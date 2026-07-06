@@ -378,6 +378,27 @@ Slide-type selection guidance: use `trueFalse` with `"heading": "COMMON MISCONCE
 
 ---
 
+## Planning practical sequences — when one practical = two lessons
+
+A multi-step or concept-heavy practical should usually NOT be forced into a single theory+practical lesson. Decide the split from the lesson sequence (no manual flag):
+
+**Default:** if the practical is short and the underlying idea is already secure, one `practical` lesson is fine.
+
+**KS3 — split into two** when the practical is multi-step and needs real concept build-up before students can just *do* it:
+- **Lesson N — build-up** (`standard` type): builds the ideas, ends by previewing the method.
+- **Lesson N+1 — the practical** (`practical` type): students walk in ready to work.
+- Naming: consecutive numbered lessons in the same macrotopic folder, e.g. `Lesson 4 - Enzymes and pH` then `Lesson 5 - Enzymes and pH practical`.
+
+**Y12/13 — demo-then-practical pattern:**
+- **Lesson N — demo lesson**: Patryk orders a demo setup and shows the technique in class.
+- **Lesson N+1 — the practical**: students run it with a **method sheet listing the CPAC skills** (Common Practical Assessment Criteria) they must hit. Always put the CPAC success criteria on the A-level method sheet.
+
+**Capstone rule (pairs with the above):** when a practical fills its whole lesson, the deep extended-writing payoff belongs in the follow-up lesson — build that follow-up (existing `revision` or `review` type) up to a genuine 6-mark extended question as the capstone, with sentence starters on the support sheet, using the class's real practical results as the data rather than generic textbook numbers.
+
+This is a planning workflow, not a renderer feature — there is no dedicated lessonType for it.
+
+---
+
 ## Review lesson specification
 
 ### Slide sequence

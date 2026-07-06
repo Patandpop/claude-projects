@@ -78,7 +78,7 @@ Cleaned 2026-07-02: only outstanding items below.
 - Docs updated: SKILL.md (three-file rule + new **Answer sheet** section), worksheet-spec.md (answer-sheet frameworks table), slide-options-v4.md (`ic.group`, 6-mark rule, Learn-C). Skill repackaged (404 KB) → upload to claude.ai.
 - STILL OPEN from 07-03 (secondary, below): Bug 54 (native flowchart shapes), Bug 55 (Learn-slide cap for review — verify current value first), Bug 57 (dead `.tiers.X.qs` shape — grep real lessons), image-description placeholder regression, subject-specific top bars, "mark the answers" activity type.
 
-**New lesson pattern — practical + theory-review two-part sequence, ending in a 6-marker with sentence starters** 🆕 DESIGN PATTERN — NEEDS PATRYK DECISION
+**New lesson pattern — practical + theory-review two-part sequence, ending in a 6-marker with sentence starters** ✅ DECIDED 2026-07-06 — documented as a planning workflow in SKILL.md ("Planning practical sequences"), no new lessonType. Patryk's splitting rule (2026-07-05): KS3 build-up lesson before multi-step practicals; Y12/13 demo lesson before, CPAC criteria on the method sheet; capstone 6-marker in the follow-up lesson using real class results.
 Observed: the amylase pH practical revision lesson (9AB) rightly spends its full length on the practical itself, so the Mastering tier tops out at a 5-mark explain question and the B4 sentence-starter machinery never gets exercised on a real 6-marker.
 
 Proposal: for practical lessons where the practical fills the lesson, pair it with a follow-up **theory-review lesson** (existing `lessonType: "revision"` or a new dedicated type) that:
