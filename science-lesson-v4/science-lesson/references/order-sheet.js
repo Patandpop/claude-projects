@@ -13,7 +13,7 @@ const tb = require('./textbook-index.js');
 
 const PLANNER_PATH  = path.join(__dirname, '../../Planner.xlsx');
 const EQUIP_KEY     = path.join(__dirname, 'equipment-key.md');
-const UPLOAD_LOG    = path.join(__dirname, '../../upload-log.txt');
+const BRIEF_LOG     = path.join(__dirname, '../../brief-log.json');
 const CONTEXT_PATH  = path.join(__dirname, '../../context.json');
 const DRIVE_BASE    = 'G:\\My Drive\\Beechen Cliff Science\\Lessons';
 
@@ -97,6 +97,35 @@ function lookupEquipment(lessonName, key) {
     if (nLesson.includes(k) || k.includes(nLesson)) return v;
   }
   return null;
+}
+
+// Human label for a sets value ("threes" → "sets of 3") for the equipment cell.
+function setsLabel(sets) {
+  const map = { threes: 'sets of 3', pairs: 'pairs', demo: 'demo (1 set)', individual: 'individual' };
+  return map[String(sets || '').toLowerCase()] || String(sets || '');
+}
+
+// Equipment cells that carry no orderable equipment — don't annotate these with sets.
+function isNonOrder(equipText) {
+  return /^(n\/a|already printed|see teacher)/i.test(String(equipText || ''));
+}
+
+// Append an entry to brief-log.json (same shape brief-log.js writes) so the
+// daily brief can see the order sheet went in this week.
+function appendBriefLog(file, message) {
+  let log = { entries: [] };
+  if (fs.existsSync(file)) {
+    try {
+      const parsed = JSON.parse(fs.readFileSync(file, 'utf8'));
+      if (parsed && Array.isArray(parsed.entries)) log = parsed;
+    } catch { /* unreadable log — start fresh rather than crash the order sheet */ }
+  }
+  log.entries.push({
+    timestamp: new Date().toISOString().slice(0, 19).replace('T', ' '),
+    category:  'deadline',
+    message,
+  });
+  fs.writeFileSync(file, JSON.stringify(log, null, 2), 'utf8');
 }
 
 // Best-guess when not in key — rules loaded from equipment-rules.json
@@ -387,7 +416,7 @@ async function main() {
       const flag = p.guessed ? ' [GUESS]' : '';
       console.log(`  P${LESSON_COLS.indexOf(slot.lessonCol)+1} ${cls.padEnd(5)} last=${p.lastLesson}`);
       console.log(`          next=${p.nextLesson}`);
-      console.log(`          equip=${p.equipment}${flag}`);
+      console.log(`          equip=${p.equipment}${isNonOrder(p.equipment) ? '' : ` [${setsLabel(p.sets)}]`}${flag}`);
       if (p.books) console.log(`          ${p.books}`);
     }
   }
@@ -455,8 +484,13 @@ async function main() {
       const p = plan[normalizeClass(cls)];
       // Strip "[next TBD]" suffix for the sheet
       const lessonForSheet = p.nextLesson.replace(/\s*\[next TBD\]/, '').replace(/\s*\[unknown\]/, 'TBD');
+      const equipBase = p.equipment || 'see teacher';
+      // Technicians need the set count on the sheet — it was computed but never written.
+      const equipCell = equipBase
+        + (isNonOrder(equipBase) ? '' : ` — ${setsLabel(p.sets)}`)
+        + (p.books ? `  ·  ${p.books}` : '');
       setCell(lessonAddr, lessonForSheet);
-      setCell(equipAddr,  (p.equipment || 'see teacher') + (p.books ? `  ·  ${p.books}` : ''));
+      setCell(equipAddr,  equipCell);
     }
   }
 
@@ -512,11 +546,15 @@ async function main() {
   zip.writeZip(PLANNER_PATH);
   console.log(`Written sheet "${newSheetName}" to Planner.xlsx`);
 
-  // ── Upload log ──
-  const logLine = `${new Date().toISOString().slice(0,10)} Week ${nextWeekType} ${fmtDate(mondayDate)}\n`;
-  fs.appendFileSync(UPLOAD_LOG, logLine, 'utf8');
-  console.log(`Appended to upload-log.txt`);
+  // ── Brief-log entry — daily-brief.js clears its Thursday order-sheet warning
+  // by finding an entry matching /order sheet/ + /submit/ in brief-log.json.
+  appendBriefLog(BRIEF_LOG, `order sheet submitted — Week ${nextWeekType} w/c ${fmtDate(mondayDate)}`);
+  console.log('Logged submission to brief-log.json');
   console.log('\nDone. Upload Planner.xlsx to Google Drive to share with technicians.');
 }
 
-main().catch(err => { console.error('ERROR:', err.message); process.exit(1); });
+if (require.main === module) {
+  main().catch(err => { console.error('ERROR:', err.message); process.exit(1); });
+} else {
+  module.exports = { appendBriefLog, setsLabel, isNonOrder, normalizeLesson, booksToOrder };
+}

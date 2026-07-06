@@ -485,6 +485,56 @@ function driveDestDir(year, subject, macrotopic, lessonNum, topic) {
   return path.join(DRIVE_ROOT, `Year ${year}`, subject, macrotopic, `Lesson ${lessonNum} - ${topic} Review`);
 }
 
+// Duplicate-folder guard: when the macrotopic was inferred (and the inference is a
+// guess), a wrong guess used to mkdir a brand-new macrotopic chain next to the real
+// one. Prefer, in order: (1) the exact review folder if it already exists anywhere
+// under Year/subject, (2) the macrotopic that already holds the preceding lesson,
+// (3) the computed path — with a loud note when it would create a new macrotopic.
+function resolveDestDir(year, subject, macrotopic, reviewLesson, topic) {
+  const primary = driveDestDir(year, subject, macrotopic, reviewLesson, topic);
+  if (fs.existsSync(primary)) return { destDir: primary, note: 'already exists — will reuse' };
+
+  const subjDir = path.join(DRIVE_ROOT, `Year ${year}`, subject);
+  const normName = s => s.toLowerCase().replace(/[–—]/g, '-').replace(/\s+/g, ' ').trim();
+  const target = normName(`Lesson ${reviewLesson} - ${topic} Review`);
+  let macros = [];
+  try {
+    macros = fs.readdirSync(subjDir, { withFileTypes: true })
+      .filter(d => d.isDirectory()).map(d => d.name);
+  } catch (_) { /* Year/subject folder missing — fall through to primary */ }
+
+  const lessonsIn = mac => {
+    try {
+      return fs.readdirSync(path.join(subjDir, mac), { withFileTypes: true })
+        .filter(d => d.isDirectory()).map(d => d.name);
+    } catch (_) { return []; }
+  };
+
+  // (1) the review folder already exists in another macrotopic — reuse it
+  for (const mac of macros) {
+    const hit = lessonsIn(mac).find(l => normName(l) === target);
+    if (hit) return { destDir: path.join(subjDir, mac, hit), note: `reusing existing folder in "${mac}"` };
+  }
+  // (2) the preceding lesson lives somewhere — the review belongs beside it
+  const prevRe = new RegExp(`^lesson\\s+${reviewLesson - 1}\\b`, 'i');
+  for (const mac of macros) {
+    if (lessonsIn(mac).some(l => prevRe.test(l))) {
+      return {
+        destDir: path.join(subjDir, mac, `Lesson ${reviewLesson} - ${topic} Review`),
+        note: `placed beside Lesson ${reviewLesson - 1} in "${mac}"`,
+      };
+    }
+  }
+  // (3) fall back to the computed path — warn if it means a brand-new macrotopic
+  const macExists = fs.existsSync(path.join(subjDir, macrotopic));
+  return {
+    destDir: primary,
+    note: macExists
+      ? 'new lesson folder in existing macrotopic'
+      : `WARNING: would CREATE a brand-new macrotopic folder "${macrotopic}" — check this is right before confirming`,
+  };
+}
+
 // ── N1: confirm prompt ────────────────────────────────────────────────────────
 function askConfirm(msg) {
   const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
@@ -538,7 +588,7 @@ async function main() {
   const macrotopic   = args.macrotopic || inferMacrotopic(args.year, args.subject, args.topic);
   const reviewLesson = args.lesson + 1;
   const topicSlug    = args.topic.replace(/\s+/g, '_');
-  const destDir      = driveDestDir(args.year, args.subject, macrotopic, reviewLesson, args.topic);
+  const { destDir, note: destNote } = resolveDestDir(args.year, args.subject, macrotopic, reviewLesson, args.topic);
 
   // Class size: context-standing.json → --classsize → default 30 (M11)
   let classSize = args.classSize;
@@ -576,6 +626,7 @@ async function main() {
   console.log(`  ${topicSlug}_test_review_worksheet.docx`);
   console.log('\nDrive folder (M8):');
   console.log('  ' + destDir);
+  console.log('  (' + destNote + ')');
 
   if (args.dryRun) {
     // N2: dry-run — print only, touch nothing

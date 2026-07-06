@@ -279,6 +279,12 @@ function main() {
   hardFails += tbTest.fails;
   warnings  += tbTest.warns;
 
+  // Supporting scripts (daily-brief / order-sheet / uploader integration).
+  console.log('');
+  const ssTest = require(path.join(__dirname, 'suite-scripts.test.js')).run();
+  hardFails += ssTest.fails;
+  warnings  += ssTest.warns;
+
   console.log('');
   if (hardFails) {
     console.log(`${RED}FAILED${RST} — ${hardFails} hard assertion(s), ${warnings} warning(s).`);

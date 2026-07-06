@@ -95,124 +95,134 @@ if (!jsonArg) {
 }
 
 // ── Load content JSON (M1) ────────────────────────────────────────────────────
-let content;
+// A content JSON is an array of 1–N lessons — every lesson uploads, not just the first.
+let lessons;
 try {
   const raw = fs.readFileSync(jsonArg, 'utf8').trim();
-  // build.js sometimes wraps the content in an array — unwrap if needed
   const parsed = JSON.parse(raw);
-  content = Array.isArray(parsed) ? parsed[0] : parsed;
+  lessons = Array.isArray(parsed) ? parsed : [parsed];
 } catch (err) {
   console.error('upload-to-drive: could not read content JSON: ' + err.message);
   process.exit(1);
 }
 
-const meta = content.meta || {};
-const { year, subject, macrotopic, lessonNumber, title } = meta;
-const missing = ['year','subject','macrotopic','lessonNumber','title'].filter(k => !meta[k]);
-if (missing.length) {
-  console.error('upload-to-drive: missing meta fields: ' + missing.join(', '));
-  process.exit(1);
-}
-
-// ── Construct destination path (M2) ──────────────────────────────────────────
-const destDir = path.join(
-  DRIVE_ROOT,
-  `Year ${year}`,
-  subject,
-  macrotopic,
-  `Lesson ${lessonNumber} - ${title}`
-);
-
-// ── Locate source files ───────────────────────────────────────────────────────
-// Bug fix: meta.outputDir takes priority over the JSON's own directory (mirrors build.js priority 1)
-const srcDir = meta.outputDir ? path.resolve(meta.outputDir) : path.dirname(path.resolve(jsonArg));
-
-// Bug fix: derive base name the same way build.js does (build.js lines 2680-2683),
-// not from the JSON filename which may differ from the output base.
-const slug = s => String(s || 'lesson').trim().replace(/[^A-Za-z0-9]+/g, '-')
-  .replace(/^-+|-+$/g, '').replace(/-{2,}/g, '-') || 'lesson';
-const split = String(meta.differentiation || 'none').toLowerCase() === 'split';
-const ability = meta.abilityLabel ? slug(meta.abilityLabel) : (split ? 'mixed_ability' : '');
-const base = slug(meta.topic || meta.title) + (ability ? '_' + ability : '');
-
-const sourceFiles = [
-  { src: base + '.pptx',                  destName: base + '_PTO.pptx' },
-  { src: base + '_worksheet.docx',        destName: base + '_PTO_worksheet.docx' },
-  { src: base + '_support_worksheet.docx',destName: base + '_PTO_support_worksheet.docx' },
-];
-
-// M5: destination folder must exist — never create it
+// M5: Drive must be mounted — checked once for the whole run
 const driveLetter = DRIVE_ROOT.slice(0, 3);
 if (!fs.existsSync(driveLetter)) {
   console.error('upload-to-drive: Google Drive not mounted at ' + driveLetter);
   process.exit(1);
 }
-// M8: dry-run — print only, touch nothing (no log written)
-if (dryRun) {
-  const folder = fs.existsSync(destDir) ? '' : ' (folder missing — copy would fail)';
-  console.log('[dry-run] Would copy to: ' + destDir + folder);
+
+const slug = s => String(s || 'lesson').trim().replace(/[^A-Za-z0-9]+/g, '-')
+  .replace(/^-+|-+$/g, '').replace(/-{2,}/g, '-') || 'lesson';
+
+// Returns true if this lesson uploaded at least one file (or would, in dry-run).
+function processLesson(content) {
+  const meta = content.meta || {};
+  const { year, subject, macrotopic, lessonNumber, title } = meta;
+  const missing = ['year','subject','macrotopic','lessonNumber','title'].filter(k => !meta[k]);
+  if (missing.length) {
+    console.error('upload-to-drive: missing meta fields: ' + missing.join(', ') + (title ? ` (lesson "${title}")` : ''));
+    return false;
+  }
+
+  // ── Construct destination path (M2) ──
+  const destDir = path.join(
+    DRIVE_ROOT,
+    `Year ${year}`,
+    subject,
+    macrotopic,
+    `Lesson ${lessonNumber} - ${title}`
+  );
+
+  // Bug fix: meta.outputDir takes priority over the JSON's own directory (mirrors build.js priority 1)
+  const srcDir = meta.outputDir ? path.resolve(meta.outputDir) : path.dirname(path.resolve(jsonArg));
+
+  // Bug fix: derive base name the same way build.js does, not from the JSON filename.
+  const split = String(meta.differentiation || 'none').toLowerCase() === 'split';
+  const ability = meta.abilityLabel ? slug(meta.abilityLabel) : (split ? 'mixed_ability' : '');
+  const base = slug(meta.topic || meta.title) + (ability ? '_' + ability : '');
+
+  // Review lessons ship an answer sheet in the support-worksheet slot.
+  const isReview = String(content.lessonType || '').toLowerCase() === 'review';
+  const sourceFiles = [
+    { src: base + '.pptx',           destName: base + '_PTO.pptx' },
+    { src: base + '_worksheet.docx', destName: base + '_PTO_worksheet.docx' },
+    isReview
+      ? { src: base + '_answers.docx',           destName: base + '_PTO_answers.docx' }
+      : { src: base + '_support_worksheet.docx', destName: base + '_PTO_support_worksheet.docx' },
+  ];
+
+  // M8: dry-run — print only, touch nothing (no log written)
+  if (dryRun) {
+    const folder = fs.existsSync(destDir) ? '' : ' (folder missing — copy would fail)';
+    console.log('[dry-run] Would copy to: ' + destDir + folder);
+    for (const f of sourceFiles) {
+      const srcPath = path.join(srcDir, f.src);
+      const exists = fs.existsSync(srcPath) ? '' : ' (source missing — would skip)';
+      console.log('  ' + f.src + ' → ' + f.destName + exists);
+    }
+    return true;
+  }
+
+  // lesson-log write — always attempted (M1), never fatal (M7).
+  function writeLessonLog(uploaded) {
+    try {
+      const records = buildLogRecords(content, { driveFolder: destDir, uploaded });
+      const total = appendLog(logPath(), records);
+      console.log(`lesson-log: ${records.length} record(s) written (${total} total) → ${logPath()}`);
+    } catch (err) {
+      console.warn('lesson-log: could not update log (build unaffected) — ' + err.message);
+    }
+  }
+
+  // M1: log the lesson even if its Drive folder doesn't exist yet — it was still built.
+  if (!fs.existsSync(destDir)) {
+    console.error('upload-to-drive: Drive folder not found (Drive is mounted but path missing):\n  ' + destDir);
+    writeLessonLog(false);
+    return false;
+  }
+
+  // M3 + M4: copy files, renaming each with _PTO before the extension
+  const logFile = path.join(__dirname, '../../upload-log.txt');
+  const copied = [];
+
   for (const f of sourceFiles) {
-    const srcPath = path.join(srcDir, f.src);
-    const exists = fs.existsSync(srcPath) ? '' : ' (source missing — would skip)';
-    console.log('  ' + f.src + ' → ' + f.destName + exists);
+    const srcPath  = path.join(srcDir, f.src);
+    const destPath = path.join(destDir, f.destName);
+
+    if (!fs.existsSync(srcPath)) {
+      console.warn('  ! source missing, skipped: ' + f.src);
+      continue;
+    }
+    try {
+      fs.copyFileSync(srcPath, destPath);
+      copied.push(f.destName);
+    } catch (err) {
+      console.error('  ! copy failed: ' + f.src + ' — ' + err.message);
+    }
   }
-  process.exit(0);
-}
 
-// lesson-log write — always attempted (M1), never fatal (M7). Called before every
-// non-dry-run exit with the real upload status.
-function writeLessonLog(uploaded) {
-  try {
-    const records = buildLogRecords(content, { driveFolder: destDir, uploaded });
-    const total = appendLog(logPath(), records);
-    console.log(`lesson-log: ${records.length} record(s) written (${total} total) → ${logPath()}`);
-  } catch (err) {
-    console.warn('lesson-log: could not update log (build unaffected) — ' + err.message);
+  // M6: confirm on success; N2: log entry
+  if (copied.length) {
+    console.log('Uploaded to: ' + destDir);
+    copied.forEach(n => console.log('  ' + n));
+
+    const logLine = [
+      new Date().toISOString().slice(0, 19).replace('T', ' '),
+      `Lesson ${lessonNumber} - ${title}`,
+      destDir,
+    ].join('\t') + '\n';
+    fs.appendFileSync(logFile, logLine, 'utf8');
   }
+
+  // M1: record the lesson in lesson-log.json regardless of copy success.
+  writeLessonLog(copied.length > 0);
+  return copied.length > 0;
 }
 
-// M1: log the lesson even if its Drive folder doesn't exist yet — it was still built.
-if (!fs.existsSync(destDir)) {
-  console.error('upload-to-drive: Drive folder not found (Drive is mounted but path missing):\n  ' + destDir);
-  writeLessonLog(false);
-  process.exit(1);
+let okCount = 0;
+for (const lesson of lessons) {
+  if (processLesson(lesson)) okCount++;
 }
-
-// M3 + M4: copy files, renaming each with _PTO before the extension
-const logFile = path.join(__dirname, '../../upload-log.txt');
-const copied = [];
-
-for (const f of sourceFiles) {
-  const srcPath  = path.join(srcDir, f.src);
-  const destPath = path.join(destDir, f.destName);
-
-  if (!fs.existsSync(srcPath)) {
-    console.warn('  ! source missing, skipped: ' + f.src);
-    continue;
-  }
-  try {
-    fs.copyFileSync(srcPath, destPath);
-    copied.push(f.destName);
-  } catch (err) {
-    console.error('  ! copy failed: ' + f.src + ' — ' + err.message);
-  }
-}
-
-// M6: confirm on success; N2: log entry
-if (copied.length) {
-  console.log('Uploaded to: ' + destDir);
-  copied.forEach(n => console.log('  ' + n));
-
-  // N2: append timestamped log entry
-  const logLine = [
-    new Date().toISOString().slice(0, 19).replace('T', ' '),
-    `Lesson ${lessonNumber} - ${title}`,
-    destDir,
-  ].join('\t') + '\n';
-  fs.appendFileSync(logFile, logLine, 'utf8');
-}
-
-// M1: record the lesson in lesson-log.json regardless of copy success.
-writeLessonLog(copied.length > 0);
-
-process.exit(copied.length > 0 ? 0 : 1);
+process.exit(okCount === lessons.length ? 0 : 1);

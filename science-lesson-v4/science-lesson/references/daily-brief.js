@@ -45,7 +45,30 @@ const PLANNER       = path.join(ROOT, 'Planner.xlsx');
 const PREVIEW  = process.argv.includes('--preview');
 const DRIVE_UP = fs.existsSync('G:\\');
 
-function loadTodayPeriods(ctx) {
+// Current classes fallback (until July 2026). Prefer context-standing.json `classes` keys.
+const CURRENT_CLASSES = ['7BYA','7MLA','8AB','8XP','9AB','10S2','12D'];
+
+// Homework OUT and IN happen on a fixed day per year group (Y12/13: every lesson).
+// Override the defaults with a `homeworkDays` map in context-standing.json, e.g. {"7":"Mon"}.
+const HW_DAY_DEFAULT = { 7: 'Mon', 8: 'Tue', 9: 'Wed', 10: 'Thu' };
+
+function classYear(cls) {
+  const m = String(cls || '').match(/^(\d+)/);
+  return m ? parseInt(m[1]) : null;
+}
+
+function computeSetHomework(cls, date, standing) {
+  const year = classYear(cls);
+  if (!year) return false;
+  if (year >= 12) return true; // A-level: homework every lesson
+  const days = Object.assign({}, HW_DAY_DEFAULT, (standing && standing.homeworkDays) || {});
+  const want = days[year];
+  if (!want) return false;
+  const dayShort = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][date.getDay()];
+  return String(want).slice(0, 3).toLowerCase() === dayShort.toLowerCase();
+}
+
+function loadTodayPeriods(ctx, standing) {
   if (!fs.existsSync(PLANNER)) return null;
   try {
     const weekType   = (ctx && ctx.weekType) || 'A';
@@ -67,19 +90,25 @@ function loadTodayPeriods(ctx) {
         return m.date === isoDate() && (!m.classes || !m.classes.length
           || m.classes.map(function(c){return c.toUpperCase();}).includes(cls));
       });
+      const dayShort = DAY_NAMES[TODAY.getDay()];
       return {
         period:      LESSON_COLS.indexOf(slot.lessonCol) + 1,
         class:       cls,
         lessonTopic: topicMatch ? topicMatch[1].trim() : lessonName,
         lessonNumber: numMatch ? parseInt(numMatch[1]) : null,
-        room:        null,
+        room:        (standing && standing.room) || null,
         isTest:      !!(ctx && ctx.tests && ctx.tests.some(function(t) { return t.class.toUpperCase() === cls && t.date === isoDate(); })),
         isRevision:  !!(ctx && ctx.revisionMode && ctx.revisionMode.some(function(r) { return r.class.toUpperCase() === cls && r.active; })),
         isAbsent:    !!(missingEn),
         isCover:     !!(missingEn && missingEn.action === 'cover'),
-        isShared:    !!(ctx && ctx.sharing && ctx.sharing.some(function(s) { return s.class.toUpperCase() === cls; })),
+        // SHARED only when the standing arrangement matches today's day (and week type if given)
+        isShared:    !!(ctx && ctx.sharing && ctx.sharing.some(function(s) {
+          return s.class.toUpperCase() === cls
+            && (!s.day || String(s.day).slice(0,3).toLowerCase() === dayShort.toLowerCase())
+            && (!s.weekType || !ctx.weekType || s.weekType === ctx.weekType);
+        })),
         isDisjointed:!!(ctx && ctx.combinedOrDisjointed && ctx.combinedOrDisjointed.some(function(c) { return c.class.toUpperCase() === cls && c.date === isoDate(); })),
-        setHomework: false,
+        setHomework: computeSetHomework(cls, TODAY, standing),
       };
     });
   } catch (e) { return null; }
@@ -144,7 +173,10 @@ function norm(s) {
 function findUploadEntry(topic, lessonNum, uploadLog) {
   if (!topic && !lessonNum) return null;
   const nt = norm(topic);
-  for (const en of uploadLog) {
+  // Most recent upload wins — the log is append-only, so walk it backwards
+  // (rebuilt lessons and shared topic prefixes otherwise link the oldest folder).
+  for (let i = uploadLog.length - 1; i >= 0; i--) {
+    const en = uploadLog[i];
     if (!en.name) continue;
     const nn = norm(en.name);
     if (lessonNum && nn === norm('Lesson ' + lessonNum + ' - ' + topic)) return en;
@@ -165,12 +197,13 @@ function folderFiles(dp) {
       pptx:    files.find(function(f) { return f.endsWith('_PTO.pptx'); }),
       ws:      files.find(function(f) { return f.endsWith('_PTO_worksheet.docx'); }),
       support: files.find(function(f) { return f.endsWith('_PTO_support_worksheet.docx'); }),
+      answers: files.find(function(f) { return f.endsWith('_PTO_answers.docx'); }),
     };
   } catch { return {}; }
 }
 
 function fileUrl(dir, name) {
-  return 'file:///' + path.join(dir, name).replace(/\\/g, '/');
+  return 'file:///' + encodeURI(path.join(dir, name).replace(/\\/g, '/'));
 }
 
 // ─── Question bank ────────────────────────────────────────────────────────────
@@ -244,6 +277,7 @@ function sec1(todayPeriods, ctx, standing, uploadLog, log) {
     const wsLinks = (dp && files.ws)
       ? '<a href="' + fileUrl(dp, files.ws) + '">Standard</a>'
         + (files.support ? ' | <a href="' + fileUrl(dp, files.support) + '">Support</a>' : '')
+        + (files.answers ? ' | <a href="' + fileUrl(dp, files.answers) + '">Answers</a>' : '')
       : miss('[NOT YET UPLOADED]');
 
     // Homework OUT (M5)
@@ -366,11 +400,14 @@ function sec3(log, ctx) {
 
 // ─── Section 4: AI-Suggested Tasks (M12–M14) ──────────────────────────────────
 
-function sec4(ctx, log, todayPeriods) {
+function sec4(ctx, log, todayPeriods, standing) {
   const d = dow();
   if (d < 1 || d > 4) return '<p><em>AI tasks only shown Mon–Thu.</em></p>';
 
-  const ALL  = ['7BYA','7MLA','8AB','8XP','9AB','10S2','10C4','11C3'];
+  // Marking rota covers KS3/4 classes only (Y12/13 accountability is section 6).
+  const fromStanding = standing && standing.classes ? Object.keys(standing.classes) : null;
+  const ALL = (fromStanding && fromStanding.length ? fromStanding : CURRENT_CLASSES)
+    .filter(function(c) { return (classYear(c) || 0) < 12; });
   const wk   = schoolWeek(ctx);
   const parts = [];
 
@@ -522,13 +559,13 @@ function main() {
   const standing  = loadJson(STANDING);
   const uploadLog = loadUploadLog();
   const log       = loadJson(BRIEF_LOG) || { entries: [] };
-  const periods   = loadTodayPeriods(ctx);
+  const periods   = loadTodayPeriods(ctx, standing);
 
   const html = buildHtml([
     section(1, "Today's Lessons",       'lessons',   sec1(periods, ctx, standing, uploadLog, log)),
     section(2, 'Tutor Time',            'tutor',     sec2(standing, log)),
     section(3, 'Urgent Today',          'urgent',    sec3(log, ctx)),
-    section(4, 'AI-Suggested Tasks',    'tasks',     sec4(ctx, log, periods)),
+    section(4, 'AI-Suggested Tasks',    'tasks',     sec4(ctx, log, periods, standing)),
     section(5, 'Upcoming Deadlines',    'deadlines', sec5(ctx, log)),
     section(6, 'Y12/13 Accountability', 'y12',       sec6()),
     section(7, 'End of Day Checklist',  'checklist', sec7(periods)),
@@ -556,4 +593,9 @@ function main() {
   console.log('Brief written to: ' + outFile);
 }
 
-main();
+if (require.main === module) {
+  main();
+} else {
+  // Test surface — pure helpers only, nothing here touches Drive or the filesystem.
+  module.exports = { computeSetHomework, classYear, findUploadEntry, norm, CURRENT_CLASSES };
+}

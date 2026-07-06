@@ -11,7 +11,8 @@ const ROOT          = path.join(__dirname, '../..');
 const CONTEXT_PATH  = path.join(ROOT, 'context.json');
 const STANDING_PATH = path.join(ROOT, 'context-standing.json');
 
-const CLASSES = ['7BYA','7MLA','8AB','8XP','9AB','10S2','10C4','11C3'];
+// Current classes (until July 2026 — new classes arrive September 2026).
+const CLASSES = ['7BYA','7MLA','8AB','8XP','9AB','10S2','12D'];
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
