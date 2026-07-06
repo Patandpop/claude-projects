@@ -18,6 +18,7 @@ description: "Creates lesson PowerPoints and worksheets for science lessons (phy
 - **MCQ = ONE slide.** Question + 4 coloured options + protocol strip + answer box at the bottom of the SAME slide. Patryk adds the entrance animation to the answer box himself in PowerPoint for the 3-2-1 reveal. Never a separate answer slide.
 - **Practical/Build slides expecting apparatus (circuits, equipment setups) MUST have an image placeholder** — steps in the left ~56%, placeholder on the right.
 - No emojis. No timers. No AO1/AO2. No "Mixed Ability" written on slides.
+- **No em dashes in any generated content** — slides, worksheets, answers, model text (Patryk's rule, 2026-07-02: "refrain from using them across everything"). Use a comma, a full stop, or a hyphen instead. Keep generated prose lean — less is more; Patryk adds the more.
 - No class name in worksheet titles.
 - Never abbreviate questions — full text on: Do Now slide, Do Now Answers (verbatim), Apply slide, Review (verbatim).
 - Min 4 Do Now questions.
@@ -589,17 +590,15 @@ Fix:
 Current: A previously working Learn slide type that had students copy down key terms and core lesson information has been replaced by a plain information box. The dedicated copy-down slide no longer generates.
 Fix: Restore the keywords/copy-down slide as a proper Learn slide type. It should be a well-formatted slide (navy/gold house style) where students copy key terms and core lesson information. It must be part of the Learn cycle — not a box inserted elsewhere, and not replaced by a plain `body` string. Re-add it as a selectable Learn variant if it was removed from the schema.
 
-**Bug 12 — Backup data table appears on worksheet instead of PowerPoint only**
-Current: When a lesson includes backup experimental data (e.g. a results table for students who did not get valid practical results), this table is being placed on the worksheet.
-Fix: Backup data tables must only appear on the PowerPoint slide. Never on the worksheet. Placing it on the worksheet allows students to copy without engaging with their own data. If the JSON includes a backup data table, it renders on the slide only.
+**Bug 12 — Backup data table appears on worksheet instead of PowerPoint only** ✓ FIXED (verified 2026-07-06, Patryk ruling: blank table only)
+Verified against a real amylase build: the worksheet carries ONLY a blank recording table (derived from `referenceData.headers` when `wx.results` is absent); no referenceData value appears anywhere in the worksheet XML. The filled MODEL DATA table renders on the PPTX only (BUILD · MODEL DATA slide). This is the ruled behaviour — never re-add a filled data table to worksheets.
 
 **Bug 13 — Keywords box on support sheet is too wide**
 Current: The keyword reference box next to the Do Now on the support worksheet stretches to the full width of the Do Now column.
 Fix: The keywords box must shrink to fit its content — sized to the width of the longest keyword entry plus padding, not the full column width. It sits to the right of the Do Now questions and should be compact.
 
-**Bug 14 — Backup data values have inconsistent/dirty sig figs**
-Current: Backup data values are generated with trailing imprecision, e.g. 4.21, 8.38, 12.61.
-Fix: Backup data values must be clean and consistent to the appropriate sig figs. Use values like 4.20, 8.40, 12.60 — round multiples that are clearly intentional. Never generate values that look like measurement noise (4.21, 8.38). This applies wherever backup data is generated in the lesson content object.
+**Bug 14 — Backup data values have inconsistent/dirty sig figs** ✓ ADDRESSED 2026-07-06 (authoring rule — values come from the content JSON, not the renderer)
+AUTHORING RULE: `referenceData` values must be clean and consistent to appropriate sig figs — round multiples that are clearly intentional (4.20, 8.40, 12.60), never measurement noise (4.21, 8.38, 12.61). Keep decimal places consistent down each column. Write this way EVERY time backup/model data is generated in a lesson content object.
 
 **Bug 15 — Keyword layout on worksheets: single merged table instead of two separate elements** ✓ FIXED 2026-06-19
 Current: Keywords appear as one table/box, mixing reference terms and write-in definitions.
@@ -638,9 +637,8 @@ Fix: `slidePractical` renders equipment as a navy/amber box in the right column,
 Current: The 4-box misconception slide layout is not working well. At minimum the "why it feels true" box should be removed.
 Status: BLOCKED — do not change the renderer blind. Open questions: (a) is a question-based format better than statement-based? (b) what does best practice say for presenting misconceptions in secondary science? Research and decide structure + trigger conditions before touching code. Note: `trueFalse` with `heading: "COMMON MISCONCEPTIONS"` is the preferred alternative for most cases (see slide-type selection guidance above) — only use `type: "misconception"` where a standalone treatment is genuinely needed.
 
-**Bug 25 — Learn-A slide: box header titles and navy ribbon too small** ⚠ STATUS UNKNOWN
-Current: Box header text and the navy section ribbon on Learn-A slides render too small.
-Fix: Minimum double the current font size on box headers. Verify `navyHeaderBox` header font size — target ≥ 16pt on the header bar (classroom projection standard is 18pt minimum). If shrinking, the box has too much content — cut content, not font.
+**Bug 25 — Learn-A slide: box header titles and navy ribbon too small** ✓ FIXED (verified in code 2026-07-06)
+`navyHeaderBox` header bar renders at fontSize 22, bold, white-on-navy — above the ≥16pt classroom floor. Body text is `autoFontSize` min 11 / max 20. If a header ever shrinks again, the box has too much content — cut content, not font.
 
 **Bug 26 — Practical images with embeddedImagePath not appearing on worksheet** ✓ FIXED (verified 2026-07-02)
 `diagramOrImage(prac)` in build.js (~line 2677) now checks `imageConfidence === 'search' && embeddedImagePath` and embeds the real image in the DOCX, falling back to the description-aware diagram box otherwise.

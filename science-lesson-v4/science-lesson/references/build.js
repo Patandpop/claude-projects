@@ -3862,6 +3862,15 @@ async function main() {
       const base = slug(L.meta.topic || L.meta.title) + (ability ? '_' + ability : '');
 
       const outDir = resolveOutputDir(L);
+      if (!fs.existsSync(outDir)) {
+        // Local dirs are safe to create; Drive lesson folders are NEVER created here
+        // (a wrong meta.outputDir would silently mint a duplicate folder chain on Drive).
+        if (/^[Gg]:[\\\/]/.test(path.resolve(outDir))) {
+          throw new Error('output dir is on Google Drive and does not exist — refusing to create it (fix meta.outputDir or create the folder yourself): ' + outDir);
+        }
+        fs.mkdirSync(outDir, { recursive: true });
+        console.warn('[build] output dir did not exist — created: ' + outDir);
+      }
       outDirsUsed.add(outDir);
 
       // 1 \u2014 PPTX (one version, for everyone)

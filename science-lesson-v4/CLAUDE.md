@@ -44,8 +44,7 @@ Driven from data already in the content object — no manual scaffolding to writ
 
 | What gets added | Trigger |
 |---|---|
-| Hint line under each Do Now question | `doNow.questions[n].hint` |
-| Write-lines under Do Now questions | always in support mode |
+| Hint line under each Do Now question | `doNow.questions[n].hint` (hints are optional and context-based — most questions have none) |
 | Word bank on Developing Apply tier | `wx.wordBank[]` or `title.keywords[]` |
 | GUESS scaffold on calculation questions | `q.qType: "calculation"` |
 | Equation + units hint above GUESS scaffold | `q.equation` + optional `q.units` |
@@ -116,4 +115,5 @@ Patryk gets NEW classes in September 2026 — he will supply the new list then; 
 - **claude.ai sandbox build.js can be STALE.** Before porting any claude.ai-session backlog/build.js change home: compare line counts; if the sandbox copy is smaller, grep home build.js before believing any "not implemented" claim; never bulk-overwrite build.js with a sandbox copy — extract specific functions by diff. Stray dated files in the project root (`backlog DD-MM-YY.md`) are the sign a claude.ai paste landed outside `references/backlog.md`.
 - **`fmt-equations.js` does NOT exist and never should.** Equation handling is `parseEq()`/`normSym`/`prettyText` inside build.js.
 - **Backlog statuses lie.** Active backlog = `science-lesson/references/backlog.md` only. Always grep build.js before re-implementing anything a backlog entry claims is missing.
-- **build.js does not mkdir its output dir** — ENOENT if the target folder doesn't exist.
+- **build.js creates missing LOCAL output dirs but refuses missing Drive dirs** (fixed 2026-07-06). A missing `meta.outputDir` on `G:\` is a hard per-lesson error by design — never "fix" it by creating Drive folders.
+- **No em dashes** in generated lesson content or in prose written for Patryk (his rule, 2026-07-02: "refrain from using them across everything").
