@@ -53,4 +53,4 @@ $size = [math]::Round((Get-Item $OUT).Length / 1KB, 1)
 Write-Host ""
 Write-Host "Packed science-lesson.skill - $date ($($size) KB)"
 Write-Host ""
-Write-Host "Next: upload science-lesson.skill to claude.ai -> Projects -> Science Lesson"
+Write-Host "Next: replace the old science-lesson.skill file in claude.ai with this one"

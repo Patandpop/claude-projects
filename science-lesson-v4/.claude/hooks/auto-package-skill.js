@@ -51,4 +51,4 @@ if (result.status !== 0) {
 }
 
 console.log('[auto-package] science-lesson.skill rebuilt.');
-console.log('[auto-package] ACTION NEEDED: upload science-lesson.skill to claude.ai → Projects → Science Lesson');
+console.log('[auto-package] ACTION NEEDED: replace the old science-lesson.skill file in claude.ai with this one');

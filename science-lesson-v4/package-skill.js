@@ -47,4 +47,4 @@ const stat = fs.statSync(OUT);
 console.log(`\nPacked science-lesson.skill — ${date}`);
 ENTRIES.forEach(e => console.log('  ' + e));
 console.log(`\nOutput: ${OUT} (${(stat.size / 1024).toFixed(1)} KB)`);
-console.log('\nNext: upload science-lesson.skill to claude.ai → Projects → Science Lesson');
+console.log('\nNext: replace the old science-lesson.skill file in claude.ai with this one');
