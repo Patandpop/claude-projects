@@ -730,6 +730,9 @@ global.
 Also fixed in passing (2026-07-05): Learn-H "While watching" marker used the banned `✎` pencil glyph
 (forces font substitution) — swapped to `☞`, the house write/instruction marker used elsewhere.
 
+**Bug 59 — guessExample slide visual quality cluster** 🆕 NEEDS DESIGN PASS (2026-07-06, from Patryk's Fraction-Demo eyeball)
+Row proportions unbalanced; G/U/E/S/S letter/label sizing inconsistent; formula triangle distorts (fixed width vs capped height) and cannot subdivide beyond 3 symbols (suppress it when components > 3, or design an n-way layout); Substitute/Solve rows render raw text with no parseEq/normSym so "div" prints instead of ÷ (that last part is a separable logic fix). The phase-3 stacked fraction on this slide is correct — do not touch it. Visual redesign requires a mock + Patryk sign-off before any renderer change.
+
 **Feature — "Mark the answers" activity** ✅ BUILT 2026-07-04
 New `markTheAnswers` Build item (slide-options-v4.md): one exam question + 3–4 realistically-flawed
 sample answers, marked against the reused mark scheme (`indicativeContent`/`levelDescriptors`/

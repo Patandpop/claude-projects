@@ -8,6 +8,17 @@ Cleaned 2026-07-02: only outstanding items below.
 
 <!-- entries appended below -->
 
+## Session log — 2026-07-06 (morning eyeball of Fraction-Demo — Patryk)
+
+**Bug 59 — guessExample slide visual quality cluster** 🆕 NEEDS DESIGN PASS (logged from Patryk's visual inspection of `Fraction-Demo.pptx`; do NOT build blind — mock and get sign-off first, per the visual workflow)
+Observed on the BUILD · WORKED EXAMPLE (GUESS) slide and the standalone formula triangle:
+1. **Row proportions off** — the weighted G/U/E/S/S rows leave the slide unbalanced ("the slide just doesn't look that good"); revisit ROW_WEIGHTS and padding.
+2. **Letter/label sizes** — the G/U/E/S/S badge and prompt text sizes don't sit well against the row heights; needs a consistent scale.
+3. **Formula triangle renders weird** — distorted/tall at some sizes; `drawFormulaTriangle` in the E row uses a fixed `triW` with height capped by the row, so aspect ratio drifts; the standalone (practiceTriangle) subdivision lines also look wrong.
+4. **Triangle doesn't subdivide beyond 3 symbols** — only top / bottomLeft / bottomRight are supported; equations with more components need either a proper n-way layout or the triangle suppressed entirely (>3 symbols → no triangle).
+5. **Substitute/Solve rows print raw text** — "div" appeared instead of ÷: the G/U/S/S content rows render `r.content` raw with no `parseEq`/`normSym` pass, so `\div`/word operators never convert. These are equation fields and must typeset like the E row does. (This part is a plain logic fix, separable from the design pass.)
+NOTE: the phase-3 stacked fraction itself (v = d over t) renders correctly on this slide — the issues are the surrounding layout, not the new fraction stack.
+
 ## Session log — 2026-07-05 (Bug 54 native flow shapes + Bug 58 image placeholder — Claude Code)
 
 **Bug 54 — native flowchart/cycle shapes** ✅ BUILT 2026-07-05 (plan-mode; mock signed off before touching build.js)
