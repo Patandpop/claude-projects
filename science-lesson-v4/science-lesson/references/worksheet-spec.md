@@ -180,7 +180,7 @@ Rules:
 | Element | Rule |
 |---|---|
 | Section dividers | Thin top rule (1pt #CCCCCC) + ALL CAPS label, bold, 10pt, #003366. Single rule only — no second rule below the label. |
-| Write lines | Support worksheet only (`scaffolded` mode). Hairline top-border rows, 0.5pt #BBBBBB, 200 twips (~0.14") tall. Never on the standard worksheet. |
+| Write lines | Support worksheet only (`developing` mode — the internal mode string for the support sheet). Hairline top-border rows, 0.5pt #BBBBBB, 200 twips (~0.14") tall. Never on the standard worksheet. |
 | Answer boxes | Both sheets. Bordered box sized by marks (1 mark → 1 line, ≤3 marks → 3 lines, >3 marks → 5 lines). |
 | Marks annotation | Right-aligned paragraph immediately after the question, size 10pt, colour #888888, format `[X marks]`. |
 | Tier badges | Narrow pill (1800 DXA), pastel background, tier colour text. Gold left border (3pt #FFD700) on the badge paragraph. |

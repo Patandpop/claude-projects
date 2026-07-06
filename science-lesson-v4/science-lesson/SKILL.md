@@ -1,6 +1,6 @@
 ---
 name: science-lesson
-description: "Creates lesson PowerPoints and worksheets for science lessons (physics, chemistry, biology). Use when asked to make a lesson, presentation, slide deck, PowerPoint, worksheet, booklet, or revision resource for any science topic or class. Always trigger for: 'make a lesson on', 'create a worksheet for', 'build slides for', 'lesson for 7BYA', 'lesson for 7MLA', 'lesson for 8AB', 'lesson for 8XP', 'lesson for 9AB', 'lesson for 10S2', 'lesson for 10C4', 'lesson for 11C3', or any science topic paired with a teaching request. Also trigger for standalone worksheet requests: 'make me a Type C exam paper for 10S2', 'revision worksheet on forces'."
+description: "Creates lesson PowerPoints and worksheets for science lessons (physics, chemistry, biology). Use when asked to make a lesson, presentation, slide deck, PowerPoint, worksheet, booklet, or revision resource for any science topic or class. Always trigger for: 'make a lesson on', 'create a worksheet for', 'build slides for', 'lesson for 7BYA', 'lesson for 7MLA', 'lesson for 8AB', 'lesson for 8XP', 'lesson for 9AB', 'lesson for 10S2', 'lesson for 12D', or any science topic paired with a teaching request. Also trigger for standalone worksheet requests: 'make me a Type C exam paper for 10S2', 'revision worksheet on forces'."
 ---
 
 # Science Lesson Skill — v2
@@ -53,7 +53,7 @@ description: "Creates lesson PowerPoints and worksheets for science lessons (phy
 - **Apply slide = separate gold-bordered box per question (Variant A), three tiers across, questions stacking down.** Each question is its own box with a `"Q1 / Q2 / Q3"` label under a full-width tier header. This is the default and what Patryk means by "multiple boxes". The single-unified-column look (all of a tier's questions crammed into one tall box) is the failure mode he dislikes — never produce it. Use Variant B (full-width Mastering row) only when one Mastering question is genuinely long (>140 chars). The naming is now consistent between SKILL.md and slide-options-v4.md — do not reintroduce a "default to C" instruction.
 - **Review MUST mirror EVERY Apply question.** The review section is the mark scheme for the Apply task: for each tier, include an answer for every Apply question in that tier (3 apply questions → 3 review Q/A pairs per tier), verbatim question text, each in its own separate box (`reviewRow`). Never collapse three Apply questions into one review answer. The review `developing`/`reaching`/`mastering` arrays must each have the same length as the matching Apply arrays.
 - **When Patryk uploads an existing resource to work from, it is a floor, not a suggestion.** Port EVERY question, every table, every scaffold, and mark every image/diagram position with a placeholder. Adapt the format to the house style — never reduce the content. If something genuinely can't fit, ask before cutting.
-- Worksheets must carry the full lesson: Do Now (with word bank/gap-fill recall for scaffolded versions), the experiment section (diagram box + results table + conclusion questions) for practical lessons, and the full Apply set. A worksheet with one question per tier is bland and wrong.
+- Worksheets must carry the full lesson: Do Now (with word bank/gap-fill recall for support versions), the experiment section (diagram box + results table + conclusion questions) for practical lessons, and the full Apply set. A worksheet with one question per tier is bland and wrong.
 
 **Box and space economy (Patryk's confirmed preferences)**
 - **Content boxes on Learn slides are NOT the default.** Use `navyHeaderBox` stacks only when a section genuinely needs a labelled header (e.g. definition box, equation box). Plain body text without a box is fine for examples, values tables, or brief notes — boxes waste vertical space and students are writing in their books not the slide.
@@ -258,11 +258,11 @@ Field names are fixed. If a slide type needs something not in the schema, check 
 | 8XP | 8 | Lower mixed | AQA | Do Now + Build; word bank on cloze | Full scaffolding |
 | 9AB | 9 | Higher | AQA | Build + Apply; no word bank | No word bank |
 | 10S2 | 10 | Higher triple | AQA | Apply; 6-marker if practical | Minimal scaffolding |
-| 10C4 | 10 | Mid | AQA | Do Now + Build + Apply | Light scaffolding |
-| 11C3 | 11 | Mixed | AQA | Build + Apply; 6-marker always | Full scaffolding |
 | 12D-Phy | 12 | A-level | OCR Physics A | Build + Apply; calculation-heavy | Minimal — equation hints only |
 
-Standard lessons emit THREE files: `.pptx` + `_worksheet.docx` + `_support_worksheet.docx`. Review lessons emit TWO files: `.pptx` + `_worksheet.docx` (the booklet). The support sheet is the same content with scaffolding added automatically across ALL tiers (word bank where tier-appropriate, GUESS scaffold on calculations, equation/units hint line, Do Now `hint` lines + keywords box, sentence starters, key-word definition table, practical design prompt checklist, explanation prompt chain). `differentiation: "split"` / `meta.abilityLabel` only set the filename label — they never change whether the support sheet is produced. Identical titles, identical layout family — never visibly "the easy sheet".
+This table expires July 2026 — Patryk gets new classes in September 2026 and will supply the new list. (10C4 and 11C3 in older files are no longer his classes.)
+
+Standard lessons emit THREE files: `.pptx` + `_worksheet.docx` + `_support_worksheet.docx`. Review lessons also emit three, but different: `.pptx` + `_worksheet.docx` (the booklet) + `_answers.docx` (model-answer sheet — takes the support-worksheet slot). The support sheet is the same content with scaffolding added automatically across ALL tiers (word bank where tier-appropriate, GUESS scaffold on calculations, equation/units hint line, Do Now `hint` lines + keywords box, sentence starters, key-word definition table, practical design prompt checklist, explanation prompt chain). `differentiation: "split"` / `meta.abilityLabel` only set the filename label — they never change whether the support sheet is produced. Identical titles, identical layout family — never visibly "the easy sheet".
 
 **Learn variant selection guide (choose the one that fits the content):**
 - A: Key info in boxes (definitions, key facts, labelled sections)
@@ -520,7 +520,7 @@ Build a single lesson object: two Learn slides (one per topic), unified Do Now d
 
 Fix these when next editing build.js or the worksheet renderer. Each item includes the exact behaviour to fix and the expected correct behaviour.
 
-**Bug 1 — Worksheet boxes stretch in Google Docs**
+**Bug 1 — Worksheet boxes stretch in Google Docs** ✓ FIXED (confirmed in code 2026-06-29, re-verified 2026-07-06: answer boxes use `HeightRule.AT_LEAST` + `blanks()` zero-spacing fix. Reopen only if stretching reappears in Google Docs.)
 Current: Answer boxes and content boxes auto-expand to fill available height when the worksheet is opened in Google Docs.
 Fix: All boxes must use fixed heights. Never auto-expanding/auto-resizing height. Set explicit pixel/point heights on every box in the DOCX renderer so they stay the same size regardless of viewing environment.
 
@@ -528,11 +528,11 @@ Fix: All boxes must use fixed heights. Never auto-expanding/auto-resizing height
 Current: The keyword reference list (key terms for the lesson) only appears on the support worksheet, not the standard worksheet.
 Fix: The keyword reference box (compact, shrink-to-fit, sitting next to the Do Now) must appear on ALL worksheets — standard and support. It is a reference tool, not a scaffolding tool.
 
-**Bug 3 — Learn workedExample slide: example box text too small**
+**Bug 3 — Learn workedExample slide: example box text too small** ✓ FIXED (confirmed in code 2026-06-29, re-verified 2026-07-06: prompt/steps/answer all `autoFontSize` min 16pt)
 Current: The text inside the example/worked steps box on Learn variant F (equation + worked example) renders too small to read from the front of a classroom.
 Fix: Increase the font size in the example box. Target minimum 16pt on the slide (classroom projector standard). This is a renderer fix in the workedExample slide function.
 
-**Bug 4 — Build workedExample answer slide: answer in wrong column**
+**Bug 4 — Build workedExample answer slide: answer in wrong column** ✓ FIXED (confirmed in code 2026-06-29, re-verified 2026-07-06: `yourTurn.answer` pre-populated in the right column of the same slide for animation reveal)
 Current: On the Build workedExample → yourTurn slide, the right-hand column (Your Turn answer) is blank. The answer only appears on a separate answer slide.
 Fix: Pre-populate the answer in the RIGHT column of the workedExample slide itself. The teacher reveals it using PowerPoint's own entrance animation (added manually by Patryk in PowerPoint after export). The answer must be present in the PPTX at build time — it is never blank. Remove any separate answer slide for workedExample if one is being generated; the reveal is via animation on the same slide.
 
