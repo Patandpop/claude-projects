@@ -306,6 +306,77 @@ function toPptxRuns(segs, opts) {
     return {text:seg.v||'', options:base()};
   });
 }
+/* renderEqShapes — Bug 33/53 phase 3 (Patryk sign-off 2026-07-06: native shape
+   pairs, NOT rendered images). Draws an equation as positioned PowerPoint shapes
+   so {a/b} fractions render as a TRUE stack: numerator over a bar over the
+   denominator, all editable text in Cambria Math. Only dedicated equation
+   surfaces call this (Learn-F equation box, guessExample E row, practiceTriangle
+   reference box) — they own their box geometry. Inline prose and small boxes
+   keep the full-size diagonal a⁄b from toPptxRuns.
+   Returns false when it drew nothing (no fraction, or the stack would not fit
+   legibly) — the caller then falls back to the existing toPptxRuns path.
+   NOTE: a fraction stack cannot be a single shape, so this is the sanctioned
+   exception to the "combine fill+text into one shape" rule. Shape names
+   eqFracNum / eqFracBar / eqFracDen are asserted by the regression harness. */
+function renderEqShapes(slide, segs, box, opts) {
+  const o = opts || {};
+  if (!arr(segs).some(sg => sg.t === 'frac')) return false;
+  const fs = o.fontSize || 24;
+  // Average glyph-width factor for Cambria Math bold at slide sizes (~0.60 em).
+  const estW = (text, size) => String(text || '').length * size * 0.60 / 72;
+
+  // num/den size: a step below the line size, but the 2-line stack must fit box.h.
+  const fracFs = Math.max(12, Math.min(Math.round(fs * 0.82), Math.floor((box.h * 72) / 3.0)));
+  const lineH = fracFs * 1.30 / 72;
+  if (lineH * 2.2 > box.h) return false; // box too shallow for a legible stack
+
+  // Walk segments into layout groups: consecutive text/sub/sup segments stay one
+  // txt() run group; each fraction becomes its own num/bar/den stack.
+  const groups = [];
+  let run = [], runW = 0;
+  const flushRun = () => { if (run.length) { groups.push({ kind: 'run', runs: run, w: runW }); run = []; runW = 0; } };
+  for (const sg of segs) {
+    if (sg.t === 'frac') {
+      flushRun();
+      const w = Math.max(estW(sg.num, fracFs), estW(sg.den, fracFs)) + 0.10;
+      groups.push({ kind: 'frac', num: sg.num, den: sg.den, w });
+    } else {
+      run.push(...toPptxRuns([sg], o));
+      const scale = (sg.t === 'sub' || sg.t === 'sup') ? 0.65 : 1;
+      const rawText = sg.t === 'radical' ? '√' + segsToPlain(sg.children) : (sg.v || '');
+      runW += estW(rawText, fs * scale);
+    }
+  }
+  flushRun();
+
+  const totalW = groups.reduce((a, g) => a + g.w, 0) + 0.04 * Math.max(0, groups.length - 1);
+  if (totalW > box.w - 0.1) return false; // equation too wide — diagonal fallback
+
+  // Container (fill/border) drawn first when the caller hands one over.
+  if (box.fill || box.line) {
+    slide.addShape('rect', { x: box.x, y: box.y, w: box.w, h: box.h, fill: box.fill, line: box.line || { type: 'none' } });
+  }
+  let cx = (o.align === 'left') ? box.x + 0.05 : box.x + (box.w - totalW) / 2;
+  const midY = box.y + box.h / 2;
+  for (const g of groups) {
+    if (g.kind === 'run') {
+      txt(slide, g.runs, { x: cx, y: box.y, w: g.w + 0.30, h: box.h, valign: 'middle', align: 'left', margin: 0 });
+    } else {
+      const common = Object.assign(
+        { fontFace: FONT_MATH, fontSize: fracFs, align: 'center', margin: 0 },
+        o.color && { color: o.color }, o.bold && { bold: true });
+      txt(slide, g.num, Object.assign({ objectName: 'eqFracNum', x: cx, y: midY - lineH - 0.005, w: g.w, h: lineH, valign: 'bottom' }, common));
+      slide.addShape('line', {
+        objectName: 'eqFracBar', x: cx + g.w * 0.08, y: midY, w: g.w * 0.84, h: 0,
+        line: { color: o.color || '1A1A2E', width: Math.max(1.25, fs / 16) },
+      });
+      txt(slide, g.den, Object.assign({ objectName: 'eqFracDen', x: cx, y: midY + 0.005, w: g.w, h: lineH, valign: 'top' }, common));
+    }
+    cx += g.w + 0.04;
+  }
+  return true;
+}
+
 // docx TextRun array — subScript/superScript are docx TextRun constructor props.
 // Fractions/radicals emit OOXML math (rendered in Cambria Math by Word default).
 function toDocxRuns(segs, opts) {
@@ -1289,17 +1360,25 @@ function slideLearn(pptx, L, item) {
       // E7/M3: two side-by-side equation boxes of equal width
       const eqW = (CW - 0.12) / 2;
       twinEqs.forEach((eq, i) => {
-        txt(s, toPptxRuns(parseEq(eq), { fontSize: 28, color: GOLD, bold: true }), {
-          x: MX + i * (eqW + 0.12), y, w: eqW, h: eqH, fill: { color: '152347' }, line: GOLD2,
-          align: 'center', valign: 'middle',
-        });
+        const eqSegs = parseEq(eq);
+        const eqX = MX + i * (eqW + 0.12);
+        // Bug 33/53 phase 3: true stacked fraction as native shapes; diagonal fallback
+        if (!renderEqShapes(s, eqSegs, { x: eqX, y, w: eqW, h: eqH, fill: { color: '152347' }, line: GOLD2 }, { fontSize: 28, color: GOLD, bold: true })) {
+          txt(s, toPptxRuns(eqSegs, { fontSize: 28, color: GOLD, bold: true }), {
+            x: eqX, y, w: eqW, h: eqH, fill: { color: '152347' }, line: GOLD2,
+            align: 'center', valign: 'middle',
+          });
+        }
       });
     } else {
-      // M4: single equation — existing behaviour unchanged
-      txt(s, toPptxRuns(parseEq(item.equation || ''), {fontSize:28, color:GOLD, bold:true}), {
-        x: MX, y, w: CW, h: eqH, fill: { color: '152347' }, line: GOLD2,
-        align: 'center', valign: 'middle',
-      });
+      // M4: single equation — Bug 33/53 phase 3: stacked fraction, diagonal fallback
+      const eqSegs = parseEq(item.equation || '');
+      if (!renderEqShapes(s, eqSegs, { x: MX, y, w: CW, h: eqH, fill: { color: '152347' }, line: GOLD2 }, { fontSize: 28, color: GOLD, bold: true })) {
+        txt(s, toPptxRuns(eqSegs, {fontSize:28, color:GOLD, bold:true}), {
+          x: MX, y, w: CW, h: eqH, fill: { color: '152347' }, line: GOLD2,
+          align: 'center', valign: 'middle',
+        });
+      }
     }
     y += eqH + GAP;
     const comps = arr(item.components);
@@ -2215,9 +2294,12 @@ function slideGuessExample(pptx, L, item) {
     if (i > 0) s.addShape('line', { x: rightX, y: ry, w: rightW, h: 0, line: { color: GOLD, width: 1 } });
     if (i === 2) {
       // equation row: text + vector formula triangle — bigger triangle, more padding around it
-      const eqRuns = toPptxRuns(parseEq(item.equation || ''), { fontSize: 20, color: GOLD, bold: true });
+      const eqSegs = parseEq(item.equation || '');
       const triW = 1.4, triPad = 0.2;
-      txt(s, eqRuns, { x: rightX + 0.2, y: ry, w: rightW - triW - triPad - 0.2, h: rowH, color: GOLD, valign: 'middle', margin: 0 });
+      // Bug 33/53 phase 3: stacked fraction in the E row when it fits; diagonal fallback
+      if (!renderEqShapes(s, eqSegs, { x: rightX + 0.2, y: ry + 0.06, w: rightW - triW - triPad - 0.2, h: rowH - 0.12 }, { fontSize: 20, color: GOLD, bold: true, align: 'left' })) {
+        txt(s, toPptxRuns(eqSegs, { fontSize: 20, color: GOLD, bold: true }), { x: rightX + 0.2, y: ry, w: rightW - triW - triPad - 0.2, h: rowH, color: GOLD, valign: 'middle', margin: 0 });
+      }
       const triH = Math.min(1.35, rowH - 0.2);
       drawFormulaTriangle(s, rightX + rightW - triW - triPad, ry + (rowH - triH) / 2, triW, triH, item.equationSymbols || {});
     } else if (isLast) {
@@ -2268,8 +2350,11 @@ function slidePracticeTriangle(pptx, L, item) {
   const eqY = y + 0.35 + GAP;
   const eqH = Math.min(1.1, availH * 0.22);
   s.addShape('rect', { x: rightX, y: eqY, w: rightW, h: eqH, fill: { color: 'FFFFFF' }, line: GOLD2 });
-  const eqRuns = toPptxRuns(parseEq(item.equation || ''), { fontSize: 22, color: NAVY, bold: true });
-  txt(s, eqRuns, { x: rightX + 0.1, y: eqY, w: rightW - 0.2, h: eqH, valign: 'middle', align: 'center', margin: 0 });
+  // Bug 33/53 phase 3: stacked fraction in the reference box when it fits; diagonal fallback
+  const ptEqSegs = parseEq(item.equation || '');
+  if (!renderEqShapes(s, ptEqSegs, { x: rightX + 0.1, y: eqY, w: rightW - 0.2, h: eqH }, { fontSize: 22, color: NAVY, bold: true })) {
+    txt(s, toPptxRuns(ptEqSegs, { fontSize: 22, color: NAVY, bold: true }), { x: rightX + 0.1, y: eqY, w: rightW - 0.2, h: eqH, valign: 'middle', align: 'center', margin: 0 });
+  }
   const triAvailH = availH - 0.35 - GAP - eqH - GAP;
   const triY = eqY + eqH + GAP;
   const triSize = Math.min(rightW - 0.3, triAvailH);

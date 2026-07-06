@@ -257,6 +257,13 @@ function main() {
         // Bug 58: the generic placeholder must NOT appear (H + J author descriptions).
         if (xml.includes('add imageDescription to JSON')) fail('generic image placeholder present — Bug 58 regressed (H/J dropped imageDescription)');
         else pass('image slides carry authored descriptions (no generic placeholder)');
+        // Bug 33/53 phase 3: the Learn-F {d/t} renders as a NATIVE stacked fraction
+        // (named num/bar/den shapes), and therefore no diagonal ⁄ fallback in this deck.
+        if (xml.includes('eqFracNum') && xml.includes('eqFracBar') && xml.includes('eqFracDen'))
+          pass('stacked fraction shapes present (eqFracNum/Bar/Den)');
+        else fail('Learn-F fraction did not render as native stacked shapes — phase 3 regressed');
+        if (!xml.includes('⁄')) pass('no diagonal ⁄ fallback in the fraction deck');
+        else fail('diagonal ⁄ present — the stacked path fell back unexpectedly');
       }
     }
   }

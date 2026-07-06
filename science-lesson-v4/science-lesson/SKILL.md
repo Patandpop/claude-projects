@@ -663,6 +663,13 @@ the MATH MINI-SYNTAX above — there is NO `fmt-equations.js` file. What was fix
   emit OOXML math (`m:f`/`m:rad`), which Word renders in Cambria Math by default.
 - **Fractions**: PPTX diagonal `a⁄b` now full-size (was tiny — sub+sup compounded a 0.65 shrink). Word
   keeps a true stacked bar.
+- **PHASE 3 SHIPPED 2026-07-06 — true stacked fractions in PPTX** (`renderEqShapes`): on dedicated
+  equation surfaces (Learn-F equation box incl. twins, guessExample E row, practiceTriangle reference
+  box) a `{a/b}` fraction renders as a NATIVE stack — numerator over a real bar over the denominator,
+  editable Cambria Math shapes (named `eqFracNum`/`eqFracBar`/`eqFracDen`, harness-asserted). Falls
+  back to the full-size diagonal automatically when there is no fraction, the box is too shallow, or
+  the equation is too wide. Inline prose sinks and small boxes (e.g. rearrangement chips) keep the
+  diagonal by design.
 - **Radicals**: `sqrt(x)` → `√x` glyph in PPTX; true radical with vinculum in Word.
 - **Prose sinks** that bypassed parseEq (review-lesson worked examples: `reviewRow`, indicative
   content, handwritten model answers, `workedExample` prompts/answer) now run `prettyText` =

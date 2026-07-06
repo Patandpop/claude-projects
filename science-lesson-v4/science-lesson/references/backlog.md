@@ -90,7 +90,7 @@ Status: not implemented — needs a decision on whether this becomes a documente
 
 ---
 
-**Equation rendering — diagonal-fraction hack renders too small next to other equation text** 🆕 REINFORCES existing Bug 33/53 (equation rendering overhaul, MAJOR)
+**Equation rendering — diagonal-fraction hack renders too small next to other equation text** ✅ RESOLVED 2026-07-06 (Bug 33/53 phase 3 shipped: native stacked shape-pair fractions via `renderEqShapes` on Learn-F / guessExample / practiceTriangle; diagonal stays only as the automatic small-box/inline fallback. Demo deck `Fraction-Demo.pptx` in project root for the morning eyeball.)
 Found: eclipse lesson Learn-F equation slide. The `{d/t}` visual-fraction hack compounds PowerPoint's own super/subscript shrink with the renderer's `subFs = fontSize * 0.65`, so the fraction reads tiny next to full-size text.
 
 Interim workaround (adopted): write equations needing a fraction as `d ÷ t` (division symbol, plain text) wherever the containing box isn't large enough — used in `guessExample` and Learn-F this session, now also noted in the guessExample docs.
