@@ -733,6 +733,9 @@ Also fixed in passing (2026-07-05): Learn-H "While watching" marker used the ban
 **Bug 59 — guessExample slide visual quality cluster** 🆕 NEEDS DESIGN PASS (2026-07-06, from Patryk's Fraction-Demo eyeball)
 Row proportions unbalanced; G/U/E/S/S letter/label sizing inconsistent; formula triangle distorts (fixed width vs capped height) and cannot subdivide beyond 3 symbols (suppress it when components > 3, or design an n-way layout); Substitute/Solve rows render raw text with no parseEq/normSym so "div" prints instead of ÷ (that last part is a separable logic fix). The phase-3 stacked fraction on this slide is correct — do not touch it. Visual redesign requires a mock + Patryk sign-off before any renderer change.
 
+**Bug 60 — practiceTriangle: answers on the slide, navy/gold box under each question** 🆕 (2026-07-06)
+Answers currently go to speaker notes only and there is no answer slide. Wanted: one separate answer box under each question card, navy fill + gold styling (house answer style), present at build time on the SAME slide — Patryk adds the reveal animation himself in PowerPoint (same convention as the MCQ answer box). Not built yet.
+
 **Feature — "Mark the answers" activity** ✅ BUILT 2026-07-04
 New `markTheAnswers` Build item (slide-options-v4.md): one exam question + 3–4 realistically-flawed
 sample answers, marked against the reused mark scheme (`indicativeContent`/`levelDescriptors`/
