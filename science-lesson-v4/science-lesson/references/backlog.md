@@ -174,5 +174,10 @@ Model answers (incl. the new answer sheet) should integrate: GUESS scaffold for 
 
 ---
 
+**Feature — bigFact slide type (U6)** 🆕 (rescued 2026-07-06 from an old memory file before archiving it — never built)
+High-impact single-concept Build slide: one huge number/fact (e.g. "37 °C") filling a navy slide, gold ~72pt Trebuchet, optional unit + one context line, before a practical or at a key teaching moment (Duarte sparkline engagement peak). Schema idea: `{ "type": "bigFact", "fact": "37", "unit": "°C", "context": "The optimum temperature for amylase" }`. Display-only, no worksheet output. Small renderer job when wanted.
+
+---
+
 **Feature — Subject-specific top bar images** 🆕 NEEDS SCOPE DECISION
 Currently one fixed Physics top bar reused for every lesson. Want: Chemistry top bar (idea: graphene / fullerene structure) and Biology top bar (idea: serotonin molecule or similar — not decided). Scope TBD: subject detection/specification per lesson + image storage location.
