@@ -185,6 +185,20 @@ const _GREEK = _SYM; // back-compat alias — anything that referenced _GREEK st
    sqrt) is NOT touched here — that is parseEq's job. Unknown text passes through. */
 function normSym(str) {
   let s = String(str == null ? '' : str);
+  // Bug 61: JSON authored with a SINGLE backslash ("\rho") arrives mangled — JSON.parse
+  // turns \r into a carriage return, so the renderer sees CR+"ho" and the symbol is lost.
+  // Repair: a control char whose escape letter + the following letters spell EXACTLY a
+  // known symbol name is restored (the author meant a backslash command). Exact match
+  // only — legitimate newlines/tabs followed by ordinary words are never touched.
+  const _CTRL = { '\r': 'r', '\n': 'n', '\t': 't', '\b': 'b', '\f': 'f' };
+  s = s.replace(/[\r\n\t\b\f]([A-Za-z]+)/g, (m, rest) => {
+    const name = _CTRL[m[0]] + rest;
+    if (_SYM[name]) {
+      console.warn(`[eq] repaired mangled \\${name} — author it as "\\\\${name}" (double backslash) in JSON`);
+      return _SYM[name];
+    }
+    return m;
+  });
   s = s.replace(/\\([A-Za-z]+)/g, (_, g) => _SYM[g] || `\\${g}`);
   // Compound units first (longest match wins), then operators, then bare units.
   s = s
@@ -1403,7 +1417,7 @@ function slideLearn(pptx, L, item) {
         goldBox(s, cx, cy, thisW, compH, [
           ...symRuns,
           { text: String(c.name || ''), options: { fontSize: 17, color: 'FFFFFF', breakLine: true } },
-          { text: String(c.unit || ''), options: { fontSize: 15, italic: true, color: 'AABBD0' } },
+          { text: prettyText(String(c.unit || '')), options: { fontSize: 15, italic: true, color: 'AABBD0' } }, // Bug 61: m/s^2 → m/s²
         ], { fill: '152347', valign: 'middle', align: 'center' });
       });
       y += rows * compH + (rows - 1) * 0.12 + GAP;
