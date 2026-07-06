@@ -3,7 +3,9 @@
 
 **Division of labour:** Claude Code (home, this repo) = edits only. claude.ai (school) = run only — SKILL.md is read-only there, never modified in a school session. Use Plan Mode before any session that touches `build.js`.
 
-Patryk cannot read code — explain every change in plain English (what changed and why), never in diff-speak.
+Patryk cannot read code — explain every change in plain English (what changed and why), never in diff-speak. Session-end summaries and next-session prompts must also be plain teacher-facing language: break plans into phases, no jargon, no code identifiers without a one-line explanation.
+
+**Cost + safety rules:** prefer local execution; if a change would introduce a paid API call, flag it to Patryk BEFORE building it. Scripts may only CREATE or COPY files on Drive in their sanctioned locations (uploader → existing lesson folders; test-review → its one folder; brief → Daily Brief folder) — never delete, move, or rename anything on Drive, and log every Drive write.
 
 ---
 
