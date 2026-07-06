@@ -1,0 +1,20 @@
+node_modules/
+
+# Build outputs
+*.pptx
+*.docx
+*.pdf
+*.xlsx
+*.zip
+
+# Drive sidecar files
+*.path.txt
+upload-log.txt
+brief-log.json
+
+# Temp / misc
+null
+assets/
+_core_text.txt
+_extend_text.txt
+*.skill

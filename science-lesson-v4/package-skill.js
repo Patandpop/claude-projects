@@ -3,7 +3,7 @@
 // Run: node package-skill.js
 // Output: science-lesson.skill in this directory
 
-const { execSync } = require('child_process');
+const AdmZip = require('adm-zip');
 const path = require('path');
 const fs = require('fs');
 
@@ -11,13 +11,21 @@ const ROOT = __dirname;
 const SKILL_DIR = path.join(ROOT, 'science-lesson');
 const OUT = path.join(ROOT, 'science-lesson.skill');
 
+// Keep in sync with package-skill.ps1 (the canonical packer) — same ENTRIES list.
 const ENTRIES = [
   'SKILL.md',
   'references/build.js',
+  'references/graph_gen.py',
+  'references/textbook-index.js',
+  'references/textbook-index.md',
   'references/slide-options-v4.md',
   'references/worksheet-spec.md',
   'references/engage-library.md',
   'references/starfield_header_FINAL.png',
+  'references/backlog.md',
+  'references/lesson-backlog-SKILL.md',
+  'references/Caveat-Regular.ttf',
+  'references/Caveat-Bold.ttf',
 ];
 
 // Verify all source files exist before touching the output
@@ -28,32 +36,11 @@ if (missing.length) {
   process.exit(1);
 }
 
-// Delete old .skill file so ZipFile::Open('Create') starts fresh
-if (fs.existsSync(OUT)) fs.unlinkSync(OUT);
-
-// Build a PowerShell one-liner that creates the ZIP with correct entry names
-const outEsc = OUT.replace(/\\/g, '\\\\');
-const skillDirEsc = SKILL_DIR.replace(/\\/g, '\\\\');
-
-const entryLines = ENTRIES.map(e => {
-  const src = path.join(SKILL_DIR, e).replace(/\\/g, '\\\\');
-  const dest = e.replace(/\\/g, '/');
-  return `[System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile($zip, '${src}', '${dest}', [System.IO.Compression.CompressionLevel]::Optimal)`;
-}).join('; ');
-
-const ps = [
-  `Add-Type -AssemblyName System.IO.Compression.FileSystem`,
-  `$zip = [System.IO.Compression.ZipFile]::Open('${outEsc}', 'Create')`,
-  entryLines,
-  `$zip.Dispose()`,
-].join('; ');
-
-try {
-  execSync(`powershell -NoProfile -Command "${ps}"`, { stdio: 'inherit' });
-} catch (err) {
-  console.error('Failed to create skill file:', err.message);
-  process.exit(1);
+const zip = new AdmZip();
+for (const e of ENTRIES) {
+  zip.addLocalFile(path.join(SKILL_DIR, e), path.dirname(e) === '.' ? '' : path.dirname(e));
 }
+zip.writeZip(OUT);
 
 const date = new Date().toISOString().slice(0, 10);
 const stat = fs.statSync(OUT);

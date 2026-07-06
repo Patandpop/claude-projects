@@ -1,0 +1,49 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(**)",
+      "Glob(**)",
+      "Grep(**)",
+      "Bash(git status)",
+      "Bash(git log*)",
+      "Bash(git diff*)"
+    ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"c:/Users/magda/claude-projects/science-lesson-v4/.claude/hooks/session-start.js\""
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"c:/Users/magda/claude-projects/science-lesson-v4/.claude/hooks/test-on-renderer-edit.js\"",
+            "timeout": 120,
+            "statusMessage": "Running regression harness..."
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"c:/Users/magda/claude-projects/science-lesson-v4/.claude/hooks/auto-package-skill.js\""
+          }
+        ]
+      }
+    ]
+  }
+}

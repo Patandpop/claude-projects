@@ -1,0 +1,8 @@
+[
+  { "match": "\\btest\\b(?:\\s|$)", "exclude": "graph|prac", "equipment": "already printed — confirm with Patryk", "sets": "threes" },
+  { "match": "revision|review",    "equipment": "N/A",                                       "sets": "threes" },
+  { "match": "trip|pshe|cover",    "equipment": "N/A",                                       "sets": "threes" },
+  { "match": "\\bdemo\\b",         "equipment": "DEMO — see teacher",                        "sets": "demo"   },
+  { "match": "prac|practical|\\brp\\b", "equipment": "see teacher — practical equipment needed", "sets": "threes" },
+  { "match": "graph",              "equipment": "graph paper, ruler, pencil",                "sets": "threes" }
+]

@@ -11,10 +11,17 @@ $OUT       = Join-Path $ROOT "science-lesson.skill"
 $ENTRIES = @(
     "SKILL.md",
     "references/build.js",
+    "references/graph_gen.py",
+    "references/textbook-index.js",
+    "references/textbook-index.md",
     "references/slide-options-v4.md",
     "references/worksheet-spec.md",
     "references/engage-library.md",
-    "references/starfield_header_FINAL.png"
+    "references/starfield_header_FINAL.png",
+    "references/backlog.md",
+    "references/lesson-backlog-SKILL.md",
+    "references/Caveat-Regular.ttf",
+    "references/Caveat-Bold.ttf"
 )
 
 # Verify all source files exist

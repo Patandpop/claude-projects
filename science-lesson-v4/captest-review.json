@@ -1,0 +1,64 @@
+{
+  "meta": {
+    "class": "11C3",
+    "topic": "CAP TEST Review — overflow",
+    "title": "CAP TEST Review — deliberately over every count",
+    "lessonType": "review",
+    "worksheet": "A",
+    "subject": "Physics",
+    "objective": "Stress-test the Learn/Build/Apply counts on a review lesson (Bug 55 uncap)"
+  },
+  "title": { "keywords": ["force", "acceleration", "momentum", "energy"] },
+  "doNow": {
+    "questions": [
+      { "q": "DO NOW Q1 — state Newton's second law as an equation.", "a": "F = m a.", "marks": 1 },
+      { "q": "DO NOW Q2 — give the unit of momentum.", "a": "kg m/s.", "marks": 1 }
+    ]
+  },
+  "learn": [
+    { "variant": "A", "heading": "LEARN 1 — Forces (should render — review is uncapped)", "body": "Resultant force changes motion.\nBalanced forces = constant velocity." },
+    { "variant": "A", "heading": "LEARN 2 — F = ma", "body": "Force = mass x acceleration.\nMore force, more acceleration." },
+    { "variant": "A", "heading": "LEARN 3 — Momentum", "body": "p = m v.\nConserved in collisions." },
+    { "variant": "A", "heading": "LEARN 4 — Work and energy", "body": "Work = force x distance.\nEnergy is conserved." },
+    { "variant": "A", "heading": "LEARN 5 — Stopping distance (past the old 4-cap — should STILL render in review)", "body": "Thinking distance + braking distance.\nBoth increase with speed." },
+    { "variant": "A", "heading": "LEARN 6 — Terminal velocity (past the old 4-cap — should STILL render in review)", "body": "Weight = drag.\nResultant force zero, constant velocity." }
+  ],
+  "build": [
+    { "type": "markTheAnswers", "questionNumber": "3", "marks": 6, "question": "BUILD MARK-THE-ANSWERS — Explain, using Newton's laws, why a passenger lurches forward when a car brakes sharply.",
+      "instruction": "Mark each answer against the mark scheme. Give a level and a mark out of 6.",
+      "levelDescriptors": [ { "level": "Level 3", "range": "5-6", "desc": "Links inertia / Newton's first law to the passenger continuing forward and the seatbelt force." }, { "level": "Level 2", "range": "3-4", "desc": "Some linked points; incomplete." }, { "level": "Level 1", "range": "1-2", "desc": "Simple statements, no links." } ],
+      "indicativeContent": [ { "text": "The passenger has inertia / tends to stay in motion (Newton's first law).", "group": "first law" }, { "text": "The car decelerates but the passenger keeps moving at the original speed.", "group": "first law" }, { "text": "So the passenger moves forward relative to the car.", "group": "effect" }, { "text": "A seatbelt provides the backward force to decelerate the passenger.", "group": "effect" } ],
+      "doesNotAward": [ "The brakes push the passenger forward.", "There is a forward force on the passenger from the car." ],
+      "samples": [
+        { "label": "Student A", "text": "When the car brakes it pushes you forward because of the force from the brakes going into your body.", "jitterProfile": 1, "awardedLevel": "Level 1", "awardedMarks": 1, "hits": ["describes the forward lurch"], "misses": ["invents a forward force", "no inertia / first law"], "comment": "Misconception: there is no forward force on the passenger." },
+        { "label": "Student B", "text": "The passenger has inertia so by Newton's first law they keep moving forward at the same speed while the car slows down, so they move forward until the seatbelt provides a backward force.", "jitterProfile": 3, "awardedLevel": "Level 3", "awardedMarks": 6, "hits": ["inertia / first law", "car slows, passenger continues", "seatbelt backward force"], "misses": [], "comment": "Clear, fully linked answer." },
+        { "label": "Student C", "text": "They go forward because the car stops suddenly.", "jitterProfile": 2, "awardedLevel": "Level 1", "awardedMarks": 1, "hits": ["links to the car stopping"], "misses": ["no inertia", "no mechanism"], "comment": "States outcome, no physics reason." }
+      ] },
+    { "type": "modelAnswerReview", "questionNumber": "4", "marks": 3, "qType": "calculation",
+      "modelAnswer": ["p = m v", "p = 1200 x 15", "p = 18000 kg m/s"],
+      "jitterProfile": 2,
+      "indicativeContent": [ { "text": "Correct equation p = m v.", "group": "substitution" }, { "text": "Correct substitution 1200 x 15.", "group": "substitution" }, { "text": "Answer 18000 kg m/s with unit.", "group": "answer" } ],
+      "doesNotAward": [ "Answer with no unit." ] },
+    { "type": "sort", "instruction": "BUILD SORT (extra Build item — should render in review) — sort each quantity as scalar or vector.", "items": ["Force", "Speed", "Velocity", "Energy", "Momentum"], "categories": { "A": "Scalar", "B": "Vector" }, "sorted": { "A": ["Speed", "Energy"], "B": ["Force", "Velocity", "Momentum"] } }
+  ],
+  "apply": {
+    "developing": [
+      { "q": "APPLY DEV 1 — state the equation for weight.", "a": "W = m g.", "marks": 1 },
+      { "q": "APPLY DEV 2 — give the unit of force.", "a": "Newton (N).", "marks": 1 }
+    ],
+    "reaching": [
+      { "q": "APPLY REA 1 — a 2 kg mass accelerates at 3 m/s^2. Calculate the resultant force.", "qType": "calculation", "marks": 3, "given": "m = 2 kg, a = 3 m/s^2", "unknown": "resultant force", "equation": "F = m a", "substitute": "F = 2 x 3", "solve": "6 N", "a": "6 N" }
+    ],
+    "mastering": [
+      { "q": "APPLY MAS 1 — Explain, in terms of momentum, how a crumple zone reduces the force on occupants in a crash.", "qType": "extended", "contentType": "extended_writing", "marks": 6,
+        "levelDescriptors": [ { "level": "Level 3", "range": "5-6", "desc": "Links change in momentum, longer time, smaller force via F = change in p / t." }, { "level": "Level 2", "range": "3-4", "desc": "Some linked points; incomplete." }, { "level": "Level 1", "range": "1-2", "desc": "Simple statements." } ],
+        "indicativeContent": [ { "text": "The change in momentum in the crash is fixed.", "group": "momentum" }, { "text": "The crumple zone increases the time of the collision.", "group": "time" }, { "text": "Force = change in momentum / time.", "group": "force" }, { "text": "A longer time gives a smaller force.", "group": "force" }, { "text": "So the force on the occupants is reduced.", "group": "force" }, { "text": "Reducing the force reduces injury.", "group": "force" } ],
+        "doesNotAward": [ "The crumple zone absorbs the momentum.", "The crumple zone stops the force." ] }
+    ]
+  },
+  "review": {
+    "developing": [ { "q": "REVIEW DEV — state Newton's first law.", "a": "An object stays at rest or constant velocity unless a resultant force acts." } ],
+    "reaching": [ { "q": "REVIEW REA — a 2 kg mass accelerates at 3 m/s^2; find the force.", "a": "6 N (F = m a = 2 x 3)." } ],
+    "mastering": [ { "q": "REVIEW MAS — explain how a crumple zone reduces force using momentum.", "a": "Longer collision time for the same change in momentum means a smaller force (F = change in p / t)." } ]
+  }
+}

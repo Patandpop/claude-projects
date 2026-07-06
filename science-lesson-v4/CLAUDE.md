@@ -44,7 +44,6 @@ Driven from data already in the content object — no manual scaffolding to writ
 
 | What gets added | Trigger |
 |---|---|
-| KEY WORDS definition table | `wx.definitions[]` or `title.keywords[]` |
 | Hint line under each Do Now question | `doNow.questions[n].hint` |
 | Write-lines under Do Now questions | always in support mode |
 | Word bank on Developing Apply tier | `wx.wordBank[]` or `title.keywords[]` |
@@ -76,7 +75,7 @@ At the end of any session where SKILL.md, build.js, slide-options-v4.md, or work
 2. Upload `science-lesson.skill` to claude.ai (Projects → Science Lesson) so the school version matches
 3. This is a standing requirement — never skip it
 
-Files included in the skill package: SKILL.md, references/build.js, references/slide-options-v4.md, references/worksheet-spec.md, references/engage-library.md, references/starfield_header_FINAL.png
+Files included in the skill package (canonical list = `$ENTRIES` in package-skill.ps1): SKILL.md, references/build.js, references/graph_gen.py, references/textbook-index.js, references/textbook-index.md, references/slide-options-v4.md, references/worksheet-spec.md, references/engage-library.md, references/starfield_header_FINAL.png, references/backlog.md, references/lesson-backlog-SKILL.md, references/Caveat-Regular.ttf, references/Caveat-Bold.ttf
 
 ---
 

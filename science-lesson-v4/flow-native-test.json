@@ -1,0 +1,120 @@
+{
+  "meta": {
+    "topic": "Flow Native Test",
+    "title": "Native Flowchart & Cycle Rendering",
+    "class": "9AB",
+    "yearLine": "Year 9  ·  Biology  ·  Regression fixture",
+    "theme": "Biology",
+    "type": "revision",
+    "lessonType": "revision",
+    "year": 9,
+    "subject": "Biology",
+    "macrotopic": "Regression",
+    "lessonNumber": 99
+  },
+  "title": {
+    "objectives": [
+      "Render flow / sequence Learn slides as native, editable PPTX shapes",
+      "Render flowchart nodes with real arrow shapes, not text glyphs",
+      "Prove image-description placeholders carry their suggested-search text"
+    ],
+    "keywords": ["flowchart", "cycle", "sequence", "native shapes"]
+  },
+  "doNow": {
+    "variant": "A",
+    "questions": [
+      { "q": "What is a flowchart used to show?", "a": "A process, sequence or cycle of steps in order.", "marks": 1 },
+      { "q": "Name one biological cycle.", "a": "Nitrogen cycle / carbon cycle / water cycle.", "marks": 1 }
+    ]
+  },
+  "learn": [
+    {
+      "variant": "G",
+      "heading": "How Coronary Heart Disease Develops",
+      "steps": [
+        { "label": "Fatty deposits", "note": "Cholesterol and other fatty substances build up slowly inside the walls of the coronary arteries over many years." },
+        { "label": "Artery narrows", "note": "The build-up forms a hard plaque that makes the lumen of the artery narrower, so less blood can flow through it." },
+        { "label": "Reduced blood flow", "note": "The narrowed artery delivers less oxygenated blood to the heart muscle, especially during exercise when demand is high." },
+        { "label": "Chest pain (angina)", "note": "The oxygen-starved heart muscle causes a tight, painful, crushing feeling in the chest known as angina." },
+        { "label": "Clot forms", "note": "A plaque can rupture and trigger a blood clot that suddenly blocks the artery completely." },
+        { "label": "Heart attack", "note": "With no blood supply, part of the heart muscle dies — this is a myocardial infarction, or heart attack." }
+      ]
+    },
+    {
+      "variant": "FLOW",
+      "heading": "Photosynthesis to Respiration",
+      "steps": [
+        { "label": "Light absorbed", "note": "Chlorophyll in the chloroplasts absorbs light energy from the Sun to power the reaction." },
+        { "label": "Glucose made", "note": "Carbon dioxide and water are combined into glucose, storing the light energy as chemical energy." },
+        { "label": "Energy released", "note": "Respiration in the mitochondria breaks glucose back down to release usable energy for the cell." }
+      ]
+    },
+    {
+      "variant": "I",
+      "heading": "The Nitrogen Cycle",
+      "orientation": "vertical",
+      "cycle": true,
+      "nodes": [
+        { "label": "Nitrogen gas", "note": "Unreactive N2 in the atmosphere" },
+        { "label": "Nitrates in soil", "note": "Fixed by bacteria and lightning" },
+        { "label": "Plant proteins", "note": "Absorbed and built into amino acids" },
+        { "label": "Decay", "note": "Decomposers return nitrogen to the soil" }
+      ]
+    },
+    {
+      "variant": "H",
+      "heading": "The Heart in Action",
+      "videoLink": { "text": "Watch: the cardiac cycle (2 min)", "url": "https://example.org/cardiac-cycle" },
+      "toWatch": [
+        "Which chamber pumps blood to the lungs?",
+        "What do the valves stop from happening?"
+      ],
+      "prompt": "How does the structure of the left ventricle match its job?",
+      "imageDescription": "labelled cross-section diagram of the human heart showing four chambers, valves and major blood vessels",
+      "questions": [
+        { "q": "Which side of the heart pumps oxygenated blood?", "a": "The left side (left ventricle)." },
+        { "q": "Why is the left ventricle wall thicker?", "a": "It must generate higher pressure to pump blood around the whole body." }
+      ]
+    },
+    {
+      "variant": "J",
+      "heading": "Enzyme Rate vs Temperature",
+      "axes": { "x": "Temperature (°C)", "y": "Rate of reaction" },
+      "imageDescription": "line graph of enzyme reaction rate against temperature peaking at 37 degrees then falling sharply as the enzyme denatures",
+      "features": [
+        { "label": "Optimum", "description": "Rate is highest at about 37 °C for human enzymes." },
+        { "label": "Denaturing", "description": "Above the optimum the active site changes shape and rate falls fast." }
+      ]
+    }
+  ],
+  "whiteboard": {
+    "rounds": [
+      { "q": "Where does the fatty build-up happen in CHD?", "a": "Inside the coronary artery walls." },
+      { "q": "What gas do plants take in for photosynthesis?", "a": "Carbon dioxide." }
+    ]
+  },
+  "apply": {
+    "variant": "A",
+    "developing": [
+      { "q": "Name the first stage in the development of coronary heart disease.", "a": "Fatty deposits build up in the coronary artery walls.", "marks": 1, "qType": "concept" },
+      { "q": "State what a flowchart arrow represents.", "a": "The direction of the process from one step to the next.", "marks": 1, "qType": "concept" }
+    ],
+    "reaching": [
+      { "q": "Explain why a narrowed coronary artery can cause a heart attack.", "a": "Less oxygenated blood reaches the heart muscle; a clot can block it completely, so muscle cells die.", "marks": 3, "qType": "concept", "starters": ["A narrowed artery means…", "If a clot forms then…"] }
+    ],
+    "mastering": [
+      { "q": "Describe the full sequence from fatty deposits to a heart attack, explaining each stage.", "a": "Fatty deposits narrow the artery, reducing blood flow, causing angina; a ruptured plaque forms a clot that blocks the artery, killing heart muscle in a heart attack.", "marks": 6, "qType": "extended_writing", "starters": ["First, fatty deposits…", "As a result, blood flow…", "Finally, a clot…"] }
+    ]
+  },
+  "review": {
+    "developing": [
+      { "q": "What builds up inside the coronary arteries in CHD?", "a": "Fatty deposits / cholesterol plaque." }
+    ],
+    "reaching": [
+      { "q": "Why does a narrowed artery cause angina?", "a": "Less oxygenated blood reaches the heart muscle, causing chest pain." }
+    ],
+    "mastering": [
+      { "q": "Explain the whole CHD sequence to a heart attack.", "a": "Deposits narrow the artery, blood flow drops, a clot blocks it, and heart muscle dies." }
+    ]
+  }
+}

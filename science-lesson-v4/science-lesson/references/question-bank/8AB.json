@@ -1,0 +1,72 @@
+{
+  "class": "8AB",
+  "year": 8,
+  "KS": "KS3",
+  "questions": [
+    {
+      "id": "8ab-001",
+      "text": "What is a gene?",
+      "answer": "A section of DNA that codes for a particular characteristic.",
+      "type": "define",
+      "subject": "Biology",
+      "topic": "Inheritance and Variation",
+      "KS": "KS3",
+      "AO": "AO1",
+      "dateAdded": "2026-06-23",
+      "lessonRef": "Formation of Fossil Fuels",
+      "usedIn": ["Formation of Fossil Fuels"]
+    },
+    {
+      "id": "8ab-002",
+      "text": "Name one way offspring can vary from their parents.",
+      "answer": "Different combination of genes / mutation / environmental factors.",
+      "type": "recall",
+      "subject": "Biology",
+      "topic": "Inheritance and Variation",
+      "KS": "KS3",
+      "AO": "AO1",
+      "dateAdded": "2026-06-23",
+      "lessonRef": "Formation of Fossil Fuels",
+      "usedIn": ["Formation of Fossil Fuels"]
+    },
+    {
+      "id": "8ab-003",
+      "text": "Complete: Hydrocarbon + _______ → _______ + _______",
+      "answer": "Hydrocarbon + oxygen → carbon dioxide + water",
+      "type": "complete",
+      "subject": "Chemistry",
+      "topic": "Combustion",
+      "KS": "KS3",
+      "AO": "AO2",
+      "dateAdded": "2026-06-23",
+      "lessonRef": "Formation of Fossil Fuels",
+      "usedIn": ["Formation of Fossil Fuels"]
+    },
+    {
+      "id": "8ab-004",
+      "text": "In a parallel circuit, what happens to the current at a junction?",
+      "answer": "The current splits between the branches.",
+      "type": "recall",
+      "subject": "Physics",
+      "topic": "Electricity — Circuits",
+      "KS": "KS3",
+      "AO": "AO1",
+      "dateAdded": "2026-06-23",
+      "lessonRef": "Formation of Fossil Fuels",
+      "usedIn": ["Formation of Fossil Fuels"]
+    },
+    {
+      "id": "8ab-005",
+      "text": "State one advantage of a parallel circuit over a series circuit.",
+      "answer": "If one component fails the others continue to work / each component receives the full voltage.",
+      "type": "explain",
+      "subject": "Physics",
+      "topic": "Electricity — Circuits",
+      "KS": "KS3",
+      "AO": "AO2",
+      "dateAdded": "2026-06-23",
+      "lessonRef": "Formation of Fossil Fuels",
+      "usedIn": ["Formation of Fossil Fuels"]
+    }
+  ]
+}

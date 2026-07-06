@@ -1,0 +1,47 @@
+{
+  "_comment": "Schema definition for Do Now question bank files. Each class has its own file named <CLASS>.json.",
+  "_fileStructure": {
+    "class": "string — class code e.g. 8AB",
+    "year": "number — year group e.g. 8",
+    "KS": "KS3 | KS4 | KS5",
+    "questions": "array of question objects (see below)"
+  },
+  "_questionSchema": {
+    "id": "string — globally unique, class-prefixed e.g. '8ab-001'",
+    "text": "string — question text as shown to students",
+    "answer": "string — mark-scheme answer shown on slide 2",
+    "type": "recall | define | calculate | explain | complete",
+    "subject": "Biology | Chemistry | Physics",
+    "topic": "string — curriculum topic tested e.g. 'Electricity — Circuits'",
+    "KS": "KS3 | KS4 | KS5",
+    "AO": "AO1 | AO2 | AO3",
+    "dateAdded": "string — ISO 8601 e.g. '2026-06-23'",
+    "lessonRef": "string — lesson topic where this first appeared as a Do Now",
+    "usedIn": "string[] — lesson names where this has been used (optional, for recency tracking)"
+  },
+  "_example": {
+    "id": "8ab-001",
+    "text": "What is a gene?",
+    "answer": "A section of DNA that codes for a particular characteristic.",
+    "type": "define",
+    "subject": "Biology",
+    "topic": "Inheritance and Variation",
+    "KS": "KS3",
+    "AO": "AO1",
+    "dateAdded": "2026-06-23",
+    "lessonRef": "Formation of Fossil Fuels",
+    "usedIn": ["Formation of Fossil Fuels"]
+  },
+  "_typeGuide": {
+    "recall": "State, Name, Give, What is — retrieval of a fact",
+    "define": "What is meant by, Define — requires a definition",
+    "calculate": "Find, Calculate, Work out — numerical answer required",
+    "explain": "Explain why, State one advantage — requires reasoning",
+    "complete": "Complete the equation / sentence — fill-in-the-blank"
+  },
+  "_AOGuide": {
+    "AO1": "recall and define — knowing and understanding",
+    "AO2": "apply — using knowledge to calculate or explain a scenario",
+    "AO3": "evaluate or analyse — rarely used in Do Now"
+  }
+}

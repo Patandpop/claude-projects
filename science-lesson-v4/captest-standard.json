@@ -1,0 +1,78 @@
+{
+  "meta": {
+    "class": "8XP",
+    "topic": "CAP TEST Standard — overflow",
+    "title": "CAP TEST Standard — deliberately over every count",
+    "lessonType": "standard",
+    "worksheet": "A",
+    "subject": "Physics",
+    "objective": "Stress-test the Learn/Build/Apply counts on a standard lesson"
+  },
+  "title": { "keywords": ["alpha", "beta", "gamma", "isotope"] },
+  "doNow": {
+    "questions": [
+      { "q": "DO NOW Q1 — name the three types of nuclear radiation.", "a": "Alpha, beta, gamma.", "marks": 1 },
+      { "q": "DO NOW Q2 — which radiation is stopped by paper?", "a": "Alpha.", "marks": 1 }
+    ]
+  },
+  "engage": {
+    "title": "Where is radiation around us?",
+    "hook": "Bananas are slightly radioactive.",
+    "reveal": { "question": "Name three natural sources of background radiation.", "answer": "Rocks/soil (radon), cosmic rays, food." }
+  },
+  "learn": [
+    { "variant": "A", "heading": "LEARN 1 — Atomic structure", "body": "Protons are positive.\nNeutrons are neutral.\nElectrons are negative." },
+    { "variant": "A", "heading": "LEARN 2 — Isotopes", "body": "Same protons, different neutrons.\nSame element, different mass number." },
+    { "variant": "A", "heading": "LEARN 3 — Alpha decay", "body": "Emits a helium nucleus.\nMass number falls by 4, atomic number by 2." },
+    { "variant": "A", "heading": "LEARN 4 — Beta decay", "body": "A neutron becomes a proton.\nAn electron is emitted.\nAtomic number rises by 1." },
+    { "variant": "A", "heading": "LEARN 5 — Gamma decay (SHOULD BE DROPPED past the 4-cap)", "body": "High-energy EM wave.\nNo change to mass or atomic number." },
+    { "variant": "A", "heading": "LEARN 6 — Half-life (SHOULD BE DROPPED past the 4-cap)", "body": "Time for half the nuclei to decay.\nConstant for a given isotope." }
+  ],
+  "build": [
+    { "type": "mcq", "q": "BUILD MCQ 1 — which radiation is most ionising?", "options": { "A": "Alpha", "B": "Beta", "C": "Gamma", "D": "X-ray" }, "answer": "A", "explanation": "Alpha is the most ionising (and least penetrating)." },
+    { "type": "mcq", "q": "BUILD MCQ 2 — which is stopped by a few mm of aluminium?", "options": { "A": "Alpha", "B": "Beta", "C": "Gamma", "D": "None" }, "answer": "B", "explanation": "Beta is stopped by a few mm of aluminium." },
+    { "type": "mcq", "q": "BUILD MCQ 3 — what does gamma need to stop it?", "options": { "A": "Paper", "B": "Aluminium", "C": "Thick lead/concrete", "D": "Air" }, "answer": "C", "explanation": "Gamma needs thick lead or concrete." },
+    { "type": "mcq", "q": "BUILD MCQ 4 — isotopes of an element have the same number of what?", "options": { "A": "Neutrons", "B": "Protons", "C": "Nucleons", "D": "Mass" }, "answer": "B", "explanation": "Same protons (same element), different neutrons." },
+    { "type": "sort", "instruction": "BUILD SORT (extra Build item) — sort each into penetrating power.", "items": ["Alpha", "Beta", "Gamma"], "categories": { "A": "Least penetrating", "B": "Most penetrating" }, "sorted": { "A": ["Alpha"], "B": ["Gamma"] } },
+    { "type": "correctTheStatement", "instruction": "BUILD CORRECT-THE-STATEMENT (extra Build item).", "statements": [
+      { "text": "Alpha radiation is the most penetrating.", "correction": "Alpha is the LEAST penetrating." },
+      { "text": "Gamma changes the atomic number.", "correction": "Gamma does not change mass or atomic number." },
+      { "text": "Beta decay emits a helium nucleus.", "correction": "Beta decay emits an electron." },
+      { "text": "Isotopes differ in their number of protons.", "correction": "Isotopes differ in NEUTRONS; protons are the same." }
+    ] },
+    { "type": "markTheAnswers", "questionNumber": "MtA", "marks": 6, "question": "BUILD MARK-THE-ANSWERS — Explain why alpha radiation is dangerous if a source is swallowed but relatively safe outside the body.",
+      "instruction": "Mark each answer. Give a level and a mark out of 6.",
+      "levelDescriptors": [ { "level": "Level 3", "range": "5-6", "desc": "Links high ionisation + short range to inside vs outside the body." }, { "level": "Level 2", "range": "3-4", "desc": "Some linked points; incomplete." }, { "level": "Level 1", "range": "1-2", "desc": "Simple statements, no links." } ],
+      "indicativeContent": [ { "text": "Alpha is strongly ionising.", "group": "ionisation" }, { "text": "It has a very short range / is stopped by skin.", "group": "range" }, { "text": "Outside the body it cannot penetrate the skin.", "group": "outside" }, { "text": "Inside the body it damages cells directly.", "group": "inside" } ],
+      "doesNotAward": [ "Alpha is the most penetrating (it is the least penetrating).", "Alpha travels a long way in air." ],
+      "samples": [
+        { "label": "Student A", "text": "Alpha is really penetrating so it goes right through you and thats why its dangerous inside.", "jitterProfile": 1, "awardedLevel": "Level 1", "awardedMarks": 1, "hits": ["mentions danger inside the body"], "misses": ["wrongly says alpha is penetrating"], "comment": "Core misconception: alpha is the LEAST penetrating." },
+        { "label": "Student B", "text": "Alpha is strongly ionising but has a short range so outside the body the skin stops it, while inside it damages cells directly.", "jitterProfile": 3, "awardedLevel": "Level 3", "awardedMarks": 6, "hits": ["strongly ionising", "short range / stopped by skin", "damages cells inside"], "misses": [], "comment": "Fully linked explanation." },
+        { "label": "Student C", "text": "Its dangerous inside because there is more of it in your body.", "jitterProfile": 2, "awardedLevel": "Level 1", "awardedMarks": 1, "hits": ["identifies inside as more dangerous"], "misses": ["no ionisation", "no range"], "comment": "No mechanism given." }
+      ] }
+  ],
+  "apply": {
+    "developing": [
+      { "q": "APPLY DEV 1 — name the radiation stopped by paper.", "a": "Alpha.", "marks": 1 },
+      { "q": "APPLY DEV 2 — what is an isotope?", "a": "Atoms of the same element with different numbers of neutrons.", "marks": 2 },
+      { "q": "APPLY DEV 3 — which radiation is an EM wave?", "a": "Gamma.", "marks": 1 }
+    ],
+    "reaching": [
+      { "q": "APPLY REA 1 — describe what happens to the nucleus in alpha decay.", "a": "It loses 2 protons and 2 neutrons (a helium nucleus).", "marks": 2 },
+      { "q": "APPLY REA 2 — a source has a half-life of 6 hours. What fraction remains after 18 hours?", "qType": "calculation", "marks": 2, "given": "3 half-lives", "unknown": "fraction remaining", "equation": "fraction = (1/2)^n", "substitute": "(1/2)^3", "solve": "1/8", "a": "1/8" },
+      { "q": "APPLY REA 3 — explain why beta decay increases the atomic number.", "a": "A neutron turns into a proton, so proton number rises by 1.", "marks": 2 }
+    ],
+    "mastering": [
+      { "q": "APPLY MAS 1 — evaluate the use of gamma vs alpha sources for a medical tracer.", "a": "Gamma penetrates out of the body to be detected and is less ionising to tissue; alpha would be absorbed and cause damage.", "marks": 4 },
+      { "q": "APPLY MAS 2 — explain why background radiation must be subtracted from count-rate measurements.", "a": "Background adds counts not from the source, so the measured rate is too high unless corrected.", "marks": 3 },
+      { "q": "APPLY MAS 3 — a nuclide undergoes alpha then beta decay. Describe the net change in atomic number.", "a": "Alpha lowers Z by 2, beta raises Z by 1, so net change is -1.", "marks": 3 }
+    ]
+  },
+  "review": {
+    "questions": [
+      { "q": "REVIEW Q1 — rank alpha, beta, gamma by penetrating power.", "a": "Alpha < beta < gamma." },
+      { "q": "REVIEW Q2 — what stays the same in an isotope?", "a": "Proton number." },
+      { "q": "REVIEW Q3 — define half-life.", "a": "Time for half the nuclei in a sample to decay." }
+    ]
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "class": "10S2",
+  "year": 10,
+  "KS": "KS4",
+  "questions": [
+    {
+      "id": "10s2-001",
+      "text": "What is pressure?",
+      "answer": "Force per unit area.",
+      "type": "define",
+      "subject": "Physics",
+      "topic": "Pressure",
+      "KS": "KS4",
+      "AO": "AO1",
+      "dateAdded": "2026-06-23",
+      "lessonRef": "Pressure Law Practical",
+      "usedIn": ["Pressure Law Practical"]
+    }
+  ],
+  "_note": "Pressure-Law.pptx was incomplete — only Q1 extracted. Questions Q2–Q5 were blank in the source file."
+}

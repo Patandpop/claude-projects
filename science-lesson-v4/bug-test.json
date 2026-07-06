@@ -1,0 +1,109 @@
+[{
+  "meta": {
+    "title": "Bug Test — 3 Fixes",
+    "topic": "Ideal Gas Law",
+    "class": "9AB",
+    "subject": "Physics",
+    "lessonType": "standard",
+    "objectives": ["Recall and apply the ideal gas law equation pV = nRT"]
+  },
+  "title": {
+    "objectives": ["Recall and apply the ideal gas law equation pV = nRT"],
+    "keywords": ["pressure", "volume", "temperature", "moles"]
+  },
+  "doNow": {
+    "variant": "A",
+    "questions": [
+      { "q": "What is the unit of pressure?", "a": "Pascal (Pa)", "marks": 1 },
+      { "q": "Convert 300 K to degrees Celsius.", "a": "27 °C", "marks": 1 }
+    ]
+  },
+  "engage": {
+    "variant": "news",
+    "hook": "A sealed aerosol can left in a hot car can explode.",
+    "imagePlaceholder": true,
+    "reveal": {
+      "question": "Why does the can fail?",
+      "answer": "Heat speeds up the gas particles inside. They hit the walls harder and more often, and pressure builds until the can gives way."
+    }
+  },
+  "learn": [
+    {
+      "variant": "A",
+      "heading": "Gas Behaviour",
+      "boxes": [
+        { "header": "Key facts", "items": ["Gas particles move randomly", "Increasing temperature increases kinetic energy", "Pressure is caused by particle collisions with the walls"] }
+      ],
+      "keywords": ["pressure", "volume", "temperature"],
+      "imagePlaceholder": true,
+      "imageDescription": "diagram of gas particles in a container with arrows showing collisions with walls"
+    },
+    {
+      "variant": "F",
+      "heading": "Ideal Gas Law",
+      "equation": "pV = nRT",
+      "components": [
+        { "symbol": "p", "name": "pressure", "unit": "Pa" },
+        { "symbol": "V", "name": "volume", "unit": "m³" },
+        { "symbol": "n", "name": "moles", "unit": "mol" },
+        { "symbol": "R", "name": "gas constant", "unit": "J mol⁻¹ K⁻¹" },
+        { "symbol": "T", "name": "temperature", "unit": "K" }
+      ],
+      "rearrangements": ["p = nRT / V", "T = pV / nR"],
+      "example": "2 mol of gas at 300 K in a 0.05 m³ container: p = (2 × 8.31 × 300) / 0.05 = 99 720 Pa"
+    }
+  ],
+  "build": [
+    {
+      "type": "mcq",
+      "q": "A gas is compressed at constant temperature. What happens to the pressure?",
+      "options": ["A  It increases", "B  It decreases", "C  It stays the same", "D  It becomes zero"],
+      "answer": "A",
+      "explanation": "Boyle's Law: at constant T, p is proportional to 1/V — halving volume doubles pressure."
+    },
+    {
+      "type": "graphWithData"
+    },
+    {
+      "type": "workedExample",
+      "worked": {
+        "prompt": "Worked example — find the speed. v = {d/t}",
+        "steps": [
+          "v = {d/t}",
+          "v = 100 \\div 4",
+          "Power dissipated: P = I^2 \\times R",
+          "Time to fall: t = sqrt(4) = 2 s"
+        ]
+      },
+      "yourTurn": {
+        "prompt": "Your turn: find v when d = 200 m and t = 5 s",
+        "answer": "v = 200 \\div 5 = 40 m/s"
+      }
+    }
+  ],
+  "worksheetExtras": {
+    "referenceData": {
+      "headers": ["Volume (m³)", "Pressure (Pa)"],
+      "rows": [
+        [0.010, 99500],
+        [0.020, 49800],
+        [0.030, 33200],
+        [0.040, 24900],
+        [0.050, 19900]
+      ],
+      "note": "Results for 1 mol of gas at 300 K — paste your graph into the slide"
+    }
+  },
+  "apply": {
+    "developing": [{ "q": "State what pV = nRT is called.", "a": "The ideal gas law.", "marks": 1 }],
+    "reaching": [{ "q": "Calculate the pressure of 3 mol of gas at 290 K in a 0.1 m³ container. R = 8.31 J mol⁻¹ K⁻¹.", "a": "p = (3 × 8.31 × 290) / 0.1 = 72 297 Pa", "marks": 3, "equation": "p = nRT / V", "qType": "calculation" }],
+    "mastering": [{ "q": "Explain why the ideal gas law breaks down at very high pressures.", "a": "At high pressures, gas particles are close enough that intermolecular forces and particle volume become significant.", "marks": 4 }]
+  },
+  "review": {
+    "questions": [
+      { "q": "What does n represent in pV = nRT?", "a": "Number of moles." },
+      { "q": "A gas at 100 kPa and 300 K is heated to 600 K at constant volume. What is the new pressure?", "a": "200 kPa: p \\propto T at constant V." },
+      { "q": "Give the heating-power equation and its units.", "a": "P = I^2 \\times R, measured in watts. Compare v = {d/t} in m/s." }
+    ]
+  }
+}]
