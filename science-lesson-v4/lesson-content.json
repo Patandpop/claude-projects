@@ -1,0 +1,351 @@
+[
+  {
+    "meta": {
+      "class": "7MLA",
+      "topic": "Days and years",
+      "title": "Days and Years",
+      "lessonType": "standard",
+      "theme": "physics",
+      "year": 7,
+      "subject": "Physics",
+      "macrotopic": "Space",
+      "lessonNumber": 1,
+      "outputDir": "c:/Users/magda/claude-projects/science-lesson-v4/Days and Years Lesson"
+    },
+    "title": {
+      "objectives": [
+        "Identify what causes day and night on Earth",
+        "Describe how the Earth spins on its axis and orbits the Sun",
+        "Explain why other planets have different length days and years"
+      ],
+      "keywords": ["day", "night", "year", "axis", "spin", "orbit"]
+    },
+    "doNow": {
+      "variant": "A",
+      "questions": [
+        { "q": "Name two energy stores.", "a": "Any two: kinetic, thermal, chemical, gravitational, elastic.", "marks": 2 },
+        { "q": "What is the name of the force that pulls objects towards the Earth?", "a": "Gravity.", "marks": 1 },
+        { "q": "Give one example of a non-contact force.", "a": "Gravity, magnetism, or electrostatic force.", "marks": 1 },
+        { "q": "Name one part of a plant cell that an animal cell does not have.", "a": "Cell wall, chloroplast, or permanent vacuole.", "marks": 1 },
+        { "q": "What is the job of the mitochondria in a cell?", "a": "To release energy through respiration.", "marks": 1 }
+      ]
+    },
+    "engage": {
+      "variant": "prediction",
+      "hook": "How does the Sun appear to move across the sky during a single day?",
+      "content": "You have watched sunrise and sunset your whole life. Predict the path the Sun takes from morning to night, then we will explain what is really moving.",
+      "imagePlaceholder": true,
+      "imageDescription": "time-lapse photograph of the Sun arcing across the sky from sunrise to sunset"
+    },
+    "learn": [
+      {
+        "variant": "A",
+        "heading": "Day and night, and a year",
+        "boxes": [
+          { "header": "Day and night", "items": [
+            "The Earth spins on its axis once every 24 hours.",
+            "The side facing the Sun has day; the side facing away has night.",
+            "The Earth spins from west to east, so the Sun appears to rise in the east."
+          ] },
+          { "header": "A year", "items": [
+            "The Earth orbits the Sun once every 365.25 days.",
+            "One full orbit is one year.",
+            "The extra quarter day is why we add a leap day every four years."
+          ] }
+        ],
+        "imagePlaceholder": true,
+        "imageDescription": "diagram of Earth spinning on its tilted axis while orbiting the Sun"
+      },
+      {
+        "variant": "A",
+        "heading": "The Earth's tilt and the seasons",
+        "boxes": [
+          { "header": "Why we have seasons", "items": [
+            "The Earth is tilted on its axis by about 23.5 degrees.",
+            "In summer your hemisphere tilts towards the Sun, giving longer, warmer days.",
+            "In winter it tilts away, giving shorter, colder days.",
+            "When the northern hemisphere has summer, the southern hemisphere has winter."
+          ] }
+        ],
+        "imagePlaceholder": true,
+        "imageDescription": "diagram showing Earth's axial tilt causing seasons in the northern and southern hemispheres"
+      }
+    ],
+    "build": [
+      { "type": "mcq", "q": "What causes day and night on Earth?",
+        "options": ["The Sun orbits the Earth once a day", "The Earth spins on its axis once a day", "The Moon blocks the Sun's light", "The Earth orbits the Sun once a day"],
+        "answer": "B", "explanation": "The Earth spins on its axis every 24 hours, so one side faces the Sun (day) and the other faces away (night)." },
+      { "type": "mcq", "q": "Why does the Sun appear to rise in the east and set in the west?",
+        "options": ["The Sun moves around the Earth", "The Earth spins from west to east", "The Earth orbits the Sun", "The Sun gets brighter then fades"],
+        "answer": "B", "explanation": "The Earth rotates from west to east, so the Sun appears to travel the opposite way across the sky." },
+      { "type": "mcq", "q": "How long does the Earth take to orbit the Sun once?",
+        "options": ["24 hours", "28 days", "365.25 days", "10 years"],
+        "answer": "C", "explanation": "One orbit of the Sun takes 365.25 days, which is one year." },
+      { "type": "mcq", "q": "Why is it summer in Australia when it is winter in the UK?",
+        "options": ["Australia is much closer to the Sun", "The two hemispheres tilt in opposite directions", "Australia spins faster than the UK", "The Sun only shines on Australia"],
+        "answer": "B", "explanation": "The Earth's tilt means when the northern hemisphere leans away from the Sun (our winter), the southern hemisphere leans towards it (their summer)." }
+    ],
+    "apply": {
+      "developing": [
+        { "q": "Why is it light during the daytime and dark at night?", "a": "The Earth spins on its axis. The side facing the Sun has daylight; the side facing away is in shadow, giving night.", "marks": 2, "qType": "concept" },
+        { "q": "Why does the Sun seem to rise in the east and set in the west?", "a": "The Earth rotates from west to east, so the Sun appears to move the opposite way across the sky.", "marks": 2, "qType": "concept" }
+      ],
+      "reaching": [
+        { "q": "Why is it lunchtime in Australia when it is midnight in the UK?", "a": "They are on opposite sides of the Earth. The Sun lights only one half at a time, so when the UK faces away Australia faces the Sun.", "marks": 3, "qType": "concept" },
+        { "q": "Why does the Sun set later in summer than in winter?", "a": "In summer the UK tilts towards the Sun, so we spend longer in sunlight each day, giving longer days.", "marks": 3, "qType": "concept" }
+      ],
+      "mastering": [
+        { "q": "Why do Australians have a summer barbecue at Christmas while the UK builds snowmen?", "a": "Australia is in the southern hemisphere. When the north tilts away from the Sun (our winter), the south tilts towards it, giving them summer.", "marks": 4, "qType": "extended_writing", "contentType": "extended_writing" },
+        { "q": "Explain why a day on Venus is longer than a year on Venus.", "a": "Venus spins very slowly. It takes 243 Earth days to spin once (its day) but only 225 Earth days to orbit the Sun (its year).", "marks": 4, "qType": "extended_writing", "contentType": "extended_writing" }
+      ]
+    },
+    "worksheetExtras": {
+      "collectionTable": {
+        "title": "PLANET DATA",
+        "instruction": "Use the planet data cards to complete the table.",
+        "headers": ["Planet", "Day length", "Year length (Earth days/years)", "Daytime temp (°C)"],
+        "rows": [
+          ["Mercury", "", "", ""],
+          ["Venus", "", "", ""],
+          ["Earth", "", "", ""],
+          ["Mars", "", "", ""],
+          ["Jupiter", "", "", ""],
+          ["Saturn", "", "", ""],
+          ["Uranus", "", "", ""],
+          ["Neptune", "", "", ""],
+          ["Pluto", "", "", ""]
+        ]
+      }
+    }
+  },
+  {
+    "meta": {
+      "class": "7MLA",
+      "topic": "Phases of the Moon",
+      "title": "Phases of the Moon",
+      "lessonType": "standard",
+      "theme": "physics",
+      "year": 7,
+      "subject": "Physics",
+      "macrotopic": "Space",
+      "lessonNumber": 2,
+      "uncapLearn": true,
+      "outputDir": "c:/Users/magda/claude-projects/science-lesson-v4/Phases of the Moon"
+    },
+    "title": {
+      "objectives": [
+        "State how long the Moon takes to orbit the Earth",
+        "Describe how the Moon changes its appearance during its orbit",
+        "Explain why the Moon has a far side"
+      ],
+      "keywords": ["Moon", "phase", "orbit", "reflect", "crescent", "gibbous"]
+    },
+    "doNow": {
+      "variant": "A",
+      "questions": [
+        { "q": "Explain why we have day and night.", "a": "The Earth spins on its axis every 24 hours. The side facing the Sun has day; the side facing away has night.", "marks": 2 },
+        { "q": "Explain why we have a year.", "a": "The Earth takes 365.25 days to orbit the Sun once, which is one year.", "marks": 2 },
+        { "q": "How long does the Earth take to spin once on its axis?", "a": "24 hours.", "marks": 1 },
+        { "q": "Which force keeps the Earth in orbit around the Sun?", "a": "Gravity.", "marks": 1 }
+      ]
+    },
+    "engage": {
+      "variant": "prediction",
+      "hook": "Why does the Moon seem to change shape through the month?",
+      "content": "The Moon looks different night to night, from a thin sliver to a full circle. Predict what is really changing before we model it.",
+      "imagePlaceholder": true,
+      "imageDescription": "composite photograph of the eight phases of the Moon across one month"
+    },
+    "learn": [
+      {
+        "variant": "A",
+        "heading": "The Moon and its phases",
+        "boxes": [
+          { "header": "Why the Moon shines", "items": [
+            "The Moon does not make its own light.",
+            "We see it because it reflects light from the Sun.",
+            "We only see the part of the sunlit Moon that faces the Earth."
+          ] },
+          { "header": "The Moon's orbit", "items": [
+            "The Moon orbits the Earth once every 28 days.",
+            "As it moves, we see different amounts of its sunlit side.",
+            "These different views are called the phases of the Moon."
+          ] }
+        ],
+        "imagePlaceholder": true,
+        "imageDescription": "diagram of the Moon orbiting the Earth with the Sun lighting one side and the eight phases labelled"
+      },
+      { "variant": "D", "heading": "New Moon", "instruction": "This is the view of the Moon from Earth.", "tip": "The Moon sits between the Earth and the Sun, so the side facing us is dark.",
+        "embeddedImagePath": "c:/Users/magda/claude-projects/science-lesson-v4/Phases of the Moon/phase-images/phase1_new_moon.png", "imageConfidence": "search" },
+      { "variant": "D", "heading": "Waxing Crescent", "instruction": "This is the view of the Moon from Earth.", "tip": "Waxing means the lit part is growing.",
+        "embeddedImagePath": "c:/Users/magda/claude-projects/science-lesson-v4/Phases of the Moon/phase-images/phase2_waxing_crescent.png", "imageConfidence": "search" },
+      { "variant": "D", "heading": "First Quarter", "instruction": "This is the view of the Moon from Earth.", "tip": "We can now see the right half lit.",
+        "embeddedImagePath": "c:/Users/magda/claude-projects/science-lesson-v4/Phases of the Moon/phase-images/phase3_first_quarter.png", "imageConfidence": "search" },
+      { "variant": "D", "heading": "Waxing Gibbous", "instruction": "This is the view of the Moon from Earth.", "tip": "More than half is lit and still growing.",
+        "embeddedImagePath": "c:/Users/magda/claude-projects/science-lesson-v4/Phases of the Moon/phase-images/phase4_waxing_gibbous.png", "imageConfidence": "search" },
+      { "variant": "D", "heading": "Full Moon", "instruction": "This is the view of the Moon from Earth.", "tip": "The whole face we see is lit by the Sun.",
+        "embeddedImagePath": "c:/Users/magda/claude-projects/science-lesson-v4/Phases of the Moon/phase-images/phase5_full_moon.png", "imageConfidence": "search" },
+      { "variant": "D", "heading": "Waning Gibbous", "instruction": "This is the view of the Moon from Earth.", "tip": "Waning means the lit part is shrinking.",
+        "embeddedImagePath": "c:/Users/magda/claude-projects/science-lesson-v4/Phases of the Moon/phase-images/phase6_waning_gibbous.png", "imageConfidence": "search" },
+      { "variant": "D", "heading": "Last Quarter", "instruction": "This is the view of the Moon from Earth.", "tip": "We can now see the left half lit.",
+        "embeddedImagePath": "c:/Users/magda/claude-projects/science-lesson-v4/Phases of the Moon/phase-images/phase7_last_quarter.png", "imageConfidence": "search" },
+      { "variant": "D", "heading": "Waning Crescent", "instruction": "This is the view of the Moon from Earth.", "tip": "Only a thin sliver is left before the next new Moon.",
+        "embeddedImagePath": "c:/Users/magda/claude-projects/science-lesson-v4/Phases of the Moon/phase-images/phase8_waning_crescent.png", "imageConfidence": "search" },
+      {
+        "variant": "A",
+        "heading": "The far side of the Moon",
+        "boxes": [
+          { "header": "Not a dark side", "items": [
+            "The Moon spins once for every orbit of the Earth.",
+            "This means the same side always faces us.",
+            "The side we never see is called the far side, not the dark side.",
+            "Both sides get sunlight during the Moon's orbit."
+          ] }
+        ],
+        "imagePlaceholder": true,
+        "imageDescription": "diagram showing the Moon keeping the same face towards Earth as it orbits"
+      }
+    ],
+    "build": [
+      { "type": "mcq", "q": "Why can we see the Moon in the night sky?",
+        "options": ["It makes its own light", "It reflects light from the Sun", "It is a burning ball of gas", "It reflects light from the Earth"],
+        "answer": "B", "explanation": "The Moon does not make its own light. We see the sunlight it reflects." },
+      { "type": "mcq", "q": "How long does the Moon take to orbit the Earth?",
+        "options": ["24 hours", "7 days", "28 days", "365 days"],
+        "answer": "C", "explanation": "The Moon orbits the Earth once about every 28 days." },
+      { "type": "mcq", "q": "Why do we always see the same side of the Moon?",
+        "options": ["The Moon does not spin at all", "The Moon spins once for each orbit of the Earth", "The Moon is too far to see the other side", "The far side is always in darkness"],
+        "answer": "B", "explanation": "The Moon spins once for every orbit, so the same side always faces the Earth." },
+      { "type": "mcq", "q": "What force keeps the Moon in orbit around the Earth?",
+        "options": ["Magnetism", "Friction", "Gravity", "Electrostatic force"],
+        "answer": "C", "explanation": "Gravity is the force that keeps the Moon orbiting the Earth." }
+    ],
+    "apply": {
+      "developing": [
+        { "q": "The Moon does not make its own light. How can we see it?", "a": "It reflects light from the Sun.", "marks": 1, "qType": "concept" },
+        { "q": "How long does the Moon take to orbit the Earth?", "a": "About 28 days.", "marks": 1, "qType": "concept" },
+        { "q": "Why do we always see the same side of the Moon?", "a": "The Moon spins once for every orbit, so the same side always faces us.", "marks": 2, "qType": "concept" },
+        { "q": "What force keeps the Moon in orbit around the Earth?", "a": "Gravity.", "marks": 1, "qType": "concept" }
+      ],
+      "reaching": [
+        { "q": "Why do we only see a full Moon once a month?", "a": "Only once each orbit is the Moon in the position where the whole side facing us is fully lit by the Sun.", "marks": 2, "qType": "concept" },
+        { "q": "What is a new Moon?", "a": "When the Moon is between the Earth and the Sun, so the side facing us gets no sunlight and looks dark.", "marks": 2, "qType": "concept" },
+        { "q": "Put the phases in order, starting from new Moon.", "a": "New Moon, waxing crescent, first quarter, waxing gibbous, full Moon, waning gibbous, last quarter, waning crescent.", "marks": 3, "qType": "concept" }
+      ],
+      "mastering": [
+        { "q": "Write a paragraph explaining why we see different phases of the Moon.", "a": "As the Moon orbits the Earth we see different amounts of its sunlit side, from none at new Moon to all at full Moon and back again.", "marks": 4, "qType": "extended_writing", "contentType": "extended_writing" },
+        { "q": "Explain why the Moon's far side is not actually always dark.", "a": "The Moon spins once per orbit so one side always faces away from Earth, but that far side still receives sunlight during the orbit.", "marks": 4, "qType": "extended_writing", "contentType": "extended_writing" }
+      ]
+    }
+  },
+  {
+    "meta": {
+      "class": "8XP",
+      "topic": "Resources and recycling",
+      "title": "Resources and Recycling",
+      "lessonType": "standard",
+      "theme": "chemistry",
+      "year": 8,
+      "subject": "Chemistry",
+      "macrotopic": "Earth's resources",
+      "lessonNumber": 7,
+      "outputDir": "c:/Users/magda/claude-projects/science-lesson-v4/Resources and Recycling"
+    },
+    "title": {
+      "objectives": [
+        "Identify resources as renewable or finite",
+        "Describe how commonly recycled materials are produced",
+        "Evaluate the pros and cons of recycling these materials"
+      ],
+      "keywords": ["resource", "finite", "renewable", "recycle", "raw material", "ore"]
+    },
+    "doNow": {
+      "variant": "A",
+      "questions": [
+        { "q": "Name the three main fossil fuels.", "a": "Coal, oil and gas.", "marks": 1 },
+        { "q": "About what percentage of the atmosphere is oxygen?", "a": "About 20%.", "marks": 1 },
+        { "q": "True or false: oil is formed from trees that died millions of years ago.", "a": "False. Oil forms from tiny sea creatures and plankton.", "marks": 1 },
+        { "q": "What does a carbon sink do?", "a": "It stores carbon compounds, keeping carbon out of the atmosphere.", "marks": 1 },
+        { "q": "Name one process that removes carbon dioxide from the atmosphere.", "a": "Photosynthesis, or carbon dioxide dissolving in the oceans.", "marks": 1 }
+      ]
+    },
+    "engage": {
+      "variant": "prediction",
+      "hook": "Some metals we rely on could run out within about 15 years at our current rate of use.",
+      "content": "Copper has roughly 14 years left and indium, used in phone screens, about 50. Predict which everyday items would become hard to make first.",
+      "imagePlaceholder": true,
+      "imageDescription": "pile of discarded electronic devices and mobile phones sorted for recycling"
+    },
+    "learn": [
+      {
+        "variant": "A",
+        "heading": "Finite and renewable resources",
+        "boxes": [
+          { "header": "Where resources come from", "items": [
+            "Resources are taken from the atmosphere, the water and the land.",
+            "We turn them into useful materials and products."
+          ] },
+          { "header": "Finite or renewable", "items": [
+            "Finite resources will run out, for example coal, oil and slate.",
+            "Renewable resources can be replaced, for example wood and biogas.",
+            "Recycling makes finite resources last longer."
+          ] }
+        ],
+        "imagePlaceholder": true,
+        "imageDescription": "comparison of finite resources such as coal and oil with renewable resources such as wood"
+      },
+      {
+        "variant": "H",
+        "heading": "What happens to your recycling",
+        "videoLink": { "text": "BBC Bitesize: Earth's resources and recycling", "url": "https://www.bbc.co.uk/bitesize/topics/z3fv4wx/articles/zsgkdp3" },
+        "toWatch": ["Which materials are sorted for recycling", "What each material is turned into"],
+        "questions": [
+          { "q": "Name two materials that are sorted for recycling.", "a": "Any two: glass, metal, paper, plastic." },
+          { "q": "Give one reason recycling is better than making a material from new.", "a": "It saves finite raw materials and uses less energy." }
+        ]
+      }
+    ],
+    "build": [
+      { "type": "mcq", "q": "Which of these is a renewable resource?",
+        "options": ["Coal", "Oil", "Wood", "Slate"],
+        "answer": "C", "explanation": "Wood is renewable because we can grow more trees. Coal, oil and slate are finite." },
+      { "type": "mcq", "q": "Why does recycling help finite resources last longer?",
+        "options": ["It creates new atoms", "It reduces how quickly we use up raw materials", "It makes the resource renewable", "It removes the need for any energy"],
+        "answer": "B", "explanation": "Recycling reuses materials, so we take less new resource from the ground." },
+      { "type": "mcq", "q": "Aluminium lasts about 1780 years now, or 2225 years if we cut use by 25%. What does this show?",
+        "options": ["Recycling has no effect", "Using less makes a resource last longer", "Aluminium is renewable", "Aluminium will never run out"],
+        "answer": "B", "explanation": "Reducing use and recycling both extend how long a finite resource lasts." },
+      { "type": "mcq", "q": "Where are the Earth's resources extracted from?",
+        "options": ["Only from the sea", "The atmosphere, water and land", "Only from deep mines", "From other planets"],
+        "answer": "B", "explanation": "Resources come from the atmosphere, the water and the land." }
+    ],
+    "apply": {
+      "developing": [
+        { "q": "Sort these into finite or renewable: coal, wood, oil, biogas.", "a": "Finite: coal, oil. Renewable: wood, biogas.", "marks": 2, "qType": "concept" },
+        { "q": "Name two materials that we commonly recycle.", "a": "Any two: glass, metal, paper, plastic.", "marks": 1, "qType": "concept" },
+        { "q": "Give one benefit of recycling.", "a": "It saves finite resources, uses less energy, or reduces waste.", "marks": 1, "qType": "concept" }
+      ],
+      "reaching": [
+        { "q": "Describe how one material, such as glass or metal, is recycled.", "a": "It is collected, sorted, cleaned, melted down and then reshaped into new products.", "marks": 3, "qType": "concept" },
+        { "q": "Give one problem with recycling a material.", "a": "Sorting and cleaning cost money and energy, and some materials lose quality each time.", "marks": 2, "qType": "concept" }
+      ],
+      "mastering": [
+        { "q": "Use the resource data to write a short speech persuading people to recycle.", "a": "Use figures like copper having about 14 years left, and argue recycling extends supplies, saves energy and cuts waste.", "marks": 5, "qType": "extended_writing", "contentType": "extended_writing" },
+        { "q": "Evaluate the pros and cons of recycling metal.", "a": "Pros: it saves finite ore and energy. Cons: collection and sorting cost money and energy. Overall it makes limited supplies last longer.", "marks": 5, "qType": "extended_writing", "contentType": "extended_writing" }
+      ]
+    },
+    "worksheetExtras": {
+      "collectionTable": {
+        "title": "RECYCLING RESEARCH",
+        "instruction": "Use the recycling laminates to research each material and complete the table.",
+        "headers": ["Recycled material", "Finite or renewable?", "How it is made", "Benefits of recycling", "Problems with recycling"],
+        "rows": [
+          ["Glass", "", "", "", ""],
+          ["Metal", "", "", "", ""],
+          ["Paper", "", "", "", ""],
+          ["Plastic", "", "", "", ""]
+        ]
+      }
+    }
+  }
+]

@@ -134,8 +134,12 @@ description: "Creates lesson PowerPoints and worksheets for science lessons (phy
     "subject": "Physics",
     "macrotopic": "Forces",
     "lessonNumber": 3,
-    "textbookRef": "optional — override the auto textbook match (see below)"
+    "textbookRef": "optional — override the auto textbook match (see below)",
+    "uncapLearn": false
   },
+// meta.uncapLearn: standard/practical lessons normally cap the Learn section at 4 slides.
+// Set true ONLY when a lesson genuinely needs a longer gallery of Learn slides (e.g. one
+// image per item — phases of the Moon, one slide per phase). Default false keeps the 4-cap.
   "title": { "objectives": ["..."], "keywords": ["..."] },
 
 // TEXTBOOK REFERENCES (automatic) — the Apply slide + Apply worksheet section show
@@ -211,7 +215,13 @@ description: "Creates lesson PowerPoints and worksheets for science lessons (phy
                       "contentType": "extended_writing" } ]
   },
   "review": { "questions": [ { "q": "...", "a": "..." } ] },
-  "worksheetExtras": { "wordBank": ["..."], "results": { "headers": ["Point","Current (A)"], "rows": 6 } },
+  "worksheetExtras": { "wordBank": ["..."], "results": { "headers": ["Point","Current (A)"], "rows": 6 },
+    "collectionTable": { "title": "PLANET DATA", "instruction": "Use the data cards to complete the table.", "headers": ["Planet","Day length","Temp"], "rows": [["Mercury","",""],["Venus","",""]] } },
+// worksheetExtras.collectionTable: a student data-collection grid on the standard worksheet
+// for NON-practical lessons (research-from-laminates / data-card tasks — planets, recycling).
+// `rows` is a number (all-blank writing rows) OR an array of row arrays; a prefilled first cell
+// becomes a fixed row label and the empty cells become writing space. Renders after the Build
+// section. (Practical lessons keep using `results` inside the experiment section.)
   "image_dump": {
     "images": [
       { "path": "/mnt/user-data/outputs/img_1.png", "label": "Engage" },

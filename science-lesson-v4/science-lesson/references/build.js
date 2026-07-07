@@ -2941,7 +2941,7 @@ async function buildPptx(L, outPath) {
 
   if (type === 'standard' || type === 'practical' || type === 'annotation') {
     slideEngage(pptx, L);
-    arr(L.learn).slice(0, 4).forEach((it) => slideLearn(pptx, L, it));
+    (L.meta && L.meta.uncapLearn ? arr(L.learn) : arr(L.learn).slice(0, 4)).forEach((it) => slideLearn(pptx, L, it));
     renderBuildSlides(pptx, L, buildItems);
     slideVisualiser(pptx, L, visItem);                          // MANDATORY — never omit
     slideApply(pptx, L);
@@ -2970,7 +2970,7 @@ async function buildPptx(L, outPath) {
   } else {
     // unknown type — treat as standard (keep the 4-Learn cap)
     slideEngage(pptx, L);
-    arr(L.learn).slice(0, 4).forEach((it) => slideLearn(pptx, L, it));
+    (L.meta && L.meta.uncapLearn ? arr(L.learn) : arr(L.learn).slice(0, 4)).forEach((it) => slideLearn(pptx, L, it));
     renderBuildSlides(pptx, L, buildItems);
     slideVisualiser(pptx, L, visItem);
     slideApply(pptx, L);
@@ -3171,7 +3171,7 @@ function resultsTable(headers, rows) {
     bodyRows.push(new TableRow({
       children: colW.map((w, i) => cell({
         w, borders: GREY_TBL, margins: { top: 40, bottom: 40, left: 80, right: 80 }, valign: VerticalAlign.TOP,
-        children: r ? [P(R(r[i] == null ? '' : r[i], { size: 20 }))] : blanks(3),
+        children: r ? (r[i] == null || r[i] === '' ? blanks(2) : [P(R(r[i], { size: 20 }))]) : blanks(3),
       })),
     }));
   });
@@ -3878,6 +3878,12 @@ function buildWorksheetChildren(L, mode) {
       arr(pracA.questions).forEach((q, i) => ch.push(...question(i + 1, q.q || '')));
     }
     buildSection();
+    if (wx.collectionTable && arr(wx.collectionTable.headers).length) {
+      const ct = wx.collectionTable;
+      ch.push(...divider(ct.title || 'DATA COLLECTION'));
+      if (ct.instruction) ch.push(...contextBox(ct.instruction));
+      ch.push(...resultsTable(ct.headers, ct.rows == null ? 6 : ct.rows));
+    }
     applySection({});
   }
   return ch;
