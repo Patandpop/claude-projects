@@ -1,0 +1,709 @@
+[
+  {
+    "meta": {
+      "class": "9AB",
+      "topic": "Irradiation and contamination",
+      "title": "Irradiation and Contamination",
+      "lessonType": "standard",
+      "theme": "physics",
+      "worksheet": "A",
+      "differentiation": "none",
+      "abilityLabel": "higher_ability",
+      "year": 9,
+      "subject": "Physics",
+      "macrotopic": "Radioactivity",
+      "uncapLearn": true,
+      "outputDir": "c:/Users/magda/claude-projects/science-lesson-v4/Irradiation and Contaminaton"
+    },
+    "title": {
+      "objectives": [
+        "Describe the properties of alpha, beta and gamma radiation",
+        "Define activity and half-life and use them in a calculation",
+        "Compare irradiation and contamination, and their advantages and disadvantages"
+      ],
+      "keywords": ["irradiation", "contamination", "activity", "half-life", "alpha", "beta", "gamma", "ionising", "becquerel"]
+    },
+    "doNow": {
+      "variant": "A",
+      "questions": [
+        { "q": "Why do some atoms undergo nuclear decay?", "a": "Their nucleus is unstable (an unbalanced number of protons and neutrons), so it releases radiation to become more stable.", "marks": 2 },
+        { "q": "What does the term half-life mean?", "a": "The time taken for the number of unstable nuclei, or the activity, to fall to half of its starting value.", "marks": 2, "hint": "The time for the number of unstable ______ to fall by ______." },
+        { "q": "Name the three types of nuclear radiation and put them in order of ionising power, from most to least.", "a": "Alpha (most ionising), beta, then gamma (least ionising).", "marks": 2 },
+        { "q": "The half-life of Zn-71 is 2.4 minutes. You start with 100.0 g. How much is left after 7.2 minutes?", "a": "7.2 / 2.4 = 3 half-lives. 100 x (1/2)^3 = 100 x 0.125 = 12.5 g.", "marks": 3, "qType": "calculation", "equation": "remaining = start x (1/2)^n" },
+        { "q": "What is meant by the activity of a source, and what unit is it measured in?", "a": "Activity is the number of nuclear decays per second. It is measured in becquerel (Bq).", "marks": 2 }
+      ],
+      "specPoints": ["AQA P7.2 hazards and uses of radioactive emissions, irradiation and contamination"]
+    },
+    "engage": {
+      "variant": "prediction",
+      "hook": "Why are these scientists wearing full protective suits to stand near a source they could photograph safely from across the room?",
+      "content": "The danger from a radioactive source depends on whether it is near you, or on you and inside you. Predict which is worse, then we will see why.",
+      "imagePlaceholder": true,
+      "imageDescription": "scientists in yellow and green hazmat radiation suits handling a radioactive source",
+      "embeddedImagePath": "c:/Users/magda/claude-projects/science-lesson-v4/Irradiation and Contaminaton/source-images/Contaminat_36.png",
+      "imageConfidence": "search"
+    },
+    "learn": [
+      {
+        "variant": "B",
+        "heading": "Key words: activity, half-life, count-rate",
+        "definitions": [
+          { "term": "Activity", "definition": "The number of nuclear decays that happen every second in a radioactive source. It is measured in becquerel (Bq)." },
+          { "term": "Half-life", "definition": "The time taken for the number of unstable nuclei in a sample, or the activity, to fall to half of its starting value." },
+          { "term": "Count-rate", "definition": "The number of decays detected each second by a detector such as a Geiger-Muller tube." }
+        ],
+        "below": "none"
+      },
+      {
+        "variant": "A",
+        "heading": "The three types of radiation",
+        "boxes": [
+          { "header": "Alpha (a)", "items": ["Stopped by paper or skin", "Travels only a few cm in air", "The most strongly ionising", "Most dangerous INSIDE the body"] },
+          { "header": "Beta (b)", "items": ["Stopped by a few mm of aluminium", "Travels about a metre in air", "Moderately ionising"] },
+          { "header": "Gamma (g)", "items": ["Only reduced by thick lead or concrete", "Travels a long way in air", "The least ionising", "More dangerous OUTSIDE the body"] }
+        ],
+        "keywords": ["ionising", "penetrating", "alpha", "beta", "gamma"],
+        "imagePlaceholder": true,
+        "imageDescription": "diagram of alpha beta gamma radiation penetration stopped by paper aluminium and lead"
+      },
+      {
+        "variant": "A",
+        "heading": "Contamination",
+        "boxes": [
+          { "header": "What it is", "items": ["Radioactive material is put ON or INSIDE an object or person", "The object or person then gives off radiation themselves", "The radiation carries on until the material is removed or decays"] },
+          { "header": "Examples", "items": ["Radioactive dust from the Chernobyl disaster landing on land and crops", "Alexander Litvinenko, poisoned with polonium-210 in his tea", "Breathing in radioactive radon gas"] }
+        ],
+        "keywords": ["contamination", "polonium-210", "radon"],
+        "imagePlaceholder": true,
+        "imageDescription": "diagram showing irradiation versus external contamination versus internal contamination on the human body",
+        "embeddedImagePath": "c:/Users/magda/claude-projects/science-lesson-v4/Irradiation and Contaminaton/source-images/Contaminat_09.png",
+        "imageConfidence": "search"
+      },
+      {
+        "variant": "A",
+        "heading": "Irradiation (exposure)",
+        "boxes": [
+          { "header": "What it is", "items": ["An object or person is EXPOSED to radiation from an outside source", "They do NOT become radioactive and do NOT give off radiation afterwards", "Once the source is removed or blocked, the exposure stops"] },
+          { "header": "Uses", "items": ["Food is exposed to gamma rays to kill bacteria and make it last longer", "X-ray and CT scans in hospitals", "Killing cancer cells (radiotherapy)", "Checking the thickness of metal or paper in a factory"] }
+        ],
+        "keywords": ["irradiation", "sterilise", "radiotherapy"],
+        "imagePlaceholder": true,
+        "imageDescription": "gamma rays killing bacteria on a strawberry to sterilise food",
+        "embeddedImagePath": "c:/Users/magda/claude-projects/science-lesson-v4/Irradiation and Contaminaton/source-images/Contaminat_23.png",
+        "imageConfidence": "search"
+      },
+      {
+        "variant": "E",
+        "heading": "Irradiation vs contamination",
+        "comparison": {
+          "aTitle": "Irradiation",
+          "bTitle": "Contamination",
+          "rows": [
+            { "a": "Exposed to radiation from an outside source", "b": "Radioactive material is on or inside you" },
+            { "a": "You do NOT become radioactive", "b": "You DO give off radiation yourself" },
+            { "a": "Usually short term, stops when the source is removed", "b": "Can be long term until the material is removed or decays" },
+            { "a": "Protect by increasing distance and shielding", "b": "Protect with a suit, gloves and washing after exposure" }
+          ]
+        }
+      }
+    ],
+    "build": [
+      {
+        "type": "sort",
+        "instruction": "Sort each scenario into irradiation or contamination.",
+        "items": [
+          "Food is exposed to gamma rays to kill bacteria, then eaten safely",
+          "A worker walks past the nuclear store each day and gets a small dose, but never touches the source",
+          "An X-ray machine takes a picture of a broken bone",
+          "Radioactive dust from Chernobyl settles on soil and crops",
+          "A patient swallows a radioactive tracer that travels through the body",
+          "Litvinenko drinks tea containing polonium-210"
+        ],
+        "categories": { "A": "Irradiation (exposed to radiation)", "B": "Contamination (material on or in you)" },
+        "sorted": {
+          "A": ["Food is exposed to gamma rays to kill bacteria, then eaten safely", "A worker walks past the nuclear store each day and gets a small dose, but never touches the source", "An X-ray machine takes a picture of a broken bone"],
+          "B": ["Radioactive dust from Chernobyl settles on soil and crops", "A patient swallows a radioactive tracer that travels through the body", "Litvinenko drinks tea containing polonium-210"]
+        }
+      },
+      {
+        "type": "correctTheStatement",
+        "instruction": "These statements are incorrect. Rewrite each one so it is right.",
+        "jitterProfile": 3,
+        "statements": [
+          { "text": "Once youve had an X-ray you stay radioactive and can give off radiation to other people.", "correction": "An X-ray irradiates you, it does not make you radioactive. You do not give off radiation afterwards." },
+          { "text": "Irradiated food is dangerous because the food itself becomes radioactive.", "correction": "Irradiated food does not become radioactive. The radiation kills bacteria but leaves no radioactivity behind, so it is safe." },
+          { "text": "Gamma sources always do the most damage inside the body because they travel furthest.", "correction": "Inside the body an alpha source does the most damage because it is the most strongly ionising." },
+          { "text": "Contamination and irradiation are just two words for the same thing.", "correction": "Irradiation is being exposed to radiation. Contamination is having radioactive material on or inside you." }
+        ]
+      },
+      {
+        "type": "mcq",
+        "q": "Which of these is an example of contamination rather than irradiation?",
+        "options": ["Standing near a sealed gamma source", "Having a chest X-ray", "Breathing in radioactive radon gas", "Food being sterilised with gamma rays"],
+        "answer": "C",
+        "explanation": "Breathing in radon puts radioactive material inside the body, which then gives off radiation. The others expose the person to radiation from an outside source.",
+        "commonError": "Choosing the X-ray because it feels dangerous, but an X-ray only irradiates you."
+      }
+    ],
+    "apply": {
+      "developing": [
+        { "q": "Define the terms irradiation and contamination.", "a": "Irradiation: an object or person is exposed to radiation but does not become radioactive. Contamination: radioactive material is put on or inside an object or person, which then gives off radiation.", "marks": 2, "qType": "concept", "contentType": "routine_recall" },
+        { "q": "Give one everyday example of irradiation and one of contamination.", "a": "Irradiation: an X-ray, or food sterilised with gamma rays. Contamination: breathing in radon gas, or radioactive dust landing on the skin.", "marks": 2, "qType": "concept" }
+      ],
+      "reaching": [
+        { "q": "A source has an activity of 800 Bq and a half-life of 6 hours. What is its activity after 18 hours?", "a": "18 / 6 = 3 half-lives. 800 -> 400 -> 200 -> 100 Bq.", "marks": 3, "qType": "calculation", "contentType": "known_procedure", "given": "activity = 800 Bq, half-life = 6 hours, time = 18 hours", "unknown": "activity after 18 hours", "equation": "number of half-lives = time / half-life", "substitute": "18 / 6 = 3 half-lives", "solve": "800 -> 400 -> 200 -> 100 Bq" },
+        { "q": "Explain why beta and gamma are more dangerous than alpha outside the body, but alpha is most dangerous inside the body.", "a": "Outside: alpha is stopped by skin and clothing so it cannot reach living cells, while beta and gamma pass through and reach organs. Inside: alpha is the most strongly ionising, so it does the most damage to nearby cells.", "marks": 4, "qType": "explain" }
+      ],
+      "mastering": [
+        { "q": "A hospital needs a radioactive source to use as a medical tracer inside a patient. Evaluate the properties the source should have, and explain the risks and benefits.", "a": "A tracer is swallowed or injected, so it is a source of contamination inside the body. A gamma emitter is best because gamma can pass out of the body to be detected, while alpha or beta would be absorbed and damage cells without escaping. The half-life should be short so the activity falls quickly and exposure is limited, but long enough to finish the scan. Risk: the radioactive material can spread to healthy tissue and ionise cells, which can cause cancer. Benefit: imaging with a tracer can replace some invasive surgery.", "marks": 6, "qType": "extended_writing", "contentType": "extended_writing",
+          "indicativeContent": [
+            { "text": "A tracer is swallowed or injected, so it is contamination inside the body", "group": "type" },
+            { "text": "A gamma emitter is best because gamma can pass out of the body to be detected", "group": "choice" },
+            { "text": "Alpha or beta would be absorbed inside the body and would not be detected", "group": "choice" },
+            { "text": "A short half-life limits how long the patient is exposed", "group": "half-life" },
+            { "text": "The half-life must still be long enough to complete the scan", "group": "half-life" },
+            { "text": "Risk: the material can ionise healthy cells and cause cancer", "group": "risk" },
+            { "text": "Benefit: imaging can replace some invasive surgery", "group": "benefit" }
+          ]
+        }
+      ]
+    },
+    "worksheetExtras": {
+      "cloze": [
+        "_____ is when an object or person is exposed to radiation from an outside source, but does not become radioactive.",
+        "_____ is when radioactive material is put on or inside an object or person, which then gives off radiation itself.",
+        "Inside the body, an _____ source is the most dangerous because it is the most strongly ionising.",
+        "Food can be exposed to _____ rays to kill bacteria, which makes it safe to eat and last longer.",
+        "The activity of a source is measured in _____."
+      ],
+      "clozeWordBank": ["Irradiation", "Contamination", "alpha", "gamma", "becquerel"]
+    },
+    "image_dump": {
+      "images": [
+        { "path": "c:/Users/magda/claude-projects/science-lesson-v4/Irradiation and Contaminaton/source-images/Contaminat_22.png", "label": "Irradiation vs contamination table" },
+        { "path": "c:/Users/magda/claude-projects/science-lesson-v4/Irradiation and Contaminaton/source-images/Contaminat_01.jpg", "label": "Chernobyl (contamination)" },
+        { "path": "c:/Users/magda/claude-projects/science-lesson-v4/Irradiation and Contaminaton/source-images/Contaminat_07.png", "label": "Litvinenko (Po-210 contamination)" },
+        { "path": "c:/Users/magda/claude-projects/science-lesson-v4/Irradiation and Contaminaton/source-images/Contaminat_04.png", "label": "Medical tracer diagram" },
+        { "path": "c:/Users/magda/claude-projects/science-lesson-v4/Irradiation and Contaminaton/source-images/Contaminat_05.png", "label": "Thickness gauge (beta) diagram" },
+        { "path": "c:/Users/magda/claude-projects/science-lesson-v4/Irradiation and Contaminaton/source-images/Contaminat_12.png", "label": "X-ray of neck (irradiation)" },
+        { "path": "c:/Users/magda/claude-projects/science-lesson-v4/Irradiation and Contaminaton/source-images/Contaminat_37.png", "label": "Radiotherapy cobalt machine" },
+        { "path": "c:/Users/magda/claude-projects/science-lesson-v4/Irradiation and Contaminaton/source-images/Contaminat_14.png", "label": "Radura irradiated-food symbol" },
+        { "path": "c:/Users/magda/claude-projects/science-lesson-v4/Irradiation and Contaminaton/source-images/Contaminat_20.png", "label": "Background radiation from daily life" },
+        { "path": "c:/Users/magda/claude-projects/science-lesson-v4/Irradiation and Contaminaton/source-images/Contaminat_33.png", "label": "Daily Mail cancer headlines (peer review)" }
+      ]
+    }
+  },
+  {
+    "meta": {
+      "class": "9AB",
+      "topic": "Specific latent heat",
+      "title": "Specific Latent Heat of Water",
+      "lessonType": "practical",
+      "theme": "physics",
+      "worksheet": "A",
+      "differentiation": "none",
+      "abilityLabel": "higher_ability",
+      "year": 9,
+      "subject": "Physics",
+      "macrotopic": "Energy",
+      "outputDir": "c:/Users/magda/claude-projects/science-lesson-v4/Specific Latent Heat"
+    },
+    "title": {
+      "objectives": [
+        "Define specific latent heat, and the difference between fusion and vaporisation",
+        "Measure the specific latent heat of water in a practical",
+        "Evaluate the practical and explain why the measured value is not exact"
+      ],
+      "keywords": ["latent heat", "vaporisation", "fusion", "change of state", "joule", "kilogram"]
+    },
+    "doNow": {
+      "variant": "A",
+      "questions": [
+        { "q": "What is the difference between irradiation and contamination?", "a": "Irradiation: exposed to radiation but you do not become radioactive. Contamination: radioactive material is on or inside you, so you give off radiation.", "marks": 2 },
+        { "q": "Give one advantage of using irradiation.", "a": "It sterilises food or equipment without high temperatures, or it can kill cancer cells, or check the thickness of materials.", "marks": 1 },
+        { "q": "In a heating experiment, name the independent variable and the dependent variable.", "a": "Independent: the energy supplied (or time heated). Dependent: the mass of water boiled away.", "marks": 2 },
+        { "q": "Why should a measurement be repeated and a mean taken?", "a": "To reduce the effect of random error and make the result more reliable.", "marks": 2 },
+        { "q": "A student measures a value that is larger than the true value. Suggest one reason why.", "a": "Some energy is lost to the surroundings instead of boiling the water, so more energy seems to be needed per kilogram.", "marks": 1 }
+      ],
+      "specPoints": ["AQA P3.2 specific latent heat, changes of state"]
+    },
+    "engage": {
+      "variant": "prediction",
+      "hook": "Would you rather be boiled alive in water or in olive oil, or would it make no difference?",
+      "content": "Olive oil boils at about 300 C, water at 100 C. No matter how long you heat liquid water, it will not go above 100 C. Where does all the extra energy go?",
+      "imagePlaceholder": true,
+      "imageDescription": "old painting of people boiling something in a large cauldron over a fire",
+      "embeddedImagePath": "c:/Users/magda/claude-projects/science-lesson-v4/Specific Latent Heat/source-images/EPIBAlaten_02.jpg",
+      "imageConfidence": "search"
+    },
+    "learn": [
+      {
+        "variant": "B",
+        "heading": "Key words: latent heat, fusion, vaporisation",
+        "definitions": [
+          { "term": "Specific latent heat", "definition": "The energy needed to change the state of one kilogram of a substance without changing its temperature. It is measured in joules per kilogram (J/kg)." },
+          { "term": "Specific latent heat of fusion", "definition": "The energy needed to melt one kilogram of a solid into a liquid without changing its temperature." },
+          { "term": "Specific latent heat of vaporisation", "definition": "The energy needed to boil one kilogram of a liquid into a gas without changing its temperature." }
+        ],
+        "below": "none"
+      },
+      {
+        "variant": "F",
+        "heading": "The latent heat equation",
+        "equation": "E = m L",
+        "components": [
+          { "symbol": "E", "name": "Energy supplied", "unit": "joules (J)" },
+          { "symbol": "m", "name": "Mass changing state", "unit": "kilograms (kg)" },
+          { "symbol": "L", "name": "Specific latent heat", "unit": "joules per kilogram (J/kg)" }
+        ],
+        "rearrangements": ["L = E / m", "m = E / L"],
+        "example": "To boil away 0.10 kg of water needs E = m x L = 0.10 x 2,260,000 = 226,000 J."
+      },
+      {
+        "variant": "J",
+        "heading": "Heating curve for water",
+        "axes": { "x": "Energy supplied (J)", "y": "Temperature (C)" },
+        "features": [
+          { "label": "Rising sections", "description": "The temperature rises as the solid, liquid or gas is heated." },
+          { "label": "Flat section at 0 C", "description": "Energy is melting the ice. The temperature stays the same (latent heat of fusion)." },
+          { "label": "Flat section at 100 C", "description": "Energy is boiling the water. The temperature stays the same (latent heat of vaporisation)." }
+        ],
+        "instruction": "Sketch the heating curve and label where latent heat is being supplied.",
+        "imagePlaceholder": true,
+        "imageDescription": "heating curve graph of temperature against energy for water showing two flat plateaus where the ice melts and where the water boils"
+      }
+    ],
+    "build": [
+      {
+        "type": "practical",
+        "intro": "Measure the specific latent heat of vaporisation of water by finding how much energy is needed to boil away a measured mass of water.",
+        "worksheetIntro": true,
+        "equipment": ["joulemeter", "immersion heater", "power pack", "beaker", "funnel", "top-pan weighing scales", "connecting wires", "water"],
+        "steps": [
+          "Set up the immersion heater in a beaker of water, connected to the power pack through the joulemeter.",
+          "Place the beaker on the weighing scales and record the starting mass.",
+          "Reset the joulemeter to zero and switch on. Let the water boil steadily.",
+          "After a few minutes, switch off and record the energy on the joulemeter and the new mass.",
+          "The mass lost is the mass of water boiled away. Work out L = energy supplied / mass boiled away.",
+          "Repeat and take a mean."
+        ],
+        "warning": "Steam and boiling water cause severe burns. Keep hands clear and switch off before touching the beaker.",
+        "imagePlaceholder": true,
+        "imageDescription": "apparatus diagram immersion heater beaker of boiling water on a balance to measure latent heat",
+        "embeddedImagePath": "c:/Users/magda/claude-projects/science-lesson-v4/Specific Latent Heat/source-images/EPIBAlaten_05.jpg",
+        "imageConfidence": "search",
+        "questions": [
+          { "q": "Why does the water stay at 100 C while it boils, even though energy is still being supplied?", "a": "The energy is being used to change state (break the bonds between water molecules), not to raise the temperature." },
+          { "q": "Why is the measured value of L usually larger than the true value?", "a": "Some energy is lost to the surroundings, so more energy is recorded than is actually used to boil the water." }
+        ]
+      },
+      {
+        "type": "graphWithData"
+      },
+      {
+        "type": "practiceTriangle",
+        "equation": "L = E / m",
+        "equationSymbols": { "top": "E", "bottomLeft": "L", "bottomRight": "m" },
+        "questions": [
+          { "q": "180,000 J of energy boils away 0.080 kg of water. Find L.", "a": "L = E / m = 180,000 / 0.080 = 2,250,000 J/kg.", "marks": 2 },
+          { "q": "How much energy is needed to boil away 0.25 kg of water? (L = 2,260,000 J/kg)", "a": "E = m x L = 0.25 x 2,260,000 = 565,000 J.", "marks": 2 }
+        ]
+      }
+    ],
+    "apply": {
+      "developing": [
+        { "q": "What is meant by the specific latent heat of vaporisation of water?", "a": "The energy needed to boil one kilogram of water into steam without changing its temperature.", "marks": 2, "qType": "concept", "contentType": "routine_recall" },
+        { "q": "State the equation that links energy, mass and specific latent heat, and give the unit of each quantity.", "a": "E = m L. E in joules (J), m in kilograms (kg), L in joules per kilogram (J/kg).", "marks": 2, "qType": "concept" }
+      ],
+      "reaching": [
+        { "q": "In an experiment, 240,000 J of energy boiled away 0.106 kg of water. Calculate the specific latent heat and the percentage difference from the true value of 2,260,000 J/kg.", "a": "L = 240,000 / 0.106 = 2,264,000 J/kg. Percentage difference = (2,264,000 - 2,260,000) / 2,260,000 x 100 = 0.2%.", "marks": 4, "qType": "calculation", "contentType": "known_procedure", "given": "E = 240,000 J, m = 0.106 kg, true L = 2,260,000 J/kg", "unknown": "L and percentage difference", "equation": "L = E / m", "substitute": "L = 240,000 / 0.106", "solve": "L = 2,264,000 J/kg, about 0.2% from the true value" }
+      ],
+      "mastering": [
+        { "q": "Write up this experiment to measure the specific latent heat of water. Include the aim, method, a safety precaution, your result, and an evaluation of why the value is not exact. (6 marks)", "a": "Aim: to measure the specific latent heat of vaporisation of water. Method: boil water with an immersion heater through a joulemeter, record the energy supplied and the mass of water boiled away, then use L = E / m. Safety: steam causes burns, so switch off before touching the beaker. Result: a value close to 2,260,000 J/kg. Evaluation: the measured value is a little too high because some energy is lost to the surroundings rather than boiling the water. Repeating and taking a mean, and insulating the beaker, would improve it.", "marks": 6, "qType": "extended_writing", "contentType": "extended_writing",
+          "indicativeContent": [
+            { "text": "Aim: to measure the specific latent heat of vaporisation of water", "group": "aim" },
+            { "text": "Method: boil water with an immersion heater through a joulemeter", "group": "method" },
+            { "text": "Record the energy supplied and the mass of water boiled away", "group": "method" },
+            { "text": "Use L = E / m to calculate the specific latent heat", "group": "calculation" },
+            { "text": "Safety: steam and boiling water cause burns", "group": "safety" },
+            { "text": "Evaluation: energy is lost to the surroundings, so the value is too high", "group": "evaluation" },
+            { "text": "Improve by insulating the beaker and repeating to take a mean", "group": "evaluation" }
+          ]
+        }
+      ]
+    },
+    "worksheetExtras": {
+      "referenceData": {
+        "headers": ["Mass boiled away (kg)", "Energy supplied (J)"],
+        "rows": [[0.027, 60000], [0.051, 120000], [0.079, 180000], [0.106, 240000], [0.128, 300000], [0.157, 360000]],
+        "xCol": 0,
+        "yCol": 1,
+        "xIntercept": true,
+        "interceptAccepted": 2260000,
+        "note": "Energy supplied plotted against mass of water boiled away. The gradient of the line is the specific latent heat of vaporisation."
+      },
+      "results": { "headers": ["Reading", "Energy on joulemeter (J)", "Mass boiled away (kg)"], "rows": 4 }
+    },
+    "image_dump": {
+      "images": [
+        { "path": "c:/Users/magda/claude-projects/science-lesson-v4/Specific Latent Heat/source-images/EPIBAlaten_03.png", "label": "Kettle timer (kettle method)" },
+        { "path": "c:/Users/magda/claude-projects/science-lesson-v4/Specific Latent Heat/source-images/EPIBAlaten_04.jpg", "label": "Drinks cooling in iced water (plenary)" }
+      ]
+    }
+  },
+  {
+    "meta": {
+      "class": "7MLA",
+      "topic": "Eclipses",
+      "title": "Eclipses",
+      "lessonType": "standard",
+      "theme": "physics",
+      "worksheet": "A",
+      "differentiation": "none",
+      "year": 7,
+      "subject": "Physics",
+      "macrotopic": "Space",
+      "lessonNumber": 3,
+      "outputDir": "c:/Users/magda/claude-projects/science-lesson-v4/Eclipse 7MLA"
+    },
+    "title": {
+      "objectives": [
+        "State what a solar eclipse is",
+        "Describe how a solar eclipse happens",
+        "Explain the difference between a solar eclipse and a lunar eclipse"
+      ],
+      "keywords": ["solar eclipse", "lunar eclipse", "umbra", "penumbra", "shadow", "orbit"]
+    },
+    "doNow": {
+      "variant": "A",
+      "questions": [
+        { "q": "Explain why we have day and night.", "a": "The Earth spins on its axis once every 24 hours. The side facing the Sun has day, the side facing away has night.", "marks": 2 },
+        { "q": "Explain why we have a year.", "a": "The Earth orbits the Sun. One full orbit takes 365.25 days, which is one year.", "marks": 2 },
+        { "q": "Why does the Moon appear to have phases?", "a": "The Moon orbits the Earth and reflects sunlight. We see different amounts of the lit side as it moves, which gives the phases.", "marks": 2 },
+        { "q": "What is the name of the Moon phase when we cannot see any of it lit up?", "a": "A new moon.", "marks": 1 },
+        { "q": "What does the Moon orbit?", "a": "The Earth.", "marks": 1 }
+      ],
+      "specPoints": ["KS3 Space: Earth, Sun and Moon; day, year, phases, eclipses"]
+    },
+    "engage": {
+      "variant": "mysteryImage",
+      "hook": "This photo was taken from the International Space Station in 2005. What could the big black dot on the Earth be?",
+      "content": "The dark spot is the shadow of the Moon falling on the Earth. That shadow is a solar eclipse. Today we will find out how it happens.",
+      "imagePlaceholder": true,
+      "imageDescription": "photo from the International Space Station showing the dark round shadow of the Moon on the Earth during a solar eclipse",
+      "embeddedImagePath": "c:/Users/magda/claude-projects/science-lesson-v4/Eclipse 7MLA/source-images/DELBAREcli_04.jpg",
+      "imageConfidence": "search"
+    },
+    "learn": [
+      {
+        "variant": "A",
+        "heading": "What is a solar eclipse?",
+        "boxes": [
+          { "header": "Solar eclipse", "items": ["Happens when the Moon moves between the Sun and the Earth", "The Moon blocks the Sun's light and casts a shadow on the Earth", "People standing in the shadow see the Sun go dark"] },
+          { "header": "Key words", "items": ["When only a few beads of light are left, we see Baileys beads", "When the Moon fully covers the Sun, the eclipse is in totality"] }
+        ],
+        "keywords": ["solar eclipse", "shadow", "totality"],
+        "imagePlaceholder": true,
+        "imageDescription": "diagram of a solar eclipse with the Sun, Moon and Earth in a line and the umbra and penumbra shadow",
+        "embeddedImagePath": "c:/Users/magda/claude-projects/science-lesson-v4/Eclipse 7MLA/source-images/DELBAREcli_01.png",
+        "imageConfidence": "search"
+      },
+      {
+        "variant": "G",
+        "heading": "How a solar eclipse happens",
+        "steps": [
+          { "label": "The Moon orbits the Earth", "note": "Sometimes it passes directly between the Earth and the Sun." },
+          { "label": "The Moon blocks the sunlight", "note": "It casts a shadow that lands on the Earth." },
+          { "label": "The umbra", "note": "The dark middle of the shadow, where the Sun is fully blocked (a total eclipse)." },
+          { "label": "The penumbra", "note": "The lighter outer shadow, where the Sun is only partly blocked (a partial eclipse)." }
+        ]
+      },
+      {
+        "variant": "E",
+        "heading": "Solar vs lunar eclipse",
+        "comparison": {
+          "aTitle": "Solar eclipse",
+          "bTitle": "Lunar eclipse",
+          "rows": [
+            { "a": "The Moon is between the Sun and the Earth", "b": "The Earth is between the Sun and the Moon" },
+            { "a": "The Moon's shadow falls on the Earth", "b": "The Earth's shadow falls on the Moon" },
+            { "a": "Happens at a new moon", "b": "Happens at a full moon" },
+            { "a": "The Sun appears to go dark", "b": "The Moon can look red or orange" }
+          ]
+        }
+      },
+      {
+        "variant": "A",
+        "heading": "Why eclipses are rare, and 12 August 2026",
+        "boxes": [
+          { "header": "Why they are rare", "items": ["The Moon's orbit is tilted, so it usually passes above or below the Sun", "The three have to line up almost exactly for an eclipse"] },
+          { "header": "12 August 2026", "items": ["A partial solar eclipse will be seen from the UK, the best for many years", "The Moon will cover about 90% of the Sun as seen from the South West", "It runs from about 6:17pm, greatest at about 7:12pm, ending about 8:06pm", "NEVER look straight at the Sun. Use special eclipse glasses, not sunglasses, or watch the Royal Observatory live stream"] }
+        ],
+        "keywords": ["partial eclipse", "eclipse glasses", "safety"],
+        "imagePlaceholder": true,
+        "imageDescription": "partial solar eclipse in the sky with the Moon covering most of the Sun leaving a crescent",
+        "embeddedImagePath": "c:/Users/magda/claude-projects/science-lesson-v4/Eclipse 7MLA/source-images/Solareclip_18.png",
+        "imageConfidence": "search"
+      }
+    ],
+    "build": [
+      {
+        "type": "sort",
+        "instruction": "Sort each statement into solar eclipse or lunar eclipse.",
+        "items": [
+          "The Moon is between the Sun and the Earth",
+          "The Earth is between the Sun and the Moon",
+          "The Moon's shadow falls on the Earth",
+          "The Earth's shadow falls on the Moon",
+          "Happens at a new moon",
+          "The Moon can look red or orange"
+        ],
+        "categories": { "A": "Solar eclipse", "B": "Lunar eclipse" },
+        "sorted": {
+          "A": ["The Moon is between the Sun and the Earth", "The Moon's shadow falls on the Earth", "Happens at a new moon"],
+          "B": ["The Earth is between the Sun and the Moon", "The Earth's shadow falls on the Moon", "The Moon can look red or orange"]
+        }
+      }
+    ],
+    "apply": {
+      "developing": [
+        { "q": "Fill in the gaps: In a solar eclipse the _____ moves between the _____ and the Earth. The dark middle of the shadow is the _____.", "a": "Moon; Sun; umbra.", "marks": 3, "qType": "concept", "contentType": "routine_recall" },
+        { "q": "Draw and label a solar eclipse. Label the Sun, the Moon, the Earth, the umbra and the penumbra.", "a": "Sun, then Moon, then Earth in a line. Umbra is the dark central shadow, penumbra is the lighter outer shadow.", "marks": 3, "qType": "concept", "diagram": true }
+      ],
+      "reaching": [
+        { "q": "Write a short paragraph explaining the difference between a solar eclipse and a lunar eclipse.", "a": "In a solar eclipse the Moon is between the Sun and the Earth, so the Moon's shadow falls on the Earth and the Sun appears to go dark. In a lunar eclipse the Earth is between the Sun and the Moon, so the Earth's shadow falls on the Moon and the Moon can look red.", "marks": 4, "qType": "extended_writing" }
+      ],
+      "mastering": [
+        { "q": "Compare a solar and a lunar eclipse. Give 3 similarities, 3 features unique to solar eclipses, and 3 unique to lunar eclipses.", "a": "Similarities: both need the Sun, Earth and Moon in a line; both involve a shadow; both are rare. Solar only: Moon between Sun and Earth, shadow on Earth, happens at new moon. Lunar only: Earth between Sun and Moon, shadow on Moon, Moon looks red, happens at full moon.", "marks": 6, "qType": "extended_writing", "contentType": "extended_writing",
+          "indicativeContent": [
+            { "text": "Similarity: both need the Sun, Earth and Moon nearly in a line", "group": "similarities" },
+            { "text": "Similarity: both involve one body casting a shadow", "group": "similarities" },
+            { "text": "Similarity: both are rare because the Moon's orbit is tilted", "group": "similarities" },
+            { "text": "Solar only: the Moon is between the Sun and the Earth", "group": "solar" },
+            { "text": "Solar only: the Moon's shadow falls on the Earth and it happens at a new moon", "group": "solar" },
+            { "text": "Lunar only: the Earth is between the Sun and the Moon", "group": "lunar" },
+            { "text": "Lunar only: the Earth's shadow falls on the Moon, which looks red, at a full moon", "group": "lunar" }
+          ]
+        }
+      ]
+    },
+    "worksheetExtras": {
+      "wordBank": ["Sun", "Moon", "Earth", "umbra", "penumbra", "shadow", "orbit", "totality"],
+      "cloze": [
+        "A solar eclipse happens when the _____ moves between the Sun and the Earth.",
+        "The Moon blocks the Sun's light and casts a _____ onto the Earth.",
+        "The dark middle of the shadow is called the _____.",
+        "The lighter outer part of the shadow is called the _____.",
+        "In a _____ eclipse, the Earth is between the Sun and the Moon and the Moon can look red."
+      ],
+      "clozeWordBank": ["Moon", "shadow", "umbra", "penumbra", "lunar"]
+    },
+    "image_dump": {
+      "images": [
+        { "path": "c:/Users/magda/claude-projects/science-lesson-v4/Eclipse 7MLA/source-images/DELBAREcli_02.jpg", "label": "Total solar eclipse (corona)" },
+        { "path": "c:/Users/magda/claude-projects/science-lesson-v4/Eclipse 7MLA/source-images/DELBAREcli_15.jpg", "label": "Lunar eclipse (blood moon)" },
+        { "path": "c:/Users/magda/claude-projects/science-lesson-v4/Eclipse 7MLA/source-images/DELBAREcli_05.png", "label": "Solar eclipse geometry" },
+        { "path": "c:/Users/magda/claude-projects/science-lesson-v4/Eclipse 7MLA/source-images/Solareclip_19.png", "label": "Child wearing eclipse glasses (safety)" }
+      ]
+    }
+  },
+  {
+    "meta": {
+      "class": "8XP",
+      "topic": "Eclipses through history",
+      "title": "Eclipses Through History",
+      "lessonType": "standard",
+      "theme": "physics",
+      "worksheet": "A",
+      "differentiation": "none",
+      "year": 8,
+      "subject": "Physics",
+      "macrotopic": "Space",
+      "uncapLearn": true,
+      "outputDir": "c:/Users/magda/claude-projects/science-lesson-v4/Eclipse 8XP"
+    },
+    "title": {
+      "objectives": [
+        "Describe how a solar eclipse happens",
+        "Describe how people have understood eclipses through history",
+        "Explain how eclipses have helped scientists make discoveries"
+      ],
+      "keywords": ["eclipse", "solar eclipse", "shadow", "corona", "helium", "gravity", "prediction"]
+    },
+    "doNow": {
+      "variant": "A",
+      "questions": [
+        { "q": "Light travels in straight lines. What do we call the dark area made when an object blocks light?", "a": "A shadow.", "marks": 1 },
+        { "q": "Which is bigger in real life, the Sun or the Moon?", "a": "The Sun. It only looks the same size because it is much further away.", "marks": 1 },
+        { "q": "What does the Moon orbit?", "a": "The Earth.", "marks": 1 },
+        { "q": "Why do we have day and night?", "a": "The Earth spins on its axis, so one side faces the Sun (day) and the other faces away (night).", "marks": 2 },
+        { "q": "Name one thing that would be dangerous about looking straight at the Sun.", "a": "It can permanently damage your eyes.", "marks": 1 }
+      ],
+      "specPoints": ["KS3 Space: eclipses; how scientific ideas develop over time"]
+    },
+    "engage": {
+      "variant": "prediction",
+      "hook": "For thousands of years, a solar eclipse could terrify a whole city. Why do you think people were so frightened?",
+      "content": "Long ago, nobody knew why the Sun suddenly went dark in the day. Some thought a dragon was eating it. Today we can predict eclipses to the minute, and even use them to make discoveries.",
+      "imagePlaceholder": true,
+      "imageDescription": "dramatic total solar eclipse in a dark sky with the Sun's corona glowing around the black Moon",
+      "embeddedImagePath": "c:/Users/magda/claude-projects/science-lesson-v4/Eclipse 8XP/source-images/Solareclip_02.png",
+      "imageConfidence": "search"
+    },
+    "learn": [
+      {
+        "variant": "G",
+        "heading": "How a solar eclipse happens",
+        "steps": [
+          { "label": "The Moon orbits the Earth", "note": "Sometimes it passes right between the Earth and the Sun." },
+          { "label": "The Moon blocks the sunlight", "note": "It casts a shadow onto the Earth." },
+          { "label": "People in the shadow", "note": "see the Sun partly or fully covered. The sky darkens in the day." }
+        ],
+        "imagePlaceholder": true,
+        "imageDescription": "simple diagram of the Sun, Moon and Earth lined up during a solar eclipse",
+        "embeddedImagePath": "c:/Users/magda/claude-projects/science-lesson-v4/Eclipse 8XP/source-images/Solareclip_01.png",
+        "imageConfidence": "search"
+      },
+      {
+        "variant": "A",
+        "heading": "12 August 2026: an eclipse over the UK",
+        "boxes": [
+          { "header": "What will happen", "items": ["A partial solar eclipse, the best seen from the UK for many years", "The Moon will cover about 90% of the Sun as seen from the South West", "From about 6:17pm, greatest at about 7:12pm, ending about 8:06pm", "The sky will not go fully dark, it will feel like dusk or a cloudy day"] },
+          { "header": "Staying safe", "items": ["NEVER look straight at the Sun, even during an eclipse, as it can damage your eyes", "Use special eclipse glasses, NOT sunglasses", "Or watch the Royal Observatory live stream"] }
+        ],
+        "keywords": ["partial eclipse", "eclipse glasses", "corona"],
+        "imagePlaceholder": true,
+        "imageDescription": "children safely watching a solar eclipse wearing cardboard eclipse glasses",
+        "embeddedImagePath": "c:/Users/magda/claude-projects/science-lesson-v4/Eclipse 8XP/source-images/Solareclip_03.png",
+        "imageConfidence": "search"
+      },
+      {
+        "variant": "A",
+        "heading": "Ancient times: eclipses as omens",
+        "boxes": [
+          { "header": "About 2000 BC", "items": ["Ancient China and Babylon recorded eclipses", "In one Chinese story, a dragon was eating the Sun, and people banged drums to scare it away", "Babylonian astronomers spotted that eclipses repeat in a pattern of about 18 years"] }
+        ],
+        "keywords": ["omen", "Babylon", "pattern"],
+        "imagePlaceholder": true,
+        "imageDescription": "ancient Chinese illustration of a dragon eating the Sun during an eclipse"
+      },
+      {
+        "variant": "A",
+        "heading": "585 BC: the eclipse that stopped a battle",
+        "boxes": [
+          { "header": "The Eclipse of Thales", "items": ["The Greek writer Herodotus tells the story of a solar eclipse during a battle between the Medes and the Lydians", "The soldiers were so frightened that the day turned to night that they stopped fighting and made peace", "The Greek thinker Thales is said to have predicted it, though historians are not sure how"] }
+        ],
+        "keywords": ["Thales", "Herodotus", "prediction"],
+        "imagePlaceholder": true,
+        "imageDescription": "ancient painting of two armies stopping a battle as a solar eclipse darkens the sky"
+      },
+      {
+        "variant": "A",
+        "heading": "1715: Halley predicts the path",
+        "boxes": [
+          { "header": "Edmond Halley", "items": ["The English scientist Edmond Halley predicted the exact path of a total eclipse across England in 1715", "He drew a map showing where and when the shadow would fall", "This showed eclipses follow the laws of physics, not magic or omens"] }
+        ],
+        "keywords": ["Halley", "path", "prediction"],
+        "imagePlaceholder": true,
+        "imageDescription": "Edmond Halley 1715 eclipse map showing the path of the Moon's shadow across England"
+      },
+      {
+        "variant": "A",
+        "heading": "1868: a new element found in the Sun",
+        "boxes": [
+          { "header": "The discovery of helium", "items": ["During a total eclipse in 1868, the scientist Janssen studied the light from the Sun", "He saw a yellow line that did not match any element known on Earth", "It was a brand new element, named helium after Helios, the Greek Sun god", "Helium is the only element discovered in space before it was found on Earth"] }
+        ],
+        "keywords": ["helium", "spectrum", "Janssen"],
+        "imagePlaceholder": true,
+        "imageDescription": "spectroscope splitting sunlight into a spectrum with a bright yellow helium line"
+      },
+      {
+        "variant": "A",
+        "heading": "1919: proving Einstein right",
+        "boxes": [
+          { "header": "Eddington's expedition", "items": ["During a total eclipse in 1919, the scientist Eddington photographed stars near the dark Sun", "The starlight had been bent by the Sun's gravity, exactly as Einstein predicted", "This eclipse proved Einstein's theory of general relativity and made him world famous"] }
+        ],
+        "keywords": ["Eddington", "Einstein", "gravity"],
+        "imagePlaceholder": true,
+        "imageDescription": "1919 eclipse photograph of stars near the Sun used to prove Einstein's theory of gravity"
+      },
+      {
+        "variant": "K",
+        "heading": "Eclipses through history: a timeline",
+        "events": [
+          { "year": "2000 BC", "label": "Ancient omens", "detail": "China and Babylon record eclipses and fear them" },
+          { "year": "585 BC", "label": "Thales", "detail": "An eclipse is said to stop a battle" },
+          { "year": "1715", "label": "Halley", "detail": "Predicts the eclipse path across England" },
+          { "year": "1868", "label": "Helium", "detail": "A new element found in the Sun" },
+          { "year": "1919", "label": "Eddington", "detail": "Eclipse proves Einstein's gravity" },
+          { "year": "2026", "label": "UK eclipse", "detail": "Partial eclipse on 12 August" }
+        ]
+      }
+    ],
+    "build": [
+      {
+        "type": "sort",
+        "instruction": "Sort each idea about eclipses into superstition or science.",
+        "items": [
+          "A dragon is eating the Sun, so bang drums to scare it away",
+          "Eclipses repeat in a pattern of about 18 years",
+          "The eclipse is a warning from the gods to stop a battle",
+          "Halley predicted the exact path of the shadow across England",
+          "Helium was discovered by studying the Sun's light",
+          "The darkening Sun means bad luck is coming"
+        ],
+        "categories": { "A": "Superstition", "B": "Science" },
+        "sorted": {
+          "A": ["A dragon is eating the Sun, so bang drums to scare it away", "The eclipse is a warning from the gods to stop a battle", "The darkening Sun means bad luck is coming"],
+          "B": ["Eclipses repeat in a pattern of about 18 years", "Halley predicted the exact path of the shadow across England", "Helium was discovered by studying the Sun's light"]
+        }
+      }
+    ],
+    "apply": {
+      "developing": [
+        { "q": "Match each date to what happened: 585 BC, 1715, 1868, 1919.", "a": "585 BC: an eclipse is said to have stopped a battle (Thales). 1715: Halley predicted the eclipse path. 1868: helium found in the Sun. 1919: Eddington proved Einstein's gravity.", "marks": 4, "qType": "concept", "contentType": "routine_recall" },
+        { "q": "Why were ancient people frightened of eclipses?", "a": "They did not know why the Sun suddenly went dark in the day, so they thought it was a bad omen or a creature eating the Sun.", "marks": 2, "qType": "concept" }
+      ],
+      "reaching": [
+        { "q": "Explain how the 1868 eclipse led to the discovery of a new element.", "a": "During the eclipse, scientists studied the light from the Sun and saw a yellow line that did not match any known element. This was a new element, helium, the first element found in space before it was found on Earth.", "marks": 3, "qType": "explain" }
+      ],
+      "mastering": [
+        { "q": "Explain how our understanding of eclipses has changed from ancient times to today, using examples.", "a": "In ancient times people feared eclipses as omens, such as a dragon eating the Sun, and a 585 BC eclipse is said to have stopped a battle. Over time scientists learned that eclipses follow the laws of physics: Halley predicted the path of the 1715 eclipse, helium was discovered in the Sun in 1868, and in 1919 an eclipse proved Einstein's theory of gravity. Today we predict eclipses exactly and use them to study the Sun.", "marks": 6, "qType": "extended_writing", "contentType": "extended_writing",
+          "indicativeContent": [
+            { "text": "In ancient times eclipses were feared as omens (a dragon eating the Sun)", "group": "ancient" },
+            { "text": "In 585 BC an eclipse is said to have frightened armies into stopping a battle", "group": "ancient" },
+            { "text": "Scientists learned eclipses follow the laws of physics, not magic", "group": "shift" },
+            { "text": "In 1715 Halley predicted the exact path of an eclipse", "group": "science" },
+            { "text": "In 1868 helium was discovered by studying the Sun during an eclipse", "group": "science" },
+            { "text": "In 1919 an eclipse proved Einstein's theory that gravity bends light", "group": "science" },
+            { "text": "Today we predict eclipses exactly and use them to study the Sun's corona", "group": "modern" }
+          ]
+        }
+      ]
+    },
+    "worksheetExtras": {
+      "wordBank": ["shadow", "Moon", "Sun", "Earth", "corona", "eclipse glasses", "partial"],
+      "cloze": [
+        "In ancient China, people believed a _____ was eating the Sun during an eclipse.",
+        "In 585 BC, a solar eclipse is said to have stopped a _____ between two armies.",
+        "In 1715, Edmond _____ correctly predicted the path of an eclipse across England.",
+        "In 1868, a new element called _____ was discovered by studying the Sun's light.",
+        "In 1919, an eclipse helped prove _____'s theory that gravity can bend light.",
+        "On 12 August 2026 there will be a _____ solar eclipse over the UK."
+      ],
+      "clozeWordBank": ["dragon", "battle", "Halley", "helium", "Einstein", "partial"],
+      "collectionTable": {
+        "title": "12 AUGUST 2026 KEY FACTS",
+        "instruction": "Fill in the key facts about the eclipse to keep in your book.",
+        "headers": ["Fact", "Detail"],
+        "rows": [["Type of eclipse", ""], ["How much of the Sun is covered", ""], ["Time it starts / is greatest / ends", ""], ["How to watch it safely", ""]]
+      }
+    },
+    "image_dump": {
+      "images": [
+        { "path": "c:/Users/magda/claude-projects/science-lesson-v4/Eclipse 8XP/source-images/Solareclip_02.png", "label": "Partial solar eclipse photo" },
+        { "path": "c:/Users/magda/claude-projects/science-lesson-v4/Eclipse 8XP/source-images/Solareclip_03.png", "label": "Eclipse glasses (safety)" }
+      ]
+    }
+  }
+]

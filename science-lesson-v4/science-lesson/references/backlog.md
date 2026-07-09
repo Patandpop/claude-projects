@@ -8,6 +8,26 @@ Cleaned 2026-07-02: only outstanding items below.
 
 <!-- entries appended below -->
 
+## Session log — 2026-07-08 (Patryk lesson batch: irradiation, latent heat, eclipses — Claude Code)
+
+**Feature — timeline slide (Learn variant K) needs a per-event image slot** 🆕 (Patryk explicitly wants this)
+Variant K currently renders `events:[{year,label,detail}]` as a text-only strip. Patryk wants each event to be able to carry a small image above and/or below the date+info, with an `imageDescription` that prints the usual `suggested search:` placeholder prompt when no image is embedded (so he gets Google-Images guidance per event). Workaround used 2026-07-08: for the 8XP eclipse-history lesson, each era was authored as a separate Learn-A slide (one per era) with its own `imageDescription`, plus a text-only variant-K strip as an overview. Proper fix: add optional `image`/`imageDescription`/`embeddedImagePath` per event to `slideTimeline` (build.js ~1636), reusing `imageOrPlaceholder`.
+
+**Feature — "reformat the information" build activity type** 🆕
+A new Build type where students are given information and must reorganise/reformat it (into a table, mind-map, ordered list, storyboard, etc.). Does not exist. Patryk likes this task style; design a schema (name TBD, e.g. `reformat`) + slide renderer + worksheet space. Related to the storyboard-gap-fill he wanted for 8XP (currently done as `worksheetExtras.cloze`).
+
+**Feature — build-time warning when any image slot has no description** 🆕
+Placeholders with no `imageDescription` print `[Image — add imageDescription to JSON]` instead of a Google-search prompt. Caught one on a Learn-J slide during this session's verification (fixed by hand). Want a non-fatal build warning listing every slide that fell back to the generic placeholder, so a missing description is never shipped silently. (Same spirit as Bug 58.)
+
+**Feature — extraction never silently skipped (source-image guard)** 🆕
+build.js does NOT auto-extract images from source PPTX/DOCX; that is a manual authoring step. Yesterday's (2026-07-07) lessons shipped with NO source images because the step was skipped, and the empty `image_dump` gave no signal. Want: a warn (or checklist) when a lesson references a source deck but has no `image_dump.images` and no matched `embeddedImagePath`. This session extracted every deck's images into a per-lesson `source-images/` folder and referenced a curated subset (embedded on slides + top picks in the image bank); the full set stays on disk so nothing is lost.
+
+**Note — cloze/gap-fill renders on Type-A worksheets only + question-set variety review** 🆕
+`worksheetExtras.cloze` only renders on the default (Type A) worksheet, not on review/exam sheets (build.js ~3862 dispatch) — this is why gap-fills "stopped executing" for Patryk on some sheets. Decide: allow cloze on more worksheet types, or document the limit. Patryk also wants a broader review of question-set VARIETY (what activity/question types exist, where each renders, and adding more) — treat as its own review.
+
+**Bug — Drive upload macrotopic mapping (`Space` vs `P4 Earth in Space`)** 🆕 (deferred — Patryk chose local-only for this batch)
+The generated `.path.txt` for Year 7 Physics space lessons emits `...\Physics\Space\Lesson N - ...`, but the real Drive folder is `...\Physics\P4 Earth in Space\Lesson N - ...`. upload-to-drive.js errors on a missing folder, so 2026-07-07's lessons never uploaded (their Drive folders are still empty). Fix the macrotopic→Drive-path mapping so lessons land in the correct folder. Until fixed, build with `NO_UPLOAD=1` and copy by hand, or align `meta.macrotopic` to the real Drive segment.
+
 ## Session log — 2026-07-06 (morning eyeball of Fraction-Demo — Patryk)
 
 **Bug 59 — guessExample slide visual quality cluster** 🆕 NEEDS DESIGN PASS (logged from Patryk's visual inspection of `Fraction-Demo.pptx`; do NOT build blind — mock and get sign-off first, per the visual workflow)
