@@ -123,8 +123,11 @@ function main() {
     if (/\[graph_gen\]/.test(output)) fail('graph_gen reported an error (graphs will be missing)');
     else pass('no graph_gen errors');
 
+    // CONTENT CHECK must print for every lesson (2026-07-09 authoring-rule report).
+    if (output.includes('── CONTENT CHECK ·')) pass('CONTENT CHECK report printed');
+    else fail('CONTENT CHECK report missing from build output');
     // MCQ-count shortfall is a soft signal (some fixtures deliberately trip it).
-    const mcqWarn = output.match(/MCQ count \d+ ≠ 4[^\n]*/g);
+    const mcqWarn = output.match(/✗ MCQ count [^\n]*/g);
     if (mcqWarn) mcqWarn.forEach(m => warn(m.trim()));
 
     // Per-lesson file + content assertions.
@@ -179,6 +182,12 @@ function main() {
         const missing = ['×', '÷', '²', '√'].filter(c => !xml.includes(c));
         if (missing.length) fail(`bug-test pptx missing typeset symbol(s): ${missing.join(' ')} — equation overhaul (Bug 53) regressed`);
         else pass('equation overhaul: × ÷ ² √ all typeset in bug-test pptx');
+        // 2026-07-09: the image bank slide is ALWAYS wanted when the lesson has any
+        // images (this deck generates graphs). The old delete-me banner must be gone.
+        if (xml.includes('IMAGE BANK')) pass('image bank slide present (always-on)');
+        else fail('IMAGE BANK slide missing — image-dump always-on regressed');
+        if (xml.includes('DELETE BEFORE SHARING')) fail('old "DELETE BEFORE SHARING" banner still present');
+        else pass('delete-me banner gone (bank is kept, not deleted)');
       }
     }
 

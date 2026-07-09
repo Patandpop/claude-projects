@@ -1668,6 +1668,14 @@ function slideLearn(pptx, L, item) {
           { text: String(ev.label || ''), options: { bold: true, fontSize: Math.round(11 * fsScale), color: NAVY, breakLine: true, paraSpaceAfter: 2 } },
           { text: String(ev.detail || ''), options: { fontSize: Math.round(10 * fsScale), color: '555555' } },
         ], { fill: 'FFFFFF', valign: 'top' });
+        // 2026-07-08 request: each event can carry its own image — it renders on the
+        // OPPOSITE side of the timeline from the event box (that space was empty),
+        // with the usual suggested-search placeholder when only a description exists.
+        if (ev.embeddedImagePath || ev.imageDescription) {
+          const imgH2 = Math.min(boxH, availH * 0.32);
+          const iy = above ? lineY + 0.06 + tickH : lineY - tickH - imgH2;
+          imageOrPlaceholder(s, ev, bx, iy, boxW, imgH2);
+        }
       });
     }
   }
@@ -2317,12 +2325,13 @@ function slideGuessExample(pptx, L, item) {
       const triH = Math.min(1.35, rowH - 0.2);
       drawFormulaTriangle(s, rightX + rightW - triW - triPad, ry + (rowH - triH) / 2, triW, triH, item.equationSymbols || {});
     } else if (isLast) {
-      // Solve row — gold banner echoing the reviewRow answer style, bold + larger
+      // Solve row — gold banner echoing the reviewRow answer style, bold + larger.
+      // Bug 59(5): rows run through parseEq so "\div"/"times"/"^2" typeset as ÷ × ².
       const fs = autoFontSize(r.content, rightW, rowH, { min: 16, max: 24 });
-      txt(s, r.content, { x: rightX + 0.15, y: ry, w: rightW - 0.3, h: rowH, color: GOLD, bold: true, fontSize: Math.max(fs, 17), valign: 'middle' });
+      txt(s, toPptxRuns(parseEq(r.content), { fontSize: Math.max(fs, 17), color: GOLD, bold: true }), { x: rightX + 0.15, y: ry, w: rightW - 0.3, h: rowH, valign: 'middle' });
     } else {
       const fs = autoFontSize(r.content, rightW, rowH, { min: 15, max: 22 });
-      txt(s, r.content, { x: rightX + 0.15, y: ry, w: rightW - 0.3, h: rowH, color: GOLD, fontSize: fs, valign: 'middle' });
+      txt(s, toPptxRuns(parseEq(r.content), { fontSize: fs, color: GOLD }), { x: rightX + 0.15, y: ry, w: rightW - 0.3, h: rowH, valign: 'middle' });
     }
   });
   bottomBar(s, obj);
@@ -2807,7 +2816,12 @@ function slidePredictThenCheck(pptx, L, item) {
   bottomBar(s, obj);
 }
 
-/* M7: image_dump — verification grid appended last; Patryk deletes before sharing */
+/* image_dump — image-bank grid appended last. Patryk ruling 2026-07-09: he ALWAYS
+   wants this slide when the lesson has any images (it was missing from lessons
+   whose JSON had no explicit image_dump field). So the slide now self-assembles:
+   generated graphs + every embedded image used on slides + the authored dump list,
+   deduplicated by path. Generated assets (graphs) also stay on disk in the output
+   folder. */
 function slideImageDump(pptx, L) {
   const rd = (L.worksheetExtras || {}).referenceData;
   const autoImages = [];
@@ -2815,16 +2829,34 @@ function slideImageDump(pptx, L) {
     const pngPath = callGraphGen(rd, false);
     if (pngPath) autoImages.push({ path: pngPath, label: 'Results graph' });
   }
+  // Every image actually embedded on a slide, labelled by where it was used.
+  const embedded = [];
+  const grab = (it, label) => {
+    if (it && it.embeddedImagePath) embedded.push({ path: it.embeddedImagePath, label });
+  };
+  grab(L.engage, 'Engage');
+  arr(L.learn).forEach((it, i) => {
+    grab(it, `Learn ${String(it.variant || '').toUpperCase() || i + 1}`);
+    arr(it.events).forEach((ev, j) => grab(ev, `Timeline event ${j + 1}`));
+  });
+  arr(L.build).forEach((b) => grab(b, (b.type || b.variant || 'Build') + ''));
   const userImages = Array.isArray((L.image_dump || {}).images) ? L.image_dump.images : [];
-  const images = [...autoImages, ...userImages];
+  const seen = new Set();
+  const images = [...autoImages, ...embedded, ...userImages].filter((img) => {
+    const key = img.path || img.label || '';
+    if (!key || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
   if (!images.length) return;
 
   const s = pptx.addSlide();
   s.background = { color: BG };
 
-  // Navy header bar with gold title — house style, makes "delete me" obvious without amber tint
+  // Navy header bar with gold title — house style. Patryk KEEPS this slide (2026-07-09
+  // ruling) — it is the lesson's image bank, not a delete-me artifact.
   const headerH = 0.5;
-  txt(s, 'IMAGE DUMP — DELETE BEFORE SHARING', {
+  txt(s, 'IMAGE BANK — sources and assets used in this lesson', {
     x: 0, y: 0, w: SW, h: headerH,
     fill: { color: NAVY }, color: GOLD, bold: true,
     fontSize: 14, align: 'center', valign: 'middle',
@@ -2863,6 +2895,123 @@ function slideImageDump(pptx, L) {
       fontSize: 10, align: 'center', valign: 'top', italic: true,
     });
   });
+}
+
+/* CONTENT CHECK (2026-07-09 Patryk ruling): loud per-lesson validation of the
+   authoring rules that keep slipping on the claude.ai side (audit 2026-07-09:
+   3 of 4 lessons had no MCQs, none had review sections, all had 5 Do Nows).
+   ✓/✗ lines only — warn loudly, never block. Mirrored in SKILL.md so the
+   authoring side can self-check before handing content over. */
+function contentCheck(L) {
+  const meta = L.meta || {};
+  const type = (meta.lessonType || meta.type || 'standard').toLowerCase();
+  const name = meta.topic || meta.title || 'unknown';
+  const isTeaching = type === 'standard' || type === 'practical' || type === 'annotation';
+  const lines = [];
+  const check = (ok, good, bad) => lines.push(ok ? `  ✓ ${good}` : `  ✗ ${bad}`);
+
+  const dn = arr((L.doNow || {}).questions).length;
+  check(dn === 6, 'Do Now 6/6', `Do Now has ${dn} question(s) — rule is exactly 6`);
+
+  if (isTeaching) {
+    const mcq = arr(L.build).filter(b => ['mcq', 'mcq_image'].includes(b.type || b.variant)).length;
+    check(mcq === 4, 'MCQ count 4/4', `MCQ count ${mcq} — rule is exactly 4, each placed after the Learn content it tests`);
+    TIERS.forEach(t => {
+      const a = arr((L.apply || {})[t]).length;
+      check(a >= 3, `Apply ${t} ${a}/3+`, `Apply ${t} has ${a} question(s) — minimum 3 per tier`);
+    });
+    TIERS.forEach(t => {
+      const a = arr((L.apply || {})[t]).length;
+      const r = arr((L.review || {})[t]).length;
+      check(r === a, `Review ${t} mirrors Apply (${r}/${a})`,
+        `Review ${t} has ${r} answer(s) for ${a} Apply question(s) — review must mirror EVERY Apply question`);
+    });
+  }
+
+  // Image slots without a searchable description (generic placeholder would ship)
+  const noDesc = [];
+  const slot = (it, label) => {
+    if (it && it.imagePlaceholder !== false && !it.embeddedImagePath && !it.imageDescription) noDesc.push(label);
+  };
+  slot(L.engage, 'Engage');
+  arr(L.learn).forEach((it, i) => {
+    if (['A', 'B', 'D', 'H', 'J'].includes(String(it.variant || '').toUpperCase())) slot(it, `Learn ${i + 1} (${it.variant})`);
+  });
+  check(!noDesc.length, 'image slots carry descriptions',
+    `image slots with NO imageDescription (generic placeholder ships): ${noDesc.join(', ')}`);
+
+  // Extraction guard: a lesson with no images anywhere usually means the
+  // source-image extraction step was skipped (2026-07-07 batch shipped bare).
+  const anyImg = [L.engage, ...arr(L.learn), ...arr(L.build)].some(i => i && i.embeddedImagePath)
+    || arr((L.image_dump || {}).images).length > 0;
+  check(anyImg, 'images embedded / image bank present',
+    'NO images anywhere (no embeddedImagePath, empty image_dump) — if a source deck exists, extraction was skipped');
+
+  // Drive destination: missing meta = never uploads, never reaches lesson-log
+  const missMeta = ['year', 'subject', 'macrotopic', 'lessonNumber', 'title'].filter(k => !meta[k]);
+  check(!missMeta.length, 'Drive meta complete',
+    `Drive meta missing (${missMeta.join(', ')}) — lesson will NOT upload or reach lesson-log.json`);
+
+  if ((L.worksheetExtras || {}).cloze && !isTeaching)
+    lines.push('  ✗ worksheetExtras.cloze only renders on standard/practical worksheets — it will be dropped for this lesson type');
+
+  console.log(`── CONTENT CHECK · ${name}`);
+  lines.forEach(l => console.log(l));
+}
+
+/* CONTENT CHECK (2026-07-09, Patryk ruling): loud per-lesson validation of the
+   authoring rules that keep slipping on the claude.ai side (audit found: 0-1 MCQs,
+   Apply 2/1/1, no review sections, Do Now 5, missing Drive meta). Prints ✓/✗
+   lines. NEVER blocks the build — warn loudly, never block. Mirrored in SKILL.md
+   so the authoring side self-checks before handing a JSON over. */
+function contentCheck(L) {
+  const meta = L.meta || {};
+  const type = (meta.lessonType || meta.type || 'standard').toLowerCase();
+  const name = meta.topic || meta.title || 'unknown';
+  const isTeaching = type === 'standard' || type === 'practical' || type === 'annotation';
+  const lines = [];
+  const check = (ok, good, bad) => lines.push(ok ? `  ✓ ${good}` : `  ✗ ${bad}`);
+
+  const dn = arr((L.doNow || {}).questions).length;
+  check(dn === 6, `Do Now ${dn}/6`, `Do Now has ${dn} question(s) — rule is exactly 6`);
+
+  if (isTeaching) {
+    const mcq = arr(L.build).filter((b) => ['mcq', 'mcq_image'].includes(b.type || b.variant)).length;
+    check(mcq === 4, 'MCQ count 4/4', `MCQ count ${mcq} — rule is exactly 4, each placed after the Learn content it tests`);
+    TIERS.forEach((t) => {
+      const a = arr((L.apply || {})[t]).length;
+      check(a >= 3, `Apply ${t} ${a}/3+`, `Apply ${t} has ${a} question(s) — minimum 3 per tier`);
+    });
+    TIERS.forEach((t) => {
+      const a = arr((L.apply || {})[t]).length;
+      const r = arr((L.review || {})[t]).length;
+      check(r === a && a > 0, `Review ${t} mirrors Apply (${r}/${a})`,
+        `Review ${t} has ${r} answer(s) for ${a} Apply question(s) — review must mirror EVERY Apply question`);
+    });
+  }
+
+  // Image discipline: every placeholder slot needs a Google-searchable description,
+  // and a lesson with no images at all usually means source extraction was skipped.
+  const imgItems = [L.engage, ...arr(L.learn)].filter(Boolean)
+    .filter((it) => it.imagePlaceholder !== false);
+  const noDesc = imgItems.filter((it) => !it.embeddedImagePath && !it.imageDescription).length;
+  check(noDesc === 0, 'image slots all described/embedded',
+    `${noDesc} image slot(s) with no imageDescription — the generic placeholder will ship`);
+  const anyImg = [L.engage, ...arr(L.learn), ...arr(L.build)].some((i) => i && i.embeddedImagePath)
+    || arr((L.image_dump || {}).images).length > 0;
+  check(anyImg, 'images embedded / image bank present',
+    'NO images anywhere (no embeddedImagePath, empty image_dump) — if a source deck exists, extraction was skipped');
+
+  const missMeta = ['year', 'subject', 'macrotopic', 'lessonNumber', 'title'].filter((k) => !meta[k]);
+  check(missMeta.length === 0, 'Drive meta complete',
+    `Drive meta missing: ${missMeta.join(', ')} — lesson will NOT upload or reach lesson-log`);
+
+  const wx = L.worksheetExtras || {};
+  if (wx.cloze && !isTeaching)
+    lines.push('  ✗ cloze only renders on standard/practical worksheets — it will be dropped on this lesson type');
+
+  console.log(`── CONTENT CHECK · ${name}`);
+  lines.forEach((l) => console.log(l));
 }
 
 /* 6-mark rule: an extended (non-calculation) question worth ≥6 marks must carry
@@ -2922,6 +3071,7 @@ async function buildPptx(L, outPath) {
   pptx.theme = { headFontFace: FONT, bodyFontFace: FONT };
 
   const type = (L.meta.lessonType || L.meta.type || 'standard').toLowerCase();
+  contentCheck(L); // 2026-07-09: loud authoring-rule report (replaces the lone MCQ warn)
   checkSixMarkRule(L);
   // Bug 57: the renderer reads flat apply.developing/reaching/mastering and
   // review.questions — a nested `.tiers.X.qs` shape is silently dropped. Warn
@@ -2931,10 +3081,6 @@ async function buildPptx(L, outPath) {
   });
   const buildItems = arr(L.build);
   const visItem = buildItems.find((b) => (b.type || b.variant) === 'visualiser');
-  if ((type === 'standard' || type === 'practical') && buildItems.length) {
-    const mcqCount = buildItems.filter((b) => ['mcq', 'mcq_image'].includes(b.type || b.variant)).length;
-    if (mcqCount !== 4) console.error(`[build] MCQ count ${mcqCount} ≠ 4 in "${(L.meta || {}).topic || 'unknown'}"`); // M3: B9 error not warn
-  }
 
   slideTitleDoNow(pptx, L);                                     // questions embedded — always
   slideDoNowAnswers(pptx, L);

@@ -21,7 +21,7 @@ description: "Creates lesson PowerPoints and worksheets for science lessons (phy
 - **No em dashes in any generated content** — slides, worksheets, answers, model text (Patryk's rule, 2026-07-02: "refrain from using them across everything"). Use a comma, a full stop, or a hyphen instead. Keep generated prose lean — less is more; Patryk adds the more.
 - No class name in worksheet titles.
 - Never abbreviate questions — full text on: Do Now slide, Do Now Answers (verbatim), Apply slide, Review (verbatim).
-- Min 4 Do Now questions.
+- **Exactly 6 Do Now questions** (Patryk ruling 2026-07-09 — replaces the old "min 4"). All retrieval from PREVIOUSLY-TAUGHT content, never the current lesson.
 - One MCQ per Build slide.
 - Purple pen bar on every Do Now Answers + every Review slide.
 - Answers = core info only, 1–3 lines. Teacher elaborates.
@@ -45,6 +45,11 @@ description: "Creates lesson PowerPoints and worksheets for science lessons (phy
 **Classroom routine elements (baked into slides — never omit)**
 - Every Build MCQ slide: protocol strip — `THINK (silent) → DECIDE → SHOW on 3-2-1` — sits between the options and the answer box on the single MCQ slide.
 - Every Do Now slide: silent-entry footer — `Silent start · pen out · attempt all questions`.
+
+**CONTENT CHECK — the build prints a ✓/✗ report on every lesson; author so every line is ✓**
+The renderer validates each lesson loudly (never blocks): Do Now exactly 6 · MCQ count exactly 4 · Apply ≥3 per tier · Review mirrors EVERY Apply question per tier · every image slot has imageDescription or an embedded image · at least one image somewhere (empty image bank = extraction was probably skipped) · Drive meta complete (year/subject/macrotopic/lessonNumber/title — missing meta = never uploads, never reaches lesson-log) · cloze only on standard/practical. Fix the JSON until the report is clean BEFORE handing files over. `meta.macrotopic` must be the EXACT Drive folder name (e.g. "P4 Earth in Space", not "Space") or the upload will fail.
+
+The final slide of every deck is the **IMAGE BANK** (kept, not deleted): it self-assembles from every embedded image + generated graphs + `image_dump.images`. Timeline (Learn-K) events may each carry `imageDescription`/`embeddedImagePath` — the image renders opposite the event box.
 
 **Content volume & source fidelity**
 - **Always build exactly 4 MCQs, each positioned AFTER the Learn content it tests** (confirmed standing rule 2026-07-02). Never fewer even if Patryk may not use all four live; never place an MCQ before or disconnected from the content it checks.

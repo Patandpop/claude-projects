@@ -1,4 +1,14 @@
-# Overnight session changelog — fable-overnight branch (2026-07-06)
+# Session changelog — fable-overnight branch
+
+## 2026-07-09 session
+
+| Commit | Task | What it did | How to revert |
+|---|---|---|---|
+| 94fd7f7 | baseline | Committed the 07-08 claude.ai session artifacts unchanged (backlog paste, rebuilt skill, lesson JSON, sidecars, behaviour tracker docx) | Nothing to revert — pre-session state |
+| e994479 | P1+P2 | Inspected your memory-log skill package (contained nothing home lacked — the class data lives in your pasted chat and is being staged in P5), archived it to _archive/. Wrote AUDIT-2026-07-09.md: renderer clean on all 15 checklist items; real failures are content-discipline (0-1 MCQs, Apply 2/1/1, NO review sections, Do Now 5 not 6, missing Drive meta on 3 of 4). | `git revert e994479` |
+| (P3) | P3 | Logic fixes: image bank slide now ALWAYS renders when a lesson has any images (self-assembles from embedded + graphs + dump list; banner renamed IMAGE BANK — you keep it); CONTENT CHECK ✓/✗ report prints for every lesson (Do Now=6, MCQ=4, Apply ≥3/tier, Review mirrors Apply, image descriptions, extraction guard, Drive meta, cloze limits) and is mirrored in SKILL.md; Do Now rule now exactly 6; timeline events can carry per-event images (opposite side of the line); GUESS rows typeset ÷ × ² properly (Bug 59 item 5); uploader drops the _PTO suffix (matchers accept legacy) and prints "did you mean" macrotopic suggestions on a missing Drive folder (the Space → P4 Earth in Space miss); daily-brief matches both naming generations. Harness: new assertions for CONTENT CHECK, IMAGE BANK always-on, banner removal. npm test green. | `git revert` this commit |
+
+## 2026-07-06 overnight session
 
 Every checkpoint below is one git commit on the `fable-overnight` branch.
 To undo any single step: `git revert <hash>` (safe, keeps later work).

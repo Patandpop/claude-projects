@@ -193,11 +193,18 @@ function folderFiles(dp) {
   if (!dp || !DRIVE_UP || !fs.existsSync(dp)) return {};
   try {
     const files = fs.readdirSync(dp);
+    // 2026-07-09: new uploads use clean names (no _PTO); legacy _PTO files still match.
+    const pick = function(suffix) {
+      return files.find(function(f) { return f.endsWith('_PTO' + suffix); })
+          || files.find(function(f) { return f.endsWith(suffix); });
+    };
     return {
-      pptx:    files.find(function(f) { return f.endsWith('_PTO.pptx'); }),
-      ws:      files.find(function(f) { return f.endsWith('_PTO_worksheet.docx'); }),
-      support: files.find(function(f) { return f.endsWith('_PTO_support_worksheet.docx'); }),
-      answers: files.find(function(f) { return f.endsWith('_PTO_answers.docx'); }),
+      pptx:    files.find(function(f) { return f.endsWith('_PTO.pptx'); })
+            || files.find(function(f) { return f.endsWith('.pptx') && !/_PTO/.test(f); }),
+      // "_support_worksheet.docx" also ends with "_worksheet.docx" — exclude it here
+      ws:      files.find(function(f) { return f.endsWith('_worksheet.docx') && !f.includes('_support_'); }),
+      support: pick('_support_worksheet.docx'),
+      answers: pick('_answers.docx'),
     };
   } catch { return {}; }
 }

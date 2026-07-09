@@ -144,13 +144,14 @@ function processLesson(content) {
   const base = slug(meta.topic || meta.title) + (ability ? '_' + ability : '');
 
   // Review lessons ship an answer sheet in the support-worksheet slot.
+  // 2026-07-09 (Patryk): no more _PTO suffix — Drive copies keep the clean local names.
   const isReview = String(content.lessonType || '').toLowerCase() === 'review';
   const sourceFiles = [
-    { src: base + '.pptx',           destName: base + '_PTO.pptx' },
-    { src: base + '_worksheet.docx', destName: base + '_PTO_worksheet.docx' },
+    { src: base + '.pptx',           destName: base + '.pptx' },
+    { src: base + '_worksheet.docx', destName: base + '_worksheet.docx' },
     isReview
-      ? { src: base + '_answers.docx',           destName: base + '_PTO_answers.docx' }
-      : { src: base + '_support_worksheet.docx', destName: base + '_PTO_support_worksheet.docx' },
+      ? { src: base + '_answers.docx',           destName: base + '_answers.docx' }
+      : { src: base + '_support_worksheet.docx', destName: base + '_support_worksheet.docx' },
   ];
 
   // M8: dry-run — print only, touch nothing (no log written)
@@ -179,6 +180,15 @@ function processLesson(content) {
   // M1: log the lesson even if its Drive folder doesn't exist yet — it was still built.
   if (!fs.existsSync(destDir)) {
     console.error('upload-to-drive: Drive folder not found (Drive is mounted but path missing):\n  ' + destDir);
+    // 2026-07-09 (the Space → "P4 Earth in Space" miss): show what macrotopic folders
+    // actually exist at that level so the authoring fix is obvious. Still NEVER creates.
+    try {
+      const subjDir = path.join(DRIVE_ROOT, `Year ${year}`, subject);
+      const sibs = fs.readdirSync(subjDir, { withFileTypes: true })
+        .filter((d) => d.isDirectory()).map((d) => d.name);
+      if (sibs.length) console.error('  did you mean one of these macrotopic folders? ' + sibs.join(' | ')
+        + '\n  (set meta.macrotopic to the EXACT Drive folder name)');
+    } catch (_) { /* Year/subject level missing too — nothing to suggest */ }
     writeLessonLog(false);
     return false;
   }

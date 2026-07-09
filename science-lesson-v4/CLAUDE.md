@@ -20,7 +20,7 @@ Patryk cannot read code — explain every change in plain English (what changed 
 
 **Output priority in build.js:** 1. `meta.outputDir` → 2. CLI arg 2 → 3. `/mnt/user-data/outputs` (sandbox auto-detect) → 4. current working directory.
 
-**NO Drive path is inside build.js.** At home, `upload-to-drive.js` is auto-invoked by build.js after the lesson loop: it reads the `.path.txt` sidecar, copies the output files (with `_PTO` suffix) into the Drive lesson folder, and appends to `upload-log.txt` and `lesson-log.json`. It never creates lesson folders — it errors if the folder is missing. `--dry-run` previews; `NO_UPLOAD=1` skips upload entirely. On claude.ai the uploader file doesn't exist, so the step silently skips.
+**NO Drive path is inside build.js.** At home, `upload-to-drive.js` is auto-invoked by build.js after the lesson loop: it copies the output files (clean names — the `_PTO` suffix was dropped 2026-07-09; matchers still accept legacy `_PTO` files) into the Drive lesson folder, and appends to `upload-log.txt` and `lesson-log.json`. It never creates lesson folders — it errors if the folder is missing. `--dry-run` previews; `NO_UPLOAD=1` skips upload entirely. On claude.ai the uploader file doesn't exist, so the step silently skips.
 
 Google Drive for Desktop mounts at `G:\My Drive`. Lessons live at `G:\My Drive\Beechen Cliff Science\Lessons\Year [X]\[Subject]\[Macrotopic]\Lesson [N] - [title]\`. Brief/automation data lives at `G:\My Drive\Beechen Cliff Science\Admin\Brief Data\` (`context.json`, `context-standing.json`, `brief-log.json`, `lesson-log.json`).
 
