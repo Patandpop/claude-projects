@@ -110,6 +110,8 @@ Patryk gets NEW classes in September 2026 — he will supply the new list then; 
 
 (10C4 and 11C3 appear in older files but are no longer Patryk's classes.)
 
+**2026/27 is STAGED, not live:** `classes-2026-27.json` (project root) holds next year's full picture — classes, sizes, sharing teachers + specialisms, KS3 vs KS4/5 period times, lessons-per-fortnight, PSHE-9AB. In September: flip context.js / order-sheet.js / daily-brief.js class lists to it, and read `specs/next-year-system.md` for the folder structure + school-Drive uploader plan. Do not flip anything before then.
+
 ---
 
 ## Traps — read before believing any status claim

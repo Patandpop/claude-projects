@@ -4156,6 +4156,18 @@ async function main() {
         const drivePath = `G:\\My Drive\\Beechen Cliff Science\\Lessons\\Year ${year}\\${subject}\\${macrotopic}\\Lesson ${lessonNumber} - ${lessonTitle}`;
         fs.writeFileSync(path.join(outDir, base + '.path.txt'), drivePath, 'utf8');
         console.log('  \u2713 ' + base + '.path.txt');
+        // 4b \u2014 Manifest sidecar (2026/27 school-Drive uploader): which files belong in
+        // which folder, consumed by references/push-to-school.js \u2192 Apps Script web app.
+        // Same trigger as the sidecar; relative folder path (no G:\ \u2014 the school root differs).
+        const isRev = String(L.lessonType || '').toLowerCase() === 'review';
+        const manifest = {
+          builtOn: new Date().toISOString().slice(0, 10),
+          class: L.meta.class || null, year, subject, macrotopic, lessonNumber, title: lessonTitle,
+          folder: `Year ${year}/${subject}/${macrotopic}/Lesson ${lessonNumber} - ${lessonTitle}`,
+          files: [base + '.pptx', base + '_worksheet.docx',
+                  base + (isRev ? '_answers.docx' : '_support_worksheet.docx')],
+        };
+        fs.writeFileSync(path.join(outDir, base + '.manifest.json'), JSON.stringify(manifest, null, 2), 'utf8');
       }
 
       ok++;

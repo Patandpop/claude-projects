@@ -1,0 +1,107 @@
+{
+  "validFrom": "2026-09-01",
+  "stagedOn": "2026-07-09",
+  "note": "2026/27 classes staged from Patryk's timetable chat (2026-07-09). Live scripts (context.js, order-sheet.js, daily-brief.js) still run on the 2025/26 classes until term ends; flip them to this file in September.",
+  "periodStructure": {
+    "KS3_and_Y9": {
+      "P1": "09:00-10:00",
+      "break": "10:00-10:25",
+      "P2": "10:25-11:30",
+      "P3": "11:30-12:30",
+      "lunch": "12:30-13:15",
+      "P4": "13:15-14:15",
+      "P5": "14:15-15:15"
+    },
+    "KS4_and_KS5": {
+      "P1": "09:00-10:00",
+      "P2": "10:00-11:05",
+      "break": "11:05-11:30",
+      "P3": "11:30-12:30",
+      "P4": "12:30-13:30",
+      "lunch": "13:30-14:15",
+      "P5": "14:15-15:15"
+    },
+    "knownCalendarError": "The school calendar shows KS3 P2 lessons as 10:00-11:00; the correct KS3 P2 is 10:25-11:30 (7MLA Mon, 9AS Wed, 9XS Thu all affected). P1/P3/P5 are the same clock time for every key stage."
+  },
+  "formTime": { "group": "Y7 Byron", "time": "08:25-09:00", "days": "Mon-Fri", "teaching": false },
+  "specialismRules": [
+    "A specialist takes the module of their specialty as a priority.",
+    "Patryk prefers NOT to teach Biology - sharing teachers take Bio where possible.",
+    "Mr L Hollis: Chemistry specialist (8AG) - takes Chem, and likely Bio too since he has more lessons with 8AG than Patryk; Patryk takes Physics.",
+    "Ms S Sole: Chemistry specialist (8XP) - takes Chem; Patryk takes Bio and Physics.",
+    "Ms A Milland (9AS): takes Biology; Patryk takes Physics and Chemistry.",
+    "General pattern: one module with one teacher, the next module with the other."
+  ],
+  "classes": {
+    "7MLA": {
+      "year": 7, "code": "Sc-7ML", "size": null, "sizeNote": "TBC - Patryk is their only teacher",
+      "soleTeacher": true, "subjects": "all science",
+      "lessonsPerFortnight": 6,
+      "slots": { "weekA": ["Mon P2 (10:25-11:30)", "Tue P5 (14:15-15:15)", "Thu P4 (13:15-14:15)"], "weekB": ["Mon P2 (10:25-11:30)", "Tue P5 (14:15-15:15)", "Wed P5 (14:15-15:15)"] }
+    },
+    "8XP": {
+      "year": 8, "code": "Sc-8XP", "size": 32,
+      "sharedWith": [{ "teacher": "Ms S Sole", "specialism": "Chemistry", "takes": "Chemistry", "slots": "Wed P2, both weeks" }],
+      "patrykTakes": "Biology + Physics",
+      "lessonsPerFortnight": 4,
+      "slots": { "weekA": ["Tue P3 (11:30-12:30)", "Fri P5 (14:15-15:15)"], "weekB": ["Tue P3 (11:30-12:30)", "Fri P5 (14:15-15:15)"] }
+    },
+    "8AG": {
+      "year": 8, "code": "Sc-8AG", "size": 32,
+      "sharedWith": [{ "teacher": "Mr L Hollis", "specialism": "Chemistry", "takes": "Chemistry + most likely Biology (he has more lessons with this class)", "slots": "Tue P4 + Thu P3, both weeks" }],
+      "patrykTakes": "Physics",
+      "lessonsPerFortnight": 2,
+      "slots": { "weekA": ["Fri P1 (09:00-10:00)"], "weekB": ["Fri P1 (09:00-10:00)"] }
+    },
+    "9AS": {
+      "year": 9, "code": "Sc-9AS", "size": 32,
+      "sharedWith": [{ "teacher": "Ms A Milland", "specialism": null, "takes": "Biology", "slots": "Mon P5, both weeks" }],
+      "patrykTakes": "Physics + Chemistry",
+      "lessonsPerFortnight": 4,
+      "slots": { "weekA": ["Wed P2 (10:25-11:30)", "Thu P3 (11:30-12:30)"], "weekB": ["Wed P2 (10:25-11:30)", "Thu P3 (11:30-12:30)"] }
+    },
+    "9XS": {
+      "year": 9, "code": "Sc-9XS", "size": 32, "soleTeacher": true, "subjects": "all science",
+      "lessonsPerFortnight": 6,
+      "slots": { "weekA": ["Mon P3 (11:30-12:30)", "Wed P3 (11:30-12:30)", "Thu P2 (10:25-11:30)"], "weekB": ["Mon P3 (11:30-12:30)", "Wed P3 (11:30-12:30)", "Thu P2 (10:25-11:30)"] }
+    },
+    "10C2": {
+      "year": 10, "code": "Sc-10C2", "size": 23, "course": "Combined science",
+      "sharedWith": [
+        { "teacher": "Ms B Cox", "slots": "Wed P1, both weeks" },
+        { "teacher": "Ms R Bala", "slots": "Tue P2 both weeks + Fri P3 Week B" }
+      ],
+      "lessonsPerFortnight": 5,
+      "slots": { "weekA": ["Wed P4 (12:30-13:30)", "Thu P1 (09:00-10:00)", "Fri P3 (11:30-12:30)"], "weekB": ["Wed P4 (12:30-13:30)", "Thu P1 (09:00-10:00)"] }
+    },
+    "10S2": {
+      "year": 10, "code": "Ph-10S2", "size": 29, "course": "Separate science (some students may move to combined)",
+      "patrykTakes": "ALL the Physics",
+      "lessonsPerFortnight": 3,
+      "slots": { "weekA": ["Wed P1 (09:00-10:00)"], "weekB": ["Wed P1 (09:00-10:00)", "Fri P3 (11:30-12:30)"] }
+    },
+    "11S2": {
+      "year": 11, "code": "Ph-11S2", "size": 32, "note": "Same students as this year's 10S2",
+      "patrykTakes": "Physics only",
+      "lessonsPerFortnight": 3,
+      "slots": { "weekA": ["Mon P1 (09:00-10:00)"], "weekB": ["Mon P1 (09:00-10:00)", "Tue P1 (09:00-10:00)"] }
+    },
+    "12C": {
+      "year": 12, "code": "Ph-12C", "size": null, "sizeNote": "TBC", "examBoard": "OCR Physics A",
+      "patrykTakes": "half the content (split TBC - schedule of who covers what to come)",
+      "lessonsPerFortnight": 4,
+      "slots": { "weekA": ["Tue P1+P2 double (09:00-11:05)"], "weekB": ["Mon P5 (14:15-15:15)", "Tue P2 (10:00-11:05)"] }
+    },
+    "13D": {
+      "year": 13, "code": "Ph-13D", "size": 23, "sizeNote": "Current 12D students; some may drop, so possibly smaller, never larger", "examBoard": "OCR Physics A",
+      "patrykTakes": "half the content (same arrangement as 12C)",
+      "lessonsPerFortnight": 4,
+      "slots": { "weekA": ["Tue P4 (12:30-13:30)", "Fri P2 (10:00-11:05)"], "weekB": ["Tue P4 (12:30-13:30)", "Fri P2 (10:00-11:05)"] }
+    },
+    "PSHE-9AB": {
+      "year": 9, "code": "PSHE-9AB", "size": 25, "course": "PSHE (not science)",
+      "lessonsPerFortnight": 1,
+      "slots": { "weekA": ["Wed P5 (14:15-15:15)"], "weekB": [] }
+    }
+  }
+}
