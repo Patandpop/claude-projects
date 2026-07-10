@@ -188,6 +188,9 @@ function main() {
         else fail('IMAGE BANK slide missing — image-dump always-on regressed');
         if (xml.includes('DELETE BEFORE SHARING')) fail('old "DELETE BEFORE SHARING" banner still present');
         else pass('delete-me banner gone (bank is kept, not deleted)');
+        // Bug 60 (2026-07-10): practiceTriangle answers live ON the slide in navy/gold boxes.
+        if (xml.includes('ANSWER') && xml.includes('YOUR TURN')) pass('practiceTriangle on-slide ANSWER boxes present (Bug 60)');
+        else fail('practiceTriangle on-slide answers missing — Bug 60 regressed');
       }
     }
 

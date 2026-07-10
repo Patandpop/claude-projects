@@ -745,14 +745,14 @@ global.
 Also fixed in passing (2026-07-05): Learn-H "While watching" marker used the banned `✎` pencil glyph
 (forces font substitution) — swapped to `☞`, the house write/instruction marker used elsewhere.
 
-**Bug 59 — guessExample slide visual quality cluster** 🆕 NEEDS DESIGN PASS (2026-07-06, from Patryk's Fraction-Demo eyeball)
-Row proportions unbalanced; G/U/E/S/S letter/label sizing inconsistent; formula triangle distorts (fixed width vs capped height) and cannot subdivide beyond 3 symbols (suppress it when components > 3, or design an n-way layout); Substitute/Solve rows render raw text with no parseEq/normSym so "div" prints instead of ÷ (that last part is a separable logic fix). The phase-3 stacked fraction on this slide is correct — do not touch it. Visual redesign requires a mock + Patryk sign-off before any renderer change.
+**Bug 59 — guessExample slide visual quality cluster** ✓ FIXED 2026-07-10 (mock approved by Patryk, then built)
+Row weights rebalanced to [1,1,1.35,1,1.15]; G/U/E/S/S badges scale with the row (55%, capped 0.62"), prompts 15pt; formula triangle is aspect-locked (width = 1.15 × height) and SUPPRESSED when `equationSymbols` is absent or has more than 3 entries (equation then takes the full row at 26pt — never draw A/B/C defaults); Substitute/Solve rows typeset through parseEq (÷ × ² render properly).
 
 **Bug 61 — Greek symbols lost when JSON uses a single backslash** ✓ FIXED 2026-07-06
 `"\rho"` in JSON parses to carriage-return+"ho" (the ρ is destroyed before the renderer sees it). normSym now repairs exact-match mangled symbol names and warns loudly. AUTHORING RULE: always double-escape backslash commands in lesson JSON — `"\\rho"`, `"\\times"`, `"\\div"`, `"\\Delta"`. Component unit lines also typeset now (`m/s^2` → `m/s²`).
 
-**Bug 60 — practiceTriangle: answers on the slide, navy/gold box under each question** 🆕 (2026-07-06)
-Answers currently go to speaker notes only and there is no answer slide. Wanted: one separate answer box under each question card, navy fill + gold styling (house answer style), present at build time on the SAME slide — Patryk adds the reveal animation himself in PowerPoint (same convention as the MCQ answer box). Not built yet.
+**Bug 60 — practiceTriangle: answers on the slide, navy/gold box under each question** ✓ FIXED 2026-07-10 (mock approved, then built)
+Each question card now carries its own navy-fill gold-border ANSWER box beneath it (question 58% / answer 38% of the card), answers typeset through parseEq, present at build time on the SAME slide — Patryk adds the reveal animation himself (MCQ convention). No answer authored = the question keeps the full card. Speaker notes keep a plain copy. Harness asserts the boxes render.
 
 **Feature — "Mark the answers" activity** ✅ BUILT 2026-07-04
 New `markTheAnswers` Build item (slide-options-v4.md): one exam question + 3–4 realistically-flawed

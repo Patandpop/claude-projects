@@ -2256,6 +2256,15 @@ function slideRect(slide, x, y, w, h) {
 /* drawFormulaTriangle(x, y, w, h, {top, bottomLeft, bottomRight})
    White vector triangle with a horizontal + vertical divider — the classic
    physics "formula triangle". Never a raster image. */
+/* Bug 59 (approved mock 2026-07-10): the vector triangle only makes sense for a
+   3-symbol relationship. Absent symbols or more than 3 → suppress the triangle
+   entirely (the equation then gets the full row, larger). Never draw A/B/C defaults. */
+function triangleUsable(symbols) {
+  if (!symbols) return false;
+  const filled = ['top', 'bottomLeft', 'bottomRight'].filter((k) => symbols[k]).length;
+  return filled === 3 && Object.keys(symbols).length <= 3;
+}
+
 function drawFormulaTriangle(slide, x, y, w, h, symbols) {
   const top = String((symbols && symbols.top) || 'A');
   const bl = String((symbols && symbols.bottomLeft) || 'B');
@@ -2288,9 +2297,9 @@ function slideGuessExample(pptx, L, item) {
   // didn't need the full 66% width, so the left label column gets more breathing room.
   const leftW = CW * 0.38, rightX = MX + leftW + GAP, rightW = CW - leftW - GAP;
   const availH = BOT_Y - 0.08 - y;
-  // Weighted row heights — Equation row gets noticeably more height than the other four so
-  // the formula triangle has room to breathe instead of fighting for space in an equal-fifth row.
-  const ROW_WEIGHTS = [0.85, 0.85, 1.6, 0.85, 0.85];
+  // Weighted row heights — approved mock 2026-07-10: gentler weighting than the old
+  // [0.85,0.85,1.6,0.85,0.85], which starved the G/U rows; Solve gets a little extra.
+  const ROW_WEIGHTS = [1, 1, 1.35, 1, 1.15];
   const weightUnit = availH / ROW_WEIGHTS.reduce((a, b) => a + b, 0);
   const rowHeights = ROW_WEIGHTS.map((w) => w * weightUnit);
   const rowY = [];
@@ -2308,22 +2317,28 @@ function slideGuessExample(pptx, L, item) {
     const ry = rowY[i];
     const rowH = rowHeights[i];
     const isLast = i === rows.length - 1;
-    // left label column
-    s.addShape('roundRect', { x: MX, y: ry + (rowH - 0.42) / 2, w: 0.42, h: 0.42, rectRadius: 0.06, fill: { color: GOLD }, line: { type: 'none' } });
-    txt(s, r.letter, { x: MX, y: ry + (rowH - 0.42) / 2, w: 0.42, h: 0.42, color: NAVY, bold: true, fontSize: 18, align: 'center', valign: 'middle' });
-    txt(s, r.prompt, { x: MX + 0.55, y: ry, w: leftW - 0.55, h: rowH, color: NAVY, bold: isLast, fontSize: 13, valign: 'middle' });
+    // left label column — badge scales with the row (approved mock: 55% capped 0.62")
+    const badge = Math.min(0.62, rowH * 0.55);
+    s.addShape('roundRect', { x: MX, y: ry + (rowH - badge) / 2, w: badge, h: badge, rectRadius: 0.07, fill: { color: GOLD }, line: { type: 'none' } });
+    txt(s, r.letter, { x: MX, y: ry + (rowH - badge) / 2, w: badge, h: badge, color: NAVY, bold: true, fontSize: Math.round(badge * 42), align: 'center', valign: 'middle' });
+    txt(s, r.prompt, { x: MX + badge + 0.15, y: ry, w: leftW - badge - 0.15, h: rowH, color: NAVY, bold: isLast, fontSize: 15, valign: 'middle' });
     // divider between rows (skip before first row)
     if (i > 0) s.addShape('line', { x: rightX, y: ry, w: rightW, h: 0, line: { color: GOLD, width: 1 } });
     if (i === 2) {
-      // equation row: text + vector formula triangle — bigger triangle, more padding around it
+      // equation row. Triangle only for a genuine 3-symbol relationship (Bug 59);
+      // otherwise the equation takes the full row at a larger size.
       const eqSegs = parseEq(item.equation || '');
-      const triW = 1.4, triPad = 0.2;
+      const hasTri = triangleUsable(item.equationSymbols);
+      const triH = Math.min(1.25, rowH - 0.24);
+      const triW = triH * 1.15; // aspect-locked (approved mock)
+      const triPad = 0.3;
+      const eqW = hasTri ? rightW - triW - triPad - 0.45 : rightW - 0.5;
+      const eqFs = hasTri ? 20 : 26;
       // Bug 33/53 phase 3: stacked fraction in the E row when it fits; diagonal fallback
-      if (!renderEqShapes(s, eqSegs, { x: rightX + 0.2, y: ry + 0.06, w: rightW - triW - triPad - 0.2, h: rowH - 0.12 }, { fontSize: 20, color: GOLD, bold: true, align: 'left' })) {
-        txt(s, toPptxRuns(eqSegs, { fontSize: 20, color: GOLD, bold: true }), { x: rightX + 0.2, y: ry, w: rightW - triW - triPad - 0.2, h: rowH, color: GOLD, valign: 'middle', margin: 0 });
+      if (!renderEqShapes(s, eqSegs, { x: rightX + 0.25, y: ry + 0.06, w: eqW, h: rowH - 0.12 }, { fontSize: eqFs, color: GOLD, bold: true, align: 'left' })) {
+        txt(s, toPptxRuns(eqSegs, { fontSize: eqFs, color: GOLD, bold: true }), { x: rightX + 0.25, y: ry, w: eqW, h: rowH, color: GOLD, valign: 'middle', margin: 0 });
       }
-      const triH = Math.min(1.35, rowH - 0.2);
-      drawFormulaTriangle(s, rightX + rightW - triW - triPad, ry + (rowH - triH) / 2, triW, triH, item.equationSymbols || {});
+      if (hasTri) drawFormulaTriangle(s, rightX + rightW - triW - triPad, ry + (rowH - triH) / 2, triW, triH, item.equationSymbols);
     } else if (isLast) {
       // Solve row — gold banner echoing the reviewRow answer style, bold + larger.
       // Bug 59(5): rows run through parseEq so "\div"/"times"/"^2" typeset as ÷ × ².
@@ -2356,14 +2371,31 @@ function slidePracticeTriangle(pptx, L, item) {
   const n = Math.max(1, qs.length);
   const cardH = (bottom - y - (n - 1) * 0.08) / n;
   qs.forEach((q, qi) => {
+    const cy = y + qi * (cardH + 0.08);
     const qText = prettyText(q.q || '') + marksTag(q.marks); // 2026-07-05: superscripts/symbols
-    const qFs = autoFontSize(qText, leftW, cardH, { min: 12, max: 22 });
-    goldBox(s, MX, y + qi * (cardH + 0.08), leftW, cardH, [
+    // Bug 60 (approved mock 2026-07-10): the answer lives ON the slide, in its own
+    // navy/gold box under each question — Patryk adds the reveal animation himself
+    // in PowerPoint (same convention as the MCQ answer box). No answer authored →
+    // the question keeps the full card.
+    const hasA = !!q.a;
+    const qH = hasA ? cardH * 0.58 : cardH;
+    const qFs = autoFontSize(qText, leftW, qH, { min: 12, max: 22 });
+    goldBox(s, MX, cy, leftW, qH, [
       { text: `Q${qi + 1}  `, options: { bold: true, fontSize: qFs } },
       { text: qText, options: { fontSize: qFs } },
     ], { valign: 'middle' });
+    if (hasA) {
+      const aH = cardH * 0.38;
+      txt(s, [
+        { text: 'ANSWER   ', options: { bold: true, fontSize: 12, color: 'FFFFFF' } },
+        ...toPptxRuns(parseEq(String(q.a)), { fontSize: 16, color: GOLD, bold: true }),
+      ], {
+        x: MX + 0.35, y: cy + qH + cardH * 0.04, w: leftW - 0.35, h: aH,
+        fill: { color: NAVY }, line: GOLD2, valign: 'middle', margin: 8,
+      });
+    }
   });
-  // Answers go to speaker notes, not the slide — this is independent practice, checked live.
+  // Speaker notes keep a plain-text copy of the answers (harmless, sometimes handy).
   if (qs.some((q) => q.a)) {
     s.addNotes('Answers:\n' + qs.map((q, i) => `${i + 1}. ${q.a || ''}`).join('\n'));
   }
@@ -2378,10 +2410,16 @@ function slidePracticeTriangle(pptx, L, item) {
   if (!renderEqShapes(s, ptEqSegs, { x: rightX + 0.1, y: eqY, w: rightW - 0.2, h: eqH }, { fontSize: 22, color: NAVY, bold: true })) {
     txt(s, toPptxRuns(ptEqSegs, { fontSize: 22, color: NAVY, bold: true }), { x: rightX + 0.1, y: eqY, w: rightW - 0.2, h: eqH, valign: 'middle', align: 'center', margin: 0 });
   }
-  const triAvailH = availH - 0.35 - GAP - eqH - GAP;
-  const triY = eqY + eqH + GAP;
-  const triSize = Math.min(rightW - 0.3, triAvailH);
-  drawFormulaTriangle(s, rightX + (rightW - triSize) / 2, triY + (triAvailH - triSize) / 2, triSize, triSize, item.equationSymbols || {});
+  // Triangle only for a genuine 3-symbol relationship (Bug 59) — aspect-locked, never squashed.
+  if (triangleUsable(item.equationSymbols)) {
+    const triAvailH = availH - 0.35 - GAP - eqH - GAP;
+    const triH = Math.min(triAvailH, (rightW - 0.3) / 1.15);
+    const triW = triH * 1.15;
+    if (triH > 0.7) {
+      const triY = eqY + eqH + GAP;
+      drawFormulaTriangle(s, rightX + (rightW - triW) / 2, triY + (triAvailH - triH) / 2, triW, triH, item.equationSymbols);
+    }
+  }
   bottomBar(s, obj);
 }
 
