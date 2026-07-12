@@ -11,22 +11,10 @@ const ROOT = __dirname;
 const SKILL_DIR = path.join(ROOT, 'science-lesson');
 const OUT = path.join(ROOT, 'science-lesson.skill');
 
-// Keep in sync with package-skill.ps1 (the canonical packer) — same ENTRIES list.
-const ENTRIES = [
-  'SKILL.md',
-  'references/build.js',
-  'references/graph_gen.py',
-  'references/textbook-index.js',
-  'references/textbook-index.md',
-  'references/slide-options-v4.md',
-  'references/worksheet-spec.md',
-  'references/engage-library.md',
-  'references/starfield_header_FINAL.png',
-  'references/backlog.md',
-  'references/lesson-backlog-SKILL.md',
-  'references/Caveat-Regular.ttf',
-  'references/Caveat-Bold.ttf',
-];
+// The packed-file list lives in skill-manifest.json — the ONE place it is written.
+// package-skill.ps1 and .claude/hooks/auto-package-skill.js read the same file, so
+// the three can no longer drift apart (they used to hold three hand-synced copies).
+const ENTRIES = require(path.join(ROOT, 'skill-manifest.json')).entries;
 
 // Verify all source files exist before touching the output
 const missing = ENTRIES.filter(e => !fs.existsSync(path.join(SKILL_DIR, e)));

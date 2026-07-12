@@ -10,22 +10,11 @@ const ROOT = path.resolve(__dirname, '../..');
 const SKILL_FILE = path.join(ROOT, 'science-lesson.skill');
 const SCRIPT = path.join(ROOT, 'package-skill.ps1');
 
-// Watch every file that package-skill.ps1 puts in the bundle (fonts/PNG change rarely but cheaply).
-const WATCHED = [
-  'science-lesson/SKILL.md',
-  'science-lesson/references/build.js',
-  'science-lesson/references/graph_gen.py',
-  'science-lesson/references/textbook-index.js',
-  'science-lesson/references/textbook-index.md',
-  'science-lesson/references/slide-options-v4.md',
-  'science-lesson/references/worksheet-spec.md',
-  'science-lesson/references/engage-library.md',
-  'science-lesson/references/backlog.md',
-  'science-lesson/references/lesson-backlog-SKILL.md',
-  'science-lesson/references/starfield_header_FINAL.png',
-  'science-lesson/references/Caveat-Regular.ttf',
-  'science-lesson/references/Caveat-Bold.ttf',
-].map(f => path.join(ROOT, f));
+// Watch exactly the files the packer bundles. The list lives in skill-manifest.json
+// (the ONE place it is written) — package-skill.ps1 and package-skill.js read the
+// same file, so the three can no longer drift apart.
+const WATCHED = require(path.join(ROOT, 'skill-manifest.json')).entries
+  .map(f => path.join(ROOT, 'science-lesson', f));
 
 function mtime(f) {
   try { return fs.statSync(f).mtimeMs; } catch { return 0; }

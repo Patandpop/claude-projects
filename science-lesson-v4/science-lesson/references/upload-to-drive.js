@@ -79,9 +79,126 @@ function appendLog(file, records) {
   return log.length;
 }
 
+// ── Macrotopic fuzzy matcher (2026-07-12) ─────────────────────────────────────
+// Patryk had to type meta.macrotopic as the EXACT Drive folder name ("P4 Earth
+// in Space", not "Space") or the upload failed with only a "did you mean" hint.
+// resolveMacrotopic maps what he typed onto a real folder that already exists.
+// It NEVER creates a folder, and it refuses to guess when the answer is
+// ambiguous — a wrong confident guess would file a lesson in the wrong topic.
+
+// "P4 Earth in Space" → "earth in space"; drops a leading unit code (P4, B3.4, C12)
+// and all punctuation, so the comparison is on the human words only.
+function normTopic(s) {
+  return String(s || '')
+    .toLowerCase()
+    .replace(/^\s*[a-z]{1,2}\s*\d+(\.\d+)?\s*[-–—:.]?\s*/i, '')  // leading unit code
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+}
+const topicTokens = (s) => normTopic(s).split(' ').filter(Boolean);
+
+// Dice coefficient on character bigrams — 1.0 identical, 0.0 nothing in common.
+// Used only as the last resort, to catch typos ("Photosythesis").
+function dice(a, b) {
+  const bigrams = (s) => {
+    const out = new Map();
+    for (let i = 0; i < s.length - 1; i++) {
+      const g = s.slice(i, i + 2);
+      out.set(g, (out.get(g) || 0) + 1);
+    }
+    return out;
+  };
+  const A = bigrams(a), B = bigrams(b);
+  if (!A.size || !B.size) return a === b ? 1 : 0;
+  let hits = 0;
+  for (const [g, n] of A) hits += Math.min(n, B.get(g) || 0);
+  return (2 * hits) / ([...A.values()].reduce((x, y) => x + y, 0) + [...B.values()].reduce((x, y) => x + y, 0));
+}
+
+const FUZZY_FLOOR = 0.62;   // below this, a typo-match is not trustworthy
+const FUZZY_LEAD  = 0.08;   // best must beat runner-up by this much, or it's ambiguous
+
+/* resolveMacrotopic(folders, wanted) → { name, how, candidates? }
+     how: 'exact'    — folder name matched (case-insensitive)
+          'normal'   — matched once the unit code / punctuation was ignored
+          'contains' — every word typed appears in exactly one folder ("Space")
+          'fuzzy'    — closest by spelling, clearly ahead of the runner-up
+          null       — no match, or ambiguous (candidates lists the near-misses) */
+function resolveMacrotopic(folders, wanted) {
+  const list = (folders || []).filter(Boolean);
+  const w = String(wanted || '');
+  if (!list.length || !w) return { name: null, how: null, candidates: list };
+
+  const pick = (hits, how) => (hits.length === 1
+    ? { name: hits[0], how }
+    : (hits.length > 1 ? { name: null, how: null, candidates: hits } : null));
+
+  // 1 — exact (case-insensitive)
+  let r = pick(list.filter((f) => f.toLowerCase() === w.toLowerCase()), 'exact');
+  if (r) return r;
+
+  // 2 — equal once unit code + punctuation are ignored
+  r = pick(list.filter((f) => normTopic(f) === normTopic(w)), 'normal');
+  if (r) return r;
+
+  // 3 — every word typed appears in the folder ("Space" → "P4 Earth in Space")
+  const wt = topicTokens(w);
+  if (wt.length) {
+    r = pick(list.filter((f) => {
+      const ft = topicTokens(f);
+      return wt.every((t) => ft.includes(t));
+    }), 'contains');
+    if (r) return r;
+  }
+
+  // 4 — closest by spelling, but only when it clearly wins (typo safety net)
+  const scored = list
+    .map((f) => ({ f, s: dice(normTopic(f), normTopic(w)) }))
+    .sort((a, b) => b.s - a.s);
+  const best = scored[0], next = scored[1];
+  if (best && best.s >= FUZZY_FLOOR && (!next || best.s - next.s >= FUZZY_LEAD)) {
+    return { name: best.f, how: 'fuzzy' };
+  }
+  return { name: null, how: null, candidates: scored.filter((x) => x.s > 0.3).map((x) => x.f) };
+}
+
+// ── Which three files a lesson ships ──────────────────────────────────────────
+// Pure + exported so the harness can assert the ACTUAL behaviour. (The old test
+// only grepped this file's source text, which is why the meta.lessonType bug
+// below survived: the source string matched while the runtime value was
+// undefined for every real review lesson.)
+const slugName = (s) => String(s || 'lesson').trim().replace(/[^A-Za-z0-9]+/g, '-')
+  .replace(/^-+|-+$/g, '').replace(/-{2,}/g, '-') || 'lesson';
+
+function baseNameFor(meta) {
+  const m = meta || {};
+  const split = String(m.differentiation || 'none').toLowerCase() === 'split';
+  const ability = m.abilityLabel ? slugName(m.abilityLabel) : (split ? 'mixed_ability' : '');
+  return slugName(m.topic || m.title) + (ability ? '_' + ability : '');
+}
+
+// Review AND revision lessons ship a model-answer sheet in the support slot —
+// exactly the rule build.js applies when writing the files.
+function isReviewType(meta) {
+  const t = String((meta || {}).lessonType || '').toLowerCase();
+  return t === 'review' || t === 'revision';
+}
+
+function outputFilesFor(meta) {
+  const base = baseNameFor(meta);
+  return [
+    base + '.pptx',
+    base + '_worksheet.docx',
+    base + (isReviewType(meta) ? '_answers.docx' : '_support_worksheet.docx'),
+  ];
+}
+
 // When required as a module (tests), export the helpers and run nothing else.
 if (require.main !== module) {
-  module.exports = { splitClasses, buildLogRecords, appendLog };
+  module.exports = {
+    splitClasses, buildLogRecords, appendLog,
+    resolveMacrotopic, normTopic, outputFilesFor, baseNameFor, isReviewType,
+  };
   return;
 }
 
@@ -113,9 +230,6 @@ if (!fs.existsSync(driveLetter)) {
   process.exit(1);
 }
 
-const slug = s => String(s || 'lesson').trim().replace(/[^A-Za-z0-9]+/g, '-')
-  .replace(/^-+|-+$/g, '').replace(/-{2,}/g, '-') || 'lesson';
-
 // Returns true if this lesson uploaded at least one file (or would, in dry-run).
 function processLesson(content) {
   const meta = content.meta || {};
@@ -127,32 +241,51 @@ function processLesson(content) {
   }
 
   // ── Construct destination path (M2) ──
+  // 2026-07-12: the macrotopic no longer has to be typed as the exact Drive
+  // folder name. Read the real folders and map onto one of them; only fall back
+  // to the literal text when the subject folder can't be listed. Never creates.
+  const subjDir = path.join(DRIVE_ROOT, `Year ${year}`, subject);
+  let macroFolder = macrotopic;
+  let macroFolders = [];
+  try {
+    macroFolders = fs.readdirSync(subjDir, { withFileTypes: true })
+      .filter((d) => d.isDirectory()).map((d) => d.name);
+  } catch (_) { /* Year/subject level missing — the destDir check below reports it */ }
+
+  if (macroFolders.length) {
+    const m = resolveMacrotopic(macroFolders, macrotopic);
+    if (m.name && m.how !== 'exact') {
+      console.log(`upload-to-drive: macrotopic "${macrotopic}" → "${m.name}" (matched by ${m.how})`);
+      macroFolder = m.name;
+    } else if (m.name) {
+      macroFolder = m.name;                        // exact, incl. case correction
+    } else {
+      console.error(`upload-to-drive: macrotopic "${macrotopic}" does not match any folder in ${subjDir}`);
+      if (m.candidates && m.candidates.length) {
+        console.error('  closest folders: ' + m.candidates.join(' | ')
+          + '\n  too close to call — set meta.macrotopic to the one you mean.');
+      } else {
+        console.error('  folders here: ' + macroFolders.join(' | '));
+      }
+    }
+  }
+
   const destDir = path.join(
     DRIVE_ROOT,
     `Year ${year}`,
     subject,
-    macrotopic,
+    macroFolder,
     `Lesson ${lessonNumber} - ${title}`
   );
 
   // Bug fix: meta.outputDir takes priority over the JSON's own directory (mirrors build.js priority 1)
   const srcDir = meta.outputDir ? path.resolve(meta.outputDir) : path.dirname(path.resolve(jsonArg));
 
-  // Bug fix: derive base name the same way build.js does, not from the JSON filename.
-  const split = String(meta.differentiation || 'none').toLowerCase() === 'split';
-  const ability = meta.abilityLabel ? slug(meta.abilityLabel) : (split ? 'mixed_ability' : '');
-  const base = slug(meta.topic || meta.title) + (ability ? '_' + ability : '');
-
-  // Review lessons ship an answer sheet in the support-worksheet slot.
+  // Base name + file list come from the shared pure helpers above, so what the
+  // harness asserts and what actually uploads can never drift apart.
   // 2026-07-09 (Patryk): no more _PTO suffix — Drive copies keep the clean local names.
-  const isReview = String(content.lessonType || '').toLowerCase() === 'review';
-  const sourceFiles = [
-    { src: base + '.pptx',           destName: base + '.pptx' },
-    { src: base + '_worksheet.docx', destName: base + '_worksheet.docx' },
-    isReview
-      ? { src: base + '_answers.docx',           destName: base + '_answers.docx' }
-      : { src: base + '_support_worksheet.docx', destName: base + '_support_worksheet.docx' },
-  ];
+  const base = baseNameFor(meta);
+  const sourceFiles = outputFilesFor(meta).map((n) => ({ src: n, destName: n }));
 
   // M8: dry-run — print only, touch nothing (no log written)
   if (dryRun) {

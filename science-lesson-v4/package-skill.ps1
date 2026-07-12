@@ -7,22 +7,16 @@ $ErrorActionPreference = 'Stop'
 $ROOT      = $PSScriptRoot
 $SKILL_DIR = Join-Path $ROOT "science-lesson"
 $OUT       = Join-Path $ROOT "science-lesson.skill"
+$MANIFEST  = Join-Path $ROOT "skill-manifest.json"
 
-$ENTRIES = @(
-    "SKILL.md",
-    "references/build.js",
-    "references/graph_gen.py",
-    "references/textbook-index.js",
-    "references/textbook-index.md",
-    "references/slide-options-v4.md",
-    "references/worksheet-spec.md",
-    "references/engage-library.md",
-    "references/starfield_header_FINAL.png",
-    "references/backlog.md",
-    "references/lesson-backlog-SKILL.md",
-    "references/Caveat-Regular.ttf",
-    "references/Caveat-Bold.ttf"
-)
+# The packed-file list lives in skill-manifest.json — the ONE place it is written.
+# package-skill.js and .claude/hooks/auto-package-skill.js read the same file, so
+# the three can no longer drift apart (they used to hold three hand-synced copies).
+if (-not (Test-Path $MANIFEST)) {
+    Write-Error "skill-manifest.json not found at $MANIFEST"
+    exit 1
+}
+$ENTRIES = (Get-Content $MANIFEST -Raw | ConvertFrom-Json).entries
 
 # Verify all source files exist
 $missing = $ENTRIES | Where-Object { -not (Test-Path (Join-Path $SKILL_DIR $_)) }

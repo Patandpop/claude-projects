@@ -1,0 +1,17 @@
+{
+  "_comment": "THE canonical list of files packed into science-lesson.skill. Read by package-skill.ps1, package-skill.js and .claude/hooks/auto-package-skill.js — change it here and all three follow. Paths are relative to science-lesson/.",
+  "entries": [
+    "SKILL.md",
+    "references/build.js",
+    "references/graph_gen.py",
+    "references/textbook-index.js",
+    "references/textbook-index.md",
+    "references/slide-options-v4.md",
+    "references/worksheet-spec.md",
+    "references/engage-library.md",
+    "references/starfield_header_FINAL.png",
+    "references/lesson-backlog-SKILL.md",
+    "references/Caveat-Regular.ttf",
+    "references/Caveat-Bold.ttf"
+  ]
+}

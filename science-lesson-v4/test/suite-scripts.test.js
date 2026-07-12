@@ -70,11 +70,60 @@ function run() {
     try { fs.unlinkSync(tmp); } catch (_) {}
   }
 
-  // uploader — review lessons swap support for answers in the copy list
+  // uploader — review lessons swap support for answers in the copy list.
+  // Behavioural, not a source grep: the old grep-based version passed while the
+  // code read content.lessonType instead of content.meta.lessonType, so every
+  // real review lesson silently uploaded without its answer sheet (fixed 2026-07-12).
+  const up = require('../science-lesson/references/upload-to-drive.js');
+
+  const revFiles = up.outputFilesFor({ topic: 'Rates of Reaction Review', lessonType: 'review' });
+  if (revFiles[2] === 'Rates-of-Reaction-Review_answers.docx')
+    pass('uploader review lesson ships the answer sheet (meta.lessonType read correctly)');
+  else fail(`uploader review file list wrong — third file is "${revFiles[2]}", expected the _answers.docx sheet`);
+
+  const revisionFiles = up.outputFilesFor({ topic: 'Paper 1 Revision', lessonType: 'revision' });
+  if (revisionFiles[2].endsWith('_answers.docx'))
+    pass('uploader treats revision like review (answer sheet, matching build.js)');
+  else fail('uploader does not treat revision lessons like review — answer sheet would not upload');
+
+  const stdFiles = up.outputFilesFor({ topic: 'Ideal Gas Law', lessonType: 'standard' });
+  if (stdFiles[2] === 'Ideal-Gas-Law_support_worksheet.docx')
+    pass('uploader standard lesson still ships the support worksheet');
+  else fail(`uploader standard file list wrong — third file is "${stdFiles[2]}"`);
+
+  // macrotopic fuzzy matcher (2026-07-12) — maps what Patryk typed onto a real folder.
+  const FOLDERS = ['P4 Earth in Space', 'P1 Energy Transfers', 'B3 Organisation', 'C5 Energy Changes', 'Photosynthesis'];
+  const cases = [
+    ['P4 Earth in Space', 'P4 Earth in Space', 'exact'],
+    ['p4 earth in space', 'P4 Earth in Space', 'exact'],          // case-insensitive
+    ['Earth in Space',    'P4 Earth in Space', 'normal'],         // unit code omitted
+    ['Space',             'P4 Earth in Space', 'contains'],       // the real 2026-07-09 miss
+    ['Photosythesis',     'Photosynthesis',    'fuzzy'],          // typo
+    ['Organisation',      'B3 Organisation',   'contains'],
+  ];
+  for (const [typed, want, how] of cases) {
+    const r = up.resolveMacrotopic(FOLDERS, typed);
+    if (r.name === want) pass(`macrotopic "${typed}" → "${want}" (${r.how})`);
+    else fail(`macrotopic "${typed}" → ${r.name === null ? 'NO MATCH' : '"' + r.name + '"'}, expected "${want}" by ${how}`);
+  }
+  // Ambiguity must NOT be guessed — "Energy" fits both "P1 Energy Transfers" and
+  // "C5 Energy Changes" equally, and a confident wrong guess misfiles the lesson.
+  const amb = up.resolveMacrotopic(FOLDERS, 'Energy');
+  if (amb.name === null && amb.candidates && amb.candidates.length >= 2)
+    pass('ambiguous macrotopic refuses to guess and lists the candidates');
+  else fail(`ambiguous macrotopic "Energy" was resolved to "${amb.name}" — it must refuse rather than misfile a lesson`);
+  // But a full normalised match still wins outright even when another folder shares
+  // the word — "Energy Changes" is C5, not an ambiguity with "P1 Energy Transfers".
+  const exactish = up.resolveMacrotopic(FOLDERS, 'Energy Changes');
+  if (exactish.name === 'C5 Energy Changes')
+    pass('a complete topic name still resolves outright despite a shared word');
+  else fail(`"Energy Changes" resolved to ${exactish.name === null ? 'NO MATCH' : '"' + exactish.name + '"'} — expected C5 Energy Changes`);
+  // Nonsense must not match anything.
+  const none = up.resolveMacrotopic(FOLDERS, 'Quantum Basket Weaving');
+  if (none.name === null) pass('unrelated macrotopic does not fuzzy-match onto a real folder');
+  else fail(`unrelated macrotopic matched "${none.name}" — the fuzzy floor is too low`);
+
   const upSrc = fs.readFileSync(path.join(__dirname, '../science-lesson/references/upload-to-drive.js'), 'utf8');
-  if (upSrc.includes("_answers.docx") && upSrc.includes("lessonType || '').toLowerCase() === 'review'"))
-    pass('uploader is review-aware (_answers.docx in the copy list)');
-  else fail('uploader missing review answer-sheet handling');
   if (upSrc.includes('for (const lesson of lessons)'))
     pass('uploader loops over every lesson in a multi-lesson JSON');
   else fail('uploader still only uploads the first lesson of an array');
