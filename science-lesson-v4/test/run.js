@@ -362,6 +362,38 @@ function main() {
   if (totalMedia > 0) pass(`${totalMedia} image(s) embedded across all decks`);
   else fail('zero images embedded anywhere — graph/image pipeline is broken');
 
+  // Blocking CONTENT CHECK (2026-07-12): a teaching lesson with no Apply questions
+  // is a broken deliverable and must refuse to build — but --force must override
+  // it (the checker could be wrong, minutes before a lesson). Thin lessons (a light
+  // tier, 5 Do Nows) must still build. Build a tiny synthetic lesson to prove all three.
+  console.log('\n── content-check blocking policy');
+  {
+    const emptyApply = {
+      meta: { class: '9AB', topic: 'Blocker Probe', title: 'Blocker Probe', lessonType: 'standard' },
+      title: { objectives: ['x'], keywords: ['x'] },
+      doNow: { questions: Array.from({ length: 6 }, (_, i) => ({ q: 'Q' + i, a: 'A' })) },
+      learn: [{ variant: 'A', imagePlaceholder: false }],
+      build: [], apply: { developing: [], reaching: [], mastering: [] },
+    };
+    const probeDir = path.join(tmp, 'blocker-probe');
+    fs.mkdirSync(probeDir, { recursive: true });
+    const probePath = path.join(probeDir, '_input.json');
+    fs.writeFileSync(probePath, JSON.stringify([emptyApply]), 'utf8');
+    const env = Object.assign({}, process.env, { NO_UPLOAD: '1' });
+
+    const blocked = cp.spawnSync(process.execPath, [BUILD_JS, probePath, probeDir], { cwd: ROOT, encoding: 'utf8', env });
+    const blockedOut = (blocked.stdout || '') + (blocked.stderr || '');
+    if (/refusing to build/i.test(blockedOut) && !fs.existsSync(path.join(probeDir, 'Blocker-Probe.pptx')))
+      pass('no-Apply lesson refuses to build (blocking check fires, no files written)');
+    else fail('no-Apply lesson built anyway — the blocking Apply check did not fire');
+
+    const forced = cp.spawnSync(process.execPath, [BUILD_JS, probePath, probeDir, '--force'], { cwd: ROOT, encoding: 'utf8', env });
+    const forcedOut = (forced.stdout || '') + (forced.stderr || '');
+    if (/FORCED BUILD/i.test(forcedOut) && fs.existsSync(path.join(probeDir, 'Blocker-Probe.pptx')))
+      pass('--force overrides the blocking check and builds anyway (loudly)');
+    else fail('--force did not override the blocking check — the escape hatch is broken');
+  }
+
   // Unit coverage the NO_UPLOAD build path can't reach (lesson-log writer).
   console.log('');
   const logTest = require(path.join(__dirname, 'lesson-log.test.js')).run();

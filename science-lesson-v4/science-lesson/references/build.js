@@ -3128,7 +3128,10 @@ function contentCheck(L) {
   const name = meta.topic || meta.title || 'unknown';
   const isTeaching = type === 'standard' || type === 'practical' || type === 'annotation';
   const lines = [];
+  const blockers = [];   // 2026-07-12: BROKEN output — refuse to build (overridable)
   const check = (ok, good, bad) => lines.push(ok ? `  ✓ ${good}` : `  ✗ ${bad}`);
+  // A blocking check: the lesson would be unusable or unfindable, not merely thin.
+  const must = (ok, good, bad) => { check(ok, good, bad); if (!ok) blockers.push(bad); };
 
   const dn = arr((L.doNow || {}).questions).length;
   check(dn === 6, `Do Now ${dn}/6`, `Do Now has ${dn} question(s) — rule is exactly 6`);
@@ -3175,9 +3178,24 @@ function contentCheck(L) {
   check(anyImg, 'images embedded / image bank present',
     'NO images anywhere (no embeddedImagePath, empty image_dump) — if a source deck exists, extraction was skipped');
 
+  // NOT blocking: missing Drive meta only stops the HOME auto-upload. The lesson
+  // still builds and is fully teachable, and at school (claude.ai) there is no
+  // uploader at all — so refusing to build here would deny a usable lesson over a
+  // field that does not matter in the room. The uploader errors loudly by itself.
   const missMeta = ['year', 'subject', 'macrotopic', 'lessonNumber', 'title'].filter((k) => !meta[k]);
   check(missMeta.length === 0, 'Drive meta complete',
-    `Drive meta missing: ${missMeta.join(', ')} — lesson will NOT upload or reach lesson-log`);
+    `Drive meta missing: ${missMeta.join(', ')} — builds fine, but will NOT auto-upload or reach the lesson log`);
+
+  // BLOCKING: a teaching lesson with no Apply questions has nothing for pupils to
+  // do — the worksheet prints empty tier headings. That is a broken deliverable
+  // rather than a thin one, and it cannot happen in a real lesson, so refusing is
+  // safe. Everything else stays a warning: a thin lesson at 08:55 still beats no
+  // lesson. --force overrides even this, in case the checker itself is wrong.
+  if (isTeaching) {
+    const applyTotal = TIERS.reduce((n, t) => n + arr((L.apply || {})[t]).length, 0);
+    must(applyTotal > 0, 'Apply section present',
+      'Apply has NO questions in any tier — the worksheet would print empty tier headings');
+  }
 
   const wx = L.worksheetExtras || {};
   if (wx.cloze && !isTeaching)
@@ -3185,6 +3203,36 @@ function contentCheck(L) {
 
   console.log(`── CONTENT CHECK · ${name}`);
   lines.forEach((l) => console.log(l));
+
+  // Plain-English one-liner so a thin lesson is visible without reading the list.
+  const thin = lines.filter((l) => l.startsWith('  ✗')).length - blockers.length;
+  if (thin > 0) console.log(`  ⚠ Built, but ${thin} authoring rule(s) fell short — see the ✗ lines above.`);
+
+  return blockers;
+}
+
+/* Blocking policy (2026-07-12, after a second-opinion consult):
+     - HARD FAIL on faults that make the output broken or unfindable (no Drive
+       meta, no Apply questions). Refusing is right: the lesson would be lost.
+     - WARN on thin pedagogy (5 Do Nows, 2 MCQs, a light tier). A thin lesson at
+       08:55 still beats no lesson, so these never block.
+     - ALWAYS overridable with --force (or FORCE_BUILD=1) for the case that
+       matters most: a false positive in a checker, minutes before a lesson.
+       Every override is announced loudly so it can never become the silent norm. */
+const FORCE_BUILD = process.argv.includes('--force') || process.env.FORCE_BUILD === '1';
+function enforceBlockers(blockers, label) {
+  if (!blockers.length) return;
+  if (FORCE_BUILD) {
+    console.error(`  ⚠ FORCED BUILD — ${blockers.length} blocking fault(s) ignored on "${label}":`);
+    blockers.forEach((b) => console.error(`      • ${b}`));
+    return;
+  }
+  const msg = [
+    `${blockers.length} blocking fault(s) — refusing to build "${label}":`,
+    ...blockers.map((b) => '      • ' + b),
+    '    Fix the lesson JSON, or re-run with --force to build it anyway.',
+  ].join('\n    ');
+  throw new Error(msg);
 }
 
 /* 6-mark rule: an extended (non-calculation) question worth ≥6 marks must carry
@@ -3247,7 +3295,11 @@ async function buildPptx(L, outPath) {
   pptx.theme = { headFontFace: FONT, bodyFontFace: FONT };
 
   const type = (L.meta.lessonType || L.meta.type || 'standard').toLowerCase();
-  contentCheck(L); // 2026-07-09: loud authoring-rule report (replaces the lone MCQ warn)
+  // 2026-07-09: loud authoring-rule report (replaces the lone MCQ warn).
+  // 2026-07-12: it now also returns the BLOCKING faults — a lesson that would be
+  // lost (no Drive meta) or empty (no Apply questions) refuses to build unless
+  // --force is passed. Thin-but-usable lessons still build with a warning.
+  enforceBlockers(contentCheck(L), L.meta.topic || L.meta.title || 'lesson');
   checkSixMarkRule(L);
   // Bug 57: the renderer reads flat apply.developing/reaching/mastering and
   // review.questions — a nested `.tiers.X.qs` shape is silently dropped. Warn
