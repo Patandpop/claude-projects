@@ -106,6 +106,12 @@ function main() {
     catch (e) { fail(`fixture is not valid JSON: ${e.message}`); continue; }
     const lessons = Array.isArray(parsed) ? parsed : [parsed];
     lessons.forEach(L => { if (L && L.meta) delete L.meta.outputDir; });
+    // 2026-07-12 review policy: authoring side omits `review`; the builder copies
+    // Apply Q&A onto the review slides itself. Strip review from the y7 fixture
+    // (every Apply tier question carries an answer) so the auto-copy path is
+    // exercised on every run (assertion further down). bug-test keeps its review
+    // prose — the ² glyph coverage depends on that prose superscript path.
+    if (fixture === 'y7-b1-l1-mrs-gren.json') lessons.forEach(L => { delete L.review; });
     const sanitisedPath = path.join(outDir, '_input.json');
     fs.writeFileSync(sanitisedPath, JSON.stringify(lessons), 'utf8');
 
@@ -122,6 +128,13 @@ function main() {
     // Graph pipeline guard — the exact failure class fixed 2026-07-02.
     if (/\[graph_gen\]/.test(output)) fail('graph_gen reported an error (graphs will be missing)');
     else pass('no graph_gen errors');
+
+    // Degraded-output guard (2026-07-12): a build that "succeeded" but shipped a
+    // grey placeholder / lost font / dropped textbook ref now says so via
+    // "⚠ BUILD WARNING". Fixtures must build with zero of them.
+    const bw = output.match(/⚠ BUILD WARNING[^\n]*/g);
+    if (bw) { bw.forEach(m => fail(`degraded output: ${m.trim()}`)); }
+    else pass('no build warnings (nothing silently degraded)');
 
     // CONTENT CHECK must print for every lesson (2026-07-09 authoring-rule report).
     if (output.includes('── CONTENT CHECK ·')) pass('CONTENT CHECK report printed');
@@ -237,6 +250,24 @@ function main() {
       if (fs.existsSync(doc) && readArchiveXml(doc).includes('37°C'))
         fail('bigFact leaked onto the worksheet — should be display-only');
       else pass('bigFact: no worksheet-side output (display-only, as specced)');
+    }
+
+    // Review auto-copy (2026-07-12): this fixture's `review` section was stripped
+    // at sanitise time, so tier review slides can only exist if buildReviewSlides
+    // copied the Apply Q&A itself. This is what lets the authoring side stop
+    // writing the review section out by hand (token saving).
+    if (fixture === 'y7-b1-l1-mrs-gren.json') {
+      const pptx = path.join(outDir, baseName(lessons[0].meta) + '.pptx');
+      if (!fs.existsSync(pptx)) fail('y7 pptx missing');
+      else {
+        const xml = readArchiveXml(pptx);
+        const tiersOnSlides = ['DEVELOPING', 'REACHING', 'MASTERING'].filter(t => xml.includes('Review · ' + t));
+        if (tiersOnSlides.length === 3) pass('review slides auto-copied from Apply (authored review omitted)');
+        else fail(`review auto-copy regressed — only ${tiersOnSlides.length}/3 tier review slides built from Apply`);
+        // The copy must be verbatim: an Apply answer must appear on the review slide.
+        if (xml.includes('Sensitivity')) pass('auto-copied review carries the Apply answer text verbatim');
+        else fail('auto-copied review slides are missing the Apply answer text');
+      }
     }
 
     // Textbook reference guard: amylase (Y9 enzymes) must auto-match the index

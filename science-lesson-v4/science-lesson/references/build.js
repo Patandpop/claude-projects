@@ -128,13 +128,16 @@ const GOLD_DASH = { color: GOLD, width: 1, dashType: 'dash' };
 const CAVEAT = 'Caveat';
 const CAVEAT_REGULAR_PATH = path.join(__dirname, 'Caveat-Regular.ttf');
 const CAVEAT_BOLD_PATH = path.join(__dirname, 'Caveat-Bold.ttf');
-const CAVEAT_CPI = 105; // approx Caveat chars-per-inch at 1pt (script font, looser than Trebuchet)
+const CAVEAT_CPI = 100; // approx Caveat BOLD chars-per-inch at 1pt (bold runs slightly wider than regular)
+// 2026-07-12 (Patryk): amplitudes cut ~40% across all presets — the up/down
+// bounce and slant made words hard to read from the back; keeps the neat→messy
+// spread but every preset is calmer. Handwriting is also bold + 2pt bigger now.
 const JITTER_PROFILES = [
-  { rot: [-1, 0.5, -0.5, 1, 0], base: [0, 0.01, -0.01, 0.005, -0.005] },                                    // 1 neat
-  { rot: [-2, 1.5, -1, 2, -0.5, 1], base: [0.01, -0.015, 0.02, -0.01, 0.015, -0.02] },                       // 2
-  { rot: [-3, 2, -2.5, 3, -1.5, 2.5, -1], base: [0.02, -0.025, 0.015, -0.02, 0.03, -0.015, 0.02] },          // 3 mid
-  { rot: [-4.5, 3, -3.5, 4, -2.5, 3.5, -4, 2], base: [0.03, -0.035, 0.025, -0.03, 0.04, -0.02, 0.035, -0.025] }, // 4
-  { rot: [-6, 4.5, -5, 5.5, -4, 5, -6.5, 3.5, -4.5], base: [0.04, -0.05, 0.035, -0.045, 0.05, -0.03, 0.045, -0.04, 0.03] }, // 5 messy
+  { rot: [-0.6, 0.3, -0.3, 0.6, 0], base: [0, 0.006, -0.006, 0.003, -0.003] },                                    // 1 neat
+  { rot: [-1.2, 0.9, -0.6, 1.2, -0.3, 0.6], base: [0.006, -0.009, 0.012, -0.006, 0.009, -0.012] },                 // 2
+  { rot: [-1.8, 1.2, -1.5, 1.8, -0.9, 1.5, -0.6], base: [0.012, -0.015, 0.009, -0.012, 0.018, -0.009, 0.012] },    // 3 mid
+  { rot: [-2.7, 1.8, -2.1, 2.4, -1.5, 2.1, -2.4, 1.2], base: [0.018, -0.021, 0.015, -0.018, 0.024, -0.012, 0.021, -0.015] }, // 4
+  { rot: [-3.6, 2.7, -3, 3.3, -2.4, 3, -3.9, 2.1, -2.7], base: [0.024, -0.03, 0.021, -0.027, 0.03, -0.018, 0.027, -0.024] }, // 5 messy
 ];
 
 /* ============================== UTILITIES ================================ */
@@ -509,7 +512,10 @@ function lessonBookRef(L) {
       override: meta.textbookRef,
     });
     return m ? 'Read more — ' + TBIDX.formatRef(m) : '';
-  } catch (_) { return ''; }
+  } catch (e) {
+    buildWarn(`textbook reference lookup failed (${e.message || e}) — Apply slide/worksheet ships without a page ref`);
+    return '';
+  }
 }
 
 /* goldBox(x, y, w, h, content, opts?) — white fill, gold 2pt border */
@@ -578,17 +584,42 @@ function imagePlaceholder(slide, x, y, w, h, description) {
   });
 }
 
+/* BUILD WARNINGS (2026-07-12) — degraded-output collector. Any failure that
+   used to be swallowed (image embed, handwriting font, textbook lookup) now
+   logs "⚠ BUILD WARNING" immediately and is counted per lesson so a build that
+   "succeeded" but shipped a worse file says so out loud. Never blocks. */
+const BUILD_WARNS = [];
+function buildWarn(msg) {
+  BUILD_WARNS.push(msg);
+  console.error(`  ⚠ BUILD WARNING: ${msg}`);
+}
+function flushBuildWarns(name) {
+  const n = BUILD_WARNS.length;
+  if (n) console.error(`  ⚠ ${n} build warning(s) on "${name}" — output is degraded, see lines above`);
+  BUILD_WARNS.length = 0;
+  return n;
+}
+
 /* imageOrPlaceholder(item, x, y, w, h) — embed the lesson's real image when one
    was matched (imageConfidence 'search' + embeddedImagePath), else a
    description-aware grey placeholder. Single source of truth so a slide type can
    never again forget to pass item.imageDescription (Bug 58 regression — variants
-   H and J were calling imagePlaceholder without it). */
+   H and J were calling imagePlaceholder without it). A promised image that is
+   missing or unreadable now warns loudly instead of degrading silently. */
 function imageOrPlaceholder(slide, item, x, y, w, h) {
   if (item && item.imageConfidence === 'search' && item.embeddedImagePath) {
-    slide.addImage({ path: item.embeddedImagePath, x, y, w, h });
-  } else {
-    imagePlaceholder(slide, x, y, w, h, (item && item.imageDescription) || null);
+    if (fs.existsSync(item.embeddedImagePath)) {
+      try {
+        slide.addImage({ path: item.embeddedImagePath, x, y, w, h });
+        return;
+      } catch (e) {
+        buildWarn(`image embed failed, grey placeholder shipped instead (${item.embeddedImagePath}): ${e.message || e}`);
+      }
+    } else {
+      buildWarn(`image file NOT FOUND, grey placeholder shipped instead: ${item.embeddedImagePath}`);
+    }
   }
+  imagePlaceholder(slide, x, y, w, h, (item && item.imageDescription) || null);
 }
 
 /* annotationZone — dashed gold, "worked live" label. Immovable. */
@@ -622,7 +653,7 @@ function handwritingMode(L, item) {
    Shared by both render paths below so layout logic exists exactly once. */
 function layoutHandwriting(text, w, opts) {
   const o = opts || {};
-  const fontSize = o.fontSize || 20;
+  const fontSize = o.fontSize || 22;
   const profile = o.profile != null ? o.profile : 2;
   const baseLineH = (fontSize * 1.55) / 72;
   const paras = Array.isArray(text) ? text.map(String) : [String(text || '')];
@@ -667,7 +698,7 @@ function layoutHandwriting(text, w, opts) {
    JITTER_PROFILES. Real, editable text — not an image. */
 function handwritingBlockEditable(slide, x, y, w, h, text, opts) {
   const o = opts || {};
-  const fontSize = o.fontSize || 20;
+  const fontSize = o.fontSize || 22;
   const color = o.color || '1A1A2E';
   if (o.fill !== false) {
     slide.addShape('rect', { x, y, w, h, fill: { color: o.bg || 'FFFFFF' }, line: o.line || GOLD2 });
@@ -676,7 +707,7 @@ function handwritingBlockEditable(slide, x, y, w, h, text, opts) {
   placed.forEach(({ word, x: wx, y: wy, w: ww, rot }) => {
     slide.addText(word, {
       x: x + wx, y: y + wy, w: ww + 0.14, h: lineH,
-      fontFace: CAVEAT, fontSize, color, rotate: rot,
+      fontFace: CAVEAT, fontSize, bold: true, color, rotate: rot,   // bold 2026-07-12: heavier stroke reads better from the back
       align: 'left', valign: 'bottom', margin: 0,
     });
   });
@@ -694,8 +725,15 @@ function handwritingBlockEditable(slide, x, y, w, h, text, opts) {
 let _caveatBase64Cache = null;
 function caveatBase64() {
   if (_caveatBase64Cache == null) {
-    try { _caveatBase64Cache = fs.readFileSync(CAVEAT_REGULAR_PATH).toString('base64'); }
-    catch (e) { _caveatBase64Cache = ''; }
+    // Bold preferred since 2026-07-12 — all handwriting renders bold now.
+    try { _caveatBase64Cache = fs.readFileSync(CAVEAT_BOLD_PATH).toString('base64'); }
+    catch (e) {
+      try { _caveatBase64Cache = fs.readFileSync(CAVEAT_REGULAR_PATH).toString('base64'); }
+      catch (e2) {
+        buildWarn('handwriting font (Caveat) could not be read — raster handwriting will fall back to a generic font');
+        _caveatBase64Cache = '';
+      }
+    }
   }
   return _caveatBase64Cache;
 }
@@ -708,7 +746,7 @@ function caveatBase64() {
    Everything else on the deck stays normal editable text. */
 function handwritingBlockRaster(slide, x, y, w, h, text, opts) {
   const o = opts || {};
-  const fontSize = o.fontSize || 20;
+  const fontSize = o.fontSize || 22;
   const color = (o.color || '1A1A2E').replace(/^(?!#)/, '#');
   const { placed, lineH, padTop, usedH } = layoutHandwriting(text, w, Object.assign({ boxH: h }, o));
   const px = 96;
@@ -721,7 +759,7 @@ function handwritingBlockRaster(slide, x, y, w, h, text, opts) {
   }
   placed.forEach(({ word, x: wx, y: wy, rot }) => {
     const px_ = wx * px, py_ = (wy + fontSize / 72 * 1.1) * px;
-    parts.push(`<text x="${px_.toFixed(1)}" y="${py_.toFixed(1)}" font-family="Caveat" font-size="${(fontSize * px / 72).toFixed(1)}" fill="${color}" transform="rotate(${rot} ${px_.toFixed(1)} ${py_.toFixed(1)})">${esc(word)}</text>`);
+    parts.push(`<text x="${px_.toFixed(1)}" y="${py_.toFixed(1)}" font-family="Caveat" font-weight="bold" font-size="${(fontSize * px / 72).toFixed(1)}" fill="${color}" transform="rotate(${rot} ${px_.toFixed(1)} ${py_.toFixed(1)})">${esc(word)}</text>`);
   });
   if (o.ruled) {
     const ruleGap = lineH * px;
@@ -1009,11 +1047,7 @@ function slideEngage(pptx, L) {
     const qW = hasImg ? leftW : CW;
     goldBox(s, MX, midY, qW, midH, e.reveal.question, { bold: true, fontSize: autoFontSize(e.reveal.question, qW, midH, { min: 16, max: 34 }), valign: 'middle', align: 'center', fill: 'FFFDE7' });
     if (hasImg) {
-      if (e.imageConfidence === 'search' && e.embeddedImagePath) {
-        s.addImage({ path: e.embeddedImagePath, x: MX + leftW + 0.15, y: midY, w: CW * 0.45 - 0.15, h: midH });
-      } else {
-        imagePlaceholder(s, MX + leftW + 0.15, midY, CW * 0.45 - 0.15, midH, e.imageDescription);
-      }
+      imageOrPlaceholder(s, e, MX + leftW + 0.15, midY, CW * 0.45 - 0.15, midH);
     }
     const ansY = midY + midH + GAP;
     txt(s, e.reveal.answer || '', {
@@ -1035,11 +1069,7 @@ function slideEngage(pptx, L) {
       // (image_search run, Wikimedia/clearly-licensed source) before this build step —
       // build.js itself does not call image_search. 'described' (or unset) renders the
       // placeholder with e.imageDescription so the description is never lost/blank.
-      if (e.imageConfidence === 'search' && e.embeddedImagePath) {
-        s.addImage({ path: e.embeddedImagePath, x: MX + leftW + 0.15, y, w: CW * 0.45 - 0.15, h: ctxH + videoH + (videoH ? GAP : 0) });
-      } else {
-        imagePlaceholder(s, MX + leftW + 0.15, y, CW * 0.45 - 0.15, ctxH + videoH + (videoH ? GAP : 0), e.imageDescription);
-      }
+      imageOrPlaceholder(s, e, MX + leftW + 0.15, y, CW * 0.45 - 0.15, ctxH + videoH + (videoH ? GAP : 0));
     } else {
       // No image: hook (large, prominent) + body below — or body alone at larger/centred size.
       // Prevents the single-flat-paragraph-in-a-huge-box layout that looks visually empty.
@@ -1857,7 +1887,7 @@ function slideCorrectStatement(pptx, L, item) {
     const cx = MX + col * (colW + GAP);
     const cy = y + row * (rowH + GAP);
     handwritingBlock(s, cx, cy, colW, claimH, prettyText(st.text || st.claim || ''), {
-      fontSize: 20, profile, ruled: false, mode: handwritingMode(L, item),   // 2026-07-05: bigger — 16pt read too small from the back
+      fontSize: 22, profile, ruled: false, mode: handwritingMode(L, item),   // 2026-07-12: +2pt again per Patryk — pupils still found it small
     });
     goldBox(s, cx, cy + claimH + GAP * 0.4, colW, correctH, [
       { text: '✓  ', options: { bold: true, fontSize: 16, color: GOLD } },
@@ -2262,9 +2292,9 @@ function slideModelAnswerReview(pptx, L, item) {
       imagePlaceholder(s, MX, y, leftW, panelH, 'Model graph — add graphData to JSON');
     }
   } else if (qType === 'calculation') {
-    handwritingBlock(s, MX, y, leftW, panelH, arr(item.modelAnswer).map(prettyText), { fontSize: 22, profile, ruled: true, mode: handwritingMode(L, item) }); // Bug 53 symbols; 2026-07-05 bigger
+    handwritingBlock(s, MX, y, leftW, panelH, arr(item.modelAnswer).map(prettyText), { fontSize: 24, profile, ruled: true, mode: handwritingMode(L, item) }); // Bug 53 symbols; 2026-07-12 +2pt per Patryk
   } else {
-    handwritingBlock(s, MX, y, leftW, panelH, prettyText(item.modelAnswer || ''), { fontSize: 24, profile, ruled: true, mode: handwritingMode(L, item) });
+    handwritingBlock(s, MX, y, leftW, panelH, prettyText(item.modelAnswer || ''), { fontSize: 26, profile, ruled: true, mode: handwritingMode(L, item) });
   }
 
   goldBox(s, rightX, y, rightW, panelH, buildMarkingPanelRuns(item), {
@@ -2325,7 +2355,7 @@ function slideMarkTheAnswers(pptx, L, item) {
       bold: true, fontSize: 12, align: 'left', valign: 'middle', margin: 6,
     });
     handwritingBlock(f1.s, rightX, cy + labelH, rightW, boxH - labelH, prettyText(sm.text || ''), {
-      fontSize: 17, ruled: true, mode: handwritingMode(L, item),
+      fontSize: 19, ruled: true, mode: handwritingMode(L, item),   // 2026-07-12: +2pt per Patryk
       profile: sm.jitterProfile != null ? sm.jitterProfile : (MTA_JITTER[i] != null ? MTA_JITTER[i] : 2),
     });
   });
@@ -3069,7 +3099,8 @@ function slideImageDump(pptx, L) {
       } else {
         imagePlaceholder(s, x, y, iw, imgH, img.label || 'no path');
       }
-    } catch (_) {
+    } catch (e) {
+      buildWarn(`image bank: "${img.label || img.path}" failed to load (${e.message || e}) — grey placeholder shipped`);
       imagePlaceholder(s, x, y, iw, imgH, img.label || 'load error');
     }
     // Gold italic label below each image (always gold — unassigned shown grey-gold)
@@ -3109,12 +3140,25 @@ function contentCheck(L) {
       const a = arr((L.apply || {})[t]).length;
       check(a >= 3, `Apply ${t} ${a}/3+`, `Apply ${t} has ${a} question(s) — minimum 3 per tier`);
     });
-    TIERS.forEach((t) => {
-      const a = arr((L.apply || {})[t]).length;
-      const r = arr((L.review || {})[t]).length;
-      check(r === a && a > 0, `Review ${t} mirrors Apply (${r}/${a})`,
-        `Review ${t} has ${r} answer(s) for ${a} Apply question(s) — review must mirror EVERY Apply question`);
-    });
+    // Review policy (2026-07-12): review is a verbatim copy of Apply, and the
+    // builder does the copying itself (buildReviewSlides falls back to Apply Q&A).
+    // The authoring side should OMIT review entirely; an explicit review is still
+    // honoured (must mirror every Apply question), but it is wasted authoring.
+    const reviewAuthored = TIERS.some((t) => arr((L.review || {})[t]).length);
+    if (reviewAuthored) {
+      TIERS.forEach((t) => {
+        const a = arr((L.apply || {})[t]).length;
+        const r = arr((L.review || {})[t]).length;
+        check(r === a && a > 0, `Review ${t} mirrors Apply (${r}/${a})`,
+          `Review ${t} has ${r} answer(s) for ${a} Apply question(s) — review must mirror EVERY Apply question (or omit review and let the builder copy)`);
+      });
+    } else {
+      TIERS.forEach((t) => {
+        const missingA = arr((L.apply || {})[t]).map(normQ).filter((q) => !q.a).length;
+        check(missingA === 0, `Review ${t} auto-copied from Apply`,
+          `Apply ${t} has ${missingA} question(s) with NO answer — those drop off the auto-copied review slides`);
+      });
+    }
   }
 
   // Image discipline: every placeholder slot needs a Google-searchable description,
@@ -3415,7 +3459,9 @@ function diagramOrImage(prac) {
         alignment: AlignmentType.CENTER,
         spacing: { after: GAP_MD }, // M2
       }), spacer()];
-    } catch (_) {}
+    } catch (e) {
+      buildWarn(`worksheet diagram image failed to embed (${prac.embeddedImagePath}): ${e.message || e} — description box shipped instead`);
+    }
   }
   return diagramBox(prac.imageDescription || '[Equipment / apparatus diagram — teacher inserts]', 8); // M6: use imageDescription in fallback
 }
@@ -4330,10 +4376,12 @@ async function main() {
       }
 
       ok++;
+      flushBuildWarns(label);       // 2026-07-12: degraded-but-successful builds now say so out loud
     } catch (e) {
       fail++;
       console.error('  \u2717 FAILED: ' + label + ' \u00B7 ' + e.message);
       if (process.env.BUILD_DEBUG) console.error(e.stack);
+      flushBuildWarns(label);
     }
   }
   console.log('\nDone. ' + ok + ' lesson(s) built, ' + fail + ' failed.');
