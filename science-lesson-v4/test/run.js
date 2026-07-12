@@ -134,10 +134,11 @@ function main() {
     for (const L of lessons) {
       if (!L.meta) { fail('lesson missing meta'); continue; }
       const base     = baseName(L.meta);
-      const isReview = String(L.meta.lessonType || '').toLowerCase() === 'review';
+      const lessonTypeLower = String(L.meta.lessonType || '').toLowerCase();
+      const isReview = lessonTypeLower === 'review' || lessonTypeLower === 'revision';
       const before   = hardFails;
 
-      // Review lessons: PPTX + worksheet + model-answer sheet (no support worksheet).
+      // Review/revision lessons: PPTX + worksheet + model-answer sheet (no support worksheet).
       // Standard lessons: PPTX + worksheet + support worksheet.
       const expected = [base + '.pptx', base + '_worksheet.docx'];
       expected.push(base + (isReview ? '_answers.docx' : '_support_worksheet.docx'));
@@ -191,7 +192,51 @@ function main() {
         // Bug 60 (2026-07-10): practiceTriangle answers live ON the slide in navy/gold boxes.
         if (xml.includes('ANSWER') && xml.includes('YOUR TURN')) pass('practiceTriangle on-slide ANSWER boxes present (Bug 60)');
         else fail('practiceTriangle on-slide answers missing — Bug 60 regressed');
+        // bigFact (2026-07-11): fact + unit + context all render; no literal
+        // "undefined" from an unguarded optional field.
+        if (xml.includes('37') && xml.includes('°C') && xml.includes('optimum temperature'))
+          pass('bigFact slide: fact + unit + context all present');
+        else fail('bigFact slide missing fact/unit/context text');
+        if (!xml.includes('undefined')) pass('bigFact slide: no literal "undefined" leaking from optional fields');
+        else fail('bigFact slide leaks literal "undefined" — optional unit/context not guarded');
+        // reformatFlowchart (2026-07-12): question slide (shuffled, lettered) +
+        // answer slide (correct order, native arrows) both present.
+        const reformatSteps = ['Blood enters the right atrium', 'Blood passes into the right ventricle', 'Blood is pumped to the lungs', 'Oxygenated blood returns to the left atrium'];
+        if (reformatSteps.every((t) => xml.includes(t)))
+          pass('reformatFlowchart: all 4 step labels present');
+        else fail('reformatFlowchart: one or more step labels missing');
+        if (xml.includes('How the heart pumps blood') && xml.includes('How the heart pumps blood: ANSWERS'))
+          pass('reformatFlowchart: both question and answer slide headers present');
+        else fail('reformatFlowchart: question/answer slide header missing');
+        if (xml.includes('shown as'))
+          pass('reformatFlowchart: answer slide cross-references the shuffled letters');
+        else fail('reformatFlowchart: answer slide missing letter cross-reference');
+        // annotatedDiagram (Bug 34, 2026-07-12): key box lists every label,
+        // numbered badges render (roundRect/ellipse already asserted elsewhere
+        // for native shapes — here just confirm the key text and heading).
+        const diagLabels = ['Pencil line', 'Chromatography paper', 'Small glass beaker', 'Splint'];
+        if (xml.includes('Chromatography equipment') && diagLabels.every((t) => xml.includes(t)))
+          pass('annotatedDiagram: heading + all 4 key-box labels present');
+        else fail('annotatedDiagram: heading or key-box labels missing');
+        if (xml.includes('KEY')) pass('annotatedDiagram: key box header present');
+        else fail('annotatedDiagram: key box header missing');
       }
+      // Display-only checks aside, reformatFlowchart's worksheet-side ordering
+      // line must appear (blank order for students to fill in).
+      const doc = path.join(outDir, baseName(lessons[0].meta) + '_worksheet.docx');
+      if (fs.existsSync(doc)) {
+        const dxml = readArchiveXml(doc);
+        if (dxml.includes('Correct order:')) pass('reformatFlowchart: worksheet ordering line present');
+        else fail('reformatFlowchart: worksheet ordering line missing');
+      }
+    }
+
+    // No worksheet-side output for a bigFact Build item (display-only, per spec).
+    if (fixture === 'bug-test.json') {
+      const doc = path.join(outDir, baseName(lessons[0].meta) + '_worksheet.docx');
+      if (fs.existsSync(doc) && readArchiveXml(doc).includes('37°C'))
+        fail('bigFact leaked onto the worksheet — should be display-only');
+      else pass('bigFact: no worksheet-side output (display-only, as specced)');
     }
 
     // Textbook reference guard: amylase (Y9 enzymes) must auto-match the index
@@ -303,6 +348,12 @@ function main() {
   const ssTest = require(path.join(__dirname, 'suite-scripts.test.js')).run();
   hardFails += ssTest.fails;
   warnings  += ssTest.warns;
+
+  // Exam-doc library parser (pure lib — question/part index + mark-scheme join).
+  console.log('');
+  const elTest = require(path.join(__dirname, 'exam-library.test.js')).run();
+  hardFails += elTest.fails;
+  warnings  += elTest.warns;
 
   console.log('');
   if (hardFails) {

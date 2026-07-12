@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Silence Debt Timer</title>
+<style>
+  :root {
+    --navy: #0D1B5E;
+    --donow-bar: #25408D;
+    --gold: #FABB2E;
+    --amber: #E65100;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0; width: 100%; height: 100%;
+    overflow: hidden;
+    font-family: 'Segoe UI', Trebuchet MS, Arial, sans-serif;
+    background: var(--navy);
+    transition: background-color 0.4s ease;
+    user-select: none;
+  }
+
+  #clickzone {
+    position: fixed; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    cursor: pointer;
+  }
+
+  #tabs {
+    position: fixed; top: 0; left: 0; right: 0;
+    display: flex; gap: 4px; padding: 8px 8px 0 8px;
+    z-index: 10;
+  }
+  .tab {
+    flex: 1;
+    background: rgba(255,255,255,0.12);
+    color: #fff;
+    text-align: center;
+    padding: 8px 4px 6px 4px;
+    border-radius: 6px 6px 0 0;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    line-height: 1.15;
+  }
+  .tab.active { background: rgba(255,255,255,0.32); }
+  .tab .balance { display: block; font-size: 11px; font-weight: 400; opacity: 0.85; margin-top: 2px; }
+  .tab input {
+    width: 100%; text-align: center; font: inherit; font-weight: 600;
+    border: none; border-radius: 3px; padding: 2px;
+  }
+
+  #number {
+    font-size: 22vh;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.02em;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.35);
+    line-height: 1;
+  }
+  #modeLabel {
+    color: #fff; opacity: 0.85; font-size: 20px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px;
+  }
+  #hint { color: #fff; opacity: 0.65; font-size: 14px; margin-top: 14px; }
+
+  #zeroMessage {
+    font-size: 9vh; font-weight: 700; color: var(--navy);
+    text-align: center; padding: 0 5vw; line-height: 1.1;
+  }
+  #zeroSub { font-size: 4vh; color: var(--navy); opacity: 0.75; margin-top: 8px; }
+
+  #controls {
+    position: fixed; top: 60px; right: 12px;
+    display: flex; flex-direction: column; gap: 8px; align-items: flex-end;
+    z-index: 10;
+  }
+  button.ctl {
+    font: inherit; font-size: 13px; font-weight: 600;
+    border: none; border-radius: 6px; padding: 8px 12px;
+    background: rgba(255,255,255,0.18); color: #fff; cursor: pointer;
+  }
+  button.ctl:hover { background: rgba(255,255,255,0.3); }
+  #payoffBtn { background: var(--donow-bar); }
+  #accrueBtn { background: var(--amber); }
+  .adjustRow { display: flex; gap: 6px; }
+  .adjustRow button { width: 44px; }
+
+  #messageEdit {
+    position: fixed; bottom: 10px; left: 12px; right: 12px;
+    display: flex; gap: 8px; align-items: center; z-index: 10;
+  }
+  #messageEdit label { color: #fff; opacity: 0.7; font-size: 12px; }
+  #messageEdit input {
+    flex: 1; max-width: 320px; font: inherit; font-size: 13px;
+    padding: 6px 8px; border-radius: 5px; border: none;
+  }
+
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<div id="tabs"></div>
+
+<div id="controls">
+  <div class="adjustRow">
+    <button class="ctl" id="minus5">-5s</button>
+    <button class="ctl" id="plus5">+5s</button>
+  </div>
+  <button class="ctl" id="payoffBtn">Start Pay-Off Time</button>
+  <button class="ctl" id="accrueBtn">Back to Accrue Mode</button>
+</div>
+
+<div id="clickzone">
+  <div id="modeLabel"></div>
+  <div id="number"></div>
+  <div id="zeroWrap" class="hidden">
+    <div id="zeroMessage"></div>
+    <div id="zeroSub">0:00</div>
+  </div>
+  <div id="hint">Click anywhere &middot; spacebar &middot; clicker &nbsp;=&nbsp; start / pause<br>
+  Click the selected class tab again to rename it</div>
+</div>
+
+<div id="messageEdit">
+  <label for="messageInput">Zero message:</label>
+  <input type="text" id="messageInput" maxlength="60">
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var STORE_KEY = 'silenceTimer.v1';
+  var DEFAULT_CLASSES = ['7BYA', '7MLA', '8AB', '8XP', '9AB', '10S2', '12D'];
+  var COLORS = { navy: '#0D1B5E', donowBar: '#25408D', gold: '#FABB2E', amber: '#E65100' };
+
+  function loadState() {
+    var raw;
+    try { raw = JSON.parse(localStorage.getItem(STORE_KEY)); } catch (e) { raw = null; }
+    if (!raw || !Array.isArray(raw.classes) || !raw.classes.length) {
+      raw = { classes: DEFAULT_CLASSES.slice(), selected: DEFAULT_CLASSES[0], state: {}, message: 'Well done!' };
+    }
+    raw.state = raw.state || {};
+    raw.classes.forEach(function (c) {
+      if (!raw.state[c]) raw.state[c] = { balance: 0, mode: 'accrue', payoffStart: 0 };
+    });
+    if (raw.classes.indexOf(raw.selected) === -1) raw.selected = raw.classes[0];
+    if (typeof raw.message !== 'string') raw.message = 'Well done!';
+    return raw;
+  }
+
+  var data = loadState();
+  var running = false;       // always paused on load — never auto-resume
+  var lastTick = null;
+
+  function save() {
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(data)); } catch (e) { /* storage unavailable — state stays in memory only */ }
+  }
+
+  function curState() { return data.state[data.selected]; }
+
+  function fmt(sec) {
+    sec = Math.max(0, Math.round(sec));
+    var m = Math.floor(sec / 60), s = sec % 60;
+    return m + ':' + (s < 10 ? '0' : '') + s;
+  }
+
+  function lerp(a, b, t) { return Math.round(a + (b - a) * t); }
+  function hexToRgb(hex) {
+    var n = parseInt(hex.slice(1), 16);
+    return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+  }
+  function lerpColor(hexA, hexB, t) {
+    t = Math.max(0, Math.min(1, t));
+    var a = hexToRgb(hexA), b = hexToRgb(hexB);
+    return 'rgb(' + lerp(a[0], b[0], t) + ',' + lerp(a[1], b[1], t) + ',' + lerp(a[2], b[2], t) + ')';
+  }
+
+  // ---- pause/unpause -------------------------------------------------------
+  function pause() {
+    if (running) tick();     // flush partial elapsed time before stopping
+    running = false;
+    lastTick = null;
+    save();
+    render();
+  }
+
+  function unpause() {
+    var st = curState();
+    if (st.mode === 'payoff' && st.balance <= 0) return; // already at zero — nothing to run
+    running = true;
+    lastTick = Date.now();
+    render();
+  }
+
+  function toggleRun() {
+    if (running) pause(); else unpause();
+  }
+
+  function tick() {
+    var st = curState();
+    var now = Date.now();
+    var dt = lastTick ? (now - lastTick) / 1000 : 0;
+    lastTick = now;
+    if (st.mode === 'accrue') {
+      st.balance += dt;
+    } else {
+      st.balance -= dt;
+      if (st.balance <= 0) {
+        st.balance = 0;
+        running = false;
+        lastTick = null;
+        save();
+      }
+    }
+  }
+
+  // ---- mode flips -----------------------------------------------------------
+  function startPayoff() {
+    pause();
+    var st = curState();
+    st.mode = 'payoff';
+    st.payoffStart = Math.max(st.balance, 1);
+    save();
+    render();
+  }
+
+  function backToAccrue() {
+    pause();
+    var st = curState();
+    st.mode = 'accrue';
+    st.payoffStart = 0;
+    save();
+    render();
+  }
+
+  // ---- manual correction ------------------------------------------------
+  function adjust(delta) {
+    var st = curState();
+    st.balance = Math.max(0, st.balance + delta);
+    save();
+    render();
+  }
+
+  // ---- class selection / rename -----------------------------------------
+  function selectClass(name) {
+    if (name === data.selected) return;
+    pause();                 // switching class is an attention shift — never keeps running
+    data.selected = name;
+    save();
+    renderTabs();
+    render();
+  }
+
+  function renameClass(oldName, newName, inputEl) {
+    newName = (newName || '').trim();
+    if (!newName || newName === oldName) { renderTabs(); return; }
+    if (data.classes.indexOf(newName) !== -1) {
+      alert('A tab is already named "' + newName + '". Pick a different name.');
+      renderTabs();
+      return;
+    }
+    var idx = data.classes.indexOf(oldName);
+    data.classes[idx] = newName;
+    data.state[newName] = data.state[oldName];
+    delete data.state[oldName];
+    if (data.selected === oldName) data.selected = newName;
+    save();
+    renderTabs();
+  }
+
+  // ---- rendering ----------------------------------------------------------
+  var tabsEl = document.getElementById('tabs');
+  var numberEl = document.getElementById('number');
+  var modeLabelEl = document.getElementById('modeLabel');
+  var zeroWrap = document.getElementById('zeroWrap');
+  var zeroMessageEl = document.getElementById('zeroMessage');
+  var zeroSubEl = document.getElementById('zeroSub');
+  var hintEl = document.getElementById('hint');
+  var payoffBtn = document.getElementById('payoffBtn');
+  var accrueBtn = document.getElementById('accrueBtn');
+  var messageInput = document.getElementById('messageInput');
+
+  function renderTabs() {
+    tabsEl.innerHTML = '';
+    data.classes.forEach(function (name) {
+      var st = data.state[name];
+      var tab = document.createElement('div');
+      tab.className = 'tab' + (name === data.selected ? ' active' : '');
+
+      var label = document.createElement('div');
+      label.textContent = name;
+      var bal = document.createElement('span');
+      bal.className = 'balance';
+      bal.textContent = fmt(st.balance);
+      label.appendChild(bal);
+      tab.appendChild(label);
+
+      tab.addEventListener('click', function (e) {
+        e.stopPropagation();
+        if (name === data.selected) {
+          startRename(tab, name);
+        } else {
+          selectClass(name);
+        }
+      });
+      tabsEl.appendChild(tab);
+    });
+  }
+
+  function startRename(tab, name) {
+    tab.innerHTML = '';
+    var input = document.createElement('input');
+    input.type = 'text';
+    input.value = name;
+    input.maxLength = 12;
+    tab.appendChild(input);
+    input.focus();
+    input.select();
+    var done = false;
+    function commit() {
+      if (done) return;
+      done = true;
+      renameClass(name, input.value, input);
+    }
+    input.addEventListener('click', function (e) { e.stopPropagation(); });
+    input.addEventListener('keydown', function (e) {
+      e.stopPropagation();
+      if (e.key === 'Enter') { e.preventDefault(); commit(); }
+      else if (e.key === 'Escape') { done = true; renderTabs(); }
+    });
+    input.addEventListener('blur', commit);
+  }
+
+  function render() {
+    var st = curState();
+    var atZero = st.mode === 'payoff' && st.balance <= 0;
+
+    // ---- background colour state ----
+    var bg;
+    if (!running) {
+      bg = atZero ? COLORS.gold : COLORS.navy;
+    } else if (st.mode === 'accrue') {
+      bg = COLORS.amber;
+    } else {
+      var t = st.payoffStart > 0 ? (1 - st.balance / st.payoffStart) : 1; // 0=far from zero, 1=at zero
+      bg = lerpColor(COLORS.donowBar, COLORS.gold, t);
+    }
+    document.body.style.background = bg;
+
+    // ---- content ----
+    if (atZero) {
+      zeroWrap.classList.remove('hidden');
+      numberEl.classList.add('hidden');
+      modeLabelEl.classList.add('hidden');
+      hintEl.classList.add('hidden');
+      zeroMessageEl.textContent = data.message || '';
+      zeroSubEl.textContent = fmt(0);
+    } else {
+      zeroWrap.classList.add('hidden');
+      numberEl.classList.remove('hidden');
+      modeLabelEl.classList.remove('hidden');
+      hintEl.classList.remove('hidden');
+      numberEl.textContent = fmt(st.balance);
+      modeLabelEl.textContent = st.mode === 'accrue'
+        ? (running ? 'Accruing debt' : 'Paused · Accrue mode')
+        : (running ? 'Paying off' : 'Paused · Pay-off mode');
+    }
+
+    payoffBtn.classList.toggle('hidden', st.mode !== 'accrue');
+    accrueBtn.classList.toggle('hidden', st.mode !== 'payoff');
+
+    renderBalancesOnly();
+  }
+
+  function renderBalancesOnly() {
+    var tabs = tabsEl.querySelectorAll('.tab');
+    tabs.forEach(function (tab, i) {
+      var name = data.classes[i];
+      if (!name || name !== data.selected && tab.querySelector('input')) return;
+      var balEl = tab.querySelector('.balance');
+      if (balEl) balEl.textContent = fmt(data.state[name].balance);
+    });
+  }
+
+  // ---- main loop ------------------------------------------------------------
+  setInterval(function () {
+    if (!running) return;
+    tick();
+    render();
+  }, 200);
+
+  // ---- input handling ---------------------------------------------------
+  document.getElementById('clickzone').addEventListener('click', toggleRun);
+
+  var TOGGLE_KEYS = ['Space', 'ArrowRight', 'PageDown', 'Enter'];
+  document.addEventListener('keydown', function (e) {
+    var tag = document.activeElement && document.activeElement.tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA') return; // typing — never hijack
+    if (TOGGLE_KEYS.indexOf(e.code) !== -1) {
+      e.preventDefault();
+      toggleRun();
+    }
+  });
+
+  // Auto-pause the instant the tab loses focus/visibility — safety-critical.
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) pause();
+  });
+  window.addEventListener('blur', function () { pause(); });
+
+  document.getElementById('plus5').addEventListener('click', function (e) { e.stopPropagation(); adjust(5); });
+  document.getElementById('minus5').addEventListener('click', function (e) { e.stopPropagation(); adjust(-5); });
+  payoffBtn.addEventListener('click', function (e) { e.stopPropagation(); startPayoff(); });
+  accrueBtn.addEventListener('click', function (e) { e.stopPropagation(); backToAccrue(); });
+
+  messageInput.value = data.message;
+  messageInput.addEventListener('click', function (e) { e.stopPropagation(); });
+  messageInput.addEventListener('input', function () {
+    data.message = messageInput.value;
+    save();
+    if (curState().mode === 'payoff' && curState().balance <= 0) zeroMessageEl.textContent = data.message;
+  });
+
+  // ---- boot ------------------------------------------------------------
+  renderTabs();
+  render();
+})();
+</script>
+</body>
+</html>

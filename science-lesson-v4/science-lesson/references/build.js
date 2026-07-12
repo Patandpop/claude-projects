@@ -1172,17 +1172,24 @@ function _flowBezier(d) {
 /* flowStepBox — one native step: navy roundRect + gold number badge + editable
    label/note. The badge sits over the top-left corner; the text box starts to
    the RIGHT of the badge so text can never overlap the number. Inch coords. */
+/* numberBadge — the gold numbered circle used on flow steps and, since
+   2026-07-12, on annotatedDiagram labels. (cx, cy) is the circle's centre. */
+function numberBadge(slide, cx, cy, d, idx) {
+  const BX = cx - d / 2, BY = cy - d / 2;
+  slide.addShape('ellipse', { x: BX, y: BY, w: d, h: d, fill: { color: GOLD }, line: { type: 'none' } });
+  txt(slide, String(idx + 1), { x: BX, y: BY, w: d, h: d, bold: true, color: NAVY2, fontSize: 15, align: 'center', valign: 'middle' });
+}
+
 function flowStepBox(slide, X, Y, W, H, bcx, bcy, idx, step) {
   slide.addShape('roundRect', { x: X, y: Y, w: W, h: H, rectRadius: 0.06, fill: { color: NAVY2 }, line: GOLD2 });
-  const bd = 0.34, BX = bcx - bd / 2, BY = bcy - bd / 2;
+  const bd = 0.34, BX = bcx - bd / 2;
   const padL = Math.max(0.1, (BX + bd) - X + 0.06);
   const tX = X + padL, tW = Math.max(0.4, W - padL - 0.08);
   const label = String(step.label || ('Step ' + (idx + 1))), note = String(step.note || '');
   const runs = [{ text: label, options: { bold: true, color: 'FFFFFF', fontSize: autoFontSize(label, tW, H * 0.45, { min: 13, max: 19 }), breakLine: true, paraSpaceAfter: 4 } }];
   if (note) runs.push({ text: note, options: { italic: true, color: GOLD, fontSize: autoFontSize(note, tW, H * 0.55, { min: 10, max: 13 }) } });
   txt(slide, runs, { x: tX, y: Y + 0.04, w: tW, h: H - 0.08, align: 'left', valign: 'middle', margin: 3, fit: 'shrink' });
-  slide.addShape('ellipse', { x: BX, y: BY, w: bd, h: bd, fill: { color: GOLD }, line: { type: 'none' } });
-  txt(slide, String(idx + 1), { x: BX, y: BY, w: bd, h: bd, bold: true, color: NAVY2, fontSize: 15, align: 'center', valign: 'middle' });
+  numberBadge(slide, bcx, bcy, bd, idx);
 }
 
 /* flowArrow — native gold arrow between two points (INCHES). Straight line by
@@ -2029,6 +2036,145 @@ function slideMisconception(pptx, L, item) {
     { text: item.truth || '', options: { fontSize: 17 } },
   ], { valign: 'middle' });
   mcqProtocolStrip(s, 'Hold up A if you believed the claim before today');
+  bottomBar(s, objectiveText(L));
+}
+
+/* ---- BUILD — bigFact (2026-07-11) ------------------------------------------
+   One huge number/fact filling a navy slide, display-only (no worksheet
+   output — unmatched Build types already produce nothing there). Schema:
+   { type: "bigFact", fact, unit?, context? }. navBar/bottomBar kept for deck
+   navigation consistency even though the body is a full navy background. */
+function slideBigFact(pptx, L, item) {
+  const s = pptx.addSlide();
+  s.background = { color: NAVY };
+  navBar(s, 'build');
+  const x = MX, w = SW - 2 * MX;
+  const bodyTop = TOP, bodyBot = BOT_Y - GAP;
+  const contextH = item.context ? 0.6 : 0;
+  const factH = bodyBot - bodyTop - contextH;
+
+  const fact = String(item.fact != null ? item.fact : '');
+  const factSize = autoFontSize(fact, w, factH, { min: 32, max: 96 });
+  const runs = [{ text: fact, options: { fontSize: factSize, bold: true, color: GOLD } }];
+  if (item.unit) {
+    runs.push({ text: ' ' + item.unit, options: { fontSize: Math.round(factSize * 0.5), bold: true, color: GOLD } });
+  }
+  txt(s, runs, {
+    x, y: bodyTop, w, h: factH,
+    align: 'center', valign: 'middle', fit: 'shrink',
+  });
+  if (item.context) {
+    txt(s, item.context, {
+      x, y: bodyTop + factH, w, h: contextH,
+      fontSize: 18, color: 'FFFFFF', align: 'center', valign: 'top', fit: 'shrink',
+    });
+  }
+  bottomBar(s, objectiveText(L));
+}
+
+/* ---- BUILD — reformatFlowchart (2026-07-12) --------------------------------
+   Students reorder scrambled process steps. Schema: { type:"reformatFlowchart",
+   heading?, instruction?, steps:[{label, note?}] } — steps are authored in the
+   CORRECT order; the question slide displays them shuffled (deterministic, not
+   random, so slide/worksheet/tests always agree) and lettered A/B/C… instead of
+   numbered, so the letter order itself doesn't leak the answer. The answer
+   slide shows the same boxes back in the correct order, connected with the
+   same native gold arrows used on Learn-I flowcharts, each labelled with its
+   step number and a reminder of which letter it was shown as. */
+function shuffleOrder(n) {
+  const order = [];
+  let lo = 0, hi = n - 1, takeHigh = true;
+  while (lo <= hi) {
+    if (takeHigh) { order.push(hi--); } else { order.push(lo++); }
+    takeHigh = !takeHigh;
+  }
+  return order;
+}
+
+function slideReformatFlowchart(pptx, L, item) {
+  const obj = objectiveText(L);
+  const steps = arr(item.steps).slice(0, 6);
+  const n = steps.length;
+  const order = shuffleOrder(n);                 // shuffled[k] = steps[order[k]]
+  const letters = 'ABCDEF';
+
+  // ---- question slide: shuffled, lettered, no arrows (order is undetermined) ----
+  let s = pptx.addSlide();
+  s.background = { color: BG };
+  navBar(s, 'build');
+  let y = sectionHeader(s, 'BUILD · ' + (item.heading || 'REORDER THE STEPS'), STAGE.build, TOP);
+  const cols = n > 3 ? 3 : n;
+  const rows = Math.ceil(n / cols) || 1;
+  const cellW = (CW - (cols - 1) * GAP) / cols, cellH = Math.min(1.8, (BOT_Y - 0.08 - y - 0.4 - GAP - (rows - 1) * GAP) / rows);
+  order.forEach((origIdx, k) => {
+    const col = k % cols, row = Math.floor(k / cols);
+    const bx = MX + col * (cellW + GAP), by = y + row * (cellH + GAP);
+    goldBox(s, bx, by, cellW, cellH, [
+      { text: letters[k] + '   ', options: { bold: true, fontSize: 16, color: AMBER } },
+      { text: String(steps[origIdx].label || ''), options: { fontSize: 14 } },
+    ], { valign: 'middle' });
+  });
+  const footY = y + rows * cellH + (rows - 1) * GAP + GAP;
+  txt(s, item.instruction || 'Work out the correct order — write the letters in sequence.', {
+    x: MX, y: footY, w: CW, h: 0.4, fill: { color: NAVY },
+    color: 'FFFFFF', bold: true, fontSize: 12, align: 'center', valign: 'middle',
+  });
+  bottomBar(s, obj);
+
+  // ---- answer slide: correct order, native arrows, letter cross-reference ----
+  s = pptx.addSlide();
+  s.background = { color: BG };
+  navBar(s, 'build');
+  y = sectionHeader(s, 'BUILD · ' + (item.heading || 'REORDER THE STEPS') + ': ANSWERS', STAGE.build, TOP);
+  y = purplePenBar(s, y - GAP + 0.02);
+  const arrowSz = 0.3;
+  const nodeW = (CW - (n - 1) * arrowSz) / n;
+  const nodeH = Math.min(2.2, BOT_Y - 0.08 - y);
+  steps.forEach((st, i) => {
+    const nx = MX + i * (nodeW + arrowSz);
+    const shownAs = letters[order.indexOf(i)];
+    goldBox(s, nx, y, nodeW, nodeH, [
+      { text: (i + 1) + '  (shown as ' + shownAs + ')', options: { bold: true, fontSize: 11, color: GOLD, breakLine: true, paraSpaceAfter: 4 } },
+      { text: String(st.label || ''), options: { fontSize: 13 } },
+    ], { fill: NAVY, valign: 'middle', align: 'center' });
+    if (i < n - 1) {
+      const acy = y + nodeH / 2;
+      flowArrow(s, nx + nodeW + 0.04, acy, nx + nodeW + arrowSz - 0.04, acy);
+    }
+  });
+  bottomBar(s, obj);
+}
+
+/* ---- BUILD — annotatedDiagram (Bug 34, 2026-07-12) -------------------------
+   Base image + numbered gold badges at labelled points, with a key box
+   listing what each number means. Schema: { type:"annotatedDiagram", heading?,
+   imageDescription?, embeddedImagePath?, labels:[{x, y, text}] } — x/y are
+   fractions (0–1) of the image's own width/height, so badge placement survives
+   the image being scaled to fit the slide. Reuses numberBadge() (the same gold
+   circle already used on flow steps) and imageOrPlaceholder() for the base
+   image, same as every other image slot in the deck. */
+function slideAnnotatedDiagram(pptx, L, item) {
+  const s = pptx.addSlide();
+  s.background = { color: BG };
+  navBar(s, 'build');
+  const y = sectionHeader(s, 'BUILD · ' + (item.heading || 'LABEL THE DIAGRAM'), STAGE.build, TOP);
+  const labels = arr(item.labels);
+  const bottomY = BOT_Y - 0.08;
+  const imgW = CW * 0.6, imgX = MX, imgY = y;
+  const imgH = bottomY - imgY;
+  imageOrPlaceholder(s, item, imgX, imgY, imgW, imgH);
+  const d = 0.32;
+  labels.forEach((lb, i) => {
+    const cx = imgX + Math.max(0, Math.min(1, lb.x || 0)) * imgW;
+    const cy = imgY + Math.max(0, Math.min(1, lb.y || 0)) * imgH;
+    numberBadge(s, cx, cy, d, i);
+  });
+  const keyX = imgX + imgW + 0.2, keyW = CW - imgW - 0.2;
+  const keyLines = labels.map((lb, i) => (i + 1) + '  —  ' + String(lb.text || ''));
+  goldBox(s, keyX, imgY, keyW, imgH, [
+    { text: 'KEY', options: { bold: true, fontSize: 13, color: NAVY, breakLine: true, paraSpaceAfter: 8 } },
+    ...keyLines.flatMap((line, i) => [{ text: line, options: { fontSize: 13, breakLine: i < keyLines.length - 1, paraSpaceAfter: 6 } }]),
+  ], { valign: 'top' });
   bottomBar(s, objectiveText(L));
 }
 
@@ -2935,73 +3081,16 @@ function slideImageDump(pptx, L) {
   });
 }
 
-/* CONTENT CHECK (2026-07-09 Patryk ruling): loud per-lesson validation of the
-   authoring rules that keep slipping on the claude.ai side (audit 2026-07-09:
-   3 of 4 lessons had no MCQs, none had review sections, all had 5 Do Nows).
-   ✓/✗ lines only — warn loudly, never block. Mirrored in SKILL.md so the
-   authoring side can self-check before handing content over. */
-function contentCheck(L) {
-  const meta = L.meta || {};
-  const type = (meta.lessonType || meta.type || 'standard').toLowerCase();
-  const name = meta.topic || meta.title || 'unknown';
-  const isTeaching = type === 'standard' || type === 'practical' || type === 'annotation';
-  const lines = [];
-  const check = (ok, good, bad) => lines.push(ok ? `  ✓ ${good}` : `  ✗ ${bad}`);
-
-  const dn = arr((L.doNow || {}).questions).length;
-  check(dn === 6, 'Do Now 6/6', `Do Now has ${dn} question(s) — rule is exactly 6`);
-
-  if (isTeaching) {
-    const mcq = arr(L.build).filter(b => ['mcq', 'mcq_image'].includes(b.type || b.variant)).length;
-    check(mcq === 4, 'MCQ count 4/4', `MCQ count ${mcq} — rule is exactly 4, each placed after the Learn content it tests`);
-    TIERS.forEach(t => {
-      const a = arr((L.apply || {})[t]).length;
-      check(a >= 3, `Apply ${t} ${a}/3+`, `Apply ${t} has ${a} question(s) — minimum 3 per tier`);
-    });
-    TIERS.forEach(t => {
-      const a = arr((L.apply || {})[t]).length;
-      const r = arr((L.review || {})[t]).length;
-      check(r === a, `Review ${t} mirrors Apply (${r}/${a})`,
-        `Review ${t} has ${r} answer(s) for ${a} Apply question(s) — review must mirror EVERY Apply question`);
-    });
-  }
-
-  // Image slots without a searchable description (generic placeholder would ship)
-  const noDesc = [];
-  const slot = (it, label) => {
-    if (it && it.imagePlaceholder !== false && !it.embeddedImagePath && !it.imageDescription) noDesc.push(label);
-  };
-  slot(L.engage, 'Engage');
-  arr(L.learn).forEach((it, i) => {
-    if (['A', 'B', 'D', 'H', 'J'].includes(String(it.variant || '').toUpperCase())) slot(it, `Learn ${i + 1} (${it.variant})`);
-  });
-  check(!noDesc.length, 'image slots carry descriptions',
-    `image slots with NO imageDescription (generic placeholder ships): ${noDesc.join(', ')}`);
-
-  // Extraction guard: a lesson with no images anywhere usually means the
-  // source-image extraction step was skipped (2026-07-07 batch shipped bare).
-  const anyImg = [L.engage, ...arr(L.learn), ...arr(L.build)].some(i => i && i.embeddedImagePath)
-    || arr((L.image_dump || {}).images).length > 0;
-  check(anyImg, 'images embedded / image bank present',
-    'NO images anywhere (no embeddedImagePath, empty image_dump) — if a source deck exists, extraction was skipped');
-
-  // Drive destination: missing meta = never uploads, never reaches lesson-log
-  const missMeta = ['year', 'subject', 'macrotopic', 'lessonNumber', 'title'].filter(k => !meta[k]);
-  check(!missMeta.length, 'Drive meta complete',
-    `Drive meta missing (${missMeta.join(', ')}) — lesson will NOT upload or reach lesson-log.json`);
-
-  if ((L.worksheetExtras || {}).cloze && !isTeaching)
-    lines.push('  ✗ worksheetExtras.cloze only renders on standard/practical worksheets — it will be dropped for this lesson type');
-
-  console.log(`── CONTENT CHECK · ${name}`);
-  lines.forEach(l => console.log(l));
-}
-
-/* CONTENT CHECK (2026-07-09, Patryk ruling): loud per-lesson validation of the
-   authoring rules that keep slipping on the claude.ai side (audit found: 0-1 MCQs,
-   Apply 2/1/1, no review sections, Do Now 5, missing Drive meta). Prints ✓/✗
-   lines. NEVER blocks the build — warn loudly, never block. Mirrored in SKILL.md
-   so the authoring side self-checks before handing a JSON over. */
+/* CONTENT CHECK (2026-07-09, Patryk ruling; merged 2026-07-11 — see backlog.md):
+   loud per-lesson validation of the authoring rules that keep slipping on the
+   claude.ai side (audit found: 0-1 MCQs, Apply 2/1/1, no review sections, Do Now
+   5, missing Drive meta). Prints ✓/✗ lines. NEVER blocks the build — warn loudly,
+   never block. Mirrored in SKILL.md so the authoring side self-checks before
+   handing a JSON over. Note (2026-07-11): this file briefly had two shadowed
+   declarations of this function — a dead one that listed slide names for the
+   missing-image-description warning, and this surviving one, which had the
+   broader/more-correct image scan but only reported a count. Merged: keeps the
+   broader scan, restores the slide-name listing. */
 function contentCheck(L) {
   const meta = L.meta || {};
   const type = (meta.lessonType || meta.type || 'standard').toLowerCase();
@@ -3030,11 +3119,13 @@ function contentCheck(L) {
 
   // Image discipline: every placeholder slot needs a Google-searchable description,
   // and a lesson with no images at all usually means source extraction was skipped.
-  const imgItems = [L.engage, ...arr(L.learn)].filter(Boolean)
-    .filter((it) => it.imagePlaceholder !== false);
-  const noDesc = imgItems.filter((it) => !it.embeddedImagePath && !it.imageDescription).length;
-  check(noDesc === 0, 'image slots all described/embedded',
-    `${noDesc} image slot(s) with no imageDescription — the generic placeholder will ship`);
+  const imgItems = [
+    L.engage && { it: L.engage, label: 'Engage' },
+    ...arr(L.learn).map((it, i) => ({ it, label: `Learn ${i + 1} (${it.variant})` })),
+  ].filter(Boolean).filter((x) => x.it.imagePlaceholder !== false);
+  const noDesc = imgItems.filter((x) => !x.it.embeddedImagePath && !x.it.imageDescription).map((x) => x.label);
+  check(noDesc.length === 0, 'image slots all described/embedded',
+    `image slots with NO imageDescription (generic placeholder ships): ${noDesc.join(', ')}`);
   const anyImg = [L.engage, ...arr(L.learn), ...arr(L.build)].some((i) => i && i.embeddedImagePath)
     || arr((L.image_dump || {}).images).length > 0;
   check(anyImg, 'images embedded / image bank present',
@@ -3087,6 +3178,9 @@ function renderBuildSlides(pptx, L, buildItems) {
     else if (bt === 'trueFalse') slideTrueFalse(pptx, L, b);
     else if (bt === 'practical') slidePractical(pptx, L, b);
     else if (bt === 'misconception') slideMisconception(pptx, L, b);
+    else if (bt === 'bigFact') slideBigFact(pptx, L, b);
+    else if (bt === 'reformatFlowchart') slideReformatFlowchart(pptx, L, b);
+    else if (bt === 'annotatedDiagram') slideAnnotatedDiagram(pptx, L, b);
     else if (bt === 'workedExample') slideWorkedExample(pptx, L, b);
     else if (bt === 'guessExample') slideGuessExample(pptx, L, b);
     else if (bt === 'practiceTriangle') slidePracticeTriangle(pptx, L, b);
@@ -3713,6 +3807,29 @@ function buildQuestionBlocks(L, state, mode) {
       out.push(...question(++state.n, (b.instruction || 'Sort each item into the correct category.') +
         '  Items: ' + arr(b.items).join(', ') + '.'));
       out.push(...sortTableDocx(b.categories));
+    } else if (bt === 'reformatFlowchart') {
+      const steps = arr(b.steps).slice(0, 6);
+      const n = steps.length;
+      const order = shuffleOrder(n);
+      const letters = 'ABCDEF';
+      out.push(...question(++state.n, b.instruction || 'These steps are in the wrong order. Write the letters in the correct order below.'));
+      order.forEach((origIdx, k) => {
+        out.push(P([R(letters[k] + '   ', { bold: true, size: 22 }), R(steps[origIdx].label || '', { size: 22 })], { indent: { left: 360 }, spacing: { before: GAP_SM, after: GAP_SM } })); // M3
+      });
+      out.push(P(R('Correct order:   ' + '_____   '.repeat(n), { size: 22 }), { indent: { left: 360 }, spacing: { before: GAP_SM, after: GAP_SM } })); // M3
+      if (mode === 'answers') {
+        const correctLetters = steps.map((_, i) => letters[order.indexOf(i)]).join(', ');
+        out.push(...plainAnswerCallout(correctLetters));
+      }
+    } else if (bt === 'annotatedDiagram') {
+      // Worksheet side stays minimal on purpose — the numbered key belongs on
+      // the slide; confirm with Patryk once he's seen the slide whether he
+      // also wants the key reproduced here.
+      out.push(...question(++state.n, 'Label the diagram from the board, then describe what each labelled part does.'));
+      if (mode === 'answers') {
+        const keyText = arr(b.labels).map((lb, i) => (i + 1) + ' ' + String(lb.text || '')).join(', ');
+        out.push(...plainAnswerCallout(keyText));
+      }
     } else if (bt === 'trueFalse') {
       out.push(...question(++state.n, 'For each statement, write True or False. If False, correct it.'));
       arr(b.statements).forEach((st, i) => {
@@ -4167,8 +4284,11 @@ async function main() {
       await buildPptx(L, pptxPath);
       console.log('  \u2713 ' + path.basename(pptxPath));
 
-      // 2 \u2014 Worksheet (review lessons: booklet only; standard lessons: companion worksheet)
-      const isReview = String((L.meta || {}).lessonType || '').toLowerCase() === 'review';
+      // 2 \u2014 Worksheet (review/revision lessons: booklet only; standard lessons: companion worksheet)
+      // 2026-07-11: revision lessons get the same answer-sheet treatment as review
+      // lessons (Patryk's call \u2014 see backlog.md "Revision lesson output set change").
+      const lessonTypeLower = String((L.meta || {}).lessonType || '').toLowerCase();
+      const isReview = lessonTypeLower === 'review' || lessonTypeLower === 'revision';
       const wsPath = path.join(outDir, base + '_worksheet.docx');
       await buildDocx(L, wsPath, 'standard');
       console.log('  \u2713 ' + path.basename(wsPath));
@@ -4197,7 +4317,8 @@ async function main() {
         // 4b \u2014 Manifest sidecar (2026/27 school-Drive uploader): which files belong in
         // which folder, consumed by references/push-to-school.js \u2192 Apps Script web app.
         // Same trigger as the sidecar; relative folder path (no G:\ \u2014 the school root differs).
-        const isRev = String(L.lessonType || '').toLowerCase() === 'review';
+        const revLower = String((L.meta || {}).lessonType || '').toLowerCase();
+        const isRev = revLower === 'review' || revLower === 'revision';
         const manifest = {
           builtOn: new Date().toISOString().slice(0, 10),
           class: L.meta.class || null, year, subject, macrotopic, lessonNumber, title: lessonTitle,

@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "science-lesson-advisor": {
+      "command": "node",
+      "args": ["science-lesson/references/advisor-mcp-server.js"]
+    }
+  }
+}

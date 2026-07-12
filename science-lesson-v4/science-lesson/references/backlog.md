@@ -8,29 +8,59 @@ Cleaned 2026-07-02: only outstanding items below.
 
 <!-- entries appended below -->
 
+## Session log — 2026-07-11 (Fable advisor tool, backlog cleanup, bigFact, revision-lesson fix, timer tool — Claude Code)
+
+**Fable advisor tool** ✅ BUILT — `consult_advisor` MCP tool + manual `/advisor` command, for a second opinion from a different AI model at genuine decision points. Manual/on-demand only, real small paid cost per use. See `[[project-science-lesson]]` memory for full detail.
+
+**Revision-lesson output set** ✅ FIXED — revision lessons now get the same three-file treatment as review lessons (model-answer sheet instead of the support worksheet), matching what Patryk confirmed he wanted. Caught and fixed a second, older bug in the same area: the Drive-upload helper file was checking the wrong piece of data and so had been putting the wrong third filename in every review lesson's upload record.
+
+**Duplicate image-description check** ✅ FIXED — closes the "known follow-up" noted in the 2026-07-08 entry below. There were two copies of the same check; the working one only reported a count of slides missing a description, the other (better) one that named the actual slides was silently never running. Merged into one, so the warning now names slides again, not just a count.
+
+**bigFact slide type** ✅ BUILT — see 2026-07-08 entry below for the original request. New slide style: one huge number/fact filling the screen (e.g. "37°C — the optimum temperature for amylase"), gold text on navy. Sample deck built to check it looks right.
+
+**Design-pending options document** ✅ WRITTEN 2026-07-11, all 3 resolved 2026-07-12 — `specs/design-pending-options.md`. "Reformat the information" and Bug 34 (annotated diagram) both picked and built same session — see their own entries below. Subject-specific top-bar images: Physics/Chemistry stay as-is; Biology needs new artwork that Patryk is making himself (see `[[project-science-lesson]]` memory for the standing reminder to check back on it).
+
+Full backlog re-check done same session as the 2026-07-09 hygiene pass below — all entries below double-checked against the actual code, not just against old backlog text.
+
+---
+
+## Session log — 2026-07-10 (Bug 59 + Bug 60, per approved mocks — Claude Code)
+
+**Bug 59 — guessExample slide visual quality cluster** ✅ BUILT 2026-07-10 (commit `b6f006a2`, per Patryk's approved mocks from the 07-06 eyeball — see that session's entry below for the original findings)
+Row proportions rebalanced (weighted `ROW_WEIGHTS`, `build.js:2300-2302`), letter/badge sizing now scales with row height (`build.js:2321-2324`), formula triangle aspect-locked (`triW = triH * 1.15`, `build.js:2333`) and suppressed entirely above 3 symbols (`triangleUsable()`, `build.js:2328-2331`), Substitute/Solve rows now run through `parseEq` so raw operator words typeset as ÷ × ² (`build.js:2344-2349`). Fixture + harness coverage added; demo deck rebuilt.
+
+**Bug 60 — practiceTriangle answer boxes** ✅ BUILT 2026-07-10 (commit `b6f006a2`, same session)
+Answers now live ON the slide in navy/gold boxes under each question (`build.js:2376-2396`), one box per question, matching the spec from the 07-06 eyeball below. Patryk animates the reveal himself in PowerPoint.
+
+---
+
+## Session log — 2026-07-09 (backlog hygiene pass — Claude Code)
+
+Several 🆕 items below turned out to already be built in the 2026-07-09 CONTENT CHECK / image-bank session (commit `a9a7d9c2`, "P3") and the 07-04/07-05 sessions, but were never marked done — correcting the record here rather than re-implementing. Verified against `build.js` directly, not against the backlog text (see CLAUDE.md: "backlog statuses lie"). See each corrected entry below for evidence.
+
 ## Session log — 2026-07-08 (Patryk lesson batch: irradiation, latent heat, eclipses — Claude Code)
 
-**Feature — timeline slide (Learn variant K) needs a per-event image slot** 🆕 (Patryk explicitly wants this)
-Variant K currently renders `events:[{year,label,detail}]` as a text-only strip. Patryk wants each event to be able to carry a small image above and/or below the date+info, with an `imageDescription` that prints the usual `suggested search:` placeholder prompt when no image is embedded (so he gets Google-Images guidance per event). Workaround used 2026-07-08: for the 8XP eclipse-history lesson, each era was authored as a separate Learn-A slide (one per era) with its own `imageDescription`, plus a text-only variant-K strip as an overview. Proper fix: add optional `image`/`imageDescription`/`embeddedImagePath` per event to `slideTimeline` (build.js ~1636), reusing `imageOrPlaceholder`.
+**Feature — timeline slide (Learn variant K) needs a per-event image slot** ✅ BUILT same session (2026-07-08)
+Each timeline event can now carry its own `image`/`imageDescription`/`embeddedImagePath` (`build.js:1671-1678`, comment dated 2026-07-08), reusing `imageOrPlaceholder`. The 8XP eclipse-history workaround (separate Learn-A slides per era) is no longer needed for future lessons of this kind.
 
-**Feature — "reformat the information" build activity type** 🆕
-A new Build type where students are given information and must reorganise/reformat it (into a table, mind-map, ordered list, storyboard, etc.). Does not exist. Patryk likes this task style; design a schema (name TBD, e.g. `reformat`) + slide renderer + worksheet space. Related to the storyboard-gap-fill he wanted for 8XP (currently done as `worksheetExtras.cloze`).
+**Feature — "reformat the information" build activity type** ✅ BUILT 2026-07-12 as `reformatFlowchart` (Patryk picked Option C from the 07-11 options doc)
+Students reorder scrambled process steps. `slideReformatFlowchart()` in build.js — question slide shows steps shuffled (deterministic `shuffleOrder()`, lettered A–F not numbered so the letters don't leak the answer), answer slide shows them back in the correct order with native gold arrows (reused `flowArrow`, and the same numbered gold-circle badge now factored out as `numberBadge()`). Worksheet side prints the same shuffled list with blank ordering boxes, filled in on the answers sheet. Fixture + `npm test` coverage added. Docs in `slide-options-v4.md`.
 
-**Feature — build-time warning when any image slot has no description** 🆕
-Placeholders with no `imageDescription` print `[Image — add imageDescription to JSON]` instead of a Google-search prompt. Caught one on a Learn-J slide during this session's verification (fixed by hand). Want a non-fatal build warning listing every slide that fell back to the generic placeholder, so a missing description is never shipped silently. (Same spirit as Bug 58.)
+**Feature — build-time warning when any image slot has no description** ✅ BUILT 2026-07-09 (CONTENT CHECK block, commit `a9a7d9c2`), duplicate-check bug fixed 2026-07-11
+`contentCheck` now warns on every image slot with no `imageDescription`, naming each slide by name (not just a count). Fixed 2026-07-11: `build.js` had two shadowed `contentCheck` declarations — a dead one that properly listed slide names, and the surviving one that only reported a count. Merged into one working version. `npm test` green.
 
-**Feature — extraction never silently skipped (source-image guard)** 🆕
-build.js does NOT auto-extract images from source PPTX/DOCX; that is a manual authoring step. Yesterday's (2026-07-07) lessons shipped with NO source images because the step was skipped, and the empty `image_dump` gave no signal. Want: a warn (or checklist) when a lesson references a source deck but has no `image_dump.images` and no matched `embeddedImagePath`. This session extracted every deck's images into a per-lesson `source-images/` folder and referenced a curated subset (embedded on slides + top picks in the image bank); the full set stays on disk so nothing is lost.
+**Feature — extraction never silently skipped (source-image guard)** ✅ BUILT 2026-07-09 (CONTENT CHECK block, commit `a9a7d9c2`)
+`contentCheck` warns when a lesson has no `embeddedImagePath` anywhere and an empty `image_dump` (`build.js:3038-3041`). Caveat: this is a coarser "any image present" signal, not a literal "source deck was referenced but not extracted from" check — revisit if it proves noisy or misses a real case.
 
 **Note — cloze/gap-fill renders on Type-A worksheets only + question-set variety review** 🆕
 `worksheetExtras.cloze` only renders on the default (Type A) worksheet, not on review/exam sheets (build.js ~3862 dispatch) — this is why gap-fills "stopped executing" for Patryk on some sheets. Decide: allow cloze on more worksheet types, or document the limit. Patryk also wants a broader review of question-set VARIETY (what activity/question types exist, where each renders, and adding more) — treat as its own review.
 
-**Bug — Drive upload macrotopic mapping (`Space` vs `P4 Earth in Space`)** 🆕 (deferred — Patryk chose local-only for this batch)
-The generated `.path.txt` for Year 7 Physics space lessons emits `...\Physics\Space\Lesson N - ...`, but the real Drive folder is `...\Physics\P4 Earth in Space\Lesson N - ...`. upload-to-drive.js errors on a missing folder, so 2026-07-07's lessons never uploaded (their Drive folders are still empty). Fix the macrotopic→Drive-path mapping so lessons land in the correct folder. Until fixed, build with `NO_UPLOAD=1` and copy by hand, or align `meta.macrotopic` to the real Drive segment.
+**Bug — Drive upload macrotopic mapping (`Space` vs `P4 Earth in Space`)** 🔧 PARTIALLY ADDRESSED 2026-07-09
+`upload-to-drive.js:180-194` now prints a "did you mean one of these macrotopic folders?" suggestion (listing sibling folders) when the destination Drive folder is missing, dated to this exact "Space → P4 Earth in Space" miss. This is a loud diagnostic, not an automatic fix — `meta.macrotopic` still has to be set to the exact Drive folder name by hand. Leave open unless Patryk wants an automatic mapping table instead of the prompt.
 
 ## Session log — 2026-07-06 (morning eyeball of Fraction-Demo — Patryk)
 
-**Bug 59 — guessExample slide visual quality cluster** 🆕 NEEDS DESIGN PASS (logged from Patryk's visual inspection of `Fraction-Demo.pptx`; do NOT build blind — mock and get sign-off first, per the visual workflow)
+**Bug 59 — guessExample slide visual quality cluster** ✅ BUILT 2026-07-10 — see the session log at the top of this file for what shipped (logged from Patryk's visual inspection of `Fraction-Demo.pptx`; original findings below, kept for reference)
 Observed on the BUILD · WORKED EXAMPLE (GUESS) slide and the standalone formula triangle:
 1. **Row proportions off** — the weighted G/U/E/S/S rows leave the slide unbalanced ("the slide just doesn't look that good"); revisit ROW_WEIGHTS and padding.
 2. **Letter/label sizes** — the G/U/E/S/S badge and prompt text sizes don't sit well against the row heights; needs a consistent scale.
@@ -42,7 +72,7 @@ NOTE: the phase-3 stacked fraction itself (v = d over t) renders correctly on th
 **Bug 61 — Greek symbol lost on Learn-F twin slide ("ho =" instead of "ρ =")** ✅ FIXED 2026-07-06 (renderer hardening, same morning)
 Root cause: JSON authored `"\rho"` with a SINGLE backslash — JSON parsing turns `\r` into an invisible carriage return, so the renderer received CR+"ho" and the ρ never existed by the time normSym ran. Fix in build.js: `normSym` now repairs a control char whose escape letter + following letters spell EXACTLY a known symbol name (CR+"ho" → ρ, tab+"imes" → ×, etc.), with a loud console warning telling the author to use a double backslash. Exact-match only, so real newlines/tabs in prose are never touched. Also fixed in passing: Learn-F component unit line now typesets (`m/s^2` → `m/s²` via prettyText). AUTHORING RULE: backslash commands in lesson JSON must be double-escaped — `"\\rho"`, `"\\times"`, `"\\div"`. Demo deck rebuilt; ρ renders in both the equation and component boxes.
 
-**Bug 60 — practiceTriangle: answers must be ON the slide, in navy/gold boxes under each question** 🆕 (logged from Patryk's Fraction-Demo eyeball 2026-07-06; noted only, not built)
+**Bug 60 — practiceTriangle: answers must be ON the slide, in navy/gold boxes under each question** ✅ BUILT 2026-07-10 — see the session log at the top of this file (logged from Patryk's Fraction-Demo eyeball 2026-07-06; original spec below, kept for reference)
 Currently the BUILD · YOUR TURN (practiceTriangle) answers go to speaker notes only — there is no answer slide, so realistically the answers belong on the SAME slide. Wanted: a separate answer box under each question card — dark blue (navy) fill with gold styling, matching the house answer-reveal look (same pattern as the MCQ answer box: present in the deck at build time, Patryk adds the entrance animation himself in PowerPoint for the reveal). One answer box per question, not one combined box.
 
 ## Session log — 2026-07-05 (Bug 54 native flow shapes + Bug 58 image placeholder — Claude Code)
@@ -135,8 +165,8 @@ Status: workaround only. The real fix is Bug 33/53 in SKILL.md — true stacked 
 
 ---
 
-**Bug 34 — annotated diagram breakdown slide type** BLOCKED → UNBLOCKED (reference available)
-The chromatography source deck (`Lesson_4_-_EPIBA_Chromatography_EPA.pptx`) is a usable reference: one base diagram plus positioned text-label callouts (Solvent Front, Separated Dyes, Filter Paper, etc.). Prototype a slide type that takes a base image + labelled callout positions. Renderer change — needs Patryk sign-off on the design before building.
+**Bug 34 — annotated diagram breakdown slide type** ✅ BUILT 2026-07-12 as `annotatedDiagram` (Patryk picked Option B — numbered badges + key box)
+`slideAnnotatedDiagram()` in build.js — base image (same `imageOrPlaceholder` convention as every other image slot) with numbered gold badges (`numberBadge()`) at fractional x/y positions on the image, plus a key box listing what each number means. Checked `DELBAR Chromatography.pptx` (the teaching deck, on Drive alongside `WS Chromatography.pptx`) for real content — its actual equipment diagram (slides 5–6) is drawn with edge labels + leader lines, not a base image, so it couldn't be reused directly as a base picture; used its 7 real equipment labels (water/solvent, glass beaker, splint, chromatography paper, coloured pigment/solute, coloured ink, pencil line) as realistic fixture content instead. Fixture + `npm test` coverage added. Worksheet side is a plain "label the diagram from the board" prompt for now — Patryk to confirm whether the numbered key should also print there. Docs in `slide-options-v4.md`.
 
 ---
 
@@ -153,7 +183,7 @@ Was: raw notation rendered literally on Review-lesson worked examples — `\time
 
 **Bug/Rule (folds into Bug 53) — units render as symbols, not words** ✅ small safe whitelist in `normSym` (meters/second→m/s, seconds→s) + SKILL.md rule to author symbols. Anything outside the whitelist must be authored as a symbol.
 
-**Bug 57 — fixture/lesson tier shape mismatch: `.tiers.X.qs` silently not rendered** 🆕 (found during Bug 53 work) build.js reads `apply.developing` / `review.developing` (flat arrays) or `review.questions`, NOT `apply.tiers.developing.qs` / `review.tiers.developing.qs`. bug-test.json used the nested `.tiers` shape → its apply + review tier content rendered EMPTY (silently). During Bug 53 I gave bug-test's `review` a working `review.questions` array so the regression guard exercises reviewRow; bug-test's `apply.tiers` nesting is STILL dead (out of scope, harmless for the harness). TODO next session: (1) grep real lesson JSONs in the project + Drive for `"tiers"` under apply/review — any real lesson using it is silently dropping tier content; (2) decide whether build.js should also accept the `.tiers.X.qs` shape (defensive normaliser) or whether authoring must always use the flat shape (add a build-time warn when `.tiers` is seen). No renderer change made yet.
+**Bug 57 — fixture/lesson tier shape mismatch: `.tiers.X.qs` silently not rendered** ✅ CLOSED — stale duplicate of the entry already ✅ above (2026-07-04 session, "Bug 57 ✅ build-time warn..."). `build.js:3113-3119` warns loudly whenever `.tiers` is seen under apply/review — the "warn, don't silently coerce" choice was already made. The TODO's grep-real-lessons task is done: searched every `*.json` in the repo for the literal string `"tiers"` — zero matches, no real lesson content is silently losing content this way.
 
 ---
 
@@ -167,28 +197,26 @@ Six-step Learn flowcharts (e.g. "How Coronary Heart Disease Develops") render as
 
 ---
 
-**Bug 55 — Learn-slide cap wrong for Review/revision lessons** 🆕
-Hard cap of 2 Learn slides/lesson doesn't fit Review/revision lessons, which carry more content. Revision lesson type should apply a different (higher/none) cap than standard new-content lessons. (Note: memory says cap was raised 2→4 on 2026-06-25 — verify current cap value in build.js before changing.)
+**Bug 55 — Learn-slide cap wrong for Review/revision lessons** ✅ CLOSED — stale duplicate of the entry already ✅ above (2026-07-04 session). `build.js:3133-3153` gives review/revision lessons a dedicated dispatch path that renders all Learn slides uncapped, confirmed by an explicit "Bug 55" comment in the code.
 
 ---
 
-**Bug 56 — "Purple pen time" Core/Challenge table forces two columns when only one tier exists** 🆕
-When a lesson has a single question type/tier (no real Core/Challenge split), the slide still forces the two-table layout → large blank space. Needs conditional layout: single full-width table when there's only one tier.
+**Bug 56 — "Purple pen time" Core/Challenge table forces two columns when only one tier exists** ✅ CLOSED — stale duplicate of the entry already ✅ above (2026-07-04 session). `build.js:1301-1324` already has the conditional: single tier → one full-width table, both tiers → the two half-width columns.
 
 ---
 
-**Feature/Rule — Revision lesson output set change** 🆕 CHANGES THE THREE-FILE RULE for revision
-Revision/Review lessons should output: PPTX + standard worksheet + **ANSWER SHEET** (well-formatted) — the answer sheet replaces the support-worksheet slot (revision already suppresses support per Bug 51). Needs SKILL.md three-file-rule update for the revision exception.
+**Feature/Rule — Revision lesson output set change** ✅ FIXED 2026-07-11 CHANGES THE THREE-FILE RULE for revision
+The 2026-07-04 "Revision-lesson cluster" (session log above) had built the answer-sheet output only for `lessonType === "review"` — `lessonType: "revision"` lessons were still getting the standard `_support_worksheet.docx`. The backlog's earlier claim that "revision already suppresses support per Bug 51" could not be verified anywhere in the repo (no Bug 51 found) and was incorrect. Patryk confirmed 2026-07-11: revision lessons should get the same answer-sheet treatment as review lessons. Fixed: the `isReview` check in the output-file dispatch and the manifest-sidecar `isRev` check (both in `build.js`, near the end of the per-lesson build loop) now match `=== 'review' || === 'revision'`. Same fix also caught and corrected a pre-existing manifest bug: the sidecar's `isRev` check had been reading `L.lessonType` instead of `L.meta.lessonType` (always false, so every shipped review lesson's manifest had the wrong third filename listed) — now reads the correct field. `test/run.js`'s own expected-file assertion (which was still `review`-only) updated to match. `npm test` green.
 
 ---
 
-**Feature/Rule — Model answer frameworks** 🆕
-Model answers (incl. the new answer sheet) should integrate: GUESS scaffold for calculation questions (extend the existing GUESS machinery to model answers); bullet-pointed structure for 6-mark extended answers. Answer-sheet formatting needs a general review pass (specifics TBD).
+**Feature/Rule — Model answer frameworks** ✅ BUILT 2026-07-04 (session log above), reach extended 2026-07-11
+`answerReveal`/`answerFramework` (GUESS scaffold for calc answers, `markingPanelDocx` for 6-markers) already existed and worked, but were only reachable via the same `isReview` gate as the output-set change above — so they only fired for `lessonType: "review"`. The fix above extends their reach to `lessonType: "revision"` too; no new framework code was needed.
 
 ---
 
-**Rule — 6-mark indicative content minimum** 🆕
-6-mark extended questions must list ≥6 indicative content marking points (match points to mark allocation).
+**Rule — 6-mark indicative content minimum** ✅ BUILT 2026-07-04 (session log above) — verified 2026-07-11, no gap
+`checkSixMarkRule(L)` (`build.js:3058-3076`) runs unconditionally at `build.js:3113`, before the lesson-type dispatch — it already checks every lesson type, not just review/revision. Nothing further needed here.
 
 ---
 
@@ -205,16 +233,16 @@ Model answers (incl. the new answer sheet) should integrate: GUESS scaffold for 
 
 ---
 
-**Feature ideas — Worksheet worked-example area** 🆕
-1. Show the actual question text at the top of the worked-example/answer box so it's clear what's being answered.
-2. New activity type "mark the answers": present 3–4 sample student answers to a question (e.g. a 6-marker), students mark them against a mark scheme. Good as a Build task; also add as a worksheet option.
+**Feature ideas — Worksheet worked-example area** ✅ BOTH ALREADY BUILT — corrected 2026-07-11 (another stale entry caught by checking the code directly)
+1. Question text at the top of the worked-example/your-turn box: already there — `slideWorkedExample` (`build.js:2251-2258`) prints a `WORKED EXAMPLE` / `YOUR TURN` header with each prompt shown in a box above the steps.
+2. "Mark the answers" activity type: already built as `markTheAnswers` — slide (`build.js:2164` on, dispatched at `:3079`) AND worksheet version (`build.js:3728`). Covered by the `review-answers-test.json` fixture.
 
 ---
 
-**Feature — bigFact slide type (U6)** 🆕 (rescued 2026-07-06 from an old memory file before archiving it — never built)
-High-impact single-concept Build slide: one huge number/fact (e.g. "37 °C") filling a navy slide, gold ~72pt Trebuchet, optional unit + one context line, before a practical or at a key teaching moment (Duarte sparkline engagement peak). Schema idea: `{ "type": "bigFact", "fact": "37", "unit": "°C", "context": "The optimum temperature for amylase" }`. Display-only, no worksheet output. Small renderer job when wanted.
+**Feature — bigFact slide type (U6)** ✅ BUILT 2026-07-11
+High-impact single-concept Build slide: one huge number/fact (e.g. "37 °C") filling a navy slide, gold text, optional unit + one context line. `slideBigFact()` in `build.js`, dispatched from `renderBuildSlides` on `type: "bigFact"`. Schema: `{ "type": "bigFact", "fact": "37", "unit": "°C", "context": "The optimum temperature for amylase" }` — `unit`/`context` optional, guarded so an absent field never renders literal "undefined". Fact text auto-sizes (32-96pt) so a long fact string never disappears to an unreadably small size. Display-only, no worksheet output (confirmed: unmatched Build types already produce nothing on the worksheet side). Documented in `slide-options-v4.md`. Fixture coverage added to `bug-test.json` + `test/run.js` (fact/unit/context render, no literal "undefined", no worksheet leak). `npm test` green.
 
 ---
 
-**Feature — Subject-specific top bar images** 🆕 NEEDS SCOPE DECISION
+**Feature — Subject-specific top bar images** 🔧 AWAITING PATRYK'S SIGN-OFF — options + open questions drafted 2026-07-11 in `specs/design-pending-options.md` (aspect-ratio risk checked and cleared: the 5 candidate PNGs are 1500×120, matches the current 674×54 placement's ratio)
 Currently one fixed Physics top bar reused for every lesson. Want: Chemistry top bar (idea: graphene / fullerene structure) and Biology top bar (idea: serotonin molecule or similar — not decided). Scope TBD: subject detection/specification per lesson + image storage location.

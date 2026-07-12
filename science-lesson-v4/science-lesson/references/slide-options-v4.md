@@ -292,6 +292,52 @@ Max 3 questions. Answer slide auto-generated.
   "truth": "what's actually true (≤3 lines, core physics/chem/bio only)" }
 ```
 
+### BUILD — bigFact
+Display-only — one huge number/fact filling a navy slide, gold text. No worksheet output.
+```json
+{ "type": "bigFact",
+  "fact": "37",
+  "unit": "°C",
+  "context": "The optimum temperature for amylase" }
+```
+`unit` and `context` are optional.
+
+### BUILD — reformatFlowchart
+Students reorder scrambled process steps. Author `steps` in the CORRECT order — the
+renderer shuffles them for display (question slide + worksheet show a fixed shuffle,
+lettered A/B/C… not numbered, so the letters don't give the order away), then an
+"ANSWERS" slide shows the same steps back in the correct order with native gold
+arrows, each labelled with its step number and the letter it was shown as.
+```json
+{ "type": "reformatFlowchart",
+  "heading": "How the heart pumps blood",
+  "instruction": "Work out the correct order — write the letters in sequence.",
+  "steps": [
+    { "label": "Blood enters the right atrium", "note": "optional short note" },
+    { "label": "..." }
+  ] }
+```
+Up to 6 steps. `heading` and `instruction` are optional (sensible defaults used).
+
+### BUILD — annotatedDiagram
+Base image + numbered gold badges at labelled points, with a key box listing what
+each number means (Bug 34). Same image convention as every other image slot
+(`embeddedImagePath` + `imageDescription`) — ships a placeholder if no real image is
+matched yet, same as Learn/Engage slides.
+```json
+{ "type": "annotatedDiagram",
+  "heading": "Chromatography equipment",
+  "imageDescription": "labelled chromatography apparatus: beaker, filter paper, splint, pencil line",
+  "labels": [
+    { "x": 0.5, "y": 0.85, "text": "Pencil line" },
+    { "x": 0.5, "y": 0.55, "text": "Chromatography paper" },
+    { "x": 0.3, "y": 0.9,  "text": "Small glass beaker" }
+  ] }
+```
+`x`/`y` are fractions (0–1) of the image's own width/height, so badges stay on the
+right spot however the image is scaled. Worksheet side is a plain "label the diagram
+from the board" prompt — tell me if you'd like the numbered key reproduced there too.
+
 ### BUILD — sort
 ```json
 { "type": "sort", "instruction": "Sort each item into the correct category.",

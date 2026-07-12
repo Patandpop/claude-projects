@@ -12,6 +12,11 @@ node_modules/
 upload-log.txt
 brief-log.json
 
+# Home-only regenerable data and logs
+exam-library-index.json
+advisor-log.txt
+$scratch/
+
 # Temp / misc
 null
 assets/
