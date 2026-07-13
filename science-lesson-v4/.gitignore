@@ -28,4 +28,7 @@ _core_text.txt
 _extend_text.txt
 *.skill
 Feynman Plates/
-science-lesson/references/question-bank/
+# Seeded Do Now banks are generated from the exam library (seed-do-now-bank.js).
+# The schema stays in git; the data does not.
+science-lesson/references/question-bank/*.json
+!science-lesson/references/question-bank/schema.json
