@@ -57,7 +57,7 @@ The final slide of every deck is the **IMAGE BANK** (kept, not deleted): it self
 - **Source material is a floor to EXTEND, not just preserve** (confirmed 2026-07-02): beyond porting every question/table/scaffold, actively add genuine depth — historical context, the "why this mattered" layer, connections to the bigger picture — woven into the same slides. Pre-build checklist question: "what's the one thing in this topic that makes it click, that isn't in the source material yet?"
 - **Apply: minimum 3 questions per tier** unless Patryk says otherwise. One question per tier is never enough.
 - **Apply slide = separate gold-bordered box per question (Variant A), three tiers across, questions stacking down.** Each question is its own box with a `"Q1 / Q2 / Q3"` label under a full-width tier header. This is the default and what Patryk means by "multiple boxes". The single-unified-column look (all of a tier's questions crammed into one tall box) is the failure mode he dislikes — never produce it. Use Variant B (full-width Mastering row) only when one Mastering question is genuinely long (>140 chars). The naming is now consistent between SKILL.md and slide-options-v4.md — do not reintroduce a "default to C" instruction.
-- **Review MUST mirror EVERY Apply question.** The review section is the mark scheme for the Apply task: for each tier, include an answer for every Apply question in that tier (3 apply questions → 3 review Q/A pairs per tier), verbatim question text, each in its own separate box (`reviewRow`). Never collapse three Apply questions into one review answer. The review `developing`/`reaching`/`mastering` arrays must each have the same length as the matching Apply arrays.
+- **Review: DO NOT AUTHOR IT (2026-07-12).** The review slides are a verbatim copy of the Apply questions and answers, and build.js now makes that copy itself. **Omit the `review` field entirely** on standard/practical lessons — just make sure every Apply question carries its `a` answer (an answerless Apply question drops off the review slides, and the CONTENT CHECK flags it). Writing a review section out by hand is wasted output; if one IS authored (special case), it must mirror every Apply question per tier, verbatim. Review-TYPE lessons (`lessonType: "review"`) are unaffected — their structure is its own section below.
 - **When Patryk uploads an existing resource to work from, it is a floor, not a suggestion.** Port EVERY question, every table, every scaffold, and mark every image/diagram position with a placeholder. Adapt the format to the house style — never reduce the content. If something genuinely can't fit, ask before cutting.
 - Worksheets must carry the full lesson: Do Now (with word bank/gap-fill recall for support versions), the experiment section (diagram box + results table + conclusion questions) for practical lessons, and the full Apply set. A worksheet with one question per tier is bland and wrong.
 
@@ -219,7 +219,9 @@ The final slide of every deck is the **IMAGE BANK** (kept, not deleted): it self
     "mastering":  [ { "q": "...", "a": "...", "marks": 6, "qType": "extended_writing",
                       "contentType": "extended_writing" } ]
   },
-  "review": { "questions": [ { "q": "...", "a": "..." } ] },
+// "review": OMIT on standard/practical lessons — build.js copies Apply Q&A onto the
+// review slides itself (2026-07-12). Only author it for a special case, and then it
+// must mirror every Apply question per tier.
   "worksheetExtras": { "wordBank": ["..."], "results": { "headers": ["Point","Current (A)"], "rows": 6 },
     "collectionTable": { "title": "PLANET DATA", "instruction": "Use the data cards to complete the table.", "headers": ["Planet","Day length","Temp"], "rows": [["Mercury","",""],["Venus","",""]] } },
 // worksheetExtras.collectionTable: a student data-collection grid on the standard worksheet
@@ -553,242 +555,23 @@ Build a single lesson object: two Learn slides (one per topic), unified Do Now d
 
 ---
 
-## Known Bugs and Fix Backlog
+## Known Bugs and fixes
 
-Fix these when next editing build.js or the worksheet renderer. Each item includes the exact behaviour to fix and the expected correct behaviour.
-
-**Bug 1 — Worksheet boxes stretch in Google Docs** ✓ FIXED (confirmed in code 2026-06-29, re-verified 2026-07-06: answer boxes use `HeightRule.AT_LEAST` + `blanks()` zero-spacing fix. Reopen only if stretching reappears in Google Docs.)
-Current: Answer boxes and content boxes auto-expand to fill available height when the worksheet is opened in Google Docs.
-Fix: All boxes must use fixed heights. Never auto-expanding/auto-resizing height. Set explicit pixel/point heights on every box in the DOCX renderer so they stay the same size regardless of viewing environment.
-
-**Bug 2 — Keywords box missing from standard worksheets** ✓ FIXED 2026-06-19
-Current: The keyword reference list (key terms for the lesson) only appears on the support worksheet, not the standard worksheet.
-Fix: The keyword reference box (compact, shrink-to-fit, sitting next to the Do Now) must appear on ALL worksheets — standard and support. It is a reference tool, not a scaffolding tool.
-
-**Bug 3 — Learn workedExample slide: example box text too small** ✓ FIXED (confirmed in code 2026-06-29, re-verified 2026-07-06: prompt/steps/answer all `autoFontSize` min 16pt)
-Current: The text inside the example/worked steps box on Learn variant F (equation + worked example) renders too small to read from the front of a classroom.
-Fix: Increase the font size in the example box. Target minimum 16pt on the slide (classroom projector standard). This is a renderer fix in the workedExample slide function.
-
-**Bug 4 — Build workedExample answer slide: answer in wrong column** ✓ FIXED (confirmed in code 2026-06-29, re-verified 2026-07-06: `yourTurn.answer` pre-populated in the right column of the same slide for animation reveal)
-Current: On the Build workedExample → yourTurn slide, the right-hand column (Your Turn answer) is blank. The answer only appears on a separate answer slide.
-Fix: Pre-populate the answer in the RIGHT column of the workedExample slide itself. The teacher reveals it using PowerPoint's own entrance animation (added manually by Patryk in PowerPoint after export). The answer must be present in the PPTX at build time — it is never blank. Remove any separate answer slide for workedExample if one is being generated; the reveal is via animation on the same slide.
-
-**Bug 5 — MCQ answer slide shows "Common error" line** ✓ FIXED (confirmed 2026-06-25)
-Current: Below the correct answer box on the MCQ answer slide, a "Common error: ..." line renders in gold italic.
-Fix: `slideMcq` does not render `commonError` — the answer box only shows correct answer + explanation. `commonError` is unused in MCQ. Note: `predictThenCheck` reveal slide does render `commonError` by design — that is intentional and separate.
-
-**Bug 6 — Subheading text not gold, and is underlined** ✓ FIXED 2026-06-25
-Current: Subheadings on worksheets (e.g. section labels like "Apply", topic subheadings) are rendered with underline styling and/or the wrong colour.
-Fix: `sectionLabel()` colour changed from NAVY → GOLD (#FABB2E). No underline was present in current code. Applies to "Method", "Variables", "Video questions" labels on practical worksheets.
-
-**Bug 7 — Tier pills use solid block colours instead of pastel fill** ✓ FIXED 2026-06-19
-Current: In some builds, the Developing/Reaching/Mastering tier pills on worksheets use solid block colours (e.g. solid green, solid orange, solid red).
-Fix: Tier pills must always use pastel fill (light tint of the tier colour, not full saturation block). The pastel style is confirmed correct — revert any solid-colour regression. Note: on PPTX Apply slides, tier badges are full-width column headers (not pills), so this fix applies to DOCX worksheets only.
-
-**Bug 8 — MCQ count inconsistent (sometimes 1, sometimes 3, sometimes 4)** ✓ FIXED 2026-06-19 (build-time warning; rule documented)
-Current: The number of MCQ questions generated per lesson is inconsistent — sometimes 1, sometimes 3, sometimes 4.
-Fix: Hard rule is exactly 4 MCQ questions per lesson (4 Build slides of type "mcq"). Trace through build.js and SKILL.md to find what is overriding or ignoring this count. The rule is: every standard lesson gets exactly 4 MCQ Build slides unless Patryk explicitly states otherwise. Fix the enforcement so it never produces fewer.
-
-**Bug 9 — Review slides show class name and subject in top-right corner** ✓ FIXED (confirmed 2026-06-25)
-Current: Review slides display e.g. "8AB · Physics" as a subtitle text in the top-right area of the slide header.
-Fix: Confirmed `meta.class` only appears on line 359 of build.js (title slide only). `slideReviewTier` renders "Review · DEVELOPING" or "Review · TODAY'S LEARNING" — no class name or subject.
-
-**Bug 10 — Support worksheet keywords table has definitions pre-filled** ✓ FIXED 2026-06-19
-Current: The keywords table on the support worksheet shows the term in the left column and a definition/hint underneath the term text. The right column ("What it means") may also be pre-populated or have redundant content.
-Fix:
-- Left column: key term only, no definition or hint text underneath.
-- Right column: completely blank — students write the definition themselves.
-- Only include terms that: (a) appear on a slide in this specific lesson, AND (b) students are expected to define themselves (i.e. not terms whose definitions are already given on a slide).
-- Remove the word "Hint:" from any support sheet prompt — it is implicit that a nudge is a hint.
-
-**Bug 11 — Keywords/copy-down Learn slide has disappeared** ✓ FIXED 2026-06-19 (replaced with new Learn-B teal keywords band)
-Current: A previously working Learn slide type that had students copy down key terms and core lesson information has been replaced by a plain information box. The dedicated copy-down slide no longer generates.
-Fix: Restore the keywords/copy-down slide as a proper Learn slide type. It should be a well-formatted slide (navy/gold house style) where students copy key terms and core lesson information. It must be part of the Learn cycle — not a box inserted elsewhere, and not replaced by a plain `body` string. Re-add it as a selectable Learn variant if it was removed from the schema.
-
-**Bug 12 — Backup data table appears on worksheet instead of PowerPoint only** ✓ FIXED (verified 2026-07-06, Patryk ruling: blank table only)
-Verified against a real amylase build: the worksheet carries ONLY a blank recording table (derived from `referenceData.headers` when `wx.results` is absent); no referenceData value appears anywhere in the worksheet XML. The filled MODEL DATA table renders on the PPTX only (BUILD · MODEL DATA slide). This is the ruled behaviour — never re-add a filled data table to worksheets.
-
-**Bug 13 — Keywords box on support sheet is too wide**
-Current: The keyword reference box next to the Do Now on the support worksheet stretches to the full width of the Do Now column.
-Fix: The keywords box must shrink to fit its content — sized to the width of the longest keyword entry plus padding, not the full column width. It sits to the right of the Do Now questions and should be compact.
-
-**Bug 14 — Backup data values have inconsistent/dirty sig figs** ✓ ADDRESSED 2026-07-06 (authoring rule — values come from the content JSON, not the renderer)
-AUTHORING RULE: `referenceData` values must be clean and consistent to appropriate sig figs — round multiples that are clearly intentional (4.20, 8.40, 12.60), never measurement noise (4.21, 8.38, 12.61). Keep decimal places consistent down each column. Write this way EVERY time backup/model data is generated in a lesson content object.
-
-**Bug 15 — Keyword layout on worksheets: single merged table instead of two separate elements** ✓ FIXED 2026-06-19
-Current: Keywords appear as one table/box, mixing reference terms and write-in definitions.
-Fix: Keywords must be split into TWO separate elements:
-- Element A (reference list): A compact box sitting next to the Do Now at the top of the worksheet. Lists all lesson key terms. No definitions. Shrink-to-fit width. Appears on both standard and support worksheets.
-- Element B (define-these-terms box): A write-in box that appears in the Learn section of the worksheet, as part of the lesson flow. Contains only the key terms that students are expected to define themselves as they encounter the content in the lesson. Students write the definition in the box during the lesson. This element appears in the Learn section, not at the top.
-These are two distinct elements with distinct purposes. Never merge them.
-
-**Bug 16 — GUESS box has redundant explanatory labels and answer lines after it** ✓ FIXED 2026-06-19
-Current: The G and U rows of the GUESS scaffold include explanatory text in brackets, e.g. "G — Given (what information has the question given you?)". Answer lines appear after the GUESS box.
-Fix:
-- Labels must be G, U, E, S, S only — no bracketed explanations on any row. Students know what the letters mean.
-- The E (equation) row should be pre-filled where the equation is known.
-- Remove all answer lines after a GUESS box. The GUESS table IS the answer structure — lines after it are redundant.
-
-**Bug 17 — Model answer colour scheme not used on PowerPoint answer slides**
-Current: The gold/yellow answer styling (used well on worksheets) is not carried through to PowerPoint answer slides.
-Fix: Integrate the gold/yellow model answer colour scheme into PowerPoint answer slides. Answer boxes on slides should use the same visual language as the worksheet model answers — gold border, gold or amber answer text, consistent with the house style. This applies to workedExample answer reveals, Review answer boxes, and any other slide where a model answer is displayed.
-
-**Bug 18 — Worksheet too long (target ~4 sides)**
-Current: Worksheets are generating at 6-7 sides or more.
-Fix: Aim for roughly 4 sides (2 double-sided sheets) as a general target. This is NOT a hard page-count rule — do not add a hard cap that breaks the renderer. Instead: use tighter box sizing, reduce whitespace between sections, remove redundant answer lines, shrink boxes to fit content rather than defaulting to large fixed heights. The goal is a worksheet that prints as 2 sheets double-sided, not a booklet. If content genuinely requires more space, that is acceptable — the principle is to avoid unnecessary padding and oversized empty boxes.
-
-**Bug 19 — Answer box colour regression (introduced 2026-06-20)** ✓ FIXED (confirmed 2026-06-25)
-Current: All slide answer boxes render amber/red instead of white.
-Fix: `goldBox()` defaults to `fill: 'FFFFFF'`. Amber (#E65100) is used ONLY in: (a) equipment list box border/header in practical slides, (b) model/backup table headers, (c) step number badges, (d) predictThenCheck prediction panel — all intentional. No regression present in current code.
-
-**Bug 20 — Learn variant G (flow diagram) layout: cramped horizontal strip** ✓ FIXED (approved SVGs 2026-06-22) → **SUPERSEDED by Bug 54 (2026-07-05)**
-The approved zigzag geometry is retained, but the rendering moved from a flattened SVG image to native PPTX shapes (see Bug 54). `buildLearnGSvg` no longer exists.
-
-**Bug 21 — Practical Build slide: equipment list missing** ✓ FIXED (confirmed 2026-06-25)
-Current: When `lessonType` is `practical` and the build item includes `equipment: [...]`, the equipment list does not appear on the build/method slide.
-Fix: `slidePractical` renders equipment as a navy/amber box in the right column, below the image placeholder (or filling the right column if no image). Label: "EQUIPMENT PER GROUP", amber border, bullet list.
-
-**Bug 22 — Misconception slide layout — BLOCKED: research required**
-Current: The 4-box misconception slide layout is not working well. At minimum the "why it feels true" box should be removed.
-Status: BLOCKED — do not change the renderer blind. Open questions: (a) is a question-based format better than statement-based? (b) what does best practice say for presenting misconceptions in secondary science? Research and decide structure + trigger conditions before touching code. Note: `trueFalse` with `heading: "COMMON MISCONCEPTIONS"` is the preferred alternative for most cases (see slide-type selection guidance above) — only use `type: "misconception"` where a standalone treatment is genuinely needed.
-
-**Bug 25 — Learn-A slide: box header titles and navy ribbon too small** ✓ FIXED (verified in code 2026-07-06)
-`navyHeaderBox` header bar renders at fontSize 22, bold, white-on-navy — above the ≥16pt classroom floor. Body text is `autoFontSize` min 11 / max 20. If a header ever shrinks again, the box has too much content — cut content, not font.
-
-**Bug 26 — Practical images with embeddedImagePath not appearing on worksheet** ✓ FIXED (verified 2026-07-02)
-`diagramOrImage(prac)` in build.js (~line 2677) now checks `imageConfidence === 'search' && embeddedImagePath` and embeds the real image in the DOCX, falling back to the description-aware diagram box otherwise.
-
-**Bug 30 — Worksheet subheadings illegible in black-and-white print** 🆕 NEEDS PROTOTYPE
-Current: Large gold-filled block prints as solid grey — loses visual hierarchy in B&W.
-Fix: Prototype two options at next Claude Code session before implementing:
-- Option A: Bold gold text (`FABB2E`) + thick left-border bar (~4pt), NO fill
-- Option B: Bold gold text + thin underline/rule beneath, NO fill
-Either option must read clearly as a section break when printed B&W. Show both to Patryk before committing.
-
-**Bug 34 — Annotated diagram breakdown missing** BLOCKED — awaiting reference
-Current: No structured way to show a diagram with labelled text boxes alongside it.
-Status: BLOCKED — Patryk to send the atmosphere layers lesson as a reference example. Do not implement until that reference has been reviewed.
-
-**Bug 33 / 53 — Equation rendering overhaul** ✅ FIXED 2026-07-03 (MAJOR)
-Equation conversion lives inside build.js (`parseEq()` → `toPptxRuns()`/`toDocxRuns()`), driven by
-the MATH MINI-SYNTAX above — there is NO `fmt-equations.js` file. What was fixed:
-- **Operators**: `parseEq` now maps `\times \div \pm \cdot \to \rightarrow \leq \geq \approx \neq
-  \degree \deg \propto` (was Greek-only → raw commands printed literally). Unknown `\cmd` still passes through.
-- **Font**: equation runs render in **Cambria Math** (`FONT_MATH`) in PPTX; Word fractions/radicals
-  emit OOXML math (`m:f`/`m:rad`), which Word renders in Cambria Math by default.
-- **Fractions**: PPTX diagonal `a⁄b` now full-size (was tiny — sub+sup compounded a 0.65 shrink). Word
-  keeps a true stacked bar.
-- **PHASE 3 SHIPPED 2026-07-06 — true stacked fractions in PPTX** (`renderEqShapes`): on dedicated
-  equation surfaces (Learn-F equation box incl. twins, guessExample E row, practiceTriangle reference
-  box) a `{a/b}` fraction renders as a NATIVE stack — numerator over a real bar over the denominator,
-  editable Cambria Math shapes (named `eqFracNum`/`eqFracBar`/`eqFracDen`, harness-asserted). Falls
-  back to the full-size diagonal automatically when there is no fraction, the box is too shallow, or
-  the equation is too wide. Inline prose sinks and small boxes (e.g. rearrangement chips) keep the
-  diagonal by design.
-- **Radicals**: `sqrt(x)` → `√x` glyph in PPTX; true radical with vinculum in Word.
-- **Prose sinks** that bypassed parseEq (review-lesson worked examples: `reviewRow`, indicative
-  content, handwritten model answers, `workedExample` prompts/answer) now run `prettyText` =
-  `normSym` (symbols + safe unit whitelist) + `unicodeScript` (`^2`/`_2` → Unicode ²/₂), keeping the
-  Trebuchet body font. `workedExample` prompt/answer take the full parseEq path (they are equations).
-- **Regression guard**: `test/run.js` fails if any output XML contains raw `\times`/`\div`, and
-  asserts × ÷ ² √ all appear typeset in the bug-test deck.
-
-Equation introduction order rule (authoring): **introduce the squared form first, root form as
-secondary rearrangement only.** Never open a Learn-F slide with the root form if the primary physics
-is in the squared form (e.g. `c^2_rms = 3RT/M` first, then `c_rms = sqrt(...)` as a later step).
-
-**Bug 43 — Year 12 OCR Physics A: chapter-level spec alignment insufficient** 🆕
-Current: textbook-index.md may only have chapter-level entries for OCR A Year 12.
-Fix: For 12D-Phy lessons, align to sub-chapter granularity using `references/textbook-index.md`. Ensure the index includes OCR A Year 12 sub-chapters (not just Kerboodle KS3/KS4 entries). If the index is missing OCR A Year 12 entries, flag to Patryk before building.
-
-**Bug 55 — Learn-slide cap wrong for review lessons** ✅ FIXED 2026-07-04
-Was: review lessons fell to the standard/unknown path and were capped at 4 Learn slides (`slice(0,4)`),
-too few for content-heavy revision. Fix: a dedicated `review` dispatcher branch renders **all** Learn
-slides (no cap), matching `revision`/`whiteboard`. Standard/practical/annotation/unknown keep the 4-cap.
-
-**Bug 56 — "Purple pen" Core/Challenge table forced two columns on single-tier** ✅ FIXED 2026-07-04
-(Learn-C single tier → one full-width table.)
-
-**Bug 57 — dead `apply.tiers.X.qs` / `review.tiers.X.qs` nesting shape** ✅ FIXED 2026-07-04
-The renderer reads flat `apply.developing/reaching/mastering` and `review.questions` — a nested
-`.tiers.X.qs` shape is silently dropped. Fix: build-time warn (`[build] "apply.tiers" is not read …`)
-when the shape is seen, so authoring gets corrected. No defensive coercion — the flat shape is the only
-supported one (no real lesson used `.tiers`; the `bug-test.json` fixture was cleaned to flat).
-
-**Bug 54 — Flow/cycle Learn slides rendered as a flattened image** ✅ FIXED 2026-07-05 (RENDERER)
-Was: Learn-G (flow/sequence) built the whole diagram as one rendered SVG embedded with `addImage`
-(`buildLearnGSvg`), so text was not editable, step notes were silently truncated to 2×26 chars, and
-long labels clipped/overlapped the number badges (reported on "How Coronary Heart Disease Develops").
-Fix: `buildLearnGSvg` deleted; the ≥3-step branch now calls `renderLearnGFlow`, which draws the same
-**approved zigzag geometry** (`LEARN_G_LAYOUTS`, unchanged) as **native PPTX shapes** — `flowStepBox`
-(navy roundRect + gold ellipse number badge + editable label/note, `autoFontSize`, full note text) and
-`flowArrow` (curved custom-geometry freeform arrows that arch with the flow, gold, triangle arrowhead).
-Learn-I (linear flowchart) keeps its schema but its inter-node `→`/`↓` glyphs and the `cycle` indicator
-are now native `flowArrow` shapes too (straight line arrows; a curved return arrow for `cycle: true`).
-Same JSON schema — existing lessons rebuild natively with no migration. Aliases `FLOW`/`SEQUENCE`→G,
-`FLOWCHART`→I. Regression fixture `flow-native-test.json` asserts roundRect + custGeom present, no SVG
-media embedded, and full long-note text survives.
-
-**Bug 58 — image-description placeholder regression on Learn H / J** ✅ FIXED 2026-07-05
-(Re-opens an older image-placeholder bug whose number predates the current 25–57 list.)
-Was: `[Image — add imageDescription to JSON]` (the generic fallback) still appeared on Learn-H (video)
-and Learn-J (graph sketch) slides even when the JSON authored `imageDescription` — those two call sites
-passed no description to `imagePlaceholder` (variants A/B/D had been fixed earlier; H/J were missed; the
-Build `mcq_image` slide never checked for an embedded image at all). Fix: extracted a single
-`imageOrPlaceholder(slide, item, x, y, w, h)` helper (embeds the real image when
-`imageConfidence === 'search' && embeddedImagePath`, else renders the placeholder with
-`item.imageDescription`) and routed A/B/D/H/J + `mcq_image` through it. `flow-native-test.json` asserts
-the generic placeholder never appears when a description is authored. NB: legacy fixtures still contain
-deliberately description-less placeholders, so the generic-string ban is scoped to the new fixture, not
-global.
-
-Also fixed in passing (2026-07-05): Learn-H "While watching" marker used the banned `✎` pencil glyph
-(forces font substitution) — swapped to `☞`, the house write/instruction marker used elsewhere.
-
-**Bug 59 — guessExample slide visual quality cluster** ✓ FIXED 2026-07-10 (mock approved by Patryk, then built)
-Row weights rebalanced to [1,1,1.35,1,1.15]; G/U/E/S/S badges scale with the row (55%, capped 0.62"), prompts 15pt; formula triangle is aspect-locked (width = 1.15 × height) and SUPPRESSED when `equationSymbols` is absent or has more than 3 entries (equation then takes the full row at 26pt — never draw A/B/C defaults); Substitute/Solve rows typeset through parseEq (÷ × ² render properly).
-
-**Bug 61 — Greek symbols lost when JSON uses a single backslash** ✓ FIXED 2026-07-06
-`"\rho"` in JSON parses to carriage-return+"ho" (the ρ is destroyed before the renderer sees it). normSym now repairs exact-match mangled symbol names and warns loudly. AUTHORING RULE: always double-escape backslash commands in lesson JSON — `"\\rho"`, `"\\times"`, `"\\div"`, `"\\Delta"`. Component unit lines also typeset now (`m/s^2` → `m/s²`).
-
-**Bug 60 — practiceTriangle: answers on the slide, navy/gold box under each question** ✓ FIXED 2026-07-10 (mock approved, then built)
-Each question card now carries its own navy-fill gold-border ANSWER box beneath it (question 58% / answer 38% of the card), answers typeset through parseEq, present at build time on the SAME slide — Patryk adds the reveal animation himself (MCQ convention). No answer authored = the question keeps the full card. Speaker notes keep a plain copy. Harness asserts the boxes render.
-
-**Feature — "Mark the answers" activity** ✅ BUILT 2026-07-04
-New `markTheAnswers` Build item (slide-options-v4.md): one exam question + 3–4 realistically-flawed
-sample answers, marked against the reused mark scheme (`indicativeContent`/`levelDescriptors`/
-`doesNotAward`). Two slides (TASK handwriting grid + MARK SCHEME panel/verdicts) via `slideMarkTheAnswers`;
-also prints on the worksheet (annotate + level/mark) and answer sheet (verdicts + hits/misses + panel).
-Renders in review lessons (the review dispatcher runs Build items) and standard/practical lessons.
+The bug-fix history (Bugs 1 to 61, dates, code notes) lives at home in
+`references/backlog.md` and is deliberately NOT shipped in this skill: it is
+developer history with no bearing on authoring a lesson. If a build looks wrong,
+describe the problem plainly to Patryk so Claude Code can fix build.js at home.
+Never try to edit build.js from a school session.
 
 ---
 
-## Planned Feature — Spaced Retrieval Do Now Question Bank
+## Do Now question bank — spaced retrieval (engine built at home; wiring pending)
 
-**Overview:**
-Every time a lesson is built, its Do Now questions are automatically logged to a persistent question bank. When building a new lesson's Do Now, the skill draws from the bank to generate questions using spaced retrieval logic — not just questions from the previous lesson.
+A per-class bank with a spaced-retrieval selector now EXISTS at home
+(`references/do-now-bank.js`, tested) but is not yet wired into build.js. Until it
+is, author the six Do Now questions as normal: backwards-looking, mostly recall
+(AO1), never previewing today.
 
-**Bank structure:**
-- Top level: KS3 / KS4 / KS5
-- Second level: topic (e.g. Forces, Waves, Cells, Atomic Structure)
-- Third level: subtopic (e.g. Newton's Second Law, Refraction, Mitosis, Isotopes)
-- Each entry is a QUESTION TEMPLATE, not a fixed question. The same concept is tested with varied values, contexts, or phrasings each time it is used. Example: "Calculate density given mass and volume" is one template — the actual numbers change every time it appears in a Do Now.
-
-**Each template is tagged with:**
-- KS (KS3 / KS4 / KS5)
-- Topic
-- Subtopic
-- Assessment objective: AO1 (recall/define/state/name) or AO2 (apply/calculate/explain/describe)
-- Question type: recall | define | calculate | explain | describe
-
-**Do Now allocation logic:**
-- 5-6 questions per Do Now (default 5; Patryk may specify 6)
-- Allocation split (to be refined): approximately 1-2 questions from the most recent lesson's topic; remainder distributed via spaced retrieval weighting — prioritising content taught several weeks ago or at the start of the year, not just last lesson
-- AO balance enforced: never all AO1 (all recall), never all AO2 (all calculation/explanation). Each Do Now must include a mix
-- Variety enforced: question types should not repeat more than twice in one Do Now
-
-**Year 9 special handling:**
-Year 9 sits across KS3 and the start of KS4 (GCSE) at Beechen Cliff. The retrieval pool for Year 9 covers both KS3 and KS4 topics. Weighting should favour KS3 consolidation in the first half of the year, shifting gradually toward KS4 retrieval as GCSE content accumulates. Analyse the Year 9 scheme of work to determine appropriate topic boundaries.
-
-**Output format:**
-TBD — Excel is the likely starting point (one row per template, columns for KS/topic/subtopic/AO/type/template text) but this may change depending on how useful the Excel format proves to be in practice. Do not hard-code the format — design the logging step to be format-agnostic so the output can be switched.
+When wired, the session will PICK six from the bank instead of writing them,
+leaning on older topics; for KS4 the low-demand questions will come from real AQA
+exam parts. Design and status: `specs/do-now-bank.md` (home).

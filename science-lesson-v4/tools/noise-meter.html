@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Noise Meter</title>
+<style>
+  :root {
+    --navy: #0D1B5E;
+    --gold: #FABB2E;
+    --green: #1B7F3B;
+    --amber: #E65100;
+    --red: #B00020;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0; width: 100%; height: 100%;
+    overflow: hidden;
+    font-family: 'Segoe UI', Trebuchet MS, Arial, sans-serif;
+    background: var(--navy);
+    color: #fff;
+    transition: background-color 0.35s ease;
+    user-select: none;
+  }
+  #stage {
+    position: fixed; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center;
+  }
+  #state {
+    font-size: 16vh; font-weight: 800; letter-spacing: 0.02em;
+    text-shadow: 0 2px 14px rgba(0,0,0,0.35); line-height: 1;
+  }
+  #sub { font-size: 3.2vh; font-weight: 600; opacity: 0.85; margin-top: 1vh; text-transform: uppercase; letter-spacing: 0.1em; }
+
+  /* live bar */
+  #barWrap {
+    width: 70vw; height: 6vh; margin-top: 4vh;
+    background: rgba(255,255,255,0.14); border-radius: 999px; overflow: hidden;
+  }
+  #bar { height: 100%; width: 0%; border-radius: 999px; background: #fff; transition: width 0.08s linear; }
+
+  /* controls */
+  #panel {
+    position: fixed; left: 0; right: 0; bottom: 0;
+    display: flex; gap: 10px; align-items: center; justify-content: center;
+    padding: 12px; background: rgba(0,0,0,0.28); flex-wrap: wrap;
+  }
+  button {
+    font: inherit; font-weight: 700; color: var(--navy); background: var(--gold);
+    border: none; border-radius: 8px; padding: 10px 16px; cursor: pointer;
+  }
+  button.secondary { background: rgba(255,255,255,0.2); color: #fff; }
+  .thresh { display: flex; align-items: center; gap: 6px; font-size: 14px; }
+  .thresh input { width: 120px; }
+
+  #startOverlay {
+    position: fixed; inset: 0; z-index: 20;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    background: var(--navy); text-align: center; padding: 0 8vw; cursor: pointer;
+  }
+  #startOverlay h1 { font-size: 8vh; margin: 0 0 2vh; }
+  #startOverlay p { font-size: 3vh; opacity: 0.85; max-width: 40ch; line-height: 1.4; }
+  .hidden { display: none !important; }
+
+  /* canvas that feeds the pop-out window — kept off-screen */
+  #pipCanvas { position: fixed; left: -9999px; top: 0; }
+  #pipVideo  { position: fixed; left: -9999px; top: 0; width: 320px; height: 180px; }
+</style>
+</head>
+<body>
+
+<div id="startOverlay">
+  <h1>Noise Meter</h1>
+  <p>Tap anywhere to start. The meter uses this device's microphone to show a traffic light on the board. Nothing is recorded and no sound ever leaves this computer.</p>
+  <p style="font-size:2.2vh; opacity:0.7; margin-top:3vh;">After it starts, use <b>Pop out (stays on top)</b> to float it over PowerPoint, even in presenter view.</p>
+</div>
+
+<div id="stage">
+  <div id="state">--</div>
+  <div id="sub">calm</div>
+  <div id="barWrap"><div id="bar"></div></div>
+</div>
+
+<div id="panel">
+  <button id="popBtn" class="secondary" title="Float a small always-on-top window over PowerPoint">Pop out (stays on top)</button>
+  <div class="thresh">Talk level <input id="talkRange" type="range" min="5" max="80" value="30"></div>
+  <div class="thresh">Too loud <input id="loudRange" type="range" min="10" max="95" value="55"></div>
+  <button id="calibBtn" class="secondary" title="Set the two thresholds from the current room noise">Calibrate to room</button>
+  <button id="fsBtn" class="secondary">Full screen</button>
+</div>
+
+<canvas id="pipCanvas" width="480" height="270"></canvas>
+<video id="pipVideo" muted playsinline></video>
+
+<script>
+'use strict';
+(function () {
+  var NAVY = '#0D1B5E', GREEN = '#1B7F3B', AMBER = '#E65100', RED = '#B00020';
+  var STATE = { level: 0, band: 'calm' };
+  var talk = 30, loud = 55;           // % of full scale
+  var analyser = null, data = null, running = false;
+
+  // persistence
+  try {
+    var saved = JSON.parse(localStorage.getItem('noiseMeter') || '{}');
+    if (saved.talk) talk = saved.talk;
+    if (saved.loud) loud = saved.loud;
+  } catch (e) {}
+  function save() { try { localStorage.setItem('noiseMeter', JSON.stringify({ talk: talk, loud: loud })); } catch (e) {} }
+
+  var els = {
+    start: document.getElementById('startOverlay'),
+    state: document.getElementById('state'),
+    sub: document.getElementById('sub'),
+    bar: document.getElementById('bar'),
+    body: document.body,
+    talkR: document.getElementById('talkRange'),
+    loudR: document.getElementById('loudRange'),
+    pop: document.getElementById('popBtn'),
+    calib: document.getElementById('calibBtn'),
+    fs: document.getElementById('fsBtn'),
+    canvas: document.getElementById('pipCanvas'),
+    video: document.getElementById('pipVideo'),
+  };
+  els.talkR.value = talk; els.loudR.value = loud;
+
+  function bandFor(level) {
+    if (level >= loud) return 'loud';
+    if (level >= talk) return 'talk';
+    return 'calm';
+  }
+  var BANDS = {
+    calm: { bg: NAVY,  word: 'CALM',      sub: 'silent work',   color: '#fff' },
+    talk: { bg: AMBER, word: 'PARTNER',   sub: 'quiet talk ok', color: '#fff' },
+    loud: { bg: RED,   word: 'TOO LOUD',  sub: 'bring it down',  color: '#fff' },
+  };
+
+  async function start() {
+    if (running) return;
+    var stream;
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } });
+    } catch (e) {
+      els.start.querySelector('p').textContent = 'Microphone blocked. Allow the microphone for this page (padlock icon in the address bar) and reload.';
+      return;
+    }
+    var ctx = new (window.AudioContext || window.webkitAudioContext)();
+    var srcNode = ctx.createMediaStreamSource(stream);
+    analyser = ctx.createAnalyser();
+    analyser.fftSize = 1024;
+    analyser.smoothingTimeConstant = 0.85;
+    srcNode.connect(analyser);
+    data = new Uint8Array(analyser.fftSize);
+    running = true;
+    els.start.classList.add('hidden');
+    loop();
+  }
+
+  function rmsLevel() {
+    analyser.getByteTimeDomainData(data);
+    var sum = 0;
+    for (var i = 0; i < data.length; i++) { var v = (data[i] - 128) / 128; sum += v * v; }
+    var rms = Math.sqrt(sum / data.length);          // 0..~1
+    // map to a friendly 0..100 with a gentle curve so classroom noise spreads out
+    return Math.min(100, Math.round(Math.pow(rms, 0.6) * 220));
+  }
+
+  var displayLevel = 0;
+  function loop() {
+    if (!running) return;
+    var raw = rmsLevel();
+    displayLevel += (raw - displayLevel) * 0.35;      // extra visual smoothing
+    STATE.level = displayLevel;
+    STATE.band = bandFor(displayLevel);
+    render();
+    drawPip();
+    requestAnimationFrame(loop);
+  }
+
+  function render() {
+    var b = BANDS[STATE.band];
+    els.body.style.background = b.bg;
+    els.state.textContent = b.word;
+    els.sub.textContent = b.sub;
+    els.bar.style.width = Math.min(100, STATE.level) + '%';
+    els.bar.style.background = STATE.band === 'loud' ? '#fff' : (STATE.band === 'talk' ? '#fff' : 'var(--gold)');
+  }
+
+  // ---- Picture-in-Picture pop-out: draw the meter to a canvas, stream it into a
+  // muted <video>, and request PiP. The PiP window floats above every other app,
+  // including a fullscreen PowerPoint slideshow — the only way a page can stay on
+  // top of presenter view without installing anything. Drag it to the top-left once
+  // and the browser keeps it there.
+  var pipStream = null;
+  function drawPip() {
+    var c = els.canvas, g = c.getContext('2d');
+    var b = BANDS[STATE.band];
+    g.fillStyle = b.bg; g.fillRect(0, 0, c.width, c.height);
+    g.fillStyle = '#fff';
+    g.font = '800 54px Segoe UI, Arial, sans-serif';
+    g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.fillText(b.word, c.width / 2, c.height / 2 - 20);
+    g.font = '600 22px Segoe UI, Arial, sans-serif';
+    g.fillText(b.sub.toUpperCase(), c.width / 2, c.height / 2 + 30);
+    // bar
+    var bw = c.width * 0.8, bx = c.width * 0.1, by = c.height - 46;
+    g.fillStyle = 'rgba(255,255,255,0.2)'; g.fillRect(bx, by, bw, 18);
+    g.fillStyle = STATE.band === 'calm' ? '#FABB2E' : '#fff';
+    g.fillRect(bx, by, bw * Math.min(1, STATE.level / 100), 18);
+  }
+
+  async function popOut() {
+    if (!('requestPictureInPicture' in HTMLVideoElement.prototype)) {
+      alert('This browser cannot pop out an always-on-top window. Use Chrome or Edge for the pop-out; the full-screen meter still works everywhere.');
+      return;
+    }
+    try {
+      if (document.pictureInPictureElement) { await document.exitPictureInPicture(); return; }
+      if (!pipStream) {
+        pipStream = els.canvas.captureStream(15);
+        els.video.srcObject = pipStream;
+        await els.video.play();
+      }
+      await els.video.requestPictureInPicture();
+    } catch (e) {
+      alert('Could not open the pop-out window: ' + (e.message || e));
+    }
+  }
+
+  // ---- calibrate: sample the room for ~2s, set talk just above the floor and
+  // loud a band above talk, so the thresholds fit THIS room, not a guess.
+  function calibrate() {
+    if (!running) return;
+    var samples = [], t0 = Date.now();
+    var prev = els.calib.textContent; els.calib.textContent = 'Listening…';
+    (function collect() {
+      samples.push(STATE.level);
+      if (Date.now() - t0 < 2000) { setTimeout(collect, 60); return; }
+      var avg = samples.reduce(function (a, b) { return a + b; }, 0) / samples.length;
+      talk = Math.max(8, Math.round(avg + 12));
+      loud = Math.min(95, Math.round(talk + 22));
+      els.talkR.value = talk; els.loudR.value = loud; save();
+      els.calib.textContent = prev;
+    })();
+  }
+
+  // events
+  els.start.addEventListener('click', start);
+  els.pop.addEventListener('click', popOut);
+  els.calib.addEventListener('click', calibrate);
+  els.fs.addEventListener('click', function () {
+    if (document.fullscreenElement) document.exitFullscreen();
+    else document.documentElement.requestFullscreen();
+  });
+  els.talkR.addEventListener('input', function () { talk = +els.talkR.value; if (loud <= talk) { loud = talk + 5; els.loudR.value = loud; } save(); });
+  els.loudR.addEventListener('input', function () { loud = +els.loudR.value; if (loud <= talk) { talk = loud - 5; els.talkR.value = talk; } save(); });
+})();
+</script>
+</body>
+</html>

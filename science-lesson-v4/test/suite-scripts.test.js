@@ -128,6 +128,29 @@ function run() {
     pass('uploader loops over every lesson in a multi-lesson JSON');
   else fail('uploader still only uploads the first lesson of an array');
 
+  // last-lesson summariser (2026-07-12) — condenses the lesson log to "what we did
+  // last time" per class, so the school session need not be told each lesson.
+  const ll = require('../science-lesson/references/last-lesson.js');
+  const logRecs = [
+    { class: '9AB', topic: 'Cells', lessonNumber: 3, builtOn: '2026-05-01', subtopics: ['x'], doNow: [{ q: 'Q1', id: 'a' }] },
+    { class: '9AB', topic: 'Diffusion', lessonNumber: 5, builtOn: '2026-05-08', subtopics: ['y'], doNow: [{ q: 'Q2', examRef: 'Phys-Q1a' }] },
+    { class: '8XP', topic: 'Forces', lessonNumber: 2, builtOn: '2026-05-06', subtopics: [], doNow: [] },
+  ];
+  const sum = ll.summariseLatest(logRecs);
+  if (sum.classes['9AB'] && sum.classes['9AB'].topic === 'Diffusion')
+    pass('last-lesson picks the most recent lesson per class (by lessonNumber)');
+  else fail(`last-lesson picked the wrong 9AB lesson: ${sum.classes['9AB'] && sum.classes['9AB'].topic}`);
+  if (sum.classes['9AB'].doNowIds && sum.classes['9AB'].doNowIds[0] === 'Phys-Q1a')
+    pass('last-lesson carries the Do Now ids used (for the future no-repeat rule)');
+  else fail('last-lesson dropped the Do Now ids');
+  if (Object.keys(sum.classes).length === 2)
+    pass('last-lesson summarises one entry per class');
+  else fail(`last-lesson produced ${Object.keys(sum.classes).length} classes, expected 2`);
+  // date tie-break when lessonNumber is equal/absent
+  if (ll.isLater({ lessonNumber: null, builtOn: '2026-05-08' }, { lessonNumber: null, builtOn: '2026-05-01' }))
+    pass('last-lesson falls back to build date when lessonNumber is absent');
+  else fail('last-lesson date tie-break is wrong');
+
   console.log(`  ${fails ? RED : GRN}${fails} failure(s)${RST}`);
   return { fails, warns };
 }

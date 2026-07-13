@@ -3,17 +3,15 @@
 
 ---
 
-## HARD CONTENT RULES
+## HARD CONTENT RULES — live in SKILL.md (one home; do not re-copy here)
 
-- **Apply:** min 3 questions per tier · ≤140 chars per question · min 16pt (enforce before building — never let renderer shrink)
-- **Review:** mirror EVERY Apply question verbatim · same count per tier as Apply · fill slide, no dead space
-- **Do Now:** min 4 questions · ≤120 chars each
+SKILL.md's HARD RULES section is authoritative for counts and policy (Do Now = exactly 6; MCQ = exactly 4; Apply min 3 per tier; **omit `review` — build.js copies Apply itself, 2026-07-12**; Learn max 4; Visualiser mandatory on standard/practical). This file only adds the per-slide character limits the renderer cannot fix for you:
+
+- **Apply question:** ≤140 chars · min 16pt (enforce before building — never let the renderer shrink)
+- **Do Now question:** ≤120 chars
 - **Engage:** hook ≤120 chars · body/content ≤400 chars · instruction steps ≤100 chars, max 4
-- **Engage reveal:** `reveal.question` ≤120 chars · `reveal.answer` ≤200 chars — enforce before building, don't rely on the renderer to shrink it into place
-- **Build MCQ:** min 4 per lesson, each targeting a distinct idea/pitfall · single slide, no separate answer slide
-- **Review answer:** ≤160 chars, core info only (teacher elaborates aloud)
-- **Visualiser:** mandatory in standard and practical lessons — IPEVO URL is baked in, never write "[teacher inserts]"
-- **Learn:** max 4 Learn slides per lesson
+- **Engage reveal:** `reveal.question` ≤120 chars · `reveal.answer` ≤200 chars
+- **Review answer (when authored at all):** ≤160 chars, core info only (teacher elaborates aloud)
 - **Practical/Build slides expecting apparatus MUST have an image placeholder** (set `imagePlaceholder: false` only when genuinely no apparatus)
 
 ---
@@ -513,14 +511,7 @@ Top-right of the Apply title (slide **and** worksheet) an automatic textbook ref
 Min 3 questions per tier. Developing ≥1 concept; Mastering ≥1 calculation (KS4) or extended reasoning (KS3).
 
 ### REVIEW
-```json
-"review": {
-  "developing": [{ "q": "verbatim from apply Q1", "a": "≤160 chars — core marking points", "commonError": "..." }],
-  "reaching":   [{ "q": "...", "a": "..." }],
-  "mastering":  [{ "q": "...", "a": "..." }]
-}
-```
-Must mirror EVERY Apply question — same count per tier. Rows fill the slide (no dead space).
+**Do not author (2026-07-12).** Omit the `review` field — build.js copies every Apply question and answer onto the review slides itself. Just ensure every Apply question carries its `a`. If a special case genuinely needs a hand-written review, the old shape still works (tier arrays mirroring Apply, answers ≤160 chars) but it is wasted output otherwise.
 
 ### WHITEBOARD ROUNDS
 ```json
@@ -529,16 +520,9 @@ Must mirror EVERY Apply question — same count per tier. Rows fill the slide (n
 
 ---
 
-## LESSON TYPE → SLIDE SEQUENCE
+## LESSON TYPE → SLIDE SEQUENCE — lives in SKILL.md (one home; do not re-copy here)
 
-| Type | Sequence |
-|---|---|
-| standard | Title → DoNow → DoNow Answers → Engage → Learn(1–2) → Build×4min → Visualiser → Apply → Review×3 |
-| practical | Title → DoNow → DoNow Answers → Engage → Learn(1–2) → Build practical → Q&A answers → Visualiser → Apply → Review×3 |
-| revision | Title → DoNow → DoNow Answers → Learn-C → Whiteboard rounds → Apply → Review×3 |
-| review | Title → DoNow → DoNow Answers → Learn (all, no cap) → Build items → Visualiser → Apply → Review×3 |
-| whiteboard | Title → DoNow → DoNow Answers → Whiteboard rounds → Apply → Review×3 |
-
+The sequence table is in SKILL.md ("Lesson type → slide sequence"). Renderer-side notes only:
 Visualiser is mandatory in standard, practical and **review** — never omit. **review**
 (`lessonType:"review"`) renders **all** Learn slides (no 4-slide cap — Bug 55), no Engage, and runs
 Build items (so `markTheAnswers` / `modelAnswerReview` reach the review deck). Standard/practical/

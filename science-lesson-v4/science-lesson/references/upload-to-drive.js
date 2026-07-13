@@ -374,4 +374,19 @@ let okCount = 0;
 for (const lesson of lessons) {
   if (processLesson(lesson)) okCount++;
 }
+
+// 2026-07-12: refresh the compact per-class "last lesson" summary the school
+// session reads (so Patryk stops recapping the previous lesson by hand). Best
+// effort — a summary failure must never fail the upload run.
+if (!dryRun) {
+  try {
+    const { generate } = require('./last-lesson.js');
+    const out = process.env.LAST_LESSON_OUT
+      || path.join(path.dirname(logPath()), 'last-lesson.json');
+    generate(logPath(), out, { quiet: false });
+  } catch (err) {
+    console.warn('last-lesson: summary not refreshed (upload unaffected) — ' + err.message);
+  }
+}
+
 process.exit(okCount === lessons.length ? 0 : 1);

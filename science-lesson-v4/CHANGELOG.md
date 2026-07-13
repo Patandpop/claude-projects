@@ -1,5 +1,18 @@
 # Session changelog — fable-overnight branch
 
+## 2026-07-12 session — full setup review + improvements
+
+You asked for a whole-setup review, then approved acting on it. Plain-English summary of everything built. Each is its own commit; `git revert <hash>` undoes any one.
+
+| Commit | Task | What it did | How to revert |
+|---|---|---|---|
+| aa7d2b1 | safety | Committed all pending work AND seven files that had never been saved into version control (the advisor wiring, the exam-library test, the Silence Debt Timer, two design docs, the review report). A wrong cleanup could have lost them. Gitignored home-only regenerable data. | `git revert aa7d2b1` |
+| 6ff79f7 | handwriting + loud failures + review auto-copy | Handwriting on model-answer slides is now BOLD, 2pt bigger everywhere, and about 40% less wavy (you said pupils found it small and hard to read from the back). Image/font/textbook failures that used to silently ship a worse file now print a loud BUILD WARNING and the test fails on any. The review section is now copied from Apply by the builder itself, so the school chat can stop writing it out (a token saving). | `git revert 6ff79f7` |
+| 9469444 | macrotopic + upload bug + one packing list | The Drive folder name no longer has to be typed exactly ("Space" now finds "P4 Earth in Space"; typos are caught; genuinely ambiguous names are refused, not guessed). FIXED a live bug where every review lesson was uploading without its answer sheet (the code read the wrong field). The three copies of the skill packing list became one shared file, and the 33 KB developer backlog stopped being shipped to school. | `git revert 9469444` |
+| 8f74b3e | content-check tiers | The quality report now refuses to build only when the output is genuinely broken (a lesson with no questions at all), warns on merely-thin lessons, and can always be forced past with `--force` for the case where the checker itself is wrong minutes before a lesson. | `git revert 8f74b3e` |
+| 0d8cf6e | Do Now bank engine | Built and tested the engine for the biggest time saver: a per-class question bank that PICKS six Do Now questions per lesson (spaced retrieval) instead of writing them, with KS4 questions drawn from your real AQA exam parts. Not yet wired into the school session — that is a later step. Design in specs/do-now-bank.md. | `git revert 0d8cf6e` |
+| (this) | tools + input savers + skill slim | New classroom Noise Meter (tools/noise-meter.html) that floats over PowerPoint via pop-out. Weekly context capture now asks one question on a normal week instead of five. A "last lesson" summary now writes itself after each build so the school chat need not be told what you did last time. SKILL.md had its 207-line bug history removed (moved home) to cut what school re-reads every session. Root tidied. | `git revert` this commit |
+
 ## 2026-07-09 session
 
 | Commit | Task | What it did | How to revert |

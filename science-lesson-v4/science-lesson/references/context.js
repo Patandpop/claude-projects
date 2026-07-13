@@ -121,6 +121,37 @@ async function weeklyMode(dryRun) {
   const wtAns    = await ask(rl, `Week type [${defType}]: `);
   const weekType = /^[AB]$/i.test(wtAns) ? wtAns.toUpperCase() : defType;
 
+  // ── Quick path (2026-07-12) ────────────────────────────────────────────────
+  // Most weeks nothing unusual happens: no trips, no new tests, no cover, no
+  // events. The carry-forward state (tests still ahead, active revision, standing
+  // sharing) already describes such a week. So show it and ask ONE question. Only
+  // fall through to the full five-prompt walk when something actually changed.
+  const carriedTests = ((prev && prev.tests) || [])
+    .filter(t => t.date >= weekOf)
+    .map(t => Object.assign({}, t, { confirmed: true }));
+  const carriedRevision = ((prev && prev.revisionMode) || [])
+    .filter(r => r.active).map(r => Object.assign({}, r));
+  const carriedSharing = (standing.sharing || []).filter(s => !s.weekType || s.weekType === weekType);
+
+  console.log(`\nCarrying forward for Week ${weekType} (${weekOf}):`);
+  console.log('  Tests:    ' + (carriedTests.length ? carriedTests.map(t => `${t.class} ${t.date}`).join(', ') : 'none'));
+  console.log('  Revision: ' + (carriedRevision.length ? carriedRevision.map(r => r.class).join(', ') : 'none'));
+  console.log('  Sharing:  ' + (carriedSharing.length ? carriedSharing.map(s => `${s.class} ${s.day}`).join(', ') : 'none (from standing)'));
+  const unusual = await ask(rl, '\nAnything different this week — trips, a new test, cover, events? [y/N]: ');
+  if (!/^y/i.test(unusual)) {
+    const ctxQuick = {
+      weekOf, weekType,
+      missingPeriods: [], tests: carriedTests, combinedOrDisjointed: [],
+      revisionMode: carriedRevision, eventsAffectingPeriods: [], sharing: carriedSharing,
+    };
+    rl.close();
+    if (!dryRun) { fs.writeFileSync(CONTEXT_PATH, JSON.stringify(ctxQuick, null, 2), 'utf8'); console.log('\nWrote context.json (quick — nothing unusual).'); }
+    else { console.log('\n--dry-run — would write:'); console.log(JSON.stringify(ctxQuick, null, 2)); }
+    printSummary(ctxQuick);
+    return;
+  }
+  console.log('  → full setup (blank line finishes each section):');
+
   // ── 1/5: Missing periods ──────────────────────────────────────────────────
   console.log('\n── 1/5  Missing days/periods (trips, INSET, bank holidays) ──');
   console.log('  YYYY-MM-DD [CLASS CLASS] [reason]  — blank line to finish');
