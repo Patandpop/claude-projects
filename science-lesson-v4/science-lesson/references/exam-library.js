@@ -40,13 +40,20 @@ const SPEC_VERSION = '1';
 
 /* ------------------------------------------------------------------ RTF strip */
 
-// Replace balanced {\pict ...} blobs with [FIG] BEFORE anything else. Braces
+// Replace balanced {\pict ...} blobs with [FIG:n] BEFORE anything else. Braces
 // inside a pict are balanced; \-escaped chars are skipped so a stray brace in
 // hex data cannot unbalance the scan.
+//
+// The number is the figure's position in the document (0, 1, 2 …), which is the
+// SAME order exam-figures.js pulls the real images out in. That is how a question
+// part gets matched to its actual picture instead of just being flagged "has a
+// figure somewhere". Before 2026-07-13 this wrote a bare "[FIG]" and the image
+// itself was discarded — which made a third of the library unusable in print.
+const RE_FIG = /\[FIG(?::\d+)?\]/;
+
 function stripPictBlobs(s) {
   let out = '';
-  let i = 0;
-  const n = s.length;
+  let i = 0, n = s.length, fig = 0;
   while (i < n) {
     const idx = s.indexOf('{\\pict', i);
     if (idx === -1) { out += s.slice(i); break; }
@@ -59,9 +66,18 @@ function stripPictBlobs(s) {
       else if (c === '}') { depth--; if (depth === 0) { j++; break; } }
     }
     if (depth !== 0) throw new Error('exam-library: unbalanced {\\pict} blob starting at offset ' + idx);
-    out += '[FIG]';
+    out += `[FIG:${fig++}]`;
     i = j;
   }
+  return out;
+}
+
+// Which figures does this chunk of text refer to? -> [0, 3, 7]
+function figureIds(text) {
+  const out = [];
+  const re = /\[FIG:(\d+)\]/g;
+  let m;
+  while ((m = re.exec(String(text || '')))) out.push(parseInt(m[1], 10));
   return out;
 }
 
@@ -93,13 +109,51 @@ function stripRtf(raw) {
 
 /* ------------------------------------------------------------- topic from name */
 
-function topicFromFilename(filename) {
-  const base = String(filename || '').replace(/\.[^.]+$/, '').trim();
+/* Spelling fixes for the filenames (Patryk's Drive files are NEVER renamed — this
+   only corrects the topic names we STORE). Loaded from exam-name-fixes.json at the
+   project root so the list is visible and editable without touching code. */
+let _nameFixes = null;
+function nameFixes() {
+  if (_nameFixes) return _nameFixes;
+  _nameFixes = {};
+  try {
+    const p = path.join(__dirname, '..', '..', 'exam-name-fixes.json');
+    const j = JSON.parse(fs.readFileSync(p, 'utf8'));
+    _nameFixes = j.fixes || {};
+  } catch (_) { /* no fixes file — run unfixed rather than fail */ }
+  return _nameFixes;
+}
+
+function applyNameFixes(s, fixes) {
+  let out = String(s || '');
+  for (const [wrong, right] of Object.entries(fixes || {})) {
+    out = out.replace(new RegExp(`\\b${wrong}\\b`, 'gi'), right);
+  }
+  return out.replace(/\s{2,}/g, ' ');   // collapse the double-space typo too
+}
+
+/* topicFromFilename("Biology - Bioenergetics - Photosynthesis 2.doc")
+     -> { subject:'Biology', topic:'Bioenergetics', subtopic:'Photosynthesis', instance:2 }
+
+   The trailing number matters: Patryk's exam exports cap at 60 questions, so a big
+   subtopic is split across several documents. Without stripping it, "Photosynthesis 1"
+   and "Photosynthesis 2" become two unrelated subtopics and the topic fragments. */
+function topicFromFilename(filename, fixes) {
+  const raw  = String(filename || '').replace(/\.[^.]+$/, '').trim();
+  const base = applyNameFixes(raw, fixes || nameFixes());
   const bits = base.split(/\s+-\s+/).map((b) => b.trim()).filter(Boolean);
+
+  let subtopic = bits.length > 2 ? bits.slice(2).join(' - ') : null;
+  let instance = 1;
+  if (subtopic) {
+    const m = subtopic.match(/^(.*?)\s+(\d+)$/);
+    if (m) { subtopic = m[1].trim(); instance = parseInt(m[2], 10); }
+  }
   return {
     subject:  bits[0] || null,
     topic:    bits[1] || null,
-    subtopic: bits.length > 2 ? bits.slice(2).join(' - ') : null,
+    subtopic,
+    instance,
   };
 }
 
@@ -278,7 +332,7 @@ function parseDoc(docPath) {
   const text = stripRtf(raw);
   const lines = text.split('\n');
 
-  const { subject, topic, subtopic } = topicFromFilename(path.basename(docPath));
+  const { subject, topic, subtopic, instance } = topicFromFilename(path.basename(docPath));
   if (!subject || !topic || !subtopic) {
     warnings.push(`filename "${path.basename(docPath)}" did not split into Subject - Topic - Subtopic; got ${JSON.stringify({ subject, topic, subtopic })}`);
   }
@@ -324,28 +378,37 @@ function parseDoc(docPath) {
     for (const p of q.parts) {
       const scheme = ms.byId.get(p.id) || (p.id === '' ? ms.whole : null);
       const examiner = er.byId.get(p.id) || (p.id === '' ? er.whole : null) || er.whole || null;
+      const gist = examinerGist(examiner);
       let msObj = null;
       if (scheme) {
         msObj = {
           text: scheme.text,
           notes: scheme.notes,
           levels: scheme.levels,
-          examinerCommentary: examiner,
+          examinerCommentary: examiner,        // always kept verbatim
+          examiner: gist,                      // the distilled gist (may be null)
         };
       } else {
         joinMisses.push(`Q${q.q} part "${p.id || '(whole)'}"`);
       }
       const cmd = commandWord(p.text);
+      const diff = difficulty(gist && gist.passRate, cmd, p.marks);
+      // A part shows its own figures plus any figure in the question stem it belongs to.
+      const figs = Array.from(new Set([...(p.figures || []), ...(q.stemFigures || [])]));
       parts.push({
-        subject, topic, subtopic,
+        subject, topic, subtopic, instance,
         question: q.q,
         part: p.id,
         text: p.text,
         commandWord: cmd,
         marks: p.marks,
         hasFigure: p.hasFigure || q.stemHasFigure,
+        figures: figs,                         // indices into this doc's extracted images
         questionTotalMarks: q.totalMarks,
         challengeScore: challengeScore(cmd, p.marks),
+        difficulty: diff.value,                // 0-100, higher = harder
+        difficultyBasis: diff.basis,           // real pass rate, or an estimate — never blurred
+        passRate: gist ? gist.passRate : null, // raw %, kept as-is
         ms: msObj,
       });
     }
@@ -363,13 +426,17 @@ function parseDoc(docPath) {
     specVersion: SPEC_VERSION,
     parsedAt: new Date().toISOString(),
     source: path.basename(docPath),
-    subject, topic, subtopic,
+    subject, topic, subtopic, instance,
     counts: {
       questions: questions.length,
       parts: parts.length,
       joinHits,
       joinMisses: joinMisses.length,
       joinCoveragePct: parts.length ? Math.round((joinHits / parts.length) * 1000) / 10 : 0,
+      withFigure: parts.filter((p) => p.hasFigure).length,
+      withExaminer: parts.filter((p) => p.ms && p.ms.examinerCommentary).length,
+      withPassRate: parts.filter((p) => p.passRate != null).length,
+      withCommonError: parts.filter((p) => p.ms && p.ms.examiner && p.ms.examiner.commonError).length,
     },
     parts,
     joinMisses,
@@ -391,7 +458,8 @@ function parseQuestionBlock(block, warnings) {
 
   const { stem, segments } = splitParts(body);
   const stemText = stem.join(' ').replace(/\s{2,}/g, ' ').trim();
-  const stemHasFigure = /\[FIG\]/.test(stemText);
+  const stemHasFigure = RE_FIG.test(stemText);
+  const stemFigures   = figureIds(stemText);
 
   const hasOwnTariff = (seg) => seg.lines.some((l) => RE_TARIFF.test(l));
 
@@ -419,7 +487,7 @@ function parseQuestionBlock(block, warnings) {
         const allLines = seg.lines.concat(...kids.map((k) => k.lines));
         const { marks, text } = extractTariff(allLines);
         if (marks == null) warnings.push(`Q${q} part "${seg.letter}" (extended, collapsed) has no (N) tariff line — marks set null`);
-        parts.push({ id: seg.letter, marks, text: text.trim(), hasFigure: /\[FIG\]/.test(text) });
+        parts.push({ id: seg.letter, marks, text: text.trim(), hasFigure: RE_FIG.test(text), figures: figureIds(text) });
       }
       continue;
     }
@@ -430,16 +498,16 @@ function parseQuestionBlock(block, warnings) {
     if (marks == null) {
       warnings.push(`Q${q} part "${seg.id}" has no (N) tariff line — marks set null`);
     }
-    parts.push({ id: seg.id, marks, text: full.trim(), hasFigure: /\[FIG\]/.test(full) });
+    parts.push({ id: seg.id, marks, text: full.trim(), hasFigure: RE_FIG.test(full), figures: figureIds(full) });
   }
 
   // Whole-question single-part case: no markers at all.
   if (!parts.length) {
-    parts.push({ id: '', marks: totalMarks, text: stemText, hasFigure: stemHasFigure });
+    parts.push({ id: '', marks: totalMarks, text: stemText, hasFigure: stemHasFigure, figures: stemFigures });
   }
 
   if (totalMarks == null) throw new Error(`exam-library: Q${q} has no "(Total N marks)" marker`);
-  return { q, totalMarks, stemText, stemHasFigure, parts };
+  return { q, totalMarks, stemText, stemHasFigure, stemFigures, parts };
 }
 
 // One mark-scheme block -> { byId: Map(partId -> {text,notes,levels}), whole }.
@@ -467,6 +535,90 @@ function parseSchemeBlock(block) {
     whole = build(stem);
   }
   return { byId, whole };
+}
+
+/* -------------------------------------------------- examiner report → the gist
+
+   The examiner's commentary is ALREADY a summary, written by the examiner, and it
+   follows a very regular shape:
+
+     "Just over 80 % of the students scored 2 marks for correctly describing …"
+     "A common error was to state that …"
+
+   So we pull out the two things worth having — how many students actually got it,
+   and what they usually got wrong — with plain pattern matching. No AI, no API
+   call, no cost, and it is deterministic and testable. The full commentary is
+   always kept verbatim as well, so nothing is lost if a pattern misses.
+
+   DIFFICULTY: where the examiner states a percentage, that IS the difficulty —
+   real data beats any guess. A 2-mark question only 30% of pupils got is harder
+   than a 4-mark one that 75% got. Marks and command word are only a fallback. */
+
+const NUM_WORDS = {
+  half: 50, 'a half': 50, 'a third': 33, 'two thirds': 67, 'a quarter': 25,
+  'three quarters': 75, most: 70, few: 15, 'very few': 8, 'almost all': 92,
+  'the majority': 65, 'a minority': 30,
+};
+
+// "Just over 80 % of students scored 2 marks" -> 80
+function passRate(text) {
+  const s = String(text || '');
+  // an explicit percentage, optionally hedged ("just over", "nearly", "around")
+  const m = s.match(/(\d{1,3}(?:\.\d+)?)\s*%/);
+  if (m) {
+    const v = parseFloat(m[1]);
+    if (v >= 0 && v <= 100) return v;
+  }
+  // a worded proportion, only when it is clearly about students scoring
+  const low = s.toLowerCase();
+  if (/(student|candidate)/.test(low)) {
+    for (const [word, val] of Object.entries(NUM_WORDS)) {
+      if (new RegExp(`\\b${word}\\b`).test(low)) return val;
+    }
+  }
+  return null;
+}
+
+/* The sentence that says what pupils got WRONG.
+
+   Care is needed: examiner reports praise as often as they criticise, and a loose
+   pattern happily returns "Some students demonstrated an excellent understanding"
+   as a "common error". So we look for an explicit mistake cue, and throw out any
+   sentence that is plainly praise unless it also names the error. */
+const ERROR_STRONG = /(common error|common mistake|the most common|incorrectly|failed to|did not|were unable|could not|confused|misread|misunderstood|wrongly|omitted|forgot|mistake|error|misconception|lost the mark|no credit|not credited|insufficient)/i;
+const PRAISE = /(excellent|well answered|answered well|correctly|accurately|good understanding|no difficulty|high(?:ly)? successful|full marks were|majority scored)/i;
+
+function commonError(text) {
+  const s = String(text || '').replace(/\s+/g, ' ').trim();
+  if (!s) return null;
+  const sentences = s.split(/(?<=[.!?])\s+/).filter((x) => x.length > 25);
+  // A sentence counts only if it names a mistake AND is not simply praise.
+  const hit = sentences.find((x) => ERROR_STRONG.test(x) && !PRAISE.test(x))
+    // Second pass: a sentence that praises AND criticises is still useful.
+    || sentences.find((x) => ERROR_STRONG.test(x));
+  return hit ? hit.trim() : null;
+}
+
+/* examinerGist(text) -> { passRate, commonError, matched } | null
+   `matched` says whether the patterns actually found anything, so the batch run
+   can report an honest coverage figure instead of quietly pretending. */
+function examinerGist(text) {
+  if (!text) return null;
+  const pr = passRate(text);
+  const ce = commonError(text);
+  return {
+    passRate: pr,
+    commonError: ce,
+    matched: pr != null || ce != null,
+  };
+}
+
+// Difficulty 0-100 (higher = harder). Real pass rate wins; otherwise fall back to
+// the marks/command-word guess, and SAY which was used — never blur the two.
+function difficulty(pr, cmd, marks) {
+  if (pr != null) return { value: Math.round(100 - pr), basis: 'examiner pass rate' };
+  const guess = Math.min(100, challengeScore(cmd, marks) * 12);
+  return { value: guess, basis: 'estimated from marks + command word' };
 }
 
 // One examiner-report block -> { byId: Map(partId -> text), whole }.
@@ -539,6 +691,7 @@ function main(argv) {
 module.exports = {
   stripRtf, stripPictBlobs, parseDoc, splitParts, extractTariff, extractLevels,
   topicFromFilename, commandWord, challengeScore, commandTier, tariffBonus,
+  figureIds, passRate, commonError, examinerGist, difficulty, applyNameFixes,
   SPEC_VERSION,
 };
 

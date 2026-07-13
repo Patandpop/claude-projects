@@ -17,6 +17,10 @@ exam-library-index.json
 advisor-log.txt
 $scratch/
 
+# Generated exam library — rebuild any time with exam-library-batch.js.
+# Big (tens of thousands of figures) and derived entirely from Patryk's Drive docs.
+exam-library/
+
 # Temp / misc
 null
 assets/
@@ -24,3 +28,4 @@ _core_text.txt
 _extend_text.txt
 *.skill
 Feynman Plates/
+science-lesson/references/question-bank/

@@ -8,6 +8,21 @@ Cleaned 2026-07-02: only outstanding items below.
 
 <!-- entries appended below -->
 
+## Session log — 2026-07-13 (full slide-design sample pack, home only — Claude Code)
+
+**Doc gap 🆕** — `slide-options-v4.md` documents 9 Learn layouts (A–I) and 19 Build activity types. The renderer actually supports **11 Learn layouts and 21 Build types**. Never documented anywhere, and no sample file ever exercised them until this session's `design-audit/all-slides.json`:
+- Learn **J** — graph sketch (`build.js:1638`): `{ variant:"J", heading, axes:{x,y}, features:[{label,description}], instruction }`.
+- Learn **K** — timeline (`build.js:1673`): `{ variant:"K", heading, events:[{year,label,detail}] }`, max 8 events.
+- `mcq_image` (`build.js:1766`) — same fields as `mcq` plus `imageDescription`.
+- `graphResults` (`build.js:2733`) and `graphWithData` (`build.js:2777`) — both need `worksheetExtras.referenceData.rows` or they silently render nothing, no warning.
+Fix: update `slide-options-v4.md` with these five entries next time it's touched.
+
+**Bug 🆕 — `graph_gen.py` fits a straight line to curved data.** Confirmed visually in the sample pack (`design-audit/slides/45_build_graph-results_UNDOCUMENTED.png`): fed a realistic rate-of-reaction volume/time curve, it draws a straight best-fit line through it, reports R²≈0.82 as if that were acceptable, and prints an extrapolated "x-intercept = −18.81 s" that is meaningless for this kind of data. The linear-fit + x-intercept logic in `graph_gen.py` looks like it was built for straight-line practicals (e.g. distance/time at constant speed) and is being applied unconditionally to curved ones too. Needs either a curve-fit option or a flag to suppress the linear-fit annotations when the data isn't linear.
+
+**Reference — full sample deck exists:** `design-audit/ALL-SLIDES.pdf` (70 unique slide designs, one page each, curated from 127 rendered slides across 8 sample lessons) + `design-audit/decks/*.pptx` (the 8 source decks) + `design-audit/INDEX.txt` (what each page is). Local only, not committed, not on Drive. Useful next time any slide-visual work is proposed — check it before assuming a layout has never been seen rendered.
+
+---
+
 ## Session log — 2026-07-11 (Fable advisor tool, backlog cleanup, bigFact, revision-lesson fix, timer tool — Claude Code)
 
 **Fable advisor tool** ✅ BUILT — `consult_advisor` MCP tool + manual `/advisor` command, for a second opinion from a different AI model at genuine decision points. Manual/on-demand only, real small paid cost per use. See `[[project-science-lesson]]` memory for full detail.

@@ -1,0 +1,18 @@
+{
+  "_comment": "Spelling corrections applied to EXAM DOC FILENAMES while reading them. The files on Google Drive are NEVER renamed — this only fixes the topic names we store in the library, so that (for example) 'Cell Strucutre 2' files up with 'Cell Structure 1' instead of becoming a separate topic. Add a line here if a new typo appears; nothing in the code needs changing.",
+  "_howItWorks": "Each key is matched as a whole word (case-insensitive) in the filename and replaced by its value. Applied before the name is split into Subject - Topic - Subtopic.",
+
+  "fixes": {
+    "Strucutre": "Structure",
+    "Nervious": "Nervous",
+    "Flid": "Fluid",
+    "Scalers": "Scalars",
+    "Satellities": "Satellites",
+    "Radiactive": "Radioactive",
+    "Propability": "Probability",
+    "Proability": "Probability",
+    "Observered": "Observed"
+  },
+
+  "_instanceNumbers": "A trailing number on a subtopic ('Photosynthesis 1', 'Photosynthesis 2') means Patryk had to split that subtopic across several documents because each one holds at most 60 questions. The number is stripped off into a separate 'instance' field so both halves rejoin as ONE subtopic. This is handled in code, not here."
+}

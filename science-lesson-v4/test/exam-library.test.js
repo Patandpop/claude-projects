@@ -88,6 +88,73 @@ function run() {
   if (idx.warnings.length) warn(`parser reported ${idx.warnings.length} warning(s): ${idx.warnings.slice(0, 3).join(' | ')}`);
   else ok('parser reported no warnings');
 
+  /* ===================== 2026-07-13: scale + figures + examiner =============== */
+
+  // --- filename handling: instance numbers and typos ---
+  // Patryk's exports cap at 60 questions, so a big subtopic is split across
+  // several docs ("Photosynthesis 1", "Photosynthesis 2"). Without stripping the
+  // trailing number, the two halves become two unrelated subtopics.
+  const t1 = EL.topicFromFilename('Biology - Bioenergetics - Photosynthesis 2.doc');
+  eq(t1.subtopic, 'Photosynthesis', 'instance number stripped off the subtopic');
+  eq(t1.instance, 2, 'instance number captured separately (2)');
+  const t2 = EL.topicFromFilename('Biology - Bioenergetics - Photosynthesis 1.doc');
+  (t1.subtopic === t2.subtopic ? ok : bad)('both halves of a split subtopic rejoin as ONE subtopic');
+  eq(EL.topicFromFilename('Physics - Forces - Gravity.doc').instance, 1,
+    'a single-document subtopic defaults to instance 1');
+  // Typos in his filenames must not fragment the taxonomy (Drive files are NOT renamed).
+  eq(EL.topicFromFilename('Biology - Cell Biology - Cell Strucutre 2.doc').subtopic, 'Cell Structure',
+    'filename typo corrected on read (Strucutre → Structure)');
+  eq(EL.topicFromFilename('Physics - Waves - Waves in Air Flid and Solids 1.doc').subtopic,
+    'Waves in Air Fluid and Solids', 'filename typo corrected on read (Flid → Fluid)');
+
+  // --- figures: the images are REAL, not just flagged ---
+  const FIG = require(path.join(ROOT, 'science-lesson', 'references', 'exam-figures.js'));
+  const fx = FIG.extractFigures(DOC, null, { dryRun: true });
+  (fx.total > 0 ? ok : bad)(`document contains ${fx.total} picture blob(s)`);
+  eq(fx.unsupported, 0, 'every picture is a decodable PNG/JPEG (no metafiles to convert)');
+  eq(fx.invalid, 0, 'no picture decoded to corrupt bytes (a bad figure is skipped, never shipped)');
+  eq(fx.figures.length, fx.total, 'every picture blob was recovered');
+  // The bytes must really be a PNG/JPEG — check the file signature, not just the count.
+  const png = fx.figures.find((f) => f.ext === 'png');
+  (png && png.bytes > 100 ? ok : bad)('recovered PNG figures carry real image bytes');
+  // De-duplication: exam papers repeat the same logos/diagrams.
+  const uniq = new Set(fx.figures.map((f) => f.sha));
+  (uniq.size < fx.figures.length ? ok : warn)(
+    `duplicate figures share one file (${fx.figures.length} references → ${uniq.size} unique images)`);
+
+  // Parts must point at the ACTUAL figures, not merely say "has one somewhere".
+  const linked = idx.parts.filter((p) => p.figures && p.figures.length);
+  (linked.length > 0 ? ok : bad)(`${linked.length} parts are linked to specific figures by index`);
+  const badIdx = linked.filter((p) => p.figures.some((n) => n < 0 || n >= fx.total));
+  eq(badIdx.length, 0, 'every figure index points at a figure that exists in the document');
+
+  // --- examiner reports: real difficulty, and honest about when it is a guess ---
+  eq(EL.passRate('Just over 80 % of the students scored 2 marks for this.'), 80,
+    'pass rate read from the examiner report (80%)');
+  eq(EL.passRate('This question was answered well.'), null,
+    'no pass rate invented when the examiner gives no figure');
+  const real = idx.parts.filter((p) => p.difficultyBasis === 'examiner pass rate');
+  const est  = idx.parts.filter((p) => p.difficultyBasis !== 'examiner pass rate');
+  (real.length > 0 ? ok : bad)(`${real.length}/${idx.parts.length} parts get difficulty from a REAL pass rate`);
+  (est.every((p) => p.passRate == null) ? ok : bad)(
+    'estimated difficulty is only used where the examiner stated no figure (never blurred together)');
+  // A harder question must score higher than an easier one, using the real data.
+  const easy = idx.parts.find((p) => p.passRate != null && p.passRate >= 80);
+  const hard = idx.parts.find((p) => p.passRate != null && p.passRate <= 30);
+  if (easy && hard) (hard.difficulty > easy.difficulty ? ok : bad)(
+    `difficulty tracks the real pass rate (${hard.passRate}% → ${hard.difficulty}, ${easy.passRate}% → ${easy.difficulty})`);
+  else warn('not enough spread in pass rates to compare an easy and a hard question');
+
+  // Common-error extraction must pick out MISTAKES, not praise — a loose pattern
+  // happily returns "students demonstrated an excellent understanding" as an error.
+  const praise = EL.commonError('Some students demonstrated an excellent understanding of fusion in stars.');
+  (praise === null ? ok : bad)('praise is NOT mistaken for a common error');
+  const err = EL.commonError('Many students confused fission with fusion and lost the mark.');
+  (err && /confused/.test(err) ? ok : bad)('a genuine common error is picked out of the examiner report');
+  // The full commentary is always kept, so nothing is lost when a pattern misses.
+  const kept = idx.parts.filter((p) => p.ms && p.ms.examinerCommentary).length;
+  (kept > 0 ? ok : bad)(`examiner commentary kept verbatim on ${kept} parts (nothing discarded)`);
+
   return { fails, warns };
 }
 
