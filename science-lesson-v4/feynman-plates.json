@@ -1,0 +1,152 @@
+{
+  "_comment": "Wall plates from the Feynman Lectures figures. Each entry = one A4 page: the figure recoloured in its tier's palette, with a caption underneath written in the Lectures' own register (terse, declarative, physical — never AI filler). EDIT THIS FILE FREELY: move an image between tiers, reword any caption, or set skip:true. Nothing here is in code. Run: python chalkify.py --plates feynman-plates.json",
+
+  "_tiers": {
+    "key": {
+      "style": "chalk",
+      "meaning": "Most important — the complex physics. White chalk on black slate.",
+      "contains": "quantum, relativity, fields, nuclear, wave optics"
+    },
+    "medium": {
+      "style": "gold_navy",
+      "meaning": "Middle — biology. Gold on navy (house colours).",
+      "contains": "biology"
+    },
+    "lesser": {
+      "style": "navy_gold",
+      "meaning": "Least — the basic physics and chemistry. Navy on gold (house colours).",
+      "contains": "introductory mechanics, basic optics, chemistry"
+    }
+  },
+
+  "_captionStyle": "Title line, then one to three sentences. Say what the figure SHOWS and what it MEANS. Plain, direct, unhurried. No adjectives for their own sake. If it is a warning against a mistake, say so plainly — Feynman did.",
+
+  "_sourceFolder": "Feynman Images",
+  "_outputFolder": "Feynman Plates",
+
+  "plates": [
+    {
+      "file": "Diffraction Pattern Graph.webp",
+      "tier": "key",
+      "title": "Interference with electrons",
+      "caption": "Electrons leave the gun one at a time and arrive at the backstop one at a time, as whole particles. Yet the pattern P₁₂ is not the sum of P₁ and P₂. We must add the amplitudes and square afterwards: P₁₂ = |φ₁ + φ₂|². The electron did not go through hole 1, and it did not go through hole 2. The question is the wrong question.",
+      "_filenameWarning": "The filename says 'Diffraction Pattern Graph', but the figure is the two-hole electron experiment. The caption follows the figure, not the filename."
+    },
+    {
+      "file": "Observered Probability Amplitudes.webp",
+      "tier": "key",
+      "title": "Watching the electrons",
+      "caption": "Put a light behind the wall and see which hole each electron passes through. Now we always catch it going through one hole or the other — and the interference is gone: P′₁₂ = P′₁ + P′₂. Looking changes the result. It is not that our instrument is clumsy; it is that a definite path and an interference pattern cannot both exist."
+    },
+    {
+      "file": "Diffraction.webp",
+      "tier": "key",
+      "title": "A line of oscillators, all in phase",
+      "caption": "An array of length L radiating with no phase lag (α = 0) sends nearly all of its energy into a narrow beam straight ahead. The first zero lies at the angle θ₁ where the path difference across the array is one wavelength λ. The longer the array in wavelengths, the sharper the beam."
+    },
+    {
+      "file": "Relative Time Mirror.webp",
+      "tier": "key",
+      "title": "The light clock",
+      "caption": "A pulse leaves the bottom mirror, travels to the top and returns. To the man riding with the clock the light goes straight up and down. To us, watching it move past at speed u, the light must travel the longer slanted path — and since light goes at c for both of us, the moving clock must tick more slowly. Time itself is the thing that gives.",
+      "_note": "Light-clock / time-dilation construction: the two slanted legs are each ½cτ, the horizontal offset ½uτ, and D is the mirror separation."
+    },
+    {
+      "file": "X Ct X dash Ct Dash.webp",
+      "tier": "key",
+      "title": "How not to draw it",
+      "caption": "A spacetime diagram with the axes of two observers, x-ct and x'-ct'. The worldlines sketched here are marked NOT CORRECT — a warning, not a result. It is worth as much to see clearly why a picture is wrong as to see why the right one is right."
+    },
+    {
+      "file": "Radioactive Decay.webp",
+      "tier": "key",
+      "title": "Radioactive decay",
+      "caption": "Every atom has the same chance of decaying in the next second, no matter how long it has already waited. From that one fact the whole curve follows: after a time T half remain, after 2T a quarter, after 3T an eighth. The substance never quite disappears, and no atom ever grows old."
+    },
+    {
+      "file": "Repulsion Force from Atom.webp",
+      "tier": "key",
+      "title": "The force between two atoms",
+      "caption": "Far apart, atoms attract weakly, and the attraction falls off roughly as F = k/r⁷. Push them closer than the separation d and they repel, violently. Matter is hard for the same reason it holds together at all: the force changes sign."
+    },
+    {
+      "file": "Magnets.webp",
+      "tier": "key",
+      "title": "Deflecting an electron beam",
+      "caption": "A hot filament boils off electrons, a voltage accelerates them, plates deflect them electrically, and a magnet deflects them magnetically. Where the beam lands on the fluorescent screen tells us the force. This is how we learn that a magnetic field pushes a moving charge sideways — at right angles to both the field and the motion."
+    },
+    {
+      "file": "Diffraction Propability Amplitudes.webp",
+      "tier": "key",
+      "title": "Lines of the magnetic field",
+      "caption": "A construction of the field vector B at several points around a current, with the field lines wrapping in closed loops. Lines of B never begin and never end; they only close on themselves.",
+      "needsPatrykCheck": true,
+      "_note": "UNCERTAIN. The filename says 'Diffraction Probability Amplitudes' but the figure shows B vectors (B_P, B_Q, B_R, B_P-infinity) and looped field lines. I have captioned what is visibly drawn rather than invent a source. Please correct the caption or re-tier it."
+    },
+    {
+      "file": "Proability Amplitudes.webp",
+      "tier": "key",
+      "title": "Closed loops of field",
+      "caption": "Field lines threading two loops and closing on themselves, with points C, D and E marked along the path. The circulation of the field around a closed path is the whole content of the law; the lines have nowhere to start and nowhere to stop.",
+      "needsPatrykCheck": true,
+      "_note": "UNCERTAIN. The filename says 'Probability Amplitudes' but the figure shows looped field lines, not amplitudes. Captioned from what is drawn. Please correct or re-tier."
+    },
+
+    {
+      "file": "Strucutre of DNA.webp",
+      "tier": "medium",
+      "title": "The structure of DNA",
+      "caption": "Two backbones of sugar and phosphate run alongside each other, and between them the bases pair off: A with B, C with D, each to its own partner and no other. Because the pairing is exact, each strand carries the full instructions for building its opposite. That is the whole trick of inheritance, written out in chemistry."
+    },
+
+    {
+      "file": "Particle Spacing.webp",
+      "tier": "lesser",
+      "title": "A cubic array of atoms",
+      "caption": "Sodium and chlorine atoms, alternating on a cubic lattice. Nearest neighbour distance d = a/2. Salt is not a heap of molecules but a single vast arrangement, repeated without variation."
+    },
+    {
+      "file": "Electromagnetic Spectrum.webp",
+      "tier": "lesser",
+      "title": "The electromagnetic spectrum",
+      "caption": "From a slow electrical disturbance to the gamma rays of cosmic radiation, the whole table is one phenomenon at different frequencies. We call it a field, or a wave, or a particle according to how it happens to behave at that frequency — but it is all the same thing."
+    },
+    {
+      "file": "Conservation of Momentum.webp",
+      "tier": "lesser",
+      "title": "Equal carts on a track",
+      "caption": "Whatever the two carts do when they meet — bounce apart, spin, or stick together — the total momentum afterwards is exactly what it was before. In the last frame they lock together and both stand still: the momenta were equal and opposite, and they cancelled."
+    },
+    {
+      "file": "Moments.webp",
+      "tier": "lesser",
+      "title": "Balancing a loaded beam",
+      "caption": "The weight W hangs at one end and the loads sit along the beam. Take moments about the pivot: each weight counts for its size times its distance, and for balance the turning effects must cancel exactly."
+    },
+    {
+      "file": "Pulley Relationship.webp",
+      "tier": "lesser",
+      "title": "Weight on an inclined plane",
+      "caption": "Stevinus's figure. The triangle has sides 3, 4 and 5, and the weight W is held by a pull of 1 lb along the slope. One need not calculate at all: the answer is forced by the geometry, and by the fact that a chain draped over the triangle cannot set itself into perpetual motion."
+    },
+    {
+      "file": "Vectors.webp",
+      "tier": "lesser",
+      "title": "Adding vectors in space",
+      "caption": "A vector is fixed by its three components, and two vectors are added by adding the components one at a time. The boxes are only there to help the eye; the rule is the same whichever way we turn the axes, and that is exactly what makes a vector worth having."
+    },
+    {
+      "file": "Refraction of Light.webp",
+      "tier": "lesser",
+      "title": "Why the sun is not where you see it",
+      "caption": "The air is denser near the ground, so light from the sun bends as it comes down through the atmosphere. We see the sun along the straight line the light finally arrives on — higher than it truly is. At sunset the real sun has already gone below the horizon."
+    },
+    {
+      "file": "Change in Velocity not sure what it exactly displays.webp",
+      "tier": "lesser",
+      "title": "The change in velocity",
+      "caption": "A body moves along a curve; its velocity is v₁ at one instant and v₂ a moment later. It is tempting to draw the difference between the two arrows where they happen to sit on the page — but that is not Δv, and the figure says so. To subtract two vectors they must first be brought to a common origin. Only then does the difference mean anything.",
+      "_note": "Patryk's filename said he was unsure what this shows. It is the standard warning figure for finding delta-v on a curved path: the 'delta-v? No!' construction."
+    }
+  ]
+}
