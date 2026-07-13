@@ -36,6 +36,12 @@ function buildLogRecords(content, extra) {
         const rec = { q: q.q };
         if (q.id != null) rec.id = q.id;
         if (q.marks != null) rec.marks = q.marks;
+        // 2026-07-12: capture the bank/exam id NOW, before the Do Now bank exists,
+        // so the spaced-retrieval selector can later say "don't repeat this
+        // question for N lessons". bankId = a bank question; examRef = the AQA
+        // exam part it came from (real-exam provenance for KS4).
+        if (q.bankId != null) rec.bankId = q.bankId;
+        if (q.examRef != null) rec.examRef = q.examRef;
         return rec;
       })
     : [];

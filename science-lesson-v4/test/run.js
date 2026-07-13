@@ -418,6 +418,13 @@ function main() {
   hardFails += elTest.fails;
   warnings  += elTest.warns;
 
+  // Do Now bank (spaced-retrieval selector + exam sourcing) — simulated, since
+  // the bank can't run on real classes until September.
+  console.log('');
+  const dnTest = require(path.join(__dirname, 'do-now-bank.test.js')).run();
+  hardFails += dnTest.fails;
+  warnings  += dnTest.warns;
+
   console.log('');
   if (hardFails) {
     console.log(`${RED}FAILED${RST} — ${hardFails} hard assertion(s), ${warnings} warning(s).`);

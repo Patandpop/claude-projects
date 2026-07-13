@@ -185,3 +185,33 @@ science-lesson/references/
 - Students answer in exercise books — **no answer lines** on the worksheet.
 - The bank is the source of truth; `build.js` JSON files do not duplicate question text.
 - Question `id` values are permanent once assigned — never reuse or renumber.
+
+---
+
+## Implementation update — 2026-07-12 (engine built + tested)
+
+The selector engine and the KS4 exam sourcing are now built and covered by `npm test`. Where the built engine refines the original spec above, the engine is authoritative. Design confirmed by a second-opinion consult; policy notes below.
+
+### What was built
+
+- **`science-lesson/references/do-now-bank.js`** — pure, deterministic, no paid calls, no Drive.
+  - `examPartsToBank(index)` — turns an exam-library index into Do Now candidates: keeps 1 to 2 mark parts with a recall command word, rejects figures and levelled mark schemes, tidies the mark-scheme text into a clean answer, and keeps an `examRef` back to the real exam part. Yields 24 usable questions from the 217-part Physics index.
+  - `selectDoNow({ bank, history, currentTopic, ... })` — spaced-retrieval picker driven by class-level data only (lessons-since-taught from the lesson log, plus recently-used ids). Deterministic per lesson. Backfills and reports an honest shortfall when the bank is thin; never throws on an empty (new September class) log.
+- **`test/do-now-bank.test.js`** — simulates a term of lessons and asserts spacing, no-repeats-in-window, determinism, and graceful empty/thin behaviour. Wired into `npm test`.
+- **Lesson-log groundwork** — `upload-to-drive.js` now records `bankId` and `examRef` on each logged Do Now question, so this year's final lessons already capture what the selector will need.
+
+### Refinements to the spec above
+
+- **Six questions, not five.** The Do Now rule is exactly 6 (CLAUDE.md / CONTENT CHECK). The bucket plan is: 1 from the last lesson, 2 from 2 to 4 lessons ago, 2 from 5 or more lessons ago, 1 current/prerequisite.
+- **Spacing comes from the lesson log, not `lessonRef` matching.** The selector reads which topics a class was actually taught and when, which is more reliable than per-question `lessonRef` strings.
+- **Recency dedup uses question ids from the lesson log** (last 4 lessons), not the `usedIn` array on the bank question.
+- **KS4 questions can be exam-sourced.** New since the original spec.
+
+### Scope honesty (from the consult)
+
+- Exam grounding is a **KS4 AQA** feature first. Only Physics is indexed; Years 7 to 9 and the Year 12 OCR A class will hit the fresh-authoring fallback until their content is added. Do not let 12D pull AQA questions: wrong board is wrong grounding.
+- Where the strict CONTENT CHECK and a thin-bank fallback meet, generated questions must count as valid so there is no build-blocking spiral minutes before a lesson.
+
+### Still to do (needs SKILL.md — deferred)
+
+The school session wiring: at lesson start, call `selectDoNow` with the class bank + lesson-log history, drop the six into `doNow.questions`, author fresh only when thin (tagged `source: generated`) and save those back so the bank self-heals. Plus the SKILL.md lines telling the session to do this instead of writing six from scratch.
