@@ -100,6 +100,9 @@ def resolve_key(style, alternate, index):
 # --------------------------------------------------------------------- plates
 # A4 at 300 dpi. One figure per page, caption underneath, full-bleed background
 # in the tier's colour so it reads from across the room when pinned to a wall.
+# LANDSCAPE by default: these figures are wide, and on a portrait page they left
+# big dead bands above and below. --portrait switches back.
+A4_LANDSCAPE = (3508, 2480)
 A4_PORTRAIT = (2480, 3508)
 DPI = 300
 
@@ -176,13 +179,13 @@ def wrap_to_width(draw, text, font, max_px):
 
 
 def make_plate(fig_path, bg, line, title, caption, texture, gamma, white, black, seed,
-               fonts):
+               fonts, portrait=False):
     """Compose one A4 page: recoloured figure above, caption below."""
     img = Image.open(fig_path)
     fig = recolour(img, bg, line, texture=texture, white=white, black=black,
                    gamma=gamma, seed=seed)
 
-    W, H = A4_PORTRAIT
+    W, H = A4_PORTRAIT if portrait else A4_LANDSCAPE
     margin = 200                       # ~17mm
     gap = 130                          # between figure and caption
     page = Image.new("RGB", (W, H), tuple(bg))
@@ -196,10 +199,11 @@ def make_plate(fig_path, bg, line, title, caption, texture, gamma, white, black,
     body_lines = wrap_to_width(draw, caption, body_font, text_w)
     caption_h = title_h + len(body_lines) * body_leading
 
-    # Fit the figure to whatever room the caption leaves. These are small webp
-    # exports, so upscaling is capped: past ~3x, line art just goes soft.
+    # Fit the figure to whatever room the caption leaves. The sources are small webp
+    # exports, so upscaling is capped — but these are wall posters read from across
+    # a room, where filling the page beats pixel-crispness, so the cap is generous.
     fig_box_h = H - 2 * margin - caption_h - gap
-    scale = min(text_w / fig.width, fig_box_h / fig.height, 3.0)
+    scale = min(text_w / fig.width, fig_box_h / fig.height, 4.5)
     fig = fig.resize((max(1, int(fig.width * scale)), max(1, int(fig.height * scale))),
                      Image.LANCZOS)
 
@@ -222,7 +226,8 @@ def make_plate(fig_path, bg, line, title, caption, texture, gamma, white, black,
     return page
 
 
-def run_plates(manifest_path, pdf=False, texture=0.0, gamma=1.0, white=245.0, black=40.0):
+def run_plates(manifest_path, pdf=False, texture=0.0, gamma=1.0, white=245.0, black=40.0,
+               portrait=False):
     mpath = Path(manifest_path)
     manifest = json.loads(mpath.read_text(encoding="utf-8"))
     root = mpath.parent
@@ -252,7 +257,8 @@ def run_plates(manifest_path, pdf=False, texture=0.0, gamma=1.0, white=245.0, bl
         bg, line = PALETTES[style]
 
         page = make_plate(fig_path, bg, line, p.get("title", ""), p.get("caption", ""),
-                          texture, gamma, white, black, seed=i, fonts=fonts)
+                          texture, gamma, white, black, seed=i, fonts=fonts,
+                          portrait=portrait)
         name = f"{i + 1:02d}_{tier}_{fig_path.stem}.png"
         page.save(out / name, dpi=(DPI, DPI))
         pages.append(page)
@@ -288,6 +294,8 @@ def main():
     ap.add_argument("--plates", default=None,
                     help="manifest JSON -> print-ready A4 pages with captions (e.g. feynman-plates.json)")
     ap.add_argument("--pdf", action="store_true", help="with --plates: also write one combined PDF")
+    ap.add_argument("--portrait", action="store_true",
+                    help="with --plates: portrait pages (default is landscape — the figures are wide)")
     ap.add_argument("--style", default="chalk", choices=list(PALETTES) + ["house"],
                     help="colour scheme; 'house' pairs with --alternate to flip navy/gold per file")
     ap.add_argument("--alternate", action="store_true",
@@ -306,7 +314,7 @@ def main():
     # Plate mode: build A4 wall pages from a manifest instead of loose recolours.
     if args.plates:
         run_plates(args.plates, pdf=args.pdf, texture=args.texture, gamma=args.gamma,
-                   white=args.white, black=args.black)
+                   white=args.white, black=args.black, portrait=args.portrait)
         return
 
     if not args.input:

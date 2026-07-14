@@ -1,152 +1,146 @@
 {
   "_comment": "Wall plates from the Feynman Lectures figures. Each entry = one A4 page: the figure recoloured in its tier's palette, with a caption underneath written in the Lectures' own register (terse, declarative, physical — never AI filler). EDIT THIS FILE FREELY: move an image between tiers, reword any caption, or set skip:true. Nothing here is in code. Run: python chalkify.py --plates feynman-plates.json",
-
   "_tiers": {
     "key": {
       "style": "chalk",
-      "meaning": "Most important — the complex physics. White chalk on black slate.",
+      "meaning": "Most important — the deepest physics. White chalk on black slate.",
       "contains": "quantum, relativity, fields, nuclear, wave optics"
     },
     "medium": {
       "style": "gold_navy",
-      "meaning": "Middle — biology. Gold on navy (house colours).",
-      "contains": "biology"
+      "meaning": "Middle — fields, biology, the spectrum. Gold on navy (house colours).",
+      "contains": "fields and waves, biology, reference"
     },
     "lesser": {
       "style": "navy_gold",
-      "meaning": "Least — the basic physics and chemistry. Navy on gold (house colours).",
-      "contains": "introductory mechanics, basic optics, chemistry"
+      "meaning": "Foundational — introductory mechanics and chemistry. Navy on gold (house colours).",
+      "contains": "introductory mechanics, chemistry"
     }
   },
-
-  "_captionStyle": "Title line, then one to three sentences. Say what the figure SHOWS and what it MEANS. Plain, direct, unhurried. No adjectives for their own sake. If it is a warning against a mistake, say so plainly — Feynman did.",
-
+  "_captionStyle": "Feynman's register: terse and technical. Say what the figure SHOWS and state the physics plainly. No editorialising, no flourishes, no 'this amazing diagram'. One title line, then one to three sentences.",
   "_sourceFolder": "Feynman Images",
   "_outputFolder": "Feynman Plates",
-
   "plates": [
     {
       "file": "Diffraction Pattern Graph.webp",
       "tier": "key",
-      "title": "Interference with electrons",
-      "caption": "Electrons leave the gun one at a time and arrive at the backstop one at a time, as whole particles. Yet the pattern P₁₂ is not the sum of P₁ and P₂. We must add the amplitudes and square afterwards: P₁₂ = |φ₁ + φ₂|². The electron did not go through hole 1, and it did not go through hole 2. The question is the wrong question.",
+      "title": "Interference experiment with electrons",
+      "caption": "(a) The apparatus: electrons from the gun pass a wall with two holes and arrive at the backstop. (b) The distributions P₁ and P₂ observed with one hole open at a time. (c) The distribution P₁₂ observed with both open. P₁₂ = |φ₁ + φ₂|², not P₁ + P₂: the amplitudes add, and only then is the square taken.",
       "_filenameWarning": "The filename says 'Diffraction Pattern Graph', but the figure is the two-hole electron experiment. The caption follows the figure, not the filename."
     },
     {
       "file": "Observered Probability Amplitudes.webp",
       "tier": "key",
-      "title": "Watching the electrons",
-      "caption": "Put a light behind the wall and see which hole each electron passes through. Now we always catch it going through one hole or the other — and the interference is gone: P′₁₂ = P′₁ + P′₂. Looking changes the result. It is not that our instrument is clumsy; it is that a definite path and an interference pattern cannot both exist."
+      "title": "The same experiment, watched",
+      "caption": "A light source at A shows which hole each electron passes through. With the electrons observed, the interference disappears and the distributions simply add: P′₁₂ = P′₁ + P′₂."
     },
     {
       "file": "Diffraction.webp",
       "tier": "key",
-      "title": "A line of oscillators, all in phase",
-      "caption": "An array of length L radiating with no phase lag (α = 0) sends nearly all of its energy into a narrow beam straight ahead. The first zero lies at the angle θ₁ where the path difference across the array is one wavelength λ. The longer the array in wavelengths, the sharper the beam."
+      "title": "An array of in-phase oscillators",
+      "caption": "An array of length L radiating with no phase delay (α = 0), and the intensity pattern it produces. The first zero lies at the angle θ₁ at which the path difference across the array is one wavelength λ."
     },
     {
       "file": "Relative Time Mirror.webp",
       "tier": "key",
       "title": "The light clock",
-      "caption": "A pulse leaves the bottom mirror, travels to the top and returns. To the man riding with the clock the light goes straight up and down. To us, watching it move past at speed u, the light must travel the longer slanted path — and since light goes at c for both of us, the moving clock must tick more slowly. Time itself is the thing that gives.",
+      "caption": "A light clock moving at speed u, drawn in the frame S. The pulse travels the two slant paths, each ½cτ, while the clock itself advances ½uτ; D is the mirror separation. Since c is the same for both observers, the moving clock runs slow.",
       "_note": "Light-clock / time-dilation construction: the two slanted legs are each ½cτ, the horizontal offset ½uτ, and D is the mirror separation."
     },
     {
       "file": "X Ct X dash Ct Dash.webp",
       "tier": "key",
       "title": "How not to draw it",
-      "caption": "A spacetime diagram with the axes of two observers, x-ct and x'-ct'. The worldlines sketched here are marked NOT CORRECT — a warning, not a result. It is worth as much to see clearly why a picture is wrong as to see why the right one is right."
+      "caption": "(a) An incorrect diagram of a decay in spacetime, drawn on the axes x–ct and x′–ct′ of two observers."
     },
     {
       "file": "Radioactive Decay.webp",
       "tier": "key",
       "title": "Radioactive decay",
-      "caption": "Every atom has the same chance of decaying in the next second, no matter how long it has already waited. From that one fact the whole curve follows: after a time T half remain, after 2T a quarter, after 3T an eighth. The substance never quite disappears, and no atom ever grows old."
+      "caption": "The radioactivity of a sample against time. The fraction remaining halves in every period T: one half after T, one quarter after 2T, one eighth after 3T."
     },
     {
       "file": "Repulsion Force from Atom.webp",
       "tier": "key",
       "title": "The force between two atoms",
-      "caption": "Far apart, atoms attract weakly, and the attraction falls off roughly as F = k/r⁷. Push them closer than the separation d and they repel, violently. Matter is hard for the same reason it holds together at all: the force changes sign."
+      "caption": "The force F between two atoms as a function of their separation r. Beyond the separation d the atoms attract, with F = k/r⁷; closer than d they repel."
     },
     {
       "file": "Magnets.webp",
-      "tier": "key",
+      "tier": "medium",
       "title": "Deflecting an electron beam",
-      "caption": "A hot filament boils off electrons, a voltage accelerates them, plates deflect them electrically, and a magnet deflects them magnetically. Where the beam lands on the fluorescent screen tells us the force. This is how we learn that a magnetic field pushes a moving charge sideways — at right angles to both the field and the motion."
+      "caption": "Electrons from a hot filament are accelerated through the potential V, deflected by a pair of charged plates and by a magnet, and strike a fluorescent screen."
     },
     {
       "file": "Diffraction Propability Amplitudes.webp",
-      "tier": "key",
-      "title": "Lines of the magnetic field",
-      "caption": "A construction of the field vector B at several points around a current, with the field lines wrapping in closed loops. Lines of B never begin and never end; they only close on themselves.",
-      "needsPatrykCheck": true,
-      "_note": "UNCERTAIN. The filename says 'Diffraction Probability Amplitudes' but the figure shows B vectors (B_P, B_Q, B_R, B_P-infinity) and looped field lines. I have captioned what is visibly drawn rather than invent a source. Please correct the caption or re-tier it."
+      "tier": "medium",
+      "title": "Amplitudes with a quadratic phase delay",
+      "caption": "The addition of amplitudes for many in-phase oscillators whose phase delays vary as the square of the distance from the point D of the previous figure.",
+      "_note": "Identified by Patryk 2026-07-14 from the Lectures: this is the Cornu-spiral amplitude addition, NOT magnetic field lines as first guessed. Caption is the Lectures' own wording."
     },
     {
       "file": "Proability Amplitudes.webp",
-      "tier": "key",
-      "title": "Closed loops of field",
-      "caption": "Field lines threading two loops and closing on themselves, with points C, D and E marked along the path. The circulation of the field around a closed path is the whole content of the law; the lines have nowhere to start and nowhere to stop.",
+      "tier": "medium",
+      "title": "The addition of amplitudes",
+      "caption": "The addition of amplitudes for many oscillators of equal strength, the phase of each advancing uniformly around the curve. The points C, D and E mark the resultant at successive stages.",
       "needsPatrykCheck": true,
-      "_note": "UNCERTAIN. The filename says 'Probability Amplitudes' but the figure shows looped field lines, not amplitudes. Captioned from what is drawn. Please correct or re-tier."
+      "_note": "The companion 'previous figure' to the Cornu spiral — the vibration curve whose point D the other caption refers to. Check the wording if you have the original."
     },
-
     {
       "file": "Strucutre of DNA.webp",
       "tier": "medium",
       "title": "The structure of DNA",
-      "caption": "Two backbones of sugar and phosphate run alongside each other, and between them the bases pair off: A with B, C with D, each to its own partner and no other. Because the pairing is exact, each strand carries the full instructions for building its opposite. That is the whole trick of inheritance, written out in chemistry."
+      "caption": "Two chains of ribose sugar and phosphate, bridged by the base pairs A:B and C:D. Each base pairs only with its own partner, so either chain determines the other."
     },
-
+    {
+      "file": "Electromagnetic Spectrum.webp",
+      "tier": "medium",
+      "title": "The electromagnetic spectrum",
+      "caption": "From an electrical disturbance at 10² oscillations per second to the γ-rays of cosmic radiation at 10²⁷. The rough behaviour is called a field, a wave, or a particle according to the frequency."
+    },
+    {
+      "file": "Refraction of Light.webp",
+      "tier": "medium",
+      "title": "The refraction of sunlight",
+      "caption": "Light from the sun bends as it passes down through the atmosphere, which is denser near the ground. The sun is seen along the line the light finally arrives on, higher than it truly is."
+    },
     {
       "file": "Particle Spacing.webp",
       "tier": "lesser",
       "title": "A cubic array of atoms",
-      "caption": "Sodium and chlorine atoms, alternating on a cubic lattice. Nearest neighbour distance d = a/2. Salt is not a heap of molecules but a single vast arrangement, repeated without variation."
-    },
-    {
-      "file": "Electromagnetic Spectrum.webp",
-      "tier": "lesser",
-      "title": "The electromagnetic spectrum",
-      "caption": "From a slow electrical disturbance to the gamma rays of cosmic radiation, the whole table is one phenomenon at different frequencies. We call it a field, or a wave, or a particle according to how it happens to behave at that frequency — but it is all the same thing."
+      "caption": "Sodium and chlorine atoms alternating on a cubic lattice. Nearest neighbour distance d = a/2."
     },
     {
       "file": "Conservation of Momentum.webp",
       "tier": "lesser",
       "title": "Equal carts on a track",
-      "caption": "Whatever the two carts do when they meet — bounce apart, spin, or stick together — the total momentum afterwards is exactly what it was before. In the last frame they lock together and both stand still: the momenta were equal and opposite, and they cancelled."
+      "caption": "Two equal carts in successive experiments (a) to (e). In each, whether they bounce, spin, or stick, the total momentum after the collision equals the total momentum before."
     },
     {
       "file": "Moments.webp",
       "tier": "lesser",
-      "title": "Balancing a loaded beam",
-      "caption": "The weight W hangs at one end and the loads sit along the beam. Take moments about the pivot: each weight counts for its size times its distance, and for balance the turning effects must cancel exactly."
+      "title": "A loaded beam",
+      "caption": "The weight W balances loads of 60 and 100 placed along the beam. For equilibrium the moments about the pivot must cancel: each load counts for its size times its distance."
     },
     {
       "file": "Pulley Relationship.webp",
       "tier": "lesser",
       "title": "Weight on an inclined plane",
-      "caption": "Stevinus's figure. The triangle has sides 3, 4 and 5, and the weight W is held by a pull of 1 lb along the slope. One need not calculate at all: the answer is forced by the geometry, and by the fact that a chain draped over the triangle cannot set itself into perpetual motion."
+      "caption": "Stevinus's figure. On a frictionless triangle of sides 3, 4 and 5, the weight W is held by a pull of 1 lb along the slope."
     },
     {
       "file": "Vectors.webp",
       "tier": "lesser",
-      "title": "Adding vectors in space",
-      "caption": "A vector is fixed by its three components, and two vectors are added by adding the components one at a time. The boxes are only there to help the eye; the rule is the same whichever way we turn the axes, and that is exactly what makes a vector worth having."
-    },
-    {
-      "file": "Refraction of Light.webp",
-      "tier": "lesser",
-      "title": "Why the sun is not where you see it",
-      "caption": "The air is denser near the ground, so light from the sun bends as it comes down through the atmosphere. We see the sun along the straight line the light finally arrives on — higher than it truly is. At sunset the real sun has already gone below the horizon."
+      "title": "The addition of vectors in space",
+      "caption": "Each vector is fixed by its three components, and the sum is obtained by adding the components one at a time. The result does not depend on how the axes are turned."
     },
     {
       "file": "Change in Velocity not sure what it exactly displays.webp",
       "tier": "lesser",
       "title": "The change in velocity",
-      "caption": "A body moves along a curve; its velocity is v₁ at one instant and v₂ a moment later. It is tempting to draw the difference between the two arrows where they happen to sit on the page — but that is not Δv, and the figure says so. To subtract two vectors they must first be brought to a common origin. Only then does the difference mean anything.",
+      "caption": "The velocities v₁ and v₂ at two instants on a curved path of radius R, separated by the angle Δθ. The difference of the two arrows drawn where they stand is not Δv: the vectors must first be brought to a common origin.",
       "_note": "Patryk's filename said he was unsure what this shows. It is the standard warning figure for finding delta-v on a curved path: the 'delta-v? No!' construction."
     }
-  ]
+  ],
+  "_tierBalance": "Tiers are importance-ranked, then split into roughly even thirds so all three palettes appear on the wall about equally (7 / 6 / 6). Move any file between tiers here — nothing in the code cares."
 }
