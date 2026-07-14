@@ -95,31 +95,42 @@ Retrieval and spacing: [Nature Reviews Psychology on spacing and retrieval](http
 
 ---
 
-## F. The menu
+## F. The menu — with what is actually done
 
-Effort key: S = an evening or less, M = a weekend session, L = multiple sessions. "Skill file?" = blocked until the other project finishes with it.
+**Status as of 14 July 2026.** 14 of the 20 are DONE. 3 you rejected. 3 are left.
 
-| # | Proposal | Helps with | Payoff | Effort | Skill file? |
-|---|---|---|---|---|---|
-| 1 | Commit the seven unsaved files | Bugs/safety | Removes the biggest data-loss risk | S | No |
-| 2 | Make silent image/font failures loud | Bugs | Kills the worst recurring bug family | S | No |
-| 3 | Do Now question bank engine (build and test now, wire in September) | Input + tokens + teaching | Biggest single win in the project | L | Partly |
-| 4 | Macrotopic auto-map for Drive uploads | Input | Removes a per-lesson typing trap | S | No |
-| 5 | Per-slide image check in the test harness | Bugs | Catches Bug 26/58 class before shipping | S | No |
-| 6 | Move bug history out of the skill file | Tokens | 26 percent off the skill file, zero risk | S | YES |
-| 7 | De-duplicate the three instruction documents | Tokens + consistency | 35 to 40 percent off per-session load | M | YES |
-| 8 | Slim the per-lesson content (auto-copy review, defaults) | Tokens | 20 to 30 percent off every lesson | M | YES |
-| 9 | One shared packaging list | Bugs | Ends the three-list drift risk | S | No |
-| 10 | Tool: Hinge-question board | Teaching | Best-evidence routine, ten seconds to use | S/M | No |
-| 11 | Tool: Cold-call picker | Teaching | Ad-free, loads your real classes | S | No |
-| 12 | Tool: Do Now board | Teaching + input | Pairs with #3, works standalone too | S | No |
-| 13 | Tool: Routine timer strip | Teaching | Most-used widget category in surveys | S | No |
-| 14 | Tool: Noise meter (optionally feeding the Silence Debt Timer) | Behaviour | Objective, hands-free debt | M | No |
-| 15 | Tool: Whole-class feedback sheet builder | Workload | Marking from 2 to 3 hours toward 1 | M | No |
-| 16 | Per-class lesson defaults file | Input | Clarify-five shrinks to two | S | YES |
-| 17 | "Last lesson" summary for the school session | Input | Stops the verbal recap each lesson | M | Partly |
-| 18 | Smoke tests for September scripts | Bugs | Insurance before unattended runs | M | No |
-| 19 | Tidy the project root, delete stale sibling copies | Safety | Wrong-file accidents become unlikely | S | No |
-| 20 | Strict mode for the content quality report | Bugs | Gaps cannot ship (needs your judgement) | S | No |
+| # | Proposal | Status |
+|---|---|---|
+| 1 | Commit the seven unsaved files | **DONE** (`aa7d2b1`) |
+| 2 | Make silent image/font failures loud | **DONE** (`6ff79f7`) |
+| 3 | Do Now question bank | **DONE, beyond plan** — engine built (`0d8cf6e`), then seeded with **1,295 real exam questions** from your 108 documents (`896cc15`). Only the school-session wiring is left, and that waits for September's classes. |
+| 4 | Macrotopic auto-map for Drive uploads | **DONE** (`9469444`) — also fixed a live bug where every review lesson uploaded without its answer sheet. |
+| 5 | Per-slide image check in the test harness | **DONE** (`6ff79f7`) |
+| 6 | Move bug history out of the skill file | **DONE** (`2523097`) — SKILL.md 795 → 575 lines. |
+| 7 | De-duplicate the three instruction documents | **DONE** (`2523097`) — and it caught a real inconsistency (one file still said "Do Now: min 4" when the rule is exactly 6). |
+| 8 | Slim the per-lesson content | **DONE** (`6ff79f7`) — the builder now copies Apply into Review itself, so the school chat stops writing it out. |
+| 9 | One shared packaging list | **DONE** (`9469444`) |
+| 10 | Tool: Hinge-question board | **REJECTED** — "I choose if something needs re-teaching." |
+| 11 | Tool: Cold-call picker | **REJECTED** — "I cold call myself and track it." |
+| 12 | Tool: Do Now board | **DROPPED** — you weren't sure what it was; superseded by the booklet work. |
+| 13 | Tool: Routine timer strip | **REJECTED** |
+| 14 | Tool: Noise meter | **DONE** (`2523097`) — `tools/noise-meter.html`, passive display with an always-on-top pop-out. Mic-driven *automation* deliberately not built, per your caveat. |
+| 15 | Tool: Whole-class feedback sheet builder | **NOT STARTED** — the marking-time one. Still worth doing; say the word. |
+| 16 | Per-class lesson defaults file | **DONE** (`4252ee6`) — `class-defaults.json`. Four classes still need a ruling from you (see below). |
+| 17 | "Last lesson" summary for the school session | **HALF DONE** (`2523097`) — the file now writes itself after every build. The school chat reading it needs a skill-file change, which belongs with the Do Now wiring in September. |
+| 18 | Smoke tests for September scripts | **NOT STARTED** — insurance for the daily brief / order sheet before they run unattended. |
+| 19 | Tidy the project root, retire stale copies | **DONE** (`2523097`) — moved, not deleted, into `_retired-2026-07-12`. |
+| 20 | Strict mode for the content quality report | **DONE** (`8f74b3e`) — refuses only on genuinely broken output, warns on thin, `--force` escape hatch. |
 
-Suggested first bite, all doable before the skill file unlocks: 1, 2, 4, 5, 9 (one evening of safety work), then pick one tool from 10 to 13 to enjoy. Items 6, 7, 8, 16 queue up as one tidy token-cutting session the moment the other project finishes.
+### Also built, which was not on this menu at all
+- **The exam library** (`896cc15`): all 108 of your exam documents read, zero failures. 4,450 questions, 19,424 parts, **17,787 figures recovered** that the parser had been throwing away.
+- **The homework booklet builder** (`896cc15`): run it per topic, get an exam-style paper plus a self-assessment mark scheme.
+- **The Feynman wall plates** (`4252ee6`, `dd70533`): 19 landscape A4 pages plus a PDF.
+
+### What is genuinely left
+1. **#15 whole-class feedback sheet builder** — the only remaining thing that saves you *evenings*.
+2. **#18 smoke tests** for the September scripts.
+3. **September wiring** (#3 + #17): the school session picking Do Now questions and reading the last-lesson summary. Waits for the new class lists.
+4. **Your rulings**: word-bank settings for 8AG, 9AS, 9XS (and confirm 8XP, 10S2, 11S2). Listed in `class-defaults.json` under `_openQuestions`.
+5. **Chemistry exam docs** — the moment they land on Drive, one command picks them up.
+6. **Kerboodle / OCR A textbook database** for 12C and 13D weekly homework. Not started.

@@ -8,6 +8,32 @@ Cleaned 2026-07-02: only outstanding items below.
 
 <!-- entries appended below -->
 
+## Session log — 2026-07-13/14 (exam library at scale, homework booklets, class defaults, Feynman plates — Claude Code)
+
+**Exam library — BUILT ✅.** All 108 of Patryk's AQA exam documents (Biology 50, Physics 58) now parse: **108/108, zero failures.** 4,450 questions, 19,424 question parts, ~99% joined to their real mark schemes. Chemistry was being exported by Patryk on 2026-07-14 and drops in with no code change (the batch runner is subject-agnostic).
+- **Figures recovered (the load-bearing fix).** The parser was replacing every picture with the text `[FIG]` and discarding the image — and 39% of parts have one. The `{\pict}` blobs are plain PNG/JPEG hex (checked: zero metafiles), so `exam-figures.js` decodes them losslessly. **17,787 figures** out, de-duplicated by hash, each linked to its question part by index. Without this, printed booklets were impossible for a third of the library.
+- **Two scale blockers fixed:** every doc used to write to the SAME index filename (they would have overwritten each other); and the trailing instance number on a filename ("Photosynthesis 1"/"2" — his 60-question export cap) was being swallowed into the subtopic, splitting one topic into several. Filename typos are corrected on read via `exam-name-fixes.json`. **Drive files are never renamed, moved or touched.**
+- **Difficulty is real, not guessed:** the examiner's own stated pass rate ("80% of students scored…") is used where present — **11,729 of 19,424 parts (60%)**. Where absent we estimate and LABEL it as an estimate; the two are never blurred. Local regex, **no paid API** (advisor agreed: the commentary is already an examiner-written summary).
+- **Two outputs, two jobs:** `docs/<doc>.json` (full text + scheme + examiner, loaded on demand) and `catalogue.json` (slim, no question text — sorted subject > topic > subtopic > marks > difficulty, so finding a question is token-cheap).
+
+**Homework booklet BUILDER — BUILT ✅** (`homework-booklet.js`). A tool, not a pile of booklets: run per topic on demand. Produces an exam-style paper (real questions, real figures, answer lines by tariff, ramped easy→hard **like a test paper** — NOT sorted by marks; that ordering is for the index, not the pupil) plus a separate self-assessment mark scheme carrying the real scheme, the examiner's common errors, and "70% of students scored on this in the real exam".
+
+**Do Now bank SEEDED ✅** (`seed-do-now-bank.js`) — 1,295 real exam questions, Year 9+, gated on content taught. **12C and 13D get nothing from it: they sit OCR A, and a question from the wrong board is wrong grounding, not merely thin.** School-session wiring still pending (September).
+
+**Class defaults — BUILT ✅** (`class-defaults.json`). The word-bank/homework rules existed nowhere for the 2026/27 classes. Records what Patryk stated; classes he has not ruled on are marked null and listed, never guessed.
+
+**Feynman wall plates — BUILT ✅** (`chalkify.py --plates`, `feynman-plates.json`). 19 landscape A4 pages + PDF, importance-tiered into even thirds across the three palettes.
+
+### Still open from this session
+- **Whole-class feedback sheet builder** 🆕 — the marking-workload tool from the setup review (#15). Not started; the only remaining item that saves Patryk evenings.
+- **Smoke tests for the September scripts** 🆕 — daily-brief / order-sheet / context run unattended from September with only light coverage (#18).
+- **September wiring** 🔧 — school session PICKING Do Now questions from the bank, and reading the last-lesson summary. Both need SKILL.md changes and the new class lists.
+- **Word-bank rulings needed from Patryk** 🔧 — 8AG, 9AS, 9XS unknown; confirm 8XP, 10S2, 11S2. Listed in `class-defaults.json` `_openQuestions`.
+- **Kerboodle / OCR A textbook database** 🆕 — 12C and 13D need weekly homework from the OCR A end-of-subsection questions. Not started.
+- **One Feynman caption still unverified** 🔧 — the companion figure to the Cornu spiral (`Proability Amplitudes.webp`), flagged rather than invented.
+
+---
+
 ## Session log — 2026-07-13 (full slide-design sample pack, home only — Claude Code)
 
 **Doc gap 🆕** — `slide-options-v4.md` documents 9 Learn layouts (A–I) and 19 Build activity types. The renderer actually supports **11 Learn layouts and 21 Build types**. Never documented anywhere, and no sample file ever exercised them until this session's `design-audit/all-slides.json`:
