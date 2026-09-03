@@ -1,0 +1,401 @@
+====================================================================================================
+PACK: 4_Yr_7_KS3_Biology_DELBAR_2025   ->   Year 7 / Biology
+====================================================================================================
+
+  PACK TOPIC : Topic 1 Cells (Autumn term)
+  DRIVE TOPIC: B1 Cells
+    [match 1.00] Lesson 1 MRS GREN and Homework Set                   -> B1 Cells/Lesson 1 MRS GREN   (6 files)
+    [match 1.00] Lesson 2 Microscopes                                 -> B1 Cells/Lesson 2 - Microscopes   (7 files)
+    [MERGE 0.86] Lesson 3 Animal cells (Could be combined with lesson -> B1 Cells/Lesson 3 - Animal Cells and Plant Cells   (4 files)
+    [MERGE 0.86] Lesson 4 Plants cells                                -> B1 Cells/Lesson 3 - Animal Cells and Plant Cells   (7 files)
+    [match 1.00] Lesson 5 Specialised cells                           -> B1 Cells/Lesson 4 - Specialised Cells   (7 files)
+    [match 1.00] Lesson 7 Tissues                                     -> B1 Cells/Lesson 5 - Tissues   (4 files)
+    [ NEW      ] Lesson 8 Organ systems (Optional)                    -> B1 Cells/ (create)   (6 files)
+    [match 0.93] Lesson 9 Unicellular vs Multicelluar                 -> B1 Cells/Lesson 6 - Unicellular vs Multicellular   (3 files)
+    [ ASSESS   ] Lesson 6 Formative review                            -> assessment/homework bundle, NOT a lesson   (3 files)
+    [ TOPIC-LEVEL FILES ] 6 file(s) sitting in the topic folder:
+        - 7A1 Cells Topic Overview.docx
+        - Science KS3 Cells Technicians guide.xlsx
+        - MNSP Year 7 biology core practical Cells.docx
+        - Copy of Lesson 9 Unicelluar vs multicelluar.pptx
+        - Copy of Lesson 7 and 8 Tissues and Organs.pptx
+        - Core prac- Cells.pptx
+
+  PACK TOPIC : Topic 2 Body structure and systems (Spring term)
+  DRIVE TOPIC: B2 Body Systems
+    [match 1.00] Lesson 1 Response to exercise and Homework Set (Opti -> B2 Body Systems/Lesson 1 - Response to Exercise   (12 files)
+    [match 1.00] Lesson 2 Fitness and Respiration                     -> B2 Body Systems/Lesson 2 - Fitness and Respiration   (6 files)
+    [match 1.00] Lesson 3 The structure of the lung                   -> B2 Body Systems/Lesson 3 - The Structure of the Lungs   (13 files)
+    [ NEW      ] Lesson 4 Core practical - lung dissection            -> B2 Body Systems/ (create)   (7 files)
+    [match 1.00] Lesson 5 Breathing and the alveoli                   -> B2 Body Systems/Lesson 4 - Breathing and the Alveoli   (8 files)
+    [match 1.00] Lesson 6 - Effects of Smoking and vaping             -> B2 Body Systems/Lesson 5 Effects of Smoking and Vaping   (5 files)
+    [ NEW      ] Lesson 8 Drugs (Optional)                            -> B2 Body Systems/ (create)   (3 files)
+    [match 1.00] Lesson 9 Muscles and antagonistic pairs              -> B2 Body Systems/Lesson 6 - Muscles and Antagonistic Pairs   (8 files)
+    [match 1.00] Lesson 10 Skeletons and joints                       -> B2 Body Systems/Lesson 7 - Skeletons and Joints   (16 files)
+    [ ASSESS   ] Lesson 7 Formative review                            -> assessment/homework bundle, NOT a lesson   (4 files)
+    [ TOPIC-LEVEL FILES ] 3 file(s) sitting in the topic folder:
+        - _Science KS3 Body Structure and System.xlsx
+        - 7A2 Body Systems Topic Overview.docx
+        - MNSP Year 7 biology core practical Body systems.docx
+
+  PACK TOPIC : Topic 3 Reproduction (Spring term)
+  DRIVE TOPIC: B3 Human and Plant Reproduction
+    [match 1.00] Lesson 1 Puberty and homework setting                -> B3 Human and Plant Reproduction/Lesson 1 - Puberty   (12 files)
+    [match 1.00] Lesson 2 The menstrual cycle                         -> B3 Human and Plant Reproduction/Lesson 2 - The Menstrual Cycle   (11 files)
+    [match 1.00] Lesson 3 Fertilisation                               -> B3 Human and Plant Reproduction/Lesson 3 - Fertilisation   (12 files)
+    [match 1.00] Lesson 4 Contraception                               -> B3 Human and Plant Reproduction/Lesson 4 - Contraception   (3 files)
+    [match 1.00] Lesson 5 Foetal development                          -> B3 Human and Plant Reproduction/Lesson 5 - Foetal Development   (9 files)
+    [match 1.00] Lesson 7 Fertility treatments (IVF)                  -> B3 Human and Plant Reproduction/Lesson 6 - Fertility Treatment (IVF)   (12 files)
+    [match 1.00] Lesson 8 Structure of a flower (Optional)            -> B3 Human and Plant Reproduction/Lesson 7 - Structure of a Flower   (6 files)
+    [match 1.00] Lesson 9 Pollination and fertilisation (Optional)    -> B3 Human and Plant Reproduction/Lesson 8 - Pollination and Fertilisation   (7 files)
+    [ ASSESS   ] Lesson 6 Formative review                            -> assessment/homework bundle, NOT a lesson   (5 files)
+    [ TOPIC-LEVEL FILES ] 3 file(s) sitting in the topic folder:
+        - 7A2 Reproduction Topic Overview.docx
+        - Science KS3 Reproduction.xlsx
+        - MNSP Year 7 biology core practical Reproduction.docx
+
+  PACK TOPIC : Topic 4 Interdependence (Summer term)
+  DRIVE TOPIC: B4 Interdependence
+    [match 0.91] Lesson 1 The Woolly Mammoth and homework set         -> B4 Interdependence/Lesson 1 - The Wooly Mammoth   (12 files)
+    [match 1.00] Lesson 2 Physical adaptations                        -> B4 Interdependence/Lesson 2 - Physical Adaptations   (14 files)
+    [ NEW      ] Lesson 3 ICT Endangered Species (Optional)           -> B4 Interdependence/ (create)   (8 files)
+    [ NEW      ] Lesson 4 Seasonal adaptations (Optional)             -> B4 Interdependence/ (create)   (5 files)
+    [match 1.00] Lesson 5 Behavioural adaptations                     -> B4 Interdependence/Lesson 3 - Behavioural  Adaptations   (14 files)
+    [match 1.00] Lesson 7 Predators prey relationships (Optional)     -> B4 Interdependence/Lesson 5 - Predator prey Relationships (optional)   (7 files)
+    [match 1.00] Lesson 8 Instinct (Optional)                         -> B4 Interdependence/Lesson 6 - Instincts (Optional)   (4 files)
+    [match 1.00] Lesson 9 Classification                              -> B4 Interdependence/Lesson 4 - Classification   (13 files)
+    [match 1.00] Lesson 10 Food Chains                                -> B4 Interdependence/Lesson 10 - Food Chains   (9 files)
+    [match 1.00] Lesson 11 Pyramids of Numbers and Biomass            -> B4 Interdependence/Lesson 11 - Pyramids of Numbers and Biomass   (12 files)
+    [match 1.00] Lesson 12 Food Webs                                  -> B4 Interdependence/Lesson 12 - Food Webs   (13 files)
+    [ ASSESS   ] Lesson 6 Formative Assessment Point 1                -> assessment/homework bundle, NOT a lesson   (10 files)
+    [ EMPTY    ] (no pack source)                                     -> B4 Interdependence/Lesson 7 - Classification
+    [ EMPTY    ] (no pack source)                                     -> B4 Interdependence/Lesson 8 - Food Chains
+    [ EMPTY    ] (no pack source)                                     -> B4 Interdependence/Lesson 9 - Pyramids of numbers and Biomass
+    [ TOPIC-LEVEL FILES ] 5 file(s) sitting in the topic folder:
+        - Year 7 interdependence homework.docx
+        - 7A3 Interdependence Topic Overview.docx
+        - KS3 Interdependence technicians guide.xlsx
+        - MNSP Year 7 biology core practical Interdependence.docx
+        - MNSP Year 7 biology core practical Interdependence (1).docx
+
+====================================================================================================
+PACK: 5_Yr_7_KS3_Chemistry_DELBAR_2025   ->   Year 7 / Chemistry
+====================================================================================================
+
+  PACK TOPIC : Topic 1 Atoms, elements and compounds (Autumn term)
+  DRIVE TOPIC: C2 Atoms, Elements, Compounds and Mixtures
+    [match 1.00] Lesson 1 Working safely in the lab and Homework Set  -> C2 Atoms, Elements, Compounds and Mixtures/Lesson 1 - Working Safely in the Lab (Optional)   (5 files)
+    [match 1.00] Lesson 2 Chemical and Physical change (Optional)     -> C2 Atoms, Elements, Compounds and Mixtures/Lesson 2 - Chemical and Physical Changes (opional)   (6 files)
+    [match 1.00] Lesson 3 Elements                                    -> C2 Atoms, Elements, Compounds and Mixtures/Lesson 3 - Elements   (3 files)
+    [match 1.00] Lesson 4 The Periodic Table                          -> C2 Atoms, Elements, Compounds and Mixtures/Lesson 4 - The Periodic Table   (5 files)
+    [match 0.89] Lesson 6 Compounds                                   -> C2 Atoms, Elements, Compounds and Mixtures/Lesson 6 - Componds   (20 files)
+    [match 1.00] Lesson 7 Naming Compounds                            -> C2 Atoms, Elements, Compounds and Mixtures/Lesson 7 - Naming Compounds   (7 files)
+    [match 0.89] Lesson 8 Chemical Formula                            -> C2 Atoms, Elements, Compounds and Mixtures/Lesson 8 - Chemical Fromula   (18 files)
+    [match 0.86] Lesson 9 Core Practical Making compounds_ Copper Sul -> C2 Atoms, Elements, Compounds and Mixtures/Lesson 9 - Core Practical Making Compounds   (6 files)
+    [ ASSESS   ] Lesson 5 Formative assessment                        -> assessment/homework bundle, NOT a lesson   (3 files)
+    [ TOPIC-LEVEL FILES ] 3 file(s) sitting in the topic folder:
+        - 7A1 Atoms Elements Compounds Topic Overview.docx
+        - Science KS3 Atoms and Elements Technicians guide.xlsx
+        - MNSP Year 7 chemistry core practical Atoms, elements & compounds.docx
+
+  PACK TOPIC : Topic 2 Particles (Autumn term)
+  DRIVE TOPIC: C1 Particles
+    [match 1.00] Lesson 1 Properties of matter and Homework Set       -> C1 Particles/Lesson 1 - Properties of Matter   (4 files)
+    [match 1.00] Lesson 2 States of matter (misconceptions)           -> C1 Particles/Lesson 2 - States of Matter   (3 files)
+    [match 1.00] Lesson 3 Using thermometers                          -> C1 Particles/Lesson 3 - Using Thermometers   (8 files)
+    [match 1.00] Lesson 4 Core practical - Changes of state           -> C1 Particles/Lesson 4 - Core Practical - Changes of State   (8 files)
+    [match 1.00] Lesson 6 Diffusion                                   -> C1 Particles/Lesson 5 - Diffusion   (6 files)
+    [match 1.00] Lesson 7 Gas Pressure                                -> C1 Particles/Lesson 6 - Gas Pressure   (2 files)
+    [ ASSESS   ] Lesson 5 Formative assessment                        -> assessment/homework bundle, NOT a lesson   (5 files)
+    [ TOPIC-LEVEL FILES ] 2 file(s) sitting in the topic folder:
+        - Science KS3 Particles Technicians guide.xlsx
+        - 7A1 Particles Topic Overview.docx
+
+  PACK TOPIC : Topic 3 Separating mixtures (Spring term)
+  DRIVE TOPIC: C3 Separating Mixtures
+    [match 1.00] Lesson 1 Chromatography and Homework Set             -> C3 Separating Mixtures/Lesson 1 - Chromatography   (13 files)
+    [match 1.00] Lesson 2 Solute, Solvent and Solution                -> C3 Separating Mixtures/Lesson 2 - Solute, Solvent and Solution   (6 files)
+    [match 1.00] Lesson 3 Factors Affecting Solubility                -> C3 Separating Mixtures/Lesson 3 - Factors Affecting Solubility   (7 files)
+    [match 1.00] Lesson 4 Saturated Solutions (Optional)              -> C3 Separating Mixtures/Lesson 4 - Saturated Solution   (2 files)
+    [match 1.00] Lesson 6 Filtration (Optional)                       -> C3 Separating Mixtures/Lesson 5 - Filtration (Optional)   (5 files)
+    [match 1.00] Lesson 7 Distillation                                -> C3 Separating Mixtures/Lesson 6 - Distillation   (7 files)
+    [match 1.00] Lesson 8 Separating iron, salt and sand (Optional)   -> C3 Separating Mixtures/Lesson 7 - Separating Iron, Salt and Sand   (5 files)
+    [ ASSESS   ] Lesson 5 Formative review                            -> assessment/homework bundle, NOT a lesson   (2 files)
+    [ TOPIC-LEVEL FILES ] 4 file(s) sitting in the topic folder:
+        - 7A2 Separating Mixtures Topic Overview.docx
+        - Science KS3 Separating Mixtures Technicians guide.xlsx
+        - MNSP Year 7 chemistry core Separation.docx
+        - Copy of MNSP Year 7 chemistry core Separation.docx
+
+  PACK TOPIC : Topic 4 Earth Science (Summer term)
+  DRIVE TOPIC: C5 Earth Science
+    !! Drive topic folder NOT FOUND: ['C5 Earth Science']
+    [ NEW      ] L2 Core practical - Salol crystals                   -> C5 Earth Science/ (create)   (4 files)
+
+  PACK TOPIC : Topic 5 Introduction to reactions (Summer term)
+  DRIVE TOPIC: C4 Introduction to Reactions
+    !! Drive topic folder NOT FOUND: ['C4 Introduction to Reactions']
+    [ NEW      ] Lesson 1 Conservation of mass                        -> C4 Introduction to Reactions/ (create)   (2 files)
+    [ NEW      ] Lesson 2 Thermal decomposition                       -> C4 Introduction to Reactions/ (create)   (1 files)
+    [ NEW      ] Lesson 3 Fire Triangle                               -> C4 Introduction to Reactions/ (create)   (4 files)
+    [ NEW      ] Lesson 4 Combustion                                  -> C4 Introduction to Reactions/ (create)   (2 files)
+    [ NEW      ] Lesson 5 Incomplete Combustion                       -> C4 Introduction to Reactions/ (create)   (1 files)
+    [ ASSESS   ] Lesson 6 Formative assessment                        -> assessment/homework bundle, NOT a lesson   (2 files)
+    [ TOPIC-LEVEL FILES ] 5 file(s) sitting in the topic folder:
+        - Copy of Carbonates thermal decomposition WS.doc
+        - Copy of Thermal Decomposition Worksheet.docx
+        - Copy of MNSP Year 7 chemistry core intro_reactions.docx
+        - Copy of C4.4 Thermal Decomposition.pptx
+        - Copy of C4.4 Thermal Decomposition FCA.pptx
+
+====================================================================================================
+PACK: 6_Yr_7_KS3_Physics_DELBAR_2025   ->   Year 7 / Physics
+====================================================================================================
+
+  PACK TOPIC : Topic 1 Forces (Autumn term)
+  DRIVE TOPIC: P1 Forces
+    [match 1.00] Lesson 1 Introduction to forces                      -> P1 Forces/Lesson 1 - Introduction to Forces   (10 files)
+    [match 1.00] Lesson 2 Balanced and unbalanced forces              -> P1 Forces/Lesson 2 - Balanced and Unbalanced Forces   (13 files)
+    [match 1.00] Lesson 3 Resultant forces                            -> P1 Forces/Lesson 3 - Resultant Forces   (9 files)
+    [ NEW      ] Lesson 4 Measuring forces (Optional)                 -> P1 Forces/ (create)   (9 files)
+    [match 1.00] Lesson 6 Weight mass and gravity                     -> P1 Forces/Lesson 5 - Weight Mass and Gravity   (14 files)
+    [match 1.00] Lesson 7 core practical - Stretching springs         -> P1 Forces/Lesson 6 - Core Practical - Stretching Springs   (18 files)
+    [match 1.00] Lesson 8 Core practical - Friction                   -> P1 Forces/Lesson 8 - Core Practical - Friction   (8 files)
+    [ NEW      ] Lesson 9 Air resistance (Optional)                   -> P1 Forces/ (create)   (5 files)
+    [ ASSESS   ] Lesson 5 Formative review                            -> assessment/homework bundle, NOT a lesson   (14 files)
+    [ TOPIC-LEVEL FILES ] 2 file(s) sitting in the topic folder:
+        - 7A1 Forces Topic Overview.docx
+        - Science KS3 Forces technicians guide.xlsx
+
+  PACK TOPIC : Topic 2 Energy (Spring term)
+  DRIVE TOPIC: P2 Energy
+    [match 1.00] Lesson 1 The Energy Stores and Homework Set          -> P2 Energy/Lesson 1 - The Energy Stores   (7 files)
+    [match 1.00] Lesson 2 The Joule (Optional)                        -> P2 Energy/Lesson 2 - The Joule   (9 files)
+    [match 1.00] Lesson 3 Energy pathways                             -> P2 Energy/Lesson 3 - Energy Pathways   (21 files)
+    [match 1.00] Lesson 4 Sankey diagrams (Optional)                  -> P2 Energy/Lesson 5 - Sankey Diagrams (optional)   (14 files)
+    [ NEW      ] Lesson 5 Core practical - Energy in food             -> P2 Energy/ (create)   (5 files)
+    [match 1.00] Lesson 7 Conduction                                  -> P2 Energy/Lesson 6 - Conduction   (7 files)
+    [match 1.00] Lesson 8 Convection                                  -> P2 Energy/Lesson 7 - Convection   (4 files)
+    [match 1.00] Lesson 9 Radiation                                   -> P2 Energy/Lesson 8 - Radiation   (5 files)
+    [match 1.00] Lesson 10 Insulation (Optional)                      -> P2 Energy/Lesson 9 - Insulation (optional)   (8 files)
+    [ ASSESS   ] Lesson 6 Formative review                            -> assessment/homework bundle, NOT a lesson   (2 files)
+    [ TOPIC-LEVEL FILES ] 2 file(s) sitting in the topic folder:
+        - Science KS3 Energy Technicians guide.xlsx
+        - 7A2 Energy Topic Overview.docx
+
+  PACK TOPIC : Topic 3 Sound and waves (Spring term)
+  DRIVE TOPIC: P3 Sound and Waves
+    [match 1.00] Lesson 1 Core practical - Investigating Sound and Ho -> P3 Sound and Waves/Lesson 1 - Core Practical - Investigating Sound   (10 files)
+    [match 1.00] Lesson 2 Transverse and Longitudinal                 -> P3 Sound and Waves/Lesson 2 - Transverse and Longitudinal   (5 files)
+    [match 1.00] Lesson 3 Amplitude and volume                        -> P3 Sound and Waves/Lesson 3 - Amplitude and Volume   (9 files)
+    [match 1.00] Lesson 4 Pitch and Frequency                         -> P3 Sound and Waves/Lesson 4 - Pitch and Frequency   (8 files)
+    [match 1.00] Lesson 6 The Ear                                     -> P3 Sound and Waves/Lesson 5 - The Ear   (9 files)
+    [match 1.00] Lesson 7 Sound Proofing                              -> P3 Sound and Waves/Lesson 7 - Sound Proofing   (6 files)
+    [ ASSESS   ] Lesson 5 Formative review                            -> assessment/homework bundle, NOT a lesson   (3 files)
+    [ TOPIC-LEVEL FILES ] 3 file(s) sitting in the topic folder:
+        - MNSP Year 7 physics core practical sound.docx
+        - 7A2 Sound Topic Overview.docx
+        - _KS3 Sound Waves_technician guide.xlsx
+
+  PACK TOPIC : Topic 4 Space (Summer term)
+  DRIVE TOPIC: P4 Earth in Space
+    [match 1.00] Lesson 1 Days and Years and homework setting         -> P4 Earth in Space/Lesson 1 - Days and Years   (9 files)
+    [match 1.00] Lesson 2 Phases of the moon                          -> P4 Earth in Space/Lesson 2 - Phases of the Moon   (5 files)
+    [match 1.00] Lesson 3 Eclipse                                     -> P4 Earth in Space/Lesson 3 - Eclipse   (9 files)
+    [match 1.00] Lesson 4 Seasons                                     -> P4 Earth in Space/Lesson 4 - Seasons   (7 files)
+    [match 1.00] Lesson 5 The planets                                 -> P4 Earth in Space/Lesson 5 - The Planets   (10 files)
+    [match 1.00] Lesson 7 Meteors and meteorites (Optional)           -> P4 Earth in Space/Lesson 6 - Meteors and Meteorites (optional)   (4 files)
+    [ NEW      ] Lesson 8 ICT Crater hunting (Optional)               -> P4 Earth in Space/ (create)   (6 files)
+    [match 1.00] Lesson 9 Life cycles of stars (Optional)             -> P4 Earth in Space/Lesson 7 - Life Cycles of Stars (optional)   (9 files)
+    [match 1.00] Lesson 10 The universe and the big bang (Optional)   -> P4 Earth in Space/Lesson 8 - The universe and the big bang (optional)   (10 files)
+    [ NEW      ] Lesson 11 Planet data analysis Task (Optional)       -> P4 Earth in Space/ (create)   (5 files)
+    [ ASSESS   ] Lesson 6 Formative Assessment point                  -> assessment/homework bundle, NOT a lesson   (3 files)
+    [ SUPPORT  ] Additional                                           -> extra material, not a lesson   (0 files)
+    [ TOPIC-LEVEL FILES ] 59 file(s) sitting in the topic folder:
+        - Coordinates and template for drawing impact craters for google classroom.pptx
+        - Solar and Lunar eclipses Reaching.docx
+        - EPIBA Life cycles of stars.pptx
+        - DELBAR Eclispes.pptx
+        - Key events for big bang.docx
+        - Planets laminates update (6).pptx
+        - _Thumbs (5).db
+        - DELBAR Seasons (1).pptx
+        ... and 51 more
+
+====================================================================================================
+PACK: 2_Year_8_Biology_DELBAR   ->   Year 8 / Biology
+====================================================================================================
+
+  PACK TOPIC : Topic 1 Respiration and photosynthesis Autumn
+  DRIVE TOPIC: B1 Respiration and Photosythesis
+    [match 0.86] L1 Aerobic Respiration homework setting              -> B1 Respiration and Photosythesis/Lesson 1 - Aerobic Respiration   (5 files)
+    [match 0.89] L2 Anaerobic Respiration                             -> B1 Respiration and Photosythesis/Lesson 2 - Anaerobic Respiration   (6 files)
+    [match 0.90] L3 Fermentation in yeast experiment                  -> B1 Respiration and Photosythesis/Lesson 3 - Fermentation in Yeast Experiment   (6 files)
+    [match 0.82] L5 Photosynthesis                                    -> B1 Respiration and Photosythesis/Lesson 5 - Photosythesis   (7 files)
+    [match 0.89] L6 Rate of photosynthesis experiment                 -> B1 Respiration and Photosythesis/Lesson 6 - Rate of Photosythesis Experiment   (6 files)
+    [match 0.86] L7 Starch in leaves                                  -> B1 Respiration and Photosythesis/Lesson 7 - Starch in Leaves   (4 files)
+    [ ASSESS   ] L4 Formative assessment                              -> assessment/homework bundle, NOT a lesson   (4 files)
+    [ EMPTY    ] (no pack source)                                     -> B1 Respiration and Photosythesis/Lesson 4 - Formative Assessment
+    [ TOPIC-LEVEL FILES ] 2 file(s) sitting in the topic folder:
+        - _Science KS3 Respiration and Photosynthesis.xlsx
+        - 8A1 Respiration and Photosynthesis Topic Overview.docx
+
+  PACK TOPIC : Topic 2 Health and digestion Spring
+  DRIVE TOPIC: B2 Health and Digestion
+    [match 1.00] Lesson 1 Nutrients and homework setting              -> B2 Health and Digestion/Lesson 1 - Nutrients   (13 files)
+    [match 1.00] Lesson 2 Food Tests - Glucose                        -> B2 Health and Digestion/Lesson 2 - Food Tests - Glucose   (2 files)
+    [match 1.00] Lesson 3 Food tests - Protein & Starch & Fats        -> B2 Health and Digestion/Lesson 3 - Food Tests - Protein and Starch and Fats   (2 files)
+    [match 1.00] Lesson 4 Nutritional value of food (Optional)        -> B2 Health and Digestion/Lesson 4 - Nutritional Value of Food (optional)   (3 files)
+    [match 1.00] Lesson 6 Digestive system                            -> B2 Health and Digestion/Lesson 5 -Digestive System   (9 files)
+    [match 1.00] Lesson 7 Enzymes                                     -> B2 Health and Digestion/Lesson 6 - Enzymes   (11 files)
+    [ ASSESS   ] Lesson 5 Formative review                            -> assessment/homework bundle, NOT a lesson   (3 files)
+    [ TOPIC-LEVEL FILES ] 3 file(s) sitting in the topic folder:
+        - 8A2 Health and Digestion Topic Overview.docx
+        - Year 8 Health and digestion homework.docx
+        - Science KS3 Technician guide Health and Digestion.xlsx
+
+  PACK TOPIC : Topic 3 Inheritance, variation and evolution Summer
+  DRIVE TOPIC: B3 Inheritance, Variation and Evolution
+    [match 1.00] Lesson 1 Discontinuous Variation and homework settin -> B3 Inheritance, Variation and Evolution/Lesson 1 - Discontinuous Variation   (9 files)
+    [match 1.00] Lesson 2 Continuous Variation                        -> B3 Inheritance, Variation and Evolution/Lesson 2 - Continuous Variation   (11 files)
+    [match 1.00] Lesson 3 Inherited and environmental variation       -> B3 Inheritance, Variation and Evolution/Lesson 3 - Inherited and Environmental Variation   (9 files)
+    [match 1.00] Lesson 4 Chromosomes & biological sex                -> B3 Inheritance, Variation and Evolution/Lesson 4 - Chromosomes and Biological Sex   (10 files)
+    [match 1.00] Lesson 6 Classification by common characteristics    -> B3 Inheritance, Variation and Evolution/Lesson 5 - Classification by Common Characteristics   (12 files)
+    [match 1.00] Lesson 7 Competition and adaptation (Optional)       -> B3 Inheritance, Variation and Evolution/Lesson 6 - Competition and Adaptation (optional)   (13 files)
+    [match 0.91] Lesson 8 Adaptation and natural selection            -> B3 Inheritance, Variation and Evolution/Lesson 7 - Adaption and Natural Selection   (6 files)
+    [match 1.00] Lesson 9 Evolution                                   -> B3 Inheritance, Variation and Evolution/Lesson 8 - Evolution   (17 files)
+    [match 1.00] Lesson 10 Evolutionary trees (Optional)              -> B3 Inheritance, Variation and Evolution/Lesson 9 - Evolutionary Trees (Optional)   (9 files)
+    [ ASSESS   ] Lesson 5 Formative assessment point                  -> assessment/homework bundle, NOT a lesson   (5 files)
+    [ TOPIC-LEVEL FILES ] 3 file(s) sitting in the topic folder:
+        - _KS3 Y8 Variation,Inhertiance and Evolution Technicians guide.xlsx
+        - Year 8 Variation, inhertiance and evo homework.docx
+        - 8A2 Variation and Inheritance Topic Overview.docx
+
+====================================================================================================
+PACK: 3_Year_8_Chemistry_DELBAR   ->   Year 8 / Chemistry
+====================================================================================================
+
+  PACK TOPIC : Topic 1 Acids and alkalis Autumn
+  DRIVE TOPIC: C1 Acids and Alkalis
+    [match 1.00] Lesson 1 Identifying acids and alkalis               -> C1 Acids and Alkalis/Lesson 1 - Identifying Acids and Alkalis   (3 files)
+    [match 1.00] Lesson 2 The pH scale                                -> C1 Acids and Alkalis/Lesson 2 - The pH Scale   (7 files)
+    [match 1.00] Lesson 3 Neutralisation                              -> C1 Acids and Alkalis/Lesson 3 - Neutralisation   (9 files)
+    [match 1.00] Lesson 5 Metals and acids                            -> C1 Acids and Alkalis/Lesson 4 - Metals and Acids   (10 files)
+    [match 1.00] Lesson 6 Acid and carbonate reactions                -> C1 Acids and Alkalis/Lesson 5 - Acid and Carbonate Reaction   (7 files)
+    [match 1.00] Lesson 7-8 Making indicators (Optional)              -> C1 Acids and Alkalis/Lesson 6-7 - Making Indicators (optional)   (5 files)
+    [ ASSESS   ] Lesson 4 Formative review                            -> assessment/homework bundle, NOT a lesson   (3 files)
+    [ TOPIC-LEVEL FILES ] 2 file(s) sitting in the topic folder:
+        - Science KS3 Acids and Alkalis technicians guide.xlsx
+        - 8A1 Acids and Alkalis Topic Overview.docx
+
+  PACK TOPIC : Topic 2 The periodic table Autumn
+  DRIVE TOPIC: C2 Periodic Table
+    [match 1.00] Lesson 1 Periodic table recap and homework setting   -> C2 Periodic Table/Lesson 1 - Periodic Table Recap   (23 files)
+    [match 1.00] Lesson 2 Trends in the periodic table                -> C2 Periodic Table/Lesson 2 - Trends in the Periodic Table   (11 files)
+    [match 1.00] Lesson 3 Group 1                                     -> C2 Periodic Table/Lesson 3 - Group 1   (4 files)
+    [match 1.00] Lesson 5 Group 7                                     -> C2 Periodic Table/Lesson 4 - Group 7   (5 files)
+    [match 1.00] Lesson 6 The Noble gases                             -> C2 Periodic Table/Lesson 5 - The Noble Gases   (3 files)
+    [ ASSESS   ] Lesson 4 Formative review                            -> assessment/homework bundle, NOT a lesson   (5 files)
+    [ TOPIC-LEVEL FILES ] 1 file(s) sitting in the topic folder:
+        - Copy of 8A1 Periodic Table Topic Overview.docx
+
+  PACK TOPIC : Topic 3 Metals and non metals_chemical energy Spring
+  DRIVE TOPIC: C3 Metals, Non Metals and Chemical Energy
+    [match 1.00] Lesson 1 Properties of metals and homework setting   -> C3 Metals, Non Metals and Chemical Energy/Lesson 1 - Properties of Metals   (3 files)
+    [match 1.00] Lesson 2 Metals and oxygen                           -> C3 Metals, Non Metals and Chemical Energy/Lesson 2 - Metals and Oxygen   (7 files)
+    [match 1.00] Lesson 3 Reactivity of metals experiment             -> C3 Metals, Non Metals and Chemical Energy/Lesson 3 - Reactivity of Metals Experiment   (9 files)
+    [match 1.00] Lesson 5 Displacement                                -> C3 Metals, Non Metals and Chemical Energy/Lesson 4 - Displacement   (8 files)
+    [match 1.00] Lesson 6 Displacement of salts                       -> C3 Metals, Non Metals and Chemical Energy/Lesson 5 - Displacement of Salts   (7 files)
+    [match 1.00] Lesson 7 Energy changes in reactions                 -> C3 Metals, Non Metals and Chemical Energy/Lesson 6 - Energy Changes in Reactions   (10 files)
+    [match 0.86] Lesson 8 OPTIONAL Balancing Equation (Higher Tier)   -> C3 Metals, Non Metals and Chemical Energy/Lesson 7 - Balancing Equations (Higher Tier) (Optional)   (9 files)
+    [ ASSESS   ] Lesson 4 Formative marking point                     -> assessment/homework bundle, NOT a lesson   (2 files)
+    [ TOPIC-LEVEL FILES ] 3 file(s) sitting in the topic folder:
+        - Metals, nonmetals and chemical energy homework.docx
+        - 8A2 Metals and Nonmetals Topic Overview.docx
+        - Science KS3 Metals, Non metals and chemical energy technicians guide.xlsx
+
+  PACK TOPIC : Topic 4 Atmosphere and resources Summer
+  DRIVE TOPIC: C4 Atmosphere and Resources
+    [ EMPTY    ] (no pack source)                                     -> C4 Atmosphere and Resources/Lesson 1 - Fossil Fuels
+    [ EMPTY    ] (no pack source)                                     -> C4 Atmosphere and Resources/Lesson 2 - The Atmosphere and Greenhouse Gases
+    [ EMPTY    ] (no pack source)                                     -> C4 Atmosphere and Resources/Lesson 3 - Metal Ores
+    [ EMPTY    ] (no pack source)                                     -> C4 Atmosphere and Resources/Lesson 4 - Electrolysis
+    [ EMPTY    ] (no pack source)                                     -> C4 Atmosphere and Resources/Lesson 5 - Resources and Recycling
+    [ EMPTY    ] (no pack source)                                     -> C4 Atmosphere and Resources/Lesson 6 - Revision
+
+====================================================================================================
+PACK: 4_Year_8_Physics_DELBAR   ->   Year 8 / Physics
+====================================================================================================
+
+  PACK TOPIC : Topic 1 Motion and pressure Autumn
+  DRIVE TOPIC: P1 Motion and Pressure
+    [match 1.00] Lesson 1 - Calculating Pressure                      -> P1 Motion and Pressure/Lesson 1 - Calculating Pressure   (7 files)
+    [match 1.00] Lesson 2 - Pressure on a surface                     -> P1 Motion and Pressure/Lesson 2 - Pressure on a Surface   (7 files)
+    [match 1.00] Lesson 3 - Air pressure                              -> P1 Motion and Pressure/Lesson 3 - Air Pressure   (10 files)
+    [match 1.00] Lesson 4 - Pressure in a fluid                       -> P1 Motion and Pressure/Lesson 4 - Pressure in Fluids   (12 files)
+    [match 1.00] Lesson 6 - Calculating Speed                         -> P1 Motion and Pressure/Lesson 5 - Calculating Speed   (7 files)
+    [match 1.00] Lesson 7 - Speed investigation (Optional)            -> P1 Motion and Pressure/Lesson 6 - Speed Investigation (optional)   (10 files)
+    [match 1.00] Lesson 8 - Distance VS Time graphs                   -> P1 Motion and Pressure/Lesson 7 - Distance vs Time Graphs   (14 files)
+    [ ASSESS   ] Lesson 5 - Formative review                          -> assessment/homework bundle, NOT a lesson   (15 files)
+    [ TOPIC-LEVEL FILES ] 2 file(s) sitting in the topic folder:
+        - _KS3 Y8 Speed and Pressure.xlsx
+        - 8A1 Motion and Pressure Topic Overview.docx
+
+  PACK TOPIC : Topic 2 Energy resources Spring
+  DRIVE TOPIC: P2 Energy Resources
+    [match 1.00] Lesson 1 Comparing light bulbs and homework setting  -> P2 Energy Resources/Lesson 1 - Comparing Light Bulbs   (5 files)
+    [match 1.00] Lesson 2 Paying for electricity                      -> P2 Energy Resources/Lesson 2 - Paying for Electricity   (9 files)
+    [match 0.86] Lesson 3 The national grid and power stations        -> P2 Energy Resources/Lesson 3 - The National Grid   (15 files)
+    [match 1.00] Lesson 4 Generating electricity                      -> P2 Energy Resources/Lesson 4 - Generating Electricity   (4 files)
+    [match 1.00] Lesson 6 Wind turbines                               -> P2 Energy Resources/Lesson 5 - Wind Turbines   (1 files)
+    [match 1.00] Lesson 7 Solar power                                 -> P2 Energy Resources/Lesson 6 - Solar Power   (3 files)
+    [match 1.00] Lesson 8 Other renewables                            -> P2 Energy Resources/Lesson 7 - Other Renewables   (5 files)
+    [ NEW      ] Lesson 9 Non renewables practical                    -> P2 Energy Resources/ (create)   (2 files)
+    [match 0.86] Lesson 10 Joule Island (Optional)                    -> P2 Energy Resources/Lesson 8 - Joule Island Pt 1 (Optional)   (3 files)
+    [match 0.86] Lesson 11 Joule Island 2 (Optional)                  -> P2 Energy Resources/Lesson 9 - Joule Island Pt 2 (Optional)   (2 files)
+    [ ASSESS   ] Lesson 5 Formative review                            -> assessment/homework bundle, NOT a lesson   (3 files)
+    [ TOPIC-LEVEL FILES ] 3 file(s) sitting in the topic folder:
+        - _KS3 Y8 Energy Resources technicians guide.xlsx
+        - Year 8 Energy resources homework.docx
+        - 8A2 Energy Resources Topic Overview.docx
+
+  PACK TOPIC : Topic 3 Light Spring
+  DRIVE TOPIC: P3 Light
+    [match 1.00] Lesson 1 Reflection and homework setting             -> P3 Light/Lesson 1 - Reflection   (20 files)
+    [match 1.00] Lesson 2 Refraction                                  -> P3 Light/Lesson 2 - Refraction   (10 files)
+    [match 1.00] Lesson 3 Lenses                                      -> P3 Light/Lesson 3 - Lenses   (9 files)
+    [match 1.00] Lesson 4 Dispersion and colour mixing                -> P3 Light/Lesson 4 - Dispersion and Colour Mixing   (16 files)
+    [match 1.00] Lesson 6 Reflecting colour                           -> P3 Light/Lesson 5 - Reflecting Colour   (8 files)
+    [ ASSESS   ] Lesson 5 Formative assessment                        -> assessment/homework bundle, NOT a lesson   (4 files)
+    [ TOPIC-LEVEL FILES ] 2 file(s) sitting in the topic folder:
+        - 8A2 Light Topic Overview.docx
+        - Year 8 Light homework.docx
+
+  PACK TOPIC : Topic 4+5 Electricity and magnetism Summer
+  DRIVE TOPIC: P4 Electricity + P5 Magnets
+    [match 1.00] Lesson 1 Circuit Symbols                             -> P4 Electricity/Lesson 1 - Circuit Symbols   (8 files)
+    [match 1.00] Lesson 2 Current in series                           -> P4 Electricity/Lesson 2 - Current in Series   (8 files)
+    [match 1.00] Lesson 3 Current in parallel                         -> P4 Electricity/Lesson 3 - Current in Parallel   (9 files)
+    [match 1.00] Lesson 4 Making fruit batteries (Optional)           -> P4 Electricity/Lesson 4 - Making Fruit Batteries (optional)   (4 files)
+    [match 1.00] Lesson 5 Potential difference in series and parallel -> P4 Electricity/Lesson 5 - Potential Difference in Series and Parallel   (8 files)
+    [ NEW      ] Lesson 6 Circuit models                              -> P4 Electricity/ (create)   (7 files)
+    [match 1.00] Lesson 8 Attract and repel_using magnets             -> P5 Magnets/Lesson 1 - Attract and Repel Using Magnets   (9 files)
+    [match 1.00] Lesson 9 Testing for magnetic materials              -> P5 Magnets/Lesson 2 - Testing for Magnetic Materials   (2 files)
+    [match 1.00] Lesson 10 Mapping magnetic fields                    -> P5 Magnets/Lesson 3 - Mapping Magnetic Fields   (3 files)
+    [match 1.00] Lesson 11 Making electromagnets                      -> P5 Magnets/Lesson 4 - Making Electromagnets   (4 files)
+    [match 0.78] Lesson 12 Changing the current into an electromagnet -> P5 Magnets/Lesson 5 - Changing the Strength of an Electromagnet   (2 files)
+    [ ASSESS   ] Lesson 7 Formative Assessment                        -> assessment/homework bundle, NOT a lesson   (1 files)
+    [ TOPIC-LEVEL FILES ] 2 file(s) sitting in the topic folder:
+        - 8A3 Electricity and magnetism Topic Overview.docx
+        - Year 8 Electricity and magnetism homework.docx
+
+====================================================================================================
+SUMMARY
+====================================================================================================
+  4_Yr_7_KS3_Biology_DELBAR_2025        29 matched     5 new folders    327 files
+  5_Yr_7_KS3_Chemistry_DELBAR_2025      21 matched     6 new folders    172 files
+  6_Yr_7_KS3_Physics_DELBAR_2025        28 matched     5 new folders    309 files
+  2_Year_8_Biology_DELBAR               21 matched     0 new folders    182 files
+  3_Year_8_Chemistry_DELBAR             18 matched     0 new folders    150 files
+  4_Year_8_Physics_DELBAR               31 matched     2 new folders    266 files
+  TOTAL                                148 matched    18 new folders   1406 files

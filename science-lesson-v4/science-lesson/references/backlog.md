@@ -287,3 +287,13 @@ High-impact single-concept Build slide: one huge number/fact (e.g. "37 °C") fil
 
 **Feature — Subject-specific top bar images** 🔧 AWAITING PATRYK'S SIGN-OFF — options + open questions drafted 2026-07-11 in `specs/design-pending-options.md` (aspect-ratio risk checked and cleared: the 5 candidate PNGs are 1500×120, matches the current 674×54 placement's ratio)
 Currently one fixed Physics top bar reused for every lesson. Want: Chemistry top bar (idea: graphene / fullerene structure) and Biology top bar (idea: serotonin molecule or similar — not decided). Scope TBD: subject detection/specification per lesson + image storage location.
+
+---
+
+**Idea — Student first names + interests in the APPLY section (2026-09)** 💡 REFINES the existing "personalise questions" goal (see [[project-science-lesson]] line ~40, raised 2026-07-11)
+Patryk's refinement: put student FIRST NAMES into the APPLY-tier questions specifically — as the people in the scenario/word-problem, optionally tied to that student's interest — to lift engagement. Does NOT need full personalisation, just first names dropped into scenarios. Privacy: first names only (Patryk flagged this himself). Source of names + interests: TBD (class lists still being finalised for 2026-27). Needs its own design pass; not scoped for immediate build.
+
+---
+
+**New project idea — Photograph-and-mark test papers (2026-09)** 💡 NEXT PROJECT (Patryk's own idea, needs its own project chat)
+Workflow Patryk wants: (1) hold up a physical test paper and take a VIDEO flicking through it, papers stacked in ALPHABETICAL order (by student); (2) system splits the video into per-page photos, grouped back into each student's paper; (3) mark each paper automatically against an UPLOADED mark scheme; (4) output per-student marks/feedback. Open questions for the project chat: OCR/handwriting reading of pupil answers, page-to-student segmentation from one continuous video, mark-scheme matching (partial credit, method marks), and where results land (lesson-log? a markbook?). Relates to the exam-doc library work and the deferred markbook/seating-plan goal. Capture only — not started.

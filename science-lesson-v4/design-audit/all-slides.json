@@ -1,0 +1,1230 @@
+[
+  {
+    "meta": {
+      "class": "10S2",
+      "year": 10,
+      "subject": "Chemistry",
+      "macrotopic": "Rate of reaction",
+      "lessonNumber": 1,
+      "topic": "Collision theory",
+      "title": "Collision Theory",
+      "lessonType": "standard",
+      "theme": "Chemistry",
+      "uncapLearn": true
+    },
+    "title": {
+      "objectives": [
+        "Describe how particles must collide to react",
+        "Explain why concentration increases the rate",
+        "Predict the effect of temperature on rate"
+      ],
+      "keywords": ["collision", "activation energy", "rate", "concentration", "surface area"]
+    },
+    "doNow": {
+      "variant": "A",
+      "questions": [
+        { "q": "Name the three states of matter.", "a": "Solid, liquid, gas.", "marks": 1, "hint": "Think about ice, water and steam." },
+        { "q": "What is a chemical reaction?", "a": "A change where new substances are formed.", "marks": 1, "hint": "Something new is made that was not there before." },
+        { "q": "Give one sign that a chemical reaction has happened.", "a": "Gas produced, colour change, temperature change or a precipitate forms.", "marks": 1, "hint": "What would you see or feel?" },
+        { "q": "What does the word 'reactant' mean?", "a": "A substance you start with, used up in the reaction.", "marks": 1, "hint": "It is on the left of the arrow." },
+        { "q": "Which is faster, rusting iron or burning magnesium?", "a": "Burning magnesium.", "marks": 1, "hint": "One takes years, one takes seconds." },
+        { "q": "Name one gas that turns limewater cloudy.", "a": "Carbon dioxide.", "marks": 1, "hint": "You breathe it out." }
+      ],
+      "specPoints": ["4.6.1.1 Rate of reaction", "4.6.1.2 Collision theory"]
+    },
+    "engage": {
+      "variant": "prediction",
+      "hook": "Flour is not explosive. A cloud of flour dust in a mill can level the building.",
+      "content": "Grain mills and custard powder factories have been destroyed by dust explosions. The chemical is identical to the flour in your kitchen cupboard.",
+      "imagePlaceholder": true,
+      "imageDescription": "photograph of a destroyed grain silo or flour mill after a dust explosion, industrial setting",
+      "prompt": "What has changed about the flour to make it so dangerous?",
+      "reveal": {
+        "question": "Why does the dust burn so violently when the bag of flour will not?",
+        "answer": "Grinding the flour into dust gives it an enormous surface area. Far more particles are exposed to oxygen, so collisions happen everywhere at once."
+      }
+    },
+    "learn": [
+      {
+        "variant": "A",
+        "heading": "Collision theory",
+        "boxes": [
+          {
+            "header": "For a reaction to happen",
+            "items": [
+              "Particles must actually collide with each other.",
+              "They must collide with enough energy to react.",
+              "A collision with too little energy just bounces off."
+            ]
+          },
+          {
+            "header": "Activation energy",
+            "items": [
+              "The minimum energy needed for a collision to be successful.",
+              "Below this energy, nothing happens."
+            ]
+          }
+        ],
+        "keywords": ["successful collision", "activation energy", "frequency"],
+        "imagePlaceholder": true,
+        "imageDescription": "particle diagram showing two molecules colliding successfully and two bouncing apart"
+      },
+      {
+        "variant": "B",
+        "heading": "Write this in your book",
+        "toWrite": [
+          "Rate of reaction = how quickly reactants are used up or products are made.",
+          "A reaction speeds up if collisions are more frequent, or more energetic.",
+          "Activation energy is the minimum energy a collision needs to succeed."
+        ]
+      },
+      {
+        "variant": "C",
+        "corePaper": [
+          { "q": "Describe what is meant by the rate of a reaction.", "pages": "142" },
+          { "q": "State two things that must be true for a collision to lead to a reaction.", "pages": "143" },
+          { "q": "Explain why powdered zinc reacts faster than a lump of zinc.", "pages": "144" }
+        ],
+        "extendPaper": [
+          { "q": "Explain, in terms of collisions, why doubling the concentration roughly doubles the rate.", "pages": "145" },
+          { "q": "A student says heating always doubles the rate. Evaluate this claim.", "pages": "146" }
+        ]
+      },
+      {
+        "variant": "D",
+        "heading": "Energy profile",
+        "instruction": "Copy the reaction profile from the board. Label the activation energy and the overall energy change."
+      },
+      {
+        "variant": "E",
+        "heading": "Comparing the factors",
+        "comparison": {
+          "aTitle": "Increasing concentration",
+          "bTitle": "Increasing temperature",
+          "rows": [
+            { "a": "More particles in the same volume", "b": "Particles gain kinetic energy" },
+            { "a": "Collisions become more frequent", "b": "Collisions become more frequent AND more energetic" },
+            { "a": "Energy of each collision is unchanged", "b": "More collisions exceed the activation energy" },
+            { "a": "Rate increases", "b": "Rate increases much more sharply" }
+          ]
+        }
+      },
+      {
+        "variant": "F",
+        "heading": "Calculating mean rate",
+        "equation": "rate = {quantity of product/time}",
+        "components": [
+          { "symbol": "rate", "name": "Mean rate of reaction", "unit": "g/s or cm^3/s" },
+          { "symbol": "quantity", "name": "Mass or volume made", "unit": "g or cm^3" },
+          { "symbol": "time", "name": "Time taken", "unit": "seconds (s)" }
+        ],
+        "rearrangements": ["quantity = rate × time", "time = {quantity/rate}"],
+        "example": "24 cm^3 of gas is made in 30 s. rate = 24 ÷ 30 = 0.8 cm^3/s."
+      }
+    ],
+    "build": [
+      {
+        "type": "mcq",
+        "q": "Which change would NOT increase the rate of a reaction between marble chips and acid?",
+        "options": [
+          "Using more concentrated acid",
+          "Crushing the marble chips",
+          "Cooling the acid down",
+          "Warming the acid up"
+        ],
+        "answer": "C",
+        "explanation": "Cooling slows the particles down, so collisions are less frequent and less energetic.",
+        "commonError": "Students often think cooling 'saves energy' and therefore helps the reaction."
+      },
+      {
+        "type": "mcq_image",
+        "q": "Which flask will produce gas the fastest?",
+        "imageDescription": "four conical flasks side by side, each with marble chips and acid: A large chips low conc, B large chips high conc, C powder low conc, D powder high conc",
+        "options": [
+          "Large chips, dilute acid",
+          "Large chips, concentrated acid",
+          "Powdered marble, dilute acid",
+          "Powdered marble, concentrated acid"
+        ],
+        "answer": "D",
+        "explanation": "Powder gives the largest surface area and concentrated acid gives the most frequent collisions, so both factors are maximised."
+      },
+      {
+        "type": "trueFalse",
+        "heading": "COMMON MISCONCEPTIONS",
+        "statements": [
+          { "text": "Every collision between reactant particles causes a reaction.", "isTrue": false, "correction": "Only collisions with at least the activation energy cause a reaction." },
+          { "text": "Increasing the surface area increases the rate of reaction.", "isTrue": true },
+          { "text": "A catalyst is used up during the reaction.", "isTrue": false, "correction": "A catalyst is not used up. It is chemically unchanged at the end." },
+          { "text": "Heating a reaction makes the particles collide more often.", "isTrue": true },
+          { "text": "Increasing concentration gives each collision more energy.", "isTrue": false, "correction": "Concentration changes how often particles collide, not how much energy each collision has." }
+        ]
+      },
+      {
+        "type": "sort",
+        "instruction": "Sort each statement into the factor it describes.",
+        "items": [
+          "Particles move faster",
+          "More particles per unit volume",
+          "More of the solid is exposed",
+          "Collisions are more energetic",
+          "Grinding into a powder",
+          "Adding more water to the acid"
+        ],
+        "categories": { "A": "Increases the rate", "B": "Decreases the rate" },
+        "sorted": {
+          "A": ["Particles move faster", "More particles per unit volume", "More of the solid is exposed", "Collisions are more energetic", "Grinding into a powder"],
+          "B": ["Adding more water to the acid"]
+        }
+      },
+      {
+        "type": "misconception",
+        "claim": "If you double the temperature, you double the rate.",
+        "whyWrong": "It feels like a fair trade. Twice the heat should mean twice the speed, the way twice the distance means twice the time.",
+        "truth": "Rate roughly doubles for every 10 °C rise, not for a doubling of the number on the thermometer. The relationship is not proportional."
+      },
+      {
+        "type": "bigFact",
+        "fact": "10",
+        "unit": "°C",
+        "context": "A rise of this much is often enough to double the rate of reaction"
+      }
+    ],
+    "apply": {
+      "variant": "A",
+      "developing": [
+        { "q": "State what must happen for two particles to react.", "a": "They must collide with at least the activation energy.", "marks": 2, "qType": "concept" },
+        { "q": "Name two factors that increase the rate of a reaction.", "a": "Any two of: temperature, concentration, surface area, catalyst.", "marks": 2, "qType": "concept" },
+        { "q": "Define the term activation energy.", "a": "The minimum energy particles need in a collision to react.", "marks": 1, "qType": "concept" }
+      ],
+      "reaching": [
+        { "q": "Explain why crushing a solid speeds up its reaction with acid.", "a": "Crushing increases the surface area, so more particles are exposed and collisions are more frequent.", "marks": 3, "qType": "concept" },
+        { "q": "18 cm^3 of hydrogen is collected in 45 s. Calculate the mean rate.", "a": "rate = 18 ÷ 45 = 0.4 cm^3/s", "marks": 2, "qType": "calculation", "equation": "rate = {quantity/time}", "units": "cm^3/s" },
+        { "q": "Explain why a reaction slows down as it goes on.", "a": "The reactants are used up, so concentration falls and collisions become less frequent.", "marks": 3, "qType": "concept" }
+      ],
+      "mastering": [
+        { "q": "Explain why temperature has a bigger effect on rate than concentration.", "a": "Temperature increases both the frequency of collisions and the energy of each one, so more collisions exceed the activation energy. Concentration only increases frequency.", "marks": 4, "qType": "extended_writing", "contentType": "extended_writing" },
+        { "q": "0.6 g of gas is made in 25 s. Calculate the mean rate in g/s.", "a": "rate = 0.6 ÷ 25 = 0.024 g/s", "marks": 2, "qType": "calculation", "equation": "rate = {mass/time}", "units": "g/s" },
+        { "q": "A student doubles the concentration and the rate does not double. Suggest why.", "a": "Another factor is limiting the rate, for example the surface area of the solid, or the acid was already in excess.", "marks": 3, "qType": "concept" }
+      ]
+    },
+    "image_dump": {
+      "images": [
+        { "path": "science-lesson/references/starfield_header_FINAL.png", "label": "Deck header artwork (reference asset)" }
+      ]
+    }
+  },
+
+  {
+    "meta": {
+      "class": "10S2",
+      "year": 10,
+      "subject": "Physics",
+      "macrotopic": "Forces",
+      "lessonNumber": 2,
+      "topic": "Forces and motion",
+      "title": "Forces and Motion",
+      "lessonType": "standard",
+      "theme": "Physics",
+      "uncapLearn": true,
+      "annotation": true
+    },
+    "title": {
+      "objectives": [
+        "Describe the motion shown by a distance time graph",
+        "Calculate speed from distance and time",
+        "Explain the forces acting on a falling object"
+      ],
+      "keywords": ["speed", "resultant force", "terminal velocity", "acceleration"]
+    },
+    "doNow": {
+      "variant": "B",
+      "count": 6,
+      "questions": [
+        { "q": "What is the unit of force?", "a": "Newton (N).", "marks": 1, "hint": "Named after a famous physicist." },
+        { "q": "What is a resultant force?", "a": "The single force that has the same effect as all the forces combined.", "marks": 1, "hint": "Add them up, taking direction into account." },
+        { "q": "State the unit of speed.", "a": "Metres per second (m/s).", "marks": 1, "hint": "Distance over time." },
+        { "q": "If forces are balanced, what happens to the object?", "a": "It stays still or keeps moving at constant velocity.", "marks": 1, "hint": "Nothing changes about its motion." },
+        { "q": "Name the force that opposes motion through air.", "a": "Air resistance (drag).", "marks": 1, "hint": "You feel it when you cycle fast." },
+        { "q": "Is weight a force? Explain.", "a": "Yes, it is the force of gravity acting on a mass.", "marks": 1, "hint": "It is measured in newtons, not kilograms." }
+      ]
+    },
+    "engage": {
+      "variant": "mysteryImage",
+      "hook": "A skydiver in freefall stops getting faster, long before the parachute opens. Why?",
+      "imagePlaceholder": true,
+      "imageDescription": "skydiver in freefall, arms and legs spread wide, viewed from above against clouds",
+      "reveal": {
+        "answer": "As she speeds up, air resistance grows. Eventually it matches her weight, the resultant force falls to zero, and she stops accelerating."
+      }
+    },
+    "learn": [
+      {
+        "variant": "G",
+        "heading": "What happens during a skydive",
+        "steps": [
+          { "label": "Jumps out", "note": "weight acts down, almost no air resistance yet" },
+          { "label": "Accelerates", "note": "resultant force is large and downwards" },
+          { "label": "Air resistance grows", "note": "faster speed means more drag" },
+          { "label": "Terminal velocity", "note": "drag equals weight, resultant force is zero" },
+          { "label": "Parachute opens", "note": "drag jumps, she decelerates" },
+          { "label": "New terminal velocity", "note": "slower, safe landing speed" }
+        ]
+      },
+      {
+        "variant": "I",
+        "heading": "Working out a resultant force",
+        "orientation": "vertical",
+        "cycle": true,
+        "nodes": [
+          { "label": "Draw the forces", "note": "arrows, length shows size" },
+          { "label": "Pick a direction", "note": "call one way positive" },
+          { "label": "Add them up", "note": "opposite forces subtract" },
+          { "label": "State the resultant", "note": "size and direction" }
+        ]
+      },
+      {
+        "variant": "J",
+        "heading": "Reading a distance time graph",
+        "axes": { "x": "time (s)", "y": "distance (m)" },
+        "imageDescription": "distance time graph with a straight rising section, a flat section, then a steeper rising section",
+        "features": [
+          { "label": "Straight sloping line", "description": "Constant speed. The steeper the line, the faster the object." },
+          { "label": "Flat line", "description": "The object is stationary. Distance is not changing." },
+          { "label": "Curved line", "description": "The object is accelerating. The gradient is increasing." },
+          { "label": "Gradient", "description": "The gradient of a distance time graph gives the speed." }
+        ]
+      },
+      {
+        "variant": "K",
+        "heading": "How our model of motion developed",
+        "events": [
+          { "year": "350 BC", "label": "Aristotle", "detail": "Believed heavier objects fall faster." },
+          { "year": "1590", "label": "Galileo", "detail": "Showed that, ignoring air resistance, all objects fall at the same rate." },
+          { "year": "1687", "label": "Newton", "detail": "Published the three laws of motion." },
+          { "year": "1971", "label": "Apollo 15", "detail": "A hammer and a feather dropped together on the Moon landed together." }
+        ]
+      }
+    ],
+    "build": [
+      {
+        "type": "reformatFlowchart",
+        "heading": "The stages of a skydive",
+        "instruction": "These stages are in the wrong order. Work out the correct order and write the letters in sequence.",
+        "steps": [
+          { "label": "The skydiver leaves the plane", "note": "weight acts downwards" },
+          { "label": "She accelerates downwards", "note": "resultant force is large" },
+          { "label": "Air resistance increases", "note": "because her speed increases" },
+          { "label": "Air resistance equals weight", "note": "terminal velocity reached" },
+          { "label": "The parachute opens", "note": "air resistance suddenly increases" },
+          { "label": "She lands at a safe speed", "note": "a new, lower terminal velocity" }
+        ]
+      },
+      {
+        "type": "annotatedDiagram",
+        "heading": "Forces on a falling skydiver",
+        "imageDescription": "side view of a skydiver in freefall with a long downward weight arrow and a shorter upward air resistance arrow",
+        "labels": [
+          { "x": 0.5, "y": 0.15, "text": "Air resistance (drag)" },
+          { "x": 0.5, "y": 0.85, "text": "Weight" },
+          { "x": 0.2, "y": 0.5, "text": "Direction of motion" },
+          { "x": 0.8, "y": 0.5, "text": "Resultant force" }
+        ]
+      },
+      {
+        "type": "workedExample",
+        "worked": {
+          "prompt": "A runner travels 400 m in 50 s. Calculate her speed.",
+          "steps": [
+            "speed = {distance/time}",
+            "speed = 400 m ÷ 50 s",
+            "speed = 8 m/s"
+          ]
+        },
+        "yourTurn": {
+          "prompt": "A cyclist travels 750 m in 60 s. Calculate his speed.",
+          "answer": "speed = 750 ÷ 60 = 12.5 m/s"
+        }
+      },
+      {
+        "type": "guessExample",
+        "topic": "Resultant force",
+        "given": "m = 1200 kg, a = 2.5 m/s^2",
+        "unknown": "F (resultant force)",
+        "equation": "F = m × a",
+        "equationSymbols": { "top": "F", "bottomLeft": "m", "bottomRight": "a" },
+        "substitute": "F = 1200 × 2.5",
+        "solve": "F = 3000 N"
+      },
+      {
+        "type": "practiceTriangle",
+        "topic": "Force, mass and acceleration",
+        "equation": "F = m × a",
+        "equationSymbols": { "top": "F", "bottomLeft": "m", "bottomRight": "a" },
+        "questions": [
+          { "q": "A 60 kg sprinter accelerates at 4 m/s^2. Calculate the resultant force.", "a": "F = 60 × 4 = 240 N", "marks": 2 },
+          { "q": "A 900 N force acts on a 300 kg trolley. Calculate the acceleration.", "a": "a = 900 ÷ 300 = 3 m/s^2", "marks": 2 },
+          { "q": "A 5000 N force gives an acceleration of 2 m/s^2. Calculate the mass.", "a": "m = 5000 ÷ 2 = 2500 kg", "marks": 2 }
+        ]
+      },
+      {
+        "type": "errorAnalysis",
+        "wrongWorking": [
+          "speed = {distance/time}",
+          "distance = 2 km, time = 400 s",
+          "speed = 2 ÷ 400 = 0.005 m/s",
+          "speed = 0.005 m/s"
+        ],
+        "errorLine": 3,
+        "fix": "speed = 2000 m ÷ 400 s = 5 m/s",
+        "errorType": "unit conversion, kilometres were not converted to metres"
+      }
+    ],
+    "apply": {
+      "variant": "B",
+      "developing": [
+        { "q": "State the equation linking speed, distance and time.", "a": "speed = distance ÷ time", "marks": 1, "qType": "concept" },
+        { "q": "A car travels 300 m in 20 s. Calculate its speed.", "a": "300 ÷ 20 = 15 m/s", "marks": 2, "qType": "calculation", "equation": "speed = {distance/time}", "units": "m/s" },
+        { "q": "What does a flat line on a distance time graph show?", "a": "The object is stationary.", "marks": 1, "qType": "concept" }
+      ],
+      "reaching": [
+        { "q": "Explain what is meant by terminal velocity.", "a": "The constant speed reached when air resistance equals weight, so the resultant force is zero.", "marks": 3, "qType": "concept" },
+        { "q": "A 70 kg skydiver has a weight of 700 N. Calculate her acceleration at the instant she jumps.", "a": "a = 700 ÷ 70 = 10 m/s^2", "marks": 3, "qType": "calculation", "equation": "F = m × a", "units": "m/s^2" },
+        { "q": "Explain why the skydiver slows down when the parachute opens.", "a": "The parachute increases air resistance so it is now bigger than her weight. The resultant force acts upwards, so she decelerates.", "marks": 3, "qType": "concept" }
+      ],
+      "mastering": [
+        { "q": "A skydiver reaches terminal velocity, opens her parachute, then reaches a second, lower terminal velocity. Explain the changes in the forces acting on her throughout the whole descent, and describe how her acceleration changes at each stage.", "a": "At first weight is much greater than drag, so there is a large downward resultant force and she accelerates. As speed rises, drag rises until it equals weight. The resultant force is now zero and she falls at a constant terminal velocity. Opening the parachute causes a sudden large increase in drag, which now exceeds weight, so the resultant force acts upwards and she decelerates. As she slows, drag falls again until it once more equals weight, giving a second, lower terminal velocity.", "marks": 6, "qType": "extended_writing", "contentType": "extended_writing" }
+      ]
+    }
+  },
+
+  {
+    "meta": {
+      "class": "10S2",
+      "year": 10,
+      "subject": "Chemistry",
+      "macrotopic": "Rate of reaction",
+      "lessonNumber": 3,
+      "topic": "Measuring rate of reaction",
+      "title": "Measuring Rate",
+      "lessonType": "standard",
+      "theme": "Chemistry",
+      "uncapLearn": true,
+      "visualiserUrl": "https://example.org/visualiser"
+    },
+    "title": {
+      "objectives": [
+        "Draw a graph of volume of gas against time",
+        "Find the rate from the gradient of a graph",
+        "Explain the shape of a rate graph"
+      ],
+      "keywords": ["gradient", "tangent", "mean rate", "plateau"]
+    },
+    "doNow": {
+      "variant": "A",
+      "questions": [
+        { "q": "What does the gradient of a graph tell you?", "a": "How quickly the y quantity changes with the x quantity.", "marks": 1, "hint": "Rise over run." },
+        { "q": "Which axis does time normally go on?", "a": "The x axis.", "marks": 1, "hint": "The horizontal one." },
+        { "q": "What piece of equipment measures a volume of gas?", "a": "A gas syringe (or an inverted measuring cylinder).", "marks": 1, "hint": "It looks like a big plastic syringe." },
+        { "q": "State the equation for mean rate of reaction.", "a": "rate = quantity of product ÷ time", "marks": 1, "hint": "How much, divided by how long." },
+        { "q": "Why does a rate graph flatten out at the end?", "a": "The reaction has finished, no more product is being made.", "marks": 1, "hint": "What has happened to the reactants?" },
+        { "q": "Name the gas made when marble chips react with acid.", "a": "Carbon dioxide.", "marks": 1, "hint": "It turns limewater cloudy." }
+      ]
+    },
+    "engage": {
+      "variant": "news",
+      "hook": "Two identical reactions were set up. One finished in 40 seconds, the other took over four minutes.",
+      "imagePlaceholder": true,
+      "imageDescription": "two identical conical flasks with gas syringes, one syringe pushed far out, the other barely moved",
+      "reveal": {
+        "answer": "Nothing was different about the chemicals. One flask had been left on a sunny windowsill, and the few degrees of extra warmth was enough."
+      }
+    },
+    "learn": [
+      {
+        "variant": "A",
+        "heading": "Reading a rate graph",
+        "body": "The steeper the line, the faster the reaction is going at that moment.\nThe line is always steepest at the very start, when the reactants are most concentrated.\nAs reactants are used up, the line gradually becomes less steep.\nWhen the line goes flat, the reaction has stopped completely.",
+        "imagePlaceholder": true,
+        "imageDescription": "volume of gas against time graph, steep at first, curving to a flat plateau"
+      },
+      {
+        "variant": "A",
+        "heading": "Annotate this graph with me",
+        "boxes": [
+          {
+            "header": "Mark these three things",
+            "items": [
+              "The point where the reaction is fastest.",
+              "The point where the reaction has finished.",
+              "A tangent drawn at 20 seconds."
+            ]
+          }
+        ],
+        "annotationZone": true
+      },
+      {
+        "variant": "C",
+        "corePaper": [
+          { "q": "Describe how you would measure the volume of gas produced.", "pages": "148" },
+          { "q": "Explain the shape of a volume against time graph.", "pages": "149" },
+          { "q": "Calculate the mean rate from a set of results.", "pages": "150" }
+        ]
+      },
+      {
+        "variant": "I",
+        "heading": "Finding the rate at one moment",
+        "orientation": "horizontal",
+        "nodes": [
+          { "label": "Pick the time", "note": "e.g. 20 s" },
+          { "label": "Draw a tangent", "note": "just touching the curve" },
+          { "label": "Find the gradient", "note": "rise ÷ run" },
+          { "label": "That is the rate", "note": "in cm^3/s" }
+        ]
+      }
+    ],
+    "build": [
+      {
+        "type": "graphInterpret",
+        "graphLabel": "Volume of carbon dioxide against time",
+        "axes": { "x": "time (s)", "y": "volume of gas (cm^3)" },
+        "imagePlaceholder": true,
+        "questions": [
+          { "q": "At what time did the reaction finish?", "a": "At 60 s, where the line becomes flat.", "marks": 1 },
+          { "q": "During which 20 second period was the reaction fastest?", "a": "Between 0 and 20 s, where the line is steepest.", "marks": 1 },
+          { "q": "Calculate the mean rate over the first 40 seconds.", "a": "48 ÷ 40 = 1.2 cm^3/s", "marks": 2 }
+        ]
+      },
+      {
+        "type": "graphResults",
+        "graphNotes": [
+          "The line is steepest at the start, so the reaction is fastest then.",
+          "The gradient falls as the acid is used up.",
+          "The plateau shows the reaction has finished.",
+          "The final volume tells you how much gas was made in total."
+        ],
+        "closingRemark": "Same reaction, same chemicals. Only the gradient tells you the rate."
+      },
+      {
+        "type": "graphWithData",
+        "graphNotes": [
+          "Plot time on the x axis and volume on the y axis.",
+          "Draw a smooth curve of best fit, not dot to dot.",
+          "The gradient at any point is the rate at that moment."
+        ]
+      },
+      {
+        "type": "predictThenCheck",
+        "setup": "The same reaction is repeated with acid at 20 °C and then at 30 °C.",
+        "prediction": "Will the graph reach a higher final volume, or just get there faster?",
+        "reveal": "It reaches the same final volume, but much sooner. The line is steeper and flattens earlier.",
+        "explanation": "Temperature changes how quickly the reactants are used up, not how much product there is to make. The amount of reactant is unchanged.",
+        "commonError": "Students very often draw the hotter reaction reaching a higher plateau."
+      },
+      {
+        "type": "visualiser",
+        "context": "Model answers · Drawing a tangent"
+      }
+    ],
+    "worksheetExtras": {
+      "referenceData": {
+        "headers": ["Time (s)", "Volume of gas (cm^3)"],
+        "rows": [
+          [0, 0],
+          [10, 28],
+          [20, 46],
+          [30, 58],
+          [40, 66],
+          [50, 70],
+          [60, 72],
+          [70, 72]
+        ],
+        "note": "Marble chips reacting with 1.0 mol/dm^3 hydrochloric acid at 20 °C."
+      }
+    },
+    "apply": {
+      "developing": [
+        { "q": "Name a piece of apparatus used to collect a gas.", "a": "A gas syringe.", "marks": 1, "qType": "concept" },
+        { "q": "What does a flat line on a rate graph mean?", "a": "The reaction has finished.", "marks": 1, "qType": "concept" },
+        { "q": "Which part of the graph shows the fastest rate?", "a": "The steepest part, at the very start.", "marks": 1, "qType": "concept" }
+      ],
+      "reaching": [
+        { "q": "36 cm^3 of gas is made in 30 s. Calculate the mean rate.", "a": "36 ÷ 30 = 1.2 cm^3/s", "marks": 2, "qType": "calculation", "equation": "rate = {volume/time}", "units": "cm^3/s" },
+        { "q": "Explain why the graph gets less steep over time.", "a": "The reactants are being used up, so the concentration falls and collisions become less frequent.", "marks": 3, "qType": "concept" },
+        { "q": "Describe how to find the rate at exactly 20 seconds.", "a": "Draw a tangent to the curve at 20 s and calculate its gradient.", "marks": 2, "qType": "concept" }
+      ],
+      "mastering": [
+        { "q": "Explain why raising the temperature makes the line steeper but does not raise the final volume.", "a": "Higher temperature means more frequent, more energetic collisions, so the reaction is faster. The amount of reactant is unchanged, so the same total volume of gas is made.", "marks": 4, "qType": "extended_writing", "contentType": "extended_writing" },
+        { "q": "Using the results table, calculate the mean rate over the first 20 seconds.", "a": "46 ÷ 20 = 2.3 cm^3/s", "marks": 3, "qType": "calculation", "equation": "rate = {volume/time}", "units": "cm^3/s" },
+        { "q": "A student's curve goes dot to dot. Explain why this is poor practice.", "a": "The true relationship is a smooth curve. Joining points exactly assumes every reading is perfect and hides anomalies.", "marks": 3, "qType": "concept" }
+      ]
+    },
+    "review": {
+      "questions": [
+        { "q": "What does the gradient of a rate graph tell you?", "a": "The rate of reaction at that moment." },
+        { "q": "Why does a rate graph plateau?", "a": "All of one reactant has been used up." },
+        { "q": "How do you find the rate at a single instant?", "a": "Draw a tangent and find its gradient." },
+        { "q": "State the equation for mean rate.", "a": "rate = quantity of product ÷ time" }
+      ]
+    }
+  },
+
+  {
+    "meta": {
+      "class": "10S2",
+      "year": 10,
+      "subject": "Chemistry",
+      "macrotopic": "Rate of reaction",
+      "lessonNumber": 4,
+      "topic": "Required practical: rates",
+      "title": "Required Practical: Rates",
+      "lessonType": "practical",
+      "theme": "Chemistry"
+    },
+    "title": {
+      "objectives": [
+        "Follow a method to measure rate of reaction",
+        "Record results accurately in a table",
+        "Identify the independent and dependent variables"
+      ],
+      "keywords": ["independent variable", "control variable", "anomaly", "repeat"]
+    },
+    "doNow": {
+      "variant": "A",
+      "questions": [
+        { "q": "What is the independent variable?", "a": "The one you deliberately change.", "marks": 1, "hint": "You choose its values." },
+        { "q": "What is the dependent variable?", "a": "The one you measure.", "marks": 1, "hint": "It depends on what you changed." },
+        { "q": "Why do we repeat readings?", "a": "To spot anomalies and calculate a mean, which improves accuracy.", "marks": 1, "hint": "One reading could be a fluke." },
+        { "q": "Name one hazard when using hydrochloric acid.", "a": "It is an irritant, it can damage eyes and skin.", "marks": 1, "hint": "Think about your eyes." },
+        { "q": "What is a control variable?", "a": "A variable kept the same so the test is fair.", "marks": 1, "hint": "Everything else you do not change." },
+        { "q": "What is an anomalous result?", "a": "A result that does not fit the pattern of the others.", "marks": 1, "hint": "The odd one out on your graph." }
+      ]
+    },
+    "engage": {
+      "variant": "demo",
+      "hook": "Two beakers of acid. One marble chip in each. One fizzes gently, one erupts.",
+      "content": "The chips came out of the same jar and the acid came out of the same bottle. Watch closely before you decide what is different.",
+      "imagePlaceholder": true,
+      "imageDescription": "two beakers of acid on a demo bench, one with a whole marble chip, one with crushed marble powder, one fizzing far more vigorously",
+      "prompt": "What is the only thing I changed?"
+    },
+    "learn": [
+      {
+        "variant": "A",
+        "heading": "Planning the investigation",
+        "boxes": [
+          {
+            "header": "The variables",
+            "items": [
+              "Independent: the concentration of the acid.",
+              "Dependent: the volume of gas collected in 60 s.",
+              "Control: mass of marble, size of chips, temperature, volume of acid."
+            ]
+          },
+          {
+            "header": "Safety",
+            "items": [
+              "Goggles on from the moment the acid is out.",
+              "Report any spills straight away."
+            ]
+          }
+        ],
+        "imagePlaceholder": true,
+        "imageDescription": "conical flask with delivery tube leading to a gas syringe, clamped on a stand"
+      },
+      {
+        "variant": "D",
+        "heading": "Results table",
+        "instruction": "Copy this results table into your book before you touch any equipment."
+      }
+    ],
+    "build": [
+      {
+        "type": "practical",
+        "intro": "You will measure how the concentration of acid affects the volume of gas produced in one minute.",
+        "steps": [
+          "Measure 50 cm^3 of acid into the conical flask.",
+          "Add 5 g of marble chips and immediately fit the bung.",
+          "Start the stopwatch and record the gas volume every 10 s.",
+          "Repeat with acid of a different concentration."
+        ],
+        "warning": "Hydrochloric acid is an irritant. Wear eye protection at all times. Do not lean over the flask when you fit the bung.",
+        "equipment": [
+          "Conical flask and bung with delivery tube",
+          "Gas syringe",
+          "50 cm^3 measuring cylinder",
+          "Marble chips (5 g per run)",
+          "Hydrochloric acid at three concentrations",
+          "Stopwatch",
+          "Eye protection"
+        ],
+        "imagePlaceholder": true,
+        "imageDescription": "labelled apparatus: conical flask, bung, delivery tube, gas syringe on a clamp stand",
+        "questions": [
+          { "q": "Why must the bung be fitted immediately?", "a": "Gas escapes before the syringe can collect it, so the readings would be too low." },
+          { "q": "Why is the mass of marble kept the same each time?", "a": "It is a control variable. Changing it would change the surface area and make the test unfair." },
+          { "q": "Suggest one way to improve the accuracy of the timing.", "a": "Use a data logger, or have one person watch the syringe and another read the stopwatch." }
+        ]
+      },
+      {
+        "type": "correctTheStatement",
+        "instruction": "Every one of these statements is wrong. Write the corrected version.",
+        "jitterProfile": 3,
+        "statements": [
+          { "text": "The gas syringe measures the mass of gas produced.", "correction": "The gas syringe measures the volume of gas produced." },
+          { "text": "You should use a different mass of marble each time.", "correction": "The mass of marble must be kept the same. It is a control variable." },
+          { "text": "An anomaly should be included when you calculate the mean.", "correction": "An anomaly should be identified and excluded from the mean." },
+          { "text": "Concentrated acid makes more gas in total than dilute acid.", "correction": "Concentrated acid makes the gas faster, but the total volume depends on the amount of marble." }
+        ]
+      }
+    ],
+    "worksheetExtras": {
+      "referenceData": {
+        "headers": ["Concentration (mol/dm^3)", "Volume of gas in 60 s (cm^3)"],
+        "rows": [
+          [0.5, 22],
+          [1.0, 44],
+          [1.5, 65],
+          [2.0, 88]
+        ],
+        "note": "Class results, mean of three repeats."
+      }
+    },
+    "apply": {
+      "developing": [
+        { "q": "Name the independent variable in this practical.", "a": "The concentration of the acid.", "marks": 1, "qType": "concept" },
+        { "q": "Name the dependent variable.", "a": "The volume of gas collected.", "marks": 1, "qType": "concept" },
+        { "q": "State one control variable.", "a": "Mass of marble chips, temperature, or volume of acid.", "marks": 1, "qType": "concept" }
+      ],
+      "reaching": [
+        { "q": "Explain why goggles must be worn.", "a": "Hydrochloric acid is an irritant and could damage the eyes if it splashed.", "marks": 2, "qType": "concept" },
+        { "q": "Explain why the results are repeated three times.", "a": "Repeats allow anomalies to be spotted and a mean to be calculated, which improves accuracy.", "marks": 2, "qType": "concept" },
+        { "q": "Using the table, describe the pattern in the results.", "a": "As concentration increases, the volume of gas made in 60 s increases, roughly in proportion.", "marks": 3, "qType": "concept" }
+      ],
+      "mastering": [
+        { "q": "Design a method to investigate the effect of surface area instead of concentration.", "a": "Keep concentration, volume of acid, mass of marble and temperature the same. Change only the chip size, from large chips to small chips to powder. Measure the gas volume every 10 s for 60 s and repeat three times.", "marks": 6, "qType": "practical_design", "contentType": "new_procedure" },
+        { "q": "One group recorded 44 cm^3 at 0.5 mol/dm^3. Explain whether this is an anomaly.", "a": "Yes. The pattern shows roughly 22 cm^3 at that concentration, so 44 cm^3 is double the expected value and does not fit the trend.", "marks": 3, "qType": "concept" },
+        { "q": "Explain why doubling the concentration roughly doubles the volume of gas made in 60 s.", "a": "Doubling the concentration doubles the number of acid particles in the same volume, so collisions with the marble are twice as frequent and the reaction runs twice as fast.", "marks": 4, "qType": "extended_writing", "contentType": "extended_writing" }
+      ]
+    }
+  },
+
+  {
+    "meta": {
+      "class": "10S2",
+      "year": 10,
+      "subject": "Chemistry",
+      "macrotopic": "Rate of reaction",
+      "lessonNumber": 5,
+      "topic": "Rate of reaction test review",
+      "title": "Rates Test Review",
+      "lessonType": "review",
+      "theme": "Chemistry"
+    },
+    "title": {
+      "objectives": [
+        "Identify why marks were lost in the test",
+        "Use the mark scheme to improve an answer",
+        "Correct your own working on calculation questions"
+      ],
+      "keywords": ["mark scheme", "indicative content", "working", "units"]
+    },
+    "doNow": {
+      "variant": "A",
+      "questions": [
+        { "q": "State the equation for mean rate of reaction.", "a": "rate = quantity of product ÷ time", "marks": 1, "hint": "How much, divided by how long." },
+        { "q": "What must a collision have to be successful?", "a": "At least the activation energy.", "marks": 1, "hint": "Enough of something." },
+        { "q": "Give the unit of rate when a gas is collected.", "a": "cm^3/s", "marks": 1, "hint": "Volume over time." },
+        { "q": "What does a catalyst do to the activation energy?", "a": "It lowers it, by providing a different pathway.", "marks": 1, "hint": "It makes success easier." },
+        { "q": "Why does a rate graph go flat?", "a": "The reaction has finished, a reactant has been used up.", "marks": 1, "hint": "Nothing left to react." },
+        { "q": "Name two factors that increase rate.", "a": "Any two of temperature, concentration, surface area, catalyst.", "marks": 1, "hint": "Think about the four factors." }
+      ]
+    },
+    "learn": [
+      {
+        "variant": "A",
+        "heading": "Where the marks went",
+        "boxes": [
+          {
+            "header": "Most marks were lost on",
+            "items": [
+              "Not giving units in calculation answers.",
+              "Saying 'faster' without saying why in terms of collisions.",
+              "Confusing 'more collisions' with 'more energetic collisions'."
+            ]
+          },
+          {
+            "header": "Done well",
+            "items": [
+              "Reading values off the graph accurately.",
+              "Naming the four factors."
+            ]
+          }
+        ],
+        "imagePlaceholder": true,
+        "imageDescription": "bar chart of class performance by question number"
+      },
+      {
+        "variant": "E",
+        "heading": "What the mark scheme actually wanted",
+        "comparison": {
+          "aTitle": "What most people wrote",
+          "bTitle": "What earned the mark",
+          "rows": [
+            { "a": "It gets faster", "b": "The rate increases because collisions are more frequent" },
+            { "a": "There is more energy", "b": "A greater proportion of collisions exceed the activation energy" },
+            { "a": "rate = 1.2", "b": "rate = 1.2 cm^3/s" },
+            { "a": "The powder has more surface", "b": "The powder has a larger surface area, so more particles are exposed" }
+          ]
+        }
+      }
+    ],
+    "build": [
+      {
+        "type": "modelAnswerReview",
+        "questionNumber": "2.3",
+        "marks": 3,
+        "qType": "short",
+        "jitterProfile": 1,
+        "modelAnswer": "Powder has a bigger surface area. More particles are exposed to the acid. So collisions happen more often and the rate goes up.",
+        "indicativeContent": [
+          { "text": "larger <u>surface area</u>", "group": "observation" },
+          { "text": "more particles <u>exposed</u> to the acid", "group": "explanation" },
+          { "text": "collisions are more <u>frequent</u> **so** rate increases", "group": "explanation" }
+        ],
+        "doesNotAward": [
+          "more collisions with more energy (energy is unchanged by surface area)",
+          "the powder is more concentrated"
+        ]
+      },
+      {
+        "type": "modelAnswerReview",
+        "questionNumber": "4.1",
+        "marks": 4,
+        "qType": "calculation",
+        "jitterProfile": 3,
+        "modelAnswer": [
+          "rate = {volume/time}",
+          "volume = 48 cm^3",
+          "time = 40 s",
+          "rate = 48 ÷ 40",
+          "rate = 1.2 cm^3/s"
+        ],
+        "indicativeContent": [
+          { "text": "correct equation quoted", "group": "substitution" },
+          { "text": "values read correctly from the graph", "group": "substitution" },
+          { "text": "1.2", "group": "answer" },
+          { "text": "<u>cm^3/s</u>", "group": "answer" }
+        ],
+        "doesNotAward": ["answer with no unit", "40 ÷ 48 = 0.83"],
+        "ecfNote": "If the volume was misread from the graph, full ecf is given for a correct division and unit."
+      },
+      {
+        "type": "modelAnswerReview",
+        "questionNumber": "5.2",
+        "marks": 3,
+        "qType": "graph",
+        "jitterProfile": 0,
+        "modelAnswer": "The curve is steepest at the start and flattens by 60 s.",
+        "graphData": {
+          "headers": ["Time (s)", "Volume of gas (cm^3)"],
+          "rows": [
+            [0, 0],
+            [10, 28],
+            [20, 46],
+            [30, 58],
+            [40, 66],
+            [50, 70],
+            [60, 72],
+            [70, 72]
+          ]
+        },
+        "indicativeContent": [
+          { "text": "all points plotted <u>accurately</u>", "group": "plotting" },
+          { "text": "smooth <u>curve</u> of best fit, not dot to dot", "group": "plotting" },
+          { "text": "curve flattens to a plateau", "group": "interpretation" }
+        ],
+        "doesNotAward": ["straight line of best fit", "points joined dot to dot"]
+      },
+      {
+        "type": "markTheAnswers",
+        "questionNumber": "6",
+        "marks": 6,
+        "question": "Explain, in terms of particles, why increasing the temperature increases the rate of a reaction.",
+        "instruction": "Mark each answer against the scheme. Give it a level and a mark out of 6.",
+        "levelDescriptors": [
+          { "level": "Level 3", "range": "5–6 marks", "desc": "Clear explanation linking temperature to both collision frequency and collision energy, with reference to activation energy." },
+          { "level": "Level 2", "range": "3–4 marks", "desc": "Links temperature to particle speed and to either frequency or energy of collisions, but not both." },
+          { "level": "Level 1", "range": "1–2 marks", "desc": "Simple statements about particles moving faster, with little or no link to rate." }
+        ],
+        "indicativeContent": [
+          { "text": "particles gain <u>kinetic energy</u>", "group": "collision theory" },
+          { "text": "particles move <u>faster</u>", "group": "collision theory" },
+          { "text": "collisions are more <u>frequent</u>", "group": "collision theory" },
+          { "text": "a greater proportion of collisions have the <u>activation energy</u>", "group": "energy" },
+          { "text": "so more collisions are <u>successful</u>", "group": "energy" },
+          { "text": "**therefore** the rate increases", "group": "conclusion" }
+        ],
+        "doesNotAward": [
+          "the particles get bigger",
+          "there are more particles when it is hotter",
+          "heat makes the reaction want to happen more"
+        ],
+        "samples": [
+          {
+            "label": "Student A",
+            "text": "The particles move faster when its hotter so they hit each other more. This makes the reaction go quicker.",
+            "jitterProfile": 1,
+            "awardedLevel": "Level 2",
+            "awardedMarks": 3,
+            "hits": ["particles move faster", "collisions are more frequent"],
+            "misses": ["activation energy", "proportion of successful collisions"],
+            "comment": "Frequency only. No mention of collision energy or activation energy, so it cannot reach Level 3."
+          },
+          {
+            "label": "Student B",
+            "text": "When you heat it up there is more particles in the beaker so they collide more and the rate goes up.",
+            "jitterProfile": 3,
+            "awardedLevel": "Level 1",
+            "awardedMarks": 1,
+            "hits": ["collisions are more frequent"],
+            "misses": ["kinetic energy", "activation energy", "successful collisions"],
+            "comment": "Carries the classic misconception that heating creates more particles. Credit only for the frequency idea."
+          },
+          {
+            "label": "Student C",
+            "text": "Heating gives the particles more kinetic energy so they move faster and collide more often. More of the collisions have enough energy to get over the activation energy, so more collisions are successful and the rate increases.",
+            "jitterProfile": 2,
+            "awardedLevel": "Level 3",
+            "awardedMarks": 6,
+            "hits": ["kinetic energy", "particles move faster", "collisions more frequent", "activation energy", "successful collisions", "rate increases"],
+            "misses": [],
+            "comment": "Both strands covered and linked to activation energy. Full marks."
+          }
+        ]
+      }
+    ],
+    "apply": {
+      "developing": [
+        { "q": "State the unit of rate when gas volume is measured.", "a": "cm^3/s", "marks": 1, "qType": "concept" },
+        { "q": "Name the four factors that affect rate.", "a": "Temperature, concentration, surface area, catalyst.", "marks": 2, "qType": "concept" },
+        { "q": "What is activation energy?", "a": "The minimum energy needed for a collision to be successful.", "marks": 1, "qType": "concept" }
+      ],
+      "reaching": [
+        { "q": "Rewrite this answer to earn the mark: 'It goes faster because it is hot.'", "a": "The particles gain kinetic energy and move faster, so collisions are more frequent and more of them exceed the activation energy.", "marks": 3, "qType": "extended_writing" },
+        { "q": "60 cm^3 of gas is made in 25 s. Calculate the mean rate.", "a": "60 ÷ 25 = 2.4 cm^3/s", "marks": 2, "qType": "calculation", "equation": "rate = {volume/time}", "units": "cm^3/s" },
+        { "q": "Explain why a catalyst increases the rate.", "a": "It provides an alternative pathway with a lower activation energy, so more collisions are successful.", "marks": 3, "qType": "concept" }
+      ],
+      "mastering": [
+        { "q": "Explain fully why surface area and temperature both increase rate, but for different reasons.", "a": "Surface area increases the number of exposed particles, so collisions are more frequent. The energy of each collision is unchanged. Temperature increases both the frequency of collisions and the energy of each one, so a greater proportion exceed the activation energy.", "marks": 6, "qType": "extended_writing", "contentType": "extended_writing" },
+        { "q": "A student divided time by volume. Explain the error and give the correct working.", "a": "Rate is quantity divided by time, not the other way round. rate = 48 ÷ 40 = 1.2 cm^3/s.", "marks": 3, "qType": "calculation" },
+        { "q": "Explain why a rate graph plateaus at the same height regardless of temperature.", "a": "The plateau height depends on the amount of reactant, which is unchanged. Temperature only changes how quickly that amount is used up.", "marks": 4, "qType": "extended_writing" }
+      ]
+    }
+  },
+
+  {
+    "meta": {
+      "class": "9AB",
+      "year": 9,
+      "subject": "Biology",
+      "macrotopic": "Organisation",
+      "lessonNumber": 6,
+      "topic": "Enzymes",
+      "title": "Enzymes",
+      "lessonType": "standard",
+      "theme": "Biology"
+    },
+    "title": {
+      "objectives": [
+        "Describe an enzyme as a biological catalyst",
+        "Explain the lock and key model",
+        "Describe the effect of temperature on an enzyme"
+      ],
+      "keywords": ["enzyme", "substrate", "active site", "denature"]
+    },
+    "doNow": {
+      "variant": "A",
+      "questions": [
+        { "q": "What is a catalyst?", "a": "A substance that speeds up a reaction without being used up.", "marks": 1, "hint": "It helps but is not consumed." },
+        { "q": "Name the enzyme that breaks down starch.", "a": "Amylase.", "marks": 1, "hint": "It is in your saliva." },
+        { "q": "What are enzymes made of?", "a": "Protein.", "marks": 1, "hint": "One of the three food groups." },
+        { "q": "Where in the body is amylase produced?", "a": "Salivary glands and the pancreas.", "marks": 1, "hint": "Starts working in your mouth." },
+        { "q": "What is the normal human body temperature?", "a": "37 °C.", "marks": 1, "hint": "Just under 40." },
+        { "q": "What does 'denature' mean?", "a": "The enzyme's shape changes so it no longer works.", "marks": 1, "hint": "Think about frying an egg." }
+      ]
+    },
+    "engage": {
+      "variant": "video",
+      "hook": "Your body makes tens of thousands of different enzymes. Each one only ever does a single job.",
+      "content": "Without them, digesting a single meal would take years rather than hours. They are the reason biology happens at a useful speed.",
+      "imagePlaceholder": true,
+      "imageDescription": "3D molecular render of an enzyme with a substrate fitting into its active site",
+      "videoLink": {
+        "text": "Enzymes and the lock and key model (4 min)",
+        "url": "https://www.bbc.co.uk/bitesize/enzymes"
+      },
+      "prompt": "Why would a 'one enzyme fits all' body be a disaster?"
+    },
+    "learn": [
+      {
+        "variant": "H",
+        "heading": "Enzymes and the active site",
+        "videoLink": {
+          "text": "Enzymes and the lock and key model (4 min)",
+          "url": "https://www.bbc.co.uk/bitesize/enzymes"
+        },
+        "toWatch": [
+          "How the substrate fits into the active site.",
+          "Why an enzyme only works on one substrate.",
+          "What happens to the active site when it is heated too far."
+        ],
+        "prompt": "Pause at 2:10. What is happening to the shape of the active site?",
+        "questions": [
+          { "q": "What is the active site?", "a": "The part of the enzyme where the substrate binds." },
+          { "q": "Why is an enzyme specific?", "a": "Its active site is a complementary shape to only one substrate." },
+          { "q": "What happens above the optimum temperature?", "a": "The active site changes shape and the enzyme denatures, so it no longer works." },
+          { "q": "Is a denatured enzyme dead?", "a": "Enzymes are not alive. The change is permanent, so it cannot work again." }
+        ]
+      }
+    ],
+    "apply": {
+      "developing": [
+        { "q": "Define the term enzyme.", "a": "A biological catalyst that speeds up reactions in the body.", "marks": 2, "qType": "concept" },
+        { "q": "Name the part of the enzyme the substrate binds to.", "a": "The active site.", "marks": 1, "qType": "concept" },
+        { "q": "State the optimum temperature for most human enzymes.", "a": "37 °C.", "marks": 1, "qType": "concept" }
+      ],
+      "reaching": [
+        { "q": "Explain why an enzyme only works on one substrate.", "a": "The active site has a specific shape that only one substrate is complementary to.", "marks": 3, "qType": "concept" },
+        { "q": "Describe what happens to an enzyme at 80 °C.", "a": "The active site changes shape, the enzyme denatures and can no longer bind the substrate.", "marks": 3, "qType": "concept" },
+        { "q": "Explain why enzyme activity is low at 5 °C.", "a": "Particles have little kinetic energy, so enzyme and substrate collide less often.", "marks": 2, "qType": "concept" }
+      ],
+      "mastering": [
+        { "q": "Explain the shape of a graph of enzyme activity against temperature.", "a": "Activity rises to the optimum because collisions become more frequent. Above the optimum the active site denatures, so activity falls sharply to zero.", "marks": 5, "qType": "extended_writing", "contentType": "extended_writing" },
+        { "q": "A student says a denatured enzyme can be cooled back down and reused. Evaluate this.", "a": "This is wrong. Denaturing permanently changes the shape of the active site, so cooling does not restore it.", "marks": 3, "qType": "concept" },
+        { "q": "Suggest why enzymes in a hot spring bacterium work at 80 °C.", "a": "Their enzymes have a different structure with a higher optimum temperature, so the active site does not denature at 80 °C.", "marks": 3, "qType": "concept" }
+      ]
+    }
+  },
+
+  {
+    "meta": {
+      "class": "7BYA",
+      "year": 7,
+      "subject": "Biology",
+      "macrotopic": "Cells",
+      "lessonNumber": 7,
+      "topic": "Animal and plant cells",
+      "title": "Animal and Plant Cells",
+      "lessonType": "standard",
+      "theme": "Biology"
+    },
+    "title": {
+      "objectives": [
+        "Name the parts of an animal cell",
+        "Name the extra parts found in a plant cell",
+        "Describe the job of each part"
+      ],
+      "keywords": ["nucleus", "cytoplasm", "membrane", "chloroplast", "cell wall"]
+    },
+    "doNow": {
+      "variant": "A",
+      "questions": [
+        { "q": "What is the smallest unit of a living thing?", "a": "A cell.", "marks": 1, "hint": "You need a microscope to see one." },
+        { "q": "Name one thing all living things do.", "a": "Any of MRS GREN: move, respire, sense, grow, reproduce, excrete, nutrition.", "marks": 1, "hint": "Think MRS GREN." },
+        { "q": "What do we use to look at cells?", "a": "A microscope.", "marks": 1, "hint": "It magnifies." },
+        { "q": "Are plants made of cells?", "a": "Yes, all living things are made of cells.", "marks": 1, "hint": "Everything alive is." },
+        { "q": "What colour are most plant leaves?", "a": "Green.", "marks": 1, "hint": "Because of chlorophyll." },
+        { "q": "What gas do plants need to make food?", "a": "Carbon dioxide.", "marks": 1, "hint": "We breathe it out." }
+      ]
+    },
+    "engage": {
+      "variant": "oddOneOut",
+      "hook": "Nucleus. Cytoplasm. Chloroplast. Cell membrane. One of these does not belong in an animal cell.",
+      "content": "All four of these are real parts of a cell, and three of them are in every animal cell in your body right now.",
+      "imagePlaceholder": true,
+      "imageDescription": "four labelled cell parts side by side: nucleus, cytoplasm, chloroplast, cell membrane",
+      "prompt": "Which is the odd one out, and how do you know?"
+    },
+    "learn": [
+      {
+        "variant": "A",
+        "heading": "Parts of a cell",
+        "boxes": [
+          {
+            "header": "In every cell",
+            "items": [
+              "Nucleus: controls the cell and holds the DNA.",
+              "Cytoplasm: jelly where the reactions happen.",
+              "Cell membrane: controls what goes in and out."
+            ]
+          },
+          {
+            "header": "Only in plant cells",
+            "items": [
+              "Cell wall: made of cellulose, gives support.",
+              "Chloroplast: where photosynthesis happens.",
+              "Vacuole: stores sap and keeps the cell firm."
+            ]
+          }
+        ],
+        "keywords": ["nucleus", "cytoplasm", "membrane", "chloroplast", "cell wall", "vacuole"],
+        "imagePlaceholder": true,
+        "imageDescription": "side by side labelled diagrams of a typical animal cell and a typical plant cell"
+      }
+    ],
+    "apply": {
+      "developing": [
+        { "q": "Name the part of the cell that controls it.", "a": "The nucleus.", "marks": 1, "qType": "concept" },
+        { "q": "Name two parts found in both animal and plant cells.", "a": "Any two of: nucleus, cytoplasm, cell membrane.", "marks": 2, "qType": "concept" },
+        { "q": "What is the job of the cell membrane?", "a": "It controls what enters and leaves the cell.", "marks": 1, "qType": "concept" }
+      ],
+      "reaching": [
+        { "q": "Name three parts found only in plant cells.", "a": "Cell wall, chloroplast, vacuole.", "marks": 3, "qType": "concept" },
+        { "q": "Explain why plant cells have chloroplasts but animal cells do not.", "a": "Plants make their own food by photosynthesis, which happens in the chloroplasts. Animals eat their food instead.", "marks": 2, "qType": "concept" },
+        { "q": "What is the job of the cell wall?", "a": "It supports the cell and stops it bursting.", "marks": 1, "qType": "concept" }
+      ],
+      "mastering": [
+        { "q": "A cell is seen under a microscope. It has a nucleus and a cell wall. Explain what type of cell it must be.", "a": "It must be a plant cell, because only plant cells have a cell wall. The nucleus shows it is not a bacterium.", "marks": 3, "qType": "concept" },
+        { "q": "Explain why a plant wilts when it is not watered.", "a": "The vacuoles lose water and shrink, so the cells are no longer firm and cannot support the plant.", "marks": 3, "qType": "concept" },
+        { "q": "Root cells have no chloroplasts. Suggest why.", "a": "Roots are underground, so they get no light. Chloroplasts would be useless because photosynthesis needs light.", "marks": 3, "qType": "concept" }
+      ]
+    }
+  },
+
+  {
+    "meta": {
+      "class": "10S2",
+      "year": 10,
+      "subject": "Chemistry",
+      "macrotopic": "Rate of reaction",
+      "lessonNumber": 8,
+      "topic": "Rates revision",
+      "title": "Rates Revision",
+      "lessonType": "revision",
+      "theme": "Chemistry"
+    },
+    "title": {
+      "objectives": [
+        "Recall the four factors that affect rate",
+        "Apply collision theory to unfamiliar examples",
+        "Answer exam questions under time pressure"
+      ],
+      "keywords": ["collision", "activation energy", "catalyst", "gradient"]
+    },
+    "doNow": {
+      "variant": "A",
+      "questions": [
+        { "q": "State the four factors that affect rate.", "a": "Temperature, concentration, surface area, catalyst.", "marks": 2, "hint": "Two are about the particles, two are about the conditions." },
+        { "q": "Define activation energy.", "a": "The minimum energy needed for a successful collision.", "marks": 1, "hint": "The minimum." },
+        { "q": "How does a catalyst work?", "a": "It provides an alternative pathway with a lower activation energy.", "marks": 2, "hint": "It does not push, it makes the hill smaller." },
+        { "q": "What does the gradient of a rate graph show?", "a": "The rate at that moment.", "marks": 1, "hint": "Steepness." },
+        { "q": "Why does rate fall as a reaction proceeds?", "a": "Reactants are used up, so collisions are less frequent.", "marks": 2, "hint": "What is running out?" },
+        { "q": "State the equation for mean rate.", "a": "rate = quantity of product ÷ time", "marks": 1, "hint": "How much over how long." }
+      ]
+    },
+    "learn": [
+      {
+        "variant": "A",
+        "heading": "The four factors",
+        "boxes": [
+          {
+            "header": "Frequency only",
+            "items": [
+              "Concentration: more particles in the same volume.",
+              "Surface area: more particles exposed.",
+              "Pressure (gases): particles pushed closer together."
+            ]
+          },
+          {
+            "header": "Frequency and energy",
+            "items": [
+              "Temperature: particles move faster AND collide harder.",
+              "Catalyst: lowers the activation energy needed."
+            ]
+          }
+        ],
+        "imagePlaceholder": true,
+        "imageDescription": "summary diagram of the four rate factors with particle pictures"
+      },
+      {
+        "variant": "B",
+        "heading": "Learn these three sentences",
+        "toWrite": [
+          "Increasing concentration increases the frequency of collisions.",
+          "Increasing temperature increases both the frequency and the energy of collisions.",
+          "A catalyst lowers the activation energy, so a greater proportion of collisions are successful."
+        ]
+      },
+      {
+        "variant": "E",
+        "heading": "Exam command words",
+        "comparison": {
+          "aTitle": "Describe",
+          "bTitle": "Explain",
+          "rows": [
+            { "a": "Say what happens", "b": "Say why it happens" },
+            { "a": "The rate increases", "b": "The rate increases because collisions are more frequent" },
+            { "a": "No 'because' needed", "b": "Must link cause to effect" },
+            { "a": "The line gets steeper", "b": "The line gets steeper because the reaction is faster" }
+          ]
+        }
+      },
+      {
+        "variant": "F",
+        "heading": "The one equation you must know",
+        "equation": "rate = {quantity of product/time}",
+        "components": [
+          { "symbol": "rate", "name": "Mean rate", "unit": "g/s or cm^3/s" },
+          { "symbol": "quantity", "name": "Mass or volume of product", "unit": "g or cm^3" },
+          { "symbol": "time", "name": "Time", "unit": "s" }
+        ],
+        "rearrangements": ["quantity = rate × time", "time = {quantity/rate}"],
+        "example": "72 cm^3 in 60 s gives rate = 72 ÷ 60 = 1.2 cm^3/s."
+      },
+      {
+        "variant": "G",
+        "heading": "How to answer a 6 mark rate question",
+        "steps": [
+          { "label": "Name the factor", "note": "temperature, concentration, surface area or catalyst" },
+          { "label": "Say what it does to the particles", "note": "faster, closer, more exposed" },
+          { "label": "Link to collisions", "note": "more frequent, more energetic, or both" },
+          { "label": "Mention activation energy", "note": "a greater proportion are successful" },
+          { "label": "State the effect on rate", "note": "therefore the rate increases" }
+        ]
+      }
+    ],
+    "whiteboard": {
+      "rounds": [
+        { "q": "A reaction produces 90 cm^3 of gas in 45 s. Calculate the mean rate.", "a": "90 ÷ 45 = 2.0 cm^3/s", "subject": "Chemistry" },
+        { "q": "Explain why powdered zinc reacts faster than a lump of zinc.", "a": "Larger surface area, more particles exposed, collisions are more frequent.", "subject": "Chemistry" },
+        { "q": "Why does a catalyst not get used up?", "a": "It is not a reactant. It provides a lower energy pathway and is chemically unchanged at the end.", "subject": "Chemistry" },
+        { "q": "A rate graph flattens after 50 s. What does this tell you?", "a": "The reaction has finished, one of the reactants has been completely used up.", "subject": "Chemistry" }
+      ]
+    },
+    "build": [
+      {
+        "type": "visualiser",
+        "context": "Model answers · 6 mark rate question"
+      }
+    ],
+    "apply": {
+      "variant": "C",
+      "developing": [
+        { "q": "Name the four factors that affect rate.", "a": "Temperature, concentration, surface area, catalyst.", "marks": 2, "qType": "concept" },
+        { "q": "State the unit of rate when gas is collected.", "a": "cm^3/s", "marks": 1, "qType": "concept" },
+        { "q": "What is a catalyst?", "a": "A substance that speeds up a reaction without being used up.", "marks": 1, "qType": "concept" }
+      ],
+      "reaching": [
+        { "q": "84 cm^3 of gas is made in 40 s. Calculate the mean rate.", "a": "84 ÷ 40 = 2.1 cm^3/s", "marks": 2, "qType": "calculation", "equation": "rate = {volume/time}", "units": "cm^3/s" },
+        { "q": "Explain why concentration affects rate.", "a": "More particles in the same volume means collisions are more frequent, so the rate increases.", "marks": 3, "qType": "concept" },
+        { "q": "Explain how a catalyst increases rate.", "a": "It provides an alternative pathway with a lower activation energy, so a greater proportion of collisions are successful.", "marks": 3, "qType": "concept" }
+      ],
+      "mastering": [
+        { "q": "Explain fully, in terms of collisions, why increasing temperature increases the rate.", "a": "Particles gain kinetic energy and move faster, so collisions are more frequent. They also collide more energetically, so a greater proportion of collisions exceed the activation energy and are successful. Both effects increase the rate.", "marks": 6, "qType": "extended_writing", "contentType": "extended_writing" },
+        { "q": "Compare the effect of surface area and temperature on collision energy.", "a": "Surface area changes only the frequency of collisions. Temperature changes both the frequency and the energy of collisions.", "marks": 4, "qType": "extended_writing" },
+        { "q": "A student claims a catalyst lowers the temperature needed. Evaluate.", "a": "Partly right. A catalyst lowers the activation energy, so the reaction can run at a lower temperature, but it does not change the temperature itself.", "marks": 3, "qType": "concept" }
+      ]
+    }
+  }
+]

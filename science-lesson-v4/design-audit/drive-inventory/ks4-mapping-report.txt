@@ -1,0 +1,142 @@
+====================================================================================================
+SUBJECT: Physics
+====================================================================================================
+
+  P1 Energy
+    -> Year 10/Physics/P1 Energy   (existing folders: 0)
+    pack: 12 lessons, 0 DIRT, 2 support folders
+    -> 0 match, 12 new, 0 tagged (Separate)
+
+  P2 Electricity
+    -> Year 10/Physics/P2 Electricity   (existing folders: 0)
+    pack: 16 lessons, 0 DIRT, 7 support folders
+    -> 0 match, 16 new, 0 tagged (Separate)
+
+  P3 The Particle Model
+    -> Year 9/Physics/P3 Particles   (existing folders: 12)
+    pack: 12 lessons, 1 DIRT, 1 support folders
+    -> 9 match, 3 new, 0 tagged (Separate)
+
+  P4 Atomic structure
+    -> Year 9/Physics/P4 Atomic Strucutre   (existing folders: 11)
+    pack: 12 lessons, 0 DIRT, 1 support folders
+    -> 11 match, 1 new, 0 tagged (Separate)
+
+  P5 Forces
+    -> Year 10/Physics/P5 Forces   (existing folders: 0)
+    pack: 21 lessons, 2 DIRT, 4 support folders
+    -> 0 match, 21 new, 0 tagged (Separate)
+
+  P6 Waves
+    -> Year 11/Physics/P6 Waves   (existing folders: 0)
+    pack: 15 lessons, 0 DIRT, 1 support folders
+    -> 0 match, 15 new, 6 tagged (Separate)
+
+  P7 Magnetism
+    -> Year 11/Physics/P7 Magnetism   (existing folders: 0)
+    pack: 12 lessons, 2 DIRT, 2 support folders
+    -> 0 match, 12 new, 0 tagged (Separate)
+
+  P8 Space
+    -> Year 11/Physics/P8 Space   (existing folders: 0)
+    pack: 5 lessons, 0 DIRT, 2 support folders
+    -> 0 match, 5 new, 0 tagged (Separate)
+====================================================================================================
+SUBJECT: Chemistry
+====================================================================================================
+
+  C1 Atomic structure and the periodic table
+    -> Year 9/Chemistry/C1 Atomic Structure   (existing folders: 14)
+    pack: 13 lessons, 2 DIRT, 2 support folders
+    -> 13 match, 0 new, 0 tagged (Separate)
+
+  C2 Bonding, structure and the properties of matter
+    -> Year 9/Chemistry/C2 Bonding and Structure   (existing folders: 0)
+    pack: 14 lessons, 0 DIRT, 2 support folders
+    -> 0 match, 14 new, 0 tagged (Separate)
+
+  C3 Quantitative chemistry
+    -> Year 10/Chemistry/C3 Quantitative Chemistry   (existing folders: 0)
+    pack: 0 lessons, 0 DIRT, 22 support folders
+    -> 0 match, 0 new, 0 tagged (Separate)
+
+  C4 Chemical changes
+    -> Year 10/Chemistry/C4 Chemical Changes   (existing folders: 0)
+    pack: 16 lessons, 2 DIRT, 3 support folders
+    -> 0 match, 16 new, 1 tagged (Separate)
+
+  C5 Energy changes
+    -> Year 10/Chemistry/C5 Energy Changes   (existing folders: 0)
+    pack: 10 lessons, 2 DIRT, 3 support folders
+    -> 0 match, 10 new, 4 tagged (Separate)
+
+  C6 The rate and extent of chemical change
+    -> Year 11/Chemistry/C6 The rate and extent of chemical change   (existing folders: 0)
+    pack: 8 lessons, 1 DIRT, 4 support folders
+    -> 0 match, 8 new, 0 tagged (Separate)
+
+  C7 Organic Chemistry
+    -> Year 11/Chemistry/C7 Organic Chemistry   (existing folders: 0)
+    pack: 13 lessons, 1 DIRT, 1 support folders
+    -> 0 match, 13 new, 6 tagged (Separate)
+
+  C8 Chemical Analysis
+    -> Year 11/Chemistry/C8 Chemical Analysis   (existing folders: 0)
+    pack: 8 lessons, 1 DIRT, 1 support folders
+    -> 0 match, 8 new, 3 tagged (Separate)
+
+  C9 Atmosphere
+    -> Year 11/Chemistry/C9 Atmosphere   (existing folders: 0)
+    pack: 8 lessons, 1 DIRT, 2 support folders
+    -> 0 match, 8 new, 0 tagged (Separate)
+
+  C10 Using Resources
+    -> Year 11/Chemistry/C10 Using Resources   (existing folders: 0)
+    pack: 9 lessons, 1 DIRT, 3 support folders
+    -> 0 match, 9 new, 0 tagged (Separate)
+====================================================================================================
+SUBJECT: Biology
+====================================================================================================
+
+  B1 Cell Biology
+    -> Year 9/Biology/B1 Cells   (existing folders: 0)
+    pack: 15 lessons, 3 DIRT, 1 support folders
+    -> 0 match, 15 new, 0 tagged (Separate)
+
+  B2 Organisation
+    -> Year 9/Biology/B2 Organisation   (existing folders: 0)
+    pack: 13 lessons, 2 DIRT, 1 support folders
+    -> 0 match, 13 new, 0 tagged (Separate)
+
+  B3 Infection and response
+    -> Year 10/Biology/B3 Infection and Response   (existing folders: 0)
+    pack: 11 lessons, 2 DIRT, 4 support folders
+    -> 0 match, 11 new, 0 tagged (Separate)
+
+  B4 Bioenergetics and plant tissues
+    -> Year 10/Biology/B4 Bioenergetics and Plants   (existing folders: 0)
+    pack: 15 lessons, 2 DIRT, 5 support folders
+    -> 0 match, 15 new, 0 tagged (Separate)
+
+  B5 Homeostasis and response
+    -> Year 10/Biology/B5 Homeostasis   (existing folders: 0)
+    pack: 0 lessons, 0 DIRT, 17 support folders
+    -> 0 match, 0 new, 0 tagged (Separate)
+
+  B6 Inheritance, variation and evolution
+    -> Year 11/Biology/B6 Inheritance, variation and evolution   (existing folders: 0)
+    pack: 0 lessons, 0 DIRT, 17 support folders
+    -> 0 match, 0 new, 0 tagged (Separate)
+
+  B7 Ecology
+    -> Year 11/Biology/B7 Ecology   (existing folders: 0)
+    pack: 11 lessons, 3 DIRT, 2 support folders
+    -> 0 match, 11 new, 0 tagged (Separate)
+
+====================================================================================================
+SUMMARY
+====================================================================================================
+  Year 10: 0 matched, 101 new lessons, 5 tagged (Separate)
+  Year 11: 0 matched, 89 new lessons, 15 tagged (Separate)
+  Year 9: 33 matched, 46 new lessons, 0 tagged (Separate)
+  total lesson files (excl. top-level material): 3851

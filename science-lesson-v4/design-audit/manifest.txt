@@ -1,0 +1,143 @@
+
+===== Animal-and-plant-cells =====
+   1  Animal and Plant Cells | Year 7 · Biology | Learning Objectives: | 1. Name the parts of an animal cell
+   2  ☞ Purple pen time · mark and correct your answers | What is the smallest unit of a living thing? | A cell. | N
+   3  ENGAGE · ODD ONE OUT | Nucleus. Cytoplasm. Chloroplast. Cell membrane. One of these does not belong in an anim
+   4  LEARN · PARTS OF A CELL | In every cell | Nucleus: controls the cell and holds the DNA. | Cytoplasm: jelly whe
+   5  IPEVO Visualiser | Model answers under the visualiser · Animal and plant cells | https://apps.ipevo.com/pwa/vi
+   6  APPLY · CHOOSE YOUR LEVEL | Read more — Activate 1, pp. 14–16 | DEVELOPING | Q1
+   7  Review · DEVELOPING | ☞ Purple pen time · mark and correct your answers | Name the part of the cell that contr
+   8  Review · REACHING | ☞ Purple pen time · mark and correct your answers | Name three parts found only in plant c
+   9  Review · MASTERING | ☞ Purple pen time · mark and correct your answers | A cell is seen under a microscope. It
+
+===== Collision-theory =====
+   1  Collision Theory | Year 10 · Chemistry | Learning Objectives: | 1. Describe how particles must collide to reac
+   2  ☞ Purple pen time · mark and correct your answers | Name the three states of matter. | Solid, liquid, gas. | W
+   3  ENGAGE · MAKE A PREDICTION | Flour is not explosive. A cloud of flour dust in a mill can level the building. |
+   4  LEARN · COLLISION THEORY | For a reaction to happen | Particles must actually collide with each other. | They 
+   5  LEARN · WRITE THIS IN YOUR BOOK · KEY WORDS | Learning objective: | Describe how particles must collide to rea
+   6  ☞ Purple pen time · mark and correct your answers | CORE PAPER | Question | Pages
+   7  LEARN · ENERGY PROFILE (COPY INTO YOUR BOOK) | ☞ Copy the reaction profile from the board. Label the activatio
+   8  LEARN · COMPARING THE FACTORS | INCREASING CONCENTRATION | INCREASING TEMPERATURE | More particles in the same
+   9  LEARN · CALCULATING MEAN RATE | rate = | quantity of product | time
+  10  BUILD · CHECK YOUR UNDERSTANDING | Which change would NOT increase the rate of a reaction between marble chips
+  11  BUILD · CHECK YOUR UNDERSTANDING | Which flask will produce gas the fastest? | [Paste image — suggested search
+  12  BUILD · COMMON MISCONCEPTIONS | 1 | Every collision between reactant particles causes a reaction. | T / F
+  13  BUILD · COMMON MISCONCEPTIONS: ANSWERS | ☞ Purple pen time · mark and correct your answers | 1 | Every collisi
+  14  BUILD · SORT | Sort each statement into the factor it describes. | 1 | Particles move faster
+  15  BUILD · SORT: ANSWERS | INCREASES THE RATE | · Particles move faster | · More particles per unit volume
+  16  BUILD · WHAT PEOPLE GET WRONG | THE CLAIM | “If you double the temperature, you double the rate.” | WHY IT FEE
+  17  10 | °C | A rise of this much is often enough to double the rate of reaction | Learning objective:
+  18  IPEVO Visualiser | Model answers under the visualiser · Collision theory | https://apps.ipevo.com/pwa/visualiz
+  19  APPLY · CHOOSE YOUR LEVEL | Read more — AQA Chemistry (Kerboodle), pp. 130–140 | DEVELOPING | Q1
+  20  Review · DEVELOPING | ☞ Purple pen time · mark and correct your answers | State what must happen for two parti
+  21  Review · REACHING | ☞ Purple pen time · mark and correct your answers | Explain why crushing a solid speeds up
+  22  Review · MASTERING | ☞ Purple pen time · mark and correct your answers | Explain why temperature has a bigger 
+  23  IMAGE BANK — sources and assets used in this lesson | Deck header artwork (reference asset)
+
+===== Enzymes =====
+   1  Enzymes | Year 9 · Biology | Learning Objectives: | 1. Describe an enzyme as a biological catalyst
+   2  ☞ Purple pen time · mark and correct your answers | What is a catalyst? | A substance that speeds up a reactio
+   3  ENGAGE · WATCH | Your body makes tens of thousands of different enzymes. Each one only ever does a single job.
+   4  LEARN · VIDEO · ENZYMES AND THE ACTIVE SITE | ► | Enzymes and the lock and key model (4 min) | ☞ While watchin
+   5  LEARN · VIDEO QUESTIONS: ANSWERS | ☞ Purple pen time · mark and correct your answers | What is the active site
+   6  IPEVO Visualiser | Model answers under the visualiser · Enzymes | https://apps.ipevo.com/pwa/visualizer.app/ |
+   7  APPLY · CHOOSE YOUR LEVEL | Read more — AQA Biology (Kerboodle), pp. 42–44 | DEVELOPING | Q1
+   8  Review · DEVELOPING | ☞ Purple pen time · mark and correct your answers | Define the term enzyme. | A biologic
+   9  Review · REACHING | ☞ Purple pen time · mark and correct your answers | Explain why an enzyme only works on on
+  10  Review · MASTERING | ☞ Purple pen time · mark and correct your answers | Explain the shape of a graph of enzym
+
+===== Forces-and-motion =====
+   1  Forces and Motion | Year 10 · Physics | Learning Objectives: | 1. Describe the motion shown by a distance time
+   2  ☞ Purple pen time · mark and correct your answers | What is the unit of force? | Newton (N). | What is a resul
+   3  ENGAGE · MYSTERY IMAGE | A skydiver in freefall stops getting faster, long before the parachute opens. Why? | 
+   4  LEARN · WHAT HAPPENS DURING A SKYDIVE | Jumps out | weight acts down, almost no air resistance yet | 1
+   5  LEARN · WORKING OUT A RESULTANT FORCE | Draw the forces | arrows, length shows size | Pick a direction
+   6  LEARN · READING A DISTANCE TIME GRAPH | distance (m) | │ | time (s)
+   7  LEARN · HOW OUR MODEL OF MOTION DEVELOPED | 350 BC | Aristotle | Believed heavier objects fall faster.
+   8  BUILD · The stages of a skydive | A | She lands at a safe speed | B
+   9  BUILD · The stages of a skydive: ANSWERS | ☞ Purple pen time · mark and correct your answers | 1 (shown as B) 
+  10  BUILD · Forces on a falling skydiver | [Paste image — suggested search: side view of a skydiver in freefall wi
+  11  BUILD · WORKED EXAMPLE → YOUR TURN | WORKED EXAMPLE | YOUR TURN | A runner travels 400 m in 50 s. Calculate he
+  12  BUILD · WORKED EXAMPLE · RESULTANT FORCE | G | What are you given? | m = 1200 kg, a = 2.5
+  13  BUILD · YOUR TURN · FORCE, MASS AND ACCELERATION | Q1 | A 60 kg sprinter accelerates at 4 m/s². Calculate the 
+  14  BUILD · SPOT THE MISTAKE | 1 speed = {distance/time} | 2 distance = 2 km, time = 400 s | 3 speed = 2 ÷ 400 = 0
+  15  BUILD · SPOT THE MISTAKE: ANSWER | ☞ Purple pen time · mark and correct your answers | 1 speed = {distance/tim
+  16  IPEVO Visualiser | Model answers under the visualiser · Forces and motion | https://apps.ipevo.com/pwa/visuali
+  17  APPLY · CHOOSE YOUR LEVEL | Read more — AQA Physics (Kerboodle), pp. 128–158 | DEVELOPING | Q1
+  18  Review · DEVELOPING | ☞ Purple pen time · mark and correct your answers | State the equation linking speed, di
+  19  Review · REACHING | ☞ Purple pen time · mark and correct your answers | Explain what is meant by terminal velo
+  20  Review · MASTERING | ☞ Purple pen time · mark and correct your answers | A skydiver reaches terminal velocity,
+
+===== Measuring-rate-of-reaction =====
+   1  Measuring Rate | Year 10 · Chemistry | Learning Objectives: | 1. Draw a graph of volume of gas against time
+   2  ☞ Purple pen time · mark and correct your answers | What does the gradient of a graph tell you? | How quickly 
+   3  ENGAGE · IN THE NEWS | Two identical reactions were set up. One finished in 40 seconds, the other took over fo
+   4  LEARN · READING A RATE GRAPH | Reading a rate graph | The steeper the line, the faster the reaction is going a
+   5  LEARN · ANNOTATE THIS GRAPH WITH ME | Mark these three things | The point where the reaction is fastest. | The
+   6  ☞ Purple pen time · mark and correct your answers | CORE PAPER | Question | Pages
+   7  LEARN · FINDING THE RATE AT ONE MOMENT | Pick the time | e.g. 20 s | Draw a tangent
+   8  BUILD · READ THE GRAPH: ANSWERS | ☞ Purple pen time · mark and correct your answers | Volume of carbon dioxide
+   9  BUILD · RESULTS GRAPH | Reading the graph | 1 | The line is steepest at the start, so the reaction is fastest 
+  10  BUILD · DATA + GRAPH | Time (s) | Volume of gas (cm^3) | 0
+  11  BUILD · MAKE A PREDICTION | The same reaction is repeated with acid at 20 °C and then at 30 °C. | Will the gra
+  12  BUILD · CHECK YOUR PREDICTION | ☞ Purple pen time · mark and correct your answers | YOUR PREDICTION | Will the
+  13  IPEVO Visualiser | Model answers · Drawing a tangent | https://example.org/visualiser | ↑ Click to open
+  14  APPLY · CHOOSE YOUR LEVEL | Read more — AQA Chemistry (Kerboodle), pp. 112–116 | DEVELOPING | Q1
+  15  Review · TODAY’S LEARNING | ☞ Purple pen time · mark and correct your answers | What does the gradient of a ra
+  16  IMAGE BANK — sources and assets used in this lesson | Results graph
+
+===== Rate-of-reaction-test-review =====
+   1  Rates Test Review | Year 10 · Chemistry | Learning Objectives: | 1. Identify why marks were lost in the test
+   2  ☞ Purple pen time · mark and correct your answers | State the equation for mean rate of reaction. | rate = qua
+   3  LEARN · WHERE THE MARKS WENT | Most marks were lost on | Not giving units in calculation answers. | Saying &ap
+   4  LEARN · WHAT THE MARK SCHEME ACTUALLY WANTED | WHAT MOST PEOPLE WROTE | WHAT EARNED THE MARK | It gets faster
+   5  BUILD · MODEL ANSWER — Q2.3 [3 marks] | Powder | has | a
+   6  BUILD · MODEL ANSWER — Q4.1 [4 marks] | rate | = | {volume/time}
+   7  BUILD · MODEL ANSWER — Q5.2 [3 marks] | INDICATIVE CONTENT | PLOTTING | •
+   8  BUILD · MARK THE ANSWERS — Q6 [6 marks] | Q | Explain, in terms of particles, why increasing the temperature i
+   9  BUILD · MARK THE ANSWERS: MARKS AWARDED | Q | Explain, in terms of particles, why increasing the temperature i
+  10  IPEVO Visualiser | Model answers under the visualiser · Rate of reaction test review | https://apps.ipevo.com/
+  11  APPLY · CHOOSE YOUR LEVEL | Read more — AQA Chemistry (Kerboodle), pp. 112–116 | DEVELOPING | Q1
+  12  Review · DEVELOPING | ☞ Purple pen time · mark and correct your answers | State the unit of rate when gas volu
+  13  Review · REACHING | ☞ Purple pen time · mark and correct your answers | Rewrite this answer to earn the mark: 
+  14  Review · MASTERING | ☞ Purple pen time · mark and correct your answers | Explain fully why surface area and te
+
+===== Rates-revision =====
+   1  Rates Revision | Year 10 · Chemistry | Learning Objectives: | 1. Recall the four factors that affect rate
+   2  ☞ Purple pen time · mark and correct your answers | State the four factors that affect rate. | Temperature, co
+   3  LEARN · THE FOUR FACTORS | Frequency only | Concentration: more particles in the same volume. | Surface area: 
+   4  LEARN · LEARN THESE THREE SENTENCES · KEY WORDS | Learning objective: | Recall the four factors that affect ra
+   5  LEARN · EXAM COMMAND WORDS | DESCRIBE | EXPLAIN | Say what happens
+   6  LEARN · THE ONE EQUATION YOU MUST KNOW | rate = | quantity of product | time
+   7  LEARN · HOW TO ANSWER A 6 MARK RATE QUESTION | Name the factor | temperature, concentration, surface area or c
+   8  Chemistry Round · Q1 of 4 | A reaction produces 90 cm³ of gas in 45 s. Calculate the mean rate. | Learning obj
+   9  Chemistry Round · Q1 of 4 · ANSWER | A reaction produces 90 cm³ of gas in 45 s. Calculate the mean rate. | 90 
+  10  Chemistry Round · Q2 of 4 | Explain why powdered zinc reacts faster than a lump of zinc. | Learning objective:
+  11  Chemistry Round · Q2 of 4 · ANSWER | Explain why powdered zinc reacts faster than a lump of zinc. | Larger sur
+  12  Chemistry Round · Q3 of 4 | Why does a catalyst not get used up? | Learning objective: | Recall the four facto
+  13  Chemistry Round · Q3 of 4 · ANSWER | Why does a catalyst not get used up? | It is not a reactant. It provides 
+  14  Chemistry Round · Q4 of 4 | A rate graph flattens after 50 s. What does this tell you? | Learning objective: |
+  15  Chemistry Round · Q4 of 4 · ANSWER | A rate graph flattens after 50 s. What does this tell you? | The reaction
+  16  IPEVO Visualiser | Model answers · 6 mark rate question | https://apps.ipevo.com/pwa/visualizer.app/ | ↑ Click
+  17  APPLY · CHOOSE YOUR LEVEL | Read more — AQA Chemistry (Kerboodle), pp. 130–140 | DEVELOPING | Q1
+  18  Review · DEVELOPING | ☞ Purple pen time · mark and correct your answers | Name the four factors that affect ra
+  19  Review · REACHING | ☞ Purple pen time · mark and correct your answers | 84 cm³ of gas is made in 40 s. Calcula
+  20  Review · MASTERING | ☞ Purple pen time · mark and correct your answers | Explain fully, in terms of collisions
+
+===== Required-practical-rates =====
+   1  Required Practical: Rates | Year 10 · Chemistry | Learning Objectives: | 1. Follow a method to measure rate of
+   2  ☞ Purple pen time · mark and correct your answers | What is the independent variable? | The one you deliberate
+   3  ENGAGE · DEMONSTRATION | Two beakers of acid. One marble chip in each. One fizzes gently, one erupts. | The ch
+   4  LEARN · PLANNING THE INVESTIGATION | The variables | Independent: the concentration of the acid. | Dependent: 
+   5  LEARN · RESULTS TABLE (COPY INTO YOUR BOOK) | ☞ Copy this results table into your book before you touch any eq
+   6  BUILD · REQUIRED PRACTICAL: RATES | You will measure how the concentration of acid affects the volume of gas p
+   7  BUILD · PRACTICAL QUESTIONS: ANSWERS | ☞ Purple pen time · mark and correct your answers | Why must the bung b
+   8  BUILD · MODEL DATA | Class results, mean of three repeats. | Concentration (mol/dm^3) | Volume of gas in 60 s 
+   9  BUILD · CORRECT THE STATEMENT | Every one of these statements is wrong. Write the corrected version. | The | g
+  10  IPEVO Visualiser | Model answers under the visualiser · Required practical: rates | https://apps.ipevo.com/pwa
+  11  APPLY · CHOOSE YOUR LEVEL | DEVELOPING | Q1 | Name the independent variable in this practical. [1 mark]
+  12  Review · DEVELOPING | ☞ Purple pen time · mark and correct your answers | Name the independent variable in thi
+  13  Review · REACHING | ☞ Purple pen time · mark and correct your answers | Explain why goggles must be worn. | Hy
+  14  Review · MASTERING | ☞ Purple pen time · mark and correct your answers | Design a method to investigate the ef
+  15  IMAGE BANK — sources and assets used in this lesson | Results graph

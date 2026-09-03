@@ -1,0 +1,862 @@
+{
+  "_meta": {
+    "generatedFrom": [
+      "Science Pacing All Years 2026-27.xlsx (columns marked PTO)",
+      "Y12 A-level physics PACING - 2026-27.docx (column 'Module 1 and 4 PTO/AJS')",
+      "Yr13 A-level physics PACING - 2026-27.docx (column 'Teacher AJS/PTO Modules 5')"
+    ],
+    "generatedOn": "2026-07-22",
+    "academicYear": "2026-2027",
+    "warning": "Pacing topic NUMBERS disagree with Patryk's folder numbers. Always match by TITLE. Folder names below are the authority for where files go."
+  },
+  "keyStage3and4": {
+    "year7": {
+      "class": "7Ml",
+      "ownership": {
+        "columnIsPatrykOnly": true,
+        "patrykSubjects": [
+          "Physics",
+          "Chemistry",
+          "Biology",
+          "Science Skills"
+        ],
+        "note": "7Ml - Patryk is the sole teacher, so every topic is his."
+      },
+      "teacherColumns": {
+        "E": "PTO"
+      },
+      "patrykColumns": [
+        {
+          "column": "E",
+          "class": "7Ml",
+          "qualification": "Mixed Ability",
+          "teacher": "PTO"
+        }
+      ],
+      "teachingSequence": [
+        {
+          "order": 1,
+          "pacingLabel": "Intro to Science",
+          "subject": "Science Skills",
+          "driveTopicFolder": "Introduction to Science",
+          "patrykTeaches": true,
+          "note": "NEW - folder does not exist yet",
+          "firstTaught": "2026-09-07",
+          "weekCount": 1
+        },
+        {
+          "order": 2,
+          "pacingLabel": "P1 Forces",
+          "subject": "Physics",
+          "driveTopicFolder": "P1 Forces",
+          "patrykTeaches": true,
+          "note": "",
+          "firstTaught": "2026-09-21",
+          "weekCount": 3
+        },
+        {
+          "order": 3,
+          "pacingLabel": "B1 Cells",
+          "subject": "Biology",
+          "driveTopicFolder": "B1 Cells",
+          "patrykTeaches": true,
+          "note": "",
+          "firstTaught": "2026-10-12",
+          "weekCount": 3
+        },
+        {
+          "order": 4,
+          "pacingLabel": "C1 Particles",
+          "subject": "Chemistry",
+          "driveTopicFolder": "C1 Particles",
+          "patrykTeaches": true,
+          "note": "",
+          "firstTaught": "2026-11-09",
+          "weekCount": 3
+        },
+        {
+          "order": 5,
+          "pacingLabel": "C1 A,E,C & M",
+          "subject": "Chemistry",
+          "driveTopicFolder": "C2 Atoms, Elements, Compounds and Mixtures",
+          "patrykTeaches": true,
+          "note": "pacing says C1, folder is C2",
+          "firstTaught": "2026-11-30",
+          "weekCount": 2
+        },
+        {
+          "order": 6,
+          "pacingLabel": "P2 Energy",
+          "subject": "Physics",
+          "driveTopicFolder": "P2 Energy",
+          "patrykTeaches": true,
+          "note": "",
+          "firstTaught": "2026-12-14",
+          "weekCount": 3
+        },
+        {
+          "order": 7,
+          "pacingLabel": "B2 Body Systems",
+          "subject": "Biology",
+          "driveTopicFolder": "B2 Body Systems",
+          "patrykTeaches": true,
+          "note": "",
+          "firstTaught": "2027-01-18",
+          "weekCount": 2
+        },
+        {
+          "order": 8,
+          "pacingLabel": "C2 Separating",
+          "subject": "Chemistry",
+          "driveTopicFolder": "C3 Separating Mixtures",
+          "patrykTeaches": true,
+          "note": "pacing says C2, folder is C3",
+          "firstTaught": "2027-02-01",
+          "weekCount": 2
+        },
+        {
+          "order": 9,
+          "pacingLabel": "B3 Human Repro",
+          "subject": "Biology",
+          "driveTopicFolder": "B3 Human and Plant Reproduction",
+          "patrykTeaches": true,
+          "note": "human half of the folder",
+          "firstTaught": "2027-03-08",
+          "weekCount": 3
+        },
+        {
+          "order": 10,
+          "pacingLabel": "P3 Sound Waves",
+          "subject": "Physics",
+          "driveTopicFolder": "P3 Sound and Waves",
+          "patrykTeaches": true,
+          "note": "",
+          "firstTaught": "2027-04-12",
+          "weekCount": 2
+        },
+        {
+          "order": 11,
+          "pacingLabel": "C3 Reactions",
+          "subject": "Chemistry",
+          "driveTopicFolder": "C4 Introduction to Reactions",
+          "patrykTeaches": true,
+          "note": "pacing says C3, folder is C4",
+          "firstTaught": "2027-04-26",
+          "weekCount": 2
+        },
+        {
+          "order": 12,
+          "pacingLabel": "B4 Interdep'ce",
+          "subject": "Biology",
+          "driveTopicFolder": "B4 Interdependence",
+          "patrykTeaches": true,
+          "note": "",
+          "firstTaught": "2027-06-07",
+          "weekCount": 2
+        },
+        {
+          "order": 13,
+          "pacingLabel": "B5 Plant Repro",
+          "subject": "Biology",
+          "driveTopicFolder": "B3 Human and Plant Reproduction",
+          "patrykTeaches": true,
+          "note": "plant half of the same folder",
+          "firstTaught": "2027-06-21",
+          "weekCount": 2
+        },
+        {
+          "order": 14,
+          "pacingLabel": "P4 Earth In Space",
+          "subject": "Physics",
+          "driveTopicFolder": "P4 Earth in Space",
+          "patrykTeaches": true,
+          "note": "",
+          "firstTaught": "2027-07-05",
+          "weekCount": 2
+        }
+      ],
+      "unmappedLabels": []
+    },
+    "year8": {
+      "class": "8XP + 8AG",
+      "ownership": {
+        "columnIsPatrykOnly": false,
+        "patrykSubjects": [
+          "Physics",
+          "Biology"
+        ],
+        "note": "8XP: Ms Sole (SLS) takes Chemistry, Patryk takes Biology + Physics. 8AG: Mr Hollis (LHO) takes Chemistry and Biology, Patryk takes Physics only. The two classes run the SAME topics in ROTATED order (a carousel), so they are never on the same topic at the same time."
+      },
+      "teacherColumns": {
+        "D": "PTO/SLS",
+        "E": "PTO/LHO"
+      },
+      "patrykColumns": [
+        {
+          "column": "D",
+          "class": "8XP",
+          "qualification": "HPA/MPA mixed",
+          "teacher": "PTO/SLS"
+        },
+        {
+          "column": "E",
+          "class": "8AG",
+          "qualification": "HPA/MPA mixed",
+          "teacher": "PTO/LHO"
+        }
+      ],
+      "teachingSequence": [
+        {
+          "order": 1,
+          "pacingLabel": "C1 Acids & Alkalis",
+          "subject": "Chemistry",
+          "driveTopicFolder": "C1 Acids and Alkalis",
+          "patrykTeaches": false,
+          "note": "",
+          "firstTaught": "2026-09-07",
+          "weekCount": 3
+        },
+        {
+          "order": 2,
+          "pacingLabel": "P1 Motion & Pressure",
+          "subject": "Physics",
+          "driveTopicFolder": "P1 Motion and Pressure",
+          "patrykTeaches": true,
+          "note": "",
+          "firstTaught": "2026-09-28",
+          "weekCount": 3
+        },
+        {
+          "order": 3,
+          "pacingLabel": "B1 Resp & Photo",
+          "subject": "Biology",
+          "driveTopicFolder": "B1 Respiration and Photosythesis",
+          "patrykTeaches": true,
+          "note": "folder name has a typo: Photosythesis",
+          "firstTaught": "2026-10-19",
+          "weekCount": 3
+        },
+        {
+          "order": 4,
+          "pacingLabel": "C1 Periodic Table",
+          "subject": "Chemistry",
+          "driveTopicFolder": "C2 Periodic Table",
+          "patrykTeaches": false,
+          "note": "pacing says C1, folder is C2",
+          "firstTaught": "2026-11-16",
+          "weekCount": 3
+        },
+        {
+          "order": 5,
+          "pacingLabel": "P3 Light",
+          "subject": "Physics",
+          "driveTopicFolder": "P3 Light",
+          "patrykTeaches": true,
+          "note": "",
+          "firstTaught": "2026-12-07",
+          "weekCount": 3
+        },
+        {
+          "order": 6,
+          "pacingLabel": "B2 Health & Digestion",
+          "subject": "Biology",
+          "driveTopicFolder": "B2 Health and Digestion",
+          "patrykTeaches": true,
+          "note": "",
+          "firstTaught": "2027-01-11",
+          "weekCount": 3
+        },
+        {
+          "order": 7,
+          "pacingLabel": "C3 M, NM & Energy",
+          "subject": "Chemistry",
+          "driveTopicFolder": "C3 Metals, Non Metals and Chemical Energy",
+          "patrykTeaches": false,
+          "note": "",
+          "firstTaught": "2027-02-01",
+          "weekCount": 3
+        },
+        {
+          "order": 8,
+          "pacingLabel": "B3 Vari, Inher & Evo",
+          "subject": "Biology",
+          "driveTopicFolder": "B3 Inheritance, Variation and Evolution",
+          "patrykTeaches": true,
+          "note": "",
+          "firstTaught": "2027-03-15",
+          "weekCount": 3
+        },
+        {
+          "order": 9,
+          "pacingLabel": "P2 Energy Resources",
+          "subject": "Physics",
+          "driveTopicFolder": "P2 Energy Resources",
+          "patrykTeaches": true,
+          "note": "",
+          "firstTaught": "2027-04-19",
+          "weekCount": 3
+        },
+        {
+          "order": 10,
+          "pacingLabel": "P4 Electricity & Magnetism",
+          "subject": "Physics",
+          "driveTopicFolder": "P4 Electricity + P5 Magnets",
+          "patrykTeaches": true,
+          "note": "pacing merges two folders",
+          "firstTaught": "2027-05-10",
+          "weekCount": 3
+        },
+        {
+          "order": 11,
+          "pacingLabel": "C4 Atmosphere & Earth",
+          "subject": "Chemistry",
+          "driveTopicFolder": "C4 Atmosphere and Resources",
+          "patrykTeaches": false,
+          "note": "C5 Earths Resources may also apply",
+          "firstTaught": "2027-06-28",
+          "weekCount": 3
+        }
+      ],
+      "unmappedLabels": []
+    },
+    "year9": {
+      "class": "9AS + 9XS",
+      "ownership": {
+        "columnIsPatrykOnly": false,
+        "patrykSubjects": [
+          "Physics",
+          "Chemistry",
+          "Biology"
+        ],
+        "note": "9AS: Ms Milland (AM) takes Biology, Patryk takes Physics + Chemistry. 9XS: Patryk is sole teacher, so he needs every Year 9 topic regardless."
+      },
+      "teacherColumns": {
+        "D": "AM/PTO",
+        "G": "PTO"
+      },
+      "patrykColumns": [
+        {
+          "column": "D",
+          "class": "9AS",
+          "qualification": "HPA/MPA mixed",
+          "teacher": "AM/PTO"
+        },
+        {
+          "column": "G",
+          "class": "9XS",
+          "qualification": "HPA/MPA mixed",
+          "teacher": "PTO"
+        }
+      ],
+      "teachingSequence": [
+        {
+          "order": 1,
+          "pacingLabel": "P3 Particles L1-13",
+          "subject": "Physics",
+          "driveTopicFolder": "P3 Particles",
+          "patrykTeaches": true,
+          "note": "13 lessons; folder currently has 12",
+          "firstTaught": "2026-09-07",
+          "weekCount": 5
+        },
+        {
+          "order": 2,
+          "pacingLabel": "B1 Cells L1-7",
+          "subject": "Biology",
+          "driveTopicFolder": "B1 Cells",
+          "patrykTeaches": true,
+          "note": "first block, lessons 1-7",
+          "firstTaught": "2026-10-12",
+          "weekCount": 3
+        },
+        {
+          "order": 3,
+          "pacingLabel": "C1 Atomic Structure L1-13",
+          "subject": "Chemistry",
+          "driveTopicFolder": "C1 Atomic Structure",
+          "patrykTeaches": true,
+          "note": "13 lessons; folder currently has 14",
+          "firstTaught": "2026-11-09",
+          "weekCount": 4
+        },
+        {
+          "order": 4,
+          "pacingLabel": "B1 Cells L8-16",
+          "subject": "Biology",
+          "driveTopicFolder": "B1 Cells",
+          "patrykTeaches": true,
+          "note": "second block, lessons 8-16",
+          "firstTaught": "2026-12-07",
+          "weekCount": 3
+        },
+        {
+          "order": 5,
+          "pacingLabel": "P4 Atomic structure",
+          "subject": "Physics",
+          "driveTopicFolder": "P4 Atomic Strucutre",
+          "patrykTeaches": true,
+          "note": "folder name has a typo: Strucutre",
+          "firstTaught": "2027-01-11",
+          "weekCount": 4
+        },
+        {
+          "order": 6,
+          "pacingLabel": "B2 Organisation L1-7",
+          "subject": "Biology",
+          "driveTopicFolder": "B2 Organisation",
+          "patrykTeaches": true,
+          "note": "first block, lessons 1-7",
+          "firstTaught": "2027-02-08",
+          "weekCount": 3
+        },
+        {
+          "order": 7,
+          "pacingLabel": "B2 Organisation L8-14",
+          "subject": "Biology",
+          "driveTopicFolder": "B2 Organisation",
+          "patrykTeaches": true,
+          "note": "second block, lessons 8-14",
+          "firstTaught": "2027-03-08",
+          "weekCount": 3
+        },
+        {
+          "order": 8,
+          "pacingLabel": "C2 Bonding & structure L1-13",
+          "subject": "Chemistry",
+          "driveTopicFolder": "C2 Bonding and Structure",
+          "patrykTeaches": true,
+          "note": "",
+          "firstTaught": "2027-04-12",
+          "weekCount": 6
+        },
+        {
+          "order": 9,
+          "pacingLabel": "Maths for physics",
+          "subject": "Physics",
+          "driveTopicFolder": "",
+          "patrykTeaches": true,
+          "note": "skills block, no topic folder",
+          "firstTaught": "2027-07-05",
+          "weekCount": 1
+        }
+      ],
+      "unmappedLabels": []
+    },
+    "year10combined": {
+      "class": "10C-2",
+      "ownership": {
+        "columnIsPatrykOnly": true,
+        "patrykSubjects": [
+          "Physics",
+          "Chemistry"
+        ],
+        "note": "10C-2 is a THREE-way split: PTO 5 lessons, RBA 3, BCO 2, each running a different topic in parallel. Patryk's strand is NOT purely Physics - it includes C5 Energy Changes. Do not infer ownership from subject here."
+      },
+      "teacherColumns": {
+        "D": "PTO (5)",
+        "E": "RBA (3)",
+        "F": "BCO (2)"
+      },
+      "patrykColumns": [
+        {
+          "column": "D",
+          "class": "10C-2",
+          "qualification": "Combined Science",
+          "teacher": "PTO (5)"
+        }
+      ],
+      "teachingSequence": [
+        {
+          "order": 1,
+          "pacingLabel": "P1 - Energy L1-11",
+          "subject": "Physics",
+          "driveTopicFolder": "P1 Energy",
+          "patrykTeaches": true,
+          "note": "",
+          "firstTaught": "2026-09-07",
+          "weekCount": 4
+        },
+        {
+          "order": 2,
+          "pacingLabel": "P2 Electricity L1-16",
+          "subject": "Physics",
+          "driveTopicFolder": "P2 Electricity",
+          "patrykTeaches": true,
+          "note": "",
+          "firstTaught": "2026-10-12",
+          "weekCount": 6
+        },
+        {
+          "order": 3,
+          "pacingLabel": "C5 Energy changes L1-5",
+          "subject": "Chemistry",
+          "driveTopicFolder": "C5 Energy Changes",
+          "patrykTeaches": true,
+          "note": "Combined only - Patryk teaches this for 10C-2",
+          "firstTaught": "2026-12-07",
+          "weekCount": 3
+        },
+        {
+          "order": 4,
+          "pacingLabel": "P5 Forces L1-20",
+          "subject": "Physics",
+          "driveTopicFolder": "P5 Forces",
+          "patrykTeaches": true,
+          "note": "COMBINED tier: 20 lessons",
+          "firstTaught": "2027-01-18",
+          "weekCount": 15
+        }
+      ],
+      "unmappedLabels": []
+    },
+    "year10separate": {
+      "class": "10S-2",
+      "ownership": {
+        "columnIsPatrykOnly": true,
+        "patrykSubjects": [
+          "Physics"
+        ],
+        "note": "10S-2 splits by specialism: EJA Biology, LHO Chemistry, PTO all the Physics."
+      },
+      "teacherColumns": {
+        "E": "EJA",
+        "F": "LHO",
+        "G": "PTO"
+      },
+      "patrykColumns": [
+        {
+          "column": "G",
+          "class": "10S-2",
+          "qualification": "Physics Separate",
+          "teacher": "PTO"
+        }
+      ],
+      "teachingSequence": [
+        {
+          "order": 1,
+          "pacingLabel": "P1 - Energy L1-11",
+          "subject": "Physics",
+          "driveTopicFolder": "P1 Energy",
+          "patrykTeaches": true,
+          "note": "",
+          "firstTaught": "2026-09-07",
+          "weekCount": 7
+        },
+        {
+          "order": 2,
+          "pacingLabel": "P2 Electricity L1-16",
+          "subject": "Physics",
+          "driveTopicFolder": "P2 Electricity",
+          "patrykTeaches": true,
+          "note": "",
+          "firstTaught": "2026-11-16",
+          "weekCount": 10
+        },
+        {
+          "order": 3,
+          "pacingLabel": "P5 Forces L1-25",
+          "subject": "Physics",
+          "driveTopicFolder": "P5 Forces",
+          "patrykTeaches": true,
+          "note": "SEPARATE tier: 25 lessons - the 5 extra need a (Separate) tag",
+          "firstTaught": "2027-02-22",
+          "weekCount": 11
+        }
+      ],
+      "unmappedLabels": []
+    },
+    "year11separate": {
+      "class": "11S2",
+      "ownership": {
+        "columnIsPatrykOnly": true,
+        "patrykSubjects": [
+          "Physics"
+        ],
+        "note": "11S2 splits by specialism: EJA Biology, SLS Chemistry, PTO Physics only."
+      },
+      "teacherColumns": {
+        "E": "EJA",
+        "F": "SLS",
+        "G": "PTO"
+      },
+      "patrykColumns": [
+        {
+          "column": "G",
+          "class": "11S2",
+          "qualification": "Physics Separate",
+          "teacher": "PTO"
+        }
+      ],
+      "teachingSequence": [
+        {
+          "order": 1,
+          "pacingLabel": "P6 Waves L1-13",
+          "subject": "Physics",
+          "driveTopicFolder": "P6 Waves",
+          "patrykTeaches": true,
+          "note": "",
+          "firstTaught": "2026-09-28",
+          "weekCount": 5
+        },
+        {
+          "order": 2,
+          "pacingLabel": "P7 Magnetism L1-11",
+          "subject": "Physics",
+          "driveTopicFolder": "P7 Magnetism",
+          "patrykTeaches": true,
+          "note": "",
+          "firstTaught": "2026-11-30",
+          "weekCount": 6
+        },
+        {
+          "order": 3,
+          "pacingLabel": "P8 Space L1-5",
+          "subject": "Physics",
+          "driveTopicFolder": "P8 Space",
+          "patrykTeaches": true,
+          "note": "",
+          "firstTaught": "2027-02-01",
+          "weekCount": 2
+        }
+      ],
+      "unmappedLabels": []
+    }
+  },
+  "keyStage5": {
+    "year12": {
+      "class": "12C",
+      "examBoard": "OCR Physics A",
+      "patrykOwns": "Module 1 and Module 4 (column 'PTO/AJS'); FCA takes Modules 2 and 3",
+      "driveRoot": "Lessons/Year 12",
+      "teachingSequence": [
+        {
+          "order": 1,
+          "term": 1,
+          "chapter": "Chapter 11 - Waves 1",
+          "sections": [
+            "11.1 Progressive waves",
+            "11.2 Wave properties",
+            "11.3 Reflection and refraction",
+            "11.4 Diffraction and polarisation",
+            "11.5 Intensity",
+            "11.6 Electromagnetic waves",
+            "11.7 Polarisation of electromagnetic waves",
+            "11.8 Refractive index",
+            "11.9 Total internal reflection"
+          ],
+          "practicals": [
+            "PAG 5.3 Determining the frequency and wavelength of a wave using an oscilloscope"
+          ]
+        },
+        {
+          "order": 2,
+          "term": "1-2",
+          "chapter": "Chapter 12 - Waves 2",
+          "sections": [
+            "12.1 Superposition of waves",
+            "12.2 Interference",
+            "12.3 The Young double-slit experiment",
+            "12.4 Stationary waves",
+            "12.5 Harmonics",
+            "12.6 Stationary waves in air columns"
+          ],
+          "practicals": [
+            "PAG 5.1 Determining the wavelength of light with a diffraction grating"
+          ]
+        },
+        {
+          "order": 3,
+          "term": 2,
+          "chapter": "Chapter 8 - Charge and Current",
+          "sections": [
+            "8.1 Current and charge",
+            "8.2 Moving charges",
+            "8.3 Kirchhoff's first law",
+            "8.4 Mean drift velocity"
+          ],
+          "practicals": []
+        },
+        {
+          "order": 4,
+          "term": "2-3",
+          "chapter": "Chapter 9 - Energy, Power and Resistance",
+          "sections": [
+            "9.1 Circuit symbols (not a lesson)",
+            "9.2 Potential difference and EMF",
+            "9.3 The electron gun (not a lesson)",
+            "9.4 Resistance",
+            "9.5 I-V characteristics",
+            "9.6 Diodes",
+            "9.7 Resistance and resistivity",
+            "9.8 The thermistor",
+            "9.9 The LDR",
+            "9.10 Electrical energy and power",
+            "9.11 Paying for electricity"
+          ],
+          "practicals": [
+            "PAG 4.1 Investigating Resistance",
+            "PAG 3.1 Determining the resistivity"
+          ]
+        },
+        {
+          "order": 5,
+          "term": 4,
+          "chapter": "Chapter 10 - Electrical Circuits",
+          "sections": [
+            "10.1 Kirchhoff's laws and circuits",
+            "10.2 Combining resistors",
+            "10.3 Analysing circuits",
+            "10.4 Internal resistance",
+            "10.5 Potential divider circuits",
+            "10.6 Sensing circuits"
+          ],
+          "practicals": []
+        },
+        {
+          "order": 6,
+          "term": 4,
+          "chapter": "Chapter 13 - Quantum Physics",
+          "sections": [
+            "13.1 The photon model",
+            "13.2 The photoelectric effect",
+            "13.3 Einstein's photoelectric effect equation",
+            "13.4 Wave-particle duality"
+          ],
+          "practicals": [
+            "PAG 6.1 Determining the Planck Constant (may slip until after Y12 exams)"
+          ]
+        },
+        {
+          "order": 7,
+          "term": 5,
+          "chapter": "Chapter 14 - Thermal Physics",
+          "sections": [
+            "14.1 Temperature",
+            "14.2 Solids, liquids and gases",
+            "14.3 Internal energy",
+            "14.4 Specific heat capacity",
+            "14.5 Specific latent heat"
+          ],
+          "practicals": []
+        },
+        {
+          "order": 8,
+          "term": 6,
+          "chapter": "Chapter 15 - Ideal Gases",
+          "sections": [
+            "15.1 The kinetic theory",
+            "15.2 Gas laws",
+            "15.3 Root mean square speed",
+            "15.4 The Boltzmann constant"
+          ],
+          "practicals": [
+            "PAG 8.1 Estimating absolute zero"
+          ]
+        }
+      ],
+      "practicalsNotPatryks": [
+        "PAG 1.1 Investigating g",
+        "PAG 2.1 Determining the Young's Modulus of a Metal"
+      ]
+    },
+    "year13": {
+      "class": "13D",
+      "examBoard": "OCR Physics A",
+      "patrykOwns": "Module 5, plus part of Module 6 (column 'AJS/PTO'); FCA takes the rest of Module 6",
+      "driveRoot": "Lessons/Year 13",
+      "resolvedMismatch": "The existing Year 13 folders (Chapter 17 Oscillations, 21 Capacitance, 22 Electric Fields, 23 Magnetic Fields) are FCA's chapters for 2026-27, left over from a previous split. DECIDED 2026-07-22: the pacing document wins. Build the six chapters below. Leave the old folders in place untouched - do not delete them.",
+      "teachingSequence": [
+        {
+          "order": 1,
+          "term": 1,
+          "chapter": "Chapter 19 - Stars",
+          "sections": [
+            "19.1 Objects in the universe",
+            "19.2 The life cycle of stars",
+            "19.3 The Hertzsprung-Russell diagram",
+            "19.4 Energy levels in atoms",
+            "19.5 Spectra",
+            "19.6 Analysing starlight",
+            "19.7 Stellar luminosity"
+          ],
+          "practicals": []
+        },
+        {
+          "order": 2,
+          "term": 1,
+          "chapter": "Chapter 20 - Cosmology",
+          "sections": [
+            "20.1 Astronomical distances",
+            "20.2 The Doppler effect",
+            "20.3 Hubble's law",
+            "20.4 The Big Bang theory",
+            "20.5 Evolution of the Universe"
+          ],
+          "practicals": []
+        },
+        {
+          "order": 3,
+          "term": 2,
+          "chapter": "Chapter 24 - Particle Physics",
+          "sections": [
+            "24.1 Alpha-particle scattering experiment",
+            "24.2 The nucleus",
+            "24.3 Antiparticles, hadrons, and leptons",
+            "24.4 Quarks",
+            "24.5 Beta decay"
+          ],
+          "practicals": []
+        },
+        {
+          "order": 4,
+          "term": "2-3",
+          "chapter": "Chapter 25 - Radioactivity",
+          "sections": [
+            "25.1 Radioactivity",
+            "25.2 Nuclear decay equations",
+            "25.3 Half-life and activity",
+            "25.4 Radioactive decay calculations",
+            "25.5 Modelling radioactive decay",
+            "25.6 Radioactive dating"
+          ],
+          "practicals": [
+            "PAG 7.2 Investigating the absorption of alpha, beta and gamma"
+          ]
+        },
+        {
+          "order": 5,
+          "term": 3,
+          "chapter": "Chapter 26 - Nuclear Physics",
+          "sections": [
+            "26.1 Einstein's mass-energy equations",
+            "26.2 Binding energy",
+            "26.3 Nuclear fission",
+            "26.4 Nuclear fusion"
+          ],
+          "practicals": []
+        },
+        {
+          "order": 6,
+          "term": "3-4",
+          "chapter": "Chapter 27 - Medical Imaging",
+          "sections": [
+            "27.4 The gamma camera (taught early, on Mock paper 2)",
+            "27.1 X-rays",
+            "27.2 Interaction of X-rays with matter",
+            "27.3 CAT scans",
+            "27.5 PET scans"
+          ],
+          "practicals": []
+        }
+      ],
+      "practicalsNotPatryks": [
+        "PAG 8.1 Estimating absolute zero",
+        "PAG 10.1 Factors affecting SHM",
+        "PAG 9.1 Charging / discharging capacitors",
+        "PAG 9.2 Capacitors in series / parallel",
+        "PAG 11.1 Investigating transformers",
+        "PAG 12 Research"
+      ]
+    }
+  }
+}

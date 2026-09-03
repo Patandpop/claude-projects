@@ -89,9 +89,9 @@ Canonical package list = `$ENTRIES` in `package-skill.ps1`. Keep `package-skill.
 
 ## Test lessons and test review lessons (standing rules)
 
-**Test lessons:** NO slides, NO Drive folder, NO build. The order sheet shows core/challenge paper counts per class. Test papers: `G:\My Drive\Beechen Cliff Science\Admin\Tests\Year [X]\[Topic]\Tests\` (filename identifies higher vs lower tier); markschemes in the sibling `Markschemes\` folder (often embedded as the second half of the test file).
+**Test lessons:** NO slides, NO Drive folder, NO build. The order sheet shows core/challenge paper counts per class. Test papers: `G:\My Drive\Beechen Cliff Science\Admin\Assessment\Year [X]\[Subject]\[Topic]\` (filename identifies higher vs lower tier, and Combined vs Separate). The folder is `Assessment` — NOT `Tests` (corrected 2026-07-22; the old `Admin\Tests` path never existed on Drive). Each topic folder holds the test, its markscheme, and its PLC together. **A missing markscheme means it is embedded in the test document itself** — that is expected, not a gap.
 
-**Test review lessons:** the ONE case where the skill creates a Drive folder — `Lesson [n+1] - [Topic] Review` inside the same macrotopic folder. Timing is Patryk-controlled (marking time needed). Generator: `test-review-lesson.js` reads the test PDF from Admin\Tests.
+**Test review lessons:** the ONE case where the skill creates a Drive folder — `Lesson [n+1] - [Topic] Review` inside the same macrotopic folder. Timing is Patryk-controlled (marking time needed). Generator: `test-review-lesson.js` reads the test PDF from `Admin\Assessment`.
 
 ---
 
