@@ -133,9 +133,13 @@ element in the deck is flat.
 ### Text measurement is guesswork
 There is no font-metrics access in Node. `autoFontSize()` estimates with a fixed heuristic:
 roughly 120 character-points per inch of width, with a 1.4x line height, targeting 85% of the
-box height. `wordWidthIn()` for handwriting uses a Caveat constant of 100 characters per inch
-per point. Both are approximations, which is why `fit: 'shrink'` is on nearly everything.
-**A reskin that changes the body font invalidates both constants.**
+box height. That is an approximation, which is why `fit: 'shrink'` is on nearly everything.
+**A reskin that changes the body font invalidates that constant.**
+
+The one exception is handwriting: since 2026-10-02 `wordWidthIn()` reads each letter's real
+width straight out of the bundled Caveat file (its `cmap` and `hmtx` tables), so handwritten
+word spacing is exact. A reskin could reuse that reader to measure a body font the same way,
+provided the font file ships next to build.js.
 
 ---
 
@@ -145,7 +149,7 @@ per point. Both are approximations, which is why `fit: 'shrink'` is on nearly ev
 |---|---|---|
 | **Trebuchet MS** | Body and headings, set as the pptx theme font and passed explicitly on every `txt()` call | Ships with Windows and Office |
 | **Cambria Math** | Every equation run (`toPptxRuns`, `renderEqShapes`) | Ships with every version of Office, so zero install on school machines |
-| **Caveat** (Regular and Bold) | Handwriting only | **Not installed on school machines.** Handled two ways: the TTFs are injected into the .pptx zip as `ppt/fonts/font1.fntdata` and `font2.fntdata` with an `embeddedFontLst` entry, and the raster fallback inlines the font as base64 inside an SVG |
+| **Caveat** (Regular and Bold) | Handwriting only | **Not installed on school machines.** Handled two ways: the fonts are injected into the .pptx zip as `ppt/fonts/font1.fntdata` and `font2.fntdata` with an `embeddedFontLst` entry, and the picture route draws the handwriting into a PNG with Pillow |
 
 Constraints that follow:
 
@@ -153,6 +157,9 @@ Constraints that follow:
   rewrites `presentation.xml`, its rels and `[Content_Types].xml` by hand using adm-zip. It
   runs only when the deck contains a handwriting slide type, and it is best-effort: on any
   failure it leaves the file untouched and the text substitutes a fallback font.
+- **The embedded font must be wrapped as Embedded OpenType (EOT).** PowerPoint silently
+  ignores a raw `.ttf` placed in a `.fntdata` part. `ttfToEot()` adds the EOT header, built
+  from the font's own tables. Verified with a PowerPoint export on 2026-10-02.
 - Any new font a reskin introduces has to either ship with Office or go through the same
   embedding path.
 - Google Slides needs none of the embedding, since Caveat is a native Google Font there.
@@ -174,8 +181,8 @@ Constraints that follow:
 | Shadows on images | Not available |
 | Transparency on images | Not available |
 | Source | `path` (a local file) in every case. pptxgenjs also accepts `data:` base64 URIs, unused here |
-| Formats | PNG and JPEG are safe. **SVG is used once**, by the raster handwriting fallback, which writes a temp `.svg` and inserts it by path. This is the most fragile thing in the pipeline: SVG support in PowerPoint is version-dependent and it will not survive older clients or LibreOffice reliably |
-| Generated images | matplotlib PNGs via `graph_gen.py`, spawned with `execSync` into the OS temp directory and cleaned up after `writeFile` |
+| Formats | PNG and JPEG only. **Avoid SVG:** PowerPoint's SVG renderer ignores CSS `@font-face`, and pptxgenjs's companion fallback for an SVG is the SVG text saved under a `.png` name, not a real picture. The old handwriting picture route hit both problems; it was replaced with a real PNG on 2026-10-02 |
+| Generated images | matplotlib PNGs via `graph_gen.py` and Pillow PNGs via `handwriting_png.py`, both spawned with `execSync` into the OS temp directory and cleaned up after `writeFile` |
 
 **Practical consequence for a reskin:** anything that needs a gradient, a soft shadow, a
 rounded photo, a texture or a non-rectangular crop has to become a pre-rendered PNG. There is
@@ -254,7 +261,7 @@ Ordered by how much of the deck a change would touch.
 
 | Change | Risk | Why |
 |---|---|---|
-| Change the body font | **High** | `autoFontSize` (120 char-pt per inch) and `wordWidthIn` (Caveat CPI 100) are calibrated to Trebuchet and Caveat. Every box on every slide would need re-measuring, and `fit: 'shrink'` would start firing on slides that currently fit |
+| Change the body font | **High** | `autoFontSize` (120 char-pt per inch) is calibrated to Trebuchet. Every box on every slide would need re-measuring, and `fit: 'shrink'` would start firing on slides that currently fit. (Handwriting is unaffected: it measures Caveat's real letter widths) |
 | Change the frame heights (`NAV_H`, `BOT_H`, `TOP`) | **High** | Every slide computes its content height as `BOT_Y - 0.08 - y`. All 30-odd layouts shift together |
 | Introduce gradients or soft shadows | **High** | Not reachable in pptxgenjs. Every affected element becomes a pre-rendered PNG, and PNGs are stretched not aspect-fitted |
 | Change the gold border weight or colour | **Medium** | `GOLD2` is referenced in dozens of places, but it is one constant. The amber exceptions are separate and would need deciding on |
@@ -277,21 +284,32 @@ than LibreOffice for pptx and it removes the intermediate PDF step, so PyMuPDF i
 If a LibreOffice render is specifically wanted later (for example to check how the deck
 degrades on a non-Office viewer), LibreOffice would have to be installed first.
 
-### Three things the golden renders actually showed
+### Three things the first golden renders showed, all fixed 2026-10-02
 
-These are observations from the 100 exported PNGs, not predictions.
+The first renders (commit `e0d5210a`) exposed three defects. All three are now fixed, and
+the current `golden/` renders show the corrected output. Compare against that commit to see
+the before state.
 
-1. **The handwriting does not look like handwriting on this machine.** In `C-09.png`
-   (editable mode) and `C-10.png` (raster mode) the jitter, the word spacing and the ruled
-   lines are all correct, but the glyphs render in a generic bold sans rather than Caveat.
-   Caveat is not installed locally, so either the embedded font is not being picked up on
-   this export path, or the raster SVG's base64 `@font-face` is not being honoured. The
-   layout engine is fine; the typeface is not arriving. Worth confirming on a school machine
-   before a reskin builds anything on top of the handwriting look.
-2. **The formula triangle clips its bottom-left label.** In `B-21.png` the label "rate" reads
-   as "ate", because `drawFormulaTriangle` places the bottom-left text box at the triangle's
-   full bounding-box edge, where the slanted side has already cut in. Longer than a
-   single-symbol label will always clip.
-3. **`graph_gen.py` fits a straight line through curved data.** In `B-26.png` the rate curve
-   gets a linear best fit plus an extrapolated x-intercept at -57.6 s. That is graph_gen's
-   behaviour, not build.js's, but any reskin of the graph slides inherits it.
+1. **Handwriting did not look like handwriting.** Both routes rendered Caveat as a plain
+   bold sans. Cause: the font was embedded as a raw `.ttf`, which PowerPoint ignores; and the
+   picture route was an SVG whose `@font-face` PowerPoint also ignores. Fixed by wrapping the
+   embedded font as EOT (editable route, still the default) and drawing the picture route
+   as a real PNG with Pillow. Once real Caveat appeared, the old word-width guess proved
+   roughly twice too wide, so word spacing now uses the font's real letter widths, and
+   unruled single-line statements are centred rather than sunk to the bottom of their box.
+2. **The formula triangle clipped its labels** ("rate" read as "ate" in `B-21.png`). Label
+   boxes now fit the triangle's real interior at their height, and the font steps down to fit.
+   The triangle also now takes 2 to 4 quantities along the bottom (`B-23.png`, `B-24.png`).
+3. **`graph_gen.py` fitted a straight line through curved data**, with a meaningless
+   x-intercept at -57.6 s. It now draws a straight line only when the data is straight, and
+   otherwise a smooth curve of best fit (quadratic, power law, levelling-off curve or cubic,
+   whichever fits and keeps the data's shape), with no intercept or straight-line numbers.
+   Authors can force either with `referenceData.fit`.
+
+### Seen in the renders but not fixed (outside that brief)
+
+- **Mark-scheme panels can overflow their box.** On `C-07.png` the last exclusionary claim
+  runs off the bottom (it did in the first renders too). Likely cause: `fit: 'shrink'` is
+  applied by PowerPoint when it recalculates the text, which a straight export does not do.
+- **Equation fields do not convert units written with `/` and `^` together**: `kg/m^3` in a
+  GUESS row prints raw (`B-24.png`), because the `/` is read as a fraction first.

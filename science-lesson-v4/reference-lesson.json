@@ -468,6 +468,27 @@
         ]
       },
       {
+        "type": "practiceTriangle",
+        "topic": "specific heat capacity",
+        "equation": "\\Delta E = mc\\Delta\\theta",
+        "equationSymbols": { "top": "\\Delta E", "bottom": ["m", "c", "\\Delta\\theta"] },
+        "questions": [
+          { "q": "Heat 2 kg of water by 10°C. c = 4200 J/kg°C. Find \\Delta E.", "a": "84000 J", "marks": 2 },
+          { "q": "50000 J heats 5 kg of oil by 5°C. Find c.", "a": "2000 J/kg°C", "marks": 3 },
+          { "q": "12600 J heats 0.5 kg of water. c = 4200 J/kg°C. Find \\Delta\\theta.", "a": "6°C", "marks": 3 }
+        ]
+      },
+      {
+        "type": "guessExample",
+        "topic": "density of a block",
+        "given": "\\rho = 2700 kg/m^3, l = 0.2 m, w = 0.1 m, h = 0.05 m",
+        "unknown": "Mass of the aluminium block",
+        "equation": "m = \\rho lwh",
+        "equationSymbols": { "top": "m", "bottom": ["\\rho", "l", "w", "h"] },
+        "substitute": "m = 2700 \\times 0.2 \\times 0.1 \\times 0.05",
+        "solve": "m = 2.7 kg"
+      },
+      {
         "type": "errorAnalysis",
         "wrongWorking": [
           "rate = time \\div volume",

@@ -2,7 +2,9 @@
 
 Source of truth: `science-lesson/references/build.js` (4451 lines, frozen), cross-checked
 against `science-lesson/references/slide-options-v4.md` (v4.1).
-Written 2026-09-03 as the "before" picture for a visual reskin. Nothing in build.js was changed.
+Written 2026-09-03 as the "before" picture for a visual reskin. Updated 2026-10-02 for three
+fixes (handwriting font and spacing, formula triangle labels and 2-4 bottom cells, curved
+graphs); see render-constraints.md section 12.
 
 This document covers the **PowerPoint** side only. The two Word documents per lesson
 (`_worksheet.docx`, plus `_support_worksheet.docx` or `_answers.docx`) come from a separate
@@ -280,11 +282,11 @@ An unrecognised type renders **nothing at all**, silently.
 | `modelAnswerReview` | 1 | Left 48%: the model answer. Right 52%: a navy marking panel with a gold border | **Three `qType` states.** `short` is handwriting at 26pt; `calculation` is handwriting from an array of step strings at 24pt; `graph` is a matplotlib plot from `graphData` via `graph_gen.py`, or a grey placeholder if Python fails. Panel sections appear conditionally: INDICATIVE CONTENT always, BANDS only with `levelDescriptors`, EXCLUSIONARY CLAIMS in red only with `doesNotAward`, an ECF note only with `ecfNote`. A `group` on an indicative item inserts a pale gold sub-heading; `dependentOn` appends an italic clause. `<u>` and `**` markup are honoured |
 | `markTheAnswers` | **2** | A shared frame: question full width on top, marking panel on the left 42%, samples on the right 58%. Slide 1: each sample is a navy and gold name tab over handwriting. Slide 2 ("MARKS AWARDED"): the same frame with the right column replaced by verdicts (level and mark in amber, green ✓ hits, red ✗ misses, italic comment) | 1 to 4 samples, extras truncated. Each sample gets a different jitter preset by default (1, 3, 2, 4) |
 | `workedExample` | 1 | Two columns under navy headers WORKED EXAMPLE and YOUR TURN. Left: numbered steps with equation typesetting. Right: the your-turn prompt over a navy answer panel | **Edge: `meta.annotation: true`** replaces the left steps with a dashed "worked live" annotation zone and moves the steps into speaker notes. **Edge: no `yourTurn.answer`** renders an empty white gold-bordered rectangle instead of the navy panel |
-| `guessExample` | 1 | Five GUESS rows. Left: a gold rounded badge (G, U, E, S, S) plus a navy prompt. Right: one tall navy panel with gold hairline dividers between rows | **Edge: `triangleUsable`** (exactly three symbols supplied and no extra keys) draws the white vector formula triangle beside a 20pt equation; otherwise the equation takes the full row at 26pt and no triangle is drawn. Stacked versus diagonal fraction as in Learn F. The last row is a gold bold "Solve" banner |
+| `guessExample` | 1 | Five GUESS rows. Left: a gold rounded badge (G, U, E, S, S) plus a navy prompt. Right: one tall navy panel with gold hairline dividers between rows | **Edge: `triangleUsable`** (a top plus 2 to 4 bottom quantities, no other keys) draws the white vector formula triangle beside a 20pt equation, wider for 3 or 4 bottom cells (aspect 1.15, 1.45, 1.75); otherwise the equation takes the full row at 26pt and no triangle is drawn. Labels fit the triangle's interior and shrink to fit (floor 9pt). Stacked versus diagonal fraction as in Learn F. The last row is a gold bold "Solve" banner |
 | `practiceTriangle` | 1 | Left 65%: up to 3 question cards. Right 35%: an "EQUATION" label, a white reference box with the equation, and optionally the formula triangle | **Edge: `q.a` present** splits each card 58/38 and adds a navy and gold ANSWER box under the question; absent leaves the question the full card. **Edge:** the triangle is drawn only when `triangleUsable` **and** at least 0.7in of height remains. Answers are also written to speaker notes |
 | `errorAnalysis` | **2** | Task slide: numbered wrong working on the left 60%, a cream "Your task" strip and a white working zone on the right. Answer slide: purple pen bar, the same working with the error line amber, bold and underlined plus a green ✓ fix line, and an answer panel on the right | `errorType` adds an italic line to the answer panel |
 | `graphInterpret` | 1 | Left 55%: a white gold-bordered frame with a label, two drawn navy axis lines, and the image or annotation zone inside. Right 45%: up to 3 question and answer pairs, question in navy with white text (40% of the row) over the answer in navy with gold text (60%) | **Edge: `annotationZone: true`** puts a dashed live-working box inside the axes instead of an image. The header always reads ": ANSWERS" even on first showing |
-| `graphResults` | 1 | 70% matplotlib graph, 30% navy2 "Reading the graph" panel with numbered notes and an optional gold italic closing remark | **Renders nothing at all** without `worksheetExtras.referenceData.rows`. Grey placeholder if `graph_gen.py` fails |
+| `graphResults` | 1 | 70% matplotlib graph, 30% navy2 "Reading the graph" panel with numbered notes and an optional gold italic closing remark | **Renders nothing at all** without `worksheetExtras.referenceData.rows`. Grey placeholder if `graph_gen.py` fails. **Two graph states** (`referenceData.fit`, default auto): a straight line with gradient/intercept box and dashed extrapolation, or a smooth curve of best fit with no stats box |
 | `graphWithData` | 1 | 50% data table (navy header row with amber text, white body rows with navy text and navy cell borders), 50% compact graph | **Renders nothing at all** without `referenceData.rows`. Its presence also **suppresses** the practical Model Data slide |
 | `predictThenCheck` | **2** | Predict slide: an optional cream setup box, a large amber prediction band at 22pt, a cream "write it in your book" zone, and a navy commit footer. Check slide: purple pen bar, then YOUR PREDICTION (amber header, white box) beside WHAT ACTUALLY HAPPENS (navy header, navy and gold box), plus an optional full-width WHY box | The WHY box takes up to 30% of the height, capped at 1.3in |
 | `visualiser` | 1 | Handled by the caller, not the dispatcher. See section 6 | |
@@ -384,13 +386,17 @@ Used by `correctTheStatement`, `modelAnswerReview` and `markTheAnswers`.
 
 - **`editable` (default)**: every word becomes its own small Caveat text box, bold, rotated and
   baseline-shifted per one of five fixed jitter presets (0 neat to 4 messy). Real, selectable
-  PPTX text. Caveat is embedded into the .pptx afterwards by rewriting the zip.
-- **`raster`**: the identical layout is written as an SVG with Caveat inlined as a base64
-  `@font-face` and inserted as an image. Set via `item.renderMode` or `meta.handwritingMode`.
+  PPTX text. Caveat is embedded into the .pptx afterwards (EOT-wrapped, which PowerPoint needs).
+- **`raster`**: the identical layout is drawn into a transparent PNG by `handwriting_png.py`
+  (Pillow + the bundled Caveat) and laid over a native gold-bordered box. Not editable on the
+  slide. Set via `item.renderMode` or `meta.handwritingMode`. Falls back to editable, with a
+  build warning, if Python is unavailable.
 
-Both modes share `layoutHandwriting`, which stretches line spacing to fill the box (capped at
-2.4x the natural line height) so working never leaves trailing blank rules. `ruled: true`
-draws pale blue baseline rules under each line.
+Both modes share `layoutHandwriting`. Word widths come from Caveat's real letter widths.
+In **ruled** boxes it stretches line spacing to fill the box (capped at 2.4x the natural line
+height) so working never leaves trailing blank rules, and `ruled: true` draws pale blue
+baseline rules under each line. **Unruled** boxes keep natural spacing and are centred
+vertically.
 
 ### 9.3 Equations, three rendering paths
 - **Stacked fraction** (`renderEqShapes`): only on the three dedicated equation surfaces, that

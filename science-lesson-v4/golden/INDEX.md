@@ -47,7 +47,7 @@ node golden/index-golden.js
 | `A-28.png` | 28 | Review · MASTERING |
 | `A-29.png` | 29 | IMAGE BANK — sources and assets used in this lesson |
 
-## B — Reference-B-Build-Types (34 slides)
+## B — Reference-B-Build-Types (36 slides)
 
 | PNG | Slide | Label from the slide itself |
 |---|---|---|
@@ -73,18 +73,20 @@ node golden/index-golden.js
 | `B-20.png` | 20 | BUILD · WORKED EXAMPLE → YOUR TURN |
 | `B-21.png` | 21 | BUILD · WORKED EXAMPLE · MEAN RATE |
 | `B-22.png` | 22 | BUILD · YOUR TURN · MEAN RATE |
-| `B-23.png` | 23 | BUILD · SPOT THE MISTAKE |
-| `B-24.png` | 24 | BUILD · SPOT THE MISTAKE: ANSWER |
-| `B-25.png` | 25 | BUILD · READ THE GRAPH: ANSWERS |
-| `B-26.png` | 26 | BUILD · RESULTS GRAPH |
-| `B-27.png` | 27 | BUILD · MAKE A PREDICTION |
-| `B-28.png` | 28 | BUILD · CHECK YOUR PREDICTION |
-| `B-29.png` | 29 | IPEVO Visualiser |
-| `B-30.png` | 30 | APPLY · CHOOSE YOUR LEVEL |
-| `B-31.png` | 31 | Review · DEVELOPING |
-| `B-32.png` | 32 | Review · REACHING |
-| `B-33.png` | 33 | Review · MASTERING |
-| `B-34.png` | 34 | IMAGE BANK — sources and assets used in this lesson |
+| `B-23.png` | 23 | BUILD · YOUR TURN · SPECIFIC HEAT CAPACITY |
+| `B-24.png` | 24 | BUILD · WORKED EXAMPLE · DENSITY OF A BLOCK |
+| `B-25.png` | 25 | BUILD · SPOT THE MISTAKE |
+| `B-26.png` | 26 | BUILD · SPOT THE MISTAKE: ANSWER |
+| `B-27.png` | 27 | BUILD · READ THE GRAPH: ANSWERS |
+| `B-28.png` | 28 | BUILD · RESULTS GRAPH |
+| `B-29.png` | 29 | BUILD · MAKE A PREDICTION |
+| `B-30.png` | 30 | BUILD · CHECK YOUR PREDICTION |
+| `B-31.png` | 31 | IPEVO Visualiser |
+| `B-32.png` | 32 | APPLY · CHOOSE YOUR LEVEL |
+| `B-33.png` | 33 | Review · DEVELOPING |
+| `B-34.png` | 34 | Review · REACHING |
+| `B-35.png` | 35 | Review · MASTERING |
+| `B-36.png` | 36 | IMAGE BANK — sources and assets used in this lesson |
 
 ## C — Reference-C-Marking-Slides (15 slides)
 
@@ -138,4 +140,4 @@ node golden/index-golden.js
 | `E-10.png` | 10 | APPLY · CHOOSE YOUR LEVEL |
 | `E-11.png` | 11 | Review · TODAY’S LEARNING |
 
-**Total: 100 slides.**
+**Total: 102 slides.**
