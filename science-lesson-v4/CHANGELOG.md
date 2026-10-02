@@ -9,7 +9,7 @@ Every slide type was rendered to a picture so the reskin starts from a true reco
 | e8f2f2d | restore point | Saved everything exactly as it was, on branch `pre-reskin`, before any change. | n/a |
 | e0d5210 | the "before" record | **design-inventory.md** lists every slide the builder can make, **render-constraints.md** says what PowerPoint files can and cannot draw, and **golden/** holds a picture of every slide plus the files behind them. | `git revert e0d5210` |
 | aa30cf4 | **three bugs fixed** | **Handwriting now looks handwritten in PowerPoint.** The handwriting font was being put inside the file in a form PowerPoint ignores, so it showed as plain bold text. It now goes in the form PowerPoint reads, and the words stay editable. Word spacing was also fixed (it was based on a guess that was twice too wide), and the picture version now works too. **Formula triangles** no longer cut off their labels, and can now hold up to four quantities along the bottom, so `Ep = mgh` and `ΔE = mcΔθ` get triangles. **Results graphs** draw a smooth curve for curved data instead of a wrong straight line with a made-up intercept; straight-line practicals are unchanged. | `git revert aa30cf4` |
-| (next) | refreshed pictures | The golden pictures re-made with the fixes, so they match what the builder now produces. The first set is kept in history at `e0d5210`. | `git revert` that commit |
+| 62a512a | refreshed pictures | The golden pictures re-made with the fixes, so they match what the builder now produces. The first set is kept in history at `e0d5210`. | `git revert 62a512a` |
 
 **Upload needed:** replace `science-lesson.skill` in claude.ai with the new one (packed 2026-10-02).
 
