@@ -172,6 +172,7 @@ Rules:
 - At least 4 pre-filled data rows
 - Never label it "correct results" — it is reference data
 - Rendered as: section label → italic note → pre-filled results table
+- Graph line (`"fit"`, optional, used by the results graph slides): `"auto"` by default picks a curve when a straight line clearly does not fit the data, otherwise a straight line. Set `"fit": "linear"` for a straight-line practical where the gradient or intercept matters (latent heat, absolute zero, Hooke's law): that draws the line, the gradient and intercept box, and the dashed line back to the x-axis. Set `"fit": "curve"` for rates, pressure against volume, cooling, enzyme optimum: a smooth curve of best fit over the data only, no intercept and no straight-line numbers.
 
 ---
 

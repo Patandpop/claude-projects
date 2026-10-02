@@ -256,7 +256,7 @@ GUESS-scaffolded worked example on ONE slide ("we do" step). Distinct from `work
 In `substitute`/`equation` prefer inline `÷` over `{a/b}` — these rows are short, and a one-line diagonal reads cleaner than a fraction here (the old tiny-fraction shrink is fixed, so `{a/b}` is legible too if you need it). Use for any lesson introducing a new equation, straight after the Learn-F intro.
 
 ### BUILD — practiceTriangle
-"You do" independent-practice step, completing the I-do → we-do → you-do sequence (Learn-F → `guessExample` → this). Left ~65%: up to 3 short calculation questions, one gold-bordered box each. Right ~35%: the same equation + formula triangle pinned as a live reference. Answers go to speaker notes, never the slide.
+"You do" independent-practice step, completing the I-do → we-do → you-do sequence (Learn-F → `guessExample` → this). Left ~65%: up to 3 short calculation questions, one gold-bordered box each, each with its answer in a navy box underneath (Patryk adds the reveal animation) and a copy in speaker notes. Right ~35%: the same equation + formula triangle pinned as a live reference.
 ```json
 { "type": "practiceTriangle", "topic": "optional header suffix",
   "questions": [{ "q": "...", "a": "...", "marks": 2 }],
@@ -264,6 +264,14 @@ In `substitute`/`equation` prefer inline `÷` over `{a/b}` — these rows are sh
   "equationSymbols": { "top": "pV", "bottomLeft": "n", "bottomRight": "RT" } }
 ```
 Max 3 questions (hard cap). Worksheet carries the questions with working space.
+
+### Formula triangle (`equationSymbols`, used by guessExample and practiceTriangle)
+One quantity on top, **2 to 4 multiplied quantities along the bottom**. Use the `bottom` list for anything beyond three quantities:
+```json
+"equationSymbols": { "top": "Ep", "bottom": ["m", "g", "h"] }
+"equationSymbols": { "top": "\\Delta E", "bottom": ["m", "c", "\\Delta\\theta"] }
+```
+The original `{ "top", "bottomLeft", "bottomRight" }` form still works for three quantities. The triangle only suits "one quantity = the others multiplied together". Leave `equationSymbols` out for anything else (`a = (v − u)/t`, `Ek = ½mv²`): the renderer suppresses a triangle that doesn't fit this shape and gives the equation the full row instead. Symbols accept the usual `\\Delta`, `\\rho`, `\\theta` commands. Labels shrink to fit their cell, so short symbols read best.
 
 ### BUILD — errorAnalysis
 ```json
@@ -366,14 +374,14 @@ Min 4 statements. Mix ~40–60% false. Every false statement needs `correction`.
 Best for lessons where the key idea involves a mechanism students confidently mispredict.
 
 Both `modelAnswerReview` and `correctTheStatement` share one handwriting engine.
-Handwriting defaults to real editable PPTX text (Caveat embedded into the
-.pptx package). If Caveat font-embedding ever proves unreliable in a real
-PowerPoint open, set `"renderMode": "raster"` on the build item (or
-`"handwritingMode": "raster"` in `meta`, to switch every handwriting slide in
-the lesson at once) — this swaps to a self-contained SVG image with Caveat
-embedded as base64 inside it, so it still displays correctly with zero
-dependency on the .pptx-level embed. Nothing else on the deck is affected
-either way.
+Handwriting defaults to real editable PPTX text, with Caveat embedded in the
+.pptx in the format PowerPoint loads (fixed 2026-10-02: before that the font
+was ignored and handwriting showed as plain bold text in PowerPoint). Set
+`"renderMode": "raster"` on the build item (or `"handwritingMode": "raster"`
+in `meta`, for every handwriting slide in the lesson) to get a picture of the
+same handwriting instead: identical layout, looks right on any machine or app,
+but the words can't be edited on the slide (edit the JSON and rebuild).
+Nothing else on the deck is affected either way.
 
 ### BUILD — modelAnswerReview
 Test review Build slide — one slide per test question. Left: handwritten model

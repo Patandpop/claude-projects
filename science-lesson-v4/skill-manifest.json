@@ -4,6 +4,7 @@
     "SKILL.md",
     "references/build.js",
     "references/graph_gen.py",
+    "references/handwriting_png.py",
     "references/textbook-index.js",
     "references/textbook-index.md",
     "references/slide-options-v4.md",

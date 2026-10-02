@@ -202,9 +202,8 @@ The final slide of every deck is the **IMAGE BANK** (kept, not deleted): it self
     { "type": "mcq", "q": "...", "options": ["A...","B...","C...","D..."], "answer": "B", "explanation": "...", "commonError": "..." },
     { "type": "practical", "intro": "...", "worksheetIntro": false, "steps": ["..."], "equipment": ["beaker", "thermometer", "..."], "warning": "...", "imagePlaceholder": true, "questions": [ { "q": "...", "a": "..." } ] },
     { "type": "workedExample", "worked": { "prompt": "...", "steps": ["..."] }, "yourTurn": { "prompt": "...", "answer": "..." } },
-    { "type": "guessExample", "topic": "...", "given": "...", "unknown": "...", "equation": "...", "equationSymbols": { "top": "...", "bottomLeft": "...", "bottomRight": "..." }, "substitute": "...", "solve": "..." },
-    { "type": "practiceTriangle", "questions": [ { "q": "...", "a": "...", "marks": 2 } ], "equation": "...", "equationSymbols": { "top": "...", "bottomLeft": "...", "bottomRight": "..." } },
-    { "type": "errorAnalysis", "wrongWorking": ["..."], "errorLine": 3, "fix": "..." },
+    { "type": "guessExample", "topic": "...", "given": "...", "unknown": "...", "equation": "...", "equationSymbols": { "top": "...", "bottom": ["...", "..."] }, "substitute": "...", "solve": "..." },
+    { "type": "practiceTriangle", "questions": [ { "q": "...", "a": "...", "marks": 2 } ], "equation": "...", "equationSymbols": { "top": "...", "bottom": ["...", "...", "..."] } },    { "type": "errorAnalysis", "wrongWorking": ["..."], "errorLine": 3, "fix": "..." },
     { "type": "graphInterpret", "graphLabel": "V-t graph", "axes": { "x": "time (s)", "y": "velocity (m/s)" }, "questions": [ { "q": "...", "a": "..." } ] },
     { "type": "misconception", "claim": "...", "whyWrong": "...", "truth": "..." },
     { "type": "sort", "...": "see slide-options-v4.md" },
@@ -240,6 +239,7 @@ The final slide of every deck is the **IMAGE BANK** (kept, not deleted): it self
 ```
 
 Notes on key fields:
+- **`equationSymbols` (formula triangle):** one quantity on top, 2 to 4 MULTIPLIED quantities in `bottom` (`{ "top": "Ep", "bottom": ["m", "g", "h"] }`). Omit it for any other kind of equation (`a = (v − u)/t`, `Ek = ½mv²`): no triangle is drawn. Full rules in slide-options-v4.md.
 - **Image extraction (M1–M3):** When a source PPTX or DOCX is uploaded, extract images using Python's `zipfile` module before building the JSON. PPTX: extract from `ppt/media/`; DOCX: extract from `word/media/`. Write each file as `/mnt/user-data/outputs/img_1.png`, `img_2.png`, etc. Match EACH image to a slide slot by type group (real-world photo → Engage; labelled diagram → Learn A/B; apparatus setup → Build practical). **Set `embeddedImagePath` + `imageConfidence: "search"` on EVERY matched slide entry independently** — multiple `embeddedImagePath` fields per lesson are valid and expected. If Engage gets img_1.png and Learn A gets img_2.png, both entries get their own field. `image_dump` catches genuinely unmatched images only — never use it as a fallback for images that have a clear slot match. Matched images must NOT also appear in `image_dump`. The `image_dump` slide is appended last and must be deleted before sharing.
 - `learn[].boxes` is the preferred Learn-A form (navy-header boxes stacking rules/key info) — much better than a flat `body` string, which renders plain.
 - `apply[].diagram: true` (or a string label) emits a framed diagram box on the worksheet under that question — use for any question that refers to a circuit/diagram. `diagramLines` controls the box height.

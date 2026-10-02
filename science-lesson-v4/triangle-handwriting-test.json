@@ -1,0 +1,102 @@
+[
+  {
+    "meta": {
+      "class": "10S2",
+      "year": 10,
+      "subject": "Physics",
+      "theme": "physics",
+      "topic": "Triangle Handwriting Test",
+      "title": "Triangle, handwriting and curve regression",
+      "lessonType": "standard"
+    },
+    "title": {
+      "objectives": ["Use equations with more than three quantities"],
+      "keywords": ["gravitational potential energy", "specific heat capacity", "density"]
+    },
+    "doNow": {
+      "variant": "A",
+      "questions": [
+        { "q": "Give the unit of energy.", "a": "joule (J)" },
+        { "q": "Give the unit of mass.", "a": "kilogram (kg)" },
+        { "q": "What is g on Earth?", "a": "9.8 N/kg" },
+        { "q": "Give the unit of specific heat capacity.", "a": "J/kg°C" },
+        { "q": "Give the unit of density.", "a": "kg/m^3" },
+        { "q": "What does Δθ mean?", "a": "temperature change" }
+      ]
+    },
+    "engage": {
+      "variant": "prediction",
+      "hook": "Which stores more energy: a brick on a shelf or a cup of hot tea?",
+      "imagePlaceholder": false
+    },
+    "learn": [],
+    "build": [
+      {
+        "type": "practiceTriangle",
+        "topic": "gravitational potential energy",
+        "equation": "E_p = mgh",
+        "equationSymbols": { "top": "Ep", "bottom": ["m", "g", "h"] },
+        "questions": [
+          { "q": "A 2 kg book is lifted 1.5 m. g = 9.8 N/kg. Find E_p.", "a": "29.4 J", "marks": 2 },
+          { "q": "A 60 kg climber gains 5880 J. g = 9.8 N/kg. Find h.", "a": "10 m", "marks": 3 }
+        ]
+      },
+      {
+        "type": "guessExample",
+        "topic": "density of a block",
+        "given": "\\rho = 2700 kg/m^3, l = 0.2 m, w = 0.1 m, h = 0.05 m",
+        "unknown": "mass of the block",
+        "equation": "m = \\rho lwh",
+        "equationSymbols": { "top": "m", "bottom": ["\\rho", "l", "w", "h"] },
+        "substitute": "m = 2700 \\times 0.2 \\times 0.1 \\times 0.05",
+        "solve": "m = 2.7 kg"
+      },
+      {
+        "type": "practiceTriangle",
+        "topic": "not a product",
+        "equation": "a = {(v - u)/t}",
+        "equationSymbols": { "top": "a", "bottom": ["v", "u", "t"], "extra": "minus sign" },
+        "questions": [
+          { "q": "v = 20 m/s, u = 5 m/s, t = 3 s. Find a.", "a": "5 m/s^2", "marks": 2 }
+        ]
+      },
+      {
+        "type": "correctTheStatement",
+        "renderMode": "raster",
+        "statements": [
+          { "text": "Lifting twice as high halves the energy.", "correction": "Twice as high stores twice the energy." },
+          { "text": "Water heats up faster than oil.", "correction": "Oil heats faster: lower specific heat capacity." },
+          { "text": "A heavier block is always denser.", "correction": "Density depends on mass and volume." },
+          { "text": "g is the same everywhere in space.", "correction": "g depends on the planet or moon." }
+        ]
+      },
+      {
+        "type": "graphResults",
+        "graphNotes": ["Steepest at the start.", "Levels off when a reactant runs out."]
+      }
+    ],
+    "worksheetExtras": {
+      "referenceData": {
+        "headers": ["Time (s)", "Volume of gas (cm3)"],
+        "rows": [[0, 0], [30, 22], [60, 38], [90, 48], [120, 54], [150, 57], [180, 58], [210, 58]]
+      }
+    },
+    "apply": {
+      "developing": [
+        { "q": "Write the equation for gravitational potential energy.", "a": "E_p = mgh", "marks": 1 },
+        { "q": "Give the unit of g.", "a": "N/kg", "marks": 1 },
+        { "q": "Name the quantity measured in J/kg°C.", "a": "specific heat capacity", "marks": 1 }
+      ],
+      "reaching": [
+        { "q": "A 3 kg mass is lifted 2 m. g = 9.8 N/kg. Find E_p.", "a": "58.8 J", "marks": 2 },
+        { "q": "Find the energy to heat 2 kg of water by 5°C. c = 4200 J/kg°C.", "a": "42000 J", "marks": 2 },
+        { "q": "A block is 0.1 m by 0.1 m by 0.1 m with density 1000 kg/m^3. Find its mass.", "a": "1 kg", "marks": 2 }
+      ],
+      "mastering": [
+        { "q": "Rearrange E_p = mgh to make h the subject.", "a": "h = E_p ÷ (mg)", "marks": 1 },
+        { "q": "Explain why a formula triangle cannot be used for a = (v - u)/t.", "a": "It is not one quantity equal to a product of the others", "marks": 2 },
+        { "q": "Find the temperature rise when 21000 J heats 1 kg of water. c = 4200 J/kg°C.", "a": "5°C", "marks": 2 }
+      ]
+    }
+  }
+]

@@ -16,6 +16,15 @@ json_data fields:
     interceptAccepted float     — accepted value for % error (optional)
     compact          bool       — compact mode for Variant B (no stats box, smaller figure)
     title            str        — optional override title
+    fit              str        — "auto" (default) | "linear" | "curve"
+                                  linear: straight line of best fit, gradient, intercepts,
+                                          dashed extrapolation to the x-intercept (straight-line
+                                          practicals: latent heat, absolute zero, Hooke's law)
+                                  curve:  smooth curve of best fit over the data range only; no
+                                          extrapolation, no intercept, no straight-line stats
+                                          (rates, P against V, enzyme optimum, cooling curves)
+                                  auto:   curve when a straight line clearly does not fit
+                                          (R² < 0.98 AND a quadratic halves the leftover error)
 """
 import sys
 import json
@@ -32,6 +41,106 @@ NAVY, GOLD, AMBER, RED, WHITE = '#152347', '#FABB2E', '#E65100', '#E42431', '#FF
 def _unit(header):
     """Extract unit string from 'Label (unit)' header format."""
     return header.split('(')[-1].rstrip(')').strip() if '(' in header else ''
+
+
+def _r2(ys, pred):
+    ss_tot = np.sum((ys - ys.mean()) ** 2)
+    return 1 - np.sum((ys - pred) ** 2) / ss_tot if ss_tot != 0 else 1.0
+
+
+def choose_fit(xs, ys, requested='auto'):
+    """'linear' or 'curve'. Explicit requests win; 'auto' only calls data curved when a
+    straight line is clearly wrong, so noisy straight-line practicals stay linear."""
+    if requested in ('linear', 'curve'):
+        return requested
+    if len(xs) < 3:
+        return 'linear'
+    lin_res = np.sum((ys - np.polyval(np.polyfit(xs, ys, 1), xs)) ** 2)
+    quad_res = np.sum((ys - np.polyval(np.polyfit(xs, ys, 2), xs)) ** 2)
+    curved = _r2(ys, np.polyval(np.polyfit(xs, ys, 1), xs)) < 0.98 and quad_res < 0.5 * lin_res
+    return 'curve' if curved else 'linear'
+
+
+def _pchip(xs, ys, xq):
+    """Fritsch-Carlson monotone cubic through the points (numpy only, no scipy):
+    smooth, never overshoots, so a levelling-off curve stays level."""
+    h = np.diff(xs)
+    d = np.diff(ys) / h
+    m = np.zeros_like(ys)
+    for k in range(1, len(xs) - 1):
+        if d[k - 1] * d[k] > 0:
+            w1, w2 = 2 * h[k] + h[k - 1], h[k] + 2 * h[k - 1]
+            m[k] = (w1 + w2) / (w1 / d[k - 1] + w2 / d[k])
+    m[0], m[-1] = d[0], d[-1]
+    idx = np.clip(np.searchsorted(xs, xq) - 1, 0, len(xs) - 2)
+    t = (xq - xs[idx]) / h[idx]
+    h00, h10 = 2 * t**3 - 3 * t**2 + 1, t**3 - 2 * t**2 + t
+    h01, h11 = -2 * t**3 + 3 * t**2, t**3 - t**2
+    return h00 * ys[idx] + h10 * h[idx] * m[idx] + h01 * ys[idx + 1] + h11 * h[idx] * m[idx + 1]
+
+
+def _shape_ok(xs, ys, yq):
+    """A fitted curve must keep the data's shape: if the data only rises (or only
+    falls) the curve may not turn back, and if the data only ever bends one way
+    (levelling off, or inverse proportion) the curve may not flip its bend."""
+    tol = 1e-6 * (np.ptp(ys) or 1.0)
+    steps = np.diff(ys)
+    dq = np.diff(yq)
+    if np.all(steps >= 0) and np.any(dq < -tol):
+        return False
+    if np.all(steps <= 0) and np.any(dq > tol):
+        return False
+    if len(xs) >= 3:
+        bends = np.diff(steps / np.diff(xs))       # change in slope between neighbouring points
+        ddq = np.diff(dq)
+        btol = 0.02 * (np.max(np.abs(ddq)) or 1.0)  # ignore rounding-sized wobbles in the bend
+        if np.all(bends < 0) and np.any(ddq > btol):
+            return False
+        if np.all(bends > 0) and np.any(ddq < -btol):
+            return False
+    return True
+
+
+def _plateau_fit(xs, ys):
+    """y = A + B·e^(-k·(x - x0)): rises (or falls) and levels off. Fits rate-of-reaction
+    curves, cooling curves, decay. k is found by a 1-D search; A and B by least squares."""
+    x0, span = xs.min(), np.ptp(xs) or 1.0
+    best = None
+    for k in np.logspace(np.log10(0.1 / span), np.log10(30 / span), 400):
+        M = np.column_stack([np.ones_like(xs), np.exp(-k * (xs - x0))])
+        coef, *_ = np.linalg.lstsq(M, ys, rcond=None)
+        sse = np.sum((M @ coef - ys) ** 2)
+        if best is None or sse < best[0]:
+            best = (sse, k, coef)
+    _, k, (A, B) = best
+    return lambda x: A + B * np.exp(-k * (x - x0))
+
+
+def curve_of_best_fit(xs, ys, xq):
+    """Smooth curve over the data range. Tries, in order: a quadratic, a power law
+    (y = a·x^n, which covers inverse proportion such as P against V), a levelling-off
+    curve (_plateau_fit: rates, cooling, decay), then a cubic.
+    The first that fits well (R² >= 0.99) and keeps the data's shape (_shape_ok) wins.
+    Otherwise a monotone curve through the points (never overshoots)."""
+    order = np.argsort(xs)
+    xs, ys = xs[order], ys[order]
+    candidates = []
+    if len(xs) > 2:
+        candidates.append(lambda x, c=np.polyfit(xs, ys, 2): np.polyval(c, x))
+    if np.all(xs > 0) and (np.all(ys > 0) or np.all(ys < 0)) and len(xs) > 2:
+        sign = 1.0 if ys[0] > 0 else -1.0
+        n, ln_a = np.polyfit(np.log(xs), np.log(sign * ys), 1)
+        candidates.append(lambda x, n=n, a=np.exp(ln_a), s=sign: s * a * np.power(x, n))
+    if len(xs) > 3:
+        candidates.append(_plateau_fit(xs, ys))
+    if len(xs) > 3:
+        candidates.append(lambda x, c=np.polyfit(xs, ys, 3): np.polyval(c, x))
+    for f in candidates:
+        if _r2(ys, f(xs)) >= 0.99 and _shape_ok(xs, ys, f(xq)):
+            return f(xq)
+    if len(xs) >= 3 and not (np.all(np.diff(ys) >= 0) or np.all(np.diff(ys) <= 0)):
+        return np.polyval(np.polyfit(xs, ys, 2), xq)   # a peak or trough (enzyme optimum)
+    return _pchip(xs, ys, xq)
 
 
 def render(data, out_path, compact=False):
@@ -55,17 +164,20 @@ def render(data, out_path, compact=False):
     xs = np.array([float(r[xc]) for r in rows])
     ys = np.array([float(r[yc]) for r in rows])
 
+    # 2026-10-02: straight line only when the data is a straight line. Before this,
+    # every dataset got a linear fit and an extrapolated x-intercept, including
+    # rate curves (intercept at -57.6 s) and pressure against volume.
+    fit = choose_fit(xs, ys, str(data.get('fit', 'auto')).lower())
+    is_curve = fit == 'curve'
+
     # M7: linear regression via numpy.polyfit degree 1
     m, b = np.polyfit(xs, ys, 1)
 
     # R² — for stats box
-    y_pred = m * xs + b
-    ss_res = np.sum((ys - y_pred) ** 2)
-    ss_tot = np.sum((ys - ys.mean()) ** 2)
-    r2 = 1 - ss_res / ss_tot if ss_tot != 0 else 1.0
+    r2 = _r2(ys, m * xs + b)
 
-    # N1: x-intercept disabled when xIntercept=false
-    xi = (-b / m) if (do_xi and m != 0) else None
+    # N1: x-intercept disabled when xIntercept=false; never on a curve
+    xi = (-b / m) if (do_xi and m != 0 and not is_curve) else None
 
     x0, x1 = xs.min(), xs.max()
     data_range = x1 - x0
@@ -114,15 +226,16 @@ def render(data, out_path, compact=False):
         xe = np.linspace(xl, x0, 300)
         ax.plot(xe, m * xe + b, color=AMBER, lw=1.8, ls='--', zorder=3)
 
-    # Gold solid best-fit line — data range only (M2)
+    # Gold solid best-fit line (or curve) — data range only (M2)
     xf = np.linspace(x0, x1, 300)
-    ax.plot(xf, m * xf + b, color=GOLD, lw=2.0, zorder=4)
+    ax.plot(xf, curve_of_best_fit(xs, ys, xf) if is_curve else m * xf + b, color=GOLD, lw=2.0, zorder=4)
 
     # Gold scatter points — no coordinate labels on points (M2)
     ax.scatter(xs, ys, color=GOLD, s=70, zorder=5)
 
-    # Stats box top-left — M2; skipped in compact mode (M3)
-    if not compact:
+    # Stats box top-left — M2; skipped in compact mode (M3). Gradient, intercepts and
+    # R² describe a straight line, so a curve gets no stats box at all.
+    if not compact and not is_curve:
         xu = _unit(x_hdr)
         yu = _unit(y_hdr)
         # gradient units: y-unit / x-unit

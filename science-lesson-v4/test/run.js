@@ -32,6 +32,7 @@ const FIXTURES = [
   'y7-b1-l1-mrs-gren.json',   // KS3 standard lesson; no-word-bank / basic flow
   'review-answers-test.json', // review lesson; answer sheet (GUESS + indicative frameworks), Bug 56 single-tier
   'flow-native-test.json',    // Bug 54: native flow/cycle shapes (Learn-G/I) + Bug 58 image-description placeholder
+  'triangle-handwriting-test.json', // 2026-10-02: 3- and 4-cell formula triangles, picture handwriting, EOT font embed, curved graph
 ];
 
 // Strings the RENDERER must never emit (terminology + font-glyph regressions).
@@ -242,6 +243,51 @@ function main() {
         if (dxml.includes('Correct order:')) pass('reformatFlowchart: worksheet ordering line present');
         else fail('reformatFlowchart: worksheet ordering line missing');
       }
+    }
+
+    // 2026-10-02 fixes: formula triangles beyond three quantities, picture
+    // handwriting, a Caveat embed PowerPoint actually loads, curved graph data.
+    if (fixture === 'triangle-handwriting-test.json') {
+      const pptx = path.join(outDir, baseName(lessons[0].meta) + '.pptx');
+      if (fs.existsSync(pptx)) {
+        const zip = new AdmZip(pptx);
+        const xml = readArchiveXml(pptx);
+        // Two product equations get triangles (3-cell Ep = mgh, 4-cell m = ρlwh);
+        // the non-product a = (v - u)/t must NOT, despite carrying symbols.
+        const tris = (xml.match(/prstGeom prst="triangle"/g) || []).length;
+        if (tris === 2) pass('formula triangles: 3- and 4-cell drawn, non-product equation suppressed');
+        else fail(`formula triangles: expected 2 triangle shapes, found ${tris}`);
+        if (xml.includes('<a:t>ρ</a:t>')) pass('formula triangle: \\rho label typeset as ρ in its own cell');
+        else fail('formula triangle: 4-cell label ρ missing');
+        // Picture handwriting: every embedded .png must be a real PNG (the old route
+        // shipped SVG text under a .png name) and no SVG may remain.
+        const media = zip.getEntries().filter((e) => /^ppt\/media\//.test(e.entryName));
+        const fakePng = media.filter((e) => /\.png$/i.test(e.entryName)
+          && !e.getData().subarray(0, 4).equals(Buffer.from([0x89, 0x50, 0x4E, 0x47])));
+        if (media.some((e) => /\.svg$/i.test(e.entryName))) fail('handwriting: SVG media still embedded (old raster route)');
+        else if (fakePng.length) fail(`handwriting: ${fakePng.length} ".png" media file(s) are not real PNGs`);
+        else pass('picture handwriting: real PNG media, no SVG');
+        // Caveat embed must be EOT-wrapped: PowerPoint ignores a raw .ttf part.
+        const fnt = zip.getEntry('ppt/fonts/font2.fntdata');
+        if (fnt && fnt.getData().readUInt16LE(34) === 0x504C) pass('Caveat embedded in EOT form (PowerPoint loads it)');
+        else fail('Caveat embed is not EOT-wrapped: PowerPoint will substitute a plain font');
+      }
+      // graph_gen fit choice on real lesson data: rate curve, latent heat line, P against V curve.
+      const py = process.platform === 'win32' ? 'python' : 'python3';
+      const probe = [
+        'import numpy as np, graph_gen as g',
+        'a = lambda r: (np.array([x for x, _ in r], float), np.array([y for _, y in r], float))',
+        'print(g.choose_fit(*a([[0,0],[30,22],[60,38],[90,48],[120,54],[150,57],[180,58],[210,58]])),',
+        '      g.choose_fit(*a([[0.027,60000],[0.051,120000],[0.079,180000],[0.106,240000],[0.128,300000],[0.157,360000]])),',
+        '      g.choose_fit(*a([[0.01,99500],[0.02,49800],[0.03,33200],[0.04,24900],[0.05,19900]])))',
+      ].join('\n');
+      const gr = cp.spawnSync(py, ['-c', probe], {
+        cwd: path.join(ROOT, 'science-lesson', 'references'), encoding: 'utf8',
+        env: Object.assign({}, process.env, { PYTHONDONTWRITEBYTECODE: '1' }),   // no __pycache__ in the skill folder
+      });
+      const got = String(gr.stdout || '').trim();
+      if (got === 'curve linear curve') pass('graph_gen: curved data gets a curve, straight-line practical keeps its line');
+      else fail(`graph_gen fit choice wrong: expected "curve linear curve", got "${got || (gr.stderr || '').trim()}"`);
     }
 
     // No worksheet-side output for a bigFact Build item (display-only, per spec).

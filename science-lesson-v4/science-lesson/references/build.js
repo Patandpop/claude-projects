@@ -639,8 +639,128 @@ function jitterFor(profileIdx, wordIdx) {
   const p = JITTER_PROFILES[Math.max(0, Math.min(JITTER_PROFILES.length - 1, profileIdx))];
   return { rot: p.rot[wordIdx % p.rot.length], base: p.base[wordIdx % p.base.length] };
 }
+/* ---- CAVEAT FONT FILE HELPERS (2026-10-02) --------------------------------
+   Read the bundled Caveat TTF directly, so (1) it can be wrapped in the format
+   PowerPoint actually loads from inside a .pptx, and (2) word spacing uses the
+   font's real letter widths instead of a guess. */
+function ttfTables(buf) {
+  const tables = {};
+  const n = buf.readUInt16BE(4);
+  for (let i = 0; i < n; i++) {
+    const o = 12 + i * 16;
+    tables[buf.toString('latin1', o, o + 4)] = { off: buf.readUInt32BE(o + 8), len: buf.readUInt32BE(o + 12) };
+  }
+  return tables;
+}
+
+/* ttfToEot(buf) — wrap a TrueType font in an uncompressed Embedded OpenType
+   header (EOT v0x00020001). PowerPoint IGNORES a raw .ttf placed in
+   ppt/fonts/*.fntdata and silently substitutes another font; wrapped like
+   this it loads it (verified by PowerPoint export, golden render C-09,
+   2026-10-02). Every header field is copied from the font's own OS/2, head
+   and name tables. */
+function ttfToEot(ttf) {
+  const t = ttfTables(ttf);
+  const os2 = t['OS/2'], head = t.head, name = t.name;
+  if (!os2 || !head || !name) throw new Error('font is missing its OS/2, head or name table');
+  const nameStr = (id) => {                      // Windows Unicode string, UTF-16BE → LE
+    const count = ttf.readUInt16BE(name.off + 2), strOff = name.off + ttf.readUInt16BE(name.off + 4);
+    let best = null;
+    for (let i = 0; i < count; i++) {
+      const r = name.off + 6 + i * 12;
+      if (ttf.readUInt16BE(r) !== 3 || ttf.readUInt16BE(r + 2) !== 1 || ttf.readUInt16BE(r + 6) !== id) continue;
+      const s = strOff + ttf.readUInt16BE(r + 10);
+      if (!best || ttf.readUInt16BE(r + 4) === 0x409) best = ttf.subarray(s, s + ttf.readUInt16BE(r + 8));
+    }
+    const le = Buffer.from(best || Buffer.alloc(0));
+    le.swap16();
+    return le;
+  };
+  const fixed = Buffer.alloc(82);
+  fixed.writeUInt32LE(0x00020001, 8);                                   // Version
+  ttf.copy(fixed, 16, os2.off + 32, os2.off + 42);                      // PANOSE
+  fixed.writeUInt8(1, 26);                                              // Charset: default
+  fixed.writeUInt8(ttf.readUInt16BE(os2.off + 62) & 1, 27);             // Italic
+  fixed.writeUInt32LE(ttf.readUInt16BE(os2.off + 4), 28);               // Weight
+  fixed.writeUInt16LE(ttf.readUInt16BE(os2.off + 8), 32);               // fsType
+  fixed.writeUInt16LE(0x504C, 34);                                      // Magic number
+  for (let i = 0; i < 4; i++) fixed.writeUInt32LE(ttf.readUInt32BE(os2.off + 42 + i * 4), 36 + i * 4);
+  if (ttf.readUInt16BE(os2.off) >= 1) {                                 // code page ranges (OS/2 v1+)
+    fixed.writeUInt32LE(ttf.readUInt32BE(os2.off + 78), 52);
+    fixed.writeUInt32LE(ttf.readUInt32BE(os2.off + 82), 56);
+  }
+  fixed.writeUInt32LE(ttf.readUInt32BE(head.off + 8), 60);              // checkSumAdjustment
+  const parts = [fixed];
+  [1, 2, 5, 4].forEach((id, i) => {             // family, style, version, full name
+    const s = nameStr(id);
+    const sz = Buffer.alloc(i === 0 ? 2 : 4);   // a 2-byte padding precedes every name after the first
+    sz.writeUInt16LE(s.length, i === 0 ? 0 : 2);
+    parts.push(sz, s);
+  });
+  parts.push(Buffer.alloc(4));                  // padding + empty root string
+  const header = Buffer.concat(parts);
+  header.writeUInt32LE(header.length + ttf.length, 0);                  // EOTSize
+  header.writeUInt32LE(ttf.length, 4);                                  // FontDataSize
+  return Buffer.concat([header, ttf]);
+}
+
+/* caveatMetrics() — advance width (in em) for any character, from the bold
+   Caveat file's cmap (format 4) + hmtx tables. null when the font can't be
+   read, in which case wordWidthIn falls back to the old flat estimate. */
+let _caveatMetrics;
+function caveatMetrics() {
+  if (_caveatMetrics !== undefined) return _caveatMetrics;
+  _caveatMetrics = null;
+  try {
+    const buf = fs.readFileSync(fs.existsSync(CAVEAT_BOLD_PATH) ? CAVEAT_BOLD_PATH : CAVEAT_REGULAR_PATH);
+    const t = ttfTables(buf);
+    const upm = buf.readUInt16BE(t.head.off + 18);
+    const nHM = buf.readUInt16BE(t.hhea.off + 34);
+    const adv = (g) => buf.readUInt16BE(t.hmtx.off + Math.min(g, nHM - 1) * 4);
+    let sub = null;                              // first Unicode format-4 cmap subtable
+    for (let i = 0; i < buf.readUInt16BE(t.cmap.off + 2); i++) {
+      const r = t.cmap.off + 4 + i * 8;
+      const plat = buf.readUInt16BE(r), enc = buf.readUInt16BE(r + 2);
+      const so = t.cmap.off + buf.readUInt32BE(r + 4);
+      if (((plat === 3 && enc === 1) || plat === 0) && buf.readUInt16BE(so) === 4) { sub = so; break; }
+    }
+    if (!sub) return _caveatMetrics;
+    const seg = buf.readUInt16BE(sub + 6) / 2;
+    const endA = sub + 14, startA = endA + seg * 2 + 2, deltaA = startA + seg * 2, rangeA = deltaA + seg * 2;
+    const glyph = (c) => {
+      for (let i = 0; i < seg; i++) {
+        if (buf.readUInt16BE(endA + i * 2) < c) continue;
+        const start = buf.readUInt16BE(startA + i * 2);
+        if (start > c) return 0;
+        const delta = buf.readUInt16BE(deltaA + i * 2), ro = buf.readUInt16BE(rangeA + i * 2);
+        if (!ro) return (c + delta) & 0xFFFF;
+        const g = buf.readUInt16BE(rangeA + i * 2 + ro + (c - start) * 2);
+        return g ? (g + delta) & 0xFFFF : 0;
+      }
+      return 0;
+    };
+    const cache = new Map();
+    _caveatMetrics = (ch) => {
+      if (!cache.has(ch)) cache.set(ch, adv(glyph(ch.codePointAt(0))) / upm);
+      return cache.get(ch);
+    };
+  } catch (e) {
+    buildWarn(`could not read Caveat letter widths (${e.message || e}) — handwriting spacing uses a rough estimate`);
+  }
+  return _caveatMetrics;
+}
+
+/* wordWidthIn — width of one handwritten word INCLUDING the gap after it.
+   2026-10-02: measured from the real Caveat glyph widths. The old flat
+   estimate (CAVEAT_CPI) was roughly twice too wide for Caveat, which only
+   became visible once PowerPoint finally displayed the real font: huge,
+   uneven gaps between words. The gap is 1.4 spaces, a touch looser than
+   typeset text, as handwriting is. */
 function wordWidthIn(word, fontSize) {
-  return (String(word).length * fontSize) / CAVEAT_CPI + 0.05;
+  const m = caveatMetrics();
+  if (!m) return (String(word).length * fontSize) / CAVEAT_CPI + 0.05;
+  const em = [...String(word)].reduce((sum, ch) => sum + m(ch), 0) + 1.4 * m(' ');
+  return (em * fontSize) / 72;
 }
 /* M3: per-item override, else lesson-wide L.meta.handwritingMode, else editable (default) */
 function handwritingMode(L, item) {
@@ -670,19 +790,29 @@ function layoutHandwriting(text, w, opts) {
     });
     lines.push(cur);
   });
-  // Spread mode: when a box height is supplied, stretch the line spacing so the
-  // working fills the whole box (no dead space / trailing blank rules) and the
-  // baseline rules come out evenly parallel. Capped so short answers don't sprawl.
+  // Spread mode (RULED boxes only): when a box height is supplied, stretch the
+  // line spacing so the working fills the whole box (no dead space / trailing
+  // blank rules) and the baseline rules come out evenly parallel. Capped so
+  // short answers don't sprawl.
+  // Unruled boxes (correctTheStatement) keep natural spacing and are centred
+  // vertically instead (2026-10-02): once the real, narrower Caveat was in use
+  // most statements fit on one line, and spreading one line over the whole box
+  // sank the words to the bottom edge with empty space above.
   let lineH = baseLineH;
+  let top = padTop;
   if (o.boxH && lines.length) {
-    const avail = o.boxH - padTop * 2;
-    lineH = Math.min(Math.max(baseLineH, avail / lines.length), baseLineH * 2.4);
+    if (o.ruled) {
+      const avail = o.boxH - padTop * 2;
+      lineH = Math.min(Math.max(baseLineH, avail / lines.length), baseLineH * 2.4);
+    } else {
+      top = Math.max(padTop, (o.boxH - lines.length * lineH) / 2);
+    }
   }
   const placed = [];
   let wordIdx = 0;
   lines.forEach((line, li) => {
     let cx = padX;
-    const cy = padTop + li * lineH;
+    const cy = top + li * lineH;
     line.forEach((word) => {
       const ww = wordWidthIn(word, fontSize);
       const { rot, base } = jitterFor(profile, wordIdx++);
@@ -690,7 +820,7 @@ function layoutHandwriting(text, w, opts) {
       cx += ww;
     });
   });
-  return { placed, lineH, padTop, lineCount: lines.length, usedH: padTop + lines.length * lineH };
+  return { placed, lineH, padTop: top, lineCount: lines.length, usedH: top + lines.length * lineH };
 }
 
 /* handwritingBlockEditable — primary render path (M1/M2): each word is its
@@ -712,67 +842,71 @@ function handwritingBlockEditable(slide, x, y, w, h, text, opts) {
     });
   });
   if (o.ruled) {
-    // Even baseline rules under every line, stepped by the (spread) line height —
-    // the working sits on evenly parallel rules and fills the box (no trailing blanks).
-    const ruleGap = lineH;
-    for (let ly = y + padTop + lineH; ly < y + h - 0.04; ly += ruleGap) {
-      slide.addShape('line', { x: x + 0.14, y: ly, w: w - 0.14 * 2 - 0.05, h: 0, line: { color: 'C9C9DC', width: 0.75 } });
-    }
+    handwritingRuleYs(padTop, lineH, h).forEach((ry) => {
+      slide.addShape('line', { x: x + 0.14, y: y + ry, w: w - 0.14 * 2 - 0.05, h: 0, line: { color: 'C9C9DC', width: 0.75 } });
+    });
   }
   return { usedH, lineCount };
 }
 
-let _caveatBase64Cache = null;
-function caveatBase64() {
-  if (_caveatBase64Cache == null) {
-    // Bold preferred since 2026-07-12 — all handwriting renders bold now.
-    try { _caveatBase64Cache = fs.readFileSync(CAVEAT_BOLD_PATH).toString('base64'); }
-    catch (e) {
-      try { _caveatBase64Cache = fs.readFileSync(CAVEAT_REGULAR_PATH).toString('base64'); }
-      catch (e2) {
-        buildWarn('handwriting font (Caveat) could not be read — raster handwriting will fall back to a generic font');
-        _caveatBase64Cache = '';
-      }
-    }
-  }
-  return _caveatBase64Cache;
+/* handwritingRuleYs — box-relative y of each ruled line. Even baseline rules
+   under every line, stepped by the (spread) line height, so the working sits
+   on evenly parallel rules and fills the box (no trailing blanks). Shared by
+   both render paths. */
+function handwritingRuleYs(padTop, lineH, h) {
+  const ys = [];
+  for (let ly = padTop + lineH; ly < h - 0.04; ly += lineH) ys.push(ly);
+  return ys;
 }
 
-/* handwritingBlockRaster — M3 fallback: same word-jitter layout, rendered as
-   a self-contained SVG (Caveat embedded as base64 @font-face so it displays
-   correctly even without OOXML font embedding), inserted as an image. Use
-   only if the M2 font-embed approach proves unreliable in real PowerPoint —
-   toggle via item.renderMode:'raster' or L.meta.handwritingMode:'raster'.
-   Everything else on the deck stays normal editable text. */
+/* callHandwritingPng(spec) — spawns handwriting_png.py (Pillow + the bundled
+   Caveat TTF), returns a temp PNG path or null. Mirrors callGraphGen: same
+   python command, temp files cleaned up after writeFile. */
+function callHandwritingPng(spec) {
+  try {
+    const t = `${Date.now()}_${Math.random().toString(36).slice(2)}`;
+    const inP = path.join(os.tmpdir(), `hw_in_${t}.json`);
+    const outP = path.join(os.tmpdir(), `hw_out_${t}.png`);
+    const py = process.platform === 'win32' ? 'python' : 'python3';
+    const fontPath = fs.existsSync(CAVEAT_BOLD_PATH) ? CAVEAT_BOLD_PATH : CAVEAT_REGULAR_PATH;
+    fs.writeFileSync(inP, JSON.stringify(Object.assign({}, spec, { fontPath, dpi: 200, outPath: outP })));
+    _tmpFiles.push(inP, outP);
+    cp.execSync(`${py} "${path.join(__dirname, 'handwriting_png.py')}" "${inP}"`, { stdio: 'pipe' });
+    return fs.existsSync(outP) ? outP : null;
+  } catch (e) {
+    console.error('[handwriting_png]', String((e.stderr && e.stderr.toString()) || e.message || e).trim());
+    return null;
+  }
+}
+
+/* handwritingBlockRaster — the picture route: the SAME word layout as the
+   editable route, drawn into a real PNG by handwriting_png.py so it looks
+   identical on any machine, any app, with no font install. Not editable on
+   the slide (edit the lesson JSON and rebuild). Opt in per item with
+   renderMode:'raster', or for a whole lesson with meta.handwritingMode.
+   2026-10-02: replaces the old SVG version, which never worked in PowerPoint
+   (its SVG renderer ignores @font-face, and pptxgenjs's companion ".png" was
+   SVG text with the wrong extension, so there was no real fallback image).
+   The gold box itself stays a native shape so its border matches the deck.
+   If Python is unavailable, warns loudly and falls back to editable text. */
 function handwritingBlockRaster(slide, x, y, w, h, text, opts) {
   const o = opts || {};
-  const fontSize = o.fontSize || 22;
-  const color = (o.color || '1A1A2E').replace(/^(?!#)/, '#');
-  const { placed, lineH, padTop, usedH } = layoutHandwriting(text, w, Object.assign({ boxH: h }, o));
-  const px = 96;
-  const W = Math.round(w * px), H = Math.round(h * px);
-  const b64 = caveatBase64();
-  const parts = [`<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">`];
-  if (b64) parts.push(`<defs><style>@font-face{font-family:'Caveat';src:url(data:font/ttf;base64,${b64}) format('truetype');}</style></defs>`);
-  if (o.fill !== false) {
-    parts.push(`<rect x="0" y="0" width="${W}" height="${H}" fill="${(o.bg || 'FFFFFF').replace(/^(?!#)/, '#')}" stroke="${(o.line && o.line.color || GOLD).replace(/^(?!#)/, '#')}" stroke-width="3"/>`);
-  }
-  placed.forEach(({ word, x: wx, y: wy, rot }) => {
-    const px_ = wx * px, py_ = (wy + fontSize / 72 * 1.1) * px;
-    parts.push(`<text x="${px_.toFixed(1)}" y="${py_.toFixed(1)}" font-family="Caveat" font-weight="bold" font-size="${(fontSize * px / 72).toFixed(1)}" fill="${color}" transform="rotate(${rot} ${px_.toFixed(1)} ${py_.toFixed(1)})">${esc(word)}</text>`);
+  const lay = layoutHandwriting(text, w, Object.assign({ boxH: h }, o));
+  const png = callHandwritingPng({
+    w, h, fontSize: o.fontSize || 22, color: o.color || '1A1A2E',
+    lineH: lay.lineH, words: lay.placed,
+    rules: o.ruled ? handwritingRuleYs(lay.padTop, lay.lineH, h) : [],
+    ruleX0: 0.14, ruleX1: w - 0.19, ruleColor: 'C9C9DC',
   });
-  if (o.ruled) {
-    const ruleGap = lineH * px;
-    for (let ly = (padTop + lineH) * px; ly < H - 4; ly += ruleGap) {
-      parts.push(`<line x1="10" y1="${ly.toFixed(1)}" x2="${W - 10}" y2="${ly.toFixed(1)}" stroke="#C9C9DC" stroke-width="1"/>`);
-    }
+  if (!png) {
+    buildWarn('picture handwriting could not be drawn (Python/Pillow) — editable handwriting shipped instead');
+    return handwritingBlockEditable(slide, x, y, w, h, text, o);
   }
-  parts.push('</svg>');
-  const tmpPath = path.join(os.tmpdir(), `hw_${Date.now()}_${Math.random().toString(36).slice(2)}.svg`);
-  fs.writeFileSync(tmpPath, parts.join('\n'), 'utf8');
-  _tmpFiles.push(tmpPath);
-  slide.addImage({ path: tmpPath, x, y, w, h });
-  return { usedH, lineCount: undefined };
+  if (o.fill !== false) {
+    slide.addShape('rect', { x, y, w, h, fill: { color: o.bg || 'FFFFFF' }, line: o.line || GOLD2 });
+  }
+  slide.addImage({ path: png, x, y, w, h });
+  return { usedH: lay.usedH, lineCount: lay.lineCount };
 }
 
 /* handwritingBlock(x, y, w, h, text, opts) — public entry, dispatches on
@@ -789,8 +923,9 @@ function handwritingBlock(slide, x, y, w, h, text, opts) {
    Caveat so it displays correctly in PowerPoint without a local font install.
    Google Slides needs none of this (native Google Font there). Best-effort:
    on any failure, leaves the file untouched — text still carries
-   fontFace:'Caveat' so an unpatched file just substitutes a fallback font,
-   which is the M3 fallback path in practice. */
+   fontFace:'Caveat' so an unpatched file just substitutes a fallback font.
+   The fonts go in EOT-wrapped (ttfToEot): until 2026-10-02 they went in as
+   raw .ttf, which PowerPoint ignored, so handwriting showed as plain sans. */
 function embedCaveatFont(pptxPath) {
   try {
     if (!fs.existsSync(CAVEAT_REGULAR_PATH) || !fs.existsSync(CAVEAT_BOLD_PATH)) {
@@ -830,8 +965,9 @@ function embedCaveatFont(pptxPath) {
     zip.updateFile('ppt/presentation.xml', Buffer.from(pres, 'utf8'));
     zip.updateFile('ppt/_rels/presentation.xml.rels', Buffer.from(rels, 'utf8'));
     zip.updateFile('[Content_Types].xml', Buffer.from(ct, 'utf8'));
-    zip.addFile('ppt/fonts/font1.fntdata', fs.readFileSync(CAVEAT_REGULAR_PATH));
-    zip.addFile('ppt/fonts/font2.fntdata', fs.readFileSync(CAVEAT_BOLD_PATH));
+    // EOT-wrapped, not raw TTF: PowerPoint silently ignores a raw .ttf here (see ttfToEot).
+    zip.addFile('ppt/fonts/font1.fntdata', ttfToEot(fs.readFileSync(CAVEAT_REGULAR_PATH)));
+    zip.addFile('ppt/fonts/font2.fntdata', ttfToEot(fs.readFileSync(CAVEAT_BOLD_PATH)));
     zip.writeZip(pptxPath);
     return true;
   } catch (e) {
@@ -2429,31 +2565,85 @@ function slideRect(slide, x, y, w, h) {
   slide.addShape('rect', { x, y, w, h, fill: { color: 'FFFFFF' }, line: GOLD2 });
 }
 
-/* drawFormulaTriangle(x, y, w, h, {top, bottomLeft, bottomRight})
-   White vector triangle with a horizontal + vertical divider — the classic
-   physics "formula triangle". Never a raster image. */
-/* Bug 59 (approved mock 2026-07-10): the vector triangle only makes sense for a
-   3-symbol relationship. Absent symbols or more than 3 → suppress the triangle
-   entirely (the equation then gets the full row, larger). Never draw A/B/C defaults. */
-function triangleUsable(symbols) {
-  if (!symbols) return false;
-  const filled = ['top', 'bottomLeft', 'bottomRight'].filter((k) => symbols[k]).length;
-  return filled === 3 && Object.keys(symbols).length <= 3;
+/* Formula triangle model. One quantity on top, 2 to 4 MULTIPLIED quantities
+   along the bottom: { top:"E", bottom:["m","c","Δθ"] } for E = mcΔθ. Covering
+   any one still gives the rearrangement. (2026-10-02, Bug 59 point 4: until
+   then anything beyond 3 symbols simply lost its triangle.) The original
+   { top, bottomLeft, bottomRight } shape still works, read as a 2-item bottom;
+   bottomMiddle extends it by hand. Bug 59 rule kept: anything that is not a
+   clean "one quantity = product of the others" (missing top, unknown keys,
+   5+ on the bottom, blanks) → null → no triangle, and the equation gets the
+   full row instead. Never draw A/B/C defaults. */
+const TRI_LEGACY = ['bottomLeft', 'bottomMiddle', 'bottomRight'];
+function triangleSymbols(symbols) {
+  if (!symbols || typeof symbols !== 'object') return null;
+  if (Object.keys(symbols).some((k) => k !== 'top' && k !== 'bottom' && !TRI_LEGACY.includes(k))) return null;
+  const hasLegacy = TRI_LEGACY.some((k) => k in symbols);
+  let bottom;
+  if (Array.isArray(symbols.bottom) && !hasLegacy) bottom = symbols.bottom;
+  else if (!('bottom' in symbols) && hasLegacy) bottom = TRI_LEGACY.filter((k) => k in symbols).map((k) => symbols[k]);
+  else return null;                              // neither form, or an ambiguous mix of both
+  const clean = (v) => (v == null ? '' : prettyText(String(v)).trim());
+  const top = clean(symbols.top);
+  bottom = bottom.map(clean);
+  if (!top || bottom.length < 2 || bottom.length > 4 || bottom.some((b) => !b)) return null;
+  return { top, bottom };
+}
+function triangleUsable(symbols) { return !!triangleSymbols(symbols); }
+/* width ÷ height. Wider for more bottom cells so each label keeps room:
+   1.15 (two, the approved mock), 1.45 (three), 1.75 (four). */
+function triangleAspect(symbols) {
+  const t = triangleSymbols(symbols);
+  return 1.15 + 0.3 * ((t ? t.bottom.length : 2) - 2);
 }
 
+/* drawFormulaTriangle(x, y, w, h, symbols) — white vector triangle with a
+   horizontal divider and n−1 vertical dividers along the bottom. Never a
+   raster image.
+   2026-10-02: every label box is sized to the triangle's real INTERIOR at the
+   label's height. Before, the boxes spanned the bounding box, so the slanted
+   sides clipped anything wider than one letter ("rate" showed as "ate").
+   Font size steps down to fit the room (floor 9pt), fit:'shrink' as backstop. */
 function drawFormulaTriangle(slide, x, y, w, h, symbols) {
-  const top = String((symbols && symbols.top) || 'A');
-  const bl = String((symbols && symbols.bottomLeft) || 'B');
-  const br = String((symbols && symbols.bottomRight) || 'C');
+  const t = triangleSymbols(symbols);
+  if (!t) return;
+  const n = t.bottom.length;
   const apexX = x + w / 2;
-  const f = 0.42; // fraction down the slanted side where the divider sits
+  const f = 0.42;                                // fraction down the slanted side where the divider sits
   const Ly = y + f * h;
+  const widthAt = (yy) => w * Math.max(0, Math.min(1, (yy - y) / h));   // interior width at height yy
+  const fitFs = (label, room, max) => Math.max(9, Math.min(max, Math.floor((room * 105) / Math.max(1, label.length))));
+  const label = (text, bx, by, bw, bh, fs) => txt(slide, text, {
+    x: bx, y: by, w: Math.max(0.1, bw), h: bh, color: NAVY, bold: true, fontSize: fs,
+    align: 'center', valign: 'middle', margin: 0, fit: 'shrink',
+  });
+
   slide.addShape('triangle', { x, y, w, h, fill: { color: 'FFFFFF' }, line: { color: NAVY, width: 2 } });
   slide.addShape('line', { x: x + w * (1 - f) / 2, y: Ly, w: w * f, h: 0, line: { color: NAVY, width: 1.5 } });
-  slide.addShape('line', { x: apexX, y: Ly, w: 0, h: (y + h) - Ly, line: { color: NAVY, width: 1.5 } });
-  txt(slide, top, { x: x + w * 0.25, y: y + (Ly - y) * 0.1, w: w * 0.5, h: (Ly - y) * 0.75, color: NAVY, bold: true, fontSize: 16, align: 'center', valign: 'middle' });
-  txt(slide, bl, { x, y: Ly + 0.02, w: w * 0.5, h: (y + h) - Ly - 0.04, color: NAVY, bold: true, fontSize: 14, align: 'center', valign: 'middle' });
-  txt(slide, br, { x: apexX, y: Ly + 0.02, w: w * 0.5, h: (y + h) - Ly - 0.04, color: NAVY, bold: true, fontSize: 14, align: 'center', valign: 'middle' });
+
+  // Top: sat low in the top section, just above the divider, where it is widest.
+  const topH = Math.min((Ly - y) * 0.7, 16 * 1.3 / 72);
+  const topY = Ly - 0.03 - topH;
+  const topRoom = widthAt(topY + topH / 2) - 0.08;
+  label(t.top, apexX - topRoom / 2, topY, topRoom, topH, fitFs(t.top, topRoom, 16));
+
+  // Bottom: dividers give every cell equal usable width at the row's midpoint
+  // (equal spacing along the base would starve the outer cells, which lose
+  // area to the slanted sides). Each outer label is also kept clear of the
+  // slant at the TOP of its text, where the interior is narrowest.
+  const midY = (Ly + y + h) / 2;
+  const innerW = widthAt(midY), innerX = apexX - innerW / 2, cellW = innerW / n;
+  for (let i = 1; i < n; i++) {
+    slide.addShape('line', { x: innerX + i * cellW, y: Ly, w: 0, h: (y + h) - Ly, line: { color: NAVY, width: 1.5 } });
+  }
+  const rowH = (y + h) - Ly - 0.04;
+  const textH = Math.min(rowH, 14 * 1.3 / 72);
+  const slantRoom = widthAt(midY - textH / 2);   // interior width at the top of the text line
+  t.bottom.forEach((sym, i) => {
+    const left = Math.max(innerX + i * cellW, apexX - slantRoom / 2) + 0.04;
+    const right = Math.min(innerX + (i + 1) * cellW, apexX + slantRoom / 2) - 0.04;
+    label(sym, left, Ly + 0.02, right - left, rowH, fitFs(sym, right - left, 14));
+  });
 }
 
 /* ---- BUILD — guessExample (GUESS-scaffolded worked example, ONE slide) ----
@@ -2506,7 +2696,7 @@ function slideGuessExample(pptx, L, item) {
       const eqSegs = parseEq(item.equation || '');
       const hasTri = triangleUsable(item.equationSymbols);
       const triH = Math.min(1.25, rowH - 0.24);
-      const triW = triH * 1.15; // aspect-locked (approved mock)
+      const triW = triH * triangleAspect(item.equationSymbols); // aspect-locked; wider for 3-4 bottom cells
       const triPad = 0.3;
       const eqW = hasTri ? rightW - triW - triPad - 0.45 : rightW - 0.5;
       const eqFs = hasTri ? 20 : 26;
@@ -2589,8 +2779,9 @@ function slidePracticeTriangle(pptx, L, item) {
   // Triangle only for a genuine 3-symbol relationship (Bug 59) — aspect-locked, never squashed.
   if (triangleUsable(item.equationSymbols)) {
     const triAvailH = availH - 0.35 - GAP - eqH - GAP;
-    const triH = Math.min(triAvailH, (rightW - 0.3) / 1.15);
-    const triW = triH * 1.15;
+    const triAspect = triangleAspect(item.equationSymbols);   // wider for 3-4 bottom cells
+    const triH = Math.min(triAvailH, (rightW - 0.3) / triAspect);
+    const triW = triH * triAspect;
     if (triH > 0.7) {
       const triY = eqY + eqH + GAP;
       drawFormulaTriangle(s, rightX + (rightW - triW) / 2, triY + (triAvailH - triH) / 2, triW, triH, item.equationSymbols);

@@ -8,6 +8,16 @@ Cleaned 2026-07-02: only outstanding items below.
 
 <!-- entries appended below -->
 
+## Session log — 2026-10-02 (three render bugs from the golden renders — Claude Code)
+
+Found by rendering every slide type to PNG (`golden/`, baseline commit `e0d5210a`). All fixed, `npm test` green with a new fixture (`triangle-handwriting-test.json`).
+
+- ✅ **Handwriting showed as plain bold text in PowerPoint**, in both modes. The bundled Caveat font went into the .pptx as a raw `.ttf`, which PowerPoint ignores; it now goes in wrapped as EOT (`ttfToEot`), and PowerPoint uses it. Editable text stays the default (Patryk's call: picture only if editable could not be fixed). The picture mode (`renderMode:"raster"`) was an SVG PowerPoint also could not draw; it is now a real PNG drawn by `handwriting_png.py` (Pillow, packaged). Word spacing now uses Caveat's real letter widths (the old guess was about twice too wide once the real font appeared), and unruled one-line statements are centred instead of sinking to the bottom of their box.
+- ✅ **Formula triangle clipped its labels** ("rate" showed as "ate"). Labels now fit the triangle's real interior. Also closes **Bug 59 point 4**: triangles now take 2 to 4 multiplied quantities along the bottom, `equationSymbols: { top, bottom: [...] }`; the old three-key form still works; non-product equations still get no triangle.
+- ✅ **graph_gen straight line through curved data** (entry below). New `referenceData.fit`: auto (default), linear, curve. Curves are a smooth best fit with no intercept or straight-line numbers.
+- 🆕 **Mark-scheme panel overflows its box** on long schemes (`golden/C-07.png`, also in the baseline): the last exclusionary claim runs off the bottom.
+- 🆕 **`kg/m^3` prints raw in GUESS rows**: `parseEq` reads the `/` as a fraction before the `^` (`golden/B-24.png`).
+
 ## Session log — 2026-07-13/14 (exam library at scale, homework booklets, class defaults, Feynman plates — Claude Code)
 
 **Exam library — BUILT ✅.** All 108 of Patryk's AQA exam documents (Biology 50, Physics 58) now parse: **108/108, zero failures.** 4,450 questions, 19,424 question parts, ~99% joined to their real mark schemes. Chemistry was being exported by Patryk on 2026-07-14 and drops in with no code change (the batch runner is subject-agnostic).
@@ -43,7 +53,7 @@ Cleaned 2026-07-02: only outstanding items below.
 - `graphResults` (`build.js:2733`) and `graphWithData` (`build.js:2777`) — both need `worksheetExtras.referenceData.rows` or they silently render nothing, no warning.
 Fix: update `slide-options-v4.md` with these five entries next time it's touched.
 
-**Bug 🆕 — `graph_gen.py` fits a straight line to curved data.** Confirmed visually in the sample pack (`design-audit/slides/45_build_graph-results_UNDOCUMENTED.png`): fed a realistic rate-of-reaction volume/time curve, it draws a straight best-fit line through it, reports R²≈0.82 as if that were acceptable, and prints an extrapolated "x-intercept = −18.81 s" that is meaningless for this kind of data. The linear-fit + x-intercept logic in `graph_gen.py` looks like it was built for straight-line practicals (e.g. distance/time at constant speed) and is being applied unconditionally to curved ones too. Needs either a curve-fit option or a flag to suppress the linear-fit annotations when the data isn't linear.
+**Bug ✅ FIXED 2026-10-02 (see session log at top) — `graph_gen.py` fits a straight line to curved data.** Confirmed visually in the sample pack (`design-audit/slides/45_build_graph-results_UNDOCUMENTED.png`): fed a realistic rate-of-reaction volume/time curve, it draws a straight best-fit line through it, reports R²≈0.82 as if that were acceptable, and prints an extrapolated "x-intercept = −18.81 s" that is meaningless for this kind of data. The linear-fit + x-intercept logic in `graph_gen.py` looks like it was built for straight-line practicals (e.g. distance/time at constant speed) and is being applied unconditionally to curved ones too. Needs either a curve-fit option or a flag to suppress the linear-fit annotations when the data isn't linear.
 
 **Reference — full sample deck exists:** `design-audit/ALL-SLIDES.pdf` (70 unique slide designs, one page each, curated from 127 rendered slides across 8 sample lessons) + `design-audit/decks/*.pptx` (the 8 source decks) + `design-audit/INDEX.txt` (what each page is). Local only, not committed, not on Drive. Useful next time any slide-visual work is proposed — check it before assuming a layout has never been seen rendered.
 
