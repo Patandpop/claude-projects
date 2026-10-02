@@ -1,0 +1,910 @@
+[
+  {
+    "meta": {
+      "class": "9AB",
+      "year": 9,
+      "subject": "Physics",
+      "theme": "physics",
+      "macrotopic": "Reference",
+      "lessonNumber": 1,
+      "topic": "Reference A Learn Variants",
+      "title": "Reference A: every Learn variant",
+      "lessonType": "standard",
+      "uncapLearn": true,
+      "visualiserUrl": "https://apps.ipevo.com/pwa/visualizer.app/",
+      "outputDir": "C:/Users/magda/claude-projects/science-lesson-v4/golden/build"
+    },
+    "title": {
+      "objectives": [
+        "Describe how speed is calculated from distance and time",
+        "Explain the difference between speed and velocity",
+        "Apply the speed equation to unfamiliar contexts"
+      ],
+      "keywords": ["speed", "velocity", "displacement", "scalar", "vector"]
+    },
+    "doNow": {
+      "variant": "A",
+      "questions": [
+        { "q": "What is the unit of speed?", "a": "metres per second, m/s", "marks": 1, "hint": "Distance unit over time unit." },
+        { "q": "Name one scalar quantity.", "a": "Speed, distance, mass or energy", "marks": 1, "hint": "A scalar has size only." },
+        { "q": "Name one vector quantity.", "a": "Velocity, displacement, force or acceleration", "marks": 1, "hint": "A vector has size and direction." },
+        { "q": "Write the equation linking speed, distance and time.", "a": "speed = distance / time", "marks": 1, "hint": "Think about the triangle." },
+        { "q": "A car travels 100 m in 5 s. What is its speed?", "a": "20 m/s", "marks": 2, "hint": "Divide distance by time." },
+        { "q": "Why is velocity a vector but speed is not?", "a": "Velocity states a direction as well as a size", "marks": 2, "hint": "One of them tells you which way." }
+      ],
+      "specPoints": ["4.5.1.1 Distance and displacement", "4.5.1.2 Speed"]
+    },
+    "engage": {
+      "variant": "prediction",
+      "hook": "A cheetah and a peregrine falcon race over 100 m. Which finishes first?",
+      "content": "Cheetahs reach about 29 m/s over short bursts. Peregrine falcons are the fastest animals on Earth, but only in a dive, and a level 100 m race is not a dive.",
+      "imagePlaceholder": true,
+      "imageDescription": "cheetah running at full speed side view",
+      "prompt": "Talk to the person next to you. What would change your answer?",
+      "videoLink": { "text": "Slow motion cheetah sprint", "url": "https://www.example.org/cheetah" },
+      "reveal": {
+        "question": "Which animal wins a level 100 m race?",
+        "answer": "The cheetah. A falcon only beats it while diving, not in level flight."
+      }
+    },
+    "learn": [
+      {
+        "variant": "A",
+        "heading": "Speed and velocity",
+        "boxes": [
+          { "header": "Speed", "items": ["How fast an object moves.", "A scalar: size only, no direction.", "Measured in metres per second."] },
+          { "header": "Velocity", "items": ["Speed in a stated direction.", "A vector: size and direction.", "Changes if the direction changes, even at constant speed."] }
+        ],
+        "keywords": ["scalar", "vector", "displacement"],
+        "imageConfidence": "search",
+        "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/topbar-bio-1-dna.png",
+        "imageDescription": "diagram contrasting speed and velocity arrows"
+      },
+      {
+        "variant": "A",
+        "heading": "Working out an average speed",
+        "body": "Average speed uses the total distance and the total time.\nIt hides any stops or changes of pace along the way.\nTwo journeys with the same average speed can look completely different.",
+        "annotationZone": true
+      },
+      {
+        "variant": "B",
+        "heading": "Motion vocabulary",
+        "definitions": [
+          { "term": "Scalar", "definition": "A quantity with size only.", "etymology": "from Latin scala, a ladder" },
+          { "term": "Vector", "definition": "A quantity with size and direction.", "etymology": "from Latin vehere, to carry" },
+          { "term": "Displacement", "definition": "Straight line distance and direction from start to finish." },
+          { "term": "Speed", "definition": "Distance travelled per unit time." }
+        ],
+        "below": "content+image",
+        "boxes": [
+          { "header": "Watch for", "items": ["Distance is scalar, displacement is vector.", "A full lap gives zero displacement."] }
+        ],
+        "imageDescription": "athletics track showing one full lap with start and finish at the same point"
+      },
+      {
+        "variant": "B",
+        "heading": "Six terms to know",
+        "definitions": [
+          { "term": "Distance", "definition": "Total path length travelled." },
+          { "term": "Displacement", "definition": "Straight line from start to end, with direction." },
+          { "term": "Speed", "definition": "Distance per unit time." },
+          { "term": "Velocity", "definition": "Displacement per unit time." },
+          { "term": "Acceleration", "definition": "Rate of change of velocity." },
+          { "term": "Deceleration", "definition": "Negative acceleration, slowing down." }
+        ],
+        "below": "none"
+      },
+      {
+        "variant": "C",
+        "corePaper": [
+          { "q": "Define speed and give its unit", "pages": "142" },
+          { "q": "Calculate speed from distance and time", "pages": "143 to 144" },
+          { "q": "Read a distance time graph", "pages": "146" }
+        ],
+        "extendPaper": [
+          { "q": "Compare speed and velocity for circular motion", "pages": "148" },
+          { "q": "Find velocity from a gradient", "pages": "149 to 150" }
+        ]
+      },
+      {
+        "variant": "C",
+        "corePaper": [
+          { "q": "Typical speeds for walking, running and cycling", "pages": "145" },
+          { "q": "Convert km/h into m/s", "pages": "147" }
+        ]
+      },
+      {
+        "variant": "D",
+        "heading": "Distance time graph",
+        "instruction": "Copy this distance time graph into your book and label all three sections.",
+        "tip": "Use a ruler. Label the axes before you draw the line.",
+        "imageDescription": "distance time graph with a straight rising section, a flat section and a steeper rising section"
+      },
+      {
+        "variant": "E",
+        "heading": "Speed against velocity",
+        "comparison": {
+          "aTitle": "Speed",
+          "bTitle": "Velocity",
+          "rows": [
+            { "a": "Scalar quantity", "b": "Vector quantity" },
+            { "a": "Size only", "b": "Size and direction" },
+            { "a": "Always positive", "b": "Can be negative" },
+            { "a": "Unchanged by turning a corner", "b": "Changes when direction changes" }
+          ]
+        }
+      },
+      {
+        "variant": "F",
+        "heading": "The speed equation",
+        "equation": "v = {s/t}",
+        "components": [
+          { "symbol": "v", "name": "speed", "unit": "m/s" },
+          { "symbol": "s", "name": "distance", "unit": "m" },
+          { "symbol": "t", "name": "time", "unit": "s" }
+        ],
+        "rearrangements": ["s = v \\times t", "t = {s/v}"],
+        "example": "A runner covers 400 m in 50 s. Speed = 400 ÷ 50 = 8 m/s."
+      },
+      {
+        "variant": "F",
+        "heading": "Two related equations",
+        "equations": ["a = {\\Delta v/t}", "s = v \\times t"],
+        "components": [
+          { "symbol": "a", "name": "acceleration", "unit": "m/s^2" },
+          { "symbol": "\\Delta v", "name": "change in velocity", "unit": "m/s" },
+          { "symbol": "t", "name": "time", "unit": "s" },
+          { "symbol": "s", "name": "distance", "unit": "m" },
+          { "symbol": "v", "name": "speed", "unit": "m/s" }
+        ]
+      },
+      {
+        "variant": "G",
+        "heading": "Planning a speed measurement",
+        "steps": [
+          { "label": "Measure the distance", "note": "Use a tape measure, record in metres" },
+          { "label": "Mark start and finish", "note": "Cones at both ends" },
+          { "label": "Time the run", "note": "Start and stop on the marks" },
+          { "label": "Repeat three times", "note": "Reduces random error" },
+          { "label": "Calculate the mean speed", "note": "Total distance over mean time" }
+        ]
+      },
+      {
+        "variant": "G",
+        "heading": "Two step check",
+        "steps": [
+          { "label": "Find the distance", "note": "Read it from the question" },
+          { "label": "Divide by the time", "note": "Give the unit" }
+        ]
+      },
+      {
+        "variant": "G",
+        "heading": "Full investigation cycle",
+        "steps": [
+          { "label": "Ask a question", "note": "What affects speed?" },
+          { "label": "Predict", "note": "State the expected pattern" },
+          { "label": "Plan", "note": "Choose variables" },
+          { "label": "Measure", "note": "Repeat readings" },
+          { "label": "Analyse", "note": "Plot the graph" },
+          { "label": "Conclude", "note": "Answer the question" }
+        ]
+      },
+      {
+        "variant": "H",
+        "heading": "Measuring speed with light gates",
+        "videoLink": { "text": "How a light gate measures speed", "url": "https://www.example.org/light-gates" },
+        "toWatch": [
+          "What the light gate actually measures",
+          "Why the card length matters",
+          "One reason a light gate beats a stopwatch"
+        ],
+        "prompt": "Pause at 1:20 and predict what happens if the card is twice as long.",
+        "imageDescription": "light gate and trolley on a ramp in a school laboratory",
+        "questions": [
+          { "q": "What does the light gate time?", "a": "How long the card blocks the beam" },
+          { "q": "Why is a light gate more precise than a stopwatch?", "a": "There is no human reaction time" }
+        ]
+      },
+      {
+        "variant": "I",
+        "heading": "From measurement to answer",
+        "orientation": "vertical",
+        "cycle": true,
+        "nodes": [
+          { "label": "Measure distance", "note": "metres" },
+          { "label": "Measure time", "note": "seconds" },
+          { "label": "Divide", "note": "distance over time" },
+          { "label": "Check the unit", "note": "m/s" }
+        ]
+      },
+      {
+        "variant": "I",
+        "heading": "Journey stages",
+        "orientation": "horizontal",
+        "cycle": true,
+        "nodes": [
+          { "label": "Accelerate", "note": "speed rising" },
+          { "label": "Cruise", "note": "constant speed" },
+          { "label": "Decelerate", "note": "speed falling" },
+          { "label": "Stop", "note": "speed zero" }
+        ]
+      },
+      {
+        "variant": "J",
+        "heading": "Reading a distance time graph",
+        "axes": { "x": "Time (s)", "y": "Distance (m)" },
+        "imageDescription": "distance time graph with three distinct gradients",
+        "features": [
+          { "label": "Steep line", "description": "Fast, large distance in a short time" },
+          { "label": "Shallow line", "description": "Slow, small distance in the same time" },
+          { "label": "Flat line", "description": "Stationary, distance is not changing" }
+        ]
+      },
+      {
+        "variant": "K",
+        "heading": "Measuring speed through history",
+        "events": [
+          { "year": "1590", "label": "Galileo's ramps", "detail": "Timed balls with a water clock" },
+          { "year": "1849", "label": "Fizeau's wheel", "detail": "First good measurement of light speed", "imageDescription": "Fizeau toothed wheel apparatus diagram" },
+          { "year": "1958", "label": "Radar guns", "detail": "Speed from a frequency shift" },
+          { "year": "2010", "label": "GPS timing", "detail": "Speed from satellite clocks" }
+        ]
+      }
+    ],
+    "build": [
+      {
+        "type": "mcq",
+        "q": "A car travels 240 m in 12 s. What is its average speed?",
+        "options": ["2 m/s", "20 m/s", "200 m/s", "2880 m/s"],
+        "answer": "B",
+        "explanation": "240 ÷ 12 = 20 m/s. Dividing the wrong way round gives 0.05 m/s."
+      },
+      { "type": "visualiser" }
+    ],
+    "apply": {
+      "variant": "A",
+      "developing": [
+        { "q": "State the unit of speed.", "a": "metres per second (m/s)", "marks": 1 },
+        { "q": "Write the equation linking speed, distance and time.", "a": "speed = distance ÷ time", "marks": 1 },
+        { "q": "A walker covers 60 m in 30 s. Calculate the speed.", "a": "2 m/s", "marks": 2, "qType": "calculation" }
+      ],
+      "reaching": [
+        { "q": "Explain why velocity is a vector but speed is not.", "a": "Velocity states a direction as well as a size", "marks": 2 },
+        { "q": "A cyclist rides 1500 m in 300 s. Calculate the speed.", "a": "5 m/s", "marks": 2, "qType": "calculation" },
+        { "q": "Describe what a flat section on a distance time graph shows.", "a": "The object is stationary", "marks": 2 }
+      ],
+      "mastering": [
+        { "q": "A runner completes one 400 m lap in 50 s. Calculate the average speed and the average velocity.", "a": "Speed 8 m/s. Velocity 0 m/s because displacement is zero", "marks": 4, "qType": "calculation" },
+        { "q": "Explain why a car moving at constant speed around a roundabout has a changing velocity.", "a": "Direction changes continuously, and velocity depends on direction", "marks": 3 },
+        { "q": "Convert 72 km/h into m/s and show your working.", "a": "72000 ÷ 3600 = 20 m/s", "marks": 3, "qType": "calculation" }
+      ]
+    }
+  },
+
+  {
+    "meta": {
+      "class": "10S2",
+      "year": 10,
+      "subject": "Chemistry",
+      "theme": "chemistry",
+      "macrotopic": "Reference",
+      "lessonNumber": 2,
+      "topic": "Reference B Build Types",
+      "title": "Reference B: every Build activity",
+      "lessonType": "standard",
+      "outputDir": "C:/Users/magda/claude-projects/science-lesson-v4/golden/build"
+    },
+    "title": {
+      "objectives": [
+        "Describe how surface area affects the rate of a reaction",
+        "Explain rate changes using collision theory"
+      ],
+      "keywords": ["rate", "collision", "surface area", "catalyst"]
+    },
+    "doNow": {
+      "variant": "B",
+      "questions": [
+        { "q": "Name two things that speed up a reaction.", "a": "Higher temperature and higher concentration", "marks": 2, "hint": "Think about the five rate factors." },
+        { "q": "What does a catalyst do to the activation energy?", "a": "Lowers it", "marks": 1, "hint": "It gives an easier route." },
+        { "q": "State the unit for rate of reaction by mass.", "a": "g/s", "marks": 1, "hint": "Amount over time." },
+        { "q": "Why does powdered marble react faster than chips?", "a": "Larger surface area gives more frequent collisions", "marks": 2, "hint": "Count the exposed particles." },
+        { "q": "What two conditions must a collision meet to be successful?", "a": "Correct orientation and enough energy", "marks": 2, "hint": "Energy is only half of it." },
+        { "q": "Sketch the shape of a mass loss curve.", "a": "Steep at first, then levelling off flat", "marks": 2, "hint": "It never goes back up." }
+      ]
+    },
+    "engage": {
+      "variant": "mysteryImage",
+      "hook": "Why do flour mills explode but bags of flour do not?",
+      "imagePlaceholder": false,
+      "reveal": {
+        "answer": "Suspended flour dust has an enormous surface area, so the whole cloud can burn at once."
+      }
+    },
+    "learn": [],
+    "build": [
+      {
+        "type": "mcq",
+        "q": "Which change always increases the rate of a reaction?",
+        "options": ["Cooling the mixture", "Raising the temperature", "Adding more water", "Using larger lumps"],
+        "answer": "B",
+        "explanation": "Higher temperature means faster particles and more frequent successful collisions."
+      },
+      {
+        "type": "mcq",
+        "q": "A catalyst increases rate because it",
+        "options": { "A": "raises the temperature", "B": "is used up in the reaction", "C": "provides a route with lower activation energy", "D": "increases the concentration" },
+        "answer": "C",
+        "explanation": "The catalyst is not used up and the temperature is unchanged."
+      },
+      {
+        "type": "mcq",
+        "q": "Which graph shape shows a reaction that has finished?",
+        "options": ["A straight rising line", "A curve that levels off", "A falling straight line", "A line through the origin"],
+        "answer": "B",
+        "explanation": "Levelling off means no more product is being made."
+      },
+      {
+        "type": "mcq_image",
+        "q": "Which flask will produce gas fastest?",
+        "options": ["Large chips, cold acid", "Large chips, warm acid", "Powder, cold acid", "Powder, warm acid"],
+        "answer": "D",
+        "explanation": "Powder gives the largest surface area and warm acid gives the most energetic collisions, so both factors act together.",
+        "imageConfidence": "search",
+        "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/topbar-chem-1-graphene.png",
+        "imageDescription": "four conical flasks of marble and acid at different temperatures"
+      },
+      {
+        "type": "trueFalse",
+        "heading": "TRUE OR FALSE",
+        "statements": [
+          { "text": "A catalyst is used up during the reaction.", "isTrue": false, "correction": "It is chemically unchanged at the end." },
+          { "text": "Powdered solids react faster than lumps.", "isTrue": true },
+          { "text": "Cooling a reaction always speeds it up.", "isTrue": false, "correction": "Cooling slows it down." },
+          { "text": "The steepest part of a rate graph is at the start.", "isTrue": true }
+        ]
+      },
+      {
+        "type": "sort",
+        "instruction": "Sort each change into the correct column.",
+        "items": ["Heating the acid", "Using bigger lumps", "Adding a catalyst", "Diluting the acid", "Grinding to a powder", "Cooling in ice"],
+        "categories": { "A": "Speeds it up", "B": "Slows it down" },
+        "sorted": {
+          "A": ["Heating the acid", "Adding a catalyst", "Grinding to a powder"],
+          "B": ["Using bigger lumps", "Diluting the acid", "Cooling in ice"]
+        }
+      },
+      {
+        "type": "practical",
+        "title": "Measuring rate by mass loss",
+        "intro": "Marble chips react with hydrochloric acid and the flask loses mass as carbon dioxide escapes.",
+        "equipment": ["Conical flask", "Marble chips, 5 g", "Hydrochloric acid, 50 cm3", "Balance", "Cotton wool"],
+        "steps": [
+          "Place the flask on the balance and zero it.",
+          "Add the acid, then the marble chips, and plug with cotton wool.",
+          "Record the mass every 30 seconds for 5 minutes.",
+          "Plot mass lost against time."
+        ],
+        "warning": "Wear eye protection. Hydrochloric acid is an irritant.",
+        "imageConfidence": "search",
+        "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/topbar-chem-2-fullerene.png",
+        "imageDescription": "conical flask on a balance with cotton wool plug",
+        "questions": [
+          { "q": "Why is the flask plugged with cotton wool?", "a": "It lets gas out but stops acid spray escaping" },
+          { "q": "Why does the graph level off?", "a": "One reactant has been used up" }
+        ]
+      },
+      {
+        "type": "misconception",
+        "claim": "A catalyst makes the reaction produce more product.",
+        "whyWrong": "You see the reaction finish sooner, so it feels like more has happened in the same time.",
+        "truth": "A catalyst changes only the rate. The final yield is exactly the same."
+      },
+      {
+        "type": "bigFact",
+        "fact": "10",
+        "unit": "degrees",
+        "context": "A 10 degree Celsius rise roughly doubles the rate of many reactions."
+      },
+      {
+        "type": "reformatFlowchart",
+        "heading": "REORDER THE METHOD",
+        "instruction": "Work out the correct order and write the letters in sequence.",
+        "steps": [
+          { "label": "Zero the balance with the empty flask" },
+          { "label": "Add acid to the flask" },
+          { "label": "Add the marble chips" },
+          { "label": "Plug with cotton wool and start the timer" },
+          { "label": "Record the mass every 30 seconds" }
+        ]
+      },
+      {
+        "type": "annotatedDiagram",
+        "heading": "LABEL THE APPARATUS",
+        "imageConfidence": "search",
+        "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/topbar-bio-3-leafveins.png",
+        "imageDescription": "gas syringe apparatus for measuring rate of reaction",
+        "labels": [
+          { "x": 0.2, "y": 0.25, "text": "Conical flask holding the reactants" },
+          { "x": 0.55, "y": 0.2, "text": "Delivery tube" },
+          { "x": 0.8, "y": 0.4, "text": "Gas syringe" },
+          { "x": 0.35, "y": 0.7, "text": "Reaction mixture" }
+        ]
+      },
+      {
+        "type": "workedExample",
+        "worked": {
+          "prompt": "48 cm^3 of gas is collected in 60 s. Find the mean rate.",
+          "steps": [
+            "Write the equation: rate = volume \\div time",
+            "Substitute: rate = 48 \\div 60",
+            "Solve: rate = 0.8",
+            "Add the unit: 0.8 cm^3/s"
+          ]
+        },
+        "yourTurn": {
+          "prompt": "36 cm^3 of gas is collected in 45 s. Find the mean rate.",
+          "answer": "rate = 36 \\div 45 = 0.8 cm^3/s"
+        }
+      },
+      {
+        "type": "guessExample",
+        "topic": "mean rate",
+        "given": "Volume of gas = 60 cm^3, time = 40 s",
+        "unknown": "Mean rate of reaction",
+        "equation": "rate = {V/t}",
+        "equationSymbols": { "top": "V", "bottomLeft": "rate", "bottomRight": "t" },
+        "substitute": "rate = 60 \\div 40",
+        "solve": "rate = 1.5 cm^3/s"
+      },
+      {
+        "type": "practiceTriangle",
+        "topic": "mean rate",
+        "equation": "rate = {V/t}",
+        "equationSymbols": { "top": "V", "bottomLeft": "rate", "bottomRight": "t" },
+        "questions": [
+          { "q": "24 cm^3 of gas in 30 s. Find the rate.", "a": "0.8 cm^3/s", "marks": 2 },
+          { "q": "90 cm^3 of gas in 45 s. Find the rate.", "a": "2 cm^3/s", "marks": 2 },
+          { "q": "A rate of 0.5 cm^3/s for 80 s. Find the volume.", "a": "40 cm^3", "marks": 3 }
+        ]
+      },
+      {
+        "type": "errorAnalysis",
+        "wrongWorking": [
+          "rate = time \\div volume",
+          "rate = 40 \\div 60",
+          "rate = 0.67",
+          "rate = 0.67 cm^3/s"
+        ],
+        "errorLine": 1,
+        "errorType": "Equation written upside down",
+        "fix": "rate = volume \\div time = 60 \\div 40 = 1.5 cm^3/s"
+      },
+      {
+        "type": "graphInterpret",
+        "graphLabel": "Volume of gas against time",
+        "axes": { "x": "Time (s)", "y": "Volume (cm3)" },
+        "imageDescription": "gas volume against time curve that rises steeply then levels off",
+        "questions": [
+          { "q": "Where is the reaction fastest?", "a": "At the start, where the curve is steepest", "marks": 1 },
+          { "q": "What does the flat section show?", "a": "The reaction has stopped, a reactant is used up", "marks": 2 },
+          { "q": "How would a powder change the curve?", "a": "Steeper at the start, levelling at the same final volume", "marks": 2 }
+        ]
+      },
+      {
+        "type": "graphResults",
+        "graphNotes": [
+          "The steepest gradient is at t = 0, where concentration is highest.",
+          "The gradient falls steadily as the acid is used up.",
+          "The curve flattens when one reactant runs out."
+        ],
+        "closingRemark": "Same final volume, different time to get there."
+      },
+      {
+        "type": "predictThenCheck",
+        "setup": "Two flasks hold the same mass of marble and the same acid. One holds chips, the other holds powder.",
+        "prediction": "Which flask stops bubbling first, and will they lose the same total mass?",
+        "reveal": "The powder finishes first, but both lose exactly the same total mass.",
+        "explanation": "Surface area changes the rate, not the amount of product."
+      },
+      { "type": "visualiser", "context": "Model rate calculations under the visualiser" }
+    ],
+    "worksheetExtras": {
+      "referenceData": {
+        "headers": ["Time (s)", "Volume of gas (cm3)"],
+        "rows": [[0, 0], [30, 22], [60, 38], [90, 48], [120, 54], [150, 57], [180, 58], [210, 58]],
+        "note": "Class results, 5 g marble chips with 50 cm3 of 1.0 mol/dm3 hydrochloric acid."
+      }
+    },
+    "apply": {
+      "variant": "B",
+      "developing": [
+        { "q": "Name three factors that change the rate of a reaction.", "a": "Temperature, concentration, surface area, catalyst", "marks": 3 },
+        { "q": "State what a catalyst does.", "a": "Speeds up the reaction without being used up", "marks": 1 },
+        { "q": "Give the unit of rate measured by gas volume.", "a": "cm3/s", "marks": 1 }
+      ],
+      "reaching": [
+        { "q": "Explain why powdered marble reacts faster than chips.", "a": "More surface area exposed, so more frequent collisions", "marks": 3 },
+        { "q": "Explain the shape of a mass loss curve.", "a": "Steep at first as concentration is high, then flat when a reactant runs out", "marks": 3 },
+        { "q": "60 cm3 of gas is collected in 25 s. Calculate the mean rate.", "a": "2.4 cm3/s", "marks": 2, "qType": "calculation" }
+      ],
+      "mastering": [
+        { "q": "Using collision theory, explain fully why raising the temperature of a reacting mixture by 10 degrees Celsius can roughly double the rate of reaction, and explain why a catalyst has a different effect on the same mixture.", "a": "Higher temperature gives particles more kinetic energy, so collisions are more frequent and a far greater proportion exceed the activation energy. A catalyst does not change particle energy, it provides an alternative pathway with a lower activation energy, so more collisions succeed at the same temperature.", "marks": 6 }
+      ]
+    },
+    "review": {
+      "developing": [
+        { "q": "Three factors that change rate", "a": "Temperature, concentration, surface area" },
+        { "q": "What a catalyst does", "a": "Speeds the reaction without being used up" },
+        { "q": "Unit of rate by gas volume", "a": "cm3/s" }
+      ],
+      "reaching": [
+        { "q": "Why powder beats chips", "a": "More surface area, more frequent collisions" },
+        { "q": "Why the curve levels off", "a": "A reactant has run out" },
+        { "q": "60 cm3 in 25 s", "a": "2.4 cm3/s" }
+      ],
+      "mastering": [
+        { "q": "Temperature and catalyst compared", "a": "Temperature raises collision energy and frequency, a catalyst lowers activation energy" }
+      ]
+    }
+  },
+
+  {
+    "meta": {
+      "class": "10S2",
+      "year": 10,
+      "subject": "Chemistry",
+      "theme": "chemistry",
+      "macrotopic": "Reference",
+      "lessonNumber": 3,
+      "topic": "Reference C Marking Slides",
+      "title": "Reference C: marking and review slides",
+      "lessonType": "review",
+      "outputDir": "C:/Users/magda/claude-projects/science-lesson-v4/golden/build"
+    },
+    "title": {
+      "objectives": ["Mark exam answers accurately against a mark scheme"],
+      "keywords": ["indicative content", "level of response", "error carried forward"]
+    },
+    "doNow": {
+      "variant": "A",
+      "questions": [
+        { "q": "What does ECF stand for?", "a": "Error carried forward", "marks": 1 },
+        { "q": "How many marks is a level of response question usually worth?", "a": "6", "marks": 1 },
+        { "q": "What is indicative content?", "a": "The marking points an answer could contain", "marks": 1 },
+        { "q": "Why must units be given in a calculation answer?", "a": "The final mark is usually for the unit", "marks": 1 },
+        { "q": "What does 'do not accept' mean on a mark scheme?", "a": "That wording scores zero even if the rest is right", "marks": 1 },
+        { "q": "Name one thing that never earns a mark.", "a": "Repeating the question wording", "marks": 1 }
+      ]
+    },
+    "learn": [
+      {
+        "variant": "C",
+        "corePaper": [
+          { "q": "Rate of reaction definition and units", "pages": "180" },
+          { "q": "Collision theory explanation", "pages": "182 to 183" }
+        ],
+        "extendPaper": [
+          { "q": "Tangent method for rate at an instant", "pages": "186" }
+        ]
+      }
+    ],
+    "build": [
+      {
+        "type": "modelAnswerReview",
+        "questionNumber": "3.2",
+        "marks": 6,
+        "qType": "short",
+        "modelAnswer": "Powder has a bigger surface area. More acid particles can hit the marble at once. So collisions are more frequent. Rate goes up. Same mass of marble so the same total gas. The curve is steeper but ends at the same height.",
+        "jitterProfile": 2,
+        "indicativeContent": [
+          { "text": "powder has a larger <u>surface area</u>", "group": "surface area" },
+          { "text": "more particles are <u>exposed</u> to the acid", "group": "surface area" },
+          { "text": "collisions are more <u>frequent</u>", "group": "collision theory" },
+          { "text": "so the <u>rate</u> increases", "group": "collision theory", "dependentOn": "MP3" },
+          { "text": "the same mass of marble is used **and** the same volume of acid", "group": "yield" },
+          { "text": "so the final volume of gas is <u>unchanged</u>", "group": "yield" }
+        ],
+        "levelDescriptors": [
+          { "level": "Level 3", "range": "5 to 6 marks", "desc": "Links surface area to collision frequency and to the unchanged yield" },
+          { "level": "Level 2", "range": "3 to 4 marks", "desc": "Links surface area to rate but not to yield" },
+          { "level": "Level 1", "range": "1 to 2 marks", "desc": "States powder is faster with no mechanism" }
+        ],
+        "doesNotAward": [
+          "powder has more energy",
+          "the particles get smaller so they react more",
+          "more product is made with powder"
+        ]
+      },
+      {
+        "type": "modelAnswerReview",
+        "questionNumber": "4.1",
+        "marks": 3,
+        "qType": "calculation",
+        "modelAnswer": [
+          "rate = V \\div t",
+          "rate = 48 \\div 60",
+          "rate = 0.8 cm^3/s"
+        ],
+        "jitterProfile": 0,
+        "indicativeContent": [
+          { "text": "correct equation stated or implied", "group": "substitution" },
+          { "text": "correct substitution 48 \\div 60", "group": "substitution" },
+          { "text": "answer 0.8 with unit cm^3/s", "group": "answer" }
+        ],
+        "ecfNote": "An arithmetic slip after correct substitution still earns the substitution mark and the unit mark."
+      },
+      {
+        "type": "modelAnswerReview",
+        "questionNumber": "4.3",
+        "marks": 4,
+        "qType": "graph",
+        "modelAnswer": "Plot the points and draw a smooth curve of best fit.",
+        "graphData": {
+          "headers": ["Time (s)", "Volume of gas (cm3)"],
+          "rows": [[0, 0], [30, 22], [60, 38], [90, 48], [120, 54], [150, 57], [180, 58]]
+        },
+        "indicativeContent": [
+          { "text": "axes labelled with <u>quantity and unit</u>" },
+          { "text": "sensible linear scales" },
+          { "text": "all points plotted accurately" },
+          { "text": "smooth curve of best fit, **not** dot to dot" }
+        ],
+        "doesNotAward": ["points joined with straight lines", "line forced through the origin at the expense of fit"]
+      },
+      {
+        "type": "markTheAnswers",
+        "questionNumber": "5",
+        "marks": 6,
+        "question": "Explain how increasing the concentration of the acid changes the rate of reaction.",
+        "instruction": "Mark each answer against the mark scheme. Give it a level and a mark out of 6.",
+        "levelDescriptors": [
+          { "level": "Level 3", "range": "5 to 6", "desc": "Full collision theory link with correct use of frequency" },
+          { "level": "Level 2", "range": "3 to 4", "desc": "Some collision theory, imprecise language" },
+          { "level": "Level 1", "range": "1 to 2", "desc": "States the rate increases with no mechanism" }
+        ],
+        "indicativeContent": [
+          { "text": "more acid particles in the same <u>volume</u>", "group": "concentration" },
+          { "text": "particles are closer together", "group": "concentration" },
+          { "text": "collisions are more <u>frequent</u>", "group": "collision theory" },
+          { "text": "more successful collisions per second", "group": "collision theory" },
+          { "text": "so the <u>rate</u> increases", "group": "outcome" },
+          { "text": "the total gas produced is unchanged **unless** acid is limiting", "group": "outcome" }
+        ],
+        "doesNotAward": ["the particles have more energy", "the collisions are harder"],
+        "samples": [
+          {
+            "label": "Student A",
+            "text": "There is more acid so it goes faster. The particles bump more.",
+            "jitterProfile": 1,
+            "awardedLevel": "Level 1",
+            "awardedMarks": 2,
+            "hits": ["rate increases"],
+            "misses": ["no mention of frequency", "no link to particles per volume"],
+            "comment": "Everyday language, no collision theory."
+          },
+          {
+            "label": "Student B",
+            "text": "More particles in the same volume so they are closer. That means more collisions so the rate goes up.",
+            "jitterProfile": 3,
+            "awardedLevel": "Level 2",
+            "awardedMarks": 4,
+            "hits": ["more particles per volume", "collisions increase", "rate increases"],
+            "misses": ["does not say collisions are more frequent"],
+            "comment": "Close to Level 3. Needs the word frequent."
+          },
+          {
+            "label": "Student C",
+            "text": "The particles have more energy so they hit harder and the reaction is faster.",
+            "jitterProfile": 2,
+            "awardedLevel": "Level 1",
+            "awardedMarks": 1,
+            "hits": ["rate increases"],
+            "misses": ["mechanism is wrong"],
+            "comment": "Classic misconception: concentration confused with temperature."
+          }
+        ]
+      },
+      {
+        "type": "correctTheStatement",
+        "instruction": "These statements are incorrect. Correct each one in your book.",
+        "jitterProfile": 3,
+        "statements": [
+          { "text": "A catalyst is used up in the reaction.", "correction": "A catalyst is chemically unchanged at the end." },
+          { "text": "Powder produces more gas than chips.", "correction": "Powder produces the same gas, just faster." },
+          { "text": "Higher concentration gives particles more energy.", "correction": "Higher concentration gives more frequent collisions, not more energy." },
+          { "text": "The rate is highest when the graph is flat.", "correction": "The rate is zero when the graph is flat." }
+        ]
+      },
+      {
+        "type": "correctTheStatement",
+        "instruction": "Raster handwriting mode, same layout rendered as an image.",
+        "renderMode": "raster",
+        "jitterProfile": 4,
+        "statements": [
+          { "text": "Cooling speeds up a reaction.", "correction": "Cooling slows a reaction down." },
+          { "text": "Rate is measured in seconds.", "correction": "Rate is measured in cm3/s or g/s." },
+          { "text": "All collisions cause a reaction.", "correction": "Only collisions with enough energy and correct orientation react." },
+          { "text": "Surface area changes the final yield.", "correction": "Surface area changes only the rate." }
+        ]
+      },
+      { "type": "graphWithData" },
+      { "type": "visualiser" }
+    ],
+    "worksheetExtras": {
+      "referenceData": {
+        "headers": ["Time (s)", "Volume of gas (cm3)"],
+        "rows": [[0, 0], [30, 22], [60, 38], [90, 48], [120, 54], [150, 57], [180, 58]]
+      }
+    },
+    "apply": {
+      "variant": "A",
+      "developing": [
+        { "q": "State what indicative content means.", "a": "The marking points an answer could contain", "marks": 1 },
+        { "q": "Give the unit of rate by gas volume.", "a": "cm3/s", "marks": 1 },
+        { "q": "State one thing that never earns a mark.", "a": "Repeating the question wording", "marks": 1 }
+      ],
+      "reaching": [
+        { "q": "Explain why a mark scheme lists 'do not accept' wording.", "a": "Those answers show a misconception even if they sound right", "marks": 2 },
+        { "q": "Explain what error carried forward allows.", "a": "Later marks are still given for correct method after an earlier slip", "marks": 2 },
+        { "q": "Describe the difference between Level 2 and Level 3 here.", "a": "Level 3 links surface area to both rate and unchanged yield", "marks": 2 }
+      ],
+      "mastering": [
+        { "q": "Mark Student C's answer and justify your decision using the mark scheme.", "a": "Level 1, 1 mark. The outcome is right but the mechanism given is the temperature explanation, which the scheme excludes", "marks": 4 },
+        { "q": "Rewrite Student A's answer so it would reach Level 3.", "a": "Add particles per volume, closer together, more frequent collisions, and the unchanged total yield", "marks": 4 },
+        { "q": "Explain why band marking suits a 6 mark explanation but not a calculation.", "a": "Explanations vary in quality across a range, calculations are either correct at each step or not", "marks": 3 }
+      ]
+    },
+    "review": {
+      "questions": [
+        { "q": "What does ECF allow?", "a": "Later method marks after an earlier slip" },
+        { "q": "What separates Level 2 from Level 3?", "a": "Linking mechanism to outcome, not just stating it" },
+        { "q": "Why is 'the collisions are harder' excluded?", "a": "It is the temperature explanation, not concentration" }
+      ]
+    }
+  },
+
+  {
+    "meta": {
+      "class": "8XP",
+      "year": 8,
+      "subject": "Biology",
+      "theme": "biology",
+      "macrotopic": "Reference",
+      "lessonNumber": 4,
+      "topic": "Reference D Annotation Mode",
+      "title": "Reference D: annotation and empty state edges",
+      "lessonType": "annotation",
+      "annotation": true,
+      "outputDir": "C:/Users/magda/claude-projects/science-lesson-v4/golden/build"
+    },
+    "title": {
+      "objectives": ["Work through a calculation live with the class"],
+      "keywords": []
+    },
+    "doNow": {
+      "variant": "A",
+      "count": 6,
+      "questions": [
+        { "q": "What is a producer?", "a": "An organism that makes its own food", "marks": 1 },
+        { "q": "Name the process plants use to make glucose.", "a": "Photosynthesis", "marks": 1 },
+        { "q": "Where in the cell does photosynthesis happen?", "a": "The chloroplast", "marks": 1 },
+        { "q": "What gas do plants take in for photosynthesis?", "a": "Carbon dioxide", "marks": 1 }
+      ]
+    },
+    "engage": {
+      "variant": "demo",
+      "content": "A pondweed shoot is placed under a lamp. Bubbles appear from the cut stem, and they appear faster when the lamp is moved closer. Nothing else about the setup changes.",
+      "imagePlaceholder": false
+    },
+    "learn": [
+      {
+        "variant": "A",
+        "heading": "Photosynthesis in one line",
+        "body": "Carbon dioxide plus water, using light energy, makes glucose plus oxygen.\nThe chloroplast holds the chlorophyll that absorbs the light.",
+        "imagePlaceholder": false
+      },
+      {
+        "variant": "J",
+        "heading": "Rate against light intensity",
+        "axes": { "x": "Light intensity", "y": "Rate of photosynthesis" },
+        "imagePlaceholder": false,
+        "instruction": "Sketch the curve on your whiteboard. Mark where light stops being the limiting factor."
+      }
+    ],
+    "build": [
+      {
+        "type": "workedExample",
+        "worked": {
+          "prompt": "A pondweed gives off 45 bubbles in 3 minutes. Find the rate per minute.",
+          "steps": [
+            "rate = bubbles \\div time",
+            "rate = 45 \\div 3",
+            "rate = 15 bubbles per minute"
+          ]
+        },
+        "yourTurn": {
+          "prompt": "The same pondweed gives off 84 bubbles in 4 minutes. Find the rate."
+        }
+      },
+      { "type": "visualiser" }
+    ],
+    "apply": {
+      "developing": [
+        { "q": "Name the gas given off in photosynthesis.", "a": "Oxygen", "marks": 1 },
+        { "q": "State where photosynthesis happens.", "a": "In the chloroplasts", "marks": 1 },
+        { "q": "Give one factor that limits photosynthesis.", "a": "Light intensity, carbon dioxide or temperature", "marks": 1 }
+      ],
+      "reaching": [
+        { "q": "Explain why bubble rate rises as the lamp moves closer.", "a": "More light energy is available, so the rate rises", "marks": 2 },
+        { "q": "Explain why the curve eventually flattens.", "a": "Another factor becomes limiting", "marks": 2 }
+      ],
+      "mastering": [
+        { "q": "Design a fair test to find the effect of light intensity on photosynthesis rate.", "a": "Vary lamp distance, keep temperature and carbon dioxide constant, count bubbles per minute, repeat and mean", "marks": 6 }
+      ]
+    }
+  },
+
+  {
+    "meta": {
+      "class": "7BYA",
+      "year": 7,
+      "subject": "Biology",
+      "theme": "biology",
+      "macrotopic": "Reference",
+      "lessonNumber": 5,
+      "topic": "Reference E Whiteboard Rounds",
+      "title": "Reference E: whiteboard and untiered review",
+      "lessonType": "whiteboard",
+      "outputDir": "C:/Users/magda/claude-projects/science-lesson-v4/golden/build"
+    },
+    "title": {
+      "objectives": ["Recall the seven life processes at speed"],
+      "keywords": ["MRS GREN", "respiration", "excretion"]
+    },
+    "doNow": {
+      "variant": "B",
+      "questions": [
+        { "q": "What does the M in MRS GREN stand for?", "a": "Movement", "marks": 1 },
+        { "q": "What does the R stand for?", "a": "Respiration", "marks": 1 },
+        { "q": "What does the S stand for?", "a": "Sensitivity", "marks": 1 },
+        { "q": "What does the G stand for?", "a": "Growth", "marks": 1 },
+        { "q": "What does the E stand for?", "a": "Excretion", "marks": 1 },
+        { "q": "What does the N stand for?", "a": "Nutrition", "marks": 1 }
+      ]
+    },
+    "whiteboard": {
+      "rounds": [
+        { "subject": "Biology", "q": "Which life process removes waste made by the body?", "a": "Excretion" },
+        { "subject": "Biology", "q": "Which life process releases energy from glucose?", "a": "Respiration" },
+        { "subject": "Biology", "q": "Which life process lets an organism respond to its surroundings?", "a": "Sensitivity" }
+      ]
+    },
+    "build": [{ "type": "visualiser" }],
+    "apply": {
+      "variant": "C",
+      "developing": [
+        { "q": "List the seven life processes.", "a": "Movement, respiration, sensitivity, growth, reproduction, excretion, nutrition", "marks": 3 },
+        { "q": "Name the process that makes new organisms.", "a": "Reproduction", "marks": 1 },
+        { "q": "Name the process that takes in food.", "a": "Nutrition", "marks": 1 }
+      ],
+      "reaching": [
+        { "q": "Explain the difference between excretion and egestion.", "a": "Excretion removes waste made by the body, egestion removes undigested food", "marks": 2 },
+        { "q": "Explain why a car is not alive even though it moves.", "a": "It does not carry out all seven life processes", "marks": 2 },
+        { "q": "Give one life process a seed carries out before germinating.", "a": "Respiration", "marks": 1 }
+      ],
+      "mastering": [
+        { "q": "A student says a flame is alive because it moves, grows and needs oxygen. Evaluate this claim.", "a": "It fails several processes: no reproduction of its own kind, no sensitivity, no excretion of metabolic waste", "marks": 4 },
+        { "q": "Explain why viruses are hard to classify as living.", "a": "They reproduce only inside host cells and do not respire or excrete independently", "marks": 3 },
+        { "q": "Suggest how you would test whether a seed is respiring.", "a": "Use a temperature probe or limewater, comparing live seeds with boiled seeds", "marks": 3 }
+      ]
+    },
+    "review": {
+      "questions": [
+        { "q": "Waste made by the body is removed by", "a": "Excretion" },
+        { "q": "Energy is released from glucose by", "a": "Respiration" },
+        { "q": "Responding to surroundings is", "a": "Sensitivity" },
+        { "q": "Undigested food leaving the body is", "a": "Egestion, not excretion" }
+      ]
+    }
+  }
+]

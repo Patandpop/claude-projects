@@ -32,3 +32,8 @@ Feynman Plates/
 # The schema stays in git; the data does not.
 science-lesson/references/question-bank/*.json
 !science-lesson/references/question-bank/schema.json
+
+# Golden renders: the pre-reskin visual baseline. Everything in this one folder
+# is committed on purpose, including the decks and worksheets, so every PNG can
+# be traced back to the exact file that produced it.
+!golden/**
