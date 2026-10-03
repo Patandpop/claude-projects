@@ -380,86 +380,34 @@ async function main() {
     if (PATRYK_CLASSES_RAW.every(c => lastLessons[c])) break;
   }
 
-  // ── Load equipment key ──
-  const equipKey = loadEquipmentKey(EQUIP_KEY);
-  console.log(`Equipment key: ${Object.keys(equipKey).length} entries`);
+  // ── Plan the week slot by slot (planner-catalogue.js, 2026-10-03) ──
+  // Each slot gets the NEXT lesson in turn from that class's own sequence (his topics only),
+  // tracked from every slot of his filled sheets; topics end with a test/revision step;
+  // INSET days and holidays get no lesson; equipment comes from the technician guides.
+  const pc = require('./planner-catalogue.js');
+  const week = pc.planWeek(mondayDate);
+  const days = ['Mon','Tue','Wed','Thu','Fri'];
+  const setsLabelOf = (s) => (s ? setsLabel(s) : '');
+  const equipCellOf = (pl) => {
+    if (!pl || !pl.equipment) return 'N/A';
+    const base = pl.equipment;
+    const sets = isNonOrder(base) || !pl.sets ? '' : ` — ${setsLabelOf(pl.sets)}`;
+    const print = pl.printing && !/^n\/?a$/i.test(pl.printing) ? `  ·  Print: ${pl.printing}` : '';
+    return base + sets + print + (pl.check ? '  [CHECK]' : '');
+  };
+  const lessonCellOf = (pl) => (pl && pl.lesson ? pl.lesson.title : (pl ? pl.text : 'N/A'));
 
-  // ── Build plan per class ──
-  const plan = {};
-  for (const cls of PATRYK_CLASSES_RAW) {
-    const last  = lastLessons[cls] || {};
-    const next  = findNextLessonDrive(cls, last.lesson || '');
-    const nextLesson = next ? `Lesson ${next.num} - ${next.title}` : (last.lesson ? `${last.lesson} [next TBD]` : '[unknown]');
-    const equip = lookupEquipment(nextLesson, equipKey) || lookupEquipment(last.lesson || '', equipKey);
-    const equipText = equip ? equip.equipment : bestGuessEquipment(nextLesson).equipment;
-    const sets      = equip ? equip.sets      : bestGuessEquipment(nextLesson).sets;
-    const guessed   = !equip;
-
-    const subject = next ? next.subject : null;
-    plan[cls] = {
-      lastLesson:  last.lesson || '(none)',
-      nextLesson:  nextLesson,
-      equipment:   equipText,
-      sets,
-      guessed,
-      subject,
-      books:       booksToOrder(cls, next ? `Lesson ${next.num} - ${next.title}` : '', subject),
-      lastSheet:   last.sheet || '(none)'
-    };
-  }
-
-  // ── Apply context.json overrides (tests, revision, pre-planned absences) ──
-  const ctx = fs.existsSync(CONTEXT_PATH) ? JSON.parse(fs.readFileSync(CONTEXT_PATH, 'utf8')) : null;
-  if (ctx) {
-    const nextStart = localISO(mondayDate);
-    const nextEnd   = localISO(new Date(mondayDate.getFullYear(), mondayDate.getMonth(), mondayDate.getDate() + 4));
-    for (const cls of PATRYK_CLASSES_RAW) {
-      const p = plan[cls];
-      const test = (ctx.tests || []).find(t => t.class === cls && t.date >= nextStart && t.date <= nextEnd);
-      if (test) { p.equipment = `already printed — test${test.topic ? ': ' + test.topic : ''}`; p.guessed = false; p.books = ''; continue; } // actual test → no books
-      const rev = (ctx.revisionMode || []).find(r => r.class === cls && r.active);
-      if (rev) { p.equipment = 'N/A — revision'; p.guessed = false; const b = tb.primaryBook({ year: school.yearOf(cls), subject: p.subject }); p.books = b ? `Books: 2× ${b}` : ''; continue; } // revision → 2 sets
-      const mp = (ctx.missingPeriods || []).find(m => m.date >= nextStart && m.date <= nextEnd && (!(m.classes || []).length || m.classes.includes(cls)));
-      if (mp) { p.equipment = mp.action === 'move' ? 'N/A — lesson moved' : 'N/A — cover'; p.guessed = false; }
-    }
-    console.log(`Context: week ${ctx.weekOf} (${ctx.weekType})`);
-  }
-
-  // ── Print terminal summary ──
   console.log('\n' + '═'.repeat(72));
   console.log(`ORDER SHEET: Week ${nextWeekType}   Monday ${fmtDate(mondayDate)}`);
   console.log('═'.repeat(72));
-
-  const days = ['Mon','Tue','Wed','Thu','Fri'];
-  for (const day of days) {
-    const slots = timetable[day] || [];
-    if (slots.length === 0) continue;
-    console.log(`\n${day}:`);
-    for (const slot of slots) {
-      const cls = slot.class;
-      if (!isPatrykClass(cls)) {
-        console.log(`  P${LESSON_COLS.indexOf(slot.lessonCol)+1} ${cls.padEnd(5)} → N/A (not Patryk's class)`);
-        continue;
-      }
-      const normCls = normalizeClass(cls);
-      const p = plan[normCls];
-      const flag = p.guessed ? ' [GUESS]' : '';
-      console.log(`  P${LESSON_COLS.indexOf(slot.lessonCol)+1} ${cls.padEnd(5)} last=${p.lastLesson}`);
-      console.log(`          next=${p.nextLesson}`);
-      console.log(`          equip=${p.equipment}${isNonOrder(p.equipment) ? '' : ` [${setsLabel(p.sets)}]`}${flag}`);
-      if (p.books) console.log(`          ${p.books}`);
-    }
+  let lastDay = -1;
+  for (const sl of week.slots) {
+    if (sl.day !== lastDay) { console.log(`\n${days[sl.day]}:`); lastDay = sl.day; }
+    const pl = sl.plan;
+    console.log(`  P${sl.period} ${String(sl.cls || sl.rawClass).padEnd(6)} ${pl.text}${pl.check ? '  [CHECK]' : ''}`);
+    if (pl.lesson) console.log(`          equip (${pl.equipSource}): ${String(pl.equipment).slice(0, 100)}`);
+    if (pl.note) console.log(`          ${pl.note}`);
   }
-
-  // Print classes not found in timetable
-  for (const cls of PATRYK_CLASSES_RAW) {
-    const inTimetable = Object.values(timetable).flat().some(s => normalizeClass(s.class) === cls);
-    if (!inTimetable) {
-      const p = plan[cls];
-      console.log(`\n[NO TIMETABLE SLOT FOUND] ${cls}: last=${p.lastLesson}`);
-    }
-  }
-
   console.log('\n' + '─'.repeat(72));
 
   if (dryRun) {
@@ -493,35 +441,12 @@ async function main() {
     ? { Mon:[4,6,7], Tue:[9,11,12], Wed:[14,16,17], Thu:[19,21,22], Fri:[24,26,27] }
     : { Mon:[4,5,6], Tue:[8,9,10], Wed:[12,13,14], Thu:[16,17,18], Fri:[20,21,22] };
 
-  for (const day of days) {
-    const slots   = timetable[day] || [];
-    const offsets = dayOffsets[day];
+  for (const sl of week.slots) {
+    const offsets = dayOffsets[days[sl.day]];
     if (!offsets) continue;
     const [, lessonRow, equipRow] = offsets;
-
-    for (const slot of slots) {
-      const cls = slot.class;
-      const lCol = slot.lessonCol;
-      const lessonAddr = `${lCol}${lessonRow}`;
-      const equipAddr  = `${lCol}${equipRow}`;
-
-      if (!isPatrykClass(cls)) {
-        setCell(lessonAddr, 'N/A');
-        setCell(equipAddr,  'N/A');
-        continue;
-      }
-
-      const p = plan[normalizeClass(cls)];
-      // Strip "[next TBD]" suffix for the sheet
-      const lessonForSheet = p.nextLesson.replace(/\s*\[next TBD\]/, '').replace(/\s*\[unknown\]/, 'TBD');
-      const equipBase = p.equipment || 'see teacher';
-      // Technicians need the set count on the sheet — it was computed but never written.
-      const equipCell = equipBase
-        + (isNonOrder(equipBase) ? '' : ` — ${setsLabel(p.sets)}`)
-        + (p.books ? `  ·  ${p.books}` : '');
-      setCell(lessonAddr, lessonForSheet);
-      setCell(equipAddr,  equipCell);
-    }
+    setCell(`${sl.col}${lessonRow}`, lessonCellOf(sl.plan));
+    setCell(`${sl.col}${equipRow}`, equipCellOf(sl.plan));
   }
 
   // ── Add new sheet to zip ──
