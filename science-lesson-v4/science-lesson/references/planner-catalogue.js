@@ -365,7 +365,47 @@ if (require.main === module) {
   const val = (k) => { const i = a.indexOf('--' + k); return i >= 0 ? a[i + 1] : null; };
   const parse = (s) => { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); };
   const ctx = loadAll();
-  if (val('catalogue')) {
+  if (val('export')) {
+    // Data file for the planner web app (planner/): everything it needs, nothing it must fetch.
+    const tb = require('./textbook-index.js');
+    const SIZES = { '7MLA': 34, '8XP': 33, '8AG': 29, '9AS': 32, '9XS': 32, '10C2': 28, '10S2': 30, '11S2': 29, '12C': 28, '13D': 18, 'PSHE-9AB': 27 };
+    const classes = {};
+    for (const [cls, seq] of Object.entries(ctx.seqs)) {
+      classes[cls] = {
+        year: seq[0] ? seq[0].year : null, size: SIZES[cls] || null,
+        seq: seq.map((L) => {
+          const e = equipmentFor(L);
+          let book = '';
+          try { book = tb.formatRef(tb.matchLesson({ year: L.year, subject: L.subject, topic: L.title })) || ''; } catch { book = ''; }
+          let built = null;
+          if (L.folder) { try { built = fs.readdirSync(L.folder).some((f) => /\.pptx$/i.test(f)); } catch { built = false; } }
+          return { topic: L.topic, unit: L.unit, num: L.num, title: L.title, eq: e.equipment, sets: e.sets || null,
+            print: e.printing || '', eqSrc: e.source, book, built, planned: L.source === 'plan',
+            rel: L.folder ? path.relative(DRIVE, L.folder).split(path.sep).join('/') : null };
+        }),
+      };
+    }
+    // Week A and Week B timetables from his most recent filled sheet of each letter
+    const timetable = {};
+    for (const letter of ['A', 'B']) {
+      const sh = [...ctx.sheets].reverse().find((s) => school.weekLetter(s.monday) === letter);
+      timetable[letter] = sh ? sheetSlots(sh).filter((s) => s.rawClass).map((s) => ({ day: s.day, period: s.period, col: s.col, cls: s.cls || s.rawClass })) : [];
+    }
+    // progress up to the newest filled sheet
+    const history = {};
+    for (const s of ctx.sheets) for (const sl of sheetSlots(s)) if (sl.cls) (history[sl.cls] = history[sl.cls] || []).push(sl);
+    const progressOut = {};
+    for (const cls of Object.keys(ROUTES)) {
+      const p = progress(ctx.seqs[cls], history[cls] || []);
+      progressOut[cls] = { taught: [...p.taught], last: p.last, unit: p.unit, closed: [...p.closed], tested: [...p.tested] };
+    }
+    const out = {
+      generated: new Date().toISOString(), weekAStart: school.WEEK_A_START, terms: TERMS, inset: [...INSET],
+      filledWeeks: ctx.sheets.map((s) => iso(s.monday)), classes, timetable, progress: progressOut,
+    };
+    fs.writeFileSync(val('export'), JSON.stringify(out));
+    console.log(`planner data written: ${val('export')} (${Math.round(fs.statSync(val('export')).size / 1024)} KB, ${Object.keys(classes).length} classes, filled weeks to ${out.filledWeeks.slice(-1)[0]})`);
+  } else if (val('catalogue')) {
     fs.writeFileSync(val('catalogue'), JSON.stringify(ctx.seqs, null, 1));
     console.log('catalogue written:', Object.entries(ctx.seqs).map(([c, s]) => `${c} ${s.length}`).join(', '));
   } else if (val('backtest')) {
