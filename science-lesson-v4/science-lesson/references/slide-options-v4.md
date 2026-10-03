@@ -5,7 +5,7 @@
 
 ## HARD CONTENT RULES — live in SKILL.md (one home; do not re-copy here)
 
-SKILL.md's HARD RULES section is authoritative for counts and policy (Do Now = exactly 6; MCQ = exactly 4; Apply min 3 per tier; **omit `review` — build.js copies Apply itself, 2026-07-12**; Learn max 4; Visualiser mandatory on standard/practical). This file only adds the per-slide character limits the renderer cannot fix for you:
+SKILL.md's HARD RULES section is authoritative for counts and policy (Do Now = exactly 6; MCQ = exactly 6, one block — experiment MCQs tagged about:"practical"; Apply min 3 per tier; **omit `review` — build.js copies Apply itself, 2026-07-12**; Learn max 4; Visualiser mandatory on standard/practical). This file only adds the per-slide character limits the renderer cannot fix for you:
 
 - **Apply question:** ≤140 chars · min 16pt (enforce before building — never let the renderer shrink)
 - **Do Now question:** ≤120 chars
