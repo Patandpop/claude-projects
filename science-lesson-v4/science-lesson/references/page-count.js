@@ -61,16 +61,28 @@ function wordAvailable() {
   return process.platform === 'win32';
 }
 
+// If Word hangs (a hidden dialog) and the timeout kills PowerShell, the Word it started would
+// be left running invisibly. Close ONLY automation-launched Word started by this run, never a
+// Word window Patryk opened himself.
+function killStrayWord(since) {
+  const iso = since.toISOString();
+  cp.spawnSync('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command',
+    `Get-CimInstance Win32_Process -Filter "Name='WINWORD.EXE'" | Where-Object { $_.CommandLine -match '/Automation' -and $_.CreationDate -ge [datetime]'${iso}' } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force }`],
+    { encoding: 'utf8', timeout: 30000 });
+}
+
 // Returns [{file, pages, sections:[{title,page}], error?}] — pages null when Word is unavailable.
 function countPages(files) {
   const list = (Array.isArray(files) ? files : [files]).map((f) => path.resolve(f));
   if (!wordAvailable()) return list.map((file) => ({ file, pages: null, sections: [], error: 'Word not available' }));
-  const r = cp.spawnSync('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command', PS_SCRIPT], {
+  const startedAt = new Date();
+  const r =cp.spawnSync('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command', PS_SCRIPT], {
     encoding: 'utf8',
     env: Object.assign({}, process.env, { PAGECOUNT_FILES: JSON.stringify(list), PAGECOUNT_SECTION_RE: SECTION_RE }),
     timeout: 60000 + 20000 * list.length,
   });
   if (r.status !== 0 || !r.stdout.trim()) {
+    killStrayWord(startedAt);
     const msg = (r.stderr || r.error || 'no output').toString().trim().split('\n')[0];
     return list.map((file) => ({ file, pages: null, sections: [], error: msg }));
   }
