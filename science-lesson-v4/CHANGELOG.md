@@ -1,5 +1,17 @@
 # Session changelog — fable-overnight branch
 
+## 2026-10-03 session: maths in ordinary text, and the September scripts
+
+From the bug sweep. Each row is its own commit; `git revert <hash>` undoes just that one.
+
+| Commit | What it did | How to revert |
+|---|---|---|
+| 7bc6b44 | **Order sheet, daily brief, context tool** now use this year's classes (one list, read from classes-2026-27.json) and the right Week A/B. The order sheet had been treating last July's tab as your newest week and copying the wrong week's timetable; it now also refuses to overwrite a week you filled yourself. The league and Jeopardy files (real student names) are kept out of git. | `git revert 7bc6b44` |
+| fb4f10e | **Words stay words in sentences.** "times", "seconds", "metres" only turn into × s m next to numbers. Your 9AB amylase lesson had printed "repeats the experiment three × and gets × of 38 s". MCQ options like "A.C. current" and "d.c. supply" no longer lose their first letters. | `git revert fb4f10e` |
+| ea9680d | **v^2, H_2O, {1/2} now work in every text box**, not just equation fields: real raised/lowered text on slides, ² ₂ on worksheets. Also fixes kg/m^3 in GUESS rows and a raw "\div" on the reference error-analysis slide. New test lesson `maths-prose-test.json` guards it. | `git revert ea9680d` |
+
+**Upload needed:** replace `science-lesson.skill` in claude.ai with the new one (packed 2026-10-03).
+
 ## 2026-10-02 session: the slide inventory, and three render bugs fixed
 
 Every slide type was rendered to a picture so the reskin starts from a true record. That showed three faults, now fixed and tested. `git revert <hash>` undoes any one of them.

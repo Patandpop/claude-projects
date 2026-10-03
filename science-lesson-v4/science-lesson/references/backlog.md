@@ -16,7 +16,8 @@ Found by rendering every slide type to PNG (`golden/`, baseline commit `e0d5210a
 - ✅ **Formula triangle clipped its labels** ("rate" showed as "ate"). Labels now fit the triangle's real interior. Also closes **Bug 59 point 4**: triangles now take 2 to 4 multiplied quantities along the bottom, `equationSymbols: { top, bottom: [...] }`; the old three-key form still works; non-product equations still get no triangle.
 - ✅ **graph_gen straight line through curved data** (entry below). New `referenceData.fit`: auto (default), linear, curve. Curves are a smooth best fit with no intercept or straight-line numbers.
 - 🆕 **Mark-scheme panel overflows its box** on long schemes (`golden/C-07.png`, also in the baseline): the last exclusionary claim runs off the bottom.
-- 🆕 **`kg/m^3` prints raw in GUESS rows**: `parseEq` reads the `/` as a fraction before the `^` (`golden/B-24.png`).
+- ✅ **`kg/m^3` prints raw in GUESS rows**: fixed 2026-10-03 (`ea9680d`): fraction parts now get their powers typeset, so it renders kg⁄m³.
+- ✅ **Maths shorthand raw in ~100 slide fields, prose word swaps ("three ×"), MCQ "A.C." stripped**: fixed 2026-10-03 (`fb4f10e`, `ea9680d`); regression fixture `maths-prose-test.json`.
 
 ## Session log — 2026-07-13/14 (exam library at scale, homework booklets, class defaults, Feynman plates — Claude Code)
 

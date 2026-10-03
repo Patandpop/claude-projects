@@ -153,8 +153,10 @@ Produces CORE PAPER | CHALLENGE PAPER tables (navy header, gold title — house 
 ```
 Max 6 rows. Rows expand to fill slide (no dead zone at bottom).
 
-### MATH NOTATION (any equation field: `equation`, worked `steps`, `q`/`a`, `example`, …)
-Renders in **Cambria Math** (ships with every MS Office). Mini-syntax:
+### MATH NOTATION (works in ANY text field since 2026-10-03, not only equation fields)
+Equation fields render in **Cambria Math** (ships with every MS Office). In ordinary text (Learn boxes, MCQ options,
+hooks, tables...) `^`/`_` become real raised/lowered text in the slide font and `{a/b}` a diagonal a⁄b; worksheets
+use ² ₂ characters. Links and file names are never touched, and a bare `/` in prose stays a slash. Mini-syntax:
 `{num/den}` fraction (legible diagonal in PPTX, true stacked bar in Word) · `x^2` superscript ·
 `x_2` subscript · `^{m s}` multi-char · `sqrt(...)` root (√ glyph in PPTX, true radical in Word) ·
 `\greek` (`\Delta`, `\rho`) · operators `\times`→× `\div`→÷ `\pm`→± `\cdot`→· `\to`/`\rightarrow`→→
@@ -162,6 +164,9 @@ Renders in **Cambria Math** (ships with every MS Office). Mini-syntax:
 **Rule (Bug 53):** author operators/units as symbols in model answers/working — × not "times", ÷ not
 "divide", m/s not "meters/second" (or use the `\times`/`\div` commands). Don't hand-type ² ₂ glyphs —
 write `^2`/`_2` and let the renderer place them.
+**Word swaps (2026-10-03):** the renderer only turns words into symbols in a maths context: units straight
+after a number ("100 metres" → "100 m") and "times"/"divided by" between operands ("V = I times R").
+"Repeat three times" and "a few seconds later" are left as written. Typing × ÷ directly is still best.
 
 ### LEARN F — equation callout
 ```json
