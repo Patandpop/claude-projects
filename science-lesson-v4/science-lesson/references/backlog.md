@@ -8,6 +8,14 @@ Cleaned 2026-07-02: only outstanding items below.
 
 <!-- entries appended below -->
 
+## Session log — 2026-10-03 (10C2 L11 Non Renewable Resources trial build — Claude Code)
+
+Found while building and rendering the trial lesson (new Apply structure). Not fixed: build.js changes need Plan Mode.
+- 🆕 **Sentence starters on an extended-writing question land on the wrong sheet.** `starters` on a Mastering `extended_writing` question printed on the STANDARD worksheet, while the SUPPORT worksheet showed only the generic "What changes? / Why? / What does this mean?" prompts. Starters should go on the support sheet (with or instead of the generic prompts, and the generic prompts don't fit "evaluate" questions anyway).
+- 🆕 **GUESS fields pre-fill the standard worksheet.** Giving an Apply calculation `given`/`unknown`/`equation` fills those cells on BOTH worksheets, which gives the working away on Mastering questions. Workaround used: `equationHint` only (support-sheet hint, blank GUESS cells). Consider pre-filling only on the support sheet.
+- 🆕 **CONTENT CHECK false positive on Learn E:** it demands an `imageDescription` for comparison slides, which have no image area, so the image only reaches the image bank.
+- 🆕 **graphInterpret slide is titled "READ THE GRAPH: ANSWERS"** and carries the purple-pen bar, but it is the only graph slide (questions + answers to animate). Title reads oddly when students first see it.
+
 ## Session log — 2026-10-02 (three render bugs from the golden renders — Claude Code)
 
 Found by rendering every slide type to PNG (`golden/`, baseline commit `e0d5210a`). All fixed, `npm test` green with a new fixture (`triangle-handwriting-test.json`).
