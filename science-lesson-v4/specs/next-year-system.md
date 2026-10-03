@@ -20,6 +20,7 @@ Lessons 2026-2027/            (location decision UNRESOLVED — see §4)
 
 - **Dual-version rule:** standard + support worksheets come from the SAME content object. Support = added scaffolding (word banks, sentence starters, hints), NEVER fewer questions per tier. Sometimes Patryk wants two full versions generated to pick from — that is two builds of the same object with a variation note, not two content objects.
 - Print assets (topic overview sheets KS3, unit front sheets KS4/5, homeworks, assessments/PLCs) are ORDER-SHEET items, not build outputs. They never appear in lesson folders. Quantity on the order sheet = class size, labelled by topic.
+- **Drive as actually filed (reorganisation finished 2026-10-02):** the live tree is `G:\My Drive\Beechen Cliff Science\Lessons\Year X\Subject\Topic\Lesson N - Title` (Year 12/13 have no subject layer: `Lessons\Year 12\Chapter N - Name\Lesson N - Section`). KS4 topic overviews sit at TOPIC level (beside the lesson folders, never inside one). Tests/markschemes/PLCs: `Admin\Assessment\Year X\Subject\Topic`. Key homeworks + Activate scans: `Admin\Homework`. Full map: `design-audit/drive-inventory/REORG-SUMMARY.md`; open gaps: `GAPS-and-cleanup.md`.
 
 ## 2. scheme-of-learning.json — the central data source
 
