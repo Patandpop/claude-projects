@@ -1,0 +1,118 @@
+/* Planner web app — server (Google Apps Script). Patryk 2026-10-03.
+   Same pattern as the behaviour tracker: a web app bound to a Google Sheet, opened with ?key=.
+   Deploy: Execute as "Me", access "Anyone within organisation" (the school blocks public apps).
+
+   Sheet tabs (made by setup()):
+     Data       planner-data.json from home (node science-lesson/references/planner-catalogue.js --export),
+                stored in 45,000-character chunks down column A
+     Weeks      A: Monday (YYYY-MM-DD)  B: the saved week as JSON  C: saved at
+     Equipment  A: lesson key  B: equipment  C: sets  D: saved at    (edits the planner remembers)
+   Script properties:
+     PLANNER_KEY   the secret in the link (?key=...)
+     TEMPLATE_ID   a Google Sheet holding ONE of his order-sheet tabs, used for the Excel download
+*/
+
+const VERSION = 1;
+
+function setup() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  [['Data', ['chunk']], ['Weeks', ['monday', 'week', 'saved']], ['Equipment', ['lesson', 'equipment', 'sets', 'saved']]].forEach(([name, head]) => {
+    let sh = ss.getSheetByName(name);
+    if (!sh) sh = ss.insertSheet(name);
+    if (sh.getLastRow() === 0) sh.appendRow(head);
+  });
+  const props = PropertiesService.getScriptProperties();
+  if (!props.getProperty('PLANNER_KEY')) props.setProperty('PLANNER_KEY', Utilities.getUuid().slice(0, 12));
+  Logger.log('Planner key: ' + props.getProperty('PLANNER_KEY') + '  (open the web app URL with ?key=THIS)');
+}
+
+function check_(k) {
+  if (!k || k !== PropertiesService.getScriptProperties().getProperty('PLANNER_KEY')) throw new Error('Locked');
+}
+
+function doGet(e) {
+  const key = (e && e.parameter && e.parameter.key) || '';
+  if (key !== PropertiesService.getScriptProperties().getProperty('PLANNER_KEY')) {
+    return HtmlService.createHtmlOutput('<p style="font-family:sans-serif;padding:24px">Locked. Open the link that ends in ?key=</p>');
+  }
+  const t = HtmlService.createTemplateFromFile('Planner');
+  t.key = key;
+  return t.evaluate().setTitle('Planner').setXFrameOptionsMode(HtmlService.XFrameOptionsMode.DEFAULT);
+}
+
+function include(name) { return HtmlService.createHtmlOutputFromFile(name).getContent(); }
+
+function sheet_(name) { return SpreadsheetApp.getActiveSpreadsheet().getSheetByName(name); }
+
+// Everything the page needs in one call.
+function loadAll(k) {
+  check_(k);
+  const d = sheet_('Data');
+  const chunks = d.getLastRow() > 1 ? d.getRange(2, 1, d.getLastRow() - 1, 1).getValues().map((r) => r[0]).join('') : '';
+  const weeks = {};
+  const w = sheet_('Weeks');
+  if (w.getLastRow() > 1) w.getRange(2, 1, w.getLastRow() - 1, 2).getValues().forEach(([m, json]) => {
+    const mon = m instanceof Date ? Utilities.formatDate(m, Session.getScriptTimeZone(), 'yyyy-MM-dd') : String(m);
+    try { weeks[mon] = JSON.parse(json); } catch (e) { /* skip a damaged row */ }
+  });
+  const learned = {};
+  const q = sheet_('Equipment');
+  if (q.getLastRow() > 1) q.getRange(2, 1, q.getLastRow() - 1, 3).getValues().forEach(([key, eq, sets]) => { learned[key] = { eq, sets: sets || null }; });
+  return { version: VERSION, data: chunks ? JSON.parse(chunks) : null, weeks, learned, hasTemplate: !!PropertiesService.getScriptProperties().getProperty('TEMPLATE_ID') };
+}
+
+function importData(k, text) {
+  check_(k);
+  const obj = JSON.parse(text);
+  if (!obj || !obj.classes || !obj.timetable) throw new Error('That is not a planner-data.json file.');
+  const d = sheet_('Data');
+  if (d.getLastRow() > 1) d.getRange(2, 1, d.getLastRow() - 1, 1).clearContent();
+  const parts = [];
+  for (let i = 0; i < text.length; i += 45000) parts.push([text.slice(i, i + 45000)]);
+  d.getRange(2, 1, parts.length, 1).setNumberFormat('@').setValues(parts);
+  return { classes: Object.keys(obj.classes).length, generated: obj.generated };
+}
+
+function saveWeek(k, week) {
+  check_(k);
+  const w = sheet_('Weeks');
+  const json = JSON.stringify(week);
+  const n = w.getLastRow();
+  const mons = n > 1 ? w.getRange(2, 1, n - 1, 1).getDisplayValues().map((r) => r[0]) : [];
+  const at = mons.indexOf(week.monday);
+  const row = [week.monday, json, new Date()];
+  if (at >= 0) w.getRange(at + 2, 1, 1, 3).setValues([row]);
+  else { w.appendRow(row); w.getRange(w.getLastRow(), 1).setNumberFormat('@').setValue(week.monday); }
+  return { saved: week.monday };
+}
+
+function learnEquipment(k, key, eq, sets) {
+  check_(k);
+  const q = sheet_('Equipment');
+  const n = q.getLastRow();
+  const keys = n > 1 ? q.getRange(2, 1, n - 1, 1).getValues().map((r) => r[0]) : [];
+  const at = keys.indexOf(key);
+  const row = [key, eq, sets || '', new Date()];
+  if (at >= 0) q.getRange(at + 2, 1, 1, 4).setValues([row]); else q.appendRow(row);
+  return true;
+}
+
+// Fill a copy of his real order-sheet tab and hand back an .xlsx (same layout the technicians know).
+function exportXlsx(k, cells, title) {
+  check_(k);
+  const id = PropertiesService.getScriptProperties().getProperty('TEMPLATE_ID');
+  if (!id) throw new Error('No order-sheet template set yet (see README: TEMPLATE_ID).');
+  const copy = DriveApp.getFileById(id).makeCopy(title);
+  try {
+    const ss = SpreadsheetApp.openById(copy.getId());
+    const sh = ss.getSheets()[0];
+    sh.setName(title.slice(0, 99));
+    cells.forEach((c) => sh.getRange(c.addr).setValue(c.value));
+    SpreadsheetApp.flush();
+    const url = 'https://docs.google.com/spreadsheets/d/' + copy.getId() + '/export?format=xlsx';
+    const blob = UrlFetchApp.fetch(url, { headers: { Authorization: 'Bearer ' + ScriptApp.getOAuthToken() } }).getBlob();
+    return { name: title + '.xlsx', b64: Utilities.base64Encode(blob.getBytes()) };
+  } finally {
+    copy.setTrashed(true);
+  }
+}

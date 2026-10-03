@@ -16,7 +16,8 @@
   const iso = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
   const parse = (s) => { const [y, m, d] = String(s).split('-').map(Number); return new Date(y, m - 1, d); };
   const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
-  const mondayOf = (d) => addDays(d, -((d.getDay() + 6) % 7));
+  // always midnight: a time of day would make week counting run one week too far
+  const mondayOf = (d) => addDays(new Date(d.getFullYear(), d.getMonth(), d.getDate()), -((d.getDay() + 6) % 7));
 
   function isTeachingDay(data, d) {
     const s = iso(d);
@@ -25,6 +26,7 @@
   }
   // Week letter: parity of TEACHING weeks since the first Week A (holiday weeks don't count).
   function weekLetter(data, monday) {
+    monday = mondayOf(monday);
     const start = parse(data.weekAStart);
     const isTW = (m) => [0, 1, 2, 3, 4].some((k) => { const s = iso(addDays(m, k)); return (data.terms || []).some(([a, b]) => s >= a && s <= b); });
     let n = 0;
@@ -159,14 +161,24 @@
   }
   // Cells for his technicians' sheet (new layout): lesson row and equipment row per day block.
   const ROWS = { 0: [6, 7, 8], 1: [11, 12, 13], 2: [16, 17, 18], 3: [21, 22, 23], 4: [26, 27, 28] };
+  // Every one of the 25 slot positions is written (blank when empty) because the template copy
+  // still holds an old week. Per slot: room (C/G/K/O/S, class row), class (E/I/M/Q/U, class row),
+  // lesson row, equipment row, class size (C/G/K/O/S, size row).
+  const ROOM_COL = { B: 'C', F: 'G', J: 'K', N: 'O', R: 'S' }, CLASS_COL = { B: 'E', F: 'I', J: 'M', N: 'Q', R: 'U' };
   function sheetCells(data, week) {
     const cells = [{ addr: 'R1', value: `Week ${week.letter}` }, { addr: 'S1', value: week.monday.split('-').reverse().join('/') }];
-    for (const s of week.slots) {
-      const [lr, er, sr] = ROWS[s.day];
-      cells.push({ addr: `${s.col}${lr}`, value: lessonCell(data, s) }, { addr: `${s.col}${er}`, value: equipCell(s) });
-      const size = (data.classes[s.cls] || {}).size;
-      const classCol = { B: 'C', F: 'G', J: 'K', N: 'O', R: 'S' }[s.col];
-      if (size && classCol) cells.push({ addr: `${classCol}${sr}`, value: size });
+    for (let day = 0; day < 5; day++) {
+      const [lr, er, sr] = ROWS[day];
+      for (const col of ['B', 'F', 'J', 'N', 'R']) {
+        const s = week.slots.find((x) => x.day === day && x.col === col);
+        const size = s ? (data.classes[s.cls] || {}).size : '';
+        cells.push(
+          { addr: `${ROOM_COL[col]}${lr - 1}`, value: s ? 'S8' : '' },
+          { addr: `${CLASS_COL[col]}${lr - 1}`, value: s ? s.cls : '' },
+          { addr: `${col}${lr}`, value: s ? lessonCell(data, s) : '' },
+          { addr: `${col}${er}`, value: s ? equipCell(s) : '' },
+          { addr: `${ROOM_COL[col]}${sr}`, value: size || '' });
+      }
     }
     return cells;
   }
