@@ -690,6 +690,17 @@ function autoFontSize(text, w, h, { min = 10, max = 28, linesHint } = {}) {
   return min;
 }
 
+/* fitListFont(lines, w, h, min, max) — biggest size at which a bulleted list (one item per
+   paragraph, 6pt after each) fits the box. Same width model as autoFontSize. */
+function fitListFont(lines, w, h, min, max) {
+  for (let fs = max; fs >= min; fs--) {
+    const cpl = Math.max(1, Math.floor((w * 120) / fs));
+    const n = lines.reduce((t, l) => t + Math.max(1, Math.ceil(flattenText(l).length / cpl)), 0);
+    if ((n * fs * 1.4 + lines.length * 6) / 72 <= h * 0.85) return fs;
+  }
+  return min;
+}
+
 /* navyHeaderBox(x, y, w, headerText, bodyLines[]) — one table shape */
 function navyHeaderBox(slide, x, y, w, headerText, bodyLines, bodyH) {
   const border = [{ type: 'solid', pt: 2, color: GOLD }, { type: 'solid', pt: 2, color: GOLD },
@@ -2182,7 +2193,11 @@ function slideSort(pptx, L, item) {
   const colW = (CW - 0.15) / 2;
   const rows = Math.ceil(items.length / 2);
   const cellH = (BOT_Y - 0.08 - y - (rows - 1) * 0.1) / rows; // M5: removed 0.7 cap
-  const sortFs = Math.min(16, Math.max(11, cellH * 14));        // M6: scale font to box height
+  // 2026-10-03 (Patryk, 10C2 L11): short items ("wind", "coal") sat tiny in big boxes under the old
+  // 16pt cap. Size every box from the LONGEST item (one size for all, so the grid stays even),
+  // fitted to the box's real width and height: short words fill it, long ones still fit.
+  const longest = items.reduce((a, it) => (String(it).length > a.length ? String(it) : a), '');
+  const sortFs = autoFontSize('00   ' + longest, colW - 0.3, cellH, { min: 16, max: 32 });
   items.forEach((it, i) => {
     const cx = MX + (i % 2) * (colW + 0.15);
     const cy = y + Math.floor(i / 2) * (cellH + 0.1);
@@ -2210,8 +2225,11 @@ function slideSort(pptx, L, item) {
     });
     const list = arr(sorted[k]);
     const boxH = BOT_Y - 0.08 - y - 0.42;
-    const ansFs = Math.min(16, Math.max(11, (boxH / Math.max(1, list.length)) * 14)); // M7
-    const runs = list.map((it) => ({ text: '\u00B7  ' + it, options: { fontSize: ansFs, breakLine: true, paraSpaceAfter: 6 } }));
+    const ansFs = fitListFont(list.map((it) => '·  ' + it), cw2 - 0.3, boxH, 16, 40); // M7, sized to fill (2026-10-03)
+    // spread a short list down the box instead of bunching it at the top (2026-10-03)
+    const spare = boxH * 72 * 0.8 - list.length * ansFs * 1.4;
+    const gapPt = Math.max(6, Math.min(30, spare / Math.max(1, list.length)));
+    const runs = list.map((it) => ({ text: '\u00B7  ' + it, options: { fontSize: ansFs, breakLine: true, paraSpaceAfter: gapPt } }));
     goldBox(s, cx, y + 0.42, cw2, boxH, runs, { valign: 'top', fill: NAVY, color: GOLD });
   });
   bottomBar(s, obj);
