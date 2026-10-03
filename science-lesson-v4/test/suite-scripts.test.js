@@ -82,6 +82,10 @@ function run() {
     if (wl('2026-09-07') === 'A' && wl('2026-09-14') === 'B' && wl('2026-10-05') === 'A' && wl('2026-10-12') === 'B')
       pass('Week A/B matches the filled order sheets (Sep 7 A … Oct 12 B)');
     else fail('week letter disagrees with the filled order sheets');
+    // Patryk 2026-10-03: the sequence carries on over holidays (holiday weeks don't count).
+    if (wl('2026-10-19') === 'A' && wl('2026-11-02') === 'B' && wl('2026-12-14') === 'B' && wl('2027-01-04') === 'A' && wl('2027-02-22') === 'A')
+      pass('A/B carries over half term and Christmas (19 Oct A → 2 Nov B)');
+    else fail(`A/B after holidays wrong: 2 Nov → ${wl('2026-11-02')}, 4 Jan → ${wl('2027-01-04')}`);
   }
 
   // order-sheet brief-log append — daily-brief must recognise the entry
