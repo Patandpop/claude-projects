@@ -15,7 +15,7 @@ description: "Creates lesson PowerPoints and worksheets for science lessons (phy
 - **Visualiser slide is MANDATORY in standard and practical lessons. Never omit. The IPEVO link `https://apps.ipevo.com/pwa/visualizer.app/` is baked into the renderer — never output "[teacher inserts]".**
 - **Do Now question numbers = gold rounded SQUARES with navy numbers. Never circles.**
 - **Title slide left column: big title (26–32pt), then Learning Objectives in a bordered box (navy `#152347` fill, gold border, 14–15pt), then Key Words in a matching bordered box (13pt). No school name anywhere in the left column.**
-- **MCQ = ONE slide.** Question + 4 coloured options + protocol strip + answer box at the bottom of the SAME slide. Patryk adds the entrance animation to the answer box himself in PowerPoint for the 3-2-1 reveal. Never a separate answer slide.
+- **MCQ = ONE slide.** Question + 4 coloured options + protocol strip + answer box at the bottom of the SAME slide. The renderer adds the click-to-appear animation to the answer box itself (2026-10-03); Patryk no longer adds it by hand. Never a separate answer slide.
 - **Practical/Build slides expecting apparatus (circuits, equipment setups) MUST have an image placeholder** — steps in the left ~56%, placeholder on the right.
 - No emojis. No timers. No AO1/AO2. No "Mixed Ability" written on slides.
 - **No em dashes in any generated content** — slides, worksheets, answers, model text (Patryk's rule, 2026-07-02: "refrain from using them across everything"). Use a comma, a full stop, or a hyphen instead. Keep generated prose lean — less is more; Patryk adds the more.
@@ -27,6 +27,7 @@ description: "Creates lesson PowerPoints and worksheets for science lessons (phy
 - Answers = core info only, 1–3 lines. Teacher elaborates.
 - Theme colour on nav tab + header bar + bottom bar ONLY. Content box bodies = white fill + gold `#FABB2E` border. Exception: misconception callout body uses amber border `#E65100`; MCQ option cells keep their light tint of the badge colour (confirmed liked).
 - MCQ colours: A=pink, B=blue, C=green, D=yellow (see slide-options-v4.md).
+- **Click animations are automatic (2026-10-03):** every navy box with gold answer text (MCQ answers, Do Now answers, review answers, worked-answer boxes, reveals) gets an "Appear on click" animation in reading order. Learn slides and banners are never animated. Keep answers in navy/gold boxes so this works; never put an answer in another colour.
 - Review tab/title = green `#1B5E20`. Never grey.
 - Combine fill + text into one shape. No stacked rect + text box.
 - Image placeholders on any slide expecting an image.

@@ -1070,6 +1070,75 @@ function handwritingBlock(slide, x, y, w, h, text, opts) {
    fontFace:'Caveat' so an unpatched file just substitutes a fallback font.
    The fonts go in EOT-wrapped (ttfToEot): until 2026-10-02 they went in as
    raw .ttf, which PowerPoint ignored, so handwriting showed as plain sans. */
+/* addRevealAnimations(pptxPath) — Patryk 2026-10-03: every navy/gold answer box appears as a
+   WHOLE box on click, so he no longer adds the entrance animations by hand each morning.
+   A reveal box = a shape filled house navy (0D1B5E) whose text includes gold (FABB2E) runs. That
+   excludes the nav and bottom bars (white text) and the empty navy decoration (formula-triangle
+   bars). Effect: "Appear", one click per box, in reading order (top to bottom, then left to right).
+   animBg="1" makes the box and its text appear together. Appear is the simplest entrance effect
+   and the one most likely to survive Google Slides' import. A slide that already has its own
+   timing is left alone. Returns the number of boxes animated. */
+function addRevealAnimations(pptxPath) {
+  const zip = new AdmZip(pptxPath);
+  let total = 0;
+  for (const e of zip.getEntries()) {
+    if (!/^ppt\/slides\/slide\d+\.xml$/.test(e.entryName)) continue;
+    let xml = e.getData().toString('utf8');
+    if (xml.includes('<p:timing')) continue;
+    if (/<a:t>LEARN [·\-:]/.test(xml)) continue;   // Learn content is taught, not revealed
+    const boxes = [];
+    for (const sp of xml.match(/<p:sp>[\s\S]*?<\/p:sp>/g) || []) {
+      const spPr = (sp.match(/<p:spPr>[\s\S]*?<\/p:spPr>/) || [''])[0];
+      if (!/^<p:spPr>[\s\S]*?<a:solidFill><a:srgbClr val="0D1B5E"/.test(spPr.replace(/<a:ln[\s\S]*?<\/a:ln>/g, ''))) continue;
+      if (!/<a:rPr[^>]*>[\s\S]*?<a:srgbClr val="FABB2E"/.test(sp)) continue;
+      if (!/<a:t>[^<]*\S/.test(sp)) continue;
+      // most of the box's text must be gold (an answer), not a gold label on a white question
+      let gold = 0, all = 0;
+      for (const r of sp.match(/<a:r>[\s\S]*?<\/a:r>/g) || []) {
+        const raw = ((r.match(/<a:t>([^<]*)<\/a:t>/) || [])[1] || '').trim();
+        if (/^(ANSWER|Answer:?)$/.test(raw)) continue;                  // the label on an answer box
+        const t = raw.length;
+        all += t;
+        if (/<a:srgbClr val="FABB2E"/.test(r)) gold += t;
+      }
+      if (!all || gold / all < 0.5) continue;
+      const text = (sp.match(/<a:t>([^<]*)<\/a:t>/g) || []).join(' ');
+      if (/IMAGE BANK|Read more/i.test(text)) continue;                 // banners, not answers
+      const id = (sp.match(/<p:cNvPr id="(\d+)"/) || [])[1];
+      const off = sp.match(/<a:off x="(\d+)" y="(\d+)"/);
+      if (id && off) boxes.push({ id, x: +off[1], y: +off[2] });
+    }
+    if (!boxes.length) continue;
+    // reading order; boxes within ~0.1" of the same top count as one row
+    boxes.sort((a, b) => (Math.abs(a.y - b.y) < 91440 ? a.x - b.x : a.y - b.y));
+    let n = 3;
+    const clicks = boxes.map((b) => {
+      const [c1, c2, c3, c4] = [n++, n++, n++, n++];
+      return `<p:par><p:cTn id="${c1}" fill="hold"><p:stCondLst><p:cond delay="indefinite"/></p:stCondLst><p:childTnLst>` +
+        `<p:par><p:cTn id="${c2}" fill="hold"><p:stCondLst><p:cond delay="0"/></p:stCondLst><p:childTnLst>` +
+        `<p:par><p:cTn id="${c3}" presetID="1" presetClass="entr" presetSubtype="0" fill="hold" grpId="0" nodeType="clickEffect">` +
+        `<p:stCondLst><p:cond delay="0"/></p:stCondLst><p:childTnLst><p:set><p:cBhvr>` +
+        `<p:cTn id="${c4}" dur="1" fill="hold"><p:stCondLst><p:cond delay="0"/></p:stCondLst></p:cTn>` +
+        `<p:tgtEl><p:spTgt spid="${b.id}"/></p:tgtEl><p:attrNameLst><p:attrName>style.visibility</p:attrName></p:attrNameLst>` +
+        `</p:cBhvr><p:to><p:strVal val="visible"/></p:to></p:set></p:childTnLst></p:cTn></p:par>` +
+        `</p:childTnLst></p:cTn></p:par></p:childTnLst></p:cTn></p:par>`;
+    }).join('');
+    const timing = '<p:timing><p:tnLst><p:par><p:cTn id="1" dur="indefinite" restart="never" nodeType="tmRoot"><p:childTnLst>' +
+      '<p:seq concurrent="1" nextAc="seek"><p:cTn id="2" dur="indefinite" nodeType="mainSeq"><p:childTnLst>' + clicks +
+      '</p:childTnLst></p:cTn><p:prevCondLst><p:cond evt="onPrev" delay="0"><p:tgtEl><p:sldTgt/></p:tgtEl></p:cond></p:prevCondLst>' +
+      '<p:nextCondLst><p:cond evt="onNext" delay="0"><p:tgtEl><p:sldTgt/></p:tgtEl></p:cond></p:nextCondLst></p:seq>' +
+      '</p:childTnLst></p:cTn></p:par></p:tnLst><p:bldLst>' +
+      boxes.map((b) => `<p:bldP spid="${b.id}" grpId="0" animBg="1"/>`).join('') + '</p:bldLst></p:timing>';
+    // <p:timing> sits after <p:clrMapOvr> and before any <p:extLst> at the end of <p:sld>
+    const tail = xml.lastIndexOf('<p:extLst>') > xml.lastIndexOf('</p:cSld>') ? xml.lastIndexOf('<p:extLst>') : xml.lastIndexOf('</p:sld>');
+    xml = xml.slice(0, tail) + timing + xml.slice(tail);
+    zip.updateFile(e.entryName, Buffer.from(xml, 'utf8'));
+    total += boxes.length;
+  }
+  if (total) zip.writeZip(pptxPath);
+  return total;
+}
+
 function embedCaveatFont(pptxPath) {
   try {
     if (!fs.existsSync(CAVEAT_REGULAR_PATH) || !fs.existsSync(CAVEAT_BOLD_PATH)) {
@@ -3724,6 +3793,8 @@ async function buildPptx(L, outPath) {
   await pptx.writeFile({ fileName: outPath });
   const usesHandwriting = buildItems.some((b) => ['modelAnswerReview', 'correctTheStatement', 'markTheAnswers'].includes(b.type || b.variant));
   if (usesHandwriting) embedCaveatFont(outPath);                  // M2: embed Caveat so it survives on any machine
+  try { addRevealAnimations(outPath); }                           // 2026-10-03: answer boxes appear on click
+  catch (e) { buildWarn('click animations not added: ' + e.message); }
   while (_tmpFiles.length) { try { fs.unlinkSync(_tmpFiles.pop()); } catch {} }
 }
 

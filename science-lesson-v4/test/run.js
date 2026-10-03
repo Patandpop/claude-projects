@@ -331,6 +331,32 @@ function main() {
       }
     }
 
+    // Click animations (Patryk 2026-10-03): navy/gold answer boxes appear on click. Every
+    // animation must point at a shape that exists on its slide, never on a Learn slide or a
+    // banner (IMAGE BANK / Read more).
+    {
+      const deck = fs.readdirSync(outDir).find(n => n.endsWith('.pptx'));
+      if (deck) {
+        const zip = new AdmZip(path.join(outDir, deck));
+        let clicks = 0, bad = [];
+        for (const e of zip.getEntries().filter(x => /^ppt\/slides\/slide\d+\.xml$/.test(x.entryName))) {
+          const x = e.getData().toString('utf8');
+          const ids = [...x.matchAll(/<p:spTgt spid="(\d+)"/g)].map(m => m[1]);
+          if (!ids.length) continue;
+          clicks += (x.match(/nodeType="clickEffect"/g) || []).length;
+          if (/<a:t>LEARN [·\-:]/.test(x)) bad.push(`${e.entryName} is a Learn slide`);
+          for (const id of ids) {
+            const sp = (x.match(new RegExp(`<p:sp><p:nvSpPr><p:cNvPr id="${id}"[\\s\\S]*?</p:sp>`)) || [])[0];
+            if (!sp) bad.push(`${e.entryName}: animation targets missing shape ${id}`);
+            else if (/IMAGE BANK|Read more/.test(sp)) bad.push(`${e.entryName}: banner animated`);
+          }
+        }
+        if (bad.length) fail('click animations: ' + bad.slice(0, 3).join('; '));
+        else if (fixture === 'bug-test.json' && clicks < 5) fail(`click animations: only ${clicks} on the bug-test deck (expected the answer boxes)`);
+        else pass(`click animations: ${clicks} answer box${clicks === 1 ? '' : 'es'} appear on click`);
+      }
+    }
+
     // MCQ block placement (Patryk 2026-10-03): the fixture lists its two experiment MCQs FIRST;
     // the renderer must move them to straight after the practical method slide, and put the
     // four learning MCQs together before every other Build slide.
