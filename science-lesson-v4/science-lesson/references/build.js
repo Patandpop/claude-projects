@@ -3897,6 +3897,8 @@ function variablesTable() {
   ], colW, GREY_TBL), spacer()];
 }
 
+let _guessUsedOnSheet = false;   // set by applyTierSection, reset per buildDocx
+
 /* guessScaffold(mode, vals?) — mode: 'full' | 'backward-fade' | 'blank' | 'answer'
    'full': Given + Unknown pre-filled (vals.given, vals.unknown), rest blank — Developing.
    'backward-fade': Given/Unknown/Equation/Substitute pre-filled (vals.given, vals.unknown,
@@ -3922,31 +3924,28 @@ function guessScaffold(mode, vals) {
     vals = vals || {};
     pre = [vals.given, vals.unknown, vals.equation || null, null, null];
   }
+  // 2026-10-03 (Patryk chose "Option A", design-audit/guess-options-2026-10-03.png): ONE row of
+  // five boxes with the letter inside each — no navy header row, no spacer paragraphs — about a
+  // third of the old table's height. Pre-filled values follow the letter.
   const colW = [2021, 2021, 2021, 2021, 2022];
   const heads = ['G', 'U', 'E', 'S', 'S'];
-  return [spacer(), fullTable([
-    new TableRow({
-      children: heads.map((h, i) => cell({
-        w: colW[i], fill: NAVY, borders: GREY_TBL, margins: { top: 50, bottom: 50, left: 60, right: 60 },
-        children: [P(R(h, { bold: true, size: 20, color: GOLD }), { alignment: AlignmentType.CENTER })],
-      })),
-    }),
+  return [fullTable([
     new TableRow({
       children: colW.map((w, i) => {
         const emph = isAns && i === 4;                                  // Solve cell — the final answer
-        const kids = pre[i] != null && pre[i] !== ''
-          ? (isAns
-              ? [P(toDocxRuns(parseEq(String(pre[i])), { size: 20, bold: emph, color: emph ? NAVY : undefined }))]
-              : [P(toDocxRuns(parseEq(String(pre[i])), { size: 18 })), ...blanks(2)])
-          : (isAns ? [P(R('', { size: 20 }))] : blanks(3));
+        const has = pre[i] != null && pre[i] !== '';
+        const letter = R(heads[i] + '  ', { bold: true, size: 20, color: NAVY });
+        const first = has
+          ? P([letter, ...toDocxRuns(parseEq(String(pre[i])), { size: isAns ? 20 : 18, bold: emph, color: emph ? NAVY : undefined })])
+          : P(letter);
         return cell({
           w, fill: emph ? 'FFF8E1' : undefined,
           borders: GREY_TBL, valign: VerticalAlign.TOP, margins: { top: 40, bottom: 40, left: 60, right: 60 },
-          children: kids,
+          children: isAns ? [first] : [first, ...blanks(1)],
         });
       }),
     }),
-  ], colW, GREY_TBL), spacer()];
+  ], colW, GREY_TBL)];
 }
 
 /* ---- ANSWER SHEET (mode 'answers') — model-answer frameworks ---------------
@@ -4362,7 +4361,11 @@ function applyTierSection(L, tier, mode, opts) {
       ], { indent: { left: 360 }, spacing: { before: GAP_XS, after: GAP_XS } })); // M3
     }
     let guessAdded = false;
-    if ((calc || q.guess)) {
+    // 2026-10-03 (Patryk): GUESS is never auto-added for calculations, never on Year 7/8
+    // (they don't know the structure), and at most ONE per worksheet — only where the
+    // question asks for it (q.guess). Calculations without it get a normal answer box.
+    const yearNum = parseInt((L.meta || {}).year || (String((L.meta || {}).class || '').match(/^\d+/) || [])[0], 10);
+    if (q.guess && !(yearNum <= 8) && !_guessUsedOnSheet) {
       // contentType: 'new_procedure' | 'known_procedure' — defaults to known_procedure if unset
       const contentType = q.contentType || 'known_procedure';
       const isReaching = tier === 'reaching';
@@ -4377,7 +4380,7 @@ function applyTierSection(L, tier, mode, opts) {
         else if (isReaching) scaffoldMode = 'blank';
         else scaffoldMode = null; // Mastering known_procedure: no scaffold table at all
       }
-      if (scaffoldMode) { out.push(...guessScaffold(scaffoldMode, { given: q.given, unknown: q.unknown, equation: q.equation, substitute: q.substitute })); guessAdded = true; }
+      if (scaffoldMode) { out.push(...guessScaffold(scaffoldMode, { given: q.given, unknown: q.unknown, equation: q.equation, substitute: q.substitute })); guessAdded = true; _guessUsedOnSheet = true; }
     }
     if (q.structure) out.push(...structureGuide(q.structure));
 
@@ -4614,6 +4617,7 @@ function buildWorksheetChildren(L, mode) {
   return ch;
 }
 async function buildDocx(L, outPath, mode) {
+  _guessUsedOnSheet = false;                                     // one GUESS row per worksheet
   const doc = new Document({
     styles: {
       default: {

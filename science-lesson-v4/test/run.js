@@ -127,6 +127,18 @@ function main() {
     if (r.status !== 0) { fail(`build exited ${r.status}`); console.log(DIM + output.trim() + RST); continue; }
     pass('build exited 0');
 
+    // GUESS rules (Patryk 2026-10-03): never on a Year 7/8 worksheet, never more than one
+    // per worksheet. The Option-A row writes each letter as "<L>  " inside its own cell, so
+    // the "U  " run (U appears once per row) counts the rows.
+    for (const f of fs.readdirSync(outDir).filter(n => /_(support_)?worksheet\.docx$/.test(n))) {
+      const rows = (readArchiveXml(path.join(outDir, f)).match(/>U  <\/w:t>/g) || []).length;
+      const yr = parseInt(((lessons[0] || {}).meta || {}).year, 10);
+      if (yr <= 8 && rows) fail(`${f}: GUESS row on a Year ${yr} worksheet (KS3 never gets GUESS)`);
+      else if (rows > 1) fail(`${f}: ${rows} GUESS rows — the limit is one per worksheet`);
+      else if (fixture === 'bug-test.json' && rows !== 1) fail(`${f}: expected the one requested GUESS row (guess:true, Year 9), found ${rows}`);
+      else pass(`${f}: GUESS rule ok (${rows} row${rows === 1 ? '' : 's'})`);
+    }
+
     // Graph pipeline guard — the exact failure class fixed 2026-07-02.
     if (/\[graph_gen\]/.test(output)) fail('graph_gen reported an error (graphs will be missing)');
     else pass('no graph_gen errors');

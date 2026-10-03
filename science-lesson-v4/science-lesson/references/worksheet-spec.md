@@ -38,7 +38,7 @@ The support worksheet (`_support_worksheet.docx`) carries the same questions and
 | Write-lines under True/False statements | always in support mode |
 | Word bank on Developing Apply tier | `wx.wordBank[]` or `title.keywords[]` (if >2 terms) |
 | Equation + units hint above GUESS scaffold | `q.equation` + optional `q.units` on Apply question |
-| GUESS scaffold on calculation questions | `q.qType: "calculation"` |
+| GUESS row (one per sheet, Year 9+ only, compact single row — 2026-10-03) | `q.guess: true` on the question (NOT automatic for calculations) |
 | Practical design prompts above write lines (5 lines) | `q.qType: "practical_design"` on Apply question — replaces answer box |
 | Explanation prompts above write lines (4 lines) | `q.contentType: "extended_writing"` + `q.marks ≥ 5` — replaces sentence starters + answer box |
 | Lettered sub-question breakdown | `q.subSteps: ["step a", "step b"]` on Apply question — each step gets 1 write line |
@@ -108,7 +108,7 @@ Tag Apply/Build questions with `contentType` before assigning support:
 **qType values:** `"concept"` · `"calculation"` · `"practical_design"` · `"extended_writing"`
 
 - `"practical_design"` — triggers method prompt scaffold on support sheet (replaces answer box)
-- `"calculation"` — triggers GUESS scaffold
+- `"calculation"` — calculation question; gets an answer box (GUESS only with `guess: true`, Year 9+, one per sheet)
 - `"extended_writing"` — same as `contentType: "extended_writing"` for triggering explanation prompts
 
 **subSteps** — optional array of strings on any Apply question. Support sheet only: breaks question into lettered sub-parts (a)(b)(c...) each with one write line. Use for multi-step problems where isolating each step prevents students getting stuck. Does not appear on standard worksheet.

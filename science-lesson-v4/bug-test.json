@@ -273,7 +273,8 @@
           "a": "p = (3 × 8.31 × 290) / 0.1 = 72 297 Pa",
           "marks": 3,
           "equation": "p = nRT / V",
-          "qType": "calculation"
+          "qType": "calculation",
+          "guess": true
         }
       ],
       "mastering": [
