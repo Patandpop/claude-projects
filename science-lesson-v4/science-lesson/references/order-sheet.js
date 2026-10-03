@@ -17,32 +17,53 @@ const BRIEF_LOG     = path.join(__dirname, '../../brief-log.json');
 const CONTEXT_PATH  = path.join(__dirname, '../../context.json');
 const DRIVE_BASE    = 'G:\\My Drive\\Beechen Cliff Science\\Lessons';
 
-const PATRYK_CLASSES_RAW = ['7BYA','7MLA','8AB','8XP','9AB','10S2','12D'];
-const PATRYK_CLASS_MAP   = new Map(PATRYK_CLASSES_RAW.map(c => [c.toUpperCase(), c]));
-function isPatrykClass(cls)  { return PATRYK_CLASS_MAP.has(cls.toUpperCase()); }
-function normalizeClass(cls) { return PATRYK_CLASS_MAP.get(cls.toUpperCase()) || cls; }
+// Class list + Week A/B rule live in school-classes.js (read from classes-2026-27.json).
+// PSHE is Patryk's but never needs an equipment order, so only science classes are planned.
+const school = require('./school-classes.js');
+const PATRYK_CLASSES_RAW = school.SCIENCE_CLASSES;
+function isPatrykClass(cls)  { const k = school.normClass(cls); return !!k && PATRYK_CLASSES_RAW.includes(k); }
+function normalizeClass(cls) { return school.normClass(cls) || cls; }
+// "Cover: Specific Latent Heat" is still the lesson that was taught — match on the title.
+function stripCover(lesson) { return String(lesson || '').replace(/^\s*cover\s*:\s*/i, ''); }
 
 // ─── Order Sheet date helpers ─────────────────────────────────────────────────
 
-// Parse date from sheet name — Academic year: Sep–Dec = current cal year, Jan–Aug = next
-function sheetDate(rows, name) {
+// Month + day from a sheet name ("Order Sheet Week B - Sep 14" → {mon:8, day:14}), or null.
+function sheetMonthDay(name) {
   const months = {jan:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,aug:7,sep:8,oct:9,nov:10,dec:11,
                   january:0,february:1,march:2,april:3,june:5,july:6,august:7,september:8,october:9,november:10,december:11};
   const dm = name.match(/([a-z]+)\s+(\d+)\s*$/i);
-  if (dm) {
-    const mon = months[dm[1].toLowerCase()];
-    const day = parseInt(dm[2]);
-    if (mon !== undefined && day) {
-      const now = new Date();
-      const cal = now.getFullYear();
-      // Academic year starts Sep; Jan-Aug belong to the year after the Sep that opened it
-      const ayStart = now.getMonth() >= 8 ? cal : cal - 1;
-      const yr = mon >= 8 ? ayStart : ayStart + 1;
-      const d = new Date(yr, mon, day);
-      return dateToSerial(d);
-    }
+  if (!dm) return null;
+  const mon = months[dm[1].toLowerCase()];
+  const day = parseInt(dm[2]);
+  return mon !== undefined && day ? { mon, day } : null;
+}
+
+// Sheet names carry no year, and Planner.xlsx holds MORE than one academic year
+// (2025/26 tabs Sep 22 … Jul 6, then 2026/27 tabs from Sep 7). Assigning every tab to the
+// current academic year made last July's tab look like July NEXT year — newer than this
+// week — so the generator copied a 2025/26 sheet. Fix: tabs are in chronological order, so
+// walk them newest-first and step back an academic year whenever the month jumps forward.
+// Returns a Map(sheet name → Excel serial date). `today` is injectable for tests.
+function sheetDates(names, today = new Date()) {
+  const out = new Map();
+  const acad = (mon) => (mon + 4) % 12;                       // Sep = 0 … Aug = 11
+  const dated = names.map(n => ({ n, md: sheetMonthDay(n) })).filter(x => x.md);
+  if (!dated.length) return out;
+  const cal = today.getFullYear();
+  let ay = today.getMonth() >= 8 ? cal : cal - 1;             // academic year containing today
+  const dateIn = (ayStart, md) => new Date(md.mon >= 8 ? ayStart : ayStart + 1, md.mon, md.day);
+  // The newest tab can sit at most a few weeks ahead of today; if not, it belongs to last year.
+  const newest = dated[dated.length - 1].md;
+  if (dateIn(ay, newest) - today > 60 * 86400000) ay -= 1;
+  let prev = null;
+  for (let i = dated.length - 1; i >= 0; i--) {
+    const { n, md } = dated[i];
+    if (prev && acad(md.mon) > acad(prev.mon)) ay -= 1;       // e.g. Jul tab before a Sep tab
+    out.set(n, dateToSerial(dateIn(ay, md)));
+    prev = md;
   }
-  return 0;
+  return out;
 }
 
 function dateToSerial(d) {
@@ -143,10 +164,9 @@ function bestGuessEquipment(lesson) {
 
 // ─── Drive Folder Lookup ──────────────────────────────────────────────────────
 
-const YEAR_MAP = { '7BYA':7,'7MLA':7,'7MLB':7,'8AB':8,'8XP':8,'9AB':9,'10S2':10,'10C4':10,'11C3':11,'12D':12 };
 
 function findNextLessonDrive(cls, lastLesson) {
-  const yr = YEAR_MAP[cls];
+  const yr = school.yearOf(cls);
   if (!yr) return null;
   const yearDir = path.join(DRIVE_BASE, `Year ${yr}`);
   if (!fs.existsSync(yearDir)) return null;
@@ -202,7 +222,7 @@ function findNextLessonDrive(cls, lastLesson) {
 // Normal matched lesson → 1 set; test-review → 2 sets (book only); practical,
 // test, unmatched, or unknown year/book → none. "set" = a class set of books.
 function booksToOrder(cls, lessonName, subject) {
-  const year = YEAR_MAP[cls];
+  const year = school.yearOf(cls);
   if (!year) return '';
   const norm = normalizeLesson(lessonName);              // 'practical'/'rp' already → 'prac'
   if (norm.includes('prac')) return '';                  // experiment/practical → no books
@@ -310,45 +330,55 @@ async function main() {
   console.log('Loading Planner.xlsx…');
   let { zip, ss, ssXml, wbXml, rlXml, sheets } = loadXlsx(PLANNER_PATH);
 
-  // ── Find filled order sheets ──
-  const filledSheets = sheets
-    .filter(s => isFilledSheet(s.name))
-    .map(s => {
-      const rows = parseRows(zip.readAsText(s.file), ss);
-      const date = sheetDate(rows, s.name);
-      const weekType = sheetWeekType(s.name);
-      return { ...s, rows, date, weekType };
-    })
+  // ── Find filled order sheets (dated by tab order — see sheetDates) ──
+  const filled = sheets.filter(s => isFilledSheet(s.name));
+  const dates  = sheetDates(filled.map(s => s.name));
+  const targetSerial = dateToSerial(mondayDate);
+  const allDated = filled
+    .map(s => ({ ...s, rows: parseRows(zip.readAsText(s.file), ss), date: dates.get(s.name) || 0, weekType: sheetWeekType(s.name) }))
     .filter(s => s.date > 0)
     .sort((a,b) => a.date - b.date);
 
+  // Never overwrite a week Patryk has already filled himself.
+  const already = allDated.find(s => Math.abs(s.date - targetSerial) < 3);
+  if (already) {
+    console.error(`ERROR: "${already.name}" already covers the week of ${fmtDate(mondayDate)} — nothing generated.`);
+    process.exit(1);
+  }
+
+  // Only this academic year's sheets, and only weeks before the one being planned:
+  // a 2025/26 tab must never supply a "last lesson" for a 2026/27 class with the same code.
+  const ayStart = dateToSerial(new Date(mondayDate.getMonth() >= 8 ? mondayDate.getFullYear() : mondayDate.getFullYear() - 1, 8, 1));
+  const filledSheets = allDated.filter(s => s.date >= ayStart && s.date < targetSerial);
+
   if (filledSheets.length === 0) {
-    console.error('ERROR: No filled order sheets found in Planner.xlsx');
+    console.error('ERROR: No filled order sheets from this school year before that week in Planner.xlsx');
     process.exit(1);
   }
 
   const latest = filledSheets[filledSheets.length - 1];
   console.log(`Latest sheet: ${latest.name} (date: ${fmtDate(serialToDate(latest.date))})`);
 
-  // ── Extract timetable from latest sheet ──
-  const timetable = extractTimetable(latest.rows);
+  // ── Week type: same fortnight rule as the behaviour app (school-classes.js) ──
+  const nextWeekType = school.weekLetter(mondayDate);
 
-  // ── Extract last lesson per class ──
+  // ── Timetable: copy the most recent sheet of the SAME week type (A and B differ) ──
+  const sameWeek = [...filledSheets].reverse().find(s => s.weekType === nextWeekType);
+  const timetableSheet = sameWeek || latest;
+  if (!sameWeek) console.warn(`WARNING: no Week ${nextWeekType} sheet yet this year — copying the timetable from "${latest.name}". Check every slot.`);
+  console.log(`Timetable copied from: ${timetableSheet.name}`);
+  const timetable = extractTimetable(timetableSheet.rows);
+
+  // ── Extract last lesson per class (newest sheet first; class spellings normalised) ──
   const lastLessons = {};
-  // Scan from most recent to oldest
   for (let i = filledSheets.length - 1; i >= 0; i--) {
     const lessons = extractLessons(filledSheets[i].rows);
-    for (const [cls, lesson] of Object.entries(lessons)) {
-      if (!lastLessons[cls]) lastLessons[cls] = { lesson, sheet: filledSheets[i].name };
+    for (const [raw, lesson] of Object.entries(lessons)) {
+      const cls = normalizeClass(raw);
+      if (!lastLessons[cls]) lastLessons[cls] = { lesson: stripCover(lesson), sheet: filledSheets[i].name };
     }
     if (PATRYK_CLASSES_RAW.every(c => lastLessons[c])) break;
   }
-
-  // ── Determine next week type ──
-  if (!latest.weekType) {
-    console.warn(`WARNING: could not determine week type from "${latest.name}" — defaulting to Week A. Check sheet name format.`);
-  }
-  const nextWeekType = latest.weekType === 'A' ? 'B' : 'A';
 
   // ── Load equipment key ──
   const equipKey = loadEquipmentKey(EQUIP_KEY);
@@ -388,7 +418,7 @@ async function main() {
       const test = (ctx.tests || []).find(t => t.class === cls && t.date >= nextStart && t.date <= nextEnd);
       if (test) { p.equipment = `already printed — test${test.topic ? ': ' + test.topic : ''}`; p.guessed = false; p.books = ''; continue; } // actual test → no books
       const rev = (ctx.revisionMode || []).find(r => r.class === cls && r.active);
-      if (rev) { p.equipment = 'N/A — revision'; p.guessed = false; const b = tb.primaryBook({ year: YEAR_MAP[cls], subject: p.subject }); p.books = b ? `Books: 2× ${b}` : ''; continue; } // revision → 2 sets
+      if (rev) { p.equipment = 'N/A — revision'; p.guessed = false; const b = tb.primaryBook({ year: school.yearOf(cls), subject: p.subject }); p.books = b ? `Books: 2× ${b}` : ''; continue; } // revision → 2 sets
       const mp = (ctx.missingPeriods || []).find(m => m.date >= nextStart && m.date <= nextEnd && (!(m.classes || []).length || m.classes.includes(cls)));
       if (mp) { p.equipment = mp.action === 'move' ? 'N/A — lesson moved' : 'N/A — cover'; p.guessed = false; }
     }
@@ -446,7 +476,7 @@ async function main() {
 
   // ── Clone latest sheet, update cells ──
   console.log('\nGenerating order sheet…');
-  let sheetXml = zip.readAsText(latest.file);
+  let sheetXml = zip.readAsText(timetableSheet.file);
   let currentSs = [...ss];
 
   // Helper: ensure string in SS and update cell
@@ -459,7 +489,7 @@ async function main() {
   setCell('S1', fmtDate(mondayDate));
 
   // Update lesson and equipment cells for each day/period
-  const dayOffsets = isNewFormat(latest.rows)
+  const dayOffsets = isNewFormat(timetableSheet.rows)
     ? { Mon:[4,6,7], Tue:[9,11,12], Wed:[14,16,17], Thu:[19,21,22], Fri:[24,26,27] }
     : { Mon:[4,5,6], Tue:[8,9,10], Wed:[12,13,14], Thu:[16,17,18], Fri:[20,21,22] };
 
@@ -556,5 +586,5 @@ async function main() {
 if (require.main === module) {
   main().catch(err => { console.error('ERROR:', err.message); process.exit(1); });
 } else {
-  module.exports = { appendBriefLog, setsLabel, isNonOrder, normalizeLesson, booksToOrder };
+  module.exports = { appendBriefLog, setsLabel, isNonOrder, normalizeLesson, booksToOrder, sheetDates, dateToSerial, stripCover };
 }

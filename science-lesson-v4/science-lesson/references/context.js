@@ -11,8 +11,9 @@ const ROOT          = path.join(__dirname, '../..');
 const CONTEXT_PATH  = path.join(ROOT, 'context.json');
 const STANDING_PATH = path.join(ROOT, 'context-standing.json');
 
-// Current classes (until July 2026 — new classes arrive September 2026).
-const CLASSES = ['7BYA','7MLA','8AB','8XP','9AB','10S2','12D'];
+// Class list: school-classes.js (classes-2026-27.json) — the hard-coded 2025/26 list was dropped 2026-10-02.
+const school  = require('./school-classes.js');
+const CLASSES = school.CLASSES;
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -69,7 +70,7 @@ async function absentMode(dateArg, dryRun) {
   const periodsAns = await ask(rl, 'Periods (e.g. P3,P4 or "all") [all]: ');
   const pracAns    = await ask(rl, 'Practical lesson? → moves to next slot [y/N]: ');
 
-  const classes = classesAns ? classesAns.split(',').map(s => s.trim().toUpperCase()) : [];
+  const classes = classesAns ? classesAns.split(',').map(s => school.normClass(s.trim()) || s.trim().toUpperCase()) : [];
   const action  = /^y/i.test(pracAns) ? 'move' : 'cover';
   const entry   = { date: absDate, periods: periodsAns || 'all', reason, classes, action };
 
@@ -162,8 +163,8 @@ async function weeklyMode(dryRun) {
     const tokens = line.split(/\s+/);
     const date   = tokens[0];
     if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) { console.log('  (bad date — YYYY-MM-DD)'); continue; }
-    const clsList = tokens.slice(1).map(t => t.toUpperCase()).filter(t => CLASSES.includes(t));
-    const reason  = tokens.slice(1).filter(t => !CLASSES.includes(t.toUpperCase())).join(' ') || 'unspecified';
+    const clsList = tokens.slice(1).map(t => school.normClass(t)).filter(Boolean);   // "7ml" → 7MLA
+    const reason  = tokens.slice(1).filter(t => !school.normClass(t)).join(' ') || 'unspecified';
     const pAns    = await ask(rl, '  Periods (e.g. P3,P4 or "all") [all]: ');
     const pracAns = await ask(rl, '  Practical lesson? → move to next slot [y/N]: ');
     missingPeriods.push({ date, periods: pAns || 'all', reason, classes: clsList, action: /^y/i.test(pracAns) ? 'move' : 'cover' });

@@ -37,3 +37,8 @@ science-lesson/references/question-bank/*.json
 # is committed on purpose, including the decks and worksheets, so every PNG can
 # be traced back to the exact file that produced it.
 !golden/**
+
+# Classroom tools with REAL student names embedded (rosters / tutor group). Never commit.
+scientist-league.html
+classroom-jeopardy.html
+Students*.csv

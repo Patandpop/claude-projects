@@ -53,6 +53,37 @@ function run() {
     pass('isNonOrder classifies non-order cells');
   else fail('isNonOrder misclassifies');
 
+  // order-sheet: Planner.xlsx holds two school years of tabs with no year in the name.
+  // Bug (2026-10-02): last July's tab was dated July NEXT year and treated as the newest week.
+  {
+    const names = ['Order Sheet Week B - Sep 22', 'Order Sheet Week A - Dec 15 ', 'Order Sheet Week B - July 6',
+                   'Order Sheet Week A - Sep 7', 'Order Sheet Week B - Sep 28', 'Order Sheet Week A - Oct 5'];
+    const d = order.sheetDates(names, new Date(2026, 9, 2));
+    const iso = n => { const x = new Date(Date.UTC(1899, 11, 30) + d.get(n) * 86400000); // local date, as the script prints it
+      return `${x.getFullYear()}-${String(x.getMonth() + 1).padStart(2, '0')}-${String(x.getDate()).padStart(2, '0')}`; };
+    if (iso('Order Sheet Week B - July 6') === '2026-07-06' && iso('Order Sheet Week B - Sep 22') === '2025-09-22'
+        && iso('Order Sheet Week A - Oct 5') === '2026-10-05')
+      pass('order sheet dates last year\'s tabs to last year (July 6 → 2026, not 2027)');
+    else fail(`order sheet tab dating wrong: Jul 6 → ${iso('Order Sheet Week B - July 6')}, Oct 5 → ${iso('Order Sheet Week A - Oct 5')}`);
+    if (order.stripCover('Cover: Specific Latent Heat') === 'Specific Latent Heat') pass('cover lessons match on their title');
+    else fail('stripCover did not remove the "Cover:" prefix');
+  }
+
+  // school-classes: one class list (classes-2026-27.json) + the behaviour app's Week A/B rule.
+  {
+    const school = require('../science-lesson/references/school-classes.js');
+    const spell = { '7Ml': '7MLA', '7ML': '7MLA', 'PSHE - 9AB': 'PSHE-9AB', 'Ph-12C': '12C', '10c2': '10C2' };
+    const bad = Object.entries(spell).filter(([raw, want]) => school.normClass(raw) !== want);
+    if (!bad.length) pass('Planner spellings (7Ml, PSHE - 9AB, Ph-12C) map to 2026/27 classes');
+    else fail('class spellings not recognised: ' + bad.map(b => b[0]).join(', '));
+    if (school.normClass('9AB') === null && school.normClass('12D') === null) pass('2025/26 classes (9AB, 12D) are no longer Patryk\'s');
+    else fail('old 2025/26 classes still treated as current');
+    const wl = s => { const [y, m, dd] = s.split('-').map(Number); return school.weekLetter(new Date(y, m - 1, dd)); };
+    if (wl('2026-09-07') === 'A' && wl('2026-09-14') === 'B' && wl('2026-10-05') === 'A' && wl('2026-10-12') === 'B')
+      pass('Week A/B matches the filled order sheets (Sep 7 A … Oct 12 B)');
+    else fail('week letter disagrees with the filled order sheets');
+  }
+
   // order-sheet brief-log append — daily-brief must recognise the entry
   const tmp = path.join(os.tmpdir(), 'brieflog-test-' + Date.now() + '.json');
   try {

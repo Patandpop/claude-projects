@@ -45,16 +45,17 @@ const PLANNER       = path.join(ROOT, 'Planner.xlsx');
 const PREVIEW  = process.argv.includes('--preview');
 const DRIVE_UP = fs.existsSync('G:\\');
 
-// Current classes fallback (until July 2026). Prefer context-standing.json `classes` keys.
-const CURRENT_CLASSES = ['7BYA','7MLA','8AB','8XP','9AB','10S2','12D'];
+// Class list + Week A/B rule: school-classes.js (classes-2026-27.json). context-standing.json
+// `classes` keys still win when present. The old hard-coded 2025/26 list was dropped 2026-10-02.
+const school = require('./school-classes.js');
+const CURRENT_CLASSES = school.CLASSES;
 
 // Homework OUT and IN happen on a fixed day per year group (Y12/13: every lesson).
 // Override the defaults with a `homeworkDays` map in context-standing.json, e.g. {"7":"Mon"}.
 const HW_DAY_DEFAULT = { 7: 'Mon', 8: 'Tue', 9: 'Wed', 10: 'Thu' };
 
 function classYear(cls) {
-  const m = String(cls || '').match(/^(\d+)/);
-  return m ? parseInt(m[1]) : null;
+  return school.yearOf(cls);   // knows PSHE-9AB is Year 9 (the old regex returned null for it)
 }
 
 function computeSetHomework(cls, date, standing) {
@@ -71,7 +72,10 @@ function computeSetHomework(cls, date, standing) {
 function loadTodayPeriods(ctx, standing) {
   if (!fs.existsSync(PLANNER)) return null;
   try {
-    const weekType   = (ctx && ctx.weekType) || 'A';
+    // Week letter from the calendar, not context.json: context is only rewritten when Patryk
+    // runs context.js, so a stale file (still "June, Week A" on 2026-10-02) picked the wrong
+    // fortnight's timetable for every brief.
+    const weekType   = school.weekLetter(TODAY);
     const { zip, ss, sheets } = loadXlsx(PLANNER);
     const candidates = sheets.filter(function(s) { return isFilledSheet(s.name) && sheetWeekType(s.name) === weekType; });
     if (!candidates.length) return null;
@@ -105,13 +109,16 @@ function loadTodayPeriods(ctx, standing) {
         isShared:    !!(ctx && ctx.sharing && ctx.sharing.some(function(s) {
           return s.class.toUpperCase() === cls
             && (!s.day || String(s.day).slice(0,3).toLowerCase() === dayShort.toLowerCase())
-            && (!s.weekType || !ctx.weekType || s.weekType === ctx.weekType);
+            && (!s.weekType || s.weekType === weekType);
         })),
         isDisjointed:!!(ctx && ctx.combinedOrDisjointed && ctx.combinedOrDisjointed.some(function(c) { return c.class.toUpperCase() === cls && c.date === isoDate(); })),
         setHomework: computeSetHomework(cls, TODAY, standing),
       };
     });
-  } catch (e) { return null; }
+  } catch (e) {
+    console.warn(`[brief] could not read today's lessons from Planner.xlsx: ${e.message}`);
+    return null;
+  }
 }
 
 // ─── Loaders ──────────────────────────────────────────────────────────────────
