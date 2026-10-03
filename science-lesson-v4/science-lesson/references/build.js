@@ -78,7 +78,7 @@ const TBIDX = require('./textbook-index.js');   // textbook page-reference match
 const {
   Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell,
   WidthType, BorderStyle, ShadingType, AlignmentType, VerticalAlign,
-  LineRuleType, HeightRule, ImageRun,
+  LineRuleType, HeightRule, ImageRun, TabStopType,
   Math: DocxMath, MathFraction, MathRadical, MathRun: DocxMathRun,
 } = require('docx');
 
@@ -3711,7 +3711,23 @@ const GAP_XS = 10;    // hint/annotation lines directly under a question
 const GAP_SM = 20;    // list items, sub-parts, between question blocks, before/after tables
 const GAP_MD = 40;    // after section titles/headers, around embedded images
 const blanks = (n) => Array.from({ length: n }, () => new Paragraph({ spacing: { before: GAP_NONE, after: GAP_NONE } }));
-const spacer = () => new Paragraph({ spacing: { before: GAP_SM, after: GAP_SM } }); // M1: before/after tables
+// M1: a gap before/after tables. 2026-10-03 (Patryk deletes these by hand): a THIN 6pt line, not a
+// full blank line, and tidyGaps() merges runs of them into one. Word still needs SOME paragraph
+// between two tables (or it fuses them into one), so it is never removed entirely.
+const spacer = () => {
+  const p = new Paragraph({ keepNext: true, spacing: { before: 0, after: 0, line: 120, lineRule: LineRuleType.EXACT }, children: [new TextRun({ text: '', size: 4 })] });
+  p._gap = true;
+  return p;
+};
+// Drop a gap paragraph that directly follows another gap (or opens the sheet).
+function tidyGaps(children) {
+  const out = [];
+  for (const c of children) {
+    if (c && c._gap && (!out.length || out[out.length - 1]._gap)) continue;
+    out.push(c);
+  }
+  return out;
+}
 
 function fullTable(rows, columnWidths, borders) {
   return new Table({
@@ -3734,7 +3750,7 @@ function cell(o) {
 function divider(text, rightRef) {
   const theme = DIVIDER_THEME[String(text).toUpperCase()] || { fill: 'EEF1F8', border: '003366' };
   const leftB = { style: BorderStyle.SINGLE, size: 36, color: theme.border };
-  const titleCellArgs = { fill: theme.fill, borders: { ...NO_B, left: leftB }, margins: { top: 60, bottom: 60, left: 180, right: 80 }, children: [P(R(String(text).toUpperCase(), { bold: true, size: 28, color: theme.border }))] };
+  const titleCellArgs = { fill: theme.fill, borders: { ...NO_B, left: leftB }, margins: { top: 60, bottom: 60, left: 180, right: 80 }, children: [P(R(String(text).toUpperCase(), { bold: true, size: 28, color: theme.border }), { keepNext: true, keepLines: true })] }; // never stranded at a page foot
   if (rightRef) {
     // Two-column: title left, textbook reference top-right in dark blue on gold.
     const refW = 5600, titleW = PAGE_W - refW;
@@ -3761,7 +3777,7 @@ function tierBadge(tier) {
     rows: [new TableRow({
       children: [cell({
         w: 1800, fill: pastel[tier] || 'F5F5F5', margins: { top: 40, bottom: 40, left: 140, right: 140 },
-        children: [P(R(cap(tier), { bold: true, size: 18, color: TIER_DOCX[tier] || '333333' }), { alignment: AlignmentType.CENTER, border: { left: { style: BorderStyle.SINGLE, size: 24, color: 'FFD700' } } })],
+        children: [P(R(cap(tier), { bold: true, size: 18, color: TIER_DOCX[tier] || '333333' }), { alignment: AlignmentType.CENTER, keepNext: true, border: { left: { style: BorderStyle.SINGLE, size: 24, color: 'FFD700' } } })], // stays with its first question
       })],
     })],
   })];
@@ -3779,15 +3795,14 @@ function wordBank(terms) {
 
 /* question(num, text, marks?) (+ optional subParts[]) */
 function question(num, text, marks, subParts) {
-  const out = [P([
+  // C4 (revised 2026-10-03): the marks sit at the right-hand end of the question's LAST line,
+  // exam-paper style, instead of taking a whole line of their own. Colour-muted annotation.
+  const runs = [
     R(`Q${num}  `, { bold: true, size: 24 }),
     R(prettyText(text), { size: 24 }),   // 2026-07-05: superscripts/symbols typeset in every worksheet question
-  ], { spacing: { before: GAP_SM, after: marks ? GAP_NONE : GAP_SM } })]; // M3: between question blocks
-  // C4: marks right-aligned on its own line, colour-muted so it reads as annotation
-  if (marks) {
-    out.push(P(R(`[${marks} ${marks > 1 ? 'marks' : 'mark'}]`, { size: 20, color: '888888' }),
-      { alignment: AlignmentType.RIGHT, spacing: { before: GAP_NONE, after: GAP_SM } })); // M3
-  }
+  ];
+  if (marks) runs.push(R('	', { size: 24 }), R(`[${marks} ${marks > 1 ? 'marks' : 'mark'}]`, { size: 20, color: '888888' }));
+  const out = [P(runs, { spacing: { before: GAP_SM, after: GAP_SM }, tabStops: [{ type: TabStopType.RIGHT, position: PAGE_W }] })]; // M3
   arr(subParts).forEach((sp) => {
     out.push(P(R(sp, { size: 24 }), { indent: { left: 360 }, spacing: { before: GAP_SM, after: GAP_SM } })); // M3
   });
@@ -4634,7 +4649,7 @@ async function buildDocx(L, outPath, mode) {
           margin: { top: 720, bottom: 720, left: 900, right: 900 },
         },
       },
-      children: buildWorksheetChildren(L, mode),
+      children: tidyGaps(buildWorksheetChildren(L, mode)),
     }],
   });
   const buf = await Packer.toBuffer(doc);
