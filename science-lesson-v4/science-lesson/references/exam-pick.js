@@ -103,6 +103,22 @@ function loadUsage() {
   try { return JSON.parse(fs.readFileSync(USAGE, 'utf8')); } catch { return {}; }
 }
 
+// Parser damage guards: a part that starts mid-word ("nd turbines are used...") lost its
+// opening; a question that talks about "the graph/figure/table" but carries no picture can't be
+// answered. Both are rejected rather than shown to pupils.
+function damaged(q) { return q.parts.some((p) => /^[a-z]/.test(hb.clean(p.text))) ||
+  (!q.figs.length && /\b(graph|figure|diagram|table|chart|photograph|shown (below|above|in))\b/i.test(q.text)); }
+// Answered in BOOKS, so nothing that needs the printed paper: drawing lines/rings, ticking
+// boxes, completing a table, marking a diagram or graph.
+function paperOnly(q) { return /\b(draw (a|one|two|three|straight|vertical|horizontal)?\s*(straight )?(line|ring|circle|arrow)|draw a ring|tick|complete the (table|diagram|graph|chart|sentence)|on the (diagram|graph|figure|chart) (above|below)|label|plot|shade|circle the|ring around|list a)\b/i.test(q.text); }
+// A calculation must come with its numbers. If a "Calculate" part has no digit anywhere before it,
+// the data lived in a lead-in the parser lost.
+function noData(q) {
+  let seen = '';
+  for (const p of q.parts) { const t = hb.clean(p.text); seen += ' ' + t; if (/\b(calculate|how many|how much|work out|determine)\b/i.test(t) && !/\d/.test(seen)) return true; }
+  return false;
+}
+
 // -> { board, worksheet } (either may be null), each a slide/worksheet-ready object.
 function pickForLesson(L, opts) {
   const o = opts || {};
@@ -120,21 +136,6 @@ function pickForLesson(L, opts) {
   if (!all.length) return { board: null, worksheet: null, why: `no ${subject} / ${topic} questions in the library yet` };
   const used = new Set((o.usage || loadUsage())[cls] || []);
   const lw = lessonWords(L);
-  // Parser damage guards: a part that starts mid-word ("nd turbines are used...") lost its
-  // opening; a question that talks about "the graph/figure/table" but carries no picture can't be
-  // answered. Both are rejected rather than shown to pupils.
-  const damaged = (q) => q.parts.some((p) => /^[a-z]/.test(hb.clean(p.text))) ||
-    (!q.figs.length && /\b(graph|figure|diagram|table|chart|photograph|shown (below|above|in))\b/i.test(q.text));
-  // Answered in BOOKS, so nothing that needs the printed paper: drawing lines/rings, ticking
-  // boxes, completing a table, marking a diagram or graph.
-  const paperOnly = (q) => /\b(draw (a|one|two|three|straight|vertical|horizontal)?\s*(straight )?(line|ring|circle|arrow)|draw a ring|tick|complete the (table|diagram|graph|chart|sentence)|on the (diagram|graph|figure|chart) (above|below)|label|plot|shade|circle the|ring around|list a)\b/i.test(q.text);
-  // A calculation must come with its numbers. If a "Calculate" part has no digit anywhere before it,
-  // the data lived in a lead-in the parser lost.
-  const noData = (q) => {
-    let seen = '';
-    for (const p of q.parts) { const t = hb.clean(p.text); seen += ' ' + t; if (/\b(calculate|how many|how much|work out|determine)\b/i.test(t) && !/\d/.test(seen)) return true; }
-    return false;
-  };
   const fresh = all.filter((q) => !used.has(q.id) && !q.tiny && !damaged(q) && !paperOnly(q) && !noData(q));
   const rank = (a, b) => (b.rel - a.rel) || ((a.passRate == null) - (b.passRate == null)) ||
     (Math.abs((a.passRate || 50) - 50) - Math.abs((b.passRate || 50) - 50)) || a.id.localeCompare(b.id);
@@ -182,7 +183,7 @@ function recordUse(cls, ids) {
   fs.writeFileSync(USAGE, JSON.stringify(u, null, 1), 'utf8');
 }
 
-module.exports = { pickForLesson, recordUse, AQA_TOPIC };
+module.exports = { pickForLesson, recordUse, loadUsage, candidates, damaged, paperOnly, noData, AQA_TOPIC, USAGE };
 
 if (require.main === module) {
   const f = process.argv[2];
