@@ -189,13 +189,15 @@ function main() {
     // Equation overhaul (Bug 53) positive guard: bug-test carries \times \div
     // I^2 {d/t} sqrt() across an equation field and a review prose answer. The
     // typeset symbols must actually appear in the deck (raw-command guard above
-    // catches the inverse). × ÷ come from parseEq operator map; ² from the prose
-    // unicode-script path; √ from the radical seg.
+    // catches the inverse). × ÷ come from parseEq operator map; the raised 2 from the
+    // prose maths pass (a real superscript run); √ from the radical seg.
     if (fixture === 'bug-test.json') {
       const pptx = path.join(outDir, baseName(lessons[0].meta) + '.pptx');
       if (fs.existsSync(pptx)) {
         const xml = readArchiveXml(pptx);
-        const missing = ['×', '÷', '²', '√'].filter(c => !xml.includes(c));
+        // Since 2026-10-03 prose powers are real raised runs (baseline="30000"), not the ² glyph.
+        const missing = ['×', '÷', '√'].filter(c => !xml.includes(c));
+        if (!xml.includes('²') && !/baseline="30000"[^>]*>(?:<[^>]+>)*<a:t>2</.test(xml)) missing.push('² (raised 2)');
         if (missing.length) fail(`bug-test pptx missing typeset symbol(s): ${missing.join(' ')} — equation overhaul (Bug 53) regressed`);
         else pass('equation overhaul: × ÷ ² √ all typeset in bug-test pptx');
         // 2026-07-09: the image bank slide is ALWAYS wanted when the lesson has any
@@ -395,7 +397,7 @@ function main() {
         else fail('no superscript/subscript runs on the slides — prose maths not typeset');
         if (slides.includes('1⁄2 of the mass')) pass('{1/2} in prose becomes a diagonal 1⁄2');
         else fail('{1/2} in a Learn box did not become 1⁄2');
-        if (slides.includes('kg⁄m³')) pass('GUESS row units: kg/m^3 → kg⁄m³');
+        if (slides.includes('kg⁄m³') || slides.includes('kg⁄m3')) pass('GUESS row units: kg/m^3 → kg⁄m³ (3 raised)');
         else fail('GUESS row kg/m^3 not typeset (power inside the fraction)');
         const keep = ['three times', 'A few seconds later the metre stick fell', 'Divide the class', 'A.C. current', 'd.c. supply', 'clip_2'];
         const lost = keep.filter(k => !slides.includes(k));

@@ -156,7 +156,8 @@ Max 6 rows. Rows expand to fill slide (no dead zone at bottom).
 ### MATH NOTATION (works in ANY text field since 2026-10-03, not only equation fields)
 Equation fields render in **Cambria Math** (ships with every MS Office). In ordinary text (Learn boxes, MCQ options,
 hooks, tables...) `^`/`_` become real raised/lowered text in the slide font and `{a/b}` a diagonal a⁄b; worksheets
-use ² ₂ characters. Links and file names are never touched, and a bare `/` in prose stays a slash. Mini-syntax:
+use real raised/lowered runs too. Powers are drawn at 120% of the line size (PowerPoint/Word shrink them
+to about 80%), and ² ³ ₂ characters typed by hand are converted to the same size. Links and file names are never touched, and a bare `/` in prose stays a slash. Mini-syntax:
 `{num/den}` fraction (legible diagonal in PPTX, true stacked bar in Word) · `x^2` superscript ·
 `x_2` subscript · `^{m s}` multi-char · `sqrt(...)` root (√ glyph in PPTX, true radical in Word) ·
 `\greek` (`\Delta`, `\rho`) · operators `\times`→× `\div`→÷ `\pm`→± `\cdot`→· `\to`/`\rightarrow`→→

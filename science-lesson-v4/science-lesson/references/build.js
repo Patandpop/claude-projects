@@ -251,6 +251,14 @@ function unicodeScript(str) {
    use parseEq → toPptxRuns/toDocxRuns). */
 function prettyText(str) { return unicodeScript(normSym(str)); }
 
+// Powers/subscripts are drawn at 120% of the line's size. PowerPoint and Word both shrink
+// raised/lowered text by about a third on their own, so they land at about 80% (Patryk
+// 2026-10-03: they used to be 65% AND shrunk again, which made them tiny).
+const SCRIPT_SCALE = 1.2;
+const _SUP_REV = Object.fromEntries(Object.entries(_SUP).map(([k, v]) => [v, k]));
+const _SUB_REV = Object.fromEntries(Object.entries(_SUB).map(([k, v]) => [v, k]));
+const _RE_SCRIPT_GLYPH = /[⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻⁼⁽⁾ⁿ₀₁₂₃₄₅₆₇₈₉₊₋₌₍₎]/;
+
 /* proseMathSegs(str) — maths shorthand in ORDINARY text (2026-10-03). Before this,
    only equation fields and a few prose sinks converted it, so ~100 slide fields
    (Learn boxes, comparison rows, MCQ options, Engage hook...) showed raw "v^2",
@@ -260,9 +268,30 @@ function prettyText(str) { return unicodeScript(normSym(str)); }
      ("Na^+"), or braced ("SO_{4}", "x^{2n}")
    - a bare "/" is left alone ("and/or", "m/s"); no word swaps here
    - links and file names are never touched */
+/* docxMathRuns(text, opts) — Word twin of proseMathRuns: one TextRun per piece, raised/
+   lowered pieces at SCRIPT_SCALE of the run size (Word's default body size is 11pt = 22). */
+function docxMathRuns(text, opts) {
+  const o = opts || {};
+  const segs = proseMathSegs(text);
+  if (!segs) return [new TextRun(Object.assign({}, o, { text: String(text == null ? '' : text) }))];
+  const scriptSize = Math.round((o.size || 22) * SCRIPT_SCALE);
+  return segs.map(sg => new TextRun(Object.assign({}, o, { text: sg.v },
+    sg.t !== 'text' && { size: scriptSize },
+    sg.t === 'sup' && { superScript: true }, sg.t === 'sub' && { subScript: true })));
+}
+
+/* splitScriptGlyphs(segs) — text segments holding ² ³ ⁻ ₂... are split so those
+   characters become real sup/sub segments (drawn at SCRIPT_SCALE, not glyph size). */
+function splitScriptGlyphs(segs) {
+  return segs.flatMap(sg => sg.t !== 'text' || !_RE_SCRIPT_GLYPH.test(sg.v || '') ? [sg]
+    : sg.v.split(/([⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻⁼⁽⁾ⁿ]+|[₀₁₂₃₄₅₆₇₈₉₊₋₌₍₎]+)/).filter(Boolean)
+      .map(v => _SUP_REV[v[0]] ? { t: 'sup', v: [...v].map(c => _SUP_REV[c]).join('') }
+        : _SUB_REV[v[0]] ? { t: 'sub', v: [...v].map(c => _SUB_REV[c]).join('') } : { t: 'text', v }));
+}
+
 function proseMathSegs(str) {
   const s0 = String(str == null ? '' : str);
-  if (!/[\^_{}\\\r\n\t\b\f]/.test(s0)) return null;
+  if (!/[\^_{}\\\r\n\t\b\f]/.test(s0) && !_RE_SCRIPT_GLYPH.test(s0)) return null;
   if (/:\/\/|www\.|\.(?:png|jpe?g|gif|pdf|pptx|docx)\b/i.test(s0)) return null;
   const s = symCmds(s0);
   const segs = [];
@@ -293,17 +322,11 @@ function proseMathSegs(str) {
     push('text', ch); i++;
   }
   if (buf) segs.push({ t: 'text', v: buf });
-  const changed = segs.length !== 1 || segs[0].t !== 'text' || segs[0].v !== s0;
-  return changed ? segs : null;
-}
-
-/* proseMathPlain(str) — same pass for sinks that need ONE flat string (Word runs):
-   sub/superscripts become Unicode ² ₂ where every character has one, else stay raw. */
-function proseMathPlain(str) {
-  const segs = proseMathSegs(str);
-  if (!segs) return String(str == null ? '' : str);
-  return segs.map(sg => sg.t === 'text' ? sg.v
-    : unicodeScript((sg.t === 'sup' ? '^{' : '_{') + sg.v + '}')).join('');
+  // Unicode ² ³ ⁻ ₂ (from prettyText, {a/b} parts, or typed by hand) become real raised/
+  // lowered pieces too, so every power is drawn at the same SCRIPT_SCALE size.
+  const out = splitScriptGlyphs(segs);
+  const changed = out.length !== 1 || out[0].t !== 'text' || out[0].v !== s0;
+  return changed ? out : null;
 }
 
 function parseEq(raw) {
@@ -377,14 +400,15 @@ function segsToPlain(segs) {
 function toPptxRuns(segs, opts) {
   const o = opts || {};
   const fs = o.fontSize || 18;
-  const subFs = Math.round(fs * 0.65);
+  const subFs = Math.round(fs * SCRIPT_SCALE);
   const base = (x) => Object.assign({fontSize:fs, fontFace:FONT_MATH}, o.bold && {bold:true}, o.color && {color:o.color}, x);
   const small = (x) => Object.assign({fontSize:subFs, fontFace:FONT_MATH}, o.color && {color:o.color}, x);
-  return segs.flatMap(seg => {
+  const part = (v) => splitScriptGlyphs([{ t: 'text', v }]).flatMap(sg => toPptxRuns([sg], o));   // kg/m³ → real raised 3
+  return splitScriptGlyphs(arr(segs)).flatMap(seg => {
     // Bug 53: diagonal fraction at FULL size (num/den no longer shrunk sub+sup on
     // top of the 0.65 scale — that compounding made {d/t} render tiny). pptxgenjs
     // has no Office Math, so this stays a legible diagonal a⁄b.
-    if (seg.t === 'frac') return [{text:seg.num,options:base()},{text:'⁄',options:base()},{text:seg.den,options:base()}];
+    if (seg.t === 'frac') return [...part(seg.num), {text:'⁄',options:base()}, ...part(seg.den)];
     if (seg.t === 'radical') return [{text:'√', options:base()}, ...toPptxRuns(seg.children, o)]; // √-glyph, no vinculum in PPTX
     if (seg.t === 'sub')  return {text:seg.v, options:small({subscript:true})};
     if (seg.t === 'sup')  return {text:seg.v, options:small({superscript:true})};
@@ -427,7 +451,7 @@ function renderEqShapes(slide, segs, box, opts) {
       groups.push({ kind: 'frac', num: sg.num, den: sg.den, w });
     } else {
       run.push(...toPptxRuns([sg], o));
-      const scale = (sg.t === 'sub' || sg.t === 'sup') ? 0.65 : 1;
+      const scale = (sg.t === 'sub' || sg.t === 'sup') ? 0.8 : 1;   // rendered size of a raised piece
       const rawText = sg.t === 'radical' ? '√' + segsToPlain(sg.children) : (sg.v || '');
       runW += estW(rawText, fs * scale);
     }
@@ -467,10 +491,10 @@ function renderEqShapes(slide, segs, box, opts) {
 function toDocxRuns(segs, opts) {
   const o = opts || {};
   const sz = o.size || 22;
-  const subSz = Math.round(sz * 0.65);
+  const subSz = Math.round(sz * SCRIPT_SCALE);
   const base = (x) => Object.assign({size:sz}, o.bold && {bold:true}, o.color && {color:o.color}, o.italic && {italics:true}, x);
   const small = (x) => Object.assign({size:subSz}, o.color && {color:o.color}, x);
-  return segs.flatMap(seg => {
+  return splitScriptGlyphs(arr(segs)).flatMap(seg => {   // typed ² → real raised run
     if (seg.t === 'frac') return new DocxMath({ children: [new MathFraction({ numerator: [new DocxMathRun(seg.num)], denominator: [new DocxMathRun(seg.den)] })] }); // M2: stacked fraction via OOXML math
     if (seg.t === 'radical') return new DocxMath({ children: [new MathRadical({ children: [new DocxMathRun(segsToPlain(seg.children))] })] }); // true radical with vinculum (Cambria Math)
     if (seg.t === 'sub')  return new TextRun(small({text:seg.v, subScript:true}));
@@ -506,8 +530,7 @@ function markupToPptxRuns(raw, baseOpts) {
 }
 // DOCX twin — same rule: underline ONLY marks a word that MUST be used.
 function markupToDocxRuns(raw, baseOpts) {
-  return parseMarkup(raw).map((seg) => new TextRun(Object.assign({}, baseOpts,
-    { text: proseMathPlain(seg.text) },   // maths shorthand, same as R()
+  return parseMarkup(raw).flatMap((seg) => docxMathRuns(seg.text, Object.assign({}, baseOpts,   // maths, same as R()
     seg.underline ? { underline: {} } : {},
     seg.bold ? { bold: true } : {})));
 }
@@ -517,14 +540,14 @@ function markupToDocxRuns(raw, baseOpts) {
    ========================================================================= */
 
 function txt(slide, content, o) {
-  slide.addText(proseMathRuns(content), Object.assign({ fontFace: FONT }, o));
+  slide.addText(proseMathRuns(content, o && o.fontSize), Object.assign({ fontFace: FONT }, o));
 }
 
 /* proseMathRuns(content) — every slide text box passes through here (via txt), so
    maths shorthand typesets in ANY field: real super/subscript runs in the box's own
    font (Patryk 2026-10-03). Runs that are already equations (Cambria Math from
    toPptxRuns) or already raised/lowered are left exactly as they are. */
-function proseMathRuns(content) {
+function proseMathRuns(content, boxSize) {
   const toRuns = (text, opts) => {
     const segs = proseMathSegs(text);
     if (!segs) return null;
@@ -532,6 +555,7 @@ function proseMathRuns(content) {
     const runs = segs.map(sg => ({
       text: sg.v,
       options: Object.assign({}, base, { breakLine: false },
+        sg.t !== 'text' && { fontSize: Math.round((base.fontSize || boxSize || 18) * SCRIPT_SCALE) },
         sg.t === 'sup' && { superscript: true }, sg.t === 'sub' && { subscript: true }),
     }));
     // A line break belongs after the LAST piece only, never mid-equation.
@@ -553,8 +577,9 @@ function proseMathRuns(content) {
    (Learn A boxes, Learn C revision tables, reference data are tables, not txt()). */
 function table(slide, rows, opts) {
   const cellMath = (cell) => {
-    if (typeof cell === 'string') return proseMathSegs(cell) ? { text: proseMathRuns(cell) } : cell;
-    if (cell && cell.text != null) return Object.assign({}, cell, { text: proseMathRuns(cell.text) });
+    const size = (cell && cell.options && cell.options.fontSize) || (opts && opts.fontSize);
+    if (typeof cell === 'string') return proseMathSegs(cell) ? { text: proseMathRuns(cell, size) } : cell;
+    if (cell && cell.text != null) return Object.assign({}, cell, { text: proseMathRuns(cell.text, size) });
     return cell;
   };
   slide.addTable(rows.map(r => r.map(cellMath)), opts);
@@ -3675,9 +3700,10 @@ const DIVIDER_THEME = {
   'APPLY':            { fill: 'FFEBEE', border: 'B71C1C' },
 };
 
-const P = (children, opts) => new Paragraph(Object.assign({ children: arr(children) }, opts || {}));
-// Every worksheet run: maths shorthand → Unicode ² ₂ a⁄b (one run per call, 70 call sites).
-const R = (text, opts) => new TextRun(Object.assign({ text: proseMathPlain(text) }, opts || {}));
+const P = (children, opts) => new Paragraph(Object.assign({ children: arr(children).flat(Infinity) }, opts || {}));
+// Every worksheet run: maths shorthand → real raised/lowered runs at SCRIPT_SCALE. Returns an
+// array when the text holds maths; P() flattens it, and every R() goes through P().
+const R = (text, opts) => { const r = docxMathRuns(text, opts); return r.length === 1 ? r[0] : r; };
 // M6: standardised paragraph-spacing scale (twips) — replaces the previous scattered
 // 0/10/20/30/40/60/80/120/160 mix. Line spacing (1.5x, BDA rule) is untouched — see ~L2745.
 const GAP_NONE = 0;   // tightly-grouped lines within one scaffold block
