@@ -120,7 +120,7 @@ function main() {
     // Build — NO_UPLOAD keeps the Drive uploader out of the test.
     const r = cp.spawnSync(process.execPath, [BUILD_JS, sanitisedPath, outDir], {
       cwd: ROOT, encoding: 'utf8',
-      env: Object.assign({}, process.env, { NO_UPLOAD: '1', NO_PAGECOUNT: '1' }),
+      env: Object.assign({}, process.env, { NO_UPLOAD: '1', NO_PAGECOUNT: '1', NO_EXAM_LOG: '1' }),
     });
     const output = (r.stdout || '') + (r.stderr || '');
 
@@ -355,6 +355,17 @@ function main() {
         else if (fixture === 'bug-test.json' && clicks < 5) fail(`click animations: only ${clicks} on the bug-test deck (expected the answer boxes)`);
         else pass(`click animations: ${clicks} answer box${clicks === 1 ? '' : 'es'} appear on click`);
       }
+    }
+
+    // Exam question slides (Patryk 2026-10-03): bug-test carries a hand-made L.examQuestion so this
+    // runs without the (gitignored) exam library. Two slides after Apply; mark scheme verbatim, one
+    // navy/gold box per part with each marking point on its own line.
+    if (fixture === 'bug-test.json') {
+      const xml = readArchiveXml(path.join(outDir, baseName(lessons[0].meta) + '.pptx'));
+      const ok = xml.includes('EXAM QUESTION · AQA · 3 MARKS') && xml.includes('EXAM QUESTION · MARK SCHEME') &&
+        xml.includes('collide with the walls more often') && xml.includes('Many said the pressure stays the same.');
+      if (ok) pass('exam question + mark scheme slides present, mark scheme verbatim');
+      else fail('exam question slides missing or mark scheme text altered');
     }
 
     // MCQ block placement (Patryk 2026-10-03): the fixture lists its two experiment MCQs FIRST;

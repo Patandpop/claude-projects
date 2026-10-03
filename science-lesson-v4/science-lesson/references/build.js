@@ -3251,6 +3251,116 @@ function pickApplyVariant(apply) {
   if (mast.length === 1 && (mast[0].q || '').length > 160) return 'B';
   return 'A'; // default: individual question boxes — never silently fall to the unified-box layout (C)
 }
+/* ---- EXAM QUESTION + MARK SCHEME (Patryk 2026-10-03) ------------------------------
+   After Apply, every Year 9-11 lesson shows ONE real exam question on the board (chosen by
+   exam-pick.js at home), answered in books, then its real mark scheme. Text is VERBATIM.
+   L.examQuestion = { examRef, board, marks, passRate, figure:{path,w,h}|null,
+                      groups:[{ stem, parts:[{label,text,marks,ms,commonError,passRate}] }] } */
+function examQuestionRuns(eq, fs) {
+  const runs = [];
+  eq.groups.forEach((g) => {
+    if (g.stem) runs.push({ text: g.stem, options: { fontSize: fs, breakLine: true, paraSpaceAfter: 6 } });
+    g.parts.forEach((p) => {
+      if (p.label) runs.push({ text: `(${p.label})  `, options: { fontSize: fs, bold: true, color: NAVY } });
+      runs.push({ text: p.text, options: { fontSize: fs } });
+      runs.push({ text: `   [${p.marks} mark${p.marks === 1 ? '' : 's'}]`, options: { fontSize: Math.max(14, fs - 4), color: '777777', breakLine: true, paraSpaceAfter: 8 } });
+    });
+  });
+  return runs;
+}
+
+function slideExamQuestion(pptx, L) {
+  const eq = L.examQuestion;
+  if (!eq || !arr(eq.groups).length) return;
+  const obj = objectiveText(L);
+  const s = pptx.addSlide();
+  s.background = { color: BG };
+  navBar(s, 'apply');
+  let y = sectionHeader(s, `EXAM QUESTION \u00B7 ${eq.board || 'AQA'} \u00B7 ${eq.marks} MARKS`, STAGE.apply, TOP);
+  txt(s, 'Real exam question. Answer it in your book.', { x: MX, y, w: CW, h: 0.35, italic: true, fontSize: 14, color: '333333', valign: 'middle' });
+  y += 0.42;
+  const h = BOT_Y - 0.1 - y;
+  const plain = eq.groups.map((g) => [g.stem, ...g.parts.map((p) => `(${p.label}) ${p.text} [${p.marks} marks]`)].filter(Boolean).join(' ')).join(' ');
+  let tx = MX, tw = CW;
+  if (eq.figure && eq.figure.path && fs.existsSync(eq.figure.path)) {
+    // figure on the left, at most half the width, never stretched
+    const maxW = CW * 0.48, maxH = h;
+    const r = (eq.figure.w && eq.figure.h) ? eq.figure.w / eq.figure.h : 4 / 3;
+    let iw = maxW, ih = iw / r;
+    if (ih > maxH) { ih = maxH; iw = ih * r; }
+    s.addImage({ path: eq.figure.path, x: MX, y: y + (maxH - ih) / 2, w: iw, h: ih });
+    tx = MX + iw + 0.25; tw = CW - iw - 0.25;
+  }
+  const fsz = autoFontSize(plain, tw - 0.2, h, { min: 16, max: 26 });
+  goldBox(s, tx, y, tw, h, examQuestionRuns(eq, fsz), { valign: 'top', margin: 10 });
+  bottomBar(s, obj);
+}
+
+function slideExamMarkScheme(pptx, L) {
+  const eq = L.examQuestion;
+  if (!eq || !arr(eq.groups).length) return;
+  const obj = objectiveText(L);
+  const s = pptx.addSlide();
+  s.background = { color: BG };
+  navBar(s, 'apply');
+  let y = sectionHeader(s, 'EXAM QUESTION \u00B7 MARK SCHEME', STAGE.apply, TOP);
+  txt(s, 'Mark your answer in purple pen. This is the real examiner mark scheme.', { x: MX, y, w: CW, h: 0.35, italic: true, fontSize: 14, color: '333333', valign: 'middle' });
+  y += 0.42;
+  const parts = eq.groups.flatMap((g) => g.parts);
+  const insight = parts.map((p) => {
+    const bits = [];
+    if (p.passRate != null) bits.push(`${p.passRate}% of students got (${p.label || 'this'}) right.`);
+    if (p.commonError) bits.push(p.commonError);
+    return bits.join(' ');
+  }).filter(Boolean).join('  ');
+  const insH = insight ? 1.1 : 0;
+  const h = BOT_Y - 0.1 - y - (insH ? insH + 0.12 : 0);
+  // AQA writes marking points as one run-on line with a bare "1" after each point. Put each point on
+  // its own line and show its mark as "(1)". The words themselves are untouched (verbatim rule).
+  const UNIT = /^(kg|g|mg|m|cm|mm|km|s|ms|h|min|j|kj|mj|w|kw|mw|n|v|a|ma|hz|khz|k|pa|kpa|mol|dm|l|ml|%)\b/i;
+  const points = (ms) => {
+    const out = []; let cur = '';
+    const toks = String(ms || '').split(/\s+/);
+    toks.forEach((t, k) => {
+      const next = toks[k + 1] || '';
+      if (/^[1-3]$/.test(t) && cur && !UNIT.test(next)) { out.push(`${cur.trim()}  (${t})`); cur = ''; }
+      else cur += ' ' + t;
+    });
+    if (cur.trim()) out.push(cur.trim());
+    return out;
+  };
+  // one navy/gold box per part (each answer appears on its own click), height shared by text length
+  const texts = parts.map((p) => points(p.ms));
+  const weight = texts.map((t) => Math.max(60, t.join(' ').length + 40 * t.length));
+  const avail = h - 0.1 * (parts.length - 1);
+  const tot = weight.reduce((a, b) => a + b, 0);
+  let yy = y;
+  parts.forEach((p, i) => {
+    const bh = avail * weight[i] / tot;
+    const lines = texts[i];
+    const plain = `(${p.label || i + 1})  ` + lines.join(' ');
+    const fsz = autoFontSize(plain, CW - 0.25, bh, { min: 16, max: 24, linesHint: undefined });
+    const runs = [{ text: `(${p.label || i + 1})  `, options: { fontSize: fsz, bold: true } }];
+    lines.forEach((ln, k) => runs.push({ text: ln, options: { fontSize: fsz, breakLine: k < lines.length - 1 } }));
+    goldBox(s, MX, yy, CW, bh, runs, { fill: NAVY, color: GOLD, valign: 'middle', margin: 10 });
+    yy += bh + 0.1;
+  });
+  if (insight) {
+    const iy = BOT_Y - 0.1 - insH;
+    txt(s, [{ text: 'What the examiner saw:  ', options: { bold: true, color: NAVY } }, { text: insight }], {
+      x: MX, y: iy, w: CW, h: insH, fontSize: autoFontSize(insight, CW - 0.3, insH, { min: 12, max: 16 }),
+      color: '333333', fill: { color: 'FFF8E1' }, line: GOLD2, valign: 'middle', margin: 8, fit: 'shrink',
+    });
+  }
+  bottomBar(s, obj);
+}
+
+function slideApplyThenExam(pptx, L) {
+  slideApply(pptx, L);
+  slideExamQuestion(pptx, L);
+  slideExamMarkScheme(pptx, L);
+}
+
 function slideApply(pptx, L) {
   const apply = L.apply; if (!apply) return;
   const obj = objectiveText(L);
@@ -3756,18 +3866,18 @@ async function buildPptx(L, outPath) {
     (L.meta && L.meta.uncapLearn ? arr(L.learn) : arr(L.learn).slice(0, 4)).forEach((it) => slideLearn(pptx, L, it));
     renderBuildSlides(pptx, L, buildItems);
     slideVisualiser(pptx, L, visItem);                          // MANDATORY — never omit
-    slideApply(pptx, L);
+    slideApplyThenExam(pptx, L);                               // + real exam question (Y9-11, home)
     buildReviewSlides(pptx, L);
   } else if (type === 'revision') {
     arr(L.learn).forEach((it) => slideLearn(pptx, L, it));      // typically Learn-C
     slideWhiteboardRounds(pptx, L);
     if (visItem) slideVisualiser(pptx, L, visItem);
-    slideApply(pptx, L);
+    slideApplyThenExam(pptx, L);                               // + real exam question (Y9-11, home)
     buildReviewSlides(pptx, L);
   } else if (type === 'whiteboard') {
     slideWhiteboardRounds(pptx, L);
     if (visItem) slideVisualiser(pptx, L, visItem);
-    slideApply(pptx, L);
+    slideApplyThenExam(pptx, L);                               // + real exam question (Y9-11, home)
     buildReviewSlides(pptx, L);
   } else if (type === 'review') {
     // Bug 55: review lessons are content-heavy — render ALL Learn slides (no
@@ -3777,7 +3887,7 @@ async function buildPptx(L, outPath) {
     arr(L.learn).forEach((it) => slideLearn(pptx, L, it));
     renderBuildSlides(pptx, L, buildItems);
     slideVisualiser(pptx, L, visItem);                          // mandatory (auto-generated) — matches the documented review sequence
-    slideApply(pptx, L);
+    slideApplyThenExam(pptx, L);                               // + real exam question (Y9-11, home)
     buildReviewSlides(pptx, L);
   } else {
     // unknown type — treat as standard (keep the 4-Learn cap)
@@ -3785,7 +3895,7 @@ async function buildPptx(L, outPath) {
     (L.meta && L.meta.uncapLearn ? arr(L.learn) : arr(L.learn).slice(0, 4)).forEach((it) => slideLearn(pptx, L, it));
     renderBuildSlides(pptx, L, buildItems);
     slideVisualiser(pptx, L, visItem);
-    slideApply(pptx, L);
+    slideApplyThenExam(pptx, L);                               // + real exam question (Y9-11, home)
     buildReviewSlides(pptx, L);
   }
 
@@ -4451,6 +4561,28 @@ function buildQuestionBlocks(L, state, mode) {
 }
 
 /* one Apply tier section */
+/* examWorksheetBlock(eq) — the worksheet's real exam question (verbatim, no answer lines). */
+function examWorksheetBlock(eq) {
+  const out = [spacer(), new Table({
+    width: { size: 3600, type: WidthType.DXA }, columnWidths: [3600], borders: NO_TBL_B,
+    rows: [new TableRow({ children: [cell({
+      w: 3600, fill: 'E8EAF6', margins: { top: 40, bottom: 40, left: 140, right: 140 },
+      children: [P(R(`Exam question (${eq.board || 'AQA'}) · answer in your book`, { bold: true, size: 18, color: NAVY }),
+        { alignment: AlignmentType.CENTER, keepNext: true, border: { left: { style: BorderStyle.SINGLE, size: 24, color: 'FFD700' } } })],
+    })] })],
+  })];
+  arr(eq.groups).forEach((g) => {
+    if (g.stem) out.push(P(R(prettyText(g.stem), { size: 24 }), { spacing: { before: GAP_SM, after: GAP_XS } }));
+    g.parts.forEach((pt) => {
+      const label = pt.label ? `(${pt.label})  ` : '';
+      out.push(P([R(label, { bold: true, size: 24 }), R(prettyText(pt.text), { size: 24 }),
+        R('\t', { size: 24 }), R(`[${pt.marks} ${pt.marks === 1 ? 'mark' : 'marks'}]`, { size: 20, color: '888888' })],
+        { spacing: { before: GAP_SM, after: GAP_SM }, tabStops: [{ type: TabStopType.RIGHT, position: PAGE_W }] }));
+    });
+  });
+  return out;
+}
+
 function applyTierSection(L, tier, mode, opts) {
   const o = opts || {};
   const qs = arr(L.apply && L.apply[tier]).map(normQ);
@@ -4662,6 +4794,9 @@ function buildWorksheetChildren(L, mode) {
     if (!L.apply) return;
     ch.push(...divider('APPLY', lessonBookRef(L)));   // textbook ref top-right of the Apply title
     TIERS.forEach((t) => ch.push(...applyTierSection(L, t, mode, o || {})));
+    // 2026-10-03: a second, different real exam question, only when it still fits 4 pages
+    // (build.js decides with page-count.js). Answered in books: no answer lines.
+    if (L.examWorksheet && L._examOnSheet && mode !== 'answers') ch.push(...examWorksheetBlock(L.examWorksheet));
   };
 
   if (type === 'B') {                                    // exam practice
@@ -4839,6 +4974,22 @@ async function main() {
       outDirsUsed.add(outDir);
 
       // 1 \u2014 PPTX (one version, for everyone)
+      // 0 — Real exam questions (Patryk 2026-10-03), home only: exam-pick.js and the exam
+      //     library are not packaged for claude.ai, so school builds skip this quietly. A lesson
+      //     can opt out with meta.examQuestion:false or bring its own L.examQuestion.
+      const examPickPath = path.join(__dirname, 'exam-pick.js');
+      let examPicked = null;
+      if (L.examQuestion === undefined && (L.meta || {}).examQuestion !== false && fs.existsSync(examPickPath) && !process.env.NO_EXAM_PICK) {
+        try {
+          examPicked = require(examPickPath).pickForLesson(L);
+          L.examQuestion = examPicked.board || null;
+          if (L.examWorksheet === undefined) L.examWorksheet = examPicked.worksheet || null;
+          if (examPicked.board) console.log(`  [exam] board: ${examPicked.board.examRef} (${examPicked.board.marks} marks)` +
+            (examPicked.worksheet ? `; worksheet candidate: ${examPicked.worksheet.examRef}` : ''));
+          else if (examPicked.why) console.log(`  [exam] none: ${examPicked.why}`);
+        } catch (e) { buildWarn('exam question not picked: ' + e.message); }
+      }
+
       const pptxPath = path.join(outDir, base + '.pptx');
       await buildPptx(L, pptxPath);
       console.log('  \u2713 ' + path.basename(pptxPath));
@@ -4863,6 +5014,28 @@ async function main() {
         const supportPath = path.join(outDir, base + '_support_worksheet.docx');
         await buildDocx(L, supportPath, 'developing');
         console.log('  \u2713 ' + path.basename(supportPath));
+      }
+
+      // 3a \u2014 worksheet exam question (Patryk 2026-10-03): rebuild both sheets WITH it, keep it only
+      //     if Word says both still fit 4 pages; otherwise rebuild without. Needs the page counter,
+      //     so it only ever happens at home.
+      const pcPath = path.join(__dirname, 'page-count.js');
+      if (L.examWorksheet && !isReview && fs.existsSync(pcPath) && !process.env.NO_PAGECOUNT) {
+        const supportP = path.join(outDir, base + '_support_worksheet.docx');
+        L._examOnSheet = true;
+        await buildDocx(L, wsPath, 'standard');
+        await buildDocx(L, supportP, 'developing');
+        const pcx = require(pcPath);
+        const res = pcx.countPages([wsPath, supportP]);
+        if (res.every((r) => r.pages != null && r.pages <= pcx.PAGE_LIMIT)) {
+          L._examWorksheetUsed = true;
+          console.log(`  [exam] worksheet question added (${L.examWorksheet.examRef}): ${res.map((r) => r.pages).join('/')} pages`);
+        } else {
+          L._examOnSheet = false;
+          await buildDocx(L, wsPath, 'standard');
+          await buildDocx(L, supportP, 'developing');
+          console.log('  [exam] worksheet question left off: it would push the sheet past 4 pages');
+        }
       }
 
       // 3b \u2014 4-page rule (Patryk 2026-10-03): ask Word for the real page count. Home only
@@ -4903,6 +5076,11 @@ async function main() {
         fs.writeFileSync(path.join(outDir, base + '.manifest.json'), JSON.stringify(manifest, null, 2), 'utf8');
       }
 
+      // remember which exam questions this class has now seen (never repeated)
+      if (examPicked && !process.env.NO_EXAM_LOG) {
+        const used = [L.examQuestion && L.examQuestion.examRef, L._examWorksheetUsed && L.examWorksheet && L.examWorksheet.examRef].filter(Boolean);
+        try { require(examPickPath).recordUse((L.meta || {}).class, used); } catch (e) { buildWarn('exam usage not saved: ' + e.message); }
+      }
       ok++;
       flushBuildWarns(label);       // 2026-07-12: degraded-but-successful builds now say so out loud
     } catch (e) {

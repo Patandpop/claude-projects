@@ -300,6 +300,36 @@
           "a": "P = I^2 \\times R, measured in watts. Compare v = {d/t} in m/s."
         }
       ]
+    },
+    "examQuestion": {
+      "examRef": "TEST#Q1",
+      "board": "AQA",
+      "marks": 3,
+      "passRate": 48,
+      "figure": null,
+      "groups": [
+        {
+          "stem": "A sealed container holds 0.5 mol of gas at 300 K.",
+          "parts": [
+            {
+              "label": "a",
+              "text": "State what happens to the pressure if the temperature rises and the volume stays the same.",
+              "marks": 1,
+              "ms": "pressure increases 1",
+              "commonError": "Many said the pressure stays the same.",
+              "passRate": 61
+            },
+            {
+              "label": "b",
+              "text": "Explain this in terms of particles.",
+              "marks": 2,
+              "ms": "particles move faster 1 collide with the walls more often 1",
+              "commonError": "",
+              "passRate": 35
+            }
+          ]
+        }
+      ]
     }
   }
 ]

@@ -443,7 +443,7 @@ async function build(opts) {
   return { qs, bookletPath, answersPath };
 }
 
-module.exports = { build, selectQuestions, imageSize };
+module.exports = { build, selectQuestions, imageSize, clean, letterGroups, stripStem };
 
 if (require.main === module) {
   const a = process.argv.slice(2);
