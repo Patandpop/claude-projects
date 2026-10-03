@@ -4730,6 +4730,21 @@ async function main() {
         console.log('  \u2713 ' + path.basename(supportPath));
       }
 
+      // 3b \u2014 4-page rule (Patryk 2026-10-03): ask Word for the real page count. Home only
+      //     (page-count.js is not packaged); NO_PAGECOUNT=1 skips it (the test harness sets it).
+      const pageCountPath = path.join(__dirname, 'page-count.js');
+      if (fs.existsSync(pageCountPath) && !process.env.NO_PAGECOUNT && !isReview) {
+        try {
+          const pc = require(pageCountPath);
+          const sheets = [wsPath, path.join(outDir, base + '_support_worksheet.docx')];
+          for (const res of pc.countPages(sheets)) {
+            const v = pc.verdict(res);
+            if (!v) continue;
+            if (res.pages > pc.PAGE_LIMIT) buildWarn(v); else console.log('  ' + v);
+          }
+        } catch (e) { console.log('  [pages] page count skipped: ' + e.message); }
+      }
+
       // 4 \u2014 Drive sidecar: one-line text file with the destination folder path.
       //     Only written when all Drive meta fields are present. Used by drive-upload.ps1.
       const { year, subject, macrotopic, lessonNumber } = L.meta;

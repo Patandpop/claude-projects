@@ -120,7 +120,7 @@ function main() {
     // Build — NO_UPLOAD keeps the Drive uploader out of the test.
     const r = cp.spawnSync(process.execPath, [BUILD_JS, sanitisedPath, outDir], {
       cwd: ROOT, encoding: 'utf8',
-      env: Object.assign({}, process.env, { NO_UPLOAD: '1' }),
+      env: Object.assign({}, process.env, { NO_UPLOAD: '1', NO_PAGECOUNT: '1' }),
     });
     const output = (r.stdout || '') + (r.stderr || '');
 
