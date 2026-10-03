@@ -309,7 +309,7 @@ Currently one fixed Physics top bar reused for every lesson. Want: Chemistry top
 
 ---
 
-**Idea — Student first names + interests in the APPLY section (2026-09)** 💡 REFINES the existing "personalise questions" goal (see [[project-science-lesson]] line ~40, raised 2026-07-11)
+**~~Idea — Student first names + interests in the APPLY section (2026-09)~~ DROPPED 2026-10-03** (Patryk: no longer wanted; Mastering gets unfamiliar-context SCENARIO questions instead, and real exam questions go on the board after Apply). Original note kept for history: REFINES the existing "personalise questions" goal (see [[project-science-lesson]] line ~40, raised 2026-07-11)
 Patryk's refinement: put student FIRST NAMES into the APPLY-tier questions specifically — as the people in the scenario/word-problem, optionally tied to that student's interest — to lift engagement. Does NOT need full personalisation, just first names dropped into scenarios. Privacy: first names only (Patryk flagged this himself). Source of names + interests: TBD (class lists still being finalised for 2026-27). Needs its own design pass; not scoped for immediate build.
 
 ---
