@@ -331,6 +331,30 @@ function main() {
       }
     }
 
+    // MCQ block placement (Patryk 2026-10-03): the fixture lists its two experiment MCQs FIRST;
+    // the renderer must move them to straight after the practical method slide, and put the
+    // four learning MCQs together before every other Build slide.
+    if (fixture === 'amylase-test-9ab.json') {
+      const pptx = path.join(outDir, baseName(lessons[0].meta) + '.pptx');
+      const zip = new AdmZip(pptx);
+      const slides = zip.getEntries().filter(e => /^ppt\/slides\/slide\d+\.xml$/.test(e.entryName))
+        .sort((a, b) => parseInt(a.entryName.match(/\d+/)[0], 10) - parseInt(b.entryName.match(/\d+/)[0], 10))
+        .map(e => e.getData().toString('utf8'));
+      const at = (needle) => slides.findIndex(x => x.includes(needle));
+      const learn = at('correctly describes enzyme denaturation');
+      const predict = slides.findIndex(x => /PREDICT/i.test(x));
+      const method = at('drops of iodine solution to each well');   // the method slide's first step
+      const water = at('kept in a water bath');
+      const iodine = at('starch has all been broken down');
+      const graph = at('Rate of amylase activity vs Temperature');
+      // the practical may have its own Q&A answer slide, so allow up to 2 slides between
+      // the method and the first experiment MCQ.
+      if (learn >= 0 && predict > learn && water > method && water - method <= 2 &&
+          iodine === water + 1 && (graph < 0 || graph > iodine))
+        pass(`MCQ block: learning MCQs first (slide ${learn + 1}), experiment MCQs right after the method (slides ${water + 1}-${iodine + 1})`);
+      else fail(`MCQ placement wrong: learn=${learn + 1} predict=${predict + 1} method=${method + 1} waterMCQ=${water + 1} iodineMCQ=${iodine + 1} graph=${graph + 1}`);
+    }
+
     // Textbook reference guard: amylase (Y9 enzymes) must auto-match the index
     // and render "Read more — [book] pp. …" on the Apply slide AND worksheet.
     if (fixture === 'amylase-test-9ab.json') {

@@ -2236,7 +2236,7 @@ function slideSort(pptx, L, item) {
 }
 
 /* ---- BUILD — practical (+ optional Q&A answers slide) -------------------- */
-function slidePractical(pptx, L, item) {
+function slidePractical(pptx, L, item, beforeData) {
   const obj = objectiveText(L);
   const s = pptx.addSlide();
   s.background = { color: BG };
@@ -2303,6 +2303,9 @@ function slidePractical(pptx, L, item) {
     });
     bottomBar(s2, obj);
   }
+
+  // Experiment MCQs (about:"practical") go here: after the method (and its answers), BEFORE the data.
+  if (typeof beforeData === 'function') beforeData();
 
   // Model data slide \u2014 skipped when graphWithData build item present (M5: graphWithData replaces it)
   const rd = (L.worksheetExtras || {}).referenceData;
@@ -3480,7 +3483,7 @@ function contentCheck(L) {
 
   if (isTeaching) {
     const mcq = arr(L.build).filter((b) => ['mcq', 'mcq_image'].includes(b.type || b.variant)).length;
-    check(mcq === 4, 'MCQ count 4/4', `MCQ count ${mcq} — rule is exactly 4, each placed after the Learn content it tests`);
+    check(mcq === 6, 'MCQ count 6/6', `MCQ count ${mcq} — rule is exactly 6 (one block after Learn; experiment MCQs tagged about:"practical" go after the method slide)`);
     TIERS.forEach((t) => {
       const a = arr((L.apply || {})[t]).length;
       check(a >= 3, `Apply ${t} ${a}/3+`, `Apply ${t} has ${a} question(s) — minimum 3 per tier`);
@@ -3603,14 +3606,38 @@ function checkSixMarkRule(L) {
 /* renderBuildSlides — dispatch each Build item to its slide(s). Shared by the
    standard/practical/annotation path and the review path (so Build activities
    reach review slides too). Visualiser is handled by the caller, not here. */
+/* orderBuildItems — MCQ block placement (Patryk 2026-10-03: "having it scattered across the
+   lesson makes it disjointed"). Whatever order the JSON lists them in:
+   - learning MCQs form ONE block straight after Learn, before the rest of Build;
+   - MCQs tagged about:"practical" sit straight after the practical METHOD slide, before the
+     data/results slides (or join the learning block when the lesson has no practical slide).
+   Every other Build item keeps its authored order. */
+function orderBuildItems(items) {
+  const kind = (b) => b.type || b.variant || 'mcq';
+  const isMcq = (b) => kind(b) === 'mcq' || kind(b) === 'mcq_image';
+  const isPrac = (b) => isMcq(b) && /practical|experiment/i.test(String(b.about || ''));
+  const list = arr(items);
+  const learnMcqs = list.filter((b) => isMcq(b) && !isPrac(b));
+  const pracMcqs = list.filter(isPrac);
+  const rest = list.filter((b) => !isMcq(b));
+  const p = rest.findIndex((b) => kind(b) === 'practical');
+  if (p < 0) return [...learnMcqs, ...pracMcqs, ...rest];
+  // The practical renders its own method -> answers -> model-data slides; its experiment MCQs ride
+  // along on the practical item and are drawn inside that group, between the answers and the data.
+  const prac = Object.assign({}, rest[p], { _mcqs: pracMcqs });
+  return [...learnMcqs, ...rest.slice(0, p), prac, ...rest.slice(p + 1)];
+}
+
 function renderBuildSlides(pptx, L, buildItems) {
-  arr(buildItems).forEach((b) => {
+  orderBuildItems(buildItems).forEach((b) => {
     const bt = (b.type || b.variant || 'mcq');
     if (bt === 'mcq') slideMcq(pptx, L, b);
     else if (bt === 'mcq_image') slideMcqImage(pptx, L, b);
     else if (bt === 'sort') slideSort(pptx, L, b);
     else if (bt === 'trueFalse') slideTrueFalse(pptx, L, b);
-    else if (bt === 'practical') slidePractical(pptx, L, b);
+    else if (bt === 'practical') slidePractical(pptx, L, b, () => arr(b._mcqs).forEach((m) => {
+      if ((m.type || m.variant) === 'mcq_image') slideMcqImage(pptx, L, m); else slideMcq(pptx, L, m);
+    }));
     else if (bt === 'misconception') slideMisconception(pptx, L, b);
     else if (bt === 'bigFact') slideBigFact(pptx, L, b);
     else if (bt === 'reformatFlowchart') slideReformatFlowchart(pptx, L, b);

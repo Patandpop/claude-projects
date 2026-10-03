@@ -47,12 +47,12 @@ description: "Creates lesson PowerPoints and worksheets for science lessons (phy
 - Every Do Now slide: silent-entry footer — `Silent start · pen out · attempt all questions`.
 
 **CONTENT CHECK — the build prints a ✓/✗ report on every lesson; author so every line is ✓**
-The renderer validates each lesson loudly (never blocks): Do Now exactly 6 · MCQ count exactly 4 · Apply ≥3 per tier · Review mirrors EVERY Apply question per tier · every image slot has imageDescription or an embedded image · at least one image somewhere (empty image bank = extraction was probably skipped) · Drive meta complete (year/subject/macrotopic/lessonNumber/title — missing meta = never uploads, never reaches lesson-log) · cloze only on standard/practical. Fix the JSON until the report is clean BEFORE handing files over. `meta.macrotopic` must be the EXACT Drive folder name (e.g. "P4 Earth in Space", not "Space") or the upload will fail.
+The renderer validates each lesson loudly (never blocks): Do Now exactly 6 · MCQ count exactly 6 · Apply ≥3 per tier · Review mirrors EVERY Apply question per tier · every image slot has imageDescription or an embedded image · at least one image somewhere (empty image bank = extraction was probably skipped) · Drive meta complete (year/subject/macrotopic/lessonNumber/title — missing meta = never uploads, never reaches lesson-log) · cloze only on standard/practical. Fix the JSON until the report is clean BEFORE handing files over. `meta.macrotopic` must be the EXACT Drive folder name (e.g. "P4 Earth in Space", not "Space") or the upload will fail.
 
 The final slide of every deck is the **IMAGE BANK** (kept, not deleted): it self-assembles from every embedded image + generated graphs + `image_dump.images`. Timeline (Learn-K) events may each carry `imageDescription`/`embeddedImagePath` — the image renders opposite the event box.
 
 **Content volume & source fidelity**
-- **Always build exactly 4 MCQs, each positioned AFTER the Learn content it tests** (confirmed standing rule 2026-07-02). Never fewer even if Patryk may not use all four live; never place an MCQ before or disconnected from the content it checks.
+- **Always build exactly 6 MCQs, as ONE block** (Patryk 2026-10-03, replaces the old 4-scattered rule: scattered MCQs make the lesson feel disjointed). Learning MCQs come straight after the Learn section, before the rest of Build. An MCQ about the experiment gets `"about": "practical"` and is shown right after the practical method slide (and its answers), before the data. The renderer does the ordering itself, so list them anywhere in `build`; just tag the experiment ones. Never fewer than 6.
 - **Equation lessons follow I do → we do → you do:** Learn-F equation intro → `guessExample` worked example (1–2 slides) → `practiceTriangle` independent practice. This is the default sequence whenever a new equation is introduced.
 - **Source material is a floor to EXTEND, not just preserve** (confirmed 2026-07-02): beyond porting every question/table/scaffold, actively add genuine depth — historical context, the "why this mattered" layer, connections to the bigger picture — woven into the same slides. Pre-build checklist question: "what's the one thing in this topic that makes it click, that isn't in the source material yet?"
 - **Apply: minimum 3 questions per tier** unless Patryk says otherwise. One question per tier is never enough.
@@ -385,7 +385,7 @@ Every extracted image appears here — matched ones carry their slot label, unma
 
 | Type | Sequence |
 |---|---|
-| standard | Title → DoNow → DoNow Answers → Engage → Learn(1–2) → Build×3 (MCQ default; swap ≤2 for workedExample / errorAnalysis / graphInterpret / trueFalse as topic demands) → Visualiser → Apply → Review×3 |
+| standard | Title → DoNow → DoNow Answers → Engage → Learn(1–2) → MCQ block ×6 → Build (workedExample / errorAnalysis / graphInterpret / trueFalse as topic demands) → Visualiser → Apply → Review×3 |
 | revision | Title → DoNow → DoNow Answers → Learn-C → Whiteboard QA rounds → Apply → Review×3 |
 | practical | Title → DoNow → DoNow Answers → Engage → Learn(1–2) → Build practical → Build Q&A → Visualiser → Apply → Review×3 |
 | whiteboard | Title → DoNow → DoNow Answers → Whiteboard QA rounds → Apply → Review×3 |
@@ -551,7 +551,7 @@ Applies to all Engage, Learn, and Build practical image placeholders.
 
 Valid when Patryk says "combine lessons X and Y" or "fast-paced hour covering both", typically when adjacent lessons in the scheme have thin or repetitive content.
 
-Build a single lesson object: two Learn slides (one per topic), unified Do Now drawing from both topics, Build covering both topics, Apply and Review spanning both. Do NOT pad either topic to fill time. Same output format: PPTX + worksheets (not a double-length lesson — a merged single lesson). Normal MCQ count (4) still applies across both topics combined.
+Build a single lesson object: two Learn slides (one per topic), unified Do Now drawing from both topics, Build covering both topics, Apply and Review spanning both. Do NOT pad either topic to fill time. Same output format: PPTX + worksheets (not a double-length lesson — a merged single lesson). Normal MCQ count (6, one block) still applies across both topics combined.
 
 ---
 

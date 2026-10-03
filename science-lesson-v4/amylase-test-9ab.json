@@ -14,7 +14,15 @@
       "Investigate the effect of temperature and pH on amylase activity",
       "Analyse results to identify optimum conditions for amylase"
     ],
-    "keywords": ["enzyme", "substrate", "active site", "optimum", "denatured", "amylase", "iodine"]
+    "keywords": [
+      "enzyme",
+      "substrate",
+      "active site",
+      "optimum",
+      "denatured",
+      "amylase",
+      "iodine"
+    ]
   },
   "doNow": {
     "questions": [
@@ -52,12 +60,32 @@
       "variant": "B",
       "heading": "Key Terms — Enzymes",
       "definitions": [
-        { "term": "Enzyme", "definition": "A biological catalyst made of protein", "etymology": "Greek: en- (in) + zyme (leaven) — first found in yeast" },
-        { "term": "Substrate", "definition": "The molecule that fits the active site", "etymology": "Latin: sub- (under) + stratum (layer spread beneath)" },
-        { "term": "Active site", "definition": "The specific region where the substrate binds" },
-        { "term": "Optimum", "definition": "The conditions where enzyme activity is highest" },
-        { "term": "Denatured", "definition": "When the enzyme's 3D shape is permanently changed" },
-        { "term": "Amylase", "definition": "An enzyme that breaks starch into maltose" }
+        {
+          "term": "Enzyme",
+          "definition": "A biological catalyst made of protein",
+          "etymology": "Greek: en- (in) + zyme (leaven) — first found in yeast"
+        },
+        {
+          "term": "Substrate",
+          "definition": "The molecule that fits the active site",
+          "etymology": "Latin: sub- (under) + stratum (layer spread beneath)"
+        },
+        {
+          "term": "Active site",
+          "definition": "The specific region where the substrate binds"
+        },
+        {
+          "term": "Optimum",
+          "definition": "The conditions where enzyme activity is highest"
+        },
+        {
+          "term": "Denatured",
+          "definition": "When the enzyme's 3D shape is permanently changed"
+        },
+        {
+          "term": "Amylase",
+          "definition": "An enzyme that breaks starch into maltose"
+        }
       ]
     },
     {
@@ -97,11 +125,26 @@
       "variant": "G",
       "heading": "How Amylase Breaks Down Starch",
       "steps": [
-        { "label": "Starch enters", "note": "Amylase ready in saliva" },
-        { "label": "Substrate binds", "note": "Active site locks onto starch" },
-        { "label": "Complex forms", "note": "Bonds in starch break" },
-        { "label": "Maltose released", "note": "Starch fully broken down" },
-        { "label": "Enzyme reused", "note": "Active site unchanged" }
+        {
+          "label": "Starch enters",
+          "note": "Amylase ready in saliva"
+        },
+        {
+          "label": "Substrate binds",
+          "note": "Active site locks onto starch"
+        },
+        {
+          "label": "Complex forms",
+          "note": "Bonds in starch break"
+        },
+        {
+          "label": "Maltose released",
+          "note": "Starch fully broken down"
+        },
+        {
+          "label": "Enzyme reused",
+          "note": "Active site unchanged"
+        }
       ]
     },
     {
@@ -110,14 +153,50 @@
       "heading": "Rate of Reaction",
       "equation": "Rate = 1 ÷ Time",
       "components": [
-        { "symbol": "Rate", "name": "Rate of reaction", "unit": "s⁻¹" },
-        { "symbol": "Time", "name": "Time for colour change", "unit": "seconds (s)" }
+        {
+          "symbol": "Rate",
+          "name": "Rate of reaction",
+          "unit": "s⁻¹"
+        },
+        {
+          "symbol": "Time",
+          "name": "Time for colour change",
+          "unit": "seconds (s)"
+        }
       ],
-      "rearrangements": ["Time = 1 ÷ Rate"],
+      "rearrangements": [
+        "Time = 1 ÷ Rate"
+      ],
       "example": "Colour change at 37°C takes 40 s.  Rate = 1 ÷ 40 = 0.025 s⁻¹"
     }
   ],
   "build": [
+    {
+      "type": "mcq",
+      "about": "practical",
+      "q": "Why is each tube of starch and amylase kept in a water bath?",
+      "options": {
+        "A": "To keep the temperature constant",
+        "B": "To stop the iodine changing colour",
+        "C": "To add more starch",
+        "D": "To speed up the timer"
+      },
+      "answer": "A",
+      "explanation": "Temperature is the control variable; the water bath holds it steady."
+    },
+    {
+      "type": "mcq",
+      "about": "practical",
+      "q": "Which iodine result shows the starch has all been broken down?",
+      "options": {
+        "A": "Blue-black",
+        "B": "Orange-brown",
+        "C": "Colourless",
+        "D": "Purple"
+      },
+      "answer": "B",
+      "explanation": "Iodine stays orange-brown when no starch is left."
+    },
     {
       "type": "mcq",
       "q": "Which statement correctly describes enzyme denaturation?",
@@ -233,7 +312,10 @@
     {
       "type": "graphInterpret",
       "graphLabel": "Rate of amylase activity vs Temperature",
-      "axes": { "x": "Temperature (°C)", "y": "Rate of reaction (s⁻¹)" },
+      "axes": {
+        "x": "Temperature (°C)",
+        "y": "Rate of reaction (s⁻¹)"
+      },
       "questions": [
         {
           "q": "At what temperature is amylase most active? Name this temperature.",
@@ -255,9 +337,21 @@
   ],
   "apply": {
     "developing": [
-      { "q": "Name the enzyme that digests starch.", "marks": 1, "a": "Amylase." },
-      { "q": "What colour does iodine turn when starch is present?", "marks": 1, "a": "Blue-black." },
-      { "q": "What happens to a denatured enzyme's active site?", "marks": 2, "a": "The active site permanently changes shape — the substrate no longer fits." }
+      {
+        "q": "Name the enzyme that digests starch.",
+        "marks": 1,
+        "a": "Amylase."
+      },
+      {
+        "q": "What colour does iodine turn when starch is present?",
+        "marks": 1,
+        "a": "Blue-black."
+      },
+      {
+        "q": "What happens to a denatured enzyme's active site?",
+        "marks": 2,
+        "a": "The active site permanently changes shape — the substrate no longer fits."
+      }
     ],
     "reaching": [
       {
@@ -299,9 +393,18 @@
   },
   "review": {
     "developing": [
-      { "q": "Name the enzyme that digests starch.", "a": "Amylase." },
-      { "q": "What colour does iodine turn when starch is present?", "a": "Blue-black." },
-      { "q": "What happens to a denatured enzyme's active site?", "a": "The active site permanently changes shape — the substrate no longer fits." }
+      {
+        "q": "Name the enzyme that digests starch.",
+        "a": "Amylase."
+      },
+      {
+        "q": "What colour does iodine turn when starch is present?",
+        "a": "Blue-black."
+      },
+      {
+        "q": "What happens to a denatured enzyme's active site?",
+        "a": "The active site permanently changes shape — the substrate no longer fits."
+      }
     ],
     "reaching": [
       {
@@ -335,11 +438,27 @@
   "worksheetExtras": {
     "referenceData": {
       "note": "Model class results — use if your own data is anomalous",
-      "headers": ["Temperature (°C)", "Time for colour change (s)", "Rate (s⁻¹)"],
+      "headers": [
+        "Temperature (°C)",
+        "Time for colour change (s)",
+        "Rate (s⁻¹)"
+      ],
       "rows": [
-        [20, 120, "0.0083"],
-        [37, 40, "0.0250"],
-        [60, 180, "0.0056"]
+        [
+          20,
+          120,
+          "0.0083"
+        ],
+        [
+          37,
+          40,
+          "0.0250"
+        ],
+        [
+          60,
+          180,
+          "0.0056"
+        ]
       ]
     }
   }
