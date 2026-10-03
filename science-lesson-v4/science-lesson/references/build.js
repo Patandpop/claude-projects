@@ -159,7 +159,8 @@ function mcqOptions(o) {                         // array or {A..D} → {A..D}
   if (Array.isArray(o)) {
     const out = {};
     ['A', 'B', 'C', 'D'].forEach((L, i) => {
-      out[L] = String(o[i] == null ? '' : o[i]).replace(/^[A-D][.):]\s*/i, '');
+      // Strip an authored "A." / "B)" label — but not an abbreviation: "A.C. current", "d.c. supply"
+      out[L] = String(o[i] == null ? '' : o[i]).replace(/^[A-D][.):]\s*(?![A-Za-z]\.)/i, '');
     });
     return out;
   }
@@ -182,11 +183,9 @@ const _SYM = {
 };
 const _GREEK = _SYM; // back-compat alias — anything that referenced _GREEK still works
 
-/* normSym(str) — plain-text symbol normaliser for PROSE sinks (reviewRow,
-   indicative content, handwriting model answers). Converts \cmd tokens and a
-   SMALL, SAFE whitelist of unit/operator WORDS to symbols. Structure (^ _ {}/
-   sqrt) is NOT touched here — that is parseEq's job. Unknown text passes through. */
-function normSym(str) {
+/* symCmds(str) — \cmd tokens → symbols (\times → ×, \rho → ρ), plus the Bug 61
+   repair. Safe on ANY text: only backslash commands are touched. */
+function symCmds(str) {
   let s = String(str == null ? '' : str);
   // Bug 61: JSON authored with a SINGLE backslash ("\rho") arrives mangled — JSON.parse
   // turns \r into a carriage return, so the renderer sees CR+"ho" and the symbol is lost.
@@ -202,17 +201,31 @@ function normSym(str) {
     }
     return m;
   });
-  s = s.replace(/\\([A-Za-z]+)/g, (_, g) => _SYM[g] || `\\${g}`);
-  // Compound units first (longest match wins), then operators, then bare units.
-  s = s
-    .replace(/\b(?:met(?:er|re)s?)\s*(?:\/|per)\s*second\b/gi, 'm/s')
-    .replace(/\bmet(?:er|re)s?\b/gi, 'm')
-    .replace(/\bseconds\b/gi, 's')
-    .replace(/\bdivided by\b/gi, '÷')
-    .replace(/\bdivide\b/gi, '÷')
-    .replace(/\btimes\b/gi, '×');
-  return s;
+  return s.replace(/\\([A-Za-z]+)/g, (_, g) => _SYM[g] || `\\${g}`);
 }
+
+/* wordSwaps(str) — unit/operator WORDS → symbols, but ONLY in a maths context
+   (2026-10-03, Patryk): units directly after a number ("100 metres" → "100 m"),
+   "times" / "divided by" only between operands ("V = I times R", "12 divided by 3").
+   Before this, every "times"/"seconds"/"metre" was swapped, so prose broke:
+   "repeat three times" → "three ×", "a few seconds later" → "a few s later". */
+const _OP_L = String.raw`(?<=(?:\d|\)|(?<![A-Za-z])[A-Za-z])\s*)`;   // left operand: digit, ")" or a lone letter
+const _OP_R = String.raw`(?=\s*(?:\d|\(|[A-Za-z](?![A-Za-z])))`;     // right operand: digit, "(" or a lone letter
+const _RE_TIMES   = new RegExp(_OP_L + String.raw`\btimes\b` + _OP_R, 'gi');
+const _RE_DIVBY   = new RegExp(_OP_L + String.raw`\bdivided by\b` + _OP_R, 'gi');
+function wordSwaps(str) {
+  return String(str == null ? '' : str)
+    .replace(/(\d)(\s*)met(?:er|re)s?\s*(?:\/|per)\s*second\b/gi, '$1$2m/s')   // compound unit first
+    .replace(/(\d)(\s*)met(?:er|re)s?\b/gi, '$1$2m')
+    .replace(/(\d)(\s*)seconds?\b/gi, '$1$2s')
+    .replace(_RE_DIVBY, '÷')
+    .replace(_RE_TIMES, '×');
+}
+
+/* normSym(str) — plain-text symbol normaliser for PROSE sinks (reviewRow,
+   indicative content, handwriting model answers) and equation fields (parseEq).
+   Structure (^ _ {}/ sqrt) is NOT touched here — that is parseEq's job. */
+function normSym(str) { return wordSwaps(symCmds(str)); }
 
 /* unicodeScript(str) — plain-text super/subscript for PROSE sinks that render
    flat strings (no run-level super/superscript). Converts x^2 / x^{2} → x²,
