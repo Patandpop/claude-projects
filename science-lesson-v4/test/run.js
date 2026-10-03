@@ -32,6 +32,7 @@ const FIXTURES = [
   'y7-b1-l1-mrs-gren.json',   // KS3 standard lesson; no-word-bank / basic flow
   'review-answers-test.json', // review lesson; answer sheet (GUESS + indicative frameworks), Bug 56 single-tier
   'flow-native-test.json',    // Bug 54: native flow/cycle shapes (Learn-G/I) + Bug 58 image-description placeholder
+  'maths-prose-test.json',    // 2026-10-03: maths shorthand in ordinary text, prose word swaps, MCQ abbreviations
   'triangle-handwriting-test.json', // 2026-10-02: 3- and 4-cell formula triangles, picture handwriting, EOT font embed, curved graph
 ];
 
@@ -371,6 +372,40 @@ function main() {
     // imageDescription (never the generic "add imageDescription" placeholder).
     // Scoped to this fixture because it authors a description on every image
     // slot; legacy fixtures still carry description-less placeholders by design.
+    // 2026-10-03: maths shorthand (^ _ {a/b} \cmd) typesets in EVERY text field, word
+    // swaps only happen next to numbers, and MCQ abbreviations survive. Text is read per
+    // paragraph with runs joined, so a raised "2" reads as "v2" and a raw one as "v^2".
+    if (fixture === 'maths-prose-test.json') {
+      const base = baseName(lessons[0].meta);
+      const paras = (file) => {
+        const z = new AdmZip(file);
+        return z.getEntries().filter(e => /(slides\/slide\d+|word\/document)\.xml$/.test(e.entryName))
+          .flatMap(e => e.getData().toString('utf8').split(/<\/a:p>|<\/w:p>/)
+            .map(p => (p.match(/<(?:a|w):t[^>]*>[^<]*</g) || []).map(t => t.replace(/^<[^>]+>/, '').slice(0, -1)).join('')))
+          .join('\n');
+      };
+      const pptx = path.join(outDir, base + '.pptx'), wsx = path.join(outDir, base + '_worksheet.docx');
+      if (!fs.existsSync(pptx) || !fs.existsSync(wsx)) { fail('maths-prose outputs missing'); }
+      else {
+        const slides = paras(pptx), sheet = paras(wsx), xml = readArchiveXml(pptx);
+        const raw = ['^2', '_2O', 'CO_2', '{1/2}', '10^3', '\rho', 'kg/m^3', 'kg⁄m^3'].filter(n => slides.includes(n) || sheet.includes(n));
+        if (!raw.length) pass('no raw maths shorthand left on slides or worksheet');
+        else fail('raw maths shorthand survived: ' + raw.join(' '));
+        if (/baseline="30000"/.test(xml) && /baseline="-\d+"/.test(xml)) pass('slide text uses real raised and lowered runs (v², H₂O)');
+        else fail('no superscript/subscript runs on the slides — prose maths not typeset');
+        if (slides.includes('1⁄2 of the mass')) pass('{1/2} in prose becomes a diagonal 1⁄2');
+        else fail('{1/2} in a Learn box did not become 1⁄2');
+        if (slides.includes('kg⁄m³')) pass('GUESS row units: kg/m^3 → kg⁄m³');
+        else fail('GUESS row kg/m^3 not typeset (power inside the fraction)');
+        const keep = ['three times', 'A few seconds later the metre stick fell', 'Divide the class', 'A.C. current', 'd.c. supply', 'clip_2'];
+        const lost = keep.filter(k => !slides.includes(k));
+        if (!lost.length) pass('ordinary words, MCQ abbreviations and links are left alone');
+        else fail('text was wrongly changed: ' + lost.join(' | '));
+        // Word swaps belong to question/answer text (prettyText), not to every text box.
+        if (sheet.includes('100 m in 12 s') && sheet.includes('V = I × R')) pass('word swaps still apply next to numbers/operands (Apply question)');
+        else fail('"100 metres in 12 seconds" / "I times R" no longer converted in the Apply question');
+      }
+    }
     if (fixture === 'flow-native-test.json') {
       const pptx = path.join(outDir, baseName(lessons[0].meta) + '.pptx');
       if (!fs.existsSync(pptx)) { fail('flow-native pptx missing'); }

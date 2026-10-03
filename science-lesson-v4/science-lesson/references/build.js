@@ -251,6 +251,61 @@ function unicodeScript(str) {
    use parseEq → toPptxRuns/toDocxRuns). */
 function prettyText(str) { return unicodeScript(normSym(str)); }
 
+/* proseMathSegs(str) — maths shorthand in ORDINARY text (2026-10-03). Before this,
+   only equation fields and a few prose sinks converted it, so ~100 slide fields
+   (Learn boxes, comparison rows, MCQ options, Engage hook...) showed raw "v^2",
+   "H_2O", "{1/2}". Returns [{t:'text'|'sup'|'sub', v}] or null when nothing to do.
+   - \cmd → symbol (symCmds); {a/b} → diagonal a⁄b (same glyph as toPptxRuns)
+   - ^x / _x: x is a number ("v^2", "10^-3"), one letter ("x^n"), "+"/"-" after ^
+     ("Na^+"), or braced ("SO_{4}", "x^{2n}")
+   - a bare "/" is left alone ("and/or", "m/s"); no word swaps here
+   - links and file names are never touched */
+function proseMathSegs(str) {
+  const s0 = String(str == null ? '' : str);
+  if (!/[\^_{}\\\r\n\t\b\f]/.test(s0)) return null;
+  if (/:\/\/|www\.|\.(?:png|jpe?g|gif|pdf|pptx|docx)\b/i.test(s0)) return null;
+  const s = symCmds(s0);
+  const segs = [];
+  let buf = '', i = 0;
+  const push = (t, v) => { if (t === 'text') { buf += v; return; } if (buf) { segs.push({ t: 'text', v: buf }); buf = ''; } segs.push({ t, v }); };
+  const braced = (at) => {                     // s[at] === '{' → [inner, indexAfter] or null
+    let d = 1, j = at + 1;
+    while (j < s.length && d > 0) { if (s[j] === '{') d++; else if (s[j] === '}') d--; j++; }
+    return d === 0 ? [s.slice(at + 1, j - 1), j] : null;
+  };
+  while (i < s.length) {
+    const ch = s[i];
+    if (ch === '{') {
+      const b = braced(i), m = b && /^([^{}/]+)\/([^{}/]+)$/.exec(b[0]);
+      if (m) { push('text', unicodeScript(m[1]) + '⁄' + unicodeScript(m[2])); i = b[1]; continue; }
+    }
+    if ((ch === '^' || ch === '_') && /[A-Za-z0-9)\]]$/.test(buf || (segs.length ? 'x' : ''))) {
+      let arg = null, next = i + 1;
+      if (s[next] === '{') { const b = braced(next); if (b && b[0]) { arg = b[0]; next = b[1]; } }
+      else {
+        const m = /^-?\d+(?:\.\d+)?/.exec(s.slice(next))
+          || (/^[A-Za-z](?![A-Za-z])/.exec(s.slice(next)))
+          || (ch === '^' && /^[+-](?![\dA-Za-z])/.exec(s.slice(next)));
+        if (m) { arg = m[0]; next += m[0].length; }
+      }
+      if (arg != null) { push(ch === '^' ? 'sup' : 'sub', arg); i = next; continue; }
+    }
+    push('text', ch); i++;
+  }
+  if (buf) segs.push({ t: 'text', v: buf });
+  const changed = segs.length !== 1 || segs[0].t !== 'text' || segs[0].v !== s0;
+  return changed ? segs : null;
+}
+
+/* proseMathPlain(str) — same pass for sinks that need ONE flat string (Word runs):
+   sub/superscripts become Unicode ² ₂ where every character has one, else stay raw. */
+function proseMathPlain(str) {
+  const segs = proseMathSegs(str);
+  if (!segs) return String(str == null ? '' : str);
+  return segs.map(sg => sg.t === 'text' ? sg.v
+    : unicodeScript((sg.t === 'sup' ? '^{' : '_{') + sg.v + '}')).join('');
+}
+
 function parseEq(raw) {
   if (!raw) return [{t:'text',v:''}];
   // 2026-07-05: normSym first — equation FIELDS now also convert word operators
@@ -289,7 +344,7 @@ function parseEq(raw) {
         i++;
         const ds=i; while (i < s.length && !/[\s=+\-()]/.test(s[i])) i++;
         const den = s.slice(ds,i);
-        segs.push(den && num ? {t:'frac',num,den} : {t:'text',v:num+'/'+den});
+        segs.push(den && num ? {t:'frac',num:unicodeScript(num),den:unicodeScript(den)} : {t:'text',v:num+'/'+den}); // kg/m^3 → kg⁄m³ (2026-10-03)
       } else { segs.push({t:'text',v:'/'}); i++; }
       continue;
     }
@@ -298,7 +353,7 @@ function parseEq(raw) {
       while (j < s.length && d>0) { if(s[j]==='{') d++; else if(s[j]==='}') d--; j++; }
       const inner = s.slice(i+1, j-1); i=j;
       const si = inner.indexOf('/');
-      if (si > 0 && si < inner.length-1) { flush(); segs.push({t:'frac',num:inner.slice(0,si).trim(),den:inner.slice(si+1).trim()}); }
+      if (si > 0 && si < inner.length-1) { flush(); segs.push({t:'frac',num:unicodeScript(inner.slice(0,si).trim()),den:unicodeScript(inner.slice(si+1).trim())}); }
       else { buf += inner; }
       continue;
     }
@@ -452,7 +507,7 @@ function markupToPptxRuns(raw, baseOpts) {
 // DOCX twin — same rule: underline ONLY marks a word that MUST be used.
 function markupToDocxRuns(raw, baseOpts) {
   return parseMarkup(raw).map((seg) => new TextRun(Object.assign({}, baseOpts,
-    { text: seg.text },
+    { text: proseMathPlain(seg.text) },   // maths shorthand, same as R()
     seg.underline ? { underline: {} } : {},
     seg.bold ? { bold: true } : {})));
 }
@@ -462,7 +517,47 @@ function markupToDocxRuns(raw, baseOpts) {
    ========================================================================= */
 
 function txt(slide, content, o) {
-  slide.addText(content, Object.assign({ fontFace: FONT }, o));
+  slide.addText(proseMathRuns(content), Object.assign({ fontFace: FONT }, o));
+}
+
+/* proseMathRuns(content) — every slide text box passes through here (via txt), so
+   maths shorthand typesets in ANY field: real super/subscript runs in the box's own
+   font (Patryk 2026-10-03). Runs that are already equations (Cambria Math from
+   toPptxRuns) or already raised/lowered are left exactly as they are. */
+function proseMathRuns(content) {
+  const toRuns = (text, opts) => {
+    const segs = proseMathSegs(text);
+    if (!segs) return null;
+    const base = opts || {};
+    const runs = segs.map(sg => ({
+      text: sg.v,
+      options: Object.assign({}, base, { breakLine: false },
+        sg.t === 'sup' && { superscript: true }, sg.t === 'sub' && { subscript: true }),
+    }));
+    // A line break belongs after the LAST piece only, never mid-equation.
+    runs[runs.length - 1].options.breakLine = !!base.breakLine;
+    runs.forEach(r => { if (!r.options.breakLine) delete r.options.breakLine; });
+    return runs;
+  };
+  if (typeof content === 'string') return toRuns(content) || content;
+  if (!Array.isArray(content)) return content;
+  return content.flatMap(run => {
+    if (!run || typeof run.text !== 'string') return [run];
+    const op = run.options || {};
+    if (op.fontFace === FONT_MATH || op.superscript || op.subscript) return [run];
+    return toRuns(run.text, op) || [run];
+  });
+}
+
+/* table(slide, rows, opts) — addTable with the same maths pass on every cell
+   (Learn A boxes, Learn C revision tables, reference data are tables, not txt()). */
+function table(slide, rows, opts) {
+  const cellMath = (cell) => {
+    if (typeof cell === 'string') return proseMathSegs(cell) ? { text: proseMathRuns(cell) } : cell;
+    if (cell && cell.text != null) return Object.assign({}, cell, { text: proseMathRuns(cell.text) });
+    return cell;
+  };
+  slide.addTable(rows.map(r => r.map(cellMath)), opts);
 }
 
 /* navBar(stage) — 6 equal tabs, TOP strip. Active = stage fill + WHITE text. */
@@ -577,7 +672,7 @@ function navyHeaderBox(slide, x, y, w, headerText, bodyLines, bodyH) {
   const bodyText = arr(bodyLines).map((l, i) => ({
     text: String(l), options: { breakLine: true, paraSpaceAfter: 4 },
   }));
-  slide.addTable([
+  table(slide, [
     [{ text: headerText, options: { fill: { color: NAVY }, color: 'FFFFFF', bold: true, fontSize: 22, border, valign: 'middle' } }],
     [{ text: bodyText, options: { fill: { color: 'FFFFFF' }, color: '1A1A2E', fontSize: autoFontSize(arr(bodyLines).join(' '), w, Math.max(0.4, (bodyH || 1.2) - 0.65), { min: 11, max: 20 }), border, valign: 'top' } }],
   ], { x, y, w, colW: [w], rowH: [0.65, Math.max(0.4, (bodyH || 1.2) - 0.65)], fontFace: FONT, margin: 0.06, autoPage: false });
@@ -1497,7 +1592,7 @@ function slideLearn(pptx, L, item) {
           return [{ text: r.q || '', options: { fill: { color: fill }, fontSize: 10 } },
                   { text: String(r.pages || ''), options: { fill: { color: fill }, fontSize: 10, align: 'center' } }];
         }));
-      s.addTable(trows, { x, y, w, colW: [w * 0.72, w * 0.28], fontFace: FONT, border: { type: 'solid', pt: 0.5, color: 'BBBBBB' }, margin: 0.04, autoPage: false });
+      table(s, trows, { x, y, w, colW: [w * 0.72, w * 0.28], fontFace: FONT, border: { type: 'solid', pt: 0.5, color: 'BBBBBB' }, margin: 0.04, autoPage: false });
     };
     // Bug 56: two tiers → side-by-side; a single tier → one full-width table (no forced blank column).
     if (hasCore && hasExt) {
@@ -2185,7 +2280,7 @@ function slidePractical(pptx, L, item) {
     if (headers.length) tRows.push(headers.map((h) => ({ text: String(h), options: { fill: { color: NAVY }, color: AMBER, bold: true, fontSize: 18, border: ab(AMBER), valign: 'middle', align: 'center' } })));
     rd.rows.forEach((row) => tRows.push(arr(row).map((cell) => ({ text: String(cell == null ? '' : cell), options: { fill: { color: 'FFFFFF' }, color: NAVY, fontSize: 18, border: ab(NAVY), valign: 'middle', align: 'center' } }))));
     const rowH3 = Math.max(0.55, (BOT_Y - 0.08 - y3) / Math.max(1, tRows.length));
-    s3.addTable(tRows, { x: MX, y: y3, w: CW, colW, rowH: Array(tRows.length).fill(rowH3), fontFace: FONT, margin: 0.06, autoPage: false });
+    table(s3, tRows, { x: MX, y: y3, w: CW, colW, rowH: Array(tRows.length).fill(rowH3), fontFace: FONT, margin: 0.06, autoPage: false });
     bottomBar(s3, obj);
   }
 }
@@ -2998,7 +3093,7 @@ function slideGraphWithData(pptx, L, item) {                    // M5
   if (headers.length) tRows.push(headers.map((h) => ({ text: String(h), options: { fill: { color: NAVY }, color: AMBER, bold: true, fontSize: 15, border: ab(AMBER), valign: 'middle', align: 'center' } })));
   rd.rows.forEach((row) => tRows.push(arr(row).map((cell) => ({ text: String(cell == null ? '' : cell), options: { fill: { color: 'FFFFFF' }, color: NAVY, fontSize: 15, border: ab(NAVY), valign: 'middle', align: 'center' } }))));
   const rowH = Math.max(0.45, availH / Math.max(1, tRows.length));
-  s.addTable(tRows, { x: MX, y, w: halfW, colW, rowH: Array(tRows.length).fill(rowH), fontFace: FONT, margin: 0.06, autoPage: false });
+  table(s, tRows, { x: MX, y, w: halfW, colW, rowH: Array(tRows.length).fill(rowH), fontFace: FONT, margin: 0.06, autoPage: false });
   if (pngPath) {
     s.addImage({ path: pngPath, x: gX, y, w: halfW, h: availH }); // right: compact graph
   } else {
@@ -3581,7 +3676,8 @@ const DIVIDER_THEME = {
 };
 
 const P = (children, opts) => new Paragraph(Object.assign({ children: arr(children) }, opts || {}));
-const R = (text, opts) => new TextRun(Object.assign({ text: String(text) }, opts || {}));
+// Every worksheet run: maths shorthand → Unicode ² ₂ a⁄b (one run per call, 70 call sites).
+const R = (text, opts) => new TextRun(Object.assign({ text: proseMathPlain(text) }, opts || {}));
 // M6: standardised paragraph-spacing scale (twips) — replaces the previous scattered
 // 0/10/20/30/40/60/80/120/160 mix. Line spacing (1.5x, BDA rule) is untouched — see ~L2745.
 const GAP_NONE = 0;   // tightly-grouped lines within one scaffold block
