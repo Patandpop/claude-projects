@@ -108,22 +108,26 @@ This makes the button download your order sheet in exactly the layout the techni
 
 | To... | Do this |
 |---|---|
-| change a lesson | click it, type a few letters in the box on the right (e.g. "heart"), press **Enter**. ★ marks the next lesson in order |
-| add a lesson in an empty period | click the empty period, pick the class, type, **Enter** |
-| move a lesson | drag it onto another slot; it asks: shift that class's later lessons along / swap / move just this one |
-| make it a test / cover / clear it | buttons under the lesson search |
-| fix equipment | edit it, tick **remember for this lesson** to make it the default from now on, then **Apply changes** |
-| carry unfinished work | **Review not finished → next lesson** (shows as "+1 carry" on the next lesson and goes into its build prompt) |
+| change a lesson | click it. **Choose the lesson** on the right lists every lesson of its topic in order: green tick = taught (with the date and what you wrote), blue day = planned this week, gold star = what belongs here. Click one. That class's later lessons this week move along, so nothing is skipped |
+| look in another topic | the topic box above the list, or type in the search box to search all of them |
+| fix the record | tick a lesson you taught that wasn't recognised (or won't teach); untick one that was wrongly matched and it gets planned again |
+| technician details | always on show above the list; they save as soon as you click out of a box. Tick **use this every time** to make your version the default |
+| didn't finish a lesson | click it, then **Didn't finish: continue next lesson** |
+| cover | **Cover** asks: cover work for this lesson (counts as taught), or something else (the lesson moves on) |
+| add a lesson in an empty period | click the empty period, pick the class, click the lesson |
+| move a lesson | drag it onto another slot, then **Move it here** or **Swap the two**. Whatever was there moves on, never disappears |
+| make it a test / clear it | buttons under the technician details. If a test would leave lessons untaught, it lists them first |
+| carry part of a lesson | **Notes and carry-over → Review not finished → next lesson** (shows as "+1 carry" and goes into its build prompt) |
 | add a task, tests to mark, a meeting | hover the **All day** row under a day → **+ task / marking / meeting** (click a chip to remove it) |
 | see your Google Calendar | **⋯ More → Show my calendar** shows your meetings in the All day row (read only) |
 | put lessons in Google Calendar | **⋯ More → Send this week to Google Calendar**: writes the week into a separate calendar called "Lessons (Planner)". Sending again replaces that week; your main calendar is never changed |
 | undo | **Undo**, Ctrl+Z, or the Undo link in the black bar at the bottom |
-| save | **Save** or Ctrl+S. A gold dot means unsaved changes; the page warns you before leaving |
+| save | nothing to do: changes save by themselves ("All changes saved", top right). Ctrl+S saves straight away |
 | jump to a date | the date box in the top bar, **Today**, or ◀ ▶ |
 | one day only | **Day**, or click a day's name. **Week** goes back |
 | shortcuts | press **?** |
 
-Flags on a lesson: **CHECK** means the equipment is a guess; **NOT BUILT** means the Drive folder has no slides yet; **DOUBLE** means the second half of a double lesson.
+Flags on a lesson: **MISSED** = skipped earlier in this topic; **CHECK** = the equipment is a guess; **NOT BUILT** = the Drive folder has no slides yet; **NO FOLDER** = the technician guide lists it but Drive has no folder; **COVER** = cover work for this lesson; **DOUBLE** = the second half of a double lesson.
 
 ## When things change
 

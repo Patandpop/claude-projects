@@ -51,9 +51,9 @@ const callout = (s, num, x, y) => {
     s.addText(text, { x: x + 0.25, y: 2.25, w: 3.45, h: 2.9, fontFace: FONT, fontSize: 15, color: INK, valign: 'top' });
   };
   box(0.45, '1. Plans each lesson', 'It knows every class\'s lessons in order and which ones you\'ve already taught (from your Planner.xlsx). Each period gets the next lesson, and lessons you missed in the topic you\'re on come first.');
-  box(4.69, '2. Lets you change it', 'Click to swap a lesson, drag to move one, add tasks and meetings. Undo anything. Save when you\'re happy and next week carries on from it.');
+  box(4.69, '2. Lets you change it', 'Click a lesson to see its whole topic and pick another, drag to move one, add tasks and meetings. Undo anything. Changes save by themselves and next week carries on from them.');
   box(8.93, '3. Makes the paperwork', 'Equipment per lesson for the technicians (Excel to email), a print list, your lessons in Google Calendar, and a build prompt for claude.ai.');
-  body(s, 'It never goes back to a topic you\'ve finished, never suggests ICT, and counts a double lesson as one lesson.', { x: 0.45, y: 5.65, w: 12.4, h: 0.8, fontSize: 16, color: MUTED, italic: true });
+  body(s, 'It never skips a lesson without telling you, never goes back to a topic you\'ve finished, never suggests ICT, and counts a double lesson as one lesson.', { x: 0.45, y: 5.65, w: 12.4, h: 0.8, fontSize: 16, color: MUTED, italic: true });
 }
 
 /* 3 — screen at a glance */
@@ -64,9 +64,9 @@ const callout = (s, num, x, y) => {
   body(s, bullets([
     ['1', 'Today, ◀ ▶ and the date box move between weeks.'],
     ['2', 'Week / Day / Classes switch what you see.'],
-    ['3', 'Undo and Save. "⋯ More" holds everything else.'],
+    ['3', 'Undo, and whether your changes are saved (they save by themselves). "⋯ More" holds everything else.'],
     ['4', 'The grid: days across, periods down, real times on the left (top KS3/Y9, bottom KS4/5 where they differ).'],
-    ['5', 'The side panel: help when nothing is selected, the lesson\'s details when one is.'],
+    ['5', 'The side panel: help when nothing is selected; the lesson, its technician details and its whole topic when one is.'],
   ], 14), { x: 9.25, y: 1.15, w: 3.8, h: 5.9 });
 }
 
@@ -81,6 +81,8 @@ const callout = (s, num, x, y) => {
     ['MISSED', 'a lesson you skipped earlier in this topic. The planner fills these in first.'],
     ['CHECK', 'the equipment is a guess. Open the lesson and fix it.'],
     ['NOT BUILT', 'the Drive folder has no slides yet, so build it before Monday.'],
+    ['NO FOLDER', 'the technician guide lists this lesson but Drive has no folder for it.'],
+    ['COVER', 'cover work for this lesson (it counts as taught).'],
     ['DOUBLE', 'the second half of a double lesson (same lesson, one event).'],
     ['+1 carry', 'something carried over from last lesson (e.g. unfinished review).'],
     ['Red block', 'an end-of-topic test. Orange: cover. Dashed: free.'],
@@ -89,15 +91,14 @@ const callout = (s, num, x, y) => {
 
 /* 5 — changing a lesson */
 {
-  const s = slide('Changing a lesson', 'click, type, Enter');
+  const s = slide('Changing a lesson', 'the whole topic, in order');
   shot(s, 'week', 0.45, 1.1, 8.6);
   body(s, bullets([
-    ['1. Click the lesson', 'it gets a gold outline and its details open on the right.'],
-    ['2. Type a few letters', 'e.g. "heart" in "Change lesson". The list shows that class\'s lessons; ★ is the next one in order.'],
-    ['3. Press Enter', 'or click a lesson in the list. Done.'],
-    ['Buttons', 'Test makes it the end-of-topic test, Cover asks what they\'ll do, Clear frees the period.'],
-    ['Finished topics', 'never appear in the list.'],
-  ], 14), { x: 9.25, y: 1.15, w: 3.8, h: 5.9 });
+    ['1. Click the lesson', '"Choose the lesson" on the right lists EVERY lesson of its topic, in order.'],
+    ['Each row tells you', 'green ✓ = taught (with the date and what you wrote in Planner.xlsx); a blue day = planned this week; ★ next = what belongs here; plain = still to teach.'],
+    ['2. Click a lesson', 'to put it in this period. That class\'s later lessons this week move along, so the one you replaced is not lost.'],
+    ['Other topics', 'pick one in the topic box, or type in the search box to search them all.'],
+  ], 13), { x: 9.25, y: 1.15, w: 3.8, h: 5.9 });
 }
 
 /* 6 — technician details */
@@ -105,12 +106,11 @@ const callout = (s, num, x, y) => {
   const s = slide('Equipment, printing and books', 'for the technicians');
   shot(s, 'tech', 0.45, 1.1, 8.6);
   body(s, bullets([
-    ['Open "For the technicians"', 'under the lesson. It opens by itself when the equipment is a guess.'],
-    ['Equipment', 'comes from the topic\'s technician guide on Drive, or your past orders.'],
-    ['Sets', 'sets of 3, pairs (anything with heat or acid) or demo.'],
-    ['Remember for this lesson', 'tick it and your fix becomes the default every time this lesson comes round.'],
-    ['Add textbook', 'fills in the page numbers.'],
-    ['Save these details', 'keeps the changes.'],
+    ['Always on show', 'straight under the lesson name, no scrolling. Top right says where it came from; "a guess: check it" in orange means fix it.'],
+    ['Equipment', 'from the topic\'s technician guide on Drive, or your past orders.'],
+    ['Sets / Printing / Textbooks', 'sets of 3, pairs (heat or acid) or demo; "+ pages" fills in the textbook pages.'],
+    ['Saves itself', 'as soon as you click out of a box.'],
+    ['Use this every time', 'tick it and your version becomes the default whenever this lesson comes round.'],
   ], 14), { x: 9.25, y: 1.15, w: 3.8, h: 5.9 });
 }
 
@@ -119,10 +119,9 @@ const callout = (s, num, x, y) => {
   const s = slide('Moving lessons', 'drag and drop');
   shot(s, 'move', 0.45, 1.1, 8.6);
   body(s, bullets([
-    ['Drag a lesson', 'onto another period. It always asks what you want:'],
-    ['Shift along', '(same class only) the lesson moves and that class\'s later lessons this week each move one slot on.'],
+    ['Drag a lesson', 'onto another period. It asks:'],
+    ['Move it here', 'the lesson moves; that class\'s other lessons this week move along in order. If the period belonged to another class, that class\'s lesson moves to its next free period. Nothing is lost.'],
     ['Swap the two', 'the two periods trade lessons.'],
-    ['Move just this one', 'only this lesson moves; its old period becomes free.'],
     ['Onto an empty period', 'it just moves there.'],
     ['Changed your mind?', 'Undo in the black bar at the bottom, the Undo button, or Ctrl+Z.'],
   ], 14), { x: 9.25, y: 1.15, w: 3.8, h: 5.9 });
@@ -144,13 +143,25 @@ const callout = (s, num, x, y) => {
 {
   const s = slide('When a lesson doesn\'t finish', 'carry it over');
   body(s, bullets([
-    ['1.', 'Click the lesson that didn\'t finish.'],
-    ['2.', 'Open "Notes and carry-over".'],
-    ['3.', 'Click "Review not finished → next lesson" (or "Homework to collect → next lesson").'],
-    ['What happens', 'that class\'s next lesson this week shows "+1 carry", and its build prompt tells claude.ai to put the unfinished part straight after the Do Now.'],
+    ['Whole lesson to finish', 'click it, then "Didn\'t finish: continue next lesson". It goes into that class\'s next period too, and the rest of the week moves along.'],
+    ['Just the review section', 'open "Notes and carry-over", then "Review not finished → next lesson" (or "Homework to collect → next lesson").'],
+    ['What happens', 'that class\'s next lesson shows "+1 carry", and its build prompt tells claude.ai to put the unfinished part straight after the Do Now.'],
     ['No later lesson this week?', 'it tells you; add it as a note on next week\'s first lesson instead.'],
-    ['Copy build prompt', '(under "More" in the panel) copies a ready prompt for claude.ai: class, topic, lesson, Drive folder, carry-overs and notes.'],
+    ['Copy build prompt', '(button under the technician details) copies a ready prompt for claude.ai: class, topic, lesson, Drive folder, carry-overs and notes.'],
   ], 17), { x: 0.6, y: 1.3, w: 12.1, h: 5.8 });
+}
+
+/* 9b — nothing skipped */
+{
+  const s = slide('Making sure no lesson is skipped', 'the safety net');
+  body(s, bullets([
+    ['Complete lists', 'every lesson folder on Drive is in the list, however it is named, plus lessons the technician guide lists that have no folder yet (NO FOLDER). A check fails if one ever goes missing.'],
+    ['Replacing moves, never deletes', 'when you put a different lesson in a period, cover with something else, clear it, or drag, the lesson that was there moves to the class\'s next period.'],
+    ['Cover', 'asks: cover work for THIS lesson (counts as taught), or something else (the lesson moves on).'],
+    ['It warns you', 'before a test, or a jump to the next topic, would leave lessons untaught. It lists them; Cancel keeps them.'],
+    ['Ticks fix the record', 'tick a lesson you taught that wasn\'t recognised, or one you won\'t teach. Untick one that was wrongly matched: it gets planned again.'],
+    ['After the first week', 'weeks in the planner are exact, so from then on it simply carries on in order. Only the old Planner.xlsx weeks involve reading your handwriting-style entries.'],
+  ], 16), { x: 0.6, y: 1.25, w: 12.1, h: 6.0 });
 }
 
 /* 10 — classes view */
@@ -160,9 +171,9 @@ const callout = (s, num, x, y) => {
   body(s, bullets([
     ['Click Classes', '(or press C).'],
     ['One card per class', 'its current topic and the next one.'],
-    ['Each topic', 'lesson numbers: green = taught, gold outline = still to teach in the topic you\'re on.'],
-    ['Finished topics', 'stay listed so you can see what was missed, but they\'re never planned again.'],
-    ['Hover a number', 'to see the lesson title.'],
+    ['Each topic', 'green = taught, gold outline = still to teach in the topic you\'re on, dashed = optional.'],
+    ['Red, crossed out', 'never taught, in a topic you have finished. If you did teach it, tick it in the lesson list.'],
+    ['Hover a number', 'to see the title, when it was taught and what you wrote.'],
   ], 14), { x: 9.25, y: 1.15, w: 3.8, h: 5.9 });
 }
 
@@ -202,6 +213,7 @@ const callout = (s, num, x, y) => {
     ['Tests', 'when a topic\'s lessons are all done it suggests "revision or end-of-topic test"; after a revision lesson it suggests the TEST.'],
     ['Doubles', 'two periods in a row for the same class are one lesson.'],
     ['Holidays and INSET', 'no lessons (your 2026-27 dates). Week A/B carries on across holidays.'],
+    ['Optional lessons', 'folders marked (Optional), DIRT and formative assessments are in the list but only taught if you pick them.'],
     ['No ICT', 'ICT, Chromebook or IT-room suggestions are removed from the equipment.'],
     ['Reading your Planner.xlsx', 'it understands your spellings ("Specifc", "Lifecylce"), abbreviations (TIR, PAG) and "Cover:" entries.'],
   ], 18), { x: 0.6, y: 1.25, w: 12.1, h: 6.0 });
@@ -215,10 +227,10 @@ const callout = (s, num, x, y) => {
     ['2. Glance at the flags', 'MISSED, CHECK, NOT BUILT and test slots.'],
     ['3. Adjust', 'click to change, drag to move, add tasks and marking.'],
     ['4. Fix equipment', 'for any CHECK lesson; tick "remember" so it\'s right next year.'],
-    ['5. Save', '(Ctrl+S).'],
+    ['5. Nothing to save', 'it saves as you go (top right says "All changes saved").'],
     ['6. ⋯ More → Technicians\' Excel', 'and email it.'],
     ['7. ⋯ More → Send to Google Calendar', 'if you want it on your phone.'],
-    ['8. Build the lessons', 'NOT BUILT ones first: click → More → Copy build prompt → paste into claude.ai.'],
+    ['8. Build the lessons', 'NOT BUILT ones first: click the lesson, Copy build prompt, paste into claude.ai.'],
   ], 17), { x: 0.6, y: 1.25, w: 12.1, h: 6.0 });
 }
 

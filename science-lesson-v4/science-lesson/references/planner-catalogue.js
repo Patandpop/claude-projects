@@ -58,7 +58,7 @@ const singular = (w) => (w.length <= 4 ? w : /ies$/.test(w) ? w.slice(0, -3) + '
 const SYN = {
   tir: 'total internal reflection', snell: 'refractive index', snells: 'refractive index', em: 'electromagnetic',
   shc: 'specific heat capacity', gpe: 'gravitational potential energy', ke: 'kinetic energy',
-  anerobic: 'anaerobic', gases: 'gas air', gas: 'gas air', microwaves: 'microwave electromagnetic', microwave: 'microwave electromagnetic',
+  ohms: 'ohm', live: 'life', anerobic: 'anaerobic', gases: 'gas air', gas: 'gas air', microwaves: 'microwave electromagnetic', microwave: 'microwave electromagnetic',
 };
 const toks = (s) => String(s || '').toLowerCase().replace(/^\s*cover\s*:\s*/, '').replace(/[^a-z0-9 ]+/g, ' ')
   .split(/\s+/).flatMap((w) => (SYN[w] ? SYN[w].split(' ') : [w]))
@@ -105,11 +105,51 @@ function sim(x, y) {
 }
 
 /* ---------------------------------------------------------- lesson catalogue */
+// Every lesson folder, however it is spelled: "Lesson 1 MRS GREN" (no dash), "lesson 7 - History of
+// the Atom" (small l), "Lesson 2 - 3 - Exothermic..." (a two-lesson folder). Patryk 2026-10-04: a
+// lesson missing from the list is a lesson he never gets offered, so none may be dropped.
+const OPTIONAL = /\(\s*op\w*nal\s*\)|^(formative assessment|formative review|dirt\b|assessment point)|only if short on time|self study/i;
 function listLessons(dir) {
   if (!fs.existsSync(dir)) return [];
-  return fs.readdirSync(dir).map((f) => f.match(/^Lesson (\d+)\s*-\s*(.+)$/)).filter(Boolean)
-    .map((m) => ({ num: +m[1], title: m[2].trim(), folder: path.join(dir, m[0]) }))
+  return fs.readdirSync(dir).filter((f) => { try { return fs.statSync(path.join(dir, f)).isDirectory(); } catch { return false; } })
+    .map((f) => [f, f.match(/^lesson\s*(\d+)\s*(?:-\s*)?(.*)$/i)]).filter(([, m]) => m && m[2].trim())
+    .map(([f, m]) => {
+      const raw = m[2].replace(/^\d+\s*-\s*/, '').trim();
+      return { num: +m[1], title: raw.replace(/\s*\(\s*op\w*nal\s*\)\s*/i, ' ').trim(), folder: path.join(dir, f), optional: OPTIONAL.test(raw) || +m[1] === 0 };
+    })
     .sort((a, b) => a.num - b.num);
+}
+// Lessons the topic's technician guide lists but that have no folder yet (9XS B1 "Eukaryotic cells",
+// 10 P2 "Circuit symbols"). They go in the list where the guide puts them, marked "no folder".
+// DIRT / assessment rows come in as optional; test and revision rows are left to the test logic.
+function guideOnly(dir, folderLessons, range) {
+  const clean = (t) => t.replace(/\((physics|chemistry|biology) only\)|\b(epa|homework (set|setting|reminder|check|checking))\b|\bP\d+ L\d+\b/ig, ' ');
+  const rows = techGuide(dir).filter((r) => r.title && !/^(test|revision)\b|^test lesson/i.test(r.title.trim()));
+  // pass 1: best folder for each guide row by title
+  const hit = rows.map((r) => {
+    let best = null, bs = 0;
+    // both ways round, averaged: one shared word ("Circuit symbols" vs "...Parallel Circuits") is not a match
+    for (const L of folderLessons) { const s = (sim(clean(r.title), L.title) + sim(L.title, clean(r.title))) / 2; if (s > bs) { bs = s; best = L; } }
+    return bs >= 0.45 ? best : null;
+  });
+  // pass 2: a row no title matched is the folder with ITS number, if no other row claimed that
+  // folder ("Lungs and gills" = folder L14 "Exchange Surfaces", "Half live dice" = L8 "Half Life")
+  rows.forEach((r, k) => {
+    if (hit[k] || r.num == null) return;
+    const L = folderLessons.find((x) => x.num === Math.floor(r.num) && !hit.includes(x));
+    if (L && !/dirt|assessment|marking point|formative/i.test(r.title)) hit[k] = L;
+  });
+  const out = [];
+  let after = null;                                   // the folder lesson the previous guide row matched
+  for (const [k, r] of rows.entries()) {
+    if (hit[k]) { after = hit[k]; continue; }
+    // KS3 guides list DIRT lessons the folders already have ("Formative review" vs folder "Formative Assessment")
+    if (/dirt|assessment|marking point|formative/i.test(r.title) && folderLessons.some((L) => L.optional && /dirt|assessment|formative/i.test(L.title))) continue;
+    if (range && r.num != null && (r.num < range[0] || r.num > range[1])) continue;
+    const optional = /dirt|assessment|marking point|formative/i.test(r.title);
+    out.push({ after, lesson: { num: r.num || 0, title: clean(r.title).replace(/\s+and\s*$/i, '').replace(/\s{2,}/g, ' ').trim(), folder: null, optional, guideRow: r, nofolder: true } });
+  }
+  return out;
 }
 
 function classSequence(cls, sol) {
@@ -140,21 +180,37 @@ function classSequence(cls, sol) {
   const seen = new Set();
   seq.forEach((t, block) => {
     const dir = `${DRIVE}/Year ${year}/${t.subject === 'Science Skills' ? 'Science Skills' : t.subject}/${t.driveTopicFolder}`;
-    let ls = listLessons(dir);
+    const all = listLessons(dir);
+    let ls = all;
     // "B1 Cells L1-7" then later "B1 Cells L8-16": only a topic taught in BLOCKS is cut by its range.
     // (A single block's range is just the pacing count and must not drop lessons: 10C2 lost
     // P1 L12 Renewables because the pacing sheet says "L1-11".)
     const range = String(t.pacingLabel || '').match(/L(\d+)\s*-\s*(\d+)/);
     const split = seq.filter((x) => x.driveTopicFolder === t.driveTopicFolder).length > 1;
-    if (range && split && ls.length) ls = ls.filter((l) => l.num >= +range[1] && l.num <= +range[2]);
-    for (const l of ls) {
-      const key = l.folder;
+    // A lesson outside EVERY block's range goes to the nearest block, never nowhere (9XS lost
+    // B1 L17 Active Transport because the second block says "L8-16").
+    if (range && split && ls.length) {
+      const ranges = seq.filter((x) => x.driveTopicFolder === t.driveTopicFolder)
+        .map((x) => (String(x.pacingLabel || '').match(/L(\d+)\s*-\s*(\d+)/) || []).slice(1).map(Number)).filter((x) => x.length === 2);
+      const gap = (n, [a, b]) => (n < a ? a - n : n > b ? n - b : 0);
+      const mine = [+range[1], +range[2]];
+      ls = ls.filter((l) => gap(l.num, mine) === 0 || (!ranges.some((rg) => gap(l.num, rg) === 0) && ranges.every((rg) => gap(l.num, mine) <= gap(l.num, rg))));
+    }
+    // guide-only lessons slot in after the folder lesson they follow in the guide
+    const extra = all.length ? guideOnly(dir, all, range && split ? [+range[1], +range[2]] : null) : [];
+    const merged = [...extra.filter((e) => !e.after).map((e) => e.lesson)];
+    for (const l of ls) { merged.push(l); extra.filter((e) => e.after === l).forEach((e) => merged.push(e.lesson)); }
+    // a guide row that follows a lesson in the OTHER block of a split topic belongs to this block only by number
+    for (const e of extra) if (e.after && !ls.includes(e.after) && !merged.includes(e.lesson)) {
+      const k = merged.findIndex((x) => x.num > e.lesson.num);
+      if (range && split) merged.splice(k < 0 ? merged.length : k, 0, e.lesson);
+    }
+    for (const l of merged) {
+      const key = l.folder || `${dir}|${l.title}`;
       if (seen.has(key)) continue;
-      // Back-test 2026-10-03: Patryk never teaches these as lessons of their own.
-      if (/\(optional\)/i.test(l.title) || /^(formative assessment|dirt\b|assessment point)/i.test(l.title)) continue;
       if (/\(separate\)/i.test(l.title) && /combined/.test(r.seq)) continue;   // separate-only content, Combined class
       seen.add(key);
-      out.push({ year, subject: t.subject, topic: t.driveTopicFolder, unit: `${t.driveTopicFolder}#${block}`, ...l, source: 'drive' });
+      out.push({ year, subject: t.subject, topic: t.driveTopicFolder, unit: `${t.driveTopicFolder}#${block}`, ...l, source: l.folder ? 'drive' : 'guide' });
     }
   });
   return out;
@@ -172,12 +228,17 @@ function techGuide(topicDir) {
       const sheet = x.sheets[0];
       const raw = xu.parseRows(x.zip.readAsText(sheet.file), x.ss);
       const keys = Object.keys(raw).map(Number).sort((a, b) => a - b);
-      const head = keys.map((k) => raw[k]).find((r) => Object.values(r).some((v) => /^title$/i.test(String(v).trim())));
+      // KS4 guides have a Title column; KS3 guides put number and title in one "Lesson" cell
+      // ("Lesson 7 meteors and meteorites", "1 Saftey in the lab", "L5 Formative review").
+      const head = keys.map((k) => raw[k]).find((r) => Object.values(r).some((v) => /^title$/i.test(String(v).trim())))
+        || keys.map((k) => raw[k]).find((r) => /^(lesson|number|lesson number)$/i.test(String(r.A || '').trim()) && Object.values(r).some((v) => /^LO$/i.test(String(v).trim())));
       if (head) {
         const col = (re) => Object.keys(head).find((c) => re.test(String(head[c])));
-        const cT = col(/^title/i), cR = col(/resources|tech/i), cW = col(/worksheet/i), cN = col(/lesson/i);
-        rows = keys.map((k) => raw[k]).filter((r) => r !== head && r[cT]).map((r) => ({
-          num: parseFloat(r[cN]) || null, title: String(r[cT]).trim(),
+        const cN = col(/lesson|number/i), cT = col(/^title/i) || cN, cR = col(/resources|tech/i), cW = col(/worksheet/i);
+        const titleOf = (r) => String(r[cT]).replace(cT === cN ? /^\s*(lesson\s*|l)?\d+(\.\d+)?\s*/i : /^$/, '').trim();
+        rows = keys.map((k) => raw[k]).filter((r) => r !== head && r[cT] && titleOf(r)).map((r) => ({
+          // "1.0", "Lesson 4 ", "L05" all give the number
+          num: parseFloat((String(r[cN] || '').match(/\d+(\.\d+)?/) || [])[0]) || null, title: titleOf(r),
           equipment: String(r[cR] || '').replace(/\s*\r?\n\s*/g, ', ').replace(/\s{2,}/g, ' ').trim(),
           printing: String(r[cW] || '').replace(/\s*\r?\n\s*/g, ', ').replace(/\s{2,}/g, ' ').trim(),
         }));
@@ -227,6 +288,10 @@ function equipmentFor0(lesson) {
   const key = lesson.folder || `${lesson.topic}/${lesson.title}`;
   const mem = learned()[key];
   if (mem) return { ...mem, source: 'remembered' };
+  if (lesson.guideRow) {                       // no folder: the guide row it came from
+    const g = lesson.guideRow;
+    return g.equipment && !/^n\/?a$/i.test(g.equipment) ? { equipment: g.equipment, sets: setsFor(g.equipment), printing: g.printing, source: 'technician guide' } : { equipment: 'N/A', sets: null, printing: g.printing, source: 'technician guide' };
+  }
   if (lesson.folder) {
     const rows = techGuide(path.dirname(lesson.folder));
     let best = null, bs = 0;
@@ -303,6 +368,8 @@ function progress(seq, history) {
   const order = [...new Set(seq.map((x) => x.unit))];
   let unit = seq.length ? seq[0].unit : null, uncertain = false, last = -1;
   const log = [];
+  const when = {};                                  // lesson -> { date, wrote } (first time taught)
+  const stamp = (j, h, t) => { if (!when[j]) when[j] = { date: iso(h.date), wrote: t }; };
   const moveTo = (u) => {                          // entering a later topic closes all earlier ones
     const ui = order.indexOf(u);
     order.slice(0, ui).forEach((x) => closed.add(x));
@@ -353,7 +420,7 @@ function progress(seq, history) {
     if (!pick) {
       // Far ahead in the scheme (7MLA did "Elements" and "Periodic Table" in week 2): ticked off so it
       // is never repeated later, but the class is NOT moved there and nothing before it is closed.
-      if (far && !taught.has(far.j)) { taught.add(far.j); log.push(`${t} -> taught early: ${seq[far.j].topic} L${seq[far.j].num} ${seq[far.j].title}`); continue; }
+      if (far && !taught.has(far.j)) { taught.add(far.j); stamp(far.j, h, t); log.push(`${t} -> taught early: ${seq[far.j].topic} L${seq[far.j].num} ${seq[far.j].title}`); continue; }
       uncertain = true; log.push(`${t} -> ? (no match)`); continue;
     }
     const L = seq[pick.j];
@@ -370,12 +437,12 @@ function progress(seq, history) {
         .sort((a, b) => b.sc - a.sc)[0];
       if (second) covered.push(second);
     }
-    covered.forEach((o) => taught.add(o.j));
+    covered.forEach((o) => { taught.add(o.j); stamp(o.j, h, t); });
     last = Math.max(...covered.map((o) => o.j));
     uncertain = false;
     log.push(`${t} -> ${L.topic} ` + covered.map((o) => `L${seq[o.j].num} ${seq[o.j].title}`).join(' + '));
   }
-  return { taught, closed, tested, revised, unit, last, uncertain, log };
+  return { taught, closed, tested, revised, unit, last, uncertain, log, when };
 }
 
 // The next lesson: the FIRST untaught lesson of the current topic (so missed lessons are filled in);
@@ -385,7 +452,7 @@ function nextLesson(seq, st) {
   const order = [...new Set(seq.map((x) => x.unit))];
   const ui = Math.max(0, order.indexOf(st.unit));
   if (st.unit && !st.closed.has(st.unit)) {
-    const j = seq.findIndex((x, k) => x.unit === st.unit && !st.taught.has(k));
+    const j = seq.findIndex((x, k) => x.unit === st.unit && !x.optional && !st.taught.has(k));
     if (j >= 0) return j;
     st.closed.add(st.unit);
   }
@@ -397,7 +464,7 @@ function nextLesson(seq, st) {
   for (let k = ui + 1; k < order.length; k++) {
     const u = order[k];
     if (st.closed.has(u)) continue;
-    const j = seq.findIndex((x, m) => x.unit === u && !st.taught.has(m));
+    const j = seq.findIndex((x, m) => x.unit === u && !x.optional && !st.taught.has(m));
     if (j >= 0) return j;
   }
   return -1;
@@ -408,7 +475,7 @@ function report(seq, st) {
   const out = [];
   for (const u of [...new Set(seq.map((x) => x.unit))]) {
     const ls = seq.map((x, j) => ({ ...x, j })).filter((x) => x.unit === u);
-    const done = ls.filter((x) => st.taught.has(x.j)), missed = ls.filter((x) => !st.taught.has(x.j));
+    const done = ls.filter((x) => st.taught.has(x.j)), missed = ls.filter((x) => !st.taught.has(x.j) && !x.optional);
     const state = u === st.unit ? 'current' : st.closed.has(u) || st.tested.has(u) ? 'finished' : done.length ? 'started' : 'to come';
     out.push({ unit: u, topic: ls[0].topic, state, tested: st.tested.has(u), revised: !!(st.revised && st.revised.has(u)),
       done: done.map((x) => `L${x.num} ${x.title}`), missed: missed.map((x) => `L${x.num} ${x.title}`) });
@@ -496,6 +563,7 @@ if (require.main === module) {
           if (L.folder) { try { built = fs.readdirSync(L.folder).some((f) => /\.pptx$/i.test(f)); } catch { built = false; } }
           return { topic: L.topic, unit: L.unit, num: L.num, title: L.title, eq: e.equipment, sets: e.sets || null,
             print: e.printing || '', eqSrc: e.source, book, built, planned: L.source === 'plan',
+            optional: !!L.optional, nofolder: L.source === 'guide',
             rel: L.folder ? path.relative(DRIVE, L.folder).split(path.sep).join('/') : null };
         }),
       };
@@ -512,7 +580,7 @@ if (require.main === module) {
     const progressOut = {};
     for (const cls of Object.keys(ROUTES)) {
       const p = progress(ctx.seqs[cls], history[cls] || []);
-      progressOut[cls] = { taught: [...p.taught], last: p.last, unit: p.unit, closed: [...p.closed], tested: [...p.tested], revised: [...p.revised] };
+      progressOut[cls] = { taught: [...p.taught], last: p.last, unit: p.unit, closed: [...p.closed], tested: [...p.tested], revised: [...p.revised], when: p.when };
     }
     // Real clock times: Years 7-9 use the KS3 bells, Years 10-13 the KS4/5 bells (P2/P4 differ).
     let periods = {};

@@ -40,7 +40,7 @@
   #menu button:hover { background:var(--hover); }
   #menu small { color:var(--muted); display:block; font-size:11px; }
   #menu hr { border:none; border-top:1px solid var(--line); margin:4px 0; }
-  main { display:grid; grid-template-columns:1fr 360px; gap:12px; padding:12px; }
+  main { display:grid; grid-template-columns:1fr 410px; gap:12px; padding:12px; }
   main.full { grid-template-columns:1fr; }
   .cal { background:var(--panel); border:1px solid var(--line); border-radius:10px; overflow:hidden; }
   .grid { display:grid; }
@@ -91,6 +91,33 @@
   .res small { color:var(--muted); display:block; }
   .res.next { border-left:3px solid var(--gold); }
   .res.done { opacity:.55; }
+  /* side panel: technician card + the whole-topic lesson list */
+  .now { margin:2px 0 4px; font-size:14px; }
+  .card { background:var(--panel2); border:1px solid var(--line); border-radius:8px; padding:8px 10px; margin-top:8px; }
+  .card h4 { margin:0 0 6px; font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); display:flex; justify-content:space-between; gap:8px; }
+  .card .src { font-weight:400; text-transform:none; letter-spacing:0; }
+  .card .src.guess { color:var(--orange); font-weight:700; }
+  .card textarea { min-height:44px; }
+  .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:6px; }
+  label.inline { display:flex; gap:6px; align-items:center; margin:6px 0 0; }
+  .lessonlist { border:1px solid var(--line); border-radius:6px; margin-top:6px; max-height:calc(100vh - 520px); min-height:220px; overflow:auto; background:var(--panel); }
+  .lrow { display:flex; align-items:flex-start; gap:8px; padding:6px 8px; border-bottom:1px solid var(--line); font-size:12.5px; line-height:1.3; }
+  .lrow:last-child { border-bottom:none; }
+  .lrow:hover { background:var(--hover); }
+  .lrow .tick { margin-top:2px; accent-color:var(--green); cursor:pointer; }
+  .lrow .body { flex:1; cursor:pointer; }
+  .lrow .num { font-weight:700; display:inline-block; min-width:30px; color:var(--muted); }
+  .lrow small { display:block; color:var(--muted); font-size:11px; margin-top:1px; }
+  .lrow.taught .t { color:var(--muted); }
+  .lrow.taught .num { color:var(--green); }
+  .lrow.taught small { color:var(--green); }
+  .lrow.next { box-shadow:inset 3px 0 0 var(--gold); }
+  .lrow.here { background:color-mix(in srgb, var(--gold) 15%, var(--panel)); }
+  .lrow.optional .t { font-style:italic; color:var(--muted); }
+  .tag { font-size:10px; font-weight:700; border-radius:3px; padding:0 4px; margin-left:5px; border:1px solid currentColor; white-space:nowrap; }
+  .tag.next, .tag.here { color:var(--gold); } .tag.planned { color:var(--blue); } .tag.opt { color:var(--muted); } .tag.nof { color:var(--orange); }
+  .lp.opt { border-style:dashed; opacity:.6; }
+  .lp.skip { border-color:var(--red); color:var(--red); text-decoration:line-through; }
   /* Classes view */
   .classes { display:grid; grid-template-columns:repeat(auto-fill, minmax(330px, 1fr)); gap:12px; padding:12px; }
   .ccard { background:var(--panel); border:1px solid var(--line); border-left:6px solid var(--c); border-radius:10px; padding:10px 12px; }
@@ -124,7 +151,6 @@
   <button id="vWeek" class="on" title="W">Week</button><button id="vDay" title="D">Day</button><button id="vClasses" title="C">Classes</button>
   <span class="sep"></span>
   <button id="undo" title="Ctrl+Z">Undo</button>
-  <button id="save" class="primary" title="Ctrl+S">Save</button>
   <span id="status">Loading...</span>
   <div class="menuwrap"><button id="more">&#8943; More</button>
     <div id="menu">
@@ -155,7 +181,7 @@
 const KEY = <?!= JSON.stringify(key) ?>;   // the key is letters and numbers only, so unescaped output is safe
 const P = window.PlannerLogic;
 const COLS = ['B', 'F', 'J', 'N', 'R'];
-let S = { data:null, weeks:{}, learned:{}, hasTemplate:false, monday:null, week:null, undo:[], sel:-1, dirty:false, view:'week', day:0, mine:null, showMine:false, readOnly:false };
+let S = { data:null, weeks:{}, learned:{}, hasTemplate:false, monday:null, week:null, undo:[], sel:-1, dirty:false, view:'week', day:0, mine:null, showMine:false, readOnly:false, chooser:{} };
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c]));
 const status = (t) => { $('status').textContent = t; $('status').classList.toggle('dirty', S.dirty); };
@@ -183,7 +209,8 @@ function firstPlanMonday() {
   while (lastFilled && P.iso(m) <= lastFilled) m = P.addDays(m, 7);
   return m;
 }
-function leaveOk() { return !S.dirty || confirm('This week has unsaved changes. Leave without saving?'); }
+// Changes save by themselves (Patryk 2026-10-04: make it easy). Leaving a week saves it first.
+function leaveOk() { if (S.dirty) save(); return true; }
 // A week he filled in Planner.xlsx is shown exactly as he filled it (taught), read only.
 function filledWeek(mon) {
   const rows = (S.data.filled || {})[P.iso(mon)];
@@ -192,31 +219,37 @@ function filledWeek(mon) {
     slots: rows.map((r) => ({ day: r.day, period: r.period, col: r.col, cls: r.cls, kind: 'taught', text: r.text || '(blank)', eq: '', notes: [], carry: [] })) };
 }
 function loadWeek(mon) {
-  S.monday = P.mondayOf(mon); S.sel = -1; S.undo = []; S.dirty = false; S.mine = null;
+  S.monday = P.mondayOf(mon); S.sel = -1; S.undo = []; S.dirty = false; S.mine = null; S.chooser = {};
   const saved = S.weeks[P.iso(S.monday)];
   const filled = filledWeek(S.monday);
   S.readOnly = !!filled;
   S.week = filled || (saved ? JSON.parse(JSON.stringify(saved)) : P.autofill(S.data, S.weeks, S.monday, S.learned));
-  S.week.extras = S.week.extras || [];
-  status(filled ? 'Already taught (from your Planner.xlsx)' : saved ? 'Saved' : 'Planned automatically, not saved yet');
+  S.week.extras = S.week.extras || []; S.week.marks = S.week.marks || [];
+  status(filled ? 'Already taught (from your Planner.xlsx)' : saved ? 'Saved' : 'Planned automatically (saves when you change something)');
   $('jump').value = P.iso(S.monday);
   render(); editor();
   if (S.showMine && !filled) loadMine();
 }
-function change(newWeek, msg) {
+let saveTimer = null;
+// quiet: a detail edit (equipment, notes): redraw the grid only, so the box being typed in stays put
+function change(newWeek, msg, quiet) {
   if (S.readOnly) { toast('This week is already taught, so it can\'t be changed here'); return; }
   S.undo.push(JSON.stringify(S.week)); S.week = newWeek; S.week.extras = S.week.extras || []; S.dirty = true;
-  render(); editor(); status('Unsaved changes'); if (msg) toast(msg, true);
+  markGaps(); render(); if (!quiet) editor(); if (msg) toast(msg, true);
+  status('Saving...'); clearTimeout(saveTimer); saveTimer = setTimeout(save, 1200);
 }
 function undo() {
   if (!S.undo.length) { toast('Nothing to undo'); return; }
-  S.week = JSON.parse(S.undo.pop()); S.dirty = true; render(); editor(); status('Unsaved changes');
+  S.week = JSON.parse(S.undo.pop()); S.dirty = true; markGaps(); render(); editor();
+  status('Saving...'); clearTimeout(saveTimer); saveTimer = setTimeout(save, 1200);
 }
 function save() {
-  if (S.readOnly) { toast('Taught weeks come from Planner.xlsx: nothing to save'); return Promise.resolve(); }
-  status('Saving...');
-  return run('saveWeek', S.week).then(() => { S.weeks[S.week.monday] = JSON.parse(JSON.stringify(S.week)); S.dirty = false; status('Saved'); toast('Week saved'); })
-    .catch((e) => status('Save failed: ' + e.message));
+  clearTimeout(saveTimer);
+  if (S.readOnly || !S.dirty) return Promise.resolve();
+  const wk = JSON.parse(JSON.stringify(S.week));          // this week, even if he moves on before it lands
+  S.dirty = false; status('Saving...');
+  return run('saveWeek', wk).then(() => { S.weeks[wk.monday] = wk; if (S.week.monday === wk.monday) status(S.dirty ? 'Saving...' : 'All changes saved'); })
+    .catch((e) => { if (S.week.monday === wk.monday) S.dirty = true; status('NOT saved: ' + e.message + ' (Ctrl+S to try again)'); });
 }
 
 /* ------------------------------------------------------------------ render */
@@ -267,7 +300,9 @@ function render() {
       const flags = [];
       if (s.double) flags.push('<span class="flag f-dbl">DOUBLE</span>');
       if (s.kind === 'lesson' && (s.eqSrc === 'guess' || s.planned)) flags.push('<span class="flag f-check" title="Equipment is a guess: check it">CHECK</span>');
-      if (s.kind === 'lesson' && s.built === false) flags.push('<span class="flag f-built" title="No slides in the Drive folder yet">NOT BUILT</span>');
+      if (s.cover) flags.push('<span class="flag f-check" title="Cover work for this lesson: counts as taught">COVER</span>');
+      if (s.kind === 'lesson' && s.nofolder) flags.push('<span class="flag f-built" title="In the technician guide but no lesson folder on Drive">NO FOLDER</span>');
+      else if (s.kind === 'lesson' && s.built === false) flags.push('<span class="flag f-built" title="No slides in the Drive folder yet">NOT BUILT</span>');
       if (s.kind === 'lesson' && s.gap) flags.push('<span class="flag f-gap" title="A lesson missed earlier in this topic">MISSED</span>');
       if ((s.carry || []).length) flags.push('<span class="flag f-carry">+' + s.carry.length + ' carry</span>');
       const L = s.kind === 'lesson' ? c.seq[s.i] || {} : null;
@@ -311,18 +346,20 @@ function renderClasses() {
   const mon = S.monday;
   g.innerHTML = Object.keys(S.data.classes).map((cls) => {
     const c = S.data.classes[cls];
-    const rep = P.classReport(S.data, S.weeks, mon, cls);
+    const rep = P.classReport(S.data, S.weeks, mon, cls, S.readOnly ? null : S.week);
     const cur = rep.find((r) => r.state === 'current');
     const shown = rep.filter((r) => r.state !== 'to come');
     const upNext = rep.find((r) => r.state === 'to come');
     return '<div class="ccard" style="--c:' + c.colour + '"><h3>' + esc(cls) + ' <span class="muted">Year ' + c.year + '</span></h3>' +
       '<div class="muted">Now: ' + esc(cur ? cur.topic : '-') + (upNext ? ' · next topic: ' + esc(upNext.topic) : '') + '</div>' +
       shown.map((r) => {
-        const done = r.lessons.filter((l) => l.done).length;
-        return '<div class="topic"><div class="tt">' + esc(r.topic) + ' <span>' + r.state + (r.tested ? ', tested' : r.revised ? ', revised' : '') + ' · ' + done + '/' + r.lessons.length + '</span></div>' +
-          '<div class="les-list">' + r.lessons.map((l) => '<span class="lp ' + (l.done ? 'done' : r.state === 'current' ? 'miss' : '') + '" title="' + esc(l.title) + '">L' + l.num + '</span>').join('') + '</div></div>';
+        const core = r.lessons.filter((l) => !l.optional);
+        const done = core.filter((l) => l.done).length;
+        return '<div class="topic"><div class="tt">' + esc(r.topic) + ' <span>' + r.state + (r.tested ? ', tested' : r.revised ? ', revised' : '') + ' · ' + done + '/' + core.length + '</span></div>' +
+          '<div class="les-list">' + r.lessons.map((l) => '<span class="lp ' + (l.done ? 'done' : l.optional ? 'opt' : r.state === 'current' ? 'miss' : r.state === 'finished' ? 'skip' : '') +
+            '" title="' + esc('L' + l.num + ' ' + l.title + (l.optional ? ' (optional)' : '') + (l.nofolder ? ' (no folder)' : '') + (l.done ? ' · ' + whenText(l.when) : r.state === 'finished' && !l.optional ? ' · NEVER TAUGHT (topic finished)' : '')) + '">L' + l.num + '</span>').join('') + '</div></div>';
       }).join('') + '</div>';
-  }).join('') + '<div class="muted" style="grid-column:1/-1">Green = taught. Gold outline = still to teach in the topic you\'re on (the planner fills these first). Hover a lesson number for its title. Counts include weeks saved here up to w/c ' + mon.toLocaleDateString('en-GB', { day:'numeric', month:'short' }) + '.</div>';
+  }).join('') + '<div class="muted" style="grid-column:1/-1">Green = taught. Gold outline = still to teach in the topic you\'re on (the planner fills these first). Dashed = optional (only planned if you pick it). Red, crossed out = never taught in a topic you have finished: tick it in the lesson list if you did teach it. Hover a lesson number for its title and when it was taught. Counts are up to w/c ' + mon.toLocaleDateString('en-GB', { day:'numeric', month:'short' }) + '.</div>';
 }
 
 /* ------------------------------------------------------------------ modals */
@@ -334,23 +371,28 @@ function askMove(from, to) {
   if (from === to || isNaN(from)) return;
   const a = S.week.slots[from], b = S.week.slots[to];
   const same = a.cls === b.cls;
+  // Every option re-flows the class's other lessons, so whatever was in the target slot is never lost.
   modal('<h3>Move ' + esc(a.cls) + ': ' + esc(P.lessonCell(S.data, a)) + '</h3>' +
     '<p class="muted">to ' + P.DAYS[b.day] + ' P' + b.period + ' (' + esc(b.cls) + ', now ' + esc(P.lessonCell(S.data, b)) + ')</p>' +
-    '<div class="row">' + (same ? '<button class="primary" id="mShift">Shift ' + esc(a.cls) + '\'s later lessons along</button>' : '') +
-    '<button id="mSwap">Swap the two</button><button id="mMove">Move just this one</button><button id="mCancel">Cancel</button></div>');
-  const go = (mode, msg) => { closeModal(); change(P.moveSlot(S.data, S.weeks, S.week, from, to, mode, S.learned), msg); };
-  if (same) $('mShift').onclick = () => go('shift', 'Moved and shifted ' + a.cls + '\'s later lessons');
+    '<div class="row"><button class="primary" id="mMove">Move it here</button><button id="mSwap">Swap the two</button><button id="mCancel">Cancel</button></div>' +
+    '<p class="muted">' + (same ? 'Move: ' + esc(a.cls) + '\'s other lessons this week move along in order, so nothing is skipped.' : 'Move: ' + esc(b.cls) + '\'s lesson moves on to its next free slot, so it is not lost.') + '</p>');
+  const go = (mode, msg) => {
+    closeModal();
+    const nw = P.moveSlot(S.data, S.weeks, S.week, from, to, mode, S.learned);
+    change(nw, msg + reflowNote(S.week, nw, b.cls, to) + (same ? '' : reflowNote(S.week, nw, a.cls, from)));
+  };
+  $('mMove').onclick = () => go(same ? 'shift' : 'move', 'Moved');
   $('mSwap').onclick = () => go('swap', 'Swapped');
-  $('mMove').onclick = () => go('move', 'Moved');
   $('mCancel').onclick = closeModal;
 }
 function moveToEmpty(from, day, period) {
   const w = JSON.parse(JSON.stringify(S.week));
   const a = w.slots[from];
-  const moved = Object.assign({}, a, { day, period, col: COLS[period - 1], double: false });
-  Object.assign(a, { kind:'free', i:null, unit:null, text:'Free', eq:'', sets:null, print:'', notes:[], carry:[], double:false });
+  const moved = Object.assign({}, a, { day, period, col: COLS[period - 1], double: false, pinned: true });
+  Object.assign(a, { kind:'free', i:null, key:null, unit:null, text:'Free', eq:'', sets:null, print:'', notes:[], carry:[], double:false, pinned: true });
   w.slots.push(moved);
   w.slots.sort((x, y) => x.day - y.day || x.period - y.period);
+  P.refillClass(S.data, S.weeks, w, moved.cls, S.learned, Math.min(w.slots.indexOf(a), w.slots.indexOf(moved)));
   change(w, 'Moved to ' + P.DAYS[day] + ' P' + period);
 }
 function addExtra(day) {
@@ -369,107 +411,209 @@ function addExtra(day) {
 }
 
 /* ------------------------------------------------------------- side panel */
-function lessonResults(cls, q) {
-  const c = S.data.classes[cls]; if (!c) return [];
-  const st = P.progressBefore(S.data, S.weeks, S.monday)[cls];
-  S.week.slots.forEach((s) => { if (s.cls === cls && s.kind === 'lesson') st.taught.add(s.i); });
-  const finished = new Set([...st.closed, ...st.tested]);          // never offer a finished topic
-  finished.delete(st.unit);
-  const nx = P.next(c.seq, st);                                       // (finished was worked out first)
-  const words = q.toLowerCase().split(/\s+/).filter(Boolean);
-  return c.seq.map((L, k) => ({ L, k, taught: st.taught.has(k), next: nx && nx.i === k }))
-    .filter((o) => !finished.has(o.L.unit) || o.k === (S.week.slots[S.sel] || {}).i)
-    .filter((o) => words.every((w) => (o.L.title + ' ' + o.L.topic + ' l' + o.L.num).toLowerCase().includes(w)))
-    .sort((a, b) => (b.next - a.next) || (a.taught - b.taught) || a.k - b.k).slice(0, 40);
+// Patryk 2026-10-04: the change-lesson box shows EVERY lesson of the topic in order, with what is
+// taught (and when, and what he wrote), what is planned this week, and what is still to teach, so he
+// chooses with the whole picture. Ticks fix the record. The technician details sit above it,
+// always visible, and save as he types.
+const fmtDate = (d) => { if (!d) return ''; const x = P.parse(d); return x.getDate() + ' ' + x.toLocaleDateString('en-GB', { month:'short' }); };
+function whenText(w) {
+  if (!w) return 'taught';
+  if (w.wrote === 'ticked off') return 'ticked off by you';
+  if (w.wrote === 'planner') return 'planned w/c ' + fmtDate(P.iso(P.mondayOf(P.parse(w.date))));
+  return 'taught ' + fmtDate(w.date) + (w.wrote ? ' · you wrote "' + w.wrote + '"' : '');
 }
-function searchBox(cls, onPick) {
-  const draw = () => {
-    const rs = lessonResults(cls, $('q').value);
-    $('qr').innerHTML = rs.map((o, n) => '<div class="res' + (o.next ? ' next' : '') + (o.taught ? ' done' : '') + (n === 0 ? ' hi' : '') + '" data-k="' + o.k + '">' + (o.next ? '★ ' : '') + 'L' + o.L.num + ' ' + esc(o.L.title) +
-      '<small>' + esc(o.L.topic) + (o.taught ? ' · already taught or planned' : '') + (o.L.built === false ? ' · not built' : '') + '</small></div>').join('') || '<div class="res muted">No lessons match</div>';
-    $('qr').querySelectorAll('.res[data-k]').forEach((el) => el.onclick = () => onPick(+el.dataset.k));
+const slotName = (k) => { const s = S.week.slots[k]; return P.DAYS[s.day] + ' P' + s.period; };
+function unitOptions(cls) {
+  const rep = P.classReport(S.data, S.weeks, S.monday, cls, S.week);
+  const seen = {};
+  return rep.map((r) => {
+    seen[r.topic] = (seen[r.topic] || 0) + 1;
+    const label = r.state === 'current' ? 'now' : r.state === 'finished' ? 'finished' + (r.tested ? ', tested' : '') : r.state;
+    return { unit: r.unit, state: r.state, text: r.topic + (seen[r.topic] > 1 ? ' (part ' + seen[r.topic] + ')' : '') + ' · ' + label };
+  });
+}
+// The lesson chooser. pos = {day, period} of the slot; curI = the lesson in it now (or null).
+function chooser(cls, pos, curI, onPick) {
+  const c = S.data.classes[cls]; if (!c) return;
+  const units = unitOptions(cls);
+  const def = curI != null && c.seq[curI] ? c.seq[curI].unit : ((units.find((u) => u.state === 'current') || units.find((u) => u.state !== 'finished') || units[0]) || {}).unit;
+  if (S.chooser.cls !== cls || S.chooser.pos !== pos.day + '-' + pos.period) S.chooser = { cls, pos: pos.day + '-' + pos.period, unit: def };
+  $('chooser').innerHTML =
+    '<div class="row" style="margin-top:0"><select id="cUnit" style="flex:1">' + units.map((u) => '<option value="' + esc(u.unit) + '"' + (u.unit === S.chooser.unit ? ' selected' : '') + '>' + esc(u.text) + '</option>').join('') + '</select></div>' +
+    '<input type="text" id="q" placeholder="or search every topic, e.g. heart" style="margin-top:6px">' +
+    '<div class="lessonlist" id="qr"></div>' +
+    '<div class="muted" style="margin-top:4px">Click a lesson to put it here. Tick = already taught or you won\'t teach it (it won\'t be planned). Untick a wrong tick and it gets planned.</div>';
+  const row = (o, topic) => {
+    const here = o.k === curI;
+    const tags = [];
+    if (here) tags.push('<span class="tag here">in this slot</span>');
+    else if (o.next) tags.push('<span class="tag next">★ next</span>');
+    if (o.state === 'planned' && !here) tags.push('<span class="tag planned">' + o.slots.map(slotName).join(', ') + '</span>');
+    if (o.optional) tags.push('<span class="tag opt">optional</span>');
+    if (o.nofolder) tags.push('<span class="tag nof" title="In the technician guide, but there is no lesson folder on Drive">no folder</span>');
+    else if (o.built === false) tags.push('<span class="tag nof">not built</span>');
+    const sub = o.state === 'taught' ? '✓ ' + esc(whenText(o.when)) : o.mark && o.mark.done === false ? 'you marked this NOT taught' : '';
+    return '<div class="lrow ' + o.state + (o.next && !here ? ' next' : '') + (here ? ' here' : '') + (o.optional ? ' optional' : '') + '">' +
+      '<input type="checkbox" class="tick" data-k="' + o.k + '"' + (o.state === 'taught' ? ' checked' : '') + (o.state === 'planned' ? ' disabled title="Planned this week"' : ' title="' + (o.state === 'taught' ? 'Untick: NOT taught after all, so it gets planned' : 'Tick: already taught, or you won\'t teach it') + '"') + '>' +
+      '<div class="body" data-k="' + o.k + '"><span class="num">L' + o.num + '</span><span class="t">' + esc(o.title) + '</span>' + tags.join('') +
+      (topic ? '<small>' + esc(topic) + '</small>' : '') + (sub ? '<small>' + sub + '</small>' : '') + '</div></div>';
   };
+  const draw = () => {
+    const q = $('q').value.trim().toLowerCase();
+    let html;
+    if (!q) html = P.topicList(S.data, S.weeks, S.week, cls, S.chooser.unit, pos, S.learned).map((o) => row(o)).join('');
+    else {
+      const words = q.split(/\s+/);
+      html = units.flatMap((u) => P.topicList(S.data, S.weeks, S.week, cls, u.unit, pos, S.learned).map((o) => ({ o, u })))
+        .filter(({ o, u }) => words.every((w) => (o.title + ' ' + u.text + ' l' + o.num).toLowerCase().includes(w)))
+        .slice(0, 40).map(({ o, u }) => row(o, u.text)).join('');
+    }
+    $('qr').innerHTML = html || '<div class="lrow muted">No lessons match</div>';
+    $('qr').querySelectorAll('.body').forEach((el) => el.onclick = () => onPick(+el.dataset.k));
+    $('qr').querySelectorAll('.tick').forEach((el) => el.onchange = () => {
+      const k = +el.dataset.k;
+      const m = (S.week.marks || []).find((x) => x.cls === cls && x.i === k);
+      const done = el.checked ? (m && m.done === false ? null : true) : (m && m.done === true ? null : false);
+      const L = c.seq[k];
+      const nw = P.markLesson(S.data, S.weeks, S.week, cls, k, done, S.learned);
+      change(nw, (el.checked ? 'Ticked off ' : 'Not taught: ') + 'L' + L.num + ' ' + L.title + reflowNote(S.week, nw, cls, -1));
+    });
+    const hi = $('qr').querySelector('.lrow.next .body') || $('qr').querySelector('.body');
+    $('q').onkeydown = (e) => { if (e.key === 'Enter') { const f = q ? $('qr').querySelector('.body') : hi; if (f) onPick(+f.dataset.k); } };
+  };
+  $('cUnit').onchange = () => { S.chooser.unit = $('cUnit').value; $('q').value = ''; draw(); };
   $('q').oninput = draw;
-  $('q').onkeydown = (e) => { if (e.key === 'Enter') { const f = $('qr').querySelector('.res[data-k]'); if (f) onPick(+f.dataset.k); } };
   draw();
+}
+// "Wed P3 is now L1 MRS GREN": what moved in a class's week after a change.
+function reflowNote(oldW, newW, cls, except) {
+  const out = [];
+  newW.slots.forEach((s, k) => {
+    const o = oldW.slots[k];
+    if (k === except || s.cls !== cls || s.double || !o || (o.kind === s.kind && o.i === s.i)) return;
+    out.push(P.DAYS[s.day] + ' P' + s.period + ' is now ' + (s.kind === 'lesson' ? 'L' + S.data.classes[cls].seq[s.i].num : P.lessonCell(S.data, s)));
+  });
+  return out.length ? '. ' + out.slice(0, 3).join(', ') : '';
+}
+// Confirm before a change that would leave lessons untaught.
+function okToSkip(lost, what) {
+  if (!lost.length) return true;
+  return confirm(what + ' would leave these lessons untaught:\n\n• ' + lost.slice(0, 12).join('\n• ') + (lost.length > 12 ? '\n• ...and ' + (lost.length - 12) + ' more' : '') +
+    '\n\nOK = skip them (you can tick or untick them later). Cancel = keep them.');
 }
 function addPanel(day, period) {
   S.sel = -1; render();
   const classes = Object.keys(S.data.classes);
+  const sameDay = S.week.slots.find((s) => s.day === day && s.cls);
   $('ed').innerHTML = '<h2>Add a lesson · ' + P.DAYS[day] + ' P' + period + '</h2>' +
-    '<label>Class</label><select id="aCls">' + classes.map((c) => '<option>' + esc(c) + '</option>').join('') + '</select>' +
-    '<label>Find the lesson: type a few letters, Enter picks the top one</label><input type="text" id="q" placeholder="e.g. osmosis">' +
-    '<div class="results" id="qr"></div>';
+    '<label>Class</label><select id="aCls">' + classes.map((c) => '<option' + (sameDay && sameDay.cls === c ? ' selected' : '') + '>' + esc(c) + '</option>').join('') + '</select>' +
+    '<div class="card"><h4>Choose the lesson</h4><div id="chooser"></div></div>';
   const pick = (k) => {
     const cls = $('aCls').value;
     const w = JSON.parse(JSON.stringify(S.week));
-    w.slots.push(Object.assign({ day, period, col: COLS[period - 1], cls, notes:[], carry:[] }, P.lessonSlot(S.data, cls, k, S.learned)));
+    w.slots.push({ day, period, col: COLS[period - 1], cls, notes:[], carry:[], kind:'free' });
     w.slots.sort((x, y) => x.day - y.day || x.period - y.period);
-    change(w, 'Added ' + cls + ' lesson');
+    const idx = w.slots.findIndex((s) => s.day === day && s.period === period && s.cls === cls);
+    const fields = P.lessonSlot(S.data, cls, k, S.learned);
+    if (!okToSkip(P.wouldSkip(S.data, S.weeks, w, idx, fields, S.learned), 'Moving ' + cls + ' on to ' + S.data.classes[cls].seq[k].topic)) return;
+    const nw = P.setSlot(S.data, S.weeks, w, idx, fields, S.learned);
+    S.sel = idx;
+    change(nw, 'Added ' + cls + ' lesson' + reflowNote(w, nw, cls, idx));
   };
-  $('aCls').onchange = () => searchBox($('aCls').value, pick);
-  searchBox($('aCls').value, pick); $('q').focus();
+  const go = () => chooser($('aCls').value, { day, period }, null, pick);
+  $('aCls').onchange = go; go();
 }
 function lessonKey(s) { const L = S.data.classes[s.cls].seq[s.i]; return L.rel || (s.cls + '|' + L.topic + '|' + L.title); }
 
 function editor() {
   const ed = $('ed');
   if (S.readOnly) {
-    ed.innerHTML = '<h2>Taught week</h2><p class="muted">This is what you filled in Planner.xlsx for this week. It counts as taught, so the planner carries on from it. Use ▶ to plan the next week.</p>';
+    ed.innerHTML = '<h2>Taught week</h2><p class="muted">This is what you filled in Planner.xlsx for this week. It counts as taught, so the planner carries on from it. Use ▶ to plan the next week.</p>' +
+      '<p class="muted">If a lesson was matched wrongly, open the next week, click that class\'s lesson and tick or untick it in the list.</p>';
     return;
   }
   if (S.sel < 0) {
-    ed.innerHTML = '<h2>Your week</h2><p class="muted"><b>Click a lesson</b> to change it.<br><b>Click an empty period</b> to add one.<br><b>Drag</b> a lesson onto another slot to move it.<br><b>Hover the All day row</b> to add a task, tests to mark or a meeting.</p>' +
-      '<p class="muted">Gold <b>MISSED</b> = a lesson you skipped in the topic you\'re on; the planner fills those first. <b>Classes</b> (top bar) shows every class\'s progress.</p><p class="muted">Press <kbd>?</kbd> for shortcuts.</p>';
+    ed.innerHTML = '<h2>Your week</h2><p class="muted"><b>Click a lesson</b> to see its whole topic, change it, and check the technician details.<br><b>Click an empty period</b> to add one.<br><b>Drag</b> a lesson onto another slot to move it.<br><b>Hover the All day row</b> to add a task, tests to mark or a meeting.</p>' +
+      '<p class="muted">Changes save by themselves. When you change a lesson, that class\'s other lessons this week move along so nothing is skipped.</p>' +
+      '<p class="muted">Gold <b>MISSED</b> = a lesson you skipped in the topic you\'re on. <b>Classes</b> (top bar) shows every class\'s progress. Press <kbd>?</kbd> for shortcuts.</p>';
     return;
   }
   const s = S.week.slots[S.sel];
   const c = S.data.classes[s.cls];
   const curL = s.kind === 'lesson' && c ? c.seq[s.i] : null;
-  ed.innerHTML = '<h2>' + esc(s.cls) + ' · ' + P.DAYS[s.day] + ' P' + s.period + ' <span class="muted">' + esc(P.periodTime(S.data, s.cls, s.period)) + '</span></h2>' +
-    (curL ? '<div><b>' + esc(curL.title) + '</b><div class="muted">' + esc(curL.topic) + ' · Lesson ' + curL.num + '</div></div>' : '<div class="muted">' + esc(s.text) + '</div>') +
-    (c ? '<label>Change lesson: type, Enter picks the top one (★ = next)</label><input type="text" id="q" placeholder="e.g. heart"><div class="results" id="qr"></div>' : '') +
-    '<div class="row"><button id="kTest">Test</button><button id="kCover">Cover</button><button id="kFree">Clear</button></div>' +
-    '<details' + (s.eqSrc === 'guess' ? ' open' : '') + '><summary>For the technicians</summary>' +
-      '<label>Equipment</label><textarea id="eEq">' + esc(s.eq || '') + '</textarea>' +
-      '<div class="row"><select id="eSets" style="width:auto">' + [['', 'sets?'], ['threes', 'sets of 3'], ['pairs', 'pairs'], ['demo', 'demo (1 set)']].map(([v, t]) => '<option value="' + v + '"' + ((s.sets || '') === v ? ' selected' : '') + '>' + t + '</option>').join('') + '</select>' +
-      (s.kind === 'lesson' ? '<label style="display:flex;gap:4px;align-items:center;margin:0"><input type="checkbox" id="eRemember"> remember for this lesson</label>' : '') + '</div>' +
-      '<label>Printing</label><input type="text" id="ePrint" value="' + esc(s.print || '') + '">' +
-      '<label>Books</label><div class="row" style="margin-top:0"><input type="text" id="eBook" value="' + esc(s.book || '') + '" style="flex:1"><button id="eAddBook">Add textbook</button></div>' +
-      '<div class="row"><button class="primary" id="eApply">Save these details</button></div>' +
-    '</details>' +
-    '<details><summary>Notes and carry-over</summary>' +
+  const isLesson = ['lesson', 'test'].includes(s.kind);
+  const src = { 'technician guide': 'from the technician guide', 'past order': 'from a past order', remembered: 'your saved version', guess: 'a guess: check it' }[s.eqSrc] || '';
+  ed.innerHTML = '<h2>' + esc(s.cls) + ' · ' + P.DAYS[s.day] + ' P' + s.period + ' <span class="muted">' + esc(P.periodTime(S.data, s.cls, s.period)) + (s.double ? ' · 2nd half of double' : '') + '</span></h2>' +
+    (curL ? '<div class="now"><b>L' + curL.num + ' ' + esc(curL.title) + '</b><div class="muted">' + esc(curL.topic) + (curL.optional ? ' · optional' : '') + (curL.nofolder ? ' · no folder on Drive' : '') + (s.pinned ? ' · chosen by you' : ' · planned automatically') + '</div></div>'
+      : '<div class="now"><b>' + esc(P.lessonCell(S.data, s)) + '</b></div>') +
+    '<div class="card"><h4>For the technicians <span class="src' + (s.eqSrc === 'guess' ? ' guess' : '') + '">' + esc(src) + '</span></h4>' +
+      '<textarea id="eEq" placeholder="Equipment (N/A if none)">' + esc(s.eq || '') + '</textarea>' +
+      '<div class="grid2"><select id="eSets">' + [['', 'Sets?'], ['threes', 'sets of 3'], ['pairs', 'pairs'], ['demo', 'demo (1 set)']].map(([v, t]) => '<option value="' + v + '"' + ((s.sets || '') === v ? ' selected' : '') + '>' + t + '</option>').join('') + '</select>' +
+      '<input type="text" id="ePrint" placeholder="Printing" value="' + esc(s.print || '') + '"></div>' +
+      '<div class="row" style="margin-top:6px"><input type="text" id="eBook" placeholder="Textbooks" value="' + esc(s.book || '') + '" style="flex:1"><button id="eAddBook" title="Fill in the textbook pages for this lesson">+ pages</button></div>' +
+      (s.kind === 'lesson' ? '<label class="inline"><input type="checkbox" id="eRemember"' + (s.eqSrc === 'remembered' ? ' checked' : '') + '> use this every time this lesson is taught</label>' : '') +
+    '</div>' +
+    '<div class="row"><button id="kTest">Make it a test</button><button id="kCover">Cover</button><button id="kFree">Clear</button><button id="ePrompt">Copy build prompt</button>' +
+    (curL ? '<button id="kCont" title="Puts this lesson in ' + esc(s.cls) + '\'s next slot too; the rest of the week moves along">Didn\'t finish: continue next lesson</button>' : '') + '</div>' +
+    (c ? '<div class="card"><h4>Choose the lesson <span class="src">' + esc(s.cls) + '</span></h4><div id="chooser"></div></div>' : '') +
+    '<details' + ((s.notes || []).length || (s.carry || []).length ? ' open' : '') + '><summary>Notes and carry-over' + ((s.notes || []).length + (s.carry || []).length ? ' (' + ((s.notes || []).length + (s.carry || []).length) + ')' : '') + '</summary>' +
       '<label>Notes (one per line)</label><textarea id="eNotes">' + esc((s.notes || []).join('\n')) + '</textarea>' +
-      '<div class="row"><button id="eNotesSave">Save notes</button></div>' +
       ((s.carry || []).length ? '<label>Carried in from last lesson</label><div class="muted">' + s.carry.map(esc).join('<br>') + '</div>' : '') +
       '<div class="row"><button id="eRev">Review not finished → next lesson</button><button id="eHw">Homework to collect → next lesson</button></div>' +
     '</details>' +
     '<details><summary>More</summary>' +
-      '<div class="row"><button id="eRefill">Re-plan ' + esc(s.cls) + '\'s later lessons</button><button id="ePrompt">Copy build prompt</button></div>' +
+      '<div class="row"><button id="eRefill">Re-plan ' + esc(s.cls) + '\'s later lessons</button></div>' +
       (curL && curL.rel ? '<p class="muted">Drive: Lessons/' + esc(curL.rel) + '</p>' : '') +
     '</details>';
 
-  const replace = (fields, msg) => {
-    const w = JSON.parse(JSON.stringify(S.week)); const t = w.slots[S.sel];
-    Object.assign(t, fields, { day: t.day, period: t.period, col: t.col, cls: t.cls, notes: t.notes || [], carry: t.carry || [], gap: false });
-    change(w, msg);
+  const put = (fields, msg, what) => {
+    if (what && !okToSkip(P.wouldSkip(S.data, S.weeks, S.week, S.sel, fields, S.learned), what)) return;
+    const nw = P.setSlot(S.data, S.weeks, S.week, S.sel, fields, S.learned);
+    change(nw, msg + reflowNote(S.week, nw, s.cls, S.sel));
   };
-  if (c) searchBox(s.cls, (k) => replace(P.lessonSlot(S.data, s.cls, k, S.learned), 'Lesson changed'));
-  $('kTest').onclick = () => replace(P.testSlot(S.data, s.cls, curL ? curL.unit : (c ? c.seq[0].unit : null)), 'Marked as a test');
-  $('kCover').onclick = () => { const t = prompt('Cover: what will they do?', curL ? curL.title : ''); if (t != null) replace({ kind:'cover', i:null, text:t, eq:'N/A', sets:null }, 'Marked as cover'); };
-  $('kFree').onclick = () => replace({ kind:'free', i:null, unit:null, text:'Free', eq:'', sets:null, print:'' }, 'Cleared');
-  $('eAddBook').onclick = () => { $('eBook').value = curL && curL.book ? curL.book : ''; if (!$('eBook').value) toast('No textbook pages found for this lesson'); };
-  $('eApply').onclick = () => {
+  if (c) chooser(s.cls, { day: s.day, period: s.period }, curL ? s.i : null, (k) => {
+    if (k === s.i && s.kind === 'lesson') return;
+    const L = c.seq[k];
+    put(P.lessonSlot(S.data, s.cls, k, S.learned), 'L' + L.num + ' ' + L.title + ' put in', 'Moving ' + s.cls + ' on to ' + L.topic);
+  });
+  const testUnit = curL ? curL.unit : (P.progressBefore(S.data, S.weeks, S.monday)[s.cls] || {}).unit;
+  $('kTest').onclick = () => { if (testUnit) put(P.testSlot(S.data, s.cls, testUnit), 'Marked as a test', 'A test now'); };
+  // Cover: either the cover teacher teaches THIS lesson (it counts as taught) or the class does
+  // something else (this lesson moves on to the next slot).
+  $('kCover').onclick = () => {
+    modal('<h3>Cover for ' + esc(s.cls) + '</h3>' +
+      (curL ? '<button class="primary" id="cvThis" style="display:block;width:100%;text-align:left;margin-bottom:6px">Cover work for this lesson<small class="muted" style="display:block">L' + curL.num + ' ' + esc(curL.title) + ' counts as taught</small></button>' : '') +
+      '<label>Or something else (the lesson moves to the next slot)</label><input type="text" id="cvText" placeholder="e.g. Revision booklet">' +
+      '<div class="row"><button id="cvOther">Use this</button><button id="cvCancel">Cancel</button></div>');
+    if ($('cvThis')) $('cvThis').onclick = () => { closeModal(); put(Object.assign(P.lessonSlot(S.data, s.cls, s.i, S.learned), { cover: true }), 'Cover work for L' + curL.num + ' (counts as taught)'); };
+    $('cvOther').onclick = () => { const t = $('cvText').value.trim(); if (!t) return; closeModal(); put({ kind:'cover', i:null, key:null, text:t, eq:'N/A', sets:null, print:'', cover:false }, 'Marked as cover'); };
+    $('cvText').onkeydown = (e) => { if (e.key === 'Enter') $('cvOther').click(); };
+    $('cvCancel').onclick = closeModal;
+  };
+  if ($('kCont')) $('kCont').onclick = () => {
+    const k = S.week.slots.findIndex((x, n) => n > S.sel && x.cls === s.cls && !x.double && ['lesson', 'test', 'free'].includes(x.kind));
+    if (k < 0) { toast('No later ' + s.cls + ' lesson this week: next week, pick it from the list (it shows as taught; click it anyway)'); return; }
+    const nw = P.setSlot(S.data, S.weeks, S.week, k, Object.assign(P.lessonSlot(S.data, s.cls, s.i, S.learned), { carry: [] }), S.learned);
+    nw.slots[k].carry = ['Continuing from last lesson (not finished)'];
+    change(nw, 'L' + curL.num + ' continues ' + P.DAYS[nw.slots[k].day] + ' P' + nw.slots[k].period + reflowNote(S.week, nw, s.cls, k));
+  };
+  $('kFree').onclick = () => put({ kind:'free', i:null, key:null, unit:null, text:'Free', eq:'', sets:null, print:'' }, 'Cleared');
+  // technician details: saved as soon as a box is left
+  const saveDetails = () => {
     const w = JSON.parse(JSON.stringify(S.week)); const t = w.slots[S.sel];
     t.eq = $('eEq').value; t.sets = $('eSets').value || null; t.print = $('ePrint').value; t.book = $('eBook').value;
     if ($('eRemember') && $('eRemember').checked && t.kind === 'lesson') {
-      const lk = lessonKey(t); S.learned[lk] = { eq: t.eq, sets: t.sets };
+      const lk = lessonKey(t); S.learned[lk] = { eq: t.eq, sets: t.sets }; t.eqSrc = 'remembered';
       run('learnEquipment', lk, t.eq, t.sets).catch((e) => toast('Not remembered: ' + e.message));
     }
-    change(w, 'Details saved');
+    change(w, null, true);
   };
-  $('eNotesSave').onclick = () => { const w = JSON.parse(JSON.stringify(S.week)); w.slots[S.sel].notes = $('eNotes').value.split('\n').map((x) => x.trim()).filter(Boolean); change(w, 'Notes saved'); };
-  $('eRefill').onclick = () => { const w = JSON.parse(JSON.stringify(S.week)); P.refillAfter(S.data, S.weeks, w, S.sel, S.learned); change(w, 'Re-planned ' + s.cls); };
+  ['eEq', 'ePrint', 'eBook'].forEach((id) => $(id).onchange = saveDetails);
+  $('eSets').onchange = saveDetails;
+  if ($('eRemember')) $('eRemember').onchange = () => { if ($('eRemember').checked) { saveDetails(); toast('Remembered for every ' + (curL ? curL.title : 'lesson') + ' from now on'); } };
+  $('eAddBook').onclick = () => { if (curL && curL.book) { $('eBook').value = curL.book; saveDetails(); } else toast('No textbook pages found for this lesson'); };
+  $('eNotes').onchange = () => { const w = JSON.parse(JSON.stringify(S.week)); w.slots[S.sel].notes = $('eNotes').value.split('\n').map((x) => x.trim()).filter(Boolean); change(w, null, true); };
+  $('eRefill').onclick = () => { const w = JSON.parse(JSON.stringify(S.week)); P.refillAfter(S.data, S.weeks, w, S.sel, S.learned); change(w, 'Re-planned ' + s.cls + reflowNote(S.week, w, s.cls, S.sel)); };
   const carry = (what) => {
     const r = P.carryForward(S.week, S.sel, what);
     if (r.carriedTo < 0) { toast('No later ' + s.cls + ' lesson this week: add it as a note on next week\'s first one'); return; }
@@ -481,15 +625,17 @@ function editor() {
     const text = P.buildPrompt(S.data, S.week.slots[S.sel]);
     navigator.clipboard.writeText(text).then(() => toast('Build prompt copied')).catch(() => modal('<h3>Build prompt</h3><pre>' + esc(text) + '</pre>'));
   };
+  if (!isLesson) $('eEq').placeholder = 'Nothing needed';
 }
 
 // MISSED flag: a planned lesson that comes BEFORE something already taught in the same topic.
 function markGaps() {
   if (!S.week || S.readOnly) return;
-  const st = P.progressBefore(S.data, S.weeks, S.monday);
+  const st = P.progressBefore(S.data, S.weeks, S.monday, S.learned);
   S.week.slots.forEach((s) => {
     if (s.kind !== 'lesson') return;
     const c = S.data.classes[s.cls]; const L = c && c.seq[s.i]; if (!L) return;
+    P.applyMarks(st[s.cls], S.week.marks, s.cls);
     s.gap = c.seq.some((x, k) => x.unit === L.unit && k > s.i && st[s.cls].taught.has(k));
   });
 }
@@ -547,7 +693,6 @@ $('jump').onchange = () => { if ($('jump').value && leaveOk()) { loadWeek(P.pars
 $('vWeek').onclick = () => { S.view = 'week'; render(); editor(); };
 $('vDay').onclick = () => { S.view = 'day'; render(); editor(); };
 $('vClasses').onclick = () => { S.view = 'classes'; render(); };
-$('save').onclick = save;
 $('undo').onclick = undo;
 $('file').onchange = () => {
   const f = $('file').files[0]; if (!f) return;
@@ -576,7 +721,8 @@ document.addEventListener('keydown', (e) => {
 window.addEventListener('beforeunload', (e) => { if (S.dirty) { e.preventDefault(); e.returnValue = ''; } });
 
 function onLoad(r) {
-  S.data = r.data; S.weeks = r.weeks || {}; S.learned = r.learned || {}; S.hasTemplate = r.hasTemplate;
+  S.data = r.data; S.weeks = r.weeks || {};
+  if (S.data && S.data.classes) Object.values(S.weeks).forEach((w) => P.remapWeek(S.data, w));   // same lessons after a data refresh S.learned = r.learned || {}; S.hasTemplate = r.hasTemplate;
   if (!S.data) { status('No data yet: More → Import data, pick planner-data.json'); $('grid').innerHTML = ''; editor(); return; }
   if (!S.data.periodTimes || !S.data.filled) { status('Old data file: ask Claude to refresh the planner data, then More → Import data'); return; }
   loadWeek(S.monday || firstPlanMonday()); markGaps(); render();

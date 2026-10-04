@@ -75,5 +75,46 @@ const ict = Object.values(data.classes).flatMap((c) => c.seq).filter((L) => /\b(
 ok(!ict.length, `no ICT / Chromebook suggestions anywhere (${ict.length} found)`);
 ok(Array.isArray((data.filled || {})['2026-10-05']) && data.filled['2026-10-05'].some((s) => /^Cover:/.test(s.text)), 'filled weeks exported as taught (w/c 5 Oct covers kept)');
 
+// 11. Never skip a lesson (Patryk 2026-10-04)
+const slotsOf = (wk, cls) => wk.slots.map((s, k) => ({ s, k })).filter((o) => o.s.cls === cls && o.s.kind === 'lesson' && !o.s.double);
+const m7 = slotsOf(w, '7MLA');
+const firstI = m7[0].s.i, laterI = data.classes['7MLA'].seq.findIndex((L, k) => k > m7[m7.length - 1].s.i && L.unit === data.classes['7MLA'].seq[firstI].unit && !L.optional);
+const changed = P.setSlot(data, {}, w, m7[0].k, P.lessonSlot(data, '7MLA', laterI), {});
+const after = slotsOf(changed, '7MLA').map((o) => o.s.i);
+ok(after[0] === laterI && after.includes(firstI) && new Set(after).size === after.length, `changing 7MLA's first lesson keeps the replaced one later in the week (${after.join(',')})`);
+const lastK = m7[m7.length - 1].k;
+const late = P.setSlot(data, {}, w, lastK, P.lessonSlot(data, '7MLA', firstI), {});
+ok(slotsOf(late, '7MLA').slice(0, -1).every((o, n) => o.s.i === m7[n].s.i), 'changing a later slot never rewrites the earlier ones');
+const covered = P.setSlot(data, {}, w, m7[0].k, Object.assign(P.lessonSlot(data, '7MLA', firstI), { cover: true }), {});
+ok(!slotsOf(covered, '7MLA').slice(1).some((o) => o.s.i === firstI) && /^Cover: /.test(P.lessonCell(data, covered.slots[m7[0].k])), 'cover work for a lesson counts as taught (not planned again)');
+const w19u = P.autofill(data, {}, P.parse('2026-10-19'));
+const f19 = firstC(w19u, '11S2');
+ok(f19 && !a12.includes(f19.i), '19 Oct with 12 Oct NOT saved still carries on after it (no lesson planned twice)');
+const autoOpt = Object.entries(data.classes).flatMap(([cls]) => slotsOf(w, cls).filter((o) => data.classes[cls].seq[o.s.i].optional));
+ok(!autoOpt.length, 'optional lessons are never planned automatically');
+ok(data.classes['10C2'].seq.some((L) => L.nofolder && /circuit symbols/i.test(L.title)), '10C2 P2 "Circuit symbols" (technician guide, no folder) is in the list');
+ok(data.classes['7MLA'].seq.some((L) => /mrs gren/i.test(L.title)) && data.classes['9AS'].seq.some((L) => /history of the atom/i.test(L.title)), 'oddly named folders ("Lesson 1 MRS GREN", "lesson 7 - ...") are in the list');
+const warn = P.wouldSkip(data, {}, w, m7[0].k, P.testSlot(data, '7MLA', data.classes['7MLA'].seq[firstI].unit));
+ok(warn.length >= 3, `a test now would skip ${warn.length} untaught 7MLA lessons, and says so`);
+const ticked = P.markLesson(data, {}, w, '7MLA', firstI, true, {});
+ok(!slotsOf(ticked, '7MLA').some((o) => o.s.i === firstI), 'ticking a lesson off removes it from the week and the rest re-flows');
+const tl = P.topicList(data, {}, w, '7MLA', data.classes['7MLA'].seq[firstI].unit, { day: w.slots[m7[0].k].day, period: w.slots[m7[0].k].period });
+ok(tl.find((x) => x.k === firstI).next && tl.some((x) => x.state === 'taught' && x.when && x.when.wrote), 'lesson list: ★ on the right lesson, taught ones show what he wrote');
+// every lesson folder on Drive is in the class's list (home only: needs G:)
+const DRIVE = 'G:/My Drive/Beechen Cliff Science/Lessons';
+if (fs.existsSync(DRIVE)) {
+  const lost = [];
+  for (const [cls, c] of Object.entries(data.classes)) {
+    const dirs = [...new Set(c.seq.filter((L) => L.rel).map((L) => L.rel.split('/').slice(0, -1).join('/')))];
+    for (const d of dirs) for (const f of fs.readdirSync(path.join(DRIVE, d))) {
+      if (!/^lesson\s*\d/i.test(f) || !fs.statSync(path.join(DRIVE, d, f)).isDirectory()) continue;
+      if (/\(separate\)/i.test(f) && cls === '10C2') continue;
+      if (!c.seq.some((L) => L.rel === `${d}/${f}`)) lost.push(`${cls} ${d}/${f}`);
+    }
+  }
+  // split topics (9XS B1 / B2 blocks) list each folder in one block only, which is fine
+  ok(!lost.length, `every Drive lesson folder is in its class's list (${lost.length} missing${lost.length ? ': ' + lost.slice(0, 3).join('; ') : ''})`);
+}
+
 console.log(fails ?`\n${fails} FAILED` : '\nall planner logic checks passed');
 process.exit(fails ? 1 : 0);
