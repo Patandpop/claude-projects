@@ -112,7 +112,7 @@
 
 <?!= include('Logic') ?>
 <script>
-const KEY = <?= key ?>;
+const KEY = <?!= JSON.stringify(key) ?>;   // the key is letters and numbers only, so unescaped output is safe
 const P = window.PlannerLogic;
 const COLS = ['B', 'F', 'J', 'N', 'R'];
 let S = { data:null, weeks:{}, learned:{}, hasTemplate:false, monday:null, week:null, undo:[], sel:-1, dirty:false, view:'week', day:0, mine:null, showMine:false };

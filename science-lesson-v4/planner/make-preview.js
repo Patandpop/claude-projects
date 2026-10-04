@@ -22,7 +22,7 @@ window.google = { script: { run: (function make(ok, bad) {
 })() } };
 </script>
 <script>${fs.readFileSync(path.join(dir, 'logic.js'), 'utf8')}</script>`;
-html = html.replace("<?!= include('Logic') ?>", mock).replace('<?= key ?>', '"preview"');
+html = html.replace("<?!= include('Logic') ?>", mock).replace('<?!= JSON.stringify(key) ?>', '"preview"');
 if (sel >= 0) html = html.replace('</body>', `<script>setTimeout(() => { S.showMine = true; loadMine(); S.week.extras.push({ day: 1, text: 'Mark 9XS Particles tests', kind: 'marking', kindLabel: '✎' }); S.sel = ${sel}; render(); editor(); }, 300);</script></body>`);
 fs.writeFileSync(path.join(dir, 'preview.html'), html);
 console.log('planner/preview.html written');
