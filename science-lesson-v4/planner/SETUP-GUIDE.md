@@ -84,7 +84,7 @@ The files are plain text: you'll open each one and copy what's inside.
 ## Part 6: load your lessons
 
 1. The planner opens and says "No data yet".
-2. Click **Import data** (top bar) and choose **planner-data.json**.
+2. Click **⋯ More → Import data** (top right) and choose **planner-data.json**.
 3. The week appears, already planned, starting from the first week after the sheets you filled in Planner.xlsx.
 
 ## Part 7 (optional): the Technicians' Excel button
@@ -103,6 +103,9 @@ This makes the button download your order sheet in exactly the layout the techni
 
 ## Using it
 
+**For a picture-by-picture tour of every part, open `planner/Planner-guide.pptx`.** Taught weeks (from Planner.xlsx) show read-only with a green badge; **Classes** shows where every class is up to; dark mode is the default (light mode in **⋯ More**).
+
+
 | To... | Do this |
 |---|---|
 | change a lesson | click it, type a few letters in the box on the right (e.g. "heart"), press **Enter**. ★ marks the next lesson in order |
@@ -112,8 +115,8 @@ This makes the button download your order sheet in exactly the layout the techni
 | fix equipment | edit it, tick **remember for this lesson** to make it the default from now on, then **Apply changes** |
 | carry unfinished work | **Review not finished → next lesson** (shows as "+1 carry" on the next lesson and goes into its build prompt) |
 | add a task, tests to mark, a meeting | hover the **All day** row under a day → **+ task / marking / meeting** (click a chip to remove it) |
-| see your Google Calendar | **My calendar** shows your meetings in the All day row (read only) |
-| put lessons in Google Calendar | **Send to Google Calendar**: writes the week into a separate calendar called "Lessons (Planner)". Sending again replaces that week; your main calendar is never changed |
+| see your Google Calendar | **⋯ More → Show my calendar** shows your meetings in the All day row (read only) |
+| put lessons in Google Calendar | **⋯ More → Send this week to Google Calendar**: writes the week into a separate calendar called "Lessons (Planner)". Sending again replaces that week; your main calendar is never changed |
 | undo | **Undo**, Ctrl+Z, or the Undo link in the black bar at the bottom |
 | save | **Save** or Ctrl+S. A gold dot means unsaved changes; the page warns you before leaving |
 | jump to a date | the date box in the top bar, **Today**, or ◀ ▶ |
@@ -124,7 +127,7 @@ Flags on a lesson: **CHECK** means the equipment is a guess; **NOT BUILT** means
 
 ## When things change
 
-- **Your lessons or Planner.xlsx changed:** ask Claude to "refresh the planner data", then click **Import data** again and pick the new planner-data.json.
+- **Your lessons or Planner.xlsx changed:** ask Claude to "refresh the planner data", then **⋯ More → Import data** again and pick the new planner-data.json.
 - **Claude changes the app's code:** ask Claude to "rebuild the planner files", then paste the 3 new files over the old ones (Part 3), Ctrl+S, then **Deploy → Manage deployments → ✏ (pencil) → Version: New version → Deploy**. The link stays the same.
 
 ## If something goes wrong
