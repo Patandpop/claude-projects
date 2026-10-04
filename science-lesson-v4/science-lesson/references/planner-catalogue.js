@@ -112,12 +112,14 @@ const OPTIONAL = /\(\s*op\w*nal\s*\)|^(formative assessment|formative review|dir
 function listLessons(dir) {
   if (!fs.existsSync(dir)) return [];
   return fs.readdirSync(dir).filter((f) => { try { return fs.statSync(path.join(dir, f)).isDirectory(); } catch { return false; } })
-    .map((f) => [f, f.match(/^lesson\s*(\d+)\s*(?:-\s*)?(.*)$/i)]).filter(([, m]) => m && m[2].trim())
+    // "Lesson 3a - Cell Models": a lesson he added in the planner after lesson 3
+    .map((f) => [f, f.match(/^lesson\s*(\d+)([a-z](?=[\s-]))?\s*(?:-\s*)?(.*)$/i)]).filter(([, m]) => m && m[3].trim())
     .map(([f, m]) => {
-      const raw = m[2].replace(/^\d+\s*-\s*/, '').trim();
-      return { num: +m[1], title: raw.replace(/\s*\(\s*op\w*nal\s*\)\s*/i, ' ').trim(), folder: path.join(dir, f), optional: OPTIONAL.test(raw) || +m[1] === 0 };
+      const raw = m[3].replace(/^\d+\s*-\s*/, '').trim();
+      return { num: m[2] ? m[1] + m[2].toLowerCase() : +m[1], ord: +m[1] + (m[2] ? (m[2].toLowerCase().charCodeAt(0) - 96) / 100 : 0),
+        title: raw.replace(/\s*\(\s*op\w*nal\s*\)\s*/i, ' ').trim(), folder: path.join(dir, f), optional: OPTIONAL.test(raw) || (+m[1] === 0 && !m[2]) };
     })
-    .sort((a, b) => a.num - b.num);
+    .sort((a, b) => a.ord - b.ord);
 }
 // Lessons the topic's technician guide lists but that have no folder yet (9XS B1 "Eukaryotic cells",
 // 10 P2 "Circuit symbols"). They go in the list where the guide puts them, marked "no folder".
@@ -194,7 +196,7 @@ function classSequence(cls, sol) {
         .map((x) => (String(x.pacingLabel || '').match(/L(\d+)\s*-\s*(\d+)/) || []).slice(1).map(Number)).filter((x) => x.length === 2);
       const gap = (n, [a, b]) => (n < a ? a - n : n > b ? n - b : 0);
       const mine = [+range[1], +range[2]];
-      ls = ls.filter((l) => gap(l.num, mine) === 0 || (!ranges.some((rg) => gap(l.num, rg) === 0) && ranges.every((rg) => gap(l.num, mine) <= gap(l.num, rg))));
+      ls = ls.filter((l) => gap(parseInt(l.num, 10), mine) === 0 || (!ranges.some((rg) => gap(parseInt(l.num, 10), rg) === 0) && ranges.every((rg) => gap(parseInt(l.num, 10), mine) <= gap(parseInt(l.num, 10), rg))));
     }
     // guide-only lessons slot in after the folder lesson they follow in the guide
     const extra = all.length ? guideOnly(dir, all, range && split ? [+range[1], +range[2]] : null) : [];

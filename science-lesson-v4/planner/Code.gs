@@ -12,7 +12,7 @@
      TEMPLATE_ID   a Google Sheet holding ONE of his order-sheet tabs, used for the Excel download
 */
 
-const VERSION = 2;
+const VERSION = 3;
 
 function setup() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -58,7 +58,63 @@ function loadAll(k) {
   const learned = {};
   const q = sheet_('Equipment');
   if (q.getLastRow() > 1) q.getRange(2, 1, q.getLastRow() - 1, 3).getValues().forEach(([key, eq, sets]) => { learned[key] = { eq, sets: sets || null }; });
-  return { version: VERSION, data: chunks ? JSON.parse(chunks) : null, weeks, learned, hasTemplate: !!PropertiesService.getScriptProperties().getProperty('TEMPLATE_ID') };
+  const added = [];
+  const ad = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Added');
+  if (ad && ad.getLastRow() > 1) ad.getRange(2, 1, ad.getLastRow() - 1, 1).getValues().forEach(([json]) => { try { added.push(JSON.parse(json)); } catch (e) { /* skip */ } });
+  return { version: VERSION, data: chunks ? JSON.parse(chunks) : null, weeks, learned, added, hasTemplate: !!PropertiesService.getScriptProperties().getProperty('TEMPLATE_ID') };
+}
+
+// A tab, made the first time it is needed (so an existing planner needs no setup re-run).
+function tab_(name, head) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sh = ss.getSheetByName(name);
+  if (!sh) { sh = ss.insertSheet(name); sh.appendRow(head); }
+  return sh;
+}
+
+/* ------------------------------------------------------------- new lessons
+   A lesson he adds in the planner (Patryk 2026-10-05). Optionally makes an EMPTY lesson folder on
+   Drive, "Lesson 4a - Title", inside the topic folder, so he can build into it. It only ever CREATES
+   a folder (never renames, moves or deletes), reuses one that already has that name, and logs every
+   folder it makes in the Log tab. The Lessons folder is found by the LESSONS_FOLDER_ID script
+   property, or else by looking for "Beechen Cliff Science" > "Lessons" in the Drive this script can see. */
+function lessonsRoot_() {
+  const id = PropertiesService.getScriptProperties().getProperty('LESSONS_FOLDER_ID');
+  if (id) return DriveApp.getFolderById(id);
+  const tops = DriveApp.searchFolders("title = 'Beechen Cliff Science' and trashed = false");
+  while (tops.hasNext()) {
+    const kids = tops.next().getFoldersByName('Lessons');
+    if (kids.hasNext()) return kids.next();
+  }
+  return null;
+}
+function createLesson(k, info) {
+  check_(k);
+  const rec = { cls: info.cls, unit: info.unit, afterKey: info.afterKey || '', num: info.num, title: info.title, rel: null };
+  let message = 'Added to the planner.', url = '';
+  if (info.makeFolder && info.topicRel) {
+    const root = lessonsRoot_();
+    if (!root) message = 'Added, but this Google account cannot see your "Beechen Cliff Science / Lessons" folder, so no folder was made (see Part 8 of the setup guide).';
+    else {
+      let dir = root;
+      for (const part of info.topicRel.split('/')) {
+        const it = dir.getFoldersByName(part);
+        if (!it.hasNext()) { dir = null; break; }
+        dir = it.next();
+      }
+      if (!dir) message = 'Added, but the topic folder "' + info.topicRel + '" was not found on Drive, so no folder was made.';
+      else {
+        const name = String(info.folderName).replace(/[\\/:*?"<>|]+/g, ' ').trim();
+        const ex = dir.getFoldersByName(name);
+        const f = ex.hasNext() ? ex.next() : dir.createFolder(name);
+        if (!ex.hasNext()) tab_('Log', ['when', 'what', 'where']).appendRow([new Date(), 'created lesson folder', info.topicRel + '/' + name]);
+        rec.rel = info.topicRel + '/' + name; url = f.getUrl();
+        message = 'Added, with an empty folder on Drive: ' + name;
+      }
+    }
+  }
+  tab_('Added', ['lesson', 'saved']).appendRow([JSON.stringify(rec), new Date()]);
+  return { rec, message, url };
 }
 
 function importData(k, text) {

@@ -99,6 +99,16 @@ This makes the button download your order sheet in exactly the layout the techni
    - Value: the long code
    - Click **Save script properties**.
 
+## Part 8 (optional): let "New lesson" make folders on Drive
+
+When you add a lesson that isn't in the list, the planner can make an empty folder for it, e.g. `Lesson 3a - Cell Models`, inside the topic folder on Drive. It only ever **creates** a folder. It never renames, moves or deletes anything, and every folder it makes is written in a **Log** tab in the planner's Sheet.
+
+It looks for `Beechen Cliff Science > Lessons` in the Drive of the account the planner runs as (your school account). If your lessons live in your **personal** Drive, either:
+- share the `Beechen Cliff Science` folder with your school account (Editor), or
+- open the `Lessons` folder in Drive, copy the code from the address bar (`.../folders/`**`1AbC...xyz`**), and add a script property `LESSONS_FOLDER_ID` with that code (as in Part 7).
+
+If it can't find the folder, the lesson is still added to the planner and it tells you no folder was made.
+
 ---
 
 ## Using it
@@ -116,7 +126,9 @@ This makes the button download your order sheet in exactly the layout the techni
 | cover | **Cover** asks: cover work for this lesson (counts as taught), or something else (the lesson moves on) |
 | add a lesson in an empty period | click the empty period, pick the class, click the lesson |
 | move a lesson | drag it onto another slot, then **Move it here** or **Swap the two**. Whatever was there moves on, never disappears |
-| make it a test / clear it | buttons under the technician details. If a test would leave lessons untaught, it lists them first |
+| revision lesson / test | **Revision** and **Test** under the technician details. They ask which topic (it picks the one the class is in at that point). When a topic's lessons are all taught it plans a revision lesson, then the test. If either would leave lessons untaught, it lists them first |
+| a lesson that isn't in the list | **+ New lesson in this topic** under the list: type the title, choose which lesson it goes after. It goes in this period, gets an empty folder on Drive (`Lesson 3a - Title`, see Part 8) and stays in that class's list from then on |
+| clear a period | **Clear** (the lesson moves on to the next period) |
 | carry part of a lesson | **Notes and carry-over → Review not finished → next lesson** (shows as "+1 carry" and goes into its build prompt) |
 | add a task, tests to mark, a meeting | hover the **All day** row under a day → **+ task / marking / meeting** (click a chip to remove it) |
 | see your Google Calendar | **⋯ More → Show my calendar** shows your meetings in the All day row (read only) |

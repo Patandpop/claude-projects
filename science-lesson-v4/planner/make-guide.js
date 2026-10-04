@@ -85,7 +85,7 @@ const callout = (s, num, x, y) => {
     ['COVER', 'cover work for this lesson (it counts as taught).'],
     ['DOUBLE', 'the second half of a double lesson (same lesson, one event).'],
     ['+1 carry', 'something carried over from last lesson (e.g. unfinished review).'],
-    ['Red block', 'an end-of-topic test. Orange: cover. Dashed: free.'],
+    ['Red block', 'an end-of-topic test. Blue: a revision lesson. Orange: cover. Dashed: free.'],
   ], 14), { x: 6.9, y: 1.15, w: 6.0, h: 6.0 });
 }
 
@@ -98,6 +98,7 @@ const callout = (s, num, x, y) => {
     ['Each row tells you', 'green ✓ = taught (with the date and what you wrote in Planner.xlsx); a blue day = planned this week; ★ next = what belongs here; plain = still to teach.'],
     ['2. Click a lesson', 'to put it in this period. That class\'s later lessons this week move along, so the one you replaced is not lost.'],
     ['Other topics', 'pick one in the topic box, or type in the search box to search them all.'],
+    ['Not in the list?', '"+ New lesson in this topic": type the title, choose what it goes after. It goes here and gets an empty folder on Drive (Lesson 3a - Title).'],
   ], 13), { x: 9.25, y: 1.15, w: 3.8, h: 5.9 });
 }
 
@@ -210,7 +211,7 @@ const callout = (s, num, x, y) => {
     ['Your order', 'each class follows your scheme of learning, only the topics you teach (co-teachers\' topics are skipped).'],
     ['Never back', 'once a class has started a later topic, earlier topics are finished for good.'],
     ['Fill the gaps', 'within the topic a class is on, every lesson gets taught; ones you missed come first (MISSED).'],
-    ['Tests', 'when a topic\'s lessons are all done it suggests "revision or end-of-topic test"; after a revision lesson it suggests the TEST.'],
+    ['Revision, then test', 'when a topic\'s lessons are all taught it plans a revision lesson, then the end-of-topic test. The Revision and Test buttons ask which topic, starting with the one the class is in at that point.'],
     ['Doubles', 'two periods in a row for the same class are one lesson.'],
     ['Holidays and INSET', 'no lessons (your 2026-27 dates). Week A/B carries on across holidays.'],
     ['Optional lessons', 'folders marked (Optional), DIRT and formative assessments are in the list but only taught if you pick them.'],

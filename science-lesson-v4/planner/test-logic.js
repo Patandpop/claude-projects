@@ -70,7 +70,26 @@ const y7 = lessonsOf(w, '7MLA');
 ok(y7.length && y7.every((L) => L.topic === 'B1 Cells'), `7MLA never goes back a topic (12 Oct: ${y7.map((L) => 'L' + L.num).join(', ')} of B1 Cells)`);
 const c10 = lessonsOf(w, '10C2').map((L) => L.num);
 ok(c10[0] === 9 && c10[1] === 11, `10C2 fills the missed P1 lessons first (L9, L11), got ${c10.join(', ')}`);
-ok(w.slots.some((s) => s.cls === '9AS' && s.kind === 'test' && /TEST \(revision done\)/.test(s.text)), '9AS gets its P3 test after the revision');
+ok(w.slots.some((s) => s.cls === '9AS' && s.kind === 'test' && /P3 Particles — end-of-topic TEST/.test(s.text)), '9AS gets its P3 test after the revision');
+// 12. Revision and test are separate (2026-10-05): a finished topic gets a revision lesson, then the test
+const seqOf = (cls) => data.classes[cls].seq;
+const st13 = P.progressBefore(data, {}, P.parse('2026-10-12'))['13D'];
+const u13 = st13.unit;
+seqOf('13D').forEach((L, k) => { if (L.unit === u13) st13.taught.add(k); });
+const r1 = P.next(seqOf('13D'), st13);
+ok(r1 && r1.revision === u13, `a topic with every lesson taught gets a REVISION lesson first (13D ${u13})`);
+P.next(seqOf('13D'), st13); st13.revised.add(u13);
+const r2 = P.next(seqOf('13D'), st13);
+ok(r2 && r2.test === u13, 'after the revision lesson comes the TEST');
+const m9 = w.slots.findIndex((s) => s.cls === '9AS' && s.kind === 'lesson' && /C1/.test(seqOf('9AS')[s.i].unit));
+ok(m9 >= 0 && /^P3/.test(P.unitBefore(data, {}, w, '9AS', w.slots[m9])), 'Test / Revision on the 9AS slot that starts C1 is for P3 (the topic they were in), not C1');
+// 13. Lessons he adds in the planner go into the list after the lesson he chose
+const d2 = JSON.parse(JSON.stringify(data));
+const L3 = d2.classes['7MLA'].seq.find((L) => /animal cells/i.test(L.title));
+const num = P.addedNum(d2, '7MLA', L3.unit, L3.num);
+P.applyAdded(d2, [{ cls: '7MLA', unit: L3.unit, afterKey: P.lessonId(L3), num, title: 'Cell Models', rel: null }]);
+const k3 = d2.classes['7MLA'].seq.indexOf(L3);
+ok(d2.classes['7MLA'].seq[k3 + 1].title === 'Cell Models' && num === L3.num + 'a', `added lesson sits after L${L3.num} as L${num}`);
 const ict = Object.values(data.classes).flatMap((c) => c.seq).filter((L) => /\b(ict|chromebooks?|it room)\b/i.test((L.eq || '') + ' ' + (L.print || '')));
 ok(!ict.length, `no ICT / Chromebook suggestions anywhere (${ict.length} found)`);
 ok(Array.isArray((data.filled || {})['2026-10-05']) && data.filled['2026-10-05'].some((s) => /^Cover:/.test(s.text)), 'filled weeks exported as taught (w/c 5 Oct covers kept)');

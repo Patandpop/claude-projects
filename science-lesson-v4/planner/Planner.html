@@ -69,6 +69,7 @@
   .ev .eq { color:var(--muted); font-size:11px; }
   .ev.kind-inset, .ev.kind-na { --c:#757575; color:var(--muted); }
   .ev.kind-test { background:color-mix(in srgb, var(--red) 18%, var(--panel)); }
+  .ev.kind-revision { background:color-mix(in srgb, var(--blue) 16%, var(--panel)); }
   .ev.kind-cover { background:color-mix(in srgb, var(--orange) 16%, var(--panel)); }
   .ev.kind-free { background:var(--panel); border-left-style:dashed; color:var(--muted); }
   .ev.kind-taught { --c:var(--green); cursor:default; }
@@ -97,7 +98,8 @@
   .card h4 { margin:0 0 6px; font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); display:flex; justify-content:space-between; gap:8px; }
   .card .src { font-weight:400; text-transform:none; letter-spacing:0; }
   .card .src.guess { color:var(--orange); font-weight:700; }
-  .card textarea { min-height:44px; }
+  .card textarea { min-height:96px; font-size:13.5px; line-height:1.4; }
+  .newles { width:100%; margin-top:6px; border-style:dashed; }
   .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:6px; }
   label.inline { display:flex; gap:6px; align-items:center; margin:6px 0 0; }
   .lessonlist { border:1px solid var(--line); border-radius:6px; margin-top:6px; max-height:calc(100vh - 520px); min-height:220px; overflow:auto; background:var(--panel); }
@@ -299,7 +301,7 @@ function render() {
       const c = S.data.classes[s.cls] || {};
       const flags = [];
       if (s.double) flags.push('<span class="flag f-dbl">DOUBLE</span>');
-      if (s.kind === 'lesson' && (s.eqSrc === 'guess' || s.planned)) flags.push('<span class="flag f-check" title="Equipment is a guess: check it">CHECK</span>');
+      if (s.kind === 'lesson' && !s.cover && (s.eqSrc === 'guess' || s.planned)) flags.push('<span class="flag f-check" title="Equipment is a guess: check it">CHECK</span>');
       if (s.cover) flags.push('<span class="flag f-check" title="Cover work for this lesson: counts as taught">COVER</span>');
       if (s.kind === 'lesson' && s.nofolder) flags.push('<span class="flag f-built" title="In the technician guide but no lesson folder on Drive">NO FOLDER</span>');
       else if (s.kind === 'lesson' && s.built === false) flags.push('<span class="flag f-built" title="No slides in the Drive folder yet">NOT BUILT</span>');
@@ -442,6 +444,7 @@ function chooser(cls, pos, curI, onPick) {
     '<div class="row" style="margin-top:0"><select id="cUnit" style="flex:1">' + units.map((u) => '<option value="' + esc(u.unit) + '"' + (u.unit === S.chooser.unit ? ' selected' : '') + '>' + esc(u.text) + '</option>').join('') + '</select></div>' +
     '<input type="text" id="q" placeholder="or search every topic, e.g. heart" style="margin-top:6px">' +
     '<div class="lessonlist" id="qr"></div>' +
+    '<button class="newles" id="newLes">+ New lesson in this topic (not in the list)</button>' +
     '<div class="muted" style="margin-top:4px">Click a lesson to put it here. Tick = already taught or you won\'t teach it (it won\'t be planned). Untick a wrong tick and it gets planned.</div>';
   const row = (o, topic) => {
     const here = o.k === curI;
@@ -482,6 +485,7 @@ function chooser(cls, pos, curI, onPick) {
     $('q').onkeydown = (e) => { if (e.key === 'Enter') { const f = q ? $('qr').querySelector('.body') : hi; if (f) onPick(+f.dataset.k); } };
   };
   $('cUnit').onchange = () => { S.chooser.unit = $('cUnit').value; $('q').value = ''; draw(); };
+  $('newLes').onclick = () => newLesson(cls, S.chooser.unit, pos, onPick);
   $('q').oninput = draw;
   draw();
 }
@@ -500,6 +504,60 @@ function okToSkip(lost, what) {
   if (!lost.length) return true;
   return confirm(what + ' would leave these lessons untaught:\n\n• ' + lost.slice(0, 12).join('\n• ') + (lost.length > 12 ? '\n• ...and ' + (lost.length - 12) + ' more' : '') +
     '\n\nOK = skip them (you can tick or untick them later). Cancel = keep them.');
+}
+// A lesson that is not in the list yet (Patryk 2026-10-05): it goes into the topic after the lesson he
+// picks, gets an empty "Lesson 4a - Title" folder on Drive to build into, and goes in this period.
+function newLesson(cls, unit, pos, onPick) {
+  const c = S.data.classes[cls];
+  const ls = c.seq.map((L, k) => ({ L, k })).filter((o) => o.L.unit === unit);
+  if (!ls.length) return;
+  const tl = P.topicList(S.data, S.weeks, S.week, cls, unit, pos, S.learned);
+  const nx = tl.findIndex((o) => o.next);
+  const def = nx > 0 ? tl[nx - 1].k : nx === 0 ? -1 : ls[ls.length - 1].k;      // after the lesson before ★ next
+  const withRel = ls.find((o) => o.L.rel);
+  const topicRel = withRel ? withRel.L.rel.split('/').slice(0, -1).join('/') : '';
+  modal('<h3>New lesson: ' + esc(ls[0].L.topic) + '</h3>' +
+    '<label>Title</label><input type="text" id="nlTitle" placeholder="e.g. Cell Models">' +
+    '<label>Goes after</label><select id="nlAfter"><option value="-1">(start of the topic)</option>' + ls.map((o) => '<option value="' + o.k + '"' + (o.k === def ? ' selected' : '') + '>L' + o.L.num + ' ' + esc(o.L.title) + '</option>').join('') + '</select>' +
+    (topicRel ? '<label class="inline"><input type="checkbox" id="nlFolder" checked> make an empty lesson folder on Drive to build into</label><div class="muted" id="nlName"></div>'
+      : '<p class="muted">This topic has no folders on Drive yet, so it is added to the planner only.</p>') +
+    '<div class="row"><button class="primary" id="nlAdd">Add and put it here</button><button id="nlCancel">Cancel</button></div>');
+  const numFor = () => { const a = +$('nlAfter').value; return a < 0 ? '0a' : P.addedNum(S.data, cls, unit, c.seq[a].num); };
+  const showName = () => { if ($('nlName')) $('nlName').textContent = 'Folder: Lessons/' + topicRel + '/Lesson ' + numFor() + ' - ' + ($('nlTitle').value.trim() || '...'); };
+  $('nlTitle').oninput = showName; $('nlAfter').onchange = showName; showName(); $('nlTitle').focus();
+  $('nlCancel').onclick = closeModal;
+  $('nlAdd').onclick = () => {
+    const title = $('nlTitle').value.trim(); if (!title) { $('nlTitle').focus(); return; }
+    const a = +$('nlAfter').value, num = numFor();
+    const info = { cls, unit, title, num, afterKey: a >= 0 ? P.lessonId(c.seq[a]) : '^start', topicRel, makeFolder: !!($('nlFolder') && $('nlFolder').checked), folderName: 'Lesson ' + num + ' - ' + title };
+    $('nlAdd').disabled = true; $('nlAdd').textContent = 'Adding...';
+    run('createLesson', info).then((r) => {
+      closeModal();
+      S.added.push(r.rec);
+      P.applyAdded(S.data, [r.rec]);
+      // the list positions after it moved up by one: point every week back at the same lessons
+      P.remapWeek(S.data, S.week); Object.values(S.weeks).forEach((w) => P.remapWeek(S.data, w)); S.undo = [];
+      const k = S.data.classes[cls].seq.findIndex((L) => L.unit === unit && L.title === title);
+      toast(r.message);
+      if (k >= 0) onPick(k);
+    }).catch((e) => { $('nlAdd').disabled = false; $('nlAdd').textContent = 'Add and put it here'; toast('Not added: ' + e.message); });
+  };
+}
+// Revision lesson or end-of-topic test, for the topic the class is in at this point (not the topic
+// of whatever lesson was planned in the slot: 9AS's P3 test, not C1).
+function revisionOrTest(kind, s, put) {
+  const units = unitOptions(s.cls);
+  const def = P.unitBefore(S.data, S.weeks, S.week, s.cls, s, S.learned) || (units.find((u) => u.state === 'current') || {}).unit;
+  const label = kind === 'test' ? 'End-of-topic test' : 'Revision lesson';
+  modal('<h3>' + label + ' for ' + esc(s.cls) + '</h3><label>Topic</label><select id="rtUnit">' +
+    units.map((u) => '<option value="' + esc(u.unit) + '"' + (u.unit === def ? ' selected' : '') + '>' + esc(u.text) + '</option>').join('') + '</select>' +
+    '<p class="muted">' + (kind === 'test' ? 'A test finishes the topic.' : 'A revision lesson ends the teaching; the test is planned next.') + ' This period\'s lesson moves on to ' + esc(s.cls) + '\'s next period.</p>' +
+    '<div class="row"><button class="primary" id="rtOk">' + label + '</button><button id="rtCancel">Cancel</button></div>');
+  $('rtCancel').onclick = closeModal;
+  $('rtOk').onclick = () => {
+    const u = $('rtUnit').value; closeModal();
+    put(kind === 'test' ? P.testSlot(S.data, s.cls, u) : P.revisionSlot(S.data, s.cls, u), label + ' set', kind === 'test' ? 'A test now' : 'A revision lesson now');
+  };
 }
 function addPanel(day, period) {
   S.sel = -1; render();
@@ -541,7 +599,7 @@ function editor() {
   const s = S.week.slots[S.sel];
   const c = S.data.classes[s.cls];
   const curL = s.kind === 'lesson' && c ? c.seq[s.i] : null;
-  const isLesson = ['lesson', 'test'].includes(s.kind);
+  const isLesson = ['lesson', 'test', 'revision'].includes(s.kind);
   const src = { 'technician guide': 'from the technician guide', 'past order': 'from a past order', remembered: 'your saved version', guess: 'a guess: check it' }[s.eqSrc] || '';
   ed.innerHTML = '<h2>' + esc(s.cls) + ' · ' + P.DAYS[s.day] + ' P' + s.period + ' <span class="muted">' + esc(P.periodTime(S.data, s.cls, s.period)) + (s.double ? ' · 2nd half of double' : '') + '</span></h2>' +
     (curL ? '<div class="now"><b>L' + curL.num + ' ' + esc(curL.title) + '</b><div class="muted">' + esc(curL.topic) + (curL.optional ? ' · optional' : '') + (curL.nofolder ? ' · no folder on Drive' : '') + (s.pinned ? ' · chosen by you' : ' · planned automatically') + '</div></div>'
@@ -553,7 +611,7 @@ function editor() {
       '<div class="row" style="margin-top:6px"><input type="text" id="eBook" placeholder="Textbooks" value="' + esc(s.book || '') + '" style="flex:1"><button id="eAddBook" title="Fill in the textbook pages for this lesson">+ pages</button></div>' +
       (s.kind === 'lesson' ? '<label class="inline"><input type="checkbox" id="eRemember"' + (s.eqSrc === 'remembered' ? ' checked' : '') + '> use this every time this lesson is taught</label>' : '') +
     '</div>' +
-    '<div class="row"><button id="kTest">Make it a test</button><button id="kCover">Cover</button><button id="kFree">Clear</button><button id="ePrompt">Copy build prompt</button>' +
+    '<div class="row"><button id="kRev">Revision</button><button id="kTest">Test</button><button id="kCover">Cover</button><button id="kFree">Clear</button><button id="ePrompt">Copy build prompt</button>' +
     (curL ? '<button id="kCont" title="Puts this lesson in ' + esc(s.cls) + '\'s next slot too; the rest of the week moves along">Didn\'t finish: continue next lesson</button>' : '') + '</div>' +
     (c ? '<div class="card"><h4>Choose the lesson <span class="src">' + esc(s.cls) + '</span></h4><div id="chooser"></div></div>' : '') +
     '<details' + ((s.notes || []).length || (s.carry || []).length ? ' open' : '') + '><summary>Notes and carry-over' + ((s.notes || []).length + (s.carry || []).length ? ' (' + ((s.notes || []).length + (s.carry || []).length) + ')' : '') + '</summary>' +
@@ -576,8 +634,8 @@ function editor() {
     const L = c.seq[k];
     put(P.lessonSlot(S.data, s.cls, k, S.learned), 'L' + L.num + ' ' + L.title + ' put in', 'Moving ' + s.cls + ' on to ' + L.topic);
   });
-  const testUnit = curL ? curL.unit : (P.progressBefore(S.data, S.weeks, S.monday)[s.cls] || {}).unit;
-  $('kTest').onclick = () => { if (testUnit) put(P.testSlot(S.data, s.cls, testUnit), 'Marked as a test', 'A test now'); };
+  $('kTest').onclick = () => revisionOrTest('test', s, put);
+  $('kRev').onclick = () => revisionOrTest('revision', s, put);
   // Cover: either the cover teacher teaches THIS lesson (it counts as taught) or the class does
   // something else (this lesson moves on to the next slot).
   $('kCover').onclick = () => {
@@ -721,8 +779,11 @@ document.addEventListener('keydown', (e) => {
 window.addEventListener('beforeunload', (e) => { if (S.dirty) { e.preventDefault(); e.returnValue = ''; } });
 
 function onLoad(r) {
-  S.data = r.data; S.weeks = r.weeks || {};
-  if (S.data && S.data.classes) Object.values(S.weeks).forEach((w) => P.remapWeek(S.data, w));   // same lessons after a data refresh S.learned = r.learned || {}; S.hasTemplate = r.hasTemplate;
+  S.data = r.data; S.weeks = r.weeks || {}; S.learned = r.learned || {}; S.hasTemplate = r.hasTemplate; S.added = r.added || [];
+  if (S.data && S.data.classes) {
+    P.applyAdded(S.data, S.added);                                          // lessons he added in the planner
+    Object.values(S.weeks).forEach((w) => P.remapWeek(S.data, w));          // same lessons after a data refresh
+  }
   if (!S.data) { status('No data yet: More → Import data, pick planner-data.json'); $('grid').innerHTML = ''; editor(); return; }
   if (!S.data.periodTimes || !S.data.filled) { status('Old data file: ask Claude to refresh the planner data, then More → Import data'); return; }
   loadWeek(S.monday || firstPlanMonday()); markGaps(); render();
