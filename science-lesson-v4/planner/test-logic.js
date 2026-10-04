@@ -64,5 +64,16 @@ const e9 = P.calendarEvents(data, w).find((e) => e.cls === '9XS' && e.start.ends
 ok(!!e9, '9XS P2 uses KS3 time 10:25');
 ok(!ev.some((e) => e.date === '2026-10-22'), 'no calendar events on INSET day');
 
+// 10. Patryk's rules (2026-10-04)
+const lessonsOf = (wk, cls) => wk.slots.filter((s) => s.cls === cls && s.kind === 'lesson').map((s) => data.classes[cls].seq[s.i]);
+const y7 = lessonsOf(w, '7MLA');
+ok(y7.length && y7.every((L) => L.topic === 'B1 Cells'), `7MLA never goes back a topic (12 Oct: ${y7.map((L) => 'L' + L.num).join(', ')} of B1 Cells)`);
+const c10 = lessonsOf(w, '10C2').map((L) => L.num);
+ok(c10[0] === 9 && c10[1] === 11, `10C2 fills the missed P1 lessons first (L9, L11), got ${c10.join(', ')}`);
+ok(w.slots.some((s) => s.cls === '9AS' && s.kind === 'test' && /TEST \(revision done\)/.test(s.text)), '9AS gets its P3 test after the revision');
+const ict = Object.values(data.classes).flatMap((c) => c.seq).filter((L) => /\b(ict|chromebooks?|it room)\b/i.test((L.eq || '') + ' ' + (L.print || '')));
+ok(!ict.length, `no ICT / Chromebook suggestions anywhere (${ict.length} found)`);
+ok(Array.isArray((data.filled || {})['2026-10-05']) && data.filled['2026-10-05'].some((s) => /^Cover:/.test(s.text)), 'filled weeks exported as taught (w/c 5 Oct covers kept)');
+
 console.log(fails ?`\n${fails} FAILED` : '\nall planner logic checks passed');
 process.exit(fails ? 1 : 0);

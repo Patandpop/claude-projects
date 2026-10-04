@@ -37,7 +37,7 @@
 
   /* ---------------------------------------------------------------- progress */
   function cloneState(p) {
-    return { taught: new Set(p.taught || []), closed: new Set(p.closed || []), tested: new Set(p.tested || []), last: p.last == null ? -1 : p.last, unit: p.unit || null };
+    return { taught: new Set(p.taught || []), closed: new Set(p.closed || []), tested: new Set(p.tested || []), revised: new Set(p.revised || []), last: p.last == null ? -1 : p.last, unit: p.unit || null };
   }
   // Progress for every class as it stands before `monday`: the export's progress (from his
   // Planner.xlsx sheets) plus every saved week in the app that comes after those sheets.
@@ -54,26 +54,46 @@
     if (!s || !slot) return;
     if (slot.kind === 'lesson' && slot.i != null) {
       const seq = data.classes[slot.cls].seq;
-      s.taught.add(slot.i); s.last = slot.i; s.unit = seq[slot.i] ? seq[slot.i].unit : s.unit;
+      const u = seq[slot.i] ? seq[slot.i].unit : s.unit;
+      // entering a later topic closes every earlier one (never go back a topic)
+      if (u !== s.unit) { const order = [...new Set(seq.map((x) => x.unit))]; order.slice(0, order.indexOf(u)).forEach((x) => s.closed.add(x)); }
+      s.taught.add(slot.i); s.last = slot.i; s.unit = u;
     } else if (slot.kind === 'test' && slot.unit) { s.closed.add(slot.unit); s.tested.add(slot.unit); }
   }
-  // Next thing for a class: { i } a lesson, { test: unit } an end-of-topic test, or null.
+  // Next thing for a class (Patryk 2026-10-04): the FIRST untaught lesson of the current topic, so
+  // missed lessons are filled in; then the topic's end-of-topic test (unless tested, or the topic
+  // carries on in a later block); then the next topic. NEVER an earlier topic.
   function next(seq, st) {
     const order = [...new Set(seq.map((x) => x.unit))];
+    const ui = Math.max(0, order.indexOf(st.unit));
     if (st.unit && !st.closed.has(st.unit)) {
-      for (let k = Math.max(0, st.last + 1); k < seq.length && seq[k].unit === st.unit; k++) if (!st.taught.has(k)) return { i: k };
+      const j = seq.findIndex((x, k) => x.unit === st.unit && !st.taught.has(k));
+      if (j >= 0) return { i: j };
       st.closed.add(st.unit);
-      const cur = seq.find((x) => x.unit === st.unit);
-      const resumes = cur && seq.some((x) => x.topic === cur.topic && x.unit !== st.unit && order.indexOf(x.unit) > order.indexOf(st.unit));
-      if (!resumes && !st.tested.has(st.unit)) return { test: st.unit };
     }
-    for (let ui = Math.max(0, order.indexOf(st.unit)); ui < order.length; ui++) {
-      const u = order[ui];
+    if (st.unit && !st.tested.has(st.unit)) {
+      const cur = seq.find((x) => x.unit === st.unit);
+      const resumes = cur && seq.some((x) => x.topic === cur.topic && order.indexOf(x.unit) > ui);
+      if (!resumes) return { test: st.unit, revised: !!(st.revised && st.revised.has(st.unit)) };
+    }
+    for (let k = ui + 1; k < order.length; k++) {
+      const u = order[k];
       if (st.closed.has(u)) continue;
-      const j = seq.findIndex((x, k) => x.unit === u && !st.taught.has(k));
+      const j = seq.findIndex((x, m) => x.unit === u && !st.taught.has(m));
       if (j >= 0) return { i: j };
     }
     return null;
+  }
+  // Done / missed per topic for one class (the Classes view).
+  function classReport(data, savedWeeks, monday, cls) {
+    const c = data.classes[cls]; if (!c) return [];
+    const st = progressBefore(data, savedWeeks, monday)[cls];
+    return [...new Set(c.seq.map((x) => x.unit))].map((u) => {
+      const ls = c.seq.map((x, j) => ({ ...x, j })).filter((x) => x.unit === u);
+      const state = u === st.unit ? 'current' : st.closed.has(u) || st.tested.has(u) ? 'finished' : ls.some((x) => st.taught.has(x.j)) ? 'started' : 'to come';
+      return { unit: u, topic: ls[0].topic, state, tested: st.tested.has(u), revised: st.revised.has(u),
+        lessons: ls.map((x) => ({ num: x.num, title: x.title, done: st.taught.has(x.j) })) };
+    });
   }
 
   /* ----------------------------------------------------------------- filling */
@@ -85,9 +105,9 @@
       print: L.print || '', book: '', eqSrc: mem ? 'remembered' : L.eqSrc, built: L.built, planned: L.planned,
     };
   }
-  function testSlot(data, cls, unit) {
+  function testSlot(data, cls, unit, revised) {
     const L = data.classes[cls].seq.find((x) => x.unit === unit) || {};
-    return { kind: 'test', unit, text: `${L.topic || unit} — end-of-topic test or revision`, eq: 'Test papers (core / challenge): see Admin/Assessment', sets: null, print: '' };
+    return { kind: 'test', unit, text: `${L.topic || unit} — ${revised ? 'end-of-topic TEST (revision done)' : 'revision or end-of-topic test'}`, eq: 'Test papers (core / challenge): see Admin/Assessment', sets: null, print: '' };
   }
   // A fresh week from the timetable, every slot filled in turn.
   function autofill(data, savedWeeks, monday, learned) {
@@ -108,7 +128,7 @@
       }
       const nx = next(cdata.seq, st[t.cls]);
       if (!nx) { slots.push({ ...base, kind: 'free', text: 'End of planned lessons', eq: '' }); continue; }
-      const s = nx.test != null ? { ...base, ...testSlot(data, t.cls, nx.test) } : { ...base, ...lessonSlot(data, t.cls, nx.i, learned) };
+      const s = nx.test != null ? { ...base, ...testSlot(data, t.cls, nx.test, nx.revised) } : { ...base, ...lessonSlot(data, t.cls, nx.i, learned) };
       applySlot(data, st[t.cls], s);
       slots.push(s);
     }
@@ -152,7 +172,7 @@
       }
       s.double = false;
       const nx = next(cdata.seq, st);
-      Object.assign(s, nx ? (nx.test != null ? testSlot(data, cls, nx.test) : lessonSlot(data, cls, nx.i, learned)) : { kind: 'free', text: 'End of planned lessons', eq: '' }, keep);
+      Object.assign(s, nx ? (nx.test != null ? testSlot(data, cls, nx.test, nx.revised) : lessonSlot(data, cls, nx.i, learned)) : { kind: 'free', text: 'End of planned lessons', eq: '' }, keep);
       applySlot(data, st, s);
     });
   }
@@ -258,7 +278,7 @@
     return out;
   }
 
-  const api = { periodTime, calendarEvents, DAYS, iso, parse, addDays, mondayOf, isTeachingDay, weekLetter, progressBefore, next, autofill, moveSlot, refillAfter,
+  const api = { classReport, periodTime, calendarEvents, DAYS, iso, parse, addDays, mondayOf, isTeachingDay, weekLetter, progressBefore, next, autofill, moveSlot, refillAfter,
     lessonSlot, testSlot, sheetCells, printList, buildPrompt, carryForward, equipCell, lessonCell, setsLabel };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.PlannerLogic = api;
 })(typeof window !== 'undefined' ? window : this);

@@ -51,28 +51,57 @@ const ROUTES = {
 const YEAR_OF = { year7: 7, year8: 8, year9: 9, year10combined: 10, year10separate: 10, year11separate: 11, year12: 12, year13: 13 };
 
 /* ------------------------------------------------------------- fuzzy matching */
-const STOP = new Set('lesson the a an and of in to for on with by part pt required practical rp theory'.split(' '));
+const STOP = new Set('lesson the a an and of in to for on with by part pt required practical rp theory pag use using other lab'.split(' '));
+// plurals -> singular: oscilloscopes -> oscilloscope, batteries -> battery, boxes -> box, cells -> cell
+const singular = (w) => (w.length <= 4 ? w : /ies$/.test(w) ? w.slice(0, -3) + 'y' : /(s|x|ch|sh)es$/.test(w) ? w.slice(0, -2) : /[^s]s$/.test(w) ? w.slice(0, -1) : w);
+// Abbreviations and his usual spellings in Planner.xlsx -> the words in the lesson folder names.
+const SYN = {
+  tir: 'total internal reflection', snell: 'refractive index', snells: 'refractive index', em: 'electromagnetic',
+  shc: 'specific heat capacity', gpe: 'gravitational potential energy', ke: 'kinetic energy',
+  anerobic: 'anaerobic', gases: 'gas air', gas: 'gas air', microwaves: 'microwave electromagnetic', microwave: 'microwave electromagnetic',
+};
 const toks = (s) => String(s || '').toLowerCase().replace(/^\s*cover\s*:\s*/, '').replace(/[^a-z0-9 ]+/g, ' ')
-  .split(/\s+/).filter((w) => w && !STOP.has(w) && !/^\d+$/.test(w));
+  .split(/\s+/).flatMap((w) => (SYN[w] ? SYN[w].split(' ') : [w]))
+  .filter((w) => w && !STOP.has(w) && !/^\d+$/.test(w))
+  .map(singular)
+  .map((w) => (w.length > 5 ? w.replace(/(ing|ed|e)$/, '') : w));      // change = changing = changed
+// Edit distance that counts a swapped pair of letters as one slip ("saftey" = "safety").
 function lev(a, b) {
   const m = a.length, n = b.length; if (!m || !n) return m || n;
-  let prev = Array.from({ length: n + 1 }, (_, j) => j);
-  for (let i = 1; i <= m; i++) {
-    const cur = [i];
-    for (let j = 1; j <= n; j++) cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
-    prev = cur;
+  const d = Array.from({ length: m + 1 }, (_, i) => [i, ...Array(n).fill(0)]);
+  for (let j = 1; j <= n; j++) d[0][j] = j;
+  for (let i = 1; i <= m; i++) for (let j = 1; j <= n; j++) {
+    const c = a[i - 1] === b[j - 1] ? 0 : 1;
+    d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + c);
+    if (i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) d[i][j] = Math.min(d[i][j], d[i - 2][j - 2] + 1);
   }
-  return prev[n];
+  return d[m][n];
 }
-const same = (a, b) => a === b || (a.length >= 4 && b.length >= 4 && (a.startsWith(b) || b.startsWith(a))) ||
-  (a.length >= 5 && b.length >= 5 && lev(a, b) <= (Math.min(a.length, b.length) >= 8 ? 2 : 1));
-// Dice similarity over fuzzy-equal tokens, 0..1
+// How well two words match: 1 exact, .95 one is the start of the other, .85 a typo, 0 no.
+// Never a typo-match across "an-" (aerobic vs anaerobic are opposites).
+function same(a, b) {
+  if (a === b) return 1;
+  if (a.length >= 4 && b.length >= 4 && (a.startsWith(b) || b.startsWith(a))) return 0.95;
+  if (a.startsWith('an') !== b.startsWith('an')) return 0;
+  if (a.length >= 5 && b.length >= 5 && lev(a, b) <= (Math.min(a.length, b.length) >= 8 ? 2 : 1)) return 0.85;
+  return 0;
+}
+// 0..1: mostly "how much of what he wrote is in this title" (his entries are short), partly
+// how much of the title it covers, so a short exact title beats a long one that merely contains it.
 function sim(x, y) {
   const A = toks(x), B = toks(y);
   if (!A.length || !B.length) return 0;
+  // Long, specific words count more than short common ones: "superpostion" decides a match, "wave"
+  // or "cells" alone does not.
+  const wt = (w) => Math.min(12, w.length);
+  const wA = A.reduce((s, a) => s + wt(a), 0), wB = B.reduce((s, b) => s + wt(b), 0);
   const used = new Set(); let hit = 0;
-  for (const a of A) { const j = B.findIndex((b, k) => !used.has(k) && same(a, b)); if (j >= 0) { used.add(j); hit++; } }
-  return (2 * hit) / (A.length + B.length);
+  for (const a of A) {
+    let best = -1, bs = 0;
+    B.forEach((b, k) => { if (used.has(k)) return; const s = same(a, b); if (s > bs) { bs = s; best = k; } });
+    if (best >= 0) { used.add(best); hit += bs * Math.max(wt(a), wt(B[best])) / 2 + bs * Math.min(wt(a), wt(B[best])) / 2; }
+  }
+  return 0.6 * Math.min(1, hit / wA) + 0.4 * Math.min(1, (2 * hit) / (wA + wB));
 }
 
 /* ---------------------------------------------------------- lesson catalogue */
@@ -112,8 +141,12 @@ function classSequence(cls, sol) {
   seq.forEach((t, block) => {
     const dir = `${DRIVE}/Year ${year}/${t.subject === 'Science Skills' ? 'Science Skills' : t.subject}/${t.driveTopicFolder}`;
     let ls = listLessons(dir);
-    const range = String(t.pacingLabel || '').match(/L(\d+)\s*-\s*(\d+)/);       // "B1 Cells L1-7"
-    if (range && ls.length) ls = ls.filter((l) => l.num >= +range[1] && l.num <= +range[2]);
+    // "B1 Cells L1-7" then later "B1 Cells L8-16": only a topic taught in BLOCKS is cut by its range.
+    // (A single block's range is just the pacing count and must not drop lessons: 10C2 lost
+    // P1 L12 Renewables because the pacing sheet says "L1-11".)
+    const range = String(t.pacingLabel || '').match(/L(\d+)\s*-\s*(\d+)/);
+    const split = seq.filter((x) => x.driveTopicFolder === t.driveTopicFolder).length > 1;
+    if (range && split && ls.length) ls = ls.filter((l) => l.num >= +range[1] && l.num <= +range[2]);
     for (const l of ls) {
       const key = l.folder;
       if (seen.has(key)) continue;
@@ -177,7 +210,20 @@ function setsFor(text) {
   return 'threes';
 }
 
+// Patryk 2026-10-04: never recommend ICT. Technician guides say things like "Chrome or ICT
+// reccommended" or "Chromebooks or IT room"; those items are dropped from the equipment text.
+const NO_ICT = /\b(ict|chrome ?books?|chrome|it room|computer room|laptops?|ipads?|tablets?)\b/i;
+function stripICT(text) {
+  if (!text) return text;
+  const kept = String(text).split(/\s*,\s*/).filter((part) => !NO_ICT.test(part));
+  return kept.join(', ').trim() || 'N/A';
+}
 function equipmentFor(lesson) {
+  const e = equipmentFor0(lesson);
+  const printing = e.printing ? stripICT(e.printing) : e.printing;
+  return { ...e, equipment: stripICT(e.equipment), printing: printing === 'N/A' ? '' : printing };
+}
+function equipmentFor0(lesson) {
   const key = lesson.folder || `${lesson.topic}/${lesson.title}`;
   const mem = learned()[key];
   if (mem) return { ...mem, source: 'remembered' };
@@ -239,66 +285,135 @@ const isTest = (t) => /\b(assessment|test)\b/i.test(t) && !/\breview\b/i.test(t)
 const isRevision = (t) => /\brevision\b/i.test(t);
 const skip = (t) => !t || /^n\/?a$/i.test(t) || /ignite|inset|trip|pshe|baseline/i.test(t);
 
-// Progress model (back-test 2026-10-03): Patryk teaches a topic's lessons in his OWN order, skips
-// some and comes back to others, so a single pointer drifts. Instead track WHICH lessons have been
-// taught and which unit (topic block) he is in. A test or revision lesson closes the unit.
+/* Progress model (Patryk 2026-10-04):
+   - NEVER go back a topic. Once a class has a lesson in a later topic, every earlier topic is
+     finished (its missed lessons are reported, never planned).
+   - Within the CURRENT topic, every lesson gets taught: missed ones are planned first, in order,
+     before moving on.
+   - A revision lesson ends the topic's teaching; the end-of-topic test is still to come. A test
+     ends the topic completely.
+   - Matching his Planner.xlsx entries: the current topic is preferred; jumping to a later topic
+     needs a clearly better match; an entry can tick off two lessons when it covers both
+     ("Frequency, Time Period and the Wave Equation" = L2 + L3); a repeat of a taught lesson is
+     just a repeat. */
+const MATCH = 0.45;           // enough to accept a lesson in the topic he is on
+const JUMP = 0.6;             // needed to move into a later topic
 function progress(seq, history) {
-  const taught = new Set(), closed = new Set(), tested = new Set();
+  const taught = new Set(), closed = new Set(), tested = new Set(), revised = new Set();
+  const order = [...new Set(seq.map((x) => x.unit))];
   let unit = seq.length ? seq[0].unit : null, uncertain = false, last = -1;
   const log = [];
-  const unitIdx = (u) => seq.findIndex((x) => x.unit === u);
+  const moveTo = (u) => {                          // entering a later topic closes all earlier ones
+    const ui = order.indexOf(u);
+    order.slice(0, ui).forEach((x) => closed.add(x));
+    unit = u;
+  };
   for (const h of history) {
-    const t = h.lesson.replace(/^s*covers*:s*/i, '');
+    const t = h.lesson.replace(/^\s*cover\s*:\s*/i, '');
     if (skip(t)) continue;
     if (isTest(t) || isRevision(t)) {
-      // "Particles Test" closes P3 Particles even if the class has already started the next topic;
-      // a test that names no topic closes the current one.
+      // "Particles Test" ends P3 Particles even if the class has already started the next topic;
+      // a test or revision that names no topic ends the current one.
       const named = t.replace(/\b(test|assessment|revision|review|end of topic|cover)\b/ig, ' ');
       let target = unit, ts = 0;
-      for (const u of new Set(seq.map((x) => x.unit))) {
-        const topicName = String(u).replace(/#\d+$/, '').replace(/^[BCP]\d+\s+/, '');
-        const sc = sim(named, topicName);
+      for (const u of order) {
+        const sc = sim(named, String(u).replace(/#\d+$/, '').replace(/^[BCP]\d+\s+/, ''));
         if (sc > ts && sc >= 0.4) { ts = sc; target = u; }
       }
-      if (target) { closed.add(target); tested.add(target); log.push(`${t} -> ${target} finished`); }
+      if (!target) continue;
+      if (isTest(t) && !isRevision(t)) { closed.add(target); tested.add(target); log.push(`${t} -> ${target} tested`); }
+      else { closed.add(target); revised.add(target); log.push(`${t} -> ${target} revised (test still to come)`); }
       continue;
     }
-    let best = -1, bs = 0;
-    const curStart = unit ? unitIdx(unit) : 0;
-    for (let j = 0; j < seq.length; j++) {
-      if (taught.has(j)) continue;
-      let sc = sim(t, seq[j].title);
-      if (seq[j].unit === unit) sc += 0.1;                            // same topic: most likely
-      else if (j > curStart && !closed.has(seq[j].unit) && seq.findIndex((x) => x.unit !== unit && x.unit === seq[j].unit) >= curStart) sc += 0.03;
-      if (sc > bs) { bs = sc; best = j; }
+    const ui = order.indexOf(unit);
+    const nextUnit = order.slice(ui + 1).find((u) => !closed.has(u));
+    // "Photosythesis + Video Demo": score each joined part on its own and keep the best.
+    const parts = [t, ...t.split(/\s*\+\s*/).filter((x) => x && x !== t)];
+    const scored = seq.map((L, j) => ({ j, sc: Math.max(...parts.map((x) => sim(x, L.title))), unit: L.unit }));
+    const unitDone = closed.has(unit);              // revised/tested: he has moved on, expect the next topic
+    // Best in a set of candidates: an UNTAUGHT lesson wins over a near-equal taught one
+    // ("Anerobic" next to an already-taught "Aerobic"), otherwise it's a repeat.
+    const bestOf = (cands, min) => {
+      const ok = cands.filter((o) => o.sc >= min).sort((a, b) => b.sc - a.sc);
+      if (!ok.length) return null;
+      const fresh = ok.find((o) => !taught.has(o.j) && o.sc >= ok[0].sc - 0.12);
+      return fresh || ok[0];
+    };
+    const bi = bestOf(scored.filter((o) => o.unit === unit), unitDone ? 0.85 : MATCH);
+    const bn = nextUnit ? bestOf(scored.filter((o) => o.unit === nextUnit), unitDone ? MATCH : JUMP) : null;
+    const farC = scored.filter((o) => order.indexOf(o.unit) > ui + 1 && !closed.has(o.unit));
+    const far = bestOf(farC, 0.85);
+    let pick = null;
+    if (bi && (!bn || bn.sc < bi.sc + 0.2)) pick = bi;
+    else if (bn) pick = bn;
+    // a near-exact match far ahead beats a weak one here ("Periodic Table" is not "Results Tables")
+    // ...but only when what's here is a weak match (9AS "Changes of State Practical" is P3's
+    // "Changing States", not Chemistry's "Changes of State").
+    if (far && !taught.has(far.j) && (!pick || (pick.sc < 0.6 && far.sc >= pick.sc + 0.3))) pick = null;
+    if (!pick) {
+      // Far ahead in the scheme (7MLA did "Elements" and "Periodic Table" in week 2): ticked off so it
+      // is never repeated later, but the class is NOT moved there and nothing before it is closed.
+      if (far && !taught.has(far.j)) { taught.add(far.j); log.push(`${t} -> taught early: ${seq[far.j].topic} L${seq[far.j].num} ${seq[far.j].title}`); continue; }
+      uncertain = true; log.push(`${t} -> ? (no match)`); continue;
     }
-    if (best >= 0 && bs >= 0.55) { taught.add(best); unit = seq[best].unit; last = best; uncertain = false; log.push(`${t} -> ${seq[best].topic} L${seq[best].num} ${seq[best].title}`); }
-    else { uncertain = true; log.push(`${t} -> ? (no match)`); }
+    const L = seq[pick.j];
+    if (L.unit !== unit) moveTo(L.unit);
+    if (taught.has(pick.j)) { log.push(`${t} -> repeat of L${L.num} ${L.title}`); continue; }
+    // One entry can cover TWO lessons only when he joined them ("A + B", "A and B", "A, B") and
+    // every word of the second lesson's title is in what he wrote (practical vs theory must agree).
+    const covered = [pick];
+    if (/\+|,|\band\b/i.test(t)) {
+      const kind = (s) => (/theory/i.test(s) ? 'theory' : /practical|\brp\b/i.test(s) ? 'practical' : '');
+      const second = scored.filter((o) => o.unit === L.unit && o.j !== pick.j && !taught.has(o.j))
+        .filter((o) => { const B = toks(seq[o.j].title); const A = toks(t); return B.length && B.every((b) => A.some((a) => same(a, b) >= 0.85)); })
+        .filter((o) => !kind(seq[o.j].title) || !kind(t) || kind(seq[o.j].title) === kind(t))
+        .sort((a, b) => b.sc - a.sc)[0];
+      if (second) covered.push(second);
+    }
+    covered.forEach((o) => taught.add(o.j));
+    last = Math.max(...covered.map((o) => o.j));
+    uncertain = false;
+    log.push(`${t} -> ${L.topic} ` + covered.map((o) => `L${seq[o.j].num} ${seq[o.j].title}`).join(' + '));
   }
-  return { taught, closed, tested, unit, last, uncertain, log };
+  return { taught, closed, tested, revised, unit, last, uncertain, log };
 }
 
-// The next lesson: move FORWARD from the last lesson taught, skipping any already covered out of
-// order; lessons he passed over stay passed over (back-test: he rarely goes back). When the unit
-// runs out or was finished by a test/revision, the first untaught lesson of the next unit.
+// The next lesson: the FIRST untaught lesson of the current topic (so missed lessons are filled in);
+// when the topic is all taught, its end-of-topic test (unless already tested, or the topic carries
+// on in a later block); then the first untaught lesson of the next topic. Never an earlier topic.
 function nextLesson(seq, st) {
   const order = [...new Set(seq.map((x) => x.unit))];
+  const ui = Math.max(0, order.indexOf(st.unit));
   if (st.unit && !st.closed.has(st.unit)) {
-    for (let k = Math.max(0, st.last + 1); k < seq.length && seq[k].unit === st.unit; k++) if (!st.taught.has(k)) return k;
+    const j = seq.findIndex((x, k) => x.unit === st.unit && !st.taught.has(k));
+    if (j >= 0) return j;
     st.closed.add(st.unit);
-    // Back-test 2026-10-03: a topic always ends with a test or revision lesson before the next one.
-    // ...unless the topic carries on in a later block (9's B1 Cells L1-7, then C1, then B1 L8-16)
-    const cur = seq.find((x) => x.unit === st.unit);
-    const resumes = cur && seq.some((x) => x.topic === cur.topic && x.unit !== st.unit && order.indexOf(x.unit) > order.indexOf(st.unit));
-    if (!resumes && (!st.tested || !st.tested.has(st.unit))) return { test: st.unit };
   }
-  for (let ui = Math.max(0, order.indexOf(st.unit)); ui < order.length; ui++) {
-    const u = order[ui];
+  if (st.unit && !st.tested.has(st.unit)) {
+    const cur = seq.find((x) => x.unit === st.unit);
+    const resumes = cur && seq.some((x) => x.topic === cur.topic && order.indexOf(x.unit) > ui);
+    if (!resumes) return { test: st.unit, revised: st.revised && st.revised.has(st.unit) };
+  }
+  for (let k = ui + 1; k < order.length; k++) {
+    const u = order[k];
     if (st.closed.has(u)) continue;
-    const j = seq.findIndex((x, k) => x.unit === u && !st.taught.has(k));
+    const j = seq.findIndex((x, m) => x.unit === u && !st.taught.has(m));
     if (j >= 0) return j;
   }
   return -1;
+}
+
+// What each class has done and not done (for the planner's Classes view and the weekly report).
+function report(seq, st) {
+  const out = [];
+  for (const u of [...new Set(seq.map((x) => x.unit))]) {
+    const ls = seq.map((x, j) => ({ ...x, j })).filter((x) => x.unit === u);
+    const done = ls.filter((x) => st.taught.has(x.j)), missed = ls.filter((x) => !st.taught.has(x.j));
+    const state = u === st.unit ? 'current' : st.closed.has(u) || st.tested.has(u) ? 'finished' : done.length ? 'started' : 'to come';
+    out.push({ unit: u, topic: ls[0].topic, state, tested: st.tested.has(u), revised: !!(st.revised && st.revised.has(u)),
+      done: done.map((x) => `L${x.num} ${x.title}`), missed: missed.map((x) => `L${x.num} ${x.title}`) });
+  }
+  return out;
 }
 
 function loadAll() {
@@ -334,7 +449,7 @@ function planWeek(monday, ctx) {
     if (j && j.test) {
       st.tested.add(j.test);
       const topic = (seq.find((x) => x.unit === j.test) || {}).topic || j.test;
-      out.plan = { text: `${topic} — end-of-topic test or revision`, equipment: `Test papers: Admin/Assessment (${topic}) — count core/challenge`, check: true, test: true };
+      out.plan = { text: `${topic} — ${j.revised ? 'end-of-topic TEST (revision done)' : 'revision or end-of-topic test'}`, equipment: `Test papers: Admin/Assessment (${topic}) — count core/challenge`, check: true, test: true };
       slots.push(out);
       continue;
     }
@@ -357,7 +472,7 @@ function planWeek(monday, ctx) {
   return { monday, letter, timetableFrom: tt.name, slots, state };
 }
 
-module.exports = { planWeek, loadAll, classSequence, progress, nextLesson, sim, sheetSlots, plannerSheets, equipmentFor, isTeachingDay, ROUTES };
+module.exports = { planWeek, loadAll, classSequence, progress, nextLesson, report, stripICT, sim, toks, same, sheetSlots, plannerSheets, equipmentFor, isTeachingDay, ROUTES };
 
 /* ------------------------------------------------------------------------ CLI */
 if (require.main === module) {
@@ -397,7 +512,7 @@ if (require.main === module) {
     const progressOut = {};
     for (const cls of Object.keys(ROUTES)) {
       const p = progress(ctx.seqs[cls], history[cls] || []);
-      progressOut[cls] = { taught: [...p.taught], last: p.last, unit: p.unit, closed: [...p.closed], tested: [...p.tested] };
+      progressOut[cls] = { taught: [...p.taught], last: p.last, unit: p.unit, closed: [...p.closed], tested: [...p.tested], revised: [...p.revised] };
     }
     // Real clock times: Years 7-9 use the KS3 bells, Years 10-13 the KS4/5 bells (P2/P4 differ).
     let periods = {};
@@ -408,6 +523,10 @@ if (require.main === module) {
       periodTimes: { ks3: periods.KS3_and_Y9 || {}, ks4: periods.KS4_and_KS5 || {} },
       generated: new Date().toISOString(), weekAStart: school.WEEK_A_START, terms: TERMS, inset: [...INSET],
       filledWeeks: ctx.sheets.map((s) => iso(s.monday)), classes, timetable, progress: progressOut,
+      // What he actually wrote in each filled Planner.xlsx week, so the app SHOWS those weeks as
+      // taught instead of re-planning them.
+      filled: Object.fromEntries(ctx.sheets.map((s) => [iso(s.monday), sheetSlots(s).filter((x) => x.rawClass)
+        .map((x) => ({ day: x.day, period: x.period, col: x.col, cls: x.cls || x.rawClass, text: x.lesson }))])),
     };
     fs.writeFileSync(val('export'), JSON.stringify(out));
     console.log(`planner data written: ${val('export')} (${Math.round(fs.statSync(val('export')).size / 1024)} KB, ${Object.keys(classes).length} classes, filled weeks to ${out.filledWeeks.slice(-1)[0]})`);
