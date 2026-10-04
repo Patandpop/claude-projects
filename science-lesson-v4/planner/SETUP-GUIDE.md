@@ -53,7 +53,7 @@ The files are plain text: you'll open each one and copy what's inside.
 6. Click inside the new file, **Ctrl+A**, **Delete**.
 7. Open `dist/Planner.html`, **Ctrl+A**, **Ctrl+C**, then click in the Apps Script file and **Ctrl+V**.
 
-**File 3: Logic**
+**File 3: Logic** (use `dist/Logic.html`, NOT `logic.js`: Apps Script pages can only load HTML files, so the bundle step wrapped `logic.js` into `Logic.html` for you)
 8. **+ → HTML** again, name it `Logic`, delete what's in it, then paste in everything from `dist/Logic.html`.
 
 9. Press **Ctrl+S** to save. You should now have three files on the left: `Code.gs`, `Planner.html`, `Logic.html`.
