@@ -399,7 +399,13 @@ if (require.main === module) {
       const p = progress(ctx.seqs[cls], history[cls] || []);
       progressOut[cls] = { taught: [...p.taught], last: p.last, unit: p.unit, closed: [...p.closed], tested: [...p.tested] };
     }
+    // Real clock times: Years 7-9 use the KS3 bells, Years 10-13 the KS4/5 bells (P2/P4 differ).
+    let periods = {};
+    try { periods = JSON.parse(fs.readFileSync(path.join(ROOT, 'classes-2026-27.json'), 'utf8')).periodStructure || {}; } catch { periods = {}; }
+    const COLOURS = ['#1565C0', '#2E7D32', '#6A1B9A', '#C62828', '#EF6C00', '#00838F', '#AD1457', '#4E342E', '#283593', '#558B2F', '#5D4037'];
+    Object.keys(classes).forEach((c, k) => { classes[c].colour = COLOURS[k % COLOURS.length]; });
     const out = {
+      periodTimes: { ks3: periods.KS3_and_Y9 || {}, ks4: periods.KS4_and_KS5 || {} },
       generated: new Date().toISOString(), weekAStart: school.WEEK_A_START, terms: TERMS, inset: [...INSET],
       filledWeeks: ctx.sheets.map((s) => iso(s.monday)), classes, timetable, progress: progressOut,
     };

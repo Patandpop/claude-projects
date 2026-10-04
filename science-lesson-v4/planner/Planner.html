@@ -6,136 +6,242 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Planner</title>
 <style>
-  :root { --navy:#0D1B5E; --gold:#FABB2E; --bg:#EDF2FA; --ink:#1A1A2E; --muted:#6B6B7B; --line:#C9D3E6; --red:#B71C1C; --green:#1B5E20; }
-  * { box-sizing: border-box; }
-  body { margin:0; font-family: "Century Gothic", "Segoe UI", sans-serif; background:var(--bg); color:var(--ink); }
-  header { background:var(--navy); color:#fff; display:flex; align-items:center; gap:10px; padding:8px 14px; flex-wrap:wrap; position:sticky; top:0; z-index:5; }
-  header h1 { font-size:18px; margin:0 12px 0 0; color:var(--gold); }
-  .wk { display:flex; align-items:center; gap:6px; }
-  .wk b { min-width:150px; text-align:center; }
+  :root { --navy:#0D1B5E; --gold:#FABB2E; --bg:#EDF2FA; --ink:#1A1A2E; --muted:#6B6B7B; --line:#D5DDEC; --red:#B71C1C; --green:#1B5E20; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:"Century Gothic","Segoe UI",sans-serif; background:var(--bg); color:var(--ink); }
+  header { background:var(--navy); color:#fff; display:flex; align-items:center; gap:8px; padding:8px 14px; flex-wrap:wrap; position:sticky; top:0; z-index:5; }
+  header h1 { font-size:18px; margin:0 10px 0 0; color:var(--gold); }
+  header .sep { width:1px; height:24px; background:rgba(255,255,255,.25); margin:0 4px; }
+  #wkLabel { font-weight:700; min-width:170px; }
   .badge { background:var(--gold); color:var(--navy); font-weight:700; padding:2px 8px; border-radius:10px; font-size:12px; }
-  button { font-family:inherit; font-size:13px; border:1px solid var(--gold); background:#fff; color:var(--navy); padding:5px 10px; border-radius:6px; cursor:pointer; }
+  button, .btn { font-family:inherit; font-size:13px; border:1px solid var(--gold); background:#fff; color:var(--navy); padding:5px 10px; border-radius:6px; cursor:pointer; }
   header button { background:transparent; color:#fff; }
-  header button.primary, button.primary { background:var(--gold); color:var(--navy); font-weight:700; }
-  button:disabled { opacity:.45; cursor:default; }
-  main { display:grid; grid-template-columns: 1fr 360px; gap:12px; padding:12px; }
-  table { border-collapse:separate; border-spacing:6px; width:100%; table-layout:fixed; }
-  th { color:var(--navy); font-size:13px; text-align:left; }
-  td.day { width:84px; vertical-align:top; font-weight:700; color:var(--navy); font-size:13px; }
-  td.day small { display:block; font-weight:400; color:var(--muted); }
-  .cell { min-height:92px; background:#fff; border:1px solid var(--line); border-radius:8px; padding:6px 7px; font-size:12px; cursor:pointer; position:relative; }
-  .cell.empty { background:transparent; border-style:dashed; cursor:default; }
-  .cell.sel { outline:3px solid var(--gold); }
-  .cell.over { outline:3px dashed var(--navy); }
-  .cell .cls { display:inline-block; background:var(--navy); color:var(--gold); font-weight:700; border-radius:4px; padding:0 6px; margin-bottom:3px; }
-  .cell .les { font-weight:700; margin:2px 0; }
-  .cell .eq { color:var(--muted); }
-  .cell.kind-inset, .cell.kind-na { background:#F1F1F4; color:var(--muted); }
-  .cell.kind-test { background:#FFEBEE; }
-  .cell.kind-cover { background:#FFF8E1; }
-  .flags { position:absolute; top:5px; right:6px; display:flex; gap:3px; }
+  header button.on { background:rgba(250,187,46,.25); }
+  button.primary, header button.primary { background:var(--gold); color:var(--navy); font-weight:700; }
+  header input[type=date] { font-family:inherit; border-radius:6px; border:1px solid var(--gold); padding:3px 6px; }
+  #status { font-size:12px; margin-left:auto; opacity:.9; }
+  #status.dirty::before { content:"\25CF  "; color:var(--gold); }
+  main { display:grid; grid-template-columns:1fr 370px; gap:12px; padding:12px; }
+  .cal { background:#fff; border:1px solid var(--line); border-radius:10px; overflow:hidden; }
+  .grid { display:grid; }
+  .hcell { padding:8px 6px; text-align:center; border-bottom:1px solid var(--line); font-size:12px; color:var(--muted); }
+  .hcell b { display:block; font-size:20px; color:var(--ink); font-weight:400; }
+  .hcell.today b { background:var(--navy); color:var(--gold); border-radius:50%; width:36px; height:36px; line-height:36px; margin:2px auto 0; }
+  .hcell.off { background:#F4F4F6; }
+  .tcell { font-size:11px; color:var(--muted); text-align:right; padding:6px 6px 0 0; border-right:1px solid var(--line); }
+  .allday { border-bottom:2px solid var(--line); min-height:34px; padding:3px; border-right:1px solid #EEF1F7; }
+  .chip { display:flex; gap:4px; align-items:center; font-size:11px; border-radius:4px; padding:2px 5px; margin:2px 0; background:#E8EAF6; color:var(--navy); cursor:pointer; }
+  .chip.mine { background:#F1F1F4; color:#555; cursor:default; }
+  .chip .x { margin-left:auto; opacity:.5; }
+  .addx { font-size:11px; color:var(--muted); cursor:pointer; padding:1px 4px; visibility:hidden; }
+  .allday:hover .addx { visibility:visible; }
+  .slotcell { border-right:1px solid #EEF1F7; border-bottom:1px solid #EEF1F7; padding:3px; min-height:96px; position:relative; }
+  .slotcell.off { background:#F4F4F6; }
+  .slotcell.empty:hover { background:#F7F9FD; cursor:pointer; }
+  .slotcell.empty:hover::after { content:"+ add"; position:absolute; top:6px; left:8px; font-size:11px; color:var(--muted); }
+  .slotcell.over { outline:3px dashed var(--navy); outline-offset:-3px; }
+  .ev { height:100%; min-height:88px; border-radius:6px; padding:5px 7px 5px 9px; font-size:12px; cursor:pointer; position:relative; border-left:5px solid var(--c, var(--navy)); background:color-mix(in srgb, var(--c, #0D1B5E) 9%, white); }
+  .ev.sel { outline:3px solid var(--gold); }
+  .ev .top { display:flex; gap:6px; align-items:center; }
+  .ev .cls { font-weight:700; color:var(--c); }
+  .ev .tm { color:var(--muted); font-size:11px; }
+  .ev .les { font-weight:700; margin:2px 0; line-height:1.25; }
+  .ev .eq { color:var(--muted); font-size:11px; }
+  .ev.kind-inset, .ev.kind-na { --c:#9E9E9E; color:var(--muted); }
+  .ev.kind-test { background:#FFEBEE; }
+  .ev.kind-cover { background:#FFF8E1; }
+  .ev.kind-free { background:#fff; border-left-style:dashed; color:var(--muted); }
+  .flags { display:flex; gap:3px; flex-wrap:wrap; margin-top:3px; }
   .flag { font-size:10px; font-weight:700; border-radius:3px; padding:0 4px; }
   .f-check { background:#FFE0B2; color:#E65100; }
   .f-built { background:#FFCDD2; color:var(--red); }
   .f-carry { background:#C8E6C9; color:var(--green); }
-  aside { background:#fff; border:1px solid var(--line); border-radius:10px; padding:12px; align-self:start; position:sticky; top:62px; }
-  aside h2 { margin:0 0 8px; font-size:15px; color:var(--navy); }
+  .f-dbl { background:#E3F2FD; color:#0D47A1; }
+  .brk { grid-column:1 / -1; font-size:10px; color:var(--muted); background:#F7F9FD; padding:2px 8px; border-bottom:1px solid #EEF1F7; }
+  aside { background:#fff; border:1px solid var(--line); border-radius:10px; padding:12px; align-self:start; position:sticky; top:62px; max-height:calc(100vh - 80px); overflow:auto; }
+  aside h2 { margin:0 0 6px; font-size:15px; color:var(--navy); }
   label { display:block; font-size:12px; color:var(--muted); margin:8px 0 2px; }
-  select, input[type=text], textarea { width:100%; font-family:inherit; font-size:13px; padding:5px; border:1px solid var(--line); border-radius:6px; }
-  textarea { min-height:54px; resize:vertical; }
+  select, input[type=text], textarea { width:100%; font-family:inherit; font-size:13px; padding:6px; border:1px solid var(--line); border-radius:6px; }
+  textarea { min-height:50px; resize:vertical; }
   .row { display:flex; gap:6px; flex-wrap:wrap; margin-top:8px; }
   .muted { color:var(--muted); font-size:12px; }
-  #status { font-size:12px; color:#fff; opacity:.85; margin-left:auto; }
+  .results { border:1px solid var(--line); border-radius:6px; max-height:230px; overflow:auto; margin-top:4px; }
+  .res { padding:6px 8px; font-size:12px; cursor:pointer; border-bottom:1px solid #F0F2F7; }
+  .res:hover, .res.hi { background:#FFF8E1; }
+  .res small { color:var(--muted); display:block; }
+  .res.next { border-left:3px solid var(--gold); }
   .modal { position:fixed; inset:0; background:rgba(13,27,94,.35); display:none; align-items:center; justify-content:center; z-index:20; }
   .modal.on { display:flex; }
-  .box { background:#fff; border-radius:10px; padding:16px; max-width:560px; width:92%; max-height:80vh; overflow:auto; }
+  .box { background:#fff; border-radius:10px; padding:16px; max-width:580px; width:92%; max-height:82vh; overflow:auto; }
   .box h3 { margin:0 0 10px; color:var(--navy); }
   pre { white-space:pre-wrap; font-family:inherit; font-size:13px; }
+  kbd { background:#EEF1F7; border:1px solid var(--line); border-radius:4px; padding:0 5px; font-family:inherit; font-size:12px; }
+  #toast { position:fixed; bottom:18px; left:50%; transform:translateX(-50%); background:#323232; color:#fff; padding:10px 14px; border-radius:6px; font-size:13px; display:none; gap:14px; align-items:center; z-index:30; }
+  #toast.on { display:flex; }
+  #toast button { background:transparent; border:none; color:var(--gold); font-weight:700; padding:0; }
 </style>
 </head>
 <body>
 <header>
   <h1>Planner</h1>
-  <div class="wk"><button id="prev">&#9664;</button><b id="wkLabel">-</b><span class="badge" id="letter">-</span><button id="next">&#9654;</button></div>
-  <button id="auto">Auto-fill week</button>
-  <button id="save" class="primary">Save week</button>
-  <button id="undo">Undo</button>
+  <button id="today" title="T">Today</button>
+  <button id="prev" title="K">&#9664;</button><button id="next" title="J">&#9654;</button>
+  <span id="wkLabel">-</span><span class="badge" id="letter">-</span>
+  <input type="date" id="jump" title="Jump to a week">
+  <span class="sep"></span>
+  <button id="vWeek" class="on" title="W">Week</button><button id="vDay" title="D">Day</button>
+  <span class="sep"></span>
+  <button id="save" class="primary" title="Ctrl+S">Save</button>
+  <button id="undo" title="Ctrl+Z">Undo</button>
+  <button id="auto">Re-fill week</button>
+  <button id="sync">Send to Google Calendar</button>
+  <button id="mine" title="Show my calendar">My calendar</button>
   <button id="print">Print list</button>
   <button id="xlsx">Technicians' Excel</button>
   <button id="imp">Import data</button>
+  <button id="help" title="?">?</button>
   <input type="file" id="file" accept=".json" style="display:none">
   <span id="status">Loading...</span>
 </header>
 <main>
-  <section><table id="grid"></table><p class="muted" id="foot"></p></section>
-  <aside id="ed"><h2>Pick a lesson slot</h2><p class="muted">Click a slot to edit it. Drag a slot onto another to move it: you'll be asked whether to shift that class's later lessons along, swap, or move just this one.</p></aside>
+  <section class="cal"><div class="grid" id="grid"></div></section>
+  <aside id="ed"></aside>
 </main>
 <div class="modal" id="modal"><div class="box" id="mbox"></div></div>
+<div id="toast"><span id="toastMsg"></span><button id="toastUndo">Undo</button></div>
 
 <?!= include('Logic') ?>
 <script>
 const KEY = <?= key ?>;
 const P = window.PlannerLogic;
-let S = { data:null, weeks:{}, learned:{}, hasTemplate:false, monday:null, week:null, undo:[], sel:-1, dirty:false };
+const COLS = ['B', 'F', 'J', 'N', 'R'];
+let S = { data:null, weeks:{}, learned:{}, hasTemplate:false, monday:null, week:null, undo:[], sel:-1, dirty:false, view:'week', day:0, mine:null, showMine:false };
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c]));
-const status = (t) => { $('status').textContent = t; };
+const status = (t) => { $('status').textContent = t; $('status').classList.toggle('dirty', S.dirty); };
 const run = (fn, ...args) => new Promise((ok, bad) => google.script.run.withSuccessHandler(ok).withFailureHandler(bad)[fn](KEY, ...args));
+const todayMidnight = () => { const t = new Date(); return new Date(t.getFullYear(), t.getMonth(), t.getDate()); };
 
-function defaultMonday() {
+/* ------------------------------------------------------------------ toast */
+let toastTimer = null;
+function toast(msg, canUndo) {
+  $('toastMsg').textContent = msg; $('toastUndo').style.display = canUndo ? '' : 'none';
+  $('toast').classList.add('on'); clearTimeout(toastTimer); toastTimer = setTimeout(() => $('toast').classList.remove('on'), 6000);
+}
+$('toastUndo').onclick = () => { undo(); $('toast').classList.remove('on'); };
+
+/* ------------------------------------------------------------------ weeks */
+function firstPlanMonday() {
   const t = new Date(); const d = t.getDay();
-  let m = P.mondayOf(P.addDays(t, d === 0 ? 1 : d === 6 ? 2 : 7));   // plan next week; at weekends the coming week
-  // never open on a week he already filled in Planner.xlsx (its lessons are already counted)
+  let m = P.mondayOf(P.addDays(t, d === 0 ? 1 : d === 6 ? 2 : 7));
   const lastFilled = (S.data.filledWeeks || []).slice(-1)[0];
   while (lastFilled && P.iso(m) <= lastFilled) m = P.addDays(m, 7);
   return m;
 }
+function leaveOk() { return !S.dirty || confirm('This week has unsaved changes. Leave without saving?'); }
 function loadWeek(mon) {
-  S.monday = mon; S.sel = -1; S.undo = []; S.dirty = false;
-  const saved = S.weeks[P.iso(mon)];
-  S.week = saved ? JSON.parse(JSON.stringify(saved)) : P.autofill(S.data, S.weeks, mon, S.learned);
+  S.monday = P.mondayOf(mon); S.sel = -1; S.undo = []; S.dirty = false; S.mine = null;
+  const saved = S.weeks[P.iso(S.monday)];
+  S.week = saved ? JSON.parse(JSON.stringify(saved)) : P.autofill(S.data, S.weeks, S.monday, S.learned);
+  S.week.extras = S.week.extras || [];
+  const filled = (S.data.filledWeeks || []).includes(P.iso(S.monday));
+  status(filled ? 'Filled in Planner.xlsx: for reference only' : saved ? 'Saved' : 'Planned automatically, not saved yet');
+  $('jump').value = P.iso(S.monday);
   render(); editor();
-  const filled = (S.data.filledWeeks || []).includes(P.iso(mon));
-  status(filled ? 'You filled this week in Planner.xlsx: shown for reference, already counted' : saved ? 'Saved week loaded' : 'Auto-filled (not saved yet)');
+  if (S.showMine) loadMine();
 }
-function change(newWeek) { S.undo.push(JSON.stringify(S.week)); S.week = newWeek; S.dirty = true; render(); editor(); status('Unsaved changes'); }
+function change(newWeek, msg) {
+  S.undo.push(JSON.stringify(S.week)); S.week = newWeek; S.week.extras = S.week.extras || []; S.dirty = true;
+  render(); editor(); status('Unsaved changes'); if (msg) toast(msg, true);
+}
+function undo() {
+  if (!S.undo.length) { toast('Nothing to undo'); return; }
+  S.week = JSON.parse(S.undo.pop()); S.dirty = true; render(); editor(); status('Unsaved changes');
+}
+function save() {
+  status('Saving...');
+  return run('saveWeek', S.week).then(() => { S.weeks[S.week.monday] = JSON.parse(JSON.stringify(S.week)); S.dirty = false; status('Saved'); toast('Week saved'); })
+    .catch((e) => status('Save failed: ' + e.message));
+}
 
+/* ------------------------------------------------------------------ render */
+function timeLabel(p) {
+  const a = (S.data.periodTimes.ks3['P' + p] || '').split('-')[0], b = (S.data.periodTimes.ks4['P' + p] || '').split('-')[0];
+  return 'P' + p + '<br>' + (a === b ? a : a + '<br>' + b);
+}
 function render() {
-  const mon = S.monday;
-  $('wkLabel').textContent = 'w/c ' + mon.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+  const mon = S.monday, today = P.iso(todayMidnight());
+  $('wkLabel').textContent = (S.view === 'day' ? P.DAYS[S.day] + ' ' : 'w/c ') + P.addDays(mon, S.view === 'day' ? S.day : 0).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
   $('letter').textContent = 'Week ' + S.week.letter;
-  let h = '<tr><th></th>' + [1,2,3,4,5].map((p) => '<th>P' + p + '</th>').join('') + '</tr>';
-  for (let d = 0; d < 5; d++) {
+  $('vWeek').classList.toggle('on', S.view === 'week'); $('vDay').classList.toggle('on', S.view === 'day');
+  const days = S.view === 'day' ? [S.day] : [0, 1, 2, 3, 4];
+  const g = $('grid');
+  g.style.gridTemplateColumns = '64px repeat(' + days.length + ', 1fr)';
+  let h = '<div class="hcell"></div>';
+  days.forEach((d) => {
     const date = P.addDays(mon, d);
-    h += '<tr><td class="day">' + P.DAYS[d] + '<small>' + date.getDate() + '/' + (date.getMonth() + 1) + '</small></td>';
-    for (let p = 1; p <= 5; p++) {
+    const off = !P.isTeachingDay(S.data, date);
+    h += '<div class="hcell' + (P.iso(date) === today ? ' today' : '') + (off ? ' off' : '') + '" data-day="' + d + '">' + P.DAYS[d].toUpperCase() + '<b>' + date.getDate() + '</b></div>';
+  });
+  // all-day row: his extras + his own calendar
+  h += '<div class="tcell" style="padding-top:8px">All day</div>';
+  days.forEach((d) => {
+    h += '<div class="allday" data-day="' + d + '">';
+    (S.week.extras || []).forEach((x, k) => { if (x.day === d) h += '<div class="chip" data-x="' + k + '" title="Click to remove">' + esc(x.kindLabel || '') + ' ' + esc(x.text) + '<span class="x">&#10005;</span></div>'; });
+    (S.showMine && S.mine || []).forEach((e) => { if (e.day === d) h += '<div class="chip mine" title="From your Google Calendar">' + (e.time ? esc(e.time) + ' ' : '') + esc(e.title) + '</div>'; });
+    h += '<span class="addx" data-add="' + d + '">+ task / marking / meeting</span></div>';
+  });
+  for (let p = 1; p <= 5; p++) {
+    if (p === 2) h += '<div class="brk">Break: KS3 10:00-10:25 · KS4/5 11:05-11:30</div>';
+    if (p === 4) h += '<div class="brk">Lunch: KS3 12:30-13:15 · KS4/5 13:30-14:15</div>';
+    h += '<div class="tcell">' + timeLabel(p) + '</div>';
+    days.forEach((d) => {
+      const date = P.addDays(mon, d);
+      const off = !P.isTeachingDay(S.data, date);
       const i = S.week.slots.findIndex((s) => s.day === d && s.period === p);
-      if (i < 0) { h += '<td><div class="cell empty"></div></td>'; continue; }
+      if (i < 0) { h += '<div class="slotcell empty' + (off ? ' off' : '') + '" data-day="' + d + '" data-p="' + p + '"></div>'; return; }
       const s = S.week.slots[i];
+      const c = S.data.classes[s.cls] || {};
       const flags = [];
+      if (s.double) flags.push('<span class="flag f-dbl">DOUBLE</span>');
       if (s.kind === 'lesson' && (s.eqSrc === 'guess' || s.planned)) flags.push('<span class="flag f-check">CHECK</span>');
       if (s.kind === 'lesson' && s.built === false) flags.push('<span class="flag f-built">NOT BUILT</span>');
       if ((s.carry || []).length) flags.push('<span class="flag f-carry">+' + s.carry.length + ' carry</span>');
-      h += '<td><div class="cell kind-' + s.kind + (S.sel === i ? ' sel' : '') + '" draggable="true" data-i="' + i + '">' +
-        '<div class="flags">' + flags.join('') + '</div>' +
-        '<span class="cls">' + esc(s.cls) + '</span>' +
+      const L = s.kind === 'lesson' ? c.seq[s.i] || {} : null;
+      h += '<div class="slotcell" data-i="' + i + '"><div class="ev kind-' + s.kind + (S.sel === i ? ' sel' : '') + '" draggable="true" data-i="' + i + '" style="--c:' + (c.colour || '#0D1B5E') + '">' +
+        '<div class="top"><span class="cls">' + esc(s.cls) + '</span><span class="tm">' + esc(P.periodTime(S.data, s.cls, s.period)) + '</span></div>' +
         '<div class="les">' + esc(P.lessonCell(S.data, s)) + '</div>' +
-        (s.kind === 'lesson' ? '<div class="muted">' + esc((S.data.classes[s.cls].seq[s.i] || {}).topic || '') + '</div>' : '') +
-        '<div class="eq">' + esc(String(s.eq || '').slice(0, 70)) + (String(s.eq || '').length > 70 ? '...' : '') + '</div></div></td>';
-    }
-    h += '</tr>';
+        (L ? '<div class="eq">' + esc(L.topic) + ' · L' + L.num + '</div>' : '') +
+        '<div class="eq">' + esc(String(s.eq || '').slice(0, S.view === 'day' ? 400 : 60)) + (S.view !== 'day' && String(s.eq || '').length > 60 ? '...' : '') + '</div>' +
+        '<div class="flags">' + flags.join('') + '</div></div></div>';
+    });
   }
-  $('grid').innerHTML = h;
-  $('foot').textContent = 'Data from ' + (S.data.generated || '').slice(0, 10) + ' (progress to ' + (S.data.filledWeeks || []).slice(-1)[0] + '). ' + Object.keys(S.weeks).length + ' weeks saved in the planner.';
-  document.querySelectorAll('.cell[data-i]').forEach((el) => {
-    el.onclick = () => { S.sel = +el.dataset.i; render(); editor(); };
-    el.ondragstart = (e) => { e.dataTransfer.setData('text/plain', el.dataset.i); };
+  g.innerHTML = h;
+
+  g.querySelectorAll('.ev').forEach((el) => {
+    el.onclick = (e) => { e.stopPropagation(); S.sel = +el.dataset.i; render(); editor(); };
+    el.ondragstart = (e) => e.dataTransfer.setData('text/plain', el.dataset.i);
+  });
+  g.querySelectorAll('.slotcell').forEach((el) => {
     el.ondragover = (e) => { e.preventDefault(); el.classList.add('over'); };
     el.ondragleave = () => el.classList.remove('over');
-    el.ondrop = (e) => { e.preventDefault(); el.classList.remove('over'); askMove(+e.dataTransfer.getData('text/plain'), +el.dataset.i); };
+    el.ondrop = (e) => {
+      e.preventDefault(); el.classList.remove('over');
+      const from = +e.dataTransfer.getData('text/plain');
+      if (el.dataset.i != null) askMove(from, +el.dataset.i);
+      else moveToEmpty(from, +el.dataset.day, +el.dataset.p);
+    };
+    if (el.classList.contains('empty')) el.onclick = () => addPanel(+el.dataset.day, +el.dataset.p);
   });
+  g.querySelectorAll('.chip[data-x]').forEach((el) => el.onclick = () => {
+    const w = JSON.parse(JSON.stringify(S.week)); const x = w.extras.splice(+el.dataset.x, 1)[0];
+    change(w, 'Removed "' + x.text + '"');
+  });
+  g.querySelectorAll('[data-add]').forEach((el) => el.onclick = () => addExtra(+el.dataset.add));
+  g.querySelectorAll('.hcell[data-day]').forEach((el) => el.onclick = () => { S.day = +el.dataset.day; S.view = 'day'; render(); });
 }
 
+/* ------------------------------------------------------------------ modals */
 function modal(html) { $('mbox').innerHTML = html; $('modal').classList.add('on'); }
 function closeModal() { $('modal').classList.remove('on'); }
 $('modal').onclick = (e) => { if (e.target.id === 'modal') closeModal(); };
@@ -143,103 +249,175 @@ $('modal').onclick = (e) => { if (e.target.id === 'modal') closeModal(); };
 function askMove(from, to) {
   if (from === to || isNaN(from)) return;
   const a = S.week.slots[from], b = S.week.slots[to];
-  const sameClass = a.cls === b.cls;
+  const same = a.cls === b.cls;
   modal('<h3>Move ' + esc(a.cls) + ': ' + esc(P.lessonCell(S.data, a)) + '</h3>' +
     '<p class="muted">to ' + P.DAYS[b.day] + ' P' + b.period + ' (' + esc(b.cls) + ', now ' + esc(P.lessonCell(S.data, b)) + ')</p>' +
-    '<div class="row">' + (sameClass ? '<button class="primary" id="mShift">Shift this class\'s later lessons along</button>' : '') +
+    '<div class="row">' + (same ? '<button class="primary" id="mShift">Shift ' + esc(a.cls) + '\'s later lessons along</button>' : '') +
     '<button id="mSwap">Swap the two</button><button id="mMove">Move just this one</button><button id="mCancel">Cancel</button></div>');
-  if (sameClass) $('mShift').onclick = () => { closeModal(); change(P.moveSlot(S.data, S.weeks, S.week, from, to, 'shift', S.learned)); };
-  $('mSwap').onclick = () => { closeModal(); change(P.moveSlot(S.data, S.weeks, S.week, from, to, 'swap', S.learned)); };
-  $('mMove').onclick = () => { closeModal(); change(P.moveSlot(S.data, S.weeks, S.week, from, to, 'move', S.learned)); };
+  const go = (mode, msg) => { closeModal(); change(P.moveSlot(S.data, S.weeks, S.week, from, to, mode, S.learned), msg); };
+  if (same) $('mShift').onclick = () => go('shift', 'Moved and shifted ' + a.cls + '\'s later lessons');
+  $('mSwap').onclick = () => go('swap', 'Swapped');
+  $('mMove').onclick = () => go('move', 'Moved');
   $('mCancel').onclick = closeModal;
 }
+function moveToEmpty(from, day, period) {
+  const w = JSON.parse(JSON.stringify(S.week));
+  const a = w.slots[from];
+  const moved = Object.assign({}, a, { day, period, col: COLS[period - 1], double: false });
+  Object.assign(a, { kind:'free', i:null, unit:null, text:'Free', eq:'', sets:null, print:'', notes:[], carry:[], double:false });
+  w.slots.push(moved);
+  w.slots.sort((x, y) => x.day - y.day || x.period - y.period);
+  change(w, 'Moved to ' + P.DAYS[day] + ' P' + period);
+}
+function addExtra(day) {
+  modal('<h3>Add to ' + P.DAYS[day] + '</h3><label>What</label><input type="text" id="xText" placeholder="e.g. Mark 9XS Particles tests">' +
+    '<label>Type</label><select id="xKind"><option value="task">Task</option><option value="marking">Tests to mark</option><option value="meeting">Meeting</option><option value="deadline">Deadline</option></select>' +
+    '<div class="row"><button class="primary" id="xAdd">Add</button><button id="xCancel">Cancel</button></div>');
+  $('xText').focus();
+  const add = () => {
+    const text = $('xText').value.trim(); if (!text) return;
+    const kind = $('xKind').value; const labels = { task:'☐', marking:'✎', meeting:'◷', deadline:'!' };
+    const w = JSON.parse(JSON.stringify(S.week)); w.extras = w.extras || [];
+    w.extras.push({ day, text, kind, kindLabel: labels[kind] }); closeModal(); change(w, 'Added "' + text + '"');
+  };
+  $('xAdd').onclick = add; $('xText').onkeydown = (e) => { if (e.key === 'Enter') add(); };
+  $('xCancel').onclick = closeModal;
+}
 
+/* ------------------------------------------------------------- side panel */
+// Type-to-find: every lesson of the class, the suggested next ones first.
+function lessonResults(cls, q) {
+  const c = S.data.classes[cls]; if (!c) return [];
+  const st = P.progressBefore(S.data, S.weeks, S.monday)[cls];
+  S.week.slots.forEach((s) => { if (s.cls === cls && s.kind === 'lesson') st.taught.add(s.i); });
+  const nx = P.next(c.seq, st);
+  const words = q.toLowerCase().split(/\s+/).filter(Boolean);
+  return c.seq.map((L, k) => ({ L, k, taught: st.taught.has(k), next: nx && nx.i === k }))
+    .filter((o) => words.every((w) => (o.L.title + ' ' + o.L.topic + ' l' + o.L.num).toLowerCase().includes(w)))
+    .sort((a, b) => (b.next - a.next) || (a.taught - b.taught) || a.k - b.k).slice(0, 40);
+}
+function searchBox(cls, onPick) {
+  const draw = () => {
+    const rs = lessonResults(cls, $('q').value);
+    $('qr').innerHTML = rs.map((o, n) => '<div class="res' + (o.next ? ' next' : '') + (n === 0 ? ' hi' : '') + '" data-k="' + o.k + '">' + (o.next ? '★ ' : '') + 'L' + o.L.num + ' ' + esc(o.L.title) +
+      '<small>' + esc(o.L.topic) + (o.taught ? ' · already planned/taught' : '') + (o.L.built === false ? ' · not built' : '') + '</small></div>').join('') || '<div class="res muted">No lessons match</div>';
+    $('qr').querySelectorAll('.res[data-k]').forEach((el) => el.onclick = () => onPick(+el.dataset.k));
+  };
+  $('q').oninput = draw;
+  $('q').onkeydown = (e) => { if (e.key === 'Enter') { const f = $('qr').querySelector('.res[data-k]'); if (f) onPick(+f.dataset.k); } };
+  draw();
+}
+function addPanel(day, period) {
+  S.sel = -1; render();
+  const classes = Object.keys(S.data.classes);
+  $('ed').innerHTML = '<h2>Add a lesson · ' + P.DAYS[day] + ' P' + period + '</h2>' +
+    '<label>Class</label><select id="aCls">' + classes.map((c) => '<option>' + esc(c) + '</option>').join('') + '</select>' +
+    '<label>Find the lesson (type a few letters, Enter picks the top one)</label><input type="text" id="q" placeholder="e.g. osmosis">' +
+    '<div class="results" id="qr"></div>';
+  const pick = (k) => {
+    const cls = $('aCls').value;
+    const w = JSON.parse(JSON.stringify(S.week));
+    w.slots.push(Object.assign({ day, period, col: COLS[period - 1], cls, notes:[], carry:[] }, P.lessonSlot(S.data, cls, k, S.learned)));
+    w.slots.sort((x, y) => x.day - y.day || x.period - y.period);
+    change(w, 'Added ' + cls + ' lesson');
+  };
+  $('aCls').onchange = () => searchBox($('aCls').value, pick);
+  searchBox($('aCls').value, pick); $('q').focus();
+}
 function lessonKey(s) { const L = S.data.classes[s.cls].seq[s.i]; return L.rel || (s.cls + '|' + L.topic + '|' + L.title); }
 
 function editor() {
   const ed = $('ed');
-  if (S.sel < 0) { ed.innerHTML = '<h2>Pick a lesson slot</h2><p class="muted">Click a slot to edit it. Drag a slot onto another to move it.</p>'; return; }
+  if (S.sel < 0) {
+    ed.innerHTML = '<h2>Your week</h2><p class="muted">Click a lesson to change it. Click an empty period to add one. Drag a lesson onto another slot to move it. Hover the All day row to add a task, tests to mark or a meeting.</p>' +
+      '<p class="muted">Press <kbd>?</kbd> for keyboard shortcuts.</p>';
+    return;
+  }
   const s = S.week.slots[S.sel];
   const c = S.data.classes[s.cls];
-  const topics = c ? [...new Set(c.seq.map((x) => x.topic))] : [];
   const curL = s.kind === 'lesson' && c ? c.seq[s.i] : null;
-  const curTopic = curL ? curL.topic : topics[0];
-  const lessonOpts = c ? c.seq.map((x, k) => ({ x, k })).filter((o) => o.x.topic === curTopic)
-    .map((o) => '<option value="' + o.k + '"' + (s.i === o.k && s.kind === 'lesson' ? ' selected' : '') + '>L' + o.x.num + ' ' + esc(o.x.title) + (o.x.built === false ? ' (not built)' : '') + '</option>').join('') : '';
-  ed.innerHTML = '<h2>' + esc(s.cls) + ' · ' + P.DAYS[s.day] + ' P' + s.period + '</h2>' +
-    '<label>Type</label><select id="eKind">' + ['lesson','test','cover','custom','free','na'].map((k) => '<option' + (s.kind === k ? ' selected' : '') + '>' + k + '</option>').join('') + '</select>' +
-    (c ? '<label>Topic</label><select id="eTopic">' + topics.map((t) => '<option' + (t === curTopic ? ' selected' : '') + '>' + esc(t) + '</option>').join('') + '</select>' +
-         '<label>Lesson</label><select id="eLesson">' + lessonOpts + '</select>' : '') +
-    '<label>Text (cover / custom / test)</label><input type="text" id="eText" value="' + esc(s.kind === 'lesson' ? '' : s.text) + '">' +
+  ed.innerHTML = '<h2>' + esc(s.cls) + ' · ' + P.DAYS[s.day] + ' P' + s.period + ' <span class="muted">' + esc(P.periodTime(S.data, s.cls, s.period)) + '</span></h2>' +
+    (curL ? '<div class="muted"><b>' + esc(curL.title) + '</b><br>' + esc(curL.topic) + ' · Lesson ' + curL.num + (curL.rel ? '<br>Drive: Lessons/' + esc(curL.rel) : '') + '</div>' : '<div class="muted">' + esc(s.text) + '</div>') +
+    (c ? '<label>Change lesson (type to find, Enter picks the top one, ★ = next in order)</label><input type="text" id="q" placeholder="e.g. heart">' + '<div class="results" id="qr"></div>' : '') +
+    '<div class="row"><button id="kTest">Make it a test</button><button id="kCover">Cover</button><button id="kFree">Clear</button></div>' +
     '<label>Equipment</label><textarea id="eEq">' + esc(s.eq || '') + '</textarea>' +
-    '<div class="row"><select id="eSets" style="width:auto">' + [['',''],['threes','sets of 3'],['pairs','pairs'],['demo','demo (1 set)']].map(([v,t]) => '<option value="' + v + '"' + ((s.sets || '') === v ? ' selected' : '') + '>' + (t || 'sets?') + '</option>').join('') + '</select>' +
+    '<div class="row"><select id="eSets" style="width:auto">' + [['', 'sets?'], ['threes', 'sets of 3'], ['pairs', 'pairs'], ['demo', 'demo (1 set)']].map(([v, t]) => '<option value="' + v + '"' + ((s.sets || '') === v ? ' selected' : '') + '>' + t + '</option>').join('') + '</select>' +
     (s.kind === 'lesson' ? '<label style="display:flex;gap:4px;align-items:center;margin:0"><input type="checkbox" id="eRemember"> remember for this lesson</label>' : '') + '</div>' +
     '<label>Printing</label><input type="text" id="ePrint" value="' + esc(s.print || '') + '">' +
     '<label>Books</label><div class="row" style="margin-top:0"><input type="text" id="eBook" value="' + esc(s.book || '') + '" style="flex:1"><button id="eAddBook">Add textbook</button></div>' +
     '<label>Notes (one per line)</label><textarea id="eNotes">' + esc((s.notes || []).join('\n')) + '</textarea>' +
     ((s.carry || []).length ? '<label>Carried in from last lesson</label><div class="muted">' + s.carry.map(esc).join('<br>') + '</div>' : '') +
-    '<div class="row"><button class="primary" id="eApply">Apply</button><button id="eRefill">Re-fill this class\'s later slots</button></div>' +
+    '<div class="row"><button class="primary" id="eApply">Apply changes</button></div>' +
     '<div class="row"><button id="eRev">Review not finished → next lesson</button><button id="eHw">Homework to collect → next lesson</button></div>' +
-    '<div class="row"><button id="ePrompt">Copy build prompt</button></div>' +
-    (curL && curL.rel ? '<p class="muted">Drive: Lessons/' + esc(curL.rel) + '</p>' : '');
+    '<div class="row"><button id="eRefill">Re-plan ' + esc(s.cls) + '\'s later lessons</button><button id="ePrompt">Copy build prompt</button></div>';
 
-  if ($('eTopic')) $('eTopic').onchange = () => {
-    const t = $('eTopic').value;
-    $('eLesson').innerHTML = c.seq.map((x, k) => ({ x, k })).filter((o) => o.x.topic === t).map((o) => '<option value="' + o.k + '">L' + o.x.num + ' ' + esc(o.x.title) + '</option>').join('');
+  const replace = (fields, msg) => {
+    const w = JSON.parse(JSON.stringify(S.week)); const t = w.slots[S.sel];
+    Object.assign(t, fields, { day: t.day, period: t.period, col: t.col, cls: t.cls, notes: t.notes || [], carry: t.carry || [] });
+    change(w, msg);
   };
-  $('eAddBook').onclick = () => {
-    const k = $('eLesson') ? +$('eLesson').value : null;
-    const L = c && k != null ? c.seq[k] : null;
-    $('eBook').value = L && L.book ? L.book : '';
-    if (!$('eBook').value) status('No textbook pages found for that lesson');
-  };
+  if (c) searchBox(s.cls, (k) => replace(P.lessonSlot(S.data, s.cls, k, S.learned), 'Lesson changed'));
+  $('kTest').onclick = () => replace(P.testSlot(S.data, s.cls, curL ? curL.unit : (c ? c.seq[0].unit : null)), 'Marked as a test');
+  $('kCover').onclick = () => { const t = prompt('Cover: what will they do?', curL ? curL.title : ''); if (t != null) replace({ kind:'cover', i:null, text:t, eq:'N/A', sets:null }, 'Marked as cover'); };
+  $('kFree').onclick = () => replace({ kind:'free', i:null, unit:null, text:'Free', eq:'', sets:null, print:'' }, 'Cleared');
+  $('eAddBook').onclick = () => { $('eBook').value = curL && curL.book ? curL.book : ''; if (!$('eBook').value) toast('No textbook pages found for this lesson'); };
   $('eApply').onclick = () => {
-    const w = JSON.parse(JSON.stringify(S.week));
-    const t = w.slots[S.sel];
-    const kind = $('eKind').value;
-    const keep = { day: t.day, period: t.period, col: t.col, cls: t.cls, notes: $('eNotes').value.split('\n').map((x) => x.trim()).filter(Boolean), carry: t.carry || [] };
-    if (kind === 'lesson' && c) Object.assign(t, P.lessonSlot(S.data, t.cls, +$('eLesson').value, S.learned), keep);
-    else if (kind === 'test') Object.assign(t, P.testSlot(S.data, t.cls, curL ? curL.unit : ((c && c.seq[0]) || {}).unit), keep, $('eText').value ? { text: $('eText').value } : {});
-    else Object.assign(t, { kind, i: null, unit: null, text: $('eText').value || (kind === 'free' ? 'Free' : kind === 'na' ? 'N/A' : kind), built: null, planned: false }, keep);
+    const w = JSON.parse(JSON.stringify(S.week)); const t = w.slots[S.sel];
     t.eq = $('eEq').value; t.sets = $('eSets').value || null; t.print = $('ePrint').value; t.book = $('eBook').value;
+    t.notes = $('eNotes').value.split('\n').map((x) => x.trim()).filter(Boolean);
     if ($('eRemember') && $('eRemember').checked && t.kind === 'lesson') {
-      const lk = lessonKey(t);
-      S.learned[lk] = { eq: t.eq, sets: t.sets };
-      run('learnEquipment', lk, t.eq, t.sets).then(() => status('Equipment remembered for that lesson')).catch((e) => status('Not remembered: ' + e.message));
+      const lk = lessonKey(t); S.learned[lk] = { eq: t.eq, sets: t.sets };
+      run('learnEquipment', lk, t.eq, t.sets).catch((e) => toast('Not remembered: ' + e.message));
     }
-    change(w);
+    change(w, 'Changes applied');
   };
-  $('eRefill').onclick = () => { const w = JSON.parse(JSON.stringify(S.week)); P.refillAfter(S.data, S.weeks, w, S.sel, S.learned); change(w); };
+  $('eRefill').onclick = () => { const w = JSON.parse(JSON.stringify(S.week)); P.refillAfter(S.data, S.weeks, w, S.sel, S.learned); change(w, 'Re-planned ' + s.cls); };
   const carry = (what) => {
     const r = P.carryForward(S.week, S.sel, what);
-    if (r.carriedTo < 0) { status('No later lesson for ' + s.cls + ' this week: note it on next week\'s first lesson'); return; }
-    change(r.week); status('Carried to ' + P.DAYS[r.week.slots[r.carriedTo].day] + ' P' + r.week.slots[r.carriedTo].period);
+    if (r.carriedTo < 0) { toast('No later ' + s.cls + ' lesson this week: add it as a note on next week\'s first one'); return; }
+    change(r.week, 'Carried to ' + P.DAYS[r.week.slots[r.carriedTo].day] + ' P' + r.week.slots[r.carriedTo].period);
   };
   $('eRev').onclick = () => carry('Review section not finished last lesson (' + P.lessonCell(S.data, s) + ')');
   $('eHw').onclick = () => carry('Collect homework set last lesson (' + P.lessonCell(S.data, s) + ')');
   $('ePrompt').onclick = () => {
     const text = P.buildPrompt(S.data, S.week.slots[S.sel]);
-    navigator.clipboard.writeText(text).then(() => status('Build prompt copied')).catch(() => modal('<h3>Build prompt</h3><pre>' + esc(text) + '</pre>'));
+    navigator.clipboard.writeText(text).then(() => toast('Build prompt copied')).catch(() => modal('<h3>Build prompt</h3><pre>' + esc(text) + '</pre>'));
   };
 }
 
-// toolbar
-$('prev').onclick = () => { if (!S.dirty || confirm('Leave this week without saving?')) loadWeek(P.addDays(S.monday, -7)); };
-$('next').onclick = () => { if (!S.dirty || confirm('Leave this week without saving?')) loadWeek(P.addDays(S.monday, 7)); };
-$('auto').onclick = () => { if (confirm('Re-fill the whole week from where each class is up to? Your edits to this week are replaced.')) change(P.autofill(S.data, S.weeks, S.monday, S.learned)); };
-$('undo').onclick = () => { if (!S.undo.length) return; S.week = JSON.parse(S.undo.pop()); S.dirty = true; render(); editor(); status('Undone'); };
-$('save').onclick = () => {
-  status('Saving...');
-  run('saveWeek', S.week).then(() => { S.weeks[S.week.monday] = JSON.parse(JSON.stringify(S.week)); S.dirty = false; status('Saved'); })
-    .catch((e) => status('Save failed: ' + e.message));
+/* ---------------------------------------------------------------- calendar */
+function loadMine() {
+  status('Reading your Google Calendar...');
+  run('myEvents', P.iso(S.monday)).then((evs) => { S.mine = evs; render(); status(evs.length + ' events from your calendar'); })
+    .catch((e) => { S.showMine = false; status('Calendar not read: ' + e.message); });
+}
+$('mine').onclick = () => { S.showMine = !S.showMine; $('mine').classList.toggle('on', S.showMine); if (S.showMine) loadMine(); else render(); };
+$('sync').onclick = async () => {
+  if (S.dirty) await save();
+  const evs = P.calendarEvents(S.data, S.week);
+  if (!confirm('Send this week (' + evs.length + ' events) to your "Lessons (Planner)" Google Calendar? It replaces what that calendar had for this week. Your main calendar is not touched.')) return;
+  status('Sending to Google Calendar...');
+  run('syncWeek', S.week.monday, evs).then((r) => { status('In Google Calendar'); toast(r.written + ' events in "' + r.calendar + '"'); })
+    .catch((e) => status('Calendar failed: ' + e.message));
 };
+
+/* ----------------------------------------------------------------- toolbar */
+$('today').onclick = () => { if (leaveOk()) { const t = todayMidnight(); S.day = Math.min(4, (t.getDay() + 6) % 7); loadWeek(t); } };
+$('prev').onclick = () => { if (leaveOk()) loadWeek(P.addDays(S.monday, -7)); };
+$('next').onclick = () => { if (leaveOk()) loadWeek(P.addDays(S.monday, 7)); };
+$('jump').onchange = () => { if ($('jump').value && leaveOk()) loadWeek(P.parse($('jump').value)); };
+$('vWeek').onclick = () => { S.view = 'week'; render(); };
+$('vDay').onclick = () => { S.view = 'day'; render(); };
+$('save').onclick = save;
+$('undo').onclick = undo;
+$('auto').onclick = () => { if (confirm('Re-plan the whole week from where each class is up to? Your changes to this week are replaced (Undo brings them back).')) change(P.autofill(S.data, S.weeks, S.monday, S.learned), 'Week re-planned'); };
 $('print').onclick = () => {
   const list = P.printList(S.data, S.week);
   modal('<h3>To print this week</h3>' + (list.length ? '<pre>' + list.map(esc).join('\n') + '</pre>' : '<p class="muted">Nothing to print.</p>') + '<div class="row"><button id="mClose">Close</button></div>');
   $('mClose').onclick = closeModal;
 };
 $('xlsx').onclick = () => {
-  if (!S.hasTemplate) { modal('<h3>One-time setup needed</h3><p>Upload Planner.xlsx to Drive, open it with Google Sheets, copy one order-sheet tab into a new Google Sheet, then put that sheet\'s ID in the script property TEMPLATE_ID. See README.</p><div class="row"><button id="mClose">Close</button></div>'); $('mClose').onclick = closeModal; return; }
+  if (!S.hasTemplate) { modal('<h3>One-time setup needed</h3><p>The Excel button needs your order-sheet template. See Part 6 of the setup guide.</p><div class="row"><button id="mClose">Close</button></div>'); $('mClose').onclick = closeModal; return; }
   const title = 'Order Sheet Week ' + S.week.letter + ' - ' + S.monday.toLocaleDateString('en-GB', { month:'short' }) + ' ' + S.monday.getDate();
   status('Making the Excel file...');
   run('exportXlsx', P.sheetCells(S.data, S.week), title).then((r) => {
@@ -253,17 +431,35 @@ $('imp').onclick = () => $('file').click();
 $('file').onchange = () => {
   const f = $('file').files[0]; if (!f) return;
   const rd = new FileReader();
-  rd.onload = () => {
-    status('Importing...');
-    run('importData', rd.result).then((r) => { status('Imported ' + r.classes + ' classes'); return run('loadAll'); }).then(onLoad).catch((e) => status('Import failed: ' + e.message));
-  };
+  rd.onload = () => { status('Importing...'); run('importData', rd.result).then((r) => { toast('Imported ' + r.classes + ' classes'); return run('loadAll'); }).then(onLoad).catch((e) => status('Import failed: ' + e.message)); };
   rd.readAsText(f);
 };
+const HELP = [['J or →', 'next week'], ['K or ←', 'previous week'], ['T', 'today'], ['W / D', 'week / day view'], ['/', 'find a lesson (when one is selected)'], ['Delete', 'clear the selected lesson'], ['Ctrl+Z', 'undo'], ['Ctrl+S', 'save'], ['Esc', 'close / deselect'], ['?', 'this help']];
+$('help').onclick = () => { modal('<h3>Keyboard shortcuts</h3>' + HELP.map(([k, t]) => '<div><kbd>' + k + '</kbd> ' + t + '</div>').join('') + '<div class="row"><button id="mClose">Close</button></div>'); $('mClose').onclick = closeModal; };
+
+document.addEventListener('keydown', (e) => {
+  const typing = /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName);
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') { e.preventDefault(); save(); return; }
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z' && !typing) { e.preventDefault(); undo(); return; }
+  if (e.key === 'Escape') { closeModal(); if (typing) document.activeElement.blur(); else { S.sel = -1; render(); editor(); } return; }
+  if (typing || !S.week) return;
+  const k = e.key.toLowerCase();
+  if (k === 'j' || e.key === 'ArrowRight') $('next').click();
+  else if (k === 'k' || e.key === 'ArrowLeft') $('prev').click();
+  else if (k === 't') $('today').click();
+  else if (k === 'w') $('vWeek').click();
+  else if (k === 'd') $('vDay').click();
+  else if (e.key === '?') $('help').click();
+  else if (e.key === '/' && $('q')) { e.preventDefault(); $('q').focus(); }
+  else if (e.key === 'Delete' && S.sel >= 0) $('kFree').click();
+});
+window.addEventListener('beforeunload', (e) => { if (S.dirty) { e.preventDefault(); e.returnValue = ''; } });
 
 function onLoad(r) {
   S.data = r.data; S.weeks = r.weeks || {}; S.learned = r.learned || {}; S.hasTemplate = r.hasTemplate;
-  if (!S.data) { status('No data yet: click Import data and pick planner-data.json'); $('grid').innerHTML = ''; return; }
-  loadWeek(S.monday || defaultMonday());
+  if (!S.data) { status('No data yet: click Import data and pick planner-data.json'); $('grid').innerHTML = ''; editor(); return; }
+  if (!S.data.periodTimes) { status('Old data file: re-export it (guide step "refresh your lessons") and import again'); return; }
+  loadWeek(S.monday || firstPlanMonday());
 }
 run('loadAll').then(onLoad).catch((e) => status('Could not load: ' + e.message));
 </script>

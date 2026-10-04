@@ -1,0 +1,19 @@
+feature,area,priority,original,clone,notes
+Week view with real clock times per period,view,must,yes,no,KS3/Y9 vs KS4/5 P2 and P4 differ
+Today button + highlight today + current-time line,view,must,yes,no,
+Date picker to jump to any week,navigation,must,yes,no,mini calendar in Google
+Day view,view,should,yes,no,
+Month/term overview,view,could,yes,no,later
+Colour per class,view,must,yes,no,
+Click slot -> quick lesson search (type to find),edit,must,yes,no,Google quick-create; fewer clicks than topic+lesson dropdowns
+Keyboard shortcuts (J/K weeks, T today, /, Esc, ? help),edit,should,yes,no,
+Drag to move with undo toast,edit,must,yes,no,keeps his always-ask choice
+Undo (button + Ctrl+Z),edit,must,yes,partial,has Undo button
+Extras: notes/tasks/test-marking per day (all-day row),edit,should,yes,no,schedule features he asked for
+Double lessons counted once,logic,must,n/a,no,12C Tue P1+P2 bug in v1
+Unsaved-changes warning on leaving the page,safety,must,yes,partial,only on week change
+Sync saved week to a Google Calendar (dedicated Lessons calendar),integration,must,n/a,no,replace not duplicate on re-sync
+Show his other Google Calendar events (read only) in the week,integration,should,yes,no,meetings/duties next to lessons
+Search lessons across classes,navigation,could,yes,no,
+Guests / invites / Meet,skip,skip,yes,no,not needed
+Sharing calendars,skip,skip,yes,no,just him

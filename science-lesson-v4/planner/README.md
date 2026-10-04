@@ -1,5 +1,7 @@
 # Planner web app
 
+**Setting it up? Follow [SETUP-GUIDE.md](SETUP-GUIDE.md), step by step.**
+
 Plans your week lesson by lesson, lets you drag things about, remembers equipment, and downloads the technicians' order sheet as Excel in the same layout as now. It works the same way as the behaviour tracker: an Apps Script web app that saves into its own Google Sheet, opened with a private link.
 
 ## Each time your lessons or progress change (on the home PC)

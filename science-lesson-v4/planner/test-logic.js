@@ -51,5 +51,18 @@ ok(/straight after the Do Now/.test(P.buildPrompt(data, cf.week.slots[cf.carried
 const cells = P.sheetCells(data, w);
 ok(cells.some((c) => c.addr === 'R1' && c.value === 'Week B') && cells.length > 40, `sheet cells: ${cells.length} written incl. Week label`);
 
-console.log(fails ? `\n${fails} FAILED` : '\nall planner logic checks passed');
+// 8. Double lessons: 12C Tue P1+P2 in Week A (w/c 19 Oct) is ONE lesson
+const wa = P.autofill(data, {}, P.parse('2026-10-19'));
+const d12 = wa.slots.filter((s) => s.cls === '12C' && s.day === 1);
+ok(d12.length === 2 && d12[0].i === d12[1].i && d12[1].double, '12C Tue P1+P2 double = one lesson');
+
+// 9. Calendar events: real times per key stage, double merged into one event
+const ev = P.calendarEvents(data, wa);
+const e12 = ev.filter((e) => e.cls === '12C' && e.date === '2026-10-20');
+ok(e12.length === 1 && e12[0].start.endsWith('09:00') && e12[0].end.endsWith('11:05'), '12C double = one calendar event 09:00-11:05');
+const e9 = P.calendarEvents(data, w).find((e) => e.cls === '9XS' && e.start.endsWith('10:25'));
+ok(!!e9, '9XS P2 uses KS3 time 10:25');
+ok(!ev.some((e) => e.date === '2026-10-22'), 'no calendar events on INSET day');
+
+console.log(fails ?`\n${fails} FAILED` : '\nall planner logic checks passed');
 process.exit(fails ? 1 : 0);

@@ -100,13 +100,19 @@
       if (!isTeachingDay(data, date)) { slots.push({ ...base, kind: 'inset', text: (data.inset || []).includes(iso(date)) ? 'INSET day' : 'Holiday', eq: 'N/A' }); continue; }
       const cdata = data.classes[t.cls];
       if (!cdata) { slots.push({ ...base, kind: 'na', text: 'N/A', eq: 'N/A' }); continue; }
+      // Double lesson (same class, same day, the period straight after): ONE lesson across both slots.
+      const prev = slots[slots.length - 1];
+      if (prev && prev.cls === t.cls && prev.day === t.day && prev.period === t.period - 1 && prev.kind === 'lesson') {
+        slots.push({ ...base, ...take(prev), double: true });
+        continue;
+      }
       const nx = next(cdata.seq, st[t.cls]);
       if (!nx) { slots.push({ ...base, kind: 'free', text: 'End of planned lessons', eq: '' }); continue; }
       const s = nx.test != null ? { ...base, ...testSlot(data, t.cls, nx.test) } : { ...base, ...lessonSlot(data, t.cls, nx.i, learned) };
       applySlot(data, st[t.cls], s);
       slots.push(s);
     }
-    return { monday: iso(monday), letter, slots };
+    return { monday: iso(monday), letter, slots, extras: [] };
   }
 
   /* ------------------------------------------------------------------- moves */
@@ -138,8 +144,14 @@
     w.slots.forEach((s, k) => { if (s.cls === cls && k <= idx) applySlot(data, st, s); });
     w.slots.forEach((s, k) => {
       if (s.cls !== cls || k <= idx || ['inset', 'na', 'cover', 'custom'].includes(s.kind)) return;
-      const nx = next(cdata.seq, st);
       const keep = { notes: s.notes || [], carry: s.carry || [] };
+      const prev = w.slots[k - 1];
+      if (prev && prev.cls === cls && prev.day === s.day && prev.period === s.period - 1 && prev.kind === 'lesson') {
+        Object.assign(s, take(prev), keep, { double: true });          // second half of a double: same lesson
+        return;
+      }
+      s.double = false;
+      const nx = next(cdata.seq, st);
       Object.assign(s, nx ? (nx.test != null ? testSlot(data, cls, nx.test) : lessonSlot(data, cls, nx.i, learned)) : { kind: 'free', text: 'End of planned lessons', eq: '' }, keep);
       applySlot(data, st, s);
     });
@@ -210,7 +222,43 @@
     return { week: w, carriedTo: nxt };
   }
 
-  const api = { DAYS, iso, parse, addDays, mondayOf, isTeachingDay, weekLetter, progressBefore, next, autofill, moveSlot, refillAfter,
+  /* --------------------------------------------------------- times + calendar */
+  // "09:00-10:00" for a class's period: Years 7-9 use KS3 bells, Years 10-13 KS4/5 bells.
+  function periodTime(data, cls, period) {
+    const year = (data.classes[cls] || {}).year || parseInt(cls, 10) || 9;
+    const pt = (data.periodTimes || {})[year <= 9 ? 'ks3' : 'ks4'] || {};
+    return pt['P' + period] || '';
+  }
+  // The saved week as calendar events. A double lesson becomes ONE event over both periods.
+  // Times are local strings ("2026-10-12T09:00"); the server reads them as UK time.
+  function calendarEvents(data, week) {
+    const mon = parse(week.monday);
+    const out = [];
+    for (const s of week.slots.slice().sort((a, b) => a.day - b.day || a.period - b.period)) {
+      if (['inset', 'na', 'free'].includes(s.kind)) continue;
+      const t = periodTime(data, s.cls, s.period);
+      if (!t) continue;
+      const date = iso(addDays(mon, s.day));
+      const [a, b] = t.split('-');
+      const last = out[out.length - 1];
+      if (s.double && last && last.cls === s.cls && last.date === date) { last.end = `${date}T${b}`; continue; }
+      const L = s.kind === 'lesson' ? (data.classes[s.cls].seq[s.i] || {}) : {};
+      const desc = [
+        s.kind === 'lesson' ? `${L.topic} - Lesson ${L.num}` : '',
+        s.eq && !/^n\/?a$/i.test(s.eq) ? `Equipment: ${s.eq}${s.sets ? ' (' + setsLabel(s.sets) + ')' : ''}` : '',
+        s.print ? `Print: ${s.print}` : '', s.book ? `Books: ${s.book}` : '',
+        ...(s.carry || []).map((x) => `Carry over: ${x}`), ...(s.notes || []).map((x) => `Note: ${x}`),
+        L.rel ? `Drive: Lessons/${L.rel}` : '',
+      ].filter(Boolean).join('\n');
+      out.push({ cls: s.cls, date, title: `${s.cls}: ${lessonCell(data, s)}`, start: `${date}T${a}`, end: `${date}T${b}`, description: desc, colour: (data.classes[s.cls] || {}).colour || '' });
+    }
+    for (const x of week.extras || []) {
+      out.push({ cls: '', date: iso(addDays(mon, x.day)), title: x.text, allDay: true, description: x.kind || '', colour: '' });
+    }
+    return out;
+  }
+
+  const api = { periodTime, calendarEvents, DAYS, iso, parse, addDays, mondayOf, isTeachingDay, weekLetter, progressBefore, next, autofill, moveSlot, refillAfter,
     lessonSlot, testSlot, sheetCells, printList, buildPrompt, carryForward, equipCell, lessonCell, setsLabel };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.PlannerLogic = api;
 })(typeof window !== 'undefined' ? window : this);

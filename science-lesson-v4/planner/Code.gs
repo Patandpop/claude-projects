@@ -12,7 +12,7 @@
      TEMPLATE_ID   a Google Sheet holding ONE of his order-sheet tabs, used for the Excel download
 */
 
-const VERSION = 1;
+const VERSION = 2;
 
 function setup() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -95,6 +95,52 @@ function learnEquipment(k, key, eq, sets) {
   const row = [key, eq, sets || '', new Date()];
   if (at >= 0) q.getRange(at + 2, 1, 1, 4).setValues([row]); else q.appendRow(row);
   return true;
+}
+
+/* ---------------------------------------------------------- Google Calendar
+   The planner writes ONLY into its own calendar, "Lessons (Planner)", which it creates the first
+   time. Syncing a week first clears that calendar's events for Mon-Sun of that week, then writes
+   the saved week again, so re-syncing never makes duplicates. It never edits or deletes anything
+   in his main calendar; that one is only READ, to show meetings next to the lessons. */
+const CAL_NAME = 'Lessons (Planner)';
+const TZ = 'Europe/London';
+
+function lessonsCalendar_() {
+  const found = CalendarApp.getOwnedCalendarsByName(CAL_NAME);
+  if (found.length) return found[0];
+  return CalendarApp.createCalendar(CAL_NAME, { timeZone: TZ, color: CalendarApp.Color.BLUE });
+}
+const at_ = (s) => Utilities.parseDate(s, TZ, s.length > 10 ? "yyyy-MM-dd'T'HH:mm" : 'yyyy-MM-dd');
+
+function syncWeek(k, monday, events) {
+  check_(k);
+  const cal = lessonsCalendar_();
+  const start = at_(monday), end = new Date(start.getTime() + 7 * 864e5);
+  cal.getEvents(start, end).forEach((e) => e.deleteEvent());
+  const classes = [...new Set(events.map((e) => e.cls).filter(Boolean))].sort();
+  let n = 0;
+  events.forEach((e) => {
+    const ev = e.allDay
+      ? cal.createAllDayEvent(e.title, at_(e.date), { description: e.description || '' })
+      : cal.createEvent(e.title, at_(e.start), at_(e.end), { description: e.description || '', location: 'S8' });
+    if (e.cls) ev.setColor(String((classes.indexOf(e.cls) % 11) + 1));
+    n++;
+  });
+  return { written: n, calendar: CAL_NAME };
+}
+
+// His own calendar's events for Mon-Fri of that week, read only.
+function myEvents(k, monday) {
+  check_(k);
+  const start = at_(monday), end = new Date(start.getTime() + 5 * 864e5);
+  return CalendarApp.getDefaultCalendar().getEvents(start, end).map((e) => {
+    const s = e.getStartTime();
+    return {
+      title: e.getTitle(), allDay: e.isAllDayEvent(),
+      day: Math.floor((s.getTime() - start.getTime()) / 864e5),
+      time: e.isAllDayEvent() ? '' : Utilities.formatDate(s, TZ, 'HH:mm') + '-' + Utilities.formatDate(e.getEndTime(), TZ, 'HH:mm'),
+    };
+  }).filter((e) => e.day >= 0 && e.day < 5);
 }
 
 // Fill a copy of his real order-sheet tab and hand back an .xlsx (same layout the technicians know).
