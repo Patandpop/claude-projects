@@ -236,11 +236,12 @@ function techGuide(topicDir) {
         || keys.map((k) => raw[k]).find((r) => /^(lesson|number|lesson number)$/i.test(String(r.A || '').trim()) && Object.values(r).some((v) => /^LO$/i.test(String(v).trim())));
       if (head) {
         const col = (re) => Object.keys(head).find((c) => re.test(String(head[c])));
-        const cN = col(/lesson|number/i), cT = col(/^title/i) || cN, cR = col(/resources|tech/i), cW = col(/worksheet/i);
+        const cN = col(/lesson|number/i), cT = col(/^title/i) || cN, cR = col(/resources|tech/i), cW = col(/worksheet/i), cO = col(/overview|^\s*LO\s*$/i);
         const titleOf = (r) => String(r[cT]).replace(cT === cN ? /^\s*(lesson\s*|l)?\d+(\.\d+)?\s*/i : /^$/, '').trim();
         rows = keys.map((k) => raw[k]).filter((r) => r !== head && r[cT] && titleOf(r)).map((r) => ({
           // "1.0", "Lesson 4 ", "L05" all give the number
           num: parseFloat((String(r[cN] || '').match(/\d+(\.\d+)?/) || [])[0]) || null, title: titleOf(r),
+          lo: String(r[cO] || '').replace(/\s+/g, ' ').trim().slice(0, 300),
           equipment: String(r[cR] || '').replace(/\s*\r?\n\s*/g, ', ').replace(/\s{2,}/g, ' ').trim(),
           printing: String(r[cW] || '').replace(/\s*\r?\n\s*/g, ', ').replace(/\s{2,}/g, ' ').trim(),
         }));
@@ -280,6 +281,15 @@ function stripICT(text) {
   if (!text) return text;
   const kept = String(text).split(/\s*,\s*/).filter((part) => !NO_ICT.test(part));
   return kept.join(', ').trim() || 'N/A';
+}
+// What the lesson is about, from its technician-guide row ("Labelling plant and animal cells..."):
+// lets the homework match test checklist statements to lessons by content, not just title.
+function loFor(L) {
+  if (L.guideRow) return L.guideRow.lo || '';
+  if (!L.folder) return '';
+  let best = null, bs = 0;
+  for (const r of techGuide(path.dirname(L.folder))) { const sc = sim(r.title, L.title); if (sc > bs) { bs = sc; best = r; } }
+  return best && bs >= 0.5 ? best.lo || '' : '';
 }
 function equipmentFor(lesson) {
   const e = equipmentFor0(lesson);
@@ -564,7 +574,7 @@ if (require.main === module) {
           let built = null;
           if (L.folder) { try { built = fs.readdirSync(L.folder).some((f) => /\.pptx$/i.test(f)); } catch { built = false; } }
           return { topic: L.topic, unit: L.unit, num: L.num, title: L.title, eq: e.equipment, sets: e.sets || null,
-            print: e.printing || '', eqSrc: e.source, book, built, planned: L.source === 'plan',
+            print: e.printing || '', eqSrc: e.source, book, built, planned: L.source === 'plan', lo: loFor(L),
             optional: !!L.optional, nofolder: L.source === 'guide',
             rel: L.folder ? path.relative(DRIVE, L.folder).split(path.sep).join('/') : null };
         }),

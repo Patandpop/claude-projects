@@ -581,6 +581,12 @@ function main() {
   hardFails += dnTest.fails;
   warnings  += dnTest.warns;
 
+  // Test-ready homework (PLC + test aware selection, tick boxes, readable mark schemes).
+  console.log('');
+  const thTest = require(path.join(__dirname, 'test-homework.test.js')).run();
+  hardFails += thTest.fails;
+  warnings  += thTest.warns;
+
   console.log('');
   if (hardFails) {
     console.log(`${RED}FAILED${RST} — ${hardFails} hard assertion(s), ${warnings} warning(s).`);
