@@ -5,7 +5,9 @@
 const fs = require('fs');
 const path = require('path');
 const dir = __dirname;
-const sel = process.argv.includes('--select') ? +process.argv[process.argv.indexOf('--select') + 1] : -1;
+const arg = (k) => (process.argv.includes(k) ? process.argv[process.argv.indexOf(k) + 1] : null);
+const sel = arg('--select') != null ? +arg('--select') : -1;
+const view = arg('--view'); const monday = arg('--monday'); const out = arg('--out') || 'preview.html';
 let html = fs.readFileSync(path.join(dir, 'Planner.html'), 'utf8');
 const data = fs.readFileSync(path.join(dir, 'planner-data.json'), 'utf8');
 const mock = `<script>
@@ -24,5 +26,6 @@ window.google = { script: { run: (function make(ok, bad) {
 <script>${fs.readFileSync(path.join(dir, 'logic.js'), 'utf8')}</script>`;
 html = html.replace("<?!= include('Logic') ?>", mock).replace('<?!= JSON.stringify(key) ?>', '"preview"');
 if (sel >= 0) html = html.replace('</body>', `<script>setTimeout(() => { S.showMine = true; loadMine(); S.week.extras.push({ day: 1, text: 'Mark 9XS Particles tests', kind: 'marking', kindLabel: '✎' }); S.sel = ${sel}; render(); editor(); }, 300);</script></body>`);
-fs.writeFileSync(path.join(dir, 'preview.html'), html);
+if (view || monday) html = html.replace('</body>', `<script>setTimeout(() => { ${monday ? `loadWeek(P.parse('${monday}')); markGaps();` : ''} ${view ? `S.view = '${view}';` : ''} render(); editor(); }, 400);</script></body>`);
+fs.writeFileSync(path.join(dir, out), html);
 console.log('planner/preview.html written');

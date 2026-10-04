@@ -45,5 +45,5 @@ Students*.csv
 exam-usage.json
 homework-out/
 planner/planner-data.json
-planner/preview.html
+planner/preview*.html
 planner/dist/

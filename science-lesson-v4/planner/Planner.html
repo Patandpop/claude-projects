@@ -6,76 +6,108 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Planner</title>
 <style>
-  :root { --navy:#0D1B5E; --gold:#FABB2E; --bg:#EDF2FA; --ink:#1A1A2E; --muted:#6B6B7B; --line:#D5DDEC; --red:#B71C1C; --green:#1B5E20; }
+  /* Dark by default (Patryk 2026-10-04); light is a switch in the More menu. */
+  :root {
+    --navy:#0D1B5E; --gold:#FABB2E; --red:#EF5350; --green:#66BB6A; --orange:#FFA726; --blue:#64B5F6;
+    --bg:#0E1424; --panel:#161E33; --panel2:#1C2540; --ink:#E6EAF5; --muted:#98A2BC; --line:#2A3555;
+    --off:#12192B; --hover:#202A47; --chip:#24305A; --bar:#0A0F1E;
+  }
+  body.light {
+    --red:#B71C1C; --green:#1B5E20; --orange:#E65100; --blue:#0D47A1;
+    --bg:#EDF2FA; --panel:#FFFFFF; --panel2:#F7F9FD; --ink:#1A1A2E; --muted:#6B6B7B; --line:#D5DDEC;
+    --off:#F1F1F4; --hover:#F7F9FD; --chip:#E8EAF6; --bar:#0D1B5E;
+  }
   * { box-sizing:border-box; }
   body { margin:0; font-family:"Century Gothic","Segoe UI",sans-serif; background:var(--bg); color:var(--ink); }
-  header { background:var(--navy); color:#fff; display:flex; align-items:center; gap:8px; padding:8px 14px; flex-wrap:wrap; position:sticky; top:0; z-index:5; }
-  header h1 { font-size:18px; margin:0 10px 0 0; color:var(--gold); }
-  header .sep { width:1px; height:24px; background:rgba(255,255,255,.25); margin:0 4px; }
-  #wkLabel { font-weight:700; min-width:170px; }
-  .badge { background:var(--gold); color:var(--navy); font-weight:700; padding:2px 8px; border-radius:10px; font-size:12px; }
-  button, .btn { font-family:inherit; font-size:13px; border:1px solid var(--gold); background:#fff; color:var(--navy); padding:5px 10px; border-radius:6px; cursor:pointer; }
-  header button { background:transparent; color:#fff; }
-  header button.on { background:rgba(250,187,46,.25); }
-  button.primary, header button.primary { background:var(--gold); color:var(--navy); font-weight:700; }
-  header input[type=date] { font-family:inherit; border-radius:6px; border:1px solid var(--gold); padding:3px 6px; }
-  #status { font-size:12px; margin-left:auto; opacity:.9; }
+  header { background:var(--bar); color:#fff; display:flex; align-items:center; gap:8px; padding:8px 14px; position:sticky; top:0; z-index:5; border-bottom:1px solid var(--line); }
+  header h1 { font-size:18px; margin:0 8px 0 0; color:var(--gold); }
+  header .sep { width:1px; height:24px; background:rgba(255,255,255,.2); margin:0 2px; }
+  #wkLabel { font-weight:700; min-width:150px; }
+  .badge { background:var(--gold); color:#0D1B5E; font-weight:700; padding:2px 8px; border-radius:10px; font-size:12px; }
+  .badge.taught { background:var(--green); color:#fff; }
+  button { font-family:inherit; font-size:13px; border:1px solid var(--line); background:var(--panel2); color:var(--ink); padding:5px 10px; border-radius:6px; cursor:pointer; }
+  button:hover { border-color:var(--gold); }
+  header button { background:transparent; color:#fff; border-color:rgba(255,255,255,.25); }
+  header button.on { background:rgba(250,187,46,.22); border-color:var(--gold); }
+  button.primary, header button.primary { background:var(--gold); color:#0D1B5E; border-color:var(--gold); font-weight:700; }
+  header input[type=date] { font-family:inherit; border-radius:6px; border:1px solid rgba(255,255,255,.25); padding:3px 6px; background:transparent; color:#fff; color-scheme:dark; }
+  #status { font-size:12px; margin-left:auto; opacity:.85; max-width:360px; text-align:right; }
   #status.dirty::before { content:"\25CF  "; color:var(--gold); }
-  main { display:grid; grid-template-columns:1fr 370px; gap:12px; padding:12px; }
-  .cal { background:#fff; border:1px solid var(--line); border-radius:10px; overflow:hidden; }
+  .menuwrap { position:relative; }
+  #menu { display:none; position:absolute; right:0; top:34px; background:var(--panel); border:1px solid var(--line); border-radius:8px; min-width:250px; padding:6px; box-shadow:0 10px 30px rgba(0,0,0,.35); z-index:10; }
+  #menu.on { display:block; }
+  #menu button { display:block; width:100%; text-align:left; border:none; background:transparent; color:var(--ink); padding:8px 10px; }
+  #menu button:hover { background:var(--hover); }
+  #menu small { color:var(--muted); display:block; font-size:11px; }
+  #menu hr { border:none; border-top:1px solid var(--line); margin:4px 0; }
+  main { display:grid; grid-template-columns:1fr 360px; gap:12px; padding:12px; }
+  main.full { grid-template-columns:1fr; }
+  .cal { background:var(--panel); border:1px solid var(--line); border-radius:10px; overflow:hidden; }
   .grid { display:grid; }
-  .hcell { padding:8px 6px; text-align:center; border-bottom:1px solid var(--line); font-size:12px; color:var(--muted); }
+  .hcell { padding:8px 6px; text-align:center; border-bottom:1px solid var(--line); font-size:12px; color:var(--muted); cursor:pointer; }
   .hcell b { display:block; font-size:20px; color:var(--ink); font-weight:400; }
-  .hcell.today b { background:var(--navy); color:var(--gold); border-radius:50%; width:36px; height:36px; line-height:36px; margin:2px auto 0; }
-  .hcell.off { background:#F4F4F6; }
+  .hcell.today b { background:var(--gold); color:#0D1B5E; border-radius:50%; width:36px; height:36px; line-height:36px; margin:2px auto 0; font-weight:700; }
+  .hcell.off { background:var(--off); }
   .tcell { font-size:11px; color:var(--muted); text-align:right; padding:6px 6px 0 0; border-right:1px solid var(--line); }
-  .allday { border-bottom:2px solid var(--line); min-height:34px; padding:3px; border-right:1px solid #EEF1F7; }
-  .chip { display:flex; gap:4px; align-items:center; font-size:11px; border-radius:4px; padding:2px 5px; margin:2px 0; background:#E8EAF6; color:var(--navy); cursor:pointer; }
-  .chip.mine { background:#F1F1F4; color:#555; cursor:default; }
+  .allday { border-bottom:2px solid var(--line); min-height:34px; padding:3px; border-right:1px solid var(--line); }
+  .chip { display:flex; gap:4px; align-items:center; font-size:11px; border-radius:4px; padding:2px 5px; margin:2px 0; background:var(--chip); color:var(--ink); cursor:pointer; }
+  .chip.mine { opacity:.75; cursor:default; }
   .chip .x { margin-left:auto; opacity:.5; }
   .addx { font-size:11px; color:var(--muted); cursor:pointer; padding:1px 4px; visibility:hidden; }
   .allday:hover .addx { visibility:visible; }
-  .slotcell { border-right:1px solid #EEF1F7; border-bottom:1px solid #EEF1F7; padding:3px; min-height:96px; position:relative; }
-  .slotcell.off { background:#F4F4F6; }
-  .slotcell.empty:hover { background:#F7F9FD; cursor:pointer; }
+  .slotcell { border-right:1px solid var(--line); border-bottom:1px solid var(--line); padding:3px; min-height:92px; position:relative; }
+  .slotcell.off { background:var(--off); }
+  .slotcell.empty:hover { background:var(--hover); cursor:pointer; }
   .slotcell.empty:hover::after { content:"+ add"; position:absolute; top:6px; left:8px; font-size:11px; color:var(--muted); }
-  .slotcell.over { outline:3px dashed var(--navy); outline-offset:-3px; }
-  .ev { height:100%; min-height:88px; border-radius:6px; padding:5px 7px 5px 9px; font-size:12px; cursor:pointer; position:relative; border-left:5px solid var(--c, var(--navy)); background:color-mix(in srgb, var(--c, #0D1B5E) 9%, white); }
+  .slotcell.over { outline:3px dashed var(--gold); outline-offset:-3px; }
+  .ev { height:100%; min-height:84px; border-radius:6px; padding:5px 7px 5px 9px; font-size:12px; cursor:pointer; position:relative; border-left:5px solid var(--c); background:color-mix(in srgb, var(--c) 16%, var(--panel)); }
   .ev.sel { outline:3px solid var(--gold); }
   .ev .top { display:flex; gap:6px; align-items:center; }
-  .ev .cls { font-weight:700; color:var(--c); }
+  .ev .cls { font-weight:700; color:color-mix(in srgb, var(--c) 55%, var(--ink)); }
   .ev .tm { color:var(--muted); font-size:11px; }
   .ev .les { font-weight:700; margin:2px 0; line-height:1.25; }
   .ev .eq { color:var(--muted); font-size:11px; }
-  .ev.kind-inset, .ev.kind-na { --c:#9E9E9E; color:var(--muted); }
-  .ev.kind-test { background:#FFEBEE; }
-  .ev.kind-cover { background:#FFF8E1; }
-  .ev.kind-free { background:#fff; border-left-style:dashed; color:var(--muted); }
+  .ev.kind-inset, .ev.kind-na { --c:#757575; color:var(--muted); }
+  .ev.kind-test { background:color-mix(in srgb, var(--red) 18%, var(--panel)); }
+  .ev.kind-cover { background:color-mix(in srgb, var(--orange) 16%, var(--panel)); }
+  .ev.kind-free { background:var(--panel); border-left-style:dashed; color:var(--muted); }
+  .ev.kind-taught { --c:var(--green); cursor:default; }
   .flags { display:flex; gap:3px; flex-wrap:wrap; margin-top:3px; }
-  .flag { font-size:10px; font-weight:700; border-radius:3px; padding:0 4px; }
-  .f-check { background:#FFE0B2; color:#E65100; }
-  .f-built { background:#FFCDD2; color:var(--red); }
-  .f-carry { background:#C8E6C9; color:var(--green); }
-  .f-dbl { background:#E3F2FD; color:#0D47A1; }
-  .brk { grid-column:1 / -1; font-size:10px; color:var(--muted); background:#F7F9FD; padding:2px 8px; border-bottom:1px solid #EEF1F7; }
-  aside { background:#fff; border:1px solid var(--line); border-radius:10px; padding:12px; align-self:start; position:sticky; top:62px; max-height:calc(100vh - 80px); overflow:auto; }
-  aside h2 { margin:0 0 6px; font-size:15px; color:var(--navy); }
+  .flag { font-size:10px; font-weight:700; border-radius:3px; padding:0 4px; border:1px solid currentColor; }
+  .f-check { color:var(--orange); } .f-built { color:var(--red); } .f-carry { color:var(--green); } .f-dbl { color:var(--blue); } .f-gap { color:var(--gold); }
+  .brk { grid-column:1 / -1; font-size:10px; color:var(--muted); background:var(--off); padding:2px 8px; border-bottom:1px solid var(--line); }
+  aside { background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:12px; align-self:start; position:sticky; top:62px; max-height:calc(100vh - 80px); overflow:auto; }
+  aside h2 { margin:0 0 6px; font-size:15px; color:var(--gold); }
+  details { border-top:1px solid var(--line); margin-top:10px; padding-top:6px; }
+  summary { cursor:pointer; font-size:13px; font-weight:700; color:var(--ink); padding:4px 0; }
   label { display:block; font-size:12px; color:var(--muted); margin:8px 0 2px; }
-  select, input[type=text], textarea { width:100%; font-family:inherit; font-size:13px; padding:6px; border:1px solid var(--line); border-radius:6px; }
+  select, input[type=text], textarea { width:100%; font-family:inherit; font-size:13px; padding:6px; border:1px solid var(--line); border-radius:6px; background:var(--panel2); color:var(--ink); }
   textarea { min-height:50px; resize:vertical; }
   .row { display:flex; gap:6px; flex-wrap:wrap; margin-top:8px; }
   .muted { color:var(--muted); font-size:12px; }
-  .results { border:1px solid var(--line); border-radius:6px; max-height:230px; overflow:auto; margin-top:4px; }
-  .res { padding:6px 8px; font-size:12px; cursor:pointer; border-bottom:1px solid #F0F2F7; }
-  .res:hover, .res.hi { background:#FFF8E1; }
+  .results { border:1px solid var(--line); border-radius:6px; max-height:240px; overflow:auto; margin-top:4px; }
+  .res { padding:6px 8px; font-size:12px; cursor:pointer; border-bottom:1px solid var(--line); }
+  .res:hover, .res.hi { background:var(--hover); }
   .res small { color:var(--muted); display:block; }
   .res.next { border-left:3px solid var(--gold); }
-  .modal { position:fixed; inset:0; background:rgba(13,27,94,.35); display:none; align-items:center; justify-content:center; z-index:20; }
+  .res.done { opacity:.55; }
+  /* Classes view */
+  .classes { display:grid; grid-template-columns:repeat(auto-fill, minmax(330px, 1fr)); gap:12px; padding:12px; }
+  .ccard { background:var(--panel); border:1px solid var(--line); border-left:6px solid var(--c); border-radius:10px; padding:10px 12px; }
+  .ccard h3 { margin:0 0 4px; font-size:16px; }
+  .topic { margin-top:8px; }
+  .topic .tt { font-size:12px; font-weight:700; display:flex; gap:6px; align-items:center; }
+  .topic .tt span { font-weight:400; color:var(--muted); }
+  .les-list { display:flex; flex-wrap:wrap; gap:3px; margin-top:4px; }
+  .lp { font-size:11px; padding:1px 5px; border-radius:3px; border:1px solid var(--line); }
+  .lp.done { background:color-mix(in srgb, var(--green) 30%, var(--panel)); border-color:transparent; }
+  .lp.miss { border-color:var(--gold); color:var(--gold); }
+  .modal { position:fixed; inset:0; background:rgba(0,0,0,.5); display:none; align-items:center; justify-content:center; z-index:20; }
   .modal.on { display:flex; }
-  .box { background:#fff; border-radius:10px; padding:16px; max-width:580px; width:92%; max-height:82vh; overflow:auto; }
-  .box h3 { margin:0 0 10px; color:var(--navy); }
+  .box { background:var(--panel); color:var(--ink); border:1px solid var(--line); border-radius:10px; padding:16px; max-width:580px; width:92%; max-height:82vh; overflow:auto; }
+  .box h3 { margin:0 0 10px; color:var(--gold); }
   pre { white-space:pre-wrap; font-family:inherit; font-size:13px; }
-  kbd { background:#EEF1F7; border:1px solid var(--line); border-radius:4px; padding:0 5px; font-family:inherit; font-size:12px; }
+  kbd { background:var(--panel2); border:1px solid var(--line); border-radius:4px; padding:0 5px; font-family:inherit; font-size:12px; }
   #toast { position:fixed; bottom:18px; left:50%; transform:translateX(-50%); background:#323232; color:#fff; padding:10px 14px; border-radius:6px; font-size:13px; display:none; gap:14px; align-items:center; z-index:30; }
   #toast.on { display:flex; }
   #toast button { background:transparent; border:none; color:var(--gold); font-weight:700; padding:0; }
@@ -89,22 +121,30 @@
   <span id="wkLabel">-</span><span class="badge" id="letter">-</span>
   <input type="date" id="jump" title="Jump to a week">
   <span class="sep"></span>
-  <button id="vWeek" class="on" title="W">Week</button><button id="vDay" title="D">Day</button>
+  <button id="vWeek" class="on" title="W">Week</button><button id="vDay" title="D">Day</button><button id="vClasses" title="C">Classes</button>
   <span class="sep"></span>
-  <button id="save" class="primary" title="Ctrl+S">Save</button>
   <button id="undo" title="Ctrl+Z">Undo</button>
-  <button id="auto">Re-fill week</button>
-  <button id="sync">Send to Google Calendar</button>
-  <button id="mine" title="Show my calendar">My calendar</button>
-  <button id="print">Print list</button>
-  <button id="xlsx">Technicians' Excel</button>
-  <button id="imp">Import data</button>
-  <button id="help" title="?">?</button>
-  <input type="file" id="file" accept=".json" style="display:none">
+  <button id="save" class="primary" title="Ctrl+S">Save</button>
   <span id="status">Loading...</span>
+  <div class="menuwrap"><button id="more">&#8943; More</button>
+    <div id="menu">
+      <button id="mSync">Send this week to Google Calendar<small>writes to your "Lessons (Planner)" calendar</small></button>
+      <button id="mMine">Show my calendar<small>meetings and events, read only</small></button>
+      <hr>
+      <button id="mPrint">Print list<small>everything to photocopy, with quantities</small></button>
+      <button id="mXlsx">Technicians' Excel<small>the order sheet to email</small></button>
+      <hr>
+      <button id="mAuto">Re-plan this week<small>from where each class is up to</small></button>
+      <button id="mImp">Import data<small>planner-data.json from home</small></button>
+      <hr>
+      <button id="mTheme">Light mode</button>
+      <button id="mHelp">Keyboard shortcuts <small>or press ?</small></button>
+    </div>
+  </div>
+  <input type="file" id="file" accept=".json" style="display:none">
 </header>
-<main>
-  <section class="cal"><div class="grid" id="grid"></div></section>
+<main id="main">
+  <section class="cal" id="calWrap"><div class="grid" id="grid"></div></section>
   <aside id="ed"></aside>
 </main>
 <div class="modal" id="modal"><div class="box" id="mbox"></div></div>
@@ -115,12 +155,17 @@
 const KEY = <?!= JSON.stringify(key) ?>;   // the key is letters and numbers only, so unescaped output is safe
 const P = window.PlannerLogic;
 const COLS = ['B', 'F', 'J', 'N', 'R'];
-let S = { data:null, weeks:{}, learned:{}, hasTemplate:false, monday:null, week:null, undo:[], sel:-1, dirty:false, view:'week', day:0, mine:null, showMine:false };
+let S = { data:null, weeks:{}, learned:{}, hasTemplate:false, monday:null, week:null, undo:[], sel:-1, dirty:false, view:'week', day:0, mine:null, showMine:false, readOnly:false };
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c]));
 const status = (t) => { $('status').textContent = t; $('status').classList.toggle('dirty', S.dirty); };
 const run = (fn, ...args) => new Promise((ok, bad) => google.script.run.withSuccessHandler(ok).withFailureHandler(bad)[fn](KEY, ...args));
 const todayMidnight = () => { const t = new Date(); return new Date(t.getFullYear(), t.getMonth(), t.getDate()); };
+const store = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} } };
+
+/* ------------------------------------------------------------------ theme */
+function applyTheme() { const light = store.get('planner-theme') === 'light'; document.body.classList.toggle('light', light); $('mTheme').textContent = light ? 'Dark mode' : 'Light mode'; }
+applyTheme();
 
 /* ------------------------------------------------------------------ toast */
 let toastTimer = null;
@@ -139,18 +184,27 @@ function firstPlanMonday() {
   return m;
 }
 function leaveOk() { return !S.dirty || confirm('This week has unsaved changes. Leave without saving?'); }
+// A week he filled in Planner.xlsx is shown exactly as he filled it (taught), read only.
+function filledWeek(mon) {
+  const rows = (S.data.filled || {})[P.iso(mon)];
+  if (!rows) return null;
+  return { monday: P.iso(mon), letter: P.weekLetter(S.data, mon), extras: [], taught: true,
+    slots: rows.map((r) => ({ day: r.day, period: r.period, col: r.col, cls: r.cls, kind: 'taught', text: r.text || '(blank)', eq: '', notes: [], carry: [] })) };
+}
 function loadWeek(mon) {
   S.monday = P.mondayOf(mon); S.sel = -1; S.undo = []; S.dirty = false; S.mine = null;
   const saved = S.weeks[P.iso(S.monday)];
-  S.week = saved ? JSON.parse(JSON.stringify(saved)) : P.autofill(S.data, S.weeks, S.monday, S.learned);
+  const filled = filledWeek(S.monday);
+  S.readOnly = !!filled;
+  S.week = filled || (saved ? JSON.parse(JSON.stringify(saved)) : P.autofill(S.data, S.weeks, S.monday, S.learned));
   S.week.extras = S.week.extras || [];
-  const filled = (S.data.filledWeeks || []).includes(P.iso(S.monday));
-  status(filled ? 'Filled in Planner.xlsx: for reference only' : saved ? 'Saved' : 'Planned automatically, not saved yet');
+  status(filled ? 'Already taught (from your Planner.xlsx)' : saved ? 'Saved' : 'Planned automatically, not saved yet');
   $('jump').value = P.iso(S.monday);
   render(); editor();
-  if (S.showMine) loadMine();
+  if (S.showMine && !filled) loadMine();
 }
 function change(newWeek, msg) {
+  if (S.readOnly) { toast('This week is already taught, so it can\'t be changed here'); return; }
   S.undo.push(JSON.stringify(S.week)); S.week = newWeek; S.week.extras = S.week.extras || []; S.dirty = true;
   render(); editor(); status('Unsaved changes'); if (msg) toast(msg, true);
 }
@@ -159,6 +213,7 @@ function undo() {
   S.week = JSON.parse(S.undo.pop()); S.dirty = true; render(); editor(); status('Unsaved changes');
 }
 function save() {
+  if (S.readOnly) { toast('Taught weeks come from Planner.xlsx: nothing to save'); return Promise.resolve(); }
   status('Saving...');
   return run('saveWeek', S.week).then(() => { S.weeks[S.week.monday] = JSON.parse(JSON.stringify(S.week)); S.dirty = false; status('Saved'); toast('Week saved'); })
     .catch((e) => status('Save failed: ' + e.message));
@@ -169,67 +224,75 @@ function timeLabel(p) {
   const a = (S.data.periodTimes.ks3['P' + p] || '').split('-')[0], b = (S.data.periodTimes.ks4['P' + p] || '').split('-')[0];
   return 'P' + p + '<br>' + (a === b ? a : a + '<br>' + b);
 }
+function setViewButtons() {
+  ['Week', 'Day', 'Classes'].forEach((v) => $('v' + v).classList.toggle('on', S.view === v.toLowerCase()));
+  $('main').classList.toggle('full', S.view === 'classes');
+  $('ed').style.display = S.view === 'classes' ? 'none' : '';
+}
 function render() {
+  setViewButtons();
   const mon = S.monday, today = P.iso(todayMidnight());
   $('wkLabel').textContent = (S.view === 'day' ? P.DAYS[S.day] + ' ' : 'w/c ') + P.addDays(mon, S.view === 'day' ? S.day : 0).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
-  $('letter').textContent = 'Week ' + S.week.letter;
-  $('vWeek').classList.toggle('on', S.view === 'week'); $('vDay').classList.toggle('on', S.view === 'day');
+  $('letter').textContent = S.readOnly ? 'Week ' + S.week.letter + ' · taught' : 'Week ' + S.week.letter;
+  $('letter').classList.toggle('taught', S.readOnly);
+  if (S.view === 'classes') return renderClasses();
   const days = S.view === 'day' ? [S.day] : [0, 1, 2, 3, 4];
   const g = $('grid');
+  g.className = 'grid';
   g.style.gridTemplateColumns = '64px repeat(' + days.length + ', 1fr)';
   let h = '<div class="hcell"></div>';
   days.forEach((d) => {
     const date = P.addDays(mon, d);
     const off = !P.isTeachingDay(S.data, date);
-    h += '<div class="hcell' + (P.iso(date) === today ? ' today' : '') + (off ? ' off' : '') + '" data-day="' + d + '">' + P.DAYS[d].toUpperCase() + '<b>' + date.getDate() + '</b></div>';
+    h += '<div class="hcell' + (P.iso(date) === today ? ' today' : '') + (off ? ' off' : '') + '" data-day="' + d + '" title="Open this day">' + P.DAYS[d].toUpperCase() + '<b>' + date.getDate() + '</b></div>';
   });
-  // all-day row: his extras + his own calendar
   h += '<div class="tcell" style="padding-top:8px">All day</div>';
   days.forEach((d) => {
     h += '<div class="allday" data-day="' + d + '">';
     (S.week.extras || []).forEach((x, k) => { if (x.day === d) h += '<div class="chip" data-x="' + k + '" title="Click to remove">' + esc(x.kindLabel || '') + ' ' + esc(x.text) + '<span class="x">&#10005;</span></div>'; });
     (S.showMine && S.mine || []).forEach((e) => { if (e.day === d) h += '<div class="chip mine" title="From your Google Calendar">' + (e.time ? esc(e.time) + ' ' : '') + esc(e.title) + '</div>'; });
-    h += '<span class="addx" data-add="' + d + '">+ task / marking / meeting</span></div>';
+    if (!S.readOnly) h += '<span class="addx" data-add="' + d + '">+ task / marking / meeting</span>';
+    h += '</div>';
   });
   for (let p = 1; p <= 5; p++) {
     if (p === 2) h += '<div class="brk">Break: KS3 10:00-10:25 · KS4/5 11:05-11:30</div>';
     if (p === 4) h += '<div class="brk">Lunch: KS3 12:30-13:15 · KS4/5 13:30-14:15</div>';
     h += '<div class="tcell">' + timeLabel(p) + '</div>';
     days.forEach((d) => {
-      const date = P.addDays(mon, d);
-      const off = !P.isTeachingDay(S.data, date);
+      const off = !P.isTeachingDay(S.data, P.addDays(mon, d));
       const i = S.week.slots.findIndex((s) => s.day === d && s.period === p);
-      if (i < 0) { h += '<div class="slotcell empty' + (off ? ' off' : '') + '" data-day="' + d + '" data-p="' + p + '"></div>'; return; }
+      if (i < 0) { h += '<div class="slotcell' + (S.readOnly ? '' : ' empty') + (off ? ' off' : '') + '" data-day="' + d + '" data-p="' + p + '"></div>'; return; }
       const s = S.week.slots[i];
       const c = S.data.classes[s.cls] || {};
       const flags = [];
       if (s.double) flags.push('<span class="flag f-dbl">DOUBLE</span>');
-      if (s.kind === 'lesson' && (s.eqSrc === 'guess' || s.planned)) flags.push('<span class="flag f-check">CHECK</span>');
-      if (s.kind === 'lesson' && s.built === false) flags.push('<span class="flag f-built">NOT BUILT</span>');
+      if (s.kind === 'lesson' && (s.eqSrc === 'guess' || s.planned)) flags.push('<span class="flag f-check" title="Equipment is a guess: check it">CHECK</span>');
+      if (s.kind === 'lesson' && s.built === false) flags.push('<span class="flag f-built" title="No slides in the Drive folder yet">NOT BUILT</span>');
+      if (s.kind === 'lesson' && s.gap) flags.push('<span class="flag f-gap" title="A lesson missed earlier in this topic">MISSED</span>');
       if ((s.carry || []).length) flags.push('<span class="flag f-carry">+' + s.carry.length + ' carry</span>');
       const L = s.kind === 'lesson' ? c.seq[s.i] || {} : null;
-      h += '<div class="slotcell" data-i="' + i + '"><div class="ev kind-' + s.kind + (S.sel === i ? ' sel' : '') + '" draggable="true" data-i="' + i + '" style="--c:' + (c.colour || '#0D1B5E') + '">' +
-        '<div class="top"><span class="cls">' + esc(s.cls) + '</span><span class="tm">' + esc(P.periodTime(S.data, s.cls, s.period)) + '</span></div>' +
-        '<div class="les">' + esc(P.lessonCell(S.data, s)) + '</div>' +
+      const time = P.periodTime(S.data, s.cls, s.period);
+      h += '<div class="slotcell" data-i="' + i + '"><div class="ev kind-' + s.kind + (S.sel === i ? ' sel' : '') + '"' + (S.readOnly ? '' : ' draggable="true"') + ' data-i="' + i + '" style="--c:' + (c.colour || '#3F51B5') + '">' +
+        '<div class="top"><span class="cls">' + esc(s.cls) + '</span><span class="tm">' + esc(time) + '</span></div>' +
+        '<div class="les">' + esc(s.kind === 'taught' ? s.text : P.lessonCell(S.data, s)) + '</div>' +
         (L ? '<div class="eq">' + esc(L.topic) + ' · L' + L.num + '</div>' : '') +
-        '<div class="eq">' + esc(String(s.eq || '').slice(0, S.view === 'day' ? 400 : 60)) + (S.view !== 'day' && String(s.eq || '').length > 60 ? '...' : '') + '</div>' +
+        (s.eq && S.view === 'day' ? '<div class="eq">' + esc(s.eq) + '</div>' : '') +
         '<div class="flags">' + flags.join('') + '</div></div></div>';
     });
   }
   g.innerHTML = h;
 
   g.querySelectorAll('.ev').forEach((el) => {
-    el.onclick = (e) => { e.stopPropagation(); S.sel = +el.dataset.i; render(); editor(); };
+    el.onclick = (e) => { e.stopPropagation(); if (S.readOnly) return; S.sel = +el.dataset.i; render(); editor(); };
     el.ondragstart = (e) => e.dataTransfer.setData('text/plain', el.dataset.i);
   });
-  g.querySelectorAll('.slotcell').forEach((el) => {
+  if (!S.readOnly) g.querySelectorAll('.slotcell').forEach((el) => {
     el.ondragover = (e) => { e.preventDefault(); el.classList.add('over'); };
     el.ondragleave = () => el.classList.remove('over');
     el.ondrop = (e) => {
       e.preventDefault(); el.classList.remove('over');
       const from = +e.dataTransfer.getData('text/plain');
-      if (el.dataset.i != null) askMove(from, +el.dataset.i);
-      else moveToEmpty(from, +el.dataset.day, +el.dataset.p);
+      if (el.dataset.i != null) askMove(from, +el.dataset.i); else moveToEmpty(from, +el.dataset.day, +el.dataset.p);
     };
     if (el.classList.contains('empty')) el.onclick = () => addPanel(+el.dataset.day, +el.dataset.p);
   });
@@ -239,6 +302,27 @@ function render() {
   });
   g.querySelectorAll('[data-add]').forEach((el) => el.onclick = () => addExtra(+el.dataset.add));
   g.querySelectorAll('.hcell[data-day]').forEach((el) => el.onclick = () => { S.day = +el.dataset.day; S.view = 'day'; render(); });
+}
+
+// Classes view: where every class is, lesson by lesson (green = done, gold outline = missed).
+function renderClasses() {
+  const g = $('grid');
+  g.className = 'classes'; g.style.gridTemplateColumns = '';
+  const mon = S.monday;
+  g.innerHTML = Object.keys(S.data.classes).map((cls) => {
+    const c = S.data.classes[cls];
+    const rep = P.classReport(S.data, S.weeks, mon, cls);
+    const cur = rep.find((r) => r.state === 'current');
+    const shown = rep.filter((r) => r.state !== 'to come');
+    const upNext = rep.find((r) => r.state === 'to come');
+    return '<div class="ccard" style="--c:' + c.colour + '"><h3>' + esc(cls) + ' <span class="muted">Year ' + c.year + '</span></h3>' +
+      '<div class="muted">Now: ' + esc(cur ? cur.topic : '-') + (upNext ? ' · next topic: ' + esc(upNext.topic) : '') + '</div>' +
+      shown.map((r) => {
+        const done = r.lessons.filter((l) => l.done).length;
+        return '<div class="topic"><div class="tt">' + esc(r.topic) + ' <span>' + r.state + (r.tested ? ', tested' : r.revised ? ', revised' : '') + ' · ' + done + '/' + r.lessons.length + '</span></div>' +
+          '<div class="les-list">' + r.lessons.map((l) => '<span class="lp ' + (l.done ? 'done' : r.state === 'current' ? 'miss' : '') + '" title="' + esc(l.title) + '">L' + l.num + '</span>').join('') + '</div></div>';
+      }).join('') + '</div>';
+  }).join('') + '<div class="muted" style="grid-column:1/-1">Green = taught. Gold outline = still to teach in the topic you\'re on (the planner fills these first). Hover a lesson number for its title. Counts include weeks saved here up to w/c ' + mon.toLocaleDateString('en-GB', { day:'numeric', month:'short' }) + '.</div>';
 }
 
 /* ------------------------------------------------------------------ modals */
@@ -285,22 +369,24 @@ function addExtra(day) {
 }
 
 /* ------------------------------------------------------------- side panel */
-// Type-to-find: every lesson of the class, the suggested next ones first.
 function lessonResults(cls, q) {
   const c = S.data.classes[cls]; if (!c) return [];
   const st = P.progressBefore(S.data, S.weeks, S.monday)[cls];
   S.week.slots.forEach((s) => { if (s.cls === cls && s.kind === 'lesson') st.taught.add(s.i); });
-  const nx = P.next(c.seq, st);
+  const finished = new Set([...st.closed, ...st.tested]);          // never offer a finished topic
+  finished.delete(st.unit);
+  const nx = P.next(c.seq, st);                                       // (finished was worked out first)
   const words = q.toLowerCase().split(/\s+/).filter(Boolean);
   return c.seq.map((L, k) => ({ L, k, taught: st.taught.has(k), next: nx && nx.i === k }))
+    .filter((o) => !finished.has(o.L.unit) || o.k === (S.week.slots[S.sel] || {}).i)
     .filter((o) => words.every((w) => (o.L.title + ' ' + o.L.topic + ' l' + o.L.num).toLowerCase().includes(w)))
     .sort((a, b) => (b.next - a.next) || (a.taught - b.taught) || a.k - b.k).slice(0, 40);
 }
 function searchBox(cls, onPick) {
   const draw = () => {
     const rs = lessonResults(cls, $('q').value);
-    $('qr').innerHTML = rs.map((o, n) => '<div class="res' + (o.next ? ' next' : '') + (n === 0 ? ' hi' : '') + '" data-k="' + o.k + '">' + (o.next ? '★ ' : '') + 'L' + o.L.num + ' ' + esc(o.L.title) +
-      '<small>' + esc(o.L.topic) + (o.taught ? ' · already planned/taught' : '') + (o.L.built === false ? ' · not built' : '') + '</small></div>').join('') || '<div class="res muted">No lessons match</div>';
+    $('qr').innerHTML = rs.map((o, n) => '<div class="res' + (o.next ? ' next' : '') + (o.taught ? ' done' : '') + (n === 0 ? ' hi' : '') + '" data-k="' + o.k + '">' + (o.next ? '★ ' : '') + 'L' + o.L.num + ' ' + esc(o.L.title) +
+      '<small>' + esc(o.L.topic) + (o.taught ? ' · already taught or planned' : '') + (o.L.built === false ? ' · not built' : '') + '</small></div>').join('') || '<div class="res muted">No lessons match</div>';
     $('qr').querySelectorAll('.res[data-k]').forEach((el) => el.onclick = () => onPick(+el.dataset.k));
   };
   $('q').oninput = draw;
@@ -312,7 +398,7 @@ function addPanel(day, period) {
   const classes = Object.keys(S.data.classes);
   $('ed').innerHTML = '<h2>Add a lesson · ' + P.DAYS[day] + ' P' + period + '</h2>' +
     '<label>Class</label><select id="aCls">' + classes.map((c) => '<option>' + esc(c) + '</option>').join('') + '</select>' +
-    '<label>Find the lesson (type a few letters, Enter picks the top one)</label><input type="text" id="q" placeholder="e.g. osmosis">' +
+    '<label>Find the lesson: type a few letters, Enter picks the top one</label><input type="text" id="q" placeholder="e.g. osmosis">' +
     '<div class="results" id="qr"></div>';
   const pick = (k) => {
     const cls = $('aCls').value;
@@ -328,32 +414,44 @@ function lessonKey(s) { const L = S.data.classes[s.cls].seq[s.i]; return L.rel |
 
 function editor() {
   const ed = $('ed');
+  if (S.readOnly) {
+    ed.innerHTML = '<h2>Taught week</h2><p class="muted">This is what you filled in Planner.xlsx for this week. It counts as taught, so the planner carries on from it. Use ▶ to plan the next week.</p>';
+    return;
+  }
   if (S.sel < 0) {
-    ed.innerHTML = '<h2>Your week</h2><p class="muted">Click a lesson to change it. Click an empty period to add one. Drag a lesson onto another slot to move it. Hover the All day row to add a task, tests to mark or a meeting.</p>' +
-      '<p class="muted">Press <kbd>?</kbd> for keyboard shortcuts.</p>';
+    ed.innerHTML = '<h2>Your week</h2><p class="muted"><b>Click a lesson</b> to change it.<br><b>Click an empty period</b> to add one.<br><b>Drag</b> a lesson onto another slot to move it.<br><b>Hover the All day row</b> to add a task, tests to mark or a meeting.</p>' +
+      '<p class="muted">Gold <b>MISSED</b> = a lesson you skipped in the topic you\'re on; the planner fills those first. <b>Classes</b> (top bar) shows every class\'s progress.</p><p class="muted">Press <kbd>?</kbd> for shortcuts.</p>';
     return;
   }
   const s = S.week.slots[S.sel];
   const c = S.data.classes[s.cls];
   const curL = s.kind === 'lesson' && c ? c.seq[s.i] : null;
   ed.innerHTML = '<h2>' + esc(s.cls) + ' · ' + P.DAYS[s.day] + ' P' + s.period + ' <span class="muted">' + esc(P.periodTime(S.data, s.cls, s.period)) + '</span></h2>' +
-    (curL ? '<div class="muted"><b>' + esc(curL.title) + '</b><br>' + esc(curL.topic) + ' · Lesson ' + curL.num + (curL.rel ? '<br>Drive: Lessons/' + esc(curL.rel) : '') + '</div>' : '<div class="muted">' + esc(s.text) + '</div>') +
-    (c ? '<label>Change lesson (type to find, Enter picks the top one, ★ = next in order)</label><input type="text" id="q" placeholder="e.g. heart">' + '<div class="results" id="qr"></div>' : '') +
-    '<div class="row"><button id="kTest">Make it a test</button><button id="kCover">Cover</button><button id="kFree">Clear</button></div>' +
-    '<label>Equipment</label><textarea id="eEq">' + esc(s.eq || '') + '</textarea>' +
-    '<div class="row"><select id="eSets" style="width:auto">' + [['', 'sets?'], ['threes', 'sets of 3'], ['pairs', 'pairs'], ['demo', 'demo (1 set)']].map(([v, t]) => '<option value="' + v + '"' + ((s.sets || '') === v ? ' selected' : '') + '>' + t + '</option>').join('') + '</select>' +
-    (s.kind === 'lesson' ? '<label style="display:flex;gap:4px;align-items:center;margin:0"><input type="checkbox" id="eRemember"> remember for this lesson</label>' : '') + '</div>' +
-    '<label>Printing</label><input type="text" id="ePrint" value="' + esc(s.print || '') + '">' +
-    '<label>Books</label><div class="row" style="margin-top:0"><input type="text" id="eBook" value="' + esc(s.book || '') + '" style="flex:1"><button id="eAddBook">Add textbook</button></div>' +
-    '<label>Notes (one per line)</label><textarea id="eNotes">' + esc((s.notes || []).join('\n')) + '</textarea>' +
-    ((s.carry || []).length ? '<label>Carried in from last lesson</label><div class="muted">' + s.carry.map(esc).join('<br>') + '</div>' : '') +
-    '<div class="row"><button class="primary" id="eApply">Apply changes</button></div>' +
-    '<div class="row"><button id="eRev">Review not finished → next lesson</button><button id="eHw">Homework to collect → next lesson</button></div>' +
-    '<div class="row"><button id="eRefill">Re-plan ' + esc(s.cls) + '\'s later lessons</button><button id="ePrompt">Copy build prompt</button></div>';
+    (curL ? '<div><b>' + esc(curL.title) + '</b><div class="muted">' + esc(curL.topic) + ' · Lesson ' + curL.num + '</div></div>' : '<div class="muted">' + esc(s.text) + '</div>') +
+    (c ? '<label>Change lesson: type, Enter picks the top one (★ = next)</label><input type="text" id="q" placeholder="e.g. heart"><div class="results" id="qr"></div>' : '') +
+    '<div class="row"><button id="kTest">Test</button><button id="kCover">Cover</button><button id="kFree">Clear</button></div>' +
+    '<details' + (s.eqSrc === 'guess' ? ' open' : '') + '><summary>For the technicians</summary>' +
+      '<label>Equipment</label><textarea id="eEq">' + esc(s.eq || '') + '</textarea>' +
+      '<div class="row"><select id="eSets" style="width:auto">' + [['', 'sets?'], ['threes', 'sets of 3'], ['pairs', 'pairs'], ['demo', 'demo (1 set)']].map(([v, t]) => '<option value="' + v + '"' + ((s.sets || '') === v ? ' selected' : '') + '>' + t + '</option>').join('') + '</select>' +
+      (s.kind === 'lesson' ? '<label style="display:flex;gap:4px;align-items:center;margin:0"><input type="checkbox" id="eRemember"> remember for this lesson</label>' : '') + '</div>' +
+      '<label>Printing</label><input type="text" id="ePrint" value="' + esc(s.print || '') + '">' +
+      '<label>Books</label><div class="row" style="margin-top:0"><input type="text" id="eBook" value="' + esc(s.book || '') + '" style="flex:1"><button id="eAddBook">Add textbook</button></div>' +
+      '<div class="row"><button class="primary" id="eApply">Save these details</button></div>' +
+    '</details>' +
+    '<details><summary>Notes and carry-over</summary>' +
+      '<label>Notes (one per line)</label><textarea id="eNotes">' + esc((s.notes || []).join('\n')) + '</textarea>' +
+      '<div class="row"><button id="eNotesSave">Save notes</button></div>' +
+      ((s.carry || []).length ? '<label>Carried in from last lesson</label><div class="muted">' + s.carry.map(esc).join('<br>') + '</div>' : '') +
+      '<div class="row"><button id="eRev">Review not finished → next lesson</button><button id="eHw">Homework to collect → next lesson</button></div>' +
+    '</details>' +
+    '<details><summary>More</summary>' +
+      '<div class="row"><button id="eRefill">Re-plan ' + esc(s.cls) + '\'s later lessons</button><button id="ePrompt">Copy build prompt</button></div>' +
+      (curL && curL.rel ? '<p class="muted">Drive: Lessons/' + esc(curL.rel) + '</p>' : '') +
+    '</details>';
 
   const replace = (fields, msg) => {
     const w = JSON.parse(JSON.stringify(S.week)); const t = w.slots[S.sel];
-    Object.assign(t, fields, { day: t.day, period: t.period, col: t.col, cls: t.cls, notes: t.notes || [], carry: t.carry || [] });
+    Object.assign(t, fields, { day: t.day, period: t.period, col: t.col, cls: t.cls, notes: t.notes || [], carry: t.carry || [], gap: false });
     change(w, msg);
   };
   if (c) searchBox(s.cls, (k) => replace(P.lessonSlot(S.data, s.cls, k, S.learned), 'Lesson changed'));
@@ -364,13 +462,13 @@ function editor() {
   $('eApply').onclick = () => {
     const w = JSON.parse(JSON.stringify(S.week)); const t = w.slots[S.sel];
     t.eq = $('eEq').value; t.sets = $('eSets').value || null; t.print = $('ePrint').value; t.book = $('eBook').value;
-    t.notes = $('eNotes').value.split('\n').map((x) => x.trim()).filter(Boolean);
     if ($('eRemember') && $('eRemember').checked && t.kind === 'lesson') {
       const lk = lessonKey(t); S.learned[lk] = { eq: t.eq, sets: t.sets };
       run('learnEquipment', lk, t.eq, t.sets).catch((e) => toast('Not remembered: ' + e.message));
     }
-    change(w, 'Changes applied');
+    change(w, 'Details saved');
   };
+  $('eNotesSave').onclick = () => { const w = JSON.parse(JSON.stringify(S.week)); w.slots[S.sel].notes = $('eNotes').value.split('\n').map((x) => x.trim()).filter(Boolean); change(w, 'Notes saved'); };
   $('eRefill').onclick = () => { const w = JSON.parse(JSON.stringify(S.week)); P.refillAfter(S.data, S.weeks, w, S.sel, S.learned); change(w, 'Re-planned ' + s.cls); };
   const carry = (what) => {
     const r = P.carryForward(S.week, S.sel, what);
@@ -385,39 +483,46 @@ function editor() {
   };
 }
 
+// MISSED flag: a planned lesson that comes BEFORE something already taught in the same topic.
+function markGaps() {
+  if (!S.week || S.readOnly) return;
+  const st = P.progressBefore(S.data, S.weeks, S.monday);
+  S.week.slots.forEach((s) => {
+    if (s.kind !== 'lesson') return;
+    const c = S.data.classes[s.cls]; const L = c && c.seq[s.i]; if (!L) return;
+    s.gap = c.seq.some((x, k) => x.unit === L.unit && k > s.i && st[s.cls].taught.has(k));
+  });
+}
+
 /* ---------------------------------------------------------------- calendar */
 function loadMine() {
   status('Reading your Google Calendar...');
   run('myEvents', P.iso(S.monday)).then((evs) => { S.mine = evs; render(); status(evs.length + ' events from your calendar'); })
     .catch((e) => { S.showMine = false; status('Calendar not read: ' + e.message); });
 }
-$('mine').onclick = () => { S.showMine = !S.showMine; $('mine').classList.toggle('on', S.showMine); if (S.showMine) loadMine(); else render(); };
-$('sync').onclick = async () => {
+
+/* ------------------------------------------------------------------ menu */
+const menu = $('menu');
+$('more').onclick = (e) => { e.stopPropagation(); menu.classList.toggle('on'); };
+document.addEventListener('click', (e) => { if (!menu.contains(e.target) && e.target.id !== 'more') menu.classList.remove('on'); });
+const item = (id, fn) => { $(id).onclick = () => { menu.classList.remove('on'); fn(); }; };
+item('mMine', () => { S.showMine = !S.showMine; $('mMine').firstChild.textContent = S.showMine ? 'Hide my calendar' : 'Show my calendar'; if (S.showMine) loadMine(); else render(); });
+item('mSync', async () => {
+  if (S.readOnly) { toast('This week is already taught'); return; }
   if (S.dirty) await save();
   const evs = P.calendarEvents(S.data, S.week);
   if (!confirm('Send this week (' + evs.length + ' events) to your "Lessons (Planner)" Google Calendar? It replaces what that calendar had for this week. Your main calendar is not touched.')) return;
   status('Sending to Google Calendar...');
   run('syncWeek', S.week.monday, evs).then((r) => { status('In Google Calendar'); toast(r.written + ' events in "' + r.calendar + '"'); })
     .catch((e) => status('Calendar failed: ' + e.message));
-};
-
-/* ----------------------------------------------------------------- toolbar */
-$('today').onclick = () => { if (leaveOk()) { const t = todayMidnight(); S.day = Math.min(4, (t.getDay() + 6) % 7); loadWeek(t); } };
-$('prev').onclick = () => { if (leaveOk()) loadWeek(P.addDays(S.monday, -7)); };
-$('next').onclick = () => { if (leaveOk()) loadWeek(P.addDays(S.monday, 7)); };
-$('jump').onchange = () => { if ($('jump').value && leaveOk()) loadWeek(P.parse($('jump').value)); };
-$('vWeek').onclick = () => { S.view = 'week'; render(); };
-$('vDay').onclick = () => { S.view = 'day'; render(); };
-$('save').onclick = save;
-$('undo').onclick = undo;
-$('auto').onclick = () => { if (confirm('Re-plan the whole week from where each class is up to? Your changes to this week are replaced (Undo brings them back).')) change(P.autofill(S.data, S.weeks, S.monday, S.learned), 'Week re-planned'); };
-$('print').onclick = () => {
+});
+item('mPrint', () => {
   const list = P.printList(S.data, S.week);
   modal('<h3>To print this week</h3>' + (list.length ? '<pre>' + list.map(esc).join('\n') + '</pre>' : '<p class="muted">Nothing to print.</p>') + '<div class="row"><button id="mClose">Close</button></div>');
   $('mClose').onclick = closeModal;
-};
-$('xlsx').onclick = () => {
-  if (!S.hasTemplate) { modal('<h3>One-time setup needed</h3><p>The Excel button needs your order-sheet template. See Part 6 of the setup guide.</p><div class="row"><button id="mClose">Close</button></div>'); $('mClose').onclick = closeModal; return; }
+});
+item('mXlsx', () => {
+  if (!S.hasTemplate) { modal('<h3>One-time setup needed</h3><p>The Excel button needs your order-sheet template. See Part 7 of the setup guide.</p><div class="row"><button id="mClose">Close</button></div>'); $('mClose').onclick = closeModal; return; }
   const title = 'Order Sheet Week ' + S.week.letter + ' - ' + S.monday.toLocaleDateString('en-GB', { month:'short' }) + ' ' + S.monday.getDate();
   status('Making the Excel file...');
   run('exportXlsx', P.sheetCells(S.data, S.week), title).then((r) => {
@@ -426,22 +531,36 @@ $('xlsx').onclick = () => {
     a.href = URL.createObjectURL(new Blob([bytes], { type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }));
     a.download = r.name; a.click(); status('Downloaded ' + r.name);
   }).catch((e) => status('Excel failed: ' + e.message));
-};
-$('imp').onclick = () => $('file').click();
+});
+item('mAuto', () => { if (S.readOnly) { toast('This week is already taught'); return; } if (confirm('Re-plan the whole week from where each class is up to? Your changes to this week are replaced (Undo brings them back).')) { change(P.autofill(S.data, S.weeks, S.monday, S.learned), 'Week re-planned'); markGaps(); render(); } });
+item('mImp', () => $('file').click());
+item('mTheme', () => { store.set('planner-theme', document.body.classList.contains('light') ? 'dark' : 'light'); applyTheme(); });
+const HELP = [['J or →', 'next week'], ['K or ←', 'previous week'], ['T', 'today'], ['W / D / C', 'week / day / classes view'], ['/', 'find a lesson (when one is selected)'], ['Delete', 'clear the selected lesson'], ['Ctrl+Z', 'undo'], ['Ctrl+S', 'save'], ['Esc', 'close / deselect'], ['?', 'this help']];
+const showHelp = () => { modal('<h3>Keyboard shortcuts</h3>' + HELP.map(([k, t]) => '<div style="margin:4px 0"><kbd>' + k + '</kbd> ' + t + '</div>').join('') + '<div class="row"><button id="mClose">Close</button></div>'); $('mClose').onclick = closeModal; };
+item('mHelp', showHelp);
+
+/* ----------------------------------------------------------------- toolbar */
+$('today').onclick = () => { if (leaveOk()) { const t = todayMidnight(); S.day = Math.min(4, (t.getDay() + 6) % 7); loadWeek(t); markGaps(); render(); } };
+$('prev').onclick = () => { if (leaveOk()) { loadWeek(P.addDays(S.monday, -7)); markGaps(); render(); } };
+$('next').onclick = () => { if (leaveOk()) { loadWeek(P.addDays(S.monday, 7)); markGaps(); render(); } };
+$('jump').onchange = () => { if ($('jump').value && leaveOk()) { loadWeek(P.parse($('jump').value)); markGaps(); render(); } };
+$('vWeek').onclick = () => { S.view = 'week'; render(); editor(); };
+$('vDay').onclick = () => { S.view = 'day'; render(); editor(); };
+$('vClasses').onclick = () => { S.view = 'classes'; render(); };
+$('save').onclick = save;
+$('undo').onclick = undo;
 $('file').onchange = () => {
   const f = $('file').files[0]; if (!f) return;
   const rd = new FileReader();
   rd.onload = () => { status('Importing...'); run('importData', rd.result).then((r) => { toast('Imported ' + r.classes + ' classes'); return run('loadAll'); }).then(onLoad).catch((e) => status('Import failed: ' + e.message)); };
   rd.readAsText(f);
 };
-const HELP = [['J or →', 'next week'], ['K or ←', 'previous week'], ['T', 'today'], ['W / D', 'week / day view'], ['/', 'find a lesson (when one is selected)'], ['Delete', 'clear the selected lesson'], ['Ctrl+Z', 'undo'], ['Ctrl+S', 'save'], ['Esc', 'close / deselect'], ['?', 'this help']];
-$('help').onclick = () => { modal('<h3>Keyboard shortcuts</h3>' + HELP.map(([k, t]) => '<div><kbd>' + k + '</kbd> ' + t + '</div>').join('') + '<div class="row"><button id="mClose">Close</button></div>'); $('mClose').onclick = closeModal; };
 
 document.addEventListener('keydown', (e) => {
   const typing = /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName);
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') { e.preventDefault(); save(); return; }
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z' && !typing) { e.preventDefault(); undo(); return; }
-  if (e.key === 'Escape') { closeModal(); if (typing) document.activeElement.blur(); else { S.sel = -1; render(); editor(); } return; }
+  if (e.key === 'Escape') { closeModal(); menu.classList.remove('on'); if (typing) document.activeElement.blur(); else { S.sel = -1; render(); editor(); } return; }
   if (typing || !S.week) return;
   const k = e.key.toLowerCase();
   if (k === 'j' || e.key === 'ArrowRight') $('next').click();
@@ -449,7 +568,8 @@ document.addEventListener('keydown', (e) => {
   else if (k === 't') $('today').click();
   else if (k === 'w') $('vWeek').click();
   else if (k === 'd') $('vDay').click();
-  else if (e.key === '?') $('help').click();
+  else if (k === 'c') $('vClasses').click();
+  else if (e.key === '?') showHelp();
   else if (e.key === '/' && $('q')) { e.preventDefault(); $('q').focus(); }
   else if (e.key === 'Delete' && S.sel >= 0) $('kFree').click();
 });
@@ -457,9 +577,9 @@ window.addEventListener('beforeunload', (e) => { if (S.dirty) { e.preventDefault
 
 function onLoad(r) {
   S.data = r.data; S.weeks = r.weeks || {}; S.learned = r.learned || {}; S.hasTemplate = r.hasTemplate;
-  if (!S.data) { status('No data yet: click Import data and pick planner-data.json'); $('grid').innerHTML = ''; editor(); return; }
-  if (!S.data.periodTimes) { status('Old data file: re-export it (guide step "refresh your lessons") and import again'); return; }
-  loadWeek(S.monday || firstPlanMonday());
+  if (!S.data) { status('No data yet: More → Import data, pick planner-data.json'); $('grid').innerHTML = ''; editor(); return; }
+  if (!S.data.periodTimes || !S.data.filled) { status('Old data file: ask Claude to refresh the planner data, then More → Import data'); return; }
+  loadWeek(S.monday || firstPlanMonday()); markGaps(); render();
 }
 run('loadAll').then(onLoad).catch((e) => status('Could not load: ' + e.message));
 </script>
