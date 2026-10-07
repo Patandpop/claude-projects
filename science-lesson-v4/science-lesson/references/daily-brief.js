@@ -134,12 +134,13 @@ function loadUploadLog() {
   return fs.readFileSync(UPLOAD_LOG, 'utf8').split('\n').filter(Boolean).map(line => {
     const parts = line.split('\t');
     return { ts: parts[0], name: (parts[1] || '').trim(), drivePath: (parts[2] || '').trim() };
-  });
+  }).filter(en => !/^MOVED /.test(en.name));   // "MOVED <file>" lines record the original-lesson tidy, not uploads
 }
 
 // ─── Date helpers ─────────────────────────────────────────────────────────────
 
-const TODAY = new Date();
+// BRIEF_DATE=2026-10-08 makes the brief for another day (e.g. tomorrow's, the night before).
+const TODAY = process.env.BRIEF_DATE ? new Date(process.env.BRIEF_DATE + 'T08:00:00') : new Date();
 TODAY.setHours(0, 0, 0, 0);
 
 function pad(n) { return String(n).padStart(2, '0'); }
@@ -220,6 +221,56 @@ function fileUrl(dir, name) {
   return 'file:///' + encodeURI(path.join(dir, name).replace(/\\/g, '/'));
 }
 
+// Patryk 2026-10-07: he prints at school from his personal Google Drive, so every link is a real
+// https Drive link when Drive for Desktop knows the file (drive-links.js); file:/// only as a fallback.
+let driveLinks = null;
+try { driveLinks = require('./drive-links.js'); } catch (_) { /* not available: file links */ }
+function webUrl(dir, name) {
+  const full = name ? path.join(dir, name) : dir;
+  return (driveLinks && driveLinks.urlFor(full)) || fileUrl(dir, name || '');
+}
+// Support sheets are not printed for now (Patryk 2026-10-07). Flip to true to bring the link back.
+const SUPPORT_SHEETS = false;
+
+// Older lessons (not built by Claude): find the class's lesson folder from the planner's lesson list.
+const LESSONS_ROOT = 'G:\\My Drive\\Beechen Cliff Science\\Lessons';
+function plannerFolder(cls, topic, lessonNum) {
+  const data = loadJson(path.join(ROOT, 'planner', 'planner-data.json'));
+  const c = data && data.classes && data.classes[cls];
+  if (!c) return null;
+  const nt = norm(topic);
+  const hit = c.seq.find(function(L) { return L.rel && nt && norm(L.title) === nt; })
+    || c.seq.find(function(L) { return L.rel && nt.length >= 6 && (norm(L.title).includes(nt) || nt.includes(norm(L.title))); })
+    || (lessonNum ? c.seq.find(function(L) { return L.rel && L.num === +lessonNum && norm(L.title).slice(0, 6) === nt.slice(0, 6); }) : null)
+    || bestWords(c.seq.filter(function(L) { return L.rel; }), nt);
+  return hit ? path.join(LESSONS_ROOT, hit.rel) : null;
+}
+// Typos in Planner.xlsx ("Renwable"): the lesson sharing most words (first 4 letters) wins, if most match.
+function bestWords(seq, nt) {
+  const w = function(s) { return norm(s).split(' ').filter(function(x) { return x.length > 2; }).map(function(x) { return x.slice(0, 4); }); };
+  const want = w(nt); if (want.length < 2) return null;
+  let best = null, bs = 0;
+  seq.forEach(function(L) {
+    const have = w(L.title);
+    const hits = want.filter(function(x) { return have.includes(x); }).length;
+    const sc = hits / Math.max(want.length, have.length);
+    if (sc > bs) { bs = sc; best = L; }
+  });
+  return bs >= 0.6 ? best : null;
+}
+// Things to print in a lesson folder's top level: worksheets, laminates, info / method sheets, PDFs.
+// The lesson decks themselves are not printed.
+const PRINTABLE = /laminat|\bA3\b|card.?sort|cards?\b|info(rmation)?.?sheets?|fact.?sheets?|help.?sheet|method.?sheet|instructions?|placemat|worksheet|booklet|\.pdf$|\.docx?$/i;
+function printables(dp, skip) {
+  if (!dp || !fs.existsSync(dp)) return [];
+  try {
+    return fs.readdirSync(dp, { withFileTypes: true })
+      .filter(function(d) { return d.isFile() && !d.name.startsWith('~$') && PRINTABLE.test(d.name) && !(skip || []).includes(d.name); })
+      .filter(function(d) { return SUPPORT_SHEETS || !/_support_worksheet\.docx$/i.test(d.name); })
+      .map(function(d) { return d.name; });
+  } catch (_) { return []; }
+}
+
 // ─── Question bank ────────────────────────────────────────────────────────────
 
 function getHwQuestions(cls, topic) {
@@ -258,8 +309,9 @@ function sec1(todayPeriods, ctx, standing, uploadLog, log) {
     const cls    = p.class || '?';
     const topic  = p.lessonTopic || '[topic unknown]';
     const entry  = findUploadEntry(topic, p.lessonNumber, uploadLog);
-    const dp     = entry && entry.drivePath;
-    const files  = folderFiles(dp);
+    const dp     = (entry && entry.drivePath) || plannerFolder(cls, topic, p.lessonNumber);
+    const built  = !!(entry && entry.drivePath);
+    const files  = built ? folderFiles(dp) : {};
     const counts = standing && standing.classes && standing.classes[cls];
     const extra  = (counts && counts.extraTime) || [];
 
@@ -269,7 +321,8 @@ function sec1(todayPeriods, ctx, standing, uploadLog, log) {
       if (p.isTest && counts.core != null)
         printCounts = counts.core + ' core, ' + counts.extended + ' extended';
       else if (counts.standard != null)
-        printCounts = counts.standard + ' standard, ' + counts.support + ' support';
+        printCounts = SUPPORT_SHEETS ? counts.standard + ' standard, ' + counts.support + ' support'
+          : (counts.standard + (counts.support || 0)) + ' worksheets';
     }
 
     // Flags
@@ -283,16 +336,24 @@ function sec1(todayPeriods, ctx, standing, uploadLog, log) {
 
     // Drive/file links (M3)
     const folderLink = dp
-      ? '<a href="' + fileUrl(dp, '') + '" class="drive-link">' + path.basename(dp) + '</a>'
-      : miss('[NOT YET UPLOADED]');
+      ? '<a href="' + webUrl(dp, '') + '" class="drive-link">' + path.basename(dp) + '</a>'
+      : miss('[NO FOLDER FOUND]');
     const pptxLink = (dp && files.pptx)
-      ? '<a href="' + fileUrl(dp, files.pptx) + '">Open PPTX</a>'
-      : miss('[NOT YET UPLOADED]');
-    const wsLinks = (dp && files.ws)
-      ? '<a href="' + fileUrl(dp, files.ws) + '">Standard</a>'
-        + (files.support ? ' | <a href="' + fileUrl(dp, files.support) + '">Support</a>' : '')
-        + (files.answers ? ' | <a href="' + fileUrl(dp, files.answers) + '">Answers</a>' : '')
-      : miss('[NOT YET UPLOADED]');
+      ? '<a href="' + webUrl(dp, files.pptx) + '">Open PPTX</a>'
+      : (dp ? 'older lesson: open the folder' : miss('[NOT YET UPLOADED]'));
+    // Print: the built worksheet (+ answers on review lessons), plus any laminates / info / method
+    // sheets in the folder. Older lessons: whatever printable files their folder has.
+    const toPrint = [];
+    if (files.ws) toPrint.push(files.ws);
+    if (SUPPORT_SHEETS && files.support) toPrint.push(files.support);
+    if (files.answers) toPrint.push(files.answers);
+    printables(dp, toPrint.concat([files.support].filter(Boolean))).forEach(function(n) { toPrint.push(n); });
+    const wsLinks = toPrint.length
+      ? toPrint.map(function(n) {
+          const label = n === files.ws ? 'Worksheet' : n === files.answers ? 'Answers' : n.replace(/\.[^.]+$/, '');
+          return '<a href="' + webUrl(dp, n) + '">' + label + '</a>';
+        }).join(' | ')
+      : (dp ? 'nothing to print in the folder' : miss('[NOT YET UPLOADED]'));
 
     // Homework OUT (M5)
     let hwOut = '';
@@ -337,7 +398,7 @@ function sec1(todayPeriods, ctx, standing, uploadLog, log) {
       + '<div class="lesson-meta">'
       + '<strong>Folder:</strong> ' + folderLink + '<br>'
       + '<strong>Presentation:</strong> ' + pptxLink + '<br>'
-      + '<strong>Worksheets:</strong> ' + wsLinks + '<br>'
+      + '<strong>Print:</strong> ' + wsLinks + '<br>'
       + '<strong>Print counts:</strong> ' + (printCounts || miss('[CHECK COUNTS]'))
       + (extra.length ? '<br><strong>Extra time:</strong> ' + extra.map(function(s) { return s.id + ' — ' + s.percent + '% extra time'; }).join(', ') : '')
       + '</div>'

@@ -30,6 +30,10 @@ function run() {
   own.add(data, '9xs', [{ q: 'What are plasmids?' }]);
   const n = own.add(data, '9XS', [{ q: 'What are  plasmids' }, { q: 'Name a stain.' }]);
   check(n === 1 && data.classes['9XS'].length === 2, 'the same question is never stored twice for a class');
+  // uploader tidy: only the school's own lesson deck moves to "Beechen Cliff Original Lesson"
+  const up = require('../science-lesson/references/upload-to-drive.js');
+  const mv = up.originalsToTuck(['EPIBA Microscopy.pptx', 'Cells.pptx', 'Cells_worksheet.docx', 'Suspect cards laminates.pptx', 'Support sheet.pptx', 'Method Sheet.pptx', 'Old.ppt'], ['New.pptx']);
+  check(mv.join('|') === 'EPIBA Microscopy.pptx|Old.ppt', 'uploader moves only the school deck (never our decks, laminates, support or method sheets)');
   return { fails, warns: 0 };
 }
 

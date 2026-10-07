@@ -199,11 +199,34 @@ function outputFilesFor(meta) {
   ];
 }
 
+// ── Original-lesson tidy (Patryk 2026-10-07: explicit permission to move) ─────────
+// When a lesson is built into a folder, the school's own lesson deck(s) already sitting there
+// move into one subfolder, "Beechen Cliff Original Lesson", so the folder shows the built lesson.
+// Only .pptx/.ppt at the TOP level of THAT lesson folder move, and never:
+//   - a deck we built (it has a matching "<name>_worksheet.docx" or "_answers.docx" beside it),
+//   - a printed resource (laminates, card sorts, info / fact / help / support / method sheets,
+//     A3, instructions, mats, cards, worksheets): the technicians print those from the folder.
+// Nothing is deleted or renamed; a name clash in the subfolder leaves that file where it is.
+const ORIGINALS_DIR = 'Beechen Cliff Original Lesson';
+const RESOURCE_RE = /laminat|\bA3\b|card.?sort|cards?\b|info(rmation)?.?sheets?|fact.?sheets?|help.?sheet|support.?sheet|method.?sheet|instructions?|placemat|\bmat\b|worksheet|timeline|template/i;
+function originalsToTuck(names, keep) {
+  const set = new Set(names.map((n) => n.toLowerCase()));
+  const keepSet = new Set((keep || []).map((n) => n.toLowerCase()));
+  return names.filter((n) => {
+    if (!/\.pptx?$/i.test(n) || n.startsWith('~$')) return false;
+    if (keepSet.has(n.toLowerCase())) return false;
+    const stem = n.replace(/\.pptx?$/i, '').toLowerCase();
+    if (set.has(stem + '_worksheet.docx') || set.has(stem + '_answers.docx') || /_pto$/.test(stem)) return false;
+    return !RESOURCE_RE.test(n);
+  });
+}
+
 // When required as a module (tests), export the helpers and run nothing else.
 if (require.main !== module) {
   module.exports = {
     splitClasses, buildLogRecords, appendLog,
     resolveMacrotopic, normTopic, outputFilesFor, baseNameFor, isReviewType,
+    originalsToTuck, ORIGINALS_DIR,
   };
   return;
 }
@@ -302,6 +325,11 @@ function processLesson(content) {
       const exists = fs.existsSync(srcPath) ? '' : ' (source missing — would skip)';
       console.log('  ' + f.src + ' → ' + f.destName + exists);
     }
+    if (fs.existsSync(destDir)) {
+      const top = fs.readdirSync(destDir, { withFileTypes: true }).filter((d) => d.isFile()).map((d) => d.name);
+      originalsToTuck(top, sourceFiles.map((x) => x.destName))
+        .forEach((n) => console.log(`  would move ${n} → ${ORIGINALS_DIR}/`));
+    }
     return true;
   }
 
@@ -352,6 +380,25 @@ function processLesson(content) {
     }
   }
 
+  // Tidy: the school's original deck(s) into their own subfolder (see originalsToTuck).
+  const moved = [];
+  if (copied.length) {
+    try {
+      const top = fs.readdirSync(destDir, { withFileTypes: true }).filter((d) => d.isFile()).map((d) => d.name);
+      const tuck = originalsToTuck(top, sourceFiles.map((x) => x.destName));
+      if (tuck.length) {
+        const sub = path.join(destDir, ORIGINALS_DIR);
+        fs.mkdirSync(sub, { recursive: true });
+        for (const n of tuck) {
+          const to = path.join(sub, n);
+          if (fs.existsSync(to)) { console.warn(`  ! ${n} already in ${ORIGINALS_DIR}, left where it is`); continue; }
+          try { fs.renameSync(path.join(destDir, n), to); moved.push(n); }
+          catch (err) { console.warn(`  ! could not move ${n}: ${err.message}`); }
+        }
+      }
+    } catch (err) { console.warn('  ! original-lesson tidy skipped: ' + err.message); }
+  }
+
   // M6: confirm on success; N2: log entry
   if (copied.length) {
     console.log('Uploaded to: ' + destDir);
@@ -363,6 +410,10 @@ function processLesson(content) {
       destDir,
     ].join('\t') + '\n';
     fs.appendFileSync(logFile, logLine, 'utf8');
+    moved.forEach((n) => {
+      console.log(`  moved ${n} → ${ORIGINALS_DIR}/`);
+      fs.appendFileSync(logFile, [new Date().toISOString().slice(0, 19).replace('T', ' '), 'MOVED ' + n, path.join(destDir, ORIGINALS_DIR)].join('\t') + '\n', 'utf8');
+    });
     // Patryk's own Do Now questions, kept per class for later retrieval (do-now-own.js).
     try {
       const n = require('./do-now-own.js').recordLesson(content);

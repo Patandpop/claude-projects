@@ -5,7 +5,7 @@
 
 Patryk cannot read code — explain every change in plain English (what changed and why), never in diff-speak. Session-end summaries and next-session prompts must also be plain teacher-facing language: break plans into phases, no jargon, no code identifiers without a one-line explanation.
 
-**Cost + safety rules:** prefer local execution; if a change would introduce a paid API call, flag it to Patryk BEFORE building it. Scripts may only CREATE or COPY files on Drive in their sanctioned locations (uploader → existing lesson folders; test-review → its one folder; brief → Daily Brief folder) — never delete, move, or rename anything on Drive, and log every Drive write.
+**Cost + safety rules:** prefer local execution; if a change would introduce a paid API call, flag it to Patryk BEFORE building it. Scripts may only CREATE or COPY files on Drive in their sanctioned locations (uploader → existing lesson folders; test-review → its one folder; brief → Daily Brief folder) — never delete, move, or rename anything on Drive, and log every Drive write. **One approved exception (Patryk, 2026-10-07):** when the uploader builds into a lesson folder, the school's own lesson .pptx at that folder's top level moves into a `Beechen Cliff Original Lesson` subfolder in the same folder (resources/laminates and our built decks never move; each move logged in upload-log.txt).
 
 ---
 
