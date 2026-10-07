@@ -301,7 +301,6 @@ function render() {
       const c = S.data.classes[s.cls] || {};
       const flags = [];
       if (s.double) flags.push('<span class="flag f-dbl">DOUBLE</span>');
-      if (s.kind === 'lesson' && !s.cover && (s.eqSrc === 'guess' || s.planned)) flags.push('<span class="flag f-check" title="Equipment is a guess: check it">CHECK</span>');
       if (s.cover) flags.push('<span class="flag f-check" title="Cover work for this lesson: counts as taught">COVER</span>');
       if (s.kind === 'lesson' && s.nofolder) flags.push('<span class="flag f-built" title="In the technician guide but no lesson folder on Drive">NO FOLDER</span>');
       else if (s.kind === 'lesson' && s.built === false) flags.push('<span class="flag f-built" title="No slides in the Drive folder yet">NOT BUILT</span>');
@@ -602,10 +601,10 @@ function editor() {
   const isLesson = ['lesson', 'test', 'revision'].includes(s.kind);
   const src = { 'technician guide': 'from the technician guide', 'past order': 'from a past order', remembered: 'your saved version', guess: 'a guess: check it' }[s.eqSrc] || '';
   ed.innerHTML = '<h2>' + esc(s.cls) + ' · ' + P.DAYS[s.day] + ' P' + s.period + ' <span class="muted">' + esc(P.periodTime(S.data, s.cls, s.period)) + (s.double ? ' · 2nd half of double' : '') + '</span></h2>' +
-    (curL ? '<div class="now"><b>L' + curL.num + ' ' + esc(curL.title) + '</b><div class="muted">' + esc(curL.topic) + (curL.optional ? ' · optional' : '') + (curL.nofolder ? ' · no folder on Drive' : '') + (s.pinned ? ' · chosen by you' : ' · planned automatically') + '</div></div>'
+    (curL ? '<div class="now"><b>L' + curL.num + ' ' + esc(curL.title) + '</b><div class="muted">' + esc(curL.topic) + (curL.optional ? ' · optional' : '') + (curL.nofolder ? ' · no folder on Drive' : '') + '</div></div>'
       : '<div class="now"><b>' + esc(P.lessonCell(S.data, s)) + '</b></div>') +
-    '<div class="card"><h4>For the technicians <span class="src' + (s.eqSrc === 'guess' ? ' guess' : '') + '">' + esc(src) + '</span></h4>' +
-      '<textarea id="eEq" placeholder="Equipment (N/A if none)">' + esc(s.eq || '') + '</textarea>' +
+    '<div class="card"><h4>For the technicians' + (curL && curL.eqFull ? ' <span class="src" title="' + esc(curL.eqFull) + '">full guide text ⓘ</span>' : '') + '</h4>' +
+      '<textarea id="eEq" placeholder="Equipment">' + esc(s.eq || '') + '</textarea>' +
       '<div class="grid2"><select id="eSets">' + [['', 'Sets?'], ['threes', 'sets of 3'], ['pairs', 'pairs'], ['demo', 'demo (1 set)']].map(([v, t]) => '<option value="' + v + '"' + ((s.sets || '') === v ? ' selected' : '') + '>' + t + '</option>').join('') + '</select>' +
       '<input type="text" id="ePrint" placeholder="Printing" value="' + esc(s.print || '') + '"></div>' +
       '<div class="row" style="margin-top:6px"><input type="text" id="eBook" placeholder="Textbooks" value="' + esc(s.book || '') + '" style="flex:1"><button id="eAddBook" title="Fill in the textbook pages for this lesson">+ pages</button></div>' +
@@ -614,12 +613,10 @@ function editor() {
     '<div class="row"><button id="kRev">Revision</button><button id="kTest">Test</button><button id="kCover">Cover</button><button id="kFree">Clear</button><button id="ePrompt">Copy build prompt</button>' +
     (curL ? '<button id="kCont" title="Puts this lesson in ' + esc(s.cls) + '\'s next slot too; the rest of the week moves along">Didn\'t finish: continue next lesson</button>' : '') + '</div>' +
     (c ? '<div class="card"><h4>Choose the lesson <span class="src">' + esc(s.cls) + '</span></h4><div id="chooser"></div></div>' : '') +
-    '<details' + ((s.notes || []).length || (s.carry || []).length ? ' open' : '') + '><summary>Notes and carry-over' + ((s.notes || []).length + (s.carry || []).length ? ' (' + ((s.notes || []).length + (s.carry || []).length) + ')' : '') + '</summary>' +
+    '<details' + ((s.notes || []).length || (s.carry || []).length ? ' open' : '') + '><summary>Notes, carry-over and more' + ((s.notes || []).length + (s.carry || []).length ? ' (' + ((s.notes || []).length + (s.carry || []).length) + ')' : '') + '</summary>' +
       '<label>Notes (one per line)</label><textarea id="eNotes">' + esc((s.notes || []).join('\n')) + '</textarea>' +
       ((s.carry || []).length ? '<label>Carried in from last lesson</label><div class="muted">' + s.carry.map(esc).join('<br>') + '</div>' : '') +
       '<div class="row"><button id="eRev">Review not finished → next lesson</button><button id="eHw">Homework to collect → next lesson</button></div>' +
-    '</details>' +
-    '<details><summary>More</summary>' +
       '<div class="row"><button id="eRefill">Re-plan ' + esc(s.cls) + '\'s later lessons</button></div>' +
       (curL && curL.rel ? '<p class="muted">Drive: Lessons/' + esc(curL.rel) + '</p>' : '') +
     '</details>';

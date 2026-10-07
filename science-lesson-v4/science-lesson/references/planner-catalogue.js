@@ -268,10 +268,28 @@ function equipmentKey() {
 }
 const learned = () => { try { return JSON.parse(fs.readFileSync(LEARNED, 'utf8')); } catch { return {}; } };
 
+// Sets (Patryk 2026-10-07: "I most often make student work in threes, then pairs, then demos"):
+// only for real practical kit; a demo on its own is a demo; heating or acid work in pairs; else threes.
+const KIT = /\b(beakers?|test ?tubes?|boiling tubes?|flasks?|bunsen|thermometers?|balances?|scales|power (supply|pack)s?|ammeters?|voltmeters?|wires?|magnets?|microscopes?|slides?|springs?|masses|rulers?|stop ?watch(es)?|timers?|light gates?|trolle(y|ys)|ramps?|cylinders?|pipettes?|solutions?|stands?|clamps?|lamps?|lens(es)?|prisms?|ray box(es)?|tiles?|forceps|scalpels?|dissect\w*|filter|funnels?|kettles?|water ?bath|crucibles?|tongs|spatulas?|petri|agar|onion|iodine|benedict\w*|biuret|tripods?|gauzes?|circuits?|bulbs?|resistors?|batter(y|ies)|kits?|samples?|joulemeter|heater|compass(es)?|newton ?meters?|weights?|bungs?|clamp stands?|eggs?)\b/i;
 function setsFor(text) {
-  if (/bunsen|flame|heat|acid|boiling|melting|exothermic|hazard/i.test(text)) return 'pairs';
-  if (/\bdemo/i.test(text)) return 'demo';
+  if (!text || /^n\/?a$/i.test(text)) return null;
+  const demoOnly = /\bdemo/i.test(text) && !/\b(prac|practical|class|circus|students?)\b/i.test(text);
+  if (demoOnly) return 'demo';
+  if (!KIT.test(text)) return null;                       // worksheets, laminates, videos: no sets
+  if (/\b(bunsen|tripod|gauze|acid|alkali|corrosive|boiling|flame)\b/i.test(text)) return 'pairs';
   return 'threes';
+}
+// The technicians' guide text, cut down to the kit: items only, no risk notes, CLEAPSS references or
+// instructions to the technician, at most 8 items (Patryk 2026-10-07: "the suggestions are long winded").
+const NOT_KIT = /\b(cleapss|can also be|template in (the )?folder|this lesson|risk assessment|hazcard|read and practi[cs]e|please|this might|as per|in the event|to be given|full risk|sra\d+|pp\d+|eye protection|goggles|lab coats?)\b/i;
+function conciseEquipment(text) {
+  if (!text || /^n\/?a$/i.test(text)) return text;
+  const items = String(text).split(/\s*(?:[,;•\n]|\.\s+(?=[A-Z])|\s\/\s)\s*/)
+    .map((x) => x.replace(/^(demo(nstration)?\s*\d*\s*[:–-]|prac(tical)?\s*[:–-]|pink gcse physics required practical)\s*/i, '').replace(/[.\s]+$/, '').trim())
+    .filter((x) => x && x.length > 1 && !NOT_KIT.test(x) && x.split(/\s+/).length <= 9);
+  const seen = new Set();
+  const uniq = items.filter((x) => { const k = x.toLowerCase(); if (seen.has(k)) return false; seen.add(k); return true; });
+  return uniq.slice(0, 8).join(', ') + (uniq.length > 8 ? ' …' : '');
 }
 
 // Patryk 2026-10-04: never recommend ICT. Technician guides say things like "Chrome or ICT
@@ -294,7 +312,10 @@ function loFor(L) {
 function equipmentFor(lesson) {
   const e = equipmentFor0(lesson);
   const printing = e.printing ? stripICT(e.printing) : e.printing;
-  return { ...e, equipment: stripICT(e.equipment), printing: printing === 'N/A' ? '' : printing };
+  const full = stripICT(e.equipment);
+  const eq = e.source === 'remembered' ? full : conciseEquipment(full);
+  return { ...e, equipment: eq, full: eq !== full ? full : '', sets: e.source === 'remembered' ? e.sets : setsFor(eq),
+    printing: printing === 'N/A' || /^n\/?a$/i.test(printing || '') ? '' : printing };
 }
 function equipmentFor0(lesson) {
   const key = lesson.folder || `${lesson.topic}/${lesson.title}`;
@@ -317,7 +338,7 @@ function equipmentFor0(lesson) {
   let kb = null, ks = 0;
   for (const k of equipmentKey()) { const s = sim(k.name, lesson.title); if (s > ks) { ks = s; kb = k; } }
   if (kb && ks >= 0.6) return { equipment: kb.equipment, sets: kb.sets || setsFor(kb.equipment), source: 'past order' };
-  return { equipment: 'see teacher', sets: null, source: 'guess' };
+  return { equipment: '', sets: null, source: 'none' };              // nothing known: leave it empty, never filler
 }
 
 /* ---------------------------------------------------------- Planner history */
@@ -533,7 +554,7 @@ function planWeek(monday, ctx) {
       continue;
     }
     const L = j >= 0 ? seq[j] : null;
-    if (!L) out.plan = { text: 'End of planned lessons [CHECK]', equipment: 'see teacher', check: true };
+    if (!L) out.plan = { text: 'End of planned lessons', equipment: '', check: true };
     else {
       st.taught.add(j); st.last = j;
       const newTopic = prevUnit && L.unit !== prevUnit;
@@ -574,7 +595,7 @@ if (require.main === module) {
           let built = null;
           if (L.folder) { try { built = fs.readdirSync(L.folder).some((f) => /\.pptx$/i.test(f)); } catch { built = false; } }
           return { topic: L.topic, unit: L.unit, num: L.num, title: L.title, eq: e.equipment, sets: e.sets || null,
-            print: e.printing || '', eqSrc: e.source, book, built, planned: L.source === 'plan', lo: loFor(L),
+            print: e.printing || '', eqFull: e.full || '', eqSrc: e.source, book, built, planned: L.source === 'plan', lo: loFor(L),
             optional: !!L.optional, nofolder: L.source === 'guide',
             rel: L.folder ? path.relative(DRIVE, L.folder).split(path.sep).join('/') : null };
         }),

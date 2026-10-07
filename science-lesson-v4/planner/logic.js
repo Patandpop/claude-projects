@@ -311,7 +311,7 @@
       let at = seq.findIndex((L) => lessonId(L) === a.afterKey);
       if (a.afterKey === '^start') at = seq.findIndex((L) => L.unit === a.unit) - 1;   // start of the topic
       else if (at < 0) { at = -1; seq.forEach((L, k) => { if (L.unit === a.unit) at = k; }); }
-      seq.splice(at + 1, 0, { topic: proto.topic, unit: a.unit, num: a.num, title: a.title, eq: 'see teacher', sets: null, print: '', eqSrc: 'guess',
+      seq.splice(at + 1, 0, { topic: proto.topic, unit: a.unit, num: a.num, title: a.title, eq: '', sets: null, print: '', eqSrc: 'none',
         book: '', built: a.rel ? false : null, planned: false, optional: false, nofolder: !a.rel, rel: a.rel || null, added: true });
     }
     return data;
@@ -383,7 +383,9 @@
     const out = [];
     for (const s of week.slots) {
       const size = (data.classes[s.cls] || {}).size || '';
-      if (s.print && !/^n\/?a$/i.test(s.print)) out.push(`${DAYS[s.day]} P${s.period} ${s.cls}: ${s.print} × ${size}`);
+      // laminates, card sorts and anything already counted in sets are printed once per set, not per pupil
+      const perSet = /laminat|card ?sort|\bsets?\b|\bx\s?\d+\b|class set/i.test(s.print || '');
+      if (s.print && !/^n\/?a$/i.test(s.print)) out.push(`${DAYS[s.day]} P${s.period} ${s.cls}: ${s.print}${perSet ? '' : ` × ${size}`}`);
       if (s.kind === 'test') out.push(`${DAYS[s.day]} P${s.period} ${s.cls}: test papers × ${size} (count core / challenge)`);
     }
     return out;

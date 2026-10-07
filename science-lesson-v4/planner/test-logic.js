@@ -119,6 +119,12 @@ const ticked = P.markLesson(data, {}, w, '7MLA', firstI, true, {});
 ok(!slotsOf(ticked, '7MLA').some((o) => o.s.i === firstI), 'ticking a lesson off removes it from the week and the rest re-flows');
 const tl = P.topicList(data, {}, w, '7MLA', data.classes['7MLA'].seq[firstI].unit, { day: w.slots[m7[0].k].day, period: w.slots[m7[0].k].period });
 ok(tl.find((x) => x.k === firstI).next && tl.some((x) => x.state === 'taught' && x.when && x.when.wrote), 'lesson list: ★ on the right lesson, taught ones show what he wrote');
+// 14. Equipment: no filler, concise, sets only for real kit (Patryk 2026-10-07)
+const allL = Object.values(data.classes).flatMap((c) => c.seq);
+ok(!allL.some((L) => /see teacher/i.test(L.eq || '')), 'no "see teacher" filler: unknown equipment is left empty');
+ok(allL.every((L) => !L.eq || L.eq.split(', ').length <= 9), 'equipment is a short item list (at most 8 items)');
+ok(!allL.some((L) => L.sets && !/beaker|microscope|slide|tube|magnet|meter|power|lamp|scale|balance|spring|mass|tile|ruler|kit|sample|trolley|onion|iodine|solution|stand|clamp|heater|thermometer|kettle|wire|circuit|bulb|resistor|batter|funnel|filter|crucible|tong|spatula|petri|agar|pipette|cylinder|gate|ramp|forceps|scalpel|dissect|bunsen|tripod|gauze|flask|compass|weight|bung|egg|timer|watch|joulemeter|lens|prism|ray box|demo/i.test(L.eq)),
+  'sets are only suggested for real practical kit or demos');
 // every lesson folder on Drive is in the class's list (home only: needs G:)
 const DRIVE = 'G:/My Drive/Beechen Cliff Science/Lessons';
 if (fs.existsSync(DRIVE)) {
