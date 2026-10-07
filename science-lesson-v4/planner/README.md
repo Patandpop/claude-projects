@@ -55,3 +55,7 @@ Then in the planner, click **Import data** and pick `planner/planner-data.json`.
 - `node planner/make-preview.js` builds `preview.html` with the server replaced, so the page can be screenshotted headless before deploying.
 - Sequencing rules match `science-lesson/references/planner-catalogue.js`; keep the two in step.
 - Later: merge into the single hub with the behaviour tracker, brief and schedule (memory: project_tool_hub_vision).
+- **Home <-> school link (2026-10-07):** the school blocks sharing personal Drive and public school web apps, so `Mailbox.gs` runs on his PERSONAL account (public web app + key) and the school `Code.gs` calls it with UrlFetchApp (MAILBOX_URL / MAILBOX_KEY script properties). Files live in `G:\My Drive\Beechen Cliff Science\Admin\Planner Sync`.
+  - "refresh the planner data" = `node science-lesson/references/planner-catalogue.js --export planner/planner-data.json` then `node planner/planner-sync.js push`.
+  - "do my planner requests" = `node planner/planner-sync.js requests`, build each one (normal lesson build), then `node planner/planner-sync.js done <id> "<what was done>"`.
+  - `node planner/planner-sync.js state` = what the school planner last saved. `node planner/test-mailbox.js` simulates both scripts against a fake Drive.

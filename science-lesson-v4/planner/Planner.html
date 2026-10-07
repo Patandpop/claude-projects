@@ -162,6 +162,8 @@
       <button id="mPrint">Print list<small>everything to photocopy, with quantities</small></button>
       <button id="mXlsx">Technicians' Excel<small>the order sheet to email</small></button>
       <hr>
+      <button id="mClaude">Send to Claude<small>build lessons or ask for changes, done at home</small></button>
+      <hr>
       <button id="mAuto">Re-plan this week<small>from where each class is up to</small></button>
       <button id="mImp">Import data<small>planner-data.json from home</small></button>
       <hr>
@@ -610,7 +612,7 @@ function editor() {
       '<div class="row" style="margin-top:6px"><input type="text" id="eBook" placeholder="Textbooks" value="' + esc(s.book || '') + '" style="flex:1"><button id="eAddBook" title="Fill in the textbook pages for this lesson">+ pages</button></div>' +
       (s.kind === 'lesson' ? '<label class="inline"><input type="checkbox" id="eRemember"' + (s.eqSrc === 'remembered' ? ' checked' : '') + '> use this every time this lesson is taught</label>' : '') +
     '</div>' +
-    '<div class="row"><button id="kRev">Revision</button><button id="kTest">Test</button><button id="kCover">Cover</button><button id="kFree">Clear</button><button id="ePrompt">Copy build prompt</button>' +
+    '<div class="row"><button id="kRev">Revision</button><button id="kTest">Test</button><button id="kCover">Cover</button><button id="kFree">Clear</button><button id="eAsk" title="Sends this lesson to Claude Code at home to build">Ask Claude to build</button><button id="ePrompt">Copy build prompt</button>' +
     (curL ? '<button id="kCont" title="Puts this lesson in ' + esc(s.cls) + '\'s next slot too; the rest of the week moves along">Didn\'t finish: continue next lesson</button>' : '') + '</div>' +
     (c ? '<div class="card"><h4>Choose the lesson <span class="src">' + esc(s.cls) + '</span></h4><div id="chooser"></div></div>' : '') +
     '<details' + ((s.notes || []).length || (s.carry || []).length ? ' open' : '') + '><summary>Notes, carry-over and more' + ((s.notes || []).length + (s.carry || []).length ? ' (' + ((s.notes || []).length + (s.carry || []).length) + ')' : '') + '</summary>' +
@@ -680,6 +682,7 @@ function editor() {
     const text = P.buildPrompt(S.data, S.week.slots[S.sel]);
     navigator.clipboard.writeText(text).then(() => toast('Build prompt copied')).catch(() => modal('<h3>Build prompt</h3><pre>' + esc(text) + '</pre>'));
   };
+  $('eAsk').onclick = () => sendToClaude([S.sel]);
   if (!isLesson) $('eEq').placeholder = 'Nothing needed';
 }
 
@@ -693,6 +696,36 @@ function markGaps() {
     P.applyMarks(st[s.cls], S.week.marks, s.cls);
     s.gap = c.seq.some((x, k) => x.unit === L.unit && k > s.i && st[s.cls].taught.has(k));
   });
+}
+
+/* ------------------------------------------------------------ send to Claude
+   Requests go through the mailbox on his personal account to Claude Code at home ("do my planner
+   requests"). Lessons go with the same text as "Copy build prompt", plus the day and period. */
+function lessonRequest(i) {
+  const s = S.week.slots[i];
+  const when = P.DAYS[s.day] + ' ' + P.addDays(S.monday, s.day).toLocaleDateString('en-GB', { day:'numeric', month:'short' }) + ' P' + s.period;
+  return { when, cls: s.cls, prompt: P.buildPrompt(S.data, s) };
+}
+function sendToClaude(preselect) {
+  if (!S.week) return;
+  const idx = S.week.slots.map((s, i) => i).filter((i) => { const s = S.week.slots[i]; return s.kind === 'lesson' && (s.built === false || (preselect || []).includes(i)); });
+  const rows = idx.map((i) => { const r = lessonRequest(i); const on = preselect ? preselect.includes(i) : true;
+    return '<label style="display:block;margin:3px 0"><input type="checkbox" class="cReq" data-i="' + i + '"' + (on ? ' checked' : '') + '> ' + esc(r.when + ' · ' + r.cls + ' · ' + (r.prompt.split(String.fromCharCode(10))[1] || '')) + '</label>'; }).join('');
+  modal('<h3>Send to Claude</h3>' +
+    (rows ? '<p class="muted">Lessons to build (not built yet this week):</p>' + rows : '<p class="muted">Every lesson this week is already built.</p>') +
+    '<label>Message (optional)</label><textarea id="cMsg" rows="4" style="width:100%" placeholder="e.g. 9XS: make the Do Now on prokaryotic cells. Or: change the planner so..."></textarea>' +
+    '<p class="muted">At home, tell Claude Code: "do my planner requests".</p>' +
+    '<div class="row"><button class="primary" id="cSend">Send</button><button id="cCancel">Cancel</button></div>');
+  $('cCancel').onclick = closeModal;
+  $('cSend').onclick = () => {
+    const lessons = [...document.querySelectorAll('.cReq')].filter((x) => x.checked).map((x) => lessonRequest(+x.dataset.i));
+    const text = $('cMsg').value.trim();
+    if (!lessons.length && !text) { toast('Nothing to send'); return; }
+    closeModal(); status('Sending to Claude...');
+    run('sendRequest', { kind: lessons.length ? 'build' : 'message', text, lessons })
+      .then(() => { status('Sent to Claude'); toast('Sent. At home say "do my planner requests"'); })
+      .catch((e) => status('Not sent: ' + e.message));
+  };
 }
 
 /* ---------------------------------------------------------------- calendar */
@@ -735,15 +768,27 @@ item('mXlsx', () => {
 });
 item('mAuto', () => { if (S.readOnly) { toast('This week is already taught'); return; } if (confirm('Re-plan the whole week from where each class is up to? Your changes to this week are replaced (Undo brings them back).')) { change(P.autofill(S.data, S.weeks, S.monday, S.learned), 'Week re-planned'); markGaps(); render(); } });
 item('mImp', () => $('file').click());
+item('mClaude', () => sendToClaude(null));
 item('mTheme', () => { store.set('planner-theme', document.body.classList.contains('light') ? 'dark' : 'light'); applyTheme(); });
-const HELP = [['J or →', 'next week'], ['K or ←', 'previous week'], ['T', 'today'], ['W / D / C', 'week / day / classes view'], ['/', 'find a lesson (when one is selected)'], ['Delete', 'clear the selected lesson'], ['Ctrl+Z', 'undo'], ['Ctrl+S', 'save'], ['Esc', 'close / deselect'], ['?', 'this help']];
+const HELP = [['J or →', 'next week (next day in Day view)'], ['K or ←', 'previous week (previous day in Day view)'], ['T', 'today'], ['W / D / C', 'week / day / classes view'], ['/', 'find a lesson (when one is selected)'], ['Delete', 'clear the selected lesson'], ['Ctrl+Z', 'undo'], ['Ctrl+S', 'save'], ['Esc', 'close / deselect'], ['?', 'this help']];
 const showHelp = () => { modal('<h3>Keyboard shortcuts</h3>' + HELP.map(([k, t]) => '<div style="margin:4px 0"><kbd>' + k + '</kbd> ' + t + '</div>').join('') + '<div class="row"><button id="mClose">Close</button></div>'); $('mClose').onclick = closeModal; };
 item('mHelp', showHelp);
 
 /* ----------------------------------------------------------------- toolbar */
 $('today').onclick = () => { if (leaveOk()) { const t = todayMidnight(); S.day = Math.min(4, (t.getDay() + 6) % 7); loadWeek(t); markGaps(); render(); } };
-$('prev').onclick = () => { if (leaveOk()) { loadWeek(P.addDays(S.monday, -7)); markGaps(); render(); } };
-$('next').onclick = () => { if (leaveOk()) { loadWeek(P.addDays(S.monday, 7)); markGaps(); render(); } };
+// Patryk 2026-10-07: in Day view the arrows move one school day (Fri -> next Mon); in Week view, a week.
+function step(dir) {
+  if (S.view === 'day') {
+    const d = S.day + dir;
+    if (d >= 0 && d <= 4) { S.day = d; S.sel = -1; render(); editor(); return; }
+    if (!leaveOk()) return;
+    S.day = dir > 0 ? 0 : 4;
+    loadWeek(P.addDays(S.monday, 7 * dir)); markGaps(); render(); return;
+  }
+  if (leaveOk()) { loadWeek(P.addDays(S.monday, 7 * dir)); markGaps(); render(); }
+}
+$('prev').onclick = () => step(-1);
+$('next').onclick = () => step(1);
 $('jump').onchange = () => { if ($('jump').value && leaveOk()) { loadWeek(P.parse($('jump').value)); markGaps(); render(); } };
 $('vWeek').onclick = () => { S.view = 'week'; render(); editor(); };
 $('vDay').onclick = () => { S.view = 'day'; render(); editor(); };
@@ -784,6 +829,9 @@ function onLoad(r) {
   if (!S.data) { status('No data yet: More → Import data, pick planner-data.json'); $('grid').innerHTML = ''; editor(); return; }
   if (!S.data.periodTimes || !S.data.filled) { status('Old data file: ask Claude to refresh the planner data, then More → Import data'); return; }
   loadWeek(S.monday || firstPlanMonday()); markGaps(); render();
+  const sy = r.sync || {};
+  if (sy.pulled) toast('New lesson data from home loaded');
+  else if (sy.error) status('Home link not working: ' + sy.error);
 }
 run('loadAll').then(onLoad).catch((e) => status('Could not load: ' + e.message));
 </script>

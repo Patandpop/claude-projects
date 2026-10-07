@@ -10,9 +10,12 @@
    Script properties:
      PLANNER_KEY   the secret in the link (?key=...)
      TEMPLATE_ID   a Google Sheet holding ONE of his order-sheet tabs, used for the Excel download
+     MAILBOX_URL   the "Planner mailbox" web app on his PERSONAL account (Mailbox.gs), and
+     MAILBOX_KEY   its key. With these set, new data from home arrives by itself (no Import data),
+                   saved weeks go home, and "Send to Claude" requests reach Claude Code at home.
 */
 
-const VERSION = 3;
+const VERSION = 4;
 
 function setup() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -44,9 +47,66 @@ function include(name) { return HtmlService.createHtmlOutputFromFile(name).getCo
 
 function sheet_(name) { return SpreadsheetApp.getActiveSpreadsheet().getSheetByName(name); }
 
+/* ------------------------------------------------------------------ mailbox
+   The school blocks sharing his personal Drive and blocks public school web apps, so the planner
+   talks to a small web app on his personal account instead (see Mailbox.gs). Every call is best
+   effort: if the mailbox is not set up or not reachable, the planner works exactly as before. */
+function mailboxOn_() { const p = PropertiesService.getScriptProperties(); return !!(p.getProperty('MAILBOX_URL') && p.getProperty('MAILBOX_KEY')); }
+function mailGet_(params) {
+  const p = PropertiesService.getScriptProperties();
+  const q = Object.keys(params).map((x) => x + '=' + encodeURIComponent(params[x])).join('&');
+  const r = UrlFetchApp.fetch(p.getProperty('MAILBOX_URL') + '?key=' + encodeURIComponent(p.getProperty('MAILBOX_KEY')) + '&' + q, { muteHttpExceptions: true });
+  const o = JSON.parse(r.getContentText());
+  if (!o.ok) throw new Error(o.error || 'mailbox error');
+  return o;
+}
+function mailPost_(body) {
+  const p = PropertiesService.getScriptProperties();
+  body.key = p.getProperty('MAILBOX_KEY');
+  const r = UrlFetchApp.fetch(p.getProperty('MAILBOX_URL'), { method: 'post', contentType: 'application/json', payload: JSON.stringify(body), muteHttpExceptions: true });
+  const o = JSON.parse(r.getContentText());
+  if (!o.ok) throw new Error(o.error || 'mailbox error');
+  return o;
+}
+// New planner-data.json from home? Store it (same as Import data) and say so.
+function pullData_() {
+  if (!mailboxOn_()) return { on: false };
+  try {
+    const o = mailGet_({ op: 'read', name: 'planner-data.json' });
+    if (!o.found) return { on: true, note: 'no data file at home yet' };
+    const props = PropertiesService.getScriptProperties();
+    if (o.modified === props.getProperty('DATA_MODIFIED')) return { on: true };
+    importData_(o.text);
+    props.setProperty('DATA_MODIFIED', o.modified);
+    return { on: true, pulled: o.modified };
+  } catch (e) { return { on: true, error: String(e.message || e) }; }
+}
+// Saved weeks, his equipment edits and added lessons, as one file for home to read.
+function pushState_() {
+  if (!mailboxOn_()) return null;
+  try {
+    const a = loadAll_(false);
+    mailPost_({ op: 'write', name: 'planner-state.json', text: JSON.stringify({ saved: new Date().toISOString(), weeks: a.weeks, learned: a.learned, added: a.added }) });
+    return true;
+  } catch (e) { return String(e.message || e); }
+}
+// "Send to Claude": a message or a list of lessons to build, for Claude Code at home.
+function sendRequest(k, req) {
+  check_(k);
+  if (!mailboxOn_()) throw new Error('The mailbox is not set up yet (see the setup guide: MAILBOX_URL and MAILBOX_KEY).');
+  const o = mailPost_({ op: 'request', kind: req.kind, text: req.text, lessons: req.lessons || [] });
+  return { id: o.id };
+}
+
 // Everything the page needs in one call.
 function loadAll(k) {
   check_(k);
+  const sync = pullData_();
+  const a = loadAll_(true);
+  a.sync = sync;
+  return a;
+}
+function loadAll_(withData) {
   const d = sheet_('Data');
   const chunks = d.getLastRow() > 1 ? d.getRange(2, 1, d.getLastRow() - 1, 1).getValues().map((r) => r[0]).join('') : '';
   const weeks = {};
@@ -61,7 +121,7 @@ function loadAll(k) {
   const added = [];
   const ad = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Added');
   if (ad && ad.getLastRow() > 1) ad.getRange(2, 1, ad.getLastRow() - 1, 1).getValues().forEach(([json]) => { try { added.push(JSON.parse(json)); } catch (e) { /* skip */ } });
-  return { version: VERSION, data: chunks ? JSON.parse(chunks) : null, weeks, learned, added, hasTemplate: !!PropertiesService.getScriptProperties().getProperty('TEMPLATE_ID') };
+  return { version: VERSION, data: withData && chunks ? JSON.parse(chunks) : null, weeks, learned, added, hasTemplate: !!PropertiesService.getScriptProperties().getProperty('TEMPLATE_ID') };
 }
 
 // A tab, made the first time it is needed (so an existing planner needs no setup re-run).
@@ -94,7 +154,15 @@ function createLesson(k, info) {
   let message = 'Added to the planner.', url = '';
   if (info.makeFolder && info.topicRel) {
     const root = lessonsRoot_();
-    if (!root) message = 'Added, but this Google account cannot see your "Beechen Cliff Science / Lessons" folder, so no folder was made (see Part 8 of the setup guide).';
+    if (!root && mailboxOn_()) {
+      // his Lessons folders live on the personal account: the mailbox makes the folder there
+      try {
+        const o = mailPost_({ op: 'mkdir', topicRel: info.topicRel, folderName: info.folderName });
+        rec.rel = info.topicRel + '/' + String(info.folderName).replace(/[\\/:*?"<>|]+/g, ' ').trim(); url = o.url || '';
+        message = o.existed ? 'Added. That folder was already on your Drive.' : 'Added, with an empty folder on your Drive: ' + info.folderName;
+        tab_('Log', ['when', 'what', 'where']).appendRow([new Date(), 'asked mailbox for lesson folder', rec.rel]);
+      } catch (e) { message = 'Added, but the folder was not made: ' + e.message; }
+    } else if (!root) message = 'Added, but this Google account cannot see your "Beechen Cliff Science / Lessons" folder, so no folder was made (see Part 8 of the setup guide).';
     else {
       let dir = root;
       for (const part of info.topicRel.split('/')) {
@@ -114,11 +182,15 @@ function createLesson(k, info) {
     }
   }
   tab_('Added', ['lesson', 'saved']).appendRow([JSON.stringify(rec), new Date()]);
+  pushState_();
   return { rec, message, url };
 }
 
 function importData(k, text) {
   check_(k);
+  return importData_(text);
+}
+function importData_(text) {
   const obj = JSON.parse(text);
   if (!obj || !obj.classes || !obj.timetable) throw new Error('That is not a planner-data.json file.');
   const d = sheet_('Data');
@@ -139,7 +211,8 @@ function saveWeek(k, week) {
   const row = [week.monday, json, new Date()];
   if (at >= 0) w.getRange(at + 2, 1, 1, 3).setValues([row]);
   else { w.appendRow(row); w.getRange(w.getLastRow(), 1).setNumberFormat('@').setValue(week.monday); }
-  return { saved: week.monday };
+  const sent = pushState_();
+  return { saved: week.monday, home: sent };
 }
 
 function learnEquipment(k, key, eq, sets) {
@@ -150,6 +223,7 @@ function learnEquipment(k, key, eq, sets) {
   const at = keys.indexOf(key);
   const row = [key, eq, sets || '', new Date()];
   if (at >= 0) q.getRange(at + 2, 1, 1, 4).setValues([row]); else q.appendRow(row);
+  pushState_();
   return true;
 }
 

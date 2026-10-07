@@ -99,15 +99,29 @@ This makes the button download your order sheet in exactly the layout the techni
    - Value: the long code
    - Click **Save script properties**.
 
-## Part 8 (optional): let "New lesson" make folders on Drive
+## Part 8: link home and school (do this once, at home)
 
-When you add a lesson that isn't in the list, the planner can make an empty folder for it, e.g. `Lesson 3a - Cell Models`, inside the topic folder on Drive. It only ever **creates** a folder. It never renames, moves or deletes anything, and every folder it makes is written in a **Log** tab in the planner's Sheet.
+The school won't let your personal Drive be shared with your school account, and it blocks public school web apps. So a small **mailbox** script runs on your **personal** Google account instead, and the school planner talks to it. After this:
+- new lesson data from home arrives by itself (no more **Import data**),
+- **Send to Claude** and **Ask Claude to build** reach Claude Code at home,
+- **New lesson** makes its empty folder in your personal Drive's Lessons folder.
 
-It looks for `Beechen Cliff Science > Lessons` in the Drive of the account the planner runs as (your school account). If your lessons live in your **personal** Drive, either:
-- share the `Beechen Cliff Science` folder with your school account (Editor), or
-- open the `Lessons` folder in Drive, copy the code from the address bar (`.../folders/`**`1AbC...xyz`**), and add a script property `LESSONS_FOLDER_ID` with that code (as in Part 7).
+The mailbox can only read and write files in `Beechen Cliff Science / Admin / Planner Sync`, and only **create** empty lesson folders. It never renames, moves or deletes anything, and every write goes in `mailbox-log.txt` in that folder.
 
-If it can't find the folder, the lesson is still added to the planner and it tells you no folder was made.
+**A. The mailbox (signed in as your personal Gmail, tomczynskipatrick@gmail.com)**
+1. Go to **script.google.com** → **New project**. Click "Untitled project" and call it **Planner mailbox**.
+2. Open `planner/dist/Mailbox.gs` (right-click → Open with → Notepad), **Ctrl+A**, **Ctrl+C**. In Apps Script click inside `Code.gs`, **Ctrl+A**, **Ctrl+V**, **Ctrl+S**.
+3. Pick **setup** in the dropdown next to **▷ Run** and click **▷ Run**. Allow it (Advanced → Go to Planner mailbox (unsafe) → Allow).
+4. The Execution log shows `MAILBOX_KEY = ...`. Copy the letters and numbers after the = sign.
+5. **Deploy → New deployment → ⚙ → Web app**. Execute as: **Me**. Who has access: **Anyone**. **Deploy**. Copy the **Web app URL**.
+
+**B. The school planner (signed in as your school account)**
+6. Open the planner's Apps Script, click **⚙ Project Settings** → **Script properties** → **Add script property** twice:
+   - `MAILBOX_URL` = the URL from step 5
+   - `MAILBOX_KEY` = the key from step 4
+   - **Save script properties**.
+7. Run **setup** once more (▷ Run) so it can ask to connect out (allow it).
+8. Open the planner. If the top right says "Home link not working", screenshot it and send it to Claude.
 
 ---
 
@@ -127,7 +141,7 @@ If it can't find the folder, the lesson is still added to the planner and it tel
 | add a lesson in an empty period | click the empty period, pick the class, click the lesson |
 | move a lesson | drag it onto another slot, then **Move it here** or **Swap the two**. Whatever was there moves on, never disappears |
 | revision lesson / test | **Revision** and **Test** under the technician details. They ask which topic (it picks the one the class is in at that point). When a topic's lessons are all taught it plans a revision lesson, then the test. If either would leave lessons untaught, it lists them first |
-| a lesson that isn't in the list | **+ New lesson in this topic** under the list: type the title, choose which lesson it goes after. It goes in this period, gets an empty folder on Drive (`Lesson 3a - Title`, see Part 8) and stays in that class's list from then on |
+| a lesson that isn't in the list | **+ New lesson in this topic** under the list: type the title, choose which lesson it goes after. It goes in this period, gets an empty folder in your personal Drive (`Lesson 3a - Title`, needs Part 8) and stays in that class's list from then on |
 | clear a period | **Clear** (the lesson moves on to the next period) |
 | carry part of a lesson | **Notes and carry-over → Review not finished → next lesson** (shows as "+1 carry" and goes into its build prompt) |
 | add a task, tests to mark, a meeting | hover the **All day** row under a day → **+ task / marking / meeting** (click a chip to remove it) |
@@ -137,13 +151,15 @@ If it can't find the folder, the lesson is still added to the planner and it tel
 | save | nothing to do: changes save by themselves ("All changes saved", top right). Ctrl+S saves straight away |
 | jump to a date | the date box in the top bar, **Today**, or ◀ ▶ |
 | one day only | **Day**, or click a day's name. **Week** goes back |
+| one day at a time | in **Day** view, ◀ ▶ go back or forward one school day (Friday → Monday) |
+| ask Claude for something | **⋯ More → Send to Claude**: tick this week's unbuilt lessons and/or type a message. Or click a lesson → **Ask Claude to build**. At home, tell Claude Code "do my planner requests" |
 | shortcuts | press **?** |
 
-Flags on a lesson: **MISSED** = skipped earlier in this topic; **CHECK** = the equipment is a guess; **NOT BUILT** = the Drive folder has no slides yet; **NO FOLDER** = the technician guide lists it but Drive has no folder; **COVER** = cover work for this lesson; **DOUBLE** = the second half of a double lesson.
+Flags on a lesson: **MISSED** = skipped earlier in this topic; **NOT BUILT** = the Drive folder has no slides yet; **NO FOLDER** = the technician guide lists it but Drive has no folder; **COVER** = cover work for this lesson; **DOUBLE** = the second half of a double lesson.
 
 ## When things change
 
-- **Your lessons or Planner.xlsx changed:** ask Claude to "refresh the planner data", then **⋯ More → Import data** again and pick the new planner-data.json.
+- **Your lessons or Planner.xlsx changed:** ask Claude to "refresh the planner data". With Part 8 done, the planner loads it by itself next time you open it. (Without Part 8: **⋯ More → Import data** and pick the new planner-data.json.)
 - **Claude changes the app's code:** ask Claude to "rebuild the planner files", then paste the 3 new files over the old ones (Part 3), Ctrl+S, then **Deploy → Manage deployments → ✏ (pencil) → Version: New version → Deploy**. The link stays the same.
 
 ## If something goes wrong

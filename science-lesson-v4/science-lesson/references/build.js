@@ -3355,8 +3355,8 @@ function slideExamMarkScheme(pptx, L) {
   bottomBar(s, obj);
 }
 
-function slideApplyThenExam(pptx, L) {
-  slideApply(pptx, L);
+// Patryk 2026-10-07: the exam question and its mark scheme come after the Apply answers (Review slides).
+function slideExam(pptx, L) {
   slideExamQuestion(pptx, L);
   slideExamMarkScheme(pptx, L);
 }
@@ -3866,19 +3866,22 @@ async function buildPptx(L, outPath) {
     (L.meta && L.meta.uncapLearn ? arr(L.learn) : arr(L.learn).slice(0, 4)).forEach((it) => slideLearn(pptx, L, it));
     renderBuildSlides(pptx, L, buildItems);
     slideVisualiser(pptx, L, visItem);                          // MANDATORY — never omit
-    slideApplyThenExam(pptx, L);                               // + real exam question (Y9-11, home)
+    slideApply(pptx, L);
     buildReviewSlides(pptx, L);
+    slideExam(pptx, L);                                         // real exam question AFTER the Apply answers (Y9-11, home)
   } else if (type === 'revision') {
     arr(L.learn).forEach((it) => slideLearn(pptx, L, it));      // typically Learn-C
     slideWhiteboardRounds(pptx, L);
     if (visItem) slideVisualiser(pptx, L, visItem);
-    slideApplyThenExam(pptx, L);                               // + real exam question (Y9-11, home)
+    slideApply(pptx, L);
     buildReviewSlides(pptx, L);
+    slideExam(pptx, L);                                         // real exam question AFTER the Apply answers (Y9-11, home)
   } else if (type === 'whiteboard') {
     slideWhiteboardRounds(pptx, L);
     if (visItem) slideVisualiser(pptx, L, visItem);
-    slideApplyThenExam(pptx, L);                               // + real exam question (Y9-11, home)
+    slideApply(pptx, L);
     buildReviewSlides(pptx, L);
+    slideExam(pptx, L);                                         // real exam question AFTER the Apply answers (Y9-11, home)
   } else if (type === 'review') {
     // Bug 55: review lessons are content-heavy — render ALL Learn slides (no
     // slice(0,4) cap), matching the revision branch. No Engage (matches the
@@ -3887,16 +3890,18 @@ async function buildPptx(L, outPath) {
     arr(L.learn).forEach((it) => slideLearn(pptx, L, it));
     renderBuildSlides(pptx, L, buildItems);
     slideVisualiser(pptx, L, visItem);                          // mandatory (auto-generated) — matches the documented review sequence
-    slideApplyThenExam(pptx, L);                               // + real exam question (Y9-11, home)
+    slideApply(pptx, L);
     buildReviewSlides(pptx, L);
+    slideExam(pptx, L);                                         // real exam question AFTER the Apply answers (Y9-11, home)
   } else {
     // unknown type — treat as standard (keep the 4-Learn cap)
     slideEngage(pptx, L);
     (L.meta && L.meta.uncapLearn ? arr(L.learn) : arr(L.learn).slice(0, 4)).forEach((it) => slideLearn(pptx, L, it));
     renderBuildSlides(pptx, L, buildItems);
     slideVisualiser(pptx, L, visItem);
-    slideApplyThenExam(pptx, L);                               // + real exam question (Y9-11, home)
+    slideApply(pptx, L);
     buildReviewSlides(pptx, L);
+    slideExam(pptx, L);                                         // real exam question AFTER the Apply answers (Y9-11, home)
   }
 
   slideImageDump(pptx, L);                                       // M7: always last

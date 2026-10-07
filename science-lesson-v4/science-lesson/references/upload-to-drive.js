@@ -363,6 +363,11 @@ function processLesson(content) {
       destDir,
     ].join('\t') + '\n';
     fs.appendFileSync(logFile, logLine, 'utf8');
+    // Patryk's own Do Now questions, kept per class for later retrieval (do-now-own.js).
+    try {
+      const n = require('./do-now-own.js').recordLesson(content);
+      if (n) console.log(`do-now-own: ${n} Do Now question(s) saved for later retrieval`);
+    } catch (err) { console.warn('do-now-own: skipped — ' + err.message); }
   }
 
   // M1: record the lesson in lesson-log.json regardless of copy success.

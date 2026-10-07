@@ -122,6 +122,10 @@ ok(tl.find((x) => x.k === firstI).next && tl.some((x) => x.state === 'taught' &&
 // 14. Equipment: no filler, concise, sets only for real kit (Patryk 2026-10-07)
 const allL = Object.values(data.classes).flatMap((c) => c.seq);
 ok(!allL.some((L) => /see teacher/i.test(L.eq || '')), 'no "see teacher" filler: unknown equipment is left empty');
+// Patryk 2026-10-07: plain names, and bench kit (clamps, stands, tripods, heat mats, Bunsens, racks) never listed
+const items = allL.flatMap((L) => String(L.eq || '').replace(/ …$/, '').split(/,\s*/));
+ok(!items.some((x) => /^(clamps?|(clamp |retort )?stands?|tripods?|heat ?(proof )?mats?|bunsen( burners?)?|test ?tube racks?)$/i.test(x.trim())), 'bench kit is never listed');
+ok(!items.some((x) => /(round|flat)[- ]bottom/i.test(x)), 'plain names: "conical flask", not "flat bottom conical flasks"');
 ok(allL.every((L) => !L.eq || L.eq.split(', ').length <= 9), 'equipment is a short item list (at most 8 items)');
 ok(!allL.some((L) => L.sets && !/beaker|microscope|slide|tube|magnet|meter|power|lamp|scale|balance|spring|mass|tile|ruler|kit|sample|trolley|onion|iodine|solution|stand|clamp|heater|thermometer|kettle|wire|circuit|bulb|resistor|batter|funnel|filter|crucible|tong|spatula|petri|agar|pipette|cylinder|gate|ramp|forceps|scalpel|dissect|bunsen|tripod|gauze|flask|compass|weight|bung|egg|timer|watch|joulemeter|lens|prism|ray box|demo/i.test(L.eq)),
   'sets are only suggested for real practical kit or demos');

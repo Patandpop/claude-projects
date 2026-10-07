@@ -282,14 +282,43 @@ function setsFor(text) {
 // The technicians' guide text, cut down to the kit: items only, no risk notes, CLEAPSS references or
 // instructions to the technician, at most 8 items (Patryk 2026-10-07: "the suggestions are long winded").
 const NOT_KIT = /\b(cleapss|can also be|template in (the )?folder|this lesson|risk assessment|hazcard|read and practi[cs]e|please|this might|as per|in the event|to be given|full risk|sra\d+|pp\d+|eye protection|goggles|lab coats?)\b/i;
-function conciseEquipment(text) {
+// Headings, counts and paperwork that are not kit ("Per pair or group of students:", "Topic Overview").
+const NOT_KIT_ITEM = /^(none|n\/?a|per (pair|group|student)|additionally|x\s*\d+ sets|class set of\s*$)|topic overview|\btest for\b|third edition|textbooks?\b|\bbooks?\b.*\bset\b|worksheets?\b|^(teacher demo|do by|wear\b|see folder|prac\s*\d*$|\[)|tech requests|each group will need|\bbooks$/i;
+// Patryk 2026-10-07: every bench already has these, so they are never ordered or listed.
+const STANDARD_KIT = /^(and\s+)?((retort |clamp )?stands?|clamps?( (and|&) stands?)?|clamp stands?|stand and boss|boss(es)?( and clamps?)?|tripods?|heat(proof|[- ]resistant)? ?ma(t|ts)?|bunsen( burners?)?|test ?tube racks?|tripod(,| and) gauze( and bunsen)?|tripod and gauze and bunsen)$/i;
+// Say it the way a person would: "conical flask", not "Flat bottom conical flasks (250 ml)".
+const TYPO = { thermomter: 'thermometer', termometer: 'thermometer', conducitivity: 'conductivity', seperate: 'separate', perplex: 'Perspex', babs: 'babies', meter: 'metre' };
+function tidyItem(x) {
+  const raw = String(x);
+  let s = raw
+    .replace(/^(prac(tical)?|demo(nstration)?s?)\s*\d*\s*[:–-]\s*/i, '')
+    .replace(/^[A-Z]\)\s*/, '')
+    .replace(/\b(round|flat)[- ]bottom(ed)?\s+/gi, '')
+    .replace(/\s*\(([^)]*)\)/g, (m, inner) => (/\d\s*(cm3|cm³|ml|dm3|g|kg|mm|cm)\b/i.test(inner) && !/-|–/.test(inner) ? ` (${inner})` : ''))
+    .replace(/\b(\w+)\b/g, (w) => {
+      const t = TYPO[w.toLowerCase()];
+      if (!t) return w;
+      if (w.toLowerCase() === 'meter' && /newton|multi|volt|amm|lux|joule|energy|0-|n meter/i.test(raw)) return w;   // newton meter stays
+      return t;
+    })
+    .replace(/\bcm3\b/g, 'cm³').replace(/\s*-\s*$/, '').replace(/\s+/g, ' ').trim();
+  // a short heading before a colon is not kit ("Stretching springs prac: masses" -> "masses")
+  s = s.replace(/^[^:]{0,32}:\s*/, '').replace(/^(prac(tical)?|demo(nstration)?)\s*[–-]\s*/i, '');
+  // lower case, except names and acronyms (OHP, RGB, A4, HCl, Virkon, Perspex)
+  s = s.replace(/\b([A-Z])([a-z]+)\b/g, (w, a, b) => (/^(Perspex|Benedict|Bunsen|Virkon|Vaseline|Newton|Sharp|Activate|Kerboodle|Weetabix)/.test(w) ? w : a.toLowerCase() + b));
+  return s;
+}
+function conciseEquipment(text, opts) {
   if (!text || /^n\/?a$/i.test(text)) return text;
+  const keepStandard = opts && opts.keepStandard;
   const items = String(text).split(/\s*(?:[,;•\n]|\.\s+(?=[A-Z])|\s\/\s)\s*/)
-    .map((x) => x.replace(/^(demo(nstration)?\s*\d*\s*[:–-]|prac(tical)?\s*[:–-]|pink gcse physics required practical)\s*/i, '').replace(/[.\s]+$/, '').trim())
-    .filter((x) => x && x.length > 1 && !NOT_KIT.test(x) && x.split(/\s+/).length <= 9);
+    .map((x) => tidyItem(x.replace(/^(demo(nstration)?\s*\d*\s*[:–-]|prac(tical)?\s*[:–-]|pink gcse physics required practical)\s*/i, '').replace(/[.:\s]+$/, '').trim()))
+    .filter((x) => x && x.length > 1 && !NOT_KIT.test(x) && !NOT_KIT_ITEM.test(x) && x.split(/\s+/).length <= 9)
+    .filter((x) => keepStandard || !STANDARD_KIT.test(x));
   const seen = new Set();
-  const uniq = items.filter((x) => { const k = x.toLowerCase(); if (seen.has(k)) return false; seen.add(k); return true; });
-  return uniq.slice(0, 8).join(', ') + (uniq.length > 8 ? ' …' : '');
+  const uniq = items.filter((x) => { const k = x.toLowerCase().replace(/(es|s)$/, ''); if (seen.has(k)) return false; seen.add(k); return true; });
+  const out = uniq.slice(0, 8).join(', ') + (uniq.length > 8 ? ' …' : '');
+  return out ? out[0].toUpperCase() + out.slice(1) : '';
 }
 
 // Patryk 2026-10-04: never recommend ICT. Technician guides say things like "Chrome or ICT
@@ -314,7 +343,8 @@ function equipmentFor(lesson) {
   const printing = e.printing ? stripICT(e.printing) : e.printing;
   const full = stripICT(e.equipment);
   const eq = e.source === 'remembered' ? full : conciseEquipment(full);
-  return { ...e, equipment: eq, full: eq !== full ? full : '', sets: e.source === 'remembered' ? e.sets : setsFor(eq),
+  // sets are judged on the kit INCLUDING bench kit (a Bunsen practical is still a pairs practical)
+  return { ...e, equipment: eq, full: eq !== full ? full : '', sets: e.source === 'remembered' ? e.sets : setsFor(conciseEquipment(full, { keepStandard: true })),
     printing: printing === 'N/A' || /^n\/?a$/i.test(printing || '') ? '' : printing };
 }
 function equipmentFor0(lesson) {

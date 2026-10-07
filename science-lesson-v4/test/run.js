@@ -366,6 +366,15 @@ function main() {
         xml.includes('collide with the walls more often') && xml.includes('Many said the pressure stays the same.');
       if (ok) pass('exam question + mark scheme slides present, mark scheme verbatim');
       else fail('exam question slides missing or mark scheme text altered');
+      // Patryk 2026-10-07: the exam question comes AFTER the Apply answers (the Review slides).
+      const zipE = new AdmZip(path.join(outDir, baseName(lessons[0].meta) + '.pptx'));
+      const sl = zipE.getEntries().filter(e => /^ppt\/slides\/slide\d+\.xml$/.test(e.entryName))
+        .sort((a, b) => parseInt(a.entryName.match(/\d+/)[0], 10) - parseInt(b.entryName.match(/\d+/)[0], 10))
+        .map(e => e.getData().toString('utf8'));
+      const examAt = sl.findIndex(x => x.includes('EXAM QUESTION · AQA'));
+      const lastReview = sl.map((x, i) => (/>Review · /.test(x) ? i : -1)).filter(i => i >= 0).pop();
+      if (lastReview != null && examAt > lastReview) pass(`exam question (slide ${examAt + 1}) comes after the Apply answers (last Review slide ${lastReview + 1})`);
+      else fail(`exam question order wrong: exam=${examAt + 1} lastReview=${lastReview == null ? 'none' : lastReview + 1}`);
     }
 
     // MCQ block placement (Patryk 2026-10-03): the fixture lists its two experiment MCQs FIRST;
@@ -586,6 +595,12 @@ function main() {
   const thTest = require(path.join(__dirname, 'test-homework.test.js')).run();
   hardFails += thTest.fails;
   warnings  += thTest.warns;
+
+  // Patryk's own Do Now questions (kept per class after every upload, or harvested from old decks).
+  console.log('');
+  const ownTest = require(path.join(__dirname, 'do-now-own.test.js')).run();
+  hardFails += ownTest.fails;
+  warnings  += ownTest.warns;
 
   console.log('');
   if (hardFails) {
