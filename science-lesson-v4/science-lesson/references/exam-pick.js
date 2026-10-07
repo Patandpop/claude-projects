@@ -140,14 +140,23 @@ function pickForLesson(L, opts) {
   const rank = (a, b) => (b.rel - a.rel) || ((a.passRate == null) - (b.passRate == null)) ||
     (Math.abs((a.passRate || 50) - 50) - Math.abs((b.passRate || 50) - 50)) || a.id.localeCompare(b.id);
   fresh.forEach((q) => { q.rel = score(q, lw); });
-  if (m.examSubtopic) fresh.forEach((q) => { if (q.subtopic.toLowerCase() === String(m.examSubtopic).toLowerCase()) q.rel += 100; });
+  // the library spells some subtopics wrongly ("Cell Strucutre"), so compare letters ignoring order slips
+  const sameSub = (a, b) => { const k = (s) => String(s).toLowerCase().replace(/[^a-z]/g, '').split('').sort().join(''); return k(a) === k(b); };
+  if (m.examSubtopic) fresh.forEach((q) => { if (sameSub(q.subtopic, m.examSubtopic)) q.rel += 100; });
+  // meta.examKeywords: words the question must be about (9XS microscopes: microscope, onion, iodine...)
+  if (Array.isArray(m.examKeywords) && m.examKeywords.length) fresh.forEach((q) => {
+    const hits = m.examKeywords.filter((w) => new RegExp(`\\b${String(w).replace(/[^\w ]/g, '')}`, 'i').test(q.text)).length;
+    q.rel += hits ? 200 + 20 * hits : -200;
+  });
 
   // Board: 3-6 marks, <= 3 parts, at most one real figure, fits a slide at >= 16pt, short enough
   // mark scheme to read off the board, not a levelled 6-marker (those belong on paper).
   const boardOk = (q) => q.marks >= 3 && q.marks <= 6 && q.parts.length <= 3 && q.figs.length <= 1 &&
     !q.levelled && q.text.length <= (q.figs.length ? 480 : 700) && q.msLen <= 650 &&
     (q.passRate == null || (q.passRate >= 25 && q.passRate <= 75));
-  const board = fresh.filter(boardOk).sort(rank)[0] || null;
+  // meta.examRef names the board question exactly (still a real, verbatim library question)
+  const named = m.examRef ? all.find((q) => q.id === m.examRef && !damaged(q)) : null;
+  const board = named || fresh.filter(boardOk).sort(rank)[0] || null;
 
   // Worksheet: a different short figure-free question, 2-4 marks.
   const wsOk = (q) => (!board || q.id !== board.id) && q.marks >= 2 && q.marks <= 4 && !q.figs.length &&

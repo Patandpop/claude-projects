@@ -1,0 +1,453 @@
+[
+  {
+    "meta": {
+      "class": "9XS",
+      "topic": "Using microscopes",
+      "title": "Using Microscopes Required Practical",
+      "lessonType": "practical",
+      "theme": "biology",
+      "worksheet": "A",
+      "differentiation": "none",
+      "year": 9,
+      "subject": "Biology",
+      "macrotopic": "B1 Cells",
+      "lessonNumber": 3,
+      "outputDir": "C:/Users/magda/claude-projects/science-lesson-v4/Microscopes 9XS",
+      "examSubtopic": "Cell Structure",
+      "examKeywords": [
+        "microscope",
+        "onion",
+        "iodine",
+        "magnification",
+        "eyepiece",
+        "objective"
+      ],
+      "examRef": "Biology-Cell-Biology-Cell-Strucutre-2#Q22"
+    },
+    "title": {
+      "objectives": [
+        "Prepare a slide of onion cells stained with iodine",
+        "Use a light microscope to focus on cells, starting at low power",
+        "Draw onion cells and calculate the length of one cell"
+      ],
+      "keywords": [
+        "eyepiece",
+        "objective lens",
+        "stage",
+        "focus",
+        "stain",
+        "magnification"
+      ]
+    },
+    "doNow": {
+      "variant": "A",
+      "questions": [
+        {
+          "q": "What type of cell has no nucleus?",
+          "a": "A prokaryotic cell (for example a bacterium).",
+          "marks": 1
+        },
+        {
+          "q": "Where is the genetic material in a bacterial cell?",
+          "a": "A single loop of DNA free in the cytoplasm (not in a nucleus).",
+          "marks": 1
+        },
+        {
+          "q": "What are plasmids?",
+          "a": "Small rings of DNA in a bacterial cell that carry extra genes.",
+          "marks": 1
+        },
+        {
+          "q": "Name two structures found in both a bacterial cell and a plant cell.",
+          "a": "Any two from: cell wall, cell membrane, cytoplasm, ribosomes.",
+          "marks": 2
+        },
+        {
+          "q": "Which is bigger, a bacterial cell or a plant cell? Roughly how big is a bacterium?",
+          "a": "A plant cell is bigger. A bacterium is about 1 to 5 micrometres (µm) long.",
+          "marks": 2
+        },
+        {
+          "q": "What does a flagellum do for a bacterium?",
+          "a": "It spins like a tail to help the bacterium move.",
+          "marks": 1
+        }
+      ],
+      "specPoints": [
+        "AQA B1.1.1 eukaryotes and prokaryotes",
+        "AQA B1.1.4 required practical: microscopy"
+      ]
+    },
+    "engage": {
+      "variant": "prediction",
+      "hook": "The skin inside an onion is only one cell thick. How many onion cells do you think fit side by side across 1 mm?",
+      "content": "Onion skin cells are roughly 0.2 to 0.3 mm long, so only about 3 to 5 of them fit across 1 mm. Today you will measure one yourself.",
+      "imagePlaceholder": true,
+      "imageDescription": "onion epidermis cells stained with iodine seen under a light microscope",
+      "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Microscopes 9XS/source-images/onion_image1.jpeg",
+      "imageConfidence": "search",
+      "prompt": "Write your guess down before you see the answer."
+    },
+    "learn": [
+      {
+        "variant": "A",
+        "heading": "Parts of the light microscope",
+        "boxes": [
+          {
+            "header": "Lenses and light",
+            "items": [
+              "Eyepiece: the lens you look through (×10).",
+              "Objective lenses: low, medium and high power.",
+              "Light or mirror: makes the image brighter."
+            ]
+          },
+          {
+            "header": "Stage and focus",
+            "items": [
+              "Stage and clips: hold the slide still.",
+              "Coarse focus first, fine focus last."
+            ]
+          }
+        ],
+        "keywords": [
+          "eyepiece",
+          "objective lens",
+          "stage",
+          "focus"
+        ],
+        "imageDescription": "labelled diagram of a light microscope",
+        "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Microscopes 9XS/source-images/lry_image5.jpg",
+        "imageConfidence": "search"
+      },
+      {
+        "variant": "G",
+        "heading": "Focusing in the right order",
+        "steps": [
+          {
+            "label": "Lowest power objective in place",
+            "note": "Turn the nosepiece until it clicks"
+          },
+          {
+            "label": "Slide on the stage",
+            "note": "Hold it still with the clips"
+          },
+          {
+            "label": "Look from the side",
+            "note": "Bring the lens close to the slide without touching it"
+          },
+          {
+            "label": "Look through the eyepiece",
+            "note": "Turn the coarse focus to move the lens away until the cells appear"
+          },
+          {
+            "label": "Fine focus",
+            "note": "Make the image sharp"
+          },
+          {
+            "label": "Higher power",
+            "note": "Switch objective, then use only the fine focus"
+          }
+        ],
+        "imageDescription": "simple labelled light microscope showing eyepiece, objective lens, stage, coarse and fine focus",
+        "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Microscopes 9XS/source-images/lry_image2.png",
+        "imageConfidence": "search"
+      },
+      {
+        "variant": "A",
+        "heading": "Biological drawings",
+        "boxes": [
+          {
+            "header": "Do",
+            "items": [
+              "Draw only what you see.",
+              "Use a sharp pencil and single clear lines.",
+              "Draw large, at least half a page.",
+              "Label with ruled lines that do not cross."
+            ]
+          },
+          {
+            "header": "Always add",
+            "items": [
+              "A title.",
+              "The magnification you used (for example ×100).",
+              "A scale bar."
+            ]
+          },
+          {
+            "header": "Never",
+            "items": [
+              "Shade or colour in.",
+              "Draw sketchy, broken lines.",
+              "Draw cells you did not see."
+            ]
+          }
+        ],
+        "keywords": [
+          "magnification",
+          "scale bar"
+        ],
+        "imageDescription": "wrong and correct biological drawings of cells side by side",
+        "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Microscopes 9XS/source-images/lry_image1.png",
+        "imageConfidence": "search"
+      },
+      {
+        "variant": "F",
+        "heading": "Working out the length of one cell",
+        "equation": "length of one cell = length of field of view ÷ number of cells across",
+        "components": [
+          {
+            "symbol": "length of field of view",
+            "name": "How far you can see across, measured with the perspex ruler",
+            "unit": "micrometres (µm)"
+          },
+          {
+            "symbol": "number of cells across",
+            "name": "Count the cells in a line across the field of view",
+            "unit": "no unit"
+          },
+          {
+            "symbol": "length of one cell",
+            "name": "The answer",
+            "unit": "micrometres (µm)"
+          }
+        ],
+        "rearrangements": [
+          "1 mm = 1000 µm"
+        ],
+        "example": "The field of view is 1.5 mm across and 6 cells fit across it. 1.5 mm = 1500 µm, so one cell = 1500 ÷ 6 = 250 µm.",
+        "imageDescription": "labelled biological drawing of onion epidermal cells at x100 magnification",
+        "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Microscopes 9XS/source-images/onion-drawing-model.png",
+        "imageConfidence": "search"
+      }
+    ],
+    "build": [
+      {
+        "type": "mcq",
+        "q": "Which part would you adjust to make the image brighter?",
+        "options": [
+          "Eyepiece",
+          "Focus knob",
+          "Light or mirror",
+          "Objective lens"
+        ],
+        "answer": "C",
+        "explanation": "The light or mirror controls how much light passes up through the slide."
+      },
+      {
+        "type": "mcq",
+        "q": "Which part would you adjust to make a blurry image clear?",
+        "options": [
+          "Focus knob",
+          "Stage clips",
+          "Light or mirror",
+          "Eyepiece"
+        ],
+        "answer": "A",
+        "explanation": "The focus knobs move the lens to make the image sharp: coarse first, then fine."
+      },
+      {
+        "type": "mcq",
+        "q": "The eyepiece magnifies ×10 and the objective lens magnifies ×40. What is the total magnification?",
+        "options": [
+          "×4",
+          "×50",
+          "×400",
+          "×4000"
+        ],
+        "answer": "C",
+        "explanation": "Multiply them: 10 × 40 = 400. Adding them (50) is the common mistake."
+      },
+      {
+        "type": "mcq",
+        "about": "practical",
+        "q": "Why do you look from the side while moving the objective lens towards the slide?",
+        "options": [
+          "To see the cells sooner",
+          "So the lens does not hit and crack the slide",
+          "To make the image brighter",
+          "To check the stain"
+        ],
+        "answer": "B",
+        "explanation": "From the side you can stop just before the lens touches the slide."
+      },
+      {
+        "type": "mcq",
+        "about": "practical",
+        "q": "Why do we add iodine to the onion cells?",
+        "options": [
+          "To kill the cells",
+          "To stick the coverslip down",
+          "To stain the cells so the nucleus and walls show up",
+          "To make the cells bigger"
+        ],
+        "answer": "C",
+        "explanation": "Onion cells are almost see-through. Iodine stains them so the structures are visible."
+      },
+      {
+        "type": "mcq",
+        "about": "practical",
+        "q": "Why is the coverslip lowered at an angle using forceps?",
+        "options": [
+          "To stop air bubbles getting trapped",
+          "So it does not get wet",
+          "To spread the iodine",
+          "To make it stick faster"
+        ],
+        "answer": "A",
+        "explanation": "Lowering one edge first pushes the air out, so bubbles do not hide the cells."
+      },
+      {
+        "type": "practical",
+        "title": "Looking at onion cells",
+        "intro": "Make a slide of onion skin stained with iodine, find the cells at low power, then draw them and work out the length of one cell.",
+        "worksheetIntro": true,
+        "equipment": [
+          "piece of onion (cut by the teacher)",
+          "white tile",
+          "forceps",
+          "microscope slide",
+          "coverslip",
+          "light microscope",
+          "iodine solution in a dropping bottle",
+          "dropping pipette and water",
+          "perspex ruler",
+          "paper towel"
+        ],
+        "steps": [
+          "Put one drop of water in the middle of the slide.",
+          "Peel a thin layer of skin from the inside of the onion piece and lay it flat in the water with forceps.",
+          "Add two drops of iodine on top of the onion skin.",
+          "Lower the coverslip at an angle with the forceps. Dab away extra liquid with paper towel.",
+          "Clip the slide on the stage. Start with the lowest power objective and look from the side as you bring the lens close.",
+          "Look through the eyepiece and focus with the coarse knob, then the fine knob. Switch to ×100 and refocus with the fine knob.",
+          "Draw a few cells, label them and write the magnification under your drawing.",
+          "Put the perspex ruler on the stage, measure the field of view, count the cells across it and work out the length of one cell."
+        ],
+        "warning": "Eye protection on. Iodine is harmful: wash it off your skin. Carry microscopes with two hands. Report broken slides.",
+        "imagePlaceholder": true,
+        "imageDescription": "model biological drawing of onion epidermal cells labelled cell wall, cytoplasm, nucleus, magnification x100",
+        "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Microscopes 9XS/source-images/onion-drawing-model.png",
+        "imageConfidence": "search",
+        "questions": [
+          {
+            "q": "Why must the layer of onion skin be very thin?",
+            "a": "So light can pass through it and you see single cells, not a dark blur of layers."
+          },
+          {
+            "q": "Why are there no chloroplasts in the onion cells?",
+            "a": "The onion bulb grows underground with no light, so its cells do not photosynthesise."
+          }
+        ]
+      }
+    ],
+    "apply": {
+      "developing": [
+        {
+          "q": "Name the part of the microscope you turn to bring the image into focus.",
+          "a": "The focus knob (coarse focus first, then fine focus).",
+          "marks": 1,
+          "qType": "concept",
+          "contentType": "routine_recall"
+        },
+        {
+          "q": "Why is iodine added to the onion cells?",
+          "a": "It stains the cells so the nucleus and cell wall can be seen.",
+          "marks": 1,
+          "qType": "concept",
+          "contentType": "routine_recall"
+        },
+        {
+          "q": "Name three structures you can see in an onion cell stained with iodine.",
+          "a": "Any three from: cell wall, nucleus, cytoplasm, cell membrane.",
+          "marks": 3,
+          "qType": "concept",
+          "contentType": "routine_recall"
+        }
+      ],
+      "reaching": [
+        {
+          "q": "The eyepiece lens is ×10 and the objective lens is ×10. What is the total magnification?",
+          "a": "10 × 10 = ×100.",
+          "marks": 1,
+          "qType": "calculation",
+          "contentType": "known_procedure"
+        },
+        {
+          "q": "The field of view is 2 mm across and 8 onion cells fit across it. Calculate the length of one cell in micrometres.",
+          "a": "2 mm = 2000 µm. 2000 ÷ 8 = 250 µm.",
+          "marks": 3,
+          "qType": "calculation",
+          "contentType": "known_procedure",
+          "given": "field of view = 2 mm, 8 cells across",
+          "unknown": "length of one cell (µm)",
+          "equation": "length of one cell = length of field of view ÷ number of cells",
+          "substitute": "2000 µm ÷ 8",
+          "solve": "250 µm",
+          "units": "µm"
+        },
+        {
+          "q": "Explain why you should always start with the lowest power objective lens.",
+          "a": "It shows the largest area, so the cells are easier to find and focus, and the lens is further from the slide so it is less likely to hit it.",
+          "marks": 2,
+          "qType": "explain",
+          "contentType": "known_procedure"
+        }
+      ],
+      "mastering": [
+        {
+          "q": "Describe how to prepare a slide of onion cells and view them clearly with a light microscope. (6 marks)",
+          "a": "Put a drop of water on a slide. Peel a thin layer of onion skin and lay it flat in the water with forceps. Add iodine to stain it. Lower a coverslip at an angle to avoid air bubbles. Put the slide on the stage, use the lowest power objective and bring the lens close while looking from the side. Focus with the coarse then fine knob, then move to a higher power and refocus with the fine knob.",
+          "marks": 6,
+          "qType": "extended",
+          "contentType": "unfamiliar_context",
+          "indicativeContent": [
+            "Put a drop of water on a clean slide",
+            "Peel a thin layer of onion skin and lay it flat with forceps",
+            "Stain with iodine",
+            "Lower the coverslip at an angle to avoid air bubbles",
+            "Start with the lowest power objective, bringing the lens close while looking from the side",
+            "Focus with the coarse then fine knob, then switch to higher power and use only the fine knob"
+          ]
+        },
+        {
+          "q": "A student's drawing of onion cells is shaded in and has no title. Give two improvements and explain why a scale bar is useful.",
+          "a": "Use clear single lines with no shading; add a title and the magnification. A scale bar shows the real size of the cells whatever size the drawing is printed.",
+          "marks": 3,
+          "qType": "explain",
+          "contentType": "unfamiliar_context"
+        },
+        {
+          "q": "Compare an onion cell with a bacterial cell. Give three differences.",
+          "a": "The onion cell has a nucleus, the bacterium does not; the bacterium has its DNA as a loop free in the cytoplasm and may have plasmids; the onion cell is much bigger (about 250 µm compared with 1 to 5 µm).",
+          "marks": 3,
+          "qType": "explain",
+          "contentType": "unfamiliar_context"
+        }
+      ]
+    },
+    "worksheetExtras": {
+      "results": {
+        "headers": [
+          "Magnification",
+          "Length of field of view (µm)",
+          "Number of cells across",
+          "Length of one cell (µm)"
+        ],
+        "rows": [
+          [
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "",
+            "",
+            "",
+            ""
+          ]
+        ]
+      }
+    }
+  }
+]
