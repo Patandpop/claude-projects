@@ -379,6 +379,35 @@
     }
     return cells;
   }
+  // The technicians' order sheet as plain data (Patryk 2026-10-08: no template needed; Code.gs draws it).
+  // days[0..4].slots[0..4] = one box per period: room, class, lesson, kit, class size, number of sets.
+  function setsCount(s, size) {
+    if (!s || !s.sets || !size) return '';
+    if (s.sets === 'demo') return 1;
+    return Math.ceil(size / (s.sets === 'pairs' ? 2 : 3));
+  }
+  function sheetModel(data, week) {
+    const mon = parse(week.monday);
+    const days = [];
+    for (let day = 0; day < 5; day++) {
+      const date = addDays(mon, day);
+      const slots = [];
+      for (let period = 1; period <= 5; period++) {
+        const s = week.slots.find((x) => x.day === day && x.period === period && x.cls);
+        if (!s) { slots.push(null); continue; }
+        const size = (data.classes[s.cls] || {}).size || '';
+        const kit = !s.eq || /^n\/?a$/i.test(s.eq) ? '' : s.eq;
+        const extra = [s.print && !/^n\/?a$/i.test(s.print) ? 'Print: ' + s.print : '', s.book ? 'Books: ' + s.book : ''].filter(Boolean);
+        slots.push({
+          room: 'S8', cls: s.cls, lesson: lessonCell(data, s),
+          kit: kit || (extra.length ? '' : 'Nothing needed'), extra: extra.join('\n'),
+          size, sets: setsCount(s, size), setsLabel: setsLabel(s.sets),
+        });
+      }
+      days.push({ name: DAYS[day], date: date.getDate() + ' ' + date.toLocaleDateString('en-GB', { month: 'short' }), slots });
+    }
+    return { letter: week.letter, monday: week.monday.split('-').reverse().join('/'), days };
+  }
   function printList(data, week) {
     const out = [];
     for (const s of week.slots) {
@@ -446,6 +475,6 @@
   }
 
   const api = { revisionSlot, unitBefore, applyAdded, addedNum, remapWeek, lessonId, applyMarks, classReport, topicList, wouldSkip, setSlot, markLesson, refillClass, planFrom, periodTime, calendarEvents, DAYS, iso, parse, addDays, mondayOf, isTeachingDay, weekLetter, progressBefore, next, autofill, moveSlot, refillAfter,
-    lessonSlot, testSlot, sheetCells, printList, buildPrompt, carryForward, equipCell, lessonCell, setsLabel };
+    lessonSlot, testSlot, sheetCells, sheetModel, setsCount, printList, buildPrompt, carryForward, equipCell, lessonCell, setsLabel };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.PlannerLogic = api;
 })(typeof window !== 'undefined' ? window : this);

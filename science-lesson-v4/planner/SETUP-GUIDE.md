@@ -87,17 +87,9 @@ The files are plain text: you'll open each one and copy what's inside.
 2. Click **⋯ More → Import data** (top right) and choose **planner-data.json**.
 3. The week appears, already planned, starting from the first week after the sheets you filled in Planner.xlsx.
 
-## Part 7 (optional): the Technicians' Excel button
+## Part 7: nothing to do any more
 
-This makes the button download your order sheet in exactly the layout the technicians know.
-1. Upload **Planner.xlsx** to your school Drive.
-2. In Drive, right-click it → **Open with → Google Sheets**.
-3. At the bottom, right-click one of your **filled** order-sheet tabs (e.g. "Order Sheet Week A - Oct 5") → **Copy to → New spreadsheet** → open it.
-4. Look at the address bar: `https://docs.google.com/spreadsheets/d/`**`1AbC...xyz`**`/edit`. Copy the long code between `/d/` and `/edit`.
-5. Back in Apps Script, click **⚙ Project Settings** on the far left. Scroll to **Script properties → Add script property**.
-   - Property: `TEMPLATE_ID`
-   - Value: the long code
-   - Click **Save script properties**.
+The **Technicians' Excel** button now draws the order sheet itself (same boxes: room, class, lesson, kit, class size, number of sets; set to print on one landscape A4 page). No template, no TEMPLATE_ID. If you set TEMPLATE_ID before, it is simply ignored.
 
 ## Part 8: link home and school (do this once, at home)
 
@@ -151,6 +143,7 @@ The mailbox can only read and write files in `Beechen Cliff Science / Admin / Pl
 | save | nothing to do: changes save by themselves ("All changes saved", top right). Ctrl+S saves straight away |
 | jump to a date | the date box in the top bar, **Today**, or ◀ ▶ |
 | one day only | **Day**, or click a day's name. **Week** goes back |
+| a review lesson at the end of a topic | click the period, then under the topic list **★ Review lesson for this topic, built by Claude**. It goes in this period and Claude builds it at home from that topic's lessons ("do my planner requests") |
 | one day at a time | in **Day** view, ◀ ▶ go back or forward one school day (Friday → Monday) |
 | ask Claude for something | **⋯ More → Send to Claude**: tick this week's unbuilt lessons and/or type a message. Or click a lesson → **Ask Claude to build**. At home, tell Claude Code "do my planner requests" |
 | shortcuts | press **?** |

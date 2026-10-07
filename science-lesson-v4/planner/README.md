@@ -59,3 +59,4 @@ Then in the planner, click **Import data** and pick `planner/planner-data.json`.
   - "refresh the planner data" = `node science-lesson/references/planner-catalogue.js --export planner/planner-data.json` then `node planner/planner-sync.js push`.
   - "do my planner requests" = `node planner/planner-sync.js requests`, build each one (normal lesson build), then `node planner/planner-sync.js done <id> "<what was done>"`.
   - `node planner/planner-sync.js state` = what the school planner last saved. `node planner/test-mailbox.js` simulates both scripts against a fake Drive.
+- **Order sheet (2026-10-08):** no template. `logic.js sheetModel()` → `Code.gs exportXlsx()` draws it in a temporary Sheet (bins only that file), and `onePage_()` edits the .xlsx for landscape A4 fit-to-one-page. `node planner/test-ordersheet.js` checks it against a fake Sheet.

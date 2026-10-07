@@ -273,22 +273,109 @@ function myEvents(k, monday) {
   }).filter((e) => e.day >= 0 && e.day < 5);
 }
 
-// Fill a copy of his real order-sheet tab and hand back an .xlsx (same layout the technicians know).
-function exportXlsx(k, cells, title) {
+/* ---------------------------------------------------------- technicians' order sheet
+   Patryk 2026-10-08: no template to set up any more. The planner draws the sheet itself in a
+   temporary Google Sheet, downloads it as .xlsx, then bins the temporary copy (its own file only).
+   Same boxes the technicians know (per day and period: room, class, lesson, kit, class size,
+   number of sets), with more room for the kit and set to print on ONE landscape A4 page. */
+const OS = { font: 'Arial', line: '#000000', head: '#d9d9d9', sub: '#f2f2f2', lesson: '#eaf1fb' };
+
+function exportXlsx(k, model, title) {
   check_(k);
-  const id = PropertiesService.getScriptProperties().getProperty('TEMPLATE_ID');
-  if (!id) throw new Error('No order-sheet template set yet (see README: TEMPLATE_ID).');
-  const copy = DriveApp.getFileById(id).makeCopy(title);
+  const ss = SpreadsheetApp.create(title);
+  const file = DriveApp.getFileById(ss.getId());
   try {
-    const ss = SpreadsheetApp.openById(copy.getId());
     const sh = ss.getSheets()[0];
-    sh.setName(title.slice(0, 99));
-    cells.forEach((c) => sh.getRange(c.addr).setValue(c.value));
+    sh.setName('Order sheet');
+    drawOrderSheet_(sh, model);
     SpreadsheetApp.flush();
-    const url = 'https://docs.google.com/spreadsheets/d/' + copy.getId() + '/export?format=xlsx';
+    const url = 'https://docs.google.com/spreadsheets/d/' + ss.getId() + '/export?format=xlsx';
     const blob = UrlFetchApp.fetch(url, { headers: { Authorization: 'Bearer ' + ScriptApp.getOAuthToken() } }).getBlob();
-    return { name: title + '.xlsx', b64: Utilities.base64Encode(blob.getBytes()) };
+    return { name: title + '.xlsx', b64: Utilities.base64Encode(onePage_(blob, title).getBytes()) };
   } finally {
-    copy.setTrashed(true);
+    file.setTrashed(true);   // the temporary sheet this function just made, nothing else
   }
+}
+
+function drawOrderSheet_(sh, m) {
+  const COLS = 21, ROWS = 2 + 5 * 5;
+  sh.getRange(1, 1, sh.getMaxRows(), sh.getMaxColumns()).clearFormat();
+  if (sh.getMaxColumns() > COLS) sh.deleteColumns(COLS + 1, sh.getMaxColumns() - COLS);
+  if (sh.getMaxRows() > ROWS) sh.deleteRows(ROWS + 1, sh.getMaxRows() - ROWS);
+  const all = sh.getRange(1, 1, ROWS, COLS);
+  all.setFontFamily(OS.font).setFontSize(9).setVerticalAlignment('middle').setWrap(true);
+
+  sh.setColumnWidth(1, 30);
+  for (let p = 0; p < 5; p++) [44, 56, 44, 56].forEach((w, i) => sh.setColumnWidth(2 + p * 4 + i, w));
+
+  // title row
+  sh.setRowHeight(1, 24);
+  sh.getRange(1, 1, 1, 13).merge().setValue('Patryk Tomczynski · Science order sheet · Room S8').setFontSize(12).setFontWeight('bold');
+  sh.getRange(1, 14, 1, 8).merge().setValue('Week ' + m.letter + '  ·  w/c ' + m.monday).setFontSize(12).setFontWeight('bold').setHorizontalAlignment('right');
+  // period headings
+  sh.setRowHeight(2, 18);
+  sh.getRange(2, 1).setValue('Day').setFontWeight('bold').setHorizontalAlignment('center').setBackground(OS.head);
+  for (let p = 0; p < 5; p++) {
+    sh.getRange(2, 2 + p * 4, 1, 4).merge().setValue('Period ' + (p + 1)).setFontWeight('bold').setFontSize(10)
+      .setHorizontalAlignment('center').setBackground(OS.head);
+  }
+
+  m.days.forEach((d, di) => {
+    const r = 3 + di * 5;
+    [15, 18, 32, 96, 18].forEach((h, i) => sh.setRowHeight(r + i, h));
+    sh.getRange(r, 1, 5, 1).merge().setValue(d.name + ' ' + d.date).setFontWeight('bold').setFontSize(10)
+      .setHorizontalAlignment('center').setTextRotation(90).setBackground(OS.sub);
+    d.slots.forEach((s, p) => {
+      const c = 2 + p * 4;
+      sh.getRange(r, c, 1, 4).merge().setValue(d.name + ' ' + d.date + ' · P' + (p + 1))
+        .setFontSize(8).setFontColor('#555555').setHorizontalAlignment('center').setBackground(OS.sub);
+      sh.getRange(r + 1, c, 1, 4).setValues([['Room:', s ? s.room : '', 'Class:', s ? s.cls : '']]);
+      sh.getRange(r + 1, c + 1).setFontWeight('bold');
+      sh.getRange(r + 1, c + 3).setFontWeight('bold').setFontSize(10);
+      sh.getRange(r + 2, c, 1, 4).merge().setValue(s ? s.lesson : '').setFontWeight('bold').setFontSize(10)
+        .setHorizontalAlignment('center').setBackground(s ? OS.lesson : null);
+      const kitCell = sh.getRange(r + 3, c, 1, 4).merge().setHorizontalAlignment('center');
+      if (s) {
+        const text = [s.kit, s.extra].filter(Boolean).join('\n');
+        // kit in 10 pt; the "Print: / Books:" line underneath in smaller italics
+        const rt = SpreadsheetApp.newRichTextValue().setText(text || ' ');
+        const from = s.extra ? text.length - s.extra.length : text.length;
+        if (from > 0) rt.setTextStyle(0, from, SpreadsheetApp.newTextStyle().setFontSize(10).build());
+        if (from < text.length) rt.setTextStyle(from, text.length, SpreadsheetApp.newTextStyle().setFontSize(8).setItalic(true).build());
+        kitCell.setRichTextValue(rt.build());
+      }
+      sh.getRange(r + 4, c, 1, 4).setValues([['Class size:', s ? s.size : '', 'No. of sets:', s && s.sets !== '' ? (s.sets + (s.setsLabel ? ' (' + s.setsLabel + ')' : '')) : '']]);
+      sh.getRange(r + 4, c + 1).setFontWeight('bold').setHorizontalAlignment('center');
+      sh.getRange(r + 4, c + 3).setFontWeight('bold').setFontSize(8);
+      [r + 1, r + 4].forEach((rr) => { sh.getRange(rr, c).setFontColor('#555555'); sh.getRange(rr, c + 2).setFontColor('#555555'); });
+      // box: thin lines inside, a thick line round each period
+      sh.getRange(r, c, 5, 4).setBorder(true, true, true, true, null, true, OS.line, SpreadsheetApp.BorderStyle.SOLID)
+        .setBorder(true, true, true, true, null, null, OS.line, SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
+    });
+    sh.getRange(r, 1, 5, COLS).setBorder(true, true, true, true, null, null, OS.line, SpreadsheetApp.BorderStyle.SOLID_THICK);
+  });
+  sh.getRange(1, 1, 2, COLS).setBorder(null, null, true, null, null, null, OS.line, SpreadsheetApp.BorderStyle.SOLID_THICK);
+  sh.setFrozenRows(2);
+}
+
+// Sheets can't set print options, so set them in the .xlsx itself: landscape A4, fitted to one page,
+// narrow margins. If anything about the file is unexpected it is returned unchanged.
+function onePage_(blob, title) {
+  try {
+    const parts = Utilities.unzip(blob.setContentType('application/zip'));
+    const ws = parts.find((b) => /^xl\/worksheets\/sheet1\.xml$/.test(b.getName()));
+    if (!ws) return blob;
+    let x = ws.getDataAsString();
+    const fit = '<pageSetUpPr fitToPage="1"/>';
+    if (/<sheetPr\b[^>]*\/>/.test(x)) x = x.replace(/<sheetPr\b([^>]*)\/>/, '<sheetPr$1>' + fit + '</sheetPr>');
+    else if (/<sheetPr\b/.test(x)) x = x.replace('</sheetPr>', fit + '</sheetPr>');
+    else x = x.replace(/(<worksheet\b[^>]*>)/, '$1<sheetPr>' + fit + '</sheetPr>');
+    x = x.replace(/<pageMargins\b[^>]*\/>/, '').replace(/<pageSetup\b[^>]*\/>/, '');
+    const page = '<pageMargins left="0.25" right="0.25" top="0.3" bottom="0.3" header="0" footer="0"/>' +
+      '<pageSetup paperSize="9" orientation="landscape" fitToWidth="1" fitToHeight="1"/>';
+    const after = x.search(/<(headerFooter|rowBreaks|colBreaks|drawing|legacyDrawing|tableParts|extLst)\b|<\/worksheet>/);
+    x = x.slice(0, after) + page + x.slice(after);
+    const out = parts.map((b) => (b === ws ? Utilities.newBlob(x, 'application/xml', b.getName()) : b));
+    return Utilities.zip(out, title + '.xlsx');
+  } catch (e) { return blob; }
 }

@@ -436,7 +436,7 @@ function unitOptions(cls) {
   });
 }
 // The lesson chooser. pos = {day, period} of the slot; curI = the lesson in it now (or null).
-function chooser(cls, pos, curI, onPick) {
+function chooser(cls, pos, curI, onPick, onReview) {
   const c = S.data.classes[cls]; if (!c) return;
   const units = unitOptions(cls);
   const def = curI != null && c.seq[curI] ? c.seq[curI].unit : ((units.find((u) => u.state === 'current') || units.find((u) => u.state !== 'finished') || units[0]) || {}).unit;
@@ -446,6 +446,7 @@ function chooser(cls, pos, curI, onPick) {
     '<input type="text" id="q" placeholder="or search every topic, e.g. heart" style="margin-top:6px">' +
     '<div class="lessonlist" id="qr"></div>' +
     '<button class="newles" id="newLes">+ New lesson in this topic (not in the list)</button>' +
+    (onReview ? '<button class="newles" id="revLes" title="Puts a review lesson here and asks Claude to build it from this topic\'s lessons">★ Review lesson for this topic, built by Claude</button>' : '') +
     '<div class="muted" style="margin-top:4px">Click a lesson to put it here. Tick = already taught or you won\'t teach it (it won\'t be planned). Untick a wrong tick and it gets planned.</div>';
   const row = (o, topic) => {
     const here = o.k === curI;
@@ -487,6 +488,7 @@ function chooser(cls, pos, curI, onPick) {
   };
   $('cUnit').onchange = () => { S.chooser.unit = $('cUnit').value; $('q').value = ''; draw(); };
   $('newLes').onclick = () => newLesson(cls, S.chooser.unit, pos, onPick);
+  if (onReview) $('revLes').onclick = () => onReview(S.chooser.unit);
   $('q').oninput = draw;
   draw();
 }
@@ -558,6 +560,33 @@ function revisionOrTest(kind, s, put) {
   $('rtOk').onclick = () => {
     const u = $('rtUnit').value; closeModal();
     put(kind === 'test' ? P.testSlot(S.data, s.cls, u) : P.revisionSlot(S.data, s.cls, u), label + ' set', kind === 'test' ? 'A test now' : 'A revision lesson now');
+  };
+}
+// End of a topic (Patryk 2026-10-08): a review lesson in this period, built by Claude at home from the
+// topic's own lessons (their Apply questions, Do Nows and exam questions), sent through the mailbox.
+function reviewLesson(s, unit, put) {
+  const c = S.data.classes[s.cls];
+  const ls = c.seq.filter((L) => L.unit === unit);
+  if (!ls.length) return;
+  const topic = ls[0].topic;
+  modal('<h3>Review lesson: ' + esc(topic) + '</h3>' +
+    '<p>Puts a review lesson for <b>' + esc(s.cls) + '</b> in ' + P.DAYS[s.day] + ' P' + s.period + ' (this period\'s lesson moves on) and asks Claude to build it at home from this topic\'s ' + ls.length + ' lessons: their Apply questions, Do Nows and real exam questions.</p>' +
+    '<label>Anything to focus on (optional)</label><input type="text" id="rvNote" placeholder="e.g. lots of 6-markers, they struggled with osmosis">' +
+    '<div class="row"><button class="primary" id="rvOk">Put it here and ask Claude</button><button id="rvCancel">Cancel</button></div>');
+  $('rvCancel').onclick = closeModal;
+  $('rvOk').onclick = () => {
+    const note = $('rvNote').value.trim(); closeModal();
+    put(P.revisionSlot(S.data, s.cls, unit), 'Review lesson set', 'A review lesson now');
+    const when = P.DAYS[s.day] + ' ' + P.addDays(S.monday, s.day).toLocaleDateString('en-GB', { day:'numeric', month:'short' }) + ' P' + s.period;
+    const folder = (ls.find((L) => L.rel) || {}).rel;
+    const prompt = ['Make a REVIEW lesson (lessonType "review") for ' + s.cls + ' (Year ' + c.year + ') on ' + topic + '.',
+      'Build it from this topic\'s own lessons: their Apply questions, Do Now questions and the real exam questions, with model answers.',
+      'Lessons in the topic: ' + ls.map((L) => 'L' + L.num + ' ' + L.title).join('; ') + '.',
+      folder ? 'Drive topic folder: Lessons/' + folder.split('/').slice(0, -1).join('/') : '',
+      note ? 'Focus: ' + note : ''].filter(Boolean).join(String.fromCharCode(10));
+    run('sendRequest', { kind: 'build', text: '', lessons: [{ when, cls: s.cls, prompt }] })
+      .then(() => toast('Review lesson asked for. At home say "do my planner requests"'))
+      .catch((e) => toast('Review lesson set, but not sent to Claude: ' + e.message));
   };
 }
 function addPanel(day, period) {
@@ -632,7 +661,7 @@ function editor() {
     if (k === s.i && s.kind === 'lesson') return;
     const L = c.seq[k];
     put(P.lessonSlot(S.data, s.cls, k, S.learned), 'L' + L.num + ' ' + L.title + ' put in', 'Moving ' + s.cls + ' on to ' + L.topic);
-  });
+  }, (unit) => reviewLesson(s, unit, put));
   $('kTest').onclick = () => revisionOrTest('test', s, put);
   $('kRev').onclick = () => revisionOrTest('revision', s, put);
   // Cover: either the cover teacher teaches THIS lesson (it counts as taught) or the class does
@@ -756,10 +785,9 @@ item('mPrint', () => {
   $('mClose').onclick = closeModal;
 });
 item('mXlsx', () => {
-  if (!S.hasTemplate) { modal('<h3>One-time setup needed</h3><p>The Excel button needs your order-sheet template. See Part 7 of the setup guide.</p><div class="row"><button id="mClose">Close</button></div>'); $('mClose').onclick = closeModal; return; }
   const title = 'Order Sheet Week ' + S.week.letter + ' - ' + S.monday.toLocaleDateString('en-GB', { month:'short' }) + ' ' + S.monday.getDate();
   status('Making the Excel file...');
-  run('exportXlsx', P.sheetCells(S.data, S.week), title).then((r) => {
+  run('exportXlsx', P.sheetModel(S.data, S.week), title).then((r) => {
     const bytes = Uint8Array.from(atob(r.b64), (ch) => ch.charCodeAt(0));
     const a = document.createElement('a');
     a.href = URL.createObjectURL(new Blob([bytes], { type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }));
@@ -828,7 +856,10 @@ function onLoad(r) {
   }
   if (!S.data) { status('No data yet: More → Import data, pick planner-data.json'); $('grid').innerHTML = ''; editor(); return; }
   if (!S.data.periodTimes || !S.data.filled) { status('Old data file: ask Claude to refresh the planner data, then More → Import data'); return; }
-  loadWeek(S.monday || firstPlanMonday()); markGaps(); render();
+  // Patryk 2026-10-08: open on THIS week (at the weekend, next week); today's day in Day view.
+  const t = todayMidnight(), wd = t.getDay();
+  if (!S.monday) S.day = wd >= 1 && wd <= 5 ? wd - 1 : 0;
+  loadWeek(S.monday || P.mondayOf(wd === 0 ? P.addDays(t, 1) : wd === 6 ? P.addDays(t, 2) : t)); markGaps(); render();
   const sy = r.sync || {};
   if (sy.pulled) toast('New lesson data from home loaded');
   else if (sy.error) status('Home link not working: ' + sy.error);

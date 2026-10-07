@@ -1,0 +1,63 @@
+// node planner/test-ordersheet.js — runs the order-sheet drawing in Code.gs against a fake Google Sheet
+// (every call is recorded) and checks the one-page print settings, so mistakes show up before pasting.
+'use strict';
+const fs = require('fs');
+const path = require('path');
+const vm = require('vm');
+const P = require('./logic.js');
+
+let fails = 0;
+const check = (c, m) => { console.log((c ? '  ✓ ' : '  ✗ ') + m); if (!c) fails++; };
+
+const values = {}, merges = [], calls = [];
+const A = (c) => String.fromCharCode(64 + c);
+function range(r, c, nr, nc) {
+  const self = new Proxy({}, { get(_, k) {
+    if (k === 'merge') return () => { merges.push(A(c) + r + ':' + A(c + (nc || 1) - 1) + (r + (nr || 1) - 1)); return self; };
+    if (k === 'setValue') return (v) => { values[A(c) + r] = v; return self; };
+    if (k === 'setValues') return (vv) => { vv.forEach((row, i) => row.forEach((v, j) => { values[A(c + j) + (r + i)] = v; })); return self; };
+    if (k === 'setRichTextValue') return (v) => { values[A(c) + r] = v.text; return self; };
+    return (...a) => { calls.push(k); return self; };
+  } });
+  return self;
+}
+const sheet = {
+  getRange: (r, c, nr, nc) => range(r, c, nr, nc), getMaxRows: () => 1000, getMaxColumns: () => 26,
+  deleteColumns() {}, deleteRows() {}, setColumnWidth() {}, setRowHeight() {}, setFrozenRows() {}, setName() {},
+};
+const builder = () => { const b = { text: '', setText(t) { b.text = t; return b; }, setTextStyle() { return b; }, build() { return { text: b.text }; } }; return b; };
+const ctx = vm.createContext({
+  SpreadsheetApp: { newRichTextValue: builder, newTextStyle: () => new Proxy({}, { get: (_, k) => (k === 'build' ? () => ({}) : function () { return this; }) }), BorderStyle: {} },
+  PropertiesService: { getScriptProperties: () => ({ getProperty: () => null }) },
+  JSON, Date, String, Object, Error, Math,
+});
+vm.runInContext(fs.readFileSync(path.join(__dirname, 'Code.gs'), 'utf8'), ctx);
+
+console.log('── technicians\' order sheet');
+const data = require('./planner-data.json');
+const week = P.autofill(data, {}, P.parse('2026-10-12'), {});
+const model = P.sheetModel(data, week);
+ctx.drawOrderSheet_(sheet, model);
+check(/Week B/.test(values.N1), 'title row shows the week letter and date');
+check(values.B2 === 'Period 1' && values.R2 === 'Period 5', 'period headings 1 to 5');
+check(values.A3 === 'Mon 12 Oct' && values.A23 === 'Fri 16 Oct', 'a day label for each day');
+const mon1 = model.days[0].slots[0];
+check(values.E4 === mon1.cls && values.B5 === mon1.lesson, 'Monday P1: class and lesson in the right boxes');
+check(String(values.B6).startsWith(mon1.kit), 'Monday P1: kit in the big box');
+check(values.C7 === mon1.size && String(values.E7).startsWith(String(mon1.sets)), 'Monday P1: class size and number of sets');
+check(merges.includes('A3:A7') && merges.includes('B6:E6'), 'day label and kit boxes are merged');
+check(model.days.every((d) => d.slots.length === 5), 'every day has 5 period boxes (blank when free)');
+
+// one-page print settings in the downloaded file
+const xml = '<?xml version="1.0"?><worksheet xmlns="x"><sheetPr><outlinePr summaryBelow="0"/></sheetPr><sheetData/><pageMargins left="1" right="1" top="1" bottom="1" header="0" footer="0"/><drawing r:id="d"/></worksheet>';
+const blobOf = (name, s) => ({ getName: () => name, getDataAsString: () => s, setContentType() { return this; } });
+let zipped = null;
+ctx.Utilities = { unzip: () => [blobOf('xl/worksheets/sheet1.xml', xml), blobOf('xl/workbook.xml', '')], newBlob: (s, t, n) => blobOf(n, s), zip: (b) => { zipped = b; return 'zip'; } };
+ctx.onePage_(blobOf('a', ''), 't');
+const out = zipped && zipped[0].getDataAsString();
+check(out && /<sheetPr><outlinePr[^>]*\/><pageSetUpPr fitToPage="1"\/><\/sheetPr>/.test(out), 'fit-to-page switched on');
+check(out && /orientation="landscape"/.test(out) && /fitToHeight="1"/.test(out) && out.indexOf('<pageSetup') < out.indexOf('<drawing'), 'landscape A4 on one page, in the right place in the file');
+check(out && (out.match(/<pageMargins/g) || []).length === 1, 'old margins replaced, not duplicated');
+
+console.log(fails ? `FAILED ${fails}` : 'order sheet: all checks pass');
+process.exit(fails ? 1 : 0);
