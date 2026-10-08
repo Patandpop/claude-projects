@@ -113,6 +113,8 @@
   .lrow.taught .t, .lrow.done .t { color:var(--muted); }
   .lrow.taught .num, .lrow.done .num { color:var(--green); }
   .lrow.taught small, .lrow.done small { color:var(--green); }
+  .lrow.skipped .t { color:var(--muted); text-decoration:line-through; }
+  .skipB { margin-left:6px; padding:1px 7px; font-size:11px; border-radius:10px; }
   .lrow.next { box-shadow:inset 3px 0 0 var(--gold); }
   .lrow.here { background:color-mix(in srgb, var(--gold) 15%, var(--panel)); }
   .lrow.optional .t { font-style:italic; color:var(--muted); }
@@ -226,15 +228,24 @@ function filledWeek(mon) {
 }
 function loadWeek(mon) {
   S.monday = P.mondayOf(mon); S.sel = -1; S.undo = []; S.dirty = false; S.mine = null; S.chooser = {};
+  // Patryk 2026-10-08: every week can be changed, past and future, and the planner is the record.
+  // A Planner.xlsx week opens as an ordinary week (its lessons pinned); his edits replace it.
   const saved = S.weeks[P.iso(S.monday)];
-  const filled = filledWeek(S.monday);
-  S.readOnly = !!filled;
-  S.week = filled || (saved ? JSON.parse(JSON.stringify(saved)) : P.autofill(S.data, S.weeks, S.monday, S.learned));
+  const fromXlsx = !saved && !!(S.data.filled || {})[P.iso(S.monday)];
+  S.readOnly = false;
+  let w = saved ? JSON.parse(JSON.stringify(saved)) : fromXlsx ? P.fromFilled(S.data, S.monday) : P.autofill(S.data, S.weeks, S.monday, S.learned);
+  // this week and later weeks follow any change made earlier: periods not placed by hand move along
+  const thisMon = P.mondayOf(todayMidnight());
+  if (saved && S.monday >= thisMon) {
+    const fromDay = P.iso(S.monday) === P.iso(thisMon) ? Math.max(0, (todayMidnight().getDay() + 6) % 7) : 0;
+    w = P.reflowWeek(S.data, S.weeks, w, S.learned, fromDay);
+  }
+  S.week = w;
   S.week.extras = S.week.extras || []; S.week.marks = S.week.marks || [];
-  status(filled ? 'Already taught (from your Planner.xlsx)' : saved ? 'Saved' : 'Planned automatically (saves when you change something)');
+  status(fromXlsx ? 'From your Planner.xlsx: change anything, it saves as you go' : saved ? 'Saved' : 'Planned automatically (saves when you change something)');
   $('jump').value = P.iso(S.monday);
   render(); editor();
-  if (S.showMine && !filled) loadMine();
+  if (S.showMine) loadMine();
 }
 let saveTimer = null;
 // quiet: a detail edit (equipment, notes): redraw the grid only, so the box being typed in stays put
@@ -372,7 +383,7 @@ function renderClasses() {
         const core = r.lessons.filter((l) => !l.optional);
         const done = core.filter((l) => l.done).length;
         return '<div class="topic"><div class="tt">' + esc(r.topic) + ' <span>' + r.state + (r.tested ? ', tested' : r.revised ? ', revised' : '') + ' · ' + done + '/' + core.length + '</span></div>' +
-          '<div class="les-list">' + r.lessons.map((l) => '<span class="lp ' + (l.done ? 'done' : l.optional ? 'opt' : r.state === 'current' ? 'miss' : r.state === 'finished' ? 'skip' : '') +
+          '<div class="les-list">' + r.lessons.map((l) => '<span class="lp ' + (l.skipped ? 'opt' : l.done ? 'done' : l.optional ? 'opt' : r.state === 'current' ? 'miss' : r.state === 'finished' ? 'skip' : '') +
             '" title="' + esc('L' + l.num + ' ' + l.title + (l.optional ? ' (optional)' : '') + (l.nofolder ? ' (no folder)' : '') + (l.done ? ' · ' + whenText(l.when) : r.state === 'finished' && !l.optional ? ' · NEVER TAUGHT (topic finished)' : '')) + '">L' + l.num + '</span>').join('') + '</div></div>';
       }).join('') + '</div>';
   }).join('') + '<div class="muted" style="grid-column:1/-1">Settings: open a class\'s settings to set its test papers and notes for Claude. Green = taught. Gold outline = still to teach in the topic you\'re on (the planner fills these first). Dashed = optional (only planned if you pick it). Red, crossed out = never taught in a topic you have finished: tick it in the lesson list if you did teach it. Hover a lesson number for its title and when it was taught. Counts are up to w/c ' + mon.toLocaleDateString('en-GB', { day:'numeric', month:'short' }) + '.</div>';
@@ -471,7 +482,7 @@ function chooser(cls, pos, curI, onPick, onReview) {
     '<div class="lessonlist" id="qr"></div>' +
     '<button class="newles" id="newLes">+ New lesson in this topic (not in the list)</button>' +
     (onReview ? '<button class="newles" id="revLes" title="Puts a review lesson here and asks Claude to build it from this topic\'s lessons">★ Review lesson for this topic, built by Claude</button>' : '') +
-    '<div class="muted" style="margin-top:4px">Click a lesson to put it here. Tick = already taught or you won\'t teach it (it won\'t be planned). Untick a wrong tick and it gets planned.</div>';
+    '<div class="muted" style="margin-top:4px">Click a lesson to put it here. Tick = taught. <b>skip</b> = you won\'t teach it. Untick, or undo a skip, and it goes back into the plan. Every week can be changed, past ones too.</div>';
   const row = (o, topic) => {
     const here = o.k === curI;
     const tags = [];
@@ -481,7 +492,10 @@ function chooser(cls, pos, curI, onPick, onReview) {
     if (o.optional) tags.push('<span class="tag opt">optional</span>');
     if (o.nofolder) tags.push('<span class="tag nof" title="In the technician guide, but there is no lesson folder on Drive">no folder</span>');
     else if (o.built === false) tags.push('<span class="tag nof">not built</span>');
-    const sub = o.state === 'done' ? '✓ taught ' + esc(fmtDate(o.when.date)) + ' this week · untick if it didn\'t happen' : o.state === 'taught' ? '✓ ' + esc(whenText(o.when)) : o.mark && o.mark.done === false ? 'you marked this NOT taught' : '';
+    const sub = o.state === 'skipped' ? 'skipped (won\'t be planned) · <a href="#" class="unskip" data-k="' + o.k + '">undo</a>'
+      : o.state === 'done' ? '✓ taught ' + esc(fmtDate(o.when.date)) + ' · untick if it didn\'t happen' : o.state === 'taught' ? '✓ ' + esc(whenText(o.when)) : o.mark && o.mark.done === false ? 'you marked this NOT taught' : '';
+    // Skip (2026-10-08): never planned, shown as skipped rather than taught
+    if (['todo', 'planned'].includes(o.state) && !o.optional) tags.push('<button class="skipB" data-k="' + o.k + '" title="Won\'t teach it: it is not planned, and shows as skipped">skip</button>');
     return '<div class="lrow ' + o.state + (o.next && !here ? ' next' : '') + (here ? ' here' : '') + (o.optional ? ' optional' : '') + '">' +
       '<input type="checkbox" class="tick" data-k="' + o.k + '"' + (o.state === 'taught' || o.state === 'done' ? ' checked' : '') + ' title="' + (o.state === 'done' ? 'Untick: it did not happen, so it moves to the next lesson' : o.state === 'taught' ? 'Untick: NOT taught after all, so it gets planned' : o.state === 'planned' ? 'Tick: already taught, so the rest of this week moves along' : 'Tick: already taught, or you won\'t teach it') + '">' +
       '<div class="body" data-k="' + o.k + '"><span class="num">L' + o.num + '</span><span class="t">' + esc(o.title) + '</span>' + tags.join('') +
@@ -498,7 +512,17 @@ function chooser(cls, pos, curI, onPick, onReview) {
         .slice(0, 40).map(({ o, u }) => row(o, u.text)).join('');
     }
     $('qr').innerHTML = html || '<div class="lrow muted">No lessons match</div>';
-    $('qr').querySelectorAll('.body').forEach((el) => el.onclick = () => onPick(+el.dataset.k));
+    $('qr').querySelectorAll('.body').forEach((el) => el.onclick = (e) => { if (e.target.closest('.skipB,.unskip')) return; onPick(+el.dataset.k); });
+    $('qr').querySelectorAll('.skipB').forEach((el) => el.onclick = (e) => {
+      e.stopPropagation(); const k = +el.dataset.k, L = c.seq[k];
+      const nw = P.markLesson(S.data, S.weeks, S.week, cls, k, true, S.learned, true);
+      change(nw, 'Skipped L' + L.num + ' ' + L.title + reflowNote(S.week, nw, cls, -1));
+    });
+    $('qr').querySelectorAll('.unskip').forEach((el) => el.onclick = (e) => {
+      e.preventDefault(); e.stopPropagation(); const k = +el.dataset.k, L = c.seq[k];
+      const nw = P.markLesson(S.data, S.weeks, S.week, cls, k, null, S.learned);
+      change(nw, 'L' + L.num + ' ' + L.title + ' is back in the plan' + reflowNote(S.week, nw, cls, -1));
+    });
     $('qr').querySelectorAll('.tick').forEach((el) => el.onchange = () => {
       const k = +el.dataset.k;
       const o = P.topicList(S.data, S.weeks, S.week, cls, c.seq[k].unit, pos, S.learned, P.iso(todayMidnight())).find((x) => x.k === k);
@@ -869,13 +893,15 @@ $('mkDay').onclick = async () => {
   let d = P.addDays(todayMidnight(), 1);
   while (d.getDay() === 0 || d.getDay() === 6) d = P.addDays(d, 1);
   const mon = P.mondayOf(d), day = (d.getDay() + 6) % 7;
-  const week = P.iso(mon) === S.week.monday ? S.week : (S.weeks[P.iso(mon)] || P.autofill(S.data, S.weeks, mon, S.learned));
+  // the same week the planner shows: saved, or a Planner.xlsx week as an editable week, or the plan
+  const week = P.iso(mon) === S.week.monday ? S.week : (S.weeks[P.iso(mon)] || P.fromFilled(S.data, mon) || P.autofill(S.data, S.weeks, mon, S.learned));
   const slots = week.slots.filter((s) => s.day === day && !s.double && ['lesson', 'revision'].includes(s.kind));
   const label = P.DAYS[day] + ' ' + d.getDate() + ' ' + d.toLocaleDateString('en-GB', { month: 'short' });
   if (!slots.length) { toast('No lessons to build on ' + label); return; }
   const rows = slots.map((s) => {
     const name = s.kind === 'lesson' ? 'L' + S.data.classes[s.cls].seq[s.i].num + ' ' + S.data.classes[s.cls].seq[s.i].title : P.lessonCell(S.data, s);
-    return '<label style="display:block;margin:3px 0"><input type="checkbox" class="mdReq" data-p="' + s.period + '"' + (s.built === true ? '' : ' checked') + '> P' + s.period + ' ' + esc(s.cls) + ' · ' + esc(name) + (s.built === true ? ' <span class="muted">(already built)</span>' : '') + '</label>';
+    // all ticked: a folder with slides in it may only hold the school's original deck
+    return '<label style="display:block;margin:3px 0"><input type="checkbox" class="mdReq" data-p="' + s.period + '" checked> P' + s.period + ' ' + esc(s.cls) + ' · ' + esc(name) + (s.built === true ? ' <span class="muted">(folder already has slides)</span>' : '') + '</label>';
   }).join('');
   modal('<h3>Make ' + label + '</h3><p class="muted">Ticked lessons go to Claude with their checklists and class notes. At home: "do my planner requests".</p>' + rows +
     '<label>Anything else for the day (optional)</label><input type="text" id="mdNote" placeholder="e.g. 9XS are in the lab, not S8">' +

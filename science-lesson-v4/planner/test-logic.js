@@ -159,6 +159,31 @@ if (fs.existsSync(DRIVE)) {
   ok(nw.slots[idx].kind === 'custom' && (!moved || moved.i === s0.i || later.length === 0), 'unticked ("did not happen"): the lesson moves into the class\'s next period, nothing is lost');
 }
 
+// 23. Patryk 2026-10-08: past weeks are editable and the planner is the record
+{
+  const lastF = data.filledWeeks.slice(-1)[0];
+  const fw = P.fromFilled(data, P.parse(lastF));
+  const lessonSlots = fw.slots.filter((s) => s.kind === 'lesson');
+  ok(fw && lessonSlots.length > 0 && fw.slots.every((s) => s.pinned), `a Planner.xlsx week (${lastF}) opens as a normal week: ${lessonSlots.length} lessons recognised, all pinned`);
+  // seen from the start of that week, its own lessons are not yet taught
+  const s0 = lessonSlots[0];
+  const before = P.progressBefore(data, {}, P.parse(lastF))[s0.cls];
+  ok(!before.taught.has(s0.i), 'looking at a past week: lessons taught that week or later do not count as taught yet');
+  // edit it: that lesson did not happen -> next week plans it again
+  const edited = P.notHappened(data, {}, fw, [fw.slots.indexOf(s0)], {});
+  const saved = { [lastF]: edited };
+  const nextMon = P.addDays(P.parse(lastF), 7);
+  const after = P.progressBefore(data, saved, nextMon)[s0.cls];
+  const nxt = P.autofill(data, saved, nextMon);
+  ok(!after.taught.has(s0.i) && nxt.slots.some((s) => s.cls === s0.cls && s.i === s0.i), 'changing a past week re-plans the next week (the lesson that did not happen comes back)');
+  // skip: never planned, shown as skipped
+  const wk = P.autofill(data, {}, nextMon);
+  const t = wk.slots.find((s) => s.kind === 'lesson');
+  const sk = P.markLesson(data, {}, wk, t.cls, t.i, true, {}, true);
+  const row = P.topicList(data, {}, sk, t.cls, data.classes[t.cls].seq[t.i].unit, { day: 0, period: 1 }, {}).find((o) => o.k === t.i);
+  ok(row.state === 'skipped' && !sk.slots.some((s) => s.cls === t.cls && s.i === t.i), 'skip: the lesson leaves the plan and shows as skipped');
+}
+
 // 22. 10C2 is Combined: no separate-only lessons (Patryk 2026-10-08)
 {
   const bad = data.classes['10C2'].seq.filter((L) => /\(separate\)|\btriple\b|\b(chem|phys|bio)(istry|ics|logy)?\s*only\b/i.test(L.title));
