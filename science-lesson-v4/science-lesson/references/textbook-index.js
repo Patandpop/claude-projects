@@ -103,17 +103,40 @@ function tokens(s) {
 // score a section title against the lesson's token set → {shared, strong}
 function scoreTitle(titleToks, lessonSet) {
   let shared = 0, strong = false;
-  for (const t of titleToks) if (lessonSet.has(t)) { shared++; if (t.length >= 5) strong = true; }
+  // 4+ letters is a real word match ("plug" in "Cables and plugs"; 2026-10-08, was 5+)
+  for (const t of titleToks) if (lessonSet.has(t)) { shared++; if (t.length >= 4) strong = true; }
   return { shared, strong };
 }
 
 const PAGE_GAP = 8; // sections of one chapter sit ~2 pages apart; >8 = a different chapter/subject
+const SAME_IDEA = [
+  [/air resistance|water resistance/i, 'drag'],
+  [/microscop/i, 'observing'],
+  [/\bplugs?\b|mains/i, 'cables plugs'],
+  [/half.?life/i, 'radioactive decay'],
+];
+// Lessons with no textbook content of their own (2026-10-08: "Introduction and Safety" got a random page).
+const NO_BOOK = /^(introduction\b|dirt\b|.*\b(assessment|test|revision|mock|baseline|feedback)\b)/i;
 function matchLesson(opts) {
   const o = opts || {};
-  const books = booksForYear(o.year, o.subject);
-  if (!books.length) return null;
+  if (NO_BOOK.test(String(o.topic || '').trim())) return null;
+  // The class's own book wins when it has any real match; another book only when the class's book has
+  // none (2026-10-08: Year 7 "Gas Pressure" was sent to Activate 2 although Activate 1 has it).
+  const all = booksForYear(o.year, o.subject), prim = primaryBook(o);
+  if (!all.length) return null;
+  if (prim && all.includes(prim)) {
+    const own = matchIn([prim], o);
+    if (own) return own;
+    const other = matchIn(all.filter((b) => b !== prim), o);
+    return other && other.score >= 2 ? other : null;
+  }
+  return matchIn(all, o);
+}
+function matchIn(books, o) {
   const idx = loadIndex(o.mdPath);
   const lessonSet = new Set([].concat(tokens(o.topic), ...(Array.isArray(o.keywords) ? o.keywords : [o.keywords]).map(tokens)));
+  // the books' words for the same idea (2026-10-08): "Air Resistance" is "Drag forces", microscopes are "Observing cells"
+  for (const [re, add] of SAME_IDEA) if (re.test(o.topic || '')) tokens(add).forEach((t) => lessonSet.add(t));
   if (!lessonSet.size) return null;
 
   // Best cluster = run of page-adjacent qualifying sections (one chapter), scored by
@@ -141,7 +164,7 @@ function matchLesson(opts) {
   if (!best) return null;
   const pages = best.sections.map((s) => s.page).sort((a, b) => a - b);
   const lo = pages[0], hi = pages[pages.length - 1];
-  return { book: best.book, pages: lo === hi ? [lo] : [lo, hi], sections: best.sections.map((s) => s.code) };
+  return { book: best.book, pages: lo === hi ? [lo] : [lo, hi], sections: best.sections.map((s) => s.code), score: best.score };
 }
 
 // resolve override (meta.textbookRef) → else auto-match.

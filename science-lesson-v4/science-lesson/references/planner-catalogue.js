@@ -48,6 +48,9 @@ const ROUTES = {
   '10C2': { seq: 'year10combined' }, '10S2': { seq: 'year10separate' }, '11S2': { seq: 'year11separate' },
   '12C': { ks5: 'year12' }, '13D': { ks5: 'year13' },
 };
+// Separate-science-only lessons, never planned for a Combined class (Patryk 2026-10-08, 10C2):
+// "(Separate)", "Triple", "Chem / Phys / Bio Only", "+ CHEM Only If Short on Time". Higher-tier lessons stay.
+const SEPARATE_ONLY = /\(separate\)|\btriple\b|\b(chem|phys|bio)(istry|ics|logy)?\s*only\b|\bseparate\s+only\b/i;
 const YEAR_OF = { year7: 7, year8: 8, year9: 9, year10combined: 10, year10separate: 10, year11separate: 11, year12: 12, year13: 13 };
 
 /* ------------------------------------------------------------- fuzzy matching */
@@ -210,7 +213,7 @@ function classSequence(cls, sol) {
     for (const l of merged) {
       const key = l.folder || `${dir}|${l.title}`;
       if (seen.has(key)) continue;
-      if (/\(separate\)/i.test(l.title) && /combined/.test(r.seq)) continue;   // separate-only content, Combined class
+      if (SEPARATE_ONLY.test(l.title) && /combined/.test(r.seq)) continue;   // separate-only content, Combined class
       seen.add(key);
       out.push({ year, subject: t.subject, topic: t.driveTopicFolder, unit: `${t.driveTopicFolder}#${block}`, ...l, source: l.folder ? 'drive' : 'guide' });
     }
@@ -220,6 +223,38 @@ function classSequence(cls, sol) {
 
 /* ------------------------------------------------------------------ equipment */
 const guideCache = new Map();
+// What always applies to a class, from class-defaults.json, so it goes with every request to Claude
+// without Patryk typing it (2026-10-08). He can replace it in the planner's Classes view.
+let CLASS_DEFAULTS = null;
+function classProfile(cls) {
+  if (CLASS_DEFAULTS === null) { try { CLASS_DEFAULTS = JSON.parse(fs.readFileSync(path.join(ROOT, 'class-defaults.json'), 'utf8')); } catch { CLASS_DEFAULTS = {}; } }
+  const c = (CLASS_DEFAULTS.classes || CLASS_DEFAULTS)[cls];
+  if (!c) return '';
+  const bits = [];
+  if (c.course) bits.push(c.course);
+  if (c.examBoard) bits.push(c.examBoard + (/OCR/.test(c.examBoard) ? ' only, never AQA questions' : ''));
+  if (c.patrykTeaches) bits.push('I teach ' + c.patrykTeaches.join(', '));
+  if (c.wordBank === true) bits.push('word bank on cloze tasks');
+  else if (c.wordBank === false) bits.push('no word bank');
+  return bits.join('; ');
+}
+// Does this topic have an end-of-topic test? (Patryk 2026-10-08: tests follow the scheme of learning.)
+// Years 7-11 keep one folder per topic in Admin/Assessment/Year N/<Subject>/, named by topic code
+// ("B1 Cells", "P4 Atomic Strucutre"), so the code decides. true = test folder found, false = none
+// (revision only, and it goes on the "missing tests" list), null = can't tell (Year 12-13 tests
+// span several chapters), so the planner keeps its usual revision + test.
+const ASSESS = 'G:/My Drive/Beechen Cliff Science/Admin/Assessment';
+const testDirs = {};
+function testFolder(year, topic) {
+  if (!year || year >= 12) return null;
+  const code = (String(topic).match(/^([BCP]\d+)\b/i) || [])[1];
+  if (!code) return false;
+  const subj = { B: 'Biology', C: 'Chemistry', P: 'Physics' }[code[0].toUpperCase()];
+  const dir = `${ASSESS}/Year ${year}/${subj}`;
+  if (!(dir in testDirs)) { try { testDirs[dir] = fs.readdirSync(dir); } catch { testDirs[dir] = null; } }
+  if (!testDirs[dir]) return null;                       // Drive not mounted: don't guess
+  return testDirs[dir].some((f) => new RegExp('^' + code + '\\b', 'i').test(f.trim()));
+}
 function techGuide(topicDir) {
   if (guideCache.has(topicDir)) return guideCache.get(topicDir);
   let rows = [];
@@ -291,6 +326,7 @@ const TYPO = { thermomter: 'thermometer', termometer: 'thermometer', conducitivi
 function tidyItem(x) {
   const raw = String(x);
   let s = raw
+    .replace(/\s*additionally to this list you will need\s*/i, ' ')
     .replace(/^(prac(tical)?|demo(nstration)?s?)\s*\d*\s*[:–-]\s*/i, '')
     .replace(/^[A-Z]\)\s*/, '')
     .replace(/\b(round|flat)[- ]bottom(ed)?\s+/gi, '')
@@ -338,9 +374,23 @@ function loFor(L) {
   for (const r of techGuide(path.dirname(L.folder))) { const sc = sim(r.title, L.title); if (sc > bs) { bs = sc; best = r; } }
   return best && bs >= 0.5 ? best.lo || '' : '';
 }
+// The guide's Worksheet column, tidied for the order sheet (Patryk 2026-10-08: "pink gcse physics"
+// kept appearing). Drops the pink-booklet prefix, splits run-on lists ("P6 L8 WS … P6 L8 WS2 …"),
+// and removes empty and repeated items. The words of each item are kept as the guide wrote them.
+function tidyPrint(text) {
+  if (!text || /^n\/?a$/i.test(text)) return text;
+  const s = String(text)
+    .replace(/\bpink\s+gcse\s+(physics\s+)?(req(uired)?\.?\s*prac(tical)?)\s*[-:–]?\s*/gi, '')
+    .replace(/\s+(?=[BCP]\d+\s+L\d+\s)/g, ', ')                    // "… P6 L8 WS2" -> ", P6 L8 WS2"
+    .replace(/\)(?=[BCP]\d+\s+L\d)/g, '), ')                          // "(F)P6 L3" -> "(F), P6 L3"
+    .replace(/(?<![BCP]\d{1,2})\s+(?=L\d+\s+(WS|Exam)\b)/g, ', ');
+  const seen = new Set();
+  return s.split(/\s*[,;]\s*/).map((x) => x.replace(/[.\s]+$/, '').trim())
+    .filter((x) => x && !/^n\/?a$/i.test(x) && !seen.has(x.toLowerCase()) && seen.add(x.toLowerCase())).join(', ');
+}
 function equipmentFor(lesson) {
   const e = equipmentFor0(lesson);
-  const printing = e.printing ? stripICT(e.printing) : e.printing;
+  const printing = e.printing ? tidyPrint(stripICT(e.printing)) : e.printing;
   const full = stripICT(e.equipment);
   const eq = e.source === 'remembered' ? full : conciseEquipment(full);
   // sets are judged on the kit INCLUDING bench kit (a Bunsen practical is still a pairs practical)
@@ -617,14 +667,14 @@ if (require.main === module) {
     const classes = {};
     for (const [cls, seq] of Object.entries(ctx.seqs)) {
       classes[cls] = {
-        year: seq[0] ? seq[0].year : null, size: SIZES[cls] || null,
+        year: seq[0] ? seq[0].year : null, size: SIZES[cls] || null, profile: classProfile(cls),
         seq: seq.map((L) => {
           const e = equipmentFor(L);
           let book = '';
           try { book = tb.formatRef(tb.matchLesson({ year: L.year, subject: L.subject, topic: L.title })) || ''; } catch { book = ''; }
           let built = null;
           if (L.folder) { try { built = fs.readdirSync(L.folder).some((f) => /\.pptx$/i.test(f)); } catch { built = false; } }
-          return { topic: L.topic, unit: L.unit, num: L.num, title: L.title, eq: e.equipment, sets: e.sets || null,
+          return { topic: L.topic, unit: L.unit, num: L.num, title: L.title, hasTest: testFolder(L.year, L.topic, L.folder), eq: e.equipment, sets: e.sets || null,
             print: e.printing || '', eqFull: e.full || '', eqSrc: e.source, book, built, planned: L.source === 'plan', lo: loFor(L),
             optional: !!L.optional, nofolder: L.source === 'guide',
             rel: L.folder ? path.relative(DRIVE, L.folder).split(path.sep).join('/') : null };

@@ -137,12 +137,51 @@ if (fs.existsSync(DRIVE)) {
     const dirs = [...new Set(c.seq.filter((L) => L.rel).map((L) => L.rel.split('/').slice(0, -1).join('/')))];
     for (const d of dirs) for (const f of fs.readdirSync(path.join(DRIVE, d))) {
       if (!/^lesson\s*\d/i.test(f) || !fs.statSync(path.join(DRIVE, d, f)).isDirectory()) continue;
-      if (/\(separate\)/i.test(f) && cls === '10C2') continue;
+      if (/\(separate\)|\btriple\b|\b(chem|phys|bio)(istry|ics|logy)?\s*only\b/i.test(f) && cls === '10C2') continue;
       if (!c.seq.some((L) => L.rel === `${d}/${f}`)) lost.push(`${cls} ${d}/${f}`);
     }
   }
   // split topics (9XS B1 / B2 blocks) list each folder in one block only, which is fine
   ok(!lost.length, `every Drive lesson folder is in its class's list (${lost.length} missing${lost.length ? ': ' + lost.slice(0, 3).join('; ') : ''})`);
+}
+
+// 20. Patryk 2026-10-08: lessons already taught this week can be ticked; a lesson that didn't happen moves on
+{
+  const wk = P.autofill(data, {}, P.parse('2026-10-12'));
+  const idx = wk.slots.findIndex((s) => s.kind === 'lesson' && s.day === 0);
+  const s0 = wk.slots[idx], unit = data.classes[s0.cls].seq[s0.i].unit;
+  const row = (week, today) => P.topicList(data, {}, week, s0.cls, unit, { day: 4, period: 5 }, {}, today).find((o) => o.k === s0.i);
+  ok(row(wk, '2026-10-12').state === 'done', 'a lesson planned on a day that has come shows as taught (ticked)');
+  ok(row(wk, '2026-10-11').state === 'planned', 'before that day it is still just planned');
+  const later = wk.slots.filter((s, k) => k > idx && s.cls === s0.cls).map((s) => s.i);
+  const nw = P.notHappened(data, {}, wk, [idx], {});
+  const moved = nw.slots.find((s, k) => k > idx && s.cls === s0.cls && s.kind === 'lesson');
+  ok(nw.slots[idx].kind === 'custom' && (!moved || moved.i === s0.i || later.length === 0), 'unticked ("did not happen"): the lesson moves into the class\'s next period, nothing is lost');
+}
+
+// 22. 10C2 is Combined: no separate-only lessons (Patryk 2026-10-08)
+{
+  const bad = data.classes['10C2'].seq.filter((L) => /\(separate\)|\btriple\b|\b(chem|phys|bio)(istry|ics|logy)?\s*only\b/i.test(L.title));
+  ok(!bad.length, '10C2 (Combined) has no separate-only lessons' + (bad.length ? ': ' + bad.map((L) => L.title).join('; ') : ''));
+  const items = Object.values(data.classes).flatMap((c) => c.seq).map((L) => L.print || '');
+  ok(!items.some((p) => /pink\s+gcse/i.test(p)), 'no "Pink GCSE" prefixes in the printing text');
+}
+
+// 21. Tests: the week AFTER the revision lesson; topics with no test folder get revision only
+{
+  const saved = {}; const revWeek = {}; const testWeek = {}; const sameWeek = [];
+  let m = P.parse('2026-10-12');
+  for (let n = 0; n < 14; n++, m = P.addDays(m, 7)) {
+    const wk = P.autofill(data, saved, m); saved[P.iso(m)] = wk;
+    for (const s of wk.slots) {
+      const k = s.cls + '|' + s.unit;
+      if (s.kind === 'revision') revWeek[k] = wk.monday;
+      if (s.kind === 'test') { testWeek[k] = wk.monday; if (revWeek[k] === wk.monday) sameWeek.push(k); }
+    }
+  }
+  ok(Object.keys(testWeek).length > 0 && !sameWeek.length, `${Object.keys(testWeek).length} tests planned over 14 weeks, none in the same week as its revision lesson${sameWeek.length ? ': ' + sameWeek.join(', ') : ''}`);
+  const noTest = Object.keys(testWeek).filter((k) => { const [cls, unit] = k.split('|'); const L = data.classes[cls].seq.find((x) => x.unit === unit); return L && L.hasTest === false; });
+  ok(!noTest.length, 'no test is planned for a topic without a test folder' + (noTest.length ? ': ' + noTest.join(', ') : ''));
 }
 
 console.log(fails ?`\n${fails} FAILED` : '\nall planner logic checks passed');

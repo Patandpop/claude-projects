@@ -16,7 +16,14 @@ const path = require('path');
 
 const SYNC = process.env.PLANNER_SYNC || 'G:\\My Drive\\Beechen Cliff Science\\Admin\\Planner Sync';
 const DATA = path.join(__dirname, 'planner-data.json');
-const readJson = (f, dflt) => { try { return JSON.parse(fs.readFileSync(path.join(SYNC, f), 'utf8')); } catch (_) { return dflt; } };
+// Until the mailbox fix (2026-10-08) the school side wrote into an accidental second folder,
+// "Beechen Cliff Science (1)". Read whichever copy is newer, so nothing saved there is lost.
+const STRAY = SYNC.replace('Beechen Cliff Science\\', 'Beechen Cliff Science (1)\\');
+const readJson = (f, dflt) => {
+  const cands = [SYNC, STRAY].map((d) => path.join(d, f)).filter((p) => fs.existsSync(p))
+    .sort((a, b) => fs.statSync(b).mtimeMs - fs.statSync(a).mtimeMs);
+  try { return JSON.parse(fs.readFileSync(cands[0], 'utf8')); } catch (_) { return dflt; }
+};
 const log = (what) => fs.appendFileSync(path.join(SYNC, 'sync-log.txt'), new Date().toISOString().slice(0, 16).replace('T', ' ') + '  ' + what + '\n');
 
 function open() {

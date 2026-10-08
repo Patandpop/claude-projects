@@ -86,7 +86,7 @@ function pushState_() {
   if (!mailboxOn_()) return null;
   try {
     const a = loadAll_(false);
-    mailPost_({ op: 'write', name: 'planner-state.json', text: JSON.stringify({ saved: new Date().toISOString(), weeks: a.weeks, learned: a.learned, added: a.added }) });
+    mailPost_({ op: 'write', name: 'planner-state.json', text: JSON.stringify({ saved: new Date().toISOString(), weeks: a.weeks, learned: a.learned, added: a.added, classSettings: a.classSettings }) });
     return true;
   } catch (e) { return String(e.message || e); }
 }
@@ -121,7 +121,10 @@ function loadAll_(withData) {
   const added = [];
   const ad = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Added');
   if (ad && ad.getLastRow() > 1) ad.getRange(2, 1, ad.getLastRow() - 1, 1).getValues().forEach(([json]) => { try { added.push(JSON.parse(json)); } catch (e) { /* skip */ } });
-  return { version: VERSION, data: withData && chunks ? JSON.parse(chunks) : null, weeks, learned, added, hasTemplate: !!PropertiesService.getScriptProperties().getProperty('TEMPLATE_ID') };
+  const classSettings = {};
+  const cs = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('ClassSettings');
+  if (cs && cs.getLastRow() > 1) cs.getRange(2, 1, cs.getLastRow() - 1, 2).getValues().forEach(([cls, json]) => { try { classSettings[cls] = JSON.parse(json); } catch (e) { /* skip */ } });
+  return { version: VERSION, data: withData && chunks ? JSON.parse(chunks) : null, weeks, learned, added, classSettings };
 }
 
 // A tab, made the first time it is needed (so an existing planner needs no setup re-run).
@@ -215,6 +218,19 @@ function saveWeek(k, week) {
   return { saved: week.monday, home: sent };
 }
 
+// Per-class settings he types once (Patryk 2026-10-08): test papers core / challenge / paper size,
+// and notes about the class that go with every request to Claude ("8XP: word bank on cloze").
+function saveClassSetting(k, cls, obj) {
+  check_(k);
+  const sh = tab_('ClassSettings', ['class', 'settings', 'saved']);
+  const n = sh.getLastRow();
+  const keys = n > 1 ? sh.getRange(2, 1, n - 1, 1).getValues().map((r) => r[0]) : [];
+  const at = keys.indexOf(cls), row = [cls, JSON.stringify(obj || {}), new Date()];
+  if (at >= 0) sh.getRange(at + 2, 1, 1, 3).setValues([row]); else sh.appendRow(row);
+  pushState_();
+  return true;
+}
+
 function learnEquipment(k, key, eq, sets) {
   check_(k);
   const q = sheet_('Equipment');
@@ -278,7 +294,15 @@ function myEvents(k, monday) {
    temporary Google Sheet, downloads it as .xlsx, then bins the temporary copy (its own file only).
    Same boxes the technicians know (per day and period: room, class, lesson, kit, class size,
    number of sets), with more room for the kit and set to print on ONE landscape A4 page. */
-const OS = { font: 'Arial', line: '#000000', head: '#d9d9d9', sub: '#f2f2f2', lesson: '#eaf1fb' };
+// Patryk's own design (order_sheet.py, style 5, 2026-10-08): Georgia; a card per period with cutting
+// gaps between them; each class has a light tint (class box + kit box) and a key at the bottom.
+const OS = { font: 'Georgia', grey: '#808080' };
+const CLASS_COL = {
+  '7MLA': ['#FCE4D6', '#F4B183'], '8XP': ['#E2EFDA', '#A9D18E'], '8AG': ['#DDEBF7', '#9DC3E6'],
+  '9AS': ['#FFF2CC', '#FFD966'], '9XS': ['#EDE1F5', '#C9A8E0'], '10S2': ['#D5F0EC', '#8FD3CB'],
+  '10C2': ['#FBE0EC', '#F09CC0'], '11S2': ['#F6E6D2', '#DDB27C'], '12C': ['#DCE6F0', '#8EA9C9'], '13D': ['#E6F2D2', '#B5D98A'],
+};
+const tint_ = (cls) => (CLASS_COL[cls] || ['#F2F2F2', '#BFBFBF'])[0];
 
 function exportXlsx(k, model, title) {
   check_(k);
@@ -297,65 +321,74 @@ function exportXlsx(k, model, title) {
   }
 }
 
+// Excel widths (characters) and heights (points) from his file, converted to pixels for Sheets.
+const xw_ = (chars) => Math.round(chars * 7 + 5), pt_ = (p) => Math.round(p * 4 / 3);
+function lines_(text, chars) {
+  if (!text) return 1;
+  return String(text).split('\n').reduce((n, t) => n + Math.max(1, Math.ceil(t.length / chars)), 0);
+}
 function drawOrderSheet_(sh, m) {
-  const COLS = 21, ROWS = 2 + 5 * 5;
-  sh.getRange(1, 1, sh.getMaxRows(), sh.getMaxColumns()).clearFormat();
-  if (sh.getMaxColumns() > COLS) sh.deleteColumns(COLS + 1, sh.getMaxColumns() - COLS);
-  if (sh.getMaxRows() > ROWS) sh.deleteRows(ROWS + 1, sh.getMaxRows() - ROWS);
-  const all = sh.getRange(1, 1, ROWS, COLS);
-  all.setFontFamily(OS.font).setFontSize(9).setVerticalAlignment('middle').setWrap(true);
+  const CARD = [10.5, 5, 11.5, 8], starts = [];
+  let col = 2;
+  for (let p = 0; p < 5; p++) { starts.push(col); col += 4 + (p < 4 ? 1 : 0); }
+  const lastCol = col - 1, nRows = 2 + 5 * 6 + 2;
+  if (sh.getMaxColumns() > lastCol) sh.deleteColumns(lastCol + 1, sh.getMaxColumns() - lastCol);
+  if (sh.getMaxRows() > nRows) sh.deleteRows(nRows + 1, sh.getMaxRows() - nRows);
+  sh.getRange(1, 1, nRows, lastCol).setFontFamily(OS.font).setFontSize(9.5).setVerticalAlignment('middle')
+    .setHorizontalAlignment('center').setWrap(true);
+  sh.setHiddenGridlines(true);
+  sh.setColumnWidth(1, xw_(5));
+  starts.forEach((s, p) => { CARD.forEach((w, k) => sh.setColumnWidth(s + k, xw_(w))); if (p < 4) sh.setColumnWidth(s + 4, xw_(1.2)); });
 
-  sh.setColumnWidth(1, 30);
-  for (let p = 0; p < 5; p++) [44, 56, 44, 56].forEach((w, i) => sh.setColumnWidth(2 + p * 4 + i, w));
+  // title + period row
+  sh.setRowHeight(1, pt_(24));
+  sh.getRange(1, 1, 1, starts[2] - 1).merge().setValue('Teacher:  Patryk Tomczynski').setFontSize(13).setFontWeight('bold').setHorizontalAlignment('left');
+  sh.getRange(1, starts[3], 1, lastCol - starts[3] + 1).merge().setValue('Week ' + m.letter + '   w/c ' + m.monday).setFontSize(13).setFontWeight('bold').setHorizontalAlignment('right');
+  sh.setRowHeight(2, pt_(20));
+  sh.getRange(2, 1).setValue('Day').setFontSize(10).setFontWeight('bold');
+  starts.forEach((s, p) => sh.getRange(2, s, 1, 4).merge().setValue('Period ' + (p + 1)).setFontSize(12).setFontWeight('bold')
+    .setBorder(null, null, true, null, null, null, '#000000', SpreadsheetApp.BorderStyle.SOLID_MEDIUM));
 
-  // title row
-  sh.setRowHeight(1, 24);
-  sh.getRange(1, 1, 1, 13).merge().setValue('Patryk Tomczynski · Science order sheet · Room S8').setFontSize(12).setFontWeight('bold');
-  sh.getRange(1, 14, 1, 8).merge().setValue('Week ' + m.letter + '  ·  w/c ' + m.monday).setFontSize(12).setFontWeight('bold').setHorizontalAlignment('right');
-  // period headings
-  sh.setRowHeight(2, 18);
-  sh.getRange(2, 1).setValue('Day').setFontWeight('bold').setHorizontalAlignment('center').setBackground(OS.head);
-  for (let p = 0; p < 5; p++) {
-    sh.getRange(2, 2 + p * 4, 1, 4).merge().setValue('Period ' + (p + 1)).setFontWeight('bold').setFontSize(10)
-      .setHorizontalAlignment('center').setBackground(OS.head);
-  }
-
-  m.days.forEach((d, di) => {
-    const r = 3 + di * 5;
-    [15, 18, 32, 96, 18].forEach((h, i) => sh.setRowHeight(r + i, h));
-    sh.getRange(r, 1, 5, 1).merge().setValue(d.name + ' ' + d.date).setFontWeight('bold').setFontSize(10)
-      .setHorizontalAlignment('center').setTextRotation(90).setBackground(OS.sub);
-    d.slots.forEach((s, p) => {
-      const c = 2 + p * 4;
-      sh.getRange(r, c, 1, 4).merge().setValue(d.name + ' ' + d.date + ' · P' + (p + 1))
-        .setFontSize(8).setFontColor('#555555').setHorizontalAlignment('center').setBackground(OS.sub);
-      sh.getRange(r + 1, c, 1, 4).setValues([['Room:', s ? s.room : '', 'Class:', s ? s.cls : '']]);
-      sh.getRange(r + 1, c + 1).setFontWeight('bold');
-      sh.getRange(r + 1, c + 3).setFontWeight('bold').setFontSize(10);
-      sh.getRange(r + 2, c, 1, 4).merge().setValue(s ? s.lesson : '').setFontWeight('bold').setFontSize(10)
-        .setHorizontalAlignment('center').setBackground(s ? OS.lesson : null);
-      const kitCell = sh.getRange(r + 3, c, 1, 4).merge().setHorizontalAlignment('center');
-      if (s) {
-        const text = [s.kit, s.extra].filter(Boolean).join('\n');
-        // kit in 10 pt; the "Print: / Books:" line underneath in smaller italics
-        const rt = SpreadsheetApp.newRichTextValue().setText(text || ' ');
-        const from = s.extra ? text.length - s.extra.length : text.length;
-        if (from > 0) rt.setTextStyle(0, from, SpreadsheetApp.newTextStyle().setFontSize(10).build());
-        if (from < text.length) rt.setTextStyle(from, text.length, SpreadsheetApp.newTextStyle().setFontSize(8).setItalic(true).build());
-        kitCell.setRichTextValue(rt.build());
-      }
-      sh.getRange(r + 4, c, 1, 4).setValues([['Class size:', s ? s.size : '', 'No. of sets:', s && s.sets !== '' ? (s.sets + (s.setsLabel ? ' (' + s.setsLabel + ')' : '')) : '']]);
-      sh.getRange(r + 4, c + 1).setFontWeight('bold').setHorizontalAlignment('center');
-      sh.getRange(r + 4, c + 3).setFontWeight('bold').setFontSize(8);
-      [r + 1, r + 4].forEach((rr) => { sh.getRange(rr, c).setFontColor('#555555'); sh.getRange(rr, c + 2).setFontColor('#555555'); });
-      // box: thin lines inside, a thick line round each period
-      sh.getRange(r, c, 5, 4).setBorder(true, true, true, true, null, true, OS.line, SpreadsheetApp.BorderStyle.SOLID)
-        .setBorder(true, true, true, true, null, null, OS.line, SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
+  const MED = SpreadsheetApp.BorderStyle.SOLID_MEDIUM;
+  let row = 3;
+  m.days.forEach((d) => {
+    const rh = row, rrc = row + 1, rt = row + 2, re = row + 3, rs = row + 4;
+    let tl = 1, el = 1;
+    d.slots.forEach((L) => { if (L) { tl = Math.max(tl, lines_(L.lesson, 30)); el = Math.max(el, lines_(equipText_(L), 26)); } });
+    sh.setRowHeight(rh, pt_(18)); sh.setRowHeight(rrc, pt_(19));
+    sh.setRowHeight(rt, pt_(Math.max(20, tl * 15 + 6))); sh.setRowHeight(re, pt_(Math.max(62, el * 15 + 24)));
+    sh.setRowHeight(rs, pt_(19)); sh.setRowHeight(row + 5, pt_(7));
+    sh.getRange(rh, 1, 5, 1).merge().setValue(d.name).setFontSize(12).setFontWeight('bold').setTextRotation(90)
+      .setBorder(true, true, true, true, null, null, '#000000', MED);
+    d.slots.forEach((L, p) => {
+      const s = starts[p], free = !L, x = L || {};
+      const tint = free ? null : tint_(x.cls);
+      const lab = (r, c, v) => sh.getRange(r, c).setValue(v).setFontColor(free ? OS.grey : '#000000');
+      const val = (r, c, v) => sh.getRange(r, c).setValue(v === '' || v == null ? '' : v).setFontSize(11).setFontWeight('bold');
+      sh.getRange(rh, s, 1, 4).merge().setValue(d.name + ' P' + (p + 1)).setFontSize(11).setFontWeight('bold').setFontColor(free ? OS.grey : '#000000');
+      lab(rrc, s, 'Room:'); val(rrc, s + 1, x.room || ''); lab(rrc, s + 2, 'Class:'); val(rrc, s + 3, x.cls || '');
+      if (tint) sh.getRange(rrc, s + 3).setBackground(tint);
+      sh.getRange(rt, s, 1, 4).merge().setValue(x.lesson || '').setFontSize(11);
+      const eqText = free ? '' : equipText_(x);
+      const eq = sh.getRange(re, s, 1, 4).merge().setValue(eqText).setFontSize(11).setFontWeight('bold')
+        .setFontStyle(eqText === 'Nothing needed' ? 'italic' : 'normal');
+      if (tint) eq.setBackground(tint);
+      lab(rs, s, 'Class size:'); val(rs, s + 1, x.size || ''); lab(rs, s + 2, 'No. of sets:'); val(rs, s + 3, x.sets === '' ? '' : (x.sets || ''));
+      sh.getRange(rh, s, 5, 4).setBorder(true, true, true, true, false, false, '#000000', MED);   // outline only
     });
-    sh.getRange(r, 1, 5, COLS).setBorder(true, true, true, true, null, null, OS.line, SpreadsheetApp.BorderStyle.SOLID_THICK);
+    row += 6;
   });
-  sh.getRange(1, 1, 2, COLS).setBorder(null, null, true, null, null, null, OS.line, SpreadsheetApp.BorderStyle.SOLID_THICK);
-  sh.setFrozenRows(2);
+  // colour key
+  sh.setRowHeight(row, pt_(6)); row++;
+  sh.setRowHeight(row, pt_(16));
+  sh.getRange(row, 1).setValue('Key').setFontSize(9).setFontWeight('bold');
+  const used = [...new Set(m.days.flatMap((d) => d.slots.filter(Boolean).map((L) => L.cls)))].sort((a, b) => a.length - b.length || a.localeCompare(b));
+  const keyCols = starts.flatMap((s) => [s, s + 2]);
+  used.slice(0, keyCols.length).forEach((cls, k) => sh.getRange(row, keyCols[k]).setValue(cls).setFontSize(9).setFontWeight('bold').setBackground(tint_(cls)));
+}
+// What goes in the big box: the kit, then what to print and the books (one line each).
+function equipText_(L) {
+  return [L.kit, L.extra].filter(Boolean).join('\n') || 'Nothing needed';
 }
 
 // Sheets can't set print options, so set them in the .xlsx itself: landscape A4, fitted to one page,
@@ -370,8 +403,8 @@ function onePage_(blob, title) {
     if (/<sheetPr\b[^>]*\/>/.test(x)) x = x.replace(/<sheetPr\b([^>]*)\/>/, '<sheetPr$1>' + fit + '</sheetPr>');
     else if (/<sheetPr\b/.test(x)) x = x.replace('</sheetPr>', fit + '</sheetPr>');
     else x = x.replace(/(<worksheet\b[^>]*>)/, '$1<sheetPr>' + fit + '</sheetPr>');
-    x = x.replace(/<pageMargins\b[^>]*\/>/, '').replace(/<pageSetup\b[^>]*\/>/, '');
-    const page = '<pageMargins left="0.25" right="0.25" top="0.3" bottom="0.3" header="0" footer="0"/>' +
+    x = x.replace(/<printOptions\b[^>]*\/>/, '').replace(/<pageMargins\b[^>]*\/>/, '').replace(/<pageSetup\b[^>]*\/>/, '');
+    const page = '<printOptions horizontalCentered="1"/><pageMargins left="0.3" right="0.3" top="0.3" bottom="0.3" header="0.1" footer="0.1"/>' +
       '<pageSetup paperSize="9" orientation="landscape" fitToWidth="1" fitToHeight="1"/>';
     const after = x.search(/<(headerFooter|rowBreaks|colBreaks|drawing|legacyDrawing|tableParts|extLst)\b|<\/worksheet>/);
     x = x.slice(0, after) + page + x.slice(after);

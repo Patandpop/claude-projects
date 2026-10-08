@@ -39,12 +39,29 @@ function setup() {
 function out_(obj) { return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON); }
 function keyOk_(k) { return k && k === PropertiesService.getScriptProperties().getProperty('MAILBOX_KEY'); }
 
+// Folder names are matched ignoring case and spaces at either end: his real folder is called
+// "Beechen Cliff Science " (a trailing space), and an exact-name lookup missed it and made a second
+// folder (2026-10-08). If several match, the one already holding the next part of the path wins.
+function child_(dir, name, nextName) {
+  const want = String(name).trim().toLowerCase();
+  const found = [];
+  const it = dir.getFolders();
+  while (it.hasNext()) { const f = it.next(); if (f.getName().trim().toLowerCase() === want) found.push(f); }
+  if (found.length > 1 && nextName) {
+    const nx = String(nextName).trim().toLowerCase();
+    const better = found.find((f) => { const k = f.getFolders(); while (k.hasNext()) if (k.next().getName().trim().toLowerCase() === nx) return true; return false; });
+    if (better) return better;
+  }
+  // oldest first, so a later accidental copy never wins
+  found.sort((a, b) => a.getDateCreated() - b.getDateCreated());
+  return found[0] || null;
+}
 function path_(names, create) {
   let dir = DriveApp.getRootFolder();
-  for (const n of names) {
-    const it = dir.getFoldersByName(n);
-    if (it.hasNext()) dir = it.next();
-    else if (create) { dir = dir.createFolder(n); log_('created folder ' + names.join('/')); }
+  for (let i = 0; i < names.length; i++) {
+    const f = child_(dir, names[i], names[i + 1]);
+    if (f) dir = f;
+    else if (create) { dir = dir.createFolder(names[i]); log_('created folder ' + names.slice(0, i + 1).join('/')); }
     else return null;
   }
   return dir;

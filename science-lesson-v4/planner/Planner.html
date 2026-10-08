@@ -110,9 +110,9 @@
   .lrow .body { flex:1; cursor:pointer; }
   .lrow .num { font-weight:700; display:inline-block; min-width:30px; color:var(--muted); }
   .lrow small { display:block; color:var(--muted); font-size:11px; margin-top:1px; }
-  .lrow.taught .t { color:var(--muted); }
-  .lrow.taught .num { color:var(--green); }
-  .lrow.taught small { color:var(--green); }
+  .lrow.taught .t, .lrow.done .t { color:var(--muted); }
+  .lrow.taught .num, .lrow.done .num { color:var(--green); }
+  .lrow.taught small, .lrow.done small { color:var(--green); }
   .lrow.next { box-shadow:inset 3px 0 0 var(--gold); }
   .lrow.here { background:color-mix(in srgb, var(--gold) 15%, var(--panel)); }
   .lrow.optional .t { font-style:italic; color:var(--muted); }
@@ -153,6 +153,7 @@
   <button id="vWeek" class="on" title="W">Week</button><button id="vDay" title="D">Day</button><button id="vClasses" title="C">Classes</button>
   <span class="sep"></span>
   <button id="undo" title="Ctrl+Z">Undo</button>
+  <button id="mkDay" class="primary" title="Sends the next school day's lessons to Claude to build, with their checklists">Make next day</button>
   <span id="status">Loading...</span>
   <div class="menuwrap"><button id="more">&#8943; More</button>
     <div id="menu">
@@ -355,6 +356,17 @@ function renderClasses() {
     const upNext = rep.find((r) => r.state === 'to come');
     return '<div class="ccard" style="--c:' + c.colour + '"><h3>' + esc(cls) + ' <span class="muted">Year ' + c.year + '</span></h3>' +
       '<div class="muted">Now: ' + esc(cur ? cur.topic : '-') + (upNext ? ' · next topic: ' + esc(upNext.topic) : '') + '</div>' +
+      // the next lesson number, so he can check it against where he really is (Patryk 2026-10-08)
+      (() => { const nl = cur && cur.lessons.find((l) => !l.done && !l.optional); return nl ? '<div class="muted">Next lesson: <b>L' + nl.num + ' ' + esc(nl.title) + '</b></div>' : ''; })() +
+      // topics with no test folder in Admin/Assessment get revision only: listed so he can add tests
+      (() => { const miss = [...new Set(c.seq.filter((L) => L.hasTest === false && !/^introduction/i.test(L.topic)).map((L) => L.topic))];
+        return miss.length ? '<div class="muted" style="color:var(--orange)">No test in Admin/Assessment for: ' + miss.map(esc).join(', ') + '</div>' : ''; })() +
+      // settings typed once: test papers for the technicians, and notes that go with every build request
+      (() => { const cs = (S.classSettings || {})[cls] || {};
+        return '<details class="csBox" data-c="' + esc(cls) + '"><summary>Settings for ' + esc(cls) + '</summary>' +
+          '<div class="row" style="align-items:center;gap:6px">Test papers: core <input type="number" min="0" class="csCore" value="' + (cs.core != null ? cs.core : '') + '" style="width:56px"> challenge <input type="number" min="0" class="csChal" value="' + (cs.challenge != null ? cs.challenge : '') + '" style="width:56px">' +
+          '<select class="csPaper">' + ['', 'A4', 'A3', 'A4 enlarged to A3'].map((p) => '<option' + ((cs.paper || '') === p ? ' selected' : '') + ' value="' + p + '">' + (p || 'paper size') + '</option>').join('') + '</select></div>' +
+          '<label>Notes for Claude (go with every lesson request for ' + esc(cls) + ')</label><textarea class="csNotes" style="min-height:44px">' + esc(cs.notes != null ? cs.notes : (c.profile || '')) + '</textarea></details>'; })() +
       shown.map((r) => {
         const core = r.lessons.filter((l) => !l.optional);
         const done = core.filter((l) => l.done).length;
@@ -362,7 +374,18 @@ function renderClasses() {
           '<div class="les-list">' + r.lessons.map((l) => '<span class="lp ' + (l.done ? 'done' : l.optional ? 'opt' : r.state === 'current' ? 'miss' : r.state === 'finished' ? 'skip' : '') +
             '" title="' + esc('L' + l.num + ' ' + l.title + (l.optional ? ' (optional)' : '') + (l.nofolder ? ' (no folder)' : '') + (l.done ? ' · ' + whenText(l.when) : r.state === 'finished' && !l.optional ? ' · NEVER TAUGHT (topic finished)' : '')) + '">L' + l.num + '</span>').join('') + '</div></div>';
       }).join('') + '</div>';
-  }).join('') + '<div class="muted" style="grid-column:1/-1">Green = taught. Gold outline = still to teach in the topic you\'re on (the planner fills these first). Dashed = optional (only planned if you pick it). Red, crossed out = never taught in a topic you have finished: tick it in the lesson list if you did teach it. Hover a lesson number for its title and when it was taught. Counts are up to w/c ' + mon.toLocaleDateString('en-GB', { day:'numeric', month:'short' }) + '.</div>';
+  }).join('') + '<div class="muted" style="grid-column:1/-1">Settings: open a class\'s settings to set its test papers and notes for Claude. Green = taught. Gold outline = still to teach in the topic you\'re on (the planner fills these first). Dashed = optional (only planned if you pick it). Red, crossed out = never taught in a topic you have finished: tick it in the lesson list if you did teach it. Hover a lesson number for its title and when it was taught. Counts are up to w/c ' + mon.toLocaleDateString('en-GB', { day:'numeric', month:'short' }) + '.</div>';
+  // save a class's settings as soon as a box is left
+  g.querySelectorAll('.csBox').forEach((box) => {
+    const cls = box.dataset.c;
+    const num = (el) => (el.value === '' ? null : +el.value);
+    const save = () => {
+      const obj = { core: num(box.querySelector('.csCore')), challenge: num(box.querySelector('.csChal')), paper: box.querySelector('.csPaper').value, notes: box.querySelector('.csNotes').value.trim() };
+      S.classSettings = S.classSettings || {}; S.classSettings[cls] = obj;
+      run('saveClassSetting', cls, obj).then(() => status(cls + ' settings saved')).catch((e) => toast('Not saved: ' + e.message));
+    };
+    box.querySelectorAll('input,select,textarea').forEach((el) => el.onchange = save);
+  });
 }
 
 /* ------------------------------------------------------------------ modals */
@@ -457,19 +480,19 @@ function chooser(cls, pos, curI, onPick, onReview) {
     if (o.optional) tags.push('<span class="tag opt">optional</span>');
     if (o.nofolder) tags.push('<span class="tag nof" title="In the technician guide, but there is no lesson folder on Drive">no folder</span>');
     else if (o.built === false) tags.push('<span class="tag nof">not built</span>');
-    const sub = o.state === 'taught' ? '✓ ' + esc(whenText(o.when)) : o.mark && o.mark.done === false ? 'you marked this NOT taught' : '';
+    const sub = o.state === 'done' ? '✓ taught ' + esc(fmtDate(o.when.date)) + ' this week · untick if it didn\'t happen' : o.state === 'taught' ? '✓ ' + esc(whenText(o.when)) : o.mark && o.mark.done === false ? 'you marked this NOT taught' : '';
     return '<div class="lrow ' + o.state + (o.next && !here ? ' next' : '') + (here ? ' here' : '') + (o.optional ? ' optional' : '') + '">' +
-      '<input type="checkbox" class="tick" data-k="' + o.k + '"' + (o.state === 'taught' ? ' checked' : '') + (o.state === 'planned' ? ' disabled title="Planned this week"' : ' title="' + (o.state === 'taught' ? 'Untick: NOT taught after all, so it gets planned' : 'Tick: already taught, or you won\'t teach it') + '"') + '>' +
+      '<input type="checkbox" class="tick" data-k="' + o.k + '"' + (o.state === 'taught' || o.state === 'done' ? ' checked' : '') + ' title="' + (o.state === 'done' ? 'Untick: it did not happen, so it moves to the next lesson' : o.state === 'taught' ? 'Untick: NOT taught after all, so it gets planned' : o.state === 'planned' ? 'Tick: already taught, so the rest of this week moves along' : 'Tick: already taught, or you won\'t teach it') + '">' +
       '<div class="body" data-k="' + o.k + '"><span class="num">L' + o.num + '</span><span class="t">' + esc(o.title) + '</span>' + tags.join('') +
       (topic ? '<small>' + esc(topic) + '</small>' : '') + (sub ? '<small>' + sub + '</small>' : '') + '</div></div>';
   };
   const draw = () => {
     const q = $('q').value.trim().toLowerCase();
     let html;
-    if (!q) html = P.topicList(S.data, S.weeks, S.week, cls, S.chooser.unit, pos, S.learned).map((o) => row(o)).join('');
+    if (!q) html = P.topicList(S.data, S.weeks, S.week, cls, S.chooser.unit, pos, S.learned, P.iso(todayMidnight())).map((o) => row(o)).join('');
     else {
       const words = q.split(/\s+/);
-      html = units.flatMap((u) => P.topicList(S.data, S.weeks, S.week, cls, u.unit, pos, S.learned).map((o) => ({ o, u })))
+      html = units.flatMap((u) => P.topicList(S.data, S.weeks, S.week, cls, u.unit, pos, S.learned, P.iso(todayMidnight())).map((o) => ({ o, u })))
         .filter(({ o, u }) => words.every((w) => (o.title + ' ' + u.text + ' l' + o.num).toLowerCase().includes(w)))
         .slice(0, 40).map(({ o, u }) => row(o, u.text)).join('');
     }
@@ -477,6 +500,12 @@ function chooser(cls, pos, curI, onPick, onReview) {
     $('qr').querySelectorAll('.body').forEach((el) => el.onclick = () => onPick(+el.dataset.k));
     $('qr').querySelectorAll('.tick').forEach((el) => el.onchange = () => {
       const k = +el.dataset.k;
+      const o = P.topicList(S.data, S.weeks, S.week, cls, c.seq[k].unit, pos, S.learned, P.iso(todayMidnight())).find((x) => x.k === k);
+      if (o && o.state === 'done' && !el.checked) {   // planned on a day that has passed, but it didn't happen
+        const nw = P.notHappened(S.data, S.weeks, S.week, o.slots, S.learned);
+        change(nw, 'L' + c.seq[k].num + ' ' + c.seq[k].title + ' did not happen: it moves to the next lesson' + reflowNote(S.week, nw, cls, -1));
+        return;
+      }
       const m = (S.week.marks || []).find((x) => x.cls === cls && x.i === k);
       const done = el.checked ? (m && m.done === false ? null : true) : (m && m.done === true ? null : false);
       const L = c.seq[k];
@@ -611,6 +640,21 @@ function addPanel(day, period) {
   const go = () => chooser($('aCls').value, { day, period }, null, pick);
   $('aCls').onchange = go; go();
 }
+// The lesson checklist (Patryk 2026-10-08): ticks instead of typing the same things to Claude. Until he
+// changes them, sensible defaults are ticked: a review when something was carried over, homework on
+// the class's last lesson of the week, a kit check when there is practical kit.
+function checkDefaults(s) {
+  const idx = S.week.slots.indexOf(s);
+  const lastOfWeek = !S.week.slots.some((x, k) => k > idx && x.cls === s.cls && ['lesson', 'revision', 'test'].includes(x.kind) && !x.double);
+  return { review: (s.carry || []).length > 0, collectHw: false, setHw: s.kind === 'lesson' && lastOfWeek, plc: false, kit: !!s.sets && s.sets !== 'demo' };
+}
+function checklistCard(s) {
+  const ch = s.checks || checkDefaults(s);
+  return '<div class="card"><h4>Checklist for this lesson <span class="src">goes to Claude with the build</span></h4>' +
+    P.CHECKS.map(([k, t]) => '<label class="inline" style="display:block;margin:2px 0"><input type="checkbox" class="eChk" data-k="' + k + '"' + (ch[k] ? ' checked' : '') + '> ' + esc(t) + '</label>').join('') +
+    ((s.carry || []).length ? '<div class="muted" style="margin-top:4px">Carried in: ' + s.carry.map(esc).join('; ') + '</div>' : '') +
+    '<textarea id="eNotes" placeholder="Anything else for this lesson (one per line)" style="min-height:38px;margin-top:6px">' + esc((s.notes || []).join('\n')) + '</textarea></div>';
+}
 function lessonKey(s) { const L = S.data.classes[s.cls].seq[s.i]; return L.rel || (s.cls + '|' + L.topic + '|' + L.title); }
 
 function editor() {
@@ -638,17 +682,18 @@ function editor() {
       '<textarea id="eEq" placeholder="Equipment">' + esc(s.eq || '') + '</textarea>' +
       '<div class="grid2"><select id="eSets">' + [['', 'Sets?'], ['threes', 'sets of 3'], ['pairs', 'pairs'], ['demo', 'demo (1 set)']].map(([v, t]) => '<option value="' + v + '"' + ((s.sets || '') === v ? ' selected' : '') + '>' + t + '</option>').join('') + '</select>' +
       '<input type="text" id="ePrint" placeholder="Printing" value="' + esc(s.print || '') + '"></div>' +
-      '<div class="row" style="margin-top:6px"><input type="text" id="eBook" placeholder="Textbooks" value="' + esc(s.book || '') + '" style="flex:1"><button id="eAddBook" title="Fill in the textbook pages for this lesson">+ pages</button></div>' +
+      // books: pages filled in for him, unticked unless revision/review (Patryk 2026-10-08)
+      '<div class="row" style="margin-top:6px;align-items:center"><label class="inline" title="Ticked = the technicians put these textbooks out; they go on the order sheet" style="margin:0 6px 0 0"><input type="checkbox" id="eBookOn"' + (s.bookOn ? ' checked' : '') + '> Books</label>' +
+        '<input type="text" id="eBook" placeholder="Textbook pages" value="' + esc(s.book || (curL && curL.book) || '') + '" style="flex:1"></div>' +
       (s.kind === 'lesson' ? '<label class="inline"><input type="checkbox" id="eRemember"' + (s.eqSrc === 'remembered' ? ' checked' : '') + '> use this every time this lesson is taught</label>' : '') +
     '</div>' +
-    '<div class="row"><button id="kRev">Revision</button><button id="kTest">Test</button><button id="kCover">Cover</button><button id="kFree">Clear</button><button id="eAsk" title="Sends this lesson to Claude Code at home to build">Ask Claude to build</button><button id="ePrompt">Copy build prompt</button>' +
-    (curL ? '<button id="kCont" title="Puts this lesson in ' + esc(s.cls) + '\'s next slot too; the rest of the week moves along">Didn\'t finish: continue next lesson</button>' : '') + '</div>' +
+    (isLesson ? checklistCard(s) : '') +
+    '<div class="row"><button id="kRev">Revision</button><button id="kTest">Test</button><button id="kCover">Cover</button><button id="kFree">Clear</button></div>' +
     (c ? '<div class="card"><h4>Choose the lesson <span class="src">' + esc(s.cls) + '</span></h4><div id="chooser"></div></div>' : '') +
-    '<details' + ((s.notes || []).length || (s.carry || []).length ? ' open' : '') + '><summary>Notes, carry-over and more' + ((s.notes || []).length + (s.carry || []).length ? ' (' + ((s.notes || []).length + (s.carry || []).length) + ')' : '') + '</summary>' +
-      '<label>Notes (one per line)</label><textarea id="eNotes">' + esc((s.notes || []).join('\n')) + '</textarea>' +
-      ((s.carry || []).length ? '<label>Carried in from last lesson</label><div class="muted">' + s.carry.map(esc).join('<br>') + '</div>' : '') +
+    '<details><summary>More for this lesson</summary>' +
+      (curL ? '<div class="row"><button id="kCont" title="Puts this lesson in ' + esc(s.cls) + '\'s next slot too; the rest of the week moves along">Didn\'t finish: continue next lesson</button></div>' : '') +
       '<div class="row"><button id="eRev">Review not finished → next lesson</button><button id="eHw">Homework to collect → next lesson</button></div>' +
-      '<div class="row"><button id="eRefill">Re-plan ' + esc(s.cls) + '\'s later lessons</button></div>' +
+      '<div class="row"><button id="eAsk" title="Sends this lesson to Claude Code at home to build">Ask Claude to build</button><button id="ePrompt">Copy build prompt</button><button id="eRefill">Re-plan ' + esc(s.cls) + '\'s later lessons</button></div>' +
       (curL && curL.rel ? '<p class="muted">Drive: Lessons/' + esc(curL.rel) + '</p>' : '') +
     '</details>';
 
@@ -687,18 +732,24 @@ function editor() {
   // technician details: saved as soon as a box is left
   const saveDetails = () => {
     const w = JSON.parse(JSON.stringify(S.week)); const t = w.slots[S.sel];
-    t.eq = $('eEq').value; t.sets = $('eSets').value || null; t.print = $('ePrint').value; t.book = $('eBook').value;
+    if (t.eq !== $('eEq').value || t.print !== $('ePrint').value) t.edited = true;   // his own words: never overwritten by new data
+    t.eq = $('eEq').value; t.sets = $('eSets').value || null; t.print = $('ePrint').value; t.book = $('eBook').value; t.bookOn = $('eBookOn').checked;
     if ($('eRemember') && $('eRemember').checked && t.kind === 'lesson') {
       const lk = lessonKey(t); S.learned[lk] = { eq: t.eq, sets: t.sets }; t.eqSrc = 'remembered';
       run('learnEquipment', lk, t.eq, t.sets).catch((e) => toast('Not remembered: ' + e.message));
     }
     change(w, null, true);
   };
-  ['eEq', 'ePrint', 'eBook'].forEach((id) => $(id).onchange = saveDetails);
+  ['eEq', 'ePrint', 'eBook', 'eBookOn'].forEach((id) => $(id).onchange = saveDetails);
+  // the lesson checklist: saved as soon as a box changes; it goes with the build request
+  document.querySelectorAll('.eChk').forEach((el) => el.onchange = () => {
+    const w = JSON.parse(JSON.stringify(S.week));
+    w.slots[S.sel].checks = Object.fromEntries([...document.querySelectorAll('.eChk')].map((x) => [x.dataset.k, x.checked]));
+    change(w, null, true);
+  });
   $('eSets').onchange = saveDetails;
   if ($('eRemember')) $('eRemember').onchange = () => { if ($('eRemember').checked) { saveDetails(); toast('Remembered for every ' + (curL ? curL.title : 'lesson') + ' from now on'); } };
-  $('eAddBook').onclick = () => { if (curL && curL.book) { $('eBook').value = curL.book; saveDetails(); } else toast('No textbook pages found for this lesson'); };
-  $('eNotes').onchange = () => { const w = JSON.parse(JSON.stringify(S.week)); w.slots[S.sel].notes = $('eNotes').value.split('\n').map((x) => x.trim()).filter(Boolean); change(w, null, true); };
+  if ($('eNotes')) $('eNotes').onchange = () => { const w = JSON.parse(JSON.stringify(S.week)); w.slots[S.sel].notes = $('eNotes').value.split('\n').map((x) => x.trim()).filter(Boolean); change(w, null, true); };
   $('eRefill').onclick = () => { const w = JSON.parse(JSON.stringify(S.week)); P.refillAfter(S.data, S.weeks, w, S.sel, S.learned); change(w, 'Re-planned ' + s.cls + reflowNote(S.week, w, s.cls, S.sel)); };
   const carry = (what) => {
     const r = P.carryForward(S.week, S.sel, what);
@@ -708,7 +759,7 @@ function editor() {
   $('eRev').onclick = () => carry('Review section not finished last lesson (' + P.lessonCell(S.data, s) + ')');
   $('eHw').onclick = () => carry('Collect homework set last lesson (' + P.lessonCell(S.data, s) + ')');
   $('ePrompt').onclick = () => {
-    const text = P.buildPrompt(S.data, S.week.slots[S.sel]);
+    const text = P.buildPrompt(S.data, S.week.slots[S.sel], (S.classSettings || {})[S.week.slots[S.sel].cls]);
     navigator.clipboard.writeText(text).then(() => toast('Build prompt copied')).catch(() => modal('<h3>Build prompt</h3><pre>' + esc(text) + '</pre>'));
   };
   $('eAsk').onclick = () => sendToClaude([S.sel]);
@@ -733,7 +784,7 @@ function markGaps() {
 function lessonRequest(i) {
   const s = S.week.slots[i];
   const when = P.DAYS[s.day] + ' ' + P.addDays(S.monday, s.day).toLocaleDateString('en-GB', { day:'numeric', month:'short' }) + ' P' + s.period;
-  return { when, cls: s.cls, prompt: P.buildPrompt(S.data, s) };
+  return { when, cls: s.cls, prompt: P.buildPrompt(S.data, s, (S.classSettings || {})[s.cls]) };
 }
 function sendToClaude(preselect) {
   if (!S.week) return;
@@ -780,14 +831,14 @@ item('mSync', async () => {
     .catch((e) => status('Calendar failed: ' + e.message));
 });
 item('mPrint', () => {
-  const list = P.printList(S.data, S.week);
+  const list = P.printList(S.data, S.week, S.classSettings);
   modal('<h3>To print this week</h3>' + (list.length ? '<pre>' + list.map(esc).join('\n') + '</pre>' : '<p class="muted">Nothing to print.</p>') + '<div class="row"><button id="mClose">Close</button></div>');
   $('mClose').onclick = closeModal;
 });
 item('mXlsx', () => {
   const title = 'Order Sheet Week ' + S.week.letter + ' - ' + S.monday.toLocaleDateString('en-GB', { month:'short' }) + ' ' + S.monday.getDate();
   status('Making the Excel file...');
-  run('exportXlsx', P.sheetModel(S.data, S.week), title).then((r) => {
+  run('exportXlsx', P.sheetModel(S.data, S.week, S.classSettings), title).then((r) => {
     const bytes = Uint8Array.from(atob(r.b64), (ch) => ch.charCodeAt(0));
     const a = document.createElement('a');
     a.href = URL.createObjectURL(new Blob([bytes], { type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }));
@@ -797,6 +848,37 @@ item('mXlsx', () => {
 item('mAuto', () => { if (S.readOnly) { toast('This week is already taught'); return; } if (confirm('Re-plan the whole week from where each class is up to? Your changes to this week are replaced (Undo brings them back).')) { change(P.autofill(S.data, S.weeks, S.monday, S.learned), 'Week re-planned'); markGaps(); render(); } });
 item('mImp', () => $('file').click());
 item('mClaude', () => sendToClaude(null));
+// Make next day (Patryk 2026-10-08): one click sends the next school day's lessons to Claude, each with
+// its checklist, the class notes and the books, plus that day's kit and printing for reference.
+$('mkDay').onclick = async () => {
+  if (!S.data || !S.data.classes) return;
+  if (S.dirty) await save();
+  let d = P.addDays(todayMidnight(), 1);
+  while (d.getDay() === 0 || d.getDay() === 6) d = P.addDays(d, 1);
+  const mon = P.mondayOf(d), day = (d.getDay() + 6) % 7;
+  const week = P.iso(mon) === S.week.monday ? S.week : (S.weeks[P.iso(mon)] || P.autofill(S.data, S.weeks, mon, S.learned));
+  const slots = week.slots.filter((s) => s.day === day && !s.double && ['lesson', 'revision'].includes(s.kind));
+  const label = P.DAYS[day] + ' ' + d.getDate() + ' ' + d.toLocaleDateString('en-GB', { month: 'short' });
+  if (!slots.length) { toast('No lessons to build on ' + label); return; }
+  const rows = slots.map((s) => {
+    const name = s.kind === 'lesson' ? 'L' + S.data.classes[s.cls].seq[s.i].num + ' ' + S.data.classes[s.cls].seq[s.i].title : P.lessonCell(S.data, s);
+    return '<label style="display:block;margin:3px 0"><input type="checkbox" class="mdReq" data-p="' + s.period + '"' + (s.built === true ? '' : ' checked') + '> P' + s.period + ' ' + esc(s.cls) + ' · ' + esc(name) + (s.built === true ? ' <span class="muted">(already built)</span>' : '') + '</label>';
+  }).join('');
+  modal('<h3>Make ' + label + '</h3><p class="muted">Ticked lessons go to Claude with their checklists and class notes. At home: "do my planner requests".</p>' + rows +
+    '<label>Anything else for the day (optional)</label><input type="text" id="mdNote" placeholder="e.g. 9XS are in the lab, not S8">' +
+    '<div class="row"><button class="primary" id="mdGo">Send to Claude</button><button id="mdCancel">Cancel</button></div>');
+  $('mdCancel').onclick = closeModal;
+  $('mdGo').onclick = () => {
+    const pick = new Set([...document.querySelectorAll('.mdReq')].filter((x) => x.checked).map((x) => +x.dataset.p));
+    const lessons = slots.filter((s) => pick.has(s.period)).map((s) => ({ when: label + ' P' + s.period, cls: s.cls, prompt: P.buildPrompt(S.data, s, (S.classSettings || {})[s.cls]) }));
+    const kit = P.printList(S.data, week, S.classSettings).filter((x) => x.startsWith(P.DAYS[day] + ' '));
+    const text = ['Make my next day: ' + label + '.', $('mdNote').value.trim(), kit.length ? 'Printing that day: ' + kit.join('; ') : ''].filter(Boolean).join(' ');
+    if (!lessons.length) { toast('Nothing ticked'); return; }
+    closeModal(); status('Sending ' + label + ' to Claude...');
+    run('sendRequest', { kind: 'build', text, lessons }).then(() => { status('Sent ' + label + ' to Claude'); toast('Sent. At home say "do my planner requests"'); })
+      .catch((e) => status('Not sent: ' + e.message));
+  };
+};
 item('mTheme', () => { store.set('planner-theme', document.body.classList.contains('light') ? 'dark' : 'light'); applyTheme(); });
 const HELP = [['J or →', 'next week (next day in Day view)'], ['K or ←', 'previous week (previous day in Day view)'], ['T', 'today'], ['W / D / C', 'week / day / classes view'], ['/', 'find a lesson (when one is selected)'], ['Delete', 'clear the selected lesson'], ['Ctrl+Z', 'undo'], ['Ctrl+S', 'save'], ['Esc', 'close / deselect'], ['?', 'this help']];
 const showHelp = () => { modal('<h3>Keyboard shortcuts</h3>' + HELP.map(([k, t]) => '<div style="margin:4px 0"><kbd>' + k + '</kbd> ' + t + '</div>').join('') + '<div class="row"><button id="mClose">Close</button></div>'); $('mClose').onclick = closeModal; };
@@ -849,7 +931,7 @@ document.addEventListener('keydown', (e) => {
 window.addEventListener('beforeunload', (e) => { if (S.dirty) { e.preventDefault(); e.returnValue = ''; } });
 
 function onLoad(r) {
-  S.data = r.data; S.weeks = r.weeks || {}; S.learned = r.learned || {}; S.hasTemplate = r.hasTemplate; S.added = r.added || [];
+  S.data = r.data; S.weeks = r.weeks || {}; S.learned = r.learned || {}; S.classSettings = r.classSettings || {}; S.added = r.added || [];
   if (S.data && S.data.classes) {
     P.applyAdded(S.data, S.added);                                          // lessons he added in the planner
     Object.values(S.weeks).forEach((w) => P.remapWeek(S.data, w));          // same lessons after a data refresh

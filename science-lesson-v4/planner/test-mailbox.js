@@ -17,6 +17,10 @@ function folder(name) {
   f.createFolder = (n) => { const k = folder(n); f.kids.push(k); return k; };
   f.createFile = (n, text) => { const file = mkFile(n, text); f.files.push(file); return file; };
   f.getUrl = () => f.url;
+  f.getFolders = () => it(f.kids);
+  f.getName = () => f.name;
+  f.created = new Date(Date.now() + (folder.n = (folder.n || 0) + 1) * 1000);
+  f.getDateCreated = () => f.created;
   return f;
 }
 function mkFile(name, text) {
@@ -27,8 +31,10 @@ function mkFile(name, text) {
   return file;
 }
 const root = folder('My Drive');
-const bcs = root.createFolder('Beechen Cliff Science');
+// his real folder's name ends with a space (2026-10-08), and an accidental later copy exists
+const bcs = root.createFolder('Beechen Cliff Science ');
 bcs.createFolder('Admin');
+const dup = root.createFolder('Beechen Cliff Science'); dup.createFolder('Admin');
 const b1 = bcs.createFolder('Lessons').createFolder('Year 9').createFolder('Biology').createFolder('B1 Cells');
 
 function props(init) { const m = Object.assign({}, init); return { getProperty: (k) => (k in m ? m[k] : null), setProperty: (k, v) => { m[k] = v; } }; }
@@ -65,8 +71,9 @@ school.loadAll_ = () => ({ weeks: { '2026-10-12': { slots: [] } }, learned: { a:
 
 console.log('── planner mailbox');
 mb.setup();
-const sync = root.kids[0].kids[0].kids.find((k) => k.name === 'Planner Sync');
-check(!!sync, 'setup makes Admin/Planner Sync');
+const sync = bcs.kids[0].kids.find((k) => k.name === 'Planner Sync');
+check(!!sync, 'setup uses the REAL folder (name with a trailing space), not the later copy');
+check(!dup.kids[0].kids.length && root.kids.length === 2, 'no new Beechen Cliff Science folder is made');
 check(JSON.parse(mb.doGet({ parameter: { key: 'wrong', op: 'ping' } }).t).ok === false, 'a wrong key is refused');
 
 let r = school.pullData_();

@@ -53,6 +53,15 @@ function run() {
   eq(T.primaryBook({ year: 8 }), 'Activate 2', 'primaryBook Y8 → Activate 2');
   eq(T.primaryBook({ year: 12, subject: 'Physics' }), null, 'primaryBook Y12 → none');
 
+  // Known misses (Patryk 2026-10-08: book pages must be accurate)
+  const ref = (y, s, t) => T.formatRef(T.matchLesson({ year: y, subject: s, topic: t })) || '(none)';
+  eq(ref(7, 'Chemistry', 'Gas Pressure'), 'Activate 1, p. 72', 'Y7 Gas Pressure → its own book (Activate 1), not Activate 2');
+  eq(ref(7, 'Physics', 'Air Resistance'), 'Activate 1, p. 116', 'Y7 Air Resistance → "Drag forces and friction"');
+  eq(ref(7, 'Science Skills', 'Introduction and Safety'), '(none)', 'Introduction and Safety → no book page');
+  eq(ref(10, 'Physics', 'Plugs'), 'AQA Physics (Kerboodle), p. 66', 'Plugs → "Cables and plugs"');
+  eq(ref(7, 'Biology', 'Microscopes'), 'Activate 1, p. 14', 'Y7 Microscopes → "Observing cells"');
+  eq(ref(9, 'Physics', 'P3 Particles Test'), '(none)', 'a test lesson → no book page');
+
   return { fails, warns: 0 };
 }
 

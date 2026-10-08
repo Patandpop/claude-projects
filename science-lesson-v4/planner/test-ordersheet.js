@@ -23,7 +23,7 @@ function range(r, c, nr, nc) {
 }
 const sheet = {
   getRange: (r, c, nr, nc) => range(r, c, nr, nc), getMaxRows: () => 1000, getMaxColumns: () => 26,
-  deleteColumns() {}, deleteRows() {}, setColumnWidth() {}, setRowHeight() {}, setFrozenRows() {}, setName() {},
+  deleteColumns() {}, deleteRows() {}, setHiddenGridlines() {}, setColumnWidth() {}, setRowHeight() {}, setFrozenRows() {}, setName() {},
 };
 const builder = () => { const b = { text: '', setText(t) { b.text = t; return b; }, setTextStyle() { return b; }, build() { return { text: b.text }; } }; return b; };
 const ctx = vm.createContext({
@@ -38,13 +38,14 @@ const data = require('./planner-data.json');
 const week = P.autofill(data, {}, P.parse('2026-10-12'), {});
 const model = P.sheetModel(data, week);
 ctx.drawOrderSheet_(sheet, model);
-check(/Week B/.test(values.N1), 'title row shows the week letter and date');
-check(values.B2 === 'Period 1' && values.R2 === 'Period 5', 'period headings 1 to 5');
-check(values.A3 === 'Mon 12 Oct' && values.A23 === 'Fri 16 Oct', 'a day label for each day');
+check(/Teacher/.test(values.A1) && /Week B/.test(values.Q1), 'title row: teacher, week letter and date (his design)');
+check(values.B2 === 'Period 1' && values.V2 === 'Period 5' && values.F2 === undefined, 'period headings 1 to 5, with cutting gaps between cards');
+check(values.A3 === 'Mon' && values.A27 === 'Fri' && values.B3 === 'Mon P1', 'a day label for each day and a header on each card');
 const mon1 = model.days[0].slots[0];
-check(values.E4 === mon1.cls && values.B5 === mon1.lesson, 'Monday P1: class and lesson in the right boxes');
+check(values.E4 === mon1.cls && values.C4 === 'S8' && values.B5 === mon1.lesson, 'Monday P1: room, class and lesson in the right boxes');
 check(String(values.B6).startsWith(mon1.kit), 'Monday P1: kit in the big box');
-check(values.C7 === mon1.size && String(values.E7).startsWith(String(mon1.sets)), 'Monday P1: class size and number of sets');
+check(values.C7 === mon1.size && String(values.E7) === String(mon1.sets), 'Monday P1: class size and number of sets');
+check(values.A34 === 'Key' && values.B34, 'colour key row at the bottom');
 check(merges.includes('A3:A7') && merges.includes('B6:E6'), 'day label and kit boxes are merged');
 check(model.days.every((d) => d.slots.length === 5), 'every day has 5 period boxes (blank when free)');
 
@@ -56,6 +57,7 @@ ctx.Utilities = { unzip: () => [blobOf('xl/worksheets/sheet1.xml', xml), blobOf(
 ctx.onePage_(blobOf('a', ''), 't');
 const out = zipped && zipped[0].getDataAsString();
 check(out && /<sheetPr><outlinePr[^>]*\/><pageSetUpPr fitToPage="1"\/><\/sheetPr>/.test(out), 'fit-to-page switched on');
+check(out && /horizontalCentered="1"/.test(out) && out.indexOf('<printOptions') < out.indexOf('<pageMargins'), 'centred on the page, in the right place in the file');
 check(out && /orientation="landscape"/.test(out) && /fitToHeight="1"/.test(out) && out.indexOf('<pageSetup') < out.indexOf('<drawing'), 'landscape A4 on one page, in the right place in the file');
 check(out && (out.match(/<pageMargins/g) || []).length === 1, 'old margins replaced, not duplicated');
 
