@@ -602,6 +602,12 @@ function main() {
   hardFails += ownTest.fails;
   warnings  += ownTest.warns;
 
+  // Exam question kinds (self-marking multiple choice for the Forms homework).
+  console.log('');
+  const catTest = require(path.join(__dirname, 'exam-categorise.test.js')).run();
+  hardFails += catTest.fails;
+  warnings  += catTest.warns;
+
   console.log('');
   if (hardFails) {
     console.log(`${RED}FAILED${RST} — ${hardFails} hard assertion(s), ${warnings} warning(s).`);

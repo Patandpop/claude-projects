@@ -91,6 +91,73 @@ function pushState_() {
   } catch (e) { return String(e.message || e); }
 }
 // "Send to Claude": a message or a list of lessons to build, for Claude Code at home.
+/* ------------------------------------------------------------ homework quizzes
+   Patryk 2026-10-08: homework from real exam questions that marks itself. At home Claude chooses the
+   questions (homework-forms.js) and drops "homework-<class>-<due>.json" in the sync folder. Here,
+   ⋯ More → Homework quizzes turns each new one into:
+     - a Google Forms QUIZ in his school Drive (folder "Planner homework quizzes"): multiple-choice
+       questions with the right answer set, so they mark themselves; written questions show the real
+       mark scheme after submitting (worth 0 points, so nothing waits for his marking);
+     - a Google Classroom DRAFT for that class with the quiz linked and the due date set. He checks
+       and publishes it himself. (Needs the Classroom service: Services + → Google Classroom API.)
+   It only CREATES: the quiz, the folder (once) and the draft. Each one made is listed in
+   homework-made.json so it is never made twice. */
+function makeHomework(k) {
+  check_(k);
+  if (!mailboxOn_()) throw new Error('The home link (mailbox) is not set up yet.');
+  const names = mailGet_({ op: 'list' }).names || [];
+  const madeFile = mailGet_({ op: 'read', name: 'homework-made.json' });
+  const made = madeFile.found ? JSON.parse(madeFile.text || '{}') : {};
+  const out = [];
+  for (const name of names) {
+    if (made[name] || !/^homework-[A-Za-z0-9]+-\d{4}-\d{2}-\d{2}\.json$/.test(name)) continue;
+    const hw = JSON.parse(mailGet_({ op: 'read', name }).text);
+    const form = buildQuiz_(hw);
+    const draft = classroomDraft_(hw, form);
+    made[name] = { at: new Date().toISOString(), form: form.getEditUrl(), link: form.getPublishedUrl(), draft: draft.ok, note: draft.why || '' };
+    tab_('Log', ['when', 'what', 'where']).appendRow([new Date(), 'made homework quiz' + (draft.ok ? ' + Classroom draft' : ''), hw.title]);
+    out.push({ title: hw.title, form: form.getEditUrl(), draft: draft.ok, note: draft.why || '' });
+  }
+  if (out.length) mailPost_({ op: 'write', name: 'homework-made.json', text: JSON.stringify(made, null, 1) });
+  return out;
+}
+function buildQuiz_(hw) {
+  const f = FormApp.create(hw.title);
+  f.setIsQuiz(true).setDescription(hw.intro || '').setCollectEmail(true).setProgressBar(true);
+  hw.questions.forEach((q, n) => {
+    if (q.type === 'mcq') {
+      const it = f.addMultipleChoiceItem().setTitle((n + 1) + '. ' + q.text).setPoints(q.points || 1).setRequired(true);
+      it.setChoices(q.options.map((o, i) => it.createChoice(o, i === q.answer)));
+      if (q.feedback) it.setFeedbackForIncorrect(FormApp.createFeedback().setText('What examiners saw: ' + q.feedback).build());
+    } else {
+      const it = f.addParagraphTextItem().setTitle((n + 1) + '. ' + q.text + '  [' + q.marks + ' mark' + (q.marks === 1 ? '' : 's') + ']').setRequired(true).setPoints(0);
+      it.setGeneralFeedback(FormApp.createFeedback().setText('Mark scheme (mark your own answer): ' + q.scheme).build());
+    }
+  });
+  // keep his Drive tidy: the quiz goes into one folder (made once; only this new file is moved)
+  const it = DriveApp.getFoldersByName('Planner homework quizzes');
+  const folder = it.hasNext() ? it.next() : DriveApp.createFolder('Planner homework quizzes');
+  DriveApp.getFileById(f.getId()).moveTo(folder);
+  return f;
+}
+function classroomDraft_(hw, form) {
+  if (typeof Classroom === 'undefined') return { ok: false, why: 'Classroom service not switched on (Apps Script: Services + → Google Classroom API)' };
+  try {
+    const want = String(hw.cls).toLowerCase().replace(/\s+/g, '');
+    const courses = (Classroom.Courses.list({ teacherId: 'me', courseStates: ['ACTIVE'] }).courses || []);
+    const course = courses.find((c) => (String(c.name) + ' ' + String(c.section || '')).toLowerCase().replace(/\s+/g, '').includes(want));
+    if (!course) return { ok: false, why: 'no Classroom class with "' + hw.cls + '" in its name' };
+    const [y, m, d] = hw.due.split('-').map(Number);
+    const points = hw.questions.filter((q) => q.type === 'mcq').reduce((n, q) => n + (q.points || 1), 0);
+    Classroom.Courses.CourseWork.create({
+      title: hw.title, description: hw.intro || '', workType: 'ASSIGNMENT', state: 'DRAFT', maxPoints: points,
+      materials: [{ link: { url: form.getPublishedUrl(), title: hw.title } }],
+      dueDate: { year: y, month: m, day: d }, dueTime: { hours: 8, minutes: 30 },
+    }, course.id);
+    return { ok: true };
+  } catch (e) { return { ok: false, why: String(e.message || e) }; }
+}
+
 function sendRequest(k, req) {
   check_(k);
   if (!mailboxOn_()) throw new Error('The mailbox is not set up yet (see the setup guide: MAILBOX_URL and MAILBOX_KEY).');

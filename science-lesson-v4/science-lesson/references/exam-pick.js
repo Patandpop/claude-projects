@@ -31,10 +31,11 @@ const AQA_TOPIC = {
   P5: 'Forces', P6: 'Waves', P7: 'Magnetism', P8: 'Space Physics',
   B1: 'Cell Biology', B2: 'Organisation', B3: 'Infection and Response', B4: 'Bioenergetics',
   B5: 'Homeostasis and Response', B6: 'Inheritance Variation and Evolution', B7: 'Ecology',
-  C1: 'Atomic Structure and the Periodic Table', C2: 'Bonding Structure and the Properties of Matter',
+  // Chemistry: exactly as the library stores them (from his export file names, read 2026-10-08)
+  C1: 'Atomic Structure and Periodic Table', C2: 'Bonding; Structure and Properties of Matter',
   C3: 'Quantitative Chemistry', C4: 'Chemical Changes', C5: 'Energy Changes',
-  C6: 'The Rate and Extent of Chemical Change', C7: 'Organic Chemistry', C8: 'Chemical Analysis',
-  C9: 'Chemistry of the Atmosphere', C10: 'Using Resources',
+  C6: 'Rate and Extent of Chemical Change', C7: 'Organic Chemistry', C8: 'Chemical Analysis',
+  C9: 'Chemistry of the atmosphere', C10: 'Using Resources',
 };
 const OCR_CLASSES = /^(12|13)/;
 const STOP = new Set('a an and are as at be by for from how in is it its of on or that the this to was what when which why with you your use using lesson part'.split(' '));

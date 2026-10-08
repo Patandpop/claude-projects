@@ -115,6 +115,15 @@ The mailbox can only read and write files in `Beechen Cliff Science / Admin / Pl
 7. Run **setup** once more (▷ Run) so it can ask to connect out (allow it).
 8. Open the planner. If the top right says "Home link not working", screenshot it and send it to Claude.
 
+## Part 9: self-marking homework quizzes (once, at school)
+
+Claude chooses the homework at home from real exam questions; the planner turns it into a Google Forms quiz and a Google Classroom **draft**. To let it:
+1. In the planner's Apps Script, on the left next to **Services** click **+**, choose **Google Classroom API**, click **Add**.
+2. Run **setup** once more (▷ Run) and allow the new permissions (Forms and Classroom).
+3. Your Classroom classes need the class code in their name (e.g. "10C2 Science") so the planner finds the right one.
+
+Then: at home ask Claude "make homework for 10C2 due Friday". At school: **⋯ More → Homework quizzes**. Check the draft in Classroom and publish it. Multiple-choice questions mark themselves; written ones show the real mark scheme after pupils submit, so there is nothing for you to mark.
+
 ---
 
 ## Using it

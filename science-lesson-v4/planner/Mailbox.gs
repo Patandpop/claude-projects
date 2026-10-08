@@ -26,8 +26,10 @@
 */
 
 const SYNC = ['Beechen Cliff Science', 'Admin', 'Planner Sync'];
-const WRITABLE = { 'planner-state.json': true };               // whole-file writes from school
-const READABLE = { 'planner-data.json': true, 'planner-state.json': true, 'requests.json': true, 'requests-done.json': true };
+const WRITABLE = { 'planner-state.json': true, 'homework-made.json': true };   // whole-file writes from school
+const READABLE = { 'planner-data.json': true, 'planner-state.json': true, 'requests.json': true, 'requests-done.json': true, 'homework-made.json': true };
+// homework quizzes chosen at home (homework-forms.js): "homework-10C2-2026-10-16.json"
+const HOMEWORK = /^homework-[A-Za-z0-9]+-\d{4}-\d{2}-\d{2}\.json$/;
 
 function setup() {
   const p = PropertiesService.getScriptProperties();
@@ -95,7 +97,12 @@ function doGet(e) {
   const p = (e && e.parameter) || {};
   if (!keyOk_(p.key)) return out_({ ok: false, error: 'Locked' });
   if (p.op === 'ping') return out_({ ok: true });
-  if (p.op === 'read' && READABLE[p.name]) {
+  if (p.op === 'list') {
+    const names = [], it = syncFolder_().getFiles();
+    while (it.hasNext()) { const n = it.next().getName(); if (HOMEWORK.test(n)) names.push(n); }
+    return out_({ ok: true, names: names.sort() });
+  }
+  if (p.op === 'read' && (READABLE[p.name] || HOMEWORK.test(p.name || ''))) {
     const f = readFile_(p.name);
     return out_({ ok: true, name: p.name, found: !!f, modified: f ? f.modified : null, text: f ? f.text : null });
   }

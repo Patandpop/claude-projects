@@ -164,6 +164,7 @@
       <button id="mXlsx">Technicians' Excel<small>the order sheet to email</small></button>
       <hr>
       <button id="mClaude">Send to Claude<small>build lessons or ask for changes, done at home</small></button>
+      <button id="mHw">Homework quizzes<small>make the Google Forms + Classroom drafts Claude prepared</small></button>
       <hr>
       <button id="mAuto">Re-plan this week<small>from where each class is up to</small></button>
       <button id="mImp">Import data<small>planner-data.json from home</small></button>
@@ -848,6 +849,18 @@ item('mXlsx', () => {
 item('mAuto', () => { if (S.readOnly) { toast('This week is already taught'); return; } if (confirm('Re-plan the whole week from where each class is up to? Your changes to this week are replaced (Undo brings them back).')) { change(P.autofill(S.data, S.weeks, S.monday, S.learned), 'Week re-planned'); markGaps(); render(); } });
 item('mImp', () => $('file').click());
 item('mClaude', () => sendToClaude(null));
+// Homework quizzes (Patryk 2026-10-08): turn the homework Claude chose at home into self-marking
+// Google Forms and Classroom drafts. He checks each draft in Classroom and publishes it.
+item('mHw', () => {
+  status('Making homework quizzes...');
+  run('makeHomework').then((list) => {
+    status(list.length ? list.length + ' homework quiz(zes) made' : 'No new homework from home');
+    modal('<h3>Homework quizzes</h3>' + (list.length ? list.map((h) => '<p><b>' + esc(h.title) + '</b><br><a href="' + esc(h.form) + '" target="_blank">Open the quiz</a> · ' +
+      (h.draft ? 'Classroom draft ready: check it and publish' : 'no Classroom draft: ' + esc(h.note)) + '</p>').join('') :
+      '<p class="muted">Nothing new. At home, ask Claude: "make homework for 10C2 due Friday".</p>') + '<div class="row"><button id="mClose">Close</button></div>');
+    $('mClose').onclick = closeModal;
+  }).catch((e) => status('Homework not made: ' + e.message));
+});
 // Make next day (Patryk 2026-10-08): one click sends the next school day's lessons to Claude, each with
 // its checklist, the class notes and the books, plus that day's kit and printing for reference.
 $('mkDay').onclick = async () => {

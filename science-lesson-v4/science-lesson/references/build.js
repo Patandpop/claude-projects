@@ -4982,6 +4982,18 @@ async function main() {
       // 0 — Real exam questions (Patryk 2026-10-03), home only: exam-pick.js and the exam
       //     library are not packaged for claude.ai, so school builds skip this quietly. A lesson
       //     can opt out with meta.examQuestion:false or bring its own L.examQuestion.
+      // Automatic Do Now (Patryk 2026-10-08), home only: `"doNow": {"auto": true}` fills the six
+      // questions from what the class has covered (do-now-pick.js: spaced retrieval + one question from
+      // last year's content). A Do Now written into the lesson is always used as written.
+      const dnPickPath = path.join(__dirname, 'do-now-pick.js');
+      if (L.doNow && L.doNow.auto && !arr(L.doNow.questions).length && fs.existsSync(dnPickPath)) {
+        try {
+          const cls = String((L.meta || {}).class || '').split(/[\/,]/)[0].trim();
+          const r = require(dnPickPath).pick(cls, { date: (L.meta || {}).date });
+          L.doNow.questions = r.picked.map((p) => ({ q: p.q, a: p.a, marks: p.marks || 1 }));
+          console.log(`  [do now] ${r.picked.length} picked for ${cls} (${r.picked.map((p) => p.why).join(', ')})`);
+        } catch (e) { buildWarn('automatic Do Now not picked: ' + e.message); }
+      }
       const examPickPath = path.join(__dirname, 'exam-pick.js');
       let examPicked = null;
       if (L.examQuestion === undefined && (L.meta || {}).examQuestion !== false && fs.existsSync(examPickPath) && !process.env.NO_EXAM_PICK) {

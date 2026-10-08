@@ -73,6 +73,8 @@ function examPartsToBank(index, opts) {
       marks: p.marks || 1,
       source: 'exam',
       examRef: ref,
+      unit: topic,                                              // the AQA topic (subtopic is in topic)
+      passRate: p.passRate == null ? null : p.passRate,         // real examiner %; Years 7-8 get only easy ones
     });
   }
   return out;

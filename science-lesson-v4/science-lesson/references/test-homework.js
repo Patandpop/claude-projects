@@ -220,7 +220,6 @@ function plan(cls, opts) {
   const rel = (lessons.find((L) => L.rel) || {}).rel || '';
   const [yearDir, subject] = rel.split('/');
   const code = (topicFolder.match(/^[BCP]\d+/) || [])[0];
-  if (subject === 'Chemistry') throw new Error(`${cls} ${topicFolder}: the exam library has no Chemistry questions yet.`);
   const libTopic = ep.AQA_TOPIC[code];
   const dir = assessmentDir(yearDir, subject, topicFolder);
   if (!dir) throw new Error(`No Admin/Assessment folder for ${yearDir}/${subject}/${topicFolder}`);

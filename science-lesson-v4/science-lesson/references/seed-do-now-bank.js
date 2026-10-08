@@ -77,24 +77,45 @@ function run(opts) {
     });
   }
 
-  // Per class: only the subjects Patryk teaches them, and only if AQA.
+  // OCR A-level Physics (12C, 13D): short single-part questions and multiple choice with a clear
+  // answer, from exam-library/docs-ocr (exam-library-ocr.js). Never given to an AQA class.
+  const ocr = [];
+  const ocrDir = path.join(LIB, 'docs-ocr');
+  if (fs.existsSync(ocrDir)) for (const f of fs.readdirSync(ocrDir)) {
+    const d = JSON.parse(fs.readFileSync(path.join(ocrDir, f), 'utf8'));
+    for (const p of d.parts) {
+      const single = p.questionTotalMarks === p.marks;
+      if (p.marks > 2 || p.hasFigure || !single || /\[FIGURE\]/.test(p.ms.text)) continue;
+      const answer = p.mcqAnswer || p.ms.text.replace(/\s*\b[BCAM]\d\b.*$/s, '').trim();
+      if (!answer || answer.length > 160) continue;
+      ocr.push({ id: 'ocr-' + p.id.toLowerCase().replace(/[^a-z0-9]+/g, '-'), text: p.text, answer, type: p.mcqAnswer ? 'mcq' : 'recall',
+        subject: 'Physics', topic: p.subsubtopic || p.subtopic, unit: p.topic, KS: 'KS5', AO: 'AO1', marks: p.marks, source: 'exam', board: 'OCR A', examRef: p.id });
+    }
+  }
+  console.log(`  OCR A-level ${String(ocr.length).padStart(5)} short questions`);
+
+  // Per class (Patryk 2026-10-08: every class gets a bank):
+  //   Years 7-8   the EASIEST AQA recall (real pass rate 65%+, 1-2 marks), for the subjects he teaches them
+  //   Years 9-11  AQA, the subjects he teaches them
+  //   Years 12-13 OCR A only (never AQA)
   const classes = loadClasses();
   const written = [];
   const skipped = [];
 
   for (const c of classes) {
-    if (c.examQuestionsEligible !== true) {
-      skipped.push(`${c.code} — ${c.examQuestionsNote || 'not eligible (no exam-board match or year too low)'}`);
-      continue;
-    }
     const subjects = c.patrykTeaches || [];
-    const pool = subjects.flatMap((s) => bySubject.get(s) || []);
+    let pool;
+    if (c.year >= 12) pool = ocr;
+    else {
+      pool = subjects.flatMap((s) => bySubject.get(s) || []);
+      if (c.year <= 8) pool = pool.filter((q) => q.passRate != null && q.passRate >= 65 && q.marks <= 2);
+    }
     if (!pool.length) {
       skipped.push(`${c.code} — no questions for the subject(s) Patryk teaches them (${subjects.join(', ') || 'none listed'})`);
       continue;
     }
     const bank = {
-      _comment: `Do Now question bank for ${c.code}. Every question and answer is taken verbatim from a real AQA exam paper and its mark scheme. Seeded from the exam library; do not hand-edit — re-run seed-do-now-bank.js instead.`,
+      _comment: `Do Now question bank for ${c.code}. Every question and answer is taken verbatim from a real exam paper and its mark scheme (AQA GCSE, or OCR A for A-level classes). Seeded from the exam library; do not hand-edit — re-run seed-do-now-bank.js instead.`,
       class: c.code, year: c.year, examBoard: c.examBoard,
       subjects,
       seededOn: new Date().toISOString().slice(0, 10),
