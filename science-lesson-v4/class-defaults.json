@@ -3,11 +3,16 @@
   "_validFrom": "2026-09-01",
   "_sourceOfTruth": "Patryk, 2026-07-13. Word-bank + homework rules stated in chat; timetable facts cross-checked against 2026-2027-timetable.md.",
   "_howWordBankWorks": "wordBank:true means the support worksheet gets a word bank on the Developing Apply tier and on any cloze activity. It is driven by worksheetExtras.wordBank[] or title.keywords[] in the lesson content. See CLAUDE.md 'Support worksheet' table.",
-
   "classes": {
     "7MLA": {
-      "year": 7, "ks": "KS3", "examBoard": null,
-      "patrykTeaches": ["Biology", "Chemistry", "Physics"],
+      "year": 7,
+      "ks": "KS3",
+      "examBoard": null,
+      "patrykTeaches": [
+        "Biology",
+        "Chemistry",
+        "Physics"
+      ],
       "soleTeacher": true,
       "lessonsPerFortnight": 6,
       "wordBank": true,
@@ -18,10 +23,20 @@
       "notes": "Busiest class. Class size TBC."
     },
     "8XP": {
-      "year": 8, "ks": "KS3", "examBoard": null,
-      "patrykTeaches": ["Biology", "Physics"],
+      "year": 8,
+      "ks": "KS3",
+      "examBoard": null,
+      "patrykTeaches": [
+        "Biology",
+        "Physics"
+      ],
       "soleTeacher": false,
-      "sharedWith": [{ "teacher": "Ms S Sole", "takes": "Chemistry" }],
+      "sharedWith": [
+        {
+          "teacher": "Ms S Sole",
+          "takes": "Chemistry"
+        }
+      ],
       "lessonsPerFortnight": 4,
       "wordBank": true,
       "wordBankReason": "Carried forward from 2025/26 (CLAUDE.md: 'Lower mixed — word bank on cloze'). Same class code, same cohort profile. CONFIRM with Patryk.",
@@ -31,10 +46,20 @@
       "notes": "32 students."
     },
     "8AG": {
-      "year": 8, "ks": "KS3", "examBoard": null,
-      "patrykTeaches": ["Physics"],
+      "year": 8,
+      "ks": "KS3",
+      "examBoard": null,
+      "patrykTeaches": [
+        "Biology",
+        "Physics"
+      ],
       "soleTeacher": false,
-      "sharedWith": [{ "teacher": "Mr L Hollis", "takes": "Chemistry, likely Biology" }],
+      "sharedWith": [
+        {
+          "teacher": "Mr L Hollis",
+          "takes": "Chemistry, likely Biology"
+        }
+      ],
       "lessonsPerFortnight": 2,
       "wordBank": null,
       "wordBankReason": "NOT STATED — Patryk has not said whether 8AG is lower prior attainment. ASK.",
@@ -44,10 +69,20 @@
       "notes": "32 students. Only 2 lessons/fortnight — Patryk sees them least."
     },
     "9AS": {
-      "year": 9, "ks": "KS3/KS4 boundary", "examBoard": "AQA",
-      "patrykTeaches": ["Chemistry", "Physics"],
+      "year": 9,
+      "ks": "KS3/KS4 boundary",
+      "examBoard": "AQA",
+      "patrykTeaches": [
+        "Chemistry",
+        "Physics"
+      ],
       "soleTeacher": false,
-      "sharedWith": [{ "teacher": "Ms A Milland", "takes": "Biology" }],
+      "sharedWith": [
+        {
+          "teacher": "Ms A Milland",
+          "takes": "Biology"
+        }
+      ],
       "lessonsPerFortnight": 4,
       "wordBank": null,
       "wordBankReason": "NOT STATED. ASK.",
@@ -59,8 +94,14 @@
       "notes": "32 students."
     },
     "9XS": {
-      "year": 9, "ks": "KS3/KS4 boundary", "examBoard": "AQA",
-      "patrykTeaches": ["Biology", "Chemistry", "Physics"],
+      "year": 9,
+      "ks": "KS3/KS4 boundary",
+      "examBoard": "AQA",
+      "patrykTeaches": [
+        "Biology",
+        "Chemistry",
+        "Physics"
+      ],
       "soleTeacher": true,
       "lessonsPerFortnight": 6,
       "wordBank": null,
@@ -73,13 +114,24 @@
       "notes": "32 students."
     },
     "10C2": {
-      "year": 10, "ks": "KS4", "examBoard": "AQA",
+      "year": 10,
+      "ks": "KS4",
+      "examBoard": "AQA",
       "course": "Combined Science",
-      "patrykTeaches": ["Physics", "Chemistry"],
+      "patrykTeaches": [
+        "Physics",
+        "Chemistry"
+      ],
       "soleTeacher": false,
       "sharedWith": [
-        { "teacher": "Ms B Cox", "takes": null },
-        { "teacher": "Ms R Bala", "takes": null }
+        {
+          "teacher": "Ms B Cox",
+          "takes": null
+        },
+        {
+          "teacher": "Ms R Bala",
+          "takes": null
+        }
       ],
       "lessonsPerFortnight": 5,
       "wordBank": true,
@@ -92,9 +144,13 @@
       "notes": "23 students. Combined Science means this class needs CHEMISTRY exam questions — Patryk is exporting those to Drive (2026-07-14)."
     },
     "10S2": {
-      "year": 10, "ks": "KS4", "examBoard": "AQA",
+      "year": 10,
+      "ks": "KS4",
+      "examBoard": "AQA",
       "course": "Separate Science (Triple)",
-      "patrykTeaches": ["Physics"],
+      "patrykTeaches": [
+        "Physics"
+      ],
       "soleTeacher": true,
       "lessonsPerFortnight": 3,
       "wordBank": false,
@@ -107,9 +163,13 @@
       "notes": "29 students, some may move to Combined. Physics only."
     },
     "11S2": {
-      "year": 11, "ks": "KS4", "examBoard": "AQA",
+      "year": 11,
+      "ks": "KS4",
+      "examBoard": "AQA",
       "course": "Separate Science (Triple)",
-      "patrykTeaches": ["Physics"],
+      "patrykTeaches": [
+        "Physics"
+      ],
       "soleTeacher": true,
       "lessonsPerFortnight": 3,
       "wordBank": false,
@@ -121,11 +181,20 @@
       "notes": "~32 students. Same students as this year's 10S2. Physics only. Exam year."
     },
     "12C": {
-      "year": 12, "ks": "KS5", "examBoard": "OCR A",
+      "year": 12,
+      "ks": "KS5",
+      "examBoard": "OCR A",
       "course": "A-level Physics (OCR A)",
-      "patrykTeaches": ["Physics"],
+      "patrykTeaches": [
+        "Physics"
+      ],
       "soleTeacher": false,
-      "sharedWith": [{ "teacher": null, "takes": "half the content — split TBC" }],
+      "sharedWith": [
+        {
+          "teacher": null,
+          "takes": "half the content — split TBC"
+        }
+      ],
       "lessonsPerFortnight": 4,
       "wordBank": false,
       "support": true,
@@ -137,11 +206,20 @@
       "notes": "Class size TBC."
     },
     "13D": {
-      "year": 13, "ks": "KS5", "examBoard": "OCR A",
+      "year": 13,
+      "ks": "KS5",
+      "examBoard": "OCR A",
       "course": "A-level Physics (OCR A)",
-      "patrykTeaches": ["Physics"],
+      "patrykTeaches": [
+        "Physics"
+      ],
       "soleTeacher": false,
-      "sharedWith": [{ "teacher": null, "takes": "half the content — same split as 12C" }],
+      "sharedWith": [
+        {
+          "teacher": null,
+          "takes": "half the content — same split as 12C"
+        }
+      ],
       "lessonsPerFortnight": 4,
       "wordBank": false,
       "support": true,
@@ -153,7 +231,6 @@
       "notes": "23 students (may reduce, never increase). Current 12D cohort. Exam year."
     }
   },
-
   "_openQuestions": [
     "8AG, 9AS, 9XS: is this class lower prior attainment (word bank) or not? Not stated.",
     "8XP, 10S2, 11S2: word-bank setting carried forward from 2025/26 — confirm still right.",
