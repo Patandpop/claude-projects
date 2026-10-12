@@ -32,6 +32,8 @@
     for (let n = 0; n < 120; n++, d = addDays(d, 1)) {
       if (d.getDay() !== 0 && d.getDay() !== 6 && (!(data.terms || []).length || isTeachingDay(data, d))) return d;
     }
+    return d;
+  }
   // Week letter: parity of TEACHING weeks since the first Week A (holiday weeks don't count).
   function weekLetter(data, monday) {
     monday = mondayOf(monday);
@@ -54,11 +56,40 @@
   // were made in, before that week's lessons.
   function applyMarks(st, marks, cls) {
     for (const m of marks || []) {
-      if (m.cls !== cls) continue;
+      if (m.cls !== cls || m.i == null || (m.done !== true && m.done !== false)) continue;   // a record with only a note changes nothing
       // skip (2026-10-08): never planned, but shown as skipped rather than taught
       if (m.done) { st.taught.add(m.i); st.when[m.i] = m.skip ? { date: '', wrote: 'skipped' } : (st.when[m.i] || { date: '', wrote: 'ticked off' }); }
       else { st.taught.delete(m.i); delete st.when[m.i]; }
     }
+  }
+  // Shared lesson state (Patryk 2026-10-12): ONE record per class + lesson, kept in data.records
+  // (the Lessons tab), not inside a week. { cls, key, i, done, skip, stoppedAt, date }. A tick counts
+  // in every week, earlier and later. Old weeks may still carry marks of their own: both count.
+  const recs = (data, w) => (data.records || []).concat((w && w.marks) || []);
+  function findRecord(data, cls, i) { return (data.records || []).find((r) => r.cls === cls && r.i === i) || null; }
+  // Merge fields into a lesson's record (null removes a field); an empty record is dropped.
+  function setRecord(data, cls, i, fields) {
+    data.records = data.records || [];
+    let r = findRecord(data, cls, i);
+    if (!r) { r = { cls, i, key: lessonId(data.classes[cls].seq[i]) }; data.records.push(r); }
+    for (const [f, v] of Object.entries(fields)) { if (v == null) delete r[f]; else r[f] = v; }
+    if (!Object.keys(r).some((f) => !['cls', 'i', 'key'].includes(f))) data.records = data.records.filter((x) => x !== r);
+    return r;
+  }
+  // After a data refresh: point every record back at the same lesson (by its lasting name).
+  function remapRecords(data) {
+    for (const r of data.records || []) { const seq = (data.classes[r.cls] || {}).seq || []; const k = r.key ? seq.findIndex((L) => lessonId(L) === r.key) : -1; r.i = k >= 0 ? k : null; }
+    return data;
+  }
+  // Ticks saved inside weeks (before 2026-10-12) move into the records. Returns the weeks changed.
+  function migrateMarks(data, weeks) {
+    const changed = [];
+    for (const w of Object.values(weeks || {}).sort((a, b) => a.monday.localeCompare(b.monday))) {
+      if (!(w.marks || []).length) continue;
+      for (const m of w.marks) if (data.classes[m.cls] && m.i != null && data.classes[m.cls].seq[m.i]) setRecord(data, m.cls, m.i, { done: m.done, skip: m.skip || null });
+      w.marks = []; changed.push(w);
+    }
+    return changed;
   }
   function applyWeek(data, st, w) {
     for (const cls of Object.keys(st)) applyMarks(st[cls], w.marks, cls);
@@ -74,7 +105,7 @@
   function progressBefore(data, savedWeeks, monday, learned) {
     const lastFilled = (data.filledWeeks || []).slice(-1)[0];
     const st = {};
-    for (const cls of Object.keys(data.classes)) st[cls] = cloneState((data.progress || {})[cls] || {});
+    for (const cls of Object.keys(data.classes)) { st[cls] = cloneState((data.progress || {})[cls] || {}); applyMarks(st[cls], data.records, cls); }
     if (!lastFilled) return st;
     const stop = iso(mondayOf(monday));
     const filledSet = new Set(data.filledWeeks || []);
@@ -88,7 +119,7 @@
     };
     if (stop <= lastFilled) forget(stop, null);
     edited.forEach((m) => forget(m, iso(addDays(parse(m), 7))));
-    touched.forEach((cls) => rewind(data, st[cls], cls));
+    touched.forEach((cls) => { rewind(data, st[cls], cls); applyMarks(st[cls], data.records, cls); });
     edited.forEach((m) => applyWeek(data, st, savedWeeks[m]));
     for (let m = addDays(parse(lastFilled), 7); iso(m) < stop; m = addDays(m, 7)) {
       const saved = (savedWeeks || {})[iso(m)];
@@ -197,7 +228,7 @@
   function classReport(data, savedWeeks, monday, cls, week) {
     const c = data.classes[cls]; if (!c) return [];
     const st = progressBefore(data, savedWeeks, monday)[cls];
-    if (week) applyMarks(st, week.marks, cls);
+    applyMarks(st, recs(data, week), cls);
     return [...new Set(c.seq.map((x) => x.unit))].map((u) => {
       const ls = c.seq.map((x, j) => ({ ...x, j })).filter((x) => x.unit === u);
       const state = u === st.unit ? 'current' : st.closed.has(u) || st.tested.has(u) ? 'finished' : ls.some((x) => st.taught.has(x.j)) ? 'started' : 'to come';
@@ -288,7 +319,7 @@
   // it stays put, and the class's other slots this week re-flow around it. So a lesson he replaces
   // moves to the next free slot instead of disappearing (Patryk 2026-10-04: a skipped lesson is the
   // big danger).
-  const CONTENT = ['kind', 'i', 'key', 'unit', 'text', 'eq', 'sets', 'print', 'book', 'bookOn', 'checks', 'edited', 'eqSrc', 'built', 'planned', 'nofolder', 'notes', 'carry', 'pinned', 'cover'];
+  const CONTENT = ['kind', 'i', 'key', 'unit', 'text', 'eq', 'sets', 'print', 'book', 'bookOn', 'checks', 'edited', 'eqSrc', 'built', 'planned', 'nofolder', 'notes', 'carry', 'pinned', 'cover', 'own', 'sameAs'];
   const take = (s) => Object.fromEntries(CONTENT.map((k) => [k, s[k]]));
   const FREE = { kind: 'free', i: null, unit: null, text: 'Free', eq: '', sets: null, print: '', notes: [], carry: [], double: false };
   // Re-plan one class's unpinned slots this week, in order, from where the class stands.
@@ -299,12 +330,12 @@
     if (!cdata) return w;
     const st = progressBefore(data, savedWeeks, parse(w.monday), learned)[cls];
     st.now = w.monday;
-    applyMarks(st, w.marks, cls);
+    applyMarks(st, recs(data, w), cls);
     const reserved = new Set(w.slots.filter((s) => s.cls === cls && s.pinned && s.kind === 'lesson').map((s) => s.i));
     let prev = null;
     w.slots.forEach((s, n) => {
       if (s.cls !== cls) return;
-      const fixed = s.pinned || n < (from || 0) || ['inset', 'na', 'cover', 'custom', 'taught'].includes(s.kind);
+      const fixed = s.pinned || n < (from || 0) || ['inset', 'na', 'cover', 'custom', 'taught', 'away'].includes(s.kind);
       if (!fixed) {
         const keep = { notes: s.notes || [], carry: s.carry || [] };
         if (isDoubleOf(prev, s)) Object.assign(s, take(prev), keep, { pinned: false, double: true });   // second half of a double: same lesson
@@ -362,7 +393,7 @@
   function markLesson(data, savedWeeks, week, cls, i, done, learned, skip) {
     const w = JSON.parse(JSON.stringify(week));
     w.marks = (w.marks || []).filter((m) => !(m.cls === cls && m.i === i));
-    if (done != null) w.marks.push(Object.assign({ cls, i, done, key: lessonId(data.classes[cls].seq[i]) }, skip ? { skip: true } : {}));
+    setRecord(data, cls, i, { done: done == null ? null : done, skip: done && skip ? true : null });
     return refillClass(data, savedWeeks, w, cls, learned);
   }
 
@@ -372,6 +403,21 @@
     let w = week;
     for (const idx of idxs) w = setSlot(data, savedWeeks, w, idx, { kind: 'custom', i: null, unit: null, key: '', text: 'Lesson did not happen', eq: '', sets: null, print: '', book: '' }, learned);
     return w;
+  }
+  // Slide-over (Patryk 2026-10-12): after a change, every LATER saved week from this week on is
+  // re-planned at once (periods he did not place by hand move along), so later weeks, the Tests list
+  // and Make next day all agree. Weeks before `thisMonday` are the record and never move.
+  // Returns the weeks that changed; savedWeeks is updated as it goes.
+  function cascade(data, savedWeeks, fromMonday, thisMonday, learned) {
+    const out = [];
+    const floor = iso(mondayOf(thisMonday));
+    for (const m of Object.keys(savedWeeks || {}).filter((x) => x > fromMonday && x >= floor).sort()) {
+      const old = savedWeeks[m];
+      if (old.fromXlsx || old.taught) continue;
+      const nw = reflowWeek(data, savedWeeks, old, learned, 0);
+      if (JSON.stringify(nw.slots) !== JSON.stringify(old.slots)) { savedWeeks[m] = nw; out.push(nw); }
+    }
+    return out;
   }
   // Re-tick one that was marked not happened earlier is just Undo; ticking ahead of time stays markLesson.
 
@@ -387,24 +433,24 @@
   function topicList(data, savedWeeks, week, cls, unit, pos, learned, today) {
     const c = data.classes[cls]; if (!c) return [];
     const st = progressBefore(data, savedWeeks, parse(week.monday), learned)[cls];
-    applyMarks(st, week.marks, cls);
+    applyMarks(st, recs(data, week), cls);
     const here = {};
     week.slots.forEach((s, k) => { if (s.cls === cls && s.kind === 'lesson' && !s.double && !st.taught.has(s.i)) (here[s.i] = here[s.i] || []).push(k); });
     const st2 = cloneState(st); st2.now = week.monday;
     week.slots.forEach((s) => { if (s.cls === cls && pos && before(s, pos)) applySlot(data, st2, s, week.monday); });
     const reserved = new Set(week.slots.filter((s) => s.cls === cls && s.pinned && s.kind === 'lesson' && pos && before(pos, s)).map((s) => s.i));
     const nx = next(c.seq, st2, reserved);
-    const mark = (k) => (week.marks || []).find((m) => m.cls === cls && m.i === k);
+    const mark = (k) => recs(data, week).find((m) => m.cls === cls && m.i === k && (m.done === true || m.done === false));
     return c.seq.map((L, k) => ({ L, k })).filter((o) => o.L.unit === unit).map(({ L, k }) => ({
       k, num: L.num, title: L.title, optional: !!L.optional, nofolder: !!L.nofolder, built: L.built,
       state: st.taught.has(k) ? ((st.when[k] || {}).wrote === 'skipped' ? 'skipped' : 'taught') : here[k] ? (here[k].every((n) => slotDone(week, week.slots[n], today)) ? 'done' : 'planned') : 'todo',
-      when: st.when[k] || (here[k] && here[k].every((n) => slotDone(week, week.slots[n], today)) ? { date: slotDay(week, week.slots[here[k][0]]), wrote: 'this week' } : null), slots: here[k] || [], mark: mark(k) || null, next: !!(nx && nx.i === k),
+      when: st.when[k] || (here[k] && here[k].every((n) => slotDone(week, week.slots[n], today)) ? { date: slotDay(week, week.slots[here[k][0]]), wrote: 'this week' } : null), slots: here[k] || [], mark: mark(k) || null, stoppedAt: (findRecord(data, cls, k) || {}).stoppedAt || '', next: !!(nx && nx.i === k),
     }));
   }
   function unitBefore(data, savedWeeks, week, cls, pos, learned) {
     const st = progressBefore(data, savedWeeks, parse(week.monday), learned)[cls];
     if (!st) return null;
-    applyMarks(st, week.marks, cls);
+    applyMarks(st, recs(data, week), cls);
     week.slots.forEach((s) => { if (s.cls === cls && before(s, pos)) applySlot(data, st, s, week.monday); });
     return st.unit;
   }
@@ -437,7 +483,7 @@
   function wouldSkip(data, savedWeeks, week, idx, fields, learned) {
     const s = week.slots[idx]; const c = data.classes[s.cls]; if (!c) return [];
     const st = progressBefore(data, savedWeeks, parse(week.monday), learned)[s.cls];
-    applyMarks(st, week.marks, s.cls);
+    applyMarks(st, recs(data, week), s.cls);
     week.slots.forEach((x, k) => { if (x.cls === s.cls && k !== idx && x.kind === 'lesson') st.taught.add(x.i); });
     const order = [...new Set(c.seq.map((x) => x.unit))];
     let closing = [];
@@ -452,7 +498,7 @@
   }
 
   /* ------------------------------------------------------------------ outputs */
-  function setsLabel(s) { return s === 'pairs' ? 'pairs' : s === 'demo' ? 'demo (1 set)' : s === 'threes' ? 'sets of 3' : ''; }
+  function setsLabel(s) { return s === 'pairs' ? 'pairs' : s === 'demo' ? 'demo (1 set)' : s === 'threes' ? 'sets of 3' : s === 'each' ? 'one each' : ''; }
   function equipCell(s) {
     if (!s.eq || /^n\/?a$/i.test(s.eq)) return 'N/A';
     const sets = s.sets ? ` — ${setsLabel(s.sets)}` : '';
@@ -463,6 +509,7 @@
   function lessonCell(data, s) {
     if (s.kind === 'lesson') { const L = data.classes[s.cls].seq[s.i]; return (s.cover ? 'Cover: ' : '') + (L ? L.title : s.text); }
     if (s.kind === 'cover') return `Cover: ${s.text.replace(/^cover:\s*/i, '')}`;
+    if (s.kind === 'away') return 'Class away' + (s.text && !/^class away$/i.test(s.text) ? ': ' + s.text : '');
     return s.text;
   }
   // Cells for his technicians' sheet (new layout): lesson row and equipment row per day block.
@@ -493,6 +540,7 @@
   function setsCount(s, size) {
     if (!s || !s.sets || !size) return '';
     if (s.sets === 'demo') return 1;
+    if (s.sets === 'each') return size;
     return Math.ceil(size / (s.sets === 'pairs' ? 2 : 3));
   }
   function sheetModel(data, week, settings) {
@@ -543,12 +591,32 @@
     ['plc', 'Test next week: hand out / remind them of the PLC'],
     ['kit', 'Practical: check the kit before the lesson'],
   ];
-  function buildPrompt(data, s, profile) {
+  // week (optional): the rest of the week, so a lesson already made for another class is reused
+  function buildPrompt(data, s, profile, week) {
     const c = data.classes[s.cls] || {};
     const L = s.kind === 'lesson' ? c.seq[s.i] : null;
-    const lines = [`Make a lesson for ${s.cls} (Year ${c.year}).`];
-    if (L) lines.push(`Topic: ${L.topic}. Lesson ${L.num}: ${L.title}.`, L.rel ? `Drive folder: Lessons/${L.rel}` : '');
-    else lines.push(s.text);
+    const lines = [];
+    if (s.kind === 'revision') {
+      // Patryk 2026-10-09: the end-of-topic lesson before the test is a REVISION lesson
+      const ls = (c.seq || []).filter((x) => x.unit === s.unit);
+      const t = (ls[0] || {}).topic || s.text;
+      const rel = (ls.find((x) => x.rel) || {}).rel;
+      lines.push(`Make a REVISION lesson (lessonType "revision") for ${s.cls} (Year ${c.year}) on ${t}: the end of the topic, before the test.`,
+        'Build it from this topic\'s own lessons: their Apply questions, Do Nows and real exam questions, with model answers.',
+        ls.length ? 'Lessons in the topic: ' + ls.map((x) => 'L' + x.num + ' ' + x.title).join('; ') + '.' : '',
+        rel ? 'Drive topic folder: Lessons/' + rel.split('/').slice(0, -1).join('/') : '');
+    } else {
+      lines.push(`Make a lesson for ${s.cls} (Year ${c.year}).`);
+      if (L) lines.push(`Topic: ${L.topic}. Lesson ${L.num}: ${L.title}.`, L.rel ? `Drive folder: Lessons/${L.rel}` : '');
+      else lines.push(s.text);
+    }
+    // the same (or a similar) lesson made for another class: copy and adapt it, never start again
+    if (s.sameAs) lines.push(`Reuse the lesson made for ${s.sameAs.cls} (${s.sameAs.title}${s.sameAs.rel ? ', Drive folder Lessons/' + s.sameAs.rel : ''}): copy it and adapt it for ${s.cls} (see the notes about ${s.cls} below). Do not build it from scratch.`);
+    else if (week) {
+      const twin = week.slots.find((x) => x !== s && x.cls !== s.cls && !x.double && x.kind === s.kind &&
+        ((s.kind === 'lesson' && x.key && x.key === s.key) || (s.kind === 'revision' && x.unit && x.unit === s.unit)));
+      if (twin) lines.push(`${twin.cls} has the same lesson this week (${DAYS[twin.day]} P${twin.period}${twin.own ? ', made by Patryk himself' : ''}): if it is already made, reuse it and adapt it for ${s.cls} instead of building a new one.`);
+    }
     (s.carry || []).forEach((x) => lines.push(`Carry over from last lesson, put straight after the Do Now: ${x}`));
     (s.notes || []).forEach((x) => lines.push(`Note: ${x}`));
     CHECKS.forEach(([k, t]) => { if ((s.checks || {})[k]) lines.push(t + '.'); });
@@ -602,7 +670,7 @@
     return out;
   }
 
-  const api = { revisionSlot, unitBefore, applyAdded, addedNum, remapWeek, lessonId, applyMarks, classReport, topicList, wouldSkip, setSlot, markLesson, refillClass, planFrom, periodTime, calendarEvents, DAYS, iso, parse, addDays, mondayOf, isTeachingDay, nextSchoolDay, weekLetter, progressBefore, next, autofill, moveSlot, refillAfter,
+  const api = { recs, findRecord, setRecord, remapRecords, migrateMarks, cascade, revisionSlot, unitBefore, applyAdded, addedNum, remapWeek, lessonId, applyMarks, classReport, topicList, wouldSkip, setSlot, markLesson, refillClass, planFrom, periodTime, calendarEvents, DAYS, iso, parse, addDays, mondayOf, isTeachingDay, nextSchoolDay, weekLetter, progressBefore, next, autofill, moveSlot, refillAfter,
     lessonSlot, testSlot, notHappened, slotDone, slotDay, fromFilled, reflowWeek, CHECKS, sheetCells, sheetModel, setsCount, printList, buildPrompt, carryForward, equipCell, lessonCell, setsLabel };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.PlannerLogic = api;
 })(typeof window !== 'undefined' ? window : this);

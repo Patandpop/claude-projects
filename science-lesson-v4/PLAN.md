@@ -15,7 +15,14 @@ Source: `claude-code-brief.md` (2026-10-12). Tick items as they are done.
   - Exam questions: if no question passes the strict "fits a slide" rules, the picker now tries looser ones (10C2 P1 Energy had none, now gets one). A Year 9-11 deck with no exam question prints a loud BUILD WARNING with the reason.
   - Skill re-packaged. **Upload `science-lesson.skill` to claude.ai.**
 - [x] **6. Behaviour app timer X** (commits 7bd68bec, cb6b002d). The X itself worked in tests. Fixed what made it look dead: "✕ Cancel" on silent work left its timer running; X on a paused timer left the board stuck on "Paused". Version 21. **Paste Code.gs + Phone.html into Apps Script and deploy a New version.** Lag not looked at (needs a real lesson to measure).
-- [ ] **2 and 3. Shared lesson state** (one record per lesson: taught / partly / stopped-at / notes), cancelled-lesson cascade, slide-over confirmation, checkmarks carrying between weeks. NEXT. The biggest item: changes how the planner saves weeks. Start in Plan Mode.
+- [x] **2 and 3. Shared lesson state + slide-over** (2026-10-12)
+  - One record per lesson in a new `Lessons` tab (taught, skipped, not taught, where you stopped). Ticks count in every week, earlier and later, and in the Classes view. Ticks saved inside old weeks move into it the first time the planner opens.
+  - Slide-over: after any change, every later saved week (this week on) re-plans and saves straight away, so later weeks, the Tests list and Make next day agree. Past weeks never move.
+  - Confirmation: Class away and Cover (something else) have "Shift later lessons forward", ticked by default. Unticking a lesson that didn't happen asks the same (OK = shift). No = that lesson is skipped and nothing moves.
+  - "Didn't finish: continue next lesson" asks where you stopped. It shows on the next lesson and in the lesson list.
+  - Undo also undoes ticks. Tested in `test-logic.js` and in the page (headless browser).
+  - **Deploy: paste Code.gs, Planner.html and logic.js (the Logic file) into the planner's Apps Script, then Deploy > Manage deployments > New version.**
+  - Not done: free-text notes per lesson (the record has room; no box yet). Classes page hover-over is item 12.
 - [ ] **7. Mark schemes** more explicit and student-friendly.
 
 ## Next
@@ -39,4 +46,6 @@ Source: `claude-code-brief.md` (2026-10-12). Tick items as they are done.
 ## Assumptions
 
 - "Missing Year 13 lessons" = the 13D chapters with no lesson folders (20, 24, 25, 26).
+- "No, don't shift" means the missed lesson is skipped (it can be un-skipped in the lesson list), not squeezed in later.
+- Slide-over only moves periods you didn't place by hand. Anything you set yourself stays put.
 - Cancel on silent work should stop the timer silent work started, but not a separate "Timer only" timer.

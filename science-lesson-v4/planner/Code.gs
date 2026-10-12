@@ -7,6 +7,8 @@
                 stored in 45,000-character chunks down column A
      Weeks      A: Monday (YYYY-MM-DD)  B: the saved week as JSON  C: saved at
      Equipment  A: lesson key  B: equipment  C: sets  D: saved at    (edits the planner remembers)
+     Lessons    A: class|lesson key  B: the lesson's record as JSON (taught / skipped / not taught /
+                where he stopped). One row per lesson, shared by every week (2026-10-12). Made when first needed.
    Script properties:
      PLANNER_KEY   the secret in the link (?key=...)
      TEMPLATE_ID   a Google Sheet holding ONE of his order-sheet tabs, used for the Excel download
@@ -15,7 +17,7 @@
                    saved weeks go home, and "Send to Claude" requests reach Claude Code at home.
 */
 
-const VERSION = 4;
+const VERSION = 5;
 
 function setup() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -86,7 +88,7 @@ function pushState_() {
   if (!mailboxOn_()) return null;
   try {
     const a = loadAll_(false);
-    mailPost_({ op: 'write', name: 'planner-state.json', text: JSON.stringify({ saved: new Date().toISOString(), weeks: a.weeks, learned: a.learned, added: a.added, classSettings: a.classSettings }) });
+    mailPost_({ op: 'write', name: 'planner-state.json', text: JSON.stringify({ saved: new Date().toISOString(), weeks: a.weeks, records: a.records, learned: a.learned, added: a.added, classSettings: a.classSettings }) });
     return true;
   } catch (e) { return String(e.message || e); }
 }
@@ -102,24 +104,50 @@ function pushState_() {
        and publishes it himself. (Needs the Classroom service: Services + → Google Classroom API.)
    It only CREATES: the quiz, the folder (once) and the draft. Each one made is listed in
    homework-made.json so it is never made twice. */
-function makeHomework(k) {
+function makeHomework(k, only) {
   check_(k);
-  if (!mailboxOn_()) throw new Error('The home link (mailbox) is not set up yet.');
-  const names = mailGet_({ op: 'list' }).names || [];
-  const madeFile = mailGet_({ op: 'read', name: 'homework-made.json' });
+  if (!mailboxOn_()) throw new Error('Step 1 of 4 failed: this planner has no mailbox address or key saved (setup guide Part 8).');
+  const step = (n, what, fn) => { try { return fn(); } catch (e) { throw new Error('Step ' + n + ' of 4 failed (' + what + '): ' + String(e.message || e)); } };
+  const names = step(1, 'asking the mailbox which quizzes are waiting; "Unknown request" means the mailbox is an old version: paste Mailbox.gs again and deploy a New version', () => mailGet_({ op: 'list' }).names || []);
+  const madeFile = step(2, 'reading the list of quizzes already made', () => mailGet_({ op: 'read', name: 'homework-made.json' }));
   const made = madeFile.found ? JSON.parse(madeFile.text || '{}') : {};
   const out = [];
+  out.seen = names.length;
   for (const name of names) {
-    if (made[name] || !/^homework-[A-Za-z0-9]+-\d{4}-\d{2}-\d{2}\.json$/.test(name)) continue;
-    const hw = JSON.parse(mailGet_({ op: 'read', name }).text);
-    const form = buildQuiz_(hw);
+    if (made[name] || !/^homework-[A-Za-z0-9]+-\d{4}-\d{2}-\d{2}(-[a-z]+)?\.json$/.test(name) || (only && name !== only)) continue;
+    const hw = step(2, 'reading ' + name, () => JSON.parse(mailGet_({ op: 'read', name }).text));
+    const form = step(3, 'making the Google Form', () => buildQuiz_(hw));
     const draft = classroomDraft_(hw, form);
     made[name] = { at: new Date().toISOString(), form: form.getEditUrl(), link: form.getPublishedUrl(), draft: draft.ok, note: draft.why || '' };
     tab_('Log', ['when', 'what', 'where']).appendRow([new Date(), 'made homework quiz' + (draft.ok ? ' + Classroom draft' : ''), hw.title]);
     out.push({ title: hw.title, form: form.getEditUrl(), draft: draft.ok, note: draft.why || '' });
   }
-  if (out.length) mailPost_({ op: 'write', name: 'homework-made.json', text: JSON.stringify(made, null, 1) });
-  return out;
+  if (out.length) step(4, 'saving the receipt', () => mailPost_({ op: 'write', name: 'homework-made.json', text: JSON.stringify(made, null, 1) }));
+  // seen = how many quiz files the mailbox found; already = how many of those were made before
+  return { made: out, seen: names.length, already: names.filter((n) => made[n]).length, names: names };
+}
+// The Homework tab (Patryk 2026-10-09: check the homework before it becomes a Form).
+function homeworkList(k) {
+  check_(k);
+  if (!mailboxOn_()) throw new Error('The home link (mailbox) is not set up yet (setup guide Part 8).');
+  let names;
+  try { names = mailGet_({ op: 'list' }).names || []; }
+  catch (e) { throw new Error('The mailbox could not list the homework: ' + e.message + (/Unknown request/.test(e.message) ? '. Paste Mailbox.gs again and deploy a New version.' : '')); }
+  const madeFile = mailGet_({ op: 'read', name: 'homework-made.json' });
+  const made = madeFile.found ? JSON.parse(madeFile.text || '{}') : {};
+  return names.slice(-12).reverse().map((name) => {
+    let hw = null;
+    try { hw = JSON.parse(mailGet_({ op: 'read', name }).text); } catch (e) { /* listed but unreadable */ }
+    return { name, made: made[name] || null, hw };
+  });
+}
+// The Behaviour tab shows the behaviour app's phone page; its link is saved once from the tab.
+function setBehaviourUrl(k, url) {
+  check_(k);
+  const u = String(url || '').trim();
+  if (u && !/^https:\/\/script\.google\.com\/.+\/exec\?key=\S+$/.test(u)) throw new Error('That is not a behaviour app link (it should start https://script.google.com/ and end ?key=...)');
+  PropertiesService.getScriptProperties().setProperty('BEHAVIOUR_URL', u);
+  return u;
 }
 function buildQuiz_(hw) {
   const f = FormApp.create(hw.title);
@@ -145,8 +173,10 @@ function classroomDraft_(hw, form) {
   try {
     const want = String(hw.cls).toLowerCase().replace(/\s+/g, '');
     const courses = (Classroom.Courses.list({ teacherId: 'me', courseStates: ['ACTIVE'] }).courses || []);
-    const course = courses.find((c) => (String(c.name) + ' ' + String(c.section || '')).toLowerCase().replace(/\s+/g, '').includes(want));
-    if (!course) return { ok: false, why: 'no Classroom class with "' + hw.cls + '" in its name' };
+    const key = (c) => (String(c.name) + ' ' + String(c.section || '')).toLowerCase().replace(/\s+/g, '');
+    // Classroom spells 7MLA as "7Ml": if nothing matches the full code, try it without its last letter
+    const course = courses.find((c) => key(c).includes(want)) || (want.length === 4 && /a$/.test(want) ? courses.find((c) => key(c).includes(want.slice(0, 3))) : null);
+    if (!course) return { ok: false, why: 'no Classroom class with "' + hw.cls + '" in its name (found: ' + courses.map((c) => c.name).join(', ') + ')' };
     const [y, m, d] = hw.due.split('-').map(Number);
     const points = hw.questions.filter((q) => q.type === 'mcq').reduce((n, q) => n + (q.points || 1), 0);
     Classroom.Courses.CourseWork.create({
@@ -191,7 +221,11 @@ function loadAll_(withData) {
   const classSettings = {};
   const cs = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('ClassSettings');
   if (cs && cs.getLastRow() > 1) cs.getRange(2, 1, cs.getLastRow() - 1, 2).getValues().forEach(([cls, json]) => { try { classSettings[cls] = JSON.parse(json); } catch (e) { /* skip */ } });
-  return { version: VERSION, data: withData && chunks ? JSON.parse(chunks) : null, weeks, learned, added, classSettings };
+  const records = [];
+  const ls = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Lessons');
+  if (ls && ls.getLastRow() > 1) ls.getRange(2, 2, ls.getLastRow() - 1, 1).getValues().forEach(([json]) => { try { records.push(JSON.parse(json)); } catch (e) { /* skip */ } });
+  return { version: VERSION, data: withData && chunks ? JSON.parse(chunks) : null, weeks, learned, added, classSettings, records,
+    behaviourUrl: PropertiesService.getScriptProperties().getProperty('BEHAVIOUR_URL') || '' };
 }
 
 // A tab, made the first time it is needed (so an existing planner needs no setup re-run).
@@ -283,6 +317,30 @@ function saveWeek(k, week) {
   else { w.appendRow(row); w.getRange(w.getLastRow(), 1).setNumberFormat('@').setValue(week.monday); }
   const sent = pushState_();
   return { saved: week.monday, home: sent };
+}
+
+// Several weeks at once: later weeks that slid along after a change (one push home, not one per week).
+function saveWeeks(k, weeks) {
+  check_(k);
+  const w = sheet_('Weeks');
+  (weeks || []).forEach((week) => {
+    const n = w.getLastRow();
+    const mons = n > 1 ? w.getRange(2, 1, n - 1, 1).getDisplayValues().map((r) => r[0]) : [];
+    const at = mons.indexOf(week.monday);
+    const row = [week.monday, JSON.stringify(week), new Date()];
+    if (at >= 0) w.getRange(at + 2, 1, 1, 3).setValues([row]);
+    else { w.appendRow(row); w.getRange(w.getLastRow(), 1).setNumberFormat('@').setValue(week.monday); }
+  });
+  return { saved: (weeks || []).length, home: pushState_() };
+}
+// Every lesson record, written whole (a few hundred short rows at most).
+function saveLessons(k, records) {
+  check_(k);
+  const sh = tab_('Lessons', ['Lesson', 'Record']);
+  const rows = (records || []).map((r) => [r.cls + '|' + r.key, JSON.stringify(r)]);
+  if (sh.getLastRow() > 1) sh.getRange(2, 1, sh.getLastRow() - 1, 2).clearContent();
+  if (rows.length) sh.getRange(2, 1, rows.length, 2).setValues(rows);
+  return { saved: rows.length };
 }
 
 // Per-class settings he types once (Patryk 2026-10-08): test papers core / challenge / paper size,

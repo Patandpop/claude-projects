@@ -31,7 +31,34 @@
   header button.on { background:rgba(250,187,46,.22); border-color:var(--gold); }
   button.primary, header button.primary { background:var(--gold); color:#0D1B5E; border-color:var(--gold); font-weight:700; }
   header input[type=date] { font-family:inherit; border-radius:6px; border:1px solid rgba(255,255,255,.25); padding:3px 6px; background:transparent; color:#fff; color-scheme:dark; }
-  #status { font-size:12px; margin-left:auto; opacity:.85; max-width:360px; text-align:right; }
+  #status { font-size:12px; margin-left:auto; opacity:.85; max-width:300px; text-align:right; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  header button, .badge, #wkLabel { white-space:nowrap; }
+  /* Sidebar (Patryk 2026-10-09): one place to flick between the planner's areas */
+  #side { position:fixed; left:0; top:var(--hh, 50px); bottom:0; width:132px; background:var(--bar); border-right:1px solid var(--line); padding:10px 8px; display:flex; flex-direction:column; gap:4px; z-index:4; }
+  #side button { display:flex; flex-direction:column; align-items:flex-start; gap:1px; width:100%; text-align:left; background:transparent; color:#D7DCEA; border:1px solid transparent; padding:8px 9px; font-size:13px; }
+  #side button small { font-size:10.5px; color:#8D97B3; }
+  #side button:hover { border-color:rgba(255,255,255,.25); }
+  #side button.on { background:rgba(250,187,46,.18); border-color:var(--gold); color:#fff; }
+  #side hr { border:none; border-top:1px solid rgba(255,255,255,.12); margin:6px 0; width:100%; }
+  #side .count { background:var(--gold); color:#0D1B5E; border-radius:9px; padding:0 6px; font-size:11px; font-weight:700; margin-left:4px; }
+  body > main { margin-left:132px; }
+  @media (max-width: 900px) { #side { position:static; width:auto; flex-direction:row; flex-wrap:wrap; } #side hr { display:none; } body > main { margin-left:0; } }
+  .tab { padding:4px 4px 20px; max-width:980px; }
+  .tab h2 { margin:4px 0 4px; font-size:20px; color:var(--gold); }
+  .tab .lead { color:var(--muted); margin:0 0 12px; font-size:13px; }
+  .hwcard { background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:12px 14px; margin-bottom:12px; }
+  .hwcard h3 { margin:0; font-size:15px; display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  .hwcard .state { font-size:11px; font-weight:700; border-radius:10px; padding:1px 8px; border:1px solid currentColor; }
+  .hwcard .state.made { color:var(--green); } .hwcard .state.new { color:var(--gold); }
+  .hwq { border-top:1px solid var(--line); padding:8px 0; font-size:13px; line-height:1.45; }
+  .hwq .opts { margin:4px 0 0 14px; }
+  .hwq .opts div { color:var(--muted); } .hwq .opts .right { color:var(--green); font-weight:700; }
+  .hwq .ms { color:var(--muted); font-size:12px; margin-top:4px; }
+  .testrow select { width:auto; }
+  #side .lbl { display:flex; align-items:center; gap:4px; }
+  .testrow { display:grid; grid-template-columns:110px 1fr auto; gap:10px; align-items:center; padding:8px 0; border-top:1px solid var(--line); font-size:13px; }
+  .behaviour iframe { width:100%; height:calc(100vh - 150px); border:1px solid var(--line); border-radius:10px; background:#fff; }
+  .flag.f-own { color:var(--green); } .flag.f-reuse { color:var(--blue); }
   #status.dirty::before { content:"\25CF  "; color:var(--gold); }
   .menuwrap { position:relative; }
   #menu { display:none; position:absolute; right:0; top:34px; background:var(--panel); border:1px solid var(--line); border-radius:8px; min-width:250px; padding:6px; box-shadow:0 10px 30px rgba(0,0,0,.35); z-index:10; }
@@ -152,8 +179,7 @@
   <span id="wkLabel">-</span><span class="badge" id="letter">-</span>
   <input type="date" id="jump" title="Jump to a week">
   <span class="sep"></span>
-  <button id="vWeek" class="on" title="W">Week</button><button id="vDay" title="D">Day</button><button id="vClasses" title="C">Classes</button>
-  <span class="sep"></span>
+
   <button id="undo" title="Ctrl+Z">Undo</button>
   <button id="mkDay" class="primary" title="Sends the next school day's lessons to Claude to build, with their checklists">Make next day</button>
   <span id="status">Loading...</span>
@@ -166,7 +192,8 @@
       <button id="mXlsx">Technicians' Excel<small>the order sheet to email</small></button>
       <hr>
       <button id="mClaude">Send to Claude<small>build lessons or ask for changes, done at home</small></button>
-      <button id="mHw">Homework quizzes<small>make the Google Forms + Classroom drafts Claude prepared</small></button>
+      <button id="mHw">Homework quizzes<small>check them, then make the Forms + Classroom drafts</small></button>
+      <button id="mHwAll" style="display:none"></button>
       <hr>
       <button id="mAuto">Re-plan this week<small>from where each class is up to</small></button>
       <button id="mImp">Import data<small>planner-data.json from home</small></button>
@@ -177,6 +204,15 @@
   </div>
   <input type="file" id="file" accept=".json" style="display:none">
 </header>
+<nav id="side" aria-label="Planner areas">
+  <button id="vWeek" class="on" title="W">Week<small>plan and tick</small></button>
+  <button id="vDay" title="D">Day<small>one day, with kit</small></button>
+  <button id="vClasses" title="C">Classes<small>where each class is</small></button>
+  <hr>
+  <button id="vHomework">Homework<small>check, then make</small></button>
+  <button id="vTests">Tests<small>and exam practice</small></button>
+  <button id="vBehaviour">Behaviour<small>points and board</small></button>
+</nav>
 <main id="main">
   <section class="cal" id="calWrap"><div class="grid" id="grid"></div></section>
   <aside id="ed"></aside>
@@ -251,13 +287,13 @@ let saveTimer = null;
 // quiet: a detail edit (equipment, notes): redraw the grid only, so the box being typed in stays put
 function change(newWeek, msg, quiet) {
   if (S.readOnly) { toast('This week is already taught, so it can\'t be changed here'); return; }
-  S.undo.push(JSON.stringify(S.week)); S.week = newWeek; S.week.extras = S.week.extras || []; S.dirty = true;
+  S.undo.push(JSON.stringify({ w: S.week, r: S.recSnap })); S.recSnap = JSON.stringify(S.data.records || []); S.week = newWeek; S.week.extras = S.week.extras || []; S.dirty = true;
   markGaps(); render(); if (!quiet) editor(); if (msg) toast(msg, true);
   status('Saving...'); clearTimeout(saveTimer); saveTimer = setTimeout(save, 1200);
 }
 function undo() {
   if (!S.undo.length) { toast('Nothing to undo'); return; }
-  S.week = JSON.parse(S.undo.pop()); S.dirty = true; markGaps(); render(); editor();
+  const u = JSON.parse(S.undo.pop()); S.week = u.w; S.data.records = JSON.parse(u.r || '[]'); S.recSnap = u.r; S.dirty = true; markGaps(); render(); editor();
   status('Saving...'); clearTimeout(saveTimer); saveTimer = setTimeout(save, 1200);
 }
 function save() {
@@ -265,7 +301,15 @@ function save() {
   if (S.readOnly || !S.dirty) return Promise.resolve();
   const wk = JSON.parse(JSON.stringify(S.week));          // this week, even if he moves on before it lands
   S.dirty = false; status('Saving...');
-  return run('saveWeek', wk).then(() => { S.weeks[wk.monday] = wk; if (S.week.monday === wk.monday) status(S.dirty ? 'Saving...' : 'All changes saved'); })
+  const recs = JSON.stringify(S.data.records || []);
+  return run('saveWeek', wk).then(() => {
+    S.weeks[wk.monday] = wk; if (S.week.monday === wk.monday) status(S.dirty ? 'Saving...' : 'All changes saved');
+    if (recs !== S.recSaved) run('saveLessons', JSON.parse(recs)).then(() => { S.recSaved = recs; });
+    // slide-over (2026-10-12): later saved weeks re-plan now, not only when opened
+    const moved = P.cascade(S.data, S.weeks, wk.monday, todayMidnight(), S.learned);
+    if (moved.length) run('saveWeeks', moved).then(() => toast('Later weeks moved along: w/c ' + moved.map((x) => fmtDate(x.monday)).join(', ')))
+      .catch((e) => status('Later weeks NOT saved: ' + e.message));
+  })
     .catch((e) => { if (S.week.monday === wk.monday) S.dirty = true; status('NOT saved: ' + e.message + ' (Ctrl+S to try again)'); });
 }
 
@@ -275,9 +319,11 @@ function timeLabel(p) {
   return 'P' + p + '<br>' + (a === b ? a : a + '<br>' + b);
 }
 function setViewButtons() {
-  ['Week', 'Day', 'Classes'].forEach((v) => $('v' + v).classList.toggle('on', S.view === v.toLowerCase()));
-  $('main').classList.toggle('full', S.view === 'classes');
-  $('ed').style.display = S.view === 'classes' ? 'none' : '';
+  ['Week', 'Day', 'Classes', 'Homework', 'Tests', 'Behaviour'].forEach((v) => $('v' + v).classList.toggle('on', S.view === v.toLowerCase()));
+  const wide = !['week', 'day'].includes(S.view);
+  $('main').classList.toggle('full', wide);
+  $('ed').style.display = wide ? 'none' : '';
+  document.documentElement.style.setProperty('--hh', document.querySelector('header').offsetHeight + 'px');
 }
 function render() {
   setViewButtons();
@@ -286,6 +332,9 @@ function render() {
   $('letter').textContent = S.readOnly ? 'Week ' + S.week.letter + ' · taught' : 'Week ' + S.week.letter;
   $('letter').classList.toggle('taught', S.readOnly);
   if (S.view === 'classes') return renderClasses();
+  if (S.view === 'homework') return renderHomework();
+  if (S.view === 'tests') return renderTests();
+  if (S.view === 'behaviour') return renderBehaviour();
   const days = S.view === 'day' ? [S.day] : [0, 1, 2, 3, 4];
   const g = $('grid');
   g.className = 'grid';
@@ -318,6 +367,8 @@ function render() {
       if (s.double) flags.push('<span class="flag f-dbl">DOUBLE</span>');
       if (s.cover) flags.push('<span class="flag f-check" title="Cover work for this lesson: counts as taught">COVER</span>');
       if (s.kind === 'lesson' && s.nofolder) flags.push('<span class="flag f-built" title="In the technician guide but no lesson folder on Drive">NO FOLDER</span>');
+      else if (s.own) flags.push('<span class="flag f-own" title="You made this one yourself: never sent to Claude">YOURS</span>');
+      else if (s.sameAs) flags.push('<span class="flag f-reuse" title="Claude copies and adapts this class\'s lesson">REUSES ' + esc(s.sameAs.cls) + '</span>');
       else if (s.kind === 'lesson' && s.built === false) flags.push('<span class="flag f-built" title="No slides in the Drive folder yet">NOT BUILT</span>');
       if (s.kind === 'lesson' && s.gap) flags.push('<span class="flag f-gap" title="A lesson missed earlier in this topic">MISSED</span>');
       if ((s.carry || []).length) flags.push('<span class="flag f-carry">+' + s.carry.length + ' carry</span>');
@@ -353,6 +404,114 @@ function render() {
   });
   g.querySelectorAll('[data-add]').forEach((el) => el.onclick = () => addExtra(+el.dataset.add));
   g.querySelectorAll('.hcell[data-day]').forEach((el) => el.onclick = () => { S.day = +el.dataset.day; S.view = 'day'; render(); });
+}
+
+/* ------------------------------------------------------------- new tabs (2026-10-09) */
+// Homework: every quiz Claude chose at home, shown in full BEFORE it becomes a Google Form.
+function renderHomework() {
+  const g = $('grid'); g.className = 'tab'; g.style.gridTemplateColumns = '';
+  g.innerHTML = '<h2>Homework</h2><p class="lead">Quizzes Claude chose at home. Check the questions and answers, then make the Google Form and the Classroom draft. You still publish it in Classroom.</p><div id="hwList" class="muted">Reading the quizzes from home...</div>';
+  run('homeworkList').then((list) => {
+    S.hwList = list;
+    const waiting = list.filter((x) => !x.made).length;
+    $('vHomework').innerHTML = '<span class="lbl">Homework' + (waiting ? '<span class="count">' + waiting + '</span>' : '') + '</span><small>check, then make</small>';
+    if (!list.length) { $('hwList').innerHTML = 'No homework from home yet. At home, ask Claude: "make homework for 10C2 due Friday".'; return; }
+    $('hwList').innerHTML = list.map((x, n) => {
+      const hw = x.hw || { title: x.name, questions: [] };
+      const marks = hw.questions.reduce((t, q) => t + (q.points || q.marks || 0), 0);
+      const qs = hw.questions.map((q, i) => '<div class="hwq"><b>' + (i + 1) + '.</b> ' + esc(q.text) + (q.type === 'mcq'
+        ? '<div class="opts">' + q.options.map((o, k) => '<div' + (k === q.answer ? ' class="right"' : '') + '>' + (k === q.answer ? '✓ ' : '○ ') + esc(o) + '</div>').join('') + '</div>'
+        : '<div class="ms">[' + q.marks + ' mark' + (q.marks === 1 ? '' : 's') + '] Mark scheme pupils see after submitting: ' + esc(q.scheme) + '</div>') + '</div>').join('');
+      return '<div class="hwcard"><h3>' + esc(hw.title) + ' <span class="state ' + (x.made ? 'made' : 'new') + '">' + (x.made ? 'made' : 'not made yet') + '</span></h3>' +
+        '<div class="muted">' + hw.questions.length + ' questions · ' + marks + ' marks · ' + esc(hw.board || '') + '</div>' +
+        '<div class="row">' + (x.made ? '<a href="' + esc(x.made.form) + '" target="_blank"><button>Open the quiz</button></a>' + (x.made.draft ? '' : '<span class="muted">No Classroom draft: ' + esc(x.made.note) + '</span>')
+          : '<button class="primary hwMake" data-n="' + n + '">Make the Form + Classroom draft</button>') + '</div>' +
+        '<details' + (x.made ? '' : ' open') + '><summary>' + (x.made ? 'Show the questions' : 'Check the questions and answers') + '</summary>' + qs + '</details></div>';
+    }).join('');
+    document.querySelectorAll('.hwMake').forEach((b) => b.onclick = () => {
+      const x = S.hwList[+b.dataset.n]; b.disabled = true; b.textContent = 'Making...';
+      run('makeHomework', x.name).then((res) => {
+        const m = (res.made || res)[0];
+        toast(m ? (m.draft ? 'Quiz made, Classroom draft ready: check it and publish' : 'Quiz made. No Classroom draft: ' + m.note) : 'Nothing made (already made?)');
+        renderHomework();
+      }).catch((e) => { b.disabled = false; b.textContent = 'Make the Form + Classroom draft'; modal('<h3>Homework not made</h3><p>' + esc(String(e.message || e).replace(/^Error:\s*/, '')) + '</p><div class="row"><button id="mClose">Close</button></div>'); $('mClose').onclick = closeModal; });
+    });
+  }).catch((e) => { $('hwList').innerHTML = '<p>' + esc(String(e.message || e).replace(/^Error:\s*/, '')) + '</p>'; });
+}
+// Tests (Patryk 2026-10-10): the REAL tests come from the scheme and are sat in class (the test
+// lessons in the week grid). What Claude makes here is EXAM PRACTICE HOMEWORK: a printed paper plus
+// the same questions as a Google Form, worked through at home, never in class.
+function upcomingTests() {
+  const out = [];
+  for (let n = 0; n < 6; n++) {
+    const mon = P.addDays(S.monday, 7 * n), key = P.iso(mon);
+    const wk = n === 0 ? S.week : (S.weeks[key] || P.autofill(S.data, S.weeks, mon, S.learned));
+    (wk.slots || []).filter((s) => s.kind === 'test' && !s.double).forEach((s) => out.push({ s, date: P.addDays(mon, s.day) }));
+  }
+  return out;
+}
+// due date for exam practice before a test: the day before it, or a week today if that has passed
+function dueBefore(date) {
+  const d = date ? P.addDays(date, -1) : null, today = new Date();
+  return P.iso(d && d > today ? d : P.addDays(today, 7));
+}
+function practiceRequest(cls, topics, size, due) {
+  const c = S.data.classes[cls] || {};
+  const ks5 = c.year >= 12;
+  const text = 'Make ' + (size === 'full' ? 'full' : 'mini') + ' exam practice homework for ' + cls + ' (Year ' + c.year + ') on ' + topics.join(', ') + ', due ' + due +
+    (ks5 ? ': real A-level layout (OCR A).' : ': Core and Challenge papers.') + ' Printed paper + Google Form. Use test-paper.js --due ' + due + '.';
+  return run('sendRequest', { kind: 'practice', text, lessons: [] }).then(() => toast('Exam practice asked for. At home: "do my planner requests". The Forms appear in Homework.'));
+}
+function renderTests() {
+  const g = $('grid'); g.className = 'tab'; g.style.gridTemplateColumns = '';
+  const up = upcomingTests();
+  const classes = Object.keys(S.data.classes).filter((k) => (S.data.classes[k].seq || []).length);
+  const topicName = (cls, unit) => ((S.data.classes[cls].seq.find((L) => L.unit === unit) || {}).topic || unit);
+  const when = (t) => P.DAYS[t.s.day] + ' ' + t.date.getDate() + ' ' + t.date.toLocaleDateString('en-GB', { month: 'short' }) + ' P' + t.s.period;
+  g.innerHTML = '<h2>Tests and exam practice</h2><p class="lead">Tests are the school\'s own papers from the scheme (Admin/Assessment), sat in class. ' +
+    'Exam practice is homework: real exam questions printed as a paper (Core and Challenge for Years 7 to 11, the real A-level layout for 12C and 13D) and the same questions as a Google Form. ' +
+    'It is saved in Admin/Homework/Exam Practice. Its questions are kept out of later homework, Do Nows and board questions.</p>' +
+    '<div class="hwcard"><h3>Tests coming up</h3>' + (up.length ? up.map((t, n) => '<div class="testrow"><b>' + esc(t.s.cls) + '</b><span>' + esc(topicName(t.s.cls, t.s.unit)) + ' test · ' + when(t) + '</span>' +
+      '<span><select class="upSize" data-n="' + n + '"><option value="mini">mini practice</option><option value="full">full practice</option></select> <button class="upGo" data-n="' + n + '">Exam practice before it</button></span></div>').join('') : '<p class="muted">No tests planned in the next six weeks.</p>') + '</div>' +
+    '<div class="hwcard"><h3>Any exam practice</h3>' +
+      '<label for="tCls">Class</label><select id="tCls">' + classes.map((k) => '<option>' + esc(k) + '</option>').join('') + '</select>' +
+      '<label>Topics</label><div id="tTopics" class="row"></div>' +
+      '<label for="tMore">Other topics (optional, e.g. "Hubble\'s law, Stars")</label><input type="text" id="tMore">' +
+      '<div class="grid2"><select id="tSize"><option value="mini">Mini (about 20 minutes at home)</option><option value="full">Full (about 45 minutes at home)</option></select>' +
+      '<span><label for="tDue" class="inline">Due </label><input type="date" id="tDue" value="' + dueBefore(null) + '"></span></div>' +
+      '<div class="row"><button class="primary" id="tGo">Ask Claude to make it</button></div></div>';
+  const drawTopics = () => {
+    const cls = $('tCls').value;
+    const units = [...new Map(S.data.classes[cls].seq.map((L) => [L.unit, L.topic])).entries()];
+    $('tTopics').innerHTML = units.map(([u, t]) => '<label class="inline" style="margin:0 10px 0 0"><input type="checkbox" class="tTop" value="' + esc(t) + '"> ' + esc(t) + '</label>').join('');
+  };
+  $('tCls').onchange = drawTopics; drawTopics();
+  $('tGo').onclick = () => {
+    const topics = [...document.querySelectorAll('.tTop:checked')].map((x) => x.value).concat($('tMore').value.split(',').map((x) => x.trim()).filter(Boolean));
+    if (!topics.length) { toast('Tick at least one topic'); return; }
+    practiceRequest($('tCls').value, topics, $('tSize').value, $('tDue').value || dueBefore(null)).catch((e) => toast('Not sent: ' + e.message));
+  };
+  document.querySelectorAll('.upGo').forEach((b) => b.onclick = () => {
+    const t = up[+b.dataset.n], size = document.querySelector('.upSize[data-n="' + b.dataset.n + '"]').value;
+    practiceRequest(t.s.cls, [topicName(t.s.cls, t.s.unit)], size, dueBefore(t.date)).catch((e) => toast('Not sent: ' + e.message));
+  });
+}
+// Behaviour: the behaviour app's phone page inside the planner; the board opens in its own window.
+function renderBehaviour() {
+  const g = $('grid'); g.className = 'tab behaviour'; g.style.gridTemplateColumns = ''; g.style.maxWidth = 'none';
+  const url = S.behaviourUrl || '';
+  if (!url) {
+    g.innerHTML = '<h2>Behaviour</h2><p class="lead">Paste the link of your behaviour app (the phone page, ending in ?key=...). It is saved once.</p>' +
+      '<input type="text" id="bUrl" placeholder="https://script.google.com/macros/s/.../exec?key=..."><div class="row"><button class="primary" id="bSave">Save</button></div>';
+    $('bSave').onclick = () => run('setBehaviourUrl', $('bUrl').value).then((u) => { S.behaviourUrl = u; renderBehaviour(); }).catch((e) => toast(e.message));
+    return;
+  }
+  g.innerHTML = '<div class="row" style="margin:0 0 8px;align-items:center"><h2 style="margin:0 10px 0 0">Behaviour</h2>' +
+    '<a href="' + esc(url + '&view=board') + '" target="_blank"><button class="primary">Open the board (projector)</button></a>' +
+    '<a href="' + esc(url) + '" target="_blank"><button>Open in its own tab</button></a>' +
+    '<button id="bChange">Change link</button></div><iframe src="' + esc(url) + '" title="Behaviour app" allow="microphone"></iframe>' +
+    '<p class="muted">If this stays blank, paste the newest behaviour app code (it now allows being shown here), or use "Open in its own tab".</p>';
+  $('bChange').onclick = () => { S.behaviourUrl = ''; renderBehaviour(); };
 }
 
 // Classes view: where every class is, lesson by lesson (green = done, gold outline = missed).
@@ -481,7 +640,7 @@ function chooser(cls, pos, curI, onPick, onReview) {
     '<input type="text" id="q" placeholder="or search every topic, e.g. heart" style="margin-top:6px">' +
     '<div class="lessonlist" id="qr"></div>' +
     '<button class="newles" id="newLes">+ New lesson in this topic (not in the list)</button>' +
-    (onReview ? '<button class="newles" id="revLes" title="Puts a review lesson here and asks Claude to build it from this topic\'s lessons">★ Review lesson for this topic, built by Claude</button>' : '') +
+    (onReview ? '<button class="newles" id="revLes" title="Puts a revision lesson for this topic here: Claude builds it, or you have made it yourself">★ Revision lesson for this topic</button>' : '') +
     '<div class="muted" style="margin-top:4px">Click a lesson to put it here. Tick = taught. <b>skip</b> = you won\'t teach it. Untick, or undo a skip, and it goes back into the plan. Every week can be changed, past ones too.</div>';
   const row = (o, topic) => {
     const here = o.k === curI;
@@ -494,12 +653,13 @@ function chooser(cls, pos, curI, onPick, onReview) {
     else if (o.built === false) tags.push('<span class="tag nof">not built</span>');
     const sub = o.state === 'skipped' ? 'skipped (won\'t be planned) · <a href="#" class="unskip" data-k="' + o.k + '">undo</a>'
       : o.state === 'done' ? '✓ taught ' + esc(fmtDate(o.when.date)) + ' · untick if it didn\'t happen' : o.state === 'taught' ? '✓ ' + esc(whenText(o.when)) : o.mark && o.mark.done === false ? 'you marked this NOT taught' : '';
+    const stopped = o.stoppedAt ? '<small>partly taught: stopped at ' + esc(o.stoppedAt) + '</small>' : '';
     // Skip (2026-10-08): never planned, shown as skipped rather than taught
     if (['todo', 'planned'].includes(o.state) && !o.optional) tags.push('<button class="skipB" data-k="' + o.k + '" title="Won\'t teach it: it is not planned, and shows as skipped">skip</button>');
     return '<div class="lrow ' + o.state + (o.next && !here ? ' next' : '') + (here ? ' here' : '') + (o.optional ? ' optional' : '') + '">' +
       '<input type="checkbox" class="tick" data-k="' + o.k + '"' + (o.state === 'taught' || o.state === 'done' ? ' checked' : '') + ' title="' + (o.state === 'done' ? 'Untick: it did not happen, so it moves to the next lesson' : o.state === 'taught' ? 'Untick: NOT taught after all, so it gets planned' : o.state === 'planned' ? 'Tick: already taught, so the rest of this week moves along' : 'Tick: already taught, or you won\'t teach it') + '">' +
       '<div class="body" data-k="' + o.k + '"><span class="num">L' + o.num + '</span><span class="t">' + esc(o.title) + '</span>' + tags.join('') +
-      (topic ? '<small>' + esc(topic) + '</small>' : '') + (sub ? '<small>' + sub + '</small>' : '') + '</div></div>';
+      (topic ? '<small>' + esc(topic) + '</small>' : '') + (sub ? '<small>' + sub + '</small>' : '') + stopped + '</div></div>';
   };
   const draw = () => {
     const q = $('q').value.trim().toLowerCase();
@@ -527,6 +687,7 @@ function chooser(cls, pos, curI, onPick, onReview) {
       const k = +el.dataset.k;
       const o = P.topicList(S.data, S.weeks, S.week, cls, c.seq[k].unit, pos, S.learned, P.iso(todayMidnight())).find((x) => x.k === k);
       if (o && o.state === 'done' && !el.checked) {   // planned on a day that has passed, but it didn't happen
+        if (!shiftOk()) P.setRecord(S.data, cls, k, { done: true, skip: true });
         const nw = P.notHappened(S.data, S.weeks, S.week, o.slots, S.learned);
         change(nw, 'L' + c.seq[k].num + ' ' + c.seq[k].title + ' did not happen: it moves to the next lesson' + reflowNote(S.week, nw, cls, -1));
         return;
@@ -556,6 +717,9 @@ function reflowNote(oldW, newW, cls, except) {
   });
   return out.length ? '. ' + out.slice(0, 3).join(', ') : '';
 }
+// Slide-over confirmation (Patryk 2026-10-12): usually yes. No = the missed lesson is skipped and nothing moves.
+function shiftOk() { return confirm('Shift later lessons forward?\n\nOK = yes, every later lesson moves along one.\nCancel = no, skip this lesson and keep the plan as it is.'); }
+const shiftBox = '<label class="inline" style="display:block;margin-top:6px"><input type="checkbox" id="shiftOn" checked> Shift later lessons forward (untick: skip this lesson, nothing moves)</label>';
 // Confirm before a change that would leave lessons untaught.
 function okToSkip(lost, what) {
   if (!lost.length) return true;
@@ -593,7 +757,7 @@ function newLesson(cls, unit, pos, onPick) {
       S.added.push(r.rec);
       P.applyAdded(S.data, [r.rec]);
       // the list positions after it moved up by one: point every week back at the same lessons
-      P.remapWeek(S.data, S.week); Object.values(S.weeks).forEach((w) => P.remapWeek(S.data, w)); S.undo = [];
+      P.remapWeek(S.data, S.week); Object.values(S.weeks).forEach((w) => P.remapWeek(S.data, w)); P.remapRecords(S.data); S.undo = [];
       const k = S.data.classes[cls].seq.findIndex((L) => L.unit === unit && L.title === title);
       toast(r.message);
       if (k >= 0) onPick(k);
@@ -616,31 +780,38 @@ function revisionOrTest(kind, s, put) {
     put(kind === 'test' ? P.testSlot(S.data, s.cls, u) : P.revisionSlot(S.data, s.cls, u), label + ' set', kind === 'test' ? 'A test now' : 'A revision lesson now');
   };
 }
-// End of a topic (Patryk 2026-10-08): a review lesson in this period, built by Claude at home from the
-// topic's own lessons (their Apply questions, Do Nows and exam questions), sent through the mailbox.
-function reviewLesson(s, unit, put) {
+// End of a topic: a REVISION lesson in this period (Patryk 2026-10-09: what the planner called a
+// "review lesson" is his revision lesson). Three ways: Claude builds it from the topic's own lessons,
+// he has made it himself (never sent to Claude), or decide later (it is just planned).
+function revisionLesson(s, unit, put) {
   const c = S.data.classes[s.cls];
-  const ls = c.seq.filter((L) => L.unit === unit);
-  if (!ls.length) return;
-  const topic = ls[0].topic;
-  modal('<h3>Review lesson: ' + esc(topic) + '</h3>' +
-    '<p>Puts a review lesson for <b>' + esc(s.cls) + '</b> in ' + P.DAYS[s.day] + ' P' + s.period + ' (this period\'s lesson moves on) and asks Claude to build it at home from this topic\'s ' + ls.length + ' lessons: their Apply questions, Do Nows and real exam questions.</p>' +
+  const units = unitOptions(s.cls);
+  const def = unit || (units.find((u) => u.state === 'current') || units[0] || {}).unit;
+  const others = S.week.slots.filter((x) => x.cls !== s.cls && x.kind === 'revision' && !x.double);
+  modal('<h3>Revision lesson for ' + esc(s.cls) + '</h3><label>Topic</label><select id="rvUnit">' +
+    units.map((u) => '<option value="' + esc(u.unit) + '"' + (u.unit === def ? ' selected' : '') + '>' + esc(u.text) + '</option>').join('') + '</select>' +
+    '<p class="muted">Goes in ' + P.DAYS[s.day] + ' P' + s.period + '; this period\'s lesson moves on to ' + esc(s.cls) + '\'s next period. The test is planned after it.</p>' +
+    '<label class="inline" style="display:block"><input type="radio" name="rvWho" value="claude" checked> Claude builds it from this topic\'s lessons, Do Nows and exam questions</label>' +
+    '<label class="inline" style="display:block"><input type="radio" name="rvWho" value="own"> I have made it myself (not sent to Claude)</label>' +
+    (others.length ? '<label class="inline" style="display:block"><input type="radio" name="rvWho" value="same"> Use the one for <select id="rvSame">' + others.map((x, n) => '<option value="' + n + '">' + esc(x.cls + ' ' + P.DAYS[x.day] + ' P' + x.period + ': ' + P.lessonCell(S.data, x)) + '</option>').join('') + '</select> (Claude adapts it)</label>' : '') +
+    '<label class="inline" style="display:block"><input type="radio" name="rvWho" value="later"> Just plan it, decide later</label>' +
     '<label>Anything to focus on (optional)</label><input type="text" id="rvNote" placeholder="e.g. lots of 6-markers, they struggled with osmosis">' +
-    '<div class="row"><button class="primary" id="rvOk">Put it here and ask Claude</button><button id="rvCancel">Cancel</button></div>');
+    '<div class="row"><button class="primary" id="rvOk">Put it here</button><button id="rvCancel">Cancel</button></div>');
   $('rvCancel').onclick = closeModal;
   $('rvOk').onclick = () => {
+    const u = $('rvUnit').value, who = (document.querySelector('input[name=rvWho]:checked') || {}).value || 'later';
     const note = $('rvNote').value.trim(); closeModal();
-    put(P.revisionSlot(S.data, s.cls, unit), 'Review lesson set', 'A review lesson now');
+    const fields = P.revisionSlot(S.data, s.cls, u);
+    if (who === 'own') fields.own = true;
+    if (who === 'same') { const x = others[+$('rvSame').value]; fields.sameAs = { cls: x.cls, title: P.lessonCell(S.data, x) }; }
+    if (note) fields.notes = [note];
+    put(fields, 'Revision lesson set' + (who === 'own' ? ' (made by you)' : ''), 'A revision lesson now');
+    if (who !== 'claude' && who !== 'same') return;
+    const t = S.week.slots[S.sel];
     const when = P.DAYS[s.day] + ' ' + P.addDays(S.monday, s.day).toLocaleDateString('en-GB', { day:'numeric', month:'short' }) + ' P' + s.period;
-    const folder = (ls.find((L) => L.rel) || {}).rel;
-    const prompt = ['Make a REVIEW lesson (lessonType "review") for ' + s.cls + ' (Year ' + c.year + ') on ' + topic + '.',
-      'Build it from this topic\'s own lessons: their Apply questions, Do Now questions and the real exam questions, with model answers.',
-      'Lessons in the topic: ' + ls.map((L) => 'L' + L.num + ' ' + L.title).join('; ') + '.',
-      folder ? 'Drive topic folder: Lessons/' + folder.split('/').slice(0, -1).join('/') : '',
-      note ? 'Focus: ' + note : ''].filter(Boolean).join(String.fromCharCode(10));
-    run('sendRequest', { kind: 'build', text: '', lessons: [{ when, cls: s.cls, prompt }] })
-      .then(() => toast('Review lesson asked for. At home say "do my planner requests"'))
-      .catch((e) => toast('Review lesson set, but not sent to Claude: ' + e.message));
+    run('sendRequest', { kind: 'build', text: '', lessons: [{ when, cls: s.cls, prompt: P.buildPrompt(S.data, t, (S.classSettings || {})[s.cls], S.week) }] })
+      .then(() => toast('Revision lesson asked for. At home say "do my planner requests"'))
+      .catch((e) => toast('Revision lesson set, but not sent to Claude: ' + e.message));
   };
 }
 function addPanel(day, period) {
@@ -705,15 +876,22 @@ function editor() {
       : '<div class="now"><b>' + esc(P.lessonCell(S.data, s)) + '</b></div>') +
     '<div class="card"><h4>For the technicians' + (curL && curL.eqFull ? ' <span class="src" title="' + esc(curL.eqFull) + '">full guide text ⓘ</span>' : '') + '</h4>' +
       '<textarea id="eEq" placeholder="Equipment">' + esc(s.eq || '') + '</textarea>' +
-      '<div class="grid2"><select id="eSets">' + [['', 'Sets?'], ['threes', 'sets of 3'], ['pairs', 'pairs'], ['demo', 'demo (1 set)']].map(([v, t]) => '<option value="' + v + '"' + ((s.sets || '') === v ? ' selected' : '') + '>' + t + '</option>').join('') + '</select>' +
-      '<input type="text" id="ePrint" placeholder="Printing" value="' + esc(s.print || '') + '"></div>' +
+      '<div class="grid2"><select id="eSets">' + [['', 'Sets?'], ['each', 'one each'], ['pairs', 'pairs'], ['threes', 'sets of 3'], ['demo', 'demo (1 set)']].map(([v, t]) => '<option value="' + v + '"' + ((s.sets || '') === v ? ' selected' : '') + '>' + t + '</option>').join('') + '</select>' +
+      '</div><label for="ePrint">Printing</label><textarea id="ePrint" placeholder="e.g. WS Renewable Resources table, A3 laminates x8" style="min-height:70px">' + esc(s.print || '') + '</textarea>' +
       // books: pages filled in for him, unticked unless revision/review (Patryk 2026-10-08)
       '<div class="row" style="margin-top:6px;align-items:center"><label class="inline" title="Ticked = the technicians put these textbooks out; they go on the order sheet" style="margin:0 6px 0 0"><input type="checkbox" id="eBookOn"' + (s.bookOn ? ' checked' : '') + '> Books</label>' +
         '<input type="text" id="eBook" placeholder="Textbook pages" value="' + esc(s.book || (curL && curL.book) || '') + '" style="flex:1"></div>' +
       (s.kind === 'lesson' ? '<label class="inline"><input type="checkbox" id="eRemember"' + (s.eqSrc === 'remembered' ? ' checked' : '') + '> use this every time this lesson is taught</label>' : '') +
     '</div>' +
     (isLesson ? checklistCard(s) : '') +
-    '<div class="row"><button id="kRev">Revision</button><button id="kTest">Test</button><button id="kCover">Cover</button><button id="kFree">Clear</button></div>' +
+    (['lesson', 'revision'].includes(s.kind) ? '<div class="card"><h4>Who makes it</h4>' +
+      '<label class="inline" style="display:block"><input type="checkbox" id="eOwn"' + (s.own ? ' checked' : '') + '> I have made this myself (never sent to Claude)</label>' +
+      (() => { const others = S.week.slots.map((x, n) => ({ x, n })).filter(({ x, n }) => n !== S.sel && x.cls !== s.cls && !x.double && ['lesson', 'revision'].includes(x.kind));
+        return others.length ? '<label>Same as (or like) another class\'s lesson this week</label><select id="eSame"><option value="">No: build it for this lesson</option>' +
+          others.map(({ x, n }) => '<option value="' + n + '"' + (s.sameAs && s.sameAs.cls === x.cls && s.sameAs.title === P.lessonCell(S.data, x) ? ' selected' : '') + '>' + esc(x.cls + ' ' + P.DAYS[x.day] + ' P' + x.period + ': ' + P.lessonCell(S.data, x)) + '</option>').join('') + '</select>' +
+          '<div class="muted">Claude copies that lesson and adapts it for ' + esc(s.cls) + ' instead of building a new one.</div>' : ''; })() +
+    '</div>' : '') +
+    '<div class="row"><button id="kRev">Revision</button><button id="kTest">Test</button><button id="kCover">Cover</button><button id="kAway" title="The class is out (trip, mocks, assembly): this lesson moves on to their next period">Class away</button><button id="kFree">Clear</button></div>' +
     (c ? '<div class="card"><h4>Choose the lesson <span class="src">' + esc(s.cls) + '</span></h4><div id="chooser"></div></div>' : '') +
     '<details><summary>More for this lesson</summary>' +
       (curL ? '<div class="row"><button id="kCont" title="Puts this lesson in ' + esc(s.cls) + '\'s next slot too; the rest of the week moves along">Didn\'t finish: continue next lesson</button></div>' : '') +
@@ -731,27 +909,38 @@ function editor() {
     if (k === s.i && s.kind === 'lesson') return;
     const L = c.seq[k];
     put(P.lessonSlot(S.data, s.cls, k, S.learned), 'L' + L.num + ' ' + L.title + ' put in', 'Moving ' + s.cls + ' on to ' + L.topic);
-  }, (unit) => reviewLesson(s, unit, put));
+  }, (unit) => revisionLesson(s, unit, put));
   $('kTest').onclick = () => revisionOrTest('test', s, put);
-  $('kRev').onclick = () => revisionOrTest('revision', s, put);
+  $('kRev').onclick = () => revisionLesson(s, P.unitBefore(S.data, S.weeks, S.week, s.cls, s, S.learned) || null, put);
   // Cover: either the cover teacher teaches THIS lesson (it counts as taught) or the class does
   // something else (this lesson moves on to the next slot).
   $('kCover').onclick = () => {
     modal('<h3>Cover for ' + esc(s.cls) + '</h3>' +
       (curL ? '<button class="primary" id="cvThis" style="display:block;width:100%;text-align:left;margin-bottom:6px">Cover work for this lesson<small class="muted" style="display:block">L' + curL.num + ' ' + esc(curL.title) + ' counts as taught</small></button>' : '') +
-      '<label>Or something else (the lesson moves to the next slot)</label><input type="text" id="cvText" placeholder="e.g. Revision booklet">' +
+      '<label>Or something else (the lesson moves to the next slot)</label><input type="text" id="cvText" placeholder="e.g. Revision booklet">' + (curL ? shiftBox : '') +
       '<div class="row"><button id="cvOther">Use this</button><button id="cvCancel">Cancel</button></div>');
     if ($('cvThis')) $('cvThis').onclick = () => { closeModal(); put(Object.assign(P.lessonSlot(S.data, s.cls, s.i, S.learned), { cover: true }), 'Cover work for L' + curL.num + ' (counts as taught)'); };
-    $('cvOther').onclick = () => { const t = $('cvText').value.trim(); if (!t) return; closeModal(); put({ kind:'cover', i:null, key:null, text:t, eq:'N/A', sets:null, print:'', cover:false }, 'Marked as cover'); };
+    $('cvOther').onclick = () => { const t = $('cvText').value.trim(); if (!t) return; if (curL && !$('shiftOn').checked) P.setRecord(S.data, s.cls, s.i, { done: true, skip: true }); closeModal(); put({ kind:'cover', i:null, key:null, text:t, eq:'N/A', sets:null, print:'', cover:false }, 'Marked as cover'); };
     $('cvText').onkeydown = (e) => { if (e.key === 'Enter') $('cvOther').click(); };
     $('cvCancel').onclick = closeModal;
   };
   if ($('kCont')) $('kCont').onclick = () => {
     const k = S.week.slots.findIndex((x, n) => n > S.sel && x.cls === s.cls && !x.double && ['lesson', 'test', 'free'].includes(x.kind));
     if (k < 0) { toast('No later ' + s.cls + ' lesson this week: next week, pick it from the list (it shows as taught; click it anyway)'); return; }
+    const stop = (prompt('Where did you stop? (optional, e.g. "slide 9, before the practical")') || '').trim();
+    P.setRecord(S.data, s.cls, s.i, { stoppedAt: stop || null, date: P.iso(P.addDays(P.parse(S.week.monday), s.day)) });
     const nw = P.setSlot(S.data, S.weeks, S.week, k, Object.assign(P.lessonSlot(S.data, s.cls, s.i, S.learned), { carry: [] }), S.learned);
-    nw.slots[k].carry = ['Continuing from last lesson (not finished)'];
+    nw.slots[k].carry = [stop ? 'Continuing from last lesson: stopped at ' + stop : 'Continuing from last lesson (not finished)'];
     change(nw, 'L' + curL.num + ' continues ' + P.DAYS[nw.slots[k].day] + ' P' + nw.slots[k].period + reflowNote(S.week, nw, s.cls, k));
+  };
+  // Class away (Patryk 2026-10-09): nobody to teach, so the lesson moves on, like "Cover: something else"
+  $('kAway').onclick = () => {
+    modal('<h3>' + esc(s.cls) + ' away · ' + P.DAYS[s.day] + ' P' + s.period + '</h3><p class="muted">' + esc(P.lessonCell(S.data, s)) + ' moves on to ' + esc(s.cls) + '\'s next period, and the rest of the week moves along.</p>' +
+      '<label>Why (optional)</label><input type="text" id="awText" placeholder="e.g. trip, mock exams, assembly">' + (curL ? shiftBox : '') +
+      '<div class="row"><button class="primary" id="awOk">Class away</button><button id="awCancel">Cancel</button></div>');
+    $('awCancel').onclick = closeModal;
+    const go = () => { const why = $('awText').value.trim(); if (curL && !$('shiftOn').checked) P.setRecord(S.data, s.cls, s.i, { done: true, skip: true }); closeModal(); put({ kind:'away', i:null, key:null, unit:null, text: why || 'Class away', eq:'N/A', sets:null, print:'', book:'', bookOn:false, own:false, sameAs:null }, s.cls + ' away: the lesson moves on'); };
+    $('awOk').onclick = go; $('awText').onkeydown = (e) => { if (e.key === 'Enter') go(); };
   };
   $('kFree').onclick = () => put({ kind:'free', i:null, key:null, unit:null, text:'Free', eq:'', sets:null, print:'' }, 'Cleared');
   // technician details: saved as soon as a box is left
@@ -773,6 +962,13 @@ function editor() {
     change(w, null, true);
   });
   $('eSets').onchange = saveDetails;
+  if ($('eOwn')) $('eOwn').onchange = () => { const w = JSON.parse(JSON.stringify(S.week)); w.slots[S.sel].own = $('eOwn').checked; change(w, $('eOwn').checked ? 'Marked as made by you: not sent to Claude' : 'Claude can build this one', true); };
+  if ($('eSame')) $('eSame').onchange = () => {
+    const w = JSON.parse(JSON.stringify(S.week)), v = $('eSame').value;
+    if (v === '') w.slots[S.sel].sameAs = null;
+    else { const x = S.week.slots[+v], L = x.kind === 'lesson' ? S.data.classes[x.cls].seq[x.i] : null; w.slots[S.sel].sameAs = { cls: x.cls, title: P.lessonCell(S.data, x), rel: L && L.rel || null }; }
+    change(w, v === '' ? 'Built as its own lesson' : 'Claude will reuse ' + w.slots[S.sel].sameAs.cls + '\'s lesson', true);
+  };
   if ($('eRemember')) $('eRemember').onchange = () => { if ($('eRemember').checked) { saveDetails(); toast('Remembered for every ' + (curL ? curL.title : 'lesson') + ' from now on'); } };
   if ($('eNotes')) $('eNotes').onchange = () => { const w = JSON.parse(JSON.stringify(S.week)); w.slots[S.sel].notes = $('eNotes').value.split('\n').map((x) => x.trim()).filter(Boolean); change(w, null, true); };
   $('eRefill').onclick = () => { const w = JSON.parse(JSON.stringify(S.week)); P.refillAfter(S.data, S.weeks, w, S.sel, S.learned); change(w, 'Re-planned ' + s.cls + reflowNote(S.week, w, s.cls, S.sel)); };
@@ -784,7 +980,7 @@ function editor() {
   $('eRev').onclick = () => carry('Review section not finished last lesson (' + P.lessonCell(S.data, s) + ')');
   $('eHw').onclick = () => carry('Collect homework set last lesson (' + P.lessonCell(S.data, s) + ')');
   $('ePrompt').onclick = () => {
-    const text = P.buildPrompt(S.data, S.week.slots[S.sel], (S.classSettings || {})[S.week.slots[S.sel].cls]);
+    const text = P.buildPrompt(S.data, S.week.slots[S.sel], (S.classSettings || {})[S.week.slots[S.sel].cls], S.week);
     navigator.clipboard.writeText(text).then(() => toast('Build prompt copied')).catch(() => modal('<h3>Build prompt</h3><pre>' + esc(text) + '</pre>'));
   };
   $('eAsk').onclick = () => sendToClaude([S.sel]);
@@ -809,11 +1005,11 @@ function markGaps() {
 function lessonRequest(i) {
   const s = S.week.slots[i];
   const when = P.DAYS[s.day] + ' ' + P.addDays(S.monday, s.day).toLocaleDateString('en-GB', { day:'numeric', month:'short' }) + ' P' + s.period;
-  return { when, cls: s.cls, prompt: P.buildPrompt(S.data, s, (S.classSettings || {})[s.cls]) };
+  return { when, cls: s.cls, prompt: P.buildPrompt(S.data, s, (S.classSettings || {})[s.cls], S.week) };
 }
 function sendToClaude(preselect) {
   if (!S.week) return;
-  const idx = S.week.slots.map((s, i) => i).filter((i) => { const s = S.week.slots[i]; return s.kind === 'lesson' && (s.built === false || (preselect || []).includes(i)); });
+  const idx = S.week.slots.map((s, i) => i).filter((i) => { const s = S.week.slots[i]; return ['lesson', 'revision'].includes(s.kind) && !s.own && !s.double && (s.built === false || s.kind === 'revision' || (preselect || []).includes(i)); });
   const rows = idx.map((i) => { const r = lessonRequest(i); const on = preselect ? preselect.includes(i) : true;
     return '<label style="display:block;margin:3px 0"><input type="checkbox" class="cReq" data-i="' + i + '"' + (on ? ' checked' : '') + '> ' + esc(r.when + ' · ' + r.cls + ' · ' + (r.prompt.split(String.fromCharCode(10))[1] || '')) + '</label>'; }).join('');
   modal('<h3>Send to Claude</h3>' +
@@ -875,15 +1071,23 @@ item('mImp', () => $('file').click());
 item('mClaude', () => sendToClaude(null));
 // Homework quizzes (Patryk 2026-10-08): turn the homework Claude chose at home into self-marking
 // Google Forms and Classroom drafts. He checks each draft in Classroom and publishes it.
-item('mHw', () => {
+item('mHw', () => showTab('homework'));
+item('mHwAll', () => {
   status('Making homework quizzes...');
-  run('makeHomework').then((list) => {
+  run('makeHomework').then((res) => {
+    const list = Array.isArray(res) ? res : res.made;   // an older Code.gs sends just the list
     status(list.length ? list.length + ' homework quiz(zes) made' : 'No new homework from home');
-    modal('<h3>Homework quizzes</h3>' + (list.length ? list.map((h) => '<p><b>' + esc(h.title) + '</b><br><a href="' + esc(h.form) + '" target="_blank">Open the quiz</a> · ' +
+    const seen = Array.isArray(res) ? null : res;
+    modal('<h3>Homework quizzes</h3>' + (seen ? '<p class="muted">The mailbox found ' + seen.seen + ' homework file(s) from home' + (seen.already ? ', ' + seen.already + ' already made' : '') + '.' + (seen.seen ? ' ' + esc(seen.names.join(', ')) : ' Nothing is waiting there: check that the mailbox is the newest version and that the file is in Admin / Planner Sync.') + '</p>' : '') + (list.length ? list.map((h) => '<p><b>' + esc(h.title) + '</b><br><a href="' + esc(h.form) + '" target="_blank">Open the quiz</a> · ' +
       (h.draft ? 'Classroom draft ready: check it and publish' : 'no Classroom draft: ' + esc(h.note)) + '</p>').join('') :
       '<p class="muted">Nothing new. At home, ask Claude: "make homework for 10C2 due Friday".</p>') + '<div class="row"><button id="mClose">Close</button></div>');
     $('mClose').onclick = closeModal;
-  }).catch((e) => status('Homework not made: ' + e.message));
+  }).catch((e) => {
+    // an error stays on screen (the autosave "Saved" message used to cover it up)
+    status('Homework not made');
+    modal('<h3>Homework quizzes: not made</h3><p>' + esc(String(e.message || e).replace(/^Error:\s*/, '')) + '</p><div class="row"><button id="mClose">Close</button></div>');
+    $('mClose').onclick = closeModal;
+  });
 });
 // Make next day (Patryk 2026-10-08): one click sends the next school day's lessons to Claude, each with
 // its checklist, the class notes and the books, plus that day's kit and printing for reference.
@@ -900,7 +1104,7 @@ $('mkDay').onclick = async () => {
   const rows = slots.map((s) => {
     const name = s.kind === 'lesson' ? 'L' + S.data.classes[s.cls].seq[s.i].num + ' ' + S.data.classes[s.cls].seq[s.i].title : P.lessonCell(S.data, s);
     // all ticked: a folder with slides in it may only hold the school's original deck
-    return '<label style="display:block;margin:3px 0"><input type="checkbox" class="mdReq" data-p="' + s.period + '" checked> P' + s.period + ' ' + esc(s.cls) + ' · ' + esc(name) + (s.built === true ? ' <span class="muted">(folder already has slides)</span>' : '') + '</label>';
+    return '<label style="display:block;margin:3px 0"><input type="checkbox" class="mdReq" data-p="' + s.period + '"' + (s.own ? '' : ' checked') + '> P' + s.period + ' ' + esc(s.cls) + ' · ' + esc(name) + (s.own ? ' <span class="muted">(you made this)</span>' : s.sameAs ? ' <span class="muted">(reuses ' + esc(s.sameAs.cls) + '\'s)</span>' : s.built === true ? ' <span class="muted">(folder already has slides)</span>' : '') + '</label>';
   }).join('');
   modal('<h3>Make ' + label + '</h3><p class="muted">Ticked lessons go to Claude with their checklists and class notes. At home: "do my planner requests".</p>' + rows +
     '<label>Anything else for the day (optional)</label><input type="text" id="mdNote" placeholder="e.g. 9XS are in the lab, not S8">' +
@@ -908,7 +1112,7 @@ $('mkDay').onclick = async () => {
   $('mdCancel').onclick = closeModal;
   $('mdGo').onclick = () => {
     const pick = new Set([...document.querySelectorAll('.mdReq')].filter((x) => x.checked).map((x) => +x.dataset.p));
-    const lessons = slots.filter((s) => pick.has(s.period)).map((s) => ({ when: label + ' P' + s.period, cls: s.cls, prompt: P.buildPrompt(S.data, s, (S.classSettings || {})[s.cls]) }));
+    const lessons = slots.filter((s) => pick.has(s.period)).map((s) => ({ when: label + ' P' + s.period, cls: s.cls, prompt: P.buildPrompt(S.data, s, (S.classSettings || {})[s.cls], week) }));
     const kit = P.printList(S.data, week, S.classSettings).filter((x) => x.startsWith(P.DAYS[day] + ' '));
     const text = ['Make my next day: ' + label + '.', $('mdNote').value.trim(), kit.length ? 'Printing that day: ' + kit.join('; ') : ''].filter(Boolean).join(' ');
     if (!lessons.length) { toast('Nothing ticked'); return; }
@@ -941,6 +1145,10 @@ $('jump').onchange = () => { if ($('jump').value && leaveOk()) { loadWeek(P.pars
 $('vWeek').onclick = () => { S.view = 'week'; render(); editor(); };
 $('vDay').onclick = () => { S.view = 'day'; render(); editor(); };
 $('vClasses').onclick = () => { S.view = 'classes'; render(); };
+function showTab(v) { S.view = v; S.sel = -1; render(); }
+$('vHomework').onclick = () => showTab('homework');
+$('vTests').onclick = () => showTab('tests');
+$('vBehaviour').onclick = () => showTab('behaviour');
 $('undo').onclick = undo;
 $('file').onchange = () => {
   const f = $('file').files[0]; if (!f) return;
@@ -969,10 +1177,15 @@ document.addEventListener('keydown', (e) => {
 window.addEventListener('beforeunload', (e) => { if (S.dirty) { e.preventDefault(); e.returnValue = ''; } });
 
 function onLoad(r) {
-  S.data = r.data; S.weeks = r.weeks || {}; S.learned = r.learned || {}; S.classSettings = r.classSettings || {}; S.added = r.added || [];
+  S.data = r.data; S.weeks = r.weeks || {}; S.learned = r.learned || {}; S.classSettings = r.classSettings || {}; S.added = r.added || []; S.behaviourUrl = r.behaviourUrl || "";
   if (S.data && S.data.classes) {
     P.applyAdded(S.data, S.added);                                          // lessons he added in the planner
     Object.values(S.weeks).forEach((w) => P.remapWeek(S.data, w));          // same lessons after a data refresh
+    // shared lesson state (2026-10-12): one record per lesson; ticks saved inside old weeks move into it once
+    S.data.records = r.records || []; P.remapRecords(S.data);
+    const mg = P.migrateMarks(S.data, S.weeks);
+    if (mg.length) run('saveLessons', S.data.records).then(() => run('saveWeeks', mg)).catch((e) => status('Ticks not moved: ' + e.message));
+    S.recSnap = JSON.stringify(S.data.records); S.recSaved = mg.length ? null : S.recSnap;
   }
   if (!S.data) { status('No data yet: More → Import data, pick planner-data.json'); $('grid').innerHTML = ''; editor(); return; }
   if (!S.data.periodTimes || !S.data.filled) { status('Old data file: ask Claude to refresh the planner data, then More → Import data'); return; }

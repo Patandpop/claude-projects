@@ -106,6 +106,33 @@ const late = P.setSlot(data, {}, w, lastK, P.lessonSlot(data, '7MLA', firstI), {
 ok(slotsOf(late, '7MLA').slice(0, -1).every((o, n) => o.s.i === m7[n].s.i), 'changing a later slot never rewrites the earlier ones');
 const covered = P.setSlot(data, {}, w, m7[0].k, Object.assign(P.lessonSlot(data, '7MLA', firstI), { cover: true }), {});
 ok(!slotsOf(covered, '7MLA').slice(1).some((o) => o.s.i === firstI) && /^Cover: /.test(P.lessonCell(data, covered.slots[m7[0].k])), 'cover work for a lesson counts as taught (not planned again)');
+// Class away (Patryk 2026-10-09): nothing is lost, the lesson moves to the class's next period
+const away = P.setSlot(data, {}, w, m7[0].k, { kind: 'away', i: null, key: null, unit: null, text: 'trip', eq: 'N/A', sets: null, print: '' }, {});
+const awayI = slotsOf(away, '7MLA').map((o) => o.s.i);
+ok(away.slots[m7[0].k].kind === 'away' && awayI[0] === firstI && P.lessonCell(data, away.slots[m7[0].k]) === 'Class away: trip',
+  `class away: 7MLA's lesson moves on to their next period (${awayI.join(',')})`);
+const reflowed = P.refillClass(data, {}, JSON.parse(JSON.stringify(away)), '7MLA', {}, 0);
+ok(reflowed.slots[m7[0].k].kind === 'away', 'class away stays put when the week is re-planned');
+// one each: a set per pupil
+ok(P.setsCount({ sets: 'each' }, 28) === 28 && P.setsLabel('each') === 'one each' && P.setsCount({ sets: 'threes' }, 28) === 10, 'sets: "one each" = class size');
+// revision lesson prompt, and reuse of a lesson made for another class this week
+{
+  const u = data.classes['8XP'].seq[0].unit;
+  const rv = Object.assign(P.revisionSlot(data, '8XP', u), { cls: '8XP', day: 0, period: 1 });
+  const pr = P.buildPrompt(data, rv, null);
+  ok(/REVISION lesson \(lessonType "revision"\)/.test(pr) && /Lessons in the topic: L\d/.test(pr) && !/review/i.test(pr.split('\n')[0]), 'revision lesson prompt asks for a revision lesson built from the topic');
+  const k = data.classes['8XP'].seq.findIndex((L) => L.rel);
+  const L = data.classes['8XP'].seq[k];
+  const k2 = data.classes['8AG'].seq.findIndex((x) => x.rel === L.rel);
+  if (k2 >= 0) {
+    const a = Object.assign(P.lessonSlot(data, '8XP', k, {}), { cls: '8XP', day: 1, period: 3, own: true });
+    const b = Object.assign(P.lessonSlot(data, '8AG', k2, {}), { cls: '8AG', day: 4, period: 1 });
+    const wk = { slots: [a, b] };
+    ok(/8XP has the same lesson this week \(Tue P3, made by Patryk himself\): if it is already made, reuse it/.test(P.buildPrompt(data, b, null, wk)), 'same lesson for another class this week: the prompt says reuse and adapt');
+    const c = Object.assign({}, b, { sameAs: { cls: '9XS', title: 'Microscopes', rel: 'Year 9/Biology/B1 Cells/Lesson 3' } });
+    ok(/Reuse the lesson made for 9XS \(Microscopes, Drive folder Lessons\/Year 9/.test(P.buildPrompt(data, c, null, wk)), 'a lesson he points at ("same as") is copied and adapted, not built from scratch');
+  } else ok(false, 'no lesson shared by 8XP and 8AG to test reuse with');
+}
 const w19u = P.autofill(data, {}, P.parse('2026-10-19'));
 const f19 = firstC(w19u, '11S2');
 ok(f19 && !a12.includes(f19.i), '19 Oct with 12 Oct NOT saved still carries on after it (no lesson planned twice)');
@@ -117,6 +144,15 @@ const warn = P.wouldSkip(data, {}, w, m7[0].k, P.testSlot(data, '7MLA', data.cla
 ok(warn.length >= 3, `a test now would skip ${warn.length} untaught 7MLA lessons, and says so`);
 const ticked = P.markLesson(data, {}, w, '7MLA', firstI, true, {});
 ok(!slotsOf(ticked, '7MLA').some((o) => o.s.i === firstI), 'ticking a lesson off removes it from the week and the rest re-flows');
+// shared lesson state (2026-10-12): the tick is one record per lesson, so it counts in EVERY week
+ok(data.records.length === 1 && data.records[0].key && data.records[0].done === true, 'a tick is saved once, as a lesson record (not inside the week)');
+const w26 = P.autofill(data, { '2026-10-12': ticked }, P.parse('2026-10-26'));
+const tlEarlier = P.topicList(data, {}, w, '7MLA', data.classes['7MLA'].seq[firstI].unit, null);
+ok(tlEarlier.find((x) => x.k === firstI).state === 'taught', 'the tick shows in the week view too, not only where it was made');
+ok(!w26.slots.some((x) => x.cls === '7MLA' && x.i === firstI), 'and later weeks never plan it');
+P.markLesson(data, {}, w, '7MLA', firstI, null, {});
+ok(!(data.records || []).length, 'unticking back to "as the records say" removes the record');
+data.records = [];
 const tl = P.topicList(data, {}, w, '7MLA', data.classes['7MLA'].seq[firstI].unit, { day: w.slots[m7[0].k].day, period: w.slots[m7[0].k].period });
 ok(tl.find((x) => x.k === firstI).next && tl.some((x) => x.state === 'taught' && x.when && x.when.wrote), 'lesson list: ★ on the right lesson, taught ones show what he wrote');
 // 14. Equipment: no filler, concise, sets only for real kit (Patryk 2026-10-07)
@@ -216,6 +252,26 @@ if (fs.existsSync(DRIVE)) {
   ok(nsd('2026-10-13T00:30') === '2026-10-13', 'after midnight Monday night: still Tuesday, not Wednesday');
   ok(nsd('2026-10-16T19:00') === '2026-10-19', 'Friday evening: Monday');
   ok(nsd('2026-10-21T20:00') === '2026-11-02', 'day before INSET and half term: first day back');
+}
+
+// slide-over (2026-10-12): a lesson lost this week pushes the class's later SAVED weeks along
+{
+  data.records = [];
+  const wA = P.autofill(data, {}, P.parse('2026-11-02')), wB = P.autofill(data, { '2026-11-02': wA }, P.parse('2026-11-09'));
+  const sv = { '2026-11-02': wA, '2026-11-09': wB };
+  const idx = wA.slots.findIndex((x) => x.cls === '7MLA' && x.kind === 'lesson' && !x.double);
+  const lost = wA.slots[idx].i;
+  const away = P.setSlot(data, sv, wA, idx, { kind: 'away', i: null, key: null, unit: null, text: 'Trip' }, {});
+  sv['2026-11-02'] = away;
+  const moved = P.cascade(data, sv, '2026-11-02', P.parse('2026-11-02'), {});
+  const firstB = sv['2026-11-09'].slots.find((x) => x.cls === '7MLA' && x.kind === 'lesson');
+  const lastA = wA.slots.filter((x) => x.cls === '7MLA' && x.kind === 'lesson').slice(-1)[0];
+  ok(moved.length === 1 && firstB.i !== wB.slots.find((x) => x.cls === '7MLA' && x.kind === 'lesson').i, 'class away: next week is re-planned straight away (slide-over)');
+  ok(away.slots.some((x) => x.cls === '7MLA' && x.i === lost) || firstB.i === lastA.i, 'and the lost lesson is not dropped');
+  const old = P.autofill(data, {}, P.parse('2026-11-02')); old.marks = [{ cls: '7MLA', i: lost, done: true }];
+  const mg = P.migrateMarks(data, { '2026-11-02': old });
+  ok(mg.length === 1 && !old.marks.length && P.findRecord(data, '7MLA', lost).done === true, 'ticks saved inside old weeks move into the lesson records');
+  data.records = [];
 }
 
 console.log(fails ?`\n${fails} FAILED` : '\nall planner logic checks passed');
