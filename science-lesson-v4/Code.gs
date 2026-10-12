@@ -5,7 +5,7 @@
  * Students: Short is the name students see on the board. X and Y are seat positions (% of the plan), Ratio is the plan's width/height.
  */
 
-const VERSION = 20;   // shown on the phone and board so you can check the new code is live
+const VERSION = 21;   // shown on the phone and board so you can check the new code is live
 const TZ = 'Europe/London';
 const RULES = { 2: 'Work ethic', 3: 'Quality', 4: 'Attention', 5: 'Voice', 6: 'Lab safety', 7: 'Fixed stations', 8: 'Silent entry' };
 const WEEK_A_START = '2026-09-07';           // Monday of the first Week A
