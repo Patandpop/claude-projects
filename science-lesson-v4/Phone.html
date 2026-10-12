@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html>
+<head>
+<base target="_top">
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="manifest" href="<?= manifestUrl ?>">
+<meta name="theme-color" content="#0D2442">
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Atkinson+Hyperlegible+Next:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper:#EDF2F8; --grid:rgba(18,52,92,.06); --plate:#FFFFFF; --ink:#12345C; --soft:#557192; --line:#C9D6E5;
+    --sodium:#F2AE12; --sodium-text:#7A4E00; --sodium-wash:#FFF3D1;
+    --neg:#B3261E; --neg-wash:#FBE6E3; --warn:#E07B24; --warn-wash:#FDEBDC; --focus:#1B67C9;
+    --display:"Big Shoulders Display","Arial Narrow",system-ui,sans-serif;
+    --text:"Atkinson Hyperlegible Next","Atkinson Hyperlegible",Roboto,system-ui,sans-serif;
+    --on-ink:#FFFFFF; --deep:#0D2442; --blue:#2F6FD6; --purple:#7A3FC4; --ok:#1E7A4F; --warn-text:#8A3F00; --glass:rgba(237,242,248,.92);
+    --hit-wash:#DDF1E6; --hit-text:#1E6B4A; color-scheme:light;
+  }
+  /* dark mode: follows the phone (Auto), or set Light or Dark in Today > Settings */
+  html[data-theme="dark"] { --paper:#0A1829; --grid:rgba(234,242,250,.045); --plate:#13294A; --ink:#EAF2FA; --soft:#9FB4CC; --line:#27456B;
+    --sodium-text:#FFD36E; --sodium-wash:#3A3015; --neg:#FF8A7A; --neg-wash:#3A1C1F; --warn-wash:#3A2614; --focus:#6FA8FF;
+    --on-ink:#0A1829; --deep:#1C3A63; --blue:#6FA8FF; --purple:#C09BFF; --ok:#5ED39B; --warn-text:#FFB37A; --glass:rgba(10,24,41,.92);
+    --hit-wash:#12392B; --hit-text:#7FE0AE; color-scheme:dark; }
+  @media (prefers-color-scheme: dark) { html[data-theme="auto"] { --paper:#0A1829; --grid:rgba(234,242,250,.045); --plate:#13294A; --ink:#EAF2FA; --soft:#9FB4CC; --line:#27456B;
+    --sodium-text:#FFD36E; --sodium-wash:#3A3015; --neg:#FF8A7A; --neg-wash:#3A1C1F; --warn-wash:#3A2614; --focus:#6FA8FF;
+    --on-ink:#0A1829; --deep:#1C3A63; --blue:#6FA8FF; --purple:#C09BFF; --ok:#5ED39B; --warn-text:#FFB37A; --glass:rgba(10,24,41,.92);
+    --hit-wash:#12392B; --hit-text:#7FE0AE; color-scheme:dark; } }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body { margin:0; color:var(--ink); font-family:var(--text); font-size:16px; overscroll-behavior-y:contain; }
+  body { min-height:100vh; background:var(--paper);
+    background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px); background-size:24px 24px; }
+  button { font:inherit; color:inherit; cursor:pointer; -webkit-user-select:none; user-select:none; }
+  button:focus-visible,input:focus-visible,textarea:focus-visible { outline:3px solid var(--focus); outline-offset:2px; }
+  .hidden { display:none !important; }
+  svg.i { width:22px; height:22px; flex:none; }
+
+  /* top */
+  .top { padding:14px 14px 6px; display:flex; align-items:flex-end; gap:10px; }
+  .top h1 { margin:0; font-family:var(--display); font-weight:900; font-size:44px; line-height:.9; letter-spacing:.01em; }
+  .top .when { font-size:14px; color:var(--soft); font-weight:700; padding-bottom:3px; }
+  .iconBtn { margin-left:auto; width:44px; height:44px; border-radius:12px; border:1px solid var(--line); background:var(--plate); display:grid; place-items:center; }
+  .chips { display:flex; gap:8px; overflow-x:auto; padding:6px 14px 10px; scrollbar-width:none; }
+  .chips::-webkit-scrollbar { display:none; }
+  .chip { flex:none; border:1px solid var(--line); background:var(--plate); border-radius:999px; padding:8px 14px; font-weight:800; font-size:15px; }
+  .chip[aria-pressed="true"] { background:var(--ink); border-color:var(--ink); color:var(--on-ink); }
+  .chip.more { color:var(--soft); }
+
+  /* silence control */
+  .silence { position:sticky; top:0; z-index:5; padding:8px 14px; background:var(--glass); backdrop-filter:blur(8px); }
+  .modes3 { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+  .limit { display:flex; align-items:center; gap:8px; margin-top:6px; font-size:14px; font-weight:700; color:var(--soft); }
+  .limit button { border:1px solid var(--line); background:var(--plate); border-radius:10px; width:44px; height:36px; font-weight:800; font-size:18px; color:var(--ink); }
+  .limit b { color:var(--ink); min-width:48px; text-align:center; }
+  .live.big { flex-wrap:wrap; padding:14px 12px 12px 16px; min-height:128px; align-content:space-between; }
+  .live.big .lbl { font-size:22px; } .live.big .lbl small { font-size:15px; }
+  .live.big .t { font-size:40px; }
+  .live.big .btns { display:flex; gap:10px; width:100%; }
+  .live.big .end { flex:1; font-size:20px; padding:16px; }
+  .live.big .cx { min-width:88px; font-size:18px; padding:16px; }
+  .live.big .pz { flex:1; font-size:20px; padding:16px; border:0; border-radius:12px; font-weight:800; background:#EAF2FA; color:#0D2442; }
+  .trun .pz { min-width:72px; border:0; border-radius:10px; font-weight:800; background:#EAF2FA; color:#0D2442; }
+  .live.big .tmr { width:100%; font-size:14px; font-weight:700; opacity:.9; }
+  .recap { width:100%; margin-top:18px; border:0; border-radius:14px; padding:16px; font-weight:800; font-size:17px; background:var(--sodium); color:var(--sodium-text); }
+  .sum { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .sum .col { background:var(--plate); border:1px solid var(--line); border-radius:14px; padding:10px 12px; }
+  .sum h3 { margin:0 0 6px; font-family:var(--display); font-size:18px; }
+  .sum div.r { display:flex; justify-content:space-between; gap:6px; padding:4px 0; border-top:1px solid var(--paper); font-size:15px; }
+  .sum div.r:first-of-type { border-top:0; }
+  .modes3 button { border:1.5px solid var(--ink); background:var(--plate); border-radius:12px; padding:10px 4px; font-weight:800; font-size:15px; line-height:1.1; }
+  .modes3 button small { display:block; font-size:11px; font-weight:600; color:var(--soft); margin-top:2px; }
+  .go2 { display:grid; grid-template-columns:1fr 1.3fr; gap:6px; margin-top:6px; }
+  .go2 button { border:1.5px solid var(--ink); background:var(--plate); border-radius:12px; padding:12px 6px; font-weight:800; font-size:16px; }
+  .go2 .gw { background:var(--ink); color:var(--on-ink); }
+  .go2 .wide { grid-column:1 / -1; }
+  .live .adj { position:relative; margin-left:8px; padding:6px 10px; border-radius:8px; background:rgba(255,255,255,.18); color:#fff; font-weight:800; }
+  .timers { display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:6px; }
+  .timers button { border:0; background:var(--sodium-wash); color:var(--sodium-text); border-radius:12px; padding:10px 4px; font-weight:800; font-size:15px; }
+  .trun { display:flex; align-items:center; gap:6px; margin-top:6px; background:var(--deep); color:#fff; border-radius:14px; padding:6px; }
+  .trun button { border:0; border-radius:10px; font-weight:800; font-size:17px; padding:12px 14px; background:rgba(255,255,255,.14); color:#fff; min-width:64px; }
+  .trun .tt { flex:1; text-align:center; line-height:1; }
+  .trun .tt b { display:block; font-family:var(--display); font-weight:900; font-size:34px; color:var(--sodium); font-variant-numeric:tabular-nums; }
+  .trun .tt small { font-size:11px; font-weight:700; color:#A3BAD3; }
+  .trun .x { min-width:44px; background:transparent; color:#A3BAD3; }
+  .trun.idle { background:var(--sodium-wash); color:var(--sodium-text); }
+  .trun.idle button { background:rgba(122,78,0,.12); color:var(--sodium-text); }
+  .trun .start { flex:1; background:transparent !important; padding:4px; }
+  .trun.idle .tt b { color:var(--sodium-text); } .trun.idle .tt small { color:var(--sodium-text); opacity:.75; }
+  .live { display:flex; align-items:center; gap:10px; border-radius:14px; padding:10px 10px 10px 16px; color:#fff; background:var(--deep); transition:background-color .4s; position:relative; overflow:hidden; }
+  .live.amber { background:var(--warn); } .live.red { background:var(--neg); }
+  .live::before { content:""; position:absolute; inset:0; background:linear-gradient(100deg,transparent 35%,rgba(255,255,255,.14) 50%,transparent 65%); transform:translateX(-100%); animation:sweep 3s ease-in-out infinite; }
+  @keyframes sweep { to { transform:translateX(100%); } }
+  .live .lbl { font-weight:800; font-size:17px; line-height:1.1; }
+  .live .lbl small { display:block; font-weight:600; font-size:13px; opacity:.85; }
+  .live .t { font-family:var(--display); font-weight:800; font-size:30px; font-variant-numeric:tabular-nums; margin-left:auto; }
+  .live button { position:relative; border:0; border-radius:10px; padding:10px 12px; font-weight:800; }
+  .live .end { background:#fff; color:#12345C; }
+  .live .cx { background:rgba(255,255,255,.18); color:#fff; }
+
+  main { padding:4px 14px 110px; }
+  .row { display:flex; gap:8px; align-items:center; margin:6px 0 10px; }
+  .seg { display:flex; background:var(--plate); border:1px solid var(--line); border-radius:10px; padding:3px; }
+  .seg button { border:0; background:none; padding:6px 12px; border-radius:7px; font-weight:800; font-size:14px; color:var(--soft); }
+  .seg button[aria-pressed="true"] { background:var(--ink); color:var(--on-ink); }
+  #search { flex:1; min-width:0; padding:9px 12px; border:1px solid var(--line); border-radius:10px; font:inherit; background:var(--plate); }
+  .hint { font-size:13px; color:var(--soft); margin:-4px 0 10px; }
+
+  /* tiles */
+  .tile { position:relative; display:flex; flex-direction:column; justify-content:center; align-items:center; border:1px solid var(--line); border-radius:12px; background:var(--plate);
+    padding:6px 3px; line-height:1.05; box-shadow:0 1px 0 rgba(18,52,92,.08); transition:transform .1s, background-color .25s, border-color .25s; touch-action:manipulation; }
+  .tile:active { transform:scale(.95); }
+  .tile b { font-size:16px; font-weight:800; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .tile span { font-size:13px; color:var(--soft); font-weight:700; }
+  .tile.has { background:var(--sodium); border-color:#D99A0B; }
+  .tile.has b { color:#3D2A00; } .tile.has span { color:#7A4E00; }
+  .cnt { position:absolute; bottom:3px; right:6px; font-style:normal; font-size:11px; font-weight:800; color:#7A4E00; }
+  .tile.pop { animation:glow .6s ease-out; }
+  @keyframes glow { 0% { box-shadow:0 0 0 0 rgba(242,174,18,.7); } 100% { box-shadow:0 0 0 12px rgba(242,174,18,0); } }
+  .tile.sel { background:var(--ink); border-color:var(--ink); color:var(--on-ink); } .tile.sel span { color:var(--on-ink); opacity:.75; }
+  .star { position:absolute; top:-7px; right:-5px; min-width:22px; height:22px; padding:0 5px; border-radius:11px; background:var(--sodium); color:var(--sodium-text);
+    font-size:12px; font-weight:800; display:flex; align-items:center; justify-content:center; gap:1px; box-shadow:0 1px 3px rgba(18,52,92,.25); }
+  .star svg { width:11px; height:11px; }
+  .tile.pop .star { animation:pop .55s cubic-bezier(.2,.9,.3,1.5); }
+  @keyframes pop { 0% { transform:scale(0) rotate(-40deg); } 100% { transform:none; } }
+  .names { display:grid; grid-template-columns:repeat(3,1fr); gap:9px 7px; padding-top:6px; }
+  .supp { display:flex; align-items:center; gap:6px; margin-top:14px; flex-wrap:wrap; }
+  .supp span { font-weight:800; color:var(--soft); margin-right:4px; }
+  .supp button { border:1.5px solid var(--line); background:var(--plate); border-radius:10px; padding:9px 10px; font-weight:800; font-size:14px; }
+  .supp .sp { border-color:var(--blue); color:var(--blue); } .supp .se { border-color:var(--purple); color:var(--purple); }
+  .supp .on { box-shadow:inset 0 0 0 2px currentColor; background:var(--paper); }
+  .dotBtn { width:34px; height:44px; border:0; background:none; display:grid; place-items:center; margin-left:auto; padding:0; }
+  .dotBtn + .iconBtn { margin-left:0; }
+  .dot { display:block; width:13px; height:13px; border-radius:50%; background:var(--soft); }
+  .dot.green { background:#2EAD6B; } .dot.amber { background:#F2AE12; } .dot.red { background:#E5484D; }
+  .conn > div { display:flex; align-items:center; gap:10px; padding:10px 0; border-top:1px solid var(--line); font-size:16px; }
+  .conn > div:first-child { border-top:0; } .conn b { min-width:100px; } .conn span { color:var(--soft); font-weight:700; }
+  .sets { background:var(--plate); border:1px solid var(--line); border-radius:14px; padding:4px 12px; }
+  .setrow { display:flex; flex-direction:column; gap:7px; padding:11px 0; border-top:1px solid var(--line); }
+  .setrow:first-child { border-top:0; } .setrow > span { font-weight:800; }
+  .seg2 { display:flex; gap:6px; }
+  .seg2 button { flex:1; border:1.5px solid var(--line); background:var(--paper); border-radius:10px; padding:10px 6px; font-weight:800; font-size:14px; }
+  .seg2 button[aria-pressed="true"] { background:var(--ink); color:var(--on-ink); border-color:var(--ink); }
+  .tile.sup-p { box-shadow:inset 0 0 0 3px var(--blue); } .tile.sup-e { box-shadow:inset 0 0 0 3px var(--purple); }
+  .silbar { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:10px; padding:10px 14px; border-radius:12px; background:var(--plate); border:1px solid var(--line); font-weight:800; }
+  .silbar b { font-family:var(--display); font-size:24px; }
+  .silbar.ok b { color:var(--ok); } .silbar.low b { color:var(--neg); } .silbar span { color:var(--soft); font-size:14px; }
+  .clsTitleLong { font-size:30px !important; white-space:nowrap; }
+  .names .tile { min-height:74px; } .names .tile b { font-size:18px; } .names .tile span { font-size:14px; }
+  .plan { position:relative; margin-top:8px; }
+  .plan .tile { position:absolute; padding:3px 2px; border-radius:10px; }
+  .plan .tile b { font-size:14px; } .plan .tile span { font-size:12px; }
+  .planScroll { overflow-x:auto; margin:0 -14px; padding:0 14px 6px; -webkit-overflow-scrolling:touch; }
+  .plan .tile { padding:2px 1px; border-radius:8px; } .plan .tile b { font-size:inherit; overflow:visible; text-overflow:clip; } .plan .tile span { font-size:10px; }
+  .wb { margin-top:6px; text-align:center; font-family:var(--display); font-weight:800; font-size:14px; letter-spacing:.35em; color:var(--on-ink); background:var(--ink); border-radius:6px; padding:4px; }
+
+  h2 { font-family:var(--display); font-weight:800; font-size:22px; letter-spacing:.01em; margin:24px 0 8px; }
+  .list { list-style:none; margin:0; padding:0; background:var(--plate); border:1px solid var(--line); border-radius:14px; overflow:hidden; }
+  .list li { display:flex; gap:10px; align-items:center; padding:12px 14px; border-top:1px solid var(--paper); }
+  .list li:first-child { border-top:0; }
+  .grow { flex:1; min-width:0; }
+  .soft { color:var(--soft); font-size:14px; }
+  .tag { font-size:12px; font-weight:800; padding:3px 8px; border-radius:8px; white-space:nowrap; }
+  .tag.det { background:var(--neg); color:#fff; } .tag.r { background:var(--warn-wash); color:var(--warn-text); } .tag.n { background:var(--neg-wash); color:var(--neg); } .tag.p { background:var(--sodium-wash); color:var(--sodium-text); }
+  .x { border:0; background:none; color:var(--soft); font-weight:800; font-size:14px; padding:6px; }
+  .note { color:var(--soft); padding:10px 2px; }
+
+  /* bottom nav */
+  nav { position:fixed; left:0; right:0; bottom:0; z-index:8; display:flex; background:var(--plate); border-top:1px solid var(--line); padding-bottom:env(safe-area-inset-bottom,0px); }
+  nav button { flex:1; border:0; background:none; padding:9px 0 10px; display:flex; flex-direction:column; align-items:center; gap:3px; font-size:12px; font-weight:800; color:var(--soft); }
+  nav button[aria-pressed="true"] { color:var(--ink); }
+  nav button[aria-pressed="true"] svg { background:var(--sodium-wash); border-radius:10px; box-shadow:0 0 0 6px var(--sodium-wash); }
+
+  /* multi-select bar and snackbar */
+  .selbar, .snack { position:fixed; left:10px; right:10px; bottom:calc(72px + env(safe-area-inset-bottom,0px)); z-index:9; border-radius:16px; }
+  .selbar { background:var(--deep); color:#fff; padding:10px; display:flex; gap:8px; align-items:center; box-shadow:0 8px 24px rgba(18,52,92,.3); }
+  .selbar .n { font-weight:800; padding:0 4px; white-space:nowrap; }
+  .selbar button { border:0; border-radius:10px; padding:11px 12px; font-weight:800; white-space:nowrap; }
+  .selbar .p { background:var(--sodium); color:var(--sodium-text); margin-left:auto; }
+  .selbar .m { background:rgba(255,255,255,.14); color:#fff; }
+  .snack { background:var(--deep); color:#fff; padding:13px 14px 13px 16px; display:flex; align-items:center; gap:10px; font-weight:700; opacity:0; transform:translateY(12px); transition:.18s; pointer-events:none; }
+  .snack.show { opacity:1; transform:none; pointer-events:auto; }
+  .snack button { margin-left:auto; border:0; background:none; color:var(--sodium); font-weight:800; font-size:16px; padding:4px 6px; }
+
+  /* sheet */
+  .scrim { position:fixed; inset:0; background:rgba(13,36,66,.5); opacity:0; pointer-events:none; transition:opacity .16s; z-index:20; }
+  .scrim.open { opacity:1; pointer-events:auto; }
+  .sheet { position:fixed; left:0; right:0; bottom:0; max-height:88vh; overflow-y:auto; background:var(--plate); border-radius:22px 22px 0 0; padding:10px 16px calc(16px + env(safe-area-inset-bottom,0px)); z-index:21; transform:translateY(105%); transition:transform .22s cubic-bezier(.2,.8,.2,1); }
+  .sheet.open { transform:none; }
+  .grab { width:42px; height:5px; border-radius:3px; background:var(--line); margin:0 auto 12px; }
+  .who { font-family:var(--display); font-weight:900; font-size:34px; line-height:1; margin:0 0 4px; }
+  .sub { color:var(--soft); margin:0 0 16px; font-weight:600; }
+  .award { width:100%; display:flex; align-items:center; justify-content:center; gap:10px; border:0; border-radius:16px; padding:20px; font-size:21px; font-weight:800; background:var(--sodium); color:var(--sodium-text); margin-bottom:10px; }
+  .award svg { width:26px; height:26px; }
+  .pair { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .pair button { border:1.5px solid var(--neg); background:var(--plate); color:var(--neg); border-radius:16px; padding:17px 8px; font-size:18px; font-weight:800; }
+  .pair .r { border-color:var(--warn); color:var(--warn-text); background:var(--warn-wash); }
+  .keys { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+  .keys button { border:0; background:var(--warn-wash); color:var(--warn-text); border-radius:14px; padding:10px 4px; min-height:78px; }
+  .keys b { display:block; font-family:var(--display); font-size:30px; font-weight:900; line-height:1; }
+  .keys span { display:block; font-size:12px; font-weight:800; line-height:1.1; margin-top:3px; }
+  .classes { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+  .classes button { border:1px solid var(--line); background:var(--plate); border-radius:12px; padding:14px 4px; font-family:var(--display); font-weight:800; font-size:22px; }
+  .classes button[aria-pressed="true"] { background:var(--ink); color:var(--on-ink); border-color:var(--ink); }
+  .cancel { width:100%; margin-top:10px; border:0; background:none; padding:12px; color:var(--soft); font-weight:800; }
+
+  /* Today and Friday */
+  .ranges { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px; }
+  .ranges button { border:1px solid var(--line); background:var(--plate); border-radius:999px; padding:7px 14px; font-weight:800; font-size:14px; }
+  .ranges button[aria-pressed="true"] { background:var(--ink); color:var(--on-ink); border-color:var(--ink); }
+  .cls { background:var(--plate); border:1px solid var(--line); border-radius:16px; margin-bottom:10px; overflow:hidden; }
+  .cls.skipped { opacity:.5; }
+  .cls-h { width:100%; display:flex; align-items:center; gap:10px; border:0; background:none; padding:12px 14px; text-align:left; }
+  .cls-h b { font-family:var(--display); font-size:28px; font-weight:900; line-height:1; min-width:78px; }
+  .cls-h .grow { font-size:14px; color:var(--soft); font-weight:700; }
+  .goal { font-size:12px; font-weight:800; padding:5px 9px; border-radius:999px; background:var(--paper); white-space:nowrap; }
+  .goal.hit { background:var(--hit-wash); color:var(--hit-text); } .goal.missed { background:var(--neg-wash); color:var(--neg); }
+  .cls-b { padding:0 12px 12px; }
+  .skip { border:1px solid var(--line); background:var(--plate); border-radius:10px; padding:8px 12px; font-weight:800; font-size:14px; }
+  .st { width:100%; display:flex; align-items:center; gap:10px; border:1px solid var(--line); background:var(--plate); border-radius:12px; padding:11px 12px; margin-top:6px; text-align:left; }
+  .st .box { width:24px; height:24px; border:2px solid var(--line); border-radius:7px; flex:none; display:grid; place-items:center; }
+  .st.on { border-color:var(--ink); box-shadow:inset 0 0 0 1px var(--ink); }
+  .st.on .box { background:var(--ink); border-color:var(--ink); }
+  .st.on .box::after { content:""; width:6px; height:11px; border:solid var(--on-ink); border-width:0 2.5px 2.5px 0; transform:rotate(45deg) translate(-1px,-1px); }
+  .st.recent { background:var(--warn-wash); border-color:#EFC49A; }
+  .st small { display:block; font-size:12px; color:var(--warn-text); font-weight:800; }
+  .sug { font-size:12px; color:var(--sodium-text); font-weight:800; background:var(--sodium-wash); padding:3px 7px; border-radius:999px; }
+  .cta { width:100%; border:0; border-radius:14px; padding:15px; font-weight:800; font-size:17px; background:var(--ink); color:var(--on-ink); margin-top:6px; }
+  .cta.alt { background:var(--plate); color:var(--ink); border:1px solid var(--line); }
+  textarea { width:100%; min-height:220px; font:inherit; padding:12px; border:1px solid var(--line); border-radius:14px; background:var(--plate); }
+  @media (orientation:landscape) and (max-height:520px) {
+    .top { padding:8px 14px 2px; } .top h1 { font-size:32px; } .chips { padding:4px 14px 6px; } .chip { padding:5px 12px; }
+    .silence { padding:4px 14px; } .modes3 button { padding:6px 4px; } .modes3 button small { display:none; }
+    .live { padding:4px 8px 4px 14px; } .live .t { font-size:24px; } .live button { padding:7px 10px; }
+    .hint { display:none; } .row { margin:4px 0 2px; } .seg button { padding:4px 10px; }
+    nav button { flex-direction:row; justify-content:center; gap:8px; padding:6px 0; } nav svg.i { width:18px; height:18px; }
+    .selbar, .snack { bottom:calc(44px + env(safe-area-inset-bottom,0px)); left:20%; right:20%; }
+  }
+  @media (prefers-reduced-motion: reduce) { .sheet,.snack,.scrim { transition:none; } .live::before,.tile.pop .star { animation:none; } }
+</style>
+</head>
+<body data-key="<?= key ?>">
+
+<div class="top">
+  <h1 id="clsTitle">&nbsp;</h1>
+  <span class="when" id="when"></span>
+  <button class="dotBtn" id="dotBtn" aria-label="Connection"><i class="dot" id="dot"></i></button>
+  <button class="iconBtn" id="refresh" aria-label="Refresh"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M20 12a8 8 0 1 1-2.3-5.6M20 4v5h-5"/></svg></button>
+</div>
+<div class="chips" id="chips"></div>
+
+<div class="silence" id="silence"></div>
+
+<main>
+  <section id="vLog">
+    <div class="row">
+      <div class="seg"><button id="mPlan" aria-pressed="true">Plan</button><button id="mNames" aria-pressed="false">Names</button></div>
+      <input id="search" type="search" placeholder="Find" autocomplete="off" class="hidden">
+    </div>
+    <p class="hint" id="hint">Tap to award. Hold to pick several.</p>
+    <div id="studs"></div>
+    <div id="lesson"></div>
+  </section>
+
+  <section id="vDay" class="hidden">
+    <h2>Today in this class</h2>
+    <div id="daySum"></div>
+    <h2>Logged today</h2>
+    <div id="dayList"></div>
+    <h2>Positives</h2>
+    <div class="ranges" id="ranges">
+      <button data-d="1" aria-pressed="true">Today</button><button data-d="5" aria-pressed="false">5 days</button>
+      <button data-d="10" aria-pressed="false">10 days</button><button data-d="20" aria-pressed="false">20 days</button>
+    </div>
+    <div id="posList"></div>
+    <h2>Settings</h2>
+    <div class="sets">
+      <div class="setrow"><span>Tapping a student</span><div class="seg2" data-set="tap"><button data-v="pos">Gives a positive</button><button data-v="sheet">Opens options</button></div></div>
+      <div class="setrow"><span>Keep screen awake</span><div class="seg2" data-set="awake"><button data-v="on">On</button><button data-v="off">Off</button></div><p class="note" id="awakeNote" style="margin:0"></p></div>
+      <div class="setrow"><span>Theme</span><div class="seg2" data-set="theme"><button data-v="auto">Auto</button><button data-v="light">Light</button><button data-v="dark">Dark</button></div></div>
+    </div>
+    <p class="note" style="text-align:center;margin-top:24px">App version 20</p>
+  </section>
+
+  <section id="vFri" class="hidden">
+    <div id="fri"></div>
+    <div id="friList" class="hidden">
+      <h2>Email list</h2>
+      <textarea id="listText" readonly></textarea>
+      <button class="cta alt" id="copy">Copy names</button>
+      <button class="cta" id="mark">Mark as emailed</button>
+      <button class="cancel" id="backPick">Back to picking</button>
+    </div>
+    <button class="cta hidden" id="makeList"></button>
+  </section>
+</main>
+
+<div class="selbar hidden" id="selbar">
+  <span class="n" id="selN"></span>
+  <button class="p" id="selPos">+ Positive</button>
+  <button class="m" id="selNeg">Negative</button>
+  <button class="m" id="selX" aria-label="Clear selection">&#x2715;</button>
+</div>
+<div class="snack" id="snack" role="status"><span id="snackText"></span><button id="snackUndo">Undo</button></div>
+
+<nav>
+  <button id="tLog" aria-pressed="true"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="3" y="4" width="7" height="6" rx="1.5"/><rect x="14" y="4" width="7" height="6" rx="1.5"/><rect x="3" y="14" width="7" height="6" rx="1.5"/><rect x="14" y="14" width="7" height="6" rx="1.5"/></svg>Lesson</button>
+  <button id="tDay" aria-pressed="false"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"/></svg>Today</button>
+  <button id="tFri" aria-pressed="false"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>Friday</button>
+</nav>
+
+<div class="scrim" id="scrim"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true"><div class="grab"></div><div id="sheetBody"></div><button class="cancel" id="close">Cancel</button></div>
+
+<script>
+const KEY = document.body.dataset.key;
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const LS = { get: k => { try { return localStorage.getItem(k); } catch (e) { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} } };
+const STAR = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2.5 2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z"/></svg>';
+let RULES = {}, CLASSES = [], TODAY = [];
+const S = { cls:'', students:[], ratio:2.6, events:[], tab:'log', view: LS.get('view') || '', mode:{mode:'teaching'}, days:1,
+  fri:null, picks:{}, skip:{}, open:{}, shownResult:'', pop:{}, sel:[] };
+
+const NET = { down: false };
+function call(fn, ...args) {
+  return new Promise((res, rej) => google.script.run
+    .withSuccessHandler(v => { NET.down = false; updateDot(); res(v); })
+    .withFailureHandler(e => { NET.down = true; updateDot(); rej(e); })[fn](KEY, ...args));
+}
+const shortOf = n => (S.students.find(s => s.name === n) || {}).short || n;
+
+/* snackbar with undo */
+let snackTimer, snackIds = [];
+function snack(text, ids) {
+  snackIds = ids || [];
+  $('snackText').textContent = text;
+  $('snackUndo').classList.toggle('hidden', !snackIds.length);
+  $('snack').classList.add('show');
+  clearTimeout(snackTimer); snackTimer = setTimeout(() => $('snack').classList.remove('show'), ids && ids.length ? 5000 : 2200);
+}
+$('snackUndo').onclick = async () => {
+  const ids = snackIds.slice(); $('snack').classList.remove('show'); if (!ids.length) return;
+  try { S.events = await call('removeMany', S.cls, ids); render(); snack('Undone'); } catch (e) { snack('Undo failed. Check your connection.'); }
+};
+
+function tally() {
+  const m = {};
+  S.events.forEach(e => { const x = m[e.name] = m[e.name] || { pos:0, neg:0, r:[], why:[] }; if (e.type === '+') x.pos++; else { x.neg++; if (e.type === 'R') x.r.push(e.rule); if (e.rule) x.why.push(e.rule); } });
+  return m;
+}
+
+/* ---------- students ---------- */
+function tile(s, pos, style, mini, oneLine) {
+  const p = s.short.split(' '), first = p.shift();
+  const sup = s.support === 'prompt' ? ' sup-p' : s.support === 'extend' ? ' sup-e' : '';
+  const cls = 'tile' + (pos ? ' has' : '') + (S.sel.includes(s.name) ? ' sel' : '') + (S.pop[s.name] ? ' pop' : '') + (mini ? ' mini' : '') + (oneLine ? ' one' : '') + sup;
+  // plan seats: first name and initial on one line
+  const inner = oneLine ? `<b>${esc(s.short)}</b>` : `<b>${esc(first)}</b><span>${esc(p.join(' '))}</span>`;
+  return `<button class="${cls}" data-name="${esc(s.name)}"${style ? ` style="${style}"` : ''}>${inner}</button>`;
+}
+// measures the real text so each first name is as big as possible without being cut off
+const _mc = document.createElement('canvas').getContext('2d');
+function fitName(text, maxW, cap) {
+  _mc.font = `800 100px "Atkinson Hyperlegible Next","Atkinson Hyperlegible",Roboto,system-ui,sans-serif`;
+  const size = 100 * maxW / Math.max(1, _mc.measureText(text).width);
+  return Math.max(7, Math.min(cap, Math.floor(size * 10) / 10));
+}
+function silenceBar() {
+  const s = S.silence;
+  if (!s) return `<div class="silbar ok"><span>Silent time today</span><b>no data yet</b></div>`;
+  return `<div class="silbar ${s.pct >= 80 ? 'ok' : 'low'}"><span>Silent time today (goal 80%)</span><b>${s.pct}%</b></div>`;
+}
+function currentView() {
+  const seated = S.students.some(s => s.x !== null);
+  if (!seated) return 'names';
+  return S.view || (window.innerWidth > window.innerHeight ? 'plan' : 'names');
+}
+function renderStudents() {
+  const t = tally(), box = $('studs'), view = currentView();
+  $('mPlan').setAttribute('aria-pressed', view === 'plan'); $('mNames').setAttribute('aria-pressed', view === 'names');
+  $('search').classList.toggle('hidden', view !== 'names');
+  if (view === 'plan') {
+    const seated = S.students.filter(s => s.x !== null && s.y !== null).map(s => Object.assign({}, s));
+    // seat spacing = the usual gap between neighbours (not the smallest, so one misplaced seat can't shrink them all)
+    const gaps = [];
+    seated.forEach(a => { let best = null; seated.forEach(b => { const d = b.x - a.x; if (d > 2 && Math.abs(a.y - b.y) < 3 && (best === null || d < best)) best = d; }); if (best) gaps.push(best); });
+    gaps.sort((a, b) => a - b);
+    const pitch = gaps.length ? gaps[Math.floor(gaps.length / 2)] : 10;
+    // push apart any seat that sits too close to the one on its left
+    const byRow = {};
+    seated.forEach(s => { const k = Math.round(s.y / 4); (byRow[k] = byRow[k] || []).push(s); });
+    Object.values(byRow).forEach(r => { r.sort((a, b) => a.x - b.x); for (let i = 1; i < r.length; i++) if (r[i].x - r[i - 1].x < pitch * 0.85) r[i].x = r[i - 1].x + pitch; });
+    // fits the screen width (no sideways scrolling); seats are tall, first name with the initial underneath
+    const W = box.clientWidth || (window.innerWidth - 28);
+    const w = W * pitch / 100 * 0.94, h = 46;
+    const fs = Math.max(8, Math.min(15, w / 4.4));   // each name is then sized to fit its seat
+    // rows keep their order from your plan but are evenly spaced, so seats in rows close together never overlap
+    const rowKeys = [...new Set(seated.map(s => Math.round(s.y / 4)))].sort((a, b) => a - b);
+    const rowGap = h + 10, H = rowKeys.length * rowGap + 6;
+    seated.forEach(s => { s.top = 4 + rowKeys.indexOf(Math.round(s.y / 4)) * rowGap; });
+    let html = `<div class="planScroll"><div class="plan" style="width:${W}px;height:${H}px">` + seated.map(s => tile(s, (t[s.name] || {}).pos || 0,
+      `left:${W * s.x / 100 - w / 2}px;top:${s.top}px;width:${w}px;height:${h}px;font-size:${fitName(s.short.split(" ")[0], w - 9, 13) * 0.95}px`, false, false)).join('') + `</div><div class="wb" style="width:${W}px">WHITEBOARD</div></div>`;
+    html += silenceBar();
+    const un = S.students.filter(s => s.x === null || s.y === null);
+    if (un.length) html += `<h2>Not on the plan</h2><div class="names">${un.map(s => tile(s, (t[s.name] || {}).pos || 0)).join('')}</div>`;
+    box.innerHTML = html;
+  } else {
+    const q = $('search').value.trim().toLowerCase();
+    const list = S.students.filter(s => !q || s.name.toLowerCase().includes(q)).sort((a, b) => a.short.localeCompare(b.short));
+    box.innerHTML = list.length ? `<div class="names">${list.map(s => tile(s, (t[s.name] || {}).pos || 0)).join('')}</div>` + silenceBar()
+      : `<p class="note">${S.students.length ? 'No name matches.' : 'No students for this class yet.'}</p>`;
+  }
+  S.pop = {};
+  renderLesson(t);
+}
+function renderLesson(t) {
+  const n = Object.keys(t);
+  const det = n.filter(x => t[x].neg >= 2), rep = n.filter(x => t[x].r.length), one = n.filter(x => t[x].neg === 1 && !t[x].r.length);
+  let h = '';
+  if (det.length) h += `<h2>Detention</h2><ul class="list">${det.map(x => `<li><span class="tag det">DET</span><span class="grow">${esc(x)}</span><span class="soft">${t[x].why.map(r => esc(RULES[r])).join(', ')}</span></li>`).join('')}</ul>`;
+  if (rep.length) h += `<h2>Report to me</h2><ul class="list">${rep.map(x => `<li><span class="tag r">R</span><span class="grow">${esc(x)}</span><span class="soft">${t[x].r.map(r => esc(RULES[r])).join(', ')}</span></li>`).join('')}</ul>`;
+  if (one.length) h += `<h2>One negative</h2><ul class="list">${one.map(x => `<li><span class="tag n">1</span><span class="grow">${esc(x)}</span></li>`).join('')}</ul>`;
+  $('lesson').innerHTML = h;
+}
+function setView(v) { S.view = v; LS.set('view', v); renderStudents(); }
+$('mPlan').onclick = () => setView('plan'); $('mNames').onclick = () => setView('names');
+$('search').oninput = renderStudents;
+let rz; window.addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { if (S.tab === 'log') renderStudents(); }, 120); });
+
+/* tap to award, hold to multi-select */
+let holdTimer = null, held = false;
+$('studs').addEventListener('pointerdown', e => {
+  const b = e.target.closest('.tile'); if (!b) return;
+  held = false; clearTimeout(holdTimer);
+  holdTimer = setTimeout(() => { held = true; if (PREF.tap === 'pos') studentSheet(b.dataset.name); else toggleSel(b.dataset.name); if (navigator.vibrate) navigator.vibrate(1); }, 450);
+});
+['pointerup', 'pointercancel', 'pointerleave'].forEach(ev => $('studs').addEventListener(ev, () => clearTimeout(holdTimer)));
+$('studs').addEventListener('contextmenu', e => e.preventDefault());
+$('lesson').addEventListener('click', async e => {
+  if (!e.target.closest('#recapBtn')) return;
+  try { const r = await call('showRecap', S.cls); snack(r.count ? `Showing ${r.count} student${r.count > 1 ? 's' : ''} for about ${r.secs} s` : 'No positives today in this class'); }
+  catch (err) { snack('Could not send to the board. Check your connection.'); }
+});
+$('studs').addEventListener('click', e => {
+  const b = e.target.closest('.tile'); if (!b) return;
+  if (held) { held = false; return; }
+  if (S.sel.length) return toggleSel(b.dataset.name);
+  if (PREF.tap === 'pos') return log([b.dataset.name], '+');   // one tap gives a positive (undo in the bar)
+  studentSheet(b.dataset.name);
+});
+function toggleSel(name) {
+  const i = S.sel.indexOf(name); if (i > -1) S.sel.splice(i, 1); else S.sel.push(name);
+  $('selbar').classList.toggle('hidden', !S.sel.length); $('selN').textContent = S.sel.length + ' picked';
+  renderStudents();
+}
+$('selX').onclick = () => { S.sel = []; $('selbar').classList.add('hidden'); renderStudents(); };
+$('selPos').onclick = () => logMany('+');
+$('selNeg').onclick = () => logMany('-');
+
+/* ---------- sheets ---------- */
+function openSheet(html) { $('sheetBody').innerHTML = html; $('scrim').classList.add('open'); $('sheet').classList.add('open'); }
+function closeSheet() { $('scrim').classList.remove('open'); $('sheet').classList.remove('open'); }
+$('close').onclick = closeSheet; $('scrim').onclick = closeSheet;
+function studentSheet(name) {
+  const pos = (tally()[name] || {}).pos || 0, sup = (S.students.find(s => s.name === name) || {}).support || '';
+  openSheet(`<p class="who">${esc(name)}</p><p class="sub">${pos ? `${pos} positive${pos > 1 ? 's' : ''} today` : 'No positives yet today'}</p>
+    <button class="award" data-act="+" data-name="${esc(name)}">${STAR} Positive</button>
+    <div class="pair"><button data-act="-" data-name="${esc(name)}">Negative</button><button class="r" data-act="R?" data-name="${esc(name)}">Report to me</button></div>
+    <div class="supp"><span>Border</span>
+      <button data-sup="prompt" data-name="${esc(name)}" class="sp${sup === 'prompt' ? ' on' : ''}">Blue: prompt</button>
+      <button data-sup="extend" data-name="${esc(name)}" class="se${sup === 'extend' ? ' on' : ''}">Purple: extend</button>
+      <button data-sup="" data-name="${esc(name)}" class="${sup ? '' : 'on'}">None</button></div>`);
+}
+function ruleSheet(name, act) {
+  // act 'R': report to me (reason required). act '-': second negative, detention (reason optional)
+  const det = act === '-';
+  openSheet(`<p class="who">${esc(name)}</p><p class="sub">${det ? '2nd negative, detention. Reason?' : 'Report to me for'}</p><div class="keys">${Object.keys(RULES).map(r =>
+    `<button data-act="${det ? '-' : 'R'}" data-rule="${r}" data-name="${esc(name)}"><b>${r}</b><span>${esc(RULES[r])}</span></button>`).join('')}
+    ${det ? `<button data-act="-" data-rule="0" data-name="${esc(name)}"><b>&ndash;</b><span>Skip</span></button>` : ''}</div>`);
+}
+function classSheet() {
+  openSheet(`<p class="who">Classes</p><p class="sub">Today's classes are at the top of the screen.</p><div class="classes">${CLASSES.map(c =>
+    `<button data-cls="${esc(c)}" aria-pressed="${c === S.cls}">${esc(c)}</button>`).join('')}</div>`);
+}
+$('sheet').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  if (b.dataset.flush) { closeSheet(); flushQueue(); return; }
+  if (b.dataset.sup !== undefined) {
+    const n = b.dataset.name, v = b.dataset.sup, st = S.students.find(s => s.name === n);
+    if (st) st.support = v; closeSheet(); render();
+    call('setSupport', S.cls, n, v).then(() => snack(v ? `Border set: ${v === 'prompt' ? 'blue, prompt' : 'purple, extend'}` : 'Border removed'))
+      .catch(() => snack('Border not saved. Check your connection.'));
+    return;
+  }
+  if (b.dataset.act === '+') return log([b.dataset.name], '+');
+  if (b.dataset.act === '-') {
+    const n = b.dataset.name, negs = ((tally()[n] || {}).neg || 0);
+    if (b.dataset.rule === undefined && negs === 1) return ruleSheet(n, '-');   // this one makes it a detention
+    return log([n], '-', Number(b.dataset.rule) || 0);
+  }
+  if (b.dataset.act === 'R?') return ruleSheet(b.dataset.name, 'R');
+  if (b.dataset.act === 'R') return log([b.dataset.name], 'R', Number(b.dataset.rule));
+  if (b.dataset.cls) { closeSheet(); return pickClass(b.dataset.cls); }
+});
+
+/* ---------- logging ---------- */
+async function log(names, type, rule) {
+  closeSheet();
+  const t0 = tally(), before = new Set(S.events.map(e => e.id));
+  const temps = names.map(n => ({ id:'tmp', t:'', name:n, type, rule: rule || 0 }));
+  S.events.push(...temps);
+  if (type === '+') names.forEach(n => S.pop[n] = 1);
+  render();
+  const who = names.length > 1 ? `${names.length} students` : shortOf(names[0]);
+  const second = names.filter(n => type !== '+' && ((t0[n] || {}).neg || 0) + 1 === 2);
+  try {
+    const ts = Date.now();
+    const ev = names.length > 1 ? await call('logMany', S.cls, names, type, rule || 0, ts) : await call('logEvent', S.cls, names[0], type, rule || 0, ts);
+    S.events = ev.concat(queued(S.cls));
+    LS.set(cacheKey(S.cls), JSON.stringify(Object.assign(JSON.parse(LS.get(cacheKey(S.cls)) || '{}'), { events: ev })));
+    const ids = S.events.filter(e => !before.has(e.id)).map(e => e.id);
+    render();
+    snack(second.length ? `Detention: ${second.map(shortOf).join(', ')}` : type === '+' ? `Positive for ${who}` : type === 'R' ? `Report to me: ${who}` : `Negative for ${who}`, ids);
+  } catch (e) {
+    // no signal: keep the tap on the phone and send it later with the time it happened
+    temps.forEach(x => { x.queued = true; });
+    setQueue(getQueue().concat([{ cls: S.cls, names, type, rule: rule || 0, ts: Date.now() }]));
+    render(); snack('No signal: saved on your phone, it will send when you reconnect');
+  }
+}
+function logMany(type) { const names = S.sel.slice(); S.sel = []; $('selbar').classList.add('hidden'); if (names.length) log(names, type); }
+
+/* ---------- silence control ---------- */
+let modeTimer = null, tick = null, offset = 0;
+let LIMIT = 13;   // noise limit in dB above the quiet-room level, loaded from the server
+let SET = Number(LS.get('timerSet')) || 180;   // seconds the timer will start from
+const mmss = s => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+// A timer that ran out more than 1.5 s ago counts as no timer, so you can start a new one straight away.
+const timerOn = t => !!t && (t.paused || t.end > Date.now() + offset - 1500);
+// The panel is only rebuilt when its layout changes. Every half second just the numbers are updated,
+// so a tap can never land on a button that is being replaced (that was why taps sometimes did nothing).
+let silKey = '';
+function silText() {
+  const m = S.mode, t = m.timer, now = Date.now() + offset;
+  // paused (2026-10-08): the silence clock and the timer stand still
+  const at = m.paused && m.pausedAt ? m.pausedAt : now;
+  const sec = m.mode !== 'teaching' ? Math.floor((at - m.start) / 1000) - (m.countdown || 0) : 0;
+  return {
+    set: mmss(SET), left: t ? mmss(Math.max(0, Math.ceil((t.paused ? t.left || 0 : t.end - now) / 1000))) : '',
+    stime: sec < 0 ? String(-sec) : mmss(Math.max(0, sec)),
+    sword: m.paused ? 'Paused' : m.live === 'red' ? 'Tripped' : m.live === 'amber' ? 'Getting loud' : sec < 0 ? 'Counting down' : 'Listening'
+  };
+}
+function silHTML(m, t) {
+  if (m.mode === 'teaching') {
+    let h = `<div class="modes3"><button data-mode="countdown">Countdown<small>3, 2, 1, ends when quiet</small></button>
+      <button data-mode="entry">Silent entry<small>softer limit, ends when quiet</small></button></div>`;
+    // set the time first, then choose: a plain timer (practicals) or silent work (timer plus listening)
+    if (!t) h += `<div class="trun idle"><button data-t="-30">&minus;30s</button><span class="tt"><b data-k="set"></b><small>set the time</small></span><button data-t="+30">+30s</button></div>
+      <div class="go2"><button data-t="start">Timer only</button><button class="gw" data-mode="work">Silent work</button></div>`;
+    else h += `<div class="trun"><button data-t="-30">&minus;30s</button><span class="tt"><b data-k="left"></b><small>${esc(t.label || 'Timer')}${m.paused ? ' · paused' : ''}</small></span>
+      <button data-t="+30">+30s</button><button class="pz" data-pause="${m.paused ? 0 : 1}">${m.paused ? 'Resume' : 'Pause'}</button><button class="x" data-t="stop" aria-label="Stop timer">&#x2715;</button></div>
+      <div class="go2"><button class="gw wide" data-mode="work">Start silent work with this timer</button></div>`;
+    return h;
+  }
+  // running: one big panel in place of the timer row, with large End and cancel buttons
+  return `<div class="live big ${m.live || 'quiet'}"><span class="lbl">${esc(m.label || '')}<small data-k="sword"></small></span><span class="t" data-k="stime"></span>
+    ${t ? `<span class="tmr">Timer <span data-k="left"></span> left <button class="adj" data-t="-30">&minus;30s</button><button class="adj" data-t="+30">+30s</button></span>` : ''}
+    <div class="btns"><button class="pz big" data-pause="${m.paused ? 0 : 1}">${m.paused ? '&#9654; Resume' : '&#10074;&#10074; Pause'}</button><button class="end" data-end="0">End</button><button class="cx" data-end="1" aria-label="Cancel, don't count">&#x2715; Cancel</button></div></div>`;
+}
+function renderSilence(force) {
+  const m = S.mode, box = $('silence');
+  if (S.tab === 'fri') { box.classList.add('hidden'); silKey = ''; return; }
+  box.classList.remove('hidden');
+  const t = timerOn(m.timer) ? m.timer : null;
+  const key = [m.mode, m.sid || '', m.label || '', t ? 'T' + (t.label || '') : '-', m.paused ? 'P' : ''].join('|');
+  if (force === true || key !== silKey) { silKey = key; box.innerHTML = silHTML(m, t); }
+  const x = silText();
+  box.querySelectorAll('[data-k]').forEach(el => { const v = x[el.dataset.k]; if (v !== undefined && el.textContent !== v) el.textContent = v; });
+  const live = box.querySelector('.live'); if (live) { const c = `live big ${m.live || 'quiet'}`; if (live.className !== c) live.className = c; }
+}
+// Every tap that changes the silence or timer bumps this. A reply to an older check is then ignored,
+// so it can't put back a timer you just stopped or undo a +30 s.
+let actSeq = 0;
+async function act(fn, ...args) {
+  const my = ++actSeq;
+  const m = await call(fn, ...args);
+  if (my === actSeq) applyMode(m);
+  return m;
+}
+async function refreshMode() { const my = actSeq; try { const m = await call('getMode'); if (my === actSeq) applyMode(m); } catch (e) {} }
+function optimistic(changes) { S.mode = Object.assign({}, S.mode, changes); renderSilence(); }
+$('silence').addEventListener('click', async e => {
+  const b = e.target.closest('button'); if (!b) return;
+  const now = Date.now() + offset, t = timerOn(S.mode.timer) ? S.mode.timer : null;
+  // Pause / Resume (2026-10-08): the board stops listening and the timer freezes; resume carries on
+  if (b.dataset.pause) {
+    const on = b.dataset.pause === '1';
+    optimistic({ paused: on, pausedAt: on ? now : null,
+      timer: t ? (on ? Object.assign({}, t, { paused: true, left: Math.max(0, t.end - now) }) : Object.assign({}, t, { paused: false, end: now + (t.left || 0) })) : S.mode.timer });
+    try { await act('setPause', on); } catch (err) { snack(on ? 'Could not pause. Tap again.' : 'Could not resume. Tap again.'); refreshMode(); }
+    return;
+  }
+  if (b.dataset.mode) {
+    const md = b.dataset.mode, label = { countdown: 'Countdown', entry: 'Silent entry', work: 'Silent work' }[md];
+    optimistic({ mode: md, label, sid: 'pending', start: now, countdown: md === 'countdown' ? 3 : 0, live: 'quiet',
+      timer: md === 'work' && !t ? { kind: 'timer', label: 'Timer', end: now + SET * 1000, total: SET * 1000 } : S.mode.timer });
+    try { await act('setMode', md, S.cls, SET); } catch (err) { snack('Could not start. Check your connection.'); refreshMode(); }
+    return;
+  }
+  if (b.dataset.t) {
+    const a = b.dataset.t;
+    if (!t && (a === '+30' || a === '-30')) {   // before starting: just change the start time, no server call
+      SET = Math.max(30, Math.min(3600, SET + (a === '+30' ? 30 : -30))); LS.set('timerSet', SET); renderSilence(); return;
+    }
+    if (!t && a === 'start') {
+      optimistic({ timer: { kind: 'timer', label: 'Timer', end: now + SET * 1000, total: SET * 1000 } });
+      try { await act('setTimer', 'timer', S.cls, SET); } catch (err) { snack('Could not start the timer. Check your connection.'); refreshMode(); }
+      return;
+    }
+    if (!t) return;
+    if (a === '+30' || a === '-30') {
+      const d = a === '+30' ? 30000 : -30000;
+      optimistic({ timer: t.paused ? Object.assign({}, t, { left: Math.max(0, (t.left || 0) + d) }) : Object.assign({}, t, { end: now + Math.max(0, t.end - now + d) }) });
+      try { await act('adjustTimer', d / 1000); } catch (err) { snack('Timer change not sent. Tap again.'); refreshMode(); }
+    } else if (a === 'stop') {
+      optimistic({ timer: null });
+      try { await act('stopTimer'); } catch (err) { snack('Could not stop. Tap again.'); refreshMode(); }
+    }
+    return;
+  }
+  if (b.dataset.end) {
+    const cancel = b.dataset.end === '1';
+    // Cancel on silent work stops the timer it started too (the server does the same)
+    optimistic(Object.assign({ mode: 'teaching', live: 'quiet' }, cancel && S.mode.mode === 'work' && t && t.work ? { timer: null } : {}));
+    try { await act('endMode', cancel); if (cancel) snack('Cancelled, not counted'); } catch (err) { snack('Could not end. Tap again.'); refreshMode(); }
+  }
+});
+
+function applyMode(m) {
+  if (S.mode.mode !== 'teaching' && m.mode === 'teaching') setTimeout(async () => { try { S.silence = await call('getSilence', S.cls); if (S.tab === 'log') renderStudents(); } catch (e) {} }, 2500);
+  offset = m.now - Date.now();
+  if (S.mode.mode !== 'teaching' && m.mode === 'teaching' && m.lastResult && m.lastSid !== S.shownResult) {
+    S.shownResult = m.lastSid; const r = m.lastResult;
+    if (r.mode === 'countdown' && r.settle !== '') snack(`Settled in ${r.settle} s`);
+  }
+  S.boardAge = m.board ? Math.max(0, (m.now - m.board) / 1000) : null; updateDot();
+  S.mode = m; renderSilence(); scheduleMode();
+}
+function scheduleMode() {
+  clearTimeout(modeTimer); clearInterval(tick);
+  const active = S.mode.mode !== 'teaching' || timerOn(S.mode.timer);
+  if (active) tick = setInterval(renderSilence, 500);
+  modeTimer = setTimeout(async () => {
+    const my = actSeq;
+    try { const m = await call('getMode'); if (my === actSeq) applyMode(m); else scheduleMode(); } catch (e) { scheduleMode(); }
+  }, active ? 2000 : 15000);
+}
+
+/* ---------- Today ---------- */
+function renderDay() {
+  const pos = {}, neg = {};
+  S.events.forEach(e => { if (e.type === '+') pos[e.name] = (pos[e.name] || 0) + 1; else { const x = neg[e.name] = neg[e.name] || { n: 0, r: 0 }; x.n++; if (e.type === 'R') x.r++; } });
+  const pl = Object.keys(pos).sort((a, b) => pos[b] - pos[a] || a.localeCompare(b));
+  const nl = Object.keys(neg).sort((a, b) => neg[b].n - neg[a].n || a.localeCompare(b));
+  $('daySum').innerHTML = `<div class="sum"><div class="col"><h3>Positives</h3>${pl.length ? pl.map(n => `<div class="r"><span>${esc(shortOf(n))}</span><b>${pos[n]}</b></div>`).join('') : '<div class="r soft">None</div>'}</div>
+    <div class="col"><h3>Negatives</h3>${nl.length ? nl.map(n => `<div class="r"><span>${esc(shortOf(n))}</span><b>${neg[n].n}${neg[n].r ? ' (R)' : ''}${neg[n].n >= 2 ? ' DET' : ''}</b></div>`).join('') : '<div class="r soft">None</div>'}</div></div>`;
+  const ev = S.events.slice().reverse();
+  const tag = e => e.type === '+' ? '<span class="tag p">+</span>' : e.type === 'R' ? '<span class="tag r">R</span>' : '<span class="tag n">&minus;</span>';
+  $('dayList').innerHTML = ev.length ? `<ul class="list">${ev.map(e => `<li><span class="soft">${esc(e.t)}</span>${tag(e)}<span class="grow">${esc(e.name)}${e.type === 'R' ? ` <span class="soft">${esc(RULES[e.rule] || '')}</span>` : ''}</span><button class="x" data-del="${e.id}">Remove</button></li>`).join('')}</ul>` : '<p class="note">Nothing logged today.</p>';
+  loadPositives();
+}
+$('dayList').addEventListener('click', async e => {
+  const b = e.target.closest('[data-del]'); if (!b) return;
+  const ev = S.events.find(x => String(x.id) === b.dataset.del); if (!ev || !confirm(`Remove this entry for ${ev.name}?`)) return;
+  try { S.events = await call('removeMany', S.cls, [Number(b.dataset.del)]); renderDay(); snack('Removed'); } catch (err) { snack('Could not remove.'); }
+});
+async function loadPositives() {
+  $('posList').innerHTML = '<p class="note">Loading</p>';
+  try { const r = await call('positivesOver', S.cls, S.days);
+    $('posList').innerHTML = r.length ? `<ul class="list">${r.map(x => `<li><span class="tag p">${STAR.replace('<svg', '<svg width="11" height="11"')} ${x.count}</span><span class="grow">${esc(x.name)}</span></li>`).join('')}</ul>` : '<p class="note">No positives in this period.</p>';
+  } catch (e) { $('posList').innerHTML = '<p class="note">Could not load.</p>'; }
+}
+$('ranges').onclick = e => { const b = e.target.closest('button'); if (!b) return; S.days = Number(b.dataset.d); [...$('ranges').children].forEach(x => x.setAttribute('aria-pressed', x === b)); loadPositives(); };
+
+/* ---------- Friday ---------- */
+const MAX = 3;
+function goalChip(g, f) {
+  const fn = f ? ', fortnight' : '';
+  if (g.status === 'hit') return `<span class="goal hit">Silent ${g.pct}%</span>`;
+  if (g.status === 'missed') return `<span class="goal missed">Silent ${g.pct}%</span>`;
+  return `<span class="goal hit">No silence data</span>`;   // counts as meeting the goal
+}
+async function loadFriday() {
+  $('fri').innerHTML = '<p class="note">Loading</p>';
+  try { S.fri = await call('getFriday'); renderFriday(); } catch (e) { $('fri').innerHTML = '<p class="note">Could not load.</p>'; }
+}
+function renderFriday() {
+  $('fri').innerHTML = S.fri.map(c => {
+    const picks = S.picks[c.cls] || [], skipped = !!S.skip[c.cls], open = !!S.open[c.cls] && !skipped;
+    const ordered = c.students.slice().sort((a, b) => (b.pos > 0 && !b.recent) - (a.pos > 0 && !a.recent) || b.pos - a.pos || a.name.localeCompare(b.name));
+    const body = open ? `<div class="cls-b"><button class="skip" data-skip="${esc(c.cls)}">Skip this class</button>${ordered.map(s => {
+      const on = picks.includes(s.name);
+      return `<button class="st${on ? ' on' : ''}${s.recent ? ' recent' : ''}" data-pick="${esc(c.cls)}" data-name="${esc(s.name)}"><span class="box"></span>
+        <span class="grow">${esc(s.name)}${s.recent ? `<small>Emailed ${esc(s.emailed)}</small>` : ''}</span>${s.pos ? `<span class="tag p">+${s.pos}</span>` : ''}${s.pos && !s.recent ? '<span class="sug">Suggested</span>' : ''}</button>`;
+    }).join('')}</div>` : '';
+    return `<div class="cls${skipped ? ' skipped' : ''}"><button class="cls-h" data-open="${esc(c.cls)}"><b>${esc(c.cls)}</b>
+      <span class="grow">${skipped ? 'Skipped, tap to include' : `${picks.length} of ${MAX} picked`}</span>${goalChip(c.goal, c.fortnight)}</button>${body}</div>`;
+  }).join('');
+  const total = Object.keys(S.picks).reduce((n, k) => n + (S.skip[k] ? 0 : S.picks[k].length), 0);
+  $('makeList').textContent = `Make email list (${total})`; $('makeList').classList.toggle('hidden', !total);
+}
+$('fri').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  if (b.dataset.open) { const c = b.dataset.open; if (S.skip[c]) delete S.skip[c]; else S.open[c] = !S.open[c]; return renderFriday(); }
+  if (b.dataset.skip) { S.skip[b.dataset.skip] = true; return renderFriday(); }
+  if (b.dataset.pick) {
+    const c = b.dataset.pick, n = b.dataset.name, p = S.picks[c] = S.picks[c] || [], i = p.indexOf(n);
+    if (i > -1) p.splice(i, 1); else if (p.length >= MAX) snack(`${MAX} already picked. Untick one first.`); else p.push(n);
+    renderFriday();
+  }
+});
+$('makeList').onclick = () => {
+  const lines = [];
+  S.fri.forEach(c => { const p = S.picks[c.cls] || []; if (p.length && !S.skip[c.cls]) { lines.push(c.cls); p.forEach(n => lines.push(n)); lines.push(''); } });
+  $('listText').value = lines.join('\n').trim();
+  $('fri').classList.add('hidden'); $('makeList').classList.add('hidden'); $('friList').classList.remove('hidden');
+};
+$('backPick').onclick = () => { $('fri').classList.remove('hidden'); $('friList').classList.add('hidden'); renderFriday(); };
+$('copy').onclick = async () => {
+  const ta = $('listText');
+  try { await navigator.clipboard.writeText(ta.value); snack('Copied'); }
+  catch (e) { ta.removeAttribute('readonly'); ta.select(); const ok = document.execCommand('copy'); ta.setAttribute('readonly', ''); snack(ok ? 'Copied' : 'Select the text and copy it'); }
+};
+$('mark').onclick = async () => {
+  const picks = []; Object.keys(S.picks).forEach(c => { if (!S.skip[c]) S.picks[c].forEach(n => picks.push({ cls:c, name:n })); });
+  if (!picks.length) return;
+  try { await call('markEmailed', picks); snack(`${picks.length} marked as emailed`); S.picks = {}; S.skip = {}; $('backPick').onclick(); loadFriday(); }
+  catch (e) { snack('Not saved. Try again.'); }
+};
+
+/* ---------- navigation ---------- */
+function renderChips() {
+  const list = TODAY.length ? TODAY : CLASSES.slice(0, 4);
+  const extra = !list.includes(S.cls) && S.cls ? [S.cls] : [];
+  $('chips').innerHTML = [...list, ...extra].map(c => `<button class="chip" data-cls="${esc(c)}" aria-pressed="${c === S.cls}">${esc(c)}</button>`).join('')
+    + `<button class="chip more" id="more">All classes</button>`;
+}
+$('chips').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; if (b.id === 'more') return classSheet(); pickClass(b.dataset.cls); });
+function pickClass(c) { if (c === S.cls) return; S.sel = []; $('selbar').classList.add('hidden'); $('search').value = ''; loadClass(c); }
+function setTab(t) {
+  S.tab = t;
+  [['log','tLog','vLog'],['day','tDay','vDay'],['fri','tFri','vFri']].forEach(([k, b, v]) => { $(b).setAttribute('aria-pressed', t === k); $(v).classList.toggle('hidden', t !== k); });
+  $('chips').classList.toggle('hidden', t === 'fri');
+  $('clsTitle').textContent = t === 'fri' ? 'Friday' : S.cls;
+  renderSilence();
+  if (t === 'log') renderStudents(); if (t === 'day') renderDay(); if (t === 'fri') loadFriday();
+}
+$('tLog').onclick = () => setTab('log'); $('tDay').onclick = () => setTab('day'); $('tFri').onclick = () => setTab('fri');
+$('refresh').onclick = () => { if (S.tab === 'fri') loadFriday(); else loadClass(S.cls); };
+function render() { if (S.tab === 'log') renderStudents(); if (S.tab === 'day') renderDay(); }
+
+// Each class's last loaded data is kept on the phone, so it still shows with no signal.
+function cacheKey(c) { return 'class:' + c; }
+function queued(c) { return getQueue().filter(q => q.cls === c).flatMap(q => q.names.map(n => ({ id: 'q' + q.ts, t: '', name: n, type: q.type, rule: q.rule || 0, queued: true }))); }
+async function loadClass(cls) {
+  S.cls = cls; $('clsTitle').textContent = cls; $('clsTitle').classList.toggle('clsTitleLong', cls.length > 6); renderChips();
+  const cached = (() => { try { return JSON.parse(LS.get(cacheKey(cls)) || 'null'); } catch (e) { return null; } })();
+  // show this class straight away (saved copy, or empty), never the previous class's lists
+  S.students = cached ? cached.students : []; S.ratio = cached ? cached.ratio : 2.6; S.silence = cached ? cached.silence : null;
+  S.events = (cached ? cached.events : []).concat(queued(cls));
+  if (cached) render(); else { $('studs').innerHTML = '<p class="note">Loading</p>'; $('lesson').innerHTML = ''; }
+  try {
+    const d = await call('openClass', cls);
+    if (S.cls !== cls) return;
+    S.students = d.students; S.ratio = d.ratio; S.silence = d.silence || null; S.events = d.events.concat(queued(cls));
+    LS.set(cacheKey(cls), JSON.stringify({ students: d.students, ratio: d.ratio, events: d.events, silence: d.silence || null }));
+    render();
+  } catch (e) {
+    if (cached) snack('No signal: showing the saved copy of this class');
+    else $('studs').innerHTML = '<p class="note">No signal and nothing saved for this class yet.</p>';
+  }
+}
+function getQueue() { try { return JSON.parse(LS.get('queue') || '[]'); } catch (e) { return []; } }
+function setQueue(q) { LS.set('queue', JSON.stringify(q)); }
+let flushing = false;
+async function flushQueue() {
+  if (flushing) return; const q = getQueue(); if (!q.length) return;
+  flushing = true;
+  let sent = 0;
+  while (getQueue().length) {
+    const item = getQueue()[0];
+    try {
+      const ev = item.names.length > 1 ? await call('logMany', item.cls, item.names, item.type, item.rule || 0, item.ts) : await call('logEvent', item.cls, item.names[0], item.type, item.rule || 0, item.ts);
+      setQueue(getQueue().slice(1)); sent++;
+      if (item.cls === S.cls) { S.events = ev.concat(queued(S.cls)); render(); }
+    } catch (e) { break; }
+  }
+  flushing = false;
+  if (sent) snack(`${sent} saved tap${sent > 1 ? 's' : ''} sent`);
+}
+setInterval(flushQueue, 15000);
+window.addEventListener('online', flushQueue);
+document.addEventListener('visibilitychange', async () => {
+  if (document.hidden) return;
+  if (S.cls && S.tab !== 'fri') loadClass(S.cls);
+  refreshMode(); keepAwake(); flushQueue();
+});
+
+/* ---------- settings (Today tab) ---------- */
+const PREF = {
+  get tap() { return LS.get('tap') || 'pos'; },
+  get awake() { return LS.get('awake') || 'on'; },
+  get theme() { return LS.get('theme') || 'auto'; }
+};
+function applyTheme() { document.documentElement.dataset.theme = PREF.theme; }
+function updateHint() { $('hint').textContent = PREF.tap === 'pos' ? 'Tap for a positive. Hold for options.' : 'Tap for options. Hold to pick several.'; }
+function renderSettings() {
+  document.querySelectorAll('[data-set]').forEach(g => g.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(PREF[g.dataset.set] === b.dataset.v))));
+}
+$('vDay').addEventListener('click', e => {
+  const b = e.target.closest('[data-set] button'); if (!b) return;
+  const k = b.parentElement.dataset.set; LS.set(k, b.dataset.v); renderSettings();
+  if (k === 'theme') applyTheme(); if (k === 'awake') keepAwake(); if (k === 'tap') { updateHint(); S.sel = []; render(); }
+});
+// keep the screen on while the app is open (if the phone allows it inside Google's page)
+let wakeLock = null;
+async function keepAwake() {
+  const want = PREF.awake === 'on' && document.visibilityState === 'visible', note = $('awakeNote');
+  if (!('wakeLock' in navigator)) { if (PREF.awake === 'on') note.textContent = "This browser can't keep the screen on. Set Screen timeout in your phone's Display settings instead."; return; }
+  try {
+    if (want && !wakeLock) { wakeLock = await navigator.wakeLock.request('screen'); wakeLock.addEventListener('release', () => { wakeLock = null; }); }
+    if (!want && wakeLock) { await wakeLock.release(); wakeLock = null; }
+    note.textContent = '';
+  } catch (e) { note.textContent = "Your phone didn't allow this inside Google's page. If the screen still dims, set Screen timeout to 10 minutes in your phone's Display settings."; }
+}
+// connection dot: green all fine, amber the board isn't open or taps are waiting, red no signal
+function dotState() { if (NET.down) return 'red'; if (getQueue().length || S.boardAge === null || S.boardAge === undefined || S.boardAge > 20) return 'amber'; return 'green'; }
+function updateDot() { const d = $('dot'); if (d) d.className = 'dot ' + dotState(); }
+function ago(s) { return s < 90 ? `${Math.round(s)} s` : s < 5400 ? `${Math.round(s / 60)} min` : `${Math.round(s / 3600)} h`; }
+$('dotBtn').addEventListener('click', () => {
+  const q = getQueue().length, ba = S.boardAge, live = ba !== null && ba !== undefined && ba <= 20;
+  openSheet(`<p class="who">Connection</p><div class="conn">
+    <div><i class="dot ${NET.down ? 'red' : 'green'}"></i><b>Phone</b><span>${NET.down ? 'No signal right now' : 'Connected'}</span></div>
+    <div><i class="dot ${live ? 'green' : 'amber'}"></i><b>Board</b><span>${ba === null || ba === undefined ? 'Not open yet' : live ? 'Live' : 'Last seen ' + ago(ba) + ' ago'}</span></div>
+    <div><i class="dot ${q ? 'amber' : 'green'}"></i><b>Saved taps</b><span>${q ? q + ' waiting to send' : 'None waiting'}</span></div></div>
+    ${q ? '<button class="cta" data-flush="1">Send saved taps now</button>' : ''}`);
+});
+applyTheme(); updateHint(); renderSettings(); keepAwake();
+
+call('init').then(d => {
+  RULES = d.rules; CLASSES = d.classes; TODAY = d.today; if (d.limit) LIMIT = d.limit;
+  $('when').textContent = `Week ${d.week}, ${new Date().toLocaleDateString('en-GB', { weekday:'long' })}  (app 20, server ${d.version || 'old'})`;
+  if (!CLASSES.length) { $('studs').innerHTML = '<p class="note">No classes yet. Import Students.csv into the Students tab.</p>'; return; }
+  loadClass(CLASSES.includes(d.active) ? d.active : (TODAY[0] || CLASSES[0]));
+  applyMode(d.mode);
+}).catch(() => { $('studs').innerHTML = '<p class="note">Could not connect. Reopen the link.</p>'; });
+</script>
+</body>
+</html>

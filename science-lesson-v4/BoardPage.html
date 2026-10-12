@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<base target="_top">
+<meta charset="utf-8">
+<title>Positives board</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@800;900&family=Atkinson+Hyperlegible+Next:wght@600;800&display=swap" rel="stylesheet">
+<style>
+  :root { --ink:#12345C; --soft:#557192; --line:#C9D6E5; --paper:#EDF2F8; }
+  * { box-sizing:border-box; }
+  body { margin:0; min-height:100vh; background:var(--paper); color:var(--ink);
+    font-family:"Atkinson Hyperlegible Next","Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;
+    background-image:linear-gradient(rgba(18,52,92,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(18,52,92,.06) 1px,transparent 1px); background-size:24px 24px; }
+  .wrap { max-width:900px; margin:0 auto; padding:28px 20px; display:grid; grid-template-columns:204px 1fr; gap:28px; align-items:start; }
+  @media (max-width:820px) { .wrap { grid-template-columns:1fr; } }
+  h1 { font-family:"Big Shoulders Display","Arial Narrow",sans-serif; font-weight:900; font-size:48px; line-height:1; margin:0 0 10px; }
+  video { width:204px; height:78px; border-radius:6px; background:#0D2442; display:block; box-shadow:0 10px 30px rgba(13,36,66,.3); }
+  p { line-height:1.5; margin:0 0 12px; }
+  .note { font-size:14px; color:var(--soft); }
+  button { font:inherit; font-weight:800; padding:14px 18px; border-radius:12px; border:0; cursor:pointer; width:100%; margin-bottom:10px; }
+  .primary { background:var(--ink); color:#fff; font-size:18px; }
+  .secondary { background:#fff; color:var(--ink); border:1px solid var(--line); }
+  label { display:block; font-weight:700; margin:6px 0 6px; font-size:14px; }
+  select { width:100%; font:inherit; padding:10px 12px; border:1px solid var(--line); border-radius:10px; background:#fff; color:var(--ink); margin-bottom:12px; }
+  button:focus-visible, select:focus-visible { outline:3px solid #1B67C9; outline-offset:2px; }
+  .micbox { background:#fff; border:1px solid var(--line); border-radius:12px; padding:10px 12px; margin:0 0 10px; }
+  .mrow { display:flex; align-items:center; gap:8px; margin:4px 0; font-size:14px; }
+  .mrow span { flex:1; color:var(--soft); font-weight:700; }
+  .mrow b { min-width:170px; text-align:center; }
+  .mrow button { width:40px; margin:0; padding:6px 0; background:#fff; border:1px solid var(--line); color:var(--ink); }
+  .micbox > button { margin:8px 0 0; }
+  .meter { position:relative; height:12px; background:#E2E8F0; border-radius:6px; overflow:hidden; margin:6px 0 8px; }
+  .meter i { position:absolute; left:0; top:0; bottom:0; width:0; background:#FFC53D; transition:width .15s; }
+  .meter em { position:absolute; top:0; bottom:0; width:2px; background:#12345C; }
+  .meter em.trip { background:#C8372D; }
+  #cv { position:fixed; left:0; top:0; width:204px; height:78px; opacity:0; pointer-events:none; z-index:-1; }
+</style>
+</head>
+<body data-key="<?= key ?>">
+<div class="wrap">
+  <video id="vid" muted playsinline autoplay></video>
+  <div>
+    <h1>Positives board</h1>
+    <p class="note">Pop the board out once. It floats above everything, including a full-screen PowerPoint, and keeps updating from your phone. Drag its corner in as far as it goes. The text redraws sharp at any size.</p>
+    <button class="primary" id="pop">Pop out board</button>
+    <button class="secondary" id="micBtn">Turn on microphone</button>
+    <div class="micbox">
+      <div class="mrow"><span>Room now</span><b id="roomNow">mic off</b></div>
+      <div class="meter"><i id="mFill"></i><em id="mQuiet"></em><em id="mTrip" class="trip"></em></div>
+      <div class="mrow"><span>Quiet level</span><button data-adj="base" data-d="-1">&minus;</button><b id="baseVal">not set</b><button data-adj="base" data-d="1">+</button></div>
+      <div class="mrow"><span>Trips at</span><button data-adj="lim" data-d="-1">&minus;</button><b id="limVal"></b><button data-adj="lim" data-d="1">+</button></div>
+      <div class="mrow"><span>Silent entry: extra allowance</span><button data-adj="entry" data-d="-1">&minus;</button><b id="entryVal"></b><button data-adj="entry" data-d="1">+</button></div>
+      <div class="mrow"><span>Silent entry: can pass after</span><button data-adj="emin" data-d="-5">&minus;</button><b id="eminVal"></b><button data-adj="emin" data-d="5">+</button></div>
+      <button class="secondary" id="calib">Measure quiet level now</button>
+    </div>
+    <p class="note" id="msg"></p>
+    <p class="note" id="baseInfo"></p>
+    <p class="note" id="micCheck"></p>
+    <p class="note" id="status">Connecting</p>
+    <p class="note">Board version 25</p>
+  </div>
+</div>
+<canvas id="cv" width="204" height="78"></canvas>
+
+<script>
+const KEY = document.body.dataset.key;
+const $ = id => document.getElementById(id);
+const store = { get: k => { try { return localStorage.getItem(k); } catch (e) { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} } };
+function call(fn, ...args) { return new Promise((res, rej) => google.script.run.withSuccessHandler(res).withFailureHandler(rej)[fn](KEY, ...args)); }
+
+/* ---------- drawing ----------
+   Laid out for 204 x 78 only. The floating window opens at the picture's size (204 x 78),
+   then the picture switches to twice the detail at the same shape (SCALE 2) so the text is sharper. */
+const W = 204, H = 78, cv = $('cv'), g = cv.getContext('2d');
+let SCALE = 1;
+const DISPLAY = '"Big Shoulders Display","Arial Narrow",sans-serif';
+const TEXT = '"Atkinson Hyperlegible Next","Atkinson Hyperlegible","Segoe UI",sans-serif';
+let cls = '', names = [], rows = {}, firstLoad = true, offline = false, lastDraw = performance.now();
+var pushFrame = () => {};
+let TIMER = null;    // { kind, label, endLocal, total }
+let RESULT = null;   // end-of-silent-work count up: { pct, hist, total, at }
+let LEVEL = 0;       // smoothed room level: 1 = exactly at the limit
+let sparks = [];
+const GOLD = '#FFC53D', ORANGE = '#F0A020', NAVY = '#0D2442', CHALK = '#EAF2FA', RED = '#C8372D', CORAL = '#F08A6C';
+const ACCEPT = 2.8;  // seconds of quiet after the countdown before it's accepted (Patryk 2026-10-07: 1 s longer)
+function sizeCanvas() { const w = W * SCALE, h = H * SCALE; if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; } }
+sizeCanvas();
+
+function starPath(cx, cy, r) {
+  g.beginPath();
+  for (let i = 0; i < 10; i++) { const rad = i % 2 ? r * 0.45 : r, a = -Math.PI / 2 + i * Math.PI / 5; g.lineTo(cx + rad * Math.cos(a), cy + rad * Math.sin(a)); }
+  g.closePath();
+}
+function fit(text, maxW) {
+  if (g.measureText(text).width <= maxW) return text;
+  let t = text; while (t.length > 1 && g.measureText(t + '…').width > maxW) t = t.slice(0, -1);
+  return t + '…';
+}
+const COLS = 2, COLW = (W - 8) / COLS;
+function slot(i) { return { x: 4 + (i % COLS) * COLW, y: 2 + Math.floor(i / COLS) * 25 }; }
+const ease = t => 1 - Math.pow(1 - Math.min(1, Math.max(0, t)), 3);
+function mmss(sec) { const s = Math.max(0, Math.ceil(sec)); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`; }
+function T(s, x, y, size, col, font, align) { g.fillStyle = col; g.font = `900 ${size}px ${font || DISPLAY}`; g.textAlign = align || 'left'; g.textBaseline = 'alphabetic'; g.fillText(s, x, y); g.textAlign = 'left'; }
+function navyBg() { g.fillStyle = NAVY; g.fillRect(0, 0, W, H); }
+function burst(x, y, p, col) { if (p >= 1) return; for (let i = 0; i < 8; i++) { const a = i * Math.PI / 4 + .3, d = ease(p) * 12; g.globalAlpha = 1 - p; g.fillStyle = col; starPath(x + Math.cos(a) * d, y + Math.sin(a) * d, 1.8 * (1 - p) + .5); g.fill(); } g.globalAlpha = 1; }
+const LINE = 62;      // one line, one height, in every mode
+const CEL_COUNT = 3.4, CEL_ENTRY = 1.8;   // how long the tick stays: countdown, then silent entry (which goes on to the %)
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+const hexv = c => [1, 3, 5].map(i => parseInt(c.slice(i, i + 2), 16));
+const mixv = (a, b, k) => a.map((v, i) => v + (b[i] - v) * k);
+const rgbs = v => `rgb(${v.map(Math.round).join(',')})`;
+const mixc = (a, b, k) => rgbs(mixv(hexv(a), hexv(b), k));
+
+// Everything eases between states instead of swapping: background colour, wave size, glow,
+// the time sliding into the corner, and the height of the line.
+const CH = { red: 0, amp: 0, glow: 0, hero: 0, y: LINE };
+function resetChannels() { CH.red = 0; CH.amp = 0; CH.glow = 0; CH.hero = 0; CH.y = LINE; }
+function channels(dt) {
+  const lis = !!sess && sess.phase === 'listen', trip = lis && sess.tripped, lv = LEVEL, k = r => 1 - Math.exp(-r * dt);
+  CH.red += ((trip ? 1 : 0) - CH.red) * k(9);
+  const ta = lis ? (trip ? Math.min(9, clamp((lv - .5) / .5, 0, 1.2) * 10 + 3) : clamp((lv - .5) / .5, 0, 1.2) * 10) : 0;   // wave size, capped so it stays in the box
+  CH.amp += (ta - CH.amp) * k(10);
+  const tg = lis && lv < 1 && !trip ? Math.min(1, (sess.quiet || 0) / ACCEPT) : 0;
+  CH.glow += (tg - CH.glow) * k(tg > CH.glow ? 6 : 14);
+  CH.hero += ((trip && sess.mode === 'work' ? 1 : 0) - CH.hero) * k(9);
+  const ty = lis && sess.mode === 'entry' && !trip ? 40 : LINE;   // silent entry: the line sits higher
+  CH.y += (ty - CH.y) * k(8);
+}
+function bg(now) {
+  g.fillStyle = mixc(NAVY, RED, CH.red); g.fillRect(0, 0, W, H);
+  if (CH.red > .01) {
+    g.fillStyle = `rgba(0,0,0,${.16 * CH.red})`; const o = (now / 30) % 20;
+    for (let x = -H - 20; x < W + H; x += 20) { g.beginPath(); g.moveTo(x + o, H); g.lineTo(x + o + 10, H); g.lineTo(x + o + 10 + H, 0); g.lineTo(x + o + H, 0); g.closePath(); g.fill(); }
+  }
+}
+function wave(x0, x1, y0, amp, col, width, now) {
+  g.strokeStyle = col; g.lineWidth = width; g.beginPath();
+  for (let x = x0; x <= x1; x += 2) { const y = y0 + amp * (Math.sin(x * .42 + now / 55) * .6 + Math.sin(x * 1.3 - now / 33) * .4); x === x0 ? g.moveTo(x, y) : g.lineTo(x, y); }
+  g.stroke();
+}
+// the line: flat when quiet, a wave when loud, glowing the longer it stays quiet
+function theLine(now, x0, x1, y, celebrating) {
+  let col = mixv(hexv(GOLD), hexv(ORANGE), clamp((LEVEL - .7) / .6, 0, 1));
+  col = mixv(col, hexv('#FFFFFF'), CH.red);
+  g.save();
+  if (CH.amp < 2.5 || celebrating) { const gl = celebrating ? 1 : CH.glow; g.shadowColor = `rgba(255,197,61,${.3 + .6 * gl})`; g.shadowBlur = 2 + 10 * gl; }
+  wave(x0, x1, y, celebrating ? 0 : CH.amp, rgbs(col), celebrating ? 3 : (CH.amp > 2.5 ? 2 : 1.5 + 1.5 * CH.glow), now);
+  g.restore();
+}
+function silenceWord(y) {
+  if (CH.red <= .02) return;
+  g.save(); g.globalAlpha *= CH.red; g.translate(W / 2, y); const s = .92 + .08 * CH.red; g.scale(s, s);
+  T('SILENCE', 0, 0, 32, '#FFFFFF', DISPLAY, 'center'); g.restore();
+}
+function label(txt) { T(txt, 8, 13, 10, rgbs(mixv(mixv(hexv(CHALK), hexv(GOLD), CH.glow * .7), hexv('#FFFFFF'), CH.red))); }
+
+/* countdown: 3, 2, 1 over a draining line, which grows back into the line */
+function drawCountdown(now) {
+  bg(now);
+  const t = (Date.now() - sess.startLocal) / 1000, n = Math.max(1, Math.ceil(sess.cd - t)), f = t % 1, sc = 1.08 - .08 * ease(f * 3);
+  T('Silence in', 8, 13, 10, 'rgba(234,242,250,.6)');
+  g.save(); g.globalAlpha = clamp(f * 6, 0, 1); g.translate(W / 2, 48); g.scale(sc, sc); T(String(n), 0, 0, 44, CHALK, DISPLAY, 'center'); g.restore(); g.globalAlpha = 1;
+  const w = (W - 16) * Math.max(0, 1 - t / sess.cd) + 24;
+  g.strokeStyle = GOLD; g.lineWidth = 2; g.beginPath(); g.moveTo(W / 2 - w / 2, LINE); g.lineTo(W / 2 + w / 2, LINE); g.stroke();
+}
+/* the statement before silent work or silent entry; its bar drains into what comes next */
+function drawStatement(now) {
+  bg(now);
+  T(sess.word, W / 2, 46, 28, CHALK, DISPLAY, 'center');
+  if (TIMER) T(mmss((TIMER.endLocal - Date.now()) / 1000), W - 6, 14, 13, GOLD, DISPLAY, 'right');
+  const p = clamp((Date.now() - sess.statementAt) / 1000 / sess.grace, 0, 1);
+  g.strokeStyle = GOLD; g.lineWidth = 2; g.beginPath();
+  if (sess.mode === 'work') { g.moveTo(8, LINE); g.lineTo(8 + (W - 16) * (1 - p), LINE); }   // drains to the left edge, where the timeline starts
+  else { const w = (W - 16) * (1 - p) + 24; g.moveTo(W / 2 - w / 2, LINE); g.lineTo(W / 2 + w / 2, LINE); }
+  g.stroke();
+}
+/* countdown and silent entry: listening, then the spark and the tick */
+function drawListen(now) {
+  const cel = sess.phase === 'celebrate', entry = sess.mode === 'entry';
+  const c = cel ? (Date.now() - sess.celebrateAt) / 1000 : 0, fade = cel && entry ? clamp((CEL_ENTRY - c) / .3, 0, 1) : 1;
+  bg(now);
+  g.globalAlpha = fade;
+  const since = (Date.now() - sess.listenAt) / 1000, lw = cel ? W : 24 + (W - 24) * ease(since / .3), y = CH.y;
+  theLine(now, W / 2 - lw / 2, W / 2 + lw / 2, y, cel);
+  silenceWord(43);
+  label(sess.word);
+  if (cel) {
+    const s = clamp(c / .5, 0, 1), sx = W * ease(s);
+    if (s < 1) {
+      // the spark runs along the line
+      const gr = g.createLinearGradient(sx - 36, 0, sx, 0); gr.addColorStop(0, 'rgba(255,255,255,0)'); gr.addColorStop(1, 'rgba(255,255,255,.95)');
+      g.strokeStyle = gr; g.lineWidth = 3; g.beginPath(); g.moveTo(Math.max(0, sx - 36), y); g.lineTo(sx, y); g.stroke();
+      g.fillStyle = '#fff'; starPath(sx, y, 3.5); g.fill();
+    } else {
+      burst(W - 10, y, (c - .5) / .7, GOLD); g.globalAlpha = fade;
+      // then a big tick that stays, with sparkles twinkling round it
+      const k = ease((c - .5) / .4), cx = W / 2, cy = 28;
+      g.save(); g.shadowColor = 'rgba(255,197,61,.8)'; g.shadowBlur = 8; g.strokeStyle = GOLD; g.lineWidth = 5; g.lineCap = 'round'; g.lineJoin = 'round';
+      g.beginPath(); g.moveTo(cx - 16, cy); g.lineTo(cx - 5, cy + 11 * Math.min(1, k * 2));
+      if (k > .5) g.lineTo(cx - 5 + 24 * (k - .5) * 2, cy + 11 - 24 * (k - .5) * 2);
+      g.stroke(); g.restore();
+      for (let i = 0; i < 6; i++) {
+        const a = i * Math.PI / 3 + c * .6, tw = .5 + .5 * Math.sin(c * 5 + i * 1.7);
+        g.globalAlpha = k * tw * fade; g.fillStyle = GOLD; starPath(cx + Math.cos(a) * 30, cy + Math.sin(a) * 16, 2.4); g.fill();
+      }
+    }
+  }
+  g.globalAlpha = 1;
+}
+/* silent work: the time, and the timeline, which is the line */
+function drawWork(now) {
+  bg(now);
+  label(sess.mic ? sess.word : sess.word + ' (no mic)');
+  if (!TIMER) {   // timer stopped part way: the same line as the countdown
+    T(mmss((Date.now() - sess.listenAt) / 1000), W - 6, 14, 13, 'rgba(255,197,61,.85)', DISPLAY, 'right');
+    theLine(now, 0, W, LINE, false); silenceWord(43); return;
+  }
+  const left = Math.max(0, (TIMER.endLocal - Date.now()) / 1000), hero = CH.hero;
+  // the time slides into the corner while the warning shows
+  const sz = 40 + (14 - 40) * hero; g.font = `900 ${sz}px ${DISPLAY}`; const tw = g.measureText(mmss(left)).width;
+  T(mmss(left), W / 2 + ((W - 6 - tw / 2) - W / 2) * hero, 48 + (15 - 48) * hero, sz, mixc(GOLD, '#FFFFFF', hero), DISPLAY, 'center');
+  silenceWord(44);
+  // gold for quiet seconds, red for loud ones, and red straight away while it's loud
+  const total = TIMER.total / 1000, start = sess.tlStart || 0, span = Math.max(1, total - start), bw = (W - 16) / span, y = LINE - 3;
+  const loud = mixc(RED, '#2B0805', CH.red);
+  g.fillStyle = 'rgba(255,255,255,.14)'; g.fillRect(8, y, W - 16, 6);
+  sess.hist.forEach(h => { const j = h.i - start; if (j > -1 && j < span) { g.fillStyle = h.loud ? loud : GOLD; g.fillRect(8 + Math.max(0, j) * bw, y, bw + .4, 6); } });
+  const el = clamp((TIMER.total - (TIMER.endLocal - Date.now())) / 1000 - start, 0, span), done = sess.hist.length ? Math.max(0, sess.hist[sess.hist.length - 1].i + 1 - start) : 0;
+  const nowLoud = sess.tripped || LEVEL >= 1;
+  g.fillStyle = nowLoud ? loud : GOLD; g.fillRect(8 + done * bw, y, Math.max(0, (el - done) * bw), 6);
+  g.save(); g.shadowColor = nowLoud ? 'rgba(200,55,45,.9)' : 'rgba(255,197,61,.9)'; g.shadowBlur = 6; g.fillStyle = '#fff'; g.fillRect(8 + el * bw - 1, y - 2, 2, 10); g.restore();
+}
+/* the %: the bar drains into a count up; colour arrives only at the end */
+function drawResult(now) {
+  const R = RESULT, since = (Date.now() - R.at) / 1000, t = since - R.pre;
+  g.fillStyle = NAVY; g.fillRect(0, 0, W, H);
+  g.globalAlpha = R.kind === 'entry' ? clamp(since / .3, 0, 1) : 1;
+  T(R.kind === 'entry' ? 'Silent entry' : 'Silent work', 8, 13, 10, 'rgba(234,242,250,.8)');
+  const h = R.hist, n = h.length, bw = (W - 16) / n;
+  if (t < 0) {   // timer just ran out: hold 0:00 with the full bar for a moment
+    T(mmss(0), W / 2, 48, 40, GOLD, DISPLAY, 'center');
+    h.forEach((l, i) => { g.fillStyle = l ? RED : GOLD; g.fillRect(8 + i * bw, LINE - 3, bw + .4, 6); });
+    g.globalAlpha = 1; return;
+  }
+  const e = ease(t / 1.6), cut = Math.round(n * (1 - e)), a0 = g.globalAlpha;
+  for (let i = 0; i < cut; i++) { g.fillStyle = h[i] ? RED : GOLD; g.fillRect(8 + i * bw, LINE - 3, bw + .4, 6); }
+  const good = R.pct >= 80, fin = good ? GOLD : CORAL, c = t >= 1.6 ? clamp((t - 1.6) / .5, 0, 1) : 0;
+  T(Math.round(R.pct * e) + '%', W / 2, 50, 40, mixc(CHALK, fin, c), DISPLAY, 'center');
+  if (t >= 1.6) {
+    g.fillStyle = fin; g.fillRect(W / 2 - 34, 55, 68 * ease(c), 3);
+    if (good) burst(W / 2 + 40, 24, clamp((t - 1.6) / 1.2, 0, 1), GOLD);
+    else { g.globalAlpha = a0 * c; T('goal 80%', W / 2, 70, 10, 'rgba(234,242,250,.75)', DISPLAY, 'center'); }
+  }
+  g.globalAlpha = 1;
+}
+function drawTimerOnly(now) {
+  navyBg();
+  const tLeft = (TIMER.endLocal - Date.now()) / 1000, over = tLeft <= 0, last = tLeft > 0 && tLeft <= 10;
+  T('Timer', 8, 13, 10, 'rgba(234,242,250,.75)');
+  const sc = last ? 1 + 0.06 * Math.max(0, Math.sin(now / 160)) : 1;
+  g.save(); g.translate(W / 2, 54); g.scale(sc, sc); T(over ? "Time's up" : mmss(tLeft), 0, 0, over ? 30 : 46, GOLD, DISPLAY, 'center'); g.restore();
+  let a = 1; if (over) a = 0.5 + 0.5 * Math.sin(now / 90); else if (last) a = 0.6 + 0.4 * Math.sin(now / 130);
+  g.fillStyle = `rgba(255,197,61,${a})`; g.fillRect(0, H - 3, over ? W : W * Math.max(0, tLeft * 1000 / TIMER.total), 3);
+}
+function draw() {
+  const now = performance.now(), dt = Math.min(200, now - lastDraw); lastDraw = now;
+  channels(dt / 1000);
+  g.setTransform(SCALE, 0, 0, SCALE, 0, 0);
+  if (RESULT && Date.now() - RESULT.at < (6 + RESULT.pre) * 1000) { drawResult(now); pushFrame(); return; }
+  RESULT = null;
+  if (PAUSED && TIMER && TIMER.left != null) TIMER.endLocal = Date.now() + TIMER.left;   // frozen timer
+  if (sess) {
+    if (sess.phase === 'count') drawCountdown(now);
+    else if (sess.phase === 'statement') drawStatement(now);
+    else if (sess.mode === 'work') drawWork(now);
+    else drawListen(now);
+    pausedOverlay(); pushFrame(); return;
+  }
+  if (TIMER) { drawTimerOnly(now); pausedOverlay(); pushFrame(); return; }
+  navyBg();
+  if (!names.length) {
+    T('No positives yet', W / 2, H / 2 + 5, 14, 'rgba(234,242,250,.6)', TEXT, 'center');
+  } else {
+    const k = 1 - Math.exp(-dt / 110);
+    names.forEach((n, i) => {
+      const t = slot(i), r = rows[n];
+      r.x += (t.x - r.x) * k; r.y += (t.y - r.y) * k;
+      const age = now - r.born, x = r.x, top = r.y;
+      g.save(); g.globalAlpha = Math.min(1, age / 400);
+      if (age > 120 && age < 1300) {
+        const p = (age - 120) / 1180, sx = x - COLW + p * 2 * COLW;
+        const grd = g.createLinearGradient(sx, 0, sx + COLW, 0);
+        grd.addColorStop(0, 'rgba(255,197,61,0)'); grd.addColorStop(.5, 'rgba(255,197,61,.5)'); grd.addColorStop(1, 'rgba(255,197,61,0)');
+        g.fillStyle = grd; g.fillRect(x, top + 1, COLW - 2, 23);
+      }
+      const sc = age < 700 ? ease(age / 500) : 1;
+      g.save(); g.translate(x + 6, top + 13); g.rotate(age < 700 ? (1 - sc) * -2.5 : 0); g.scale(sc, sc);
+      g.fillStyle = GOLD; starPath(0, 0, 4.5); g.fill(); g.restore();
+      g.fillStyle = CHALK; g.font = `800 16px ${DISPLAY}`; g.textBaseline = 'alphabetic';
+      g.fillText(fit(n, COLW - 16), x + 13, top + 19);
+      g.restore();
+    });
+  }
+  sparks = sparks.filter(p => now - p.born < 800);
+  sparks.forEach(p => { const a = (now - p.born) / 800, d = ease(a) * p.dist; g.globalAlpha = 1 - a; g.fillStyle = GOLD; starPath(p.x + Math.cos(p.ang) * d, p.y + Math.sin(p.ang) * d, 1.4 * (1 - a) + 0.4); g.fill(); });
+  g.globalAlpha = 1;
+  if (offline) { g.fillStyle = '#F2B8A0'; g.font = `600 8px ${TEXT}`; g.textAlign = 'right'; g.fillText('Offline', W - 4, H - 4); g.textAlign = 'left'; }
+  pushFrame();
+}
+function setNames(list) {
+  const now = performance.now();
+  list.forEach((n, i) => { if (!rows[n]) { const t = slot(i); rows[n] = { x: t.x, y: firstLoad ? t.y : t.y - 10, born: firstLoad ? now - 5000 : now };
+    if (!firstLoad) for (let j = 0; j < 8; j++) sparks.push({ x: t.x + 6, y: t.y + 13, ang: j * Math.PI / 4 + Math.random() * .4, dist: 8 + Math.random() * 7, born: now }); } });
+  Object.keys(rows).forEach(n => { if (!list.includes(n)) delete rows[n]; });
+  names = list; firstLoad = false;
+}
+
+/* ---------- data ---------- */
+const doneSids = new Set();   // a silence that ended here is never restarted by a late poll
+let offset = 0, sess = null, fails = 0, polling = false, lastPoll = 0, lastLive = '', liveAt = 0;
+/* Pause (Patryk 2026-10-08): from the phone, or P on the board. While paused nothing is listened to or
+   scored and the timer is frozen; on resume the silence carries on where it stopped, with the noise
+   history cleared, so the pause never counts as noise. */
+let PAUSED = false, pausedAtLocal = 0, pauseToggledAt = 0;
+function setPaused(on) {
+  const now = Date.now();
+  if (on && !PAUSED) {
+    PAUSED = true; pausedAtLocal = now; LEVEL = 0;
+    if (TIMER && TIMER.left == null) TIMER.left = Math.max(0, TIMER.endLocal - now);
+  } else if (!on && PAUSED) {
+    const gap = now - pausedAtLocal;
+    PAUSED = false;
+    if (sess) {
+      ['startLocal', 'statementAt', 'listenAt', 'celebrateAt'].forEach((f) => { if (sess[f]) sess[f] += gap; });
+      Object.assign(sess, { run: 0, tripped: false, clearFor: 0, quietFrom: null, quiet: 0, secAcc: 0, secLoud: false, secOver: 0, lastStep: now });
+    }
+    RAW.length = 0;
+    if (TIMER && TIMER.left != null) { TIMER.endLocal = now + TIMER.left; delete TIMER.left; }
+  }
+}
+function pausedOverlay() {
+  if (!PAUSED) return;
+  g.fillStyle = 'rgba(8,18,36,.74)'; g.fillRect(0, 0, W, H);
+  T('Paused', W / 2, H / 2 + 8, 24, CHALK, DISPLAY, 'center');
+}
+document.addEventListener('keydown', (e) => {
+  if (e.key !== 'p' && e.key !== 'P') return;
+  if (!sess && !TIMER) return;
+  setPaused(!PAUSED); pauseToggledAt = Date.now();
+  call('setPause', PAUSED).catch(() => {});
+});
+async function poll() {
+  if (polling) return; polling = true; lastPoll = performance.now();
+  try {
+    const d = await call('getBoard', 6);
+    fails = 0; offline = false;
+    cls = d.cls || ''; setNames(d.names || []);
+    $('status').textContent = `Last update ${new Date().toLocaleTimeString('en-GB')}. Class ${cls || 'none'}, ${names.length} positive${names.length === 1 ? '' : 's'} today. Server ${d.version || 'old'}.`;
+    offset = d.now - Date.now();
+    const m = d.mode || { mode: 'teaching' };
+    TIMER = m.timer ? { kind: m.timer.kind, label: m.timer.label, total: m.timer.total, endLocal: m.timer.end - offset } : null;
+    if (TIMER && m.timer.paused) TIMER.left = m.timer.left;
+    // a P pressed here wins for a few seconds over a reply that left before the server knew
+    if (Date.now() - pauseToggledAt > 4000) setPaused(!!m.paused);
+    else if (PAUSED && TIMER && TIMER.left == null) TIMER.left = Math.max(0, TIMER.endLocal - Date.now());
+    if (m.mode !== 'teaching' && !doneSids.has(m.sid) && (!sess || sess.sid !== m.sid)) { if (sess) finish(false, false); begin(m); }
+    else if (m.mode === 'teaching' && sess) finish(false, m.lastSid === sess.sid && !!m.cancelled);
+  } catch (e) {
+    if (++fails >= 3) offline = true;
+    $('status').textContent = 'Could not reach the server: ' + (e && e.message ? e.message : e);
+    if (fails >= 20) location.reload();   // the Google login may have lapsed: reloading fixes it
+  }
+  polling = false;
+}
+function enterListen(now) {
+  sess.phase = 'listen'; sess.listenAt = now;
+  // where the timeline starts: the timer may already have been running
+  sess.tlStart = TIMER ? Math.max(0, (TIMER.total - (TIMER.endLocal - now)) / 1000) : 0;
+}
+function begin(m) {
+  // Timed from when the board first sees it, not when the phone tapped: a slow phone connection
+  // then just delays the start instead of eating into the countdown.
+  const now = Date.now();
+  sess = { sid: m.sid, mode: m.mode, word: ({ countdown: 'Silence', work: 'Silent work', entry: 'Silent entry' })[m.mode] || m.label || 'Silence',
+    startLocal: now, cd: m.countdown || 0, grace: m.mode === 'countdown' ? 0 : (m.grace || (m.mode === 'entry' ? 2 : 3)),
+    phase: (m.countdown || 0) > 0 ? 'count' : ((m.grace || 0) > 0 && m.mode !== 'countdown' ? 'statement' : 'listen'),
+    statementAt: now + (m.countdown || 0) * 1000, listenAt: 0, celebrateAt: 0,
+    samples: [], run: 0, tripped: false, clearFor: 0, quiet: 0, quietFrom: null, mon: 0, red: 0, settle: null,
+    hist: [], secAcc: 0, secLoud: false, secOver: 0, mic: false, tlStart: 0, lastStep: now };
+  if (sess.phase === 'listen') enterListen(now);
+  RAW.length = 0; lastLive = ''; resetChannels();
+}
+function finish(auto, cancelled) {
+  if (!sess) return;
+  const s = sess; sess = null; doneSids.add(s.sid);
+  call('submitResult', s.sid, s.mon.toFixed(1), s.red.toFixed(1), s.mode === 'countdown' ? (s.settle === null ? '' : s.settle) : '', !!auto).catch(() => {});
+  // silent work (End, or its timer ran out) and silent entry (once it passes): count up the share of quiet time.
+  // Cancel shows nothing.
+  if ((s.mode === 'work' || s.mode === 'entry') && !cancelled && s.mon >= 3) {
+    const hist = s.hist.map(h => h.loud);
+    RESULT = { kind: s.mode, pct: Math.round(100 * (1 - s.red / s.mon)), hist: hist.length ? hist : [false], at: Date.now(), pre: s.mode === 'work' && auto ? 0.7 : 0 };
+  }
+}
+function live(state) {
+  if (!sess || state === lastLive || Date.now() - liveAt < 900) return;
+  lastLive = state; liveAt = Date.now();
+  call('setLive', sess.sid, state).catch(() => {});
+}
+function p20(a) { if (!a.length) return null; const s = a.slice().sort((x, y) => x - y); return s[Math.floor(s.length * 0.2)]; }
+
+// Room level, cleaned up: a single bang far above the rest of the last second is ignored,
+// then the level is averaged (by energy) over that second. Short spikes can no longer trip it.
+// 2026-10-07: some microphones gate silence to almost nothing (far below the room's real quiet
+// level). The bang check and the average then sat far too low, so a real loud noise after a long
+// silence was thrown away as a "bang" and read near the old level. Readings are now floored just
+// under the quiet level, and a bang is judged against the quiet level, never anything lower.
+const RAW = [];
+let HEARD = null, BANGS = 0;   // mic check (2026-10-08): what the board hears after cleaning, and bangs ignored
+function smooth(db) {
+  const floor = BASE === null ? -Infinity : BASE - 6;
+  RAW.push(Math.max(db, floor)); if (RAW.length > 10) RAW.shift();
+  const sorted = RAW.slice().sort((a, b) => a - b), med = sorted[Math.floor(sorted.length / 2)];
+  const ref = Math.max(med, BASE === null ? med : BASE);
+  const vals = RAW.map(v => v > ref + 12 && RAW.filter(w => w > ref + 12).length === 1 ? ref : v);   // only a lone blip is a "bang"
+  if (db > ref + 12 && RAW.filter(w => w > ref + 12).length === 1) BANGS++;
+  return 10 * Math.log10(vals.reduce((s, v) => s + Math.pow(10, v / 10), 0) / vals.length);
+}
+
+// runs every 0.1 s; db is null when there is no microphone
+function step(db) {
+  if (calib) { if (db !== null) calib.push(db); return; }
+  if (!sess) return;
+  if (PAUSED) { LEVEL = 0; sess.lastStep = Date.now(); return; }   // paused: nothing heard, nothing scored
+  const now = Date.now(), t = (now - sess.startLocal) / 1000;
+  // timed by the clock, so it stays right even if the browser runs this less often
+  const dt = clamp((now - (sess.lastStep || now - 100)) / 1000, 0.02, 0.5); sess.lastStep = now;
+  if (db !== null && BASE === null) sess.samples.push(db);
+  if (sess.phase === 'count') {
+    if (t >= sess.cd) { if (sess.mode === 'countdown') enterListen(now); else { sess.phase = 'statement'; sess.statementAt = now; } }
+    else return;
+  }
+  if (sess.phase === 'statement') {
+    if ((now - sess.statementAt) / 1000 >= sess.grace) enterListen(now); else return;
+  }
+  if (sess.phase === 'celebrate') { if ((now - sess.celebrateAt) / 1000 >= (sess.mode === 'entry' ? CEL_ENTRY : CEL_COUNT)) finish(true, false); return; }
+  // silent work ends itself when its timer reaches 0:00, and the % plays
+  if (sess.mode === 'work' && TIMER && TIMER.endLocal - now <= 0) { finish(true, false); return; }
+  // no quiet level set yet: the first silence measures one
+  if (db !== null && BASE === null && sess.samples.length >= 20) { BASE = Math.round(p20(sess.samples)); store.set('baseline', BASE); showBase(); }
+  const hasMic = db !== null && BASE !== null;
+  sess.mic = hasMic;
+  if (!hasMic) { LEVEL = 0; return; }
+  const level = smooth(db), since = (now - sess.listenAt) / 1000;
+  HEARD = level;
+  // softer limit during silent entry (students coming in, you greeting them)
+  const lim = LIM + (sess.mode === 'entry' ? ENTRY : 0);
+  LEVEL = Math.max(0, (level - BASE) / lim);
+  // two thresholds: trips above the limit, only counts as quiet again 3 dB below it
+  const over = level > BASE + lim, under = level < BASE + lim - 3;
+  if (sess.tripped) {
+    if (under) { sess.clearFor += dt; if (sess.clearFor >= 1.75) { sess.tripped = false; sess.run = 0; } } else sess.clearFor = 0;
+  } else {
+    sess.run = over ? Math.min(2.6, sess.run + dt) : Math.max(0, sess.run - dt);
+    if (sess.run >= 2.5) { sess.tripped = true; sess.clearFor = 0; }
+  }
+  // scored a second at a time: a second is loud if it tripped, or was over the limit for half of it.
+  // The timeline and the % use the same seconds, so they always agree.
+  sess.secAcc += dt; if (over) sess.secOver += dt; sess.secLoud = sess.secLoud || sess.tripped;
+  if (sess.secAcc >= 0.999) {
+    const loud = sess.secLoud || sess.secOver >= 0.5;
+    const i = TIMER ? Math.floor((TIMER.total - (TIMER.endLocal - now)) / 1000) - 1 : sess.hist.length;
+    sess.hist.push({ i: i, loud: loud }); sess.mon += 1; if (loud) sess.red += 1;
+    sess.secAcc = Math.max(0, sess.secAcc - 1); sess.secLoud = false; sess.secOver = 0;
+  }
+  live(sess.tripped ? 'red' : sess.run >= 1 ? 'amber' : 'quiet');
+  if (sess.mode === 'countdown' || sess.mode === 'entry') {
+    // accepted after ACCEPT (2.8 s) of quiet in a row; then it ends, so your talking isn't counted.
+    // Silent entry also waits a minimum time first, so an empty room can't pass before they arrive.
+    if (!over && !sess.tripped) { if (sess.quietFrom === null) sess.quietFrom = since; sess.quiet = since - sess.quietFrom; }
+    else { sess.quietFrom = null; sess.quiet = 0; }
+    if (sess.quiet >= ACCEPT && (sess.mode === 'countdown' || since >= ENTRY_MIN)) { sess.settle = Math.round(sess.quietFrom * 10) / 10; sess.phase = 'celebrate'; sess.celebrateAt = now; }
+  }
+}
+
+/* ---------- audio clock (keeps running when the tab is hidden) and microphone ---------- */
+let actx = null, proc = null, calib = null;
+// Google's page can't use the microphone, so a small helper window (a normal top-level window from this page)
+// listens and passes the level back here about 10 times a second.
+let micDb = null, micAt = 0, micWin = null;
+window.onMicLevel = db => { micDb = db; micAt = performance.now(); };
+const micFresh = () => micDb !== null && performance.now() - micAt < 800;
+function startClock() {
+  if (actx) { actx.resume(); return; }
+  actx = new AudioContext();
+  proc = actx.createScriptProcessor(2048, 1, 1);
+  const mute = actx.createGain(); mute.gain.value = 0;
+  const idle = actx.createConstantSource(); idle.offset.value = 0; idle.connect(proc); idle.start();
+  proc.connect(mute); mute.connect(actx.destination);
+  let acc = 0;
+  proc.onaudioprocess = e => {
+    acc += e.inputBuffer.length / actx.sampleRate;
+    if (acc >= 0.1) { acc -= 0.1; step(micFresh() ? micDb : null); }
+    draw();
+    if (performance.now() - lastPoll > 1000) poll();
+  };
+}
+const HELPER = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Board microphone</title>
+<style>body{margin:0;padding:16px;font-family:"Segoe UI",system-ui,sans-serif;background:#0D2442;color:#EAF2FA}
+h1{font-size:18px;margin:0 0 6px}p{font-size:13px;color:#A3BAD3;margin:0 0 10px}
+button{font:inherit;font-weight:700;padding:10px 14px;border:0;border-radius:10px;background:#FFC53D;color:#3D2A00;cursor:pointer}
+select{width:100%;font:inherit;padding:6px;margin:8px 0;border-radius:8px}
+.bar{height:10px;background:rgba(255,255,255,.15);border-radius:6px;overflow:hidden;margin-top:10px}.bar i{display:block;height:100%;width:0;background:#FFC53D}</style></head>
+<body><h1>Board microphone</h1><p>Keep this window open. You can minimise it.</p>
+<button id="go">Start microphone</button><select id="mic"><option value="">Default microphone</option></select>
+<div class="bar"><i id="lvl"></i></div><p id="st" style="margin-top:8px"></p>
+<script>
+let ctx=null,stream=null,nodes=[];
+async function start(){
+  try{
+    if(stream) stream.getTracks().forEach(t=>t.stop()); nodes.forEach(n=>n.disconnect()); nodes=[];
+    const id=document.getElementById('mic').value;
+    stream=await navigator.mediaDevices.getUserMedia({audio:{deviceId:id?{exact:id}:undefined,echoCancellation:false,noiseSuppression:false,autoGainControl:false}});
+    if(!ctx) ctx=new AudioContext(); await ctx.resume();
+    const src=ctx.createMediaStreamSource(stream);
+    const hp=ctx.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=300;
+    const lp=ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=3000;
+    const pr=ctx.createScriptProcessor(2048,1,1); const mute=ctx.createGain(); mute.gain.value=0;
+    let sum=0,n=0; const size=Math.round(ctx.sampleRate*0.1);
+    pr.onaudioprocess=e=>{const ch=e.inputBuffer.getChannelData(0); for(let i=0;i<ch.length;i++) sum+=ch[i]*ch[i]; n+=ch.length;
+      if(n>=size){const db=20*Math.log10(Math.sqrt(sum/n)+1e-9); sum=0;n=0;
+        try{ if(window.opener&&window.opener.onMicLevel) window.opener.onMicLevel(db); else document.getElementById('st').textContent='Lost the board page. Close this and turn the microphone on again.'; }catch(err){}
+        document.getElementById('lvl').style.width=Math.max(0,Math.min(100,(db+80)*1.4))+'%';}};
+    src.connect(hp);hp.connect(lp);lp.connect(pr);pr.connect(mute);mute.connect(ctx.destination); nodes=[src,hp,lp,pr,mute];
+    const devs=(await navigator.mediaDevices.enumerateDevices()).filter(d=>d.kind==='audioinput'); const sel=document.getElementById('mic'), cur=sel.value;
+    sel.innerHTML='<option value="">Default microphone</option>'+devs.map(d=>'<option value="'+d.deviceId+'">'+(d.label||'Microphone').replace(/</g,'&lt;')+'</option>').join(''); sel.value=cur;
+    document.getElementById('st').textContent='Listening. The bar moves when the room makes noise.';
+    document.getElementById('go').textContent='Restart microphone';
+  }catch(e){document.getElementById('st').textContent='Microphone blocked: '+e.message+'. Click the icon in the address bar to allow it.';}
+}
+document.getElementById('go').onclick=start; document.getElementById('mic').onchange=start;
+<\/script></body></html>`;
+function openMic() {
+  if (micWin && !micWin.closed) { micWin.focus(); return; }
+  micWin = window.open('', 'board_mic', 'width=380,height=240');
+  if (!micWin) { $('msg').textContent = 'The browser blocked the microphone window. Allow pop-ups for this page, then click again.'; return; }
+  micWin.document.open(); micWin.document.write(HELPER); micWin.document.close();
+  $('msg').textContent = 'In the small window, click Start microphone and allow it. Then minimise that window.';
+}
+$('micBtn').onclick = () => { startClock(); openMic(); };
+// Quiet level (dB) and limit (dB above quiet) are set on this page and used straight away, even mid-silence.
+let BASE = store.get('baseline') !== null ? Number(store.get('baseline')) : null;
+let LIM = Number(store.get('limitDb')) || 13;
+let ENTRY = store.get('entryDb') !== null ? Number(store.get('entryDb')) : 6;
+let ENTRY_MIN = store.get('entryMin') !== null ? Number(store.get('entryMin')) : 30;
+function showBase() {
+  $('baseInfo').textContent = '';
+  $('baseVal').textContent = BASE === null ? 'not set' : `${BASE.toFixed(0)} dB`;
+  $('limVal').textContent = BASE === null ? `${LIM} dB above quiet` : `${(BASE + LIM).toFixed(0)} dB (${LIM} above quiet)`;
+  $('entryVal').textContent = `+${ENTRY} dB`;
+  $('eminVal').textContent = `${ENTRY_MIN} s`;
+}
+const DBMIN = -100, DBMAX = -20, pct = db => Math.max(0, Math.min(100, (db - DBMIN) / (DBMAX - DBMIN) * 100));
+setInterval(() => {
+  const on = micFresh();
+  $('roomNow').textContent = on ? `${micDb.toFixed(0)} dB` : 'mic off';
+  // mic check: the raw reading next to what the board actually uses, so a spiky mic shows up
+  $('micCheck').textContent = on && HEARD !== null && sess ? `Mic check: raw ${micDb.toFixed(0)} dB, board hears ${HEARD.toFixed(0)} dB${PAUSED ? ' (paused)' : ''}. Single bangs ignored so far: ${BANGS}.` : '';
+  $('mFill').style.width = on ? pct(micDb) + '%' : '0';
+  $('mFill').style.background = on && BASE !== null && micDb > BASE + LIM ? '#C8372D' : '#FFC53D';
+  $('mQuiet').style.display = $('mTrip').style.display = BASE === null ? 'none' : 'block';
+  if (BASE !== null) { $('mQuiet').style.left = pct(BASE) + '%'; $('mTrip').style.left = pct(BASE + LIM) + '%'; }
+}, 200);
+document.addEventListener('click', e => {
+  const btn = e.target.closest('[data-adj]'); if (!btn) return;
+  const d = Number(btn.dataset.d);
+  if (btn.dataset.adj === 'base') { BASE = (BASE === null ? (micFresh() ? Math.round(micDb) : -60) : BASE) + d; store.set('baseline', BASE); }
+  else if (btn.dataset.adj === 'lim') { LIM = Math.max(2, Math.min(40, LIM + d)); store.set('limitDb', LIM); }
+  else if (btn.dataset.adj === 'entry') { ENTRY = Math.max(0, Math.min(20, ENTRY + d)); store.set('entryDb', ENTRY); }
+  else { ENTRY_MIN = Math.max(0, Math.min(300, ENTRY_MIN + d)); store.set('entryMin', ENTRY_MIN); }
+  showBase();
+});
+
+/* ---------- video picture-in-picture ---------- */
+const vid = $('vid');
+// Frames are pushed by hand after every draw. canvas.captureStream() alone stops sending frames
+// when the tab is hidden behind PowerPoint, which froze the floating window.
+if ('MediaStreamTrackGenerator' in window && 'VideoFrame' in window) {
+  const gen = new MediaStreamTrackGenerator({ kind: 'video' });
+  const writer = gen.writable.getWriter();
+  let lastPush = 0;
+  pushFrame = () => {
+    const now = performance.now(); if (now - lastPush < 60) return; lastPush = now;
+    try { const f = new VideoFrame(cv, { timestamp: Math.round(now * 1000) }); writer.write(f).catch(() => {}); f.close(); } catch (e) {}
+  };
+  vid.srcObject = new MediaStream([gen]);
+} else {
+  const stream = cv.captureStream(0), track = stream.getVideoTracks()[0];
+  pushFrame = () => { if (track.requestFrame) track.requestFrame(); };
+  vid.srcObject = stream;
+}
+vid.play().catch(() => {});
+let framesSeen = 0, lastFrameAt = performance.now(), switched = false, sharpAt = 0;
+if (vid.requestVideoFrameCallback) {
+  const onFrame = () => { framesSeen++; lastFrameAt = performance.now(); vid.requestVideoFrameCallback(onFrame); };
+  vid.requestVideoFrameCallback(onFrame);
+  setInterval(() => {
+    // if the sharper picture stopped the window updating, go back to normal detail for good
+    if (SCALE === 2 && sharpAt && performance.now() - sharpAt > 3000 && performance.now() - lastFrameAt > 3000) { SCALE = 1; sizeCanvas(); store.set('sharp', 'off'); }
+    if (!switched && actx && performance.now() - lastFrameAt > 4000) {
+      switched = true;   // pushed frames are not arriving: fall back to the canvas's own stream
+      const s = cv.captureStream(15); vid.srcObject = s;
+      pushFrame = () => { const tr = s.getVideoTracks()[0]; if (tr && tr.requestFrame) tr.requestFrame(); };
+      vid.play().catch(() => {});
+    }
+  }, 2000);
+}
+function popOut() {
+  return vid.requestPictureInPicture()
+    .then(win => {
+      draw();
+      // the window has opened at 204 x 78: now draw at twice the detail, same shape
+      if (store.get('sharp') !== 'off') setTimeout(() => { SCALE = 2; sizeCanvas(); sharpAt = performance.now(); draw(); }, 800); $('msg').textContent = 'Board is floating. Drag it to a corner and resize it by its edge. Keep this tab open (it can be minimised).'; })
+    .catch(e => { $('msg').textContent = 'Could not pop out: ' + e.message + '. Click Pop out board again.'; });
+}
+$('pop').onclick = () => {
+  if (!document.pictureInPictureEnabled) { $('msg').textContent = 'This browser has picture-in-picture turned off.'; return; }
+  startClock();
+  draw();
+  vid.play().catch(() => {});
+  if (vid.readyState >= 1) { popOut(); return; }
+  // Brave blocks video from starting on its own, so the video may have no picture yet.
+  // Start it from this click, wait for its first frame, then pop out.
+  $('msg').textContent = 'Starting the board';
+  let done = false;
+  const go = () => { if (done) return; done = true; popOut(); };
+  vid.addEventListener('loadedmetadata', go, { once: true });
+  setTimeout(() => {
+    if (done) return;
+    if (vid.readyState < 1) { vid.srcObject = cv.captureStream(15); vid.play().catch(() => {}); vid.addEventListener('loadedmetadata', go, { once: true }); }
+    setTimeout(() => { if (!done) { done = true; $('msg').textContent = 'The board video did not start. Click Pop out board again.'; } }, 1500);
+  }, 1200);
+};
+vid.addEventListener('leavepictureinpicture', () => { SCALE = 1; sizeCanvas(); $('msg').textContent = 'Board closed. Click Pop out board to float it again.'; vid.play().catch(() => {}); });
+$('calib').onclick = () => {
+  startClock();
+  if (!micFresh()) { $('msg').textContent = 'Turn on the microphone first, then measure.'; return; }
+  $('msg').textContent = 'Measuring for 5 seconds. Keep the room as it normally is when silent.';
+  calib = [];
+  setTimeout(() => { const v = p20(calib); calib = null; if (v !== null) { BASE = Math.round(v); store.set('baseline', BASE); showBase(); $('msg').textContent = 'Quiet level saved.'; } }, 5000);
+};
+
+/* ---------- start ---------- */
+showBase();
+function loop() { if (!actx || actx.state !== 'running') draw(); requestAnimationFrame(loop); }
+loop();
+setInterval(() => { if (!actx || actx.state !== 'running') { poll(); draw(); if (actx) actx.resume().catch(() => {}); } }, 1000);
+setInterval(() => { if (!actx || actx.state !== 'running') step(micFresh() ? micDb : null); }, 100);
+Promise.all([document.fonts.load(`900 32px ${DISPLAY}`), document.fonts.load(`800 29px ${TEXT}`)]).catch(() => {}).then(() => draw());
+poll();
+</script>
+</body>
+</html>
