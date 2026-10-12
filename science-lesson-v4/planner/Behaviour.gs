@@ -1,12 +1,15 @@
 /**
  * Behaviour logger, noise meter control and Friday review.
- * Sheet tabs: Students, Log, Sessions, Emails, Settings.
- * Run setup() once, import Students.csv into the Students tab, then deploy as a web app.
+ * PART OF THE PLANNER since 2026-10-12 (one Apps Script project, one spreadsheet): this file sits
+ * beside the planner's Code.gs and uses its key (PLANNER_KEY), its check_() and its spreadsheet.
+ * Phone page = planner link + &view=phone, board = planner link + &view=board.
+ * Sheet tabs: Students, Log, Sessions, Emails, Settings (copied from the old behaviour sheet once by
+ * mergeBehaviourData() in Code.gs).
  * Students: Short is the name students see on the board. X and Y are seat positions (% of the plan), Ratio is the plan's width/height.
  */
 
-const VERSION = 21;   // shown on the phone and board so you can check the new code is live
-const TZ = 'Europe/London';
+const B_VERSION = 22;   // shown on the phone and board so you can check the new code is live
+// TZ ('Europe/London') comes from the planner's Code.gs (one project since 2026-10-12)
 const RULES = { 2: 'Work ethic', 3: 'Quality', 4: 'Attention', 5: 'Voice', 6: 'Lab safety', 7: 'Fixed stations', 8: 'Silent entry' };
 const WEEK_A_START = '2026-09-07';           // Monday of the first Week A
 const FORTNIGHTLY = ['8AG', 'PSHE-9AB'];      // reviewed per fortnight, not per week
@@ -40,11 +43,9 @@ const WORD_TYPE = { 'Positive': '+', 'Negative': '-', 'Report to me': 'R', '+': 
 
 /* ================= setup ================= */
 
-function setup() {
+// Makes any behaviour tab that is missing (mergeBehaviourData normally copies them over instead).
+function setupBehaviour() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const props = PropertiesService.getScriptProperties();
-  props.setProperty('SHEET_ID', ss.getId());
-  if (!props.getProperty('KEY')) props.setProperty('KEY', Utilities.getUuid().replace(/-/g, '').slice(0, 10));
   const tabs = {
     Students: ['Class', 'Name', 'Short', 'X', 'Y', 'Ratio'],
     Log: ['Timestamp', 'Class', 'Name', 'Type', 'Rule', 'Rule name'],
@@ -53,9 +54,10 @@ function setup() {
     Settings: ['Setting', 'Value']
   };
   Object.keys(tabs).forEach(name => {
-    let sh = ss.getSheetByName(name);
+    const tab = B_TAB[name] || name;
+    let sh = ss.getSheetByName(tab);
     if (!sh) {
-      sh = ss.insertSheet(name);
+      sh = ss.insertSheet(tab);
       sh.getRange(1, 1, 1, tabs[name].length).setValues([tabs[name]]).setFontWeight('bold');
       sh.setFrozenRows(1);
       if (name === 'Settings') {
@@ -64,16 +66,14 @@ function setup() {
       }
     }
   });
-  Logger.log('Setup done. Your key is: ' + props.getProperty('KEY'));
+  Logger.log('Behaviour tabs ready.');
 }
 
 /* ================= web entry ================= */
 
-function doGet(e) {
+// Called by the planner's doGet (which has already checked the key) for view=phone|board and api=...
+function behaviourGet_(e) {
   const p = (e && e.parameter) || {};
-  if (p.key !== key_()) {
-    return HtmlService.createHtmlOutput('<p style="font-family:sans-serif;padding:24px">Locked. Open the link that ends in ?key=</p>');
-  }
   if (p.api === 'board') return respond_(boardData_(Number(p.n) || 5), p.callback);
   if (p.api === 'live') {
     if (p.sid) CacheService.getScriptCache().put('live_' + p.sid, String(p.s || 'quiet'), 3600);
@@ -91,7 +91,7 @@ function doGet(e) {
   }
   const t = HtmlService.createTemplateFromFile('Phone');
   t.key = p.key;
-  t.manifestUrl = ScriptApp.getService().getUrl() + '?api=manifest&key=' + encodeURIComponent(p.key);
+  t.manifestUrl = ScriptApp.getService().getUrl() + '?api=manifest&view=phone&key=' + encodeURIComponent(p.key);   // home-screen app opens the phone page, not the planner
   return t.evaluate().setTitle('Behaviour')
     .addMetaTag('viewport', 'width=device-width, initial-scale=1, maximum-scale=1')
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);     // 2026-10-09: shown inside the planner's Behaviour tab
@@ -128,11 +128,15 @@ function init(k) {
   const now = new Date();
   const wl = weekLetter_(now), wd = weekday_(now);
   const classes = classOrder_();
-  const today = classes.filter(c => TIMETABLE[c] && (TIMETABLE[c][wl] || []).indexOf(wd) !== -1);
+  // today's classes from the planner's real timetable, in period order (2026-10-12); the old table if there is none
+  const tt = plannerTimetable_();
+  const slots = ((tt && tt[wl]) || []).filter(s => s.day === wd - 1).sort((a, b) => a.period - b.period);
+  const today = slots.length ? slots.map(s => classes.find(c => sameClass_(c, s.cls))).filter((c, i, a) => c && a.indexOf(c) === i)
+    : classes.filter(c => TIMETABLE[c] && (TIMETABLE[c][wl] || []).indexOf(wd) !== -1);
   return {
     classes: classes, today: today, week: wl,
     active: PropertiesService.getScriptProperties().getProperty('BOARD_CLASS') || '',
-    rules: RULES, mode: modeState_(), version: VERSION, limit: limit_()
+    rules: RULES, mode: modeState_(), version: B_VERSION, limit: limit_()
   };
 }
 
@@ -167,7 +171,7 @@ function logEvent(k, cls, name, type, rule, tapTime) {
   if (['+', '-', 'R'].indexOf(type) === -1) throw new Error('Unknown type');
   rule = rule_(type, rule);
   withLock_(() => {
-    sheet_('Log').appendRow([when_(tapTime), cls, name, TYPE_WORD[type], rule, rule ? RULES[rule] : '']);
+    bSheet_('Log').appendRow([when_(tapTime), cls, name, TYPE_WORD[type], rule, rule ? RULES[rule] : '']);
     SpreadsheetApp.flush();
   });
   const events = today_(cls);
@@ -182,7 +186,7 @@ function logMany(k, cls, names, type, rule, tapTime) {
   rule = rule_(type, rule);
   const now = when_(tapTime);
   withLock_(() => {
-    const sh = sheet_('Log');
+    const sh = bSheet_('Log');
     const rows = names.map((n, i) => [new Date(now.getTime() + i), cls, n, TYPE_WORD[type], rule, rule ? RULES[rule] : '']);
     sh.getRange(sh.getLastRow() + 1, 1, rows.length, 6).setValues(rows);
     SpreadsheetApp.flush();
@@ -195,7 +199,7 @@ function logMany(k, cls, names, type, rule, tapTime) {
 function removeEvent(k, cls, id) {
   check_(k);
   withLock_(() => {
-    const sh = sheet_('Log');
+    const sh = bSheet_('Log');
     const last = sh.getLastRow();
     if (last < 2) return;
     const n = Math.min(last - 1, 600);
@@ -217,7 +221,7 @@ function removeMany(k, cls, ids) {
   const want = {};
   (ids || []).forEach(id => want[Number(id)] = true);
   withLock_(() => {
-    const sh = sheet_('Log');
+    const sh = bSheet_('Log');
     const last = sh.getLastRow();
     if (last < 2) return;
     const n = Math.min(last - 1, 600);
@@ -283,7 +287,7 @@ function setMode(k, mode, cls, secs) {
 function setSupport(k, cls, name, val) {
   check_(k);
   val = val === 'prompt' || val === 'extend' ? val : '';
-  const sh = sheet_('Students'), last = sh.getLastRow();
+  const sh = bSheet_('Students'), last = sh.getLastRow();
   if (sh.getMaxColumns() < 7) sh.insertColumnsAfter(sh.getMaxColumns(), 7 - sh.getMaxColumns());
   if (sh.getRange(1, 7).getValue() === '') sh.getRange(1, 7).setValue('Support');
   const vals = sh.getRange(2, 1, last - 1, 2).getValues();
@@ -481,7 +485,7 @@ function recordResult_(p) {
   const mon = Math.round(Number(p.mon) || 0), red = Math.round(Number(p.red) || 0);
   const settle = p.settle !== undefined && p.settle !== '' ? Math.round(Number(p.settle)) : '';
   withLock_(() => {
-    if (mon > 0) sheet_('Sessions').appendRow([new Date(sess.start), sess.cls, MODES[sess.mode].label, mon, red, settle]);
+    if (mon > 0) bSheet_('Sessions').appendRow([new Date(sess.start), sess.cls, MODES[sess.mode].label, mon, red, settle]);
     if (p.end === '1') {
       const props = PropertiesService.getScriptProperties();
       const m = JSON.parse(props.getProperty('MODE') || '{}');
@@ -535,7 +539,7 @@ function markEmailed(k, picks) {
   if (!picks || !picks.length) return 0;
   const now = new Date();
   withLock_(() => {
-    const sh = sheet_('Emails');
+    const sh = bSheet_('Emails');
     sh.getRange(sh.getLastRow() + 1, 1, picks.length, 3).setValues(picks.map(p => [now, p.cls, p.name]));
   });
   return picks.length;
@@ -557,7 +561,7 @@ function boardData_(n) {
   const rc = CacheService.getScriptCache().get('recap');
   let recap = rc ? JSON.parse(rc) : null;
   if (recap && Date.now() > recap.end) recap = null;
-  return { cls: data.cls, names: data.names.slice(0, n), mode: m, now: Date.now(), version: VERSION, recap: recap };
+  return { cls: data.cls, names: data.names.slice(0, n), mode: m, now: Date.now(), version: B_VERSION, recap: recap };
 }
 
 function refreshBoard_(cls, events) {
@@ -583,7 +587,7 @@ function today_(cls) {
 }
 
 function readLog_() {
-  const sh = sheet_('Log'), last = sh.getLastRow();
+  const sh = bSheet_('Log'), last = sh.getLastRow();
   if (last < 2) return [];
   const n = Math.min(last - 1, LOG_TAIL);
   return sh.getRange(last - n + 1, 1, n, 5).getValues().filter(r => r[0] instanceof Date)
@@ -591,21 +595,21 @@ function readLog_() {
 }
 
 function readSessions_() {
-  const sh = sheet_('Sessions'), last = sh.getLastRow();
+  const sh = bSheet_('Sessions'), last = sh.getLastRow();
   if (last < 2) return [];
   return sh.getRange(2, 1, last - 1, 5).getValues().filter(r => r[0] instanceof Date)
     .map(r => ({ start: r[0], cls: String(r[1]), mon: Number(r[3]) || 0, red: Number(r[4]) || 0 }));
 }
 
 function readEmails_() {
-  const sh = sheet_('Emails'), last = sh.getLastRow();
+  const sh = bSheet_('Emails'), last = sh.getLastRow();
   if (last < 2) return [];
   return sh.getRange(2, 1, last - 1, 3).getValues().filter(r => r[0] instanceof Date)
     .map(r => ({ date: r[0], cls: String(r[1]), name: String(r[2]) }));
 }
 
 function students_() {
-  const sh = sheet_('Students'), last = sh.getLastRow();
+  const sh = bSheet_('Students'), last = sh.getLastRow();
   if (last < 2) return [];
   const nc = Math.min(7, sh.getLastColumn());
   const pos = v => (v === '' || v === null || !(Number(v) > 0.5)) ? null : Number(v);
@@ -628,7 +632,7 @@ function classOrder_() {
 
 function settings_() {
   const out = Object.assign({}, DEFAULTS);
-  const sh = sheet_('Settings');
+  const sh = bSheet_('Settings');
   if (sh && sh.getLastRow() >= 2) sh.getRange(2, 1, sh.getLastRow() - 1, 2).getValues()
     .forEach(r => { if (r[0] !== '') out[String(r[0]).trim()] = r[1]; });
   return out;
@@ -661,9 +665,10 @@ function weekIndex_(d) {
 function weekLetter_(d) { return (((weekIndex_(d) % 2) + 2) % 2) === 0 ? 'A' : 'B'; }
 function weekday_(d) { return Number(Utilities.formatDate(d, TZ, 'u')); }
 
-function sheet_(name) {
-  return SpreadsheetApp.openById(PropertiesService.getScriptProperties().getProperty('SHEET_ID')).getSheetByName(name);
-}
+// The planner's spreadsheet. The planner already has a "Log" tab (folders it made), so behaviour's
+// Log and Settings tabs are called "Behaviour Log" and "Behaviour Settings" there.
+const B_TAB = { Log: 'Behaviour Log', Settings: 'Behaviour Settings' };
+function bSheet_(name) { return SpreadsheetApp.getActiveSpreadsheet().getSheetByName(B_TAB[name] || name); }
 function withLock_(fn) {
   const lock = LockService.getScriptLock();
   lock.waitLock(10000);
@@ -678,5 +683,12 @@ function respond_(obj, callback) {
   }
   return json_(obj);
 }
-function key_() { return PropertiesService.getScriptProperties().getProperty('KEY'); }
-function check_(k) { if (k !== key_()) throw new Error('Locked'); }
+// check_(): the planner's, in Code.gs (one key, PLANNER_KEY)
+// Class names differ a little between the planner and the Students tab ("7MLA" / "7ML").
+function sameClass_(a, b) {
+  const A = String(a).toUpperCase().replace(/[^A-Z0-9]/g, ''), B = String(b).toUpperCase().replace(/[^A-Z0-9]/g, '');
+  if (!A || !B) return false;
+  if (A === B) return true;
+  const short = A.length < B.length ? A : B, long = A.length < B.length ? B : A;
+  return short.length >= 3 && long.indexOf(short) === 0;
+}

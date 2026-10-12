@@ -5,8 +5,9 @@ const fs = require('fs'), path = require('path');
 // the mock Students tab needs the Support column
 m.sheets.Students._data[0].push('Support');
 m.sheets.Students._data.forEach((r, i) => { if (i) r.push(i === 1 ? 'prompt' : ''); });
-eval(fs.readFileSync(path.join(__dirname, '..', 'Code.gs'), 'utf8') +
-  '\nglobal.api={init,openClass,logEvent,logMany,removeMany,getBoard,setMode,endMode,getMode,setTimer,adjustTimer,stopTimer,submitResult,getSilence,getFriday,positivesOver,setSupport,setPause};');
+// one project since 2026-10-12: the planner's Code.gs and Behaviour.gs load together (a clash would break this)
+eval(fs.readFileSync(path.join(__dirname, '..', 'Code.gs'), 'utf8') + '\n' + fs.readFileSync(path.join(__dirname, '..', 'Behaviour.gs'), 'utf8') +
+  '\nglobal.api={init,openClass,logEvent,logMany,removeMany,getBoard,setMode,endMode,getMode,setTimer,adjustTimer,stopTimer,submitResult,getSilence,getFriday,positivesOver,setSupport,setPause,mergeBehaviourData,behaviourWeek,sameClass_};');
 const k = 'k', out = []; let failed = 0;
 const ok = (n, c) => { out.push((c ? 'PASS ' : 'FAIL ') + n); if (!c) failed++; };
 
@@ -17,7 +18,7 @@ ok('init has a numeric server version', typeof api.init(k).version === 'number')
 
 let ev = api.logEvent(k, '7BYA', 'Thomas Boxall', '+', 0);
 ok('positive saved', ev.some(e => e.type === '+'));
-ok('Log stores the word, not a symbol (Sheets turns +/- into #ERROR!)', m.sheets.Log._data[1][3] === 'Positive');
+ok('Log stores the word, not a symbol (Sheets turns +/- into #ERROR!)', m.sheets['Behaviour Log']._data[1][3] === 'Positive');
 ev = api.logEvent(k, '7BYA', 'Tom Browning', 'R', 4); ok('report to me keeps its rule', ev.some(e => e.type === 'R' && e.rule === 4));
 ev = api.logMany(k, '7BYA', ['Thomas Boxall', 'Tom Browning'], '-', 0); ok('logMany saves a group', ev.filter(e => e.type === '-').length === 2);
 const ids = ev.filter(e => e.type === '-').map(e => e.id);
@@ -73,4 +74,26 @@ api.stopTimer(k);
 ok('Friday goal is a fixed 80% and this class hit it', api.getFriday(k).find(c => c.cls === '7BYA').goal.status === 'hit');
 ok('positivesOver counts', api.positivesOver(k, '7BYA', 5).length >= 1);
 ok('setSupport writes the Support column', api.setSupport(k, '7BYA', 'Tom Browning', 'extend') === 'extend' && m.sheets.Students._data[2][6] === 'extend');
+// one app (2026-10-12)
+ok('class names match across the apps (7MLA = 7ML), but not 7MLA = 7XP', api.sameClass_('7MLA', '7ML') && !api.sameClass_('7MLA', '7XP') && !api.sameClass_('7', '7ML'));
+const wdNow = Number(Utilities.formatDate(new Date(), 'Europe/London', 'u'));
+m.sheets.Data = m.makeSheet('Data', [['chunk'], [JSON.stringify({ timetable: { A: [{ day: wdNow - 1, period: 3, cls: '7BYA' }], B: [{ day: wdNow - 1, period: 3, cls: '7BYA' }] } })]]);
+delete m.cache.ptt;
+ok("today's classes come from the planner's timetable", wdNow > 5 || JSON.stringify(api.init(k).today) === '["7BYA"]');
+const wk = api.behaviourWeek(k, Utilities.formatDate(new Date(Date.now() - (wdNow - 1) * 864e5), 'Europe/London', 'yyyy-MM-dd'));
+ok('behaviourWeek gives this week\'s entries with class and time', wk.length >= 3 && wk.every((x) => /^\d{4}-\d\d-\d\dT\d\d:\d\d$/.test(x.t) && x.cls && x.type));
+m.props.OLD_BEHAVIOUR_SHEET_ID = 'old';
+const t0 = new Date(Date.now() - 864e5);
+m.old.Students = m.makeSheet('Students', [['Class', 'Name', 'Short', 'X', 'Y', 'Ratio'], ['8XP', 'Ada Lovelace', 'Ada L.', 10, 10, 2.6]]);
+m.old.Log = m.makeSheet('Log', [['Timestamp', 'Class', 'Name', 'Type', 'Rule', 'Rule name'], [t0, '8XP', 'Ada Lovelace', 'Positive', '', '']]);
+m.old.Sessions = m.makeSheet('Sessions', [['Start']]); m.old.Emails = m.makeSheet('Emails', [['Date']]); m.old.Settings = m.makeSheet('Settings', [['Setting', 'Value'], ['STANDARD', 80]]);
+const logBefore = m.sheets['Behaviour Log']._data.length;
+api.mergeBehaviourData();
+ok('merge: students replaced, settings copied', m.sheets.Students._data.length === 2 && m.sheets['Behaviour Settings']._data[1][1] === 80);
+ok('merge: older log rows are not added twice', m.sheets['Behaviour Log']._data.length === logBefore);
+m.old.Log._data.push([new Date(Date.now() + 1000), '8XP', 'Ada Lovelace', 'Positive', '', '']);
+api.mergeBehaviourData();
+ok('merge again: only the newer row is added', m.sheets['Behaviour Log']._data.length === logBefore + 1);
+ok('merge is noted in the planner Log tab, not the behaviour log', m.sheets.Log && /merged behaviour/.test(m.sheets.Log._data.slice(-1)[0][1]));
+
 console.log(out.join('\n')); console.log(failed ? `\n${failed} FAILED` : '\nAll passed'); process.exit(failed ? 1 : 0);

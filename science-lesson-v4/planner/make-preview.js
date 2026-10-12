@@ -26,6 +26,12 @@ window.google = { script: { run: (function make(ok, bad) {
     saveWeek() { setTimeout(() => ok({ saved: true }), 0); },
     saveWeeks() { setTimeout(() => ok({ saved: true }), 0); },
     saveLessons() { setTimeout(() => ok({ saved: true }), 0); },
+    // behaviour, built in (2026-10-12): a made-up class, no real names
+    init() { setTimeout(() => ok({ classes: ['7ML', '8XP'], today: ['8XP'], rules: { 2: 'Work ethic', 4: 'Attention' }, version: 22 }), 0); },
+    openClass(k, cls) { setTimeout(() => ok({ students: ['Ada Lovelace', 'Alan Turing', 'Marie Curie'].map((n, i) => ({ name: n, short: n.split(' ')[0] + ' ' + n.split(' ')[1][0] + '.', x: 20 + i * 30, y: 50, support: '' })), ratio: 2.6, events: (window.__EV = window.__EV || []) }), 0); },
+    logEvent(k, cls, name, type, rule) { setTimeout(() => { window.__EV.push({ id: Date.now() + window.__EV.length, t: '10:05', name, type, rule }); ok(window.__EV.slice()); }, 0); },
+    removeEvent(k, cls, id) { setTimeout(() => { window.__EV = window.__EV.filter((e) => e.id !== id); ok(window.__EV.slice()); }, 0); },
+    behaviourWeek(k, mon) { setTimeout(() => ok(window.__BW || []), 0); },
     homeworkList() { setTimeout(() => ok(window.__HW || []), 0); },
     makeHomework(k, name) { setTimeout(() => ok({ made: [{ title: name, form: 'https://forms', draft: true, note: '' }], seen: 1, already: 0, names: [name] }), 0); },
     sendRequest() { setTimeout(() => ok({ id: 'preview' }), 0); },
@@ -37,7 +43,7 @@ window.google = { script: { run: (function make(ok, bad) {
 })() } };
 </script>
 <script>${fs.readFileSync(path.join(dir, 'logic.js'), 'utf8')}</script>`;
-html = html.replace("<?!= include('Logic') ?>", mock).replace('<?!= JSON.stringify(key) ?>', '"preview"');
+html = html.replace("<?!= include('Logic') ?>", mock).replace('<?!= JSON.stringify(key) ?>', '"preview"').replace('<?!= JSON.stringify(appUrl) ?>', '"https://script.google.com/preview/exec"');
 if (sel >= 0) html = html.replace('</body>', `<script>setTimeout(() => { S.showMine = true; loadMine(); S.week.extras.push({ day: 1, text: 'Mark 9XS Particles tests', kind: 'marking', kindLabel: '✎' }); S.sel = ${sel}; render(); editor(); }, 300);</script></body>`);
 if (view || monday) html = html.replace('</body>', `<script>setTimeout(() => { ${monday ? `loadWeek(P.parse('${monday}')); markGaps();` : ''} ${view ? `S.view = '${view}';` : ''} render(); editor(); }, 400);</script></body>`);
 if (js) html = html.replace('</body>', `<script>setTimeout(() => { ${js} }, 900);</script></body>`);

@@ -57,7 +57,20 @@
   .testrow select { width:auto; }
   #side .lbl { display:flex; align-items:center; gap:4px; }
   .testrow { display:grid; grid-template-columns:110px 1fr auto; gap:10px; align-items:center; padding:8px 0; border-top:1px solid var(--line); font-size:13px; }
-  .behaviour iframe { width:100%; height:calc(100vh - 150px); border:1px solid var(--line); border-radius:10px; background:#fff; }
+  /* Behaviour, built in (2026-10-12) */
+  .bwrap { display:grid; grid-template-columns:minmax(0,1fr) 300px; gap:14px; align-items:start; }
+  .bplan { position:relative; width:100%; background:var(--panel); border:1px solid var(--line); border-radius:10px; }
+  .bgrid { display:flex; flex-wrap:wrap; gap:8px; padding:10px; background:var(--panel); border:1px solid var(--line); border-radius:10px; }
+  .bname { background:var(--chip); color:var(--ink); border:2px solid transparent; border-radius:8px; padding:6px 8px; font:inherit; font-size:13px; cursor:pointer; text-align:center; min-width:84px; }
+  .bplan .bname { position:absolute; transform:translate(-50%,-50%); }
+  .bname:hover { border-color:var(--gold); } .bname.prompt { border-color:var(--blue); } .bname.extend { border-color:#AB47BC; }
+  .bname .n { display:block; font-size:11px; font-weight:700; } .bname .p { color:var(--green); } .bname .m { color:var(--red); }
+  .bmode button.on { background:var(--gold); color:#111; border-color:var(--gold); }
+  .blog { background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:8px 10px; max-height:calc(100vh - 190px); overflow-y:auto; font-size:13px; }
+  .blog .r { display:flex; gap:6px; align-items:center; padding:3px 0; border-bottom:1px solid var(--line); }
+  .blog .r .x { margin-left:auto; cursor:pointer; color:var(--muted); }
+  .rules button { display:block; width:100%; text-align:left; margin:4px 0; }
+  .f-beh { color:var(--green); } .f-none { color:var(--muted); }
   .flag.f-own { color:var(--green); } .flag.f-reuse { color:var(--blue); }
   #status.dirty::before { content:"\25CF  "; color:var(--gold); }
   .menuwrap { position:relative; }
@@ -223,6 +236,7 @@
 <?!= include('Logic') ?>
 <script>
 const KEY = <?!= JSON.stringify(key) ?>;   // the key is letters and numbers only, so unescaped output is safe
+const APP_URL = <?!= JSON.stringify(appUrl) ?>;   // this web app: phone page = ?key=..&view=phone, board = &view=board
 const P = window.PlannerLogic;
 const COLS = ['B', 'F', 'J', 'N', 'R'];
 let S = { data:null, weeks:{}, learned:{}, hasTemplate:false, monday:null, week:null, undo:[], sel:-1, dirty:false, view:'week', day:0, mine:null, showMine:false, readOnly:false, chooser:{} };
@@ -282,6 +296,7 @@ function loadWeek(mon) {
   $('jump').value = P.iso(S.monday);
   render(); editor();
   if (S.showMine) loadMine();
+  loadBehWeek();
 }
 let saveTimer = null;
 // quiet: a detail edit (equipment, notes): redraw the grid only, so the box being typed in stays put
@@ -372,6 +387,9 @@ function render() {
       else if (s.kind === 'lesson' && s.built === false) flags.push('<span class="flag f-built" title="No slides in the Drive folder yet">NOT BUILT</span>');
       if (s.kind === 'lesson' && s.gap) flags.push('<span class="flag f-gap" title="A lesson missed earlier in this topic">MISSED</span>');
       if ((s.carry || []).length) flags.push('<span class="flag f-carry">+' + s.carry.length + ' carry</span>');
+      const bh = behOf(s);   // behaviour logged in this lesson (2026-10-12)
+      if (bh && (bh.p || bh.m)) flags.push('<span class="flag f-beh bjump" data-cls="' + esc(s.cls) + '" title="Positives and behaviour points logged in this lesson. Click for Behaviour">+' + bh.p + ' &minus;' + bh.m + '</span>');
+      else if (bh && bh.over && S.bWeek.length) flags.push('<span class="flag f-none bjump" data-cls="' + esc(s.cls) + '" title="Nothing logged for this lesson. Click to add">no behaviour</span>');
       const L = s.kind === 'lesson' ? c.seq[s.i] || {} : null;
       const time = P.periodTime(S.data, s.cls, s.period);
       h += '<div class="slotcell" data-i="' + i + '"><div class="ev kind-' + s.kind + (S.sel === i ? ' sel' : '') + '"' + (S.readOnly ? '' : ' draggable="true"') + ' data-i="' + i + '" style="--c:' + (c.colour || '#3F51B5') + '">' +
@@ -384,6 +402,7 @@ function render() {
   }
   g.innerHTML = h;
 
+  g.querySelectorAll('.bjump').forEach((el) => el.onclick = (e) => { e.stopPropagation(); openBehaviourFor(el.dataset.cls); });
   g.querySelectorAll('.ev').forEach((el) => {
     el.onclick = (e) => { e.stopPropagation(); if (S.readOnly) return; S.sel = +el.dataset.i; render(); editor(); };
     el.ondragstart = (e) => e.dataTransfer.setData('text/plain', el.dataset.i);
@@ -496,22 +515,121 @@ function renderTests() {
     practiceRequest(t.s.cls, [topicName(t.s.cls, t.s.unit)], size, dueBefore(t.date)).catch((e) => toast('Not sent: ' + e.message));
   });
 }
-// Behaviour: the behaviour app's phone page inside the planner; the board opens in its own window.
+// Behaviour, built into the planner (Patryk 2026-10-12: one app, one spreadsheet). Same server
+// functions as the phone (Behaviour.gs). Click a name = positive; right-click, or "Behaviour point"
+// mode, = a point with a rule. Undo for 5 seconds after each one.
+const sameClass = (a, b) => {
+  const A = String(a).toUpperCase().replace(/[^A-Z0-9]/g, ''), B = String(b).toUpperCase().replace(/[^A-Z0-9]/g, '');
+  if (!A || !B) return false; if (A === B) return true;
+  const s = A.length < B.length ? A : B, l = A.length < B.length ? B : A;
+  return s.length >= 3 && l.indexOf(s) === 0;
+};
+const minsOf = (hm) => { const [h, m] = String(hm).split(':').map(Number); return h * 60 + m; };
+// The lesson on now (or next today): its class, from this week's plan.
+function lessonNowCls() {
+  if (!S.week) return '';
+  const t = new Date(), day = (t.getDay() + 6) % 7, now = t.getHours() * 60 + t.getMinutes();
+  if (P.iso(S.monday) !== P.iso(P.mondayOf(t))) return '';
+  const today = S.week.slots.filter((s) => s.day === day && ['lesson', 'revision', 'test'].includes(s.kind));
+  const win = (s) => (P.periodTime(S.data, s.cls, s.period) || '').split('-');
+  const on = today.find((s) => { const [a, b] = win(s); return a && now >= minsOf(a) - 5 && now <= minsOf(b) + 5; });
+  return (on || today.find((s) => minsOf(win(s)[0] || '0:0') > now) || {}).cls || '';
+}
+const behLink = (view) => APP_URL + '?key=' + encodeURIComponent(KEY) + '&view=' + view;
 function renderBehaviour() {
   const g = $('grid'); g.className = 'tab behaviour'; g.style.gridTemplateColumns = ''; g.style.maxWidth = 'none';
-  const url = S.behaviourUrl || '';
-  if (!url) {
-    g.innerHTML = '<h2>Behaviour</h2><p class="lead">Paste the link of your behaviour app (the phone page, ending in ?key=...). It is saved once.</p>' +
-      '<input type="text" id="bUrl" placeholder="https://script.google.com/macros/s/.../exec?key=..."><div class="row"><button class="primary" id="bSave">Save</button></div>';
-    $('bSave').onclick = () => run('setBehaviourUrl', $('bUrl').value).then((u) => { S.behaviourUrl = u; renderBehaviour(); }).catch((e) => toast(e.message));
+  S.beh = S.beh || { mode: '+' };
+  const B = S.beh;
+  if (!B.init) {
+    g.innerHTML = '<h2>Behaviour</h2><p class="lead">Loading classes...</p>';
+    run('init').then((r) => { B.init = r; renderBehaviour(); })
+      .catch((e) => { g.innerHTML = '<h2>Behaviour</h2><p class="lead">Behaviour is not set up in this planner yet: ' + esc(e.message) + '.<br>Run <b>mergeBehaviourData</b> once in the Apps Script editor (see README).</p>'; });
     return;
   }
-  g.innerHTML = '<div class="row" style="margin:0 0 8px;align-items:center"><h2 style="margin:0 10px 0 0">Behaviour</h2>' +
-    '<a href="' + esc(url + '&view=board') + '" target="_blank"><button class="primary">Open the board (projector)</button></a>' +
-    '<a href="' + esc(url) + '" target="_blank"><button>Open in its own tab</button></a>' +
-    '<button id="bChange">Change link</button></div><iframe src="' + esc(url) + '" title="Behaviour app" allow="microphone"></iframe>' +
-    '<p class="muted">If this stays blank, paste the newest behaviour app code (it now allows being shown here), or use "Open in its own tab".</p>';
-  $('bChange').onclick = () => { S.behaviourUrl = ''; renderBehaviour(); };
+  const classes = B.init.classes || [];
+  if (!B.cls) {
+    const want = B.want || lessonNowCls();
+    B.cls = classes.find((c) => want && sameClass(c, want)) || (B.init.today || [])[0] || classes[0] || '';
+  }
+  const studs = B.cl && B.cl.cls === B.cls ? B.cl : null;
+  g.innerHTML = '<div class="row" style="margin:0 0 10px;align-items:center;flex-wrap:wrap;gap:6px"><h2 style="margin:0 8px 0 0">Behaviour</h2>' +
+    '<select id="bCls" style="width:auto;min-width:110px">' + classes.map((c) => '<option' + (c === B.cls ? ' selected' : '') + '>' + esc(c) + '</option>').join('') + '</select>' +
+    '<span class="bmode"><button data-m="+" class="' + (B.mode === '+' ? 'on' : '') + '">+ Positive</button><button data-m="-" class="' + (B.mode === '-' ? 'on' : '') + '">&minus; Behaviour point</button></span>' +
+    '<span style="flex:1"></span><a href="' + esc(behLink('board')) + '" target="_blank"><button class="primary">Open the board</button></a>' +
+    '<a href="' + esc(behLink('phone')) + '" target="_blank"><button title="Silence meter, countdowns and timers">Silence and timers</button></a>' +
+    '<button id="bCopy" title="Open this on your phone and add it to the home screen">Copy phone link</button></div>' +
+    '<div class="bwrap"><div id="bRoom">' + (studs ? '' : '<p class="lead">Loading ' + esc(B.cls) + '...</p>') + '</div>' +
+    '<div><div class="blog" id="bLog"></div><p class="muted" style="font-size:12px">Click a name: ' + (B.mode === '+' ? 'positive' : 'behaviour point') + '. Right-click: behaviour point.</p></div></div>';
+  $('bCls').onchange = () => { B.cls = $('bCls').value; B.cl = null; renderBehaviour(); };
+  g.querySelectorAll('.bmode button').forEach((b) => b.onclick = () => { B.mode = b.dataset.m; renderBehaviour(); });
+  $('bCopy').onclick = () => { navigator.clipboard.writeText(behLink('phone')).then(() => toast('Phone link copied')); };
+  if (!studs) { run('openClass', B.cls).then((r) => { B.cl = Object.assign(r, { cls: B.cls }); renderBehaviour(); }).catch((e) => toast('Not loaded: ' + e.message)); return; }
+  drawRoom();
+}
+function drawRoom() {
+  const B = S.beh, cl = B.cl, ev = cl.events || [];
+  const tally = {};
+  ev.forEach((e) => { const t = tally[e.name] = tally[e.name] || { p: 0, m: 0 }; if (e.type === '+') t.p++; else t.m++; });
+  const chip = (s) => { const t = tally[s.name] || { p: 0, m: 0 };
+    return '<button class="bname ' + esc(s.support || '') + '" data-n="' + esc(s.name) + '"' + (s.x != null && s.y != null ? ' style="left:' + s.x + '%;top:' + s.y + '%"' : '') + ' title="' + esc(s.name) + '">' + esc(s.short) +
+      '<span class="n">' + (t.p ? '<span class="p">+' + t.p + '</span> ' : '') + (t.m ? '<span class="m">&minus;' + t.m + '</span>' : '') + '&nbsp;</span></button>'; };
+  const seated = cl.students.length && cl.students.every((s) => s.x != null && s.y != null);
+  $('bRoom').innerHTML = !cl.students.length ? '<p class="lead">No students for ' + esc(B.cls) + ' in the Students tab.</p>'
+    : seated ? '<div class="bplan" style="aspect-ratio:' + (cl.ratio || 2.6) + '">' + cl.students.map(chip).join('') + '</div>'
+    : '<div class="bgrid">' + cl.students.slice().sort((a, b) => a.short.localeCompare(b.short)).map(chip).join('') + '</div>';
+  const rules = (B.init || {}).rules || {};
+  $('bLog').innerHTML = '<b>Today, ' + esc(B.cls) + '</b> · <span style="color:var(--green)">+' + ev.filter((e) => e.type === '+').length + '</span> <span style="color:var(--red)">&minus;' + ev.filter((e) => e.type !== '+').length + '</span>' +
+    (ev.length ? ev.slice().reverse().map((e) => '<div class="r"><span class="muted">' + esc(e.t) + '</span><b style="color:' + (e.type === '+' ? 'var(--green)' : 'var(--red)') + '">' + (e.type === '+' ? '+' : e.type === 'R' ? 'R' : '&minus;') + '</b>' + esc(e.name) +
+      (e.rule ? ' <span class="muted">' + esc(rules[e.rule] || '') + '</span>' : '') + '<span class="x" data-id="' + e.id + '" title="Remove">&#10005;</span></div>').join('') : '<p class="muted">Nothing yet today.</p>');
+  $('bRoom').querySelectorAll('.bname').forEach((b) => {
+    b.onclick = () => (B.mode === '+' ? logBeh(b.dataset.n, '+', 0) : pickRule(b.dataset.n));
+    b.oncontextmenu = (e) => { e.preventDefault(); pickRule(b.dataset.n); };
+  });
+  $('bLog').querySelectorAll('.x').forEach((x) => x.onclick = () => unlogBeh(+x.dataset.id));
+}
+function pickRule(name) {
+  const rules = (S.beh.init || {}).rules || {};
+  modal('<h3>Behaviour point: ' + esc(name) + '</h3><div class="rules">' + Object.keys(rules).map((r) => '<button data-r="' + r + '">' + r + '. ' + esc(rules[r]) + '</button>').join('') +
+    '<button data-r="0">No rule</button></div><div class="row"><button id="rCancel">Cancel</button></div>');
+  $('mbox').querySelectorAll('[data-r]').forEach((b) => b.onclick = () => { closeModal(); logBeh(name, '-', +b.dataset.r); });
+  $('rCancel').onclick = closeModal;
+}
+function logBeh(name, type, rule) {
+  const B = S.beh, cls = B.cls;
+  run('logEvent', cls, name, type, rule, Date.now()).then((events) => {
+    if (B.cls !== cls) return;
+    B.cl.events = events; drawRoom();
+    const mine = events.filter((e) => e.name === name && e.type === type).slice(-1)[0];
+    behToast((type === '+' ? 'Positive: ' : 'Behaviour point: ') + name, mine && mine.id);
+  }).catch((e) => toast('Not saved: ' + e.message));
+}
+function unlogBeh(id) {
+  const B = S.beh;
+  run('removeEvent', B.cls, id).then((events) => { B.cl.events = events; drawRoom(); toast('Removed'); }).catch((e) => toast('Not removed: ' + e.message));
+}
+// A corner note with Undo for 5 seconds (brief: undo toast after each log). The toast's Undo goes
+// back to undoing week changes afterwards.
+const weekUndo = () => { undo(); $('toast').classList.remove('on'); };
+function behToast(msg, id) {
+  toast(msg); $('toastUndo').style.display = id ? '' : 'none';
+  $('toastUndo').onclick = () => { $('toast').classList.remove('on'); $('toastUndo').onclick = weekUndo; if (id) unlogBeh(id); };
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => { $('toast').classList.remove('on'); $('toastUndo').onclick = weekUndo; }, 5000);
+}
+// Lesson cards: what was logged in that period ("+4 −1"), matched by class and time (2026-10-12).
+function behOf(s) {
+  if (!S.bWeek || !['lesson', 'revision', 'test', 'cover'].includes(s.kind) || s.double) return null;
+  const [a, b] = (P.periodTime(S.data, s.cls, s.period) || '').split('-');
+  if (!a) return null;
+  const date = P.iso(P.addDays(S.monday, s.day));
+  const nx = S.week.slots.find((x) => x.double && x.cls === s.cls && x.day === s.day && x.period === s.period + 1);
+  const endHm = nx ? ((P.periodTime(S.data, s.cls, nx.period) || '').split('-')[1] || b) : b;
+  const hit = S.bWeek.filter((e) => e.t.slice(0, 10) === date && sameClass(e.cls, s.cls) && minsOf(e.t.slice(11)) >= minsOf(a) - 10 && minsOf(e.t.slice(11)) <= minsOf(endHm) + 15);
+  return { p: hit.filter((e) => e.type === '+').length, m: hit.filter((e) => e.type !== '+').length, over: new Date() > new Date(date + 'T' + endHm) };
+}
+function loadBehWeek() {
+  const mon = P.iso(S.monday);
+  S.bWeek = null;
+  run('behaviourWeek', mon).then((r) => { if (P.iso(S.monday) === mon) { S.bWeek = r; if (['week', 'day'].includes(S.view)) render(); } }).catch(() => {});
 }
 
 // Classes view: where every class is, lesson by lesson (green = done, gold outline = missed).
@@ -1148,7 +1266,9 @@ $('vClasses').onclick = () => { S.view = 'classes'; render(); };
 function showTab(v) { S.view = v; S.sel = -1; render(); }
 $('vHomework').onclick = () => showTab('homework');
 $('vTests').onclick = () => showTab('tests');
-$('vBehaviour').onclick = () => showTab('behaviour');
+// Behaviour opens on the selected lesson's class, else the lesson on now
+function openBehaviourFor(cls) { S.beh = Object.assign(S.beh || { mode: '+' }, { cls: '', want: cls || '', cl: null }); showTab('behaviour'); }
+$('vBehaviour').onclick = () => { const s = S.sel >= 0 && S.week && S.week.slots[S.sel]; openBehaviourFor(s ? s.cls : ''); };
 $('undo').onclick = undo;
 $('file').onchange = () => {
   const f = $('file').files[0]; if (!f) return;

@@ -32,6 +32,19 @@ Source: `claude-code-brief.md` (2026-10-12). Tick items as they are done.
 
 ## Next
 
+- [x] **10. Behaviour app inside the planner** (2026-10-12, done ahead of 8 and 9 because Patryk asked)
+  - One Apps Script project: the behaviour code is `planner/Behaviour.gs` + `Phone.html` + `BoardPage.html`, and it uses the planner's key.
+  - One spreadsheet: `mergeBehaviourData` copies the old behaviour sheet's tabs in (Log and Settings become "Behaviour Log" / "Behaviour Settings", because the planner already has a Log tab). It can be re-run to catch up; the old sheet is only read.
+  - Behaviour tab built in, with no link or iframe:
+    - seating plan, click = positive, right-click = point with a rule;
+    - undo for 5 seconds;
+    - today's list;
+    - opens on the lesson on now, or the one clicked.
+  - Lesson cards show "+n −n" for that lesson, or "no behaviour" when a finished lesson has nothing logged. Entries are matched to the lesson by class and time, so old entries match too.
+  - Today's classes on the phone now come from the planner's timetable (the old hard-coded one listed 7BYA and PSHE).
+  - Phone = planner link + `&view=phone`, board = `&view=board`. **Setup steps in planner/README.md, "Behaviour is part of the planner".**
+  - Left for item 11: day picker / backdating, student history, end-of-day reminder, league feed, Word tracker, flags.
+
 8 Collapsible "Your week" panel · 9 Tests/Homework split + test builder · 10 Behaviour app inside the planner · 11 Behaviour desktop layout, backdating, reminder · 12 Classes page hover-over · 13 "Review last lesson" button · 14 Engage tasks, one Learn section by default
 
 ## Later

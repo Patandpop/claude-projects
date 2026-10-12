@@ -40,9 +40,73 @@ function doGet(e) {
   if (key !== PropertiesService.getScriptProperties().getProperty('PLANNER_KEY')) {
     return HtmlService.createHtmlOutput('<p style="font-family:sans-serif;padding:24px">Locked. Open the link that ends in ?key=</p>');
   }
+  // the behaviour app lives in this project too (2026-10-12): phone page, board and the board's data calls
+  const p = e.parameter;
+  if (p.view === 'phone' || p.view === 'board' || p.api) return behaviourGet_(e);
   const t = HtmlService.createTemplateFromFile('Planner');
   t.key = key;
+  t.appUrl = ScriptApp.getService().getUrl();
   return t.evaluate().setTitle('Planner').setXFrameOptionsMode(HtmlService.XFrameOptionsMode.DEFAULT);
+}
+
+/* ------------------------------------------------------------- behaviour
+   The behaviour app (Behaviour.gs, Phone.html, BoardPage.html) is part of this project since
+   2026-10-12, and its tabs live in this spreadsheet (Students, Behaviour Log, Sessions, Emails,
+   Behaviour Settings). */
+
+// The planner's timetable for the behaviour app ("today's classes"), cached for 6 hours.
+function plannerTimetable_() {
+  const c = CacheService.getScriptCache(), hit = c.get('ptt');
+  if (hit) return JSON.parse(hit);
+  const d = sheet_('Data');
+  if (!d || d.getLastRow() < 2) return null;
+  const data = JSON.parse(d.getRange(2, 1, d.getLastRow() - 1, 1).getValues().map((r) => r[0]).join(''));
+  const tt = data.timetable || null;
+  if (tt) c.put('ptt', JSON.stringify(tt), 21600);
+  return tt;
+}
+
+// Run ONCE from the editor (and again just before switching phones over, to catch up): copies the
+// old behaviour sheet's tabs into this spreadsheet. Script property OLD_BEHAVIOUR_SHEET_ID = the old
+// sheet's ID (the long code in its address bar). The old sheet is only READ, never changed.
+// Students and Settings are replaced; Log, Sessions and Emails only get rows newer than the newest here.
+function mergeBehaviourData() {
+  const id = PropertiesService.getScriptProperties().getProperty('OLD_BEHAVIOUR_SHEET_ID');
+  if (!id) throw new Error('Set the script property OLD_BEHAVIOUR_SHEET_ID to the old behaviour sheet ID first');
+  const src = SpreadsheetApp.openById(id), ss = SpreadsheetApp.getActiveSpreadsheet();
+  const out = [];
+  [['Students', 'Students', 'replace'], ['Settings', 'Behaviour Settings', 'replace'],
+   ['Log', 'Behaviour Log', 'add'], ['Sessions', 'Sessions', 'add'], ['Emails', 'Emails', 'add']].forEach(([from, to, how]) => {
+    const a = src.getSheetByName(from);
+    if (!a || a.getLastRow() < 1) { out.push(from + ': not in the old sheet'); return; }
+    const rows = a.getRange(1, 1, a.getLastRow(), a.getLastColumn()).getValues();
+    let b = ss.getSheetByName(to);
+    if (!b) { b = ss.insertSheet(to); b.setFrozenRows(1); }
+    if (how === 'replace' || b.getLastRow() < 2) {
+      b.clearContents();
+      b.getRange(1, 1, rows.length, rows[0].length).setValues(rows);
+      out.push(to + ': ' + (rows.length - 1) + ' rows copied');
+      return;
+    }
+    const have = b.getRange(2, 1, b.getLastRow() - 1, 1).getValues().map((r) => r[0]).filter((v) => v instanceof Date);
+    const newest = have.reduce((m, v) => Math.max(m, v.getTime()), 0);
+    const add = rows.slice(1).filter((r) => r[0] instanceof Date && r[0].getTime() > newest);
+    if (add.length) b.getRange(b.getLastRow() + 1, 1, add.length, add[0].length).setValues(add);
+    out.push(to + ': ' + add.length + ' newer rows added');
+  });
+  tab_('Log', ['when', 'what', 'where']).appendRow([new Date(), 'merged behaviour data', out.join('; ')]);
+  CacheService.getScriptCache().remove('board');
+  Logger.log(out.join('\n'));
+  return out;
+}
+
+// Behaviour logged in one week (the planner matches each entry to its lesson by class and time).
+function behaviourWeek(k, monday) {
+  check_(k);
+  if (!sheet_('Behaviour Log')) return [];
+  const from = Utilities.parseDate(monday, TZ, 'yyyy-MM-dd').getTime(), to = from + 7 * 864e5;
+  return readLog_().filter((r) => r.ts.getTime() >= from && r.ts.getTime() < to)
+    .map((r) => ({ t: Utilities.formatDate(r.ts, TZ, "yyyy-MM-dd'T'HH:mm"), cls: r.cls, type: r.type }));
 }
 
 function include(name) { return HtmlService.createHtmlOutputFromFile(name).getContent(); }
@@ -302,6 +366,7 @@ function importData_(text) {
   const parts = [];
   for (let i = 0; i < text.length; i += 45000) parts.push([text.slice(i, i + 45000)]);
   d.getRange(2, 1, parts.length, 1).setNumberFormat('@').setValues(parts);
+  CacheService.getScriptCache().remove('ptt');   // the behaviour app re-reads the timetable
   return { classes: Object.keys(obj.classes).length, generated: obj.generated };
 }
 
