@@ -209,5 +209,14 @@ if (fs.existsSync(DRIVE)) {
   ok(!noTest.length, 'no test is planned for a topic without a test folder' + (noTest.length ? ': ' + noTest.join(', ') : ''));
 }
 
+// Make next day: the next school day, not tomorrow's date (Patryk 2026-10-12)
+{
+  const nsd = (s) => P.iso(P.nextSchoolDay(data, new Date(s)));
+  ok(nsd('2026-10-12T21:00') === '2026-10-13', 'Monday evening: next day is Tuesday');
+  ok(nsd('2026-10-13T00:30') === '2026-10-13', 'after midnight Monday night: still Tuesday, not Wednesday');
+  ok(nsd('2026-10-16T19:00') === '2026-10-19', 'Friday evening: Monday');
+  ok(nsd('2026-10-21T20:00') === '2026-11-02', 'day before INSET and half term: first day back');
+}
+
 console.log(fails ?`\n${fails} FAILED` : '\nall planner logic checks passed');
 process.exit(fails ? 1 : 0);

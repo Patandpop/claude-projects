@@ -24,6 +24,14 @@
     if ((data.inset || []).includes(s)) return false;
     return (data.terms || []).some(([a, b]) => s >= a && s <= b);
   }
+  // "Make next day" (Patryk 2026-10-12): the next school day, not tomorrow's date. Before 6am counts as
+  // the night before (00:30 Tuesday still means Tuesday); weekends, holidays and INSET days are skipped.
+  function nextSchoolDay(data, now) {
+    let d = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    if (now.getHours() >= 6) d = addDays(d, 1);
+    for (let n = 0; n < 120; n++, d = addDays(d, 1)) {
+      if (d.getDay() !== 0 && d.getDay() !== 6 && (!(data.terms || []).length || isTeachingDay(data, d))) return d;
+    }
   // Week letter: parity of TEACHING weeks since the first Week A (holiday weeks don't count).
   function weekLetter(data, monday) {
     monday = mondayOf(monday);
@@ -594,7 +602,7 @@
     return out;
   }
 
-  const api = { revisionSlot, unitBefore, applyAdded, addedNum, remapWeek, lessonId, applyMarks, classReport, topicList, wouldSkip, setSlot, markLesson, refillClass, planFrom, periodTime, calendarEvents, DAYS, iso, parse, addDays, mondayOf, isTeachingDay, weekLetter, progressBefore, next, autofill, moveSlot, refillAfter,
+  const api = { revisionSlot, unitBefore, applyAdded, addedNum, remapWeek, lessonId, applyMarks, classReport, topicList, wouldSkip, setSlot, markLesson, refillClass, planFrom, periodTime, calendarEvents, DAYS, iso, parse, addDays, mondayOf, isTeachingDay, nextSchoolDay, weekLetter, progressBefore, next, autofill, moveSlot, refillAfter,
     lessonSlot, testSlot, notHappened, slotDone, slotDay, fromFilled, reflowWeek, CHECKS, sheetCells, sheetModel, setsCount, printList, buildPrompt, carryForward, equipCell, lessonCell, setsLabel };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.PlannerLogic = api;
 })(typeof window !== 'undefined' ? window : this);

@@ -890,8 +890,7 @@ item('mHw', () => {
 $('mkDay').onclick = async () => {
   if (!S.data || !S.data.classes) return;
   if (S.dirty) await save();
-  let d = P.addDays(todayMidnight(), 1);
-  while (d.getDay() === 0 || d.getDay() === 6) d = P.addDays(d, 1);
+  const d = P.nextSchoolDay(S.data, new Date());
   const mon = P.mondayOf(d), day = (d.getDay() + 6) % 7;
   // the same week the planner shows: saved, or a Planner.xlsx week as an editable week, or the plan
   const week = P.iso(mon) === S.week.monday ? S.week : (S.weeks[P.iso(mon)] || P.fromFilled(S.data, mon) || P.autofill(S.data, S.weeks, mon, S.learned));
