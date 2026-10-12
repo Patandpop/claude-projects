@@ -159,7 +159,7 @@ function buildQuiz_(hw) {
       if (q.feedback) it.setFeedbackForIncorrect(FormApp.createFeedback().setText('What examiners saw: ' + q.feedback).build());
     } else {
       const it = f.addParagraphTextItem().setTitle((n + 1) + '. ' + q.text + '  [' + q.marks + ' mark' + (q.marks === 1 ? '' : 's') + ']').setRequired(true).setPoints(0);
-      it.setGeneralFeedback(FormApp.createFeedback().setText('Mark scheme (mark your own answer): ' + q.scheme).build());
+      it.setGeneralFeedback(FormApp.createFeedback().setText('Mark scheme (mark your own answer):\n\n' + q.scheme).build());
     }
   });
   // keep his Drive tidy: the quiz goes into one folder (made once; only this new file is moved)

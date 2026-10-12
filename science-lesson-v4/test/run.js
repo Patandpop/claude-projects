@@ -84,7 +84,7 @@ function mediaCount(file) {
 
 /* --------------------------------------------------------------------- main */
 
-function main() {
+async function main() {
   if (!fs.existsSync(BUILD_JS)) { console.error('build.js not found at ' + BUILD_JS); process.exit(1); }
 
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'sl-regression-'));
@@ -460,6 +460,18 @@ function main() {
         // Answer sheet is Apply/Build answers only — Do Now answers must NOT print (2026-07-05).
         if (xml.includes('DO NOW')) fail('answer sheet still carries a DO NOW section — should be Apply/Build only');
       }
+      // review extras (2026-10-10): EBI follow-up tasks + Extension on the booklet; the Extension
+      // answers on the answer sheet; the slides after the review answers.
+      const wsx = path.join(outDir, base + '_worksheet.docx');
+      if (fs.existsSync(wsx) && fs.existsSync(ans)) {
+        const w = readArchiveXml(wsx), a2 = readArchiveXml(ans);
+        const need = [[w.includes('3 EBIs') && w.includes('Redo the rate calculation'), 'booklet EBI follow-up table'],
+          [w.includes('EXTENSION') && w.includes('powdered marble') && !w.includes('larger surface area so there are more frequent'), 'booklet extension questions without answers'],
+          [a2.includes('larger surface area so there are more frequent'), 'answer sheet extension answers'],
+          [a2.includes('cm³/s (or g/s)') || a2.includes('(or g/s)'), 'answer sheet answer-list answers']];
+        const bad = need.filter((n) => !n[0]);
+        if (bad.length) fail('review extras missing: ' + bad.map((n) => n[1]).join(', ')); else pass('review extras: EBI table + extension on the booklet, answers on the answer sheet');
+      }
 
       // markTheAnswers slide: the review PPTX must carry the task header + a sample label.
       const pptx = path.join(outDir, base + '.pptx');
@@ -468,6 +480,12 @@ function main() {
         const slideMiss = ['MARK THE ANSWERS', 'Student A'].filter(t => !pxml.includes(t));
         if (slideMiss.length) fail(`mark-the-answers slide missing: ${slideMiss.join(', ')}`);
         else pass('mark-the-answers slide: task header + sample label present in review pptx');
+        const extMiss = ['Support pages', 'CORRECT 3 EBIs', 'EXTENSION', 'E1', 'QUICK ANSWERS'].filter((t) => !pxml.includes(t));
+        // "(cm^3)" raises the 3 only, never the closing bracket (2026-10-10)
+        if (/<a:t>3\)<\/a:t>/.test(pxml) || /³⁾/.test(pxml)) fail('"(cm^3)": the closing bracket was raised with the power');
+        else pass('"(cm^3)": only the 3 is raised');
+        if (extMiss.length) fail(`review pptx missing: ${extMiss.join(', ')}`);
+        else pass('review pptx: Support pages heading, EBI corrections, Extension + answers, quick answers');
       }
     }
 
@@ -622,11 +640,47 @@ function main() {
   hardFails += ownTest.fails;
   warnings  += ownTest.warns;
 
+  // Mark schemes pupils can read: one line per mark, notes sorted, OCR codes in words.
+  console.log('');
+  const msTest = require(path.join(__dirname, 'ms-friendly.test.js')).run();
+  hardFails += msTest.fails;
+
   // Exam question kinds (self-marking multiple choice for the Forms homework).
   console.log('');
   const catTest = require(path.join(__dirname, 'exam-categorise.test.js')).run();
   hardFails += catTest.fails;
   warnings  += catTest.warns;
+
+  // Exam questions the exam tool filed under the wrong topic (exam-categories.json), picker guards.
+  console.log('');
+  const topicTest = require(path.join(__dirname, 'exam-topic-check.test.js')).run();
+  hardFails += topicTest.fails;
+  warnings  += topicTest.warns;
+
+  // The A-level exam reader keeps pictures, tables and multiple-choice letters (exam-library-ocr.js).
+  console.log('');
+  const ocrTest = require(path.join(__dirname, 'exam-library-ocr.test.js')).run();
+  hardFails += ocrTest.fails;
+
+  // Do Nows never repeat a homework / exam practice question (do-now-pick.js).
+  console.log('');
+  const dnhTest = require(path.join(__dirname, 'do-now-homework.test.js')).run();
+  hardFails += dnhTest.fails;
+  warnings  += dnhTest.warns;
+
+  // Practice questions Claude writes, checked against mcq-rules.md (mcq-written.js).
+  console.log('');
+  const mwTest = require(path.join(__dirname, 'mcq-written.test.js')).run();
+  hardFails += mwTest.fails;
+
+  // Exam practice homework papers (test-paper.js).
+  console.log('');
+  const paperMod = require(path.join(__dirname, 'test-paper.test.js'));
+  const paperTest = paperMod.run();
+  hardFails += paperTest.fails;
+  warnings  += paperTest.warns;
+  const paperDocx = await paperMod.runDocx();
+  hardFails += paperDocx.fails;
 
   console.log('');
   if (hardFails) {

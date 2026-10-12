@@ -23,7 +23,12 @@ Source: `claude-code-brief.md` (2026-10-12). Tick items as they are done.
   - Undo also undoes ticks. Tested in `test-logic.js` and in the page (headless browser).
   - **Deploy: paste Code.gs, Planner.html and logic.js (the Logic file) into the planner's Apps Script, then Deploy > Manage deployments > New version.**
   - Not done: free-text notes per lesson (the record has room; no box yet). Classes page hover-over is item 12.
-- [ ] **7. Mark schemes** more explicit and student-friendly.
+- [x] **7. Mark schemes pupils can read** (2026-10-12)
+  - Exam practice mark schemes (printed and on the Google Form) and the Forms homework now show one line per mark ("✓ 1 mark: black"), with the marker notes sorted underneath: Also accepted / No mark for / Doesn't matter / Marker note. A key at the top explains them.
+  - OCR (12C, 13D): codes in words ("Marks: 2 for working, 1 for the final answer"); a scheme covering (i) and (ii) gives each part its own row and marks. The source paper's question number and stray HTML are gone.
+  - Still the exam board's own words: a test checks 8,265 real AQA schemes and finds no word added. When the marks can't be split safely (about 1 in 4 AQA parts), the answer stays one block, still with the notes sorted.
+  - The examiner's common error shows once per question, as "Examiner tip".
+  - Papers already on Drive (9AS P3, 13D Stars) are unchanged. New ones get the new layout. **Planner deploy** (above) also puts the Form's mark scheme on its own line.
 
 ## Next
 

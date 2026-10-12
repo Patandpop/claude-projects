@@ -37,6 +37,8 @@ const {
   Table, TableRow, TableCell, WidthType, ImageRun, HeadingLevel,
 } = require('docx');
 const AdmZip = require('adm-zip');
+const { applyToCatalogue } = require('./exam-categories-apply.js');
+const { friendlyMs } = require('./ms-friendly.js');
 
 const LIB = path.join(__dirname, '..', '..', 'exam-library');
 const NAVY = '0D1B5E', GOLD = 'FABB2E', INK = '1A1A2E', GREY = '6B6B7B';
@@ -119,7 +121,7 @@ function selectQuestions(catalogue, docsDir, filter) {
     questions.push({
       doc: docSlug, q: qNum, parts, marks, difficulty: diff,
       realDifficulty: withRate.length > 0,
-      subject: parts[0].subject, topic: parts[0].topic, subtopic: parts[0].subtopic,
+      subject: parts[0].subject, topic: rows[0].topic || parts[0].topic, subtopic: rows[0].subtopic || parts[0].subtopic,
     });
   }
 
@@ -356,9 +358,13 @@ function answerChildren(qs, meta) {
         ],
       }));
 
-      if (ms.text) ch.push(p(clean(ms.text), { para: { spacing: { after: 40 } } }));
-      for (const note of (ms.notes || []).slice(0, 6)) {
-        ch.push(p('• ' + clean(note), { run: { size: 20, color: GREY }, para: { spacing: { after: 20 } } }));
+      // one line per mark, its notes underneath (2026-10-12: readable mark schemes)
+      const fm = friendlyMs(ms, { board: 'AQA', marks: part.marks });
+      for (const pt of fm.points) {
+        ch.push(p((fm.split ? `✓ ${pt.marks} mark${pt.marks === 1 ? '' : 's'}: ` : '✓ ') + (pt.picture ? 'shown as a picture in the mark scheme' : clean(pt.text)), { para: { spacing: { after: 30 } } }));
+        [['Also accepted', pt.also], ['No mark for', pt.no], ["Doesn't matter", pt.ignore], ['Marker note', pt.extra]].forEach(([k, xs]) => {
+          if (xs.length) ch.push(p(`    ${k}: ` + xs.map(clean).join('; '), { run: { size: 20, color: GREY }, para: { spacing: { after: 20 } } }));
+        });
       }
       for (const lv of (ms.levels || [])) {
         ch.push(p(`Level ${lv.level} (${lv.marks}): ${clean(lv.descriptor)}`,
@@ -407,7 +413,7 @@ async function build(opts) {
   if (!fs.existsSync(catPath)) {
     throw new Error(`no exam library found at ${libDir}\n  Build it first: node references/exam-library-batch.js`);
   }
-  const catalogue = JSON.parse(fs.readFileSync(catPath, 'utf8'));
+  const catalogue = applyToCatalogue(JSON.parse(fs.readFileSync(catPath, 'utf8')));
   const docsDir = path.join(libDir, 'docs');
   const figsDir = path.join(libDir, 'figures');
 
