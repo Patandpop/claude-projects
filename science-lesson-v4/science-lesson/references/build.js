@@ -3659,6 +3659,8 @@ function contentCheck(L) {
 
   const dn = arr((L.doNow || {}).questions).length;
   check(dn === 6, `Do Now ${dn}/6`, `Do Now has ${dn} question(s) — rule is exactly 6`);
+  const nPrac = arr(L.build).filter((b) => (b.type || b.variant) === 'practical').length;
+  if (nPrac > 2) lines.push(`  ✗ ${nPrac} practicals — a lesson has at most 2; only the first 2 are drawn on the worksheet`);
 
   if (isTeaching) {
     const mcq = arr(L.build).filter((b) => ['mcq', 'mcq_image'].includes(b.type || b.variant)).length;
@@ -4831,8 +4833,12 @@ function buildWorksheetChildren(L, mode) {
     }
     if (rows.length) { ch.push(spacer(), fullTable(rows, colW, GREY_TBL), spacer()); }
   } else if (type === 'E') {                             // practical
-    const prac = arr(L.build).find((b) => (b.type || b.variant) === 'practical') || {};
-    if (wx.intro || prac.intro) ch.push(...contextBox(wx.intro || prac.intro));
+    // up to TWO experiments (Patryk 2026-10-12); the second uses its own `results` on the practical item
+    const pracsE = arr(L.build).filter((b) => (b.type || b.variant) === 'practical').slice(0, 2);
+    (pracsE.length ? pracsE : [{}]).forEach((prac, k) => {
+    if (pracsE.length > 1) ch.push(...divider(prac.heading || prac.title || 'EXPERIMENT ' + (k + 1)));
+    const intro = k === 0 ? (wx.intro || prac.intro) : prac.intro;
+    if (intro) ch.push(...contextBox(intro));
     if (prac.embeddedImagePath || prac.imagePlaceholder !== false) ch.push(...diagramOrImage(prac));
     if (arr(prac.steps).length) {
       ch.push(...sectionLabel('Method'));
@@ -4841,8 +4847,9 @@ function buildWorksheetChildren(L, mode) {
     ch.push(...sectionLabel('Variables'));
     ch.push(...variablesTable());
     ch.push(...divider('RESULTS'));
-    const res = wx.results || {};
+    const res = (k === 0 ? wx.results : prac.results) || {};
     ch.push(...resultsTable(res.headers || ['', '', ''], res.rows == null ? 5 : res.rows));
+    });
     applySection({});                                    // conclusion questions — write in books
   } else if (type === 'G') {                             // video companion
     if (arr(wx.videoQuestions).length) {
@@ -4861,13 +4868,15 @@ function buildWorksheetChildren(L, mode) {
     clozeSection();
     videoQSection();
     // practical experiment section — diagram + results + conclusion questions (never strip)
-    const pracA = arr(L.build).find((b) => (b.type || b.variant) === 'practical');
-    if (pracA) {
-      ch.push(...divider(pracA.heading || pracA.title || 'EXPERIMENT')); // M2: B6 derive heading from item
+    // up to TWO experiments (Patryk 2026-10-12: reflection then refraction); the first uses
+    // worksheetExtras.results / referenceData, the second its own `results` on the practical item
+    const pracs = arr(L.build).filter((b) => (b.type || b.variant) === 'practical').slice(0, 2);
+    pracs.forEach((pracA, k) => {
+      ch.push(...divider(pracA.heading || pracA.title || (pracs.length > 1 ? 'EXPERIMENT ' + (k + 1) : 'EXPERIMENT'))); // M2: B6 derive heading from item
       if (pracA.intro && pracA.worksheetIntro !== false) ch.push(...contextBox(pracA.intro)); // M7: E11
       if (pracA.embeddedImagePath || pracA.imagePlaceholder !== false) ch.push(...diagramOrImage(pracA));
-      const resA = wx.results || {};
-      const rd = wx.referenceData;
+      const resA = (k === 0 ? wx.results : pracA.results) || {};
+      const rd = k === 0 ? wx.referenceData : null;
       if (resA.headers) {
         ch.push(...resultsTable(resA.headers, resA.rows == null ? 5 : resA.rows));
       } else if (rd && arr(rd.headers).length) {
@@ -4875,7 +4884,7 @@ function buildWorksheetChildren(L, mode) {
         ch.push(...resultsTable(rd.headers, 5));
       }
       arr(pracA.questions).forEach((q, i) => ch.push(...question(i + 1, q.q || '')));
-    }
+    });
     buildSection();
     if (wx.collectionTable && arr(wx.collectionTable.headers).length) {
       const ct = wx.collectionTable;
@@ -5005,6 +5014,16 @@ async function main() {
             (examPicked.worksheet ? `; worksheet candidate: ${examPicked.worksheet.examRef}` : ''));
           else if (examPicked.why) console.log(`  [exam] none: ${examPicked.why}`);
         } catch (e) { buildWarn('exam question not picked: ' + e.message); }
+      }
+      // Never lose the exam question silently (Patryk 2026-10-12: Reflection and Refraction had none).
+      // meta.examQuestion:false is a deliberate opt-out and stays quiet.
+      const examYear = parseInt((L.meta || {}).year || (String((L.meta || {}).class || '').match(/^\d+/) || [])[0], 10);
+      if (examYear >= 9 && examYear <= 11 && /^[BCP]\d+\b/.test(String((L.meta || {}).macrotopic || '')) &&
+          fs.existsSync(examPickPath) && (L.meta || {}).examQuestion !== false &&
+          !(L.examQuestion && arr(L.examQuestion.groups).length)) {
+        buildWarn('NO EXAM QUESTION on this deck: ' + (process.env.NO_EXAM_PICK ? 'NO_EXAM_PICK is set'
+          : !examPicked ? 'the lesson JSON already had an examQuestion key (delete it to auto-pick)'
+          : (examPicked.why || 'none picked')));
       }
 
       const pptxPath = path.join(outDir, base + '.pptx');

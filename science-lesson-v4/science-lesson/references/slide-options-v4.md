@@ -478,6 +478,7 @@ line to annotate; in `answers` mode it adds the verdict + `hits`/`misses` + the 
 `markingPanelDocx` scheme.
 
 ### BUILD — practical
+A lesson may have up to TWO practical items (each with its own `heading`; the second can carry its own `results: { headers, rows }` for the worksheet).
 ```json
 { "type": "practical", "intro": "optional 1-sentence context",
   "steps": ["≤100 chars each", "max 4 steps"],

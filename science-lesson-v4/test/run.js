@@ -401,6 +401,26 @@ function main() {
       else fail(`MCQ placement wrong: learn=${learn + 1} predict=${predict + 1} method=${method + 1} waterMCQ=${water + 1} iodineMCQ=${iodine + 1} graph=${graph + 1}`);
     }
 
+    // Two experiments (Patryk 2026-10-12): a second practical gets its own section and results
+    // table on the worksheet, not just slides.
+    if (fixture === 'amylase-test-9ab.json') {
+      const two = JSON.parse(JSON.stringify(lessons));
+      const p1 = two[0].build.find((b) => (b.type || b.variant) === 'practical');
+      p1.heading = 'EXPERIMENT 1: AMYLASE AND TEMPERATURE';
+      two[0].build.push(Object.assign({}, p1, { heading: 'EXPERIMENT 2: BOILED AMYLASE', results: { headers: ['Tube', 'Colour after 5 min', 'Starch left?'], rows: 3 } }));
+      const dir2 = path.join(tmp, 'two-practicals');
+      fs.mkdirSync(dir2, { recursive: true });
+      fs.writeFileSync(path.join(dir2, '_input.json'), JSON.stringify(two), 'utf8');
+      const r2 = cp.spawnSync(process.execPath, [BUILD_JS, path.join(dir2, '_input.json'), dir2], {
+        cwd: ROOT, encoding: 'utf8', env: Object.assign({}, process.env, { NO_UPLOAD: '1', NO_PAGECOUNT: '1', NO_EXAM_LOG: '1' }),
+      });
+      const ws = path.join(dir2, baseName(two[0].meta) + '_worksheet.docx');
+      const xml = r2.status === 0 && fs.existsSync(ws) ? readArchiveXml(ws) : '';
+      if (xml.includes('EXPERIMENT 1: AMYLASE AND TEMPERATURE') && xml.includes('EXPERIMENT 2: BOILED AMYLASE') && xml.includes('Colour after 5 min'))
+        pass('two practicals: both experiments and both results tables on the worksheet');
+      else fail('two practicals: second experiment missing from the worksheet (build exit ' + r2.status + ')');
+    }
+
     // Textbook reference guard: amylase (Y9 enzymes) must auto-match the index
     // and render "Read more — [book] pp. …" on the Apply slide AND worksheet.
     if (fixture === 'amylase-test-9ab.json') {

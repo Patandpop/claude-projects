@@ -157,14 +157,19 @@ function pickForLesson(L, opts) {
     (q.passRate == null || (q.passRate >= 25 && q.passRate <= 75));
   // meta.examRef names the board question exactly (still a real, verbatim library question)
   const named = m.examRef ? all.find((q) => q.id === m.examRef && !damaged(q)) : null;
-  const board = named || fresh.filter(boardOk).sort(rank)[0] || null;
+  // Nothing fits the strict rules (10C2 P1 Energy, 2026-10-12): rather than no exam question at all,
+  // allow 2-mark questions, any pass rate and longer text. Still never a levelled 6-marker.
+  const looseOk = (q) => q.marks >= 2 && q.marks <= 6 && q.parts.length <= 3 && q.figs.length <= 1 &&
+    !q.levelled && q.text.length <= 900 && q.msLen <= 900;
+  const board = named || fresh.filter(boardOk).sort(rank)[0] || fresh.filter(looseOk).sort(rank)[0] || null;
 
   // Worksheet: a different short figure-free question, 2-4 marks.
   const wsOk = (q) => (!board || q.id !== board.id) && q.marks >= 2 && q.marks <= 4 && !q.figs.length &&
     q.parts.length <= 2 && !q.levelled && q.text.length <= 320;
   const worksheet = fresh.filter(wsOk).sort(rank)[0] || null;
 
-  return { board: board && shape(board), worksheet: worksheet && shape(worksheet) };
+  return { board: board && shape(board), worksheet: worksheet && shape(worksheet),
+    why: board ? undefined : `no ${subject} / ${topic} question fits a slide (${fresh.length} unused of ${all.length} checked)` };
 }
 
 // The object build.js renders. Text stays verbatim (only the [FIG:n] markers are removed).
