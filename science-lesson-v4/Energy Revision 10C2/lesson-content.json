@@ -1,0 +1,140 @@
+[
+  {
+    "meta": {
+      "class": "10C2",
+      "topic": "P1 Energy revision",
+      "title": "P1 Energy Revision",
+      "lessonType": "revision",
+      "theme": "physics",
+      "worksheet": "A",
+      "differentiation": "none",
+      "year": 10,
+      "subject": "Physics",
+      "macrotopic": "P1 Energy",
+      "lessonNumber": 13,
+      "examQuestion": false
+    },
+    "title": {
+      "objectives": [
+        "Describe energy stores, transfers and how energy is wasted.",
+        "Calculate kinetic, gravitational potential and elastic potential energy.",
+        "Use the specific heat capacity, power and efficiency equations."
+      ],
+      "keywords": ["energy store", "dissipated", "kinetic energy", "gravitational potential energy", "specific heat capacity", "power", "efficiency"]
+    },
+    "doNow": {
+      "variant": "A",
+      "questions": [
+        { "q": "What is the unit of energy?", "a": "joule (J)", "marks": 1 },
+        { "q": "Which energy store increases when a spring is stretched?", "a": "elastic potential", "marks": 1, "hint": "e _ _ _ _ _ _ potential" },
+        { "q": "What does 'dissipated' energy mean?", "a": "Energy spread out to the surroundings (usually by heating), so it is less useful.", "marks": 1, "hint": "spread out · surroundings · wasted" },
+        { "q": "How many watts are in 1 kW?", "a": "1000 W", "marks": 1 },
+        { "q": "Name one renewable energy resource that is not wind.", "a": "Any one: solar, tidal, wave, hydroelectric, geothermal, biofuel.", "marks": 1 },
+        { "q": "An object's thermal energy store increases. What happens to its temperature?", "a": "It rises.", "marks": 1 }
+      ],
+      "specPoints": ["AQA 4.1.1 energy stores and systems", "AQA 4.1.2 conservation and dissipation", "AQA 4.1.3 national and global energy resources"]
+    },
+    "engage": {
+      "title": "LEARNING OBJECTIVES",
+      "hook": "Today: four big ideas from P1 Energy, then you show what you know.",
+      "content": "1. Describe how energy moves between stores, and why some is wasted.\n2. Calculate kinetic, gravitational potential and elastic potential energy.\n3. Calculate the energy needed to heat something (specific heat capacity).\n4. Calculate power and efficiency.",
+      "imagePlaceholder": false
+    },
+    "learn": [
+      {
+        "variant": "A",
+        "heading": "Energy stores and transfers",
+        "boxes": [
+          { "header": "Energy stores", "items": ["kinetic (moving) · gravitational potential (raised up) · elastic potential (stretched)", "thermal (hot) · chemical (food, fuel, batteries) · nuclear · magnetic · electrostatic"] },
+          { "header": "How energy is transferred", "items": ["mechanically (a force) · electrically (a current) · by heating · by radiation (light, sound)"] },
+          { "header": "Conservation of energy", "items": ["Energy cannot be created or destroyed, only transferred.", "Wasted energy is dissipated to the surroundings, usually by heating.", "Reduce waste: lubrication (less friction), thermal insulation (thicker walls, low thermal conductivity)."] }
+        ],
+        "imagePlaceholder": false,
+        "check": [
+          { "q": "Which energy store increases when a ball is lifted up?", "a": "gravitational potential" },
+          { "q": "State the law of conservation of energy.", "a": "Energy cannot be created or destroyed, only transferred from one store to another." },
+          { "q": "Give one way to reduce unwanted energy transfer in a machine.", "a": "Lubricate the moving parts (less friction)." }
+        ]
+      },
+      {
+        "variant": "A",
+        "heading": "Kinetic, gravitational and elastic energy",
+        "boxes": [
+          { "header": "Kinetic energy", "items": ["KE = {1/2}mv^2", "m = mass (kg), v = speed (m/s)", "Square the speed first."] },
+          { "header": "Gravitational potential energy", "items": ["GPE = mgh", "m = mass (kg), g = 9.8 N/kg, h = height (m)"] },
+          { "header": "Elastic potential energy", "items": ["E = {1/2}ke^2", "k = spring constant (N/m), e = extension (m)", "Change cm to m first."] }
+        ],
+        "imagePlaceholder": false,
+        "check": [
+          { "q": "A 2 kg ball moves at 3 m/s. Calculate its kinetic energy.", "a": "KE = 0.5 \\times 2 \\times 3^2 = 9 J" },
+          { "q": "A 5 kg box is lifted 2 m. g = 9.8 N/kg. Calculate the GPE gained.", "a": "GPE = 5 \\times 9.8 \\times 2 = 98 J" },
+          { "q": "A spring (k = 40 N/m) is stretched by 0.1 m. Calculate the elastic potential energy.", "a": "E = 0.5 \\times 40 \\times 0.1^2 = 0.2 J" }
+        ]
+      },
+      {
+        "variant": "F",
+        "heading": "Specific heat capacity",
+        "imagePlaceholder": false,
+        "equation": "\\Delta E = m c \\Delta\\theta",
+        "components": [
+          { "symbol": "\\Delta E", "name": "change in thermal energy", "unit": "joules (J)" },
+          { "symbol": "m", "name": "mass", "unit": "kilograms (kg)" },
+          { "symbol": "c", "name": "specific heat capacity", "unit": "J/kg °C" },
+          { "symbol": "\\Delta\\theta", "name": "temperature change", "unit": "°C" }
+        ],
+        "rearrangements": ["m = {\\Delta E/c\\Delta\\theta}", "\\Delta\\theta = {\\Delta E/mc}"],
+        "example": "Specific heat capacity is the energy needed to raise the temperature of 1 kg of a substance by 1 °C. Heating 2 kg of water (c = 4200 J/kg °C) by 10 °C needs 2 \\times 4200 \\times 10 = 84 000 J.",
+        "check": [
+          { "q": "What does specific heat capacity mean?", "a": "The energy needed to raise the temperature of 1 kg of a substance by 1 °C." },
+          { "q": "1 kg of oil (c = 2000 J/kg °C) warms by 5 °C. Calculate the energy transferred.", "a": "\\Delta E = 1 \\times 2000 \\times 5 = 10 000 J" },
+          { "q": "Same energy, same mass: which warms up more, a substance with a high or a low specific heat capacity?", "a": "The one with the LOW specific heat capacity." }
+        ]
+      },
+      {
+        "variant": "A",
+        "heading": "Power and efficiency",
+        "boxes": [
+          { "header": "Power", "items": ["Power is how fast energy is transferred.", "P = {E/t}  (energy in J, time in s)", "P = {W/t}  (work done in J)", "1 watt = 1 joule per second"] },
+          { "header": "Efficiency", "items": ["efficiency = {useful output energy/total input energy}", "efficiency = {useful power output/total power input}", "\\times 100 for a percentage.", "Never more than 1 (100%): some energy is always wasted."] }
+        ],
+        "imagePlaceholder": false,
+        "check": [
+          { "q": "What is the unit of power?", "a": "watt (W)" },
+          { "q": "A motor transfers 1200 J in 60 s. Calculate its power.", "a": "P = 1200 \\div 60 = 20 W" },
+          { "q": "A lamp takes in 50 J and gives out 10 J as light. Calculate its efficiency.", "a": "10 \\div 50 = 0.2 (20%)" }
+        ]
+      }
+    ],
+    "apply": {
+      "developing": [
+        { "q": "A skateboarder of mass 50 kg rolls down a ramp 2.0 m high. g = 9.8 N/kg. Calculate the gravitational potential energy she loses.", "a": "GPE = 50 \\times 9.8 \\times 2.0 = 980 J", "marks": 2, "qType": "calculation", "equation": "GPE = mgh", "units": "J" },
+        { "q": "Describe the energy transfers as the skateboarder rolls down the ramp and then slows to a stop at the bottom.", "a": "Her gravitational potential energy store decreases and her kinetic energy store increases. As she slows down, friction and air resistance transfer energy to the thermal store of the surroundings (it is dissipated).", "marks": 3, "qType": "concept", "starters": ["As she rolls down, her ... store decreases and ...", "She slows down because ..."] },
+        { "q": "0.2 kg of water is heated from 20 °C to 70 °C. c = 4200 J/kg °C. Calculate the energy transferred to the water.", "a": "\\Delta\\theta = 50 °C; \\Delta E = 0.2 \\times 4200 \\times 50 = 42 000 J", "marks": 3, "qType": "calculation", "equation": "\\Delta E = m c \\Delta\\theta", "units": "J" },
+        { "q": "A hairdryer has a power of 1500 W. Calculate the energy it transfers in 120 s.", "a": "E = P \\times t = 1500 \\times 120 = 180 000 J", "marks": 2, "qType": "calculation", "equation": "P = {E/t}", "units": "J" },
+        { "q": "A motor takes in 400 J of energy. 300 J is useful. Calculate its efficiency.", "a": "300 \\div 400 = 0.75 (75%)", "marks": 2, "qType": "calculation", "equation": "efficiency = {useful output energy/total input energy}" }
+      ],
+      "reaching": [
+        { "q": "A 0.06 kg ball is thrown upwards at 12 m/s. (a) Calculate its kinetic energy. (b) Assume no energy is wasted. Calculate the maximum height it reaches. g = 9.8 N/kg.", "a": "(a) KE = 0.5 \\times 0.06 \\times 12^2 = 4.32 J  (b) h = 4.32 \\div (0.06 \\times 9.8) = 7.3 m", "marks": 4, "qType": "calculation" },
+        { "q": "A spring with spring constant 200 N/m is stretched by 15 cm. Calculate the elastic potential energy stored.", "a": "e = 0.15 m; E = 0.5 \\times 200 \\times 0.15^2 = 2.25 J", "marks": 3, "qType": "calculation", "equation": "E = {1/2}ke^2", "units": "J" },
+        { "q": "A 2000 W heater warms a 1.5 kg aluminium block for 60 s. c = 900 J/kg °C. Assume all the energy heats the block. Calculate the temperature rise.", "a": "E = 2000 \\times 60 = 120 000 J; \\Delta\\theta = 120 000 \\div (1.5 \\times 900) = 89 °C", "marks": 4, "qType": "calculation" },
+        { "q": "Give two advantages and two disadvantages of generating electricity with solar panels.", "a": "Advantages (any two): renewable; no carbon dioxide released while running; low running costs. Disadvantages (any two): no electricity at night and less when cloudy (unreliable); needs a large area; high cost to set up.", "marks": 4, "qType": "concept" }
+      ],
+      "mastering": [
+        { "q": "A 600 kg rollercoaster car starts at rest at the top of a 20 m drop. At the bottom its speed is 18 m/s. g = 9.8 N/kg. (a) Calculate the GPE lost. (b) Calculate the kinetic energy at the bottom. (c) Calculate the efficiency of this energy transfer.", "a": "(a) GPE = 600 \\times 9.8 \\times 20 = 117 600 J  (b) KE = 0.5 \\times 600 \\times 18^2 = 97 200 J  (c) 97 200 \\div 117 600 = 0.83 (83%)", "marks": 6, "qType": "calculation" },
+        { "q": "A house is built with thick walls made of a material with a low thermal conductivity. Explain why the house cools down more slowly at night.", "a": "Low thermal conductivity means energy is transferred through the walls more slowly. Thicker walls also slow the rate of transfer. So energy is lost from the thermal store of the house to the surroundings more slowly, and the temperature falls more slowly.", "marks": 3, "qType": "concept" },
+        { "q": "The UK now generates more electricity from renewable resources, but still burns some fossil fuels. Explain why both are used.", "a": "Renewables (wind, solar) release no carbon dioxide while running and will not run out, so they reduce global warming. But wind and solar are not reliable: they depend on the weather and time of day. Fossil fuel power stations are reliable and can be switched on quickly to meet demand. So fossil fuels are still used to fill the gaps when demand is high or renewables produce too little.", "marks": 6, "qType": "extended_writing", "contentType": "extended_writing",
+          "indicativeContent": [
+            "Renewables release no carbon dioxide while generating electricity",
+            "so they add less to global warming / climate change",
+            "Renewables will not run out; fossil fuels will",
+            "Wind and solar depend on the weather and time of day, so they are unreliable",
+            "Fossil fuel power stations are reliable and can be started quickly",
+            "so fossil fuels meet high demand or fill gaps when renewables produce too little"
+          ] }
+      ]
+    },
+    "worksheetExtras": {
+      "wordBank": ["gravitational potential", "kinetic", "elastic potential", "thermal", "dissipated", "friction", "renewable", "efficiency", "power"]
+    }
+  }
+]

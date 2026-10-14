@@ -238,7 +238,9 @@ function unicodeScript(str) {
     const out = [...arg].map((c) => map[c]);
     return out.every(Boolean) ? out.join('') : null;
   };
-  return String(str == null ? '' : str).replace(/([\^_])(?:\{([^}]*)\}|(-?[A-Za-z0-9+()=]+))/g,
+  // the bare form takes letters/digits, or ONE bracketed group "^(n+1)"; never a closing bracket
+  // that belongs to the sentence: "(cm^3)" raises the 3 only (2026-10-10)
+  return String(str == null ? '' : str).replace(/([\^_])(?:\{([^}]*)\}|(-?[A-Za-z0-9+=]+|\([A-Za-z0-9+\-=]+\)))/g,
     (m, mark, braced, bare) => {
       const arg = braced != null ? braced : bare;
       const mapped = conv(arg, mark === '^' ? _SUP : _SUB);
@@ -249,7 +251,14 @@ function unicodeScript(str) {
 /* prettyText(str) — combined plain-text normaliser for PROSE sinks: symbols +
    Unicode super/subscript, body font preserved. Not for equation FIELDS (those
    use parseEq → toPptxRuns/toDocxRuns). */
-function prettyText(str) { return unicodeScript(normSym(str)); }
+function prettyText(str) { return unicodeScript(normSym(stripMarkTags(str))); }
+
+/* Mark tags (Patryk 2026-10-12): "{1}E = 0.250 × 334 000{/1}" marks the words that earned
+   mark point 1, "{x}…{/x}" the words that lost a mark. Only the handwriting slides draw them
+   (highlighter + numbered circle); every other sink strips them here. "^{2}" / "_{1}" are
+   powers, not tags, so a ^ or _ just before the brace leaves it alone. */
+const MARK_TAG_RE = /(?<![\^_])\{\/?(\d|x)\}/g;
+function stripMarkTags(str) { return String(str == null ? '' : str).replace(MARK_TAG_RE, ''); }
 
 // Powers/subscripts are drawn at 120% of the line's size. PowerPoint and Word both shrink
 // raised/lowered text by about a third on their own, so they land at about 80% (Patryk
@@ -750,11 +759,42 @@ function flushBuildWarns(name) {
    never again forget to pass item.imageDescription (Bug 58 regression — variants
    H and J were calling imagePlaceholder without it). A promised image that is
    missing or unreadable now warns loudly instead of degrading silently. */
+/* imagePixelSize(file) — width/height in pixels read from the file header (PNG, JPEG, GIF,
+   BMP), or null. 2026-10-12: pictures were being stretched to the shape of their box. */
+function imagePixelSize(file) {
+  try {
+    const b = fs.readFileSync(file);
+    if (b.length > 24 && b.readUInt32BE(0) === 0x89504e47) return { w: b.readUInt32BE(16), h: b.readUInt32BE(20) };
+    if (b.length > 10 && b.toString('ascii', 0, 3) === 'GIF') return { w: b.readUInt16LE(6), h: b.readUInt16LE(8) };
+    if (b.length > 26 && b.toString('ascii', 0, 2) === 'BM') return { w: b.readInt32LE(18), h: Math.abs(b.readInt32LE(22)) };
+    if (b[0] === 0xff && b[1] === 0xd8) {
+      let i = 2;
+      while (i + 9 < b.length) {
+        if (b[i] !== 0xff) { i++; continue; }
+        const m = b[i + 1];
+        if (m >= 0xc0 && m <= 0xcf && m !== 0xc4 && m !== 0xc8 && m !== 0xcc) return { w: b.readUInt16BE(i + 7), h: b.readUInt16BE(i + 5) };
+        i += 2 + b.readUInt16BE(i + 2);
+      }
+    }
+  } catch (_) { /* unreadable: caller falls back to the box */ }
+  return null;
+}
+/* addImageFit — the picture as large as the box allows, its own shape kept, centred in the box. */
+function addImageFit(slide, file, x, y, w, h) {
+  const px = imagePixelSize(file);
+  if (!px || !px.w || !px.h) { slide.addImage({ path: file, x, y, w, h }); return { x, y, w, h }; }
+  const s = Math.min(w / px.w, h / px.h);
+  const iw = px.w * s, ih = px.h * s;
+  const box = { x: x + (w - iw) / 2, y: y + (h - ih) / 2, w: iw, h: ih };
+  slide.addImage({ path: file, ...box });
+  return box;
+}
+
 function imageOrPlaceholder(slide, item, x, y, w, h) {
   if (item && item.imageConfidence === 'search' && item.embeddedImagePath) {
     if (fs.existsSync(item.embeddedImagePath)) {
       try {
-        slide.addImage({ path: item.embeddedImagePath, x, y, w, h });
+        addImageFit(slide, item.embeddedImagePath, x, y, w, h);
         return;
       } catch (e) {
         buildWarn(`image embed failed, grey placeholder shipped instead (${item.embeddedImagePath}): ${e.message || e}`);
@@ -921,6 +961,10 @@ function layoutHandwriting(text, w, opts) {
   const profile = o.profile != null ? o.profile : 2;
   const baseLineH = (fontSize * 1.55) / 72;
   const paras = Array.isArray(text) ? text.map(String) : [String(text || '')];
+  // mark circles (o.marks): the last word of each tagged span gets room for its circle
+  const gap = markCircleD(fontSize) + 0.06;
+  const gapAfter = (i) => (o.marks && o.marks[i] != null && o.marks[i + 1] !== o.marks[i] ? gap : 0);
+  let gi = 0;
   const padX = 0.14, padTop = 0.12;
   const maxLineW = w - padX * 2;
   const lines = [];
@@ -928,7 +972,7 @@ function layoutHandwriting(text, w, opts) {
     const words = para.trim().split(/\s+/).filter(Boolean);
     let cur = [], curW = 0;
     words.forEach((word) => {
-      const ww = wordWidthIn(word, fontSize);
+      const ww = wordWidthIn(word, fontSize) + gapAfter(gi++);
       if (curW + ww > maxLineW && cur.length) { lines.push(cur); cur = []; curW = 0; }
       cur.push(word); curW += ww;
     });
@@ -959,9 +1003,10 @@ function layoutHandwriting(text, w, opts) {
     const cy = top + li * lineH;
     line.forEach((word) => {
       const ww = wordWidthIn(word, fontSize);
+      const g = gapAfter(wordIdx);
       const { rot, base } = jitterFor(profile, wordIdx++);
       placed.push({ word, x: cx, y: cy + base, w: ww, rot });
-      cx += ww;
+      cx += ww + g;
     });
   });
   return { placed, lineH, padTop: top, lineCount: lines.length, usedH: top + lines.length * lineH };
@@ -978,6 +1023,7 @@ function handwritingBlockEditable(slide, x, y, w, h, text, opts) {
     slide.addShape('rect', { x, y, w, h, fill: { color: o.bg || 'FFFFFF' }, line: o.line || GOLD2 });
   }
   const { placed, lineH, padTop, lineCount, usedH } = layoutHandwriting(text, w, Object.assign({ boxH: h }, o));
+  drawMarkHighlights(slide, x, y, w, placed, lineH, o.marks, fontSize, 'bands');
   placed.forEach(({ word, x: wx, y: wy, w: ww, rot }) => {
     slide.addText(word, {
       x: x + wx, y: y + wy, w: ww + 0.14, h: lineH,
@@ -990,6 +1036,7 @@ function handwritingBlockEditable(slide, x, y, w, h, text, opts) {
       slide.addShape('line', { x: x + 0.14, y: y + ry, w: w - 0.14 * 2 - 0.05, h: 0, line: { color: 'C9C9DC', width: 0.75 } });
     });
   }
+  drawMarkHighlights(slide, x, y, w, placed, lineH, o.marks, fontSize, 'circles');
   return { usedH, lineCount };
 }
 
@@ -1050,14 +1097,119 @@ function handwritingBlockRaster(slide, x, y, w, h, text, opts) {
     slide.addShape('rect', { x, y, w, h, fill: { color: o.bg || 'FFFFFF' }, line: o.line || GOLD2 });
   }
   slide.addImage({ path: png, x, y, w, h });
+  drawMarkHighlights(slide, x, y, w, lay.placed, lay.lineH, o.marks, o.fontSize || 22, 'over');
   return { usedH: lay.usedH, lineCount: lay.lineCount };
+}
+
+/* Mark highlighting (Patryk 2026-10-12): show WHERE each mark came from. A tagged span of
+   handwriting gets a see-through highlighter band in that mark's colour and a numbered circle
+   after it; the mark-scheme point with the same number carries the same colour. "x" = a mark
+   lost (red band, red cross). Colours cycle after 5. */
+const MARK_HI = ['FFF176', 'A5D6A7', '90CAF9', 'F8BBD0', 'FFCC80'];   // highlighter (light)
+const MARK_INK = ['F9A825', '2E7D32', '1565C0', 'AD1457', 'EF6C00'];  // circle (dark)
+const markCircleD = (fontSize) => Math.max(0.24, Math.min(0.34, (fontSize * 0.95) / 72));
+const markHi = (m) => (m === 'x' ? 'FFCDD2' : MARK_HI[(Number(m) - 1 + 50) % MARK_HI.length]);
+const markInk = (m) => (m === 'x' ? 'C62828' : MARK_INK[(Number(m) - 1 + 50) % MARK_INK.length]);
+
+/* parseMarkWords(text) — text (string, or array of lines) with {n}…{/n} tags →
+   { text: same shape, tags removed and prettyText'd, marks: one entry per word in layout
+   order (null = untagged) }. If prettyText changes the word count the marks can't be lined
+   up, so they are dropped with a warning (the answer still renders). */
+function parseMarkWords(text) {
+  const lines = Array.isArray(text) ? text.map(String) : [String(text == null ? '' : text)];
+  const marks = [];
+  let open = null;
+  const out = lines.map((raw) => {
+    const words = [];
+    raw.trim().split(/\s+/).filter(Boolean).forEach((tok) => {
+      let mark = open, rest = '', last = 0, m;
+      const re = new RegExp(MARK_TAG_RE.source, 'g');
+      while ((m = re.exec(tok))) {
+        rest += tok.slice(last, m.index); last = re.lastIndex;
+        if (m[0][1] === '/') { if (rest.trim()) mark = open; open = null; }
+        else { open = m[1]; mark = open; }
+      }
+      rest += tok.slice(last);
+      if (rest.trim()) { words.push(rest); marks.push(mark); }
+    });
+    return words;
+  });
+  const pretty = out.map((ws) => prettyText(ws.join(' ')));
+  const count = pretty.reduce((t, l) => t + l.trim().split(/\s+/).filter(Boolean).length, 0);
+  const tagged = marks.some((m) => m != null);
+  if (tagged && count !== marks.length) {
+    buildWarn('mark highlights dropped on one answer (symbol tidy-up changed the word count)');
+    return { text: Array.isArray(text) ? pretty : pretty[0], marks: null };
+  }
+  return { text: Array.isArray(text) ? pretty : pretty[0], marks: tagged ? marks : null };
+}
+const hasMarkTags = (t) => new RegExp(MARK_TAG_RE.source).test(Array.isArray(t) ? t.join(' ') : String(t || ''));
+
+/* fitHandwritingFs — biggest handwriting size (max..min) whose words fit a w×h box, mark
+   circles included. Used where the box size is decided by the layout, not the content. */
+function fitHandwritingFs(text, w, h, max, min) {
+  const pm = hasMarkTags(text) ? parseMarkWords(text) : { text, marks: null };
+  for (let fs = max; fs > min; fs--) {
+    if (layoutHandwriting(pm.text, w, { fontSize: fs, marks: pm.marks }).usedH + 0.1 <= h) return fs;
+  }
+  return min;
+}
+/* handwritingLines — how many lines the words wrap onto. */
+function handwritingLines(text, w, fs) {
+  const pm = hasMarkTags(text) ? parseMarkWords(text) : { text, marks: null };
+  return layoutHandwriting(pm.text, w, { fontSize: fs, marks: pm.marks }).lineCount;
+}
+/* handwritingNeedH — height a handwriting block needs at a given size. */
+function handwritingNeedH(text, w, fs) {
+  const pm = hasMarkTags(text) ? parseMarkWords(text) : { text, marks: null };
+  return layoutHandwriting(pm.text, w, { fontSize: fs, marks: pm.marks }).usedH + 0.16;
+}
+
+/* drawMarkHighlights — bands + circles for the placed words (layoutHandwriting order).
+   behind=true draws only the bands (before the words); behind=false only the circles. */
+function drawMarkHighlights(slide, x, y, w, placed, lineH, marks, fontSize, part) {
+  if (!marks) return;
+  const runs = [];                       // consecutive same-mark words on the same line
+  placed.forEach((p, i) => {
+    const m = marks[i];
+    if (m == null) return;
+    const prev = runs[runs.length - 1];
+    if (prev && prev.m === m && prev.last === i - 1 && Math.abs(prev.y - p.y) < lineH * 0.5) {
+      prev.x1 = p.x + p.w; prev.last = i;
+    } else runs.push({ m, x0: p.x, x1: p.x + p.w, y: p.y, first: i, last: i });
+  });
+  const bandH = Math.min(lineH * 0.62, (fontSize * 1.05) / 72);
+  runs.forEach((r, k) => {
+    const next = runs[k + 1];
+    const endOfSpan = !(next && next.m === r.m && next.first === r.last + 1);   // span wraps onto the next line
+    if (part === 'bands' || part === 'over') {
+      slide.addShape('rect', {
+        x: x + r.x0 - 0.04, y: y + r.y + lineH - bandH - 0.02, w: r.x1 - r.x0 + 0.08, h: bandH,
+        fill: { color: markHi(r.m), transparency: part === 'over' ? 50 : 0 }, line: { type: 'none' },
+      });
+    }
+    if (part !== 'bands' && endOfSpan) {
+      const d = markCircleD(fontSize);
+      const cx = Math.min(x + r.x1 + 0.03, x + w - d - 0.02);
+      slide.addText(r.m === 'x' ? '✗' : String(r.m), {
+        shape: 'ellipse', x: cx, y: y + r.y + lineH - d - 0.02, w: d, h: d,
+        fill: { color: markInk(r.m) }, line: { color: 'FFFFFF', width: 1 },
+        color: 'FFFFFF', bold: true, fontFace: FONT, fontSize: Math.round(d * 72 * 0.55),
+        align: 'center', valign: 'middle', margin: 0,
+      });
+    }
+  });
 }
 
 /* handwritingBlock(x, y, w, h, text, opts) — public entry, dispatches on
    opts.mode ('editable' default, or 'raster' for the M3 fallback). Same
    signature/behaviour either way from the caller's point of view. */
 function handwritingBlock(slide, x, y, w, h, text, opts) {
-  const o = opts || {};
+  let o = opts || {};
+  if (hasMarkTags(text)) {                 // {1}…{/1} tags → highlighter bands + numbered circles
+    const pm = parseMarkWords(text);
+    text = pm.text; o = Object.assign({}, o, { marks: pm.marks });
+  }
   return o.mode === 'raster'
     ? handwritingBlockRaster(slide, x, y, w, h, text, o)
     : handwritingBlockEditable(slide, x, y, w, h, text, o);
@@ -1312,6 +1464,21 @@ function slideTitleDoNow(pptx, L) {
   });
   const qs = (L.doNow && arr(L.doNow.questions)) || [];
   const top = 0.78 + 0.4 + 0.1, bottom = BOT_Y - 0.40;
+  // Instruction Do Now (Patryk 2026-10-14): test lessons ("look over your notes") and review lessons
+  // ("tick WWWs and EBIs, pick 3 areas of focus") have steps, not questions. doNow.task = the steps.
+  const task = !qs.length && L.doNow ? arr(L.doNow.task) : [];
+  if (task.length) {
+    const rowH = Math.min(1.5, (bottom - top - (task.length - 1) * 0.12) / task.length);
+    task.forEach((line, i) => {
+      const ry = top + i * (rowH + 0.12);
+      s.addShape('roundRect', { x: rx, y: ry + (rowH - 0.5) / 2, w: 0.5, h: 0.5, rectRadius: 0.05, fill: { color: GOLD }, line: { type: 'none' } });
+      txt(s, String(i + 1), { x: rx, y: ry + (rowH - 0.5) / 2, w: 0.5, h: 0.5, color: NAVY, bold: true, fontSize: 20, align: 'center', valign: 'middle' });
+      goldBox(s, rx + 0.65, ry, rw - 0.65, rowH, prettyText(line), { fill: 'F8F7F0', fontSize: autoFontSize(line, rw - 0.65, rowH, { min: 18, max: 26 }), valign: 'middle' });
+    });
+    silentEntryFooter(s);
+    bottomBar(s, objectiveText(L));
+    return;
+  }
   const n = Math.max(qs.length, L.doNow?.count ?? 5); // E6: configurable slot floor
   const rowH = (bottom - top - (n - 1) * 0.08) / n;
   qs.concat(Array(Math.max(0, n - qs.length)).fill({ q: '' })).forEach((q, i) => {
@@ -1624,14 +1791,18 @@ function slideLearn(pptx, L, item) {
   if (variant === 'A') {
     let y = sectionHeader(s, ('LEARN \u00B7 ' + stripStage(item.heading || item.title || L.meta.topic, 'LEARN')).toUpperCase(), STAGE.learn, TOP);
     const bodyBottom = BOT_Y - 0.08;
-    const leftW = CW * 0.55, rightX = MX + leftW + 0.15, rightW = CW * 0.45 - 0.15;
-    const boxes = item.boxes || [{ header: item.heading || 'Key information', items: arr(item.body ? String(item.body).split('\n') : []) }];
+    // 2026-10-14: no picture and no annotation zone → the boxes use the full width (was: an empty
+    // right half), and up to 3 boxes fit. Box height is shared by the boxes actually drawn (was: a
+    // 3rd box was dropped but still took its share, squashing the others).
+    const noRight = item.imagePlaceholder === false && !item.annotationZone;
+    const leftW = noRight ? CW : CW * 0.55, rightX = MX + leftW + 0.15, rightW = CW * 0.45 - 0.15;
+    const boxes = (item.boxes || [{ header: item.heading || 'Key information', items: arr(item.body ? String(item.body).split('\n') : []) }]).slice(0, noRight ? 3 : 2);
     const kw = arr(item.keywords);
     const kwH = kw.length ? 1.0 : 0;
     const stackH = bodyBottom - y - (kwH ? kwH + GAP : 0);
     const each = (stackH - (boxes.length - 1) * GAP) / boxes.length;
     let by = y;
-    boxes.slice(0, 2).forEach((b) => {
+    boxes.forEach((b) => {
       navyHeaderBox(s, MX, by, leftW, b.header || 'Key information', arr(b.items), each);
       by += each + GAP;
     });
@@ -1688,14 +1859,17 @@ function slideLearn(pptx, L, item) {
     let y = purplePenBar(s, TOP);
     const hasCore = arr(item.corePaper).length, hasExt = arr(item.extendPaper).length;
     // Header: navy fill / gold title (house style — the green header read as off).
+    // few rows: bigger text so the table reads from the back (it used to sit in 10pt at the top)
+    const fsFor = (n) => (n <= 5 ? 18 : n <= 8 ? 14 : 10);
     const mk = (rows, x, w, title) => {
-      const trows = [[{ text: title, options: { fill: { color: NAVY }, color: GOLD, bold: true, fontSize: 12, align: 'center', colspan: 2 } }],
-        [{ text: 'Question', options: { fill: { color: NAVY }, color: 'FFFFFF', bold: true, fontSize: 10 } },
-         { text: 'Pages', options: { fill: { color: NAVY }, color: 'FFFFFF', bold: true, fontSize: 10 } }]]
+      const fs = fsFor(Math.max(arr(item.corePaper).length, arr(item.extendPaper).length) * (hasCore && hasExt ? 1.5 : 1));
+      const trows = [[{ text: title, options: { fill: { color: NAVY }, color: GOLD, bold: true, fontSize: fs + 2, align: 'center', colspan: 2 } }],
+        [{ text: 'Question', options: { fill: { color: NAVY }, color: 'FFFFFF', bold: true, fontSize: fs } },
+         { text: 'Support pages', options: { fill: { color: NAVY }, color: 'FFFFFF', bold: true, fontSize: fs } }]]
         .concat(arr(rows).map((r, i) => {
           const fill = i % 2 ? 'F5F5F5' : 'FFFFFF';
-          return [{ text: r.q || '', options: { fill: { color: fill }, fontSize: 10 } },
-                  { text: String(r.pages || ''), options: { fill: { color: fill }, fontSize: 10, align: 'center' } }];
+          return [{ text: r.q || '', options: { fill: { color: fill }, fontSize: fs } },
+                  { text: String(r.pages || ''), options: { fill: { color: fill }, fontSize: fs, align: 'center' } }];
         }));
       table(s, trows, { x, y, w, colW: [w * 0.72, w * 0.28], fontFace: FONT, border: { type: 'solid', pt: 0.5, color: 'BBBBBB' }, margin: 0.04, autoPage: false });
     };
@@ -2573,7 +2747,12 @@ function slideAnnotatedDiagram(pptx, L, item) {
    panel built from indicative content already extracted (by Claude, at
    authoring time, from the real source mark scheme PDF — this renderer never
    invents marking content). See slide-options-v4.md for the full JSON shape. */
-function buildMarkingPanelRuns(item) {
+function buildMarkingPanelRuns(item, opts) {
+  // opts.fs = base size (default 14, the original look); opts.only = 'points' | 'bands' to
+  // draw half of the panel (Mark the Answers splits a long scheme over two columns).
+  const o = opts || {};
+  const F = o.fs || 14, d = (n) => Math.max(9, F - n);
+  const show = (part) => !o.only || o.only === part;
   const runs = [];
   const push = (text, opts) => runs.push({ text, options: opts });
 
@@ -2582,7 +2761,8 @@ function buildMarkingPanelRuns(item) {
   // Section order (Patryk 2026-07-05): INDICATIVE CONTENT → BANDS → EXCLUSIONARY
   // CLAIMS — three clearly-split blocks. Underline (<u>) renders ONLY on words
   // that MUST be used; nothing else is underlined.
-  push('INDICATIVE CONTENT', { bold: true, fontSize: 14, color: GOLD, breakLine: true, paraSpaceAfter: 2 });
+  if (show('points')) {
+  push(o.pointsTitle || 'INDICATIVE CONTENT', { bold: true, fontSize: F, color: GOLD, breakLine: true, paraSpaceAfter: 2 });
   let curGroup = null;
   arr(item.indicativeContent).forEach((ic) => {
     const isObj = ic && typeof ic === 'object';
@@ -2592,41 +2772,121 @@ function buildMarkingPanelRuns(item) {
     // Answer / Conversion) — visual blocks, not more text.
     const grp = isObj && ic.group ? String(ic.group) : null;
     if (grp && grp !== curGroup) {
-      push(grp.toUpperCase(), { bold: true, fontSize: 12, color: 'FFE082', breakLine: true, paraSpaceBefore: 3, paraSpaceAfter: 2 });
+      push(grp.toUpperCase(), { bold: true, fontSize: d(2), color: 'FFE082', breakLine: true, paraSpaceBefore: 3, paraSpaceAfter: 2 });
       curGroup = grp;
     }
-    push('•  ', { fontSize: 14, color: GOLD, bold: true });
-    const markupRuns = markupToPptxRuns(prettyText(text), { fontSize: 14, color: GOLD });
+    // numbered point (mark: n) → a chip in the same colour as its highlight on the answer
+    if (isObj && ic.mark != null) push(` ${ic.mark} `, { fontSize: F, bold: true, color: NAVY, highlight: markHi(String(ic.mark)) }), push('  ', { fontSize: F });
+    else push('•  ', { fontSize: F, color: GOLD, bold: true });
+    const markupRuns = markupToPptxRuns(prettyText(text), { fontSize: F, color: GOLD });
     markupRuns.forEach((r) => runs.push(r));
-    if (dep) push(dep, { fontSize: 12, italic: true, color: 'FFE082' });
+    if (dep) push(dep, { fontSize: d(2), italic: true, color: 'FFE082' });
     runs[runs.length - 1] = Object.assign({}, runs[runs.length - 1], {
       options: Object.assign({}, runs[runs.length - 1].options, { breakLine: true, paraSpaceAfter: 4 }),
     });
   });
+  }
 
-  if (arr(item.levelDescriptors).length) {
-    push(' ', { fontSize: 6, breakLine: true });
-    push('BANDS', { bold: true, fontSize: 14, color: GOLD, breakLine: true, paraSpaceAfter: 2 });
+  if (show('bands') && arr(item.levelDescriptors).length) {
+    if (runs.length) push(' ', { fontSize: 6, breakLine: true });
+    push('BANDS', { bold: true, fontSize: F, color: GOLD, breakLine: true, paraSpaceAfter: 2 });
     arr(item.levelDescriptors).forEach((ld) => {
-      push(`${ld.level || ''} (${ld.range || ''}):  `, { bold: true, fontSize: 13, color: GOLD });
-      push(prettyText(ld.desc || ''), { fontSize: 13, color: GOLD, breakLine: true, paraSpaceAfter: 3 });
+      push(`${ld.level || ''} (${ld.range || ''}):  `, { bold: true, fontSize: d(1), color: GOLD });
+      push(prettyText(o.shortBands ? firstSentence(ld.desc || '') : (ld.desc || '')), { fontSize: d(1), color: GOLD, breakLine: true, paraSpaceAfter: 3 });
     });
   }
 
-  if (arr(item.doesNotAward).length) {
-    push(' ', { fontSize: 6, breakLine: true });
-    push('EXCLUSIONARY CLAIMS', { bold: true, fontSize: 14, color: 'FF8A80', breakLine: true, paraSpaceAfter: 2 });
+  if (show('bands') && arr(item.doesNotAward).length) {
+    if (runs.length) push(' ', { fontSize: 6, breakLine: true });
+    push(o.exclTitle || 'EXCLUSIONARY CLAIMS', { bold: true, fontSize: F, color: 'FF8A80', breakLine: true, paraSpaceAfter: 2 });
     arr(item.doesNotAward).forEach((dna) => {
-      push(`✗  ${prettyText(dna)}`, { fontSize: 13, color: 'FFCDD2', breakLine: true, paraSpaceAfter: 3 });
+      push(`✗  ${prettyText(dna)}`, { fontSize: d(1), color: 'FFCDD2', breakLine: true, paraSpaceAfter: 3 });
     });
   }
 
-  if (item.ecfNote) {
+  if (show('points') && item.ecfNote) {
     push(' ', { fontSize: 4, breakLine: true });
-    push('ECF:  ', { bold: true, fontSize: 11, color: GOLD });
-    push(item.ecfNote, { fontSize: 11, italic: true, color: GOLD, breakLine: true });
+    push('ECF:  ', { bold: true, fontSize: d(3), color: GOLD });
+    push(item.ecfNote, { fontSize: d(3), italic: true, color: GOLD, breakLine: true });
   }
   return runs;
+}
+/* markingPanelFs — largest base size (10–16pt) at which the whole panel fits its box, so a long
+   scheme shrinks instead of running off the slide. Same width model as autoFontSize. */
+function markingPanelFs(item, w, h, opts) {
+  const o = opts || {};
+  const items = [], heads = new Set();
+  arr(item.indicativeContent).forEach((ic) => {
+    items.push(String((ic && ic.text) || ic) + '    ');
+    if (ic && ic.group) heads.add(ic.group);
+  });
+  arr(item.levelDescriptors).forEach((ld) => items.push(`${ld.level} (${ld.range}): ` + (o.shortBands ? firstSentence(ld.desc || '') : (ld.desc || ''))));
+  arr(item.doesNotAward).forEach((d) => items.push('✗  ' + d));
+  const headCount = 1 + heads.size + (arr(item.levelDescriptors).length ? 1 : 0) + (arr(item.doesNotAward).length ? 1 : 0);
+  for (let fs = o.max || 22; fs > 10; fs--) {   // 2026-10-12: up to 22pt, a short scheme fills its box
+    const cpl = Math.max(1, Math.floor(((w - 0.25) * 120) / fs));
+    const lines = items.reduce((t, l) => t + Math.max(1, Math.ceil(l.length / cpl)), 0) + headCount;
+    if ((lines * fs * 1.3) / 72 + (items.length + headCount) * 0.065 <= (h - 0.25) * 0.92) return fs;   // + paragraph spacing
+  }
+  return 10;
+}
+/* firstSentence — a band descriptor cut to its first sentence (board version; the full
+   wording stays on the worksheet / answer sheet). */
+function firstSentence(t) {
+  const m = String(t).match(/^(.+?[.;])(\s|$)/);
+  return m ? m[1] : String(t);
+}
+
+/* Question pictures from the real test paper (Patryk 2026-10-12). item.snippet = a png path, or
+   meta.snippetDir = the folder paper-snippets.py wrote, looked up by question number ("3(a)(iii)").
+   Relative paths resolve from the lesson JSON's folder, then the working folder. */
+const _snipIdx = {};
+function resolveLocal(p) {
+  if (!p) return null;
+  const cands = path.isAbsolute(p) ? [p] : [path.resolve(path.dirname(process.argv[2] || '.'), p), path.resolve(p)];
+  return cands.find((c) => fs.existsSync(c)) || null;
+}
+function snippetFor(L, item, qn, opts) {
+  if (item && item.snippet === false) return null;
+  if (item && item.snippet) {
+    const f = resolveLocal(item.snippet);
+    if (!f) buildWarn(`question picture not found: ${item.snippet} (typed question used instead)`);
+    return f;
+  }
+  // meta.snippetDir: one folder, or { core: folder, extend: folder } for a two-paper test
+  // (a shared question shows the Extend picture; the content is the same)
+  const sd = L.meta && L.meta.snippetDir;
+  if (sd && typeof sd === 'object') {
+    for (const pp of ['extend', 'core']) {
+      if (item && item[pp] && sd[pp]) {
+        const f = snippetFor({ meta: { snippetDir: sd[pp] } }, Object.assign({}, item, { snippet: undefined }), item[pp], opts);
+        if (f) return f;
+      }
+    }
+    return null;
+  }
+  const dir = resolveLocal(sd);
+  const key = String(qn || (item && item.questionNumber) || '').replace(/\s+/g, '');
+  if (!dir || !key) return null;
+  if (!_snipIdx[dir]) {
+    try { _snipIdx[dir] = JSON.parse(fs.readFileSync(path.join(dir, 'snippets.json'), 'utf8')); } catch (_) { _snipIdx[dir] = {}; }
+  }
+  const hit = (opts && opts.full && _snipIdx[dir][key + '*']) || _snipIdx[dir][key];   // "*" = with its figure lead-in
+  const f = hit && (fs.existsSync(hit) ? hit : resolveLocal(path.join(dir, path.basename(hit))));
+  if (!f) buildWarn(`no question picture for Q${key} in ${dir}`);
+  return f || null;
+}
+
+/* qLabel — how a test question is named on a slide. KS3/KS4 tests come as a Core and an
+   Extend paper that share most questions under different numbers (2026-10-12): items carry
+   "core": "4(e)" and/or "extend": "1(e)", and the label says which paper(s) it is on. */
+function qLabel(item) {
+  const c = item.core, e = item.extend;
+  // the school calls it the Extend paper; on slides it is the CHALLENGE paper (terminology rule)
+  if (c && e) return `CORE Q${c} = CHALLENGE Q${e}`;
+  if (c) return `CORE ONLY · Q${c}`;
+  if (e) return `CHALLENGE ONLY · Q${e}`;
+  return 'Q' + (item.questionNumber || '');
 }
 
 function slideModelAnswerReview(pptx, L, item) {
@@ -2635,108 +2895,224 @@ function slideModelAnswerReview(pptx, L, item) {
   const s = pptx.addSlide();
   s.background = { color: BG };
   navBar(s, 'build');
-  const header = 'BUILD · MODEL ANSWER — Q' + (item.questionNumber || '') + marksTag(item.marks);
-  const y = sectionHeader(s, header, STAGE.build, TOP);
-
-  const leftW = CW * 0.48, rightX = MX + leftW + GAP, rightW = CW - leftW - GAP;
-  const panelH = BOT_Y - 0.08 - y;
+  const header = 'BUILD · MODEL ANSWER — ' + qLabel(item) + marksTag(item.marks);
+  let y = sectionHeader(s, header, STAGE.build, TOP);
   const profile = item.jitterProfile != null ? item.jitterProfile : 2;
+  const bottom = BOT_Y - 0.08;
 
-  if (qType === 'graph') {
-    const rd = item.graphData;
-    const pngPath = rd && rd.rows ? callGraphGen(rd, true) : null;
-    if (pngPath) {
-      s.addImage({ path: pngPath, x: MX, y, w: leftW, h: panelH });
-    } else {
-      imagePlaceholder(s, MX, y, leftW, panelH, 'Model graph — add graphData to JSON');
+  // the model answer itself, in whatever box the layout gives it
+  const drawAnswer = (x, ay, w, h) => {
+    if (qType === 'graph') {
+      const rd = item.graphData;
+      const pngPath = rd && rd.rows ? callGraphGen(rd, true) : null;
+      if (pngPath) addImageFit(s, pngPath, x, ay, w, h);
+      else imagePlaceholder(s, x, ay, w, h, 'Model graph — add graphData to JSON');
+      return;
     }
-  } else if (qType === 'calculation') {
-    handwritingBlock(s, MX, y, leftW, panelH, arr(item.modelAnswer).map(prettyText), { fontSize: 24, profile, ruled: true, mode: handwritingMode(L, item) }); // Bug 53 symbols; 2026-07-12 +2pt per Patryk
-  } else {
-    handwritingBlock(s, MX, y, leftW, panelH, prettyText(item.modelAnswer || ''), { fontSize: 26, profile, ruled: true, mode: handwritingMode(L, item) });
+    // raw text in: handwritingBlock reads the {n} mark tags, then tidies symbols itself
+    const raw = qType === 'calculation' ? arr(item.modelAnswer).map(String) : String(item.modelAnswer || '');
+    const text = hasMarkTags(raw) ? raw : (Array.isArray(raw) ? raw.map(prettyText) : prettyText(raw));
+    // as big as the box allows (24/26pt as before), shrinking only for a long answer (never below 16pt)
+    let fit = fitHandwritingFs(raw, w, h, qType === 'calculation' ? 24 : 26, 16);
+    // working steps: one line each, so shrink (to 16pt) before a step wraps
+    if (Array.isArray(raw)) while (fit > 16 && handwritingLines(raw, w, fit) > raw.length) fit--;
+    handwritingBlock(s, x, ay, w, h, text, { fontSize: fit, profile, ruled: true, mode: handwritingMode(L, item) });
+  };
+  // long schemes (6-markers): bands cut to their first sentence on the board so it still fits
+  const panelOpts = (w, h) => {
+    const full = markingPanelFs(item, w, h);
+    return full >= 12 ? { fs: full } : { fs: markingPanelFs(item, w, h, { shortBands: true }), shortBands: true };
+  };
+  const pStyle = { fill: NAVY, color: 'FFFFFF', valign: 'top', fontSize: 12, line: { color: GOLD, width: 2 } };
+  const panel = (x, py, w, h) => {
+    const po = panelOpts(w, h);
+    const hasBands = arr(item.levelDescriptors).length || arr(item.doesNotAward).length;
+    if (po.fs >= 12 || !hasBands) { goldBox(s, x, py, w, h, buildMarkingPanelRuns(item, po), pStyle); return; }
+    // still too long: mark points | bands + "no marks for", side by side, each sized to fit
+    const ptsOnly = Object.assign({}, item, { levelDescriptors: [], doesNotAward: [] });
+    const bandsOnly = Object.assign({}, item, { indicativeContent: [], ecfNote: '' });
+    const len = (o) => JSON.stringify([o.indicativeContent, arr(o.levelDescriptors).map((l) => firstSentence(l.desc || '')), o.doesNotAward]).length;
+    const share = Math.min(0.66, Math.max(0.5, len(ptsOnly) / (len(ptsOnly) + len(bandsOnly))));   // the longer half gets more width
+    const cw = (w - GAP) * share, cw2 = w - GAP - cw;
+    goldBox(s, x, py, cw, h, buildMarkingPanelRuns(item, { fs: markingPanelFs(ptsOnly, cw, h), only: 'points' }), pStyle);
+    goldBox(s, x + cw + GAP, py, cw2, h, buildMarkingPanelRuns(item, { fs: markingPanelFs(bandsOnly, cw2, h, { shortBands: true }), only: 'bands', shortBands: true }), pStyle);
+  };
+
+  const snip = snippetFor(L, item, null, { full: true });
+  const px = snip && imagePixelSize(snip);
+  if (snip && px && px.w && px.h) {
+    // Pick the layout that shows the paper's question BIGGER (never stretched):
+    //   tall question → picture fills the left half, answer + mark scheme stacked on the right;
+    //   short/wide question → picture across the top, answer left + mark scheme right below.
+    const H = bottom - y;
+    const topH = Math.min(H * 0.5, (CW * px.h) / px.w);
+    const raw = qType === 'calculation' ? arr(item.modelAnswer).map(String) : String(item.modelAnswer || '');
+    // picture on the left: as wide as possible (half the slide) while the answer (at 20pt)
+    // and the mark scheme (at 12pt+) still fit the column beside it; long schemes narrow it
+    const plan = [0.5, 0.44, 0.38].map((f) => {
+      const rw = CW * (1 - f) - GAP;
+      const need = qType === 'graph' ? (H - GAP) * 0.5 : Math.max((H - GAP) * 0.3, handwritingNeedH(raw, rw, 20));
+      return { f, rw, ansH: Math.min(need, (H - GAP) * 0.6), ok: markingPanelFs(item, rw, H - GAP - need) >= 12 };
+    });
+    const pick = plan.find((p) => p.ok) || plan[plan.length - 1];
+    const leftW = CW * pick.f;
+    const sLeft = Math.min(leftW / px.w, H / px.h), sTop = Math.min(CW / px.w, topH / px.h);
+    // across-the-top plan: picture height as drawn, then the answer gets only the width it
+    // needs at 22pt (40–56%), the mark scheme the rest
+    const picH = Math.min(topH, (CW * px.h) / px.w);
+    const h2top = bottom - (y + picH + GAP);
+    // calculation lines must not wrap (each working step stays on one line)
+    const fitsAt = (f) => handwritingNeedH(raw, CW * f, 22) <= h2top &&
+      (!Array.isArray(raw) || handwritingLines(raw, CW * f, 22) <= raw.length);
+    const awFrac = qType === 'graph' ? 0.52 : ([0.4, 0.46, 0.52].find(fitsAt) || 0.56);
+    const topFs = markingPanelFs(item, CW * (1 - awFrac) - GAP, h2top);
+    const leftFs = markingPanelFs(item, pick.rw, H - GAP - pick.ansH);
+    // a long scheme that would be squeezed under the picture goes beside it instead
+    const useLeft = sLeft > sTop * 1.15 || (topFs < 14 && leftFs >= topFs);
+    if (useLeft) {
+      const b = addImageFit(s, snip, MX, y, leftW, H);
+      s.addShape('rect', { x: b.x, y: b.y, w: b.w, h: b.h, fill: { color: 'FFFFFF', transparency: 100 }, line: GOLD2 });
+      const rx = MX + leftW + GAP, rw = pick.rw;
+      const ansH = pick.ansH;
+      drawAnswer(rx, y, rw, ansH);
+      panel(rx, y + ansH + GAP, rw, H - ansH - GAP);
+    } else {
+      const b = addImageFit(s, snip, MX, y, CW, topH);
+      s.addShape('rect', { x: b.x, y: b.y, w: b.w, h: b.h, fill: { color: 'FFFFFF', transparency: 100 }, line: GOLD2 });
+      const ty = y + b.h + GAP, h2 = bottom - ty;
+      const aw = CW * awFrac;
+      drawAnswer(MX, ty, aw, h2);
+      panel(MX + aw + GAP, ty, CW - aw - GAP, h2);
+    }
+    bottomBar(s, obj);
+    return;
   }
 
-  goldBox(s, rightX, y, rightW, panelH, buildMarkingPanelRuns(item), {
-    fill: NAVY, color: 'FFFFFF', valign: 'top', fontSize: 12, line: { color: GOLD, width: 2 },
-  });
-
+  // no picture: typed question across the top when given, then the original two-column layout
+  if (item.question) {
+    const qH = 0.75;
+    const qFs = autoFontSize(prettyText(item.question), CW, qH, { min: 14, max: 20 });
+    goldBox(s, MX, y, CW, qH, [
+      { text: 'Q' + (item.questionNumber || '') + '  ', options: { bold: true, fontSize: qFs, color: NAVY } },
+      { text: prettyText(item.question), options: { fontSize: qFs } },
+    ], { valign: 'middle' });
+    y += qH + GAP;
+  }
+  const leftW = CW * 0.48, rightX = MX + leftW + GAP, rightW = CW - leftW - GAP;
+  const panelH = bottom - y;
+  drawAnswer(MX, y, leftW, panelH);
+  panel(rightX, y, rightW, panelH);
   bottomBar(s, obj);
 }
 
 /* ---- BUILD — markTheAnswers (peer-assessment) ----------------------------
-   Two slides. TASK: the question + 3–4 realistically-flawed sample answers in
-   handwriting (jitterProfile varied per sample so they read as different pupils),
-   for students to mark. MARK SCHEME: the reused marking panel (buildMarkingPanelRuns)
-   on the left + a per-sample verdict column (awarded level/mark, ✓ hits / ✗ misses,
-   teacher note) on the right. Reuses the same mark-scheme fields as modelAnswerReview
-   (indicativeContent / levelDescriptors / doesNotAward). */
+   Redesigned 2026-10-12 (Patryk: the board scheme was bloated, the 6-marker ran off the slide,
+   and the samples are already on the worksheet).
+   TASK slide: the question across the top, the mark scheme filling the rest in big type
+   (two columns: numbered points | bands + "no marks for"), no samples repeated.
+   MARKS slide(s): one row per student, their handwritten answer on the left with the earned
+   marks highlighted + numbered (tags {1}…{/1}, {x}…{/x} for a lost mark), and on the right
+   only what they scored: big mark/level, the point numbers earned, what was missed.
+   Up to 3 students a slide (4 → 2 + 2) so the handwriting stays readable. Samples without
+   tags still work: the right box lists their ✓ hits / ✗ misses as before.
+   Same mark-scheme fields as modelAnswerReview (indicativeContent / levelDescriptors / doesNotAward). */
 const MTA_JITTER = [1, 3, 2, 4];                 // distinct handwriting per sample slot
 const mtaLabel = (sm, i) => sm.label || ('Student ' + String.fromCharCode(65 + i));
+function mtaQuestionBox(s, item, y) {
+  const q = prettyText(item.question || '');
+  const qH = Math.min(1.1, Math.max(0.6, Math.ceil(q.length / 110) * 0.36 + 0.2));
+  const qFs = autoFontSize(q, CW, qH, { min: 14, max: 20 });
+  goldBox(s, MX, y, CW, qH, [
+    { text: 'Q  ', options: { bold: true, fontSize: qFs, color: NAVY } },
+    { text: q, options: { fontSize: qFs } },
+  ], { valign: 'middle' });
+  return y + qH + GAP;
+}
 function slideMarkTheAnswers(pptx, L, item) {
   const obj = objectiveText(L);
   const samples = arr(item.samples).slice(0, 4);
-  const n = Math.max(1, samples.length);
-  const leftW = CW * 0.42, rightX = MX + leftW + GAP, rightW = CW - leftW - GAP;
-  const vGap = GAP * 0.8, labelH = 0.26;
+  const header = 'BUILD · MARK THE ANSWERS — Q' + (item.questionNumber || '') + marksTag(item.marks);
 
-  // Shared frame — question full-width on TOP, mark scheme panel LEFT, samples
-  // RIGHT. Scheme and answers live on the SAME slide so the class can mark from
-  // the board alone (no worksheet dependency — Patryk 2026-07-05).
-  const frame = (title, instruction) => {
-    const s = pptx.addSlide();
+  // --- task slide: question + mark scheme, full width -------------------------
+  let s = pptx.addSlide();
+  s.background = { color: BG };
+  navBar(s, 'build');
+  let y = sectionHeader(s, header, STAGE.build, TOP);
+  y = purplePenBar(s, y - GAP + 0.02);
+  y = mtaQuestionBox(s, item, y);
+  txt(s, item.instruction || 'Mark each answer on your worksheet. Give it a level and a mark.', {
+    x: MX, y, w: CW, h: 0.3, italic: true, fontSize: 14, color: '333333', valign: 'middle',
+  });
+  y += 0.36;
+  const H = BOT_Y - 0.08 - y;
+  const hasBands = arr(item.levelDescriptors).length || arr(item.doesNotAward).length;
+  const panelOpts = { fill: NAVY, color: 'FFFFFF', valign: 'top', line: { color: GOLD, width: 2 }, margin: 10 };
+  const pointsText = arr(item.indicativeContent).map((ic) => (ic && ic.text) || ic).join(' ');
+  if (hasBands) {
+    const colW = (CW - GAP) / 2;
+    const bandsText = arr(item.levelDescriptors).map((l) => firstSentence(l.desc || '')).join(' ') + ' ' + arr(item.doesNotAward).join(' ');
+    const n1 = arr(item.indicativeContent).length + 1, n2 = arr(item.levelDescriptors).length + arr(item.doesNotAward).length + 2;
+    const fs = Math.min(autoFontSize(pointsText, colW - 0.2, H, { min: 12, max: 22, linesHint: undefined }),
+      autoFontSize(bandsText, colW - 0.2, H, { min: 12, max: 22 }));
+    const fsL = Math.min(fs, Math.floor((H * 72) / (n1 * 1.6)));
+    const fsR = Math.min(fs, Math.floor((H * 72) / (n2 * 1.8)));
+    const F = Math.max(12, Math.min(fsL, fsR));
+    if (F < 14) buildWarn(`Mark the Answers Q${item.questionNumber || ''}: mark scheme is long, board text is ${F}pt`);
+    goldBox(s, MX, y, colW, H, buildMarkingPanelRuns(item, { fs: F, only: 'points', pointsTitle: 'MARK POINTS' }), panelOpts);
+    goldBox(s, MX + colW + GAP, y, colW, H, buildMarkingPanelRuns(item, { fs: F, only: 'bands', shortBands: true, exclTitle: 'NO MARKS FOR' }), panelOpts);
+  } else {
+    const n = arr(item.indicativeContent).length + 1;
+    const F = Math.max(14, Math.min(26, autoFontSize(pointsText, CW - 0.2, H, { min: 14, max: 26 }), Math.floor((H * 72) / (n * 1.7))));
+    goldBox(s, MX, y, CW, H, buildMarkingPanelRuns(item, { fs: F, pointsTitle: 'MARK POINTS' }), panelOpts);
+  }
+  bottomBar(s, obj);
+  if (!samples.length) return;
+
+  // --- marks slide(s): each student's answer, highlighted, + what they scored ---
+  const groups = samples.length === 4 ? [samples.slice(0, 2), samples.slice(2)] : [samples];
+  groups.forEach((grp, gi) => {
+    s = pptx.addSlide();
     s.background = { color: BG };
     navBar(s, 'build');
-    let y = sectionHeader(s, title, STAGE.build, TOP);
-    const qH = 0.6;
-    const qFs = autoFontSize(item.question, CW, qH, { min: 13, max: 18 });
-    goldBox(s, MX, y, CW, qH, [
-      { text: 'Q  ', options: { bold: true, fontSize: qFs, color: NAVY } },
-      { text: prettyText(item.question || ''), options: { fontSize: qFs } },
-    ], { valign: 'middle' });
-    y += qH + GAP;
-    txt(s, instruction, { x: MX, y, w: CW, h: 0.28, italic: true, fontSize: 12, color: '333333', valign: 'middle' });
-    y += 0.34;
-    const panelH = BOT_Y - 0.08 - y;
-    goldBox(s, MX, y, leftW, panelH, buildMarkingPanelRuns(item), {
-      fill: NAVY, color: 'FFFFFF', valign: 'top', fontSize: 13, line: { color: GOLD, width: 2 },
-    });
-    return { s, y, panelH };
-  };
+    y = sectionHeader(s, 'BUILD · MARK THE ANSWERS: MARKS AWARDED' + (groups.length > 1 ? ` (${gi + 1} of ${groups.length})` : ''), STAGE.build, TOP);
+    const vGap = GAP * 1.2, labelH = 0.3;
+    const rowH = (BOT_Y - 0.08 - y - vGap * (grp.length - 1)) / grp.length;
+    const lw = CW * 0.66, rx = MX + lw + GAP, rw = CW - lw - GAP;
+    grp.forEach((sm, k) => {
+      const i = gi * 2 + k;
+      const ry = y + k * (rowH + vGap);
+      txt(s, mtaLabel(sm, i), {
+        x: MX, y: ry, w: lw, h: labelH, fill: { color: NAVY }, color: GOLD,
+        bold: true, fontSize: 14, align: 'left', valign: 'middle', margin: 6,
+      });
+      const raw = String(sm.text || '');
+      const tagged = hasMarkTags(raw);
+      const hwFs = fitHandwritingFs(raw, lw, rowH - labelH, 24, 16);
+      handwritingBlock(s, MX, ry + labelH, lw, rowH - labelH, tagged ? raw : prettyText(raw), {
+        fontSize: hwFs, ruled: true, mode: handwritingMode(L, item),
+        profile: sm.jitterProfile != null ? sm.jitterProfile : (MTA_JITTER[i] != null ? MTA_JITTER[i] : 2),
+      });
 
-  // --- slide 1: mark the answers (handwritten samples, scheme alongside) ------
-  const header = 'BUILD · MARK THE ANSWERS — Q' + (item.questionNumber || '') + marksTag(item.marks);
-  const f1 = frame(header, item.instruction || 'Mark each answer against the mark scheme. Give it a level and a mark.');
-  const boxH = (f1.panelH - vGap * (n - 1)) / n;
-  samples.forEach((sm, i) => {
-    const cy = f1.y + i * (boxH + vGap);
-    txt(f1.s, mtaLabel(sm, i), {
-      x: rightX, y: cy, w: rightW, h: labelH, fill: { color: NAVY }, color: GOLD,
-      bold: true, fontSize: 12, align: 'left', valign: 'middle', margin: 6,
+      // right: only what this student scored
+      const mk = sm.awardedMarks != null ? sm.awardedMarks + (item.marks ? '/' + item.marks : '') : '';
+      const runs = [];
+      const big = rowH > 2.2 ? 36 : 28;
+      if (mk) runs.push({ text: mk + (sm.awardedLevel ? '  ' : ''), options: { bold: true, fontSize: big, color: NAVY, breakLine: !sm.awardedLevel } });
+      if (sm.awardedLevel) runs.push({ text: sm.awardedLevel, options: { bold: true, fontSize: Math.round(big * 0.6), color: AMBER, breakLine: true, paraSpaceAfter: 4 } });
+      const earned = tagged ? [...new Set((parseMarkWords(raw).marks || []).filter((m) => m != null && m !== 'x'))] : [];
+      if (earned.length) {
+        runs.push({ text: 'Marks for:  ', options: { fontSize: 15, color: '333333' } });
+        earned.forEach((m) => runs.push({ text: ` ${m} `, options: { bold: true, fontSize: 18, color: NAVY, highlight: markHi(m) } }, { text: ' ', options: { fontSize: 15 } }));
+        runs[runs.length - 1].options = Object.assign({}, runs[runs.length - 1].options, { breakLine: true, paraSpaceAfter: 6 });
+      } else {
+        arr(sm.hits).forEach((h) => runs.push({ text: '✓ ' + prettyText(h), options: { fontSize: 14, color: GREEN_OK, breakLine: true } }));
+      }
+      arr(sm.misses).forEach((m) => runs.push({ text: '✗ ' + prettyText(m), options: { fontSize: 13, color: 'B71C1C', breakLine: true } }));
+      if (sm.comment) runs.push({ text: prettyText(sm.comment), options: { italic: true, fontSize: 12, color: '333333' } });
+      goldBox(s, rx, ry, rw, rowH, runs, { valign: 'middle', align: 'center', fontSize: 14 });
     });
-    handwritingBlock(f1.s, rightX, cy + labelH, rightW, boxH - labelH, prettyText(sm.text || ''), {
-      fontSize: 19, ruled: true, mode: handwritingMode(L, item),   // 2026-07-12: +2pt per Patryk
-      profile: sm.jitterProfile != null ? sm.jitterProfile : (MTA_JITTER[i] != null ? MTA_JITTER[i] : 2),
-    });
+    bottomBar(s, obj);
   });
-  bottomBar(f1.s, obj);
-
-  // --- slide 2: SAME frame, right column = marks awarded + what they were for -
-  const f2 = frame('BUILD · MARK THE ANSWERS: MARKS AWARDED', 'How many marks did each answer earn — and what were they for?');
-  const vH = (f2.panelH - vGap * (n - 1)) / n;
-  samples.forEach((sm, i) => {
-    const vy = f2.y + i * (vH + vGap);
-    const mk = sm.awardedMarks != null ? sm.awardedMarks + (item.marks ? '/' + item.marks : '') : '';
-    const runs = [
-      { text: mtaLabel(sm, i) + '   ', options: { bold: true, fontSize: 14, color: NAVY } },
-      { text: [sm.awardedLevel || '', mk].filter(Boolean).join(' · '), options: { bold: true, fontSize: 14, color: AMBER, breakLine: true, paraSpaceAfter: 3 } },
-    ];
-    const hits = arr(sm.hits), misses = arr(sm.misses);
-    hits.forEach((h, k) => runs.push({ text: '✓ ' + prettyText(h) + '   ', options: { fontSize: 12, color: GREEN_OK, breakLine: k === hits.length - 1 } }));
-    misses.forEach((m, k) => runs.push({ text: '✗ ' + prettyText(m) + '   ', options: { fontSize: 12, color: 'B71C1C', breakLine: k === misses.length - 1 } }));
-    if (sm.comment) runs.push({ text: prettyText(sm.comment), options: { italic: true, fontSize: 12, color: '333333' } });
-    goldBox(f2.s, rightX, vy, rightW, vH, runs, { valign: 'top', fontSize: 13 });
-  });
-  bottomBar(f2.s, obj);
 }
 
 /* ---- BUILD — workedExample → yourTurn (+ answer slide) -------------------- */
@@ -3083,10 +3459,9 @@ function slideGraphInterpret(pptx, L, item) {
     const fw = CW * 0.55;
     slideRect(s, MX, y, fw, h);
     txt(s, item.graphLabel || 'Graph', { x: MX + 0.1, y: y + 0.05, w: fw - 0.2, h: 0.3, bold: true, fontSize: 12, color: NAVY });
-    const ax = MX + 0.65, ay = y + 0.5, aw = fw - 1.0, ah = h - 1.05;
-    // axes — labels omitted; graph image carries its own axis labels
-    s.addShape('line', { x: ax, y: ay, w: 0, h: ah, line: { color: NAVY, width: 1.5 } });
-    s.addShape('line', { x: ax, y: ay + ah, w: aw, h: 0, line: { color: NAVY, width: 1.5 } });
+    // 2026-10-12 (Patryk): no drawn axes. They had no labels and shrank the graph into a smaller
+    // box; the graph image carries its own axes and labels, so it gets the whole frame.
+    const ax = MX + 0.1, ay = y + 0.4, aw = fw - 0.2, ah = h - 0.5;
     if (item.annotationZone) {
       annotationZone(s, ax + 0.05, ay + 0.05, aw - 0.1, ah - 0.1);
     } else if (item.imagePlaceholder !== false) {
@@ -3111,14 +3486,14 @@ function slideGraphInterpret(pptx, L, item) {
   qs.forEach((q, i) => {
     const sy = y + i * (ph + GAP);
     const qBody = prettyText(q.q || '') + marksTag(q.marks); // 2026-07-05: superscripts/symbols
-    const qFs = autoFontSize(`Q${i + 1}  ` + qBody, rw, qH, { min: 11, max: 15 });
+    const qFs = autoFontSize(`Q${i + 1}  ` + qBody, rw, qH, { min: 12, max: 20 });
     goldBox(s, rx, sy, rw, qH, [
       { text: `Q${i + 1}  `, options: { bold: true, fontSize: qFs, color: GOLD } },
       { text: qBody, options: { fontSize: qFs, color: 'FFFFFF' } },
     ], { fill: NAVY, line: { color: GOLD, width: 2 }, valign: 'middle' });
     goldBox(s, rx, sy + qH + innerGap, rw, aH, prettyText(q.a || ''), {
       fill: NAVY, color: GOLD, line: { color: GOLD, width: 2 },
-      fontSize: autoFontSize(q.a || '', rw, aH, { min: 11, max: 15 }), valign: 'middle',
+      fontSize: autoFontSize(q.a || '', rw, aH, { min: 12, max: 20 }), valign: 'middle',
     });
   });
   bottomBar(s, obj);
@@ -3158,7 +3533,7 @@ function slideGraphResults(pptx, L, item) {                     // M4
   const pW  = CW - gW - GAP;
   const pX  = MX + gW + GAP;
   if (pngPath) {
-    s.addImage({ path: pngPath, x: MX, y, w: gW, h: availH }); // 70% left: graph
+    addImageFit(s, pngPath, MX, y, gW, availH); // 70% left: graph, shape kept
   } else {
     const desc = rd ? `Graph of ${arr(rd.headers)[1] || 'y'} against ${arr(rd.headers)[0] || 'x'}` : null;
     imagePlaceholder(s, MX, y, gW, availH, desc);
@@ -3210,7 +3585,7 @@ function slideGraphWithData(pptx, L, item) {                    // M5
   const rowH = Math.max(0.45, availH / Math.max(1, tRows.length));
   table(s, tRows, { x: MX, y, w: halfW, colW, rowH: Array(tRows.length).fill(rowH), fontFace: FONT, margin: 0.06, autoPage: false });
   if (pngPath) {
-    s.addImage({ path: pngPath, x: gX, y, w: halfW, h: availH }); // right: compact graph
+    addImageFit(s, pngPath, gX, y, halfW, availH); // right: compact graph, shape kept
   } else {
     const desc = `Graph of ${arr(rd.headers)[1] || 'y'} against ${arr(rd.headers)[0] || 'x'}`;
     imagePlaceholder(s, gX, y, halfW, availH, desc);
@@ -3449,6 +3824,191 @@ function buildReviewSlides(pptx, L) {
   }
 }
 
+/* ---- REVIEW lessons: EBI corrections + Extension (Patryk 2026-10-10) ----------------------------
+   After the test review answers, pupils correct 3 EBIs in purple pen using the follow-up tasks on
+   the front of the school's test and the support pages, then pupils who have finished go to the
+   Extension: harder real exam questions per subtopic with the support page.
+     ebiTask:   { rows: [{ q: "Q1", task: "<front-of-test follow-up task, verbatim>", pages: "P6.3 p.80" }] }
+     extension: [{ subtopic: "Specific latent heat", pages: "P6.5 p.84", questions: [{ q, a, marks, ref }] }]
+   Both optional; nothing is drawn when absent. Answers reveal on click (navy/gold boxes). */
+function slideEbiTask(pptx, L) {
+  const t = L.ebiTask;
+  const rows = arr(t && t.rows);
+  if (!rows.length) return;
+  const s = pptx.addSlide();
+  s.background = { color: BG };
+  navBar(s, 'review');
+  let y = sectionHeader(s, 'PURPLE PEN · CORRECT 3 EBIs', PURPLE_PEN, TOP);
+  const steps = arr(t.steps).length ? arr(t.steps) : ['Pick 3 EBIs from the front of your test', 'Do that question’s follow-up task in purple pen',
+    'Use the support page in the textbook', 'Finished all 3? Go to the Extension'];
+  const sw = (CW - (steps.length - 1) * 0.1) / steps.length;
+  steps.forEach((st, i) => {
+    txt(s, [{ text: `${i + 1}  `, options: { bold: true, color: GOLD, fontSize: 16 } }, { text: st, options: { color: 'FFFFFF', fontSize: 12 } }],
+      { x: MX + i * (sw + 0.1), y, w: sw, h: 0.62, fill: { color: PURPLE_PEN }, align: 'left', valign: 'middle', margin: 6, fit: 'shrink' });
+  });
+  y += 0.62 + GAP;
+  // KS3/KS4 tests come as Core + Extend papers with different front-cover tasks: rows with
+  // "paper" get one table per paper, side by side, sized to fill the slide (2026-10-12)
+  const papers = [...new Set(rows.map((r) => r.paper).filter(Boolean))];
+  if (papers.length > 1) {
+    const colGap = 0.2, tw = (CW - colGap * (papers.length - 1)) / papers.length;
+    const avail = BOT_Y - 0.08 - y - 0.42;
+    papers.forEach((pp, pi) => {
+      const pr = rows.filter((r) => r.paper === pp);
+      const tx = MX + pi * (tw + colGap);
+      txt(s, String(pp).toUpperCase().replace(/^EXTEND$/, 'CHALLENGE') + ' PAPER', { x: tx, y, w: tw, h: 0.38, fill: { color: NAVY }, color: GOLD, bold: true, fontSize: 15, align: 'center', valign: 'middle' });
+      const cw = [tw * 0.13, tw * 0.64, tw * 0.23];
+      let fs = 20;
+      for (; fs > 10; fs--) {
+        const lines = pr.reduce((n, r) => n + Math.max(Math.ceil(prettyText(r.task || '').length / Math.floor((cw[1] - 0.1) * 120 / fs)),
+          Math.ceil(String(r.pages || '').length / Math.floor((cw[2] - 0.1) * 120 / fs))), 0);
+        if ((lines * fs * 1.3) / 72 + pr.length * 0.12 <= avail * 0.92) break;
+      }
+      const trows = pr.map((r, i) => {
+        const fill = i % 2 ? 'F5F5F5' : 'FFFFFF';
+        return [{ text: String(r.q || ''), options: { fill: { color: fill }, bold: true, fontSize: fs, align: 'center', valign: 'middle' } },
+          { text: prettyText(r.task || ''), options: { fill: { color: fill }, fontSize: fs, valign: 'middle' } },
+          { text: String(r.pages || ''), options: { fill: { color: fill }, fontSize: fs, align: 'center', valign: 'middle' } }];
+      });
+      table(s, trows, { x: tx, y: y + 0.42, w: tw, colW: cw, rowH: avail / pr.length, fontFace: FONT, border: { type: 'solid', pt: 0.5, color: 'BBBBBB' }, margin: 0.06, autoPage: false });
+    });
+    bottomBar(s, objectiveText(L));
+    return;
+  }
+  const total = rows.reduce((n, r) => n + String(r.task || '').length, 0);
+  const fs = total > 1400 ? 11 : total > 1000 ? 13 : total > 600 ? 15 : 17;
+  const head = (h) => ({ text: h, options: { fill: { color: NAVY }, color: 'FFFFFF', bold: true, fontSize: fs } });
+  const trows = [[head('Question'), head('Follow-up task (front of your test)'), head('Support pages')]].concat(rows.map((r, i) => {
+    const fill = i % 2 ? 'F5F5F5' : 'FFFFFF';
+    return [{ text: String(r.q || ''), options: { fill: { color: fill }, bold: true, fontSize: fs, align: 'center' } },
+      { text: prettyText(r.task || ''), options: { fill: { color: fill }, fontSize: fs } },
+      { text: String(r.pages || ''), options: { fill: { color: fill }, fontSize: fs, align: 'center' } }];
+  }));
+  table(s, trows, { x: MX, y, w: CW, colW: [CW * 0.12, CW * 0.68, CW * 0.2], fontFace: FONT, border: { type: 'solid', pt: 0.5, color: 'BBBBBB' }, margin: 0.05, autoPage: false });
+  bottomBar(s, objectiveText(L));
+}
+// extension questions numbered E1, E2 ... across the columns (the answers slide and sheets use the same numbers)
+function extensionCols(L) {
+  let n = 0;
+  return arr(L.extension).slice(0, 4).map((c) => ({ subtopic: c.subtopic || '', pages: c.pages || '', qs: arr(c.questions).map(normQ).map((q) => Object.assign({ label: 'E' + (++n), sub: c.subtopic || '' }, q)) }))
+    .filter((c) => c.qs.length);
+}
+// The text size the cards of these columns would get on one slide.
+function extensionFontFor(cols) {
+  const colW = (CW - (cols.length - 1) * 0.15) / cols.length;
+  const avail = BOT_Y - 0.08 - (TOP + 0.38 + GAP) - 0.62 - 0.06;
+  const bodyOf = (q) => `${q.label}  ` + prettyText(q.q) + marksTag(q.marks);
+  return Math.min(...cols.flatMap((c) => {
+    const lens = c.qs.map((q) => Math.max(170, bodyOf(q).length));
+    const sum = lens.reduce((a, b) => a + b, 0), gaps = (c.qs.length - 1) * 0.08;
+    return c.qs.map((q, qi) => autoFontSize(bodyOf(q), colW, (avail - gaps) * lens[qi] / sum, { min: 9, max: 18 }));
+  }));
+}
+// One slide, a column per subtopic (Patryk 2026-10-10). Long real exam questions would come out
+// too small to read from the back on one slide, so then the columns go two to a slide.
+function slideExtension(pptx, L) {
+  const all = extensionCols(L);
+  if (!all.length) return;
+  const groups = all.length > 2 && extensionFontFor(all) < 12 ? [all.slice(0, 2), all.slice(2, 4)] : [all];
+  groups.forEach((g, gi) => slideExtensionPart(pptx, L, g, groups.length > 1 ? ` (${gi + 1} of ${groups.length})` : ''));
+}
+function slideExtensionPart(pptx, L, cols, partLabel) {
+  const s = pptx.addSlide();
+  s.background = { color: BG };
+  navBar(s, 'review');
+  let y = sectionHeader(s, 'EXTENSION · FINISHED YOUR 3 EBIs? PICK YOUR SUBTOPIC' + partLabel + ' (also in your booklet)', STAGE.review, TOP);
+  const bottom = BOT_Y - 0.08;
+  const colW = (CW - (cols.length - 1) * 0.15) / cols.length;
+  const headH = 0.62;
+  // each card is as tall as its question needs (a long calculation gets more room than "What is
+  // meant by ...?"), and every card uses the same text size, the largest that fits them all
+  const avail = bottom - y - headH - 0.06;
+  const bodyOf = (q) => `${q.label}  ` + prettyText(q.q) + marksTag(q.marks);
+  const layout = cols.map((c) => {
+    const lens = c.qs.map((q) => Math.max(170, bodyOf(q).length));
+    const sum = lens.reduce((a, b) => a + b, 0), gaps = (c.qs.length - 1) * 0.08;
+    return lens.map((l) => (avail - gaps) * l / sum);
+  });
+  const qFs = Math.min(...cols.flatMap((c, ci) => c.qs.map((q, qi) => autoFontSize(bodyOf(q), colW, layout[ci][qi], { min: 9, max: 18 }))));
+  cols.forEach((c, ci) => {
+    const cx = MX + ci * (colW + 0.15);
+    txt(s, [{ text: c.subtopic, options: { bold: true, color: GOLD, fontSize: 13, breakLine: true } },
+      { text: c.pages ? 'Support: ' + c.pages : '', options: { color: 'FFFFFF', fontSize: 10.5 } }],
+      { x: cx, y, w: colW, h: headH, fill: { color: NAVY }, align: 'center', valign: 'middle', margin: 4, fit: 'shrink' });
+    let cy = y + headH + 0.06;
+    c.qs.forEach((q, qi) => {
+      goldBox(s, cx, cy, colW, layout[ci][qi], [
+        { text: `${q.label}  `, options: { bold: true, fontSize: qFs, color: AMBER } },
+        { text: prettyText(q.q) + marksTag(q.marks), options: { fontSize: qFs } },
+      ], { valign: 'top' });
+      cy += layout[ci][qi] + 0.08;
+    });
+  });
+  bottomBar(s, objectiveText(L));
+}
+function slideExtensionAnswers(pptx, L) {
+  const qs = extensionCols(L).flatMap((c) => c.qs);
+  for (let i = 0; i < qs.length; i += 5) {
+    const part = qs.slice(i, i + 5);
+    const s = pptx.addSlide();
+    s.background = { color: BG };
+    navBar(s, 'review');
+    let y = sectionHeader(s, 'EXTENSION · ANSWERS' + (qs.length > 5 ? ` (${i / 5 + 1} of ${Math.ceil(qs.length / 5)})` : ''), STAGE.review, TOP);
+    if (!isReviewLesson(L)) y = purplePenBar(s, y);   // whole-paper review: no purple-pen bar (Patryk 2026-10-12)
+    const bottom = BOT_Y - 0.08;
+    const rowH = (bottom - y - (part.length - 1) * 0.06) / part.length;
+    // the question itself is on the Extension slide and in the booklet: here just its number + subtopic
+    part.forEach((q) => { reviewRow(s, y, rowH, null, `${q.label}  ${q.sub}`, q.a || ''); y += rowH + 0.06; });
+    bottomBar(s, objectiveText(L));
+  }
+}
+function buildReviewExtras(pptx, L) {
+  slideEbiTask(pptx, L);
+  slideExtension(pptx, L);
+  slideExtensionAnswers(pptx, L);
+}
+/* answerList build item (review lessons): short test parts answered together, Q | answer rows with the
+   answer revealed on click; up to 6 rows a slide.  { type: "answerList", heading, rows: [{ q, a }] } */
+const isReviewLesson = (L) => ((L.meta && L.meta.lessonType) || L.lessonType) === 'review';
+function slideAnswerList(pptx, L, item) {
+  const rows = arr(item.rows).map(normQ);
+  // MCQ rows state the letter: { q, correct: "B", a: "the option text" } → "B   the option text"
+  const answerOf = (q) => (q.correct ? `${q.correct}${q.a ? '   ' + q.a : ''}` : (q.a || ''));
+  // rows with a picture of the paper's question: 3 a slide, picture left, answer right
+  const snips = rows.map((q) => (q.qn || q.snippet || q.core || q.extend ? snippetFor(L, q, q.qn) : null));
+  const cap = snips.some(Boolean) ? 3 : 6;
+  const per = Math.ceil(rows.length / Math.ceil(rows.length / cap));   // balanced: 4 rows → 2 + 2, not 3 + 1
+  for (let i = 0; i < rows.length; i += per) {
+    const part = rows.slice(i, i + per);
+    const s = pptx.addSlide();
+    s.background = { color: BG };
+    navBar(s, 'build');
+    let y = sectionHeader(s, item.heading || 'QUICK ANSWERS', STAGE.build, TOP);
+    if (!isReviewLesson(L)) y = purplePenBar(s, y);   // whole-paper review: no purple-pen bar (Patryk 2026-10-12)
+    const bottom = BOT_Y - 0.08;
+    const rowH = (bottom - y - (part.length - 1) * 0.06) / part.length;
+    part.forEach((q, k) => {
+      const snip = snips[i + k];
+      if (snip) {
+        const lw = CW * 0.62;
+        s.addShape('rect', { x: MX, y, w: lw, h: rowH, fill: { color: 'FFFFFF' }, line: GOLD2 });
+        const tagH = (q.core || q.extend) ? 0.3 : 0;
+        if (tagH) txt(s, qLabel(q), { x: MX, y, w: lw, h: tagH, fill: { color: NAVY }, color: GOLD, bold: true, fontSize: 12, align: 'left', valign: 'middle', margin: 6 });
+        addImageFit(s, snip, MX + 0.04, y + tagH + 0.04, lw - 0.08, rowH - tagH - 0.08);
+        const a = prettyText(answerOf(q));
+        const big = !!q.correct;
+        txt(s, a, {
+          x: MX + lw + 0.08, y, w: CW - lw - 0.08, h: rowH, fill: { color: NAVY }, line: GOLD2, color: GOLD,
+          bold: big, fontSize: autoFontSize(a, CW - lw - 0.08, rowH, { min: 14, max: big ? 40 : 26 }),
+          align: big ? 'center' : 'left', valign: 'middle', margin: 8, fit: 'shrink',
+        });
+      } else reviewRow(s, y, rowH, null, (q.core || q.extend ? qLabel(q) + ' · ' : '') + (q.q || ''), answerOf(q));
+      y += rowH + 0.06;
+    });
+    bottomBar(s, objectiveText(L));
+  }
+}
+
 /* ---- WHITEBOARD Q&A rounds --------------------------------------------------- */
 function slideWhiteboardRounds(pptx, L) {
   const rounds = arr(L.whiteboard && L.whiteboard.rounds ? L.whiteboard.rounds : L.whiteboard);
@@ -3619,7 +4179,7 @@ function slideImageDump(pptx, L) {
     const iw = cellW - GAP;
     try {
       if (img.path && fs.existsSync(img.path)) {
-        s.addImage({ path: img.path, x, y, w: iw, h: imgH });
+        addImageFit(s, img.path, x, y, iw, imgH);
       } else {
         imagePlaceholder(s, x, y, iw, imgH, img.label || 'no path');
       }
@@ -3659,8 +4219,16 @@ function contentCheck(L) {
 
   const dn = arr((L.doNow || {}).questions).length;
   check(dn === 6, `Do Now ${dn}/6`, `Do Now has ${dn} question(s) — rule is exactly 6`);
+
+  // review Extension (2026-10-10): every column names its support page, every question has its answer
+  arr(L.extension).forEach((c, i) => {
+    const qs = arr(c && c.questions).map(normQ);
+    check(!!(c && c.pages), `Extension "${(c && c.subtopic) || i + 1}" support page`, `Extension column "${(c && c.subtopic) || i + 1}" has no support page (pages)`);
+    check(qs.length && qs.every((q) => String(q.a || '').trim()), `Extension "${(c && c.subtopic) || i + 1}" answers`, `Extension column "${(c && c.subtopic) || i + 1}" has a question with no answer (it drops off the answers slide)`);
+  });
   const nPrac = arr(L.build).filter((b) => (b.type || b.variant) === 'practical').length;
   if (nPrac > 2) lines.push(`  ✗ ${nPrac} practicals — a lesson has at most 2; only the first 2 are drawn on the worksheet`);
+  if (arr(L.extension).length > 4) lines.push('  ✗ Extension has more than 4 subtopic columns — only the first 4 are drawn');
 
   if (isTeaching) {
     const mcq = arr(L.build).filter((b) => ['mcq', 'mcq_image'].includes(b.type || b.variant)).length;
@@ -3834,6 +4402,7 @@ function renderBuildSlides(pptx, L, buildItems) {
     else if (bt === 'modelAnswerReview') slideModelAnswerReview(pptx, L, b);   // M4-M11
     else if (bt === 'correctTheStatement') slideCorrectStatement(pptx, L, b);  // M12-M16
     else if (bt === 'markTheAnswers') slideMarkTheAnswers(pptx, L, b);
+    else if (bt === 'answerList') slideAnswerList(pptx, L, b);                 // review: short parts, Q | answer
     // 'visualiser' handled by the caller
   });
 }
@@ -3872,7 +4441,12 @@ async function buildPptx(L, outPath) {
     buildReviewSlides(pptx, L);
     slideExam(pptx, L);                                         // real exam question AFTER the Apply answers (Y9-11, home)
   } else if (type === 'revision') {
-    arr(L.learn).forEach((it) => slideLearn(pptx, L, it));      // typically Learn-C
+    // Patryk 2026-10-14: Engage = the learning objectives; then Learn → 3-question check, per concept
+    slideEngage(pptx, L);
+    arr(L.learn).forEach((it, n) => {
+      slideLearn(pptx, L, it);                                  // typically Learn-C (or one concept a slide)
+      if (arr(it.check).length) slideAnswerList(pptx, L, { heading: `CHECK ${n + 1}` + ((it.heading || it.title) ? ' · ' + stripStage(it.heading || it.title, 'LEARN').toUpperCase() : ''), rows: it.check });
+    });
     slideWhiteboardRounds(pptx, L);
     if (visItem) slideVisualiser(pptx, L, visItem);
     slideApply(pptx, L);
@@ -3889,12 +4463,19 @@ async function buildPptx(L, outPath) {
     // slice(0,4) cap), matching the revision branch. No Engage (matches the
     // review 8-slide order in SKILL.md). Build items DO render here so
     // markTheAnswers / modelAnswerReview reach the review slides.
+    // 2026-10-14: Engage = the learning objectives (Patryk's standard opening); only when authored.
+    slideEngage(pptx, L);
     arr(L.learn).forEach((it) => slideLearn(pptx, L, it));
     renderBuildSlides(pptx, L, buildItems);
     slideVisualiser(pptx, L, visItem);                          // mandatory (auto-generated) — matches the documented review sequence
     slideApply(pptx, L);
     buildReviewSlides(pptx, L);
+    buildReviewExtras(pptx, L);                                 // EBI corrections + Extension (2026-10-10)
     slideExam(pptx, L);                                         // real exam question AFTER the Apply answers (Y9-11, home)
+  } else if (type === 'test') {
+    // Test lesson (Patryk 2026-10-14): pupils sit the school's paper. Title/Do Now ("look over your
+    // notes", doNow.task) and Engage (the learning objectives). Nothing else; no worksheets.
+    slideEngage(pptx, L);
   } else {
     // unknown type — treat as standard (keep the 4-Learn cap)
     slideEngage(pptx, L);
@@ -4806,6 +5387,52 @@ function buildWorksheetChildren(L, mode) {
     if (L.examWorksheet && L._examOnSheet && mode !== 'answers') ch.push(...examWorksheetBlock(L.examWorksheet));
   };
 
+
+  // REVIEW lessons (2026-10-10): the EBI follow-up tasks + Extension questions for pupils (answered
+  // in books, no boxes); on the answer sheet the model answers for the test (modelAnswerReview,
+  // answerList) and the Extension answers. Only drawn when the lesson has them.
+  const reviewExtrasSection = () => {
+    const isReview = /^(review|revision)$/i.test(String(L.meta.lessonType || ''));
+    if (!isReview) return;
+    const ebi = arr(L.ebiTask && L.ebiTask.rows);
+    if (ebi.length && mode !== 'answers') {
+      ch.push(...divider('PURPLE PEN · 3 EBIs'));
+      ch.push(P(R('Pick 3 EBIs from the front of your test. Do each one’s follow-up task in purple pen, using the support page.', { size: 20, italics: true }), { spacing: { after: GAP_SM } }));
+      const colW = [1300, 6806, 2000];
+      const rowsE = [new TableRow({ children: ['Question', 'Follow-up task', 'Support pages'].map((h, i) => cell({ w: colW[i], fill: NAVY, borders: GREY_TBL, margins: { top: 60, bottom: 60, left: 80, right: 80 },
+        children: [P(R(h, { bold: true, size: 20, color: 'FFFFFF' }))] })) })];
+      ebi.forEach((r, i) => rowsE.push(new TableRow({ children: [r.q || '', r.task || '', r.pages || ''].map((v, ci) => cell({ w: colW[ci], fill: i % 2 ? 'F5F5F5' : 'FFFFFF', borders: GREY_TBL,
+        margins: { top: 40, bottom: 40, left: 80, right: 80 }, children: [P(R(prettyText(String(v)), { size: 19, bold: ci === 0 }))] })) })));
+      ch.push(fullTable(rowsE, colW, GREY_TBL), spacer());
+    }
+    if (mode === 'answers') {
+      const items = arr(L.build).filter((b) => ['modelAnswerReview', 'answerList'].includes(b.type || b.variant));
+      if (items.length) ch.push(...divider('TEST · MODEL ANSWERS'));
+      items.forEach((b) => {
+        if ((b.type || b.variant) === 'answerList') {
+          arr(b.rows).map(normQ).forEach((r) => { ch.push(P(R(prettyText(r.q), { bold: true, size: 22 }), { spacing: { before: GAP_SM } })); ch.push(...plainAnswerCallout(r.a)); });
+          return;
+        }
+        const head = `Q${b.questionNumber || ''}` + (b.marks ? `  [${b.marks} ${b.marks > 1 ? 'marks' : 'mark'}]` : '');
+        ch.push(P(R(head, { bold: true, size: 24 }), { spacing: { before: GAP_SM }, keepNext: true }));
+        const ma = Array.isArray(b.modelAnswer) ? b.modelAnswer.join(';   ') : (b.modelAnswer || '');   // working steps, one after another
+        ch.push(...plainAnswerCallout(ma));
+        if (arr(b.indicativeContent).length || arr(b.levelDescriptors).length || arr(b.doesNotAward).length) ch.push(...markingPanelDocx(b));
+      });
+    }
+    const cols = extensionCols(L);
+    if (cols.length) {
+      ch.push(...divider(mode === 'answers' ? 'EXTENSION · ANSWERS' : 'EXTENSION'));
+      if (mode !== 'answers') ch.push(P(R('Finished your 3 EBIs? Pick the subtopic you got wrong and answer in your book.', { size: 20, italics: true }), { spacing: { after: GAP_SM } }));
+      cols.forEach((c) => {
+        ch.push(P([R(c.subtopic, { bold: true, size: 24, color: NAVY }), ...(c.pages ? [R('    Support: ' + c.pages, { size: 20, color: '555555' })] : [])], { spacing: { before: GAP_SM, after: GAP_XS }, keepNext: true }));
+        c.qs.forEach((q) => {
+          ch.push(P([R(q.label + '  ', { bold: true, size: 24 }), R(prettyText(q.q), { size: 24 }), ...(q.marks ? [R(`  [${q.marks} ${q.marks > 1 ? 'marks' : 'mark'}]`, { size: 20, color: '888888' })] : [])], { spacing: { before: GAP_SM, after: GAP_SM } }));
+          if (mode === 'answers') ch.push(...plainAnswerCallout(q.a));
+        });
+      });
+    }
+  };
   if (type === 'B') {                                    // exam practice
     if (wx.intro) ch.push(...contextBox(wx.intro));
     applySection({ marks: true, boxes: true });
@@ -4894,6 +5521,7 @@ function buildWorksheetChildren(L, mode) {
     }
     applySection({});
   }
+  reviewExtrasSection();
   return ch;
 }
 async function buildDocx(L, outPath, mode) {
@@ -5035,6 +5663,8 @@ async function main() {
       // lessons (Patryk's call \u2014 see backlog.md "Revision lesson output set change").
       const lessonTypeLower = String((L.meta || {}).lessonType || '').toLowerCase();
       const isReview = lessonTypeLower === 'review' || lessonTypeLower === 'revision';
+      const deckOnly = lessonTypeLower === 'test';     // test lessons: the opening slides only (2026-10-14)
+      if (!deckOnly) {
       const wsPath = path.join(outDir, base + '_worksheet.docx');
       await buildDocx(L, wsPath, 'standard');
       console.log('  \u2713 ' + path.basename(wsPath));
@@ -5088,6 +5718,7 @@ async function main() {
           }
         } catch (e) { console.log('  [pages] page count skipped: ' + e.message); }
       }
+      }   // end !deckOnly
 
       // 4 \u2014 Drive sidecar: one-line text file with the destination folder path.
       //     Only written when all Drive meta fields are present. Used by drive-upload.ps1.
@@ -5106,7 +5737,7 @@ async function main() {
           builtOn: new Date().toISOString().slice(0, 10),
           class: L.meta.class || null, year, subject, macrotopic, lessonNumber, title: lessonTitle,
           folder: `Year ${year}/${subject}/${macrotopic}/Lesson ${lessonNumber} - ${lessonTitle}`,
-          files: [base + '.pptx', base + '_worksheet.docx',
+          files: deckOnly ? [base + '.pptx'] : [base + '.pptx', base + '_worksheet.docx',
                   base + (isRev ? '_answers.docx' : '_support_worksheet.docx')],
         };
         fs.writeFileSync(path.join(outDir, base + '.manifest.json'), JSON.stringify(manifest, null, 2), 'utf8');

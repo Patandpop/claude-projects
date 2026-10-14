@@ -417,6 +417,30 @@ indicative content points is correct; "the less the better."
 
 **Indicative-content chunking (`group`):** give each `indicativeContent` item an optional `group` (e.g. `"substitution"`, `"answer"`, `"conversion"`) to break the marking panel into labelled visual blocks — structure, not more text. Same `group` field drives the answer-sheet panel. **Panel sections (2026-07-05):** the marking panel renders INDICATIVE CONTENT → BANDS (from `levelDescriptors`) → EXCLUSIONARY CLAIMS (from `doesNotAward`) as three split blocks, PPTX and DOCX alike. **6-mark rule:** an extended (non-calculation) ≥6-mark question must carry ≥6 `indicativeContent` points (match points to marks) — shortfalls are logged non-fatally at build time, EXCEPT band-marked questions (`levelDescriptors` present), which are exempt. The handwritten model-answer working now spreads to fill the whole box with evenly parallel ruled lines (no trailing blank rules). The same `indicativeContent` / `levelDescriptors` / `doesNotAward` fields feed the review lesson's `_answers.docx` model-answer sheet — author them on the Apply/Review questions too. See **Answer sheet** in SKILL.md.
 
+**Test review lessons (2026-10-10):** model answers for a school test are full, well-written sentences, not terse (Patryk). See SKILL.md "Test review lessons".
+
+**Question picture from the paper (2026-10-12):** add `"snippet": "path/to/Q2a.png"`, or set `meta.snippetDir` to the folder `paper-snippets.py` wrote (looked up by `questionNumber`, e.g. `"3(a)(iii)"`). The slide then shows the REAL question, never stretched: a tall question fills the left (answer above the mark scheme on the right), a short one runs across the top (answer left, scheme right). A long scheme narrows the picture, then cuts bands to their first sentence, then splits into points | bands columns, so nothing runs off. No picture: an optional typed `"question"` goes across the top. `"snippet": false` turns a picture off for one item.
+
+**Two-paper tests (KS3/KS4 Core + Extend):** `"core": "4(e)"`, `"extend": "1(e)"` on a modelAnswerReview item or an answerList row name the question on each paper (header: CORE ONLY · Q1 / CORE Q4(e) = CHALLENGE Q1(e) / CHALLENGE ONLY · Q3; the school's Extend paper is always "Challenge" on slides); `meta.snippetDir: { core, extend }` finds the picture (Extend's for a shared question). Answer lines are cut out of the pictures by `paper-snippets.py`.
+
+**Where each mark came from (2026-10-12):** wrap the words that earn a mark in `{1}…{/1}`, `{2}…{/2}` (`{x}…{/x}` = words that lost a mark) and give the matching `indicativeContent` point `"mark": 1`. The slide draws a highlighter band in that mark's colour (yellow, green, blue, pink, orange) with a numbered circle after it; the scheme point carries the same coloured number. Works in `modelAnswer` (string or calculation lines) and `markTheAnswers` sample `text`. Tags are stripped everywhere else (worksheets, answer sheet). Making the snippets (home PC, needs PyMuPDF): convert a COPY of the test .docx to PDF, then `python paper-snippets.py paper.pdf outDir` — question pictures + `snippets.json`, local only, never Drive.
+
+### BUILD — answerList (review lessons)
+Short test parts answered together: Q on the left, the answer in a navy/gold box on the right (revealed on click). Up to 6 rows per slide; more rows continue on the next slide. **2026-10-12:** a row with `"qn": "1(b)"` (looked up in `meta.snippetDir`) or `"snippet"` shows the paper's question picture on the left instead of text (3 rows a slide). Multiple choice: `"correct": "B"` states the letter big, then `a` (the option text / reason). In a review lesson there is no purple-pen bar (whole-paper review).
+```json
+{ "type": "answerList", "heading": "Q1 · QUICK ANSWERS", "rows": [ { "q": "Q1(b) When was the ice melting?", "qn": "1(b)", "correct": "B", "a": "temperature stays at 0 °C while it melts" } ] }
+```
+
+### REVIEW lessons — ebiTask and extension (top-level fields)
+Drawn after the review slides, before the exam slide.
+```json
+"ebiTask": { "rows": [ { "q": "Q1", "task": "<front-of-test follow-up task, verbatim>", "pages": "P6.3 p.80" } ] },
+"extension": [ { "subtopic": "Density", "pages": "P6.1 p.76",
+  "questions": [ { "q": "<real exam question, verbatim>", "a": "<from its mark scheme>", "marks": 2, "ref": "doc#Q5d" } ] } ]
+```
+- **ebiTask:** purple steps strip (pick 3 EBIs → follow-up task in purple pen → support page → Extension) plus a Question | Follow-up task | Support pages table.
+- **extension:** up to 4 columns, questions E1, E2 ... Each card is sized to its question. Split over two slides when one would be too small to read. Then an answers slide (E-number + subtopic | answer). The booklet prints the questions; the answer sheet prints the answers.
+
 ### BUILD — correctTheStatement
 General-purpose build task, usable in any lesson (not just test review). 4
 misconception-based **false** statements, generated the same way as
@@ -435,27 +459,30 @@ answer slide.
 Exactly 4 statements, rendered as 2 columns of 2 (4 lines per column, 8 lines total). No worksheet writing space — students correct in exercise books.
 
 ### BUILD — markTheAnswers
-Peer-assessment activity (best in review/revision lessons): one exam question,
-3–4 **realistically-flawed** sample student answers, students mark each against
-the mark scheme. Two slides sharing ONE frame — **question full-width on top,
-mark-scheme panel LEFT, samples RIGHT** — so the scheme and the answers are on
-the same slide and the class can mark from the board alone (no worksheet needed):
-**Slide 1** = samples as handwriting stacked on the right (`jitterProfile` varied
-per sample so they read as different pupils). **Slide 2 (MARKS AWARDED)** = same
-frame, right column becomes per-sample verdicts — awarded level/mark, ✓ hits /
-✗ misses, teacher note. The panel is split into three sections: **INDICATIVE
-CONTENT → BANDS → EXCLUSIONARY CLAIMS**. Reuses the SAME mark-scheme fields as
-`modelAnswerReview`.
+Peer-assessment activity: one exam question, 3–4 **realistically-flawed** sample
+student answers, students mark each against the mark scheme. The samples print on
+the worksheet, so the board does not repeat them (redesign 2026-10-12, Patryk: the
+old board scheme was bloated and the 6-marker ran off the slide).
+**Slide 1 (task)** = purple-pen bar, the question across the top, then the mark
+scheme filling the slide in big type: MARK POINTS (numbered) | BANDS (first sentence
+each) + NO MARKS FOR, in two columns when there are bands.
+**Slide 2 (MARKS AWARDED)** = one row per student: their handwritten answer on the
+left with the marks highlighted and numbered (`{n}…{/n}` tags, `{x}…{/x}` for a lost
+mark; see modelAnswerReview), and on the right only what they scored: big mark +
+level, "Marks for: 1 2 4" in the matching colours, ✗ misses, the teacher note.
+Up to 3 students a slide (4 → two slides of 2). Untagged samples still work (the
+right box lists ✓ hits instead). Same mark-scheme fields as `modelAnswerReview`;
+number the points with `"mark": n`.
 ```json
 { "type": "markTheAnswers",
   "questionNumber": "3", "marks": 6,
   "question": "the exam question being marked",
   "instruction": "Mark each answer. Give it a level and a mark out of 6.",
   "levelDescriptors": [{ "level": "Level 3", "range": "5–6", "desc": "..." }],
-  "indicativeContent": [{ "text": "marking point", "group": "collision theory" }],
+  "indicativeContent": [{ "text": "marking point", "group": "collision theory", "mark": 1 }],
   "doesNotAward": ["misconception — from the MS's do not accept notes"],
   "samples": [
-    { "label": "Student A", "text": "the sample answer (handwritten)",
+    { "label": "Student A", "text": "the sample answer, {2}words that earned point 2{/2}, {x}a mistake{/x}",
       "jitterProfile": 1, "awardedLevel": "Level 2", "awardedMarks": 3,
       "hits": ["MP the answer earned"], "misses": ["MP it missed"],
       "comment": "one-line teacher note / the misconception it shows" }
@@ -476,6 +503,9 @@ Renders on **review** slides (the review dispatcher runs Build items) and standa
 slides. On the worksheet it prints each sample in a box with a `Level: __  Mark: __ / N`
 line to annotate; in `answers` mode it adds the verdict + `hits`/`misses` + the full
 `markingPanelDocx` scheme.
+
+### LEARN — check (revision lessons, 2026-10-14)
+Any Learn item may carry `check: [{ "q", "a" }]` (3 quick questions). In a `revision` lesson a CHECK slide (Q | answer, answers on click) follows that Learn slide. `doNow.task: ["step", ...]` replaces the Do Now questions with numbered steps (test and test-review lessons; no Do Now answers slide).
 
 ### BUILD — practical
 A lesson may have up to TWO practical items (each with its own `heading`; the second can carry its own `results: { headers, rows }` for the worksheet).

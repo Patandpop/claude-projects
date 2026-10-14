@@ -192,6 +192,7 @@ function isReviewType(meta) {
 
 function outputFilesFor(meta) {
   const base = baseNameFor(meta);
+  if (String((meta || {}).lessonType || '').toLowerCase() === 'test') return [base + '.pptx'];   // test lessons: slides only (2026-10-14)
   return [
     base + '.pptx',
     base + '_worksheet.docx',
@@ -205,10 +206,11 @@ function outputFilesFor(meta) {
 // Only .pptx/.ppt at the TOP level of THAT lesson folder move, and never:
 //   - a deck we built (it has a matching "<name>_worksheet.docx" or "_answers.docx" beside it),
 //   - a printed resource (laminates, card sorts, info / fact / help / support / method sheets,
-//     A3, instructions, mats, cards, worksheets): the technicians print those from the folder.
+//     A3, instructions, mats, cards, worksheets incl. the school's "WS" short form): the
+//     technicians print those from the folder.
 // Nothing is deleted or renamed; a name clash in the subfolder leaves that file where it is.
 const ORIGINALS_DIR = 'Beechen Cliff Original Lesson';
-const RESOURCE_RE = /laminat|\bA3\b|card.?sort|cards?\b|info(rmation)?.?sheets?|fact.?sheets?|help.?sheet|support.?sheet|method.?sheet|instructions?|placemat|\bmat\b|worksheet|timeline|template/i;
+const RESOURCE_RE = /laminat|\bA3\b|card.?sort|cards?\b|info(rmation)?.?sheets?|fact.?sheets?|help.?sheet|support.?sheet|method.?sheet|instructions?|placemat|\bmat\b|worksheet|\bWS\d*\b|timeline|template/i;
 function originalsToTuck(names, keep) {
   const set = new Set(names.map((n) => n.toLowerCase()));
   const keepSet = new Set((keep || []).map((n) => n.toLowerCase()));
@@ -221,12 +223,33 @@ function originalsToTuck(names, keep) {
   });
 }
 
+// A-level lesson folder: Year 12|13/[Module N - ...]/Chapter X - .../Lesson N - title, the chapter
+// found by its NUMBER in meta.macrotopic ("Chapter 20 - Cosmology", "Ch 20", "20"). An existing
+// "Lesson N - ..." folder in that chapter is used even if its title is spelled differently.
+// Returns null when the chapter is not on Drive (the caller then reports the missing folder).
+function alevelLessonDir(year, macrotopic, lessonNumber, title, root) {
+  const base = path.join(root || DRIVE_ROOT, `Year ${year}`);
+  const n = (String(macrotopic).match(/(\d+)/) || [])[1];
+  if (!n) return null;
+  const dirs = (p) => { try { return fs.readdirSync(p, { withFileTypes: true }).filter((d) => d.isDirectory()).map((d) => d.name); } catch (_) { return []; } };
+  const isCh = (d) => new RegExp(`^Chapter ${n}\\b`).test(d);
+  let chDir = null;
+  for (const d of dirs(base)) {
+    if (isCh(d)) { chDir = path.join(base, d); break; }
+    if (/^Module \d+/.test(d)) { const c = dirs(path.join(base, d)).find(isCh); if (c) { chDir = path.join(base, d, c); break; } }
+  }
+  if (!chDir) return null;
+  const want = `Lesson ${lessonNumber} - ${title}`;
+  const same = dirs(chDir).find((d) => d === want) || dirs(chDir).find((d) => new RegExp(`^Lesson ${lessonNumber}\\s*-`, 'i').test(d));
+  return path.join(chDir, same || want);
+}
+
 // When required as a module (tests), export the helpers and run nothing else.
 if (require.main !== module) {
   module.exports = {
     splitClasses, buildLogRecords, appendLog,
     resolveMacrotopic, normTopic, outputFilesFor, baseNameFor, isReviewType,
-    originalsToTuck, ORIGINALS_DIR,
+    originalsToTuck, ORIGINALS_DIR, alevelLessonDir,
   };
   return;
 }
@@ -299,13 +322,29 @@ function processLesson(content) {
     }
   }
 
-  const destDir = path.join(
+  let destDir = path.join(
     DRIVE_ROOT,
     `Year ${year}`,
     subject,
     macroFolder,
     `Lesson ${lessonNumber} - ${title}`
   );
+  // A level (Patryk 2026-10-10): no subject level; chapters sit in Module folders,
+  // Year 13/Module 5 - .../Chapter 20 - Cosmology/Lesson 3 - Hubble's Law. Found by chapter number.
+  if (+year >= 12) {
+    const a = alevelLessonDir(year, macrotopic, lessonNumber, title);
+    if (a) destDir = a;
+  } else if (!fs.existsSync(destDir)) {
+    // 2026-10-12: the slide title can differ from the folder's name ("EM Waves: Communication and
+    // Dangers" in "Lesson 8 - Prop and Uses of EM Radiation 2 ..."). Use the ONE folder in the topic
+    // that starts "Lesson N -", as A level already does. Two or more: left alone, reported as missing.
+    try {
+      const macroDir = path.dirname(destDir);
+      const hits = fs.readdirSync(macroDir, { withFileTypes: true })
+        .filter((d) => d.isDirectory() && new RegExp(`^Lesson ${lessonNumber}\\s*-`, 'i').test(d.name));
+      if (hits.length === 1) destDir = path.join(macroDir, hits[0].name);
+    } catch (_) { /* topic folder missing: reported below */ }
+  }
 
   // Bug fix: meta.outputDir takes priority over the JSON's own directory (mirrors build.js priority 1)
   const srcDir = meta.outputDir ? path.resolve(meta.outputDir) : path.dirname(path.resolve(jsonArg));

@@ -421,6 +421,49 @@ async function main() {
       else fail('two practicals: second experiment missing from the worksheet (build exit ' + r2.status + ')');
     }
 
+    // Standard opening for the test cycle (Patryk 2026-10-14): a revision lesson runs Do Now →
+    // Engage (objectives) → Learn → 3-question check, per concept; a test lesson is just the
+    // Title/Do Now ("look over your notes") and Engage, and builds the slides only.
+    if (fixture === 'y7-b1-l1-mrs-gren.json') {
+      const slidesOf = (pptx) => new AdmZip(pptx).getEntries().filter(e => /^ppt\/slides\/slide\d+\.xml$/.test(e.entryName))
+        .sort((a, b) => parseInt(a.entryName.match(/\d+/)[0], 10) - parseInt(b.entryName.match(/\d+/)[0], 10))
+        .map(e => e.getData().toString('utf8'));
+      const env = Object.assign({}, process.env, { NO_UPLOAD: '1', NO_PAGECOUNT: '1', NO_EXAM_LOG: '1', NO_EXAM_PICK: '1' });
+      const rev = JSON.parse(JSON.stringify(lessons));
+      const L0 = rev[0];
+      L0.meta.lessonType = 'revision'; L0.meta.title = 'Cells revision opening';
+      L0.engage = { title: 'LEARNING OBJECTIVES', content: 'Recall MRS GREN. Describe a cell. Use a microscope.', imagePlaceholder: false };
+      const base = (L0.learn || [])[0] || { variant: 'A', content: 'Life processes' };
+      L0.learn = [1, 2, 3, 4].map((n) => Object.assign({}, base, { heading: 'CONCEPTZ' + n, title: 'CONCEPTZ' + n, check: [1, 2, 3].map((k) => ({ q: `Check ${n}.${k} question`, a: `Answer ${n}.${k}` })) }));
+      const dir3 = path.join(tmp, 'revision-opening');
+      fs.mkdirSync(dir3, { recursive: true });
+      fs.writeFileSync(path.join(dir3, '_input.json'), JSON.stringify(rev));
+      const r3 = cp.spawnSync(process.execPath, [BUILD_JS, path.join(dir3, '_input.json'), dir3], { cwd: ROOT, encoding: 'utf8', env });
+      const p3 = path.join(dir3, baseName(L0.meta) + '.pptx');
+      const s3 = r3.status === 0 && fs.existsSync(p3) ? slidesOf(p3) : [];
+      const at3 = (needle) => s3.findIndex(x => x.includes(needle));
+      const order = [at3('LEARNING OBJECTIVES')].concat([1, 2, 3, 4].flatMap((n) => [at3('CONCEPTZ' + n), at3(`Check ${n}.1 question`)]));
+      if (order.every((v, i) => v > 1 && (i === 0 || v > order[i - 1])) && s3.slice(order[order.length - 1]).some((x) => /APPLY/.test(x)))
+        pass('revision lesson: Engage (objectives), then Learn → 3-question check ×4, then Apply');
+      else fail(`revision lesson order wrong (build exit ${r3.status}): ${order.map((v) => v + 1).join(',')}`);
+
+      const test = JSON.parse(JSON.stringify(lessons));
+      const T0 = test[0];
+      T0.meta.lessonType = 'test'; T0.meta.title = 'Cells test';
+      T0.doNow = { task: ['Look over your notes in your book.'] };
+      T0.engage = { title: 'LEARNING OBJECTIVES', content: 'Show what you know about cells.', imagePlaceholder: false };
+      const dir4 = path.join(tmp, 'test-deck');
+      fs.mkdirSync(dir4, { recursive: true });
+      fs.writeFileSync(path.join(dir4, '_input.json'), JSON.stringify(test));
+      const r4 = cp.spawnSync(process.execPath, [BUILD_JS, path.join(dir4, '_input.json'), dir4], { cwd: ROOT, encoding: 'utf8', env });
+      const b4 = baseName(T0.meta);
+      const s4 = r4.status === 0 && fs.existsSync(path.join(dir4, b4 + '.pptx')) ? slidesOf(path.join(dir4, b4 + '.pptx')) : [];
+      const docs = fs.readdirSync(dir4).filter((f) => f.endsWith('.docx'));
+      if (s4.length === 2 && s4[0].includes('Look over your notes') && s4[1].includes('LEARNING OBJECTIVES') && !docs.length)
+        pass('test lesson: 2 slides (Do Now task + objectives), no worksheets');
+      else fail(`test lesson deck wrong (build exit ${r4.status}): ${s4.length} slides, ${docs.length} docx`);
+    }
+
     // Textbook reference guard: amylase (Y9 enzymes) must auto-match the index
     // and render "Read more — [book] pp. …" on the Apply slide AND worksheet.
     if (fixture === 'amylase-test-9ab.json') {
@@ -486,7 +529,30 @@ async function main() {
         else pass('"(cm^3)": only the 3 is raised');
         if (extMiss.length) fail(`review pptx missing: ${extMiss.join(', ')}`);
         else pass('review pptx: Support pages heading, EBI corrections, Extension + answers, quick answers');
+
+        // 2026-10-12 redesign: question picture from the paper, mark highlights, MCQ letter,
+        // no purple-pen bar on whole-paper review slides, mark tags never leak as text.
+        const slides = new AdmZip(pptx).getEntries().filter((e) => /^ppt\/slides\/slide\d+\.xml$/.test(e.entryName)).map((e) => e.getData().toString('utf8'));
+        const maSlide = slides.find((x) => x.includes('Q3(a)(iii)'));
+        if (maSlide && maSlide.includes('<p:pic>')) pass('model answer slide: question picture from the paper embedded');
+        else fail('model answer slide: question picture (snippet) not embedded');
+        if (maSlide && maSlide.includes('FFF176') && />1<\/a:t>/.test(maSlide)) pass('model answer slide: mark 1 highlighted + numbered');
+        else fail('model answer slide: mark highlight / numbered circle missing');
+        if (maSlide && maSlide.includes('CHALLENGE ONLY')) pass('two-paper test: slide says which paper the question is on');
+        else fail('two-paper test: "CHALLENGE ONLY" label missing on the model answer slide');
+        if (slides.some((x) => x.includes('CORE PAPER') && x.includes('CHALLENGE PAPER') && x.includes('CORRECT 3 EBIs'))) pass('EBI slide: one table per paper');
+        else fail('EBI slide: Core / Extend tables missing');
+        if (slides.some((x) => x.includes('QUICK ANSWERS') && x.includes('Purple pen time'))) fail('review quick answers still carry the purple-pen bar');
+        else pass('review quick answers: no purple-pen bar');
+        if (slides.some((x) => x.includes('<a:t>C   the steepest line</a:t>'))) pass('MCQ quick answer states the letter');
+        else fail('MCQ quick answer: letter + option text not found');
+        const marksSlide = slides.find((x) => x.includes('MARKS AWARDED'));
+        if (marksSlide && marksSlide.includes('3/6') && marksSlide.includes('Marks for')) pass('mark-the-answers marks slide: score + earned points');
+        else fail('mark-the-answers marks slide: score / "Marks for" missing');
       }
+      const leak = [pptx, path.join(outDir, base + '_worksheet.docx'), ans].filter((f) => fs.existsSync(f) && /(?<![\^_])\{\/?(\d|x)\}/.test(readArchiveXml(f)));
+      if (leak.length) fail('mark tags {1}…{/1} leaked into ' + leak.map((f) => path.basename(f)).join(', '));
+      else pass('mark tags stripped from every file');
     }
 
     // Bug 54 guard: flow/cycle Learn slides must be NATIVE PPTX shapes, not a

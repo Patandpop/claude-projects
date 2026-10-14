@@ -1,6 +1,6 @@
 ---
 name: science-lesson
-description: "Creates lesson PowerPoints and worksheets for science lessons (physics, chemistry, biology). Use when asked to make a lesson, presentation, slide deck, PowerPoint, worksheet, booklet, or revision resource for any science topic or class. Always trigger for: 'make a lesson on', 'create a worksheet for', 'build slides for', 'lesson for 7BYA', 'lesson for 7MLA', 'lesson for 8AB', 'lesson for 8XP', 'lesson for 9AB', 'lesson for 10S2', 'lesson for 12D', or any science topic paired with a teaching request. Also trigger for standalone worksheet requests: 'make me a Type C exam paper for 10S2', 'revision worksheet on forces'."
+description: "Creates lesson PowerPoints and worksheets for science lessons (physics, chemistry, biology). Use when asked to make a lesson, presentation, slide deck, PowerPoint, worksheet, booklet, or revision resource for any science topic or class. Always trigger for: 'make a lesson on', 'create a worksheet for', 'build slides for', 'lesson for 7MLA', 'lesson for 8XP', 'lesson for 8AG', 'lesson for 9AS', 'lesson for 9XS', 'lesson for 10C2', 'lesson for 10S2', 'lesson for 11S2', 'lesson for 12C', 'lesson for 13D', or any science topic paired with a teaching request. Also trigger for standalone worksheet requests: 'make me a Type C exam paper for 10S2', 'revision worksheet on forces'."
 ---
 
 # Science Lesson Skill — v2
@@ -54,9 +54,10 @@ The final slide of every deck is the **IMAGE BANK** (kept, not deleted): it self
 
 **Content volume & source fidelity**
 - **Mastering includes at least one SCENARIO question** (2026-10-03): an unfamiliar context the pupil has not seen in the lesson, where they must apply the idea (e.g. a new device, a real situation, a data set). Write these yourself for KS3 and A-level. (The old "student first names in Apply" idea is dropped.)
-- **Real exam questions are added automatically at home, never authored** (2026-10-03): for Year 9-11 Biology, Chemistry and Physics, a home build adds an "Exam question" slide and a "Mark scheme" slide after Apply, using a real AQA question (verbatim) chosen for the lesson. When the worksheet still fits 4 pages, a different exam question is also added under Mastering with no answer lines (answered in books). Do not write exam questions into the JSON yourself, and never write an `examQuestion` key (not even null: it switches the automatic question off); set `meta.examQuestion: false` only if Patryk asks for a lesson without one. Year 12/13 (OCR) get none until OCR exam data exists, and they never get AQA questions.
+- **Real exam questions are added automatically at home, never authored** (2026-10-03): for Year 9-11 Biology, Chemistry and Physics, a home build adds an "Exam question" slide and a "Mark scheme" slide after Apply, using a real AQA question (verbatim) chosen for the lesson. When the worksheet still fits 4 pages, a different exam question is also added under Mastering with no answer lines (answered in books). Do not write exam questions into the JSON yourself, and never write an `examQuestion` key (not even null: it switches the automatic question off); set `meta.examQuestion: false` only if Patryk asks for a lesson without one. Year 12/13 (OCR) get none on the slides yet: their OCR questions are used for homework quizzes and exam practice papers at home. They never get AQA questions.
 - **Up to TWO experiments per lesson** (Patryk 2026-10-12) when the lesson needs them (e.g. reflection, then refraction). Each is its own `type: "practical"` Build item with its own `heading`; the worksheet gives each one its own section. The second experiment's results table goes in `results` on its practical item (the first keeps `worksheetExtras.results`). Never more than two.
 - **Always build exactly 6 MCQs, as ONE block** (Patryk 2026-10-03, replaces the old 4-scattered rule: scattered MCQs make the lesson feel disjointed). Learning MCQs come straight after the Learn section, before the rest of Build. An MCQ about the experiment gets `"about": "practical"` and is shown right after the practical method slide (and its answers), before the data. The renderer does the ordering itself, so list them anywhere in `build`; just tag the experiment ones. Never fewer than 6.
+- **Writing MCQs: follow `references/mcq-rules.md`** (2026-10-10, drawn from 2,745 real AQA and OCR questions). It covers four options with similar lengths, the answer letter spread over the 6, number options smallest to largest in one unit, each wrong option one real mistake or misconception (with at least one near miss), and NOT in capitals. Never use all/none of the above.
 - **Equation lessons follow I do → we do → you do:** Learn-F equation intro → `guessExample` worked example (1–2 slides) → `practiceTriangle` independent practice. This is the default sequence whenever a new equation is introduced.
 - **Source material is a floor to EXTEND, not just preserve** (confirmed 2026-07-02): beyond porting every question/table/scaffold, actively add genuine depth — historical context, the "why this mattered" layer, connections to the bigger picture — woven into the same slides. Pre-build checklist question: "what's the one thing in this topic that makes it click, that isn't in the source material yet?"
 - **Apply: minimum 3 questions per tier** unless Patryk says otherwise. One question per tier is never enough.
@@ -272,17 +273,24 @@ Field names are fixed. If a slide type needs something not in the schema, check 
 
 ## Class Profiles
 
-| Class | Year | Ability | Exam | Worksheet default | Support sheet notes |
-|---|---|---|---|---|---|
-| 7BYA | 7 | Mixed | AQA | Do Now + Build + Apply | Word bank + sentence starters — lean heavy |
-| 7MLA | 7 | Mixed | AQA | Do Now + Build + Apply | Same as 7BYA |
-| 8AB | 8 | Higher | AQA | Apply-heavy; no word bank | No word bank — omit `wx.wordBank`, don't rely on keyword fallback |
-| 8XP | 8 | Lower mixed | AQA | Do Now + Build; word bank on cloze | Full scaffolding |
-| 9AB | 9 | Higher | AQA | Build + Apply; no word bank | No word bank |
-| 10S2 | 10 | Higher triple | AQA | Apply; 6-marker if practical | Minimal scaffolding |
-| 12D-Phy | 12 | A-level | OCR Physics A | Build + Apply; calculation-heavy | Minimal — equation hints only |
+2026/27 classes (September 2026 to July 2027). Build only the subjects Patryk teaches each class; the other teacher's subject is theirs.
 
-This table expires July 2026 — Patryk gets new classes in September 2026 and will supply the new list. (10C4 and 11C3 in older files are no longer his classes.)
+| Class | Year | Course / exam | Patryk teaches | Word bank | Notes |
+|---|---|---|---|---|---|
+| 7MLA | 7 | KS3 | All science (sole teacher) | Yes: support sheet + cloze | Lean heavy on support: word bank + sentence starters |
+| 8XP | 8 | KS3 | Biology + Physics (Ms Sole: Chemistry) | Yes: word bank on cloze | Full scaffolding |
+| 8AG | 8 | KS3 | Biology, then Physics (Mr Hollis: Chemistry) | Yes: word bank on cloze | Once a week |
+| 9AS | 9 | AQA (GCSE starts) | Physics + Chemistry (Ms Milland: Biology) | Not decided: ask Patryk | Low-demand AQA questions on taught topics only |
+| 9XS | 9 | AQA (GCSE starts) | All science (sole teacher) | Not decided: ask Patryk | Low-demand AQA questions on taught topics only |
+| 10C2 | 10 | AQA Combined Science | Physics + Chemistry | Yes: support sheet + cloze | Needs extra support |
+| 10S2 | 10 | AQA Separate (triple) | Physics only | **No** | Higher; 6-marker if practical |
+| 11S2 | 11 | AQA Separate (triple) | Physics only | **No** | Exam year |
+| 12C | 12 | OCR A Physics | Half the content (shared) | **No** | DOUBLE lessons. OCR only, never AQA questions. Calculation-heavy, equation hints only |
+| 13D | 13 | OCR A Physics | Half the content (shared) | **No** | OCR only, never AQA questions. Exam year |
+
+**Switching the word bank off:** for a **No** class set `"worksheetExtras": { "wordBank": [] }`. An empty list stops the automatic word bank (otherwise the support sheet builds one from `title.keywords`). For a **Yes** class give `worksheetExtras.wordBank` and, with a cloze, `clozeWordBank` (add one distractor).
+
+Homework: 10C2, 10S2, 11S2 = long-term exam-question booklets; 12C and 13D = every lesson (end-of-subsection textbook questions); KS3 not decided. PSHE-9AB is not science. (7BYA, 8AB, 9AB, 12D, 10C4 and 11C3 in older files are no longer his classes.)
 
 Standard lessons emit THREE files: `.pptx` + `_worksheet.docx` + `_support_worksheet.docx`. Review lessons also emit three, but different: `.pptx` + `_worksheet.docx` (the booklet) + `_answers.docx` (model-answer sheet — takes the support-worksheet slot). The support sheet is the same content with scaffolding added automatically across ALL tiers (word bank where tier-appropriate, the one GUESS row where a Year 9+ question sets `guess: true`, equation/units hint line, Do Now `hint` lines + keywords box, sentence starters, key-word definition table, practical design prompt checklist, explanation prompt chain). `differentiation: "split"` / `meta.abilityLabel` only set the filename label — they never change whether the support sheet is produced. Identical titles, identical layout family — never visibly "the easy sheet".
 
@@ -390,10 +398,11 @@ Every extracted image appears here — matched ones carry their slot label, unma
 | Type | Sequence |
 |---|---|
 | standard | Title → DoNow → DoNow Answers → Engage → Learn(1–2) → MCQ block ×6 → Build (workedExample / errorAnalysis / graphInterpret / trueFalse as topic demands) → Visualiser → Apply → Review×3 |
-| revision | Title → DoNow → DoNow Answers → Learn-C → Whiteboard QA rounds → Apply → Review×3 |
+| revision | Title → DoNow → DoNow Answers → **Engage (learning objectives)** → per concept: **Learn → CHECK (3 quick questions, answers on click)**, usually ×4 → Whiteboard QA rounds (if authored) → Apply → Review×3. See **Test-cycle lessons** below. |
+| test | Title/DoNow (`doNow.task`: "Look over your notes in your book", no questions) → Engage (learning objectives). PPTX only, no worksheets. |
 | practical | Title → DoNow → DoNow Answers → Engage → Learn(1–2) → Build practical (1–2) → Build Q&A → Visualiser → Apply → Review×3 |
 | whiteboard | Title → DoNow → DoNow Answers → Whiteboard QA rounds → Apply → Review×3 |
-| review | Title/DoNow (combined) → DoNow Answers (purple pen) → Learn (all — typically Learn-C 3-col; **no cap**, Bug 55) → Build items if authored (`markTheAnswers` / `modelAnswerReview`) → Visualiser → Apply (booklet instructions by tier) → Review — Developing/Reaching/Mastering. **No Engage.** Output: PPTX + review booklet DOCX + **model-answer sheet** (`_answers.docx`) — no support worksheet. See **Review lesson specification** and **Answer sheet** sections. |
+| review | Title/DoNow (combined) → DoNow Answers (purple pen) → Learn (all — typically Learn-C 3-col; **no cap**, Bug 55) → Build items if authored (`markTheAnswers` / `modelAnswerReview`) → Visualiser → Apply (booklet instructions by tier) → Review — Developing/Reaching/Mastering. **Engage (learning objectives) after the Do Now answers when authored (2026-10-14).** Output: PPTX + review booklet DOCX + **model-answer sheet** (`_answers.docx`) — no support worksheet. See **Review lesson specification** and **Answer sheet** sections. |
 | annotation | As standard, but `meta.annotation: true` → Learn slides and one workedExample slide include an `annotationZone` (5.5"×4" blank panel, dashed gold border, "worked live" label). Use for calculation-heavy lessons taught with the drawing tablet. After the lesson: slideshow ink → "Keep ink annotations" → export annotated PDF → post to Classroom. |
 
 Slide-type selection guidance: use `trueFalse` with `"heading": "COMMON MISCONCEPTIONS"` whenever the topic has a canonical wrong belief (heavier falls faster, current gets used up, cold flows in) — write statements that may be true or false, students evaluate each; workedExample→yourTurn for any new calculation; errorAnalysis in the lesson AFTER a calculation is introduced; graphInterpret mandatory at least once per motion/electricity/waves topic. (`type: "misconception"` still exists in the renderer but is not recommended — the standalone 3-box layout is less effective than a trueFalse evaluation activity.)
@@ -421,10 +430,23 @@ This is a planning workflow, not a renderer feature — there is no dedicated le
 
 ---
 
+## Test-cycle lessons: standard opening (Patryk 2026-10-14)
+
+Every lesson in the test cycle opens with a Do Now, then an **Engage slide that is the learning objectives** (`engage: { "title": "LEARNING OBJECTIVES", "hook": "<one line>", "content": "1. ...
+2. ...", "imagePlaceholder": false }`).
+
+| Lesson | Do Now |
+|---|---|
+| **Revision** (before the test) | 6 general questions on the topic that are NOT on the school's test (read the test in Admin/Assessment first). |
+| **Test** (`lessonType: "test"`) | `doNow.task: ["Look over your notes in your book."]`, no questions. |
+| **Test review** (marked tests back) | `doNow.task: ["Look over your test.", "Tick your WWWs and your EBIs on the front.", "Write your 3 areas of focus for today."]`, no questions. |
+
+**Revision lesson shape:** it covers the topic, leaning towards what the test examines (especially Year 10 and below). Four rounds of ONE Learn slide on one concept, each with `check: [{q, a}] ×3` (quick reminder questions; the CHECK slide follows that Learn slide, answers revealed on click). Then an extended Apply done on their own across all four concepts; Reaching and Mastering stretch into the topic's other areas (e.g. energy resources, required practicals). Set `meta.examQuestion: false` when the only exam questions available are on the class's test. A Learn-A slide with `imagePlaceholder: false` uses the full width and shows up to 3 boxes.
+
 ## Review lesson specification
 
 ### Slide sequence
-1. **Title / Do Now** (combined — Do Now questions only; no Engage on review lessons)
+1. **Title / Do Now** (combined). Test-review lessons: the Do Now is the `doNow.task` steps below, then Engage = learning objectives (2026-10-14)
 2. **Do Now Answers** (purple pen bar)
 3. **Learn** (all Learn slides — typically one Learn-C 3-column revision table; **no 4-slide cap**, Bug 55)
 4. **Build items** — only if authored; review-appropriate ones (`markTheAnswers`, `modelAnswerReview`)
@@ -432,7 +454,7 @@ This is a planning workflow, not a renderer feature — there is no dedicated le
 6. **Apply** (booklet instructions by tier — not tiered Q&A)
 7. **Review — Developing / Reaching / Mastering**
 
-Removed from review lessons: Engage slide (cut entirely). Kept: DoNow Answers and Visualiser (mandatory).
+Engage on review lessons = the learning objectives only (2026-10-14; it was cut before). Kept: DoNow Answers and Visualiser (mandatory).
 **Build items now render in review lessons** (the review dispatcher runs them) — the earlier "no Build
 slides" only held because none were authored. Add a `markTheAnswers` Build item to run a mark-the-answers
 peer-assessment inside a review lesson; it also prints on the booklet + answer sheet. Do not add MCQ/sort
@@ -446,7 +468,30 @@ Learn slides (no cap — Bug 55). The review lesson is NOT a standard lesson —
 - Column 2: booklet section reference (e.g. "Section 3")
 - Column 3: heading is exactly **"Support pages"** — Kerboodle page refs (e.g. "C1.6 p.14, C1.7 p.16"). Never "Textbook", never "Pages".
 
-Single-test classes (e.g. 9AB — Extend only): one question column ("Extend PAPER") + "Support pages". Multi-paper classes: ask Patryk which papers the class sat (Core / Extend / Challenge) before building — one column per paper.
+Single-test classes (one paper only): one question column ("Extend PAPER") + "Support pages". Multi-paper classes: ask Patryk which papers the class sat (Core / Extend / Challenge) before building — one column per paper.
+
+**What the renderer draws (2026-10-10):** `learn[{variant:"C", corePaper:[{q, pages}], extendPaper:[{q, pages}]}]`. Each paper is one table headed CORE PAPER / CHALLENGE PAPER, with columns Question | **Support pages**. Put the topic in `q` ("Q2 Density of an irregular object"). The text is large when there are few rows.
+
+### Test review lessons: model answers, EBI corrections, Extension (Patryk 2026-10-10)
+Patryk's review lesson runs in this order:
+1. Model answer for every test question, with the mark scheme beside it.
+2. Support pages table.
+3. Pupils correct 3 EBIs in purple pen, using the follow-up tasks on the front of the school's test.
+4. Pupils who have finished do the Extension.
+5. He helps pupils around the room.
+
+- **KS3/KS4 tests come as a Core and an Extend paper (KS5 is one paper). Cover BOTH (Patryk 2026-10-12):** match the questions by content. Usually Core opens with 2 easy questions Extend does not have, and Extend ends with 2 hard ones Core does not have; the middle is shared under different numbers (P3 Particles: Core Q4 = Extend Q1, Core Q5 = Extend Q2), and a shared question can still have a part on one paper only (Core Q4(f), Extend Q2(c)). Order: Core-only first, then shared, then Extend-only. Give every item `"core": "4(e)"` and/or `"extend": "1(e)"`; the slide says CORE ONLY / CORE Q4(e) = CHALLENGE Q1(e) / CHALLENGE ONLY (slides say Challenge, never Extend, per the terminology rule). Model answers for Core-only parts come from the Core mark scheme. `ebiTask.rows` get `"paper": "Core"|"Extend"` (each paper's front cover has its own tasks; the slide shows one table per paper), and the Learn-C support-pages slide gets both `corePaper` and `extendPaper`. `meta.snippetDir` = `{ "core": folder, "extend": folder }`.
+- **Model answers:** one `modelAnswerReview` per test part worth 2+ marks. Show the real question: set `meta.snippetDir` to the folder made by `paper-snippets.py` (home PC; claude.ai: skip, typed `question` instead), and tag where each mark came from with `{1}…{/1}` + `"mark": 1` on the scheme point (slide-options-v4.md, modelAnswerReview).
+  - **Model answers here are full, well-written sentences, not terse.** Patryk's rule; it overrides the short-answer rule below for review lessons.
+  - The mark-scheme panel is verbatim from the school's mark scheme.
+- **1-mark parts (MCQ: add `"correct": "B"`, and `"qn": "1(b)"` for the paper's picture):** one `answerList` Build item per question: `{ "type": "answerList", "heading": "Q1 · QUICK ANSWERS", "rows": [{ "q": "Q1(b) When was the ice melting?", "a": "B ..." }] }`. Q | answer rows, up to 6 a slide, answers revealed on click.
+- **`ebiTask`:** `{ "rows": [{ "q": "Q1", "task": "<the test's front-grid follow-up task, VERBATIM>", "pages": "P6.3 p.80" }] }`. This gives the PURPLE PEN · CORRECT 3 EBIs slide plus the same table on the booklet.
+- **`extension`:** `[{ "subtopic", "pages", "questions": [{ "q", "a", "marks", "ref" }] }]`, up to 4 subtopic columns, numbered E1, E2, ...
+  - Use REAL exam questions: at home, run `node references/extension-pick.js <spec.json> --classes 9XS,9AS`. Never invent them.
+  - Slides: Extension (one column per subtopic; split over two slides when the text would be too small) → Extension answers.
+  - Booklet: the questions. Answer sheet: the answers.
+- **Lesson shape:** a review lesson built this way needs no `apply` or `review`. Use `meta.worksheet: "C"` and `meta.examQuestion: false`.
+- **Answer sheet:** prints every model answer plus its mark-scheme panel, the answer lists and the Extension answers.
 
 ### Review booklet (the `_worksheet.docx` output)
 Set `worksheetExtras.worksheetType: "C"`. Do NOT set `navRows` — the nav/RAG table is suppressed entirely.
@@ -490,7 +535,7 @@ same content object — no separate authoring. Built by `buildWorksheetChildren(
   the same fields as the on-screen `modelAnswerReview` / `markTheAnswers` slides.
 - **Plain callout** — everything else: `q.a` (or `q.modelAnswer`) as a short navy-border answer.
 
-**Model-answer authoring rules:** short and terse, operators as symbols (× not "times", ÷ not
+**Model-answer authoring rules:** short and terse (EXCEPT test review lessons: full sentences, see above), operators as symbols (× not "times", ÷ not
 "divide"), grounded in the real mark scheme — never invent marking content.
 
 **6-mark rule:** an extended (non-calculation) question worth ≥6 marks must carry ≥6
