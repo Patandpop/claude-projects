@@ -225,10 +225,7 @@ function buildQuiz_(hw) {
         it.setChoices(q.options.map((o, i) => it.createChoice(o, i === q.answer)));
         it.setPoints(q.points || 1);
         if (q.feedback) it.setFeedbackForIncorrect(FormApp.createFeedback().setText('What examiners saw: ' + q.feedback).build());
-      } else {
-        const it = f.addParagraphTextItem().setTitle((n + 1) + '. ' + q.text + '  [' + q.marks + ' mark' + (q.marks === 1 ? '' : 's') + ']').setRequired(true).setPoints(0);
-        it.setGeneralFeedback(FormApp.createFeedback().setText('Mark scheme (mark your own answer):\n\n' + q.scheme).build());
-      }
+      } else addWritten_(f, (n + 1) + '. ' + q.text + '  [' + q.marks + ' mark' + (q.marks === 1 ? '' : 's') + ']', q.scheme);
     } catch (e) { throw new Error('question ' + (n + 1) + ' (' + q.type + '): ' + String(e.message || e)); }
   });
   // keep his Drive tidy: the quiz goes into one folder (made once; only this new file is moved)
@@ -236,6 +233,28 @@ function buildQuiz_(hw) {
   const folder = it.hasNext() ? it.next() : DriveApp.createFolder('Planner homework quizzes');
   DriveApp.getFileById(f.getId()).moveTo(folder);
   return f;
+}
+// A written question: the mark scheme shows after submitting, worth 0 points (nothing for him to mark).
+// Google Forms sometimes refuses "Invalid data updating form" for one shape of this, so try the
+// simpler shapes in turn (Patryk 2026-10-16, 13D question 7). A failed attempt's half-made item is removed.
+// 1) 0 points + feedback; 2) feedback only; 3) plain-text scheme (no ✓ or odd symbols) with 0 points; 4) plain, no points.
+function addWritten_(f, title, scheme) {
+  const plain = String(scheme || '').replace(/✓/g, '-').replace(/[^\x09\x0A\x20-\x7E -ÿͰ-Ͽ⁰-₟°×÷−→]/g, ' ');
+  const tries = [[true, scheme], [false, scheme], [true, plain], [false, plain]];
+  const errs = [];
+  for (let k = 0; k < tries.length; k++) {
+    let it = null;
+    try {
+      it = f.addParagraphTextItem().setTitle(title).setRequired(true);
+      if (tries[k][0]) it.setPoints(0);
+      it.setGeneralFeedback(FormApp.createFeedback().setText('Mark scheme (mark your own answer):\n\n' + tries[k][1]).build());
+      return it;
+    } catch (e) {
+      errs.push('attempt ' + (k + 1) + ': ' + String(e.message || e));
+      try { if (it) f.deleteItem(it); } catch (x) { /* nothing to remove */ }
+    }
+  }
+  throw new Error('written question refused by Google Forms (' + errs.join(' | ') + ')');
 }
 function classroomDraft_(hw, form) {
   if (typeof Classroom === 'undefined') return { ok: false, why: 'Classroom service not switched on (Apps Script: Services + → Google Classroom API)' };
