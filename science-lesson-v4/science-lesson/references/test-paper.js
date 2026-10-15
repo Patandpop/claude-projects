@@ -34,6 +34,9 @@
        --size mini|full     mini ≈ 20 min at home (KS3 20, KS4 25, KS5 30 marks); full ≈ 45 min (40 / 45 / 60)
        --marks N            exact mark target instead of --size
        --tier core|challenge only one of the two papers (KS3/KS4)
+       --in-class           front sheet worded as an in-class test, not homework
+       --ids "id1,id2"      hand-picked questions (library ids, e.g. Physics-Waves-Electromagnetic-Waves-3#Q14), one paper, in that order
+       --match "a,b,c"      only questions whose wording mentions one of these words (narrows a broad topic)
        --due YYYY-MM-DD     when the Form is due (default a week today)
        --no-form            paper only, no Forms quiz file
        --out <folder>       save the papers here instead
@@ -56,7 +59,7 @@ const LIB = path.join(ROOT, 'exam-library');
 const FIGS = path.join(LIB, 'figures');
 const USAGE = path.join(ROOT, 'exam-usage.json');
 const FONT = 'Arial';                       // exam papers are Arial, not the lesson house font
-const SZ = 22;                              // 11pt
+const SZ = 24;                              // 12pt (2026-10-15: 11pt read cramped)
 const readJson = (f, d) => { try { return JSON.parse(fs.readFileSync(f, 'utf8')); } catch (_) { return d; } };
 const ENT = { rarr: '→', larr: '←', bull: '•', amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ', deg: '°', times: '×', divide: '÷', minus: '−', lambda: 'λ', Delta: 'Δ', delta: 'δ', theta: 'θ', mu: 'μ', Omega: 'Ω', sigma: 'σ', pi: 'π', rho: 'ρ', le: '≤', ge: '≥', asymp: '≈', ndash: '–', mdash: '–', frac12: '½' };
 const decode = (s) => String(s || '').replace(/&([a-zA-Z]+\d*);/g, (m, k) => (ENT[k] != null ? ENT[k] : m)).replace(/&#(\d+);/g, (m, n) => String.fromCharCode(+n));
@@ -116,7 +119,9 @@ function aqaQuestions(targets, catalogue) {
     const refs = [...text.matchAll(/\bFigure\s+(\d+)/gi)].map((m) => +m[1]);
     const nFigs = new Set(parts.flatMap((p) => p.figureFiles || [])).size;
     if ((refs.length && Math.max(...refs) > nFigs) || parts.some((p) => /^[a-z]/.test(clean(p.text)))) continue;
+    if (parts.some((p) => clean(p.text).trim().length < 12)) continue;                         // a part whose words were lost in the export (2026-10-15: blank 10S2 question)
     if (!nFigs && /\b(figure|diagram|graph|table) (below|above)\b|shown (below|above)/i.test(text)) continue;
+    if (missingData(parts)) continue;
     // the library keeps a table's words but not its rows and columns: a table or matching task reads as a jumble
     if (/\btable\b|draw (one|a) line from each|list a\b|complete the (table|chart)/i.test(text)) continue;
     out.push({
@@ -145,7 +150,7 @@ function ocrQuestions(topics) {
     for (const p of d.parts) { const k = `${f.replace(/\.json$/, '')}#Q${p.question}`; if (!byQ.has(k)) byQ.set(k, []); byQ.get(k).push(p); }
     for (const [id, parts] of byQ) {
       const name = words((parts[0].subsubtopic || '') + ' ' + (parts[0].subtopic || '')).map(pre6);
-      if (!tw.some((t) => t.length && t.every((w) => name.includes(w)))) continue;
+      if (!topics.includes('*') && !tw.some((t) => t.length && t.every((w) => name.includes(w)))) continue;
       const total = parts[0].questionTotalMarks, sum = parts.reduce((n, p) => n + (p.marks || 0), 0);
       if (!total || sum !== total) continue;
       // since 2026-10-10 the library keeps the pictures and tables: a question is used when every
@@ -154,6 +159,11 @@ function ocrQuestions(topics) {
       const allText = clean(parts.map((p) => p.text).join(' '));
       const refs = [...allText.matchAll(/\bFig(?:ure|\.)\s*\d/gi)].length;
       if (refs && !parts.some((p) => (p.figureFiles || []).length || (p.tables || []).length)) continue;
+      // OCR exports can drop a part's table or data (2026-10-15): a question that talks about "the table"
+      // or "the data" with no table or picture anywhere is not printed
+      if (/\b(the|this) (table|data|results) (below|above|shows|in)\b|\btable \d/i.test(allText) && !parts.some((p) => (p.figureFiles || []).length || (p.tables || []).length)) continue;
+      // a later part that points back at information the export lost ("the value in (b)" with nothing in (b))
+      if (parts.slice(1).some((p) => /\b(from|in|using) \(([a-h])\)/i.test(p.text) && !parts.some((x) => x.part && x.part[0] === (p.text.match(/\b(?:from|in|using) \(([a-h])\)/i) || [])[1]))) continue;
       if (/^[a-z]/.test(clean(parts[0].text))) continue;                             // cut off at the start
       const ms = (parts[0].ms || {}).text;
       if (!ms) continue;
@@ -171,6 +181,30 @@ function ocrQuestions(topics) {
   return out.filter((q) => (seen.has(q.key) ? false : seen.add(q.key)));
 }
 
+// Data the export lost (2026-10-15: 11S2 Q1 asked about "the results from this experiment" with no results).
+//   - a part talks about the results / data / readings / table / graph but no picture or table carries them
+//   - a calculation's mark-scheme working uses numbers that appear nowhere in the question so far
+const COMMON = new Set(['0', '1', '2', '3', '4', '5', '10', '100', '1000', '60', '3600', '0.5', '9.8', '10.0', '4200', '24', '365']);
+function missingData(parts) {
+  let seen = '';
+  for (const p of parts) {
+    const t = clean(p.text), pics = (p.figureFiles || []).length || (p.tables || []).length;
+    seen += ' ' + t;
+    if (!pics && /\b(the|these|his|her|their|our|the student'?s) (results|data|readings|measurements)\b|\bthe (table|graph|bar chart)\b/i.test(t) &&
+        (t.match(/\d+(\.\d+)?/g) || []).length < 3 && !parts.some((x) => (x.figureFiles || []).length > 1 || (x.tables || []).length)) return true;
+    if (/\b(calculate|work out|determine)\b/i.test(t) && !pics) {
+      const ms = String((p.ms && p.ms.text) || '');
+      const work = ms.match(/\d[\d.]*\s*[×÷/]\s*\d[\d.]*(\s*[×÷/]\s*\d[\d.]*)*/);
+      if (work) {
+        const nums = work[0].split(/\s*[×÷/]\s*/).map((x) => x.replace(/\.$/, ''));
+        const have = new Set((seen.replace(/(\d) (\d{3})\b/g, '$1$2').match(/\d+(\.\d+)?/g) || []).map((x) => String(Number(x))));
+        if (nums.some((x) => !COMMON.has(String(Number(x))) && !have.has(String(Number(x))))) return true;
+      }
+    }
+  }
+  return false;
+}
+
 // Fill a mark target from a list (already in preference order), never more than +3 over.
 function fill(list, target, maxShare) {
   const out = []; let got = 0;
@@ -186,40 +220,160 @@ function fill(list, target, maxShare) {
   return out;
 }
 
+const lm = require('./lesson-match.js');
+// What a paper covers (Patryk 2026-10-15, planner test controls):
+//   o.taught    : every lesson the class has had so far (planner record), each question matched to one
+//                 of those lessons (lesson-match.js), spread evenly across them
+//   o.allTopics : the whole course for the subjects Patryk teaches the class (Year 11 general revision),
+//                 spread evenly across the topics
+//   o.topics    : chosen topics (as before), still checked against the topic's lessons
+function taughtLessons(o) {
+  if (o._taught) return o._taught;
+  const dp = require('./do-now-pick.js');
+  o._taught = dp.taughtFor(o.cls, o.date || new Date().toISOString().slice(0, 10))
+    .map((L) => ({ L, spec: lm.specFor({ topic: L.topic, title: L.title }) })).filter((x) => x.spec && !x.spec.none);
+  return o._taught;
+}
+// The lesson a question belongs to, best match first; null = about none of them.
+function lessonOf(q, specs, notYet) {
+  let best = null, br = -1;
+  const ms = (q.parts || []).map((p) => (p.ms && p.ms.text) || '').join(' ');
+  const text = clean((q.parts || []).map((p) => p.text).join(' '));
+  if (notYet && notYet.length && lm.hitsIn(text, notYet).length) return null;
+  for (const x of specs) {
+    const r = lm.match({ text, ms, subtopic: q.subtopic, subject: q.subject }, x.spec);
+    if (r.ok && lm.rank(r) > br) { br = lm.rank(r); best = x.spec.key; }
+  }
+  return best;
+}
+// Fill a mark target taking one question from each group in turn (each group in preference order),
+// so every lesson or topic gets its share instead of the easiest topic taking the paper.
+function spreadFill(list, target, groupOf) {
+  const groups = new Map();
+  for (const q of list) { const g = groupOf(q); if (!groups.has(g)) groups.set(g, []); groups.get(g).push(q); }
+  const out = []; let got = 0, moved = true;
+  while (got < target && moved) {
+    moved = false;
+    for (const [, qs] of groups) {
+      if (got >= target) break;
+      const i = qs.findIndex((q) => got + q.marks <= target + 3);
+      if (i < 0) continue;
+      const [q] = qs.splice(i, 1);
+      out.push(q); got += q.marks; moved = true;
+    }
+  }
+  return out;
+}
+const minutesToMarks = (min, ks) => Math.max(8, Math.round(min * (ks === 'ks3' ? 1 : 1.25)));   // mini = 20 minutes = 25 marks (KS3: a mark a minute)
+
 const SIZES = { mini: { ks3: 20, ks4: 25, ks5: 30 }, full: { ks3: 40, ks4: 45, ks5: 60 } };   // mini is the default (Patryk 2026-10-10)
 
 function choose(o) {
   const info = classInfo(o.cls);
   const year = info.year, ks = year >= 12 ? 'ks5' : year >= 9 ? 'ks4' : 'ks3';
-  const target = o.marks || SIZES[o.size === 'full' ? 'full' : 'mini'][ks];
+  const target = o.marks || (o.minutes ? minutesToMarks(o.minutes, ks) : SIZES[o.size === 'full' ? 'full' : 'mini'][ks]);
+  const taught = o.taught ? taughtLessons(o) : null;
+  if (o.taught && !taught.length) throw new Error(`${o.cls}: the planner has no taught lessons recorded yet`);
+  if (o.taught) o.topics = [...new Set(taught.map((x) => x.L.topic))];
+  if (!o.topics || !o.topics.length) {
+    if (!o.allTopics) throw new Error('say which topics (or use --taught / --all-topics)');
+  }
+  // the lessons a chosen topic covers: a question must be about one of them (2026-10-15 off-topic picks)
+  const topicSpecs = !o.taught && !o.allTopics && o.topics ? o.topics.flatMap((t) => {
+    const T = lm.findTopic(t);
+    return T ? Object.keys(lm.DATA[T].L).map((title) => ({ L: { topic: T, title }, spec: lm.specFor({ topic: T, title }) })).filter((x) => x.spec && !x.spec.none) : [];
+  }) : [];
+  // "everything so far" for all topics = this year's taught lessons + last year's (Year 11 general revision)
+  let covered = taught;
+  if (o.allTopics) {
+    const data = readJson(path.join(ROOT, 'planner', 'planner-data.json'), { classes: {} });
+    const prev = Object.values(data.classes).filter((c) => c.year === year - 1).flatMap((c) => c.seq.map((L) => ({ L, spec: lm.specFor({ topic: L.topic, title: L.title }) })));
+    covered = [...taughtLessons(o), ...prev].filter((x) => x.spec && !x.spec.none);
+    o.topics = [...new Set(covered.map((x) => x.L.topic))];
+  }
+  const specs = covered || topicSpecs;
+  // the words only lessons NOT yet had use ("diffract" before the diffraction lesson): such questions are out
+  const notYet = (() => {
+    if (!o.taught && !o.allTopics) return (o.exclude || []).map((w) => w.toLowerCase());
+    const had = new Set(specs.map((x) => x.spec.key));
+    const hadWords = new Set(specs.flatMap((x) => x.spec.words || []));
+    const words = [];
+    for (const t of new Set(specs.map((x) => lm.findTopic(x.L.topic)).filter(Boolean).concat(o.allTopics ? Object.keys(lm.DATA).filter((k) => /^P\d/.test(k)) : []))) {
+      for (const title of Object.keys(lm.DATA[t].L)) {
+        const sp = lm.specFor({ topic: t, title });
+        if (!sp || sp.none || sp.revision || had.has(sp.key)) continue;
+        (sp.need.length ? sp.need : sp.words).filter((w) => w.length > 4 && !hadWords.has(w)).forEach((w) => words.push(w));
+      }
+    }
+    return [...new Set(words.concat((o.exclude || []).map((w) => w.toLowerCase())))];
+  })();
   const usage = readJson(USAGE, {});
   const used = new Set([...(usage[o.cls] || []), ...(usage[o.cls + ':homework'] || []), ...(usage[o.cls + ':test'] || [])]);
   const papers = [];
-  if (ks === 'ks5') {
-    const all = ocrQuestions(o.topics).filter((q) => !used.has(q.id));
+  if (ks === 'ks5' && o.same) {
+    // --same <record .json>: the same questions again (a remake after a layout change), nothing re-picked
+    const rec = readJson(o.same, null);
+    if (!rec) throw new Error('record not found: ' + o.same);
+    const byId = new Map(ocrQuestions(['*']).map((q) => [q.id, q]));
+    const get = (id) => { if (!byId.has(id)) throw new Error('not usable or not found: ' + id); return byId.get(id); };
+    for (const p of rec.papers) papers.push({ tier: p.tier, sectionA: (p.sectionA || []).map(get), questions: p.questions.map((q) => get(q.ref)) });
+  } else if (ks === 'ks5') {
+    // OCR chapters ("Chapter 19 - Stars") are found by their lessons' sub-subtopics (Stars, Cosmology ...)
+    const ocrTopics = o.allTopics ? ['*'] : specs.length ? [...new Set(specs.flatMap((x) => (x.spec.subs === '*' ? [] : [...x.spec.subs])))] : o.topics;
+    let all = ocrQuestions(ocrTopics).filter((q) => !used.has(q.id));
+    if (specs.length) all = all.filter((q) => (q.lesson = lessonOf(q, specs, notYet)));
     if (!all.length) throw new Error(`no OCR questions found for "${o.topics.join(', ')}" (check the topic names: OCR chapter names such as Stars, Cosmology)`);
     // real A-level layout: about a quarter multiple choice (Section A), the rest structured (Section B)
     const mcqs = all.filter((q) => q.mcq), long = all.filter((q) => !q.mcq).sort((a, b) => a.marks - b.marks);
-    const a = fill(mcqs, Math.round(target * 0.25));
-    const b = fill(long, target - a.reduce((n, q) => n + q.marks, 0), 0.6);
+    const nM = o.mcq != null ? Math.min(o.mcq, mcqs.length) : null;
+    const group = (q) => q.lesson || q.subtopic;
+    const a = nM != null ? spreadFill(mcqs, nM, group).slice(0, nM) : (specs.length || o.allTopics ? spreadFill(mcqs, Math.round(target * 0.25), group) : fill(mcqs, Math.round(target * 0.25)));
+    const rest = target - a.reduce((n, q) => n + q.marks, 0);
+    const b = specs.length || o.allTopics ? spreadFill(long, rest, group) : fill(long, rest, 0.6);
     papers.push({ tier: null, sectionA: a, questions: b });
   } else {
     const cat = applyToCatalogue(readJson(path.join(LIB, 'catalogue.json'), null));
     const subjects = info.patrykTeaches || ['Biology', 'Chemistry', 'Physics'];
-    const targets = aqaTargets(year, o.topics, subjects, cat);
+    const codes = { Biology: 'B', Chemistry: 'C', Physics: 'P' };
+    const wantTopics = o.topics && o.topics.length ? o.topics : Object.keys(ep.AQA_TOPIC).filter((k) => subjects.some((sb) => k[0] === codes[sb]));
+    const targets = aqaTargets(year, wantTopics, subjects, cat);
+    // a lesson's questions may be filed under another library topic (P1 Energy's specific heat sits in
+    // Particle Model of Matter): add those subtopics too
+    if (specs.length) {
+      const want = new Set(specs.flatMap((x) => (x.spec.subs === '*' ? [] : [...x.spec.subs])));
+      const have = new Set(targets.map((t) => `${t.subject}|${t.topic}|${t.subtopic}`));
+      for (const r of cat.parts) {
+        const k = `${r.subject}|${r.topic}|${r.subtopic}`;
+        if (!have.has(k) && subjects.includes(r.subject) && want.has(String(r.subtopic).toLowerCase().replace(/[^a-z0-9]+/g, ''))) { have.add(k); targets.push({ subject: r.subject, topic: r.topic, subtopic: r.subtopic }); }
+      }
+    }
     if (!targets.length) throw new Error(`no exam topic matches "${o.topics.join(', ')}"`);
     let all = aqaQuestions(targets, cat).filter((q) => !used.has(q.id));
+    // --match "reflect,refract,...": keep only questions whose wording mentions one of these (narrows a broad topic)
+    if (o.match && o.match.length) {
+      const re = new RegExp(o.match.map((m) => m.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|'), 'i');
+      all = all.filter((q) => re.test(clean(q.parts.map((p) => p.text).join(' '))));
+    }
     if (ks === 'ks3') all = all.filter((q) => q.passRate == null || q.passRate >= 45);       // KS3: the more accessible GCSE questions
+    if (specs.length) all = all.filter((q) => (q.lesson = lessonOf(q, specs, notYet)));                  // about a lesson they have had
     // Core aims at questions about 70% of real candidates got right, Challenge at about 40% (KS3: 75 / 55).
     // Questions with no known pass rate use the library's estimate. Nothing below 15% (old-spec oddities).
     const ease = (q) => (q.passRate != null ? q.passRate : 100 - q.difficulty);
     const aim = ks === 'ks3' ? { core: 75, challenge: 55 } : { core: 70, challenge: 40 };
     const tiers = o.tier ? [o.tier] : ['core', 'challenge'];
     const taken = new Set();
-    for (const tier of tiers) {
+    if (o.ids && o.ids.length) {            // --ids: hand-picked questions, one paper, in the order given
+      const byId = new Map(aqaQuestions(targets, cat).map((q) => [q.id, q]));
+      const miss = o.ids.filter((i) => !byId.has(i));
+      if (miss.length) throw new Error('not usable or not found: ' + miss.join(', '));
+      papers.push({ tier: null, questions: o.ids.map((i) => byId.get(i)) });
+      all = [];
+    }
+    for (const tier of (o.ids && o.ids.length ? [] : tiers)) {
       const pool = all.filter((q) => ease(q) >= 15 && !(tier === 'challenge' && taken.has(q.id)))
         .sort((a, b) => Math.abs(ease(a) - aim[tier]) - Math.abs(ease(b) - aim[tier]) || (b.passRate != null) - (a.passRate != null));
-      const qs = fill(pool, target, 0.3).sort((a, b) => ease(b) - ease(a));                       // a paper ramps easy -> hard
+      const spread = specs.length || o.allTopics;
+      const qs = (spread ? spreadFill(pool, target, (q) => (o.allTopics ? String(q.lesson).split(' / ')[0] : q.lesson)) : fill(pool, target, 0.3)).sort((a, b) => ease(b) - ease(a));   // a paper ramps easy -> hard
       qs.forEach((q) => taken.add(q.id));
       papers.push({ tier, questions: qs });
     }
@@ -232,8 +386,12 @@ function choose(o) {
 
 const plainRun = (text, o) => new TextRun(Object.assign({ text: String(text), font: FONT, size: SZ }, o || {}));
 // a text run, with exam-export maths notation typeset: x^2, 10^−4, 10^{-11}, λ_max, v_0
+function powers(t) {
+  return String(t).replace(/(×\s*10)\s?[–−-]\s?(\d+)\b/g, '$1^−$2').replace(/(×\s*10)\s?(\d)\b(?![\d.])/g, (m, a, b) => (b === '0' ? m : a + '^' + b))
+    .replace(/(\/|\d\s?)(m|cm|mm|km|dm|s)([23])\b(?![\d.])/g, '$1$2^$3');
+}
 function run(text, o) {
-  const t = decode(text);
+  const t = powers(decode(text));
   if (!/[\^_]/.test(t)) return plainRun(t, o);
   const out = [];
   const re = /\^\{([^}]+)\}|\^([−–\-+]?[0-9.]+)|_\{([^}]+)\}|_(max|min|0|[0-9])\b/g;
@@ -250,7 +408,7 @@ function run(text, o) {
 const runs = (...xs) => xs.flat();
 const para = (children, o) => new Paragraph(Object.assign({ children: [].concat(children).flat() }, o || {}));
 const right = (text) => para(run(text, { bold: true }), { alignment: AlignmentType.RIGHT, spacing: { before: 40, after: 120 } });
-const line = () => para(run('_'.repeat(75), { color: '444444' }), { spacing: { before: 160, after: 0 } });
+const line = () => para(run('.'.repeat(118), { color: '555555' }), { spacing: { before: 200, after: 0 } });   // dotted, as on real papers
 const cellBorders = { top: { style: BorderStyle.SINGLE, size: 4, color: '000000' }, bottom: { style: BorderStyle.SINGLE, size: 4, color: '000000' }, left: { style: BorderStyle.SINGLE, size: 4, color: '000000' }, right: { style: BorderStyle.SINGLE, size: 4, color: '000000' } };
 const TW = 9900;   // text width in twips (A4 minus margins)
 const cell = (text, w, o) => new TableCell({ width: { size: Math.round(TW * w / 100), type: WidthType.DXA }, borders: cellBorders, columnSpan: (o || {}).span,
@@ -263,7 +421,8 @@ function figure(file, inline) {
   const buf = fs.readFileSync(fp);
   const dim = hb.imageSize(buf);
   if (!dim || !dim.w) return null;
-  if (inline && buf.length < 6000 && dim.w < 60 && dim.h < 60) return run(' ☐ ');                 // the tick box glyph
+  if (inline && dim.w <= 22 && dim.h <= 22) return run('✓');                                      // "Put a tick (✓)": the tick itself (2026-10-15)
+  if (inline && isTickBox(dim, buf.length)) return run(' ☐');                                      // the tick box glyph
   const maxW = inline === 'option' ? 330 : inline ? 160 : 520, maxH = inline === 'option' ? 110 : inline ? 120 : 360;
   const scale = Math.min(1, maxW / dim.w, maxH / dim.h);
   return new ImageRun({ data: buf, type: file.endsWith('.jpg') ? 'jpg' : 'png', transformation: { width: Math.round(dim.w * scale), height: Math.round(dim.h * scale) } });
@@ -272,6 +431,14 @@ function figure(file, inline) {
 // Returns paragraphs: the text with small inline pictures (tick boxes, equation options) in place,
 // and any big picture (graph, diagram) on its own line. A picture already shown in this question
 // (the stem's diagram repeated on every part) is not shown again.
+// A tick box: small and square. Thin or wide small pictures are equations or words, shown as pictures.
+const isTickBox = (dim, bytes) => bytes < 6000 && dim.w >= 23 && dim.w < 64 && dim.h < 64 && dim.w / dim.h > 0.75 && dim.w / dim.h < 1.33;
+function tickFile(file) {
+  const fp = path.join(FIGS, file);
+  if (!fs.existsSync(fp)) return false;
+  const buf = fs.readFileSync(fp), dim = hb.imageSize(buf) || { w: 0, h: 0 };
+  return isTickBox(dim, buf.length);
+}
 function isSmall(file) {
   const fp = path.join(FIGS, file);
   if (!fs.existsSync(fp)) return true;
@@ -317,14 +484,22 @@ function richParas(text, o) {
       if (fm) {
         const file = figMap[fm[1]];
         if (!file) return;
-        if (o.inlineFigs || isSmall(file)) { const f = figure(file, o.inlineFigs ? 'option' : true); if (f) runs.push(f); return; }   // option pictures sit next to their letter
+        if (o.inlineFigs || isSmall(file)) {
+          const f = figure(file, o.inlineFigs ? 'option' : true);
+          if (f) runs.push(f);
+          if (!o.inlineFigs && tickFile(file)) flush();                // one option per line, box after it (2026-10-15)
+          return;
+        }   // option pictures sit next to their letter
         if (shown.has(file)) return;
         shown.add(file); flush();
         const im = figure(file, false);
         if (im) out.push(para(im, { alignment: AlignmentType.CENTER, spacing: { before: 80, after: 80 } }));
         return;
       }
-      const t = b.replace(/[ \t]{2,}/g, ' ');
+      let t = b.replace(/[ \t]{2,}/g, ' ');
+      // "Tick (✓) one box." / "Tick two boxes." ends its own line, so the options start underneath
+      const tm2 = /^([\s\S]*?\btick\b[^.]{0,30}?\b(one|two|three) box(es)?\.)\s*([\s\S]*)$/i.exec(t);
+      if (tm2 && tm2[4].trim()) { runs.push(...[].concat(run(runs.length ? tm2[1] : tm2[1].replace(/^\s+/, '')))); flush(); t = tm2[4]; }
       if (t.trim()) runs.push(...[].concat(run(runs.length ? t : t.replace(/^\s+/, ''))));
     });
   });
@@ -349,6 +524,7 @@ function linesFor(p, ks5) {
   const t = clean(p.text);
   if (p.mcqAnswer) return [];
   if (noLines(t)) return [];
+  if (/=\s*\.{6,}/.test(String(p.text)) && (p.marks || 1) <= 3) return [];            // its own "answer = ......" line (OCR)
   const n = Math.max(1, Math.min(9, Math.round((p.marks || 1) * (ks5 ? 1.5 : 1.8))));
   return Array.from({ length: n }, line);
 }
@@ -364,11 +540,12 @@ function frontSheet(paper, meta) {
     new TableRow({ children: [cell('Score', 20, { run: { bold: true } }), cell(`        / ${total}`, 80)] }),
   ] }));
   ch.push(para(run('INSTRUCTIONS', { bold: true }), { spacing: { before: 240, after: 40 } }));
-  [`Homework: exam practice from real ${meta.ks === 'ks5' ? 'OCR A-level' : 'GCSE'} exam questions. Work through it at home.`,
+  [meta.inClass ? `In-class mini test, made from real ${meta.ks === 'ks5' ? 'OCR A-level' : 'GCSE'} exam questions. Work on your own and in silence.`
+      : `Homework: exam practice from real ${meta.ks === 'ks5' ? 'OCR A-level' : 'GCSE'} exam questions. Work through it at home.`,
     'Answer all the questions in the spaces provided.',
     'You may use a calculator and a ruler.',
     `Aim to spend about ${Math.max(15, Math.round(total * (meta.ks === 'ks5' ? 1.2 : 1)))} minutes on it.`,
-    'Then mark it with the mark scheme in green and correct anything you got wrong.'].forEach((t) => ch.push(para(run('• ' + t))));
+    meta.inClass ? 'Your teacher will tell you how it will be marked.' : 'Then mark it with the mark scheme in green and correct anything you got wrong.'].forEach((t) => ch.push(para(run('• ' + t))));
   ch.push(para(run('INFORMATION', { bold: true }), { spacing: { before: 160, after: 40 } }));
   [`The total mark is ${total}.`, `The marks for each question are shown in brackets ${meta.ks === 'ks5' ? '[ ]' : '( )'}.`].forEach((t) => ch.push(para(run('• ' + t))));
   return ch;
@@ -469,6 +646,7 @@ function msTable(fm, figMap) {
   const W = [12, 88].map((p) => Math.round(TW * p / 100));
   const tc = (children, w) => new TableCell({ width: { size: w, type: WidthType.DXA }, borders: cellBorders, children: children.length ? children : [para(run(''))] });
   const rows = fm.points.map((pt) => {
+    if (pt.lor) return lorRow(pt, figMap, tc, W);
     const body = pt.picture ? [para(run('Shown as a picture in the exam board mark scheme.', { italics: true }))]
       : richParas(pt.text, { figMap, shown: new Set() });
     [['Also accepted', pt.also], ['No mark for', pt.no], ["Doesn't matter", pt.ignore], ['Marker note', pt.extra]].forEach(([k, xs]) => {
@@ -480,6 +658,25 @@ function msTable(fm, figMap) {
   });
   if (fm.codes) rows.unshift(new TableRow({ children: [tc([para(run('', {}))], W[0]), tc([para(run(fm.codes, { bold: true, size: 20 }))], W[1])] }));
   return new Table({ width: { size: TW, type: WidthType.DXA }, layout: TableLayoutType.FIXED, columnWidths: W, rows });
+}
+
+// A level-of-response 6-marker (ms-friendly.js levelsBlock): how it is marked, one line per level,
+// then the points that earn credit grouped by area, one bullet each.
+function lorRow(pt, figMap, tc, W) {
+  const L = pt.lor, shown = new Set(), small = { size: 20 };
+  const body = [...L.before.flatMap((x) => richParas(x, { figMap, shown })),
+    para(run(L.how, { italics: true, size: 18, color: GREY }), { spacing: { after: 80 } })];
+  for (const lv of L.levels) body.push(para([run(`Level ${lv.level}  (${lv.marks} marks)  `, { bold: true, color: GREEN }), run(clean(lv.need), small)], { spacing: { before: 20, after: 20 } }));
+  if (L.areas.length) body.push(para(run('Points that earn credit', { bold: true }), { spacing: { before: 120, after: 20 } }));
+  for (const a of L.areas) {
+    if (a.head) body.push(para(run(a.head, { bold: true, size: 20, color: GREY }), { spacing: { before: 60, after: 0 }, keepNext: true }));
+    for (const x of a.points) body.push(...richParas('• ' + x, { figMap, shown }).map((p) => p));
+  }
+  [['Also accepted', pt.also], ['No mark for', pt.no], ["Doesn't matter", pt.ignore], ['Marker note', pt.extra]].forEach(([k, xs]) => {
+    if (xs.length) body.push(para([run(k + ': ', { bold: true, size: 18, color: GREY }), run(xs.map(clean).join('; '), { size: 18, color: GREY })], { indent: { left: 240 } }));
+  });
+  if (pt.label) body.unshift(para(run(`(${pt.label.replace(/[()\s]/g, '')})`, { bold: true })));
+  return new TableRow({ children: [tc([para(run(`✓ ${pt.marks}`, { bold: true, size: 24, color: GREEN }), { alignment: AlignmentType.CENTER })], W[0]), tc(body, W[1])] });
 }
 
 async function writeDocx(children, out) {
@@ -499,6 +696,23 @@ function outFolder(o, pick, name) {
   return { dir: path.join(ROOT, 'homework-out', 'exam-practice', o.cls), drive: false };
 }
 
+// A real "Tick (✓) one box." part whose options are words: its options and the mark scheme's answer.
+function tickOne(p) {
+  const t = String(p.text || '');
+  if (!/\btick\b[^.]{0,30}\bone box\b/i.test(t) || (p.marks || 1) !== 1) return null;
+  const pieces = t.split(/\[FIG:\d+\]/);
+  if (pieces.length < 3) return null;
+  const head = /^([\s\S]*?\bone box\.)\s*([\s\S]*)$/i.exec(pieces[0]);
+  if (!head) return null;
+  const options = [head[2], ...pieces.slice(1, -1)].map((x) => clean(x).trim()).filter(Boolean);
+  if (options.length < 2 || options.length > 5 || pieces[pieces.length - 1].trim().length > 3) return null;
+  const bare = (x) => String(x).toLowerCase().replace(/[^a-z0-9 ]+/g, ' ').replace(/\s+/g, ' ').trim();
+  const ms = bare(clean((p.ms && p.ms.text) || ''));
+  const hits = options.map((x, k) => (ms.includes(bare(x).slice(0, 40)) ? k : -1)).filter((k) => k >= 0);
+  if (hits.length !== 1) return null;
+  return { stem: powers(clean(head[1])), options: options.map(powers), answer: hits[0] };
+}
+
 // The same paper as a Google Forms quiz (homework-forms.js format): multiple choice marks itself;
 // each structured question is one written answer with its real mark scheme shown after submitting.
 function formsQuiz(paper, pick, o, name) {
@@ -509,29 +723,83 @@ function formsQuiz(paper, pick, o, name) {
     const p = q.parts[0];
     const stem = String(p.text).split('\n').map((l) => l.trim()).filter((l) => l && !q.options.some((x) => l === x || l.replace(/^[A-D][.)]?\s+/, '') === x)).join(' ');
     const pic = (p.figureFiles || []).length || /\[FIG/.test(p.text);
-    qs.push({ type: 'mcq', text: (pic ? '(Use the diagram on your paper copy.) ' : '') + clean(stem), options: q.options.map((x, k) => clean(x) || 'ABCD'[k]), answer: 'ABCD'.indexOf(q.answer), points: 1,
+    qs.push({ type: 'mcq', text: clean(stem), options: q.options.map((x, k) => clean(x) || 'ABCD'[k]), answer: 'ABCD'.indexOf(q.answer), points: 1,
       feedback: p.ms && p.ms.examinerCommentary ? clean(p.ms.examinerCommentary).slice(0, 400) : '', ref: q.id, lesson: q.subtopic });
   }
   paper.questions.forEach((q, i) => {
     const n = (paper.sectionA || []).length + i + 1;
+    if (q.board !== 'OCR A') {               // AQA: part by part (2026-10-15), tick-one parts mark themselves
+      q.parts.forEach((p) => {
+        const label = `Question ${n}${p.part ? '(' + p.part + ')' : ''}`;
+        const pic = (p.figureFiles || []).some((f) => !tickFile(f) && !isSmall(f));
+        const mc = tickOne(p);
+        if (mc) qs.push({ type: 'mcq', text: `${label}. ${mc.stem}`, options: mc.options, answer: mc.answer, points: p.marks || 1, feedback: '', ref: q.id, lesson: q.subtopic });
+        else qs.push({ type: 'written', text: `${label}\n${powers(clean(p.text))} [${p.marks}]`,
+          marks: p.marks, scheme: msPlain(p.ms, { board: 'AQA', marks: p.marks }), ref: q.id, lesson: q.subtopic });
+      });
+      return;
+    }
     const pic = q.parts.some((p) => (p.figureFiles || []).length || /\[FIG/.test(p.text));
     const text = q.parts.map((p) => (p.part ? `(${p.part}) ` : '') + clean(p.text) + ` [${p.marks}]`).join('\n');
     // one line per mark, notes underneath (2026-10-12: readable mark schemes)
     const scheme = q.board === 'OCR A' ? msPlain(q.parts[0].ms, { board: 'OCR A', marks: q.marks })
       : q.parts.map((p) => msPlain(p.ms, { board: 'AQA', marks: p.marks }, p.part ? `(${p.part})` : '')).join('\n\n');
-    qs.push({ type: 'written', text: `Question ${n} on your paper copy.${pic ? ' It has a diagram, graph or picture: look at the paper copy.' : ''}\n${text}`, marks: q.marks, scheme, ref: q.id, lesson: q.subtopic });
+    qs.push({ type: 'written', text: `Question ${n}\n${text}`, marks: q.marks, scheme, ref: q.id, lesson: q.subtopic });
   });
-  return { cls: o.cls, due, board: pick.ks === 'ks5' ? 'OCR A' : 'AQA', kind: 'exam-practice', tier: paper.tier || null,
+  return addQuizImages({ cls: o.cls, due, board: pick.ks === 'ks5' ? 'OCR A' : 'AQA', kind: 'exam-practice', tier: paper.tier || null,
     file: `homework-${o.cls}-${due}${paper.tier ? '-' + paper.tier : ''}.json`,
     title: `${o.cls} exam practice: ${name}${tier ? ' (' + tier + ')' : ''} (due ${due.split('-').reverse().slice(0, 2).join('/')})`,
-    intro: 'Exam practice homework from real exam questions. Answer each question, ideally on your paper copy first. The multiple-choice questions mark themselves. For the written questions, check your answer against the mark scheme shown after you submit and correct it in green.',
-    questions: qs };
+    intro: QUIZ_INTRO, questions: qs });
+}
+
+// Pupils have no paper copy (Patryk 2026-10-16): every picture goes into the Form, above its question,
+// and they mark their own long answers from the mark scheme shown after submitting.
+const QUIZ_INTRO = 'This is exam practice homework, made from real exam questions.\n\n' +
+  'Answer every question in this form. If a question has a picture, it is just above the question. Work out calculations on paper first if that helps, then type your answer and your working.\n\n' +
+  'The multiple-choice questions mark themselves. For the longer answers, the mark scheme appears after you submit. Mark your own answer against it and note anything you missed.\n\n' +
+  'If you get stuck, message me on Google Classroom.';
+const IMG_MAX = 1500000;                         // bytes; Google Forms takes images up to about 2 MB
+// The library parts behind a quiz question: "<doc>#Q<n>", and the part from "Question 3(b)" when it names one.
+function partsForRef(ref, text) {
+  const [doc, qn] = String(ref || '').split('#Q');
+  if (!doc || !qn) return [];
+  const d = readJson(path.join(LIB, /^ALevel-/.test(doc) ? 'docs-ocr' : 'docs', doc + '.json'), null);
+  const parts = d ? d.parts.filter((p) => String(p.question) === qn) : [];
+  const m = /^Question \d+\(([^)]+)\)/.exec(String(text || ''));
+  return m ? parts.filter((p) => p.part === m[1]) : parts;
+}
+// Adds each question's pictures (base64, in the quiz file; the planner puts them in the Form) and
+// tidies wording left in older files. A picture is shown once, above the first question that uses it.
+// Tick boxes are left out. Works on new quizzes and on files already waiting in Planner Sync.
+function addQuizImages(hw) {
+  const shown = new Set();
+  hw.missingPictures = [];
+  for (const q of hw.questions) {
+    q.text = String(q.text).replace(/ on your paper copy\./, '').replace(/ It has a diagram, graph or picture: look at the paper copy\./, '')
+      .replace(/\(Use the diagram on your paper copy\.\) /, '');
+    if (!q.ref) continue;
+    const files = [...new Set(partsForRef(q.ref, q.text).flatMap((p) => p.figureFiles || []))].filter((f) => f && !shown.has(f));
+    q.images = [];
+    for (const f of files) {
+      const fp = path.join(FIGS, f);
+      if (!fs.existsSync(fp)) { hw.missingPictures.push(q.ref + ' ' + f); continue; }
+      if (tickFile(f)) continue;
+      const buf = fs.readFileSync(fp);
+      if (buf.length > IMG_MAX) { hw.missingPictures.push(q.ref + ' ' + f + ' (too big)'); continue; }
+      shown.add(f);
+      q.images.push({ name: f, mime: /\.jpe?g$/i.test(f) ? 'image/jpeg' : 'image/png', data: buf.toString('base64') });
+    }
+    if (!q.images.length) delete q.images;
+  }
+  if (!hw.missingPictures.length) delete hw.missingPictures;
+  if (hw.kind === 'exam-practice') hw.intro = QUIZ_INTRO;
+  return hw;
 }
 
 async function build(o) {
   const pick = choose(o);
-  const name = o.title || o.topics.join(' and ');
-  const meta = { cls: o.cls, ks: pick.ks, title: name + (o.size === 'full' ? ' exam practice' : ' mini exam practice') };
+  const name = o.title || (o.allTopics ? 'All topics' : o.topics.join(' and ') + (o.taught ? ' (everything so far)' : ''));
+  const meta = { cls: o.cls, ks: pick.ks, title: name + (o.inClass ? ' mini test' : o.size === 'full' ? ' exam practice' : ' mini exam practice'), inClass: !!o.inClass };
   const where = outFolder(o, pick, name);
   const outDir = where.dir;
   const files = [];
@@ -543,7 +811,7 @@ async function build(o) {
     paper.questions.forEach((q, i) => console.log(`  Q${i + 1}. [${q.marks}${q.passRate != null ? ', pass ' + q.passRate + '%' : ''}] ${q.subtopic} · ${clean(q.parts[0].text).slice(0, 90)}`));
     if (o.dryRun) continue;
     fs.mkdirSync(outDir, { recursive: true });
-    const base = safe(`${o.cls} ${name}${o.size === 'full' ? '' : ' mini'} exam practice${paper.tier ? ' ' + (paper.tier === 'core' ? 'Core' : 'Challenge') : ''}`);
+    const base = safe(`${o.cls} ${name}${o.inClass ? ' mini test' : (o.size === 'full' ? '' : ' mini') + ' exam practice'}${paper.tier ? ' ' + (paper.tier === 'core' ? 'Core' : 'Challenge') : ''}`);
     await writeDocx(paperChildren(paper, meta), path.join(outDir, base + '.docx'));
     await writeDocx(schemeChildren(paper, meta), path.join(outDir, base + ' MS.docx'));
     files.push(base + '.docx', base + ' MS.docx');
@@ -579,12 +847,13 @@ async function build(o) {
   return pick;
 }
 
-module.exports = { choose, build, aqaTargets, aqaQuestions, ocrQuestions, fill, questionFigures, partParas, formsQuiz, outFolder };
+module.exports = { addQuizImages, _tickOne: tickOne, _powers: powers, choose, build, aqaTargets, aqaQuestions, ocrQuestions, fill, questionFigures, partParas, formsQuiz, outFolder };
 
 if (require.main === module) {
   const a = process.argv.slice(2), v = (k) => (a.includes(k) ? a[a.indexOf(k) + 1] : null);
-  if (!v('--class') || !v('--topics')) { console.error('usage: node test-paper.js --class 10C2 --topics "P1 Energy" [--size mini|full] [--marks N] [--tier core|challenge] [--due YYYY-MM-DD] [--no-form] [--dry-run]'); process.exit(1); }
-  build({ cls: v('--class'), topics: v('--topics').split(',').map((s) => s.trim()).filter(Boolean), size: v('--size') || 'mini', marks: v('--marks') ? +v('--marks') : null,
-    tier: v('--tier'), out: v('--out'), title: v('--title'), due: v('--due'), noForm: a.includes('--no-form'), dryRun: a.includes('--dry-run'), noRecord: a.includes('--no-record') })
+  if (!v('--class') || !(v('--topics') || a.includes('--taught') || a.includes('--all-topics'))) { console.error('usage: node test-paper.js --class 10C2 (--topics "P1 Energy" | --taught | --all-topics) [--size mini|full] [--minutes N] [--marks N] [--mcq N] [--tier core|challenge] [--due YYYY-MM-DD] [--no-form] [--dry-run]'); process.exit(1); }
+  build({ cls: v('--class'), topics: (v('--topics') || '').split(',').map((s) => s.trim()).filter(Boolean), taught: a.includes('--taught'), allTopics: a.includes('--all-topics'),
+    minutes: v('--minutes') ? +v('--minutes') : null, exclude: v('--not') ? v('--not').split(',').map((x) => x.trim()).filter(Boolean) : [], mcq: v('--mcq') != null ? +v('--mcq') : null, date: v('--date'), size: v('--size') || 'mini', marks: v('--marks') ? +v('--marks') : null,
+    tier: v('--tier'), out: v('--out'), title: v('--title'), due: v('--due'), noForm: a.includes('--no-form'), dryRun: a.includes('--dry-run'), noRecord: a.includes('--no-record'), same: v('--same'), inClass: a.includes('--in-class'), ids: v('--ids') ? v('--ids').split(',').map((s) => s.trim()).filter(Boolean) : null, match: v('--match') ? v('--match').split(',').map((s) => s.trim()).filter(Boolean) : null })
     .catch((e) => { console.error('exam practice not made: ' + e.message); process.exit(1); });
 }

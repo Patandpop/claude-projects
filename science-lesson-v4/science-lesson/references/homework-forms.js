@@ -160,13 +160,16 @@ function choose(cls, opts) {
       feedback: (x.p.ms && x.p.ms.examinerCommentary) ? String(x.p.ms.examinerCommentary).slice(0, 400) : '', ref: x.id, lesson: x.L.title })),
     ...practice.map((q) => ({ type: 'mcq', text: '(Practice question, not from a real exam) ' + q.stem, options: q.options, answer: 'ABCD'.indexOf(q.answer), points: 1,
       feedback: q.wrong ? Object.entries(q.wrong).map(([k, v]) => `${k}: ${v}`).join(' ').slice(0, 400) : '', ref: q.id, lesson: q.topic, written: true })),
-    ...w.map((x) => ({ type: 'written', text: x.p.text, marks: x.p.marks, scheme: msPlain(x.p.ms, { board: year >= 12 ? 'OCR A' : 'AQA', marks: x.p.marks }),   // one line per mark (2026-10-12) ref: x.id, lesson: x.L.title })),
+    ...w.map((x) => ({ type: 'written', text: x.p.text, marks: x.p.marks, scheme: msPlain(x.p.ms, { board: year >= 12 ? 'OCR A' : 'AQA', marks: x.p.marks }),   // one line per mark (2026-10-12)
+      ref: x.id, lesson: x.L.title })),
   ];
   const what = topicRes.length ? o.topics.join(' and ') : c.seq[taught[taught.length - 1].k].topic;
   const total = m.length + w.reduce((n, x) => n + x.p.marks, 0);
   const title = `${cls} homework: ${what}${o.marks ? ` (${total} marks)` : ''} (due ${due.split('-').reverse().slice(0, 2).join('/')})`;
   return { cls, due, title, board: year >= 12 ? 'OCR A' : 'AQA', questions,
-    intro: 'Answer every question. The multiple-choice questions mark themselves. For the written questions, check your answer against the mark scheme shown after you submit and correct it in green.' };
+    intro: 'Answer every question in this form.\n\n' +
+      'The multiple-choice questions mark themselves. For the written questions, the mark scheme appears after you submit. Mark your own answer against it and note anything you missed.\n\n' +
+      'If you get stuck, message me on Google Classroom.' };
 }
 
 // Google Forms shows plain text only, so "10^−4" and "x^2" become real raised characters (10⁻⁴, x²).
@@ -179,11 +182,14 @@ function formsText(hw) {
 function write(hw, dryRun) {
   formsText(hw);
   if (dryRun) return null;
-  if (!fs.existsSync(SYNC)) throw new Error('sync folder not found: ' + SYNC);
-  const file = path.join(SYNC, hw.file || `homework-${hw.cls}-${hw.due}.json`);   // exam practice adds -core / -challenge
+  // Google Drive not connected (2026-10-15): keep it in homework-out/planner-sync-waiting on this PC,
+  // to copy into Admin/Planner Sync once Drive is back (the planner only sees files there)
+  const dir = fs.existsSync(SYNC) ? SYNC : path.join(ROOT, 'homework-out', 'planner-sync-waiting');
+  if (dir !== SYNC) { fs.mkdirSync(dir, { recursive: true }); console.log(`  (Google Drive not connected: Forms file kept in ${dir}; copy it into Admin/Planner Sync)`); }
+  const file = path.join(dir, hw.file || `homework-${hw.cls}-${hw.due}.json`);   // exam practice adds -core / -challenge
   delete hw.file;
   fs.writeFileSync(file, JSON.stringify(hw, null, 1));
-  fs.appendFileSync(path.join(SYNC, 'sync-log.txt'), new Date().toISOString().slice(0, 16).replace('T', ' ') + `  wrote ${path.basename(file)}\n`);
+  fs.appendFileSync(path.join(dir, 'sync-log.txt'), new Date().toISOString().slice(0, 16).replace('T', ' ') + `  wrote ${path.basename(file)}\n`);
   const usage = readJson(USAGE, {});
   usage[hw.cls + ':homework'] = [...new Set([...(usage[hw.cls + ':homework'] || []), ...hw.questions.map((q) => q.ref)])];
   fs.writeFileSync(USAGE, JSON.stringify(usage, null, 1));

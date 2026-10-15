@@ -218,6 +218,11 @@ function buildQuiz_(hw) {
   f.setIsQuiz(true).setDescription(hw.intro || '').setCollectEmail(true).setProgressBar(true);
   hw.questions.forEach((q, n) => {
     try {
+      // pictures first, just above the question (Patryk 2026-10-16: pupils have no paper copy)
+      (q.images || []).forEach((img, k) => {
+        const it = f.addImageItem().setImage(Utilities.newBlob(Utilities.base64Decode(img.data), img.mime || 'image/png', img.name || 'picture.png'));
+        if (k === 0) it.setTitle('Question ' + (n + 1));
+      });
       if (q.type === 'mcq') {
         // Patryk 2026-10-16 ("Invalid data updating form"): in a quiz, a question worth points must
         // already have its correct answer, so the CHOICES are set BEFORE the points.
@@ -247,7 +252,7 @@ function addWritten_(f, title, scheme) {
     try {
       it = f.addParagraphTextItem().setTitle(title).setRequired(true);
       if (tries[k][0]) it.setPoints(0);
-      it.setGeneralFeedback(FormApp.createFeedback().setText('Mark scheme (mark your own answer):\n\n' + tries[k][1]).build());
+      it.setGeneralFeedback(FormApp.createFeedback().setText('Mark scheme\n\nCompare it with your answer. Give yourself the marks you earned and note anything you missed.\n\n' + tries[k][1]).build());
       return it;
     } catch (e) {
       errs.push('attempt ' + (k + 1) + ': ' + String(e.message || e));
