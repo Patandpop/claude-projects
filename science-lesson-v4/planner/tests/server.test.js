@@ -25,7 +25,8 @@ const ids = ev.filter(e => e.type === '-').map(e => e.id);
 ev = api.removeMany(k, '7BYA', ids); ok('undo removes them', ev.filter(e => e.type === '-').length === 0);
 api.logEvent(k, '7BYA', 'Thomas Boxall', '-', 0); ev = api.logEvent(k, '7BYA', 'Thomas Boxall', '-', 4);
 ok('detention reason saved on a negative', ev[ev.length - 1].rule === 4);
-const past = Date.now() - 120000;   // 2 minutes ago (an hour ago is yesterday just after midnight) ev = api.logEvent(k, '7BYA', 'Tom Browning', '+', 0, past);
+const past = Date.now() - 120000;   // 2 minutes ago (an hour ago is yesterday just after midnight)
+ev = api.logEvent(k, '7BYA', 'Tom Browning', '+', 0, past);
 ok('offline tap keeps the time it was tapped', ev.some(e => e.name === 'Tom Browning' && e.type === '+' && Math.abs(e.id - past) < 5));
 ok('board shows today\'s positives', api.getBoard(k, 6).names.length >= 1);
 ok('board check-in is recorded for the phone dot', Date.now() - api.getMode(k).board < 2000);
