@@ -217,14 +217,19 @@ function buildQuiz_(hw) {
   const f = FormApp.create(hw.title);
   f.setIsQuiz(true).setDescription(hw.intro || '').setCollectEmail(true).setProgressBar(true);
   hw.questions.forEach((q, n) => {
-    if (q.type === 'mcq') {
-      const it = f.addMultipleChoiceItem().setTitle((n + 1) + '. ' + q.text).setPoints(q.points || 1).setRequired(true);
-      it.setChoices(q.options.map((o, i) => it.createChoice(o, i === q.answer)));
-      if (q.feedback) it.setFeedbackForIncorrect(FormApp.createFeedback().setText('What examiners saw: ' + q.feedback).build());
-    } else {
-      const it = f.addParagraphTextItem().setTitle((n + 1) + '. ' + q.text + '  [' + q.marks + ' mark' + (q.marks === 1 ? '' : 's') + ']').setRequired(true).setPoints(0);
-      it.setGeneralFeedback(FormApp.createFeedback().setText('Mark scheme (mark your own answer):\n\n' + q.scheme).build());
-    }
+    try {
+      if (q.type === 'mcq') {
+        // Patryk 2026-10-16 ("Invalid data updating form"): in a quiz, a question worth points must
+        // already have its correct answer, so the CHOICES are set BEFORE the points.
+        const it = f.addMultipleChoiceItem().setTitle((n + 1) + '. ' + q.text).setRequired(true);
+        it.setChoices(q.options.map((o, i) => it.createChoice(o, i === q.answer)));
+        it.setPoints(q.points || 1);
+        if (q.feedback) it.setFeedbackForIncorrect(FormApp.createFeedback().setText('What examiners saw: ' + q.feedback).build());
+      } else {
+        const it = f.addParagraphTextItem().setTitle((n + 1) + '. ' + q.text + '  [' + q.marks + ' mark' + (q.marks === 1 ? '' : 's') + ']').setRequired(true);
+        it.setGeneralFeedback(FormApp.createFeedback().setText('Mark scheme (mark your own answer):\n\n' + q.scheme).build());
+      }
+    } catch (e) { throw new Error('question ' + (n + 1) + ' (' + q.type + '): ' + String(e.message || e)); }
   });
   // keep his Drive tidy: the quiz goes into one folder (made once; only this new file is moved)
   const it = DriveApp.getFoldersByName('Planner homework quizzes');
