@@ -93,7 +93,9 @@ function codesText(codes) {
 }
 function ocr(ms, marks) {
   // a code in the middle of a line ("... Sun. B1 Allow: ECF") starts a new line
-  const lines = decode(ms.text).replace(/^\s*\d+\s+(?:\(?(?:[a-h]|iv|v|vi{0,3}|i{1,3})\)?\s+){0,3}/, '')
+  // 2026-10-16 (12C/13D Forms): the examiner's comments are not the mark scheme (they are kept apart in
+  // ms.examinerCommentary), so they are cut off here
+  const lines = decode(ms.text).replace(/\s*\b\d?\s*Examiner['’]?s?\s+Comments?\b[\s\S]*$/i, '').replace(/^\s*\d+\s+(?:\(?(?:[a-h]|iv|v|vi{0,3}|i{1,3})\)?\s+){0,3}/, '')
     .replace(/\s(?=[BMAC][0-9](?:\s*[×x]\s*[0-9]+)?\s+(?:allow|accept|ignore|not|do not|reject)\b)/gi, '\n')
     .split('\n').map((l) => l.trim()).filter(Boolean);
   const groups = [];
@@ -108,9 +110,15 @@ function ocr(ms, marks) {
     if ((m = CODE.exec(l))) { take(m[1]); l = l.slice(m[0].length).trim(); if (!l) continue; if (!GUIDE.test(l)) { g.pt.extra.push(tidy(l)); continue; } }
     if (GUIDE.test(l) || NOTE.test(l)) { sortNote(l, g.pt); continue; }
     if ((m = CODE_END.exec(l))) { take(m[1]); l = l.slice(0, m.index).trim(); }
+    if (/^[A-Da-d]$/.test(l)) l = 'Answer: ' + l.toUpperCase();                 // a multiple-choice answer letter
     if (l) g.ans.push(l);
   }
   const live = groups.filter((x) => x.ans.length || x.codes.length);
+  // the first part's own label was cut with the question number: (ii) next means this is (i), (b) means (a)
+  if (live.length > 1 && !live[0].label && live[1].label) {
+    const nx = live[1].label.replace(/[()\s]/g, '');
+    live[0].label = { ii: 'i', iii: 'ii', b: 'a', c: 'b' }[nx] || '';
+  }
   const pts = live.map((x) => {
     x.pt.text = x.ans.join('\n');
     x.pt.marks = x.codes.reduce((a, c) => a + c.n, 0);
@@ -123,6 +131,43 @@ function ocr(ms, marks) {
   return { points: pts, codes: pts.length === 1 ? pts[0].codes : '', split: got === marks, parts: pts.length > 1 };
 }
 
+// OCR level-of-response schemes (the 6-mark "*" questions). Rules (Patryk 2026-10-15: "hard to see
+// where pupils get marks from"):
+//  1. one line per level, Level 3 first, holding only its science line ("Clear methods of measurement ...");
+//     the writing sentences ("There is a well-developed line of reasoning ...") are the same on every OCR
+//     6-marker, so they become one "How it is marked" line instead of being repeated per level;
+//  2. "0 marks / No response ..." and marker codes (B1 × 6, RM Assessor) are dropped;
+//  3. "Indicative scientific points" become "Points that earn credit", grouped under their area headings
+//     (Measurement, Uncertainty, ...) with OCR's area letters (M, U, A) removed, one bullet per point.
+// The board's words for each level and point are kept exactly.
+const LEVEL = /^\*?\s*Level\s*([1-4])\s*\(([^)]*)\)\s*(.*)$/i;
+const WRITING = /^(?:there is (?:a|an|no)\b|the information (?:is|presented)\b)/i;
+const INDICATIVE = /^(?:indicative (?:scientific )?(?:points|content)[^:]*:?|the complete plan consists of[^:]*:?)\s*/i;
+const AREA = /^(?:[A-Z]\s+)?((?:use of data|description|analysis|measurements?|uncertaint(?:y|ies)|minimising uncertaint(?:y|ies)|equipment(?: used)?(?: safety)?|safety|reliability|method|calculations?|explanation of (?:terms|results)|evaluation|conclusions?|further comments|energy approach|reverse thrust|forward thrust)(?:\s*\([A-Z]\))?)(?=\s|$)\s*(.*)$/i;
+const LOR_HOW = 'How it is marked: the marker reads the whole answer and picks the level whose description fits the science best, then gives the higher mark in that level if the answer is clear and in a sensible order, the lower mark if not.';
+function levelsBlock(text) {
+  const t = String(text || '').replace(/\bB1\s*[×x]\s*\d\b/g, '\n').replace(/Use level of response annotations in RM Assessor/gi, '\n')
+    .replace(/(\S)[ \t]*(\*?\s*Level\s*[1-4]\s*\()/g, '$1\n$2')
+    .replace(/[ \t]+(Indicative scientific points)/i, '\n$1');
+  if (!/Level\s*3\s*\(/i.test(t)) return null;
+  const out = { before: [], levels: [], areas: [] };
+  let mode = 'before', lv = null, area = null, m;
+  for (let l of t.split('\n').map((x) => x.trim().replace(/^\*\s*$/, '')).filter(Boolean)) {
+    if ((m = LEVEL.exec(l))) { lv = { level: +m[1], marks: m[2].replace(/\s*marks?$/i, '').replace(/\s*[-−]\s*/, '–'), need: m[3] ? [m[3]] : [] }; out.levels.push(lv); mode = 'lv'; continue; }
+    if (mode === 'lv' && /^0 marks?\b/i.test(l)) { mode = 'zero'; continue; }
+    if (mode !== 'before' && (m = INDICATIVE.exec(l))) { mode = 'pts'; l = l.slice(m[0].length).trim(); if (!l) continue; }
+    if (mode === 'zero') { if (/^no response\b/i.test(l)) continue; mode = 'pts'; }
+    if (mode === 'before') { out.before.push(l); continue; }
+    if (mode === 'lv') { if (!WRITING.test(l)) lv.need.push(l); continue; }
+    if ((m = AREA.exec(l))) { area = { head: m[1][0].toUpperCase() + m[1].slice(1), points: m[2] ? [m[2]] : [] }; out.areas.push(area); continue; }
+    if (!area) out.areas.push(area = { head: '', points: [] });
+    area.points.push(l.replace(/^×(?=\s*=)/, 'x'));   // the library's × where the scheme meant the letter x
+  }
+  out.levels.forEach((x) => { x.need = tidy(x.need.join(' ')); });
+  out.how = LOR_HOW + (out.areas.filter((a) => a.head).length > 1 ? ' A Level 3 answer covers every area below.' : '');
+  return out;
+}
+
 // ms: { text, notes, levels }; opts: { board: 'AQA'|'OCR A', marks }
 function friendlyMs(ms, opts) {
   const o = opts || {};
@@ -130,6 +175,7 @@ function friendlyMs(ms, opts) {
   if ((ms.levels || []).length) return { points: [point(o.marks, decode(ms.text))], levels: ms.levels, split: false, codes: '' };
   const r = o.board === 'OCR A' ? ocr(ms, o.marks) : aqa(ms, o.marks);
   r.codes = r.codes || '';
+  if (o.board === 'OCR A') for (const p of r.points) { const lor = levelsBlock(p.text); if (lor) { p.lor = lor; r.split = false; r.codes = ''; } }
   for (const p of r.points) if (!p.text.replace(/\[FIG:\d+\]|\[FIGURE\]|\bor\b/g, '').trim()) p.picture = true;   // the answer is a drawing / graph
   return r;
 }
@@ -144,6 +190,13 @@ function msPlain(ms, opts, label) {
   if (f.codes) out.push(f.codes);
   for (const p of f.points) {
     if (f.parts) out.push(`${p.label ? '(' + p.label.replace(/[()\s]/g, '') + ') ' : ''}${p.marks} mark${p.marks === 1 ? '' : 's'}${p.codes ? ' · ' + p.codes.replace(/^Marks: /, '') : ''}`);
+    if (p.lor) {
+      out.push(...p.lor.before.map(strip), p.lor.how);
+      p.lor.levels.forEach((lv) => out.push(`Level ${lv.level} (${lv.marks} marks): ${strip(lv.need)}`));
+      if (p.lor.areas.length) out.push('Points that earn credit:');
+      p.lor.areas.forEach((a) => { if (a.head) out.push(a.head); a.points.forEach((x) => out.push('   • ' + strip(x))); });
+      continue;
+    }
     const body = p.picture ? 'shown as a picture: see the mark scheme on paper' : strip(p.text).split('\n').map(tidy).filter(Boolean).join('\n   ');
     out.push(f.split && !f.codes && !f.parts ? `✓ ${p.marks} mark${p.marks === 1 ? '' : 's'}: ${body}` : `✓ ${body}`);
     if (p.also.length) out.push('   Also accepted: ' + p.also.map(strip).join('; '));
@@ -155,4 +208,4 @@ function msPlain(ms, opts, label) {
   return out.join('\n');
 }
 
-module.exports = { friendlyMs, msPlain, MS_KEY, decode };
+module.exports = { friendlyMs, msPlain, MS_KEY, decode, levelsBlock };

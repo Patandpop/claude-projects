@@ -52,6 +52,7 @@ const {
 const hb = require('./homework-booklet.js');
 const { applyToCatalogue } = require('./exam-categories-apply.js');
 const ep = require('./exam-pick.js');
+const { categorise } = require('./exam-categorise.js');
 const { friendlyMs, msPlain, MS_KEY } = require('./ms-friendly.js');
 
 const ROOT = path.join(__dirname, '..', '..');
@@ -362,20 +363,79 @@ function choose(o) {
     const aim = ks === 'ks3' ? { core: 75, challenge: 55 } : { core: 70, challenge: 40 };
     const tiers = o.tier ? [o.tier] : ['core', 'challenge'];
     const taken = new Set();
+    // GCSE multiple choice (Patryk 2026-10-16: "the first half multiple choice"): --mcq N puts N real
+    // one-mark "Tick one box" parts in a Section A, one per question, spread over the subtopics. Only parts
+    // that make sense on their own (a one-part question, or wording that does not lean on the rest of it);
+    // a part that needs its diagram keeps it (the Form shows the picture above the question).
+    let sectionA = null;
+    if (o.mcq) {
+      const tierAim = aim[tiers[0]];
+      const pool = [];
+      for (const q of all) {
+        for (const p of q.parts.slice(0, 1)) {          // the first part carries the question's opening (later parts lean on it)
+          const c = categorise(p);
+          if (!c.mcq || p.marks !== 1) continue;
+          const stem = c.mcq.stem, figs = (p.figureFiles || []).filter((f) => !tickFile(f));
+          if (q.parts.length > 1 && /\b(this|these|the student|the teacher|the scientist)\b/i.test(stem)) continue;
+          if (/\btable\b/i.test(stem) || (/\b(figure|graph|diagram)\b/i.test(stem) && !figs.length)) continue;
+          if (c.mcq.options.some((x) => x.length > 150 || /\[FIG|\bfigure\b/i.test(x))) continue;
+          pool.push({ id: q.id, part: p.part, board: 'AQA', subject: q.subject, topic: q.topic, subtopic: q.subtopic, marks: 1,
+            passRate: p.passRate, difficulty: p.difficulty || 50, options: c.mcq.options, answer: 'ABCD'[c.mcq.answer],
+            parts: [Object.assign({}, p, { text: stem + '\n' + c.mcq.options.join('\n'), mcqOptions: c.mcq.options })] });
+          break;                                                                  // one part per question
+        }
+      }
+      const stemKey = (q) => clean(q.parts[0].text).toLowerCase().replace(/[^a-z0-9]+/g, ' ').slice(0, 70);
+      const seenStem = new Set();
+      for (let k = pool.length - 1; k >= 0; k--) { const s = stemKey(pool[k]); if (seenStem.has(s)) pool.splice(k, 1); else seenStem.add(s); }   // the same question filed twice: once
+      const easeA = (q) => (q.passRate != null ? q.passRate : 100 - q.difficulty);
+      pool.sort((a, b) => Math.abs(easeA(a) - tierAim) - Math.abs(easeA(b) - tierAim));
+      const bySub = new Map();
+      pool.forEach((q) => { if (!bySub.has(q.subtopic)) bySub.set(q.subtopic, []); bySub.get(q.subtopic).push(q); });
+      sectionA = [];
+      for (let round = 0; sectionA.length < o.mcq && [...bySub.values()].some((l) => l.length > round); round++)
+        for (const l of bySub.values()) if (l[round] && sectionA.length < o.mcq) sectionA.push(l[round]);
+      // too few real ones: top up from the practice bank (mcq-written.js, the same bank the homework quizzes
+      // use), labelled as practice questions so nobody mistakes them for real exam questions
+      if (sectionA.length < o.mcq) {
+        try {
+          const mw = require('./mcq-written.js');
+          const words = o.match && o.match.length ? o.match : o.topics.map((t) => t.replace(/^[BCP]\d+\s+/, ''));   // "P1 Energy" -> "Energy"
+          for (const x of mw.forTopics('AQA', words, { subjects })) {
+            if (sectionA.length >= o.mcq) break;
+            if (used.has('practice:' + x.id)) continue;
+            sectionA.push({ id: 'practice:' + x.id, part: '', practice: true, board: 'AQA', subject: 'Physics', topic: x.topic, subtopic: x.topic, marks: 1,
+              options: x.options, answer: x.answer, parts: [{ part: '', marks: 1, figureFiles: [], text: x.stem + '\n' + x.options.join('\n'), mcqOptions: x.options, ms: { text: x.answer } }] });
+          }
+        } catch (e) { /* no practice bank */ }
+      }
+      if (sectionA.length < o.mcq) console.log(`  (only ${sectionA.length} suitable multiple-choice questions for these topics)`);
+      const inA = new Set(sectionA.map((q) => q.id));
+      all = all.filter((q) => !inA.has(q.id));
+    }
+    const targetB = sectionA ? Math.max(1, target - sectionA.length) : target;
     if (o.ids && o.ids.length) {            // --ids: hand-picked questions, one paper, in the order given
       const byId = new Map(aqaQuestions(targets, cat).map((q) => [q.id, q]));
-      const miss = o.ids.filter((i) => !byId.has(i));
+      // "doc#Q8(a,b)" takes only those parts of the question (Patryk 2026-10-16: two 6-markers for 10C2)
+      const want = o.ids.map((i) => { const m = /^(.*#Q\d+)(?:\(([^)]+)\))?$/.exec(i); return { id: m[1], parts: m[2] ? m[2].split(/[,+]/).map((s) => s.trim()) : null }; });
+      const miss = want.filter((w) => !byId.has(w.id)).map((w) => w.id);
       if (miss.length) throw new Error('not usable or not found: ' + miss.join(', '));
-      papers.push({ tier: null, questions: o.ids.map((i) => byId.get(i)) });
+      papers.push({ tier: null, questions: want.map((w) => {
+        const q = byId.get(w.id);
+        if (!w.parts) return q;
+        const parts = q.parts.filter((p) => w.parts.includes(p.part));
+        if (!parts.length) throw new Error(w.id + ' has no part ' + w.parts.join(','));
+        return Object.assign({}, q, { parts, marks: parts.reduce((n, p) => n + (p.marks || 0), 0) });
+      }) });
       all = [];
     }
     for (const tier of (o.ids && o.ids.length ? [] : tiers)) {
       const pool = all.filter((q) => ease(q) >= 15 && !(tier === 'challenge' && taken.has(q.id)))
         .sort((a, b) => Math.abs(ease(a) - aim[tier]) - Math.abs(ease(b) - aim[tier]) || (b.passRate != null) - (a.passRate != null));
       const spread = specs.length || o.allTopics;
-      const qs = (spread ? spreadFill(pool, target, (q) => (o.allTopics ? String(q.lesson).split(' / ')[0] : q.lesson)) : fill(pool, target, 0.3)).sort((a, b) => ease(b) - ease(a));   // a paper ramps easy -> hard
+      const qs = (spread ? spreadFill(pool, targetB, (q) => (o.allTopics ? String(q.lesson).split(' / ')[0] : q.lesson)) : fill(pool, targetB, 0.3)).sort((a, b) => ease(b) - ease(a));   // a paper ramps easy -> hard
       qs.forEach((q) => taken.add(q.id));
-      papers.push({ tier, questions: qs });
+      papers.push(sectionA ? { tier, sectionA, questions: qs } : { tier, questions: qs });
     }
   }
   const subjects = [...new Set(papers.flatMap((p) => [...(p.sectionA || []), ...p.questions].map((q) => q.subject)))];
@@ -715,16 +775,25 @@ function tickOne(p) {
 
 // The same paper as a Google Forms quiz (homework-forms.js format): multiple choice marks itself;
 // each structured question is one written answer with its real mark scheme shown after submitting.
+// A Form has no tables, and pupils have no paper copy (2026-10-16): a kept A-level table goes into the
+// question as rows of text, "Material | Refractive index".
+function withTables(p) {
+  return String(p.text).replace(/\[TABLE:(\d+)\]/g, (m, k) => {
+    const t = (p.tables || [])[+k];
+    if (!t || !t.rows) return m;
+    return '\n' + t.rows.map((r) => r.map((c) => clean(String(c == null ? '' : c)) || '-').join(' | ')).join('\n') + '\n';
+  });
+}
 function formsQuiz(paper, pick, o, name) {
   const due = o.due || new Date(Date.now() + 7 * 864e5).toISOString().slice(0, 10);
   const tier = paper.tier ? (paper.tier === 'core' ? 'Core' : 'Challenge') : '';
   const qs = [];
   for (const q of paper.sectionA || []) {
     const p = q.parts[0];
-    const stem = String(p.text).split('\n').map((l) => l.trim()).filter((l) => l && !q.options.some((x) => l === x || l.replace(/^[A-D][.)]?\s+/, '') === x)).join(' ');
+    const stem = withTables(p).split('\n').map((l) => l.trim()).filter((l) => l && !q.options.some((x) => l === x || l.replace(/^[A-D][.)]?\s+/, '') === x)).join((p.tables || []).length ? '\n' : ' ');   // table rows keep their lines
     const pic = (p.figureFiles || []).length || /\[FIG/.test(p.text);
-    qs.push({ type: 'mcq', text: clean(stem), options: q.options.map((x, k) => clean(x) || 'ABCD'[k]), answer: 'ABCD'.indexOf(q.answer), points: 1,
-      feedback: p.ms && p.ms.examinerCommentary ? clean(p.ms.examinerCommentary).slice(0, 400) : '', ref: q.id, lesson: q.subtopic });
+    qs.push({ type: 'mcq', text: (q.practice ? '(Practice question) ' : '') + clean(stem), options: q.options.map((x, k) => clean(x) || 'ABCD'[k]), answer: 'ABCD'.indexOf(q.answer), points: 1,
+      feedback: p.ms && p.ms.examinerCommentary ? clean(p.ms.examinerCommentary).slice(0, 400) : '', ref: q.id, part: q.part, lesson: q.subtopic });
   }
   paper.questions.forEach((q, i) => {
     const n = (paper.sectionA || []).length + i + 1;
@@ -740,7 +809,7 @@ function formsQuiz(paper, pick, o, name) {
       return;
     }
     const pic = q.parts.some((p) => (p.figureFiles || []).length || /\[FIG/.test(p.text));
-    const text = q.parts.map((p) => (p.part ? `(${p.part}) ` : '') + clean(p.text) + ` [${p.marks}]`).join('\n');
+    const text = q.parts.map((p) => (p.part ? `(${p.part}) ` : '') + clean(withTables(p)) + ` [${p.marks}]`).join('\n');
     // one line per mark, notes underneath (2026-10-12: readable mark schemes)
     const scheme = q.board === 'OCR A' ? msPlain(q.parts[0].ms, { board: 'OCR A', marks: q.marks })
       : q.parts.map((p) => msPlain(p.ms, { board: 'AQA', marks: p.marks }, p.part ? `(${p.part})` : '')).join('\n\n');
@@ -760,11 +829,12 @@ const QUIZ_INTRO = 'This is exam practice homework, made from real exam question
   'If you get stuck, message me on Google Classroom.';
 const IMG_MAX = 1500000;                         // bytes; Google Forms takes images up to about 2 MB
 // The library parts behind a quiz question: "<doc>#Q<n>", and the part from "Question 3(b)" when it names one.
-function partsForRef(ref, text) {
+function partsForRef(ref, text, part) {
   const [doc, qn] = String(ref || '').split('#Q');
   if (!doc || !qn) return [];
   const d = readJson(path.join(LIB, /^ALevel-/.test(doc) ? 'docs-ocr' : 'docs', doc + '.json'), null);
   const parts = d ? d.parts.filter((p) => String(p.question) === qn) : [];
+  if (part != null && part !== '') return parts.filter((p) => p.part === part);   // a Section A multiple-choice part
   const m = /^Question \d+\(([^)]+)\)/.exec(String(text || ''));
   return m ? parts.filter((p) => p.part === m[1]) : parts;
 }
@@ -778,7 +848,7 @@ function addQuizImages(hw) {
     q.text = String(q.text).replace(/ on your paper copy\./, '').replace(/ It has a diagram, graph or picture: look at the paper copy\./, '')
       .replace(/\(Use the diagram on your paper copy\.\) /, '');
     if (!q.ref) continue;
-    const files = [...new Set(partsForRef(q.ref, q.text).flatMap((p) => p.figureFiles || []))].filter((f) => f && !shown.has(f));
+    const files = [...new Set(partsForRef(q.ref, q.text, q.part).flatMap((p) => p.figureFiles || []))].filter((f) => f && !shown.has(f));
     q.images = [];
     for (const f of files) {
       const fp = path.join(FIGS, f);
