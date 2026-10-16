@@ -1,0 +1,31 @@
+[
+  {
+    "meta": {
+      "class": "10C2",
+      "topic": "P1 Energy test",
+      "title": "P1 Energy Test",
+      "lessonType": "test",
+      "theme": "physics",
+      "year": 10,
+      "subject": "Physics",
+      "macrotopic": "P1 Energy",
+      "examQuestion": false
+    },
+    "title": {
+      "objectives": [
+        "Show what you know about energy stores, transfers and resources.",
+        "Show your working and units in every calculation.",
+        "Use any spare time to check your answers."
+      ]
+    },
+    "doNow": {
+      "task": ["Look over your notes in your book."]
+    },
+    "engage": {
+      "title": "LEARNING OBJECTIVES",
+      "hook": "Today you show what you know about P1 Energy.",
+      "content": "1. Show what you know about energy stores, transfers and resources.\n2. Show your working and units in every calculation.\n3. Use any spare time to check your answers.",
+      "imagePlaceholder": false
+    }
+  }
+]

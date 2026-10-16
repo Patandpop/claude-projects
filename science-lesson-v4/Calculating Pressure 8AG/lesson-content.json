@@ -1,0 +1,108 @@
+[
+  {
+    "meta": {
+      "class": "8AG",
+      "topic": "Calculating pressure",
+      "title": "Calculating Pressure",
+      "lessonType": "standard",
+      "theme": "physics",
+      "worksheet": "A",
+      "differentiation": "none",
+      "year": 8,
+      "subject": "Physics",
+      "macrotopic": "P1 Motion and Pressure",
+      "lessonNumber": 1
+    },
+    "title": {
+      "objectives": [
+        "Identify the units for pressure as N/m^2 and Pa.",
+        "Use the equation pressure = force ÷ area.",
+        "Convert kilonewtons and kilopascals into newtons and pascals."
+      ],
+      "keywords": ["pressure", "force", "area", "pascal", "newton"]
+    },
+    "doNow": {
+      "variant": "A",
+      "questions": [
+        { "q": "Write the word equation for aerobic respiration.", "a": "glucose + oxygen → carbon dioxide + water", "marks": 1, "hint": "glucose + ______ → ______ + water" },
+        { "q": "Where in a cell does aerobic respiration happen?", "a": "the mitochondria", "marks": 1 },
+        { "q": "Which gas do plants take in for photosynthesis?", "a": "carbon dioxide", "marks": 1 },
+        { "q": "Name the green substance in leaves that absorbs light.", "a": "chlorophyll", "marks": 1 },
+        { "q": "What is the unit of force?", "a": "the newton (N)", "marks": 1 },
+        { "q": "A rectangle is 2 m long and 3 m wide. What is its area?", "a": "2 × 3 = 6 m^2", "marks": 1, "hint": "area = length × width" }
+      ]
+    },
+    "engage": {
+      "variant": "prediction",
+      "title": "WHICH SHOE?",
+      "hook": "Someone steps on your hand. Would you rather they wore a stiletto heel or a trainer? Why?",
+      "imagePlaceholder": false,
+      "reveal": {
+        "question": "Same person, same weight. So what is different?",
+        "answer": "The area. The trainer spreads the force over a big area, so the pressure on your hand is small. The stiletto puts it all on a tiny area: huge pressure."
+      }
+    },
+    "learn": [
+      {
+        "variant": "F",
+        "heading": "Calculating pressure",
+        "imagePlaceholder": false,
+        "equation": "p = {F/A}",
+        "components": [
+          { "symbol": "p", "name": "pressure", "unit": "pascals (Pa) or N/m^2" },
+          { "symbol": "F", "name": "force", "unit": "newtons (N)" },
+          { "symbol": "A", "name": "area", "unit": "metres squared (m^2)" }
+        ],
+        "rearrangements": ["F = p \\times A", "A = {F/p}"],
+        "example": "Pressure is the force acting on each square metre. A 600 N person standing on 0.04 m^2 of feet: p = 600 ÷ 0.04 = 15 000 Pa."
+      },
+      {
+        "variant": "A",
+        "heading": "Big area or small area?",
+        "imagePlaceholder": false,
+        "boxes": [
+          { "header": "Small area = big pressure", "items": ["stiletto heel · sharp knife · drawing pin point · nail tip", "The force is squashed onto a tiny area, so it pushes in or cuts."] },
+          { "header": "Big area = small pressure", "items": ["snowshoes · camel feet · tractor tyres · wide bag straps", "The force is spread over a big area, so it does not sink in or dig in."] },
+          { "header": "Converting units", "items": ["1 kN = 1000 N  (× 1000 to get newtons)", "1 kPa = 1000 Pa  (× 1000 to get pascals)", "1 Pa = 1 N/m^2"] }
+        ]
+      }
+    ],
+    "build": [
+      { "type": "mcq", "q": "Which equation is used to calculate pressure?", "options": ["A. pressure = force × area", "B. pressure = force ÷ area", "C. pressure = area ÷ force", "D. pressure = force + area"], "answer": "B", "explanation": "Pressure is the force on each unit of area, so divide the force by the area.", "commonError": "Multiplying force by area." },
+      { "type": "mcq", "q": "Which is a unit of pressure?", "options": ["A. newtons (N)", "B. pascals (Pa)", "C. metres squared (m^2)", "D. newton metres (Nm)"], "answer": "B", "explanation": "Pressure is measured in pascals; 1 Pa = 1 N/m^2.", "commonError": "Choosing newtons, the unit of force." },
+      { "type": "mcq", "q": "A force of 20 N acts on an area of 4 m^2. What is the pressure?", "options": ["A. 80 Pa", "B. 5 Pa", "C. 0.2 Pa", "D. 24 Pa"], "answer": "B", "explanation": "p = 20 ÷ 4 = 5 Pa.", "commonError": "80 Pa comes from multiplying; 0.2 Pa from dividing the wrong way round." },
+      { "type": "mcq", "q": "Why does a sharp knife cut better than a blunt one?", "options": ["A. The edge has a larger area, so the pressure is greater.", "B. The edge has a smaller area, so the pressure is greater.", "C. The edge has a larger area, so the pressure is smaller.", "D. The edge has a smaller area, so the pressure is smaller."], "answer": "B", "explanation": "Same force on a smaller area gives a bigger pressure.", "commonError": "Thinking a bigger area gives a bigger pressure." },
+      { "type": "mcq", "q": "Convert 3 kN into newtons.", "options": ["A. 0.003 N", "B. 30 N", "C. 300 N", "D. 3000 N"], "answer": "D", "explanation": "1 kN = 1000 N, so 3 kN = 3 × 1000 = 3000 N.", "commonError": "Multiplying by 100 instead of 1000." },
+      { "type": "mcq", "q": "Snowshoes stop you sinking into deep snow. Why?", "options": ["A. They make you lighter.", "B. They spread your weight over a bigger area, so the pressure is lower.", "C. They make the area smaller, so the pressure is higher.", "D. They reduce the force of gravity on you."], "answer": "B", "explanation": "Your weight (the force) stays the same; the bigger area lowers the pressure on the snow.", "commonError": "Thinking snowshoes change your weight." },
+      { "type": "workedExample",
+        "worked": { "prompt": "A box weighs 200 N. It rests on an area of 0.5 m^2. Calculate the pressure.", "steps": ["Write the equation: p = F ÷ A", "Put in the numbers: p = 200 ÷ 0.5", "Work it out: p = 400 Pa"] },
+        "yourTurn": { "prompt": "A crate weighs 900 N. It rests on an area of 1.5 m^2. Calculate the pressure.", "answer": "p = 900 ÷ 1.5 = 600 Pa" } },
+      { "type": "trueFalse", "heading": "COMMON MISCONCEPTIONS", "statements": [
+        { "text": "A heavier object always puts more pressure on the ground.", "isTrue": false, "correction": "Pressure also depends on area. An elephant's big feet can press less than a stiletto heel." },
+        { "text": "Pressure is measured in newtons.", "isTrue": false, "correction": "Pressure is measured in pascals (Pa) or N/m^2. Newtons measure force." },
+        { "text": "If the force stays the same and the area halves, the pressure doubles.", "isTrue": true },
+        { "text": "Pressure = force × area.", "isTrue": false, "correction": "Pressure = force ÷ area." }
+      ] }
+    ],
+    "apply": {
+      "developing": [
+        { "q": "Complete the sentence: Pressure = ______ ÷ ______. Pressure is measured in ______ (Pa).", "a": "force ÷ area; pascals", "marks": 2, "qType": "concept" },
+        { "q": "A force of 50 N acts on an area of 10 m^2. Calculate the pressure.", "a": "p = 50 ÷ 10 = 5 Pa", "marks": 2, "qType": "calculation", "equation": "p = F ÷ A", "units": "Pa" },
+        { "q": "A camel has wide, flat feet. Explain how this stops it sinking into the sand.", "a": "The wide feet give a large area, which spreads the camel's weight, so the pressure on the sand is lower.", "marks": 2, "qType": "concept", "starters": ["The camel's feet have a large ...", "So the pressure on the sand is ..."] }
+      ],
+      "reaching": [
+        { "q": "A student weighing 600 N stands on one foot. The area of the foot is 0.02 m^2. Calculate the pressure.", "a": "p = 600 ÷ 0.02 = 30 000 Pa", "marks": 2, "qType": "calculation", "equation": "p = F ÷ A", "units": "Pa" },
+        { "q": "A force of 4 kN acts on an area of 2 m^2. Calculate the pressure in pascals.", "a": "4 kN = 4000 N; p = 4000 ÷ 2 = 2000 Pa", "marks": 3, "qType": "calculation" },
+        { "q": "A drawing pin has a sharp point and a wide, flat head. Explain why it is designed like this.", "a": "The point has a tiny area, so the pressure is high and it goes into the board. The head has a large area, so the pressure on your thumb is low and it does not hurt.", "marks": 3, "qType": "concept" }
+      ],
+      "mastering": [
+        { "q": "A pressure of 2500 Pa acts on an area of 0.4 m^2. Calculate the force.", "a": "F = p × A = 2500 × 0.4 = 1000 N", "marks": 3, "qType": "calculation" },
+        { "q": "An elephant weighs 50 000 N and stands on four feet, each with an area of 0.1 m^2. A woman weighs 600 N and stands on one stiletto heel with an area of 0.0001 m^2. Who puts more pressure on the floor? Show your working.", "a": "Elephant: area = 4 × 0.1 = 0.4 m^2; p = 50 000 ÷ 0.4 = 125 000 Pa. Woman: p = 600 ÷ 0.0001 = 6 000 000 Pa. The woman's heel puts more pressure on the floor.", "marks": 4, "qType": "calculation" },
+        { "q": "A pressure of 15 kPa acts on an area of 3 m^2. Calculate the force in newtons.", "a": "15 kPa = 15 000 Pa; F = 15 000 × 3 = 45 000 N", "marks": 3, "qType": "calculation" }
+      ]
+    },
+    "worksheetExtras": {
+      "wordBank": ["force", "area", "pascals", "newtons", "large", "lower", "spreads"]
+    }
+  }
+]

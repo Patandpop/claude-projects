@@ -1,0 +1,129 @@
+[
+  {
+    "meta": {
+      "class": "8XP",
+      "topic": "Distance vs time graphs",
+      "title": "Distance vs Time Graphs",
+      "lessonType": "practical",
+      "theme": "physics",
+      "worksheet": "A",
+      "differentiation": "none",
+      "year": 8,
+      "subject": "Physics",
+      "macrotopic": "P1 Motion and Pressure",
+      "lessonNumber": 7
+    },
+    "title": {
+      "objectives": [
+        "Collect reliable data safely while working in a group.",
+        "Construct simple distance vs time graphs.",
+        "Analyse journeys using the shapes on distance vs time graphs."
+      ],
+      "keywords": ["distance", "time", "speed", "stationary", "gradient"]
+    },
+    "doNow": {
+      "variant": "A",
+      "questions": [
+        { "q": "What is the equation for pressure?", "a": "pressure = force ÷ area", "marks": 1 },
+        { "q": "What causes air pressure?", "a": "Air particles colliding with a surface.", "marks": 1 },
+        { "q": "How does water pressure change as you go deeper?", "a": "It increases.", "marks": 1 },
+        { "q": "A car travels 100 m in 10 s. What is its speed?", "a": "100 ÷ 10 = 10 m/s", "marks": 1, "hint": "speed = distance ÷ time" },
+        { "q": "A car travels at 20 m/s. How far does it go in 30 s?", "a": "20 × 30 = 600 m", "marks": 1, "hint": "distance = speed × time" },
+        { "q": "What is the unit of speed?", "a": "metres per second (m/s)", "marks": 1 }
+      ]
+    },
+    "engage": {
+      "variant": "prediction",
+      "title": "MOTION SENSOR",
+      "hook": "A motion sensor draws a graph as Sally moves in front of it. What line would it draw if Sally stood still?",
+      "imagePlaceholder": false,
+      "reveal": {
+        "question": "Distance on the up axis, time along the bottom. Sally does not move.",
+        "answer": "A flat, horizontal line. Time goes on, but her distance does not change."
+      }
+    },
+    "learn": [
+      {
+        "variant": "J",
+        "heading": "Shapes on a distance vs time graph",
+        "imageConfidence": "search",
+        "embeddedImagePath": "C:\\Users\\magda\\claude-projects\\science-lesson-v4\\Distance Time Graphs 8XP\\dt-shapes.png",
+        "imageDescription": "Distance vs time graph of one journey with sections A to E: steady, stopped, faster, coming back, speeding up",
+        "axes": { "x": "Time (s)", "y": "Distance (m)" },
+        "features": [
+          { "label": "A  Straight line going up", "description": "Moving away at a constant speed" },
+          { "label": "B  Flat (horizontal) line", "description": "Stationary: not moving" },
+          { "label": "C  Steeper straight line", "description": "Constant speed, but faster" },
+          { "label": "D  Straight line going down", "description": "Constant speed, coming back towards the start" },
+          { "label": "E  Curve getting steeper", "description": "Speeding up (accelerating)" }
+        ],
+        "instruction": "Sketch each shape in your book and label what it means."
+      },
+      {
+        "variant": "F",
+        "heading": "Speed from distance and time",
+        "imagePlaceholder": false,
+        "equation": "speed = {distance/time}",
+        "components": [
+          { "symbol": "speed", "name": "speed", "unit": "metres per second (m/s)" },
+          { "symbol": "distance", "name": "distance travelled", "unit": "metres (m)" },
+          { "symbol": "time", "name": "time taken", "unit": "seconds (s)" }
+        ],
+        "rearrangements": ["distance = speed \\times time", "time = {distance/speed}"],
+        "example": "On a distance vs time graph, a steeper line means more distance in the same time: a higher speed. A pupil hops 10 m in 8 s: speed = 10 ÷ 8 = 1.25 m/s."
+      }
+    ],
+    "build": [
+      { "type": "mcq", "q": "On a distance vs time graph, what does a flat (horizontal) line show?", "options": ["A. The object is stationary.", "B. The object is moving at a constant speed.", "C. The object is speeding up.", "D. The object is coming back to the start."], "answer": "A", "explanation": "Time goes on but the distance does not change, so the object is not moving.", "commonError": "Thinking a flat line means a steady speed." },
+      { "type": "mcq", "q": "What does a straight line going up show?", "options": ["A. The object is stationary.", "B. The object is moving at a constant speed.", "C. The object is speeding up.", "D. The object is slowing down."], "answer": "B", "explanation": "The same distance is covered every second, so the speed is constant.", "commonError": "Thinking any line going up means speeding up." },
+      { "type": "mcq", "q": "Two straight lines on the same graph. Which one shows the faster object?", "options": ["A. the steeper line", "B. the less steep line", "C. the longer line", "D. the line that starts higher"], "answer": "A", "explanation": "A steeper line covers more distance in the same time, so it is faster.", "commonError": "Choosing the longer line." },
+      { "type": "mcq", "q": "A straight line going DOWN towards the time axis shows the object is…", "options": ["A. coming back towards the start at a constant speed", "B. speeding up", "C. stationary", "D. moving further away"], "answer": "A", "explanation": "The distance from the start is getting smaller at a steady rate.", "commonError": "Thinking a line going down means slowing down." },
+      { "type": "mcq", "q": "Which equation gives speed?", "options": ["A. speed = distance × time", "B. speed = distance ÷ time", "C. speed = time ÷ distance", "D. speed = distance + time"], "answer": "B", "explanation": "Speed is the distance travelled each second.", "commonError": "Dividing time by distance." },
+      { "type": "mcq", "about": "practical", "q": "How do you make your times for the hop more reliable?", "options": ["A. Time it once, as quickly as possible.", "B. Repeat it three times and work out the mean.", "C. Use a longer measuring tape.", "D. Let a different person hop each time."], "answer": "B", "explanation": "Repeats and a mean reduce the effect of one bad reading.", "commonError": "Thinking one careful reading is enough." },
+      { "type": "practical",
+        "heading": "DISTANCE VS TIME OLYMPICS",
+        "intro": "In groups, time how long each 'event' takes over 10 m, then calculate the speed.",
+        "steps": [
+          "Measure a 10 m track with the tape measure and mark the start and finish.",
+          "One person does the event; one person times it with the stopwatch.",
+          "Events: hop, crab scuttle, heel to toe, walking backwards.",
+          "Repeat each event three times and work out the mean time.",
+          "Calculate the speed: distance ÷ mean time."
+        ],
+        "equipment": ["10 m tape measure", "stopwatch", "masking tape or cones to mark the track"],
+        "warning": "Keep the track clear of bags and chairs. Walk, do not run, back to the start.",
+        "imagePlaceholder": false,
+        "questions": [
+          { "q": "Which event was fastest? How can you tell from your results?", "a": "The one with the shortest mean time over 10 m (highest speed)." },
+          { "q": "Why did you repeat each event three times?", "a": "To spot odd results and calculate a mean, so the time is more reliable." }
+        ] },
+      { "type": "trueFalse", "heading": "COMMON MISCONCEPTIONS", "statements": [
+        { "text": "A flat line on a distance vs time graph means the object is moving at a steady speed.", "isTrue": false, "correction": "A flat line means the distance is not changing: the object is stationary." },
+        { "text": "A steeper line means a faster speed.", "isTrue": true },
+        { "text": "A line going down means the object is slowing down.", "isTrue": false, "correction": "A line going down means it is coming back towards the start." },
+        { "text": "The graph shows the shape of the path the object took.", "isTrue": false, "correction": "It shows distance against time, not the route." }
+      ] }
+    ],
+    "apply": {
+      "developing": [
+        { "q": "Complete the sentences: A flat line shows the object is ______. A straight line going up shows a ______ speed. A steeper line shows a ______ speed.", "a": "stationary; constant; faster", "marks": 3, "qType": "concept" },
+        { "q": "A pupil hops 10 m in 8 s. Calculate the speed.", "a": "speed = 10 ÷ 8 = 1.25 m/s", "marks": 2, "qType": "calculation", "equation": "speed = distance ÷ time", "units": "m/s" },
+        { "q": "Sketch a distance vs time graph: a person walks away at a steady speed, stops for 10 s, then walks back home at the same speed.", "a": "A straight line going up; then a flat line (10 s); then a straight line going down to zero distance.", "marks": 3, "qType": "concept" }
+      ],
+      "reaching": [
+        { "q": "Pete drives to work but is stuck in traffic part of the way. Describe the shape of his distance vs time graph.", "a": "A steep straight line (driving), then a flat or nearly flat line (stuck in traffic), then a steep straight line again (driving).", "marks": 3, "qType": "concept" },
+        { "q": "Hop: 10 m in 8.2 s. Crab scuttle: 10 m in 12.5 s. Calculate both speeds and say which is faster.", "a": "Hop: 10 ÷ 8.2 = 1.22 m/s. Crab: 10 ÷ 12.5 = 0.80 m/s. The hop is faster.", "marks": 3, "qType": "calculation" },
+        { "q": "Explain how you can tell from a distance vs time graph which part of a journey was fastest.", "a": "The steepest part of the line is fastest, because the most distance is covered in the least time.", "marks": 2, "qType": "concept" }
+      ],
+      "mastering": [
+        { "q": "A car travels at 60 km/h for 2 hours. It stops at a service station for 2 hours. It then travels 30 km in heavy traffic at 15 km/h. Calculate the total distance and total time, and describe the graph.", "a": "First part: 60 × 2 = 120 km. Last part: 30 ÷ 15 = 2 hours. Total: 150 km in 6 hours. Graph: steep line to 120 km at 2 h, flat line to 4 h, shallower line to 150 km at 6 h.", "marks": 4, "qType": "calculation" },
+        { "q": "Calculate the average speed of the car over the whole journey.", "a": "average speed = 150 ÷ 6 = 25 km/h", "marks": 2, "qType": "calculation" },
+        { "q": "A distance vs time graph curves and gets steeper. What is the object doing? Explain.", "a": "It is speeding up (accelerating): it covers more distance every second, so the line gets steeper.", "marks": 2, "qType": "concept" }
+      ]
+    },
+    "worksheetExtras": {
+      "wordBank": ["stationary", "constant", "faster", "steeper", "distance", "time", "speed"],
+      "results": { "headers": ["Event", "Distance (m)", "Time 1 (s)", "Time 2 (s)", "Time 3 (s)", "Mean time (s)", "Speed (m/s)"], "rows": 4 }
+    }
+  }
+]
