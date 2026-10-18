@@ -31,7 +31,7 @@ const path = require('path');
 const { categorise } = require('./exam-categorise.js');
 const dn = require('./do-now-pick.js');
 const mw = require('./mcq-written.js');
-const { msPlain } = require('./ms-friendly.js');
+const { msPlain, markPoints, numberAnswer } = require('./ms-friendly.js');
 
 const ROOT = path.join(__dirname, '..', '..');
 const LIB = path.join(ROOT, 'exam-library');
@@ -155,28 +155,67 @@ function choose(cls, opts) {
     practice = mw.forTopics(year >= 12 ? 'OCR A' : 'AQA', words, { subjects: year >= 12 ? null : (classInfo(cls).patrykTeaches || null) })
       .filter((q) => !used0.has(q.id)).slice(0, count - m.length);
   }
+  // quiz file schema 2 (2026-10-18): labels, mark points for the written answers, no due date in the title
+  const board = year >= 12 ? 'OCR A' : 'AQA';
+  const left = [];
+  const wq = w.map((x) => {
+    const mp = markPoints(x.p.ms, { board, marks: x.p.marks, calc: x.c.cat === 'calculation' || /(calculate|work out|determine)/i.test(x.p.text) });
+    if (mp.picture) { left.push({ ref: x.id, why: 'the answer is a drawing or graph' }); return null; }
+    const num = board === 'AQA' ? numberAnswer(mp, x.p.text) : null;
+    return { type: num ? 'number' : 'written', text: x.p.text, marks: x.p.marks, ...(num ? { unit: num.unit } : {}),
+      scheme: msPlain(x.p.ms, { board, marks: x.p.marks }),   // one line per mark (2026-10-12)
+      markPoints: mp.points, ...(mp.levels ? { levels: mp.levels } : {}), ref: x.id, lesson: x.L.title };
+  }).filter(Boolean);
   const questions = [
     ...m.map((x) => ({ type: 'mcq', text: x.c.mcq.stem, options: x.c.mcq.options, answer: x.c.mcq.answer, points: 1,
       feedback: (x.p.ms && x.p.ms.examinerCommentary) ? String(x.p.ms.examinerCommentary).slice(0, 400) : '', ref: x.id, lesson: x.L.title })),
     ...practice.map((q) => ({ type: 'mcq', text: '(Practice question, not from a real exam) ' + q.stem, options: q.options, answer: 'ABCD'.indexOf(q.answer), points: 1,
       feedback: q.wrong ? Object.entries(q.wrong).map(([k, v]) => `${k}: ${v}`).join(' ').slice(0, 400) : '', ref: q.id, lesson: q.topic, written: true })),
-    ...w.map((x) => ({ type: 'written', text: x.p.text, marks: x.p.marks, scheme: msPlain(x.p.ms, { board: year >= 12 ? 'OCR A' : 'AQA', marks: x.p.marks }),   // one line per mark (2026-10-12)
-      ref: x.id, lesson: x.L.title })),
+    ...wq,
   ];
+  questions.forEach((q, i) => { q.label = 'Question ' + (i + 1); (q.markPoints || []).forEach((p, k) => { p.id = 'q' + (i + 1) + '-' + (k + 1); }); });
   const what = topicRes.length ? o.topics.join(' and ') : c.seq[taught[taught.length - 1].k].topic;
-  const total = m.length + w.reduce((n, x) => n + x.p.marks, 0);
-  const title = `${cls} homework: ${what}${o.marks ? ` (${total} marks)` : ''} (due ${due.split('-').reverse().slice(0, 2).join('/')})`;
-  return { cls, due, title, board: year >= 12 ? 'OCR A' : 'AQA', questions,
-    intro: 'Answer every question in this form.\n\n' +
-      'The multiple-choice questions mark themselves. For the written questions, the mark scheme appears after you submit. Mark your own answer against it and note anything you missed.\n\n' +
-      'If you get stuck, message me on Google Classroom.' };
+  const title = `${cls} ${what} homework quiz`;
+  return finishV2({ schema: 2, cls, due, kind: 'weekly', tier: null, board, topic: what, title, questions, left });
+}
+
+/* Quiz file schema 2 (2026-10-18, design-audit/homework-replica 04 section 3 and 05 section 1.1).
+   The Form's total: multiple choice points plus every mark point's marks (the planner's totalPoints_
+   adds up the same way, so the Form and the Classroom points always agree). */
+function totalPoints(hw) {
+  return (hw.questions || []).reduce((n, q) => n + (q.type === 'mcq' ? (q.points || 1)
+    : (q.markPoints && q.markPoints.length ? q.markPoints.reduce((a, p) => a + (p.marks || 0), 0) : (q.marks || 1))), 0);
+}
+// Page 1's description, in plain words (05-design.md 1.1). No em dashes.
+function quizIntro(hw) {
+  const n = (hw.questions || []).length, m = hw.minutes;
+  const head = hw.kind === 'exam-practice' ? `Exam practice on ${hw.topic}.` : `Homework quiz on ${hw.topic}.`;
+  const out = [`${head} ${n} question${n === 1 ? '' : 's'}, about ${m} minute${m === 1 ? '' : 's'}. Do it in one go.`];
+  const lines = ['If a question has a picture, it is just above the question.'];
+  if (hw.questions.some((q) => q.type === 'number')) lines.push('For a calculation, type only the number in the answer box. Put your working in the box under it if you want.');
+  out.push(lines.join('\n'));
+  out.push(hw.questions.some((q) => q.type !== 'mcq')
+    ? 'Multiple-choice questions mark themselves. On the last page you mark your written answers yourself, using the real mark scheme.'
+    : 'The questions mark themselves.');
+  out.push('Stuck? Message me on Google Classroom.');
+  return out.join('\n\n');
+}
+// Fills in what depends on the final question list: minutes (about 1 a mark, 1.2 at A level) and the intro.
+function finishV2(hw) {
+  const total = totalPoints(hw);
+  hw.minutes = Math.max(5, Math.round(total * (hw.board === 'OCR A' ? 1.2 : 1)));
+  hw.intro = quizIntro(hw);
+  if (!hw.left) hw.left = [];
+  return hw;
 }
 
 // Google Forms shows plain text only, so "10^−4" and "x^2" become real raised characters (10⁻⁴, x²).
 const SUP = { '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹', '-': '⁻', '−': '⁻', '–': '⁻', '+': '⁺', '.': '·' };
 const supText = (t) => String(t == null ? '' : t).replace(/\^\{?([−–\-+]?[0-9.]+)\}?/g, (m, x) => [...x].map((c) => SUP[c] || c).join(''));
 function formsText(hw) {
-  hw.questions.forEach((q) => { q.text = supText(q.text); if (q.options) q.options = q.options.map(supText); if (q.scheme) q.scheme = supText(q.scheme); if (q.feedback) q.feedback = supText(q.feedback); });
+  hw.questions.forEach((q) => { q.text = supText(q.text); if (q.options) q.options = q.options.map(supText); if (q.scheme) q.scheme = supText(q.scheme); if (q.feedback) q.feedback = supText(q.feedback);
+    (q.markPoints || []).forEach((p) => { p.says = supText(p.says); if (p.also) p.also = p.also.map(supText); if (p.no) p.no = p.no.map(supText); });
+    (q.levels || []).forEach((lv) => { lv.need = supText(lv.need); }); });
   return hw;
 }
 function write(hw, dryRun) {
@@ -205,4 +244,4 @@ if (require.main === module) {
     (q.type === 'mcq' ? '\n   ' + q.options.map((x, k) => (k === q.answer ? '[✓] ' : '[ ] ') + x).join('  ') : '\n   scheme: ' + q.scheme.slice(0, 160))));
   const f = write(hw, a.includes('--dry-run'));
   console.log(f ? '\nwritten: ' + f + '\nThe school planner makes the Google Form and a Classroom draft (⋯ More → Homework quizzes).' : '\n(dry run: nothing written)');
-} else module.exports = { choose, write, poolFor, formsText, supText };
+} else module.exports = { choose, write, poolFor, formsText, supText, totalPoints, quizIntro, finishV2 };

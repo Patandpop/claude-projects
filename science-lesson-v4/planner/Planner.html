@@ -54,6 +54,44 @@
   .hwq .opts { margin:4px 0 0 14px; }
   .hwq .opts div { color:var(--muted); } .hwq .opts .right { color:var(--green); font-weight:700; }
   .hwq .ms { color:var(--muted); font-size:12px; margin-top:4px; }
+  /* Homework tab "Set new homework" (2026-10-18, design-audit/planner-tabs/spec.md 1.2 and its mock-up) */
+  details.hwsec { background:var(--panel); border:1px solid var(--line); border-radius:10px; margin:0 0 12px; padding:0; }
+  details.hwsec > summary { list-style:none; cursor:pointer; padding:11px 14px; display:flex; align-items:center; gap:10px; flex-wrap:wrap; font-weight:700; font-size:15px; }
+  details.hwsec > summary::-webkit-details-marker { display:none; }
+  details.hwsec > summary::before { content:"\25B8"; color:var(--gold); display:inline-block; transition:transform .15s; }
+  details.hwsec[open] > summary::before { transform:rotate(90deg); }
+  details.hwsec > summary .sub { font-weight:400; font-size:12px; color:var(--muted); }
+  .hwbody { padding:0 14px 14px; border-top:1px solid var(--line); }
+  .hwstep { margin-top:14px; }
+  .hwstep > .st { font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); font-weight:700; margin-bottom:6px; }
+  .hwstep > .st span { text-transform:none; letter-spacing:0; font-weight:400; }
+  .hwkinds { display:grid; grid-template-columns:repeat(auto-fill, minmax(170px, 1fr)); gap:8px; }
+  .hwkind { border:1px solid var(--line); background:var(--panel2); border-radius:8px; padding:8px 10px; text-align:left; display:block; width:100%; }
+  .hwkind b { display:block; font-size:13px; } .hwkind small { color:var(--muted); font-size:11.5px; line-height:1.3; display:block; margin-top:2px; }
+  .hwkind.on { border-color:var(--gold); background:color-mix(in srgb, var(--gold) 14%, var(--panel)); }
+  .hwkind:disabled { opacity:.55; cursor:default; }
+  .hwchips { display:flex; flex-wrap:wrap; gap:6px; }
+  .hwchip { border:2px solid var(--c); background:var(--panel2); border-radius:16px; padding:3px 12px; font-weight:700; font-size:13px; color:var(--ink); }
+  .hwchip.on { background:color-mix(in srgb, var(--c) 45%, var(--panel)); }
+  .hwchip:disabled { opacity:.4; cursor:default; border-style:dashed; }
+  .hwrow { border:1px solid var(--line); border-left:5px solid var(--c); border-radius:8px; margin-top:8px; background:var(--panel2); }
+  .hwrow > summary { list-style:none; cursor:pointer; padding:8px 10px; display:flex; gap:10px; flex-wrap:wrap; align-items:center; font-size:13px; }
+  .hwrow > summary::-webkit-details-marker { display:none; }
+  .hwrow > summary b { min-width:44px; }
+  .hwrow .inner { padding:2px 10px 10px; display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:4px 12px; }
+  .hwrow label, .hwbody > .hwstep label { display:block; font-size:12px; color:var(--muted); margin:8px 0 2px; }
+  .hwrow select, .hwrow input, .hwbody textarea { width:100%; font-family:inherit; font-size:13px; padding:6px; border:1px solid var(--line); border-radius:6px; background:var(--panel); color:var(--ink); }
+  .hwbody textarea { min-height:70px; resize:vertical; line-height:1.4; }
+  .hwseg { display:inline-flex; border:1px solid var(--line); border-radius:6px; overflow:hidden; }
+  .hwseg button { border:none; border-radius:0; padding:4px 10px; background:var(--panel2); }
+  .hwseg button.on { background:var(--gold); color:#0D1B5E; font-weight:700; }
+  .hwwhy { font-size:11.5px; color:var(--orange); }
+  .hwres { font-size:12.5px; padding:0 10px 8px; }
+  .hwres.bad { color:var(--orange); } .hwres.good { color:var(--green); }
+  .hwprev { background:var(--panel2); border:1px solid var(--line); border-radius:8px; padding:8px 10px; font-size:13px; line-height:1.45; margin-top:6px; white-space:pre-wrap; }
+  .hwpill { font-size:11px; font-weight:700; border-radius:10px; padding:1px 8px; border:1px solid currentColor; white-space:nowrap; }
+  .hwpill.draft { color:var(--gold); } .hwpill.sched { color:var(--blue); } .hwpill.made { color:var(--green); }
+  .hwq .yn { margin:3px 0 0 14px; color:var(--muted); font-size:12px; } .hwq .yn b { color:var(--ink); font-weight:400; }
   .testrow select { width:auto; }
   #side .lbl { display:flex; align-items:center; gap:4px; }
   .testrow { display:grid; grid-template-columns:110px 1fr auto; gap:10px; align-items:center; padding:8px 0; border-top:1px solid var(--line); font-size:13px; }
@@ -205,7 +243,7 @@
       <button id="mXlsx">Technicians' Excel<small>the order sheet to email</small></button>
       <hr>
       <button id="mClaude">Send to Claude<small>build lessons or ask for changes, done at home</small></button>
-      <button id="mHw">Homework quizzes<small>check them, then make the Forms + Classroom drafts</small></button>
+      <button id="mHw">Homework quizzes<small>set them: Forms + Classroom drafts</small></button>
       <button id="mHwAll" style="display:none"></button>
       <hr>
       <button id="mAuto">Re-plan this week<small>from where each class is up to</small></button>
@@ -222,7 +260,7 @@
   <button id="vDay" title="D">Day<small>one day, with kit</small></button>
   <button id="vClasses" title="C">Classes<small>where each class is</small></button>
   <hr>
-  <button id="vHomework">Homework<small>check, then make</small></button>
+  <button id="vHomework">Homework<small>set, check</small></button>
   <button id="vTests">Tests<small>and exam practice</small></button>
   <button id="vBehaviour">Behaviour<small>points and board</small></button>
 </nav>
@@ -426,36 +464,216 @@ function render() {
 }
 
 /* ------------------------------------------------------------- new tabs (2026-10-09) */
-// Homework: every quiz Claude chose at home, shown in full BEFORE it becomes a Google Form.
+// Homework (2026-10-18, design-audit/planner-tabs/spec.md 1.2 and homework-replica/05-design.md 2):
+// "Set new homework" (kind, classes, each class's quiz, version, set on, due, send, message, then
+// Make the drafts, one class at a time), and under it "Check the questions" (every quiz Claude chose at
+// home, page 1 and page 2 exactly as pupils will see them, before it becomes a Google Form).
+const HW_MSG = {
+  'exam-practice': 'This is exam practice on [topic]: [n] questions, about [m] minutes. Do it in one go. Answer every question, then mark your written answers on the last page using the mark scheme. Be honest, it shows you what to work on. Due [due], 8am.',
+  weekly: 'Your homework is a short quiz on [topic]: [n] questions, about [m] minutes. Do it in one go. Answer every question, then mark your written answers on the last page. Due [due], 8am.',
+};
+const hwFileRe = /^homework-([A-Za-z0-9]+)-(\d{4}-\d{2}-\d{2})(?:-([a-z]+))?\.json$/;
+const fmtLong = (iso) => P.parse(iso).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
+const fmtShort = (iso) => P.parse(iso).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+function hwOf(x) { return x.hw || { title: x.name, questions: [] }; }
+function hwPoints(hw) {
+  if (hw.points != null) return hw.points;
+  return (hw.questions || []).reduce((t, q) => t + (q.type === 'mcq' ? (q.points || 1) : (q.markPoints || []).length ? q.markPoints.reduce((a, p) => a + (p.marks || 0), 0) : (q.marks || 0)), 0);
+}
+function hwMinutes(hw) { return hw.minutes || Math.max(5, Math.round(hwPoints(hw) * (hw.board === 'OCR A' ? 1.2 : 1))); }
+function hwTopic(hw) { return hw.topic || String(hw.title || '').replace(/^\S+\s+(homework|exam practice):\s*/i, '').replace(/\s*\(due [^)]*\)\s*$/, '').replace(/\s*\((Core|Challenge)\)\s*$/, ''); }
+// this class's quiz files, newest due date first
+function hwQuizzesFor(cls) {
+  return (S.hwList || []).map((x) => Object.assign({ m: hwFileRe.exec(x.name) }, x)).filter((x) => x.m && x.m[1] === cls).sort((a, b) => (b.m[2] + (b.m[3] || '')).localeCompare(a.m[2] + (a.m[3] || '')));
+}
+function hwQuizLabel(x) {
+  const hw = hwOf(x);
+  return hwTopic(hw) + (x.m[3] ? ' (' + (x.m[3] === 'core' ? 'Core' : 'Challenge') + ')' : '') + ', ' + hw.questions.length + ' questions, ' + hwPoints(hw) + ' marks, ' +
+    (x.made && x.made.courseWorkId ? 'drafted' : x.made ? 'Form made' : x.checked ? 'checked' : 'not checked yet');
+}
+// the same quiz in the other version (Core <-> Challenge): same class and day, other ending
+function hwSibling(name, tier) { const m = hwFileRe.exec(name); return m && m[3] ? (S.hwList || []).find((x) => x.name === 'homework-' + m[1] + '-' + m[2] + '-' + tier + '.json') : null; }
+function hwPerDefault(cls) {
+  const qz = hwQuizzesFor(cls);
+  const first = qz.find((x) => !x.made) || qz[0];
+  const set = P.nextLessonDay(S.data, cls, todayMidnight(), true);
+  const setOn = set ? set.date : P.iso(todayMidnight());
+  const d = P.dueFor(S.data, cls, setOn) || { due: P.iso(P.addDays(P.parse(setOn), 7)), why: '' };
+  return { file: first ? first.name : '', setOn, due: d.due, why: d.why, auto: true, send: 'draft', postDate: setOn, postTime: P.lessonEnd(S.data, cls, setOn) || '15:30' };
+}
+function hwFill(cls) {
+  const p = S.hwF.per[cls], x = (S.hwList || []).find((y) => y.name === p.file), hw = x ? hwOf(x) : { questions: [] };
+  return S.hwF.msg.replace(/\[topic\]/g, hwTopic(hw)).replace(/\[n\]/g, hw.questions.length).replace(/\[m\]/g, hwMinutes(hw)).replace(/\[due\]/g, fmtLong(p.due));
+}
 function renderHomework() {
   const g = $('grid'); g.className = 'tab'; g.style.gridTemplateColumns = '';
-  g.innerHTML = '<h2>Homework</h2><p class="lead">Quizzes Claude chose at home. Check the questions and answers, then make the Google Form and the Classroom draft. You still publish it in Classroom.</p><div id="hwList" class="muted">Reading the quizzes from home...</div>';
-  run('homeworkList').then((list) => {
+  S.hwF = S.hwF || { classes: [], per: {}, msg: '', msgEdited: false, results: {} };
+  g.innerHTML = '<h2>Homework</h2><p class="lead">Set work for one or several classes. Each class gets its own Google Form and its own Classroom draft (or a post scheduled for the time you choose), due at 8:00 on the lesson about a week later. Nothing here is printed.</p>' +
+    '<details class="hwsec" open id="hwSet"><summary>Set new homework <span class="sub">kind, classes, due dates, message</span></summary><div class="hwbody">' +
+      '<div class="hwstep"><div class="st">1. Kind</div><div class="hwkinds">' +
+        '<button class="hwkind on" disabled style="opacity:1"><b>Exam practice quiz</b><small>Google Form from home: exam practice or the weekly quiz. Marks itself; pupils mark their written answers.</small></button>' +
+        '<button class="hwkind" disabled><b>Seneca or another link</b><small>Later</small></button><button class="hwkind" disabled><b>Key homework</b><small>Later</small></button><button class="hwkind" disabled><b>Revise for a test</b><small>Later</small></button>' +
+      '</div></div>' +
+      '<div class="hwstep"><div class="st">2. Classes <span>(tick one or several)</span></div><div class="hwchips" id="hwCls"><span class="muted">Reading the quizzes from home...</span></div></div>' +
+      '<div class="hwstep"><div class="st">3. Each class <span>(click a row to change it)</span></div><div id="hwPer"><p class="muted">Pick at least one class.</p></div></div>' +
+      '<div class="hwstep"><div class="st">4. Message to pupils</div><textarea id="hwMsg"></textarea><div class="muted">Plain wording you can change. Words in [brackets] are filled in for each class.</div><div id="hwPrev"></div></div>' +
+      '<div class="row"><button class="primary" id="hwMake">Make the drafts</button><span class="muted" id="hwNote"></span></div>' +
+    '</div></details>' +
+    '<details class="hwsec" id="hwCheck"><summary>Check the questions <span class="sub">each quiz as pupils will see it, before it becomes a Form</span></summary><div class="hwbody" id="hwList"><p class="muted">Reading the quizzes from home...</p></div></details>';
+  $('hwMsg').oninput = () => { S.hwF.msgEdited = true; S.hwF.msg = $('hwMsg').value; hwDrawPrev(); };
+  $('hwMake').onclick = hwMakeAll;
+  const draw = (list) => {
     S.hwList = list;
     const waiting = list.filter((x) => !x.made).length;
-    $('vHomework').innerHTML = '<span class="lbl">Homework' + (waiting ? '<span class="count">' + waiting + '</span>' : '') + '</span><small>check, then make</small>';
-    if (!list.length) { $('hwList').innerHTML = 'No homework from home yet. At home, ask Claude: "make homework for 10C2 due Friday".'; return; }
-    $('hwList').innerHTML = list.map((x, n) => {
-      const hw = x.hw || { title: x.name, questions: [] };
-      const marks = hw.questions.reduce((t, q) => t + (q.points || q.marks || 0), 0);
-      const qs = hw.questions.map((q, i) => '<div class="hwq"><b>' + (i + 1) + '.</b> ' + esc(q.text) + (q.type === 'mcq'
-        ? '<div class="opts">' + q.options.map((o, k) => '<div' + (k === q.answer ? ' class="right"' : '') + '>' + (k === q.answer ? '✓ ' : '○ ') + esc(o) + '</div>').join('') + '</div>'
-        : '<div class="ms">[' + q.marks + ' mark' + (q.marks === 1 ? '' : 's') + '] Mark scheme pupils see after submitting: ' + esc(q.scheme) + '</div>') + '</div>').join('');
-      return '<div class="hwcard"><h3>' + esc(hw.title) + ' <span class="state ' + (x.made ? 'made' : 'new') + '">' + (x.made ? 'made' : 'not made yet') + '</span></h3>' +
-        '<div class="muted">' + hw.questions.length + ' questions · ' + marks + ' marks · ' + esc(hw.board || '') + '</div>' +
-        '<div class="row">' + (x.made ? '<a href="' + esc(x.made.form) + '" target="_blank"><button>Open the quiz</button></a>' + (x.made.draft ? '' : '<span class="muted">No Classroom draft: ' + esc(x.made.note) + '</span>')
-          : '<button class="primary hwMake" data-n="' + n + '">Make the Form + Classroom draft</button>') + '</div>' +
-        '<details' + (x.made ? '' : ' open') + '><summary>' + (x.made ? 'Show the questions' : 'Check the questions and answers') + '</summary>' + qs + '</details></div>';
-    }).join('');
-    document.querySelectorAll('.hwMake').forEach((b) => b.onclick = () => {
-      const x = S.hwList[+b.dataset.n]; b.disabled = true; b.textContent = 'Making...';
-      run('makeHomework', x.name).then((res) => {
-        const m = (res.made || res)[0];
-        toast(m ? (m.draft ? 'Quiz made, Classroom draft ready: check it and publish' : 'Quiz made. No Classroom draft: ' + m.note) : 'Nothing made (already made?)');
-        renderHomework();
-      }).catch((e) => { b.disabled = false; b.textContent = 'Make the Form + Classroom draft'; modal('<h3>Homework not made</h3><p>' + esc(String(e.message || e).replace(/^Error:\s*/, '')) + '</p><div class="row"><button id="mClose">Close</button></div>'); $('mClose').onclick = closeModal; });
+    $('vHomework').innerHTML = '<span class="lbl">Homework' + (waiting ? '<span class="count">' + waiting + '</span>' : '') + '</span><small>set, check</small>';
+    hwDrawClasses(); hwDrawPer(); hwDrawMsg(); hwDrawCheck();
+  };
+  if (S.hwList) draw(S.hwList);
+  run('homeworkList').then(draw).catch((e) => {
+    const m = '<p>' + esc(String(e.message || e).replace(/^Error:\s*/, '')) + '</p>';
+    $('hwList').innerHTML = m; if (!S.hwList) $('hwCls').innerHTML = m;
+  });
+}
+function hwDrawClasses() {
+  const F = S.hwF;
+  const classes = Object.keys(S.data.classes).filter((k) => (S.data.classes[k].seq || []).length);
+  $('hwCls').innerHTML = classes.map((k) => {
+    const has = hwQuizzesFor(k).length;
+    return '<button class="hwchip' + (F.classes.includes(k) ? ' on' : '') + '" data-c="' + esc(k) + '" style="--c:' + esc(S.data.classes[k].colour || '#3F51B5') + '"' +
+      (has ? '' : ' disabled title="No quiz from home yet. Ask at home, or use the Tests tab to ask for exam practice."') + '>' + esc(k) + '</button>';
+  }).join('') + (classes.some((k) => !hwQuizzesFor(k).length) ? '<span class="muted" style="align-self:center">Greyed out: no quiz from home yet.</span>' : '');
+  $('hwCls').querySelectorAll('.hwchip').forEach((b) => b.onclick = () => {
+    const k = b.dataset.c;
+    if (F.classes.includes(k)) F.classes = F.classes.filter((x) => x !== k);
+    else { F.classes.push(k); if (!F.per[k] || !F.per[k].file) F.per[k] = hwPerDefault(k); }
+    F.classes.sort((a, b2) => classes.indexOf(a) - classes.indexOf(b2));
+    hwDrawClasses(); hwDrawPer(); hwDrawMsg();
+  });
+}
+function hwDrawPer() {
+  const F = S.hwF;
+  if (!F.classes.length) { $('hwPer').innerHTML = '<p class="muted">Pick at least one class.</p>'; return; }
+  const open = [...$('hwPer').querySelectorAll('.hwrow[open]')].map((el) => el.dataset.c);
+  $('hwPer').innerHTML = F.classes.map((k) => {
+    const p = F.per[k], c = S.data.classes[k] || {};
+    const qz = hwQuizzesFor(k), x = qz.find((y) => y.name === p.file) || qz[0];
+    if (x && p.file !== x.name) p.file = x.name;
+    const hw = x ? hwOf(x) : { questions: [] }, tier = x && x.m[3];
+    if (p.auto) { const d = P.dueFor(S.data, k, p.setOn); if (d) { p.due = d.due; p.why = d.why; } }
+    const sets = []; let d0 = P.nextLessonDay(S.data, k, todayMidnight(), true);
+    for (let n = 0; d0 && n < 8; n++) { sets.push(d0.date); d0 = P.nextLessonDay(S.data, k, d0.date, false); }
+    if (!sets.includes(p.setOn)) sets.unshift(p.setOn);
+    const other = tier ? hwSibling(p.file, tier === 'core' ? 'challenge' : 'core') : null;
+    const version = tier ? '<span class="hwseg" data-c="' + esc(k) + '"><button data-t="core"' + (tier === 'core' ? ' class="on"' : '') + (tier !== 'core' && !other ? ' disabled' : '') + '>Core</button><button data-t="challenge"' + (tier === 'challenge' ? ' class="on"' : '') + (tier !== 'challenge' && !other ? ' disabled' : '') + '>Challenge</button></span>' : '<span class="muted">One version</span>';
+    const left = (hw.left || []).length, pics = (hw.missingPictures || []).length;
+    const notes = [left ? left + ' question' + (left === 1 ? '' : 's') + ' left out (' + [...new Set(hw.left.map((l) => l.why.replace(/^it /, '')))].join(', ') + ')' : '',
+      pics ? pics + ' picture' + (pics === 1 ? '' : 's') + ' too big or missing, left out' : ''].filter(Boolean).join('. ');
+    const sendTxt = p.send === 'draft' ? 'Draft, you publish' : 'Posts ' + fmtShort(p.postDate) + ' ' + p.postTime;
+    const r = F.results[k];
+    return '<details class="hwrow" data-c="' + esc(k) + '" style="--c:' + esc(c.colour || '#3F51B5') + '"' + (open.includes(k) ? ' open' : '') + '><summary><b>' + esc(k) + '</b>' +
+      '<span>' + esc(x ? hwTopic(hw) : 'no quiz') + (tier ? ' · ' + (tier === 'core' ? 'Core' : 'Challenge') : '') + '</span>' +
+      '<span>Set ' + esc(fmtShort(p.setOn)) + '</span><span class="hwdue" data-due="' + esc(p.due) + '">Due <b>' + esc(fmtShort(p.due)) + '</b>, 8:00</span>' +
+      '<span class="hwpill ' + (p.send === 'draft' ? 'draft' : 'sched') + '">' + esc(sendTxt) + '</span>' +
+      (p.auto && p.why ? '<span class="hwwhy">' + esc(p.why) + (/half term|holiday/.test(p.why) ? ': first lesson back' : ': the next lesson after') + '</span>' : !p.auto ? '<span class="hwwhy">Due date changed by you</span>' : '') + '</summary>' +
+      (r ? '<div class="hwres ' + (r.cls || '') + '">' + r.html + '</div>' : '') +
+      '<div class="inner">' +
+        '<div><label>Quiz</label><select class="hwQuiz" data-c="' + esc(k) + '">' + qz.map((y) => '<option value="' + esc(y.name) + '"' + (y.name === p.file ? ' selected' : '') + '>' + esc(hwQuizLabel(y)) + '</option>').join('') + '</select></div>' +
+        '<div><label>Version</label>' + version + '</div>' +
+        '<div><label>Set on (their lesson)</label><select class="hwSet" data-c="' + esc(k) + '">' + sets.map((s) => '<option value="' + s + '"' + (s === p.setOn ? ' selected' : '') + '>' + esc(fmtShort(s)) + '</option>').join('') + '</select></div>' +
+        '<div><label>Due (8:00)</label><input type="date" class="hwDue" data-c="' + esc(k) + '" value="' + esc(p.due) + '">' + (p.auto ? '' : '<button class="hwAuto" data-c="' + esc(k) + '" style="margin-top:4px">Back to the rule</button>') + '</div>' +
+        '<div><label>Send</label><select class="hwSend" data-c="' + esc(k) + '"><option value="draft"' + (p.send === 'draft' ? ' selected' : '') + '>Draft only, I publish it</option><option value="schedule"' + (p.send === 'schedule' ? ' selected' : '') + '>Schedule it</option></select>' +
+          (p.send === 'schedule' ? '<div style="display:flex;gap:6px;margin-top:4px"><input type="date" class="hwPD" data-c="' + esc(k) + '" value="' + esc(p.postDate) + '"><input type="time" class="hwPT" data-c="' + esc(k) + '" value="' + esc(p.postTime) + '"></div>' : '') + '</div>' +
+        (notes ? '<div><label>Notes from home</label><span class="muted">' + esc(notes) + '</span></div>' : '') +
+      '</div></details>';
+  }).join('');
+  const q = (sel, fn) => $('hwPer').querySelectorAll(sel).forEach((el) => fn(el, F.per[el.dataset.c]));
+  const redo = (k) => { const row = $('hwPer').querySelector('.hwrow[data-c="' + k + '"]'); if (row) row.open = true; hwDrawPer(); hwDrawMsg(); };
+  q('.hwQuiz', (el, p) => el.onchange = () => { p.file = el.value; redo(el.dataset.c); });
+  q('.hwseg', (el, p) => el.querySelectorAll('button').forEach((b) => b.onclick = (e) => { e.preventDefault(); const o = hwSibling(p.file, b.dataset.t); if (o) { p.file = o.name; redo(el.dataset.c); } }));
+  q('.hwSet', (el, p) => el.onchange = () => { p.setOn = el.value; p.auto = true; p.postDate = el.value; p.postTime = P.lessonEnd(S.data, el.dataset.c, el.value) || p.postTime; redo(el.dataset.c); });
+  q('.hwDue', (el, p) => el.onchange = () => { if (el.value) { p.due = el.value; p.auto = false; } redo(el.dataset.c); });
+  q('.hwAuto', (el, p) => el.onclick = (e) => { e.preventDefault(); p.auto = true; redo(el.dataset.c); });
+  q('.hwSend', (el, p) => el.onchange = () => { p.send = el.value; redo(el.dataset.c); });
+  q('.hwPD', (el, p) => el.onchange = () => { p.postDate = el.value; redo(el.dataset.c); });
+  q('.hwPT', (el, p) => el.onchange = () => { p.postTime = el.value; redo(el.dataset.c); });
+}
+function hwDrawMsg() {
+  const F = S.hwF;
+  const kinds = F.classes.map((k) => { const x = (S.hwList || []).find((y) => y.name === (F.per[k] || {}).file); return x ? hwOf(x).kind : ''; });
+  const want = HW_MSG[kinds.every((k) => k === 'weekly') && kinds.length ? 'weekly' : 'exam-practice'];
+  if (!F.msgEdited) F.msg = want;
+  if ($('hwMsg').value !== F.msg) $('hwMsg').value = F.msg;
+  hwDrawPrev();
+}
+function hwDrawPrev() {
+  const F = S.hwF;
+  $('hwPrev').innerHTML = F.classes.slice(0, 3).map((k) => '<div class="hwprev"><b>' + esc(k) + '</b>: ' + esc(hwFill(k)) + '</div>').join('') +
+    (F.classes.length > 3 ? '<div class="muted" style="margin-top:4px">and ' + (F.classes.length - 3) + ' more, each with its own dates.</div>' : '');
+}
+// One class at a time, so a slow Form never stops the rest; each row says what happened.
+function hwMakeAll() {
+  const F = S.hwF;
+  const todo = F.classes.filter((k) => F.per[k] && F.per[k].file && !(F.results[k] && F.results[k].done));
+  if (!todo.length) { toast(F.classes.length ? 'Those are made already. Pick another class.' : 'Pick at least one class first'); return; }
+  const unchecked = todo.filter((k) => { const x = (S.hwList || []).find((y) => y.name === F.per[k].file); return x && !x.checked && !x.made; });
+  if (unchecked.length && !confirm('You have not checked the quiz for ' + unchecked.join(', ') + ' yet. Make it anyway?')) return;
+  $('hwMake').disabled = true;
+  const say = (k, html, cls, done) => { F.results[k] = { html, cls, done }; hwDrawPer(); };
+  let chain = Promise.resolve();
+  todo.forEach((k) => {
+    chain = chain.then(() => {
+      const p = F.per[k], x = (S.hwList || []).find((y) => y.name === p.file);
+      say(k, 'Making the Form...', '');
+      const item = { cls: k, kind: x ? hwOf(x).kind || 'quiz' : 'quiz', file: p.file, setOn: p.setOn, dueOn: p.due, post: p.send, postAt: p.send === 'schedule' ? p.postDate + 'T' + p.postTime : '', message: hwFill(k) };
+      return run('setHomework', item).then((r) => {
+        if (x) x.made = Object.assign({}, x.made || {}, { link: r.formUrl, form: r.editUrl, courseWorkId: r.courseWorkId, draft: r.draft });
+        const links = (r.formUrl ? ' <a href="' + esc(r.formUrl) + '" target="_blank"><button>Open the Form</button></a>' : '') + (r.classroomUrl ? ' <a href="' + esc(r.classroomUrl) + '" target="_blank"><button>Open in Classroom</button></a>' : '') +
+          ' <button class="hwCopy" data-c="' + esc(k) + '">Copy message</button>';
+        const what = r.already ? esc(r.why) : r.draft ? (r.scheduled ? 'Form made. Scheduled for ' + esc(fmtShort(p.postDate)) + ', ' + esc(p.postTime) + '.' : 'Form made. Classroom draft made: check it and publish.') : 'Form made. ' + esc(r.why);
+        const extra = (r.notes || []).filter((n) => /template/i.test(n)).map((n) => '<div class="hwwhy">' + esc(n) + '</div>').join('');
+        say(k, what + links + extra, r.draft || r.already ? 'good' : 'bad', true);
+      }).catch((e) => say(k, 'Not made: ' + esc(String(e.message || e).replace(/^Error:\s*/, '')), 'bad', false));
     });
-  }).catch((e) => { $('hwList').innerHTML = '<p>' + esc(String(e.message || e).replace(/^Error:\s*/, '')) + '</p>'; });
+  });
+  chain.then(() => {
+    $('hwMake').disabled = false;
+    $('hwNote').textContent = 'Done: ' + todo.join(', ') + '. Each row says what was made.';
+    $('hwPer').querySelectorAll('.hwCopy').forEach((b) => b.onclick = (e) => { e.preventDefault(); const t = hwFill(b.dataset.c); (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(() => toast('Message copied')).catch(() => toast('Copy did not work: select the message box instead')); });
+    hwDrawCheck();
+  });
+}
+// page 1 and page 2 of one quiz, as pupils will see them
+function hwQuizPreview(hw) {
+  const v2 = Number(hw.schema) >= 2;
+  const num = (q, i) => (v2 && q.label ? String(q.label).replace(/^Question\s+/, '') : String(i + 1));
+  const p1 = hw.questions.map((q, i) => '<div class="hwq">' + (q.pictures ? '<div class="muted">[picture' + (q.pictures > 1 ? 's: ' + q.pictures : '') + ']</div>' : '') + '<b>' + esc(num(q, i)) + '.</b> ' + esc(q.text) +
+    (q.type === 'mcq' ? '<div class="opts">' + q.options.map((o, k) => { const ok = q.answers ? q.answers.includes(k) : k === q.answer; return '<div' + (ok ? ' class="right"' : '') + '>' + (ok ? '✓ ' : '○ ') + esc(o) + '</div>'; }).join('') + '</div>'
+      : q.type === 'number' ? '<div class="ms">' + (q.unit ? 'Give your answer in ' + esc(q.unit) + '. ' : '') + '[number box] then "Your working (not required)"</div>'
+      : '<div class="ms">[' + q.marks + ' mark' + (q.marks === 1 ? '' : 's') + '] written answer</div>') + '</div>').join('');
+  const self = hw.questions.map((q, i) => ({ q, i })).filter((x) => x.q.type !== 'mcq');
+  const p2 = self.map(({ q, i }) => '<div class="hwq"><b>Question ' + esc(num(q, i)) + ' (' + q.marks + ' mark' + (q.marks === 1 ? '' : 's') + ')</b><div class="ms" style="white-space:pre-wrap">' + esc(q.scheme || 'No mark scheme was found: ask your teacher.') + '</div>' +
+    (q.marking || []).map((m) => '<div class="yn">Yes / No · <b>' + esc(m.title) + '</b> (' + m.points + ' point' + (m.points === 1 ? '' : 's') + ')' + (m.help ? '<br><span style="white-space:pre-wrap">' + esc(m.help) + '</span>' : '') + '</div>').join('') + '</div>').join('');
+  return '<div class="muted" style="margin-top:8px"><b>Page 1: answer the questions</b></div>' + p1 +
+    (self.length ? '<div class="muted" style="margin-top:10px"><b>Page 2: mark your own answers</b> (one Yes or No for each mark)</div>' + p2 : '') +
+    '<p class="muted"><b>Total: ' + hwPoints(hw) + ' points</b>, the same as the Classroom points.</p>';
+}
+function hwDrawCheck() {
+  const list = S.hwList || [];
+  if (!list.length) { $('hwList').innerHTML = '<p class="muted">No homework from home yet. At home, ask Claude: "make homework for 10C2 due Friday".</p>'; return; }
+  $('hwList').innerHTML = list.map((x, n) => {
+    const hw = hwOf(x);
+    const state = x.made && x.made.courseWorkId ? ['made', 'drafted'] : x.made ? ['made', 'Form made'] : x.checked ? ['made', 'checked'] : ['new', 'not checked yet'];
+    return '<div class="hwcard" style="margin-top:12px"><h3>' + esc(hw.title) + ' <span class="state ' + state[0] + '">' + state[1] + '</span></h3>' +
+      '<div class="muted">' + hw.questions.length + ' questions · ' + hwPoints(hw) + ' marks · ' + esc(hw.board || '') + ((hw.left || []).length ? ' · ' + hw.left.length + ' left out at home' : '') + '</div>' +
+      '<div class="row">' + (x.made && x.made.form ? '<a href="' + esc(x.made.form) + '" target="_blank"><button>Open the quiz</button></a>' : '') +
+        (x.made || x.checked ? '' : '<button class="primary hwOk" data-n="' + n + '">Looks right</button>') + '</div>' +
+      '<details><summary>' + (x.made ? 'Show the questions' : 'Check the questions and answers') + '</summary>' + hwQuizPreview(hw) + '</details></div>';
+  }).join('');
+  $('hwList').querySelectorAll('.hwOk').forEach((b) => b.onclick = () => {
+    const x = S.hwList[+b.dataset.n]; b.disabled = true;
+    run('checkHomework', x.name).then((d) => { x.checked = d; toast('Marked as checked'); hwDrawCheck(); hwDrawPer(); })
+      .catch((e) => { b.disabled = false; toast('Not saved: ' + String(e.message || e).replace(/^Error:\s*/, '')); });
+  });
 }
 // Tests (Patryk 2026-10-10): the REAL tests come from the scheme and are sat in class (the test
 // lessons in the week grid). What Claude makes here is EXAM PRACTICE HOMEWORK: a printed paper plus
@@ -474,13 +692,20 @@ function dueBefore(date) {
   const d = date ? P.addDays(date, -1) : null, today = new Date();
   return P.iso(d && d > today ? d : P.addDays(today, 7));
 }
-function practiceRequest(cls, topics, size, due) {
+// Exam practice request (Patryk 2026-10-15: more to vary). opt = { cover: 'taught'|'topics'|'all',
+// topics, minutes, mcq (A-level), tier: ''|'core'|'challenge', due }. Claude runs test-paper.js at home.
+function practiceRequest(cls, opt) {
   const c = S.data.classes[cls] || {};
   const ks5 = c.year >= 12;
-  const text = 'Make ' + (size === 'full' ? 'full' : 'mini') + ' exam practice homework for ' + cls + ' (Year ' + c.year + ') on ' + topics.join(', ') + ', due ' + due +
-    (ks5 ? ': real A-level layout (OCR A).' : ': Core and Challenge papers.') + ' Printed paper + Google Form. Use test-paper.js --due ' + due + '.';
+  const what = opt.cover === 'all' ? 'all topics (whole course, spread evenly)' : opt.cover === 'taught' ? 'everything they have been taught so far (spread evenly over those lessons)' : opt.topics.join(', ');
+  const flags = ['--class ' + cls, opt.cover === 'all' ? '--all-topics' : opt.cover === 'taught' ? '--taught' : '--topics "' + opt.topics.join(', ') + '"',
+    '--minutes ' + opt.minutes, ks5 && opt.mcq != null ? '--mcq ' + opt.mcq : '', !ks5 && opt.tier ? '--tier ' + opt.tier : '', '--due ' + opt.due].filter(Boolean).join(' ');
+  const text = 'Make exam practice homework for ' + cls + ' (Year ' + c.year + ') on ' + what + ', about ' + opt.minutes + ' minutes, due ' + opt.due +
+    (ks5 ? ': real A-level layout (OCR A), ' + opt.mcq + ' multiple choice.' : ': ' + (opt.tier ? (opt.tier === 'core' ? 'Core paper only.' : 'Challenge paper only.') : 'Core and Challenge papers.')) +
+    ' Printed paper + Google Form. Run: node science-lesson/references/test-paper.js ' + flags;
   return run('sendRequest', { kind: 'practice', text, lessons: [] }).then(() => toast('Exam practice asked for. At home: "do my planner requests". The Forms appear in Homework.'));
 }
+const PRACTICE_DEFAULT = { cover: 'taught', minutes: 20, mcq: 8, tier: '' };
 function renderTests() {
   const g = $('grid'); g.className = 'tab'; g.style.gridTemplateColumns = '';
   const up = upcomingTests();
@@ -492,27 +717,50 @@ function renderTests() {
     'It is saved in Admin/Homework/Exam Practice. Its questions are kept out of later homework, Do Nows and board questions.</p>' +
     '<div class="hwcard"><h3>Tests coming up</h3>' + (up.length ? up.map((t, n) => '<div class="testrow"><b>' + esc(t.s.cls) + '</b><span>' + esc(topicName(t.s.cls, t.s.unit)) + ' test · ' + when(t) + '</span>' +
       '<span><select class="upSize" data-n="' + n + '"><option value="mini">mini practice</option><option value="full">full practice</option></select> <button class="upGo" data-n="' + n + '">Exam practice before it</button></span></div>').join('') : '<p class="muted">No tests planned in the next six weeks.</p>') + '</div>' +
-    '<div class="hwcard"><h3>Any exam practice</h3>' +
+    '<div class="hwcard"><h3>Make exam practice</h3>' +
       '<label for="tCls">Class</label><select id="tCls">' + classes.map((k) => '<option>' + esc(k) + '</option>').join('') + '</select>' +
-      '<label>Topics</label><div id="tTopics" class="row"></div>' +
-      '<label for="tMore">Other topics (optional, e.g. "Hubble\'s law, Stars")</label><input type="text" id="tMore">' +
-      '<div class="grid2"><select id="tSize"><option value="mini">Mini (about 20 minutes at home)</option><option value="full">Full (about 45 minutes at home)</option></select>' +
-      '<span><label for="tDue" class="inline">Due </label><input type="date" id="tDue" value="' + dueBefore(null) + '"></span></div>' +
-      '<div class="row"><button class="primary" id="tGo">Ask Claude to make it</button></div></div>';
+      '<label>What it covers</label><div class="row">' +
+        '<label class="inline"><input type="radio" name="tCover" value="taught" checked> Everything they have had so far</label>' +
+        '<label class="inline"><input type="radio" name="tCover" value="topics"> Topics I choose</label>' +
+        '<label class="inline"><input type="radio" name="tCover" value="all"> All topics (whole course)</label></div>' +
+      '<div id="tTopicBox" style="display:none"><label>Topics</label><div id="tTopics" class="row"></div>' +
+      '<label for="tMore">Other topics (optional, e.g. "Hubble\'s law, Stars")</label><input type="text" id="tMore"></div>' +
+      '<label for="tMin">Length: <b id="tMinOut"></b></label><input type="range" id="tMin" min="10" max="60" step="5">' +
+      '<div id="tMcqBox"><label for="tMcq">Multiple choice questions: <b id="tMcqOut"></b></label><input type="range" id="tMcq" min="0" max="15" step="1"></div>' +
+      '<div id="tTierBox"><label for="tTier">Papers</label><select id="tTier"><option value="">Core and Challenge</option><option value="core">Core only</option><option value="challenge">Challenge only</option></select></div>' +
+      '<label for="tDue" class="inline">Due </label><input type="date" id="tDue" value="' + dueBefore(null) + '">' +
+      '<div class="row"><button class="primary" id="tGo">Ask Claude to make it</button> <button id="tDefault">Default</button></div></div>';
+  const setDefaults = () => {
+    $('tMin').value = PRACTICE_DEFAULT.minutes; $('tMcq').value = PRACTICE_DEFAULT.mcq; $('tTier').value = PRACTICE_DEFAULT.tier;
+    document.querySelector('input[name="tCover"][value="' + PRACTICE_DEFAULT.cover + '"]').checked = true; showOpts();
+  };
+  const showOpts = () => {
+    const ks5 = (S.data.classes[$('tCls').value] || {}).year >= 12;
+    const cover = (document.querySelector('input[name="tCover"]:checked') || {}).value;
+    $('tTopicBox').style.display = cover === 'topics' ? '' : 'none';
+    $('tMcqBox').style.display = ks5 ? '' : 'none';
+    $('tTierBox').style.display = ks5 ? 'none' : '';
+    $('tMinOut').textContent = $('tMin').value + ' minutes (about ' + Math.round($('tMin').value * (((S.data.classes[$('tCls').value] || {}).year || 10) <= 8 ? 1 : 1.25)) + ' marks)';
+    $('tMcqOut').textContent = $('tMcq').value;
+  };
+  ['tMin', 'tMcq'].forEach((id) => { $(id).oninput = showOpts; });
+  document.querySelectorAll('input[name="tCover"]').forEach((r) => { r.onchange = showOpts; });
+  $('tDefault').onclick = setDefaults;
   const drawTopics = () => {
     const cls = $('tCls').value;
     const units = [...new Map(S.data.classes[cls].seq.map((L) => [L.unit, L.topic])).entries()];
     $('tTopics').innerHTML = units.map(([u, t]) => '<label class="inline" style="margin:0 10px 0 0"><input type="checkbox" class="tTop" value="' + esc(t) + '"> ' + esc(t) + '</label>').join('');
   };
-  $('tCls').onchange = drawTopics; drawTopics();
+  $('tCls').onchange = () => { drawTopics(); showOpts(); }; drawTopics(); setDefaults();
   $('tGo').onclick = () => {
+    const cover = (document.querySelector('input[name="tCover"]:checked') || {}).value || 'taught';
     const topics = [...document.querySelectorAll('.tTop:checked')].map((x) => x.value).concat($('tMore').value.split(',').map((x) => x.trim()).filter(Boolean));
-    if (!topics.length) { toast('Tick at least one topic'); return; }
-    practiceRequest($('tCls').value, topics, $('tSize').value, $('tDue').value || dueBefore(null)).catch((e) => toast('Not sent: ' + e.message));
+    if (cover === 'topics' && !topics.length) { toast('Tick at least one topic'); return; }
+    practiceRequest($('tCls').value, { cover, topics, minutes: +$('tMin').value, mcq: +$('tMcq').value, tier: $('tTier').value, due: $('tDue').value || dueBefore(null) }).catch((e) => toast('Not sent: ' + e.message));
   };
   document.querySelectorAll('.upGo').forEach((b) => b.onclick = () => {
     const t = up[+b.dataset.n], size = document.querySelector('.upSize[data-n="' + b.dataset.n + '"]').value;
-    practiceRequest(t.s.cls, [topicName(t.s.cls, t.s.unit)], size, dueBefore(t.date)).catch((e) => toast('Not sent: ' + e.message));
+    practiceRequest(t.s.cls, { cover: 'topics', topics: [topicName(t.s.cls, t.s.unit)], minutes: size === 'full' ? 45 : 20, mcq: PRACTICE_DEFAULT.mcq, tier: '', due: dueBefore(t.date) }).catch((e) => toast('Not sent: ' + e.message));
   });
 }
 // Behaviour, built into the planner (Patryk 2026-10-12: one app, one spreadsheet). Same server
@@ -1197,7 +1445,7 @@ item('mHwAll', () => {
     status(list.length ? list.length + ' homework quiz(zes) made' : 'No new homework from home');
     const seen = Array.isArray(res) ? null : res;
     modal('<h3>Homework quizzes</h3>' + (seen ? '<p class="muted">The mailbox found ' + seen.seen + ' homework file(s) from home' + (seen.already ? ', ' + seen.already + ' already made' : '') + '.' + (seen.seen ? ' ' + esc(seen.names.join(', ')) : ' Nothing is waiting there: check that the mailbox is the newest version and that the file is in Admin / Planner Sync.') + '</p>' : '') + (list.length ? list.map((h) => '<p><b>' + esc(h.title) + '</b><br><a href="' + esc(h.form) + '" target="_blank">Open the quiz</a> · ' +
-      (h.draft ? 'Classroom draft ready: check it and publish' : 'no Classroom draft: ' + esc(h.note)) + '</p>').join('') :
+      (h.note ? esc(h.note) + '. ' : '') + 'Make its Classroom draft from the Homework tab' + '</p>').join('') :
       '<p class="muted">Nothing new. At home, ask Claude: "make homework for 10C2 due Friday".</p>') + '<div class="row"><button id="mClose">Close</button></div>');
     $('mClose').onclick = closeModal;
   }).catch((e) => {

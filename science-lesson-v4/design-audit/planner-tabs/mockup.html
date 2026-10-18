@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Planner Tabs Mock-up</title>
+<style>
+  /* Tokens copied from planner/Planner.html. Light here, dark below (the planner itself starts dark). */
+  :root {
+    --navy:#0D1B5E; --gold:#FABB2E; --purple:#AB47BC;
+    --red:#B71C1C; --green:#1B5E20; --orange:#E65100; --blue:#0D47A1;
+    --bg:#EDF2FA; --panel:#FFFFFF; --panel2:#F7F9FD; --ink:#1A1A2E; --muted:#6B6B7B; --line:#D5DDEC;
+    --off:#F1F1F4; --hover:#F7F9FD; --chip:#E8EAF6; --bar:#0D1B5E; --goldink:#8A5A00;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --red:#EF5350; --green:#66BB6A; --orange:#FFA726; --blue:#64B5F6;
+      --bg:#0E1424; --panel:#161E33; --panel2:#1C2540; --ink:#E6EAF5; --muted:#98A2BC; --line:#2A3555;
+      --off:#12192B; --hover:#202A47; --chip:#24305A; --bar:#0A0F1E; --goldink:#FABB2E;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --red:#EF5350; --green:#66BB6A; --orange:#FFA726; --blue:#64B5F6;
+    --bg:#0E1424; --panel:#161E33; --panel2:#1C2540; --ink:#E6EAF5; --muted:#98A2BC; --line:#2A3555;
+    --off:#12192B; --hover:#202A47; --chip:#24305A; --bar:#0A0F1E; --goldink:#FABB2E;
+    color-scheme: dark;
+  }
+  * { box-sizing:border-box; }
+  html, body { background:var(--bg); }
+  body { margin:0; font-family:"Century Gothic","Segoe UI",sans-serif; color:var(--ink); font-size:14px; overflow-x:hidden; }
+  header { background:var(--bar); color:#fff; display:flex; align-items:center; gap:8px; padding:8px 14px; position:sticky; top:0; z-index:5; border-bottom:1px solid var(--line); flex-wrap:wrap; }
+  header h1 { font-size:18px; margin:0 8px 0 0; color:var(--gold); }
+  .badge { background:var(--gold); color:#0D1B5E; font-weight:700; padding:2px 8px; border-radius:10px; font-size:12px; }
+  #wkLabel { font-weight:700; white-space:nowrap; }
+  #status { font-size:12px; margin-left:auto; opacity:.85; }
+  button { font-family:inherit; font-size:13px; border:1px solid var(--line); background:var(--panel2); color:var(--ink); padding:5px 10px; border-radius:6px; cursor:pointer; }
+  button:hover { border-color:var(--gold); }
+  button:disabled { opacity:.5; cursor:default; }
+  header button { background:transparent; color:#fff; border-color:rgba(255,255,255,.25); }
+  button.primary { background:var(--gold); color:#0D1B5E; border-color:var(--gold); font-weight:700; }
+  button.small { font-size:12px; padding:3px 8px; }
+  #side { position:fixed; left:0; top:var(--hh, 50px); bottom:0; width:132px; background:var(--bar); border-right:1px solid var(--line); padding:10px 8px; display:flex; flex-direction:column; gap:4px; z-index:4; }
+  #side button { display:flex; flex-direction:column; align-items:flex-start; gap:1px; width:100%; text-align:left; background:transparent; color:#D7DCEA; border:1px solid transparent; padding:8px 9px; font-size:13px; }
+  #side button small { font-size:10.5px; color:#8D97B3; }
+  #side button:hover { border-color:rgba(255,255,255,.25); }
+  #side button.on { background:rgba(250,187,46,.18); border-color:var(--gold); color:#fff; }
+  #side button.ghost { opacity:.55; }
+  #side hr { border:none; border-top:1px solid rgba(255,255,255,.12); margin:6px 0; width:100%; }
+  #side .count { background:var(--gold); color:#0D1B5E; border-radius:9px; padding:0 6px; font-size:11px; font-weight:700; margin-left:4px; }
+  #side .new { color:var(--gold); font-size:10px; font-weight:700; margin-left:4px; }
+  main { margin-left:132px; padding:12px; }
+  @media (max-width: 900px) {
+    #side { position:static; width:auto; flex-direction:row; flex-wrap:wrap; }
+    #side button { width:auto; }
+    #side hr { display:none; }
+    main { margin-left:0; }
+  }
+  .tab { max-width:1000px; display:none; }
+  .tab.on { display:block; }
+  .tab h2 { margin:4px 0 4px; font-size:20px; color:var(--gold); }
+  .lead { color:var(--muted); margin:0 0 12px; font-size:13px; line-height:1.45; }
+  .muted { color:var(--muted); font-size:12px; }
+  .mocknote { border:1px dashed var(--gold); border-radius:8px; padding:6px 10px; font-size:12px; color:var(--muted); margin-bottom:12px; }
+
+  /* folding sections */
+  details.sec { background:var(--panel); border:1px solid var(--line); border-radius:10px; margin-bottom:12px; }
+  details.sec > summary { list-style:none; cursor:pointer; padding:11px 14px; display:flex; align-items:center; gap:10px; flex-wrap:wrap; font-weight:700; font-size:15px; }
+  details.sec > summary::-webkit-details-marker { display:none; }
+  details.sec > summary::before { content:"\25B8"; color:var(--gold); transition:transform .15s; display:inline-block; }
+  details.sec[open] > summary::before { transform:rotate(90deg); }
+  details.sec > summary .sub { font-weight:400; font-size:12px; color:var(--muted); }
+  details.sec > summary .later { font-size:10px; font-weight:700; border:1px solid var(--muted); color:var(--muted); border-radius:3px; padding:0 4px; }
+  .secbody { padding:0 14px 14px; border-top:1px solid var(--line); }
+
+  .step { margin-top:14px; }
+  .step > .st { font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); font-weight:700; margin-bottom:6px; }
+  .kinds { display:grid; grid-template-columns:repeat(auto-fill, minmax(170px, 1fr)); gap:8px; }
+  .kind { border:1px solid var(--line); background:var(--panel2); border-radius:8px; padding:8px 10px; cursor:pointer; text-align:left; display:block; width:100%; }
+  .kind b { display:block; font-size:13px; }
+  .kind small { color:var(--muted); font-size:11.5px; line-height:1.3; display:block; margin-top:2px; }
+  .kind.on { border-color:var(--gold); background:color-mix(in srgb, var(--gold) 14%, var(--panel)); }
+  .chips { display:flex; flex-wrap:wrap; gap:6px; }
+  .cchip { border:2px solid var(--c); background:var(--panel2); border-radius:16px; padding:3px 12px; font-weight:700; font-size:13px; cursor:pointer; color:var(--ink); }
+  .cchip.on { background:color-mix(in srgb, var(--c) 45%, var(--panel)); }
+  .dot { display:inline-block; width:10px; height:10px; border-radius:50%; background:var(--c); flex:none; }
+  label { display:block; font-size:12px; color:var(--muted); margin:8px 0 2px; }
+  label.inline { display:flex; gap:6px; align-items:center; margin:4px 12px 0 0; color:var(--ink); font-size:13px; }
+  .inlines { display:flex; flex-wrap:wrap; }
+  select, input[type=text], input[type=date], input[type=time], textarea { width:100%; font-family:inherit; font-size:13px; padding:6px; border:1px solid var(--line); border-radius:6px; background:var(--panel2); color:var(--ink); max-width:100%; }
+  textarea { min-height:70px; resize:vertical; line-height:1.4; }
+  .row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-top:10px; }
+  .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  @media (max-width: 620px) { .grid2 { grid-template-columns:1fr; } }
+
+  /* per-class rows in the composer */
+  .crow { border:1px solid var(--line); border-left:5px solid var(--c); border-radius:8px; margin-top:8px; background:var(--panel2); }
+  .crow > summary { list-style:none; cursor:pointer; padding:8px 10px; display:flex; gap:10px; flex-wrap:wrap; align-items:center; font-size:13px; }
+  .crow > summary::-webkit-details-marker { display:none; }
+  .crow > summary b { min-width:44px; }
+  .crow .inner { padding:2px 10px 10px; display:grid; grid-template-columns:repeat(auto-fill, minmax(190px, 1fr)); gap:4px 12px; }
+  .seg { display:inline-flex; border:1px solid var(--line); border-radius:6px; overflow:hidden; }
+  .seg button { border:none; border-radius:0; padding:4px 10px; background:var(--panel2); }
+  .seg button.on { background:var(--gold); color:#0D1B5E; font-weight:700; }
+  .why { font-size:11.5px; color:var(--orange); }
+  .why.ok { color:var(--muted); }
+  .preview { background:var(--panel2); border:1px solid var(--line); border-radius:8px; padding:8px 10px; font-size:13px; line-height:1.45; margin-top:6px; }
+  .preview b { color:var(--goldink); }
+
+  /* status */
+  .pill { font-size:11px; font-weight:700; border-radius:10px; padding:1px 8px; border:1px solid currentColor; white-space:nowrap; }
+  .s-drafted { color:var(--gold); } :root:not([data-theme="dark"]) .s-drafted { color:var(--goldink); }
+  .s-scheduled { color:var(--blue); } .s-live { color:var(--purple); } .s-due { color:var(--orange); } .s-marked { color:var(--green); }
+  .strip { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px; }
+  .strip button { display:flex; gap:8px; align-items:center; background:var(--panel); }
+  .strip button.on { border-color:var(--gold); box-shadow:inset 0 0 0 1px var(--gold); }
+  .strip .n { font-weight:700; font-size:16px; }
+  .clsrow { border-top:1px solid var(--line); }
+  .clsrow:first-child { border-top:none; }
+  .clsrow > summary { list-style:none; cursor:pointer; padding:9px 4px; display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+  .clsrow > summary::-webkit-details-marker { display:none; }
+  .clsrow > summary b { min-width:46px; }
+  .clsrow > summary .next { margin-left:auto; font-size:12px; color:var(--muted); }
+  .item { background:var(--panel2); border:1px solid var(--line); border-radius:8px; padding:8px 10px; margin:0 0 8px; }
+  .item h4 { margin:0 0 4px; font-size:13.5px; display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  .item .meta { font-size:12px; color:var(--muted); }
+  .steps { display:grid; grid-template-columns:repeat(5, 1fr); gap:3px; margin:8px 0 4px; }
+  .steps span { font-size:10.5px; text-align:center; padding:2px 0; border-top:4px solid var(--line); color:var(--muted); }
+  .steps span.done { border-color:var(--green); color:var(--ink); }
+  .steps span.now { border-color:var(--gold); color:var(--ink); font-weight:700; }
+  .bar { height:8px; background:var(--line); border-radius:4px; overflow:hidden; }
+  .bar i { display:block; height:100%; background:var(--green); }
+  .tag { font-size:10px; font-weight:700; border-radius:3px; padding:0 4px; border:1px solid currentColor; white-space:nowrap; }
+  .t-core { color:var(--blue); } .t-chal { color:var(--purple); } .t-kind { color:var(--muted); }
+
+  /* assessment */
+  .trow { display:grid; grid-template-columns:52px minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1fr) auto; gap:10px; align-items:center; padding:9px 0; border-top:1px solid var(--line); font-size:13px; }
+  .trow.head { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.05em; border-top:none; padding-top:4px; }
+  .trow small { display:block; color:var(--muted); font-size:11.5px; }
+  .ok { color:var(--green); } .warn { color:var(--orange); } .bad { color:var(--red); }
+  @media (max-width: 760px) {
+    .trow { grid-template-columns:1fr 1fr; }
+    .trow.head { display:none; }
+    .trow > :first-child { grid-column:1 / -1; }
+    .trow > :last-child { grid-column:1 / -1; }
+  }
+  input[type=range] { width:100%; accent-color:var(--gold); }
+  .sumbox { background:color-mix(in srgb, var(--gold) 12%, var(--panel)); border:1px solid var(--gold); border-radius:10px; padding:10px 12px; margin-top:12px; }
+  .sumbox .big { font-size:18px; font-weight:700; }
+  .spread { margin-top:8px; }
+  .sp { display:grid; grid-template-columns:minmax(0,180px) 1fr 70px; gap:8px; align-items:center; font-size:12px; margin:3px 0; }
+  .sp .t { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .sp .b { height:12px; background:var(--line); border-radius:3px; overflow:hidden; display:flex; }
+  .sp .b i { display:block; height:100%; }
+  .sp .b i.m { background:var(--blue); } .sp .b i.w { background:var(--gold); }
+  .sp .v { text-align:right; color:var(--muted); }
+  .legend { display:flex; gap:14px; font-size:11.5px; color:var(--muted); margin-top:4px; }
+  .legend i { display:inline-block; width:10px; height:10px; border-radius:2px; margin-right:4px; vertical-align:-1px; }
+  .subs { display:grid; grid-template-columns:repeat(auto-fill, minmax(210px, 1fr)); gap:2px 10px; margin-top:4px; }
+  .subs label.inline { margin:3px 0; }
+  .subs .tl { font-size:10px; color:var(--green); font-weight:700; }
+  .hwq { border-top:1px solid var(--line); padding:8px 0; font-size:13px; line-height:1.45; }
+  .hwq .opts { margin:4px 0 0 14px; }
+  .hwq .opts div { color:var(--muted); } .hwq .opts .right { color:var(--green); font-weight:700; }
+  .hwq .ms { color:var(--muted); font-size:12px; margin-top:4px; }
+  .qbar { display:grid; grid-template-columns:40px 1fr 44px; gap:8px; align-items:center; font-size:12px; margin:3px 0; }
+  .qbar .b { height:12px; background:var(--line); border-radius:3px; overflow:hidden; }
+  .qbar .b i { display:block; height:100%; background:var(--green); }
+  .qbar.low .b i { background:var(--red); }
+
+  /* to agree */
+  .agree { background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:12px 14px; margin-bottom:12px; }
+  .agree h3 { margin:0 0 4px; font-size:15px; }
+  .lrow { display:flex; align-items:center; gap:8px; padding:6px 8px; border-bottom:1px solid var(--line); font-size:13px; }
+  .lrow:last-child { border-bottom:none; }
+  .lrow .num { font-weight:700; min-width:30px; color:var(--muted); }
+  .lrow .pen { margin-left:auto; cursor:pointer; color:var(--muted); background:none; border:none; padding:2px 6px; }
+  .lrow .pen:hover { color:var(--gold); }
+  .lrow input { flex:1; }
+  .lbox { border:1px solid var(--line); border-radius:6px; background:var(--panel2); max-width:520px; }
+  .card { background:var(--panel2); border:1px solid var(--line); border-radius:8px; padding:8px 10px; margin-top:8px; max-width:520px; }
+  .card h4 { margin:0 0 6px; font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); display:flex; justify-content:space-between; gap:8px; flex-wrap:wrap; }
+  .sugg { font-size:10px; color:var(--goldink); font-weight:700; margin-left:4px; }
+  .opts3 { display:grid; grid-template-columns:repeat(auto-fill, minmax(230px, 1fr)); gap:8px; margin-top:8px; }
+  .opt { border:1px solid var(--line); border-radius:8px; padding:8px 10px; background:var(--panel2); }
+  .opt.rec { border-color:var(--gold); }
+  .opt b { display:block; margin-bottom:2px; }
+  .weekmini { display:grid; grid-template-columns:repeat(5, minmax(0,1fr)); border:1px solid var(--line); border-radius:8px; overflow:hidden; margin-top:8px; font-size:11px; }
+  .weekmini > div { border-right:1px solid var(--line); padding:4px; min-height:70px; }
+  .weekmini > div:last-child { border-right:none; }
+  .weekmini .d { color:var(--muted); text-align:center; font-weight:700; margin-bottom:3px; }
+  .tchip { display:flex; gap:4px; align-items:center; border-radius:4px; padding:2px 5px; margin:2px 0; background:var(--chip); }
+  .tchip.auto { border:1px dashed var(--gold); }
+  @media (max-width: 620px) {
+    main { padding:12px 16px; }
+    .weekmini { grid-template-columns:1fr; }
+    .weekmini > div { border-right:none; border-bottom:1px solid var(--line); min-height:0; }
+  }
+  #toast { position:fixed; bottom:18px; left:50%; transform:translateX(-50%); background:#323232; color:#fff; padding:10px 14px; border-radius:6px; font-size:13px; display:none; z-index:30; max-width:calc(100vw - 32px); }
+  #toast.on { display:block; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Planner</h1>
+  <button disabled>Today</button>
+  <button disabled>&#9664;</button><button disabled>&#9654;</button>
+  <span id="wkLabel">w/c 19 Oct</span><span class="badge">A</span>
+  <span id="status">Mock-up: fake data, nothing is saved</span>
+  <button id="themeBtn">Theme</button>
+</header>
+<nav id="side" aria-label="Planner areas">
+  <button class="ghost" data-tab="none">Week<small>plan and tick</small></button>
+  <button class="ghost" data-tab="none">Day<small>one day, with kit</small></button>
+  <button class="ghost" data-tab="none">Classes<small>where each class is</small></button>
+  <hr>
+  <button data-tab="homework" class="on"><span>Homework<span class="count" id="hwCount">2</span></span><small>set work per class</small></button>
+  <button data-tab="assessment"><span>Assessment<span class="count">1</span></span><small>tests and papers</small></button>
+  <button class="ghost" data-tab="none">Behaviour<small>points and board</small></button>
+  <hr>
+  <button data-tab="agree"><span>To agree<span class="new">MOCK</span></span><small>3 small items</small></button>
+</nav>
+
+<main>
+<!-- ============================================================ HOMEWORK -->
+<section class="tab on" id="tab-homework">
+  <h2>Homework</h2>
+  <p class="lead">Set work for one or several classes, then follow it until it is marked. Everything goes to Google Classroom as a draft unless you schedule it. Nothing here is printed.</p>
+  <div class="mocknote">Mock-up for approval. Today is Sunday 18 October 2026; half term runs Thu 22 Oct to Fri 30 Oct (INSET 22 and 23), pupils back Mon 2 Nov.</div>
+
+  <div class="strip" id="strip"></div>
+
+  <details class="sec" open id="secSet">
+    <summary>Set new homework <span class="sub">kind, classes, due dates, message</span></summary>
+    <div class="secbody">
+      <div class="step"><div class="st">1. Kind</div><div class="kinds" id="kinds"></div></div>
+      <div class="step" id="kindFields"></div>
+      <div class="step"><div class="st">2. Classes <span class="muted" style="text-transform:none;letter-spacing:0;font-weight:400">(tick one or several)</span></div><div class="chips" id="clsPick"></div></div>
+      <div class="step"><div class="st">3. Each class <span class="muted" style="text-transform:none;letter-spacing:0;font-weight:400">(click a row to change it)</span></div><div id="perClass"><p class="muted">Pick at least one class.</p></div></div>
+      <div class="step"><div class="st">4. Message to pupils</div>
+        <textarea id="msg"></textarea>
+        <div class="muted">Plain wording you can change. Words in [brackets] are filled in for each class.</div>
+        <div id="msgPrev"></div>
+      </div>
+      <div class="row"><button class="primary" id="makeDrafts">Make the drafts</button><span class="muted" id="makeNote"></span></div>
+    </div>
+  </details>
+
+  <details class="sec" open id="secList">
+    <summary>Set work, by class <span class="sub" id="listSub"></span></summary>
+    <div class="secbody" id="clsList"></div>
+  </details>
+
+  <details class="sec">
+    <summary>Coming up automatically <span class="sub">revision homework 2 weeks before each test</span></summary>
+    <div class="secbody" id="autoList"></div>
+  </details>
+</section>
+
+<!-- ============================================================ ASSESSMENT -->
+<section class="tab" id="tab-assessment">
+  <h2>Assessment</h2>
+  <p class="lead">Real tests are the school's papers, sat in class (Admin / Assessment). Practice papers are homework: built here, checked here, then set from Homework.</p>
+
+  <details class="sec" open>
+    <summary>Tests coming up <span class="sub">from the planner, next 8 weeks</span></summary>
+    <div class="secbody">
+      <div class="trow head"><span>Class</span><span>Test</span><span>Paper</span><span>Revision homework</span><span>Review lesson</span><span></span></div>
+      <div id="testRows"></div>
+    </div>
+  </details>
+
+  <details class="sec" open id="secBuild">
+    <summary>Test builder <span class="sub">practice paper from real exam questions</span></summary>
+    <div class="secbody">
+      <div class="grid2">
+        <div><label for="bCls">Class</label><select id="bCls"></select></div>
+        <div><label for="bChap">Chapter</label><select id="bChap"></select></div>
+      </div>
+      <label>What it covers</label>
+      <div class="inlines" id="bCover">
+        <label class="inline"><input type="radio" name="cover" value="whole" checked> Whole chapter</label>
+        <label class="inline"><input type="radio" name="cover" value="part"> Part of a chapter</label>
+        <label class="inline"><input type="radio" name="cover" value="taught"> Everything taught so far</label>
+        <label class="inline"><input type="radio" name="cover" value="choose"> Topics I choose</label>
+      </div>
+      <div id="bSubs"></div>
+      <label>Spread</label>
+      <div class="inlines">
+        <label class="inline"><input type="radio" name="spread" value="even" checked> Even over the sub-topics</label>
+        <label class="inline"><input type="radio" name="spread" value="recent"> More on recent lessons</label>
+      </div>
+      <div class="grid2" style="margin-top:6px">
+        <div><label for="bMcq">Multiple choice questions: <b id="bMcqOut"></b> <span class="muted">(1 mark each)</span></label><input type="range" id="bMcq" min="0" max="20" step="1" value="12"></div>
+        <div><label for="bLen">Length: <b id="bLenOut"></b> <span class="seg" id="bUnit" style="margin-left:6px"><button data-u="marks" class="on">marks</button><button data-u="minutes">minutes</button></span></label><input type="range" id="bLen" min="10" max="80" step="1" value="25"></div>
+      </div>
+      <label>Paper</label>
+      <div class="seg" id="bTier"><button data-t="core">Core</button><button data-t="challenge">Challenge</button><button data-t="both" class="on">Both</button></div>
+      <span class="muted" id="bTierNote"></span>
+      <div class="sumbox">
+        <div class="big" id="bSum"></div>
+        <div class="muted" id="bSum2"></div>
+        <div class="spread" id="bSpread"></div>
+        <div class="legend"><span><i style="background:var(--blue)"></i>multiple choice marks</span><span><i style="background:var(--gold)"></i>written marks</span></div>
+        <div class="why" id="bWarn"></div>
+      </div>
+      <div class="row"><button class="primary" id="bGo">Ask Claude to make it</button><button id="bReset">Default</button><span class="muted">Built at home from the exam library (real questions, word for word). It comes back below to check.</span></div>
+    </div>
+  </details>
+
+  <details class="sec">
+    <summary>Check exam practice questions <span class="sub">before the Form is made (moved from Homework)</span> <span class="pill s-drafted">1 to check</span></summary>
+    <div class="secbody" id="checkList"></div>
+  </details>
+
+  <details class="sec">
+    <summary>Results and misconceptions <span class="later">LATER</span> <span class="sub">from the Form answers, free</span></summary>
+    <div class="secbody" id="results"></div>
+  </details>
+</section>
+
+<!-- ============================================================ TO AGREE -->
+<section class="tab" id="tab-agree">
+  <h2>Small items to agree</h2>
+  <p class="lead">Three small changes elsewhere in the planner. Each shows how it would look; nothing here is a new tab.</p>
+
+  <div class="agree">
+    <h3>1. Rename lessons you added</h3>
+    <p class="muted">Pencil only on lessons you added (the "a" numbers). Scheme lessons cannot be renamed. The name changes in the planner only: the Drive folder keeps its old name (never rename on Drive).</p>
+    <div class="lbox" id="renameList"></div>
+  </div>
+
+  <div class="agree">
+    <h3>2. Lesson extras</h3>
+    <p class="muted">A second row in the lesson panel's checklist. Ticks go to Claude with the build. "suggested" = ticked for you; untick to drop it.</p>
+    <div class="card">
+      <h4>Checklist for this lesson <span>10C2 · P1 L10 Renewable resources</span></h4>
+      <label class="inline"><input type="checkbox"> Start with a short review of last lesson</label>
+      <label class="inline"><input type="checkbox" checked> Set homework at the end</label>
+      <label class="inline"><input type="checkbox"> Test next week: hand out / remind them of the PLC</label>
+      <h4 style="margin-top:10px">Extras for this lesson <span>new</span></h4>
+      <div class="inlines" id="extras"></div>
+    </div>
+  </div>
+
+  <div class="agree">
+    <h3>3. Task checklist: where it lives</h3>
+    <div class="opts3">
+      <div class="opt rec"><b>A. Week view "All day" row (recommended)</b><span class="muted">Tasks already go there. Add a fixed list to pick from, and automatic tasks: "Mark 10C2 homework" on its due day, "Mark tests" the day after a test. Day view ticks them off.</span></div>
+      <div class="opt"><b>B. Its own Tasks tab</b><span class="muted">A list with dates. One more place to look; not recommended.</span></div>
+      <div class="opt"><b>C. Inside the morning brief only</b><span class="muted">Not in the planner at all. Loses the link to lessons and periods.</span></div>
+    </div>
+    <div class="weekmini" id="weekMini"></div>
+    <div class="muted" style="margin-top:4px">Dashed = made automatically from Homework and Assessment.</div>
+  </div>
+</section>
+</main>
+<div id="toast"></div>
+
+<script>
+/* ---------------------------------------------------------------- fake data */
+const TODAY = new Date(2026, 9, 18);
+const CLASSES = {
+  '7MLA': { y:7,  c:'#F4B183', size:28, days:[1,3,5], subj:'Science' },
+  '8AG':  { y:8,  c:'#9DC3E6', size:30, days:[2,4],   subj:'Biology' },
+  '8XP':  { y:8,  c:'#A9D18E', size:29, days:[1,4],   subj:'Physics' },
+  '9AS':  { y:9,  c:'#FFD966', size:27, days:[2,5],   subj:'Chemistry' },
+  '9XS':  { y:9,  c:'#C9A8E0', size:30, days:[1,3],   subj:'Chemistry' },
+  '10C2': { y:10, c:'#F09CC0', size:27, days:[1,2,4], subj:'Physics' },
+  '10S2': { y:10, c:'#8FD3CB', size:26, days:[2,3,5], subj:'Physics' },
+  '11S2': { y:11, c:'#DDB27C', size:25, days:[1,3,4], subj:'Physics' },
+  '12C':  { y:12, c:'#8EA9C9', size:12, days:[2,4],   subj:'OCR A Physics' },
+  '13D':  { y:13, c:'#B5D98A', size:11, days:[1,3,5], subj:'OCR A Physics' },
+};
+const CHAPTERS = {
+  '7MLA': [{ n:'Cells', subs:['Microscopes','Animal and plant cells','Specialised cells','Diffusion','Unicellular organisms'], taught:3 }],
+  '8AG':  [{ n:'Pressure', subs:['Pressure on a surface','Calculating pressure','Pressure in liquids','Atmospheric pressure','Floating and sinking'], taught:2 }],
+  '8XP':  [{ n:'Motion', subs:['Speed','Distance-time graphs','Relative motion','Forces and motion'], taught:2 }, { n:'Pressure', subs:['Pressure on a surface','Pressure in fluids','Atmospheric pressure'], taught:3 }],
+  '9AS':  [{ n:'Particles', subs:['States of matter','Changes of state','Latent heat','Density','Gas pressure'], taught:5 }],
+  '9XS':  [{ n:'Particles', subs:['States of matter','Changes of state','Density','Gas pressure'], taught:4 }, { n:'Microscopy', subs:['Microscopes','Microscope types','Magnification','Cell structure'], taught:2 }],
+  '10C2': [{ n:'P1 Energy', subs:['Energy stores','Kinetic energy','Gravitational potential energy','Elastic potential energy','Specific heat capacity','Power','Efficiency','Conservation of energy','Non-renewable resources','Renewable resources'], taught:9 }],
+  '10S2': [{ n:'P1 Energy', subs:['Energy stores','Kinetic energy','GPE','Specific heat capacity','Power','Efficiency','Insulation'], taught:6 }],
+  '11S2': [{ n:'P6 Waves', subs:['Transverse and longitudinal','Wave speed','Refraction','EM spectrum','EM uses','EM dangers','Lenses'], taught:6 }],
+  '12C':  [{ n:'Ch 13 Waves 2', subs:['Superposition','Interference','Young double-slit','Stationary waves','Harmonics'], taught:2 }],
+  '13D':  [{ n:'Ch 21 Stars', subs:['Life cycle of stars','HR diagram','Energy levels','Spectra','Diffraction gratings'], taught:5 },
+           { n:'Ch 22 Cosmology', subs:['Astronomical distances','Doppler effect','Hubble\'s law','Big Bang','Evolution of the universe'], taught:5 }],
+};
+const TESTS = [
+  { cls:'9AS',  topic:'Particles', date:new Date(2026,9,20), paper:[1,'in the test',1], rev:'set', review:'after' },
+  { cls:'10C2', topic:'P1 Energy', date:new Date(2026,10,3), paper:[1,1,1], rev:'scheduled', review:'after' },
+  { cls:'8XP',  topic:'Pressure', date:new Date(2026,10,9), paper:[1,1,0], rev:'none', review:'after' },
+  { cls:'11S2', topic:'P6 Waves', date:new Date(2026,10,12), paper:[1,1,1], rev:'none', review:'after' },
+  { cls:'13D',  topic:'Module 5: Stars and cosmology', date:new Date(2026,10,18), paper:[1,'in the test',1], rev:'none', review:'after' },
+  { cls:'9XS',  topic:'Particles', date:new Date(2026,9,14), paper:[1,1,1], rev:'set', review:'built', past:true },
+];
+const STATUSES = ['drafted','scheduled','live','due','marked'];
+const SNAME = { drafted:'Drafted', scheduled:'Scheduled', live:'Live', due:'Due', marked:'Marked' };
+const SHELP = { drafted:'in Classroom, you publish it', scheduled:'Classroom posts it by itself', live:'posted, not due yet', due:'due date reached', marked:'done' };
+let ITEMS = [
+  { cls:'10C2', kind:'seneca', title:'Seneca: Energy stores and transfers', tier:'core', set:'2026-10-05', due:'2026-10-12', status:'marked', done:24 },
+  { cls:'10C2', kind:'exam', title:'Exam practice: P1 Energy', tier:'core', set:'2026-10-13', due:'2026-10-16', status:'due', done:19 },
+  { cls:'10C2', kind:'revise', title:'Revise for your P1 Energy test', tier:'core', set:'2026-10-19', due:'2026-11-02', status:'scheduled', posts:'Mon 19 Oct, 15:30', done:0 },
+  { cls:'13D',  kind:'exam', title:'Exam practice: Evolution of the universe', tier:'one', set:'2026-10-14', due:'2026-10-21', status:'live', done:6 },
+  { cls:'8AG',  kind:'key', title:'Key homework: Pressure', tier:'core', set:'2026-10-20', due:'2026-11-03', status:'drafted', done:0 },
+  { cls:'11S2', kind:'seneca', title:'Seneca: EM spectrum', tier:'challenge', set:'2026-10-15', due:'2026-10-22', status:'live', done:14 },
+  { cls:'9XS',  kind:'exam', title:'Exam practice: Particles', tier:'core', set:'2026-10-05', due:'2026-10-12', status:'marked', done:28 },
+  { cls:'12C',  kind:'exam', title:'Exam practice: Interference', tier:'one', set:'2026-10-20', due:'2026-11-03', status:'drafted', done:0 },
+];
+const KINDS = {
+  exam:   { name:'Exam practice quiz', help:'Google Form, marks itself; long answers are self-marked inside the Form', tmpl:'This is a short exam practice quiz on [topic]. Answer every question, then use the mark scheme on the next page to mark your own written answers. Be honest: it shows you what to work on. Due [due], 8am.' },
+  seneca: { name:'Seneca or other link', help:'Drafts the Classroom post; you paste the link', tmpl:'Your homework this week is on Seneca: [topic]. Click the link and finish it by [due], 8am. Message me on Google Classroom if you need any help.' },
+  key:    { name:'Key homework', help:'The school\'s key homework for the topic, attached', tmpl:'This is your key homework for [topic]. It is attached below. Hand it in by [due], 8am. Message me on Google Classroom if you need any help.' },
+  revise: { name:'Revise for a test', help:'Test date, PLC attached, optional Seneca link', tmpl:'You have a test on [topic] on [test]. Use the PLC attached to check what you know, then revise the topics you are least sure of. Message me on Google Classroom if you need any help.' },
+  other:  { name:'Something else', help:'Your own title and instructions', tmpl:'[title]. Due [due], 8am.' },
+};
+const QUIZZES = ['Exam practice: P1 Energy (Core, checked)', 'Exam practice: P1 Energy (Challenge, checked)', 'Exam practice: Interference (12C, waiting to be checked)'];
+
+/* ---------------------------------------------------------------- dates */
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
+const iso = (d) => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+const parse = (s) => { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); };
+const addDays = (d, n) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
+const daysBetween = (a, b) => Math.round((b - a) / 86400000);
+const fmt = (d) => d.toLocaleDateString('en-GB', { weekday:'short', day:'numeric', month:'short' });
+const fmtLong = (d) => d.toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long' });
+const OFF = [['2026-10-22','2026-11-01'], ['2026-11-25','2026-11-25'], ['2026-12-19','2027-01-04']];
+const teaching = (d) => { const w = d.getDay(); if (w === 0 || w === 6) return false; const s = iso(d); return !OFF.some(([a, b]) => s >= a && s <= b); };
+const isHoliday = (d) => { const s = iso(d); return OFF.some(([a, b]) => s >= a && s <= b); };
+function lessonsFrom(cls, from, count) {
+  const out = []; let d = addDays(from, 1);
+  while (out.length < count) { if (teaching(d) && CLASSES[cls].days.includes(d.getDay())) out.push(d); d = addDays(d, 1); }
+  return out;
+}
+// The rule: from the day it is set, that class's lesson closest to 7 days on, if 4 to 9 days on. Else first lesson back.
+function dueFor(cls, setDay) {
+  const ls = lessonsFrom(cls, setDay, 12);
+  const cands = ls.filter((d) => { const g = daysBetween(setDay, d); return g >= 4 && g <= 9; });
+  if (cands.length) {
+    cands.sort((a, b) => Math.abs(daysBetween(setDay, a) - 7) - Math.abs(daysBetween(setDay, b) - 7) || a - b);
+    const g = daysBetween(setDay, cands[0]);
+    return { date: cands[0], why: g + ' days on: their lesson nearest a week', ok: true };
+  }
+  let crossed = false; for (let k = 1; k <= 9; k++) if (isHoliday(addDays(setDay, k))) crossed = true;
+  const after = ls.find((d) => daysBetween(setDay, d) > 9) || ls[ls.length - 1];
+  return { date: after, why: (crossed ? 'Half term: ' : 'No lesson 4 to 9 days on: ') + 'due first lesson back (' + daysBetween(setDay, after) + ' days)', ok: false };
+}
+
+/* ---------------------------------------------------------------- theme */
+const themeBtn = $('themeBtn');
+function curTheme() { const t = document.documentElement.dataset.theme; if (t) return t; return matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'; }
+function paintThemeBtn() { themeBtn.textContent = curTheme() === 'dark' ? 'Light mode' : 'Dark mode'; }
+themeBtn.onclick = () => { document.documentElement.dataset.theme = curTheme() === 'dark' ? 'light' : 'dark'; paintThemeBtn(); };
+paintThemeBtn();
+
+/* ---------------------------------------------------------------- shell */
+let toastT = null;
+function toast(m) { const t = $('toast'); t.textContent = m; t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('on'), 4500); }
+document.querySelectorAll('#side button').forEach((b) => b.onclick = () => {
+  if (b.dataset.tab === 'none') { toast('Not part of this mock-up: only Homework, Assessment and "To agree" are drawn.'); return; }
+  showTab(b.dataset.tab);
+});
+function showTab(t) {
+  document.querySelectorAll('#side button').forEach((x) => x.classList.toggle('on', x.dataset.tab === t));
+  document.querySelectorAll('.tab').forEach((x) => x.classList.toggle('on', x.id === 'tab-' + t));
+  window.scrollTo(0, 0);
+}
+function setHH() { document.documentElement.style.setProperty('--hh', document.querySelector('header').offsetHeight + 'px'); }
+addEventListener('resize', setHH); setHH();
+
+/* ================================================================ HOMEWORK */
+const F = { kind:'seneca', classes:[], per:{}, filter:'', topic:'', link:'', quiz:QUIZZES[0], title:'', plc:true, msgEdited:false };
+function topicFor(cls) {
+  if (F.kind === 'revise') { const t = testFor(cls); return t ? t.topic : ''; }
+  if (F.kind === 'exam') return (F.quiz.match(/: ([^(]+)/) || [,''])[1].trim();
+  if (F.topic) return F.topic;
+  const ch = CHAPTERS[cls] || []; const c = ch[ch.length - 1]; return c ? c.subs[Math.max(0, c.taught - 1)] : '';
+}
+function testFor(cls) { return TESTS.find((t) => !t.past && t.cls === cls) || null; }
+function drawKinds() {
+  $('kinds').innerHTML = Object.entries(KINDS).map(([k, v]) => '<button class="kind' + (F.kind === k ? ' on' : '') + '" data-k="' + k + '"><b>' + esc(v.name) + '</b><small>' + esc(v.help) + '</small></button>').join('');
+  $('kinds').querySelectorAll('.kind').forEach((b) => b.onclick = () => { F.kind = b.dataset.k; F.msgEdited = false; drawKinds(); drawKindFields(); drawClsPick(); drawPer(); drawMsg(true); });
+}
+function drawKindFields() {
+  const up = TESTS.filter((x) => !x.past);
+  let h = '';
+  if (F.kind === 'exam') h = '<div class="grid2"><div><label for="kQuiz">Which quiz (checked on Assessment)</label><select id="kQuiz">' + QUIZZES.map((q) => '<option' + (q === F.quiz ? ' selected' : '') + '>' + esc(q) + '</option>').join('') + '</select></div><div><label>&nbsp;</label><span class="muted">Long answers: pupils see the mark scheme on page 2 and tick each mark they earned; it counts in the Form score. No paper copy.</span></div></div>';
+  if (F.kind === 'seneca') h = '<div class="grid2"><div><label for="kTopic">Topic (blank = each class\'s latest lesson)</label><input type="text" id="kTopic" value="' + esc(F.topic) + '" placeholder="e.g. Energy stores"></div><div><label for="kLink">Seneca link (optional: you can paste it in Classroom)</label><input type="text" id="kLink" value="' + esc(F.link) + '" placeholder="https://app.senecalearning.com/..."></div></div>';
+  if (F.kind === 'key') h = '<div class="grid2"><div><label for="kKey">Key homework</label><select id="kKey"><option>Found for each class\'s current topic</option><option>Pick a file...</option></select></div><div><label>&nbsp;</label><span class="muted">Where key homework lives on Drive is still to agree (question 3).</span></div></div>';
+  if (F.kind === 'revise') h = '<div class="grid2"><div><label>Which test</label><span class="muted">Each class revises for its own next test from the planner: ' + up.map((t) => esc(t.cls) + ' ' + fmt(t.date)).join(', ') + '. Classes with no test coming up are greyed out.</span></div><div><label>&nbsp;</label><label class="inline"><input type="checkbox" id="kPlc"' + (F.plc ? ' checked' : '') + '> Attach the PLC from Admin / Assessment</label><label class="inline"><input type="checkbox"> Add a Seneca link too</label></div></div>';
+  if (F.kind === 'other') h = '<label for="kTitle">Title</label><input type="text" id="kTitle" value="' + esc(F.title) + '" placeholder="e.g. Finish the poster on renewable resources">';
+  $('kindFields').innerHTML = h;
+  const on = (id, fn) => { if ($(id)) $(id).oninput = $(id).onchange = fn; };
+  on('kQuiz', (e) => { F.quiz = e.target.value; drawPer(); drawMsg(); });
+  on('kTopic', (e) => { F.topic = e.target.value; drawMsg(); });
+  on('kLink', (e) => { F.link = e.target.value; });
+  on('kTitle', (e) => { F.title = e.target.value; drawMsg(); });
+  on('kPlc', (e) => { F.plc = e.target.checked; });
+  
+}
+function drawClsPick() {
+  if (F.kind === 'revise') F.classes = F.classes.filter(testFor);
+  $('clsPick').innerHTML = Object.keys(CLASSES).map((k) => '<button class="cchip' + (F.classes.includes(k) ? ' on' : '') + '"' + (F.kind === 'revise' && !testFor(k) ? ' disabled title="No test coming up"' : '') + ' style="--c:' + CLASSES[k].c + '" data-c="' + k + '">' + k + '</button>').join('');
+  $('clsPick').querySelectorAll('.cchip').forEach((b) => b.onclick = () => {
+    const k = b.dataset.c;
+    if (F.classes.includes(k)) F.classes = F.classes.filter((x) => x !== k); else { F.classes.push(k); initPer(k); }
+    F.classes.sort((a, b) => Object.keys(CLASSES).indexOf(a) - Object.keys(CLASSES).indexOf(b));
+    drawClsPick(); drawPer(); drawMsg();
+  });
+}
+function initPer(k, force) {
+  if (F.per[k] && !force) return;
+  const set = lessonsFrom(k, TODAY, 1)[0];
+  const d = dueFor(k, set);
+  F.per[k] = { tier: CLASSES[k].y >= 12 ? 'one' : 'core', set: iso(set), due: iso(d.date), auto: true, send: 'draft', sendDate: iso(set), sendTime: '15:30' };
+}
+function revisionDue(k) { const t = testFor(k); return t ? t.date : null; }
+function drawPer() {
+  if (!F.classes.length) { $('perClass').innerHTML = '<p class="muted">Pick at least one class.</p>'; return; }
+  $('perClass').innerHTML = F.classes.map((k) => {
+    const p = F.per[k], C = CLASSES[k], ks5 = C.y >= 12;
+    const set = parse(p.set);
+    const tt = testFor(k), gap = tt ? daysBetween(set, tt.date) : 99;
+    const rule = F.kind === 'revise' ? { date: parse(p.due), why: gap < 7 ? 'Test is only ' + gap + ' day' + (gap === 1 ? '' : 's') + ' after this: too late for revision homework' : 'Revision: due the day of the test', ok: gap >= 7 } : dueFor(k, set);
+    if (p.auto) p.due = iso(F.kind === 'revise' && revisionDue(k) ? revisionDue(k) : rule.date);
+    const setOpts = lessonsFrom(k, TODAY, 6).map((d) => '<option value="' + iso(d) + '"' + (iso(d) === p.set ? ' selected' : '') + '>' + fmt(d) + '</option>').join('');
+    const tierSeg = ks5 ? '<span class="muted">One paper (OCR A layout)</span>' : '<span class="seg" data-c="' + k + '"><button data-t="core"' + (p.tier === 'core' ? ' class="on"' : '') + '>Core</button><button data-t="challenge"' + (p.tier === 'challenge' ? ' class="on"' : '') + '>Challenge</button></span>';
+    const sendTxt = p.send === 'draft' ? 'Draft, you publish' : 'Posts ' + fmt(parse(p.sendDate)) + ' ' + p.sendTime;
+    return '<details class="crow" style="--c:' + C.c + '"><summary><b>' + k + '</b><span>' + (ks5 ? 'One paper' : p.tier === 'core' ? '<span class="tag t-core">Core</span>' : '<span class="tag t-chal">Challenge</span>') + '</span>' +
+      '<span>Set ' + fmt(set) + '</span><span>Due <b>' + fmt(parse(p.due)) + '</b>, 8:00</span><span class="pill ' + (p.send === 'draft' ? 's-drafted' : 's-scheduled') + '">' + sendTxt + '</span>' +
+      '<span class="why' + (rule.ok && p.auto ? ' ok' : '') + '">' + esc(p.auto ? rule.why : 'Due date changed by you') + '</span></summary>' +
+      '<div class="inner">' +
+        '<div><label>Paper</label>' + tierSeg + '</div>' +
+        '<div><label>Set on (their lesson)</label><select class="pSet" data-c="' + k + '">' + setOpts + '</select></div>' +
+        '<div><label>Due (8:00)</label><input type="date" class="pDue" data-c="' + k + '" value="' + p.due + '">' + (p.auto ? '' : '<button class="small pAuto" data-c="' + k + '" style="margin-top:4px">Back to the rule</button>') + '</div>' +
+        '<div><label>Send</label><select class="pSend" data-c="' + k + '"><option value="draft"' + (p.send === 'draft' ? ' selected' : '') + '>Draft only, I publish it</option><option value="sched"' + (p.send === 'sched' ? ' selected' : '') + '>Schedule it</option></select>' +
+          (p.send === 'sched' ? '<div class="grid2" style="margin-top:4px"><input type="date" class="pSD" data-c="' + k + '" value="' + p.sendDate + '"><input type="time" class="pST" data-c="' + k + '" value="' + p.sendTime + '"></div>' : '') + '</div>' +
+      '</div></details>';
+  }).join('');
+  const q = (sel, fn) => $('perClass').querySelectorAll(sel).forEach((el) => fn(el, F.per[el.dataset.c]));
+  q('.seg', (el, p) => el.querySelectorAll('button').forEach((b) => b.onclick = () => { p.tier = b.dataset.t; keepOpen(drawPer, el.dataset.c); }));
+  q('.pSet', (el, p) => el.onchange = () => { p.set = el.value; p.auto = true; keepOpen(drawPer, el.dataset.c); drawMsg(); });
+  q('.pDue', (el, p) => el.onchange = () => { p.due = el.value; p.auto = false; keepOpen(drawPer, el.dataset.c); drawMsg(); });
+  q('.pAuto', (el, p) => el.onclick = () => { p.auto = true; keepOpen(drawPer, el.dataset.c); drawMsg(); });
+  q('.pSend', (el, p) => el.onchange = () => { p.send = el.value; keepOpen(drawPer, el.dataset.c); });
+  q('.pSD', (el, p) => el.onchange = () => { p.sendDate = el.value; keepOpen(drawPer, el.dataset.c); });
+  q('.pST', (el, p) => el.onchange = () => { p.sendTime = el.value; keepOpen(drawPer, el.dataset.c); });
+}
+function keepOpen(fn, cls) {
+  fn();
+  const rows = [...$('perClass').querySelectorAll('.crow')];
+  const i = F.classes.indexOf(cls); if (rows[i]) rows[i].open = true;
+}
+function fillMsg(k) {
+  const p = F.per[k]; const t = testFor(k);
+  return $('msg').value.replace(/\[topic\]/g, '<b>' + esc(topicFor(k) || 'your topic') + '</b>')
+    .replace(/\[due\]/g, '<b>' + esc(fmtLong(parse(p.due))) + '</b>')
+    .replace(/\[test\]/g, '<b>' + esc(t ? fmtLong(t.date) : '') + '</b>')
+    .replace(/\[title\]/g, '<b>' + esc(F.title || 'Your title') + '</b>');
+}
+function drawMsg(reset) {
+  if (reset || !F.msgEdited) $('msg').value = KINDS[F.kind].tmpl;
+  $('msgPrev').innerHTML = F.classes.slice(0, 3).map((k) => '<div class="preview"><span class="dot" style="--c:' + CLASSES[k].c + '"></span> <b style="color:var(--ink)">' + k + '</b>: ' + fillMsg(k) + '</div>').join('') +
+    (F.classes.length > 3 ? '<div class="muted" style="margin-top:4px">and ' + (F.classes.length - 3) + ' more, each with its own dates.</div>' : '');
+}
+$('msg').oninput = () => { F.msgEdited = true; drawMsg(); };
+$('makeDrafts').onclick = () => {
+  if (!F.classes.length) { toast('Pick at least one class first'); return; }
+  F.classes.forEach((k) => {
+    const p = F.per[k];
+    ITEMS.push({ cls:k, kind:F.kind, title: (F.kind === 'exam' ? F.quiz.replace(/ \(.*$/, '') : F.kind === 'revise' ? 'Revise for your ' + topicFor(k) + ' test' : F.kind === 'other' ? (F.title || 'Homework') : KINDS[F.kind].name.split(' ')[0] + ': ' + (topicFor(k) || 'topic')),
+      tier:p.tier, set:p.set, due:p.due, status: p.send === 'draft' ? 'drafted' : 'scheduled', posts: p.send === 'draft' ? '' : fmt(parse(p.sendDate)) + ', ' + p.sendTime, done:0, fresh:true });
+  });
+  toast(F.classes.length + ' Classroom item' + (F.classes.length === 1 ? '' : 's') + ' made (in the real planner). Check them in Classroom.');
+  $('makeNote').textContent = 'Made: ' + F.classes.join(', ') + '. See them below.';
+  F.classes = []; drawClsPick(); drawPer(); drawStrip(); drawList(); drawMsg();
+  $('secList').open = true;
+};
+
+function drawStrip() {
+  const n = (s) => ITEMS.filter((x) => x.status === s).length;
+  $('strip').innerHTML = STATUSES.map((s) => '<button data-s="' + s + '" class="' + (F.filter === s ? 'on' : '') + '" title="' + SHELP[s] + '"><span class="n s-' + s + '">' + n(s) + '</span><span>' + SNAME[s] + '<br><small class="muted">' + SHELP[s] + '</small></span></button>').join('') +
+    (F.filter ? '<button data-s="">Show all</button>' : '');
+  $('strip').querySelectorAll('button').forEach((b) => b.onclick = () => { F.filter = F.filter === b.dataset.s ? '' : b.dataset.s; drawStrip(); drawList(); });
+  $('hwCount').textContent = n('drafted') + n('due');
+}
+function itemHtml(x, i) {
+  const C = CLASSES[x.cls]; const si = STATUSES.indexOf(x.status);
+  const steps = STATUSES.map((s, k) => '<span class="' + (k < si ? 'done' : k === si ? 'now' : '') + '">' + SNAME[s] + '</span>').join('');
+  const showDone = ['live','due','marked'].includes(x.status);
+  const pct = Math.round(100 * x.done / C.size);
+  const tier = x.tier === 'one' ? '' : x.tier === 'core' ? '<span class="tag t-core">Core</span>' : '<span class="tag t-chal">Challenge</span>';
+  const btns = [];
+  if (x.kind === 'exam') btns.push('<button class="small" data-a="form">Open Form</button>');
+  btns.push('<button class="small" data-a="cls">Open in Classroom</button>');
+  btns.push('<button class="small" data-a="copy">Copy message</button>');
+  if (x.status === 'due' && x.kind !== 'exam') btns.push('<button class="small primary" data-a="mark" data-i="' + i + '">Mark as marked</button>');
+  if (x.status === 'due' && x.kind === 'exam') btns.push('<span class="muted">Self-marked in the Form: becomes Marked when you close it</span><button class="small" data-a="mark" data-i="' + i + '">Close it now</button>');
+  return '<div class="item"><h4><span class="pill s-' + x.status + '">' + SNAME[x.status] + '</span>' + esc(x.title) + ' <span class="tag t-kind">' + esc(KINDS[x.kind].name) + '</span>' + tier + (x.fresh ? ' <span class="tag" style="color:var(--gold)">just made</span>' : '') + '</h4>' +
+    '<div class="meta">Set ' + fmt(parse(x.set)) + ' · due ' + fmt(parse(x.due)) + ', 8:00' + (x.posts ? ' · posts ' + esc(x.posts) : '') + '</div>' +
+    '<div class="steps">' + steps + '</div>' +
+    (showDone ? '<div class="row" style="margin-top:4px"><div class="bar" style="flex:1;min-width:120px"><i style="width:' + pct + '%"></i></div><span class="meta">' + x.done + ' of ' + C.size + ' handed in' + (x.kind === 'exam' && x.status !== 'live' ? ', average 64%' : '') + '</span></div>' : '') +
+    '<div class="row">' + btns.join('') + '</div></div>';
+}
+function drawList() {
+  const list = ITEMS.map((x, i) => ({ x, i })).filter(({ x }) => !F.filter || x.status === F.filter);
+  $('listSub').textContent = list.length + ' item' + (list.length === 1 ? '' : 's') + (F.filter ? ' (' + SNAME[F.filter] + ' only)' : '') + ', click a class to open it';
+  $('clsList').innerHTML = Object.keys(CLASSES).map((k) => {
+    const mine = list.filter(({ x }) => x.cls === k);
+    if (F.filter && !mine.length) return '';
+    const C = CLASSES[k];
+    const pills = STATUSES.map((s) => { const n = mine.filter(({ x }) => x.status === s).length; return n ? '<span class="pill s-' + s + '">' + n + ' ' + SNAME[s].toLowerCase() + '</span>' : ''; }).join(' ');
+    const nextDue = mine.map(({ x }) => x).filter((x) => x.status !== 'marked').sort((a, b) => a.due < b.due ? -1 : 1)[0];
+    const nl = lessonsFrom(k, TODAY, 1)[0];
+    return '<details class="clsrow"' + (mine.some(({ x }) => x.fresh) ? ' open' : '') + '><summary><span class="dot" style="--c:' + C.c + '"></span><b>' + k + '</b>' + (pills || '<span class="muted">nothing set</span>') +
+      '<span class="next">' + (nextDue ? 'next due ' + fmt(parse(nextDue.due)) : 'next lesson ' + fmt(nl)) + '</span></summary>' +
+      (mine.length ? mine.map(({ x, i }) => itemHtml(x, i)).join('') : '<p class="muted" style="margin:0 0 10px">Nothing set. Next lesson ' + fmt(nl) + '. <button class="small" data-q="' + k + '">Set homework for ' + k + '</button></p>') + '</details>';
+  }).join('');
+  $('clsList').querySelectorAll('button[data-a]').forEach((b) => b.onclick = () => {
+    if (b.dataset.a === 'mark') { ITEMS[+b.dataset.i].status = 'marked'; drawStrip(); drawList(); toast('Marked'); return; }
+    toast(b.dataset.a === 'copy' ? 'Message copied (in the real planner)' : 'Would open it in a new tab (in the real planner)');
+  });
+  $('clsList').querySelectorAll('button[data-q]').forEach((b) => b.onclick = () => { F.classes = [b.dataset.q]; initPer(b.dataset.q); drawClsPick(); drawPer(); drawMsg(); $('secSet').open = true; $('secSet').scrollIntoView({ behavior:'smooth' }); });
+}
+function drawAuto() {
+  $('autoList').innerHTML = TESTS.filter((t) => !t.past).map((t, i) => {
+    const by = lessonsFrom(t.cls, addDays(t.date, -15), 1)[0];
+    const st = t.rev === 'set' ? '<span class="pill s-live">set</span>' : t.rev === 'scheduled' ? '<span class="pill s-scheduled">scheduled</span>' : '<span class="pill s-drafted">not set</span>';
+    return '<div class="trow" style="grid-template-columns:52px 1fr auto auto"><b>' + t.cls + '</b><span>' + esc(t.topic) + ' test ' + fmt(t.date) + '<small>Revision homework: set by ' + fmt(by) + ' (2 weeks before)</small></span>' + st +
+      (t.rev === 'none' ? '<button class="small" data-i="' + i + '">Set it up</button>' : '<span></span>') + '</div>';
+  }).join('') + '<p class="muted">Only suggestions: nothing is set without you pressing Make the drafts.</p>';
+  $('autoList').querySelectorAll('button[data-i]').forEach((b) => b.onclick = () => startRevision(+b.dataset.i));
+}
+function startRevision(i) {
+  const t = TESTS.filter((x) => !x.past)[i];
+  showTab('homework'); F.kind = 'revise'; F.classes = [t.cls]; initPer(t.cls, true); F.msgEdited = false;
+  drawKinds(); drawKindFields(); drawClsPick(); drawPer(); drawMsg(true); $('secSet').open = true;
+  setTimeout(() => $('secSet').scrollIntoView({ behavior:'smooth' }), 30);
+}
+
+/* ================================================================ ASSESSMENT */
+function drawTests() {
+  const up = TESTS.filter((t) => !t.past);
+  const mark = (v, what) => v === 1 ? '<span class="ok">&#10003; ' + what + '</span>' : v === 0 ? '<span class="bad">&#10007; ' + what + ' missing</span>' : '<span class="muted">' + what + ' ' + esc(v) + '</span>';
+  const rows = TESTS.map((t) => {
+    const i = up.indexOf(t);
+    const by = lessonsFrom(t.cls, addDays(t.date, -15), 1)[0];
+    const rev = t.rev === 'set' ? '<span class="ok">Set</span>' : t.rev === 'scheduled' ? '<span class="s-scheduled">Scheduled</span>' : '<span class="warn">Not set</span><small>suggested by ' + fmt(by) + '</small>';
+    const review = t.review === 'built' ? '<span class="ok">&#10003; Lesson 9 - Particles Review</span><small><a href="#" onclick="toast(\'Would open the Drive folder\');return false" style="color:var(--blue)">open folder</a></small>' : '<span class="muted">After marking</span><small>you say when</small>';
+    return '<div class="trow"' + (t.past ? ' style="opacity:.7"' : '') + '><b><span class="dot" style="--c:' + CLASSES[t.cls].c + '"></span> ' + t.cls + '</b>' +
+      '<span>' + esc(t.topic) + '<small>' + (t.past ? 'sat ' : '') + fmt(t.date) + (t.past ? '' : ' · in ' + daysBetween(TODAY, t.date) + ' days') + '</small></span>' +
+      '<span style="font-size:12px">' + mark(t.paper[0], 'test') + '<br>' + mark(t.paper[1], 'mark scheme') + '<br>' + mark(t.paper[2], 'PLC') + '</span>' +
+      '<span>' + rev + '</span><span>' + review + '</span>' +
+      '<span class="row" style="margin:0">' + (t.past ? '<button class="small" onclick="showResults()">Results</button>' : '<button class="small" data-p="' + i + '">Practice paper</button>' + (t.rev === 'none' ? '<button class="small" data-r="' + i + '">Revision homework</button>' : '')) + '</span></div>';
+  }).join('');
+  $('testRows').innerHTML = rows + '<p class="muted">Papers are looked for in Admin / Assessment / Year X / Subject / Topic. A missing mark scheme usually means it is inside the test document.</p>';
+  $('testRows').querySelectorAll('button[data-p]').forEach((b) => b.onclick = () => { const t = up[+b.dataset.p]; $('bCls').value = t.cls; B.cls = t.cls; B.chap = 0; B.cover = 'whole'; drawBuilder(); $('secBuild').open = true; $('secBuild').scrollIntoView({ behavior:'smooth' }); });
+  $('testRows').querySelectorAll('button[data-r]').forEach((b) => b.onclick = () => startRevision(+b.dataset.r));
+}
+
+const B = { cls:'10C2', chap:0, cover:'whole', picked:null, spread:'even', unit:'marks', tier:'both', mcq:12, len:25 };
+function rate(cls) { return CLASSES[cls].y >= 12 ? 1.2 : 1.0; }
+function subList() {
+  const chs = CHAPTERS[B.cls];
+  if (B.cover === 'taught') return chs.flatMap((c) => c.subs.slice(0, c.taught).map((s, k) => ({ s, ch:c.n, order:k })));
+  if (B.cover === 'choose') return chs.flatMap((c) => c.subs.map((s) => ({ s, ch:c.n }))).filter((x) => B.picked.has(x.ch + '|' + x.s));
+  const c = chs[B.chap];
+  const all = c.subs.map((s) => ({ s, ch:c.n }));
+  return B.cover === 'part' ? all.filter((x) => B.picked.has(x.ch + '|' + x.s)) : all;
+}
+function drawBuilder() {
+  $('bCls').innerHTML = Object.keys(CLASSES).map((k) => '<option' + (k === B.cls ? ' selected' : '') + '>' + k + '</option>').join('');
+  const chs = CHAPTERS[B.cls];
+  $('bChap').innerHTML = chs.map((c, i) => '<option value="' + i + '"' + (i === B.chap ? ' selected' : '') + '>' + esc(c.n) + '</option>').join('');
+  $('bChap').disabled = B.cover === 'taught' || B.cover === 'choose';
+  document.querySelectorAll('input[name=cover]').forEach((r) => r.checked = r.value === B.cover);
+  document.querySelectorAll('input[name=spread]').forEach((r) => r.checked = r.value === B.spread);
+  if (!B.picked) { B.picked = new Set(); const c = chs[B.chap]; c.subs.slice(0, Math.max(1, c.taught)).forEach((s) => B.picked.add(c.n + '|' + s)); }
+  let sub = '';
+  if (B.cover === 'part' || B.cover === 'choose') {
+    const show = B.cover === 'part' ? [chs[B.chap]] : chs;
+    sub = show.map((c) => (show.length > 1 ? '<div class="muted" style="margin-top:6px;font-weight:700">' + esc(c.n) + '</div>' : '') + '<div class="subs">' + c.subs.map((s, k) =>
+      '<label class="inline"><input type="checkbox" class="bSub" value="' + esc(c.n + '|' + s) + '"' + (B.picked.has(c.n + '|' + s) ? ' checked' : '') + '> ' + esc(s) + (k < c.taught ? ' <span class="tl">taught</span>' : '') + '</label>').join('') + '</div>').join('');
+  }
+  if (B.cover === 'taught') {
+    const n = chs.reduce((t, c) => t + c.taught, 0);
+    sub = '<p class="muted" style="margin:6px 0 0">From the planner record: ' + n + ' lessons taught so far in ' + chs.map((c) => esc(c.n) + ' (' + c.taught + ' of ' + c.subs.length + ')').join(', ') + '. Untaught lessons are left out.</p>';
+  }
+  $('bSubs').innerHTML = sub;
+  $('bSubs').querySelectorAll('.bSub').forEach((el) => el.onchange = () => { el.checked ? B.picked.add(el.value) : B.picked.delete(el.value); calc(); });
+  const ks5 = CLASSES[B.cls].y >= 12;
+  $('bTier').style.display = ks5 ? 'none' : '';
+  $('bTierNote').textContent = ks5 ? 'One paper in the real OCR A layout (multiple choice section first).' : '';
+  $('bTier').querySelectorAll('button').forEach((b) => b.classList.toggle('on', b.dataset.t === B.tier));
+  $('bUnit').querySelectorAll('button').forEach((b) => b.classList.toggle('on', b.dataset.u === B.unit));
+  calc();
+}
+function calc() {
+  const r = rate(B.cls);
+  B.mcq = +$('bMcq').value; B.len = +$('bLen').value;
+  let total, minutes;
+  if (B.unit === 'marks') { total = Math.max(B.len, B.mcq); minutes = Math.round(total * r); }
+  else { minutes = B.len; total = Math.max(Math.round(minutes / r), B.mcq); }
+  const written = Math.max(0, total - B.mcq);
+  $('bMcqOut').textContent = B.mcq;
+  $('bLenOut').textContent = B.len + ' ' + B.unit;
+  $('bSum').textContent = B.mcq + ' MCQ + ' + written + ' written = ' + total + ' marks, about ' + minutes + ' minutes';
+  const subs = subList();
+  const ks5 = CLASSES[B.cls].y >= 12;
+  $('bSum2').textContent = B.cls + ' · ' + (B.cover === 'taught' ? 'everything taught so far' : B.cover === 'choose' ? 'topics you chose' : B.cover === 'part' ? 'part of ' + CHAPTERS[B.cls][B.chap].n : 'whole of ' + CHAPTERS[B.cls][B.chap].n) +
+    ' · ' + subs.length + ' sub-topic' + (subs.length === 1 ? '' : 's') + ' · ' + (B.spread === 'even' ? 'spread evenly' : 'more on recent lessons') + ' · ' + (ks5 ? 'OCR A layout' : B.tier === 'both' ? 'Core and Challenge' : B.tier === 'core' ? 'Core only' : 'Challenge only') +
+    ' · about ' + r + ' min per mark';
+  // share out marks: weights even, or rising towards the most recent
+  const w = subs.map((x, k) => B.spread === 'even' ? 1 : 1 + k / Math.max(1, subs.length - 1) * 2);
+  const W = w.reduce((a, b) => a + b, 0) || 1;
+  const share = (n) => { const raw = w.map((x) => n * x / W); const fl = raw.map(Math.floor); let left = n - fl.reduce((a, b) => a + b, 0);
+    raw.map((x, k) => [x - fl[k], k]).sort((a, b) => b[0] - a[0]).forEach(([, k]) => { if (left > 0) { fl[k]++; left--; } }); return fl; };
+  const m = share(B.mcq), wr = share(written);
+  const max = Math.max(1, ...subs.map((x, k) => m[k] + wr[k]));
+  $('bSpread').innerHTML = subs.length ? subs.map((x, k) => '<div class="sp"><span class="t" title="' + esc(x.s) + '">' + esc(x.s) + '</span><span class="b"><i class="m" style="width:' + (100 * m[k] / max) + '%"></i><i class="w" style="width:' + (100 * wr[k] / max) + '%"></i></span><span class="v">' + (m[k] + wr[k]) + ' mark' + (m[k] + wr[k] === 1 ? '' : 's') + '</span></div>').join('') : '';
+  const writtenQs = Math.round(written / 3.5);
+  const warn = [];
+  if (!subs.length) warn.push('Tick at least one sub-topic.');
+  else if (B.mcq + writtenQs < subs.length) warn.push('About ' + (B.mcq + writtenQs) + ' questions for ' + subs.length + ' sub-topics: some sub-topics will get nothing. Add questions or narrow it down.');
+  if (B.mcq >= total && total > 0) warn.push('Multiple choice fills the whole paper: no written questions.');
+  if (minutes > 60) warn.push('Over an hour: long for homework.');
+  $('bWarn').textContent = warn.join(' ');
+}
+$('bCls').onchange = (e) => { B.cls = e.target.value; B.chap = CHAPTERS[B.cls].length - 1; B.picked = null; B.tier = CLASSES[B.cls].y >= 12 ? 'both' : B.tier; drawBuilder(); };
+$('bChap').onchange = (e) => { B.chap = +e.target.value; B.picked = null; drawBuilder(); };
+document.querySelectorAll('input[name=cover]').forEach((r) => r.onchange = () => { B.cover = r.value; drawBuilder(); });
+document.querySelectorAll('input[name=spread]').forEach((r) => r.onchange = () => { B.spread = r.value; calc(); });
+$('bMcq').oninput = calc; $('bLen').oninput = calc;
+$('bUnit').querySelectorAll('button').forEach((b) => b.onclick = () => {
+  if (B.unit === b.dataset.u) return;
+  const r = rate(B.cls), v = +$('bLen').value;
+  B.unit = b.dataset.u; $('bLen').value = B.unit === 'minutes' ? Math.round(v * r) : Math.round(v / r);
+  drawBuilder();
+});
+$('bTier').querySelectorAll('button').forEach((b) => b.onclick = () => { B.tier = b.dataset.t; drawBuilder(); });
+$('bReset').onclick = () => { Object.assign(B, { cover:'whole', spread:'even', unit:'marks', tier:'both', picked:null, chap:CHAPTERS[B.cls].length - 1 }); $('bMcq').value = 12; $('bLen').value = 25; drawBuilder(); };
+$('bGo').onclick = () => { if (!subList().length) { toast('Tick at least one sub-topic'); return; } toast('Sent to Claude (in the real planner): "' + $('bSum').textContent + '". It comes back under Check exam practice questions.'); };
+
+function drawCheck() {
+  $('checkList').innerHTML = '<div class="item"><h4><span class="pill s-drafted">to check</span>Exam practice: Interference (12C) <span class="tag t-kind">8 questions · 22 marks</span></h4>' +
+    '<div class="hwq"><b>1.</b> Two coherent sources produce an interference pattern. What is the path difference at the second bright fringe from the centre?' +
+      '<div class="opts"><div>&#9675; 0.5&lambda;</div><div>&#9675; &lambda;</div><div>&#9675; 1.5&lambda;</div><div class="right">&#10003; 2&lambda;</div></div></div>' +
+    '<div class="hwq"><b>2.</b> Explain why the two sources must be coherent to observe a stable interference pattern. [2 marks]' +
+      '<div class="ms">Mark scheme pupils see on page 2: constant phase difference (1); so the positions of maxima and minima do not change (1).</div></div>' +
+    '<div class="hwq"><b>3.</b> Sketch the intensity pattern on the screen. [2 marks] <span class="tag warn">left out of the Form: needs drawing</span></div>' +
+    '<div class="muted" style="margin:6px 0">and 5 more questions...</div>' +
+    '<div class="row"><button class="primary" onclick="toast(\'Form made (in the real planner). Set it from Homework: Exam practice quiz.\')">Looks right: make the Form</button><button class="small">Ask Claude to change something</button></div></div>' +
+    '<div class="item"><h4><span class="pill s-marked">Form made</span>Exam practice: P1 Energy (10C2, Core and Challenge)</h4><div class="meta">Checked 13 Oct. Set from Homework.</div></div>';
+}
+function showResults() { showTab('assessment'); const d = document.querySelectorAll('#tab-assessment details.sec')[3]; d.open = true; d.scrollIntoView({ behavior:'smooth' }); }
+function drawResults() {
+  const qs = [92, 85, 41, 77, 30, 68, 88, 55];
+  $('results').innerHTML = '<p class="muted">Example: 9XS Exam practice: Particles, 28 of 30 handed in, average 64%.</p>' +
+    qs.map((p, i) => '<div class="qbar' + (p < 50 ? ' low' : '') + '"><span>Q' + (i + 1) + '</span><span class="b"><i style="width:' + p + '%"></i></span><span>' + p + '%</span></div>').join('') +
+    '<div class="item" style="margin-top:10px"><h4>Most missed</h4>' +
+      '<div class="hwq"><b>Q5 (30%)</b> Density of an irregular solid. Most picked wrong answer: "divide volume by mass" (12 pupils).<label class="inline"><input type="checkbox" checked> Put on 9XS\'s next Do Now</label></div>' +
+      '<div class="hwq"><b>Q3 (41%)</b> Why the temperature stays constant while melting. Common wrong answer: "the heat stops".<label class="inline"><input type="checkbox"> Put on 9XS\'s next Do Now</label></div></div>' +
+    '<p class="muted">Later: same view for the school tests if you type in the question marks, and a planner list of most-missed questions across classes.</p>';
+}
+
+/* ================================================================ TO AGREE */
+const LES = [{ n:'7', t:'Calculating pressure' }, { n:'8', t:'Pressure in liquids' }, { n:'8a', t:'Pressure practice questions', added:true }, { n:'9', t:'Atmospheric pressure' }, { n:'9a', t:'Syringe demo lesson', added:true }];
+let editing = -1;
+function drawRename() {
+  $('renameList').innerHTML = LES.map((L, i) => '<div class="lrow"><span class="num">L' + esc(L.n) + '</span>' +
+    (editing === i ? '<input type="text" id="rnIn" value="' + esc(L.t) + '"><button class="small primary" id="rnOk">Save</button>'
+      : '<span>' + esc(L.t) + (L.added ? ' <span class="tag" style="color:var(--green)">added by you</span>' : '') + '</span>' + (L.added ? '<button class="pen" data-i="' + i + '" title="Rename">&#9998; rename</button>' : '')) + '</div>').join('');
+  $('renameList').querySelectorAll('.pen').forEach((b) => b.onclick = () => { editing = +b.dataset.i; drawRename(); $('rnIn').focus(); $('rnIn').select(); });
+  if ($('rnOk')) {
+    const done = () => { LES[editing].t = $('rnIn').value.trim() || LES[editing].t; editing = -1; drawRename(); toast('Renamed in the planner. The Drive folder keeps its old name.'); };
+    $('rnOk').onclick = done; $('rnIn').onkeydown = (e) => { if (e.key === 'Enter') done(); if (e.key === 'Escape') { editing = -1; drawRename(); } };
+  }
+}
+function drawExtras() {
+  const ex = [['Video clip', false], ['Simulation (e.g. PhET)', false], ['Teacher demo', false], ['Practical', false], ['Memory phrase', true], ['Real data', true]];
+  $('extras').innerHTML = ex.map(([t, s]) => '<label class="inline"><input type="checkbox"' + (s ? ' checked' : '') + '> ' + esc(t) + (s ? '<span class="sugg">suggested</span>' : '') + '</label>').join('');
+}
+function drawWeek() {
+  const days = [['Mon 2', ['Photocopy 10C2 PLCs'], ['Mark 10C2 Seneca (due today)']], ['Tue 3', [], ['10C2 test today: PLC check']], ['Wed 4', ['Department meeting'], ['Mark 10C2 tests', '13D revision homework: set by today']], ['Thu 5', [], []], ['Fri 6', ['Order kit for 8XP'], []]];
+  $('weekMini').innerHTML = days.map(([d, mine, auto]) => '<div><div class="d">' + d + ' Nov</div>' + mine.map((t) => '<div class="tchip"><input type="checkbox"> ' + esc(t) + '</div>').join('') + auto.map((t) => '<div class="tchip auto"><input type="checkbox"> ' + esc(t) + '</div>').join('') + '</div>').join('');
+}
+
+/* ---------------------------------------------------------------- start */
+drawKinds(); drawKindFields(); drawClsPick(); drawPer(); drawMsg(true); drawStrip(); drawList(); drawAuto();
+drawTests(); drawBuilder(); drawCheck(); drawResults();
+drawRename(); drawExtras(); drawWeek();
+</script>
+</body>
+</html>

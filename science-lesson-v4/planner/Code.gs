@@ -15,6 +15,11 @@
      MAILBOX_URL   the "Planner mailbox" web app on his PERSONAL account (Mailbox.gs), and
      MAILBOX_KEY   its key. With these set, new data from home arrives by itself (no Import data),
                    saved weeks go home, and "Send to Claude" requests reach Claude Code at home.
+     TEMPLATE_FORM_ID  (2026-10-18) the blank quiz Form "Homework template (do not delete)" every
+                   homework quiz is copied from (it carries the quiz settings Apps Script cannot set)
+     HW_CHECKED    (made by the planner) which homework quizzes he marked "Looks right"
+   Sheet tab Homework (made when first needed): one row per class per homework set (setHomework).
+   Services: Google Classroom API (Services +), for the drafts.
 */
 
 const VERSION = 5;
@@ -121,18 +126,30 @@ function mailboxOn_() { const p = PropertiesService.getScriptProperties(); retur
 function mailGet_(params) {
   const p = PropertiesService.getScriptProperties();
   const q = Object.keys(params).map((x) => x + '=' + encodeURIComponent(params[x])).join('&');
-  const r = UrlFetchApp.fetch(p.getProperty('MAILBOX_URL') + '?key=' + encodeURIComponent(p.getProperty('MAILBOX_KEY')) + '&' + q, { muteHttpExceptions: true });
-  const o = JSON.parse(r.getContentText());
-  if (!o.ok) throw new Error(o.error || 'mailbox error');
-  return o;
+  return mailFetch_(params.op + (params.name ? ' ' + params.name : ''), () => UrlFetchApp.fetch(p.getProperty('MAILBOX_URL') + '?key=' + encodeURIComponent(p.getProperty('MAILBOX_KEY')) + '&' + q, { muteHttpExceptions: true }));
 }
 function mailPost_(body) {
   const p = PropertiesService.getScriptProperties();
   body.key = p.getProperty('MAILBOX_KEY');
-  const r = UrlFetchApp.fetch(p.getProperty('MAILBOX_URL'), { method: 'post', contentType: 'application/json', payload: JSON.stringify(body), muteHttpExceptions: true });
-  const o = JSON.parse(r.getContentText());
-  if (!o.ok) throw new Error(o.error || 'mailbox error');
-  return o;
+  return mailFetch_(body.op + (body.name ? ' ' + body.name : ''), () => UrlFetchApp.fetch(p.getProperty('MAILBOX_URL'), { method: 'post', contentType: 'application/json', payload: JSON.stringify(body), muteHttpExceptions: true }));
+}
+// Patryk 2026-10-16 ("Unexpected token '<'"): when Google is busy, the mailbox answers with an error
+// WEB PAGE (starts with "<") instead of data. Wait and try again (3 goes); if it still fails, say so in
+// plain words with the page's own message, instead of a code error about "<".
+function mailFetch_(what, fetch) {
+  let last = '';
+  for (let k = 0; k < 3; k++) {
+    if (k) Utilities.sleep(2000 * k);
+    const r = fetch();
+    const t = r.getContentText();
+    if (/^\s*\{/.test(t)) {
+      const o = JSON.parse(t);
+      if (!o.ok) throw new Error(o.error || 'mailbox error');
+      return o;
+    }
+    last = 'code ' + r.getResponseCode() + ': ' + t.replace(/<style[\s\S]*?<\/style>|<script[\s\S]*?<\/script>/gi, ' ').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 200);
+  }
+  throw new Error('the home mailbox sent back a Google error page instead of data (' + what + '), 3 tries. Try again in a minute. Google said: ' + last);
 }
 // New planner-data.json from home? Store it (same as Import data) and say so.
 function pullData_() {
@@ -159,15 +176,22 @@ function pushState_() {
 // "Send to Claude": a message or a list of lessons to build, for Claude Code at home.
 /* ------------------------------------------------------------ homework quizzes
    Patryk 2026-10-08: homework from real exam questions that marks itself. At home Claude chooses the
-   questions (homework-forms.js) and drops "homework-<class>-<due>.json" in the sync folder. Here,
-   ⋯ More → Homework quizzes turns each new one into:
-     - a Google Forms QUIZ in his school Drive (folder "Planner homework quizzes"): multiple-choice
-       questions with the right answer set, so they mark themselves; written questions show the real
-       mark scheme after submitting (worth 0 points, so nothing waits for his marking);
-     - a Google Classroom DRAFT for that class with the quiz linked and the due date set. He checks
-       and publishes it himself. (Needs the Classroom service: Services + → Google Classroom API.)
-   It only CREATES: the quiz, the folder (once) and the draft. Each one made is listed in
-   homework-made.json so it is never made twice. */
+   questions (test-paper.js exam practice, homework-forms.js weekly quiz) and drops
+   "homework-<class>-<due>[-core|-challenge].json" in the sync folder. Here:
+     - the Homework tab lists them to check (homeworkList), then "Make the drafts" calls setHomework
+       once per class: the Google Forms QUIZ (folder "Planner homework quizzes"), then a Google
+       Classroom DRAFT (or a scheduled post) due at the class's next-but-one lesson, 8:00 UK time,
+       then a row in the Homework sheet tab;
+     - ⋯ More → Homework quizzes (makeHomework) makes the Forms only, no Classroom drafts (2026-10-18:
+       the drafts come from the Homework tab so the due date and message follow the rules).
+   Quiz files: schema 2 (2026-10-18, design-audit/homework-replica/04-architecture.md section 3) has
+   labels and mark points; older files (no "schema") still work, with "mark k of n" self-marking.
+   It only CREATES: the quiz, the folder (once), the draft and the sheet row. Each quiz made is listed in
+   homework-made.json (the receipt) so it is never made twice.
+   Script property TEMPLATE_FORM_ID: a blank quiz Form he made once by hand with the settings Apps
+   Script cannot set (release grades immediately; respondents see missed questions, correct answers and
+   point values). Each new quiz is a copy of it. Without it the Form is made from scratch and the result
+   says so. */
 function makeHomework(k, only) {
   check_(k);
   if (!mailboxOn_()) throw new Error('Step 1 of 4 failed: this planner has no mailbox address or key saved (setup guide Part 8).');
@@ -176,20 +200,20 @@ function makeHomework(k, only) {
   const madeFile = step(2, 'reading the list of quizzes already made', () => mailGet_({ op: 'read', name: 'homework-made.json' }));
   const made = madeFile.found ? JSON.parse(madeFile.text || '{}') : {};
   const out = [];
-  out.seen = names.length;
   for (const name of names) {
-    if (made[name] || !/^homework-[A-Za-z0-9]+-\d{4}-\d{2}-\d{2}(-[a-z]+)?\.json$/.test(name) || (only && name !== only)) continue;
+    if (made[name] || !HW_FILE.test(name) || (only && name !== only)) continue;
     const hw = step(2, 'reading ' + name, () => JSON.parse(mailGet_({ op: 'read', name }).text));
-    const form = step(3, 'making the Google Form', () => buildQuiz_(hw));
-    const draft = classroomDraft_(hw, form);
-    made[name] = { at: new Date().toISOString(), form: form.getEditUrl(), link: form.getPublishedUrl(), draft: draft.ok, note: draft.why || '' };
-    tab_('Log', ['when', 'what', 'where']).appendRow([new Date(), 'made homework quiz' + (draft.ok ? ' + Classroom draft' : ''), hw.title]);
-    out.push({ title: hw.title, form: form.getEditUrl(), draft: draft.ok, note: draft.why || '' });
+    const notes = [], info = {};
+    const form = step(3, 'making the Google Form', () => buildQuiz_(hw, notes, info));
+    made[name] = { at: new Date().toISOString(), form: form.getEditUrl(), link: form.getPublishedUrl(), template: !!info.template, points: info.points, draft: false, note: notes.join('. ') };
+    tab_('Log', ['when', 'what', 'where']).appendRow([new Date(), 'made homework quiz' + (notes.length ? ' (' + notes.join('; ') + ')' : ''), hw.title]);
+    out.push({ title: hw.title, form: form.getEditUrl(), draft: false, note: notes.join('. ') });
   }
   if (out.length) step(4, 'saving the receipt', () => mailPost_({ op: 'write', name: 'homework-made.json', text: JSON.stringify(made, null, 1) }));
   // seen = how many quiz files the mailbox found; already = how many of those were made before
   return { made: out, seen: names.length, already: names.filter((n) => made[n]).length, names: names };
 }
+const HW_FILE = /^homework-[A-Za-z0-9]+-\d{4}-\d{2}-\d{2}(-[a-z]+)?\.json$/;
 // The Homework tab (Patryk 2026-10-09: check the homework before it becomes a Form).
 function homeworkList(k) {
   check_(k);
@@ -199,12 +223,103 @@ function homeworkList(k) {
   catch (e) { throw new Error('The mailbox could not list the homework: ' + e.message + (/Unknown request/.test(e.message) ? '. Paste Mailbox.gs again and deploy a New version.' : '')); }
   const madeFile = mailGet_({ op: 'read', name: 'homework-made.json' });
   const made = madeFile.found ? JSON.parse(madeFile.text || '{}') : {};
-  return names.slice(-12).reverse().map((name) => {
+  const checked = checkedList_();
+  return names.filter((n) => HW_FILE.test(n)).slice(-12).reverse().map((name) => {
     let hw = null;
     try { hw = JSON.parse(mailGet_({ op: 'read', name }).text); } catch (e) { /* listed but unreadable */ }
-    return { name, made: made[name] || null, hw };
+    // the tab only shows the words: leave the pictures behind (12C/13D are over 1 MB of pictures,
+    // which made the tab hang, Patryk 2026-10-16). The Form still gets them.
+    if (hw && hw.questions) {
+      const v2 = Number(hw.schema) >= 2;
+      hw.questions.forEach((q, n) => {
+        q.pictures = (q.images || []).length; delete q.images;
+        // page 2 exactly as the Form will word it (pointWords_), so a badly split scheme is spotted here
+        if (q.type === 'mcq' || needsDrawing_(q)) return;
+        const N = v2 && q.label ? String(q.label).replace(/^Question\s+/, '') : String(n + 1);
+        let at = 0;
+        q.marking = v2 && q.markPoints && q.markPoints.length
+          ? q.markPoints.map((p) => { const w = pointWords_(N, p, at + 1); at += p.marks || 0; return { title: w.title, help: w.help, points: p.marks || 1 }; })
+          : Array.from({ length: q.marks || 1 }, (x, j) => ({ title: 'Question ' + N + ', mark ' + (j + 1) + ' of ' + q.marks + ': did your answer earn this mark?', help: '', points: 1 }));
+      });
+      hw.points = totalPoints_(hw);
+    }
+    return { name, made: made[name] || null, checked: checked[name] || null, hw };
   });
 }
+// "Looks right" on the Homework tab: the quiz is marked as checked (kept in a script property).
+function checkedList_() { try { return JSON.parse(PropertiesService.getScriptProperties().getProperty('HW_CHECKED') || '{}'); } catch (e) { return {}; } }
+function checkHomework(k, name) {
+  check_(k);
+  if (!HW_FILE.test(String(name))) throw new Error('That is not a homework quiz file name.');
+  const c = checkedList_();
+  c[name] = Utilities.formatDate(new Date(), TZ, 'yyyy-MM-dd');
+  const keys = Object.keys(c);
+  keys.slice(0, Math.max(0, keys.length - 200)).forEach((x) => { delete c[x]; });   // the property stays small
+  PropertiesService.getScriptProperties().setProperty('HW_CHECKED', JSON.stringify(c));
+  return c[name];
+}
+
+/* Set homework (Homework tab "Make the drafts", 2026-10-18): ONE class per call, so a slow Form never
+   stops the others and no call gets near Apps Script's 6-minute limit (the page calls it in turn).
+   item = { cls, kind, file, setOn, dueOn (YYYY-MM-DD), post: 'draft'|'schedule', postAt ('YYYY-MM-DDTHH:mm' UK),
+            message, title? }
+   Never twice: a lock against a double click, the homework-made.json receipt, and the Homework tab row.
+   A quiz whose Form was already made from the menu gets only its Classroom draft. */
+const HW_HEAD = ['id', 'cls', 'kind', 'title', 'file', 'tier', 'formId', 'formUrl', 'courseId', 'courseWorkId', 'setOn', 'postAt', 'dueOn', 'dueUtc', 'points', 'status', 'made'];
+function setHomework(k, item) {
+  check_(k);
+  const it = item || {};
+  if (!it.cls || !/^\d{4}-\d{2}-\d{2}$/.test(String(it.dueOn || ''))) throw new Error('Each homework needs a class and a due date.');
+  if (!it.file || !HW_FILE.test(String(it.file))) throw new Error('Only quiz homework from home can be set here for now (pick a quiz for ' + it.cls + ').');
+  const fileCls = (/^homework-([A-Za-z0-9]+)-/.exec(it.file) || [])[1];
+  if (fileCls !== String(it.cls)) throw new Error(it.file + ' is for ' + fileCls + ', not ' + it.cls + '.');
+  if (it.setOn && it.dueOn <= it.setOn) throw new Error(it.cls + ': the due date must be after the day it is set.');
+  if (it.post === 'schedule' && !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(String(it.postAt || ''))) throw new Error(it.cls + ': "Schedule it" needs a date and time to post.');
+  if (!mailboxOn_()) throw new Error('The home link (mailbox) is not set up yet (setup guide Part 8).');
+  const lock = LockService.getScriptLock();
+  if (!lock.tryLock(30000)) throw new Error('The planner is busy making another homework. Try again in a minute.');
+  try {
+    const madeFile = mailGet_({ op: 'read', name: 'homework-made.json' });
+    const made = madeFile.found ? JSON.parse(madeFile.text || '{}') : {};
+    const was = made[it.file];
+    const sh = tab_('Homework', HW_HEAD);
+    const rows = sh.getLastRow() > 1 ? sh.getRange(2, 1, sh.getLastRow() - 1, HW_HEAD.length).getValues() : [];
+    const row = rows.find((r) => r[1] === it.cls && r[4] === it.file);
+    // made before (a draft from this tab, a row in the Homework tab, or a draft made by the old menu path)
+    if ((was && (was.courseWorkId || was.draft === true)) || row) {
+      const on = String((was && was.at) || (row && row[16]) || '').slice(0, 10);
+      return { ok: true, already: true, formUrl: (was && was.link) || (row && row[7]) || '', editUrl: (was && was.form) || '', classroomUrl: (was && was.classroom) || '', draft: !!((was && was.courseWorkId) || (row && row[9])),
+        why: 'Already made' + (on ? ' on ' + dayName_(on) : '') + '.' };
+    }
+    const hw = JSON.parse(mailGet_({ op: 'read', name: it.file }).text);
+    if (String(hw.cls) !== String(it.cls)) throw new Error(it.file + ' is for ' + hw.cls + ', not ' + it.cls + '.');
+    const notes = [], info = {};
+    let form = null;
+    if (was && was.form) { try { form = FormApp.openByUrl(was.form); info.points = was.points || totalPoints_(hw); info.template = was.template; } catch (e) { form = null; } }
+    if (!form) {
+      form = buildQuiz_(hw, notes, info);
+      made[it.file] = { at: new Date().toISOString(), form: form.getEditUrl(), link: form.getPublishedUrl(), template: !!info.template, points: info.points, draft: false, note: notes.join('. ') };
+      mailPost_({ op: 'write', name: 'homework-made.json', text: JSON.stringify(made, null, 1) });   // saved at once: a failed draft never makes a second Form
+    }
+    const draft = classroomDraft_(hw, form, { due: it.dueOn, message: it.message, postAt: it.post === 'schedule' ? it.postAt : null, points: info.points });
+    made[it.file] = Object.assign(made[it.file] || {}, { draft: draft.ok, courseId: draft.courseId || '', courseWorkId: draft.courseWorkId || '', classroom: draft.link || '', dueOn: it.dueOn, note: [draft.ok ? '' : draft.why].concat(notes).filter(Boolean).join('. ') });
+    mailPost_({ op: 'write', name: 'homework-made.json', text: JSON.stringify(made, null, 1) });
+    const setOn = it.setOn || Utilities.formatDate(new Date(), TZ, 'yyyy-MM-dd');
+    const n = rows.filter((r) => r[1] === it.cls && String(r[10]) === setOn).length + 1;
+    const status = draft.ok ? (draft.scheduled ? 'scheduled' : 'drafted') : 'form only';
+    sh.appendRow([it.cls + '-' + setOn + '-' + n, it.cls, it.kind || hw.kind || 'quiz', hw.title, it.file, hw.tier || '', form.getId(), form.getPublishedUrl(),
+      draft.courseId || '', draft.courseWorkId || '', setOn, it.post === 'schedule' ? it.postAt : '', it.dueOn, draft.dueUtc || '', info.points || totalPoints_(hw), status, new Date()]);
+    tab_('Log', ['when', 'what', 'where']).appendRow([new Date(), 'set homework: ' + status + (notes.length ? ' (' + notes.join('; ') + ')' : ''), it.cls + ' ' + hw.title]);
+    const why = draft.ok ? '' : (/no Classroom class/.test(draft.why) ? 'No Classroom class with ' + it.cls + ' in its name. The Form was made: link it by hand. (' + draft.why + ')' : 'The Form was made, but not the Classroom draft: ' + draft.why);
+    return { ok: true, formUrl: form.getPublishedUrl(), editUrl: form.getEditUrl(), draft: draft.ok, scheduled: !!draft.scheduled, courseId: draft.courseId || '', courseWorkId: draft.courseWorkId || '', classroomUrl: draft.link || '',
+      points: info.points, template: !!info.template, why, notes };
+  } finally { lock.releaseLock(); }
+}
+function dayName_(iso) {
+  const [y, m, d] = String(iso).split('-').map(Number);
+  return ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][new Date(y, m - 1, d).getDay()] + ' ' + d + ' ' + ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][m - 1];
+}
+
 // The Behaviour tab shows the behaviour app's phone page; its link is saved once from the tab.
 function setBehaviourUrl(k, url) {
   check_(k);
@@ -213,55 +328,208 @@ function setBehaviourUrl(k, url) {
   PropertiesService.getScriptProperties().setProperty('BEHAVIOUR_URL', u);
   return u;
 }
-function buildQuiz_(hw) {
-  const f = FormApp.create(hw.title);
-  f.setIsQuiz(true).setDescription(hw.intro || '').setCollectEmail(true).setProgressBar(true);
-  hw.questions.forEach((q, n) => {
+/* Patryk 2026-10-16: pupils mark their own written answers, and those marks count in the Form's score.
+   Page 1: the questions (pictures just above each). Multiple choice marks itself.
+   Page 2 "Mark your own answers": each written question's mark scheme, then one "Yes / No" per mark
+   point (schema 2: in the scheme's own words, "Question 6, mark 1: did you say ...?"; older files:
+   "Question 7, mark 1 of 2"), each Yes worth that point's marks, so the Form's total = multiple choice +
+   their own marks. A No shows "You missed: ..." on the View score page. Questions that need drawing
+   ("draw arrows on the diagram") are left out: a Form cannot take a drawing. */
+const DRAWING = /(?<!not )\bdraw\b|\bsketch\b(?! graph)|\b(plot|shade)\b|\blabel (the|each|it|all|on|one|two|a)\b|\bput a cross\b|\bmark (on|with) an? \b|\bcomplete the (diagram|graph|chart|circuit|ray diagram|bar chart)\b/i;
+// "Draw a ring around the correct answer" can be typed, so it is reworded instead of left out
+const RING = /\bdraw a (ring|circle) (around|round) (each|the|your)\b/gi;
+function ringToWrite_(t) { return String(t || '').replace(RING, (m, a, b, c) => 'Write down ' + c.toLowerCase()); }
+function needsDrawing_(q) { return (q.type === 'written' || q.type === 'number') && DRAWING.test(ringToWrite_(q.text)); }
+// Pupil wording (design-audit/homework-replica/05-design.md 1.2 and 1.3). Plain British English, no em dashes.
+const SELF_MARK = 'Your answers are saved. Do not change them now.\n\n' +
+  'For each written question, read the mark scheme, then choose Yes or No for every mark. Choose Yes if your answer says this, or says the same thing in other words. If you are not sure, choose No.\n\n' +
+  'You can press Back to read what you wrote, but do not change it.\n\n' +
+  'Each Yes adds to your score. Be honest: it shows you and me what to work on next.';
+const CONFIRM = 'Done, thank you. Click View score to see your total. Under each question you got wrong, and each mark you said No to, it shows what you missed. Read those before next lesson.';
+const NO_TEMPLATE = 'Made without the template, so pupils may not see their score straight away. See the setup guide: TEMPLATE_FORM_ID.';
+// The Form's total: multiple choice points plus the marks pupils give themselves (drawing questions left
+// out). One sum for the Form and the Classroom points, so the two never disagree.
+function totalPoints_(hw) {
+  return (hw.questions || []).filter((q) => !needsDrawing_(q)).reduce((n, q) => n + (q.type === 'mcq' ? (q.points || 1)
+    : (q.markPoints && q.markPoints.length ? q.markPoints.reduce((a, p) => a + (p.marks || 0), 0) : (q.marks || 1))), 0);
+}
+// The quiz Form: a copy of the template (TEMPLATE_FORM_ID) when there is one, else a new Form (and a note).
+function newQuizForm_(title, folder, notes, info) {
+  const id = PropertiesService.getScriptProperties().getProperty('TEMPLATE_FORM_ID');
+  if (id) {
     try {
-      // pictures first, just above the question (Patryk 2026-10-16: pupils have no paper copy)
-      (q.images || []).forEach((img, k) => {
-        const it = f.addImageItem().setImage(Utilities.newBlob(Utilities.base64Decode(img.data), img.mime || 'image/png', img.name || 'picture.png'));
-        if (k === 0) it.setTitle('Question ' + (n + 1));
-      });
-      if (q.type === 'mcq') {
-        // Patryk 2026-10-16 ("Invalid data updating form"): in a quiz, a question worth points must
-        // already have its correct answer, so the CHOICES are set BEFORE the points.
-        const it = f.addMultipleChoiceItem().setTitle((n + 1) + '. ' + q.text).setRequired(true);
-        it.setChoices(q.options.map((o, i) => it.createChoice(o, i === q.answer)));
-        it.setPoints(q.points || 1);
-        if (q.feedback) it.setFeedbackForIncorrect(FormApp.createFeedback().setText('What examiners saw: ' + q.feedback).build());
-      } else addWritten_(f, (n + 1) + '. ' + q.text + '  [' + q.marks + ' mark' + (q.marks === 1 ? '' : 's') + ']', q.scheme);
-    } catch (e) { throw new Error('question ' + (n + 1) + ' (' + q.type + '): ' + String(e.message || e)); }
-  });
-  // keep his Drive tidy: the quiz goes into one folder (made once; only this new file is moved)
-  const it = DriveApp.getFoldersByName('Planner homework quizzes');
-  const folder = it.hasNext() ? it.next() : DriveApp.createFolder('Planner homework quizzes');
-  DriveApp.getFileById(f.getId()).moveTo(folder);
+      const copy = DriveApp.getFileById(id).makeCopy(title, folder);
+      const f = FormApp.openById(copy.getId());
+      f.getItems().forEach((x) => f.deleteItem(x));   // the copy only (in case the template has questions)
+      f.setTitle(title);
+      info.template = true;
+      return f;
+    } catch (e) { notes.push('The template Form could not be copied (' + String(e.message || e) + '). ' + NO_TEMPLATE); }
+  } else notes.push(NO_TEMPLATE);
+  info.template = false;
+  const f = FormApp.create(title);
+  DriveApp.getFileById(f.getId()).moveTo(folder);   // keep his Drive tidy: only this new file is moved
   return f;
 }
-// A written question: the mark scheme shows after submitting, worth 0 points (nothing for him to mark).
-// Google Forms sometimes refuses "Invalid data updating form" for one shape of this, so try the
-// simpler shapes in turn (Patryk 2026-10-16, 13D question 7). A failed attempt's half-made item is removed.
-// 1) 0 points + feedback; 2) feedback only; 3) plain-text scheme (no ✓ or odd symbols) with 0 points; 4) plain, no points.
-function addWritten_(f, title, scheme) {
-  const plain = String(scheme || '').replace(/✓/g, '-').replace(/[^\x09\x0A\x20-\x7E -ÿͰ-Ͽ⁰-₟°×÷−→]/g, ' ');
-  const tries = [[true, scheme], [false, scheme], [true, plain], [false, plain]];
-  const errs = [];
-  for (let k = 0; k < tries.length; k++) {
-    let it = null;
-    try {
-      it = f.addParagraphTextItem().setTitle(title).setRequired(true);
-      if (tries[k][0]) it.setPoints(0);
-      it.setGeneralFeedback(FormApp.createFeedback().setText('Mark scheme\n\nCompare it with your answer. Give yourself the marks you earned and note anything you missed.\n\n' + tries[k][1]).build());
-      return it;
-    } catch (e) {
-      errs.push('attempt ' + (k + 1) + ': ' + String(e.message || e));
-      try { if (it) f.deleteItem(it); } catch (x) { /* nothing to remove */ }
-    }
-  }
-  throw new Error('written question refused by Google Forms (' + errs.join(' | ') + ')');
+function quizFolder_() {
+  const it = DriveApp.getFoldersByName('Planner homework quizzes');
+  return it.hasNext() ? it.next() : DriveApp.createFolder('Planner homework quizzes');
 }
-function classroomDraft_(hw, form) {
+function buildQuiz_(hw, notes, info) {
+  info = info || {};
+  const v2 = Number(hw.schema) >= 2;
+  const f = newQuizForm_(hw.title, quizFolder_(), notes, info);
+  const intro = v2 ? String(hw.intro || '') : String(hw.intro || '').replace(/For the longer answers[^\n]*/, 'For the longer answers, the next page shows the mark scheme and you mark yourself, one mark at a time.');
+  f.setIsQuiz(true);
+  f.setDescription(intro).setProgressBar(true).setConfirmationMessage(CONFIRM);
+  // settings Apps Script can set (the template sets the rest); one refused never stops the Form
+  // (email collection: the template's own "Verified" setting is kept; only a Form made from scratch is told to collect emails)
+  [...(info.template ? [] : [['setCollectEmail', true]]), ['setLimitOneResponsePerUser', true], ['setAllowResponseEdits', false], ['setShowLinkToRespondAgain', false], ['setPublishingSummary', false]].forEach(([m, v]) => {
+    try { if (typeof f[m] === 'function') f[m](v); } catch (e) { notes.push(m + ' was refused: ' + String(e.message || e)); }
+  });
+  const qs = hw.questions.filter((q) => !needsDrawing_(q));
+  const left = hw.questions.length - qs.length;
+  if (left) notes.push(left + ' question' + (left === 1 ? '' : 's') + ' left out because they need drawing on a diagram');
+  const num = (q, n) => (v2 && q.label ? String(q.label).replace(/^Question\s+/, '') : String(n + 1));
+  const marksTxt = (m) => m + ' mark' + (m === 1 ? '' : 's');
+  const selfMarked = [];
+  qs.forEach((q, n) => {
+    const N = num(q, n);
+    try {
+      // pictures first, just above the question (Patryk 2026-10-16: pupils have no paper copy)
+      // A picture that is an answer option is titled "Option A", "Option B"... (Patryk 2026-10-16: 13D
+      // question 1 had four formula pictures with no letters). Home marks them (img.label); older files:
+      // answers "A".."D" with at least that many pictures means the last ones are the options, in order.
+      const imgs = q.images || [];
+      const letters = q.type === 'mcq' && (q.options || []).length > 1 && q.options.every((o, i) => String(o).trim() === 'ABCDEF'[i]) && imgs.length >= q.options.length;
+      imgs.forEach((img, j) => {
+        const it = f.addImageItem().setImage(Utilities.newBlob(Utilities.base64Decode(img.data), img.mime || 'image/png', img.name || 'picture.png'));
+        const label = img.label || (letters && !imgs.some((x) => x.label) && j >= imgs.length - q.options.length ? 'ABCDEF'[j - (imgs.length - q.options.length)] : '');
+        if (label) it.setTitle('Question ' + N + ', option ' + label);
+        else if (j === 0) it.setTitle('Question ' + N);
+      });
+      if (q.type === 'mcq') addChoice_(f, N + '. ' + q.text, q.options, q.answers && q.answers.length > 1 ? q.answers : q.answer, q.points || 1, q.feedback ? 'What examiners saw: ' + q.feedback : '');
+      else if (q.type === 'number') {
+        // a number box (it does not score: the marks come from the marking page) and an optional working box
+        const unit = q.unit && !/give your answer in/i.test(q.text) ? ' Give your answer in ' + q.unit + '.' : '';
+        tryPlain_(N + '. ' + q.text + unit, (t) => {
+          const box = f.addTextItem().setTitle(t).setHelpText('Numbers only, for example 2.5 or 0.04').setRequired(true);
+          box.setValidation(FormApp.createTextValidation().setHelpText('Type a number only. Put the unit and working in the next box.').requireNumber().build());
+          return box;
+        }, f);
+        tryPlain_(N + '. Your working (not required)', (t) => f.addParagraphTextItem().setTitle(t).setRequired(false), f);
+        selfMarked.push({ N, q });
+      } else {
+        const title = N + '. ' + ringToWrite_(q.text) + '  [' + marksTxt(q.marks) + ']';
+        tryPlain_(title, (t) => f.addParagraphTextItem().setTitle(t).setRequired(true), f);
+        selfMarked.push({ N, q });
+      }
+    } catch (e) { throw new Error('question ' + N + ' (' + q.type + '): ' + String(e.message || e)); }
+  });
+  if (selfMarked.length) {
+    f.addPageBreakItem().setTitle('Mark your own answers').setHelpText(SELF_MARK);
+    selfMarked.forEach(({ N, q }) => {
+      try {
+        const mps = v2 && q.markPoints && q.markPoints.length ? q.markPoints : null;
+        const start = String(ringToWrite_(q.text)).replace(/\s+/g, ' ').trim();
+        const head = v2 ? 'Question ' + N + ' (' + marksTxt(q.marks) + '): ' + (start.length > 100 ? start.slice(0, 100).replace(/\s+\S*$/, '') + '...' : start)
+          : 'Question ' + N + ': mark scheme (' + marksTxt(q.marks) + ')';
+        const extra = mps && mps.some((p) => p.kind === 'answer') ? '\n\nA correct final answer gets all the marks for this question, even with no working. If you got it, choose Yes for every mark below.'
+          : mps && mps.some((p) => p.kind === 'level') ? '\n\nStart at Level 1. Stop at the first No: every level after it is No too.' : '';
+        tryPlain_(String(q.scheme || 'No mark scheme was found for this question: ask your teacher.') + extra, (t) => f.addSectionHeaderItem().setTitle(head).setHelpText(t), f);
+        if (mps) {
+          let at = 0;
+          mps.forEach((p) => { const w = pointWords_(N, p, at + 1); at += p.marks || 0; addChoice_(f, w.title, ['Yes', 'No'], 0, p.marks || 1, w.missed, w.help, w.well); });
+        } else for (let j = 1; j <= (q.marks || 1); j++) addChoice_(f, 'Question ' + N + ', mark ' + j + ' of ' + q.marks + ': did your answer earn this mark?', ['Yes', 'No'], 0, 1, '');
+      } catch (e) { throw new Error('marking page, question ' + N + ': ' + String(e.message || e)); }
+    });
+  }
+  info.points = totalPoints_(hw);
+  return f;
+}
+// One mark point's Yes/No item (05-design.md 1.2): title, help text and the "You missed" feedback.
+function pointWords_(N, p, markNo) {
+  const Q = 'Question ' + N + (p.part ? p.part : '');
+  const says = String(p.says || '').trim().replace(/[.;:,]+$/, '');
+  const long = says.length > 150;
+  const notes = [];
+  if (p.also && p.also.length) notes.push('Also accepted: ' + p.also.join('; '));
+  if (p.no && p.no.length) notes.push('No mark for: ' + p.no.join('; '));
+  let title, help = [];
+  if (p.kind === 'level') {
+    title = Q + ', Level ' + p.level + ' (' + p.from + (p.to !== p.from ? ' to ' + p.to : '') + ' marks): does your answer match this level?';
+    help = [says].concat(p.level > 1 ? ['Choose Yes only if you also said Yes to the level before.'] : []);
+  } else if (p.kind === 'mark') {
+    title = Q + ', mark ' + p.k + ' of ' + p.of + ': did your answer earn this mark?';
+    help = [says];
+  } else if (p.kind === 'method') {
+    title = Q + ', working mark' + (p.of > 1 ? ' ' + p.k + ' of ' + p.of : '') + ': did your working show ' + (long || p.of > 1 ? 'this' : says) + '?';
+    if (long || p.of > 1) help = [says];
+  } else if (p.kind === 'answer') {
+    title = Q + ', final answer: did you get ' + (long ? 'this' : says) + '?';
+    if (long) help = [says];
+  } else {
+    title = Q + ', mark ' + markNo + ': did you say ' + (long ? 'this' : says) + '?';
+    if (long) help = [says];
+  }
+  const missed = says ? 'You missed: ' + (p.kind === 'level' ? 'Level ' + p.level + ': ' : '') + says : '';
+  return { title, help: help.concat(notes).filter(Boolean).join('\n'), missed, well: says && says.length <= 80 && p.kind !== 'level' ? 'Well done: ' + says : '' };
+}
+// A marked multiple-choice question. Patryk 2026-10-16 ("Invalid data updating form"): in a quiz, a
+// question worth points must already have its correct answer, so the CHOICES are set BEFORE the points.
+// "Tick two boxes" questions (answer is a list) become tick-boxes: Forms gives their points only when
+// exactly the right boxes are ticked.
+function addChoice_(f, title, options, answer, points, feedback, help, correct) {
+  const many = Array.isArray(answer);
+  return tryPlain_(title, (t, p) => {
+    const it = (many ? f.addCheckboxItem() : f.addMultipleChoiceItem()).setTitle(t).setRequired(true);
+    if (help) it.setHelpText(p ? plain_(help) : help);
+    it.setChoices(options.map((o, i) => it.createChoice(p ? plain_(o) : o, many ? answer.indexOf(i) >= 0 : i === answer)));
+    it.setPoints(points);
+    if (feedback) it.setFeedbackForIncorrect(FormApp.createFeedback().setText(p ? plain_(feedback) : feedback).build());
+    if (correct) it.setFeedbackForCorrect(FormApp.createFeedback().setText(p ? plain_(correct) : correct).build());
+    return it;
+  }, f);
+}
+// Google Forms sometimes refuses "Invalid data updating form" over odd symbols (12C/13D question 7:
+// ×, 10⁸, ✓, long dashes). Try as written, then again in plain keyboard text (x, 10^8, -). A failed
+// attempt's half-made item is removed.
+function tryPlain_(text, make, f) {
+  let n = f.getItems ? f.getItems().length : 0, first;
+  try { return make(text, false); } catch (e) { first = e; }
+  if (f.getItems) f.getItems().slice(n).forEach((x) => { try { f.deleteItem(x); } catch (z) { /* gone */ } });
+  try { return make(plain_(text), true); }
+  catch (e) { throw new Error(String(first.message || first) + ' (and again in plain text: ' + String(e.message || e) + ')'); }
+}
+// Plain keyboard text: what Google Forms always accepts.
+function plain_(s) {
+  const sup = { '⁰': '0', '¹': '1', '²': '2', '³': '3', '⁴': '4', '⁵': '5', '⁶': '6', '⁷': '7', '⁸': '8', '⁹': '9', '⁻': '-', '⁺': '+' };
+  return String(s || '')
+    .replace(/[⁰¹²³⁴-⁹⁺⁻]+/g, (m) => '^' + m.split('').map((c) => sup[c]).join(''))
+    .replace(/[₀-₉]/g, (c) => String(c.charCodeAt(0) - 0x2080))
+    .replace(/[✓✔•]/g, '-').replace(/[–—−]/g, '-').replace(/[‘’]/g, "'").replace(/[“”]/g, '"')
+    .replace(/×/g, 'x').replace(/÷/g, '/').replace(/→/g, '->').replace(/°/g, ' degrees')
+    .replace(/\r/g, '').replace(/[^\n\x20-\x7E]/g, ' ');
+}
+// 08:00 UK on a date, as the UTC time of day Classroom wants (dueTime is UTC). British Summer Time
+// ends Sun 25 Oct 2026: 08:00 UK is 07:00 UTC up to then, 08:00 UTC after. The date never changes.
+function ukToUtc_(date, h, m) {
+  const [y, mo, d] = String(date).split('-').map(Number);
+  const z = Utilities.formatDate(new Date(Date.UTC(y, mo - 1, d, 12)), TZ, 'Z');   // "+0100" or "+0000"
+  const sign = z[0] === '-' ? -1 : 1, oh = Number(z.slice(1, 3)), om = Number(z.slice(3, 5));
+  let mins = (h || 0) * 60 + (m || 0) - sign * (oh * 60 + om);
+  mins = ((mins % 1440) + 1440) % 1440;
+  return { hours: Math.floor(mins / 60), minutes: mins % 60 };
+}
+// The Classroom item's title: "P1 Energy exam practice" (05-design.md 1.0); older files keep their title.
+function classroomTitle_(hw) {
+  if (!(Number(hw.schema) >= 2) || !hw.topic) return hw.title;
+  return hw.topic + (hw.kind === 'exam-practice' ? ' exam practice' : ' homework quiz');
+}
+// opt = { due: 'YYYY-MM-DD' (else hw.due), message (else hw.intro), postAt: 'YYYY-MM-DDTHH:mm' UK time
+// to post by itself (else a draft he publishes), points }
+function classroomDraft_(hw, form, opt) {
+  const o = opt || {};
   if (typeof Classroom === 'undefined') return { ok: false, why: 'Classroom service not switched on (Apps Script: Services + → Google Classroom API)' };
   try {
     const want = String(hw.cls).toLowerCase().replace(/\s+/g, '');
@@ -270,14 +538,19 @@ function classroomDraft_(hw, form) {
     // Classroom spells 7MLA as "7Ml": if nothing matches the full code, try it without its last letter
     const course = courses.find((c) => key(c).includes(want)) || (want.length === 4 && /a$/.test(want) ? courses.find((c) => key(c).includes(want.slice(0, 3))) : null);
     if (!course) return { ok: false, why: 'no Classroom class with "' + hw.cls + '" in its name (found: ' + courses.map((c) => c.name).join(', ') + ')' };
-    const [y, m, d] = hw.due.split('-').map(Number);
-    const points = hw.questions.filter((q) => q.type === 'mcq').reduce((n, q) => n + (q.points || 1), 0);
-    Classroom.Courses.CourseWork.create({
-      title: hw.title, description: hw.intro || '', workType: 'ASSIGNMENT', state: 'DRAFT', maxPoints: points,
-      materials: [{ link: { url: form.getPublishedUrl(), title: hw.title } }],
-      dueDate: { year: y, month: m, day: d }, dueTime: { hours: 8, minutes: 30 },
-    }, course.id);
-    return { ok: true };
+    const due = o.due || hw.due;
+    const [y, m, d] = due.split('-').map(Number);
+    const t = ukToUtc_(due, 8, 0);
+    const title = classroomTitle_(hw);
+    const body = {
+      title, description: o.message || hw.intro || '', workType: 'ASSIGNMENT', state: 'DRAFT', maxPoints: o.points || totalPoints_(hw),
+      materials: [{ link: { url: form.getPublishedUrl(), title } }],
+      dueDate: { year: y, month: m, day: d }, dueTime: t,
+    };
+    if (o.postAt) body.scheduledTime = at_(o.postAt).toISOString();   // posts itself at that UK time (stays a draft until then)
+    const res = Classroom.Courses.CourseWork.create(body, course.id) || {};
+    const pad = (x) => (x < 10 ? '0' : '') + x;
+    return { ok: true, courseId: course.id, courseWorkId: res.id || '', link: res.alternateLink || '', scheduled: !!o.postAt, dueUtc: due + 'T' + pad(t.hours) + ':' + pad(t.minutes) + 'Z' };
   } catch (e) { return { ok: false, why: String(e.message || e) }; }
 }
 

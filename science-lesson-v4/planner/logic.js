@@ -641,6 +641,51 @@
     const pt = (data.periodTimes || {})[year <= 9 ? 'ks3' : 'ks4'] || {};
     return pt['P' + period] || '';
   }
+  /* ------------------------------------------------------------- homework dates
+     Patryk's rule (design-audit/planner-tabs/spec.md 1.2, 2026-10-18): homework set on a lesson day is
+     due at that class's lesson closest to 7 days later, as long as it is 4 to 9 days later; due 8:00.
+     No lesson in 4 to 9 days (half term, INSET): the first lesson after, and the page says why. */
+  // That class's lessons on one day (periods, in order), from the A/B timetable; none on a non-teaching day.
+  function lessonsOn(data, cls, d) {
+    const dow = d.getDay();
+    if (dow === 0 || dow === 6 || ((data.terms || []).length && !isTeachingDay(data, d))) return [];
+    const L = weekLetter(data, d);
+    return ((data.timetable || {})[L] || []).filter((s) => s.cls === cls && s.day === dow - 1).map((s) => s.period).sort((a, b) => a - b);
+  }
+  // The class's next lesson day from a date (that day too when `inclusive`): { date, period }.
+  function nextLessonDay(data, cls, from, inclusive) {
+    let d = typeof from === 'string' ? parse(from) : new Date(from.getFullYear(), from.getMonth(), from.getDate());
+    if (!inclusive) d = addDays(d, 1);
+    for (let n = 0; n < 120; n++, d = addDays(d, 1)) { const p = lessonsOn(data, cls, d); if (p.length) return { date: iso(d), period: p[0] }; }
+    return null;
+  }
+  function dueFor(data, cls, setOn) {
+    const s = parse(setOn);
+    const days = [];
+    for (let k = 1; k <= 70; k++) if (lessonsOn(data, cls, addDays(s, k)).length) days.push(k);
+    if (!days.length) return null;
+    const near = days.filter((k) => k >= 4 && k <= 9).sort((a, b) => Math.abs(a - 7) - Math.abs(b - 7) || a - b);
+    if (near.length) return { due: iso(addDays(s, near[0])), days: near[0], why: '' };
+    const k = days.find((x) => x > 9) || days[days.length - 1];
+    // why it moved: a holiday (half term) or an INSET day in the way
+    let hol = 0, inset = false;
+    for (let j = 1; j < k; j++) {
+      const d = addDays(s, j), str = iso(d);
+      if (d.getDay() === 0 || d.getDay() === 6) continue;
+      if ((data.inset || []).includes(str)) inset = true;
+      else if ((data.terms || []).length && !(data.terms || []).some(([a, b]) => str >= a && str <= b)) hol++;
+    }
+    const why = hol ? (hol <= 10 ? 'half term' : 'holiday') : inset ? 'INSET day' : 'no lesson 4 to 9 days later';
+    return { due: iso(addDays(s, k)), days: k, why };
+  }
+  // When that class's lessons end on a day ("15:10"), for "Schedule it" (a double lesson: its last period).
+  function lessonEnd(data, cls, date) {
+    const ps = lessonsOn(data, cls, parse(date));
+    if (!ps.length) return '';
+    const t = periodTime(data, cls, ps[ps.length - 1]);
+    return t ? t.split('-')[1] : '';
+  }
+
   // The saved week as calendar events. A double lesson becomes ONE event over both periods.
   // Times are local strings ("2026-10-12T09:00"); the server reads them as UK time.
   function calendarEvents(data, week) {
@@ -670,7 +715,7 @@
     return out;
   }
 
-  const api = { recs, findRecord, setRecord, remapRecords, migrateMarks, cascade, revisionSlot, unitBefore, applyAdded, addedNum, remapWeek, lessonId, applyMarks, classReport, topicList, wouldSkip, setSlot, markLesson, refillClass, planFrom, periodTime, calendarEvents, DAYS, iso, parse, addDays, mondayOf, isTeachingDay, nextSchoolDay, weekLetter, progressBefore, next, autofill, moveSlot, refillAfter,
+  const api = { dueFor, nextLessonDay, lessonsOn, lessonEnd, recs, findRecord, setRecord, remapRecords, migrateMarks, cascade, revisionSlot, unitBefore, applyAdded, addedNum, remapWeek, lessonId, applyMarks, classReport, topicList, wouldSkip, setSlot, markLesson, refillClass, planFrom, periodTime, calendarEvents, DAYS, iso, parse, addDays, mondayOf, isTeachingDay, nextSchoolDay, weekLetter, progressBefore, next, autofill, moveSlot, refillAfter,
     lessonSlot, testSlot, notHappened, slotDone, slotDay, fromFilled, reflowWeek, CHECKS, sheetCells, sheetModel, setsCount, printList, buildPrompt, carryForward, equipCell, lessonCell, setsLabel };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.PlannerLogic = api;
 })(typeof window !== 'undefined' ? window : this);

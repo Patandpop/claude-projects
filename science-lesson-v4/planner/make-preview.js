@@ -15,6 +15,26 @@ const data = fs.readFileSync(path.join(dir, 'planner-data.json'), 'utf8');
 const hwDir = 'G:/My Drive/Beechen Cliff Science/Admin/Planner Sync';
 let hw = [];
 try { hw = fs.readdirSync(hwDir).filter((n) => /^homework-.*.json$/.test(n) && n !== 'homework-made.json').map((n) => ({ name: n, made: null, hw: JSON.parse(fs.readFileSync(path.join(hwDir, n), 'utf8')) })); } catch (e) { /* not at home */ }
+// a made-up schema 2 quiz (2026-10-18) so the Homework tab always has one to show, Core and Challenge
+const sampleQ = (tier) => ({ schema: 2, cls: '10C2', due: '2026-11-02', kind: 'exam-practice', tier, board: 'AQA', topic: 'P1 Energy', title: '10C2 P1 Energy exam practice (' + (tier === 'core' ? 'Core' : 'Challenge') + ')', minutes: 6,
+  intro: 'Exam practice on P1 Energy. 3 questions, about 6 minutes. Do it in one go.', left: [{ ref: 'x', label: 'Question 4', why: 'it needs drawing' }], questions: [
+    { type: 'mcq', label: 'Question 1', text: 'Why did the student insulate the beaker?', options: ['To increase energy transfer.', 'To reduce energy transfer.'], answer: 1, points: 1, images: [{ name: 'f.png', data: '' }] },
+    { type: 'number', label: 'Question 2', text: 'The power of the kettle is 2000 W. Calculate the energy transferred in 12 s.', unit: 'J', marks: 2, scheme: '✓ 1 mark: E = 2000 × 12\n✓ 1 mark: E = 24 000 (J)',
+      markPoints: [{ kind: 'method', marks: 1, says: 'E = 2000 × 12' }, { kind: 'answer', marks: 1, says: 'E = 24 000 (J)' }] },
+    { type: 'written', label: 'Question 3(b)', text: 'Give one reason the temperature rise was smaller than calculated.', marks: 1, scheme: '✓ 1 mark: the block transfers energy to the surroundings',
+      markPoints: [{ kind: 'point', marks: 1, says: 'the block transfers energy to the surroundings', also: ['heat lost to the surroundings'] }] }] });
+if (!hw.some((x) => x.hw && x.hw.schema === 2)) hw.push(...['core', 'challenge'].map((t) => ({ name: 'homework-10C2-2026-11-02-' + t + '.json', made: null, checked: null, hw: sampleQ(t) })));
+// what the server's homeworkList adds (page 2 wording, points, no pictures): the real Code.gs functions
+{
+  const vm = require('vm'), cx = vm.createContext({});
+  vm.runInContext(fs.readFileSync(path.join(dir, 'Code.gs'), 'utf8') + '\nthis.pointWords_ = pointWords_; this.totalPoints_ = totalPoints_; this.needsDrawing_ = needsDrawing_;', cx);
+  hw.forEach((x) => { const h = x.hw; if (!h || !h.questions) return; const v2 = Number(h.schema) >= 2;
+    h.questions.forEach((q, n) => { q.pictures = (q.images || []).length; delete q.images; if (q.type === 'mcq' || cx.needsDrawing_(q)) return;
+      const N = v2 && q.label ? String(q.label).replace(/^Question\s+/, '') : String(n + 1); let at = 0;
+      q.marking = v2 && (q.markPoints || []).length ? q.markPoints.map((p) => { const w = cx.pointWords_(N, p, at + 1); at += p.marks || 0; return { title: w.title, help: w.help, points: p.marks || 1 }; })
+        : Array.from({ length: q.marks || 1 }, (z, j) => ({ title: 'Question ' + N + ', mark ' + (j + 1) + ' of ' + q.marks + ': did your answer earn this mark?', help: '', points: 1 })); });
+    h.points = cx.totalPoints_(h); });
+}
 const mock = `<script>
 window.__DATA = ${data};
 window.__HW = ${JSON.stringify(hw)};
@@ -33,6 +53,8 @@ window.google = { script: { run: (function make(ok, bad) {
     removeEvent(k, cls, id) { setTimeout(() => { window.__EV = window.__EV.filter((e) => e.id !== id); ok(window.__EV.slice()); }, 0); },
     behaviourWeek(k, mon) { setTimeout(() => ok(window.__BW || []), 0); },
     homeworkList() { setTimeout(() => ok(window.__HW || []), 0); },
+    setHomework(k, item) { setTimeout(() => ok({ ok: true, formUrl: 'https://forms/view', editUrl: 'https://forms/edit', draft: true, scheduled: item.post === 'schedule', courseWorkId: 'CW1', classroomUrl: 'https://classroom.google.com', why: '', notes: [] }), 300); },
+    checkHomework(k, name) { setTimeout(() => ok('2026-10-19'), 0); },
     makeHomework(k, name) { setTimeout(() => ok({ made: [{ title: name, form: 'https://forms', draft: true, note: '' }], seen: 1, already: 0, names: [name] }), 0); },
     sendRequest() { setTimeout(() => ok({ id: 'preview' }), 0); },
     setBehaviourUrl(k, u) { setTimeout(() => ok(u), 0); }, learnEquipment() { setTimeout(() => ok(true), 0); },

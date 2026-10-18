@@ -274,5 +274,30 @@ if (fs.existsSync(DRIVE)) {
   data.records = [];
 }
 
+// Homework due dates (2026-10-18, spec 1.2): the lesson closest to 7 days later, within 4 to 9 days;
+// none in range (half term, INSET): the first lesson after, with the reason. Made-up timetable so the
+// checks do not move when his real timetable changes.
+{
+  const T = (cls, days, period) => days.map((day) => ({ day, period, cls }));
+  const tt = [...T('XN', [0, 2, 4], 1), ...T('X2', [0, 3], 3), ...T('XF', [0, 4], 2), ...T('XI', [4], 5), { day: 4, period: 6, cls: 'XI' }];
+  const hd = { terms: [['2026-09-07', '2026-10-21'], ['2026-11-02', '2026-12-18']], inset: ['2026-10-22', '2026-10-23', '2026-11-20'], weekAStart: '2026-09-07',
+    timetable: { A: tt, B: tt }, classes: { XI: { year: 10 } }, periodTimes: { ks4: { P5: '13:40-14:40', P6: '14:40-15:40' } } };
+  const d1 = P.dueFor(hd, 'XN', '2026-10-05');
+  ok(d1.due === '2026-10-12' && d1.days === 7 && !d1.why, 'homework due: a normal week, Monday to next Monday (7 days)');
+  const d2 = P.dueFor(hd, 'X2', '2026-10-08');
+  ok(d2.due === '2026-10-15' && !d2.why, 'homework due: a 2-lessons-a-week class (Mon, Thu): Thursday to next Thursday, not Monday (4 days)');
+  const d2b = P.dueFor(hd, 'X2', '2026-10-05');
+  ok(d2b.due === '2026-10-12', 'homework due: Mon, Thu class set on Monday: next Monday (7), not Thursday (3 days, too soon)');
+  const d3 = P.dueFor(hd, 'XF', '2026-10-16');
+  ok(d3.due === '2026-11-02' && d3.why === 'half term', 'homework due: the Friday before half term is due the first lesson back, "half term"');
+  const d4 = P.dueFor(hd, 'XI', '2026-11-13');
+  ok(d4.due === '2026-11-27' && d4.why === 'INSET day', 'homework due: an INSET day on the due day moves it to the next lesson, "INSET day"');
+  ok(P.nextLessonDay(hd, 'XF', '2026-10-17', true).date === '2026-10-19' && P.nextLessonDay(hd, 'XF', '2026-10-19', false).date === '2026-11-02', 'next lesson day skips weekends, INSET (23 Oct) and half term');
+  ok(P.lessonEnd(hd, 'XI', '2026-11-06') === '15:40', 'a double lesson ends at its last period (for "Schedule it")');
+  // the real data: every class has a due date within 9 days in a normal week
+  const real = Object.keys(data.classes).map((c) => [c, P.dueFor(data, c, P.nextLessonDay(data, c, '2026-11-09', true).date)]);
+  ok(real.every(([, r]) => r && r.days >= 4 && r.days <= 9 && !r.why), 'real timetable, w/c 9 Nov: every class gets a due date 4 to 9 days on (' + real.map(([c, r]) => c + ' ' + (r && r.days)).join(', ') + ')');
+}
+
 console.log(fails ?`\n${fails} FAILED` : '\nall planner logic checks passed');
 process.exit(fails ? 1 : 0);

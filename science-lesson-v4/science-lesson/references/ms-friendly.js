@@ -48,17 +48,22 @@ function aqa(ms, marks) {
     text = text.slice(0, at) + ` \u0000${holes.length}\u0000 ` + text.slice(at + n.length);
     holes.push(n);
   }
-  const pts = [];
-  let buf = '', got = 0;
-  const re = /(^|\s)([1-9])(?=\s|$)/g;
-  let last = 0, m;
-  while ((m = re.exec(text))) {
-    buf = text.slice(last, m.index);
-    pts.push({ marks: +m[2], raw: buf });
-    got += +m[2]; last = re.lastIndex;
-  }
-  const tail = text.slice(last);
-  const split = pts.length > 0 && got === marks && !/\S/.test(tail.replace(/\u0000\d+\u0000/g, ''));
+  // values: true skips a digit that is a calculation's value, not a mark ("half-lives = 4 1": the 4)
+  const cut = (values) => {
+    const pts = [];
+    let got = 0, last = 0, m;
+    const re = /(^|\s)([1-9])(?=\s|$)/g;
+    while ((m = re.exec(text))) {
+      if (values && /[=×÷/+−*-]\s*$/.test(text.slice(0, m.index + m[1].length))) continue;
+      pts.push({ marks: +m[2], raw: text.slice(last, m.index) });
+      got += +m[2]; last = re.lastIndex;
+    }
+    const tail = text.slice(last);
+    return { pts, tail, split: pts.length > 0 && got === marks && !/\S/.test(tail.replace(/\u0000\d+\u0000/g, '')) };
+  };
+  let c = cut(false);
+  if (!c.split) { const c2 = cut(true); if (c2.split) c = c2; }   // 2026-10-18: a second try for calculations
+  const { pts, tail, split } = c;
   const build = (raw, mk) => {
     const p = point(mk, raw.replace(/\u0000\d+\u0000/g, ' '));
     for (const h of raw.matchAll(/\u0000(\d+)\u0000/g)) sortNote(holes[+h[1]], p);
@@ -123,6 +128,7 @@ function ocr(ms, marks) {
     x.pt.text = x.ans.join('\n');
     x.pt.marks = x.codes.reduce((a, c) => a + c.n, 0);
     x.pt.codes = codesText(x.codes);
+    x.pt.codeList = x.codes;              // the codes one by one, for markPoints (2026-10-18)
     x.pt.label = x.label;
     return x.pt;
   });
@@ -208,4 +214,109 @@ function msPlain(ms, opts, label) {
   return out.join('\n');
 }
 
-module.exports = { friendlyMs, msPlain, MS_KEY, decode, levelsBlock };
+/* ------------------------------------------------------------------ mark points (2026-10-18)
+   markPoints(ms, {board, marks, calc, id}): the scheme as one item per mark (or per point / level),
+   for the Form's "Mark your own answers" page: pupils choose Yes or No for each, and each Yes adds
+   that item's marks to the Form's score. The items' marks always add up to the question's marks.
+   kinds: point (one creditworthy point), method (a working mark), answer (a calculation's final
+   answer), level (one level of a 6-mark question, Level 1 first), mark (the scheme could not be split:
+   "mark 1 of 2", the whole point shown). `says` is the scheme's own words (marker codes and the
+   "✓ 1 mark:" layout taken off, first letter lower case unless it is a symbol, unit or name).
+   picture: true when the answer is a drawing or graph (the question stays out of the Form). */
+const NAMES = /^(?:Sun|Earth|Moon|Mars|Jupiter|Saturn|Universe|Newton|Hubble|Kepler|Doppler|Wien|Stefan|Planck|Einstein|Celsius|Kelvin|Ohm|Joule|Watt|Avogadro|Boltzmann|Big|Milky|Coulomb|Faraday|Fleming|Rutherford|Bohr|Thomson|Chadwick|Geiger|Marsden|Darwin|Mendel|Mendeleev|Hooke|Snell|Young|Huygens|Maxwell|Lenz|Kirchhoff|Ek|Ep|UK|English|British)$/;
+function lowerFirst(t) {
+  const m = /^([A-Z][a-z]+)\b(\s*)(\S?)/.exec(t);
+  if (!m || NAMES.test(m[1]) || m[3] === '=') return t;
+  return t[0].toLowerCase() + t.slice(1);
+}
+const CODE_TAIL = /\s*\b[BMACP][0-9](?:\s*[×x]\s*[0-9]+)?\s*$/;
+const saysOf = (t) => lowerFirst(strip(String(t || '')).split('\n').map((l) => tidy(l.replace(CODE_TAIL, '').replace(/^=\s*/, ''))).filter(Boolean).join('; '));
+const range = (s) => {
+  const m = /(\d+)\s*(?:-|–|−|to)\s*(\d+)/.exec(String(s));
+  const one = +String(s).replace(/\D/g, '') || 0;
+  return m ? { from: +m[1], to: +m[2] } : { from: one, to: one };
+};
+const RESULT = /=\s*[−-]?\d|^[−-]?\d[\d.,]*\s*(?:\(|[a-zA-Zμ%°]|$)/;   // a line that gives a value
+const NO_MS ='No mark scheme was found for this question: ask your teacher.';
+function markPoints(ms, opts) {
+  const o = opts || {}, total = o.marks || 1;
+  const out = [];
+  const add = (kind, marks, says, x) => out.push(Object.assign({ kind, marks, says: says || '' }, x || {}));
+  const notes = (pt) => {
+    const r = {}, also = (pt.also || []).map(saysOf).filter(Boolean), no = (pt.no || []).map(saysOf).filter(Boolean);
+    if (also.length) r.also = also;
+    if (no.length) r.no = no;
+    return r;
+  };
+  const markItems = (n, says, x) => { for (let k = 1; k <= n; k++) add('mark', 1, says, Object.assign({ k, of: n }, x || {})); };
+  const levelItems = (lvs, x) => {
+    const L = lvs.slice().sort((a, b) => a.level - b.level).map((lv) => Object.assign({ level: lv.level, need: tidy(strip(lv.need)) }, range(lv.marks)));
+    L.forEach((lv) => add('level', lv.to - lv.from + 1, lowerFirst(lv.need), Object.assign({ level: lv.level, from: lv.from, to: lv.to }, x || {})));
+    return L;
+  };
+  let levels = null, picture = false;
+  if (!ms || !ms.text) markItems(total, NO_MS);
+  else if ((ms.levels || []).length) levels = levelItems(ms.levels.map((lv) => ({ level: lv.level, marks: lv.marks, need: lv.descriptor || '' })));   // AQA level of response
+  else {
+    const f = friendlyMs(ms, o);
+    picture = f.points.some((p) => p.picture);
+    for (const pt of f.points) {
+      const x = pt.label ? { part: '(' + pt.label.replace(/[()\s]/g, '') + ')' } : {};
+      if (pt.lor) { levels = levelItems(pt.lor.levels, x); continue; }   // OCR level of response
+      const lines = strip(pt.text).split('\n').map(tidy).filter(Boolean);
+      const nt = notes(pt);
+      if (o.board === 'OCR A') {
+        const codes = (pt.codeList || []).filter((c) => c.n);
+        const ones = codes.every((c) => c.n === 1 && !c.each);
+        const kindOf = (c) => ({ M: 'method', C: 'method', A: 'answer' }[c.k] || 'point');
+        const last = codes.length - 1;
+        const calcCodes = codes.length > 1 && codes.every((c) => /[MCA]/.test(c.k)) && codes[last].k === 'A' && codes.slice(0, -1).every((c) => c.k !== 'A');
+        if (codes.length && ones && lines.length === codes.length) codes.forEach((c, i) => add(kindOf(c), 1, saysOf(lines[i]), Object.assign({}, x, i === last ? nt : {})));
+        else if (calcCodes && lines.length >= 2) {
+          // working marks, then the final answer: the last line that gives a value ("T = 8600 (K)"),
+          // not a marker's line after it ("answer is 8620 to 3 sf")
+          let at = lines.length - 1;
+          for (let j = lines.length - 1; j > 0; j--) if (RESULT.test(lines[j])) { at = j; break; }
+          const nA = codes[last].n, nM = pt.marks - nA, work = lines.slice(0, at);
+          if (work.length === nM) work.forEach((l) => add('method', 1, saysOf(l), x));
+          else for (let k = 1; k <= nM; k++) add('method', 1, saysOf(work.join('\n')), Object.assign({ k, of: nM }, x));
+          add('answer', nA, saysOf(lines[at]), Object.assign({}, x, nt));
+        } else if (pt.marks === 1 && codes.length === 1 && codes[0].k === 'A') add('answer', 1, saysOf(lines[lines.length - 1]), Object.assign({}, x, nt));
+        else if (pt.marks === 1) add('point', 1, saysOf(pt.text), Object.assign({}, x, nt));
+        else if (pt.marks && codes.length === 1 && codes[0].each && lines.length === pt.marks) lines.forEach((l, i) => add('point', 1, saysOf(l), Object.assign({}, x, i === lines.length - 1 ? nt : {})));
+        else if (pt.marks) markItems(pt.marks, saysOf(pt.text), Object.assign({}, x, nt));
+        continue;
+      }
+      // AQA: one line per mark when the scheme splits, else "mark k of n" with the whole point
+      const mk = pt.marks || total;
+      if (mk === 1 || (f.split && o.calc)) add('point', mk, saysOf(pt.text), nt);
+      else markItems(mk, saysOf(pt.text), nt);
+    }
+    // an AQA calculation split one line per mark: the working marks, then the final answer
+    if (o.calc && o.board !== 'OCR A' && f.split && out.length > 1 && out.every((p) => p.kind === 'point') && /\d/.test(out[out.length - 1].says)) out.forEach((p, i) => { p.kind = i === out.length - 1 ? 'answer' : 'method'; });
+  }
+  // the safety net: items that do not add up to the question's marks become "mark k of n", the whole scheme each
+  if (out.reduce((n, p) => n + p.marks, 0) !== total) {
+    const says = ms && ms.text ? saysOf(friendlyMs(ms, o).points.map((p) => p.text).join('\n')) : NO_MS;
+    out.length = 0;
+    markItems(total, says);
+    levels = null;
+  }
+  if (o.id) out.forEach((p, i) => { p.id = o.id + '-' + (i + 1); });
+  return { points: out, levels, picture, calc: out.some((p) => p.kind === 'answer') };
+}
+
+// A calculation the Form can take as a number box (2026-10-18): the mark points end in a final answer
+// "E = 10 800 000 (J)" with a unit, the question asks to calculate, and it does not want standard form
+// (a number box cannot take "× 10"). Returns { unit } or null (then it stays a written answer).
+function numberAnswer(mp, questionText) {
+  const t = String(questionText || '');
+  if (!mp || !mp.points.length || mp.picture || !/\b(calculate|work out|determine)\b/i.test(t) || /standard form|\[FIG|\[TABLE/i.test(t)) return null;
+  const last = mp.points[mp.points.length - 1];
+  if (last.kind !== 'answer') return null;
+  const m = /(?:^|=\s*)(−?-?\d[\d ,.]*)\s*\(([^()\d]{1,12})\)/.exec(last.says);
+  if (!m || /×|\^|10\d/.test(last.says.slice(m.index, m.index + m[0].length))) return null;
+  return { unit: m[2].trim() };
+}
+
+module.exports = { friendlyMs, msPlain, markPoints, numberAnswer, MS_KEY, decode, levelsBlock };

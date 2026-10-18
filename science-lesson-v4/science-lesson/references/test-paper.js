@@ -53,7 +53,7 @@ const hb = require('./homework-booklet.js');
 const { applyToCatalogue } = require('./exam-categories-apply.js');
 const ep = require('./exam-pick.js');
 const { categorise } = require('./exam-categorise.js');
-const { friendlyMs, msPlain, MS_KEY } = require('./ms-friendly.js');
+const { friendlyMs, msPlain, markPoints, numberAnswer, MS_KEY } = require('./ms-friendly.js');
 
 const ROOT = path.join(__dirname, '..', '..');
 const LIB = path.join(ROOT, 'exam-library');
@@ -784,48 +784,108 @@ function withTables(p) {
     return '\n' + t.rows.map((r) => r.map((c) => clean(String(c == null ? '' : c)) || '-').join(' | ')).join('\n') + '\n';
   });
 }
+// Quiz file schema 2 (2026-10-18, design-audit/homework-replica/04-architecture.md section 3): every
+// question has its pupil-facing label ("Question 3(b)", the same on the answer page and the marking
+// page) and its text without it; written and number questions carry their mark points (one Yes/No each
+// on the marking page, adding up to the question's marks); a calculation with one numeric answer and a
+// unit is a "number" question (a number box plus an optional working box). The title has no due date
+// (the planner adds it, since the due day may move). Questions that cannot go in a Form are listed in
+// `left` with the reason, for the planner's Homework tab.
 function formsQuiz(paper, pick, o, name) {
   const due = o.due || new Date(Date.now() + 7 * 864e5).toISOString().slice(0, 10);
   const tier = paper.tier ? (paper.tier === 'core' ? 'Core' : 'Challenge') : '';
-  const qs = [];
-  for (const q of paper.sectionA || []) {
+  const board = pick.ks === 'ks5' ? 'OCR A' : 'AQA';
+  const qs = [], left = [];
+  const nA = (paper.sectionA || []).length;
+  (paper.sectionA || []).forEach((q, i) => {
     const p = q.parts[0];
     const stem = withTables(p).split('\n').map((l) => l.trim()).filter((l) => l && !q.options.some((x) => l === x || l.replace(/^[A-D][.)]?\s+/, '') === x)).join((p.tables || []).length ? '\n' : ' ');   // table rows keep their lines
-    const pic = (p.figureFiles || []).length || /\[FIG/.test(p.text);
-    qs.push({ type: 'mcq', text: (q.practice ? '(Practice question) ' : '') + clean(stem), options: q.options.map((x, k) => clean(x) || 'ABCD'[k]), answer: 'ABCD'.indexOf(q.answer), points: 1,
+    qs.push({ type: 'mcq', label: `Question ${i + 1}`, text: (q.practice ? '(Practice question) ' : '') + clean(stem), options: q.options.map((x, k) => clean(x) || 'ABCD'[k]), answer: 'ABCD'.indexOf(q.answer), points: 1,
       feedback: p.ms && p.ms.examinerCommentary ? clean(p.ms.examinerCommentary).slice(0, 400) : '', ref: q.id, part: q.part, lesson: q.subtopic });
-  }
+  });
+  // a written or number question with its mark points; null if the answer is a picture (left out)
+  const selfMarked = (base, ms, marks, calcText) => {
+    const mp = markPoints(ms, { board, marks, calc: /\b(calculate|work out|determine)\b/i.test(calcText), id: base.label.replace(/^Question /, 'q').replace(/[()]/g, '') });
+    if (mp.picture) { left.push({ ref: base.ref, label: base.label, why: 'the answer is a drawing or graph' }); return null; }
+    const num = board === 'AQA' ? numberAnswer(mp, calcText) : null;
+    return Object.assign(base, { type: num ? 'number' : 'written', marks, ...(num ? { unit: num.unit } : {}), markPoints: mp.points, ...(mp.levels ? { levels: mp.levels } : {}) });
+  };
   paper.questions.forEach((q, i) => {
-    const n = (paper.sectionA || []).length + i + 1;
+    const n = nA + i + 1;
     if (q.board !== 'OCR A') {               // AQA: part by part (2026-10-15), tick-one parts mark themselves
       q.parts.forEach((p) => {
         const label = `Question ${n}${p.part ? '(' + p.part + ')' : ''}`;
-        const pic = (p.figureFiles || []).some((f) => !tickFile(f) && !isSmall(f));
-        const mc = tickOne(p);
-        if (mc) qs.push({ type: 'mcq', text: `${label}. ${mc.stem}`, options: mc.options, answer: mc.answer, points: p.marks || 1, feedback: '', ref: q.id, lesson: q.subtopic });
-        else qs.push({ type: 'written', text: `${label}\n${powers(clean(p.text))} [${p.marks}]`,
-          marks: p.marks, scheme: msPlain(p.ms, { board: 'AQA', marks: p.marks }), ref: q.id, lesson: q.subtopic });
+        if (needsDrawing(p.text)) { left.push({ ref: q.id, label, why: 'it needs drawing' }); return; }    // a Form cannot take a drawing (2026-10-16)
+        const mc = tickQuestion(p, label, q.id, q.subtopic);
+        if (mc) { mc.label = label; mc.text = mc.text.slice(label.length + 2); mc.part = p.part || undefined; qs.push(mc); return; }
+        const w = selfMarked({ label, text: powers(ringToWrite(clean(p.text))), scheme: msPlain(p.ms, { board: 'AQA', marks: p.marks }), ref: q.id, part: p.part || undefined, lesson: q.subtopic }, p.ms, p.marks, clean(p.text));
+        if (w) qs.push(w);
       });
       return;
     }
-    const pic = q.parts.some((p) => (p.figureFiles || []).length || /\[FIG/.test(p.text));
-    const text = q.parts.map((p) => (p.part ? `(${p.part}) ` : '') + clean(withTables(p)) + ` [${p.marks}]`).join('\n');
+    const label = `Question ${n}`;
+    if (q.parts.some((p) => needsDrawing(p.text))) { left.push({ ref: q.id, label, why: 'it needs drawing' }); return; }    // OCR: one mark scheme per question, so the whole question goes
+    const text = q.parts.map((p) => (p.part ? `(${p.part}) ` : '') + ringToWrite(clean(withTables(p))) + ` [${p.marks}]`).join('\n');
     // one line per mark, notes underneath (2026-10-12: readable mark schemes)
-    const scheme = q.board === 'OCR A' ? msPlain(q.parts[0].ms, { board: 'OCR A', marks: q.marks })
-      : q.parts.map((p) => msPlain(p.ms, { board: 'AQA', marks: p.marks }, p.part ? `(${p.part})` : '')).join('\n\n');
-    qs.push({ type: 'written', text: `Question ${n}\n${text}`, marks: q.marks, scheme, ref: q.id, lesson: q.subtopic });
+    const w = selfMarked({ label, text, scheme: msPlain(q.parts[0].ms, { board: 'OCR A', marks: q.marks }), ref: q.id, lesson: q.subtopic }, q.parts[0].ms, q.marks, clean(q.parts.map((p) => p.text).join(' ')));
+    if (w) qs.push(w);
   });
-  return addQuizImages({ cls: o.cls, due, board: pick.ks === 'ks5' ? 'OCR A' : 'AQA', kind: 'exam-practice', tier: paper.tier || null,
+  const hw = { schema: 2, cls: o.cls, due, kind: 'exam-practice', tier: paper.tier || null, board, topic: name,
     file: `homework-${o.cls}-${due}${paper.tier ? '-' + paper.tier : ''}.json`,
-    title: `${o.cls} exam practice: ${name}${tier ? ' (' + tier + ')' : ''} (due ${due.split('-').reverse().slice(0, 2).join('/')})`,
-    intro: QUIZ_INTRO, questions: qs });
+    title: `${o.cls} ${name} exam practice${tier ? ' (' + tier + ')' : ''}`, questions: qs, left };
+  return addQuizImages(hw);
 }
 
+// Any "tick" part whose options are words (Patryk 2026-10-16: "Put a tick next to your answer. X Y Z"
+// came out as a typed answer with the options run into the question). One to tick -> multiple choice;
+// "Tick two boxes" / "each of your choices" -> tick-boxes (Forms gives the marks only if all are right).
+// The options sit between the tick-box pictures ([FIG:n]), or are whole sentences when there are none.
+// The right answers are the options the mark scheme names; if that is not exactly the number to tick,
+// it stays a written question.
+const TICK_INSTR = /(put a tick \([^)]*\)(?: in the box)? next to (your answer|each of your choices)\.|tick \([^)]*\) (one|two|three) box(?:es)?\.|tick (one|two|three) box(?:es)?\.)/i;
+function tickChoice(p) {
+  const t = String(p.text || '');
+  const m = TICK_INSTR.exec(t);
+  if (!m) return null;
+  const word = (m[3] || m[4] || (m[2] && /each/i.test(m[2]) ? null : 'one'));
+  const want = word ? { one: 1, two: 2, three: 3 }[word.toLowerCase()] : (p.marks || 0);
+  const stem = t.slice(0, m.index) + (want === 1 ? 'Choose one answer.' : 'Choose ' + ['', 'one', 'two', 'three', 'four', 'five'][want] + ' answers.');
+  let rest = t.slice(m.index + m[0].length).replace(/^\s*tick\s*\([^)]*\)\s*/i, '');
+  let options;
+  if (/\[FIG:\d+\]/.test(rest)) {
+    const pieces = rest.split(/\[FIG:\d+\]/);
+    if (pieces[pieces.length - 1].trim().length > 3) return null;
+    options = pieces.slice(0, -1).map((x) => clean(x)).filter(Boolean);
+  } else options = (rest.match(/[^.]+\./g) || []).map((x) => clean(x)).filter(Boolean);
+  if (!want || options.length < 2 || options.length > 6 || options.length <= want) return null;
+  // the next bit of the question ("The figure below shows ...") is not an option
+  if (options.some((x) => x.length > 200 || /\b(figure|graph|table|diagram)\b.{0,20}\b(below|shows)\b/i.test(x))) return null;
+  const bare = (x) => ' ' + String(x).toLowerCase().replace(/[^a-z0-9 ]+/g, ' ').replace(/\s+/g, ' ').trim() + ' ';
+  const ms = bare(clean((p.ms && p.ms.text) || ''));
+  const answers = options.map((x, k) => (ms.includes(bare(x).slice(0, 41).trimEnd() + (bare(x).length <= 41 ? ' ' : '')) ? k : -1)).filter((k) => k >= 0);
+  if (answers.length !== want) return null;
+  return { stem: powers(clean(stem)), options: options.map(powers), answers };
+}
+// A tick part as a Form question that marks itself: "answers" holds every right option (tick-boxes
+// when more than one), "answer" the first, for the planner's preview. Null if it cannot be converted.
+function tickQuestion(p, label, ref, lesson) {
+  const one = tickOne(p);
+  const tc = one ? { stem: one.stem, options: one.options, answers: [one.answer] } : tickChoice(p);
+  if (!tc) return null;
+  return { type: 'mcq', text: `${label}. ${tc.stem}`, options: tc.options, answer: tc.answers[0], answers: tc.answers.length > 1 ? tc.answers : undefined,
+    points: p.marks || tc.answers.length, feedback: '', ref, lesson };
+}
+// Questions that need drawing ("Draw arrows on the diagram") stay out of the Form; "Draw a ring around
+// the correct answer" can be typed, so it is reworded. Same rule as needsDrawing_ in planner/Code.gs:
+// keep the two in step (Patryk 2026-10-16).
+const DRAWING = /(?<!not )\bdraw\b|\bsketch\b(?! graph)|\b(plot|shade)\b|\blabel (the|each|it|all|on|one|two|a)\b|\bput a cross\b|\bmark (on|with) an? \b|\bcomplete the (diagram|graph|chart|circuit|ray diagram|bar chart)\b/i;
+const ringToWrite = (t) => String(t || '').replace(/\bdraw a (ring|circle) (around|round) (each|the|your)\b/gi, (m, a, b, c) => 'Write down ' + c.toLowerCase());
+const needsDrawing = (t) => DRAWING.test(ringToWrite(t));
 // Pupils have no paper copy (Patryk 2026-10-16): every picture goes into the Form, above its question,
 // and they mark their own long answers from the mark scheme shown after submitting.
 const QUIZ_INTRO = 'This is exam practice homework, made from real exam questions.\n\n' +
   'Answer every question in this form. If a question has a picture, it is just above the question. Work out calculations on paper first if that helps, then type your answer and your working.\n\n' +
-  'The multiple-choice questions mark themselves. For the longer answers, the mark scheme appears after you submit. Mark your own answer against it and note anything you missed.\n\n' +
+  'The multiple-choice questions mark themselves. For the longer answers, the next page shows the mark scheme and you mark yourself, one mark at a time.\n\n' +
   'If you get stuck, message me on Google Classroom.';
 const IMG_MAX = 1500000;                         // bytes; Google Forms takes images up to about 2 MB
 // The library parts behind a quiz question: "<doc>#Q<n>", and the part from "Question 3(b)" when it names one.
@@ -834,8 +894,8 @@ function partsForRef(ref, text, part) {
   if (!doc || !qn) return [];
   const d = readJson(path.join(LIB, /^ALevel-/.test(doc) ? 'docs-ocr' : 'docs', doc + '.json'), null);
   const parts = d ? d.parts.filter((p) => String(p.question) === qn) : [];
-  if (part != null && part !== '') return parts.filter((p) => p.part === part);   // a Section A multiple-choice part
-  const m = /^Question \d+\(([^)]+)\)/.exec(String(text || ''));
+  if (part != null && part !== '') return parts.filter((p) => p.part === part);   // a Section A multiple-choice part, or a schema 2 AQA part
+  const m = /^Question \d+\(([^)]+)\)/.exec(String(text || ''));   // older files: the label starts the text
   return m ? parts.filter((p) => p.part === m[1]) : parts;
 }
 // Adds each question's pictures (base64, in the quiz file; the planner puts them in the Form) and
@@ -844,11 +904,25 @@ function partsForRef(ref, text, part) {
 function addQuizImages(hw) {
   const shown = new Set();
   hw.missingPictures = [];
+  // files made before 2026-10-16: tick parts that came out as typed answers become multiple choice
+  hw.questions = hw.questions.map((q) => {
+    if (hw.schema === 2 || q.type !== 'written' || !q.ref || !TICK_INSTR.test(String(q.text))) return q;
+    const parts = partsForRef(q.ref, q.text);
+    const mc = parts.length === 1 ? tickQuestion(parts[0], String(q.text).split('\n')[0], q.ref, q.lesson) : null;
+    return mc || q;
+  });
   for (const q of hw.questions) {
     q.text = String(q.text).replace(/ on your paper copy\./, '').replace(/ It has a diagram, graph or picture: look at the paper copy\./, '')
       .replace(/\(Use the diagram on your paper copy\.\) /, '');
     if (!q.ref) continue;
-    const files = [...new Set(partsForRef(q.ref, q.text, q.part).flatMap((p) => p.figureFiles || []))].filter((f) => f && !shown.has(f));
+    const qparts = partsForRef(q.ref, q.text, q.part);
+    const files = [...new Set(qparts.flatMap((p) => p.figureFiles || []))].filter((f) => f && !shown.has(f));
+    // a picture that IS an answer option ("A [FIG:12]") is titled with its letter (Patryk 2026-10-16)
+    const letter = {};
+    if (q.type === 'mcq') for (const p of qparts) {
+      const marks = [...String(p.text || '').matchAll(/(?:^|\n|\s)([A-D])[.)]?\s*\[FIG:\d+\]|\[FIG:\d+\]/g)];
+      marks.forEach((m, k) => { const f = (p.figureFiles || [])[k]; if (f && m[1]) letter[f] = m[1]; });
+    }
     q.images = [];
     for (const f of files) {
       const fp = path.join(FIGS, f);
@@ -857,12 +931,13 @@ function addQuizImages(hw) {
       const buf = fs.readFileSync(fp);
       if (buf.length > IMG_MAX) { hw.missingPictures.push(q.ref + ' ' + f + ' (too big)'); continue; }
       shown.add(f);
-      q.images.push({ name: f, mime: /\.jpe?g$/i.test(f) ? 'image/jpeg' : 'image/png', data: buf.toString('base64') });
+      q.images.push({ name: f, mime: /\.jpe?g$/i.test(f) ? 'image/jpeg' : 'image/png', data: buf.toString('base64'), ...(letter[f] ? { label: letter[f] } : {}) });
     }
     if (!q.images.length) delete q.images;
   }
   if (!hw.missingPictures.length) delete hw.missingPictures;
-  if (hw.kind === 'exam-practice') hw.intro = QUIZ_INTRO;
+  if (hw.schema === 2) require('./homework-forms.js').finishV2(hw);   // minutes and the page 1 wording (05-design.md 1.1)
+  else if (hw.kind === 'exam-practice') hw.intro = QUIZ_INTRO;
   return hw;
 }
 
@@ -917,7 +992,7 @@ async function build(o) {
   return pick;
 }
 
-module.exports = { addQuizImages, _tickOne: tickOne, _powers: powers, choose, build, aqaTargets, aqaQuestions, ocrQuestions, fill, questionFigures, partParas, formsQuiz, outFolder };
+module.exports = { addQuizImages, _tickOne: tickOne, _tickChoice: tickChoice, _powers: powers, choose, build, aqaTargets, aqaQuestions, ocrQuestions, fill, questionFigures, partParas, formsQuiz, outFolder };
 
 if (require.main === module) {
   const a = process.argv.slice(2), v = (k) => (a.includes(k) ? a[a.indexOf(k) + 1] : null);
