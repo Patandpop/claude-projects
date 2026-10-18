@@ -1,0 +1,1086 @@
+[
+  {
+    "meta": {
+      "class": "11S2",
+      "topic": "Paper 1 Higher November 2020 walkthrough",
+      "title": "Paper 1 Higher November 2020 Walkthrough",
+      "lessonType": "review",
+      "theme": "physics",
+      "worksheet": "C",
+      "differentiation": "none",
+      "year": 11,
+      "subject": "Physics",
+      "board": "AQA",
+      "macrotopic": "Exam Walkthroughs",
+      "lessonNumber": 1,
+      "objective": "Walk through a real Paper 1 Higher and mark my answers with the real mark scheme",
+      "textbookRef": "none",
+      "examQuestion": false,
+      "snippetDir": "Walkthrough Paper1 11S2/snippets",
+      "handwritingMode": "raster"
+    },
+    "title": {
+      "objectives": [
+        "Answer every question on a real AQA Paper 1 Higher",
+        "Mark my answers against the real AQA mark scheme",
+        "Spot where marks are lost and correct my answers in purple pen"
+      ],
+      "keywords": [
+        "potential difference",
+        "resistance",
+        "charge flow",
+        "efficiency",
+        "specific heat capacity",
+        "nuclear fission",
+        "inversely proportional",
+        "pressure"
+      ]
+    },
+    "doNow": {
+      "questions": [
+        {
+          "q": "Write the equation that links elastic potential energy, spring constant and extension.",
+          "a": "elastic potential energy = 0.5 × spring constant × (extension)², Ee = ½ k e²",
+          "marks": 1
+        },
+        {
+          "q": "A house wall has a low thermal conductivity. What does this mean?",
+          "a": "The rate of energy transfer through the wall by conduction is low",
+          "marks": 1
+        },
+        {
+          "q": "Two resistors are connected in series. How do you find their total resistance?",
+          "a": "Add them: R total = R1 + R2",
+          "marks": 1
+        },
+        {
+          "q": "A polythene rod is rubbed with a cloth and becomes negatively charged. Explain why.",
+          "a": "Electrons are transferred from the cloth to the rod",
+          "marks": 1
+        },
+        {
+          "q": "What is meant by the specific latent heat of a substance?",
+          "a": "The energy needed to change the state of 1 kg of the substance with no change in temperature",
+          "marks": 1
+        },
+        {
+          "q": "What is a beta particle?",
+          "a": "A high-speed electron emitted from the nucleus (a neutron turns into a proton)",
+          "marks": 1
+        }
+      ]
+    },
+    "engage": {
+      "title": "LEARNING OBJECTIVES",
+      "hook": "Today we go through a real GCSE Physics Paper 1, one question at a time.",
+      "content": "1. Answer every question on the AQA Paper 1 Higher (November 2020).\n2. Mark my answers against the real AQA mark scheme.\n3. Spot where marks are lost and correct my answers in purple pen.",
+      "imagePlaceholder": false
+    },
+    "worksheetExtras": {
+      "worksheetType": "C",
+      "wordBank": []
+    },
+    "build": [
+      {
+        "type": "modelAnswerReview",
+        "questionNumber": "01.1",
+        "marks": 3,
+        "qType": "short",
+        "jitterProfile": 0,
+        "modelAnswer": "I drew {1}an ammeter as a circle with an A inside it and a voltmeter as a circle with a V inside it.{/1} The {2}voltmeter is connected in parallel with the lamp,{/2} across its two ends, and the {3}ammeter is connected in series with the lamp,{/3} in the main loop of the circuit.",
+        "indicativeContent": [
+          {
+            "text": "ammeter and voltmeter symbols correct",
+            "mark": 1
+          },
+          {
+            "text": "voltmeter in parallel with lamp",
+            "mark": 2
+          },
+          {
+            "text": "ammeter in series with lamp",
+            "mark": 3
+          }
+        ],
+        "doesNotAward": [
+          "Examiner report: a common mistake was drawing a line through the circle of the ammeter or the voltmeter"
+        ]
+      },
+      {
+        "type": "modelAnswerReview",
+        "questionNumber": "01.2",
+        "marks": 2,
+        "qType": "short",
+        "jitterProfile": 2,
+        "modelAnswer": "My line is {1}a smooth curve with the same shape as the positive half, bending the opposite way,{/1} and it {2}passes through −4.0 V, −0.2 A and carries on to −6.0 V, −0.23 A.{/2}",
+        "indicativeContent": [
+          {
+            "text": "smooth curved line of correct shape",
+            "mark": 1
+          },
+          {
+            "text": "passing through - 4.0 V, - 0.2 A **or** – 6.0 V, - 0.23 A",
+            "dependentOn": "2nd mark conditional on scoring 1st mark",
+            "mark": 2
+          }
+        ],
+        "doesNotAward": [
+          "do not accept a line that becomes horizontal"
+        ]
+      },
+      {
+        "type": "answerList",
+        "heading": "QUESTION 01.3 · QUICK ANSWER",
+        "rows": [
+          {
+            "qn": "01.3",
+            "q": "01.3 Equation linking current, potential difference and resistance",
+            "a": "potential difference = current × resistance   or   V = IR",
+            "marks": 1
+          }
+        ]
+      },
+      {
+        "type": "modelAnswerReview",
+        "questionNumber": "01.4",
+        "marks": 4,
+        "qType": "calculation",
+        "jitterProfile": 1,
+        "modelAnswer": [
+          "From Figure 2 at 1.0 V: {1}I = 0.08 A{/1}",
+          "V = I × R so {2}1.0 = 0.08 × R{/2}",
+          "{3}R = 1.0 ÷ 0.08{/3}",
+          "{4}R = 12.5 ohms{/4}"
+        ],
+        "indicativeContent": [
+          {
+            "text": "I = 0.08 (A)",
+            "mark": 1
+          },
+          {
+            "text": "1.0 = 0.08 × R",
+            "mark": 2
+          },
+          {
+            "text": "R = 1.0 ÷ 0.08",
+            "mark": 3
+          },
+          {
+            "text": "R = 12.5 (Ω)",
+            "mark": 4
+          }
+        ],
+        "ecfNote": "allow 1.0 = their I × R provided their I has been obtained from the graph; allow R = 1.0 ÷ their I; allow an answer consistent with their I",
+        "doesNotAward": [
+          "Examiner report: a common mistake was misreading the current as 0.8 A rather than 0.08 A"
+        ]
+      },
+      {
+        "type": "answerList",
+        "heading": "QUESTION 01.5 · QUICK ANSWER",
+        "rows": [
+          {
+            "qn": "01.5",
+            "q": "01.5 What is meant by a zero error?",
+            "a": "The ammeter displays a reading when it is not connected (to a circuit). Not: 'the ammeter read zero all the time'.",
+            "marks": 1
+          }
+        ]
+      },
+      {
+        "type": "answerList",
+        "heading": "QUESTION 02.1 AND 02.2 · QUICK ANSWERS",
+        "rows": [
+          {
+            "qn": "02.1",
+            "q": "02.1 Which diagram shows the correct circuit for the torch?",
+            "correct": "Right-hand circuit",
+            "a": "all three cells face the same way and the LED points the way the current flows",
+            "marks": 1
+          },
+          {
+            "qn": "02.2",
+            "q": "02.2 Equation linking charge flow, current and time",
+            "a": "charge flow = current × time   or   Q = It",
+            "marks": 1
+          }
+        ]
+      },
+      {
+        "type": "modelAnswerReview",
+        "questionNumber": "02.3",
+        "marks": 3,
+        "qType": "calculation",
+        "jitterProfile": 3,
+        "modelAnswer": [
+          "{1}I = 50 mA = 0.050 A{/1}",
+          "Q = I × t",
+          "{2}Q = 0.050 × 14 400{/2}",
+          "{3}Q = 720 C{/3}"
+        ],
+        "indicativeContent": [
+          {
+            "text": "I = 0.050 (A)",
+            "mark": 1
+          },
+          {
+            "text": "Q = 0.050 × 14 400",
+            "mark": 2
+          },
+          {
+            "text": "Q = 720 (C)",
+            "mark": 3
+          }
+        ],
+        "ecfNote": "allow a correct substitution using an incorrectly/not converted value of I; allow a correct calculation using an incorrectly/not converted value of I",
+        "doesNotAward": [
+          "Examiner report: many did not convert 50 mA to amps, or converted it wrongly"
+        ]
+      },
+      {
+        "type": "modelAnswerReview",
+        "questionNumber": "02.4",
+        "marks": 2,
+        "qType": "short",
+        "jitterProfile": 4,
+        "modelAnswer": "The LED is a diode. {1}Charge will not flow through a diode in the reverse direction,{/1} because {2}a diode has a very high resistance in the reverse direction.{/2} So there is no current and the LED does not light.",
+        "indicativeContent": [
+          {
+            "text": "there is no current in a diode (in the reverse direction) **or** charge will not flow through a diode (in the reverse direction)",
+            "mark": 1
+          },
+          {
+            "text": "allow diode will not conduct (electric charge)"
+          },
+          {
+            "text": "(because) a diode has a (very) high resistance (in the reverse direction)",
+            "mark": 2
+          }
+        ],
+        "doesNotAward": [
+          "do not accept the circuit is not complete",
+          "Examiner report: answers about polarity that did not mention the LED (diode) scored zero"
+        ]
+      },
+      {
+        "type": "answerList",
+        "heading": "QUESTION 02.5 · QUICK ANSWER",
+        "rows": [
+          {
+            "qn": "02.5",
+            "q": "02.5 Equation linking efficiency, total power input and useful power output",
+            "a": "efficiency = useful power output ÷ total power input   (no × 100 needed)",
+            "marks": 1
+          }
+        ]
+      },
+      {
+        "type": "modelAnswerReview",
+        "questionNumber": "02.6",
+        "marks": 3,
+        "qType": "calculation",
+        "jitterProfile": 0,
+        "modelAnswer": [
+          "efficiency = useful power output ÷ total power input",
+          "{1}0.75 = useful power output ÷ 0.24{/1}",
+          "{2}useful power output = 0.75 × 0.24{/2}",
+          "{3}useful power output = 0.18 W{/3}"
+        ],
+        "indicativeContent": [
+          {
+            "text": "0.75 = Useful power output ÷ 0.24",
+            "mark": 1
+          },
+          {
+            "text": "Useful power output = 0.75 × 0.24",
+            "mark": 2
+          },
+          {
+            "text": "Useful power output = 0.18 (W)",
+            "mark": 3
+          }
+        ],
+        "doesNotAward": [
+          "Examiner report: multiplying the final answer by 100 lost the last mark"
+        ]
+      },
+      {
+        "type": "answerList",
+        "heading": "QUESTION 03.1 · QUICK ANSWER",
+        "rows": [
+          {
+            "qn": "03.1",
+            "q": "03.1 Equation linking density, mass and volume",
+            "a": "density = mass ÷ volume   or   ρ = m ÷ V",
+            "marks": 1
+          }
+        ]
+      },
+      {
+        "type": "modelAnswerReview",
+        "questionNumber": "03.2",
+        "marks": 4,
+        "qType": "calculation",
+        "jitterProfile": 2,
+        "modelAnswer": [
+          "density = m ÷ V",
+          "{1}998 = m ÷ 6 500 000{/1}",
+          "{2}m = 998 × 6 500 000{/2}",
+          "{3}m = 6 487 000 000 kg{/3}",
+          "{4}m = 6.487 × 10⁹ kg{/4}"
+        ],
+        "indicativeContent": [
+          {
+            "text": "998 = m ÷ 6 500 000",
+            "mark": 1
+          },
+          {
+            "text": "m = 998 × 6 500 000",
+            "mark": 2
+          },
+          {
+            "text": "m = 6 487 000 000",
+            "mark": 3
+          },
+          {
+            "text": "m = 6.487 × 10⁹ (kg)",
+            "mark": 4
+          }
+        ],
+        "ecfNote": "allow a correct conversion of their calculated value of mass into standard form",
+        "doesNotAward": [
+          "Examiner report: copying errors, e.g. 988 kg/m³ instead of 998, or adding or losing a 0 in the volume"
+        ]
+      },
+      {
+        "type": "answerList",
+        "heading": "QUESTION 03.3 · QUICK ANSWER",
+        "rows": [
+          {
+            "qn": "03.3",
+            "q": "03.3 Equation linking energy transferred, power and time",
+            "a": "energy transferred = power × time   or   E = Pt",
+            "marks": 1
+          }
+        ]
+      },
+      {
+        "type": "modelAnswerReview",
+        "questionNumber": "03.4",
+        "marks": 3,
+        "qType": "calculation",
+        "jitterProfile": 4,
+        "modelAnswer": [
+          "{1}t = 5 × 60 × 60 = 18 000 s{/1}",
+          "E = P × t",
+          "{2}E = 1.5 × 10⁹ × 18 000{/2}",
+          "{3}E = 2.7 × 10¹³ J{/3}"
+        ],
+        "indicativeContent": [
+          {
+            "text": "t = 18 000 (s) **or** t = 5 × 60 × 60",
+            "mark": 1
+          },
+          {
+            "text": "E = 1.5 × 10⁹ × 18 000",
+            "mark": 2
+          },
+          {
+            "text": "E = 2.7 × 10¹³ (J)",
+            "mark": 3
+          }
+        ],
+        "ecfNote": "allow a correct substitution using an incorrectly/not converted value of t; allow a correct calculation using an incorrectly/not converted value of t",
+        "doesNotAward": [
+          "Examiner report: converting 5 hours into minutes instead of seconds (a correct calculation in minutes scored 2 marks)"
+        ]
+      },
+      {
+        "type": "modelAnswerReview",
+        "questionNumber": "03.5",
+        "marks": 2,
+        "qType": "short",
+        "jitterProfile": 1,
+        "modelAnswer": "First, {1}the increase in demand, from about 30 × 10⁹ W at 04:00 to about 49 × 10⁹ W at 16:00, is much greater than the 1.5 × 10⁹ W the power station can provide.{/1} Second, {2}demand stays high from 04:00 to 16:00, which is 12 hours, longer than the maximum of 5 hours.{/2}",
+        "indicativeContent": [
+          {
+            "text": "the variation in demand is (much) greater than 1.5 × 10⁹ W",
+            "mark": 1
+          },
+          {
+            "text": "allow the increase in demand is greater than the (power) output of the (hydroelectric) power station"
+          },
+          {
+            "text": "demand remains high for longer than 5 hours",
+            "mark": 2
+          },
+          {
+            "text": "allow 04:00 to 16:00 is 12 hours; allow 04:00 to 16:00 is greater than 5 hours"
+          }
+        ],
+        "doesNotAward": [
+          "Examiner report: answers about people using more energy in the day, or weather, waves, wind or tides, with no data from the graph"
+        ]
+      },
+      {
+        "type": "modelAnswerReview",
+        "questionNumber": "04.1",
+        "marks": 2,
+        "qType": "calculation",
+        "jitterProfile": 3,
+        "modelAnswer": [
+          "Gas: 3200 MJ in 2014, 10 000 MJ in 2018",
+          "{1}% increase = (10 000 − 3200) ÷ 3200 × 100{/1}",
+          "{2}% increase = 212.5 %{/2}"
+        ],
+        "indicativeContent": [
+          {
+            "text": "% increase = (10 000 - 3200) ÷ 3200 × 100",
+            "mark": 1
+          },
+          {
+            "text": "% increase = 212.5 (%)",
+            "mark": 2
+          }
+        ],
+        "doesNotAward": [
+          "Examiner report: 68% and 312.5% were common answers and both scored 0 marks"
+        ]
+      },
+      {
+        "type": "modelAnswerReview",
+        "questionNumber": "04.2",
+        "marks": 2,
+        "qType": "short",
+        "jitterProfile": 0,
+        "modelAnswer": "A gas-fired power station releases {1}no sulfur dioxide,{/1} so it does not cause acid rain. It also releases {2}less carbon dioxide per kg of fuel burned,{/2} so it adds less to global warming.",
+        "indicativeContent": [
+          {
+            "text": "Any two from:"
+          },
+          {
+            "text": "no sulfur dioxide released",
+            "mark": 1
+          },
+          {
+            "text": "doesn't cause acid rain"
+          },
+          {
+            "text": "no particulates released"
+          },
+          {
+            "text": "doesn't cause global dimming"
+          },
+          {
+            "text": "less carbon dioxide released (per kg of fuel burned)",
+            "mark": 2
+          },
+          {
+            "text": "less global warming (allow less climate change; allow less greenhouse gases)"
+          },
+          {
+            "text": "no solid waste"
+          },
+          {
+            "text": "gas mining is less destructive than coal mining"
+          }
+        ],
+        "doesNotAward": [
+          "ignore less air pollution",
+          "Examiner report: gas is NOT renewable and DOES release carbon dioxide"
+        ]
+      },
+      {
+        "type": "modelAnswerReview",
+        "questionNumber": "04.3",
+        "marks": 2,
+        "qType": "short",
+        "jitterProfile": 2,
+        "modelAnswer": "The data show that {1}the mean sea surface temperature shows a steady increase{/1} {2}from 16.45 °C in 1988 to 16.96 °C in 2016.{/2} The sea is getting warmer over time, which suggests that climate change is happening.",
+        "indicativeContent": [
+          {
+            "text": "mean sea surface temperature shows a (steady) increase",
+            "mark": 1
+          },
+          {
+            "text": "over the time period on the graph **or** from 16.45 (°C) to 16.96 (°C)",
+            "dependentOn": "conditional on scoring 1st marking point",
+            "mark": 2
+          },
+          {
+            "text": "allow between a correct pair of dates at least 10 years apart; allow a correct pair of temperatures at least 10 years apart"
+          }
+        ],
+        "doesNotAward": [
+          "Examiner report: a general upward trend with no time period or data usually scored only 1 mark"
+        ]
+      },
+      {
+        "type": "modelAnswerReview",
+        "questionNumber": "04.4",
+        "marks": 3,
+        "qType": "short",
+        "jitterProfile": 4,
+        "modelAnswer": "I would choose {1}thermistor C,{/1} because {2}its change in resistance is greatest{/2} {3}between 0 and 25 °C,{/3} which is the range of sea surface temperatures. This makes it the most sensitive to a small change in temperature.",
+        "indicativeContent": [
+          {
+            "text": "thermistor C",
+            "mark": 1
+          },
+          {
+            "text": "(because) the change in resistance is greatest",
+            "dependentOn": "conditional on scoring 1st marking point",
+            "mark": 2
+          },
+          {
+            "text": "allow the gradient is highest; allow more sensitive to temperature change"
+          },
+          {
+            "text": "between 0 and 25 ºC (allow between 16 and 17 ºC)",
+            "dependentOn": "conditional on scoring 2nd marking point",
+            "mark": 3
+          },
+          {
+            "text": "if thermistor C is not chosen, allow for 1 mark each: not thermistor A because there is no/little change in resistance; not thermistor B as there is only a small change in resistance; not thermistor D as there is no data available between 0 and 40 ºC"
+          }
+        ],
+        "doesNotAward": [
+          "Examiner report: most chose thermistor A 'because it has the lowest resistance'"
+        ]
+      },
+      {
+        "type": "answerList",
+        "heading": "QUESTION 05.1 AND 05.2 · QUICK ANSWERS",
+        "rows": [
+          {
+            "qn": "05.1",
+            "q": "05.1 One other man-made source of background radiation",
+            "a": "medical x-rays (or radiotherapy, nuclear weapons testing, a named nuclear disaster e.g. Chernobyl / Fukushima). Ignore radioactive / nuclear waste.",
+            "marks": 1
+          },
+          {
+            "qn": "05.2",
+            "q": "05.2 Name one nuclear fuel",
+            "a": "uranium or plutonium (allow thorium). Not coal, oil or gas.",
+            "marks": 1
+          }
+        ]
+      },
+      {
+        "type": "modelAnswerReview",
+        "questionNumber": "05.3",
+        "marks": 4,
+        "qType": "short",
+        "jitterProfile": 1,
+        "modelAnswer": "{1}A neutron is absorbed by a uranium nucleus.{/1} The nucleus becomes unstable and {2}splits into two parts,{/2} two smaller daughter nuclei, {3}and two or three neutrons are released{/3} {4}and gamma rays are emitted.{/4} Energy is released in the process.",
+        "indicativeContent": [
+          {
+            "text": "neutron absorbed by a uranium nucleus",
+            "mark": 1
+          },
+          {
+            "text": "nucleus splits into two parts (allow an atom splits into two parts if 1st marking point doesn't score)",
+            "mark": 2
+          },
+          {
+            "text": "**and** (2 / 3) neutrons (are released)",
+            "mark": 3
+          },
+          {
+            "text": "**and** gamma rays (are emitted)",
+            "mark": 4
+          }
+        ],
+        "doesNotAward": [
+          "Examiner report: the neutron only 'colliding with' the nucleus, or being absorbed by an 'atom', was not enough"
+        ]
+      },
+      {
+        "type": "modelAnswerReview",
+        "questionNumber": "05.4",
+        "marks": 2,
+        "qType": "short",
+        "jitterProfile": 3,
+        "modelAnswer": "In nuclear fusion, {1}two lighter nuclei join to form a heavier nucleus.{/1} {2}Some of the mass of the nuclei is converted into energy,{/2} which is released as radiation.",
+        "indicativeContent": [
+          {
+            "text": "lighter nuclei join to form heavier nuclei (allow specific examples)",
+            "mark": 1
+          },
+          {
+            "text": "some of the mass (of the nuclei) is converted to energy (of radiation)",
+            "mark": 2
+          }
+        ],
+        "doesNotAward": [
+          "Examiner report: 'atoms fuse' or 'elements fuse' was not enough; nor were bonds breaking or exothermic reactions"
+        ]
+      },
+      {
+        "type": "modelAnswerReview",
+        "questionNumber": "05.5",
+        "marks": 2,
+        "qType": "short",
+        "jitterProfile": 0,
+        "modelAnswer": "With a shorter half-life, {1}the activity of the waste decreases quickly,{/1} so {2}the risk of harm from the waste decreases quickly.{/2} The burial site would not need to be monitored for as long.",
+        "indicativeContent": [
+          {
+            "text": "activity decreases quickly (allow nuclei / waste will decay at a greater rate)",
+            "mark": 1
+          },
+          {
+            "text": "risk of harm decreases quickly",
+            "mark": 2
+          },
+          {
+            "text": "allow burial site doesn't need to be monitored for as long **or** doesn't need to be buried underground for as long **or** may not need to be buried underground"
+          }
+        ],
+        "doesNotAward": [
+          "ignore waste is radioactive for less time",
+          "Examiner report: vague 'less harm to the environment' was not enough"
+        ]
+      },
+      {
+        "type": "answerList",
+        "heading": "QUESTION 06.1 · QUICK ANSWER",
+        "rows": [
+          {
+            "qn": "06.1",
+            "q": "06.1 Which two measurements are needed to find the speed of a rider and sled?",
+            "correct": "Length + Time",
+            "a": "Length of sled and Time for sled to pass light gate (1 mark each)",
+            "marks": 2
+          }
+        ]
+      },
+      {
+        "type": "modelAnswerReview",
+        "questionNumber": "06.2",
+        "marks": 4,
+        "qType": "calculation",
+        "jitterProfile": 2,
+        "modelAnswer": [
+          "{1}Ep = 8.33 kJ = 8330 J{/1}",
+          "Ep = m × g × h",
+          "{2}8330 = m × 9.8 × 17.0{/2}",
+          "{3}m = 8330 ÷ (9.8 × 17.0){/3}",
+          "{4}m = 50.0 kg{/4}"
+        ],
+        "indicativeContent": [
+          {
+            "text": "Ep = 8330 (J)",
+            "mark": 1
+          },
+          {
+            "text": "8330 = m × 9.8 × 17.0",
+            "mark": 2
+          },
+          {
+            "text": "m = 8330 ÷ (9.8 × 17.0)",
+            "mark": 3
+          },
+          {
+            "text": "m = 50.0 (kg)",
+            "mark": 4
+          }
+        ],
+        "ecfNote": "allow a correct substitution / rearrangement / calculation using an incorrectly/not converted value of Ep",
+        "doesNotAward": [
+          "Examiner report: not converting kJ to J gave 0.05 kg; 8330 ÷ 9.8 × 17.0 gave 1445 kg"
+        ]
+      },
+      {
+        "type": "modelAnswerReview",
+        "questionNumber": "06.3",
+        "marks": 4,
+        "qType": "short",
+        "jitterProfile": 4,
+        "modelAnswer": "As each rider slides down, {1}the decrease in Ep equals the increase in Ek, so ½mv² = mgh.{/1} {2}The mass cancels on both sides of the equation, giving v² = 2gh,{/2} so {3}the final speed only depends on the vertical height and the gravitational field strength,{/3} not on the mass. Small differences in speed are {4}due to air resistance and friction, or a different starting speed.{/4}",
+        "indicativeContent": [
+          {
+            "text": "½ mv² = mgh **or** decrease in Ep = increase in Ek",
+            "mark": 1
+          },
+          {
+            "text": "masses cancel on both sides of the equation **or** v² = 2gh",
+            "mark": 2
+          },
+          {
+            "text": "(final) speed only depends on vertical height (and gravitational field strength)",
+            "mark": 3
+          },
+          {
+            "text": "variations will be due to air resistance/friction **or** different initial speed",
+            "mark": 4
+          }
+        ],
+        "doesNotAward": [
+          "Examiner report: terminal velocity answers did not score (the slide is not high enough to reach it)"
+        ]
+      },
+      {
+        "type": "answerList",
+        "heading": "QUESTION 07.1 · QUICK ANSWER",
+        "rows": [
+          {
+            "qn": "07.1",
+            "q": "07.1 Why did the temperature not start to increase straight away?",
+            "a": "The heating element of the kettle takes time to heat up (allow the kettle takes time to heat up). Not: 'water has a high specific heat capacity'.",
+            "marks": 1
+          }
+        ]
+      },
+      {
+        "type": "modelAnswerReview",
+        "questionNumber": "07.2",
+        "marks": 5,
+        "qType": "calculation",
+        "jitterProfile": 1,
+        "modelAnswer": [
+          "From Figure 10: {1}temperature change = 100 − 22 = 78 °C{/1}",
+          "E = m × c × temperature change",
+          "{2}155 000 = m × 4200 × 78{/2}",
+          "{3}m = 155 000 ÷ (4200 × 78){/3}",
+          "{4}m = 0.4731 kg{/4}",
+          "{5}m = 0.47 kg (2 s.f.){/5}"
+        ],
+        "indicativeContent": [
+          {
+            "text": "Δθ = 78 (°C)",
+            "mark": 1
+          },
+          {
+            "text": "155 000 = m × 4200 × 78",
+            "mark": 2
+          },
+          {
+            "text": "m = 155 000 ÷ (4200 × 78)",
+            "mark": 3
+          },
+          {
+            "text": "m = 0.4731 (kg)",
+            "mark": 4
+          },
+          {
+            "text": "m = 0.47 (kg)",
+            "mark": 5
+          }
+        ],
+        "ecfNote": "allow a correct substitution / rearrangement / calculation of mass using an incorrect value of Δθ",
+        "doesNotAward": [
+          "Examiner report: using a temperature change of 100 °C gave 0.37 (4 marks)"
+        ]
+      },
+      {
+        "type": "modelAnswerReview",
+        "questionNumber": "07.3",
+        "marks": 3,
+        "qType": "short",
+        "jitterProfile": 3,
+        "modelAnswer": "{1}The gradient of the straight section is the temperature change ÷ time, the rate of temperature increase.{/1} The energy transferred is E = Pt and also E = m × c × temperature change, so {2}Pt = m × c × temperature change.{/2} Dividing both sides by t gives {3}P = gradient × m × c,{/3} using the mass of the water and its specific heat capacity.",
+        "indicativeContent": [
+          {
+            "text": "Gradient = Δθ ÷ t (allow gradient = rate of temperature increase; allow calculation of gradient)",
+            "mark": 1
+          },
+          {
+            "text": "Pt = mcΔθ",
+            "mark": 2
+          },
+          {
+            "text": "P = gradient × mc",
+            "mark": 3
+          }
+        ],
+        "doesNotAward": [
+          "Examiner report: using the horizontal section, or the efficiency equation, did not score"
+        ]
+      },
+      {
+        "type": "modelAnswerReview",
+        "questionNumber": "08.1",
+        "marks": 2,
+        "qType": "calculation",
+        "jitterProfile": 0,
+        "modelAnswer": [
+          "{1}15.7 = (15.8 + 15.3 + X) ÷ 3{/1}",
+          "15.8 + 15.3 + X = 47.1",
+          "{2}X = 16.0 ohms{/2}"
+        ],
+        "indicativeContent": [
+          {
+            "text": "15.7 = (15.8 + 15.3 + X) ÷ 3",
+            "mark": 1
+          },
+          {
+            "text": "X = 16.0 (Ω)",
+            "mark": 2
+          }
+        ]
+      },
+      {
+        "type": "modelAnswerReview",
+        "questionNumber": "08.2",
+        "marks": 2,
+        "qType": "short",
+        "jitterProfile": 2,
+        "modelAnswer": "{1}Precise results show little variation,{/1} so they are close together. {2}The fourth reading, 16.2 ohms, is further away from the mean than the other values,{/2} so it makes the spread bigger and does not make the results more precise.",
+        "indicativeContent": [
+          {
+            "text": "precise results show little variation",
+            "mark": 1
+          },
+          {
+            "text": "the 4th result was further away from the mean than the other values (allow the range of values has increased)",
+            "mark": 2
+          }
+        ],
+        "doesNotAward": [
+          "ignore the 4th result was an anomaly",
+          "Examiner report: precision is not the resolution of an instrument; 'it increases the accuracy not the precision' did not score"
+        ]
+      },
+      {
+        "type": "modelAnswerReview",
+        "questionNumber": "08.3",
+        "marks": 3,
+        "qType": "short",
+        "jitterProfile": 4,
+        "modelAnswer": "If n is inversely proportional to R, then n × R is a constant. From Figure 12, {1}2 × 24 = 48 and 3 × 16 = 48,{/1} and {2}4 × 12 = 48.{/2} {3}So n × R = constant (48), showing the student was correct.{/3}",
+        "indicativeContent": [
+          {
+            "text": "two pairs of values of n and R showing that n × R = constant",
+            "mark": 1
+          },
+          {
+            "text": "third pair of values of n and R showing that n × R = constant",
+            "mark": 2
+          },
+          {
+            "text": "(so) n × R = constant (showing the student was correct)",
+            "mark": 3
+          },
+          {
+            "text": "eg 2 × 24 = 48, 3 × 16 = 48, 4 × 12 = 48, 5 × 9.5 = 47.5, 6 × 8 = 48"
+          },
+          {
+            "text": "allow 1 mark each for two statements relating the change in number of resistors to the change in (mean total) resistance; allow 1 mark for use of data from graph to confirm at least one statement"
+          }
+        ],
+        "doesNotAward": [
+          "Examiner report: 'as one goes up the other goes down' scored no marks"
+        ]
+      },
+      {
+        "type": "modelAnswerReview",
+        "questionNumber": "08.4",
+        "marks": 2,
+        "qType": "short",
+        "jitterProfile": 1,
+        "modelAnswer": "Adding a resistor in parallel gives {1}another path for the charge to flow through,{/1} so for the same potential difference {2}the total current is greater.{/2} A greater total current for the same potential difference means a smaller total resistance.",
+        "indicativeContent": [
+          {
+            "text": "multiple paths for charge / electrons to flow (allow current for charge)",
+            "mark": 1
+          },
+          {
+            "text": "total current is greater (for the same potential difference when more resistors are added)",
+            "mark": 2
+          }
+        ],
+        "doesNotAward": [
+          "Examiner report: 'the resistance is shared' was the most common answer and scored nothing"
+        ]
+      },
+      {
+        "type": "modelAnswerReview",
+        "questionNumber": "09.1",
+        "marks": 5,
+        "qType": "calculation",
+        "jitterProfile": 3,
+        "modelAnswer": [
+          "P = I × V: {1}5.75 = I × 230{/1}",
+          "{2}I = 5.75 ÷ 230{/2}",
+          "{3}I = 0.025 A{/3}",
+          "V = I × R: {4}230 = 0.025 × R{/4}",
+          "{5}R = 9200 ohms{/5}"
+        ],
+        "indicativeContent": [
+          {
+            "text": "5.75 = I × 230",
+            "mark": 1
+          },
+          {
+            "text": "I = 5.75 ÷ 230",
+            "mark": 2
+          },
+          {
+            "text": "I = 0.025 (A)",
+            "mark": 3
+          },
+          {
+            "text": "230 = 0.025 × R **or** R = 230 ÷ 0.025",
+            "mark": 4
+          },
+          {
+            "text": "R = 9200 (Ω)",
+            "mark": 5
+          },
+          {
+            "text": "alternative approach for 4th and 5th marks: 5.75 = 0.025² × R (1) or R = 5.75 ÷ 0.025², R = 9200 (Ω) (1); alternative approach: 5.75 = 230² ÷ R (3), R = 230² ÷ 5.75 (1), R = 9200 (Ω) (1)"
+          }
+        ],
+        "ecfNote": "allow a correct substitution / rearrangement / calculation of resistance using an incorrect value of I",
+        "doesNotAward": [
+          "Examiner report: P = IV rearranged wrongly to I = V ÷ P"
+        ]
+      },
+      {
+        "type": "modelAnswerReview",
+        "questionNumber": "09.2",
+        "marks": 3,
+        "qType": "short",
+        "jitterProfile": 0,
+        "modelAnswer": "The switch is on the live side, so {1}one wire in the switch is live,{/1} at a potential of 230 V. {2}The electrician is earthed, at earth potential.{/2} So {3}there would be a large potential difference between the live wire and the electrician,{/3} and a current would flow through him if he touched the wire.",
+        "indicativeContent": [
+          {
+            "text": "one wire in the switch is live (allow the switch / circuit is live; allow one wire is at a potential of 230 V)",
+            "mark": 1
+          },
+          {
+            "text": "the electrician is earthed **or** the electrician is at earth potential",
+            "mark": 2
+          },
+          {
+            "text": "(so) there will be a (large) potential difference between the live wire and the electrician / earth (if the electrician touched the wire)",
+            "mark": 3
+          }
+        ],
+        "doesNotAward": [
+          "Examiner report: 'potential difference of the live wire' instead of its potential lost the third mark"
+        ]
+      },
+      {
+        "type": "modelAnswerReview",
+        "questionNumber": "09.3",
+        "marks": 2,
+        "qType": "short",
+        "jitterProfile": 2,
+        "modelAnswer": "From Figure 14, {1}50 Hz has the lowest maximum let-go current, about 9 mA.{/1} {2}At a different frequency, such as 100 Hz, people could let go at a greater current, about 16 mA,{/2} so they are less likely to be stuck holding the circuit.",
+        "indicativeContent": [
+          {
+            "text": "50 Hz has the lowest (maximum) let-go current",
+            "mark": 1
+          },
+          {
+            "text": "a higher / lower / different frequency would allow people to let go at a greater current (allow a specific numerical example as opposed to a trend)",
+            "mark": 2
+          }
+        ],
+        "doesNotAward": [
+          "Examiner report: just reading values off the graph, with no explanation of what they mean, was not enough"
+        ]
+      },
+      {
+        "type": "answerList",
+        "heading": "QUESTION 10.1 · QUICK ANSWER",
+        "rows": [
+          {
+            "qn": "10.1",
+            "q": "10.1 Which statements describe the movement of the gas particles?",
+            "correct": "Random + Range",
+            "a": "The particles move in random directions. The particles move with a range of speeds. (1 mark each)",
+            "marks": 2
+          }
+        ]
+      },
+      {
+        "type": "modelAnswerReview",
+        "questionNumber": "10.2",
+        "marks": 4,
+        "qType": "calculation",
+        "jitterProfile": 4,
+        "modelAnswer": [
+          "pV = constant",
+          "{1}100 000 × 0.030 = 3000{/1}",
+          "{2}p × 0.025 = 3000{/2}",
+          "{3}p = 3000 ÷ 0.025{/3}",
+          "{4}p = 120 000 Pa{/4}"
+        ],
+        "indicativeContent": [
+          {
+            "text": "100 000 × 0.030 = 3000",
+            "mark": 1
+          },
+          {
+            "text": "p × 0.025 = 3000",
+            "mark": 2
+          },
+          {
+            "text": "p = 3000 ÷ 0.025",
+            "mark": 3
+          },
+          {
+            "text": "p = 120 000 (Pa)",
+            "mark": 4
+          }
+        ],
+        "ecfNote": "allow correct substitution into p1V1 = p2V2 for first 2 marking points; allow a correct substitution / rearrangement / calculation using an incorrect value of the constant",
+        "doesNotAward": [
+          "Examiner report: pressure ÷ volume = constant is wrong"
+        ]
+      },
+      {
+        "type": "modelAnswerReview",
+        "questionNumber": "10.3",
+        "marks": 4,
+        "qType": "short",
+        "jitterProfile": 1,
+        "modelAnswer": "When the temperature increases, {1}the particles have a higher mean kinetic energy,{/1} so they move faster. This means {2}there is an increased number of collisions with the walls of the balloon per second,{/2} and {3}greater forces are exerted in the collisions with the balloon walls.{/3} {4}A greater force is exerted on the same area,{/4} so the pressure increases.",
+        "indicativeContent": [
+          {
+            "text": "particles would have a higher (mean) kinetic energy (allow particles would have a higher (mean) speed)",
+            "mark": 1
+          },
+          {
+            "text": "(so) increased number of collisions with the walls of the balloon per second (allow greater frequency of collisions with the walls of the balloon)",
+            "mark": 2
+          },
+          {
+            "text": "greater forces exerted in collisions (between particles and balloon walls) (allow greater rate of change of momentum (of particles))",
+            "mark": 3
+          },
+          {
+            "text": "greater force exerted on same area (allow description using p = F/A)",
+            "mark": 4
+          }
+        ],
+        "doesNotAward": [
+          "do not accept particles vibrate more",
+          "Examiner report: pressure is NOT caused by particles colliding with each other"
+        ]
+      }
+    ],
+    "image_dump": {
+      "images": [
+        {
+          "path": "Walkthrough Paper1 11S2/snippets/Q12.png",
+          "label": "01.2 Figure 2 (I-V graph)"
+        },
+        {
+          "path": "Walkthrough Paper1 11S2/snippets/Q35.png",
+          "label": "03.5 Figure 5 (demand)"
+        },
+        {
+          "path": "Walkthrough Paper1 11S2/snippets/Q71.png",
+          "label": "07 Figure 10 (kettle)"
+        },
+        {
+          "path": "Walkthrough Paper1 11S2/snippets/Q83.png",
+          "label": "08.3 Figure 12 (resistors)"
+        }
+      ]
+    }
+  }
+]
