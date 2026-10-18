@@ -1,0 +1,102 @@
+[
+  {
+    "meta": {
+      "class": "9XS",
+      "topic": "Atoms, elements and compounds",
+      "title": "Atoms, Elements and Compounds",
+      "lessonType": "standard",
+      "theme": "chemistry",
+      "worksheet": "A",
+      "differentiation": "none",
+      "year": 9,
+      "subject": "Chemistry",
+      "macrotopic": "C1 Atomic Structure",
+      "lessonNumber": 1
+    },
+    "title": {
+      "objectives": [
+        "Define atom, element and compound.",
+        "Identify chemical reactions from the formation of new substances.",
+        "Use chemical symbols and formulae to identify elements and compounds."
+      ],
+      "keywords": ["atom", "element", "compound", "chemical reaction", "formula"]
+    },
+    "doNow": {
+      "variant": "A",
+      "questions": [
+        { "q": "What is an atom?", "a": "The smallest part of an element that can exist.", "marks": 1 },
+        { "q": "What is the chemical symbol for potassium?", "a": "K", "marks": 1 },
+        { "q": "What is an element?", "a": "A substance made of only one type of atom.", "marks": 1 },
+        { "q": "What is the chemical formula for carbon dioxide?", "a": "CO_2", "marks": 1 },
+        { "q": "What is the chemical formula for water?", "a": "H_2O", "marks": 1 },
+        { "q": "What are the rows and the columns of the periodic table called?", "a": "Rows are periods; columns are groups.", "marks": 1 }
+      ]
+    },
+    "engage": {
+      "variant": "prediction",
+      "title": "ONE LETTER",
+      "hook": "CO is a poisonous gas. Co is a metal used in magnets. How can one small letter change everything?",
+      "imagePlaceholder": false,
+      "reveal": {
+        "question": "Look at the capital letters.",
+        "answer": "Co is one element, cobalt. CO is a compound: one carbon atom (C) bonded to one oxygen atom (O). A new capital letter means a new element."
+      }
+    },
+    "learn": [
+      {
+        "variant": "A",
+        "heading": "Atoms, elements and compounds",
+        "imagePlaceholder": false,
+        "boxes": [
+          { "header": "Atom", "items": ["The smallest part of an element that can exist.", "From the Greek 'atomos': uncuttable."] },
+          { "header": "Element", "items": ["A substance made of only ONE type of atom.", "Over 100 of them, all in the periodic table."] },
+          { "header": "Compound and chemical reaction", "items": ["Compound: two or more elements chemically combined (bonded) in fixed proportions.", "Chemical reaction: forms one or more NEW substances, often with an energy change."] }
+        ]
+      },
+      {
+        "variant": "A",
+        "heading": "Symbols and formulae",
+        "imagePlaceholder": false,
+        "boxes": [
+          { "header": "Chemical symbols", "items": ["Every element has a symbol. The first letter is always a capital; any second letter is lower case.", "C carbon · Co cobalt · O oxygen · Na sodium (Latin natrium) · K potassium (Latin kalium)"] },
+          { "header": "Reading a formula", "items": ["Each capital letter starts a new element.", "A small number after a symbol counts the atoms before it: H_2O = 2 hydrogen + 1 oxygen.", "CO_2 = 1 carbon + 2 oxygen atoms (3 atoms, 2 elements)."] },
+          { "header": "Element or compound?", "items": ["One type of atom (O_2, Fe, He) = element.", "Two or more elements bonded (H_2O, NaCl, CO_2) = compound."] }
+        ]
+      }
+    ],
+    "build": [
+      { "type": "mcq", "q": "Which statement describes an element?", "options": ["A. A substance made of only one type of atom", "B. Two or more elements chemically combined", "C. Two substances mixed but not bonded", "D. The smallest part of a compound"], "answer": "A", "explanation": "An element contains only one type of atom.", "commonError": "Choosing B, which describes a compound." },
+      { "type": "mcq", "q": "Which of these is a compound?", "options": ["A. O_2", "B. Fe", "C. H_2O", "D. He"], "answer": "C", "explanation": "H_2O contains two elements, hydrogen and oxygen, bonded together.", "commonError": "Choosing O_2 because it has two atoms; both atoms are oxygen, so it is an element." },
+      { "type": "mcq", "q": "How many atoms are in one CO_2 molecule?", "options": ["A. 1", "B. 2", "C. 3", "D. 4"], "answer": "C", "explanation": "1 carbon + 2 oxygen = 3 atoms.", "commonError": "Answering 2 by counting the elements, not the atoms." },
+      { "type": "mcq", "q": "What is the difference between Co and CO?", "options": ["A. There is no difference.", "B. Co is the element cobalt; CO is a compound of carbon and oxygen.", "C. Co is a compound; CO is an element.", "D. CO is cobalt written in capitals."], "answer": "B", "explanation": "A new capital letter means a new element, so CO contains C and O.", "commonError": "Ignoring the capital letter." },
+      { "type": "mcq", "q": "Which of these shows a chemical reaction has happened?", "options": ["A. Ice melts into water.", "B. Sugar dissolves in tea.", "C. A new substance forms and gives off heat.", "D. Water is poured into a different shaped glass."], "answer": "C", "explanation": "A chemical reaction makes a new substance, often with an energy change.", "commonError": "Thinking melting or dissolving makes a new substance." },
+      { "type": "mcq", "q": "What is the chemical symbol for sodium?", "options": ["A. S", "B. So", "C. Sd", "D. Na"], "answer": "D", "explanation": "Na comes from its Latin name, natrium.", "commonError": "Using the first letters of the English name." },
+      { "type": "workedExample",
+        "worked": { "prompt": "How many atoms of each element are in H_2SO_4?", "steps": ["Split at each capital letter: H_2 · S · O_4", "H_2 = 2 hydrogen atoms", "S = 1 sulfur atom (no number means 1)", "O_4 = 4 oxygen atoms. Total = 7 atoms of 3 elements"] },
+        "yourTurn": { "prompt": "How many atoms of each element are in CaCO_3?", "answer": "1 calcium, 1 carbon, 3 oxygen = 5 atoms of 3 elements" } },
+      { "type": "trueFalse", "heading": "COMMON MISCONCEPTIONS", "statements": [
+        { "text": "O_2 is a compound because it has two atoms.", "isTrue": false, "correction": "Both atoms are oxygen, so O_2 is an element." },
+        { "text": "A compound has different properties from the elements it is made from.", "isTrue": true },
+        { "text": "Melting ice is a chemical reaction.", "isTrue": false, "correction": "No new substance forms; it is a physical change." },
+        { "text": "In a symbol, the second letter is always lower case.", "isTrue": true }
+      ] }
+    ],
+    "apply": {
+      "developing": [
+        { "q": "Define the terms atom, element and compound.", "a": "Atom: the smallest part of an element that can exist. Element: a substance made of only one type of atom. Compound: two or more elements chemically combined.", "marks": 3, "qType": "concept" },
+        { "q": "Write the chemical symbols for carbon, oxygen and gold.", "a": "C, O, Au", "marks": 3, "qType": "concept" },
+        { "q": "Sort these into elements and compounds: Fe, H_2O, O_2, NaCl.", "a": "Elements: Fe, O_2. Compounds: H_2O, NaCl.", "marks": 2, "qType": "concept" }
+      ],
+      "reaching": [
+        { "q": "How many atoms of each element are in C_6H_12O_6 (glucose)?", "a": "6 carbon, 12 hydrogen, 6 oxygen (24 atoms)", "marks": 2, "qType": "concept" },
+        { "q": "Explain the difference between Co and CO.", "a": "Co is one element, cobalt. CO contains two capital letters, so two elements, carbon and oxygen, bonded together: it is a compound.", "marks": 2, "qType": "concept" },
+        { "q": "Iron and sulfur are heated together. A new black solid forms and glows. Explain how you know a chemical reaction has happened.", "a": "A new substance (iron sulfide) has formed with different properties, and energy is given out (it glows).", "marks": 2, "qType": "concept" }
+      ],
+      "mastering": [
+        { "q": "Water is a compound of hydrogen and oxygen. Explain why water has very different properties from hydrogen and oxygen.", "a": "The atoms are chemically bonded into a new substance, H_2O, with its own properties; the elements are no longer separate, so their properties do not carry over.", "marks": 3, "qType": "concept" },
+        { "q": "A sample of pure gas contains only O_2 molecules. A student says it is a compound because each molecule has two atoms. Evaluate this claim.", "a": "The student is wrong. Both atoms are oxygen, so the gas contains only one type of atom: it is an element. A compound needs two or more different elements bonded.", "marks": 3, "qType": "concept" },
+        { "q": "Calculate the total number of atoms in 2 molecules of H_2SO_4.", "a": "One molecule: 2 + 1 + 4 = 7 atoms. Two molecules: 14 atoms.", "marks": 2, "qType": "calculation" }
+      ]
+    }
+  }
+]

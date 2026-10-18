@@ -1,0 +1,125 @@
+[
+  {
+    "meta": {
+      "class": "11S2",
+      "topic": "Year 10 revision: energy, electricity and forces",
+      "title": "Revision Lesson",
+      "lessonType": "revision",
+      "theme": "physics",
+      "worksheet": "A",
+      "differentiation": "none",
+      "year": 11,
+      "subject": "Physics",
+      "macrotopic": "P6 Waves",
+      "lessonNumber": 17,
+      "examQuestion": false
+    },
+    "title": {
+      "objectives": [
+        "Recall and use the key energy equations from Year 10.",
+        "Apply circuit rules and electrical power equations.",
+        "Apply Newton's laws, momentum and stopping distances."
+      ],
+      "keywords": ["efficiency", "specific heat capacity", "resistance", "power", "momentum", "resultant force"]
+    },
+    "doNow": {
+      "variant": "A",
+      "questions": [
+        { "q": "State the units of energy and of power.", "a": "Energy: joule (J). Power: watt (W).", "marks": 2 },
+        { "q": "Write the equation that links potential difference, current and resistance.", "a": "V = I \\times R", "marks": 1 },
+        { "q": "In a series circuit, how does the current compare at different points?", "a": "It is the same everywhere.", "marks": 1 },
+        { "q": "Write Newton's second law as an equation.", "a": "F = m \\times a", "marks": 1 },
+        { "q": "What is the unit of momentum?", "a": "kg m/s", "marks": 1 },
+        { "q": "What is the frequency of the UK mains supply?", "a": "50 Hz", "marks": 1 }
+      ]
+    },
+    "engage": {
+      "title": "LEARNING OBJECTIVES",
+      "hook": "Today: the big ideas from Year 10, then you show what you can do on your own.",
+      "content": "1. Use the energy equations: kinetic, gravitational, elastic, heating, power and efficiency.\n2. Use the circuit rules and V = IR, Q = It.\n3. Use electrical power and explain the National Grid.\n4. Use F = ma, momentum and stopping distances.",
+      "imagePlaceholder": false
+    },
+    "learn": [
+      {
+        "variant": "A",
+        "heading": "Energy",
+        "imagePlaceholder": false,
+        "boxes": [
+          { "header": "Stores and transfers", "items": ["Energy is never created or destroyed, only transferred. Wasted energy is dissipated, usually by heating."] },
+          { "header": "Store equations", "items": ["KE = {1/2}mv^2 · GPE = mgh · E_e = {1/2}ke^2 (e in m)"] },
+          { "header": "Heating, power and efficiency", "items": ["\\Delta E = mc\\Delta\\theta · P = {E/t} · efficiency = {useful output/total input}"] }
+        ],
+        "check": [
+          { "q": "A 0.5 kg ball moves at 4 m/s. Calculate its kinetic energy.", "a": "KE = 0.5 \\times 0.5 \\times 4^2 = 4 J" },
+          { "q": "Calculate the energy to heat 2 kg of water by 5 °C (c = 4200 J/kg °C).", "a": "\\Delta E = 2 \\times 4200 \\times 5 = 42 000 J" },
+          { "q": "A motor takes in 200 J and gives out 80 J usefully. Calculate its efficiency.", "a": "80 \\div 200 = 0.4 (40%)" }
+        ]
+      },
+      {
+        "variant": "A",
+        "heading": "Circuits",
+        "imagePlaceholder": false,
+        "boxes": [
+          { "header": "Equations", "items": ["V = IR · Q = It"] },
+          { "header": "Series", "items": ["Same current everywhere. Potential difference is shared. R_{total} = R_1 + R_2"] },
+          { "header": "Parallel", "items": ["Same potential difference across each branch. Branch currents add up. Total resistance is less than the smallest branch."] }
+        ],
+        "check": [
+          { "q": "12 V is across a 4 Ω resistor. Calculate the current.", "a": "I = 12 \\div 4 = 3 A" },
+          { "q": "A current of 0.5 A flows for 60 s. Calculate the charge.", "a": "Q = 0.5 \\times 60 = 30 C" },
+          { "q": "Two 6 Ω resistors are in series. What is the total resistance?", "a": "12 Ω" }
+        ]
+      },
+      {
+        "variant": "A",
+        "heading": "Electrical power and the mains",
+        "imagePlaceholder": false,
+        "boxes": [
+          { "header": "Equations", "items": ["P = IV · P = I^2R · E = QV · E = Pt"] },
+          { "header": "Mains electricity", "items": ["230 V, 50 Hz, alternating current. Live = brown, neutral = blue, earth = green and yellow."] },
+          { "header": "National Grid", "items": ["Step-up transformers raise the potential difference, so the current is lower for the same power: less energy is wasted heating the cables."] }
+        ],
+        "check": [
+          { "q": "A kettle on 230 V mains draws 10 A. Calculate its power.", "a": "P = 10 \\times 230 = 2300 W" },
+          { "q": "Why does the National Grid use step-up transformers?", "a": "A higher p.d. means a lower current, so less energy is wasted heating the cables." },
+          { "q": "What colour is the live wire?", "a": "Brown" }
+        ]
+      },
+      {
+        "variant": "A",
+        "heading": "Forces and motion",
+        "imagePlaceholder": false,
+        "boxes": [
+          { "header": "Equations", "items": ["W = mg · F = ma · p = mv · F = ke · v^2 - u^2 = 2as"] },
+          { "header": "Graphs", "items": ["Distance-time: gradient = speed. Velocity-time: gradient = acceleration; area = distance."] },
+          { "header": "Stopping distance", "items": ["Stopping distance = thinking distance + braking distance. Tiredness, alcohol and phones increase thinking distance; wet or icy roads and worn tyres or brakes increase braking distance."] }
+        ],
+        "check": [
+          { "q": "Calculate the force needed to accelerate a 1200 kg car at 2 m/s^2.", "a": "F = 1200 \\times 2 = 2400 N" },
+          { "q": "Calculate the momentum of a 0.16 kg ball moving at 35 m/s.", "a": "p = 0.16 \\times 35 = 5.6 kg m/s" },
+          { "q": "Give two factors that increase braking distance.", "a": "Any two: wet or icy road; worn tyres; worn brakes; higher speed; greater mass." }
+        ]
+      }
+    ],
+    "apply": {
+      "developing": [
+        { "q": "A 60 kg climber climbs 15 m. g = 9.8 N/kg. Calculate the gravitational potential energy gained.", "a": "GPE = 60 \\times 9.8 \\times 15 = 8820 J", "marks": 2, "qType": "calculation", "equation": "GPE = mgh", "units": "J" },
+        { "q": "A current of 2 A flows through a 6 Ω resistor. Calculate the potential difference across it.", "a": "V = 2 \\times 6 = 12 V", "marks": 2, "qType": "calculation", "equation": "V = IR", "units": "V" },
+        { "q": "A 900 kg car accelerates at 3 m/s^2. Calculate the resultant force on it.", "a": "F = 900 \\times 3 = 2700 N", "marks": 2, "qType": "calculation", "equation": "F = ma", "units": "N" },
+        { "q": "Explain why the National Grid uses step-up transformers.", "a": "They increase the potential difference, so the current is lower for the same power. A lower current wastes less energy heating the cables, so transmission is more efficient.", "marks": 3, "qType": "concept" }
+      ],
+      "reaching": [
+        { "q": "A 2.0 kW kettle heats 1.2 kg of water from 20 °C to 100 °C. c = 4200 J/kg °C. Calculate the energy needed and the time it takes, assuming no energy is wasted.", "a": "\\Delta E = 1.2 \\times 4200 \\times 80 = 403 200 J; t = 403 200 \\div 2000 = 202 s", "marks": 4, "qType": "calculation" },
+        { "q": "Two 10 Ω resistors are connected in parallel to a 6 V battery. Calculate the current from the battery.", "a": "Each branch: I = 6 \\div 10 = 0.6 A; total = 0.6 + 0.6 = 1.2 A", "marks": 3, "qType": "calculation" },
+        { "q": "A 1500 kg car travels at 20 m/s. Calculate its kinetic energy and its momentum.", "a": "KE = 0.5 \\times 1500 \\times 20^2 = 300 000 J; p = 1500 \\times 20 = 30 000 kg m/s", "marks": 4, "qType": "calculation" },
+        { "q": "Explain how drinking alcohol and a wet road each affect the stopping distance of a car.", "a": "Alcohol increases reaction time, so the thinking distance increases. A wet road reduces friction between the tyres and the road, so the braking distance increases. Both increase the stopping distance.", "marks": 3, "qType": "concept" }
+      ],
+      "mastering": [
+        { "q": "A 0.05 kg toy is launched by a spring (k = 200 N/m) compressed by 0.04 m. Calculate the maximum launch speed, assuming all the elastic energy becomes kinetic energy.", "a": "E_e = 0.5 \\times 200 \\times 0.04^2 = 0.16 J; v = sqrt(2 \\times 0.16 \\div 0.05) = 2.5 m/s", "marks": 4, "qType": "calculation" },
+        { "q": "A 3.0 kW heater runs for 20 minutes on the 230 V mains. Calculate the current and the charge that flows.", "a": "I = 3000 \\div 230 = 13 A; t = 1200 s; Q = 13.0 \\times 1200 = 1.6 \\times 10^4 C", "marks": 4, "qType": "calculation" },
+        { "q": "A 1200 kg car brakes from 25 m/s to rest in 50 m. Calculate the deceleration and the braking force.", "a": "0 - 25^2 = 2 \\times a \\times 50, so a = -6.25 m/s^2 (deceleration 6.25 m/s^2); F = 1200 \\times 6.25 = 7500 N", "marks": 5, "qType": "calculation" }
+      ]
+    },
+    "worksheetExtras": { "wordBank": [] }
+  }
+]
