@@ -623,6 +623,11 @@ function hwMakeAll() {
   todo.forEach((k) => {
     chain = chain.then(() => {
       const p = F.per[k], x = (S.hwList || []).find((y) => y.name === p.file);
+      // a post time already gone: Classroom would refuse it (replica-test 2026-10-19)
+      if (p.send === 'schedule' && P.parse(p.postDate).getTime() + ((+String(p.postTime).split(':')[0] || 0) * 60 + (+String(p.postTime).split(':')[1] || 0)) * 6e4 <= Date.now()) {
+        say(k, 'Not made: the post time (' + esc(fmtShort(p.postDate)) + ', ' + esc(p.postTime) + ') has passed. Pick a later time, or "Draft only".', 'bad', false);
+        return;
+      }
       say(k, 'Making the Form...', '');
       const item = { cls: k, kind: x ? hwOf(x).kind || 'quiz' : 'quiz', file: p.file, setOn: p.setOn, dueOn: p.due, post: p.send, postAt: p.send === 'schedule' ? p.postDate + 'T' + p.postTime : '', message: hwFill(k) };
       return run('setHomework', item).then((r) => {
@@ -631,7 +636,8 @@ function hwMakeAll() {
           ' <button class="hwCopy" data-c="' + esc(k) + '">Copy message</button>';
         const what = r.already ? esc(r.why) : r.draft ? (r.scheduled ? 'Form made. Scheduled for ' + esc(fmtShort(p.postDate)) + ', ' + esc(p.postTime) + '.' : 'Form made. Classroom draft made: check it and publish.') : 'Form made. ' + esc(r.why);
         const extra = (r.notes || []).filter((n) => /template/i.test(n)).map((n) => '<div class="hwwhy">' + esc(n) + '</div>').join('');
-        say(k, what + links + extra, r.draft || r.already ? 'good' : 'bad', true);
+        // only a row with its Classroom item is finished: "Form made, no draft" can be tried again (the Form is reused)
+        say(k, what + links + extra, r.draft || r.already ? 'good' : 'bad', !!(r.draft || r.already));
       }).catch((e) => say(k, 'Not made: ' + esc(String(e.message || e).replace(/^Error:\s*/, '')), 'bad', false));
     });
   });
@@ -649,9 +655,9 @@ function hwQuizPreview(hw) {
   const p1 = hw.questions.map((q, i) => '<div class="hwq">' + (q.pictures ? '<div class="muted">[picture' + (q.pictures > 1 ? 's: ' + q.pictures : '') + ']</div>' : '') + '<b>' + esc(num(q, i)) + '.</b> ' + esc(q.text) +
     (q.type === 'mcq' ? '<div class="opts">' + q.options.map((o, k) => { const ok = q.answers ? q.answers.includes(k) : k === q.answer; return '<div' + (ok ? ' class="right"' : '') + '>' + (ok ? '✓ ' : '○ ') + esc(o) + '</div>'; }).join('') + '</div>'
       : q.type === 'number' ? '<div class="ms">' + (q.unit ? 'Give your answer in ' + esc(q.unit) + '. ' : '') + '[number box] then "Your working (not required)"</div>'
-      : '<div class="ms">[' + q.marks + ' mark' + (q.marks === 1 ? '' : 's') + '] written answer</div>') + '</div>').join('');
+      : '<div class="ms">[' + (q.marks ? q.marks + ' mark' + (q.marks === 1 ? '' : 's') : 'marks not given') + '] written answer</div>') + '</div>').join('');
   const self = hw.questions.map((q, i) => ({ q, i })).filter((x) => x.q.type !== 'mcq');
-  const p2 = self.map(({ q, i }) => '<div class="hwq"><b>Question ' + esc(num(q, i)) + ' (' + q.marks + ' mark' + (q.marks === 1 ? '' : 's') + ')</b><div class="ms" style="white-space:pre-wrap">' + esc(q.scheme || 'No mark scheme was found: ask your teacher.') + '</div>' +
+  const p2 = self.map(({ q, i }) => '<div class="hwq"><b>Question ' + esc(num(q, i)) + ' (' + (q.marks ? q.marks + ' mark' + (q.marks === 1 ? '' : 's') : 'marks not given') + ')</b><div class="ms" style="white-space:pre-wrap">' + esc(q.scheme || 'No mark scheme was found: ask your teacher.') + '</div>' +
     (q.marking || []).map((m) => '<div class="yn">Yes / No · <b>' + esc(m.title) + '</b> (' + m.points + ' point' + (m.points === 1 ? '' : 's') + ')' + (m.help ? '<br><span style="white-space:pre-wrap">' + esc(m.help) + '</span>' : '') + '</div>').join('') + '</div>').join('');
   return '<div class="muted" style="margin-top:8px"><b>Page 1: answer the questions</b></div>' + p1 +
     (self.length ? '<div class="muted" style="margin-top:10px"><b>Page 2: mark your own answers</b> (one Yes or No for each mark)</div>' + p2 : '') +

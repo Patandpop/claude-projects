@@ -32,7 +32,7 @@ if (!hw.some((x) => x.hw && x.hw.schema === 2)) hw.push(...['core', 'challenge']
     h.questions.forEach((q, n) => { q.pictures = (q.images || []).length; delete q.images; if (q.type === 'mcq' || cx.needsDrawing_(q)) return;
       const N = v2 && q.label ? String(q.label).replace(/^Question\s+/, '') : String(n + 1); let at = 0;
       q.marking = v2 && (q.markPoints || []).length ? q.markPoints.map((p) => { const w = cx.pointWords_(N, p, at + 1); at += p.marks || 0; return { title: w.title, help: w.help, points: p.marks || 1 }; })
-        : Array.from({ length: q.marks || 1 }, (z, j) => ({ title: 'Question ' + N + ', mark ' + (j + 1) + ' of ' + q.marks + ': did your answer earn this mark?', help: '', points: 1 })); });
+        : Array.from({ length: q.marks || 1 }, (z, j) => ({ title: 'Question ' + N + ', mark ' + (j + 1) + ' of ' + (q.marks || 1) + ': did your answer earn this mark?', help: '', points: 1 })); });
     h.points = cx.totalPoints_(h); });
 }
 const mock = `<script>

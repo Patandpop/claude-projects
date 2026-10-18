@@ -138,6 +138,11 @@ const w12 = items.filter((i) => i.kind === 'written').pop(), h12 = items.filter(
 check(r12.made.length === 1 && /X-rays/.test(w12.setTitle) && h12.setHelpText.includes('3.0 x 10^8 m s^-1'), 'odd symbols refused: question and mark scheme go in as plain text (X-rays, 3.0 x 10^8 m s^-1)');
 check(items.filter((i) => i.kind === 'written' && i.setTitle).length === 1 && !items.some((i) => /Draw arrows/.test(i.setTitle || '')) && /1 question left out because they need drawing/.test(r12.made[0].note), 'a "draw arrows on the diagram" question is left out of the Form, and the note says so');
 form.addParagraphTextItem = realAdd; form.addSectionHeaderItem = realHead;
+// replica-test 2026-10-19: an old file with "marks": null (10S2 22 Oct, question 1) never says "null marks"
+files['homework-10S2-2026-10-23.json'] = JSON.stringify({ ...hw, cls: '10S2', title: '10S2 null marks', questions: [{ type: 'written', text: 'Which three appliances?', marks: null, scheme: 'fan, drill, washing machine' }] });
+items.length = 0;
+ctx.makeHomework('pk', 'homework-10S2-2026-10-23.json');
+check(!items.some((i) => /null|undefined/.test(String(i.setTitle || ''))) && items.some((i) => /^Question 1, mark 1 of 1:/.test(i.setTitle || '')), 'marks missing in an old file: no "null marks" or "of null" in any title');
 // "Tick two boxes": tick-boxes with both right answers set
 files['homework-10S2-2026-10-24.json'] = JSON.stringify({ ...hw, title: '10S2 tick two', questions: [{ type: 'mcq', text: 'Which two are true? Choose two answers.', options: ['a', 'b', 'c', 'd'], answer: 0, answers: [0, 2], points: 2 }] });
 items.length = 0;
@@ -250,6 +255,17 @@ check(s4.already && allCoursework.length === 0, 'a quiz the old menu already dra
 files['homework-9ZZ-2026-11-02.json'] = JSON.stringify({ ...v2, cls: '9ZZ', title: '9ZZ quiz' });
 const s5 = ctx.setHomework('pk', { cls: '9ZZ', file: 'homework-9ZZ-2026-11-02.json', setOn: '2026-10-20', dueOn: '2026-10-27' });
 check(s5.ok && !s5.draft && /^No Classroom class with 9ZZ in its name\. The Form was made: link it by hand\./.test(s5.why) && /2026-Ph-13D/.test(s5.why) && sheets.Homework.rows.slice(-1)[0][15] === 'form only', 'no Classroom class: "No Classroom class with 9ZZ in its name. The Form was made: link it by hand."');
+// replica-test 2026-10-19: the Classroom part failed (class missing, Classroom off, a refused post time);
+// once fixed, a second click must make the draft with the SAME Form, not answer "Already made"
+const realList = ctx.Classroom.Courses.list;
+ctx.Classroom.Courses.list = () => ({ courses: realList().courses.concat([{ id: 'C99', name: '9ZZ Science' }]) });
+allCoursework.length = 0; calls.create = 0; calls.copy.length = 0; calls.openByUrl = 0;
+const s5b = ctx.setHomework('pk', { cls: '9ZZ', file: 'homework-9ZZ-2026-11-02.json', setOn: '2026-10-20', dueOn: '2026-10-27' });
+check(s5b.ok && !s5b.already && s5b.draft && allCoursework.length === 1 && coursework.id === 'C99' && calls.create === 0 && calls.copy.length === 0 && calls.openByUrl === 1 && s5b.formUrl === s5.formUrl
+  && sheets.Homework.rows.slice(-1)[0][15] === 'drafted', 'Classroom part failed first time: the next click makes the draft, reusing the same Form');
+const s5c = ctx.setHomework('pk', { cls: '9ZZ', file: 'homework-9ZZ-2026-11-02.json', setOn: '2026-10-20', dueOn: '2026-10-27' });
+check(s5c.already && allCoursework.length === 1, '...and a third click is refused as already made');
+ctx.Classroom.Courses.list = realList;
 // Classroom spells 7MLA as "7Ml": it must still find the class
 files['homework-7MLA-2026-11-02.json'] = JSON.stringify({ ...hw, cls: '7MLA', title: '7MLA homework' });
 const s6 = ctx.setHomework('pk', { cls: '7MLA', file: 'homework-7MLA-2026-11-02.json', setOn: '2026-10-19', dueOn: '2026-11-02' });

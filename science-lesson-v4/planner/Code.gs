@@ -239,7 +239,7 @@ function homeworkList(k) {
         let at = 0;
         q.marking = v2 && q.markPoints && q.markPoints.length
           ? q.markPoints.map((p) => { const w = pointWords_(N, p, at + 1); at += p.marks || 0; return { title: w.title, help: w.help, points: p.marks || 1 }; })
-          : Array.from({ length: q.marks || 1 }, (x, j) => ({ title: 'Question ' + N + ', mark ' + (j + 1) + ' of ' + q.marks + ': did your answer earn this mark?', help: '', points: 1 }));
+          : Array.from({ length: q.marks || 1 }, (x, j) => ({ title: 'Question ' + N + ', mark ' + (j + 1) + ' of ' + (q.marks || 1) + ': did your answer earn this mark?', help: '', points: 1 }));
       });
       hw.points = totalPoints_(hw);
     }
@@ -284,7 +284,9 @@ function setHomework(k, item) {
     const was = made[it.file];
     const sh = tab_('Homework', HW_HEAD);
     const rows = sh.getLastRow() > 1 ? sh.getRange(2, 1, sh.getLastRow() - 1, HW_HEAD.length).getValues() : [];
-    const row = rows.find((r) => r[1] === it.cls && r[4] === it.file);
+    // a row only counts once it has its Classroom item: a "form only" row (the class was missing, Classroom
+    // was off, a post time was refused) can be tried again, and the Form made then is reused (replica-test 2026-10-19)
+    const row = rows.find((r) => r[1] === it.cls && r[4] === it.file && r[9]);
     // made before (a draft from this tab, a row in the Homework tab, or a draft made by the old menu path)
     if ((was && (was.courseWorkId || was.draft === true)) || row) {
       const on = String((was && was.at) || (row && row[16]) || '').slice(0, 10);
@@ -391,7 +393,7 @@ function buildQuiz_(hw, notes, info) {
   const left = hw.questions.length - qs.length;
   if (left) notes.push(left + ' question' + (left === 1 ? '' : 's') + ' left out because they need drawing on a diagram');
   const num = (q, n) => (v2 && q.label ? String(q.label).replace(/^Question\s+/, '') : String(n + 1));
-  const marksTxt = (m) => m + ' mark' + (m === 1 ? '' : 's');
+  const marksTxt = (m) => (m ? m + ' mark' + (m === 1 ? '' : 's') : 'marks not given');   // an old file with marks: null (10S2 22 Oct Q1) never shows "null marks"
   const selfMarked = [];
   qs.forEach((q, n) => {
     const N = num(q, n);
@@ -440,7 +442,7 @@ function buildQuiz_(hw, notes, info) {
         if (mps) {
           let at = 0;
           mps.forEach((p) => { const w = pointWords_(N, p, at + 1); at += p.marks || 0; addChoice_(f, w.title, ['Yes', 'No'], 0, p.marks || 1, w.missed, w.help, w.well); });
-        } else for (let j = 1; j <= (q.marks || 1); j++) addChoice_(f, 'Question ' + N + ', mark ' + j + ' of ' + q.marks + ': did your answer earn this mark?', ['Yes', 'No'], 0, 1, '');
+        } else for (let j = 1; j <= (q.marks || 1); j++) addChoice_(f, 'Question ' + N + ', mark ' + j + ' of ' + (q.marks || 1) + ': did your answer earn this mark?', ['Yes', 'No'], 0, 1, '');
       } catch (e) { throw new Error('marking page, question ' + N + ': ' + String(e.message || e)); }
     });
   }
