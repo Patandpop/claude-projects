@@ -318,6 +318,49 @@ function choose(o) {
     const byId = new Map(ocrQuestions(['*']).map((q) => [q.id, q]));
     const get = (id) => { if (!byId.has(id)) throw new Error('not usable or not found: ' + id); return byId.get(id); };
     for (const p of rec.papers) papers.push({ tier: p.tier, sectionA: (p.sectionA || []).map(get), questions: p.questions.map((q) => get(q.ref)) });
+  } else if (o.same) {
+    // --same <record .json> for GCSE too (2026-10-19): the same questions again after a format change (quiz
+    // file v2), nothing re-picked. Section A multiple choice is rebuilt from each question's first part, the
+    // same way Section A picks it; practice-bank questions come back from the bank.
+    const rec = readJson(o.same, null);
+    if (!rec) throw new Error('record not found: ' + o.same);
+    const cat = applyToCatalogue(readJson(path.join(LIB, 'catalogue.json'), null));
+    const want = new Set(rec.papers.flatMap((p) => [...(p.sectionA || []), ...p.questions.map((q) => q.ref)]).map((id) => String(id).replace(/#Q\d+.*$/, '')));
+    const keys = new Map();
+    cat.parts.filter((r) => want.has(r.doc)).forEach((r) => keys.set(`${r.subject}|${r.topic}|${r.subtopic}`, { subject: r.subject, topic: r.topic, subtopic: r.subtopic }));
+    const byId = new Map(aqaQuestions([...keys.values()], cat).map((q) => [q.id, q]));
+    // a question filed under two topics is kept once, under whichever filing comes first: look again
+    // with only this question's own topic
+    const get = (id) => {
+      if (byId.has(id)) return byId.get(id);
+      const doc = String(id).replace(/#Q\d+.*$/, ''), r = cat.parts.find((x) => x.doc === doc);
+      const q = r && aqaQuestions([{ subject: r.subject, topic: r.topic, subtopic: r.subtopic }], cat).find((x) => x.id === id);
+      if (!q) throw new Error('not usable or not found: ' + id);
+      return q;
+    };
+    let bank = [];
+    try { bank = require('./mcq-written.js').load(); } catch (e) { /* no practice bank */ }
+    const mcqItem = (id) => {
+      if (/^practice:/.test(id)) {
+        const x = bank.find((b) => 'practice:' + b.id === id);
+        if (!x) throw new Error('practice question not found: ' + id);
+        return { id, part: '', practice: true, board: 'AQA', subject: 'Physics', topic: x.topic, subtopic: x.topic, marks: 1, options: x.options, answer: x.answer,
+          parts: [{ part: '', marks: 1, figureFiles: [], text: x.stem + '\n' + x.options.join('\n'), mcqOptions: x.options, ms: { text: x.answer } }] };
+      }
+      const q = get(id), p = q.parts[0], c = categorise(p);
+      if (!c.mcq) throw new Error('no multiple-choice first part: ' + id);
+      return { id: q.id, part: p.part, board: 'AQA', subject: q.subject, topic: q.topic, subtopic: q.subtopic, marks: 1, passRate: p.passRate, difficulty: p.difficulty || 50,
+        options: c.mcq.options, answer: 'ABCD'[c.mcq.answer], parts: [Object.assign({}, p, { text: c.mcq.stem + '\n' + c.mcq.options.join('\n'), mcqOptions: c.mcq.options })] };
+    };
+    // a hand-picked part ("doc#Q8(a+b)") was recorded as the whole question id: keep the parts the record's marks say
+    const writtenOf = (r) => {
+      const q = get(r.ref);
+      if (!r.marks || q.marks === r.marks) return q;
+      let n = 0; const parts = [];
+      for (const p of q.parts) { if (n >= r.marks) break; parts.push(p); n += p.marks || 0; }
+      return Object.assign({}, q, { parts, marks: n });
+    };
+    for (const p of rec.papers) papers.push({ tier: p.tier, sectionA: (p.sectionA || []).length ? p.sectionA.map(mcqItem) : undefined, questions: p.questions.map(writtenOf) });
   } else if (ks === 'ks5') {
     // OCR chapters ("Chapter 19 - Stars") are found by their lessons' sub-subtopics (Stars, Cosmology ...)
     const ocrTopics = o.allTopics ? ['*'] : specs.length ? [...new Set(specs.flatMap((x) => (x.spec.subs === '*' ? [] : [...x.spec.subs])))] : o.topics;
