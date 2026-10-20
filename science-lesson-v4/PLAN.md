@@ -47,7 +47,9 @@ Source: `claude-code-brief.md` (2026-10-12). Tick items as they are done.
 
 - [x] **9 (part). Homework rebuilt** (2026-10-19, via the replica skills; docs in design-audit/homework-replica/): self-marking Google Forms with mark points in the scheme's own words, no printing needed, template Form for the quiz settings, 8:00 UK due times, due date = next lesson about a week on, Homework tab "Set new homework" with receipts. Parity 70/100. **Patryk: make the template Form once (planner/README or the summary) and deploy.** Still to build: status strip and hand-in counts, most-missed view, Seneca/key/revise kinds, the Assessment tab (design approved first: https://claude.ai/artifact/NQMZQajBH7LKH2jN4sADqQ).
 
-8 Collapsible "Your week" panel · 9 Tests/Homework split + test builder · 10 Behaviour app inside the planner · 11 Behaviour desktop layout, backdating, reminder · 12 Classes page hover-over · 13 "Review last lesson" button · 14 Engage tasks, one Learn section by default
+- [x] **9. Homework + Assessment tabs** (2026-10-20, commit cf33eae1): design approved; status, set work by class, all homework kinds, test builder with lesson and 6-mark control, results with grades and graphs, rename added lessons, lesson extras. **Paste Code.gs, Planner.html, Logic.html from planner/dist and deploy a New version.** Task setter: redesign first.
+
+8 Collapsible "Your week" panel · 9 (done above) · 10 Behaviour app inside the planner · 11 Behaviour desktop layout, backdating, reminder · 12 Classes page hover-over · 13 "Review last lesson" button · 14 Engage tasks, one Learn section by default
 
 ## Later
 
