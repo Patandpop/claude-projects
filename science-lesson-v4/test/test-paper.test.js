@@ -33,7 +33,7 @@ function run() {
   check(core.questions.every((q) => q.lesson && q.lesson.startsWith('P1 Energy /')), 'GCSE "P1 Energy": every question is about one of the P1 Energy lessons (lesson-match.js; specific heat and work done questions may come from where the library files them)');
   check(core.questions.slice(1).every((q, i) => ease(q) <= ease(core.questions[i]) + 0.001), 'the paper ramps from easiest to hardest');
 
-  const k5 = tp.choose({ cls: '13D', topics: ['Stars', 'Cosmology'], size: 'mini' });
+  const k5 = tp.choose({ cls: '12C', topics: ['Stars', 'Cosmology'], size: 'mini' });   // 12C: OCR like 13D, but 13D's real record has used up the astrophysics multiple choice (2026-10-19)
   const p5 = k5.papers[0];
   check(p5.tier === null && p5.sectionA.length >= 4 && p5.sectionA.every((q) => q.options && q.options.length === 4 && /^[A-D]$/.test(q.answer)),
     `A-level: one paper, Section A multiple choice with 4 lettered options and a known answer (${p5.sectionA.length} questions)`);
@@ -52,8 +52,8 @@ function run() {
     'KS3: Core and Challenge mini tests (~20 marks) from the matching GCSE subtopics, spelling slips forgiven');
 
   // the Forms copy of an A-level paper: every Section A answer is a real option, every question is there
-  const quiz = tp.formsQuiz(p5, k5, { cls: '13D', due: '2026-10-20' }, 'Stars');
-  check(quiz.file === 'homework-13D-2026-10-20.json' && quiz.questions.length === p5.sectionA.length + p5.questions.length &&
+  const quiz = tp.formsQuiz(p5, k5, { cls: '12C', due: '2026-10-20' }, 'Stars');
+  check(quiz.file === 'homework-12C-2026-10-20.json' && quiz.questions.length === p5.sectionA.length + p5.questions.length &&
     quiz.questions.filter((q) => q.type === 'mcq').every((q) => q.answer >= 0 && q.answer < q.options.length), 'the Forms copy has every question, multiple choice answers point at a real option');
   const qc = tp.formsQuiz(core, k4, { cls: '10C2', due: '2026-10-20' }, 'P1 Energy');
   check(qc.file === 'homework-10C2-2026-10-20-core.json' && qc.questions.every((q) => (q.type === 'written' || q.type === 'number') && q.scheme), 'Core and Challenge get their own Forms file; written questions carry the real mark scheme');
@@ -100,6 +100,19 @@ function run() {
     check(wk.schema === 2 && wk.kind === 'weekly' && wk.questions.every((q, i) => q.label === 'Question ' + (i + 1)) && self.every((q) => q.markPoints.length && pts(q) === q.marks),
       `weekly quiz: schema 2, labelled, every written answer's mark points add up (${self.length} written)`);
     check(!/after you submit/.test(wk.intro) && /On the last page you mark your written answers/.test(wk.intro) && /^Homework quiz on /.test(wk.intro) && !/due/.test(wk.title), 'weekly quiz: the new page 1 wording (no "mark scheme appears after you submit"), no due date in the title');
+  }
+  // the planner's test builder controls (2026-10-19): 6-mark questions and leaving lessons out
+  {
+    const six = (p) => p.papers[0].questions.filter((q) => q.parts.some((x) => x.marks === 6)).length;
+    const base = { cls: '10C2', topics: ['P1 Energy'], minutes: 25, tier: 'core' };
+    check(six(tp.choose({ ...base, long: 2 })) === 2 && six(tp.choose({ ...base, long: 0 })) === 0, '--long 2 gives exactly two 6-mark questions, --long 0 none');
+    const L = tp.longList();
+    check(L.length > 50 && L.every((x) => x.id && /^[BCP]\d+$/.test(x.code) && x.text), `the 6-mark list for the planner: ${L.length} questions, each with its topic code`);
+    const pick = L.find((x) => x.code === 'P1');
+    check(!!pick && tp.choose({ ...base, withIds: [pick.id], long: 1 }).papers[0].questions.some((q) => q.id === pick.id), 'a 6-mark question picked in the planner (--with) is in the paper');
+    const skip = ['Power', 'Efficiency', 'Kinetic Energy'];
+    const left = tp.choose({ ...base, minutes: 45, skip }).papers[0].questions.map((q) => String(q.lesson).split(' / ').pop());
+    check(left.length > 3 && !left.some((x) => skip.includes(x)), '--skip leaves those lessons out of the paper');
   }
   return { fails, warns };
 }

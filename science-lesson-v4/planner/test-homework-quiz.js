@@ -40,7 +40,7 @@ const sheets = {};
 const sheet = (name) => {
   const rows = [];
   return { rows, appendRow(r) { rows.push(r); }, getLastRow: () => rows.length,
-    getRange: (r, c, nr, nc) => ({ getValues: () => rows.slice(r - 1, r - 1 + nr).map((x) => x.slice(c - 1, c - 1 + nc)) }) };
+    getRange: (r, c, nr, nc) => ({ getValues: () => rows.slice(r - 1, r - 1 + (nr || 1)).map((x) => x.slice(c - 1, c - 1 + (nc || 1))), setValue: (v) => { rows[r - 1][c - 1] = v; } }) };
 };
 const ss = { getSheetByName: (n) => sheets[n] || null, insertSheet: (n) => (sheets[n] = sheet(n)) };
 // London time, as Apps Script's Utilities would give it
@@ -55,16 +55,22 @@ const Utilities = { sleep() {}, newBlob: (d, m, n) => ({ d, m, n }), base64Decod
     const guess = Date.UTC(y, m - 1, d, h, mi); return new Date(guess - londonOffset(guess) * 6e4); },
 };
 let lockTaken = 0;
+const cache = {};
+let resForm = null;   // the Form read by homeworkResults (made near the end)
 const ctx = vm.createContext({
   JSON, Date, String, Object, Error, Number, Math, Array, Utilities,
   PropertiesService: { getScriptProperties: () => ({ getProperty: (k) => props[k] || null, setProperty: (k, v) => { props[k] = v; } }) },
   LockService: { getScriptLock: () => ({ tryLock: () => { lockTaken++; return true; }, waitLock() { lockTaken++; }, releaseLock() {} }) },
-  FormApp: { create: () => { calls.create++; return form; }, openById: (id) => { calls.openById++; return form; }, openByUrl: () => { calls.openByUrl++; return form; }, createFeedback: feedback,
+  FormApp: { create: () => { calls.create++; return form; }, openById: (id) => { calls.openById++; return id === 'RES' ? resForm : form; }, openByUrl: () => { calls.openByUrl++; return form; }, createFeedback: feedback,
     createTextValidation: () => { const v = { steps: [] }; const b = { setHelpText(t) { v.help = t; return b; }, requireNumber() { v.steps.push('requireNumber'); return b; }, build: () => v }; return b; } },
   DriveApp: { getFoldersByName: () => ({ hasNext: () => false }), createFolder: () => ({ name: 'Planner homework quizzes' }),
     getFileById: (id) => ({ moveTo() { calls.moved++; }, makeCopy: (title, folder) => { calls.copy.push({ id, title, folder }); return { getId: () => 'COPY1' }; } }) },
   Classroom: { Courses: { list: () => ({ courses: [{ id: 'C9', name: 'Science 10C2' }, { id: 'C1', name: '9XS Science' }, { id: 'C13', name: '2026-Ph-13D' }, { id: 'C7', name: '2026-Sc-7Ml' }] }),
-    CourseWork: { create: (body, id) => { coursework = { body, id }; allCoursework.push(coursework); return { id: 'CW' + (++cwN) }; } } } },
+    CourseWork: { create: (body, id) => { coursework = { body, id }; allCoursework.push(coursework); return { id: 'CW' + (++cwN) }; },
+      get: (cid, id) => { calls.cwGet = (calls.cwGet || 0) + 1; return { state: id === 'CW1' ? 'PUBLISHED' : 'DRAFT', alternateLink: 'https://classroom/' + id }; },
+      StudentSubmissions: { list: () => ({ studentSubmissions: [{ state: 'TURNED_IN' }, { state: 'CREATED' }, { state: 'RETURNED' }] }) } },
+    Students: { list: () => ({ students: [{ profile: { emailAddress: 'amy@school', name: { fullName: 'Amy Able' } } }, { profile: { emailAddress: 'ben@school', name: { fullName: 'Ben Brief' } } }, { profile: { emailAddress: 'cal@school', name: { fullName: 'Cal Absent' } } }] }) } } },
+  CacheService: { getScriptCache: () => ({ get: (k) => cache[k] || null, put: (k, v) => { cache[k] = v; }, remove: (k) => { delete cache[k]; } }) },
   UrlFetchApp: { fetch(url, opt) {
     let res;
     if (opt && opt.method === 'post') { const b = JSON.parse(opt.payload); posted.push(b); if (b.op === 'write') files[b.name] = b.text; res = { ok: true }; }
@@ -280,6 +286,63 @@ const lv2 = ctx.homeworkList('pk').find((x) => x.name === 'homework-10C2-2026-10
 const q3 = lv2.hw.questions.find((q) => q.label === 'Question 3(b)');
 check(lv2.hw.points === 13 && q3.marking.length === 1 && q3.marking[0].title === 'Question 3(b), mark 1: did you say the block transfers energy to the surroundings?' && q3.marking[0].points === 1 && /Also accepted/.test(q3.marking[0].help),
   'Homework tab check list: page 2 items in the exact Form wording, with points, and the total');
+
+console.log('── other homework kinds, status, marking, results (2026-10-19)');
+allCoursework.length = 0;
+const sen = { cls: '10C2', kind: 'seneca', title: 'Energy stores on Seneca', link: 'https://app.senecalearning.com/abc', setOn: '2026-10-20', dueOn: '2026-10-27', post: 'draft', message: 'Your homework this week is on Seneca.' };
+const l1 = ctx.setHomework('pk', sen);
+const senRow = sheets.Homework.rows.slice(-1)[0];
+check(l1.ok && l1.draft && allCoursework.length === 1 && coursework.id === 'C9' && coursework.body.title === 'Energy stores on Seneca' && coursework.body.materials[0].link.url === sen.link
+  && !('maxPoints' in coursework.body) && coursework.body.state === 'DRAFT' && senRow[2] === 'seneca' && senRow[15] === 'drafted', 'Seneca homework: a Classroom draft with the link, no points, no Form, and a Homework row');
+const l2 = ctx.setHomework('pk', sen);
+check(l2.already && allCoursework.length === 1, 'the same Seneca homework twice: made once');
+let lbad = ''; try { ctx.setHomework('pk', { ...sen, title: '' }); } catch (e) { lbad = e.message; }
+check(/give the homework a title/.test(lbad), 'link homework with no title is refused');
+lbad = ''; try { ctx.setHomework('pk', { ...sen, title: 'x', link: 'senecalearning.com' }); } catch (e) { lbad = e.message; }
+check(/should start with https/.test(lbad), 'a link that is not a web address is refused');
+const k1 = ctx.setHomework('pk', { cls: '10C2', kind: 'key', title: 'Key homework 2: energy', setOn: '2026-10-20', dueOn: '2026-10-27', post: 'draft', message: 'Hand it in next lesson.' });
+check(k1.draft && !coursework.body.materials, 'key homework with no link: a plain draft (he attaches the file in Classroom)');
+
+// the first quiz row: posted in Classroom (CW1 is PUBLISHED in the fake), due Tue 27 Oct, with the results Form
+sheets.Homework.rows[1][6] = 'RES'; sheets.Homework.rows[1][9] = 'CW1'; sheets.Homework.rows[1][12] = '2026-10-27';
+const mkItem = (id, title, type, pts, choices) => ({ getId: () => id, getTitle: () => title, getType: () => type,
+  asMultipleChoiceItem: () => ({ getPoints: () => pts, getChoices: () => choices }), asCheckboxItem: () => ({ getPoints: () => pts }) });
+const its = [mkItem(1, '1. Which is a store of energy?', 'MULTIPLE_CHOICE', 1), mkItem(2, '2. Explain why the block cools.  [3 marks]', 'PARAGRAPH_TEXT'),
+  mkItem(3, 'Question 2, mark 1 of 3: did your answer earn this mark?', 'MULTIPLE_CHOICE', 1), mkItem(4, 'Question 2, mark 2 of 3: did your answer earn this mark?', 'MULTIPLE_CHOICE', 1),
+  mkItem(5, 'Question 2, mark 3 of 3: did your answer earn this mark?', 'MULTIPLE_CHOICE', 1)];
+const byId = (id) => its.find((x) => x.getId() === id);
+const resp = (email, when, answers, scores) => ({ getRespondentEmail: () => email, getTimestamp: () => new Date(when),
+  getItemResponses: () => Object.keys(answers).map((id) => ({ getItem: () => byId(+id), getResponse: () => answers[id] })),
+  getGradableItemResponses: () => Object.keys(scores).map((id) => ({ getItem: () => byId(+id), getScore: () => scores[id][0], getResponse: () => scores[id][1] })) });
+resForm = { getItems: () => its, getResponses: () => [
+  resp('amy@school', '2026-10-26T18:00:00Z', { 2: 'The block transfers energy to the surroundings by heating because it is hotter than the air.' }, { 1: [1, 'Thermal'], 3: [1, 'Yes'], 4: [1, 'Yes'], 5: [0, 'No'] }),
+  resp('ben@school', '2026-10-27T09:30:00Z', { 2: 'heat' }, { 1: [0, 'Kinetic'], 3: [1, 'Yes'], 4: [1, 'Yes'], 5: [1, 'Yes'] }),
+] };
+const st = ctx.homeworkStatus('pk', true);
+const quizRow = st.find((x) => x.formId === 'RES');
+check(st.length === sheets.Homework.rows.length - 1 && quizRow && quizRow.live.state === 'PUBLISHED' && quizRow.size === 3 && quizRow.done === 2, 'status: Classroom state, class size and Form responses for each homework');
+const before = calls.cwGet;
+ctx.homeworkStatus('pk');
+check(calls.cwGet === before, 'status is kept for 5 minutes (no second round of Classroom calls)');
+const r0 = ctx.homeworkResults('pk', quizRow.id);
+const amy = r0.pupils.find((p) => p.name === 'Amy Able'), ben = r0.pupils.find((p) => p.name === 'Ben Brief');
+check(r0.max === 4 && amy.score === 3 && amy.pct === 75 && !amy.late && !amy.flags.length, 'results: score out of the Form total, %, on time');
+check(ben.late && ben.flags.join() === '2', 'results: handed in after 8:00 on the due day = late; 3 marks given for "heat" is flagged');
+check(r0.missing.join() === 'Cal Absent', 'results: who has not done it, by name from the Classroom list');
+const q1 = r0.questions.find((q) => q.key === '1'), q2 = r0.questions.find((q) => q.key === '2');
+check(q1.kind === 'mcq' && q1.pct === 50 && q1.wrong[0].answer === 'Kinetic' && q1.text === 'Which is a store of energy?', 'results: multiple choice % and the wrong answer picked');
+check(q2.max === 3 && q2.pct === 83 && q2.missed[0].pct === 50 && /mark 3 of 3/.test(q2.missed[0].title) && q2.text === 'Explain why the block cools.', 'results: self-marked question %, and the mark point missed most');
+check(ctx.markHomework('pk', quizRow.id) === 'marked' && sheets.Homework.rows[1][15] === 'marked' && !cache.hwstat, 'Mark as marked saves the tick and forgets the kept status');
+check(ctx.markHomework('pk', quizRow.id, false) === 'drafted', '...and can be undone');
+const gb = ctx.setGradeBands('pk', { ks4: [{ g: '7', min: '70' }, { g: '4', min: 140 }, { g: '', min: 3 }] });
+check(gb.ks4.length === 2 && gb.ks4[0].min === 70 && gb.ks4[1].min === 100 && JSON.parse(props.GRADE_BANDS).ks3.length === 0, 'grade boundaries saved, kept between 0 and 100, blanks dropped');
+
+sheets.Added = sheet('Added'); sheets.Added.appendRow(['lesson', 'saved']);
+sheets.Added.appendRow([JSON.stringify({ cls: '10C2', unit: 'P1', num: '4a', title: 'Extra practice', rel: null }), new Date()]);
+const rn = ctx.renameAdded('pk', '10C2', 'P1', 'Extra practice', 'SHC practice');
+check(rn.name === 'SHC practice' && JSON.parse(sheets.Added.rows[1][0]).title === 'Extra practice', 'rename an added lesson: the new name is kept beside the first one');
+let rnbad = ''; try { ctx.renameAdded('pk', '10C2', 'P1', 'Not there', 'x'); } catch (e) { rnbad = e.message; }
+check(/only lessons you added/.test(rnbad), 'a scheme lesson cannot be renamed');
 
 console.log(fails ? `FAILED ${fails}` : 'homework quizzes: all checks pass');
 process.exit(fails ? 1 : 0);

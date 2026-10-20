@@ -1,6 +1,6 @@
 # Planner: Homework and Assessment tabs (design, not built)
 
-Status: for Patryk to approve. Nothing in the planner has changed. Mock-up: `mockup.html` in this folder (open it in a browser; it is fake data and saves nothing).
+Status: APPROVED by Patryk 2026-10-19, except 3.3 Task checklist (he wants the task setter far better and better integrated: redesign first). Open questions 1-9 take the defaults written here. His extra asks: show grades and graphs for each homework and test well; in the test builder, see which 6-mark questions are covered, leave out chosen sub-topics, more control. Mock-up: `mockup.html` in this folder (open it in a browser; it is fake data and saves nothing).
 
 ## The split in one line each
 

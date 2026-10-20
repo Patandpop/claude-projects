@@ -293,6 +293,16 @@ function choose(o) {
     o.topics = [...new Set(covered.map((x) => x.L.topic))];
   }
   const specs = covered || topicSpecs;
+  // --skip "Lesson A|Lesson B" (Patryk 2026-10-19: leave out chosen sub-topics): a question whose best
+  // lesson is one of these is not used. Matched against the lesson titles the paper covers.
+  const skipKeys = new Set();
+  if (o.skip && o.skip.length) {
+    const want = o.skip.map((t) => String(t).toLowerCase().trim());
+    for (const x of specs) if (want.includes(String(x.L.title).toLowerCase().trim())) skipKeys.add(x.spec.key);
+    const unknown = want.filter((t) => !specs.some((x) => String(x.L.title).toLowerCase().trim() === t));
+    if (unknown.length) console.log(`  (--skip: not a lesson in these topics, ignored: ${unknown.join('; ')})`);
+  }
+  const notSkipped = (q) => !skipKeys.has(q.lesson);
   // the words only lessons NOT yet had use ("diffract" before the diffraction lesson): such questions are out
   const notYet = (() => {
     if (!o.taught && !o.allTopics) return (o.exclude || []).map((w) => w.toLowerCase());
@@ -365,7 +375,7 @@ function choose(o) {
     // OCR chapters ("Chapter 19 - Stars") are found by their lessons' sub-subtopics (Stars, Cosmology ...)
     const ocrTopics = o.allTopics ? ['*'] : specs.length ? [...new Set(specs.flatMap((x) => (x.spec.subs === '*' ? [] : [...x.spec.subs])))] : o.topics;
     let all = ocrQuestions(ocrTopics).filter((q) => !used.has(q.id));
-    if (specs.length) all = all.filter((q) => (q.lesson = lessonOf(q, specs, notYet)));
+    if (specs.length) all = all.filter((q) => (q.lesson = lessonOf(q, specs, notYet))).filter(notSkipped);
     if (!all.length) throw new Error(`no OCR questions found for "${o.topics.join(', ')}" (check the topic names: OCR chapter names such as Stars, Cosmology)`);
     // real A-level layout: about a quarter multiple choice (Section A), the rest structured (Section B)
     const mcqs = all.filter((q) => q.mcq), long = all.filter((q) => !q.mcq).sort((a, b) => a.marks - b.marks);
@@ -399,7 +409,7 @@ function choose(o) {
       all = all.filter((q) => re.test(clean(q.parts.map((p) => p.text).join(' '))));
     }
     if (ks === 'ks3') all = all.filter((q) => q.passRate == null || q.passRate >= 45);       // KS3: the more accessible GCSE questions
-    if (specs.length) all = all.filter((q) => (q.lesson = lessonOf(q, specs, notYet)));                  // about a lesson they have had
+    if (specs.length) all = all.filter((q) => (q.lesson = lessonOf(q, specs, notYet))).filter(notSkipped);   // about a lesson they have had (and not one he left out)
     // Core aims at questions about 70% of real candidates got right, Challenge at about 40% (KS3: 75 / 55).
     // Questions with no known pass rate use the library's estimate. Nothing below 15% (old-spec oddities).
     const ease = (q) => (q.passRate != null ? q.passRate : 100 - q.difficulty);
@@ -472,11 +482,49 @@ function choose(o) {
       }) });
       all = [];
     }
+    // 6-mark questions (Patryk 2026-10-19: know which 6-markers are covered, and choose them):
+    //   --with "doc#Q8,doc#Q3": these questions go in every paper (the ones he ticked in the planner);
+    //   --long N: exactly N questions with a 6-mark part in each paper (his picks count), spread over the
+    //   lessons; N = 0 keeps 6-markers out. A 6-mark part that reads on its own goes in alone; one that leans
+    //   on the question's opening ("the student", "Figure 2") keeps the parts before it.
+    const isLong = (p) => p.marks === 6;
+    const longCut = (q) => {
+      const k = q.parts.findIndex(isLong);
+      if (k < 0) return q;
+      const alone = k === 0 || !/\b(this|these|that|the student|the students|the teacher|figure|table|graph|diagram|above|below)\b/i.test(clean(q.parts[k].text));
+      const parts = alone ? [q.parts[k]] : q.parts.slice(0, k + 1);
+      return Object.assign({}, q, { parts, marks: parts.reduce((n, p) => n + (p.marks || 0), 0) });
+    };
+    let picked = [];
+    if (o.withIds && o.withIds.length) {
+      const any = new Map(aqaQuestions(targets, cat).map((q) => [q.id, q]));
+      const miss = o.withIds.filter((id) => !any.has(id));
+      if (miss.length) throw new Error('6-mark question not usable or not found: ' + miss.join(', '));
+      picked = o.withIds.map((id) => longCut(Object.assign({ lesson: lessonOf(any.get(id), specs, []) || any.get(id).subtopic }, any.get(id))));
+      const ids = new Set(o.withIds);
+      all = all.filter((q) => !ids.has(q.id));
+    }
     for (const tier of (o.ids && o.ids.length ? [] : tiers)) {
-      const pool = all.filter((q) => ease(q) >= 15 && !(tier === 'challenge' && taken.has(q.id)))
+      let pool = all.filter((q) => ease(q) >= 15 && !(tier === 'challenge' && taken.has(q.id)))
         .sort((a, b) => Math.abs(ease(a) - aim[tier]) - Math.abs(ease(b) - aim[tier]) || (b.passRate != null) - (a.passRate != null));
       const spread = specs.length || o.allTopics;
-      const qs = (spread ? spreadFill(pool, targetB, (q) => (o.allTopics ? String(q.lesson).split(' / ')[0] : q.lesson)) : fill(pool, targetB, 0.3)).sort((a, b) => ease(b) - ease(a));   // a paper ramps easy -> hard
+      const groupOf = (q) => (o.allTopics ? String(q.lesson).split(' / ')[0] : q.lesson);
+      let fixed = picked.slice();
+      if (o.long != null) {
+        const want = Math.max(0, o.long - fixed.length);
+        const longs = pool.filter((q) => q.parts.some(isLong));
+        const byLesson = new Map();
+        longs.forEach((q) => { const g = groupOf(q) || q.subtopic; if (!byLesson.has(g)) byLesson.set(g, []); byLesson.get(g).push(q); });
+        const extra = [];
+        for (let round = 0; extra.length < want && [...byLesson.values()].some((l) => l.length > round); round++)
+          for (const l of byLesson.values()) if (l[round] && extra.length < want) extra.push(l[round]);
+        if (extra.length < want) console.log(`  (${tier}: only ${fixed.length + extra.length} usable 6-mark questions for these topics, not ${o.long})`);
+        fixed = fixed.concat(extra.map(longCut));
+        pool = pool.filter((q) => !q.parts.some(isLong));          // exactly N: no other 6-markers
+      }
+      const fixedMarks = fixed.reduce((n, q) => n + q.marks, 0);
+      const rest = Math.max(0, targetB - fixedMarks);
+      const qs = fixed.concat(rest ? (spread ? spreadFill(pool, rest, groupOf) : fill(pool, rest, 0.3)) : []).sort((a, b) => ease(b) - ease(a));   // a paper ramps easy -> hard
       qs.forEach((q) => taken.add(q.id));
       papers.push(sectionA ? { tier, sectionA, questions: qs } : { tier, questions: qs });
     }
@@ -748,9 +796,14 @@ function msKey() {
 function msTable(fm, figMap) {
   const W = [12, 88].map((p) => Math.round(TW * p / 100));
   const tc = (children, w) => new TableCell({ width: { size: w, type: WidthType.DXA }, borders: cellBorders, children: children.length ? children : [para(run(''))] });
+  // a worked answer the board printed as a picture is shown (2026-10-19: 13D age-of-Universe working
+  // was only "Shown as a picture"); the marks that share it point back at it
+  let pictured = false;
   const rows = fm.points.map((pt) => {
     if (pt.lor) return lorRow(pt, figMap, tc, W);
-    const body = pt.picture ? [para(run('Shown as a picture in the exam board mark scheme.', { italics: true }))]
+    const pics = pt.picture ? [...String(pt.text).matchAll(/\[FIG:(\d+)\]/g)].filter((m) => figMap[m[1]] && fs.existsSync(path.join(FIGS, figMap[m[1]]))) : [];
+    const body = pics.length ? (pictured = true, richParas(pt.text, { figMap, shown: new Set() }))
+      : pt.picture ? [para(run(pictured ? 'See the picture above.' : 'Shown as a picture in the exam board mark scheme.', { italics: true }))]
       : richParas(pt.text, { figMap, shown: new Set() });
     [['Also accepted', pt.also], ['No mark for', pt.no], ["Doesn't matter", pt.ignore], ['Marker note', pt.extra]].forEach(([k, xs]) => {
       if (xs.length) body.push(para([run(k + ': ', { bold: true, size: 18, color: GREY }), run(xs.map(clean).join('; '), { size: 18, color: GREY })], { indent: { left: 240 }, spacing: { before: 20, after: 20 } }));
@@ -1035,13 +1088,33 @@ async function build(o) {
   return pick;
 }
 
-module.exports = { addQuizImages, _tickOne: tickOne, _tickChoice: tickChoice, _powers: powers, choose, build, aqaTargets, aqaQuestions, ocrQuestions, fill, questionFigures, partParas, formsQuiz, outFolder };
+// Every usable AQA question with a 6-mark part, for the planner's test builder (Patryk 2026-10-19: pick
+// the 6-markers). Short: the start of the 6-mark part, its topic code and how many candidates got it.
+function longList() {
+  const cat = applyToCatalogue(readJson(path.join(LIB, 'catalogue.json'), null));
+  const code = Object.fromEntries(Object.entries(ep.AQA_TOPIC).map(([c, t]) => [t, c]));
+  const names = new Map();
+  for (const r of cat.parts) names.set(`${r.subject}|${r.topic}|${r.subtopic}`, { subject: r.subject, topic: r.topic, subtopic: r.subtopic });
+  const seen = new Set();
+  return aqaQuestions([...names.values()], cat).flatMap((q) => {
+    const p = q.parts.find((x) => x.marks === 6);
+    if (!p || !code[q.topic]) return [];
+    const text = clean(p.text).replace(/\s+/g, ' ');
+    if (seen.has(text.slice(0, 80))) return [];
+    seen.add(text.slice(0, 80));
+    return [{ id: q.id, code: code[q.topic], sub: q.subtopic, text: text.length > 170 ? text.slice(0, 170).replace(/\s+\S*$/, '') + '...' : text, pass: p.passRate != null ? p.passRate : null }];
+  });
+}
+
+module.exports = { addQuizImages, _tickOne: tickOne, _tickChoice: tickChoice, _powers: powers, choose, build, aqaTargets, aqaQuestions, ocrQuestions, fill, questionFigures, partParas, formsQuiz, outFolder, longList };
 
 if (require.main === module) {
   const a = process.argv.slice(2), v = (k) => (a.includes(k) ? a[a.indexOf(k) + 1] : null);
-  if (!v('--class') || !(v('--topics') || a.includes('--taught') || a.includes('--all-topics'))) { console.error('usage: node test-paper.js --class 10C2 (--topics "P1 Energy" | --taught | --all-topics) [--size mini|full] [--minutes N] [--marks N] [--mcq N] [--tier core|challenge] [--due YYYY-MM-DD] [--no-form] [--dry-run]'); process.exit(1); }
+  if (!v('--class') || !(v('--topics') || a.includes('--taught') || a.includes('--all-topics'))) { console.error('usage: node test-paper.js --class 10C2 (--topics "P1 Energy" | --taught | --all-topics) [--size mini|full] [--minutes N] [--marks N] [--mcq N] [--tier core|challenge] [--skip "Lesson A|Lesson B"] [--long N] [--with "doc#Q3,doc#Q8"] [--due YYYY-MM-DD] [--no-form] [--dry-run]'); process.exit(1); }
   build({ cls: v('--class'), topics: (v('--topics') || '').split(',').map((s) => s.trim()).filter(Boolean), taught: a.includes('--taught'), allTopics: a.includes('--all-topics'),
     minutes: v('--minutes') ? +v('--minutes') : null, exclude: v('--not') ? v('--not').split(',').map((x) => x.trim()).filter(Boolean) : [], mcq: v('--mcq') != null ? +v('--mcq') : null, date: v('--date'), size: v('--size') || 'mini', marks: v('--marks') ? +v('--marks') : null,
-    tier: v('--tier'), out: v('--out'), title: v('--title'), due: v('--due'), noForm: a.includes('--no-form'), dryRun: a.includes('--dry-run'), noRecord: a.includes('--no-record'), same: v('--same'), inClass: a.includes('--in-class'), ids: v('--ids') ? v('--ids').split(',').map((s) => s.trim()).filter(Boolean) : null, match: v('--match') ? v('--match').split(',').map((s) => s.trim()).filter(Boolean) : null })
+    tier: v('--tier'), out: v('--out'), title: v('--title'), due: v('--due'), noForm: a.includes('--no-form'), dryRun: a.includes('--dry-run'), noRecord: a.includes('--no-record'), same: v('--same'), inClass: a.includes('--in-class'), ids: v('--ids') ? v('--ids').split(',').map((s) => s.trim()).filter(Boolean) : null, match: v('--match') ? v('--match').split(',').map((s) => s.trim()).filter(Boolean) : null,
+    skip: v('--skip') ? v('--skip').split('|').map((s) => s.trim()).filter(Boolean) : null, long: v('--long') != null ? +v('--long') : null,
+    withIds: v('--with') ? v('--with').split(',').map((s) => s.trim()).filter(Boolean) : null })
     .catch((e) => { console.error('exam practice not made: ' + e.message); process.exit(1); });
 }

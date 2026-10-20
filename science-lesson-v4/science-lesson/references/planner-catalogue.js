@@ -163,15 +163,28 @@ function classSequence(cls, sol) {
   const out = [];
   if (r.ks5) {
     const year = YEAR_OF[r.ks5];
-    const chDirs = fs.existsSync(`${DRIVE}/Year ${year}`) ? fs.readdirSync(`${DRIVE}/Year ${year}`) : [];
+    // chapters sit in Module folders (Year 13/Module 5 - .../Chapter 19 - Stars, Patryk 2026-10-10)
+    // or, before that move, straight under the year: both are found
+    const yDir = `${DRIVE}/Year ${year}`;
+    const chDirs = [];
+    for (const d of (fs.existsSync(yDir) ? fs.readdirSync(yDir) : [])) {
+      if (/^Chapter \d+/.test(d)) chDirs.push({ name: d, dir: `${yDir}/${d}` });
+      else if (/^Module \d+/.test(d)) { try { fs.readdirSync(`${yDir}/${d}`).filter((c) => /^Chapter \d+/.test(c)).forEach((c) => chDirs.push({ name: c, dir: `${yDir}/${d}/${c}` })); } catch { /* unreadable */ } }
+    }
     for (const ch of sol.keyStage5[r.ks5].teachingSequence) {
       const n = (ch.chapter.match(/Chapter (\d+)/) || [])[1];
-      const dirName = chDirs.find((d) => new RegExp(`^Chapter ${n}\\b`).test(d));
-      const dir = dirName ? `${DRIVE}/Year ${year}/${dirName}` : null;
-      const ls = dir ? listLessons(dir) : [];
-      const topic = dirName || ch.chapter;
-      if (ls.length) ls.forEach((l) => out.push({ year, subject: 'Physics', topic, unit: topic, ...l, source: 'drive' }));
-      else (ch.sections || []).forEach((s, i) => out.push({ year, subject: 'Physics', topic, unit: topic, num: i + 1, title: s.replace(/^\d+\.\d+\s*/, ''), folder: null, source: 'plan' }));
+      const hit = chDirs.find((d) => new RegExp(`^Chapter ${n}\\b`).test(d.name));
+      const ls = hit ? listLessons(hit.dir) : [];
+      const topic = hit ? hit.name : ch.chapter;
+      const plan = (ch.sections || []).map((s, i) => ({ year, subject: 'Physics', topic, unit: topic, num: i + 1, ord: i + 1, title: s.replace(/^\d+\.\d+\s*/, ''), folder: null, source: 'plan' }));
+      // a chapter only partly made on Drive (Chapter 20 with just Lesson 3 - Hubble's Law) keeps the
+      // scheme's other sections in their places, so the planned lessons around it are not lost
+      const drive = ls.map((l) => ({ year, subject: 'Physics', topic, unit: topic, ...l, source: 'drive' }));
+      // (only a mostly-unmade chapter: Waves 1 has 8 Drive lessons for 9 sections because one covers two)
+      const fill = ls.length && ls.length * 2 <= plan.length ?plan.filter((p) => !ls.some((l) => Math.floor(l.ord) === p.num)) : [];
+      const noOrd = (l) => { if (l.source === 'plan') delete l.ord; return l; };
+      if (ls.length) [...drive, ...fill].sort((a, b) => a.ord - b.ord).forEach((l) => out.push(noOrd(l)));
+      else plan.forEach((l) => out.push(noOrd(l)));
     }
     return out;
   }
@@ -254,6 +267,24 @@ function testFolder(year, topic) {
   if (!(dir in testDirs)) { try { testDirs[dir] = fs.readdirSync(dir); } catch { testDirs[dir] = null; } }
   if (!testDirs[dir]) return null;                       // Drive not mounted: don't guess
   return testDirs[dir].some((f) => new RegExp('^' + code + '\\b', 'i').test(f.trim()));
+}
+// What is in a topic's Admin/Assessment folder (planner Assessment tab, 2026-10-19): the test, its mark
+// scheme (missing = inside the test, which is normal) and the PLC. Read only. null = no folder found.
+function assessFiles(year, topic) {
+  if (!year || year >= 12) return null;
+  const code = (String(topic).match(/^([BCP]\d+)\b/i) || [])[1];
+  if (!code) return null;
+  const subj = { B: 'Biology', C: 'Chemistry', P: 'Physics' }[code[0].toUpperCase()];
+  const dir = `${ASSESS}/Year ${year}/${subj}`;
+  if (!(dir in testDirs)) { try { testDirs[dir] = fs.readdirSync(dir); } catch { testDirs[dir] = null; } }
+  const sub = (testDirs[dir] || []).find((f) => new RegExp('^' + code + '\\b', 'i').test(f.trim()));
+  if (!sub) return null;
+  let files = [];
+  try { files = fs.readdirSync(`${dir}/${sub}`).filter((f) => /\.(pdf|docx?)$/i.test(f)); } catch { return null; }
+  const ms = files.filter((f) => /\bMS\b|mark ?scheme/i.test(f)), plc = files.filter((f) => /\bPLC\b/i.test(f));
+  const test = files.filter((f) => !ms.includes(f) && !plc.includes(f) && !/feedback|lesson/i.test(f));
+  return { rel: `Admin/Assessment/Year ${year}/${subj}/${sub}`, test: test.length, ms: ms.length, plc: plc.length,
+    higher: test.some((f) => /higher/i.test(f)), foundation: test.some((f) => /foundation/i.test(f)) };
 }
 function techGuide(topicDir) {
   if (guideCache.has(topicDir)) return guideCache.get(topicDir);
@@ -700,10 +731,19 @@ if (require.main === module) {
     try { periods = JSON.parse(fs.readFileSync(path.join(ROOT, 'classes-2026-27.json'), 'utf8')).periodStructure || {}; } catch { periods = {}; }
     const COLOURS = ['#1565C0', '#2E7D32', '#6A1B9A', '#C62828', '#EF6C00', '#00838F', '#AD1457', '#4E342E', '#283593', '#558B2F', '#5D4037'];
     Object.keys(classes).forEach((c, k) => { classes[c].colour = COLOURS[k % COLOURS.length]; });
+    // the school's test papers per topic (Assessment tab: paper / mark scheme / PLC found)
+    for (const [cls, c] of Object.entries(classes)) {
+      const a = {};
+      for (const L of c.seq) if (!(L.topic in a)) a[L.topic] = assessFiles(c.year, L.topic);
+      c.assess = Object.fromEntries(Object.entries(a).filter(([, v]) => v));
+    }
+    // the exam library's 6-mark questions (Assessment tab test builder: see and choose the 6-markers)
+    let long6 = [];
+    try { long6 = require('./test-paper.js').longList(); } catch (e) { console.log('  (6-mark list not made: ' + e.message + ')'); }
     const out = {
       periodTimes: { ks3: periods.KS3_and_Y9 || {}, ks4: periods.KS4_and_KS5 || {} },
       generated: new Date().toISOString(), weekAStart: school.WEEK_A_START, terms: TERMS, inset: [...INSET],
-      filledWeeks: ctx.sheets.map((s) => iso(s.monday)), classes, timetable, progress: progressOut,
+      filledWeeks: ctx.sheets.map((s) => iso(s.monday)), classes, timetable, progress: progressOut, long6,
       // What he actually wrote in each filled Planner.xlsx week, so the app SHOWS those weeks as
       // taught instead of re-planning them.
       filled: Object.fromEntries(ctx.sheets.map((s) => [iso(s.monday), sheetSlots(s).filter((x) => x.rawClass)

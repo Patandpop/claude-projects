@@ -1,0 +1,446 @@
+[
+  {
+    "meta": {
+      "class": "10S2",
+      "topic": "Non Renewable Resources",
+      "title": "Non Renewable Resources",
+      "lessonType": "standard",
+      "theme": "physics",
+      "worksheet": "A",
+      "differentiation": "none",
+      "year": 10,
+      "subject": "Physics",
+      "macrotopic": "P1 Energy",
+      "lessonNumber": 11
+    },
+    "title": {
+      "objectives": [
+        "Name the main non-renewable energy resources",
+        "Describe how they are used and why we rely on them",
+        "Compare the advantages and disadvantages of fossil fuels and nuclear power"
+      ],
+      "keywords": [
+        "non-renewable",
+        "fossil fuel",
+        "nuclear fuel",
+        "reliable",
+        "greenhouse gas",
+        "acid rain"
+      ]
+    },
+    "doNow": {
+      "variant": "A",
+      "questions": [
+        {
+          "q": "Give the unit for power, for energy and for gravitational field strength.",
+          "a": "Power: watts (W). Energy: joules (J). Gravitational field strength: N/kg.",
+          "marks": 3,
+          "hint": "W_______, j_______, N/k__"
+        },
+        {
+          "q": "What does a thermal insulator do?",
+          "a": "It reduces the rate of energy transfer by heating.",
+          "marks": 1,
+          "hint": "It r_______ the rate of energy t_______ by heating."
+        },
+        {
+          "q": "What does \\Delta\\theta mean in the specific heat capacity equation?",
+          "a": "The change in temperature (°C).",
+          "marks": 1
+        },
+        {
+          "q": "Write the equation for efficiency using energy.",
+          "a": "efficiency = useful output energy transfer ÷ total input energy transfer",
+          "marks": 1,
+          "hint": "efficiency = useful ÷ total"
+        },
+        {
+          "q": "A motor is given 200 J of energy and wastes 40 J. Calculate its efficiency.",
+          "a": "Useful = 200 − 40 = 160 J. 160 ÷ 200 = 0.8 (80%).",
+          "marks": 2,
+          "hint": "efficiency = useful output ÷ total input"
+        },
+        {
+          "q": "Name two renewable energy resources.",
+          "a": "Any two: wind, solar, hydroelectric, tidal, wave, geothermal, biomass.",
+          "marks": 2,
+          "hint": "w_______, s_______"
+        }
+      ]
+    },
+    "engage": {
+      "variant": "oddOneOut",
+      "engageType": 6,
+      "hook": "Coal, oil, natural gas and uranium will all run out one day. Which one is the odd one out?",
+      "imagePlaceholder": true,
+      "imageDescription": "coal, an oil pump, a gas flame and a nuclear power station",
+      "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Non Renewable Resources 10S2/img/engage-four-fuels.png",
+      "imageConfidence": "search",
+      "prompt": "Talk to your partner: which one, and why?",
+      "videoLink": {
+        "text": "Hinkley Point C: Britain's new nuclear power station",
+        "url": "https://www.youtube.com/watch?v=E5lg73SDYUw"
+      },
+      "reveal": {
+        "question": "Which is the odd one out?",
+        "answer": "Uranium. Coal, oil and gas are fossil fuels we burn. Uranium is a nuclear fuel: nothing is burned, so no carbon dioxide."
+      }
+    },
+    "learn": [
+      {
+        "variant": "A",
+        "heading": "Non-renewable energy resources",
+        "boxes": [
+          {
+            "header": "Non-renewable",
+            "items": [
+              "A non-renewable resource is used up faster than it can be replaced.",
+              "Once it is used, it is gone. One day it will run out."
+            ]
+          },
+          {
+            "header": "The main ones",
+            "items": [
+              "Fossil fuels: coal, oil and natural gas. Formed from dead plants and animals over millions of years.",
+              "Nuclear fuel: uranium. It is not a fossil fuel and it is not burned."
+            ]
+          }
+        ],
+        "imagePlaceholder": true,
+        "imageDescription": "graph of known oil, gas and coal reserves running out between 2011 and 2081",
+        "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Non Renewable Resources 10S2/img/reserves-graph.jpg",
+        "imageConfidence": "search"
+      },
+      {
+        "variant": "A",
+        "heading": "Uses, and why we rely on them",
+        "boxes": [
+          {
+            "header": "Uses",
+            "items": [
+              "Transport: petrol, diesel and kerosene (jet fuel), all made from oil.",
+              "Electricity: coal, gas and nuclear power stations.",
+              "Heating: natural gas boilers, oil and coal."
+            ]
+          },
+          {
+            "header": "Why use them?",
+            "items": [
+              "Concentrated store of energy: a little fuel releases a lot of energy.",
+              "Reliable: available day and night, whatever the weather.",
+              "Easy to store and transport."
+            ]
+          }
+        ],
+        "imagePlaceholder": true,
+        "imageDescription": "blue natural gas flame on a cooker hob",
+        "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Non Renewable Resources 10S2/img/gas-flame.png",
+        "imageConfidence": "search"
+      },
+      {
+        "variant": "A",
+        "heading": "Problems with burning fossil fuels",
+        "boxes": [
+          {
+            "header": "Gases released",
+            "items": [
+              "Carbon dioxide (CO_2): a greenhouse gas. Adds to global warming and climate change.",
+              "Sulfur dioxide (SO_2): dissolves in rain water to make acid rain.",
+              "Nitrogen dioxide (NO_2): causes acid rain and breathing problems."
+            ]
+          },
+          {
+            "header": "Acid rain",
+            "items": [
+              "Damages trees, kills fish in lakes and wears away stone buildings."
+            ]
+          }
+        ],
+        "imagePlaceholder": true,
+        "imageDescription": "cartoon storm cloud with acid rain falling",
+        "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Non Renewable Resources 10S2/img/acid-rain.png",
+        "imageConfidence": "search"
+      },
+      {
+        "variant": "E",
+        "heading": "Fossil fuels or nuclear?",
+        "comparison": {
+          "aTitle": "Fossil fuels",
+          "bTitle": "Nuclear fuel",
+          "rows": [
+            {
+              "a": "Burned to release energy",
+              "b": "Uranium nuclei split (fission). Nothing is burned."
+            },
+            {
+              "a": "Release CO_2, SO_2 and NO_2",
+              "b": "No CO_2 or SO_2 while running"
+            },
+            {
+              "a": "Concentrated store of energy",
+              "b": "Extremely concentrated: one fuel pellet = 1 tonne of coal"
+            },
+            {
+              "a": "Reliable. Gas starts in minutes, coal in hours",
+              "b": "Reliable, but takes days to start up"
+            },
+            {
+              "a": "Fuel will run out",
+              "b": "Radioactive waste stays dangerous for thousands of years"
+            },
+            {
+              "a": "Cheaper to build",
+              "b": "Expensive to build and close down. Small risk of accidents"
+            }
+          ]
+        },
+        "imageDescription": "diagram of a neutron hitting a uranium-235 nucleus in a nuclear reactor",
+        "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Non Renewable Resources 10S2/img/fission.png",
+        "imageConfidence": "search"
+      }
+    ],
+    "build": [
+      {
+        "type": "sort",
+        "instruction": "Sort each energy resource: renewable or non-renewable?",
+        "items": [
+          "wind",
+          "coal",
+          "solar",
+          "uranium",
+          "natural gas",
+          "tidal",
+          "oil",
+          "biomass"
+        ],
+        "categories": {
+          "A": "Renewable",
+          "B": "Non-renewable"
+        },
+        "sorted": {
+          "A": [
+            "wind",
+            "solar",
+            "tidal",
+            "biomass"
+          ],
+          "B": [
+            "coal",
+            "uranium",
+            "natural gas",
+            "oil"
+          ]
+        }
+      },
+      {
+        "type": "mcq",
+        "q": "What does non-renewable mean?",
+        "options": [
+          "It is free to use",
+          "It is used up faster than it can be replaced",
+          "It does not cause pollution",
+          "It only works in the daytime"
+        ],
+        "answer": "B",
+        "explanation": "Non-renewable resources run out because they cannot be replaced as fast as we use them."
+      },
+      {
+        "type": "mcq",
+        "q": "Why is natural gas used to heat most homes in the UK?",
+        "options": [
+          "It releases no carbon dioxide",
+          "It is a renewable resource",
+          "It is a concentrated, reliable store of energy",
+          "It is made from uranium"
+        ],
+        "answer": "C",
+        "explanation": "A little gas releases a lot of energy, and it is available whenever it is needed."
+      },
+      {
+        "type": "mcq",
+        "q": "Which fuel is made from oil and used in cars?",
+        "options": [
+          "Natural gas",
+          "Coal",
+          "Petrol",
+          "Uranium"
+        ],
+        "answer": "C",
+        "explanation": "Petrol and diesel are both made from crude oil."
+      },
+      {
+        "type": "graphInterpret",
+        "graphLabel": "Carbon dioxide in the air and global temperature since 1800",
+        "axes": {
+          "x": "year",
+          "y": "CO_2 (ppm); temperature rise (°C)"
+        },
+        "imagePlaceholder": true,
+        "imageDescription": "two stacked graphs: carbon dioxide in the air and global temperature rise, 1800 to 2020",
+        "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Non Renewable Resources 10S2/img/co2-temperature-graph.png",
+        "imageConfidence": "search",
+        "questions": [
+          {
+            "q": "Describe how the amount of carbon dioxide changes after 1800.",
+            "a": "It stays near 285 ppm until about 1850, then rises faster and faster, to about 410 ppm by 2020.",
+            "marks": 2
+          },
+          {
+            "q": "How much has the average global temperature risen since 1850?",
+            "a": "About 1.2 °C, mostly since 1970.",
+            "marks": 1
+          },
+          {
+            "q": "Suggest why carbon dioxide rose after 1850.",
+            "a": "People began burning large amounts of fossil fuels in factories, power stations and vehicles.",
+            "marks": 1
+          }
+        ]
+      },
+      {
+        "type": "mcq",
+        "q": "Which gas from burning fossil fuels causes acid rain?",
+        "options": [
+          "Carbon dioxide",
+          "Sulfur dioxide",
+          "Oxygen",
+          "Water vapour"
+        ],
+        "answer": "B",
+        "explanation": "Sulfur dioxide dissolves in rain water and makes it acidic."
+      },
+      {
+        "type": "mcq",
+        "q": "Why does a nuclear power station not release carbon dioxide while it runs?",
+        "options": [
+          "Its fuel is renewable",
+          "Its waste is radioactive",
+          "Its fuel is not burned",
+          "It runs on natural gas"
+        ],
+        "answer": "C",
+        "explanation": "Energy comes from splitting uranium nuclei (fission), not from burning."
+      },
+      {
+        "type": "mcq",
+        "q": "Which is a disadvantage of nuclear power?",
+        "options": [
+          "It releases sulfur dioxide",
+          "It produces radioactive waste",
+          "It is not reliable",
+          "It causes acid rain"
+        ],
+        "answer": "B",
+        "explanation": "Nuclear waste stays dangerous for thousands of years and must be stored safely."
+      }
+    ],
+    "apply": {
+      "developing": [
+        {
+          "q": "What does non-renewable mean?",
+          "a": "It is used up faster than it can be replaced, so it will run out.",
+          "marks": 1,
+          "qType": "concept",
+          "contentType": "routine_recall"
+        },
+        {
+          "q": "Name the three fossil fuels.",
+          "a": "Coal, oil and natural gas.",
+          "marks": 3,
+          "qType": "concept",
+          "contentType": "routine_recall"
+        },
+        {
+          "q": "Name the gas from burning fossil fuels that causes global warming.",
+          "a": "Carbon dioxide (CO_2).",
+          "marks": 1,
+          "qType": "concept",
+          "contentType": "routine_recall"
+        }
+      ],
+      "reaching": [
+        {
+          "q": "Name a fossil fuel used for (a) transport and (b) heating homes.",
+          "a": "(a) Petrol or diesel (from oil). (b) Natural gas.",
+          "marks": 2,
+          "qType": "concept",
+          "contentType": "known_procedure",
+          "subSteps": [
+            "Name a fuel used in cars or buses.",
+            "Name a fuel used in home boilers."
+          ]
+        },
+        {
+          "q": "Give two reasons why fossil fuels are used so much.",
+          "a": "Concentrated store of energy. Reliable: available whenever needed. Easy to store and transport.",
+          "marks": 2,
+          "qType": "concept",
+          "contentType": "known_procedure",
+          "starters": [
+            "Fossil fuels are a concentrated store of ...",
+            "They are reliable because ..."
+          ]
+        },
+        {
+          "q": "Many buses in Bath run on diesel. Name the gas from the exhaust that causes global warming, and one that causes acid rain.",
+          "a": "Carbon dioxide causes global warming. Nitrogen dioxide (or sulfur dioxide) causes acid rain.",
+          "marks": 2,
+          "qType": "concept",
+          "contentType": "known_procedure",
+          "subSteps": [
+            "Which gas causes global warming?",
+            "Which gas causes acid rain?"
+          ]
+        }
+      ],
+      "mastering": [
+        {
+          "q": "Demand for electricity jumps at 6 pm. Explain why a gas power station is used to meet it, not a nuclear one.",
+          "a": "Gas power stations start up in minutes. Nuclear power stations take days to start, so they cannot respond quickly.",
+          "marks": 2,
+          "qType": "concept",
+          "contentType": "known_procedure",
+          "starters": [
+            "A gas power station can start ...",
+            "A nuclear power station takes ..."
+          ]
+        },
+        {
+          "q": "Coal releases 900 g of CO_2 per kWh. Gas releases 400 g per kWh. A town uses 2000 kWh each hour. How much CO_2 does gas save per hour?",
+          "a": "900 − 400 = 500 g per kWh. 500 × 2000 = 1 000 000 g = 1000 kg saved per hour.",
+          "marks": 3,
+          "qType": "calculation",
+          "contentType": "new_procedure",
+          "units": "g (then kg)",
+          "equationHint": "CO_2 saved per kWh = 900 − 400, then × 2000",
+          "guess": true
+        },
+        {
+          "q": "A town's coal power station is closing. Evaluate replacing it with a gas or a nuclear power station. Give a reasoned choice.",
+          "a": "Gas: cheaper, starts quickly, but still releases CO_2 and will run out. Nuclear: no CO_2, very concentrated fuel, but radioactive waste, expensive, slow to start. A choice backed by a reason.",
+          "marks": 6,
+          "qType": "extended_writing",
+          "contentType": "extended_writing",
+          "indicativeContent": [
+            "Gas releases less CO_2 than coal, but still adds to global warming",
+            "Gas power stations are cheaper to build than nuclear",
+            "Gas stations start in minutes, so they can follow changes in demand",
+            "Nuclear releases no CO_2 or SO_2 while running",
+            "Nuclear produces radioactive waste that stays dangerous for thousands of years",
+            "Nuclear is expensive to build and to close down, and takes days to start",
+            "Both fuels are non-renewable and will run out",
+            "A clear final choice, supported by at least one reason"
+          ],
+          "starters": [
+            "Gas would be better because ...",
+            "Nuclear would be better because ...",
+            "Overall I would choose ... because ..."
+          ]
+        }
+      ]
+    },
+    "worksheetExtras": {
+      "wordBank": []
+    }
+  }
+]

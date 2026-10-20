@@ -1,0 +1,369 @@
+[
+  {
+    "meta": {
+      "class": "9XS",
+      "topic": "Mixtures and separating",
+      "title": "Mixtures and Separating",
+      "lessonType": "standard",
+      "theme": "chemistry",
+      "worksheet": "A",
+      "differentiation": "none",
+      "year": 9,
+      "subject": "Chemistry",
+      "macrotopic": "C1 Atomic Structure",
+      "lessonNumber": 2
+    },
+    "title": {
+      "objectives": [
+        "Define a {k}mixture{/k} and say how it differs from a compound",
+        "Describe filtration, crystallisation, chromatography and distillation",
+        "Choose the best separation method for a mixture and explain why"
+      ],
+      "keywords": [
+        "mixture",
+        "filtration",
+        "crystallisation",
+        "chromatography",
+        "distillation",
+        "soluble",
+        "insoluble"
+      ]
+    },
+    "doNow": {
+      "variant": "A",
+      "questions": [
+        {
+          "q": "Define an element.",
+          "a": "A substance made of only one type of atom.",
+          "marks": 1,
+          "hint": "Only one t_______ of a_______."
+        },
+        {
+          "q": "Define a compound.",
+          "a": "Two or more elements chemically combined.",
+          "marks": 1,
+          "hint": "Two or more e_______ c_______ combined."
+        },
+        {
+          "q": "Name the compound CuO.",
+          "a": "Copper oxide.",
+          "marks": 1
+        },
+        {
+          "q": "Explain why O2 is an element but H2O is a compound.",
+          "a": "O2 has only oxygen atoms. H2O has hydrogen and oxygen atoms chemically joined.",
+          "marks": 2
+        },
+        {
+          "q": "Name the change of state from gas to liquid.",
+          "a": "Condensing (condensation).",
+          "marks": 1,
+          "hint": "c_______"
+        },
+        {
+          "q": "Is melting ice a chemical reaction? Explain.",
+          "a": "No. It is a physical change: no new substance is made, it is still water.",
+          "marks": 2
+        }
+      ]
+    },
+    "engage": {
+      "variant": "prediction",
+      "title": "WET PAGE",
+      "hook": "Water was spilled on this exercise book. The black ink spread out into purple and blue. Where did the colours come from?",
+      "imagePlaceholder": true,
+      "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Mixtures Separating 9XS/img/image34.png",
+      "imageDescription": "Exercise book page with ink spread into colours by spilled water",
+      "imageConfidence": "school",
+      "reveal": {
+        "question": "Was the black ink one substance or several?",
+        "answer": "Several. Black ink is a mixture of dyes. The water carried each dye a different distance: that is chromatography."
+      }
+    },
+    "learn": [
+      {
+        "variant": "A",
+        "heading": "What is a mixture?",
+        "imagePlaceholder": false,
+        "boxes": [
+          {
+            "header": "Mixture",
+            "items": [
+              "Substances {k}not chemically combined{/k}.",
+              "Each keeps its own properties.",
+              "Separated by a physical process."
+            ]
+          },
+          {
+            "header": "Compound",
+            "items": [
+              "Elements {k}chemically combined{/k}.",
+              "New properties.",
+              "Split only by a reaction."
+            ]
+          },
+          {
+            "header": "Example",
+            "items": [
+              "Iron and sulfur mixed: a magnet pulls out the iron.",
+              "Iron sulfide: the magnet does nothing."
+            ]
+          }
+        ],
+        "definition": {
+          "term": "Mixture",
+          "text": "two or more substances not chemically combined.",
+          "origin": "Latin miscere: to mix"
+        },
+        "notes": "Ask: how could we separate iron filings and sulfur? (magnet). Then: why not iron sulfide? Air, sea water and crude oil are all mixtures."
+      },
+      {
+        "variant": "A",
+        "heading": "Filtration and crystallisation",
+        "boxes": [
+          {
+            "header": "Filtration",
+            "items": [
+              "Removes an {k}insoluble{/k} solid from a liquid: sand and water.",
+              "Residue stays in the paper; filtrate goes through."
+            ]
+          },
+          {
+            "header": "Crystallisation",
+            "items": [
+              "Gets a {k}soluble{/k} solid from a solution: salt water.",
+              "Evaporate some water, leave to cool: crystals form."
+            ]
+          }
+        ],
+        "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Mixtures Separating 9XS/img/image36.png",
+        "imageDescription": "Filtration: mixture poured through filter paper in a funnel",
+        "imageConfidence": "school",
+        "notes": "Why can't you filter salt water? The salt is dissolved: its particles are small enough to pass through the paper. GCSE link: C10 water purification, C4 making a salt."
+      },
+      {
+        "variant": "A",
+        "heading": "Chromatography",
+        "boxes": [
+          {
+            "header": "What it separates",
+            "items": [
+              "Soluble substances in one mixture: the dyes in ink."
+            ]
+          },
+          {
+            "header": "How it works",
+            "items": [
+              "Ink spot on a pencil line, above the solvent.",
+              "The solvent rises. More {k}soluble{/k} dyes travel further."
+            ]
+          }
+        ],
+        "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Mixtures Separating 9XS/img/image42.png",
+        "imageDescription": "Paper chromatogram: spots separated above the solvent",
+        "imageConfidence": "school",
+        "notes": "Pencil, not pen: pen ink would run too. Uses: drug tests on athletes, food colourings, crime scene inks (C8 Chemical Analysis)."
+      },
+      {
+        "variant": "A",
+        "heading": "Distillation",
+        "boxes": [
+          {
+            "header": "Simple distillation",
+            "items": [
+              "Pure liquid from a solution: water from salt water.",
+              "Water {k}evaporates{/k}, then {k}condenses{/k} in the condenser."
+            ]
+          },
+          {
+            "header": "Fractional distillation",
+            "items": [
+              "Liquids with different boiling points: crude oil.",
+              "Hot at the bottom, cool at the top: each condenses at its own level."
+            ]
+          }
+        ],
+        "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Mixtures Separating 9XS/img/image35.jpg",
+        "imageDescription": "Simple distillation apparatus with condenser and collecting flask",
+        "imageConfidence": "school",
+        "notes": "Cold water goes in at the bottom of the condenser. Crude oil: short chains (low boiling point) come out at the top. GCSE link: C7 crude oil."
+      }
+    ],
+    "build": [
+      {
+        "type": "mcq",
+        "q": "Which is a mixture?",
+        "options": [
+          "A. Sea water",
+          "B. Carbon dioxide",
+          "C. Oxygen",
+          "D. Water"
+        ],
+        "answer": "A",
+        "explanation": "Sea water is water with salts dissolved in it, not chemically combined.",
+        "commonError": "Choosing D: pure water is one compound.",
+        "why": {
+          "B": "a compound",
+          "C": "an element",
+          "D": "a compound"
+        }
+      },
+      {
+        "type": "mcq",
+        "q": "Which method separates sand from water?",
+        "options": [
+          "A. Chromatography",
+          "B. Filtration",
+          "C. Crystallisation",
+          "D. Fractional distillation"
+        ],
+        "answer": "B",
+        "explanation": "Sand is insoluble, so it is caught by the filter paper.",
+        "commonError": "Choosing C: crystallisation is for a dissolved solid.",
+        "why": {
+          "A": "for dissolved dyes",
+          "C": "for a soluble solid",
+          "D": "for liquids with different boiling points"
+        }
+      },
+      {
+        "type": "mcq",
+        "q": "Why can salt NOT be separated from salt water by filtration?",
+        "options": [
+          "A. Salt is insoluble",
+          "B. Salt particles are bigger than the holes",
+          "C. Salt is dissolved, so it passes through the paper",
+          "D. Salt reacts with the filter paper"
+        ],
+        "answer": "C",
+        "explanation": "Dissolved particles are small enough to pass through.",
+        "commonError": "Choosing A: salt is soluble.",
+        "why": {
+          "A": "salt dissolves",
+          "B": "they are far smaller",
+          "D": "no reaction happens"
+        }
+      },
+      {
+        "type": "mcq",
+        "q": "In chromatography, why is the start line drawn in pencil?",
+        "options": [
+          "A. It is easier to see",
+          "B. Pencil does not dissolve in the solvent",
+          "C. Pencil makes the dyes move faster",
+          "D. Pen would tear the paper"
+        ],
+        "answer": "B",
+        "explanation": "Graphite does not dissolve, so it will not run up the paper.",
+        "commonError": "Choosing A.",
+        "why": {
+          "A": "not the reason",
+          "C": "it has no effect on the dyes",
+          "D": "pen does not tear paper"
+        }
+      },
+      {
+        "type": "mcq",
+        "q": "In simple distillation, what happens in the condenser?",
+        "options": [
+          "A. The liquid boils",
+          "B. The vapour cools and condenses",
+          "C. The salt crystallises",
+          "D. The liquid freezes solid"
+        ],
+        "answer": "B",
+        "explanation": "Cold water around the condenser cools the vapour so it condenses.",
+        "commonError": "Choosing A: boiling happens in the flask.",
+        "why": {
+          "A": "that happens in the flask",
+          "C": "the salt stays in the flask",
+          "D": "it is not cold enough"
+        }
+      },
+      {
+        "type": "mcq",
+        "q": "Crude oil is a mixture of liquids with different boiling points. Which method separates it?",
+        "options": [
+          "A. Filtration through paper",
+          "B. Crystallisation by cooling",
+          "C. Paper chromatography",
+          "D. Fractional distillation"
+        ],
+        "answer": "D",
+        "explanation": "The substances in crude oil have different boiling points.",
+        "commonError": "Choosing C.",
+        "why": {
+          "A": "nothing insoluble to remove",
+          "B": "no dissolved solid",
+          "C": "used for dyes, not fuels"
+        }
+      }
+    ],
+    "apply": {
+      "developing": [
+        {
+          "q": "Define the term mixture.",
+          "a": "Two or more elements or compounds not chemically combined.",
+          "marks": 1,
+          "qType": "concept"
+        },
+        {
+          "q": "Name the method used to separate each: (a) sand and water (b) the colours in a pen ink (c) salt from salt water.",
+          "a": "(a) filtration (b) chromatography (c) crystallisation (or evaporation)",
+          "marks": 3,
+          "qType": "concept"
+        },
+        {
+          "q": "In filtration, what are the residue and the filtrate?",
+          "a": "Residue: the solid left in the filter paper. Filtrate: the liquid that passes through.",
+          "marks": 2,
+          "qType": "concept"
+        }
+      ],
+      "reaching": [
+        {
+          "q": "Explain why a magnet can separate iron from a mixture of iron and sulfur, but not from iron sulfide.",
+          "a": "In the mixture the iron is not combined, so it keeps its magnetic property. In iron sulfide the iron is chemically combined in a new compound with different properties.",
+          "marks": 2,
+          "qType": "explain",
+          "starters": [
+            "In the mixture the iron...",
+            "In iron sulfide..."
+          ]
+        },
+        {
+          "q": "Describe how to get pure water from salt water by simple distillation.",
+          "a": "Heat the salt water so the water evaporates. The vapour cools in the condenser and condenses. Collect the pure water in a flask; the salt stays behind.",
+          "marks": 3,
+          "qType": "explain"
+        },
+        {
+          "q": "A black ink gives three spots on a chromatogram. What does this tell you about the ink?",
+          "a": "It is a mixture of (at least) three dyes.",
+          "marks": 1,
+          "qType": "concept"
+        }
+      ],
+      "mastering": [
+        {
+          "q": "Ethanol boils at 78 °C and water at 100 °C. Explain how fractional distillation separates them.",
+          "a": "Heat the mixture. Ethanol has the lower boiling point, so it evaporates first, rises up the column and condenses and is collected. The water stays (or condenses lower) until the temperature reaches 100 °C.",
+          "marks": 3,
+          "qType": "extended_writing"
+        },
+        {
+          "q": "A shipwreck leaves a mixture of iron, sand, salt and water. Plan, in order, how to get each substance on its own.",
+          "a": "1. Use a magnet to remove the iron. 2. Filter to remove the sand (residue). 3. Distil the salty filtrate: pure water is collected. 4. The salt is left behind (or crystallise it from the solution).",
+          "marks": 4,
+          "qType": "extended_writing"
+        },
+        {
+          "q": "Explain why the more soluble dye travels further up the paper in chromatography.",
+          "a": "It spends more of its time dissolved in the moving solvent, so it is carried further before it sticks to the paper.",
+          "marks": 2,
+          "qType": "explain"
+        }
+      ]
+    }
+  }
+]

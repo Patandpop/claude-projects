@@ -299,5 +299,40 @@ if (fs.existsSync(DRIVE)) {
   ok(real.every(([, r]) => r && r.days >= 4 && r.days <= 9 && !r.why), 'real timetable, w/c 9 Nov: every class gets a due date 4 to 9 days on (' + real.map(([c, r]) => c + ' ' + (r && r.days)).join(', ') + ')');
 }
 
+// Homework and Assessment tabs (approved 2026-10-19)
+{
+  const bands = [{ g: '7', min: 70 }, { g: '9', min: 85 }, { g: '4', min: 40 }];
+  ok(P.gradeFor(86, bands) === '9' && P.gradeFor(70, bands) === '7' && P.gradeFor(39, bands) === 'U' && P.gradeFor(50, []) === '', 'grades: from his boundaries (any order); none set = no grade, never made up');
+  const row = { status: 'drafted', dueOn: '2026-10-27', formId: 'F' };
+  ok(P.hwStatus(row, { state: 'DRAFT' }, '2026-10-20', 0) === 'drafted' && P.hwStatus(row, { state: 'DRAFT', scheduled: true }, '2026-10-20', 0) === 'scheduled', 'status: drafted, scheduled');
+  ok(P.hwStatus(row, { state: 'PUBLISHED' }, '2026-10-20', 3) === 'live' && P.hwStatus(row, { state: 'PUBLISHED' }, '2026-10-27', 0) === 'due', 'status: posted = live; due day with no responses = due');
+  ok(P.hwStatus(row, { state: 'PUBLISHED' }, '2026-10-27', 5) === 'marked' && P.hwStatus({ status: 'drafted', dueOn: '2026-10-27' }, { state: 'PUBLISHED' }, '2026-10-28', 0) === 'due', 'status: a due Form quiz with responses marks itself; link homework waits for his tick');
+  ok(P.hwStatus({ status: 'marked' }, { state: 'PUBLISHED' }, '2026-10-20', 0) === 'marked', 'status: his "marked" tick wins');
+  const cov = P.hwCoverage({ questions: [
+    { type: 'mcq', points: 1, lesson: 'Energy stores' }, { type: 'mcq', points: 1, lesson: 'Energy stores' },
+    { type: 'written', label: 'Question 3', marks: 6, levels: [{}], lesson: 'Specific heat capacity', text: 'Describe a method to find the specific heat capacity of a metal block.' },
+    { type: 'number', markPoints: [{ marks: 2 }, { marks: 1 }], lesson: 'Specific heat capacity' }] });
+  ok(cov.total === 11 && cov.mcq === 2 && cov.long.length === 1 && cov.long[0].label === 'Question 3' && cov.parts[0].lesson === 'Specific heat capacity' && cov.parts[0].marks === 9, 'paper coverage: marks per sub-topic, the 6-mark questions, multiple choice count');
+  // rename an added lesson: shown with the new name, still the same lesson (ticks and saved weeks keep finding it)
+  const d2 = JSON.parse(JSON.stringify(data));
+  const cls = Object.keys(d2.classes).find((c) => d2.classes[c].seq.length > 3), L0 = d2.classes[cls].seq[1];
+  const rec = { cls, unit: L0.unit, afterKey: P.lessonId(L0), num: '9z', title: 'Practice lesson', rel: null };
+  P.applyAdded(d2, [rec]);
+  const at = d2.classes[cls].seq.findIndex((L) => L.title === 'Practice lesson'), id0 = P.lessonId(d2.classes[cls].seq[at]);
+  P.applyAdded(d2, [Object.assign({}, rec, { name: 'Energy practice' })]);
+  ok(d2.classes[cls].seq[at].title === 'Energy practice' && P.lessonId(d2.classes[cls].seq[at]) === id0 && d2.classes[cls].seq.filter((L) => L.added).length === 1, 'rename an added lesson: new name, same id, not added twice');
+  const d3 = JSON.parse(JSON.stringify(data));
+  P.applyAdded(d3, [Object.assign({}, rec, { name: 'Energy practice' })]);
+  ok(P.lessonId(d3.classes[cls].seq.find((L) => L.added)) === id0, 'after a reload the renamed lesson has the same id as before');
+  // lesson extras go to Claude with the build request
+  const wk = P.autofill(data, {}, P.parse('2026-11-09'));
+  const s = wk.slots.find((x) => x.kind === 'lesson');
+  s.adds = { video: true, realData: true };
+  const pr = P.buildPrompt(data, s, null, wk);
+  ok(/short video clip/.test(pr) && /real data/.test(pr) && !/simulation/i.test(pr), 'lesson extras: ticked ones are in the build request, unticked ones are not');
+  const first = wk.slots.find((x) => x.kind === 'lesson' && data.classes[x.cls].seq.findIndex((L) => L.unit === data.classes[x.cls].seq[x.i].unit) === x.i);
+  if (first) ok(P.extrasSuggested(data, first).memory === true, 'lesson extras: memory phrase suggested on the first lesson of a topic');
+}
+
 console.log(fails ?`\n${fails} FAILED` : '\nall planner logic checks passed');
 process.exit(fails ? 1 : 0);

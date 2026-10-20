@@ -240,7 +240,8 @@
   /* ----------------------------------------------------------------- filling */
   // A lesson's lasting name (its Drive folder, else topic + title). Saved weeks keep it beside the
   // list position, because the position shifts when lessons are added to the list.
-  const lessonId = (L) => (L ? L.rel || `${L.unit}|${L.title}` : '');
+  // A renamed added lesson keeps its first name as its id (origKey), so its ticks and saved weeks still find it.
+  const lessonId = (L) => (L ? L.rel || L.origKey || `${L.unit}|${L.title}` : '');
   // After a data refresh: point every saved slot and tick back at the same lesson.
   function remapWeek(data, w) {
     const find = (cls, key, text) => {
@@ -460,7 +461,10 @@
   function applyAdded(data, added) {
     for (const a of added || []) {
       const seq = (data.classes[a.cls] || {}).seq;
-      if (!seq || seq.some((L) => (a.rel && L.rel === a.rel) || (L.unit === a.unit && L.title === a.title))) continue;
+      // a.name: his new name for it (Patryk 2026-10-19: rename lessons he added; the Drive folder keeps its old name)
+      if (!seq) continue;
+      const had = seq.find((L) => (a.rel && L.rel === a.rel) || (L.unit === a.unit && (L.origKey === `${a.unit}|${a.title}` || L.title === a.title)));
+      if (had) { if (had.added && a.name) { had.origKey = had.origKey || `${a.unit}|${a.title}`; had.title = a.name; } continue; }
       const proto = seq.find((L) => L.unit === a.unit);
       if (!proto) continue;
       let at = seq.findIndex((L) => lessonId(L) === a.afterKey);
@@ -468,6 +472,7 @@
       else if (at < 0) { at = -1; seq.forEach((L, k) => { if (L.unit === a.unit) at = k; }); }
       seq.splice(at + 1, 0, { topic: proto.topic, unit: a.unit, num: a.num, title: a.title, eq: '', sets: null, print: '', eqSrc: 'none',
         book: '', built: a.rel ? false : null, planned: false, optional: false, nofolder: !a.rel, rel: a.rel || null, added: true });
+      if (a.name) { seq[at + 1].title = a.name; seq[at + 1].origKey = `${a.unit}|${a.title}`; }
     }
     return data;
   }
@@ -591,6 +596,55 @@
     ['plc', 'Test next week: hand out / remind them of the PLC'],
     ['kit', 'Practical: check the kit before the lesson'],
   ];
+  // Lesson extras (Patryk 2026-10-15, approved 2026-10-19): the parts that fall by the wayside. Ticks go
+  // to Claude with the build request. A few are suggested (not ticked) from what the lesson already has.
+  const EXTRAS = [
+    ['video', 'Video clip', 'Add a short video clip (2 to 4 minutes) that shows the idea'],
+    ['sim', 'Simulation', 'Add a simulation (PhET or similar) to explore the idea'],
+    ['demo', 'Demo', 'Add a teacher demo, with what to watch for'],
+    ['practical', 'Practical', 'Include a practical'],
+    ['memory', 'Memory phrase', 'Add a memory phrase for the key idea'],
+    ['realData', 'Real data', 'Use real data (a real table or graph) in the Apply task'],
+  ];
+  // what to suggest: practical when the lesson has kit, memory phrase on the first lesson of a topic
+  function extrasSuggested(data, s) {
+    const c = data.classes[s.cls] || {}, L = s.kind === 'lesson' ? (c.seq || [])[s.i] : null;
+    const first = L && (c.seq || []).findIndex((x) => x.unit === L.unit) === s.i;
+    return { practical: !!s.sets && s.sets !== 'demo', demo: s.sets === 'demo', memory: !!first };
+  }
+  // Grades from a percentage (Patryk 2026-10-19: grades for each homework and test). bands = his own
+  // boundaries, highest first: [{ g: '9', min: 80 }, ...]. No bands, no grade (never made up).
+  function gradeFor(pct, bands) {
+    if (pct == null || !bands || !bands.length) return '';
+    const b = bands.slice().sort((x, y) => y.min - x.min).find((x) => pct >= x.min);
+    return b ? String(b.g) : 'U';
+  }
+  // What a quiz file covers: marks per sub-topic, the long (6-mark) questions, multiple choice count.
+  function hwCoverage(hw) {
+    const by = new Map(), long = [];
+    let mcq = 0, total = 0;
+    for (const q of (hw && hw.questions) || []) {
+      const m = q.type === 'mcq' ? (q.points || 1) : (q.markPoints && q.markPoints.length ? q.markPoints.reduce((a, p) => a + (p.marks || 0), 0) : (q.marks || 0));
+      const k = q.lesson || 'Other';
+      by.set(k, (by.get(k) || 0) + m); total += m;
+      if (q.type === 'mcq') mcq++;
+      if (q.type !== 'mcq' && (m >= 6 || (q.levels && q.levels.length))) long.push({ label: q.label || '', marks: m, text: String(q.text || '').replace(/\s+/g, ' ').slice(0, 140), lesson: q.lesson || '' });
+    }
+    return { total, mcq, long, parts: [...by.entries()].map(([lesson, marks]) => ({ lesson, marks })).sort((a, b) => b.marks - a.marks) };
+  }
+  // A homework's status (spec 1.3): drafted / scheduled / live / due / marked. row = the Homework tab
+  // row; live = what Classroom says now ({ state: 'DRAFT'|'PUBLISHED', scheduled }); today = 'YYYY-MM-DD'.
+  // A Form quiz counts as marked once it is due and has responses (it marks itself; spec question 6).
+  function hwStatus(row, live, today, responses) {
+    if (row.status === 'marked') return 'marked';
+    const state = live && live.state;
+    if (state === 'PUBLISHED' || (!state && row.status === 'live')) {
+      if (row.dueOn && today >= row.dueOn) return row.formId && responses > 0 ? 'marked' : 'due';
+      return 'live';
+    }
+    if ((live && live.scheduled) || row.status === 'scheduled') return 'scheduled';
+    return row.status === 'form only' ? 'form only' : 'drafted';
+  }
   // week (optional): the rest of the week, so a lesson already made for another class is reused
   function buildPrompt(data, s, profile, week) {
     const c = data.classes[s.cls] || {};
@@ -620,6 +674,7 @@
     (s.carry || []).forEach((x) => lines.push(`Carry over from last lesson, put straight after the Do Now: ${x}`));
     (s.notes || []).forEach((x) => lines.push(`Note: ${x}`));
     CHECKS.forEach(([k, t]) => { if ((s.checks || {})[k]) lines.push(t + '.'); });
+    EXTRAS.forEach(([k, , t]) => { if ((s.adds || {})[k]) lines.push(t + '.'); });
     if (s.book && s.bookOn) lines.push(`Textbooks out: ${s.book}.`);
     const about = (profile && profile.notes) || c.profile;
     if (about) lines.push(`About ${s.cls}: ${about}`);
@@ -716,6 +771,6 @@
   }
 
   const api = { dueFor, nextLessonDay, lessonsOn, lessonEnd, recs, findRecord, setRecord, remapRecords, migrateMarks, cascade, revisionSlot, unitBefore, applyAdded, addedNum, remapWeek, lessonId, applyMarks, classReport, topicList, wouldSkip, setSlot, markLesson, refillClass, planFrom, periodTime, calendarEvents, DAYS, iso, parse, addDays, mondayOf, isTeachingDay, nextSchoolDay, weekLetter, progressBefore, next, autofill, moveSlot, refillAfter,
-    lessonSlot, testSlot, notHappened, slotDone, slotDay, fromFilled, reflowWeek, CHECKS, sheetCells, sheetModel, setsCount, printList, buildPrompt, carryForward, equipCell, lessonCell, setsLabel };
+    EXTRAS, extrasSuggested, gradeFor, hwCoverage, hwStatus, lessonSlot, testSlot, notHappened, slotDone, slotDay, fromFilled, reflowWeek, CHECKS, sheetCells, sheetModel, setsCount, printList, buildPrompt, carryForward, equipCell, lessonCell, setsLabel };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.PlannerLogic = api;
 })(typeof window !== 'undefined' ? window : this);

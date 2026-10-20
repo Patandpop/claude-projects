@@ -270,6 +270,7 @@ function setHomework(k, item) {
   check_(k);
   const it = item || {};
   if (!it.cls || !/^\d{4}-\d{2}-\d{2}$/.test(String(it.dueOn || ''))) throw new Error('Each homework needs a class and a due date.');
+  if (LINK_KINDS.indexOf(String(it.kind)) >= 0) return setLinkHomework_(it);
   if (!it.file || !HW_FILE.test(String(it.file))) throw new Error('Only quiz homework from home can be set here for now (pick a quiz for ' + it.cls + ').');
   const fileCls = (/^homework-([A-Za-z0-9]+)-/.exec(it.file) || [])[1];
   if (fileCls !== String(it.cls)) throw new Error(it.file + ' is for ' + fileCls + ', not ' + it.cls + '.');
@@ -311,11 +312,206 @@ function setHomework(k, item) {
     const status = draft.ok ? (draft.scheduled ? 'scheduled' : 'drafted') : 'form only';
     sh.appendRow([it.cls + '-' + setOn + '-' + n, it.cls, it.kind || hw.kind || 'quiz', hw.title, it.file, hw.tier || '', form.getId(), form.getPublishedUrl(),
       draft.courseId || '', draft.courseWorkId || '', setOn, it.post === 'schedule' ? it.postAt : '', it.dueOn, draft.dueUtc || '', info.points || totalPoints_(hw), status, new Date()]);
+    CacheService.getScriptCache().remove('hwstat');
     tab_('Log', ['when', 'what', 'where']).appendRow([new Date(), 'set homework: ' + status + (notes.length ? ' (' + notes.join('; ') + ')' : ''), it.cls + ' ' + hw.title]);
     const why = draft.ok ? '' : (/no Classroom class/.test(draft.why) ? 'No Classroom class with ' + it.cls + ' in its name. The Form was made: link it by hand. (' + draft.why + ')' : 'The Form was made, but not the Classroom draft: ' + draft.why);
     return { ok: true, formUrl: form.getPublishedUrl(), editUrl: form.getEditUrl(), draft: draft.ok, scheduled: !!draft.scheduled, courseId: draft.courseId || '', courseWorkId: draft.courseWorkId || '', classroomUrl: draft.link || '',
       points: info.points, template: !!info.template, why, notes };
   } finally { lock.releaseLock(); }
+}
+// Homework that is not a quiz (spec 1.2, approved 2026-10-19): Seneca or another link, the school's key
+// homework, revise for a test, something else. A Classroom draft (or scheduled post) with his message and
+// link, due 8:00 on the due day, and a row in the Homework tab. Never twice (same class, kind, title, due).
+const LINK_KINDS = ['seneca', 'key', 'revise', 'other'];
+function setLinkHomework_(it) {
+  const title = String(it.title || '').trim();
+  if (!title) throw new Error(it.cls + ': give the homework a title.');
+  if (it.link && !/^https?:\/\/\S+$/.test(String(it.link).trim())) throw new Error(it.cls + ': the link should start with https://');
+  if (it.setOn && it.dueOn <= it.setOn) throw new Error(it.cls + ': the due date must be after the day it is set.');
+  if (it.post === 'schedule' && !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(String(it.postAt || ''))) throw new Error(it.cls + ': "Schedule it" needs a date and time to post.');
+  const lock = LockService.getScriptLock();
+  if (!lock.tryLock(30000)) throw new Error('The planner is busy making another homework. Try again in a minute.');
+  try {
+    const sh = tab_('Homework', HW_HEAD);
+    const done = hwRows_().find((r) => r.cls === String(it.cls) && r.kind === it.kind && r.title === title && r.dueOn === it.dueOn && r.courseWorkId);
+    if (done) return { ok: true, already: true, draft: true, classroomUrl: '', why: 'Already made on ' + dayName_(String(done.setOn || done.dueOn)) + '.' };
+    const draft = classroomDraft_({ cls: it.cls }, null, { due: it.dueOn, message: it.message, postAt: it.post === 'schedule' ? it.postAt : null, title, link: String(it.link || '').trim() });
+    const setOn = it.setOn || Utilities.formatDate(new Date(), TZ, 'yyyy-MM-dd');
+    const n = hwRows_().filter((r) => r.cls === String(it.cls) && r.setOn === setOn).length + 1;
+    const status = draft.ok ? (draft.scheduled ? 'scheduled' : 'drafted') : 'not made';
+    if (draft.ok) sh.appendRow([it.cls + '-' + setOn + '-' + n, it.cls, it.kind, title, String(it.link || ''), '', '', '', draft.courseId || '', draft.courseWorkId || '', setOn,
+      it.post === 'schedule' ? it.postAt : '', it.dueOn, draft.dueUtc || '', '', status, new Date()]);
+    CacheService.getScriptCache().remove('hwstat');
+    tab_('Log', ['when', 'what', 'where']).appendRow([new Date(), 'set ' + it.kind + ' homework: ' + status, it.cls + ' ' + title]);
+    return { ok: draft.ok, draft: draft.ok, scheduled: !!draft.scheduled, classroomUrl: draft.link || '', courseWorkId: draft.courseWorkId || '',
+      why: draft.ok ? '' : (/no Classroom class/.test(draft.why) ? 'No Classroom class with ' + it.cls + ' in its name. (' + draft.why + ')' : 'The Classroom draft was not made: ' + draft.why) };
+  } finally { lock.releaseLock(); }
+}
+// The Homework tab's rows as objects. Sheets turns typed dates into Date values: back to 'YYYY-MM-DD'.
+function hwRows_() {
+  const sh = tab_('Homework', HW_HEAD);
+  const n = sh.getLastRow() - 1;
+  if (n < 1) return [];
+  const day = (v) => (v instanceof Date ? Utilities.formatDate(v, TZ, 'yyyy-MM-dd') : String(v || ''));
+  return sh.getRange(2, 1, n, HW_HEAD.length).getValues().map((r, i) => {
+    const o = { row: i + 2 };
+    HW_HEAD.forEach((h, j) => { o[h] = r[j]; });
+    o.setOn = day(o.setOn); o.dueOn = day(o.dueOn); o.cls = String(o.cls); o.status = String(o.status || '');
+    o.made = o.made instanceof Date ? o.made.toISOString() : String(o.made || '');
+    return o;
+  });
+}
+// Every pupil's Classroom submission for one homework (to count hand-ins).
+function allSubs_(courseId, cwId) {
+  const out = []; let token = null;
+  do {
+    const r = Classroom.Courses.CourseWork.StudentSubmissions.list(courseId, cwId, { pageSize: 100, pageToken: token }) || {};
+    (r.studentSubmissions || []).forEach((x) => out.push(x)); token = r.nextPageToken;
+  } while (token);
+  return out;
+}
+/* Set work, by class (spec 1.1 and 1.3): every homework set from the planner, newest first, with what
+   Classroom says now (draft, scheduled, posted), how many pupils are in the class, and how many have done
+   it (Form responses for a quiz, hand-ins for the rest). The page works out the status (logic.js hwStatus).
+   Read only. Kept for 5 minutes so switching tabs stays quick; "Refresh" asks again. */
+function homeworkStatus(k, fresh) {
+  check_(k);
+  const cache = CacheService.getScriptCache();
+  if (!fresh) { const hit = cache.get('hwstat'); if (hit) return JSON.parse(hit); }
+  const rows = hwRows_().reverse().slice(0, 60);
+  const out = rows.map((r) => {
+    const o = { id: r.id, cls: r.cls, kind: r.kind, title: r.title, tier: r.tier, file: r.file, formId: r.formId, formUrl: r.formUrl, setOn: r.setOn, dueOn: r.dueOn,
+      postAt: r.postAt, points: r.points, status: r.status, live: null, size: null, done: null, link: '', note: '' };
+    if (o.status !== 'marked' && r.courseId && r.courseWorkId && typeof Classroom !== 'undefined') {
+      try {
+        const cw = Classroom.Courses.CourseWork.get(r.courseId, r.courseWorkId) || {};
+        o.live = { state: cw.state || '', scheduled: !!cw.scheduledTime }; o.link = cw.alternateLink || '';
+        if (cw.state === 'PUBLISHED') {
+          const subs = allSubs_(r.courseId, r.courseWorkId);
+          o.size = subs.length;
+          if (!r.formId) o.done = subs.filter((x) => x.state === 'TURNED_IN' || x.state === 'RETURNED').length;
+        }
+      } catch (e) { o.note = 'Classroom could not find it (deleted there?)'; }
+    }
+    if (r.formId) { try { o.done = FormApp.openById(r.formId).getResponses().length; } catch (e) { o.note = 'The Form could not be opened'; } }
+    return o;
+  });
+  try { cache.put('hwstat', JSON.stringify(out), 300); } catch (e) { /* too big to keep: fine */ }
+  return out;
+}
+// "Mark as marked" (spec 1.3): key homework and other paper-free work he ticks himself; on = false undoes it.
+function markHomework(k, id, on) {
+  check_(k);
+  const r = hwRows_().find((x) => x.id === id);
+  if (!r) throw new Error('That homework is not in the Homework tab.');
+  const st = on === false ? (r.courseWorkId ? 'drafted' : 'form only') : 'marked';
+  tab_('Homework', HW_HEAD).getRange(r.row, HW_HEAD.indexOf('status') + 1).setValue(st);
+  CacheService.getScriptCache().remove('hwstat');
+  return st;
+}
+/* Results for one Form quiz (spec 2.4; Patryk 2026-10-19: "the grades and graph for each one"). Read only.
+   - every pupil: score, %, handed in late, and a flag when a self-mark looks generous (marks for a blank
+     answer, or 2+ marks for fewer than 3 words a mark); names from the Classroom class list;
+   - who has not done it (on the class list, no response);
+   - every question: % of the marks the class got, the wrong answers picked most (multiple choice), and
+     the mark points most often missed (self-marked questions). */
+function homeworkResults(k, id) {
+  check_(k);
+  const r = hwRows_().find((x) => x.id === id);
+  if (!r || !r.formId) throw new Error('That homework has no Google Form, so there are no results to read.');
+  const f = FormApp.openById(r.formId);
+  // Form items -> their question: "3(a). text" on page 1, "Question 3(a), mark 1 ..." on page 2
+  const keyOf = (t) => { const m = /^Question\s+(\d+(?:\([a-z]+\))?)/.exec(t) || /^(\d+(?:\([a-z]+\))?)\.\s/.exec(t); return m ? m[1] : null; };
+  const Q = new Map();
+  const q = (key) => { if (!Q.has(key)) Q.set(key, { key, text: '', max: 0, got: 0, n: 0, kind: 'written', wrong: {}, points: [] }); return Q.get(key); };
+  const info = {};
+  f.getItems().forEach((it) => {
+    const t = it.getTitle(), key = keyOf(t), type = String(it.getType());
+    if (!key) return;
+    if (type === 'MULTIPLE_CHOICE' || type === 'CHECKBOX') {
+      const x = type === 'MULTIPLE_CHOICE' ? it.asMultipleChoiceItem() : it.asCheckboxItem();
+      const selfMark = /^Question\s/.test(t), pts = x.getPoints() || 0;
+      info[it.getId()] = { key, pts, selfMark };
+      const qq = q(key); qq.max += pts;
+      if (!selfMark) { qq.kind = 'mcq'; qq.text = t.replace(/^\S+\.\s*/, ''); }
+      else qq.points.push({ id: it.getId(), title: t.replace(/^Question\s+\S+?,\s*/, ''), yes: 0, n: 0 });
+    } else if ((type === 'PARAGRAPH_TEXT' || type === 'TEXT') && /^\d/.test(t) && !/your working/i.test(t)) {
+      info[it.getId()] = { key, answer: true };
+      const qq = q(key);
+      if (!qq.text) qq.text = t.replace(/^\S+\.\s*/, '').replace(/\s+\[[^\]]*\]$/, '');
+      if (type === 'TEXT') qq.kind = 'number';
+    }
+  });
+  const max = [...Q.values()].reduce((a, x) => a + x.max, 0);
+  const roster = {};
+  if (r.courseId && typeof Classroom !== 'undefined') {
+    try {
+      let token = null;
+      do {
+        const s = Classroom.Courses.Students.list(r.courseId, { pageSize: 100, pageToken: token }) || {};
+        (s.students || []).forEach((x) => { const p = x.profile || {}; if (p.emailAddress) roster[String(p.emailAddress).toLowerCase()] = (p.name && p.name.fullName) || p.emailAddress; });
+        token = s.nextPageToken;
+      } while (token);
+    } catch (e) { /* no names: emails are shown */ }
+  }
+  const dueAt = r.dueOn ? at_(r.dueOn + 'T08:00').getTime() : null;
+  const pupils = f.getResponses().map((resp) => {
+    const email = String(resp.getRespondentEmail() || '').toLowerCase();
+    const answers = {}, self = {};
+    let score = 0;
+    resp.getItemResponses().forEach((ir) => { const m = info[ir.getItem().getId()]; if (m && m.answer) answers[m.key] = String(ir.getResponse() || ''); });
+    resp.getGradableItemResponses().forEach((ir) => {
+      const m = info[ir.getItem().getId()]; if (!m || m.answer) return;
+      const sc = Number(ir.getScore()) || 0; score += sc;
+      const qq = q(m.key); qq.got += sc;
+      if (m.selfMark) {
+        self[m.key] = (self[m.key] || 0) + sc;
+        const pt = qq.points.find((x) => x.id === ir.getItem().getId()); if (pt) { pt.n++; if (sc > 0) pt.yes++; }
+      } else if (sc < m.pts) { const a = [].concat(ir.getResponse() || '').join(' + ') || '(no answer)'; qq.wrong[a] = (qq.wrong[a] || 0) + 1; }
+    });
+    const flags = Object.keys(self).filter((key) => {
+      const words = String(answers[key] || '').trim().split(/\s+/).filter(Boolean).length, m = self[key];
+      return m > 0 && Q.get(key).kind === 'written' && (words === 0 || (m >= 2 && words < m * 3));
+    });
+    const when = resp.getTimestamp();
+    return { name: roster[email] || email || 'No email', email, score, pct: max ? Math.round(100 * score / max) : null, late: !!(dueAt && when && when.getTime() > dueAt), flags };
+  }).sort((a, b) => b.score - a.score);
+  const did = new Set(pupils.map((p) => p.email));
+  const missing = Object.keys(roster).filter((e) => !did.has(e)).map((e) => roster[e]).sort();
+  const questions = [...Q.values()].filter((x) => x.max).map((x) => ({ key: x.key, text: x.text, kind: x.kind, max: x.max,
+    pct: pupils.length ? Math.round(100 * x.got / (x.max * pupils.length)) : null,
+    wrong: Object.keys(x.wrong).map((a) => ({ answer: a, count: x.wrong[a] })).sort((a, b) => b.count - a.count).slice(0, 3),
+    missed: x.points.filter((p) => p.n).map((p) => ({ title: p.title, pct: Math.round(100 * (p.n - p.yes) / p.n) })).sort((a, b) => b.pct - a.pct).slice(0, 3) }));
+  return { id, cls: r.cls, title: r.title, dueOn: r.dueOn, max, size: Object.keys(roster).length || null, pupils, missing, questions };
+}
+// His grade boundaries (% for each grade), one list per key stage: { ks3: [...], ks4: [...], ks5: [...] }.
+function setGradeBands(k, bands) {
+  check_(k);
+  const clean = {};
+  ['ks3', 'ks4', 'ks5'].forEach((ks) => {
+    clean[ks] = ((bands || {})[ks] || []).map((b) => ({ g: String(b.g).trim().slice(0, 3), min: Math.max(0, Math.min(100, Number(b.min) || 0)) })).filter((b) => b.g);
+  });
+  PropertiesService.getScriptProperties().setProperty('GRADE_BANDS', JSON.stringify(clean));
+  return clean;
+}
+// Rename a lesson he added (spec 3.1). The planner's name only: the Drive folder keeps its name (never rename on Drive).
+function renameAdded(k, cls, unit, title, name) {
+  check_(k);
+  const nm = String(name || '').trim();
+  if (!nm) throw new Error('Type the new name.');
+  const ad = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Added');
+  if (!ad || ad.getLastRow() < 2) throw new Error('No added lessons saved.');
+  const vals = ad.getRange(2, 1, ad.getLastRow() - 1, 1).getValues();
+  for (let i = 0; i < vals.length; i++) {
+    let rec; try { rec = JSON.parse(vals[i][0]); } catch (e) { continue; }
+    if (rec.cls === cls && rec.unit === unit && (rec.title === title || rec.name === title)) {
+      rec.name = nm;
+      ad.getRange(i + 2, 1).setValue(JSON.stringify(rec));
+      pushState_();
+      return rec;
+    }
+  }
+  throw new Error('That lesson was not found in the Added tab (only lessons you added can be renamed).');
 }
 function dayName_(iso) {
   const [y, m, d] = String(iso).split('-').map(Number);
@@ -543,12 +739,14 @@ function classroomDraft_(hw, form, opt) {
     const due = o.due || hw.due;
     const [y, m, d] = due.split('-').map(Number);
     const t = ukToUtc_(due, 8, 0);
-    const title = classroomTitle_(hw);
+    const title = o.title || classroomTitle_(hw);
+    const url = form ? form.getPublishedUrl() : o.link;
     const body = {
-      title, description: o.message || hw.intro || '', workType: 'ASSIGNMENT', state: 'DRAFT', maxPoints: o.points || totalPoints_(hw),
-      materials: [{ link: { url: form.getPublishedUrl(), title } }],
+      title, description: o.message || hw.intro || '', workType: 'ASSIGNMENT', state: 'DRAFT',
       dueDate: { year: y, month: m, day: d }, dueTime: t,
     };
+    if (form) body.maxPoints = o.points || totalPoints_(hw);   // link homework stays ungraded in Classroom
+    if (url) body.materials = [{ link: { url, title } }];
     if (o.postAt) body.scheduledTime = at_(o.postAt).toISOString();   // posts itself at that UK time (stays a draft until then)
     const res = Classroom.Courses.CourseWork.create(body, course.id) || {};
     const pad = (x) => (x < 10 ? '0' : '') + x;
@@ -593,7 +791,8 @@ function loadAll_(withData) {
   const ls = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Lessons');
   if (ls && ls.getLastRow() > 1) ls.getRange(2, 2, ls.getLastRow() - 1, 1).getValues().forEach(([json]) => { try { records.push(JSON.parse(json)); } catch (e) { /* skip */ } });
   return { version: VERSION, data: withData && chunks ? JSON.parse(chunks) : null, weeks, learned, added, classSettings, records,
-    behaviourUrl: PropertiesService.getScriptProperties().getProperty('BEHAVIOUR_URL') || '' };
+    behaviourUrl: PropertiesService.getScriptProperties().getProperty('BEHAVIOUR_URL') || '',
+    gradeBands: (() => { try { return JSON.parse(PropertiesService.getScriptProperties().getProperty('GRADE_BANDS') || '{}'); } catch (e) { return {}; } })() };
 }
 
 // A tab, made the first time it is needed (so an existing planner needs no setup re-run).
