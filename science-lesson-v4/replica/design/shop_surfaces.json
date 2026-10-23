@@ -1,0 +1,599 @@
+{
+  "currency": "Eldritch Doubloons (Ð)",
+  "bands": {
+    "Basic": [
+      0,
+      120
+    ],
+    "Nice": [
+      150,
+      350
+    ],
+    "Fancy": [
+      500,
+      600
+    ],
+    "Eldritch": [
+      900,
+      1400
+    ]
+  },
+  "items": [
+    {
+      "id": "floors_basic_1_pine_planks",
+      "name": "Pine planks",
+      "category": "floors",
+      "zone": "floor",
+      "tier": "Basic",
+      "price": 0,
+      "lock": null
+    },
+    {
+      "id": "floors_basic_2_sandy_floor",
+      "name": "Sandy floor",
+      "category": "floors",
+      "zone": "floor",
+      "tier": "Basic",
+      "price": 80,
+      "lock": null
+    },
+    {
+      "id": "floors_basic_3_grey_flagstones",
+      "name": "Grey flagstones",
+      "category": "floors",
+      "zone": "floor",
+      "tier": "Basic",
+      "price": 110,
+      "lock": null
+    },
+    {
+      "id": "floors_nice_1_checker_tiles",
+      "name": "Checker tiles",
+      "category": "floors",
+      "zone": "floor",
+      "tier": "Nice",
+      "price": 200,
+      "lock": null
+    },
+    {
+      "id": "floors_nice_2_library_parquet",
+      "name": "Library parquet",
+      "category": "floors",
+      "zone": "floor",
+      "tier": "Nice",
+      "price": 260,
+      "lock": null
+    },
+    {
+      "id": "floors_nice_3_wave_mosaic",
+      "name": "Wave mosaic",
+      "category": "floors",
+      "zone": "floor",
+      "tier": "Nice",
+      "price": 320,
+      "lock": null
+    },
+    {
+      "id": "floors_fancy_1_deep_blue_carpet",
+      "name": "Deep-blue carpet",
+      "category": "floors",
+      "zone": "floor",
+      "tier": "Fancy",
+      "price": 550,
+      "lock": null
+    },
+    {
+      "id": "floors_fancy_2_ship_deck_compass",
+      "name": "Ship's deck + compass",
+      "category": "floors",
+      "zone": "floor",
+      "tier": "Fancy",
+      "price": 520,
+      "lock": null
+    },
+    {
+      "id": "floors_fancy_3_gold_inlay_marble",
+      "name": "Gold-inlay marble",
+      "category": "floors",
+      "zone": "floor",
+      "tier": "Fancy",
+      "price": 600,
+      "lock": null
+    },
+    {
+      "id": "floors_eldritch_1_starfield_floor",
+      "name": "Starfield floor",
+      "category": "floors",
+      "zone": "floor",
+      "tier": "Eldritch",
+      "price": 1200,
+      "lock": {
+        "type": "level",
+        "min": 15,
+        "text": "needs level 15"
+      }
+    },
+    {
+      "id": "floors_eldritch_2_rlyeh_stone",
+      "name": "R'lyeh stone",
+      "category": "floors",
+      "zone": "floor",
+      "tier": "Eldritch",
+      "price": 1000,
+      "lock": null
+    },
+    {
+      "id": "floors_eldritch_3_non_euclidean_tiles",
+      "name": "Non-Euclidean tiles",
+      "category": "floors",
+      "zone": "floor",
+      "tier": "Eldritch",
+      "price": 1400,
+      "lock": {
+        "type": "outside_work",
+        "count": 10,
+        "text": "needs 10 outside-work ticks"
+      }
+    },
+    {
+      "id": "rugs_basic_1_plain_rug",
+      "name": "Plain rug",
+      "category": "rugs",
+      "zone": "rug",
+      "tier": "Basic",
+      "price": 0,
+      "lock": null
+    },
+    {
+      "id": "rugs_basic_2_rag_rug",
+      "name": "Rag rug",
+      "category": "rugs",
+      "zone": "rug",
+      "tier": "Basic",
+      "price": 80,
+      "lock": null
+    },
+    {
+      "id": "rugs_basic_3_kelp_mat",
+      "name": "Kelp mat",
+      "category": "rugs",
+      "zone": "rug",
+      "tier": "Basic",
+      "price": 100,
+      "lock": null
+    },
+    {
+      "id": "rugs_nice_1_woven_rug",
+      "name": "Woven rug",
+      "category": "rugs",
+      "zone": "rug",
+      "tier": "Nice",
+      "price": 180,
+      "lock": null
+    },
+    {
+      "id": "rugs_nice_2_fish_rug",
+      "name": "Fish rug",
+      "category": "rugs",
+      "zone": "rug",
+      "tier": "Nice",
+      "price": 220,
+      "lock": null
+    },
+    {
+      "id": "rugs_nice_3_open_book_rug",
+      "name": "Open-book rug",
+      "category": "rugs",
+      "zone": "rug",
+      "tier": "Nice",
+      "price": 280,
+      "lock": null
+    },
+    {
+      "id": "rugs_fancy_1_spiral_rug",
+      "name": "Spiral rug",
+      "category": "rugs",
+      "zone": "rug",
+      "tier": "Fancy",
+      "price": 500,
+      "lock": null
+    },
+    {
+      "id": "rugs_fancy_2_medallion_rug",
+      "name": "Medallion rug",
+      "category": "rugs",
+      "zone": "rug",
+      "tier": "Fancy",
+      "price": 560,
+      "lock": null
+    },
+    {
+      "id": "rugs_fancy_3_star_chart_rug",
+      "name": "Star-chart rug",
+      "category": "rugs",
+      "zone": "rug",
+      "tier": "Fancy",
+      "price": 600,
+      "lock": null
+    },
+    {
+      "id": "rugs_eldritch_1_tentacle_rug",
+      "name": "Tentacle rug",
+      "category": "rugs",
+      "zone": "rug",
+      "tier": "Eldritch",
+      "price": 1100,
+      "lock": null
+    },
+    {
+      "id": "rugs_eldritch_2_sleepy_eye_rug",
+      "name": "Sleepy eye rug",
+      "category": "rugs",
+      "zone": "rug",
+      "tier": "Eldritch",
+      "price": 1200,
+      "lock": {
+        "type": "level",
+        "min": 10,
+        "text": "needs level 10"
+      }
+    },
+    {
+      "id": "rugs_eldritch_3_tide_hole",
+      "name": "Tide hole (waves back)",
+      "category": "rugs",
+      "zone": "rug",
+      "tier": "Eldritch",
+      "price": 1300,
+      "lock": {
+        "type": "outside_work",
+        "count": 8,
+        "text": "needs 8 outside-work ticks"
+      }
+    },
+    {
+      "id": "wallpapers_basic_1_plain",
+      "name": "Plain",
+      "category": "wallpapers",
+      "zone": "walls",
+      "tier": "Basic",
+      "price": 0,
+      "lock": null
+    },
+    {
+      "id": "wallpapers_basic_2_wood_panels",
+      "name": "Wood panels",
+      "category": "wallpapers",
+      "zone": "walls",
+      "tier": "Basic",
+      "price": 90,
+      "lock": null
+    },
+    {
+      "id": "wallpapers_basic_3_whitewash_brick",
+      "name": "Whitewash brick",
+      "category": "wallpapers",
+      "zone": "walls",
+      "tier": "Basic",
+      "price": 120,
+      "lock": null
+    },
+    {
+      "id": "wallpapers_nice_1_stripes",
+      "name": "Stripes",
+      "category": "wallpapers",
+      "zone": "walls",
+      "tier": "Nice",
+      "price": 180,
+      "lock": null
+    },
+    {
+      "id": "wallpapers_nice_2_cosy_waves",
+      "name": "Cosy waves",
+      "category": "wallpapers",
+      "zone": "walls",
+      "tier": "Nice",
+      "price": 240,
+      "lock": null
+    },
+    {
+      "id": "wallpapers_nice_3_library_print",
+      "name": "Library print",
+      "category": "wallpapers",
+      "zone": "walls",
+      "tier": "Nice",
+      "price": 300,
+      "lock": null
+    },
+    {
+      "id": "wallpapers_fancy_1_scales",
+      "name": "Scales",
+      "category": "wallpapers",
+      "zone": "walls",
+      "tier": "Fancy",
+      "price": 550,
+      "lock": null
+    },
+    {
+      "id": "wallpapers_fancy_2_study_damask",
+      "name": "Study damask",
+      "category": "wallpapers",
+      "zone": "walls",
+      "tier": "Fancy",
+      "price": 520,
+      "lock": null
+    },
+    {
+      "id": "wallpapers_fancy_3_chalkboard_wall",
+      "name": "Chalkboard wall",
+      "category": "wallpapers",
+      "zone": "walls",
+      "tier": "Fancy",
+      "price": 580,
+      "lock": null
+    },
+    {
+      "id": "wallpapers_eldritch_1_glowing_glyphs",
+      "name": "Glowing glyphs",
+      "category": "wallpapers",
+      "zone": "walls",
+      "tier": "Eldritch",
+      "price": 1000,
+      "lock": null
+    },
+    {
+      "id": "wallpapers_eldritch_2_sunken_ship_timbers",
+      "name": "Sunken-ship timbers",
+      "category": "wallpapers",
+      "zone": "walls",
+      "tier": "Eldritch",
+      "price": 1100,
+      "lock": {
+        "type": "outside_work",
+        "count": 6,
+        "text": "needs 6 outside-work ticks"
+      }
+    },
+    {
+      "id": "wallpapers_eldritch_3_star_chart_walls",
+      "name": "Star-chart walls",
+      "category": "wallpapers",
+      "zone": "walls",
+      "tier": "Eldritch",
+      "price": 1300,
+      "lock": {
+        "type": "level",
+        "min": 15,
+        "text": "needs level 15"
+      }
+    },
+    {
+      "id": "windows_basic_1_brass_porthole",
+      "name": "Brass porthole",
+      "category": "windows",
+      "zone": "left_wall_window",
+      "tier": "Basic",
+      "price": 0,
+      "lock": null
+    },
+    {
+      "id": "windows_basic_2_four_pane_window",
+      "name": "Four-pane window",
+      "category": "windows",
+      "zone": "left_wall_window",
+      "tier": "Basic",
+      "price": 80,
+      "lock": null
+    },
+    {
+      "id": "windows_basic_3_curtained_porthole",
+      "name": "Curtained porthole",
+      "category": "windows",
+      "zone": "left_wall_window",
+      "tier": "Basic",
+      "price": 110,
+      "lock": null
+    },
+    {
+      "id": "windows_nice_1_arched_window",
+      "name": "Arched window",
+      "category": "windows",
+      "zone": "left_wall_window",
+      "tier": "Nice",
+      "price": 200,
+      "lock": null
+    },
+    {
+      "id": "windows_nice_2_twin_portholes",
+      "name": "Twin portholes",
+      "category": "windows",
+      "zone": "left_wall_window",
+      "tier": "Nice",
+      "price": 240,
+      "lock": null
+    },
+    {
+      "id": "windows_nice_3_kelp_forest_view",
+      "name": "Kelp-forest view",
+      "category": "windows",
+      "zone": "left_wall_window",
+      "tier": "Nice",
+      "price": 320,
+      "lock": null
+    },
+    {
+      "id": "windows_fancy_1_stained_glass_fish",
+      "name": "Stained-glass fish",
+      "category": "windows",
+      "zone": "left_wall_window",
+      "tier": "Fancy",
+      "price": 550,
+      "lock": null
+    },
+    {
+      "id": "windows_fancy_2_rose_window",
+      "name": "Rose window",
+      "category": "windows",
+      "zone": "left_wall_window",
+      "tier": "Fancy",
+      "price": 600,
+      "lock": null
+    },
+    {
+      "id": "windows_fancy_3_diving_bell_porthole",
+      "name": "Diving-bell porthole",
+      "category": "windows",
+      "zone": "left_wall_window",
+      "tier": "Fancy",
+      "price": 520,
+      "lock": null
+    },
+    {
+      "id": "windows_eldritch_1_eye_in_the_deep",
+      "name": "Eye in the deep",
+      "category": "windows",
+      "zone": "left_wall_window",
+      "tier": "Eldritch",
+      "price": 1200,
+      "lock": {
+        "type": "outside_work",
+        "count": 5,
+        "text": "needs 5 outside-work ticks"
+      }
+    },
+    {
+      "id": "windows_eldritch_2_window_on_the_void",
+      "name": "Window on the void",
+      "category": "windows",
+      "zone": "left_wall_window",
+      "tier": "Eldritch",
+      "price": 1000,
+      "lock": null
+    },
+    {
+      "id": "windows_eldritch_3_rlyeh_view",
+      "name": "R'lyeh view",
+      "category": "windows",
+      "zone": "left_wall_window",
+      "tier": "Eldritch",
+      "price": 1400,
+      "lock": {
+        "type": "level",
+        "min": 15,
+        "text": "needs level 15"
+      }
+    },
+    {
+      "id": "lights_basic_1_candle",
+      "name": "Candle",
+      "category": "lights",
+      "zone": "light",
+      "tier": "Basic",
+      "price": 0,
+      "lock": null
+    },
+    {
+      "id": "lights_basic_2_ships_lantern",
+      "name": "Ship's lantern",
+      "category": "lights",
+      "zone": "light",
+      "tier": "Basic",
+      "price": 90,
+      "lock": null
+    },
+    {
+      "id": "lights_basic_3_shell_night_light",
+      "name": "Shell night light",
+      "category": "lights",
+      "zone": "light",
+      "tier": "Basic",
+      "price": 110,
+      "lock": null
+    },
+    {
+      "id": "lights_nice_1_lamp",
+      "name": "Lamp",
+      "category": "lights",
+      "zone": "light",
+      "tier": "Nice",
+      "price": 160,
+      "lock": null
+    },
+    {
+      "id": "lights_nice_2_bankers_lamp",
+      "name": "Banker's lamp",
+      "category": "lights",
+      "zone": "light",
+      "tier": "Nice",
+      "price": 240,
+      "lock": null
+    },
+    {
+      "id": "lights_nice_3_pufferfish_lantern",
+      "name": "Pufferfish lantern",
+      "category": "lights",
+      "zone": "light",
+      "tier": "Nice",
+      "price": 300,
+      "lock": null
+    },
+    {
+      "id": "lights_fancy_1_jellyfish_lamp",
+      "name": "Jellyfish lamp",
+      "category": "lights",
+      "zone": "light",
+      "tier": "Fancy",
+      "price": 500,
+      "lock": null
+    },
+    {
+      "id": "lights_fancy_2_coral_candelabra",
+      "name": "Coral candelabra",
+      "category": "lights",
+      "zone": "light",
+      "tier": "Fancy",
+      "price": 560,
+      "lock": null
+    },
+    {
+      "id": "lights_fancy_3_brass_orrery_lamp",
+      "name": "Brass orrery lamp",
+      "category": "lights",
+      "zone": "light",
+      "tier": "Fancy",
+      "price": 600,
+      "lock": null
+    },
+    {
+      "id": "lights_eldritch_1_jellyfish_chandelier",
+      "name": "Jellyfish chandelier",
+      "category": "lights",
+      "zone": "light",
+      "tier": "Eldritch",
+      "price": 1300,
+      "lock": null
+    },
+    {
+      "id": "lights_eldritch_2_floating_eye_orb",
+      "name": "Floating eye orb",
+      "category": "lights",
+      "zone": "light",
+      "tier": "Eldritch",
+      "price": 1000,
+      "lock": null
+    },
+    {
+      "id": "lights_eldritch_3_anglerfish_lure_lamp",
+      "name": "Anglerfish lure lamp",
+      "category": "lights",
+      "zone": "light",
+      "tier": "Eldritch",
+      "price": 1150,
+      "lock": {
+        "type": "outside_work",
+        "count": 6,
+        "text": "needs 6 outside-work ticks"
+      }
+    }
+  ]
+}
