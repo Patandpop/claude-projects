@@ -226,3 +226,5 @@ Sources:
 8. **Sunday review + weekly card (F09, S08), settings (S09).** Then the "should/could" list: seasonal shelf, second room and outside, class-goal tiers.
 
 Next in the replica pack: `/replica-design` (room, creature moods, coin icon, item set in one style).
+
+**Room world v2 (2026-10-23):** corner rooms, zones, upgrade lines, pets, outfits, potions, quests and the room list are in `design/world.md`. It replaces the room parts of slices 1 and 5; pets, potions, quests and new rooms become slices 9-12.
