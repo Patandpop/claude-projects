@@ -1,5 +1,5 @@
 'use strict';
-// build.js part 01-core: requires, constants (colours, sizes, stages, tiers), small helpers (cap, slug, arr, normQ, mcqOptions, esc). Loaded by build.js in order; all parts share one scope.
+// build.js part 01-core: requires, constants (colours, sizes, stages, tiers), small helpers (cap, slug, arr, normQ, mcqOptions). Loaded by build.js in order; all parts share one scope.
 
 const fs = require('fs');
 const path = require('path');
@@ -79,7 +79,6 @@ const JITTER_PROFILES = [
 const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 const slug = (s) => String(s || 'lesson').trim().replace(/[^A-Za-z0-9]+/g, '-')
   .replace(/^-+|-+$/g, '').replace(/-{2,}/g, '-') || 'lesson';
-const today = () => new Date().toISOString().slice(0, 10);
 const arr = (x) => (Array.isArray(x) ? x : (x == null ? [] : [x]));
 const marksTag = (m) => (m ? `  [${m} ${m > 1 ? 'marks' : 'mark'}]` : '');
 
@@ -100,4 +99,3 @@ function mcqOptions(o) {                         // array or {A..D} → {A..D}
   }
   return o || {};
 }
-const esc  = (s) => String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');

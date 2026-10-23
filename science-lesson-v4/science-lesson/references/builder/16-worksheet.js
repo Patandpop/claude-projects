@@ -5,11 +5,6 @@
    WORKSHEET ASSEMBLY — types A–H, split differentiation
    ========================================================================= */
 
-function mcqInline(opts) {
-  const o = mcqOptions(opts);
-  return '  (A ' + o.A + '  /  B ' + o.B + '  /  C ' + o.C + '  /  D ' + o.D + ')';
-}
-
 /* derive printable Build questions from build items */
 function buildQuestionBlocks(L, state, mode) {
   const out = [];

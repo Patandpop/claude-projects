@@ -12,48 +12,8 @@
        3. /mnt/user-data/outputs  (claude.ai sandbox — auto-detected)
        4. current working directory
 
-   INPUT  — lesson-content.json = JSON ARRAY of 1–N lesson objects (schema per
-   SKILL.md). Brief shape:
-
-     [{
-       "meta":  { "class","topic","title","lessonType","theme","worksheet",
-                  "differentiation":"none|split","annotation":false,
-                  "date"?, "visualiserUrl"?, "yearLine"? },
-       "title": { "objectives":[".."], "keywords":[".."] },     // optional wrapper
-       "doNow": { "variant":"A|B", "questions":[{"q","a","marks"?}] },
-       "engage":{ "variant","title"?,"content","prompt"?,"videoLink"?{text,url},
-                  "imagePlaceholder":true },
-       "learn": [{ "variant":"A|B|C|D", "heading","body","keywords":[],
-                   "imagePlaceholder":true,"annotationZone":false,
-                   "toWrite":[]?, "corePaper":[{q,pages}]?, "extendPaper":[]?,
-                   "instruction"? }],
-       "build": [ {"type":"mcq","q","options":[4]|{A..D},"answer":"B",
-                   "explanation"?,"commonError"?},
-                  {"type":"workedExample","worked":{prompt,steps[]},
-                   "yourTurn":{prompt,answer}},
-                  {"type":"guessExample","topic"?,"given","unknown","equation",
-                   "equationSymbols"?:{top,bottomLeft,bottomRight},"substitute","solve"},
-                  {"type":"practiceTriangle","topic"?,"questions":[{q,a,marks?}],"equation",
-                   "equationSymbols"?:{top,bottomLeft,bottomRight}},
-                  {"type":"errorAnalysis","wrongWorking":[],"errorLine":3,
-                   "fix","errorType"?},
-                  {"type":"graphInterpret","graphLabel","axes":{x,y},
-                   "annotationZone"?,"questions":[{q,a,marks}]},
-                  {"type":"misconception","claim","whyWrong","truth"},
-                  {"type":"practical","intro","steps":[],"warning"?,
-                   "questions":[{q,a}]?},
-                  {"type":"sort","instruction","items":[],
-                   "categories":{A,B},"sorted":{A:[],B:[]}} ],
-       "apply": { "variant":"A|B|C"?, "developing":[{q,a,marks,qType,
-                  "commonError"?,"starters":[]?,"structure":[]?,"given"?,
-                  "unknown"?}], "reaching":[..], "mastering":[..] },
-       "review":{ "developing":[{q,a}],"reaching":[..],"mastering":[..] }
-                  // OR { "questions":[{q,a}] } — falls back to apply q/a
-       "whiteboard": { "rounds":[{ "q","a","subject"? }] },     // whiteboard/revision
-       "worksheetExtras": { "wordBank":[]?,"videoQuestions":[]?,
-                  "navRows":[{q,topic,section}]?,"links":{developing:"..",..}?,
-                  "results":{headers:[],rows:n}?,"intro"? }     // optional
-     }]
+   INPUT  - lesson-content.json = JSON ARRAY of 1-N lesson objects. The schema lives
+   ONLY in SKILL.md "Content object schema" (one source of truth).
 
    OUTPUT — per lesson (always 3 files):
             [base].pptx · [base]_worksheet.docx · [base]_support_worksheet.docx
@@ -73,7 +33,7 @@
    one exactly as when this was a single 6,000-line file. Add new code to the part that
    fits; a new part must be added to PARTS below AND to skill-manifest.json.
 
-     01-core.js              requires, constants (colours, sizes, stages, tiers), small helpers (cap, slug, arr, normQ, mcqOptions, esc)
+     01-core.js              requires, constants (colours, sizes, stages, tiers), small helpers (cap, slug, arr, normQ, mcqOptions)
      02-equations.js         equations and markup: normSym, prettyText, parseEq, proseMathSegs, toPptxRuns/toDocxRuns, renderEqShapes, parseMarkup
      03-slide-helpers.js     slide drawing helpers: txt, keySplit, table, navBar, bottomBar, sectionHeader, goldBox, autoFontSize, navyHeaderBox, images, buildWarn
      04-handwriting.js       handwriting (Caveat font, editable and picture versions), mark-tag highlights, font metrics, EOT conversion

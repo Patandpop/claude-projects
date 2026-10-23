@@ -14,7 +14,6 @@ const _SYM = {
   times:'×', div:'÷', pm:'±', cdot:'·', to:'→', rightarrow:'→',
   leq:'≤', geq:'≥', approx:'≈', neq:'≠', degree:'°', deg:'°', propto:'∝',
 };
-const _GREEK = _SYM; // back-compat alias — anything that referenced _GREEK still works
 
 /* symCmds(str) — \cmd tokens → symbols (\times → ×, \rho → ρ), plus the Bug 61
    repair. Safe on ANY text: only backslash commands are touched. */

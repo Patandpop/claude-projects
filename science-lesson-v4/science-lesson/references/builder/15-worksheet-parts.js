@@ -490,23 +490,6 @@ function definitionTable(terms) {
   return [spacer(), fullTable(rows, colW, GREY_TBL), spacer()];
 }
 
-/* writeLines(n) — hairline ruled lines for working space; support worksheet only.
-   Callers must be wrapped in if (scaffolded). */
-function writeLines(n) {
-  const count = n || 2;
-  const rows = Array.from({ length: count }, () => new TableRow({
-    cantSplit: true,
-    height: { value: 200, rule: HeightRule.EXACT },
-    children: [cell({
-      w: PAGE_W,
-      borders: { top: { style: BorderStyle.SINGLE, size: 4, color: 'BBBBBB' }, bottom: B_NONE, left: B_NONE, right: B_NONE },
-      margins: { top: 0, bottom: 0, left: 0, right: 0 },
-      children: [new Paragraph({})],
-    })],
-  }));
-  return [fullTable(rows, [PAGE_W]), spacer()];
-}
-
 /* ---- Starfield header ------------------------------------------------------- */
 // ponytail: PNG is always bundled in the skill package — Python regeneration was dead code
 function getStarfield() {
