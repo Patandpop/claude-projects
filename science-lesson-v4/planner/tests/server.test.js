@@ -7,7 +7,7 @@ m.sheets.Students._data[0].push('Support');
 m.sheets.Students._data.forEach((r, i) => { if (i) r.push(i === 1 ? 'prompt' : ''); });
 // one project since 2026-10-12: the planner's Code.gs and Behaviour.gs load together (a clash would break this)
 eval(fs.readFileSync(path.join(__dirname, '..', 'Code.gs'), 'utf8') + '\n' + fs.readFileSync(path.join(__dirname, '..', 'Behaviour.gs'), 'utf8') +
-  '\nglobal.api={init,openClass,logEvent,logMany,removeMany,getBoard,setMode,endMode,getMode,setTimer,adjustTimer,stopTimer,submitResult,getSilence,getFriday,positivesOver,setSupport,setPause,mergeBehaviourData,behaviourWeek,sameClass_};');
+  '\nglobal.api={init,openClass,logEvent,logMany,removeMany,getBoard,setMode,endMode,getMode,setTimer,adjustTimer,stopTimer,submitResult,getSilence,getFriday,positivesOver,setSupport,setPause,mergeBehaviourData,behaviourWeek,sameClass_,lessonMcqs,saveVote,removeVote};');
 const k = 'k', out = []; let failed = 0;
 const ok = (n, c) => { out.push((c ? 'PASS ' : 'FAIL ') + n); if (!c) failed++; };
 
@@ -96,5 +96,26 @@ m.old.Log._data.push([new Date(Date.now() + 1000), '8XP', 'Ada Lovelace', 'Posit
 api.mergeBehaviourData();
 ok('merge again: only the newer row is added', m.sheets['Behaviour Log']._data.length === logBefore + 1);
 ok('merge is noted in the planner Log tab, not the behaviour log', m.sheets.Log && /merged behaviour/.test(m.sheets.Log._data.slice(-1)[0][1]));
+
+// ABCD card votes (2026-10-23)
+{
+  const day = (Number(Utilities.formatDate(new Date(), 'Europe/London', 'u')) + 6) % 7;
+  const mon = Utilities.formatDate(new Date(Date.now() - day * 864e5), 'Europe/London', 'yyyy-MM-dd');
+  const mcq = [{ q: 'Which cell has a tail?', o: ['Egg', 'Sperm', 'Nerve', 'Ciliated'], a: 'B', why: { A: 'thinks the egg swims' } }];
+  m.sheets.Data = m.makeSheet('Data', [['json'], [JSON.stringify({ classes: { '7MLA': { seq: [{ unit: 'B1', title: 'Cells', rel: 'Y7/B1/L3' }, { unit: 'B1', title: 'Specialised Cells', rel: 'Y7/B1/L4', mcq }] } }, timetable: {} })]]);
+  ok('ABCD: no saved week gives a plain message', /not saved/.test(api.lessonMcqs(k, '7MLA').none || ''));
+  m.sheets.Weeks = m.makeSheet('Weeks', [['monday', 'json'], [mon, JSON.stringify({ monday: mon, slots: [{ cls: '7MLA', day, period: 2, kind: 'lesson', key: 'Y7/B1/L4' }] })]]);
+  const lm = api.lessonMcqs(k, '7ML');
+  ok('ABCD: today\'s lesson and its questions come from the saved week (7ML = 7MLA)', lm.title === 'Specialised Cells' && lm.mcq.length === 1 && lm.mcq[0].a === 'B' && lm.today);
+  const v = api.saveVote(k, { cls: '7MLA', key: lm.key, title: lm.title, q: 0, question: mcq[0].q, right: 'B', split: { A: 30, B: 70 }, why: mcq[0].why });
+  const row = () => m.sheets['MCQ Votes']._data.slice(-1)[0];
+  ok('ABCD: a vote is saved with % right, main wrong answer and its misconception', v.pctRight === 70 && row()[9] === 70 && row()[10] === 'A' && row()[11] === 'thinks the egg swims' && row()[5] === 1);
+  const n = m.sheets['MCQ Votes']._data.length;
+  api.saveVote(k, { id: v.id, cls: '7MLA', q: 0, right: 'B', split: { A: 20, B: 80 } });
+  ok('ABCD: adjusting the split updates the same row', m.sheets['MCQ Votes']._data.length === n && row()[9] === 80);
+  ok('ABCD: undo removes the vote', api.removeVote(k, v.id) === true && m.sheets['MCQ Votes']._data.length === n - 1);
+  let bad = ''; try { api.saveVote(k, { cls: '7MLA', split: {} }); } catch (e) { bad = e.message; }
+  ok('ABCD: an empty vote is refused', /No letters/.test(bad));
+}
 
 console.log(out.join('\n')); console.log(failed ? `\n${failed} FAILED` : '\nAll passed'); process.exit(failed ? 1 : 0);

@@ -225,6 +225,23 @@
   .st.recent { background:var(--warn-wash); border-color:#EFC49A; }
   .st small { display:block; font-size:12px; color:var(--warn-text); font-weight:800; }
   .sug { font-size:12px; color:var(--sodium-text); font-weight:800; background:var(--sodium-wash); padding:3px 7px; border-radius:999px; }
+
+  /* ABCD card votes (specs/learning-loop.md M3, Patryk's feedback 2026-10-22): replaces the seating plan */
+  .abcdBtn { border:1.5px solid var(--line); background:var(--plate); border-radius:10px; padding:6px 12px; font-weight:800; font-size:14px; color:var(--ink); }
+  .abcdBtn[aria-pressed="true"] { background:var(--ink); color:var(--on-ink); border-color:var(--ink); }
+  .vhead { display:flex; align-items:center; gap:8px; margin:6px 0; }
+  .vhead button { border:1.5px solid var(--line); background:var(--plate); border-radius:10px; width:44px; height:44px; font-size:22px; font-weight:800; color:var(--ink); }
+  .vq { flex:1; font-size:15px; line-height:1.3; } .vq b { font-family:var(--display); font-size:20px; display:block; }
+  .vgrid { display:grid; grid-template-columns:1fr 1fr; grid-template-areas:"B C" "A D"; gap:10px; touch-action:none; user-select:none; -webkit-user-select:none; }
+  .vl { border-radius:16px; color:#fff; min-height:min(17vh, 140px); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:8px; text-align:center; position:relative; border:4px solid transparent; }
+  .vl b { font-family:var(--display); font-size:52px; line-height:1; } .vl small { font-size:13px; line-height:1.25; opacity:.92; margin-top:4px; max-height:3.8em; overflow:hidden; }
+  .vl.on { border-color:var(--ink); box-shadow:0 0 0 3px var(--paper) inset; } .vl.dim { opacity:.35; }
+  .vl .tick { position:absolute; top:6px; right:10px; font-size:18px; font-weight:800; }
+  .vres { text-align:center; font-family:var(--display); font-size:40px; font-weight:800; margin:10px 0 4px; min-height:48px; }
+  .vres.hint { font-family:var(--text); font-size:15px; font-weight:400; color:var(--soft); }
+  .vres .r { color:var(--ok); }
+  .vadj { display:flex; gap:10px; } .vadj button { flex:1; border:0; border-radius:14px; padding:16px 8px; font-weight:800; font-size:18px; color:#fff; }
+  .vbtns { display:flex; gap:10px; margin-top:10px; } .vbtns button { flex:1; }
   .cta { width:100%; border:0; border-radius:14px; padding:15px; font-weight:800; font-size:17px; background:var(--ink); color:var(--on-ink); margin-top:6px; }
   .cta.alt { background:var(--plate); color:var(--ink); border:1px solid var(--line); }
   textarea { width:100%; min-height:220px; font:inherit; padding:12px; border:1px solid var(--line); border-radius:14px; background:var(--plate); }
@@ -255,9 +272,11 @@
   <section id="vLog">
     <div class="row">
       <div class="seg"><button id="mPlan" aria-pressed="true">Plan</button><button id="mNames" aria-pressed="false">Names</button></div>
+      <button class="abcdBtn" id="mAbcd" aria-pressed="false" title="ABCD cards: record the class's answers to the lesson's multiple choice questions">ABCD</button>
       <input id="search" type="search" placeholder="Find" autocomplete="off" class="hidden">
     </div>
     <p class="hint" id="hint">Tap to award. Hold to pick several.</p>
+    <div id="vote" class="hidden"></div>
     <div id="studs"></div>
     <div id="lesson"></div>
   </section>
@@ -424,7 +443,107 @@ function renderLesson(t) {
   $('lesson').innerHTML = h;
 }
 function setView(v) { S.view = v; LS.set('view', v); renderStudents(); }
-$('mPlan').onclick = () => setView('plan'); $('mNames').onclick = () => setView('names');
+$('mPlan').onclick = () => { voteOn(false); setView('plan'); }; $('mNames').onclick = () => { voteOn(false); setView('names'); };
+/* ABCD card votes (specs/learning-loop.md M3/M4; Patryk 2026-10-22). Corners match the room: A bottom left,
+   B top left, C top right, D bottom right, in the board's MCQ colours. Tap a letter = everyone. Drag from one
+   letter to another = those two; keep the finger down and slide left or right to set the split (the pair
+   always reads in letter order, so sliding right gives more to the later letter). Lifting the finger saves;
+   the buttons at the bottom move the split afterwards; Skip moves on without saving; Undo for 5 seconds. */
+const VCOL = { A: '#C2185B', B: '#1565C0', C: '#2E7D32', D: '#F57F17' };
+S.vote = { on: false, cls: '', data: null, i: 0, saved: {}, live: null };
+function voteOn(on) {
+  S.vote.on = on;
+  $('mAbcd').setAttribute('aria-pressed', on);
+  $('vote').classList.toggle('hidden', !on); $('studs').classList.toggle('hidden', on); $('hint').classList.toggle('hidden', on);
+  $('search').classList.toggle('hidden', on || currentView() !== 'names');
+  if (on) setTimeout(() => $('mAbcd').scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+  if (on && S.vote.cls !== S.cls) loadVote(); else if (on) renderVote();
+}
+async function loadVote() {
+  const V = S.vote; V.cls = S.cls; V.data = null; V.i = 0; V.saved = {};
+  $('vote').innerHTML = '<p class="note">Finding this lesson\'s questions...</p>';
+  try { V.data = await call('lessonMcqs', S.cls); } catch (e) { V.data = { none: 'No signal: the questions could not be loaded.' }; }
+  if (V.cls === S.cls) renderVote();
+}
+const voteQs = () => { const d = S.vote.data || {}; return d.mcq && d.mcq.length ? d.mcq : null; };
+function splitText(sp, right) {
+  if (!sp) return '';
+  return Object.keys(sp).sort().map((L) => `<span class="${L === right ? 'r' : ''}">${L} ${sp[L]}%</span>`).join(' | ');
+}
+function renderVote() {
+  const V = S.vote, qs = voteQs(), box = $('vote');
+  if (!V.data) return;
+  const n = qs ? qs.length : 12, q = qs ? qs[V.i] : null, right = q ? q.a : '';
+  const sp = V.live || (V.saved[V.i] || {}).split || null, pair = sp ? Object.keys(sp).sort() : [];
+  box.innerHTML = (V.data.none ? `<p class="note">${esc(V.data.none)} You can still record answers as Question 1, 2, 3...</p>` : !qs ? `<p class="note">${esc(V.data.title)} has no multiple choice questions saved (only lessons Claude built have them). Recording as Question 1, 2, 3...</p>` : '') +
+    `<div class="vhead"><button id="vPrev" aria-label="Previous question">&#8249;</button><div class="vq"><b>Q${V.i + 1}${qs ? ' of ' + n : ''}</b>${q ? esc(q.q) : (V.data.title ? esc(V.data.title) : '')}</div><button id="vNext2" aria-label="Next question">&#8250;</button></div>` +
+    `<div class="vgrid" id="vgrid">` + ['A', 'B', 'C', 'D'].map((L, k) => `<div class="vl${pair.includes(L) ? ' on' : pair.length ? ' dim' : ''}" data-l="${L}" style="grid-area:${L};background:${VCOL[L]}">` +
+      `${L === right ? '<span class="tick">&#10003;</span>' : ''}<b>${L}</b>${q && q.o[k] ? `<small>${esc(q.o[k])}</small>` : ''}</div>`).join('') + `</div>` +
+    `<div class="vres${sp ? '' : ' hint'}">${sp ? splitText(sp, right) : 'Tap a letter, or drag from one letter to another'}</div>` +
+    (pair.length === 2 && !V.live ? `<div class="vadj"><button id="vMoreA" style="background:${VCOL[pair[0]]}">&#9664; more ${pair[0]}</button><button id="vMoreB" style="background:${VCOL[pair[1]]}">more ${pair[1]} &#9654;</button></div>` : '') +
+    `<div class="vbtns"><button class="cta alt" id="vSkip">Skip</button><button class="cta" id="vNext">${V.i + 1 >= n ? 'Done' : 'Next question'}</button></div>`;
+  $('vPrev').onclick = () => { if (V.i > 0) { V.i--; renderVote(); } };
+  $('vNext2').onclick = $('vSkip').onclick = () => voteGo(1);
+  $('vNext').onclick = () => voteGo(1);
+  if ($('vMoreA')) { $('vMoreA').onclick = () => voteNudge(pair, -5); $('vMoreB').onclick = () => voteNudge(pair, 5); }
+  voteGestures();
+}
+function voteGo(d) {
+  const V = S.vote, n = voteQs() ? voteQs().length : 12;
+  if (V.i + d >= n) { snack('All questions done'); voteOn(false); return; }
+  V.i = Math.max(0, V.i + d); renderVote();
+}
+// the later letter's share goes up by d (the pair always adds to 100)
+function voteNudge(pair, d) {
+  const sp = Object.assign({}, (S.vote.saved[S.vote.i] || {}).split);
+  const b = Math.max(5, Math.min(95, (sp[pair[1]] || 0) + d));
+  saveVote({ [pair[0]]: 100 - b, [pair[1]]: b }, true);
+}
+function voteGestures() {
+  const g = $('vgrid'); if (!g) return;
+  const V = S.vote;
+  let start = null, pair = null;
+  const letterAt = (x, y) => { const el = document.elementFromPoint(x, y); const c = el && el.closest('.vl'); return c ? c.dataset.l : null; };
+  const share = (x) => { const r = g.getBoundingClientRect(); return Math.max(5, Math.min(95, Math.round(((x - r.left) / r.width) * 20) * 5)); };
+  const show = (sp) => { V.live = sp; const res = $('vote').querySelector('.vres'); res.classList.remove('hint'); res.innerHTML = splitText(sp, (voteQs() || [])[V.i] ? voteQs()[V.i].a : '');
+    g.querySelectorAll('.vl').forEach((el) => { const on = sp[el.dataset.l] != null; el.classList.toggle('on', on); el.classList.toggle('dim', !on); }); };
+  g.onpointerdown = (e) => { start = letterAt(e.clientX, e.clientY); pair = null; if (!start) return; g.setPointerCapture(e.pointerId); show({ [start]: 100 }); };
+  g.onpointermove = (e) => {
+    if (!start) return;
+    if (!pair) { const L = letterAt(e.clientX, e.clientY); if (L && L !== start) pair = [start, L].sort(); else return; }
+    const b = share(e.clientX); show({ [pair[0]]: 100 - b, [pair[1]]: b });
+  };
+  g.onpointerup = g.onpointercancel = (e) => {
+    if (!start) return;
+    const sp = V.live; start = null; pair = null; V.live = null;
+    if (e.type === 'pointercancel' || !sp) { renderVote(); return; }
+    saveVote(sp, false);
+  };
+}
+async function saveVote(sp, adjust) {
+  const V = S.vote, q = (voteQs() || [])[V.i], i = V.i, prev = V.saved[i];
+  V.saved[i] = { id: prev ? prev.id : null, split: sp };
+  renderVote();
+  try {
+    const r = await call('saveVote', { id: prev ? prev.id : null, cls: S.cls, key: V.data.key || '', title: V.data.title || '', q: i, question: q ? q.q : '', right: q ? q.a : '', split: sp, why: q ? q.why : {} });
+    V.saved[i].id = r.id;
+    if (!adjust) voteSnack('Saved Q' + (i + 1) + (r.pctRight !== '' ? ': ' + r.pctRight + '% right' : ''), i, r.id);
+  } catch (e) { V.saved[i] = prev; renderVote(); snack('Not saved: no signal. Try again.'); }
+}
+// undo for 5 seconds (its own button handler, so the behaviour undo is untouched)
+let voteUndo = null;
+function voteSnack(text, i, id) {
+  voteUndo = { i, id }; snack(text, ['vote']);
+}
+const behUndo = $('snackUndo').onclick;
+$('snackUndo').onclick = async () => {
+  if (snackIds[0] !== 'vote') return behUndo();
+  $('snack').classList.remove('show');
+  const u = voteUndo; voteUndo = null; if (!u) return;
+  try { await call('removeVote', u.id); delete S.vote.saved[u.i]; S.vote.i = u.i; renderVote(); snack('Undone'); } catch (e) { snack('Undo failed. Check your connection.'); }
+};
+$('mAbcd').onclick = () => voteOn(!S.vote.on);
+
 $('search').oninput = renderStudents;
 let rz; window.addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { if (S.tab === 'log') renderStudents(); }, 120); });
 
@@ -765,7 +884,7 @@ function render() { if (S.tab === 'log') renderStudents(); if (S.tab === 'day') 
 function cacheKey(c) { return 'class:' + c; }
 function queued(c) { return getQueue().filter(q => q.cls === c).flatMap(q => q.names.map(n => ({ id: 'q' + q.ts, t: '', name: n, type: q.type, rule: q.rule || 0, queued: true }))); }
 async function loadClass(cls) {
-  S.cls = cls; $('clsTitle').textContent = cls; $('clsTitle').classList.toggle('clsTitleLong', cls.length > 6); renderChips();
+  S.cls = cls; if (S.vote && S.vote.on) loadVote(); $('clsTitle').textContent = cls; $('clsTitle').classList.toggle('clsTitleLong', cls.length > 6); renderChips();
   const cached = (() => { try { return JSON.parse(LS.get(cacheKey(cls)) || 'null'); } catch (e) { return null; } })();
   // show this class straight away (saved copy, or empty), never the previous class's lists
   S.students = cached ? cached.students : []; S.ratio = cached ? cached.ratio : 2.6; S.silence = cached ? cached.silence : null;

@@ -8,7 +8,7 @@
  * Students: Short is the name students see on the board. X and Y are seat positions (% of the plan), Ratio is the plan's width/height.
  */
 
-const B_VERSION = 22;   // shown on the phone and board so you can check the new code is live
+const B_VERSION = 23;   // shown on the phone and board so you can check the new code is live
 // TZ ('Europe/London') comes from the planner's Code.gs (one project since 2026-10-12)
 const RULES = { 2: 'Work ethic', 3: 'Quality', 4: 'Attention', 5: 'Voice', 6: 'Lab safety', 7: 'Fixed stations', 8: 'Silent entry' };
 const WEEK_A_START = '2026-09-07';           // Monday of the first Week A
@@ -691,4 +691,66 @@ function sameClass_(a, b) {
   if (A === B) return true;
   const short = A.length < B.length ? A : B, long = A.length < B.length ? B : A;
   return short.length >= 3 && long.indexOf(short) === 0;
+}
+
+/* ---------------------------------------------------------------- ABCD card votes
+   specs/learning-loop.md M3/M4 and Patryk's feedback (2026-10-22): during a lesson's multiple choice
+   questions the phone shows A/B/C/D in the room's corners in place of the seating plan. One vote per
+   question = the rough split of the cards he sees ({ A: 70, C: 30 }). Saved to the "MCQ Votes" tab with
+   % right and the main wrong answer (and the misconception that wrong option catches). Class level only:
+   no pupil names. */
+const VOTE_HEAD = ['id', 'when', 'class', 'lesson', 'title', 'q', 'question', 'right', 'split', 'pctRight', 'mainWrong', 'misconception'];
+// Today's lesson for a class (the saved planner week), with its questions in lesson order.
+// { key, title, mcq: [{ q, o, a, why }] } or { none: why }
+function lessonMcqs(k, cls) {
+  check_(k);
+  const today = new Date(), day = (Number(Utilities.formatDate(today, TZ, 'u')) + 6) % 7;
+  const mon = Utilities.formatDate(new Date(today.getTime() - day * 864e5), TZ, 'yyyy-MM-dd');
+  const w = sheet_('Weeks');
+  let week = null;
+  if (w && w.getLastRow() > 1) w.getRange(2, 1, w.getLastRow() - 1, 2).getValues().forEach(([m, json]) => {
+    const key = m instanceof Date ? Utilities.formatDate(m, TZ, 'yyyy-MM-dd') : String(m);
+    if (key === mon) { try { week = JSON.parse(json); } catch (e) { /* damaged row */ } }
+  });
+  if (!week) return { none: 'This week is not saved in the planner yet: open the planner once, then refresh.' };
+  const mine = (week.slots || []).filter((s) => sameClass_(s.cls, cls) && s.kind === 'lesson' && !s.double && s.key);
+  // today's lesson, else the most recent one this week
+  const slot = mine.filter((s) => s.day === day)[0] || mine.filter((s) => s.day < day).sort((a, b) => b.day - a.day)[0];
+  if (!slot) return { none: 'No ' + cls + ' lesson in the planner today.' };
+  const d = sheet_('Data');
+  const data = JSON.parse(d.getRange(2, 1, d.getLastRow() - 1, 1).getValues().map((r) => r[0]).join(''));
+  const seq = ((data.classes || {})[slot.cls] || {}).seq || [];
+  const L = seq.find((x) => (x.rel || x.unit + '|' + x.title) === slot.key) || {};
+  return { key: slot.key, title: L.title || slot.text || 'Lesson', today: slot.day === day, mcq: L.mcq || [] };
+}
+// v = { id?, cls, key, title, q (0-based), question, right ('A'..'D' or ''), split: { A: 70, C: 30 }, why: {B: '...'} }
+// Same id again = his adjustment of that vote (the row is updated, not added).
+function saveVote(k, v) {
+  check_(k);
+  const split = {};
+  ['A', 'B', 'C', 'D'].forEach((L) => { const n = Number((v.split || {})[L]) || 0; if (n > 0) split[L] = Math.min(100, Math.round(n)); });
+  if (!Object.keys(split).length) throw new Error('No letters in that vote.');
+  const right = /^[A-D]$/.test(String(v.right)) ? String(v.right) : '';
+  const wrong = Object.keys(split).filter((L) => L !== right).sort((a, b) => split[b] - split[a])[0] || '';
+  const row = [v.id || String(Date.now()), new Date(), String(v.cls), String(v.key || ''), String(v.title || ''), (Number(v.q) || 0) + 1, String(v.question || '').slice(0, 300),
+    right, JSON.stringify(split), right ? (split[right] || 0) : '', wrong, wrong && v.why ? String(v.why[wrong] || '') : ''];
+  const sh = tab_('MCQ Votes', VOTE_HEAD);
+  const n = sh.getLastRow() - 1;
+  if (v.id && n > 0) {
+    const ids = sh.getRange(2, 1, n, 1).getValues().map((r) => String(r[0]));
+    const at = ids.lastIndexOf(String(v.id));
+    if (at >= 0) { sh.getRange(at + 2, 1, 1, VOTE_HEAD.length).setValues([row]); return { id: row[0], pctRight: row[9], mainWrong: wrong }; }
+  }
+  sh.appendRow(row);
+  return { id: row[0], pctRight: row[9], mainWrong: wrong };
+}
+function removeVote(k, id) {
+  check_(k);
+  const sh = tab_('MCQ Votes', VOTE_HEAD), n = sh.getLastRow() - 1;
+  if (n < 1) return false;
+  const ids = sh.getRange(2, 1, n, 1).getValues().map((r) => String(r[0]));
+  const at = ids.lastIndexOf(String(id));
+  if (at < 0) return false;
+  sh.deleteRow(at + 2);
+  return true;
 }
