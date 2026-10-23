@@ -1,0 +1,482 @@
+[
+  {
+    "id": "hat_sprout",
+    "name": "The sprout",
+    "slot": "hat",
+    "tier": "Basic",
+    "price": 0,
+    "lock": null
+  },
+  {
+    "id": "hat_flat_cap",
+    "name": "Flat cap",
+    "slot": "hat",
+    "tier": "Basic",
+    "price": 60,
+    "lock": null
+  },
+  {
+    "id": "hat_beanie",
+    "name": "Beanie",
+    "slot": "hat",
+    "tier": "Basic",
+    "price": 100,
+    "lock": null
+  },
+  {
+    "id": "hat_beret",
+    "name": "Beret",
+    "slot": "hat",
+    "tier": "Nice",
+    "price": 150,
+    "lock": "level 2"
+  },
+  {
+    "id": "hat_bobble_hat",
+    "name": "Bobble hat",
+    "slot": "hat",
+    "tier": "Nice",
+    "price": 180,
+    "lock": "level 2"
+  },
+  {
+    "id": "hat_graduation_cap",
+    "name": "Graduation cap",
+    "slot": "hat",
+    "tier": "Nice",
+    "price": 260,
+    "lock": "level 2"
+  },
+  {
+    "id": "hat_wizard_hat",
+    "name": "Wizard hat",
+    "slot": "hat",
+    "tier": "Fancy",
+    "price": 550,
+    "lock": "level 5"
+  },
+  {
+    "id": "hat_little_crown",
+    "name": "Little crown",
+    "slot": "hat",
+    "tier": "Fancy",
+    "price": 600,
+    "lock": "level 5"
+  },
+  {
+    "id": "hat_pirate_tricorn",
+    "name": "Pirate tricorn",
+    "slot": "hat",
+    "tier": "Fancy",
+    "price": 520,
+    "lock": "level 5"
+  },
+  {
+    "id": "hat_crown_of_tentacles",
+    "name": "Crown of tiny tentacles",
+    "slot": "hat",
+    "tier": "Eldritch",
+    "price": 1200,
+    "lock": "level 15 (the Observatory)"
+  },
+  {
+    "id": "hat_starlight_halo",
+    "name": "Starlight halo",
+    "slot": "hat",
+    "tier": "Eldritch",
+    "price": 1100,
+    "lock": "level 15 (the Observatory)"
+  },
+  {
+    "id": "hat_floating_eye",
+    "name": "Floating eye hat",
+    "slot": "hat",
+    "tier": "Eldritch",
+    "price": 1400,
+    "lock": "level 15 (the Observatory)"
+  },
+  {
+    "id": "top_striped_tee",
+    "name": "Striped tee",
+    "slot": "top",
+    "tier": "Basic",
+    "price": 40,
+    "lock": null
+  },
+  {
+    "id": "top_yellow_raincoat",
+    "name": "Yellow raincoat",
+    "slot": "top",
+    "tier": "Basic",
+    "price": 100,
+    "lock": null
+  },
+  {
+    "id": "top_striped_scarf",
+    "name": "Striped scarf",
+    "slot": "top",
+    "tier": "Basic",
+    "price": 80,
+    "lock": null
+  },
+  {
+    "id": "top_knitted_jumper",
+    "name": "Knitted jumper",
+    "slot": "top",
+    "tier": "Nice",
+    "price": 180,
+    "lock": "level 2"
+  },
+  {
+    "id": "top_lab_coat",
+    "name": "Lab coat",
+    "slot": "top",
+    "tier": "Nice",
+    "price": 250,
+    "lock": "level 2"
+  },
+  {
+    "id": "top_dungarees",
+    "name": "Dungarees",
+    "slot": "top",
+    "tier": "Nice",
+    "price": 200,
+    "lock": "level 2"
+  },
+  {
+    "id": "top_teachers_cardigan",
+    "name": "Teacher's cardigan",
+    "slot": "top",
+    "tier": "Fancy",
+    "price": 500,
+    "lock": "level 5"
+  },
+  {
+    "id": "top_tweed_jacket",
+    "name": "Tweed jacket",
+    "slot": "top",
+    "tier": "Fancy",
+    "price": 550,
+    "lock": "level 5"
+  },
+  {
+    "id": "top_captains_coat",
+    "name": "Captain's coat",
+    "slot": "top",
+    "tier": "Fancy",
+    "price": 600,
+    "lock": "level 5"
+  },
+  {
+    "id": "top_robe_of_the_deep",
+    "name": "Robe of the deep",
+    "slot": "top",
+    "tier": "Eldritch",
+    "price": 1100,
+    "lock": "level 15 (the Observatory)"
+  },
+  {
+    "id": "top_cloak_of_stars",
+    "name": "Cloak of stars",
+    "slot": "top",
+    "tier": "Eldritch",
+    "price": 1300,
+    "lock": "level 15 (the Observatory)"
+  },
+  {
+    "id": "top_kelp_mantle",
+    "name": "Kelp mantle (sways)",
+    "slot": "top",
+    "tier": "Eldritch",
+    "price": 1000,
+    "lock": "level 15 (the Observatory)"
+  },
+  {
+    "id": "face_freckles",
+    "name": "Freckles",
+    "slot": "face",
+    "tier": "Basic",
+    "price": 0,
+    "lock": null
+  },
+  {
+    "id": "face_sticking_plaster",
+    "name": "Sticking plaster",
+    "slot": "face",
+    "tier": "Basic",
+    "price": 40,
+    "lock": null
+  },
+  {
+    "id": "face_ink_smudge",
+    "name": "Ink smudge",
+    "slot": "face",
+    "tier": "Basic",
+    "price": 60,
+    "lock": null
+  },
+  {
+    "id": "face_round_glasses",
+    "name": "Round glasses",
+    "slot": "face",
+    "tier": "Nice",
+    "price": 150,
+    "lock": "level 2"
+  },
+  {
+    "id": "face_safety_goggles",
+    "name": "Safety goggles",
+    "slot": "face",
+    "tier": "Nice",
+    "price": 200,
+    "lock": "level 2"
+  },
+  {
+    "id": "face_moustache",
+    "name": "Moustache",
+    "slot": "face",
+    "tier": "Nice",
+    "price": 180,
+    "lock": "level 2"
+  },
+  {
+    "id": "face_monocle",
+    "name": "Monocle",
+    "slot": "face",
+    "tier": "Fancy",
+    "price": 550,
+    "lock": "level 5"
+  },
+  {
+    "id": "face_half_moon_specs",
+    "name": "Half-moon specs",
+    "slot": "face",
+    "tier": "Fancy",
+    "price": 500,
+    "lock": "level 5"
+  },
+  {
+    "id": "face_heart_specs",
+    "name": "Heart specs",
+    "slot": "face",
+    "tier": "Fancy",
+    "price": 520,
+    "lock": "level 5"
+  },
+  {
+    "id": "face_third_eye",
+    "name": "Third eye (blinks)",
+    "slot": "face",
+    "tier": "Eldritch",
+    "price": 1200,
+    "lock": "level 15 (the Observatory)"
+  },
+  {
+    "id": "face_glowing_rune",
+    "name": "Glowing rune mark",
+    "slot": "face",
+    "tier": "Eldritch",
+    "price": 900,
+    "lock": "level 15 (the Observatory)"
+  },
+  {
+    "id": "face_abyssal_gaze",
+    "name": "Abyssal gaze",
+    "slot": "face",
+    "tier": "Eldritch",
+    "price": 1000,
+    "lock": "level 15 (the Observatory)"
+  },
+  {
+    "id": "held_pencil",
+    "name": "Pencil",
+    "slot": "held",
+    "tier": "Basic",
+    "price": 0,
+    "lock": null
+  },
+  {
+    "id": "held_apple",
+    "name": "Apple for teacher",
+    "slot": "held",
+    "tier": "Basic",
+    "price": 50,
+    "lock": null
+  },
+  {
+    "id": "held_sea_shell",
+    "name": "Sea shell",
+    "slot": "held",
+    "tier": "Basic",
+    "price": 80,
+    "lock": null
+  },
+  {
+    "id": "held_mug_of_tea",
+    "name": "Mug of tea",
+    "slot": "held",
+    "tier": "Nice",
+    "price": 150,
+    "lock": "level 2"
+  },
+  {
+    "id": "held_test_tube",
+    "name": "Test tube",
+    "slot": "held",
+    "tier": "Nice",
+    "price": 200,
+    "lock": "level 2"
+  },
+  {
+    "id": "held_pointer_stick",
+    "name": "Pointer stick",
+    "slot": "held",
+    "tier": "Nice",
+    "price": 220,
+    "lock": "level 2"
+  },
+  {
+    "id": "held_book",
+    "name": "Book",
+    "slot": "held",
+    "tier": "Fancy",
+    "price": 500,
+    "lock": "level 5"
+  },
+  {
+    "id": "held_lantern",
+    "name": "Lantern",
+    "slot": "held",
+    "tier": "Fancy",
+    "price": 550,
+    "lock": "level 5"
+  },
+  {
+    "id": "held_trident",
+    "name": "Trident",
+    "slot": "held",
+    "tier": "Fancy",
+    "price": 600,
+    "lock": "level 5"
+  },
+  {
+    "id": "held_lantern_of_the_deep",
+    "name": "Glowing lantern of the deep",
+    "slot": "held",
+    "tier": "Eldritch",
+    "price": 1200,
+    "lock": "level 15 (the Observatory)"
+  },
+  {
+    "id": "held_orbiting_moon",
+    "name": "Tiny orbiting moon",
+    "slot": "held",
+    "tier": "Eldritch",
+    "price": 1300,
+    "lock": "level 15 (the Observatory)"
+  },
+  {
+    "id": "held_pocket_galaxy",
+    "name": "Pocket galaxy",
+    "slot": "held",
+    "tier": "Eldritch",
+    "price": 1400,
+    "lock": "level 15 (the Observatory)"
+  },
+  {
+    "id": "skin_kelp_mint",
+    "name": "Kelp Mint (his own)",
+    "slot": "skin",
+    "tier": "Basic",
+    "price": 0,
+    "lock": null
+  },
+  {
+    "id": "skin_lavender",
+    "name": "Lavender",
+    "slot": "skin",
+    "tier": "Basic",
+    "price": 80,
+    "lock": null
+  },
+  {
+    "id": "skin_peach",
+    "name": "Peach",
+    "slot": "skin",
+    "tier": "Basic",
+    "price": 120,
+    "lock": null
+  },
+  {
+    "id": "skin_coral",
+    "name": "Coral",
+    "slot": "skin",
+    "tier": "Nice",
+    "price": 180,
+    "lock": "level 2"
+  },
+  {
+    "id": "skin_gold",
+    "name": "Gold",
+    "slot": "skin",
+    "tier": "Nice",
+    "price": 250,
+    "lock": "level 2"
+  },
+  {
+    "id": "skin_sky",
+    "name": "Sky",
+    "slot": "skin",
+    "tier": "Nice",
+    "price": 220,
+    "lock": "level 2"
+  },
+  {
+    "id": "skin_pumpkin",
+    "name": "Pumpkin (autumn)",
+    "slot": "skin",
+    "tier": "Fancy",
+    "price": 550,
+    "lock": "level 5, season: Oct-Nov"
+  },
+  {
+    "id": "skin_frost",
+    "name": "Frost (winter)",
+    "slot": "skin",
+    "tier": "Fancy",
+    "price": 550,
+    "lock": "level 5, season: Dec-Feb"
+  },
+  {
+    "id": "skin_blossom",
+    "name": "Blossom (spring)",
+    "slot": "skin",
+    "tier": "Fancy",
+    "price": 500,
+    "lock": "level 5, season: Mar-May"
+  },
+  {
+    "id": "skin_midnight",
+    "name": "Midnight glow",
+    "slot": "skin",
+    "tier": "Eldritch",
+    "price": 1200,
+    "lock": "level 15 (the Observatory)"
+  },
+  {
+    "id": "skin_abyss",
+    "name": "Abyss (glowing spots)",
+    "slot": "skin",
+    "tier": "Eldritch",
+    "price": 1400,
+    "lock": "level 15 (the Observatory)"
+  },
+  {
+    "id": "skin_aurora",
+    "name": "Aurora",
+    "slot": "skin",
+    "tier": "Eldritch",
+    "price": 1000,
+    "lock": "level 15 (the Observatory)"
+  }
+]
