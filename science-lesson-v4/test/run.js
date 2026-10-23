@@ -675,6 +675,38 @@ async function main() {
         r.forEach((q, i) => { if (i && q.y < r[i - 1].y + r[i - 1].h - 1e-6) clash = 'overlap with label ' + open + ' open'; if (q.y < area.y - 1e-6 || q.y + q.h > area.y + area.h + 1e-6) clash = 'outside the slide'; });
       }
       if (!clash) pass('Learn L: 7 crowded labels never overlap and stay on the slide'); else fail('Learn L labels: ' + clash);
+      // photo + model (D8): shared labels in the middle, a line to the part in EACH picture
+      const pairSl = slides.filter(s => /LEARN · PHOTO AND MODEL/.test(s.x));
+      const pairItem = (Array.isArray(lessonJson) ? lessonJson[0] : lessonJson).learn.find(x => x.pair);
+      if (pairSl.length === pairItem.labels.length + 1) pass(`Learn L pair: ${pairItem.labels.length} parts built one at a time + the all-labels slide`);
+      else fail(`Learn L pair: ${pairSl.length} slides (want ${pairItem.labels.length + 1})`);
+      let pw = 0, nLines = 0;
+      for (const s of pairSl) {
+        const pics = [...s.x.matchAll(/<p:pic>(?:(?!<\/p:pic>)[\s\S])*?<a:off x="(\d+)" y="(\d+)"\/>\s*<a:ext cx="(\d+)" cy="(\d+)"/g)].map(m => m.slice(1).map(Number)).sort((a, b) => a[0] - b[0]);
+        if (pics.length !== 2) { pw = Infinity; break; }
+        const e = ends(s.x); nLines = Math.max(nLines, e.length / 2);
+        for (const l of pairItem.labels) for (const [k, side] of [[0, 'left'], [1, 'right']]) {
+          if (!l[side]) continue;
+          const [px, py, cx, cy] = pics[k], pt = { x: px + l[side].x * cx, y: py + l[side].y * cy };
+          pw = Math.max(pw, Math.min(...e.map(q => Math.hypot(q.x - pt.x, q.y - pt.y))));
+        }
+      }
+      if (pw < 9144 && nLines === 5) pass(`Learn L pair: every line ends on its part in both pictures, one line for a photo-only label (worst ${(pw / 914400).toFixed(3)} in)`);
+      else fail(`Learn L pair: lines miss by ${(pw / 914400).toFixed(3)} in, or ${nLines} lines (want 5)`);
+      if (/Microscope photo x400/.test(pairSl[0] ? pairSl[0].x : '') && /Model diagram/.test(pairSl[0] ? pairSl[0].x : '')) pass('Learn L pair: captions under both pictures'); else fail('Learn L pair: captions missing');
+      // drawn diagrams (diagram_gen.py): every template draws and reports its parts inside the picture
+      const dg = path.join(ROOT, 'science-lesson', 'references', 'diagram_gen.py'), tmpD = fs.mkdtempSync(path.join(require('os').tmpdir(), 'dg-'));
+      const runs = [['particles', '--kind', 'element'], ['particles', '--kind', 'molecules'], ['particles', '--kind', 'compound'], ['particles', '--kind', 'mixture'],
+        ['atom', '--model', 'dalton'], ['atom', '--model', 'thomson'], ['atom', '--model', 'rutherford'], ['atom', '--model', 'bohr'], ['atom', '--model', 'chadwick']];
+      const bad = [];
+      for (const r of runs) {
+        try {
+          const o = JSON.parse(require('child_process').execFileSync('python', [dg, ...r, '--out', path.join(tmpD, r[2] + '.png')], { encoding: 'utf8' }));
+          if (!fs.existsSync(o.file) || !o.points.length || o.points.some(([, x, y]) => !(x > 0 && x < 1 && y > 0 && y < 1))) bad.push(r[2]);
+        } catch (e) { bad.push(r[2] + ' (' + String(e.message).split('\n')[0] + ')'); }
+      }
+      fs.rmSync(tmpD, { recursive: true, force: true });
+      if (!bad.length) pass('diagram_gen.py: all 9 templates draw, each with its labelled parts'); else fail('diagram_gen.py: ' + bad.join(', '));
     }
 
     if (fixture === 'flow-native-test.json') {

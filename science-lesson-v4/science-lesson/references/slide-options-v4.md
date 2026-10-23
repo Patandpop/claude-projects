@@ -243,7 +243,17 @@ Drawn by `references/learn-pictures.js`. `x`, `y` = where the part is, as fracti
 
 **Check every point before building (required):**
 `python references/label_points.py picture.png --points '[["nucleus!",0.40,0.47],["cell membrane",0.04,0.55]]' --out check.png --snap edge`
-then LOOK at check.png and adjust. `--snap edge` moves a point onto the nearest outline (membranes, walls, glass); end a name with `!` to keep a point where it is (parts in the middle of a flat area: nucleus, cytoplasm). It prints the final points to paste into `labels`.
+then LOOK at check.png and adjust. `--snap edge` moves a point onto the nearest outline (membranes, walls, glass); end a name with `!` to keep a point where it is (parts in the middle of a flat area: nucleus, cytoplasm). It prints the final points to paste into `labels`. On faint microscope photos the snap can catch a fleck inside the cell: always look, and pin the point with `!` if needed.
+
+**Photo + model (pair):** a real photo beside a model diagram, with ONE column of shared labels in the middle, each joined to its part in BOTH pictures (use when pupils will see the real thing, e.g. under a microscope). Never call the model a "biological drawing".
+```json
+{ "variant": "L", "heading": "Cheek cells: photo and model",
+  "pair": { "left": { "path": ".../04.jpg", "caption": "Cheek cells, microscope photo" }, "right": { "path": ".../01.jpg", "caption": "Model diagram" } },
+  "labels": [ { "text": "nucleus", "job": "controls the cell", "sentence": "...", "left": { "x": 0.255, "y": 0.649 }, "right": { "x": 0.401, "y": 0.471 } } ] }
+```
+A label may have only `left` or only `right` (a part one picture does not show). The label order is chosen so the lines cross as little as possible. Check the points on BOTH pictures with label_points.py.
+
+**Drawn diagrams (when the school slides have no usable picture):** `python references/diagram_gen.py particles --kind element|molecules|compound|mixture --out box.png` or `python references/diagram_gen.py atom --model dalton|thomson|rutherford|bohr|chadwick [--shells 2,8,1] --out atom.png`. One house style (navy outlines, shaded balls, white background). It prints the exact points of the parts it drew (nucleus, electron, shell, proton, neutron, atom, molecule...), ready for `labels`. Embed with `"imageConfidence": "search"`.
 
 ### LEARN VARIANT SELECTION GUIDE
 

@@ -5,6 +5,7 @@
     "references/build.js",
     "references/learn-pictures.js",
     "references/label_points.py",
+    "references/diagram_gen.py",
     "references/graph_gen.py",
     "references/handwriting_png.py",
     "references/textbook-index.js",

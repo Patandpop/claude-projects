@@ -120,6 +120,56 @@
      "y": 0.4
     }
    ]
+  },
+  {
+   "variant": "L",
+   "heading": "Photo and model",
+   "pair": {
+    "left": {
+     "path": "C:/Users/magda/claude-projects/science-lesson-v4/test/cell-sample.png",
+     "caption": "Microscope photo x400"
+    },
+    "right": {
+     "path": "C:/Users/magda/claude-projects/science-lesson-v4/test/atom-sample.png",
+     "caption": "Model diagram"
+    }
+   },
+   "labels": [
+    {
+     "text": "centre",
+     "job": "the middle part",
+     "sentence": "Both pictures have a centre.",
+     "left": {
+      "x": 0.4333,
+      "y": 0.475
+     },
+     "right": {
+      "x": 0.5,
+      "y": 0.5
+     }
+    },
+    {
+     "text": "edge",
+     "job": "the outside",
+     "sentence": "The edge is the outside.",
+     "left": {
+      "x": 0.0333,
+      "y": 0.5
+     },
+     "right": {
+      "x": 0.5,
+      "y": 0.075
+     }
+    },
+    {
+     "text": "only on the photo",
+     "job": "one line only",
+     "left": {
+      "x": 0.75,
+      "y": 0.4
+     }
+    }
+   ]
   }
  ],
  "build": [
