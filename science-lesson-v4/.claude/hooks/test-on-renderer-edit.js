@@ -27,7 +27,9 @@ process.stdin.on('end', () => {
       || (j.tool_response && j.tool_response.filePath) || '';
   } catch { /* no/!JSON stdin — nothing to do */ }
 
-  if (!filePath || !RENDERER_FILES.has(path.basename(filePath))) process.exit(0);
+  // build.js's code lives in references/builder/ since 2026-10-23: any part there counts too.
+  const isPart = /[\\/]references[\\/]builder[\\/][^\\/]+\.js$/.test(filePath);
+  if (!filePath || !(RENDERER_FILES.has(path.basename(filePath)) || isPart)) process.exit(0);
 
   console.error(`[regression] ${path.basename(filePath)} changed — running npm test ...`);
   const r = spawnSync('npm', ['test'], {

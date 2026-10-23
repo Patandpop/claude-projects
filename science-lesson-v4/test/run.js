@@ -546,7 +546,7 @@ async function main() {
         if (!slides.some((x) => /[BCP]\d+\.\d+ p\./.test(x)) && slides.some((x) => x.includes('p. 142')) && slides.some((x) => x.includes('pp. 142–143'))) pass('support pages show page numbers only (no C6.2-style codes)');
         else fail('support pages still show spread codes like "C6.2 p.142" (or the page numbers went missing)');
         // 2026-10-15: six highlight colours, neighbours never alike; bigger plain-words question bar
-        const hiSrc = fs.readFileSync(path.join(ROOT, 'science-lesson', 'references', 'build.js'), 'utf8').match(/const MARK_HI = \[([^\]]+)\]/);
+        const hiSrc = fs.readFileSync(path.join(ROOT, 'science-lesson', 'references', 'builder', '04-handwriting.js'), 'utf8').match(/const MARK_HI = \[([^\]]+)\]/);
         const hi = hiSrc ? hiSrc[1].match(/[0-9A-F]{6}/g) : [];
         if (hi.length === 6 && new Set(hi).size === 6) pass('six different mark highlight colours');
         else fail(`mark highlight colours: expected 6 different, found ${hi.length}`);
