@@ -155,8 +155,22 @@ async function main() {
       if (fs.existsSync(pageCountPath) && !process.env.NO_PAGECOUNT && !isReview) {
         try {
           const pc = require(pageCountPath);
-          const sheets = [wsPath, path.join(outDir, base + '_support_worksheet.docx')];
-          for (const res of pc.countPages(sheets)) {
+          const sheets = [[wsPath, 'standard'], [path.join(outDir, base + '_support_worksheet.docx'), 'developing']];
+          for (const [sheet, mode] of sheets) {
+            let res = pc.countPages([sheet])[0];
+            // over 4 pages (Patryk 2026-10-23): leave the GUESS table off first, then (support) KEYS
+            if (res.pages > pc.PAGE_LIMIT && L._guessOn && L._guessOn[mode]) {
+              L._noGuess = Object.assign({}, L._noGuess, { [mode]: true });
+              await buildDocx(L, sheet, mode);
+              res = pc.countPages([sheet])[0];
+              console.log(`  [pages] GUESS table left off the ${mode === 'developing' ? 'support' : 'standard'} sheet to fit 4 pages`);
+            }
+            if (res.pages > pc.PAGE_LIMIT && mode === 'developing' && !L._noKeys) {
+              L._noKeys = true;
+              await buildDocx(L, sheet, mode);
+              res = pc.countPages([sheet])[0];
+              console.log('  [pages] KEYS box left off the support sheet to fit 4 pages');
+            }
             const v = pc.verdict(res);
             if (!v) continue;
             if (res.pages > pc.PAGE_LIMIT) buildWarn(v); else console.log('  ' + v);

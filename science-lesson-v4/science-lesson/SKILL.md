@@ -102,6 +102,36 @@ The renderer validates each lesson loudly (never blocks): Do Now exactly 6 · MC
   | Etymology | Context note under a real science question — never a standalone question |
 - Do not add a `commonError` field to any question — it has been removed from the renderer.
 
+**Support sheet helps (Patryk 2026-10-23, tested with him on 20 real questions).** For each Apply question, decide what would stop a support pupil STARTING, and give it at most ONE help. Use the first rule that fits. "None" is a normal answer. Helps print on the support sheet only. The standard sheet and slides are unchanged.
+
+| # | when | help (field on the Apply question) |
+|---|---|---|
+| 1 | calculation | none new (equation + units hint as now) |
+| 2 | short answer (name, state, give, define, complete, sort, order), or draw / sketch | **none** (the word bank covers recall; drawings go in books) |
+| 3 | weighing up ("evaluate", "advantages and disadvantages", "argue", "A or B?") | `weighUp: { options: ["Gas", "Nuclear"], sides?: ["For","Against"], choice?: true }`. Add `choice` only if the question asks for one. |
+| 4 | comparing two things ("compare", "one similarity and one difference") | `compare: { things: ["Plant","Animal"], rows: ["How it reproduces"], similarity?: true }` |
+| 5 | the answer hinges on an idea the question does NOT already point at | `prompt`: a guiding QUESTION, in the question's own context, that points at the idea without giving it. Model: "Which MRS GREN processes can fire NOT carry out?" Don't use one when the context already shows the purpose (the camel's wide feet on sand needs none). |
+| 6 | written, 4+ marks (describe, explain, plan, design) | `steps`: 2-4 starters → "Step 1 ... Step n". If the question lists its own parts, follow them. |
+| 7 | written, 2-3 marks | `steps`: 2-3 linked starters |
+| 8 | the wording hides the ask (two instructions in one sentence, "but not", "each") | `supportQ`: a plain rewrite. Split it into short sentences; the build puts each on its own line and bolds every command word. Use it only when it clearly reads easier, and never as numbered fragments. |
+
+- **Starters (`steps`):**
+  - Write the model answer `a` FIRST, as full sentences in order. Each starter is the exact opening words of one of its sentences.
+  - Open each sentence with a neutral lead-in that holds no mark point: "As the universe cooled, ...", not "Electrons combined with nuclei, so ...". Leave at least 2 words to write.
+  - The review slide then shows `a` one sentence per line, so support pupils see their own sentences completed.
+  - Example:
+    - `a`: "First, use a magnet to remove the iron. Add water and stir, so the salt dissolves. Filter to remove the sand. Distil the salt water to collect the water; the salt is left behind."
+    - `steps`: ["First, use a magnet to", "Add water and stir, so", "Filter to", "Distil the salt water to"]
+- **Rewrite (`supportQ`):**
+  - Keep the same command words, every number and unit, every key word, and most of the content words.
+  - No sentence over 15 words, and not much longer than the original.
+  - Example: "A magnet separates iron from an iron and sulfur mixture, but not from iron sulfide. Explain why." → "Explain why a magnet separates iron from an iron and sulfur mixture. Then explain why it cannot separate iron from iron sulfide."
+- **The build checks every help.** A failing one is not printed (the plain question is), and the CONTENT CHECK names it. The build also prints which help each question got: `[support] reaching Q1: supportQ · ...`.
+- **What the build adds by itself on the support sheet:**
+  - A **KEYS** box above APPLY: the key words the Apply questions actually use, with the lesson's own meanings from `definition`, `definitions` and `title.knownWords`, plus each calculation's equation with its symbols and units from Learn F `components`. It leaves out the words in the write-in KEY WORDS table. Don't write key facts for it.
+  - If a sheet runs over 4 pages, the GUESS table is left off first, then KEYS.
+- The practical intro box on the worksheet drops a first sentence that only repeats the experiment title, so don't write intros that restate the title.
+
 **Build architecture**
 - **Renderer is frozen.** All rendering lives in `references/build.js`. Claude NEVER rewrites renderer functions. Per build, Claude writes ONLY `lesson-content.json` (an array of 1–N lesson objects matching the schema below), then runs `node references/build.js lesson-content.json`.
 - Multi-lesson batching = more objects in the JSON array. Same run. build.js wraps each lesson in try/catch so one bad lesson never kills the batch.
@@ -276,7 +306,7 @@ Field names are fixed. If a slide type needs something not in the schema, check 
 | 12C | 12 | OCR A Physics | Half the content (shared) | **No** | DOUBLE lessons. OCR only, never AQA questions. Calculation-heavy, equation hints only |
 | 13D | 13 | OCR A Physics | Half the content (shared) | **No** | OCR only, never AQA questions. Exam year |
 
-**Switching the word bank off:** for a **No** class set `"worksheetExtras": { "wordBank": [] }`. An empty list stops the automatic word bank (otherwise the support sheet builds one from `title.keywords`). For a **Yes** class give `worksheetExtras.wordBank` and, with a cloze, `clozeWordBank` (add one distractor).
+**Switching the word bank off:** for a **No** class set `"worksheetExtras": { "wordBank": [] }`. An empty list stops the automatic word bank (otherwise the support sheet builds one from `title.keywords`). For a **Yes** class give `worksheetExtras.wordBank` and, with a cloze, `clozeWordBank`. **Word bank rule (Patryk 2026-10-23):** at least 5 words, and at least 2 more words than the gaps they serve. The extras must be believable wrong answers from the same topic (e.g. "condensation" in a separation lesson). The build prints every bank in alphabetical order, never the answer order, and warns when a bank is too small.
 
 Homework: 10C2, 10S2, 11S2 = long-term exam-question booklets; 12C and 13D = every lesson (end-of-subsection textbook questions); KS3 not decided. PSHE-9AB is not science. (7BYA, 8AB, 9AB, 12D, 10C4 and 11C3 in older files are no longer his classes.)
 

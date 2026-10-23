@@ -45,7 +45,7 @@ The support worksheet (`_support_worksheet.docx`) carries the same questions and
 | Sentence starters on extended-writing questions | `q.starters[]` (skipped when B3/B4/B5 scaffold fires) |
 | Answer boxes +30% larger | always in support mode (skipped when B3/B4/B5 scaffold fires) |
 
-Scaffold priority (high → low): B3 practical_design → B4 extended_writing ≥5 marks → B5 subSteps → starters → answer box. Only the first matching scaffold fires per question.
+Scaffold priority (high → low): **support help** (2026-10-23: `weighUp` → `compare` → `steps`; `prompt` adds a guiding question then continues; `supportQ` replaces the question text) → B3 practical_design → B4 extended_writing ≥5 marks → B5 subSteps → starters → answer box. Only the first matching scaffold fires per question. Which help a question gets, and the checks each must pass: SKILL.md "Support sheet helps". The support sheet also gets the KEYS box above APPLY (key words the Apply questions use, plus needed equations). Over 4 pages: GUESS goes first, then KEYS. Word banks are printed in alphabetical order (never answer order) and need at least 5 words, or gaps + 2.
 
 All scaffolds apply across ALL tiers (Developing, Reaching, Mastering) on the support sheet. Students who need support need it throughout, not just on the lowest tier.
 

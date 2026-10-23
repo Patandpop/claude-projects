@@ -162,6 +162,24 @@ function contentCheck(L) {
   if (wx.cloze && !isTeaching)
     lines.push('  ✗ cloze only renders on standard/practical worksheets — it will be dropped on this lesson type');
 
+  // Support sheet v2 (2026-10-23): each help is checked; a failing one is not printed.
+  TIERS.forEach((t) => arr((L.apply || {})[t]).map(normQ).forEach((q, i) => {
+    const h = pickSupportHelp(L, q);
+    if (!h) return;
+    const where = `Apply ${t} Q${i + 1}`;
+    if (h.extra.length) lines.push(`  ✗ ${where}: more than one support help (${[h.kind].concat(h.extra).join(', ')}); only ${h.kind} is used`);
+    if (!h.ok) lines.push(`  ✗ ${where}: support ${h.kind} not printed (${h.why.join('; ')}); the plain question is used`);
+  }));
+  // Word banks: at least 5 words, and 2 more than the gaps they serve (Patryk 2026-10-23).
+  const gaps = arr(wx.cloze).reduce((n, s) => n + (String(s).match(/_{2,}/g) || []).length, 0);
+  if (gaps) {
+    const cb = arr(wx.clozeWordBank || wx.wordBank || (L.title || {}).keywords);
+    check(cb.length >= Math.max(5, gaps + 2), `cloze word bank ${cb.length} words for ${gaps} gaps`,
+      `cloze word bank has ${cb.length} words for ${gaps} gaps: give at least ${Math.max(5, gaps + 2)} (believable extras from the topic)`);
+  }
+  if (arr(wx.wordBank).length && arr(wx.wordBank).length < 5)
+    lines.push(`  ✗ word bank has ${arr(wx.wordBank).length} words: give at least 5 (add believable extras from the topic)`);
+
   console.log(`── CONTENT CHECK · ${name}`);
   lines.forEach((l) => console.log(l));
 
@@ -217,4 +235,100 @@ function checkSixMarkRule(L) {
   TIERS.forEach((t) => arr(L.review && L.review[t]).map(normQ).forEach((q) => scan(q, 'Review ' + t)));
   arr(L.review && L.review.questions).map(normQ).forEach((q) => scan(q, 'Review'));
   arr(L.build).forEach((b) => { if ((b.type || b.variant) === 'modelAnswerReview') scan(b, 'Build model answer'); });
+}
+
+/* ---- Support sheet v2 (Patryk 2026-10-23): ONE help per Apply question -----------------------
+   The support sheet (mode 'developing') gives an Apply question at most one help, chosen by what
+   would stop a support pupil starting (rules: SKILL.md "Support sheet helps"). Fields on the Apply
+   question, in rule order: weighUp {options[], sides?[2], choice?} · compare {things[2], rows[],
+   similarity?} · prompt (a guiding question) · steps [starters] (2-3 marks: linked starters,
+   4+: Step 1..n) · supportQ (plain rewrite). Every help is checked; one that fails is NOT printed,
+   the plain question is. Standard sheet and slides never change (except: steps lay the review
+   slide answer out one sentence per line, so pupils see their starters completed). */
+const COMMAND_WORDS = ['explain', 'describe', 'calculate', 'compare', 'evaluate', 'suggest', 'state', 'name',
+  'give', 'define', 'plan', 'predict', 'justify', 'outline', 'identify', 'sketch', 'draw', 'complete', 'sort',
+  'show', 'write', 'argue', 'discuss', 'determine', 'estimate', 'put', 'list', 'design', 'label'];
+const CMD_RE = new RegExp('\\b(' + COMMAND_WORDS.join('|') + ')\\b', 'g');
+const STOPWORDS = new Set('this that these those with from into onto than then them they their there what when where which while does each been being have more most much made make some such very also only just over under your about would could should'.split(' '));
+const normTxt = (s) => stripMarkTags(stripKeys(prettyText(s || ''))).toLowerCase()
+  .replace(/[^\p{L}\p{N}°%.\s]/gu, ' ').replace(/\.(?!\d)/g, ' ').replace(/\s+/g, ' ').trim();
+const sentencesOf = (s) => stripMarkTags(stripKeys(prettyText(s || ''))).split(/(?<=[.?!])\s+/).map((x) => x.trim()).filter(Boolean);
+const wordsOf = (s) => normTxt(s).split(' ').filter(Boolean);
+
+function lessonTerms(L) {
+  const t = L.title || {};
+  const out = [].concat(arr(t.keywords), arr(t.knownWords));
+  arr(L.learn).forEach((it) => { if (it.definition) out.push(it.definition); out.push(...arr(it.definitions)); });
+  return out.map((k) => (typeof k === 'string' ? k : k.term)).filter(Boolean);
+}
+
+// The rewrite must ask exactly the same thing: same command words (none new, one leading a
+// sentence), every number, every lesson key word and {k} term, most content words, short sentences.
+function supportQCheck(L, q) {
+  const why = [];
+  const o = normTxt(q.q), r = normTxt(q.supportQ);
+  const oc = o.match(CMD_RE) || [], rc = r.match(CMD_RE) || [];
+  const lost = [...new Set(oc)].filter((c) => !rc.includes(c));
+  const added = [...new Set(rc)].filter((c) => !oc.includes(c));
+  if (lost.length) why.push('command word lost: ' + lost.join(', '));
+  if (added.length) why.push('command word changed to: ' + added.join(', '));
+  if (oc.length && !sentencesOf(q.supportQ).some((s) => new RegExp('^(then\\s+)?(' + COMMAND_WORDS.join('|') + ')\\b', 'i').test(s)))
+    why.push('no sentence starts with the command word');
+  const nums = (s) => s.match(/\d+(?:[.,]\d+)*/g) || [];
+  const lostN = nums(o).filter((n) => !nums(r).includes(n));
+  if (lostN.length) why.push('number lost: ' + lostN.join(', '));
+  const kTerms = (String(q.q).match(/\{k\}([^{]+)\{\/k\}/g) || []).map((m) => m.replace(/\{\/?k\}/g, ''));
+  const lostT = [...new Set(lessonTerms(L).concat(kTerms))].map(normTxt).filter((t) => t && o.includes(t) && !r.includes(t));
+  if (lostT.length) why.push('key word lost: ' + lostT.join(', '));
+  const content = wordsOf(q.q).filter((w) => w.length >= 4 && !STOPWORDS.has(w) && !COMMAND_WORDS.includes(w));
+  const rw = wordsOf(q.supportQ);
+  const kept = content.filter((w) => rw.some((x) => x.slice(0, 5) === w.slice(0, 5))).length;
+  if (content.length && kept / content.length < 0.6) why.push(`only ${kept} of ${content.length} content words kept (meaning may have drifted)`);
+  const long = sentencesOf(q.supportQ).filter((s) => wordsOf(s).length > 15);
+  if (long.length) why.push('sentence over 15 words');
+  if (rw.length > wordsOf(q.q).length + 6) why.push('longer than the original');
+  return { ok: !why.length, why };
+}
+
+// Each starter must be the exact opening words of a sentence of the model answer, in order,
+// and leave something to write.
+function stepsCheck(q) {
+  const why = [];
+  const sents = sentencesOf(q.a).map(normTxt);
+  let at = 0;
+  const clean = arr(q.steps).map((s) => String(s).replace(/[_.…\s]+$/u, '').trim());
+  clean.forEach((st) => {
+    const n = normTxt(st);
+    const k = sents.findIndex((s, j) => j >= at && s.startsWith(n));
+    if (k < 0) { why.push(`starter "${st}" is not the start of a model-answer sentence (in order)`); return; }
+    if (wordsOf(sents[k]).length - wordsOf(n).length < 2) why.push(`starter "${st}" leaves nothing to write`);
+    at = k + 1;
+  });
+  if (clean.length < 2 || clean.length > 4) why.push('steps need 2 to 4 starters');
+  return { ok: !why.length, why, steps: clean };
+}
+
+// A guiding question points at the idea; it must be a question and must not give the answer.
+function promptCheck(q) {
+  const why = [];
+  if (!/\?\s*$/.test(String(q.prompt))) why.push('guiding question must end with ?');
+  const a = wordsOf(q.a), p = ' ' + normTxt(q.prompt) + ' ';
+  for (let i = 0; i + 4 <= a.length; i++) {
+    const g = a.slice(i, i + 4);
+    if (g.filter((w) => !STOPWORDS.has(w) && w.length > 2).length >= 3 && p.includes(' ' + g.join(' ') + ' ')) { why.push(`gives the answer away ("${g.join(' ')}")`); break; }
+  }
+  return { ok: !why.length, why };
+}
+
+function pickSupportHelp(L, q) {
+  const kinds = ['weighUp', 'compare', 'prompt', 'steps', 'supportQ'].filter((k) => (k === 'steps' ? arr(q.steps).length : q[k]));
+  if (!kinds.length) return null;
+  const kind = kinds[0];
+  let res = { ok: true, why: [] };
+  if (kind === 'supportQ') res = supportQCheck(L, q);
+  else if (kind === 'steps') res = stepsCheck(q);
+  else if (kind === 'prompt') res = promptCheck(q);
+  else if (kind === 'weighUp' && !arr(q.weighUp.options).length) res = { ok: false, why: ['weighUp needs options'] };
+  else if (kind === 'compare' && arr(q.compare.things).length !== 2) res = { ok: false, why: ['compare needs two things'] };
+  return Object.assign({ kind, extra: kinds.slice(1) }, res);
 }

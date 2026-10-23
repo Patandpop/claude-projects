@@ -181,7 +181,9 @@ function slideReviewTier(pptx, L, tier, questions) {
   const n = questions.length;
   const rowH = (bottom - y - (n - 1) * 0.06) / n;       // fill the slide — no dead space
   questions.forEach((q) => {
-    reviewRow(s, y, rowH, tier, q.q || '', q.a || '');   // verbatim question
+    // support steps (2026-10-23): one model-answer sentence per line, so pupils see their starters completed
+    const a = arr(q.steps).length && stepsCheck(q).ok ? sentencesOf(q.a).join('\n') : (q.a || '');
+    reviewRow(s, y, rowH, tier, q.q || '', a);   // verbatim question
     y += rowH + 0.06;
   });
   bottomBar(s, objectiveText(L));

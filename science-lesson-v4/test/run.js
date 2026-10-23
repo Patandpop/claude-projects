@@ -637,6 +637,39 @@ async function main() {
       if (/atomos/.test(notes) && /plain version here/.test(notes)) pass('Learn notes reach the speaker notes'); else fail('Learn notes missing from the speaker notes');
       if (/MCQ CHECK · question 6: [^\n]*no "why" for wrong option D/.test(output) && !/MCQ CHECK · question [1-5]:/.test(output)) pass('MCQ CHECK flags only the weak question (no "why" for D)');
       else fail('MCQ CHECK did not flag exactly the weak question 6');
+      // Support sheet v2 (2026-10-23): one checked help per Apply question, support sheet only
+      const sup = readArchiveXml(path.join(outDir, fs.readdirSync(outDir).find(n => /_support_worksheet\.docx$/.test(n))));
+      const std = readArchiveXml(path.join(outDir, fs.readdirSync(outDir).find(n => /_worksheet\.docx$/.test(n) && !/_support_/.test(n))));
+      const both = (re, what) => { if (re.test(sup) && !re.test(std)) pass(`support sheet only: ${what}`); else fail(`${what}: ${re.test(sup) ? 'also on the standard sheet' : 'missing from the support sheet'}`); };
+      both(/why it cannot separate iron from iron sulfide/, 'plain rewrite printed');
+      if (/<w:b\/>[\s\S]{0,200}?>explain<\/w:t>/.test(sup)) pass('rewrite: the second command word is bold'); else fail('rewrite: command word not bold');
+      if (!/Write the symbols\./.test(sup) && /Give the symbols for iron, sodium and lead/.test(sup)) pass('a failing rewrite falls back to the original question');
+      else fail('a failing rewrite was printed (or the original went missing)');
+      if (/Apply developing Q2: support supportQ not printed/.test(output)) pass('CONTENT CHECK names the failing rewrite'); else fail('failing rewrite not reported in the CONTENT CHECK');
+      both(/Step 1[\s\S]*First, hold a magnet over[\s\S]*Step 3[\s\S]*Finally, heat it and/, 'chunked Step 1-3 on the 4-mark question');
+      both(/Compounds have[\s\S]*FeS has[\s\S]*A different ratio is/, 'linked starters on the 3-mark question');
+      both(/What is each particle in Co made of/, 'guiding question');
+      both(/>Advantage<[\s\S]*>Disadvantage<[\s\S]*Using a magnet/, 'weigh-up table');
+      both(/>Element<\/w:t>[\s\S]{0,3000}?>Compound<\/w:t>[\s\S]*Types of atom/, 'compare table');
+      both(/KEYS/, 'KEYS box');
+      if (/Element: <\/w:t>[\s\S]{0,300}one type of atom/.test(sup) && !/polymer: /.test(sup)) pass('KEYS holds only words the Apply questions use');
+      else fail('KEYS words wrong (missing Element, or holds a word no Apply question uses)');
+      if (/\[support\] developing Q4: compare · reaching Q2: prompt · reaching Q4: weighUp · mastering Q1: supportQ · mastering Q2: steps · mastering Q4: steps/.test(output)) pass('build prints which help each question got');
+      else fail('build did not print the support help list');
+      const rev = slides.map(s => s.x).find(x => /First, hold a magnet over the mixture/.test(x)) || '';
+      if (/the iron is pulled out\.<\/a:t>[\s\S]{0,400}?(<a:br\/>|<\/a:p>)[\s\S]{0,400}?Next, add water/.test(rev)) pass('review slide: stepped answer one sentence per line');
+      else fail('review slide: stepped answer not split one sentence per line');
+      const wb = (sup.match(/Word bank: [\s\S]*?<\/w:p>/) || [''])[0].match(/<w:t[^>]*>([^<·]+)<\/w:t>/g) || [];
+      const words = wb.map(t => t.replace(/<[^>]+>/g, '').trim()).filter(t => t && t !== 'Word bank:');
+      if (words.length > 2 && words.join('|') === [...words].sort((a, b) => a.localeCompare(b, 'en', { sensitivity: 'base' })).join('|')) pass(`word bank printed in alphabetical order, not answer order (${words.length} words)`);
+      else fail(`word bank not alphabetical: ${words.join(', ')}`);
+    }
+
+    if (fixture === 'amylase-test-9ab.json') {
+      for (const f of fs.readdirSync(outDir).filter(n => /_worksheet\.docx$/.test(n))) {
+        if (/Investigate the effect of temperature on the rate/.test(readArchiveXml(path.join(outDir, f)))) fail(`${f}: practical intro still repeats the title`);
+        else pass(`${f}: practical intro that only repeats the title is left off`);
+      }
     }
 
     if (fixture === 'dual-coding-test.json') {

@@ -157,7 +157,12 @@ function applyTierSection(L, tier, mode, opts) {
   }
 
   qs.forEach((q, i) => {
-    out.push(...question(i + 1, q.q, o.marks ? q.marks : null, q.subParts));
+    // support sheet v2 (2026-10-23): at most one checked help; a failing one is not printed
+    const help = mode === 'developing' ? pickSupportHelp(L, q) : null;
+    const useHelp = help && help.ok ? help.kind : null;
+    if (useHelp) _supportHelps.push(`${tier} Q${i + 1}: ${useHelp}`);
+    if (useHelp === 'supportQ') out.push(...supportQuestion(i + 1, q.supportQ, o.marks ? q.marks : null));
+    else out.push(...question(i + 1, q.q, o.marks ? q.marks : null, q.subParts));
     if (q.diagram) out.push(...diagramBox(typeof q.diagram === 'string' ? q.diagram : null, q.diagramLines || 8));
     const calc = (q.qType || '').toLowerCase() === 'calculation';
     // support mode: equation and units hint printed above the GUESS scaffold
@@ -175,7 +180,7 @@ function applyTierSection(L, tier, mode, opts) {
     // (they don't know the structure), and at most ONE per worksheet — only where the
     // question asks for it (q.guess). Calculations without it get a normal answer box.
     const yearNum = parseInt((L.meta || {}).year || (String((L.meta || {}).class || '').match(/^\d+/) || [])[0], 10);
-    if (q.guess && !(yearNum <= 8) && !_guessUsedOnSheet) {
+    if (q.guess && !(yearNum <= 8) && !_guessUsedOnSheet && !(L._noGuess && L._noGuess[mode])) {   // _noGuess: over 4 pages
       // contentType: 'new_procedure' | 'known_procedure' — defaults to known_procedure if unset
       const contentType = q.contentType || 'known_procedure';
       const isReaching = tier === 'reaching';
@@ -196,6 +201,11 @@ function applyTierSection(L, tier, mode, opts) {
 
     // B3/B4: structured writing scaffolds on support sheet — replace starters + answer box when fired
     let scaffoldRendered = false;
+    if (useHelp === 'steps') { out.push(...stepsBlock(help.steps, (q.marks || 0) >= 4)); scaffoldRendered = true; }
+    else if (useHelp === 'weighUp') { out.push(...weighUpTable(q.weighUp)); scaffoldRendered = true; }
+    else if (useHelp === 'compare') { out.push(...compareTable(q.compare)); scaffoldRendered = true; }
+    else if (useHelp === 'prompt') out.push(...promptLine(q.prompt));
+    if (scaffoldRendered) return;
     if (mode === 'developing' && (q.qType || '').toLowerCase() === 'practical_design') {
       // B3: practical design — method prompt above free lines
       // No dingbat glyphs (pencil/arrow) — Century Gothic lacks them, which forces Word to
@@ -235,6 +245,68 @@ function applyTierSection(L, tier, mode, opts) {
     if (!scaffoldRendered && !guessAdded && o.boxes && q.marks) out.push(...answerBox(q.marks));
   });
   return out;
+}
+
+let _supportHelps = [];   // which help each Apply question got on the support sheet (printed per build)
+
+// Terms the support sheet's "write what each key word means" table asks for (so KEYS leaves them out).
+function supportDefinitionTerms(L) {
+  const wx = L.worksheetExtras || {};
+  const learnBTerms = arr(L.learn)
+    .filter(i => ['B', 'KEYWORDS', 'WRITE_IN_BOOK'].includes(String(i.variant || '').toUpperCase()))
+    .flatMap(i => arr(i.definitions));
+  const alreadyDefined = new Set([
+    ...learnBTerms.map(d => String(d.term || d).toLowerCase()),
+    ...arr(L.learn).filter(i => String(i.variant || '').toUpperCase() === 'F')
+      .flatMap(i => arr(i.components).map(c => String(c.name || '').toLowerCase())),
+  ]);
+  return arr(wx.definitions).length
+    ? arr(wx.definitions).filter(t => !alreadyDefined.has(String(t.term || t).toLowerCase()))
+    : learnBTerms;
+}
+
+// KEYS (support sheet, above APPLY): key words the Apply questions use, with the lesson's own
+// meanings, minus the write-in table's words; equations a calculation on the sheet needs.
+function keysSection(L, tableTerms) {
+  const qs = TIERS.flatMap((t) => arr((L.apply || {})[t]).map(normQ));
+  const text = ' ' + qs.map((q) => normTxt(q.q + ' ' + (q.supportQ || ''))).join(' ') + ' ';
+  const skip = new Set(arr(tableTerms).map((t) => normTxt(t.term || t)));
+  const meanings = [];
+  const t = L.title || {};
+  arr(t.knownWords).forEach((k) => k && k.term && k.definition && meanings.push({ term: k.term, meaning: k.definition }));
+  arr(L.learn).forEach((it) => {
+    if (it.definition && it.definition.term && it.definition.text) meanings.push({ term: it.definition.term, meaning: it.definition.text });
+    arr(it.definitions).forEach((d) => d && d.term && d.definition && meanings.push({ term: d.term, meaning: d.definition }));
+  });
+  const seen = new Set();
+  const words = meanings.filter((m) => {
+    const n = normTxt(m.term);
+    if (!n || seen.has(n) || skip.has(n) || !text.includes(' ' + n + ' ') && !text.includes(' ' + n + 's ')) return false;
+    seen.add(n); return true;
+  });
+  const learnF = arr(L.learn).filter((i) => String(i.variant || '').toUpperCase() === 'F' && i.equation);
+  const squash = (s) => normTxt(s).replace(/\s/g, '');
+  const eqSeen = new Set();
+  const eqs = [];
+  qs.filter((q) => (q.qType || '').toLowerCase() === 'calculation' && q.equation).forEach((q) => {
+    const k = squash(q.equation);
+    if (eqSeen.has(k)) return;
+    eqSeen.add(k);
+    const f = learnF.find((i) => squash(i.equation) === k);
+    eqs.push({ eq: q.equation, parts: f ? arr(f.components) : [], units: q.units });
+  });
+  return keysPanel(words, eqs);
+}
+
+// The practical's intro box often just restates its title bar (Patryk 2026-10-23: he deleted it
+// by hand). Drop a first sentence that holds most of the title's content words.
+function introAfterTitle(intro, title) {
+  const sents = sentencesOf(intro);
+  const tw = wordsOf(title).filter((w) => w.length >= 4 && !STOPWORDS.has(w));
+  if (!sents.length || !tw.length) return intro;
+  const first = wordsOf(sents[0]);
+  const hit = tw.filter((w) => first.some((x) => x.slice(0, 5) === w.slice(0, 5))).length;
+  return hit / tw.length >= 0.6 ? sents.slice(1).join(' ') : intro;
 }
 
 function buildWorksheetChildren(L, mode) {
@@ -298,17 +370,7 @@ function buildWorksheetChildren(L, mode) {
   // support sheet only: a key-term definition table with write-space on the sheet
   const definitionSection = () => {
     if (mode !== 'developing') return;
-    const learnBTerms = arr(L.learn)
-      .filter(i => ['B', 'KEYWORDS', 'WRITE_IN_BOOK'].includes(String(i.variant || '').toUpperCase()))
-      .flatMap(i => arr(i.definitions));
-    const alreadyDefined = new Set([
-      ...learnBTerms.map(d => String(d.term || d).toLowerCase()),
-      ...arr(L.learn).filter(i => String(i.variant || '').toUpperCase() === 'F')
-        .flatMap(i => arr(i.components).map(c => String(c.name || '').toLowerCase())),
-    ]);
-    const terms = arr(wx.definitions).length
-      ? arr(wx.definitions).filter(t => !alreadyDefined.has(String(t.term || t).toLowerCase()))
-      : learnBTerms;
+    const terms = supportDefinitionTerms(L);
     if (!terms.length) return;
     ch.push(...divider('KEY WORDS'));
     ch.push(P(R('Write what each key word means. Use the word bank and your notes to help.', { italic: true, size: 18, color: '555555' }), { spacing: { before: GAP_SM, after: GAP_SM } })); // M2
@@ -339,6 +401,7 @@ function buildWorksheetChildren(L, mode) {
   };
   const applySection = (o) => {
     if (!L.apply) return;
+    if (mode === 'developing' && !L._noKeys) ch.push(...keysSection(L, supportDefinitionTerms(L)));
     ch.push(...divider('APPLY', lessonBookRef(L)));   // textbook ref top-right of the Apply title
     TIERS.forEach((t) => ch.push(...applyTierSection(L, t, mode, o || {})));
     // 2026-10-03: a second, different real exam question, only when it still fits 4 pages
@@ -423,7 +486,7 @@ function buildWorksheetChildren(L, mode) {
     const pracsE = arr(L.build).filter((b) => (b.type || b.variant) === 'practical').slice(0, 2);
     (pracsE.length ? pracsE : [{}]).forEach((prac, k) => {
     if (pracsE.length > 1) ch.push(...divider(prac.heading || prac.title || 'EXPERIMENT ' + (k + 1)));
-    const intro = k === 0 ? (wx.intro || prac.intro) : prac.intro;
+    const intro = introAfterTitle(k === 0 ? (wx.intro || prac.intro) : prac.intro, prac.heading || prac.title || L.meta.title || '');
     if (intro) ch.push(...contextBox(intro));
     if (prac.embeddedImagePath || prac.imagePlaceholder !== false) ch.push(...diagramOrImage(prac));
     if (arr(prac.steps).length) {
@@ -459,7 +522,8 @@ function buildWorksheetChildren(L, mode) {
     const pracs = arr(L.build).filter((b) => (b.type || b.variant) === 'practical').slice(0, 2);
     pracs.forEach((pracA, k) => {
       ch.push(...divider(pracA.heading || pracA.title || (pracs.length > 1 ? 'EXPERIMENT ' + (k + 1) : 'EXPERIMENT'))); // M2: B6 derive heading from item
-      if (pracA.intro && pracA.worksheetIntro !== false) ch.push(...contextBox(pracA.intro)); // M7: E11
+      const introA = pracA.worksheetIntro !== false && introAfterTitle(pracA.intro, pracA.heading || pracA.title || '');
+      if (introA) ch.push(...contextBox(introA)); // M7: E11
       if (pracA.embeddedImagePath || pracA.imagePlaceholder !== false) ch.push(...diagramOrImage(pracA));
       const resA = (k === 0 ? wx.results : pracA.results) || {};
       const rd = k === 0 ? wx.referenceData : null;
@@ -485,6 +549,7 @@ function buildWorksheetChildren(L, mode) {
 }
 async function buildDocx(L, outPath, mode) {
   _guessUsedOnSheet = false;                                     // one GUESS row per worksheet
+  _supportHelps = [];
   const doc = new Document({
     styles: {
       default: {
@@ -516,4 +581,6 @@ async function buildDocx(L, outPath, mode) {
     zip.updateFile(entry, Buffer.from(xml, 'utf8'));
     zip.writeZip(outPath);
   }
+  L._guessOn = Object.assign({}, L._guessOn, { [mode]: _guessUsedOnSheet });   // for the 4-page fallback
+  if (mode === 'developing' && _supportHelps.length) console.log('  [support] ' + _supportHelps.join(' · '));
 }

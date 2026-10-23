@@ -96,7 +96,9 @@ function tierBadge(tier) {
 /* wordBank(terms[]) — Developing only; caller enforces */
 function wordBank(terms) {
   const runs = [R('Word bank: ', { bold: true, size: 22, color: '1E5C2D' })];
-  arr(terms).forEach((t, i) => {
+  // never in the order written (that is usually the answer order): alphabetical (Patryk 2026-10-23)
+  const sorted = [...new Set(arr(terms).map(String))].sort((a, b) => a.localeCompare(b, 'en', { sensitivity: 'base' }));
+  sorted.forEach((t, i) => {
     if (i) runs.push(R(' \u00B7 ', { italic: true, size: 22, color: '1E5C2D' }));
     runs.push(R(t, { italic: true, size: 22, color: '1E5C2D' }));
   });
@@ -488,6 +490,109 @@ function definitionTable(terms) {
     }));
   });
   return [spacer(), fullTable(rows, colW, GREY_TBL), spacer()];
+}
+
+/* ---- Support sheet v2 helps (Patryk 2026-10-23; which help a question gets: SKILL.md "Support
+   sheet helps", checks in 13-checks.js). Each takes the place of the answer box it replaces, so a
+   help never adds pages. ---------------------------------------------------------------------- */
+const HELP_BORDERS = { top: bGrey(1), bottom: bGrey(1), left: bGrey(1), right: bGrey(1) };
+const HELP_M = { top: 60, bottom: 60, left: 120, right: 120 };
+
+// The plain rewrite: one sentence per line, every command word bold.
+function supportQuestion(num, text, marks) {
+  const sents = sentencesOf(text);
+  const cmdSplit = new RegExp('(\\b(?:' + COMMAND_WORDS.join('|') + ')\\b)', 'i');
+  return sents.map((s, i) => {
+    const runs = i === 0 ? [R(`Q${num}  `, { bold: true, size: 24 })] : [];
+    s.split(cmdSplit).forEach((part, j) => { if (part) runs.push(R(part, { size: 24, bold: j % 2 === 1 })); });
+    if (i === sents.length - 1 && marks) runs.push(R('\t', { size: 24 }), R(`[${marks} ${marks > 1 ? 'marks' : 'mark'}]`, { size: 20, color: '888888' }));
+    return P(runs, { indent: i ? { left: 480 } : undefined, spacing: { before: i ? GAP_NONE : GAP_SM, after: GAP_XS }, tabStops: [{ type: TabStopType.RIGHT, position: PAGE_W }] });
+  });
+}
+
+// Linked starters (2-3 marks) or Step 1..n (4+ marks): each starter is the opening of a
+// model-answer sentence, followed by a writing line, so the endings join up.
+function stepsBlock(steps, labelled) {
+  const rows = arr(steps).map((st, i) => new TableRow({
+    cantSplit: true,
+    children: [cell({
+      w: PAGE_W, margins: HELP_M, borders: HELP_BORDERS, valign: VerticalAlign.TOP,
+      children: [P([
+        ...(labelled ? [R(`Step ${i + 1}   `, { bold: true, size: 20, color: NAVY })] : []),
+        R(st + ' ', { italic: true, size: 22, color: '555500' }),
+      ], { spacing: { before: GAP_NONE, after: GAP_NONE } })].concat(blanks(1)),
+    })],
+  }));
+  return [fullTable(rows, [PAGE_W]), spacer()];
+}
+
+// Guiding question: points at the idea without giving it. The answer box follows as normal.
+function promptLine(text) {
+  return [fullTable([new TableRow({
+    children: [cell({
+      w: PAGE_W, fill: 'FFFDE7', margins: { top: 40, bottom: 40, left: 200, right: 120 },
+      borders: { top: B_NONE, bottom: B_NONE, right: B_NONE, left: { style: BorderStyle.SINGLE, size: 12, color: GOLD } },
+      children: [P(R(prettyText(text), { italic: true, size: 22, color: '555500' }))],
+    })],
+  })], [PAGE_W])];
+}
+
+// Weigh-up table: one row per option, two sides (For / Against), then "My choice and why" when asked.
+function weighUpTable(w) {
+  const sides = arr(w.sides).length === 2 ? w.sides : ['For', 'Against'];
+  const colW = [2200, Math.floor((PAGE_W - 2200) / 2), PAGE_W - 2200 - Math.floor((PAGE_W - 2200) / 2)];
+  const head = (t, i) => cell({ w: colW[i], fill: NAVY, borders: GREY_TBL, margins: HELP_M, children: [P(R(t, { bold: true, size: 20, color: 'FFFFFF' }))] });
+  const rows = [new TableRow({ children: ['', ...sides].map(head) })];
+  arr(w.options).forEach((opt) => rows.push(new TableRow({
+    cantSplit: true,
+    children: [
+      cell({ w: colW[0], borders: GREY_TBL, margins: HELP_M, valign: VerticalAlign.TOP, children: [P(R(String(opt), { bold: true, size: 20 }))] }),
+      cell({ w: colW[1], borders: GREY_TBL, margins: HELP_M, children: blanks(2) }),
+      cell({ w: colW[2], borders: GREY_TBL, margins: HELP_M, children: blanks(2) }),
+    ],
+  })));
+  const out = [spacer(), fullTable(rows, colW, GREY_TBL)];
+  if (w.choice) out.push(fullTable([new TableRow({ children: [cell({ w: PAGE_W, borders: HELP_BORDERS, margins: HELP_M, children: [P(R('My choice and why:', { bold: true, size: 20, color: NAVY }))].concat(blanks(2)) })] })], [PAGE_W]));
+  out.push(spacer());
+  return out;
+}
+
+// Compare table: thing A | thing B, a row per point, then a similarity line when asked.
+function compareTable(c) {
+  const things = arr(c.things).slice(0, 2);
+  const labels = arr(c.rows).length ? c.rows : [''];
+  const lead = labels.some(Boolean) ? 2400 : 0;
+  const half = Math.floor((PAGE_W - lead) / 2);
+  const colW = (lead ? [lead] : []).concat([half, PAGE_W - lead - half]);
+  const head = (t, i) => cell({ w: colW[i], fill: NAVY, borders: GREY_TBL, margins: HELP_M, children: [P(R(t, { bold: true, size: 20, color: 'FFFFFF' }))] });
+  const rows = [new TableRow({ children: (lead ? [''] : []).concat(things).map(head) })];
+  labels.forEach((lab) => rows.push(new TableRow({
+    cantSplit: true,
+    children: (lead ? [cell({ w: colW[0], borders: GREY_TBL, margins: HELP_M, valign: VerticalAlign.TOP, children: [P(R(String(lab), { bold: true, size: 20 }))] })] : [])
+      .concat(things.map((_, k) => cell({ w: colW[k + (lead ? 1 : 0)], borders: GREY_TBL, margins: HELP_M, children: blanks(2) }))),
+  })));
+  const out = [spacer(), fullTable(rows, colW, GREY_TBL)];
+  if (c.similarity) out.push(fullTable([new TableRow({ children: [cell({ w: PAGE_W, borders: HELP_BORDERS, margins: HELP_M, children: [P(R('One similarity:', { bold: true, size: 20, color: NAVY }))].concat(blanks(1)) })] })], [PAGE_W]));
+  out.push(spacer());
+  return out;
+}
+
+// KEYS: only the key words the Apply questions use (with the lesson's meanings) and the equations
+// a calculation on the sheet needs. Built from words[{term, meaning}] and eqs[{eq, parts[], units}].
+function keysPanel(words, eqs) {
+  const bGold = { style: BorderStyle.SINGLE, size: 6, color: GOLD };
+  const box = { top: bGold, bottom: bGold, left: bGold, right: bGold };
+  const col = (title, kids) => [P(R(title, { bold: true, size: 20, color: NAVY }), { spacing: { before: GAP_NONE, after: GAP_XS } })].concat(kids);
+  const wordKids = words.map((w) => P([R(w.term + ': ', { bold: true, size: 20 }), R(prettyText(w.meaning), { size: 20 })], { spacing: { before: GAP_NONE, after: GAP_XS } }));
+  const eqKids = eqs.flatMap((e) => [P(toDocxRuns(parseEq(e.eq), { size: 22, color: NAVY, bold: true }), { spacing: { before: GAP_NONE, after: GAP_NONE } })]
+    .concat(arr(e.parts).map((c) => P(R(`${c.symbol} = ${c.name}${c.unit ? ' (' + c.unit + ')' : ''}`, { size: 18, color: '444444' }), { spacing: { before: GAP_NONE, after: GAP_NONE } })))
+    .concat(e.units && !arr(e.parts).length ? [P(R('Answer in ' + e.units, { size: 18, color: '444444' }))] : []));
+  const cells = [];
+  if (words.length) cells.push(col('KEYS · words', wordKids));
+  if (eqs.length) cells.push(col(words.length ? 'Equations' : 'KEYS · equations', eqKids));
+  if (!cells.length) return [];
+  const colW = cells.length === 2 ? [Math.round(PAGE_W * 0.58), PAGE_W - Math.round(PAGE_W * 0.58)] : [PAGE_W];
+  return [spacer(), fullTable([new TableRow({ children: cells.map((kids, i) => cell({ w: colW[i], borders: box, valign: VerticalAlign.TOP, margins: { top: 80, bottom: 80, left: 140, right: 140 }, children: kids })) })], colW), spacer()];
 }
 
 /* ---- Starfield header ------------------------------------------------------- */

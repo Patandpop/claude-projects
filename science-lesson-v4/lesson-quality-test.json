@@ -440,13 +440,30 @@
           "q": "Give the symbols for iron, sodium and lead. Why do they not match the English names?",
           "a": "Fe, Na, Pb. They come from Latin names: ferrum, natrium, plumbum.",
           "marks": 3,
-          "qType": "concept"
+          "qType": "concept",
+          "supportQ": "Write the symbols."
         },
         {
           "q": "Sort into elements and compounds: Fe, H_2O, O_2, NaCl, N_2, CH_4.",
           "a": "Elements: Fe, O_2, N_2. Compounds: H_2O, NaCl, CH_4.",
           "marks": 2,
           "qType": "concept"
+        },
+        {
+          "q": "Compare an element and a compound.",
+          "a": "An element has one type of atom; a compound has two or more types chemically joined. A compound can only be split by a chemical reaction.",
+          "marks": 2,
+          "qType": "concept",
+          "compare": {
+            "things": [
+              "Element",
+              "Compound"
+            ],
+            "rows": [
+              "Types of atom",
+              "Split by a chemical reaction?"
+            ]
+          }
         }
       ],
       "reaching": [
@@ -462,13 +479,29 @@
           "marks": 3,
           "qType": "concept",
           "diagram": true,
-          "diagramLines": 6
+          "diagramLines": 6,
+          "prompt": "What is each particle in Co made of, and what is each particle in CO made of?"
         },
         {
           "q": "Name the compound formed when calcium reacts with oxygen. Write the word equation.",
           "a": "Calcium oxide. calcium + oxygen \\to calcium oxide",
           "marks": 2,
           "qType": "concept"
+        },
+        {
+          "q": "Give one advantage and one disadvantage of using a magnet to separate a mixture.",
+          "a": "Advantage: quick and nothing is used up. Disadvantage: it only works if one substance is magnetic.",
+          "marks": 2,
+          "qType": "concept",
+          "weighUp": {
+            "options": [
+              "Using a magnet"
+            ],
+            "sides": [
+              "Advantage",
+              "Disadvantage"
+            ]
+          }
         }
       ],
       "mastering": [
@@ -476,19 +509,36 @@
           "q": "A magnet separates iron from an iron and sulfur mixture, but not from iron sulfide. Explain why.",
           "a": "In the mixture iron is not bonded, so keeps its properties. In iron sulfide it is bonded into a new compound with new properties.",
           "marks": 3,
-          "qType": "extended_writing"
+          "qType": "extended_writing",
+          "supportQ": "Explain why a magnet separates iron from an iron and sulfur mixture. Then explain why it cannot separate iron from iron sulfide."
         },
         {
           "q": "Fool's gold is FeS_2. The black solid made from iron and sulfur is FeS. Explain why these are different compounds.",
           "a": "Compounds have fixed proportions. FeS has 1 Fe to 1 S; FeS_2 has 1 Fe to 2 S. A different ratio is a different compound.",
           "marks": 3,
-          "qType": "extended_writing"
+          "qType": "extended_writing",
+          "steps": [
+            "Compounds have",
+            "FeS has",
+            "A different ratio is"
+          ]
         },
         {
           "q": "A bracket multiplies everything inside it. How many atoms are in Mg(OH)_2? Show your working.",
           "a": "1 Mg + 2 O + 2 H = 5 atoms.",
           "marks": 2,
           "qType": "calculation"
+        },
+        {
+          "q": "Describe how you could show that a mixture of iron and sulfur is not a compound.",
+          "marks": 4,
+          "qType": "extended_writing",
+          "a": "First, hold a magnet over the mixture and the iron is pulled out. Next, add water and the sulfur floats while the iron sinks. Finally, heat it and a new compound forms with new properties.",
+          "steps": [
+            "First, hold a magnet over",
+            "Next, add water and",
+            "Finally, heat it and"
+          ]
         }
       ]
     },
