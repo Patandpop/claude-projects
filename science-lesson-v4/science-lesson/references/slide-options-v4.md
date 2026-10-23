@@ -7,31 +7,19 @@
 
 SKILL.md's HARD RULES section is authoritative for counts and policy (Do Now = exactly 6; MCQ = exactly 6, one block — experiment MCQs tagged about:"practical"; Apply min 3 per tier; **omit `review` — build.js copies Apply itself, 2026-07-12**; Learn max 4; Visualiser mandatory on standard/practical). This file only adds the per-slide character limits the renderer cannot fix for you:
 
-- **Apply question:** ≤140 chars · min 16pt (enforce before building — never let the renderer shrink)
-- **Do Now question:** ≤120 chars
+- Apply, Do Now and Review character limits, the 16pt minimum and the practical image placeholder rule: SKILL.md HARD RULES.
 - **Engage:** hook ≤120 chars · body/content ≤400 chars · instruction steps ≤100 chars, max 4
 - **Engage reveal:** `reveal.question` ≤120 chars · `reveal.answer` ≤200 chars
-- **Review answer (when authored at all):** ≤160 chars, core info only (teacher elaborates aloud)
-- **Practical/Build slides expecting apparatus MUST have an image placeholder** (set `imagePlaceholder: false` only when genuinely no apparatus)
 
 ---
 
 ## SLIDE CONTENT SCHEMAS (what fields to provide)
 
 ### TITLE + DO NOW (combined slide)
-Auto-rendered from `meta`, `title`, and `doNow`. No extra fields.
+Auto-rendered from `meta`, `title`, and `doNow`. No extra fields. `doNow` fields: SKILL.md schema.
 ```json
-{ "title": { "objectives": ["max 3, short — fit left column"], "keywords": ["..."] },
-  "doNow": {
-    "variant": "A",
-    "keywords": ["optional — overrides title.keywords for the support worksheet keywords box"],
-    "questions": [{ "q": "...", "a": "...", "marks": 1, "hint": "REQUIRED — support worksheet shows as italic hint; write one for every question" }]
-  }
-}
+{ "title": { "objectives": ["max 3, short — fit left column"], "keywords": ["..."] } }
 ```
-Min 4 questions. Gold rounded-square number badges. `hint` is REQUIRED on every Do Now question — support worksheet shows it as an italic nudge below the question. If a question genuinely has no useful hint, write a thinking prompt ("Think about what energy stores are involved.").
-
-Support worksheet: if `doNow.keywords[]` or `title.keywords[]` exists, a gold-bordered Key words box appears to the right of the Do Now questions. No write lines under Do Now questions (write in books).
 
 ### DO NOW ANSWERS
 Auto-generated from `doNow.questions` — no additional fields needed.
@@ -62,7 +50,6 @@ Not a 7th variant. It's a navy/gold answer box that attaches to any of the 6 `en
 
 - **Layout A** — `reveal.question` present: question renders large/prominent, reveal answer box sits beside it in the same bottom row.
 - **Layout B** — `reveal.question` absent: `engage.hook` is treated as the question; reveal answer box spans the full width of the bottom row on its own.
-- `build.js` renders a static box only — no PowerPoint animation is generated. Click-to-reveal animation is added manually in PowerPoint afterward.
 
 **When to use `reveal` vs. the other variants** (from testing across forces, chemical reactions, lungs, circulatory system, punnett squares, diffraction, work done, climate change):
 
@@ -138,16 +125,13 @@ Max 2 boxes left. Image placeholder right by default. Omit `keywords` if already
 - `definition`: white card with a gold edge at the top (term, text, small origin). `examples` / `notExamples` add green / red boxes underneath: use for the one or two terms pupils mix up.
 - `examDefinition`: "LEARN THIS WORDING" box at the top, one highlight colour per mark ({n}…{/n}), "AQA: asked 7 times" when `asked` is given. Use it instead of `definition` (not both). Wording from `exam-definition.js` only, never invented.
 - `misconception`: red "✗ Not quite" (crossed out) → green "✓ Actually" across the bottom. The boxes above shrink to fit.
-- `{k}word{/k}`: key word, bold with a gold underline, in any slide text (max 3 per slide, first appearance).
 - `title.knownWords` [{term, definition}]: the dark "WORDS YOU KNOW" band on the objectives slide (after the Do Now answers).
 - `title.sequence` { learn, build, apply }: the "THIS LESSON" strip at the bottom of the objectives slide (three boxes in the stage colours, always shown). One plain instruction each (rules in SKILL.md); missing lines are filled from the lesson.
 - `definition.parts` [{part, means}] + `definition.sum`: word parts as navy chips under a Learn definition (poly "many" + mer "part" → a chain of many parts). Replaces the grey `origin` text when given.
-- MCQs: `"why": {"B": "thinks two atoms means a compound", "C": "...", "D": "..."}` names the mistake each wrong option catches (required: the build's MCQ CHECK warns without it).
+- `{k}` key words: SKILL.md. MCQ `why`: mcq-rules.md section 6.
 
-### LEARN B — write in book
-```json
-{ "variant": "B", "heading": "...", "toWrite": ["line 1", "line 2"] }
-```
+### LEARN B: keywords band
+Schema in SKILL.md (`definitions`, `below`, `boxes`).
 
 ### LEARN C — revision table
 ```json
@@ -258,18 +242,7 @@ A label may have only `left` or only `right` (a part one picture does not show).
 **Drawn diagrams (when the school slides have no usable picture):** `python references/diagram_gen.py particles --kind element|molecules|compound|mixture --out box.png` or `python references/diagram_gen.py atom --model dalton|thomson|rutherford|bohr|chadwick [--shells 2,8,1] --out atom.png`. One house style (navy outlines, shaded balls, white background). It prints the exact points of the parts it drew (nucleus, electron, shell, proton, neutron, atom, molecule...), ready for `labels`. Embed with `"imageConfidence": "search"`.
 
 ### LEARN VARIANT SELECTION GUIDE
-
-| Content shape | Variant |
-|---|---|
-| Key facts, definitions, mechanisms | A — key info boxes |
-| Copy notes into book | B — write in book |
-| Revision paper navigation | C — revision table |
-| Diagram to copy | D — image copy |
-| Compare two things side by side | E — comparison table |
-| New equation introduced | F — equation callout |
-| Process / cycle / causal chain (space-filling) | G — flow / sequence |
-| Linear chain or cycle with return arrow | I — flowchart |
-| Watch a video in lesson | H — video |
+In SKILL.md ("Learn variant selection guide").
 
 ---
 
@@ -277,9 +250,9 @@ A label may have only `left` or only `right` (a part one picture does not show).
 ```json
 { "type": "mcq", "q": "question text (≤140 chars)",
   "options": ["A...", "B...", "C...", "D..."],
-  "answer": "B", "explanation": "one sentence", "commonError": "..." }
+  "answer": "B", "explanation": "one sentence" }
 ```
-Single slide. Answer box at bottom — teacher adds entrance animation in PowerPoint for 3-2-1 reveal.
+Single slide. Answer box at bottom.
 
 ### BUILD — workedExample
 ```json
@@ -303,7 +276,7 @@ GUESS-scaffolded worked example on ONE slide ("we do" step). Distinct from `work
 In `substitute`/`equation` prefer inline `÷` over `{a/b}` — these rows are short, and a one-line diagonal reads cleaner than a fraction here (the old tiny-fraction shrink is fixed, so `{a/b}` is legible too if you need it). Use for any lesson introducing a new equation, straight after the Learn-F intro.
 
 ### BUILD — practiceTriangle
-"You do" independent-practice step, completing the I-do → we-do → you-do sequence (Learn-F → `guessExample` → this). Left ~65%: up to 3 short calculation questions, one gold-bordered box each, each with its answer in a navy box underneath (Patryk adds the reveal animation) and a copy in speaker notes. Right ~35%: the same equation + formula triangle pinned as a live reference.
+"You do" independent-practice step, completing the I-do → we-do → you-do sequence (Learn-F → `guessExample` → this). Left ~65%: up to 3 short calculation questions, one gold-bordered box each, each with its answer in a navy box underneath and a copy in speaker notes. Right ~35%: the same equation + formula triangle pinned as a live reference.
 ```json
 { "type": "practiceTriangle", "topic": "optional header suffix",
   "questions": [{ "q": "...", "a": "...", "marks": 2 }],
@@ -415,8 +388,7 @@ Min 4 statements. Mix ~40–60% false. Every false statement needs `correction`.
   "setup": "1 sentence of scenario context (≤120 chars)",
   "prediction": "question students must commit to before seeing answer (≤100 chars)",
   "reveal": "what actually happens",
-  "explanation": "why it happens",
-  "commonError": "optional" }
+  "explanation": "why it happens" }
 ```
 Best for lessons where the key idea involves a mechanism students confidently mispredict.
 
@@ -456,9 +428,9 @@ indicative content points is correct; "the less the better."
 ```
 `jitterProfile` (0–4, neat → messy) picks one of the 5 fixed handwriting presets — vary it slide to slide so a run of Build slides doesn't look identical. `qType:"graph"` renders a standard (non-handwritten) plot via `graph_gen.py` on the left instead of handwriting; the marking panel still applies. `levelDescriptors` only for level-of-response (extended-writing) questions. Conventions (`<u>`, `**and**/**or**`, `dependentOn`, `doesNotAward`) must trace back to what the actual mark scheme says — no invented shorthand, no arrows.
 
-**Indicative-content chunking (`group`):** give each `indicativeContent` item an optional `group` (e.g. `"substitution"`, `"answer"`, `"conversion"`) to break the marking panel into labelled visual blocks — structure, not more text. Same `group` field drives the answer-sheet panel. **Panel sections (2026-07-05):** the marking panel renders INDICATIVE CONTENT → BANDS (from `levelDescriptors`) → EXCLUSIONARY CLAIMS (from `doesNotAward`) as three split blocks, PPTX and DOCX alike. **6-mark rule:** an extended (non-calculation) ≥6-mark question must carry ≥6 `indicativeContent` points (match points to marks) — shortfalls are logged non-fatally at build time, EXCEPT band-marked questions (`levelDescriptors` present), which are exempt. The handwritten model-answer working now spreads to fill the whole box with evenly parallel ruled lines (no trailing blank rules). The same `indicativeContent` / `levelDescriptors` / `doesNotAward` fields feed the review lesson's `_answers.docx` model-answer sheet — author them on the Apply/Review questions too. See **Answer sheet** in SKILL.md.
+**Indicative-content chunking (`group`):** give each `indicativeContent` item an optional `group` (e.g. `"substitution"`, `"answer"`, `"conversion"`) to break the marking panel into labelled visual blocks — structure, not more text. Same `group` field drives the answer-sheet panel. **Panel sections (2026-07-05):** the marking panel renders INDICATIVE CONTENT → BANDS (from `levelDescriptors`) → EXCLUSIONARY CLAIMS (from `doesNotAward`) as three split blocks, PPTX and DOCX alike. **6-mark rule:** an extended (non-calculation) ≥6-mark question must carry ≥6 `indicativeContent` points (match points to marks) — shortfalls are logged non-fatally at build time, EXCEPT band-marked questions (`levelDescriptors` present), which are exempt. The handwritten model-answer working now spreads to fill the whole box with evenly parallel ruled lines (no trailing blank rules). The same `indicativeContent` / `levelDescriptors` / `doesNotAward` fields feed the review lesson's `_answers.docx` model-answer sheet — author them on the Apply/Review questions too. See **Answer sheet** in review-lessons.md.
 
-**Test review lessons (2026-10-10):** model answers for a school test are full, well-written sentences, not terse (Patryk). See SKILL.md "Test review lessons".
+**Test review lessons (2026-10-10):** model answers for a school test are full, well-written sentences, not terse (Patryk). See review-lessons.md "Test review lessons".
 
 **Question picture from the paper (2026-10-12):** add `"snippet": "path/to/Q2a.png"`, or set `meta.snippetDir` to the folder `paper-snippets.py` wrote (looked up by `questionNumber`, e.g. `"3(a)(iii)"`). The slide then shows the REAL question, never stretched: a tall question fills the left (answer above the mark scheme on the right), a short one runs across the top (answer left, scheme right). A long scheme narrows the picture, then cuts bands to their first sentence, then splits into points | bands columns, so nothing runs off. No picture: an optional typed `"question"` goes across the top. `"snippet": false` turns a picture off for one item.
 
@@ -541,15 +513,13 @@ to earn the mark — never for emphasis. **Band-marked 6-markers:** when `levelD
 (BANDS) are present the ≥6-indicative-points rule is NOT enforced — marks are lost via the
 bands, not the indicative count.
 Renders on **review** slides (the review dispatcher runs Build items) and standard/practical
-slides. On the worksheet it prints each sample in a box with a `Level: __  Mark: __ / N`
-line to annotate; in `answers` mode it adds the verdict + `hits`/`misses` + the full
-`markingPanelDocx` scheme.
+slides. Worksheet and answer sheet: worksheet-spec.md "markTheAnswers on the worksheet".
 
 ### LEARN — check (revision lessons, 2026-10-14)
 Any Learn item may carry `check: [{ "q", "a" }]` (3 quick questions). In a `revision` lesson a CHECK slide (Q | answer, answers on click) follows that Learn slide. `doNow.task: ["step", ...]` replaces the Do Now questions with numbered steps (test and test-review lessons; no Do Now answers slide).
 
 ### BUILD — practical
-A lesson may have up to TWO practical items (each with its own `heading`; the second can carry its own `results: { headers, rows }` for the worksheet).
+Up to two practical items: SKILL.md.
 ```json
 { "type": "practical", "intro": "optional 1-sentence context",
   "steps": ["≤100 chars each", "max 4 steps"],
@@ -574,7 +544,6 @@ Top-right of the Apply title (slide **and** worksheet) an automatic textbook ref
   "developing": [{ "q": "...", "a": "...", "marks": 2,
                    "qType": "concept | calculation | practical_design | extended_writing",
                    "contentType": "new_procedure | known_procedure | extended_writing | routine_recall",
-                   "commonError": "...",
                    "diagram": true, "diagramLines": 8,
                    "starters": ["optional sentence frames"],
                    "given": "optional", "unknown": "optional", "equation": "F = ma", "units": "N",
@@ -590,14 +559,14 @@ Top-right of the Apply title (slide **and** worksheet) an automatic textbook ref
 - `"practical_design"` — write/plan a method; triggers method prompt above 5 write lines on support sheet
 - `"extended_writing"` — multi-sentence explanation; when marks ≥ 5 triggers explanation prompt above 4 write lines on support sheet
 
-**subSteps** — support sheet only: breaks question into lettered parts (a)(b)(c) each with one write line. Use when a multi-part question would cause students to miss steps without guidance.
+**subSteps**: worksheet-spec.md.
 **Variant A** = default (individual gold-bordered boxes per question, three tier columns).
 **Variant B** = use when Mastering has 1 long question (>140 chars) — Mastering goes full-width bottom half.
 **Variant C** = revision/whiteboard lessons only — never auto-selected.
-Min 3 questions per tier. Developing ≥1 concept; Mastering ≥1 calculation (KS4) or extended reasoning (KS3).
+Questions per tier and tier mix: SKILL.md.
 
 ### REVIEW
-**Do not author (2026-07-12).** Omit the `review` field — build.js copies every Apply question and answer onto the review slides itself. Just ensure every Apply question carries its `a`. If a special case genuinely needs a hand-written review, the old shape still works (tier arrays mirroring Apply, answers ≤160 chars) but it is wasted output otherwise.
+Do not author: SKILL.md ("Review: DO NOT AUTHOR IT").
 
 ### WHITEBOARD ROUNDS
 ```json
@@ -610,7 +579,7 @@ Min 3 questions per tier. Developing ≥1 concept; Mastering ≥1 calculation (K
 
 The sequence table is in SKILL.md ("Lesson type → slide sequence"). Renderer-side notes only:
 Visualiser is mandatory in standard, practical and **review** — never omit. **review**
-(`lessonType:"review"`) renders **all** Learn slides (no 4-slide cap — Bug 55), no Engage, and runs
+(`lessonType:"review"`) renders **all** Learn slides (no 4-slide cap — Bug 55) and runs
 Build items (so `markTheAnswers` / `modelAnswerReview` reach the review deck). Standard/practical/
 annotation keep the 4-Learn cap.
 

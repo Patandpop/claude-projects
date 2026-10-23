@@ -8,21 +8,15 @@
 
 - No class name in title — topic only. No Name/Class/Date fields.
 - Write in books by default — no answer boxes unless marks/diagram/table required.
-- **Review/improvement booklets: NO answer boxes** — students answer in exercise books. Only add writing space if Patryk explicitly asks. A booklet saying "answer in your book" must never also contain answer boxes.
-- Print font is sans-serif (BDA/accessibility). Body ≥11pt, left-aligned ragged-right (never justified), line spacing 1.5.
-- Tier badges = narrow pills (NOT full-width bars on worksheets — full-width is PPTX Apply only).
+- Review booklets have no answer boxes: SKILL.md "Box and space economy".
+- Fonts, sizes, spacing and tier pills are drawn by the builder: builder-behaviour.md and "Styling rules" below.
 - Word banks: Developing tier only; never when only 2 options or answer is obvious.
-- **Worksheets carry the FULL lesson.** Min 3 Apply questions per tier. Practical lessons include: diagram box + results table + conclusion questions.
+- Full lesson on the worksheet, 3+ Apply questions per tier: SKILL.md "Content volume & source fidelity".
 - Any question referring to a circuit/diagram gets a `diagramBox()` beneath it (`q.diagram: true`).
-- **When adapting a resource Patryk provides, every question and diagram position must survive the port.** Cutting content is a build failure.
 
 ## FILE NAMING
 
-- Standard: `[topic]_[ability_label]_worksheet.docx` — e.g. `parallel_circuits_mixed_ability_worksheet.docx`
-- Support version (built alongside standard for every NON-review lesson): `..._support_worksheet.docx`
-- Answer sheet (review lessons only, replaces the support slot): `..._answers.docx`
-- NEVER "developing" or "reaching" in a filename — students see filenames.
-- No class code, no date, in any filename.
+Set by the builder: builder-behaviour.md "File naming".
 
 ---
 
@@ -34,7 +28,7 @@ The support worksheet (`_support_worksheet.docx`) carries the same questions and
 |---|---|
 | KEY WORDS definition table | `wx.definitions[]` or falls back to `title.keywords[]` |
 | Keywords box alongside Do Now (right column, gold border) | `doNow.keywords[]` or falls back to `title.keywords[]` |
-| Hint line under Do Now question | `doNow.questions[n].hint` (REQUIRED on every Do Now question) |
+| Hint line under Do Now question | `doNow.questions[n].hint` |
 | Write-lines under True/False statements | always in support mode |
 | Word bank on Developing Apply tier | `wx.wordBank[]` or `title.keywords[]` (if >2 terms) |
 | Equation + units hint above GUESS scaffold | `q.equation` + optional `q.units` on Apply question |
@@ -45,7 +39,7 @@ The support worksheet (`_support_worksheet.docx`) carries the same questions and
 | Sentence starters on extended-writing questions | `q.starters[]` (skipped when B3/B4/B5 scaffold fires) |
 | Answer boxes +30% larger | always in support mode (skipped when B3/B4/B5 scaffold fires) |
 
-Scaffold priority (high → low): **support help** (2026-10-23: `weighUp` → `compare` → `steps`; `prompt` adds a guiding question then continues; `supportQ` replaces the question text) → B3 practical_design → B4 extended_writing ≥5 marks → B5 subSteps → starters → answer box. Only the first matching scaffold fires per question. Which help a question gets, and the checks each must pass: SKILL.md "Support sheet helps". The support sheet also gets the KEYS box above APPLY (key words the Apply questions use, plus needed equations). Over 4 pages: GUESS goes first, then KEYS. Word banks are printed in alphabetical order (never answer order) and need at least 5 words, or gaps + 2.
+Scaffold priority (high → low): **support help** (2026-10-23: `weighUp` → `compare` → `steps`; `prompt` adds a guiding question then continues; `supportQ` replaces the question text) → B3 practical_design → B4 extended_writing ≥5 marks → B5 subSteps → starters → answer box. Only the first matching scaffold fires per question. Which help a question gets, and the checks each must pass: SKILL.md "Support sheet helps". KEYS box, the over-4-pages rule and word bank rules: SKILL.md.
 
 All scaffolds apply across ALL tiers (Developing, Reaching, Mastering) on the support sheet. Students who need support need it throughout, not just on the lowest tier.
 
@@ -53,30 +47,9 @@ All scaffolds apply across ALL tiers (Developing, Reaching, Mastering) on the su
 
 ---
 
-## Answer sheet — model-answer frameworks (review lessons only)
+## Answer sheet and markTheAnswers
 
-Review lessons (`lessonType: "review"`) build `_answers.docx` instead of a support worksheet. Built
-by `buildWorksheetChildren(L, 'answers')` — it walks the SAME section/tier sequence as the worksheet
-(single source of truth), printing each question then its model answer directly below. Top banner:
-"MODEL ANSWERS — marking copy". **The Do Now section is skipped entirely in answers mode
-(2026-07-05)** — the sheet is the mark scheme for the Apply/Build sections only; Do Now answers
-already live on the DoNow Answers slide.
-
-Framework per question is picked by `answerFramework(q)` (override with `q.answerStyle`):
-
-| Framework | Trigger | Render |
-|---|---|---|
-| Filled GUESS table | `qType: "calculation"` or any GUESS field present | `guessScaffold('answer', …)` — all five cells filled from `q.given/unknown/equation/substitute/solve` (Solve falls back to `q.a`), Solve cell emphasised |
-| Indicative-content panel | `marks ≥ 6`, `contentType: "extended_writing"`, or any `q.indicativeContent` | `markingPanelDocx(q)` — navy/gold, three split sections: INDICATIVE CONTENT (bullets chunked by `ic.group`; `<u>` = must-use word only) → BANDS (`levelDescriptors`) → EXCLUSIONARY CLAIMS (`doesNotAward`) |
-| Plain callout | anything else | `q.a` / `q.modelAnswer` in a navy-border callout |
-| Graph note | `qType: "graph"` | `q.a` + "see model graph on the slide" |
-
-- Symbols/equations reuse `parseEq`/`toDocxRuns` (GUESS) and `prettyText` (prose) — × ÷ fractions and
-  super/subscripts typeset exactly as on the slides.
-- **6-mark rule:** an extended (non-calc) ≥6-mark question must carry ≥6 `indicativeContent` points;
-  shortfalls are logged non-fatally at build time.
-- The answer sheet carries no blank answer boxes, word banks, or support scaffolds — it is the mark
-  scheme, not a pupil sheet.
+Answer sheet (review lessons only): review-lessons.md "Answer sheet".
 
 ### markTheAnswers on the worksheet + answer sheet
 

@@ -17,7 +17,6 @@ description: "Creates lesson PowerPoints and worksheets for science lessons (phy
 - **Practical/Build slides expecting apparatus (circuits, equipment setups) MUST have an image placeholder** — steps in the left ~56%, placeholder on the right.
 - No emojis. No timers. No AO1/AO2. No "Mixed Ability" written on slides.
 - **No em dashes in any generated content** — slides, worksheets, answers, model text (Patryk's rule, 2026-07-02: "refrain from using them across everything"). Use a comma, a full stop, or a hyphen instead. Keep generated prose lean — less is more; Patryk adds the more.
-- No class name in worksheet titles.
 - Never abbreviate questions — full text on: Do Now slide, Do Now Answers (verbatim), Apply slide, Review (verbatim).
 - **Exactly 6 Do Now questions** (Patryk ruling 2026-07-09 — replaces the old "min 4"). All retrieval from PREVIOUSLY-TAUGHT content, never the current lesson.
 - **Calculation Do Nows get new numbers, same words (Patryk 2026-10-15).** Home builds with `doNow.auto` do this by themselves (do-now-vary.js; only when the mark scheme's one-step working checks out; real values like g = 9.8 N/kg or ice's 334 000 J/kg never change; the exam library is never changed). When you WRITE a Do Now calculation that revisits an earlier lesson or exam question, use different numbers and work the answer out again; keep the wording. `"varyNumbers": false` on `doNow` keeps the original numbers.
@@ -39,7 +38,7 @@ The renderer validates each lesson loudly (never blocks): Do Now exactly 6 · MC
 - **Real exam questions are added automatically at home, never authored** (2026-10-03): for Year 9-11 Biology, Chemistry and Physics, a home build adds an "Exam question" slide and a "Mark scheme" slide after Apply, using a real AQA question (verbatim) chosen for the lesson. When the worksheet still fits 4 pages, a different exam question is also added under Mastering with no answer lines (answered in books). Do not write exam questions into the JSON yourself, and never write an `examQuestion` key (not even null: it switches the automatic question off); set `meta.examQuestion: false` only if Patryk asks for a lesson without one. Year 12/13 (OCR) get none on the slides yet: their OCR questions are used for homework quizzes and exam practice papers at home. They never get AQA questions.
 - **Up to TWO experiments per lesson** (Patryk 2026-10-12) when the lesson needs them (e.g. reflection, then refraction). Each is its own `type: "practical"` Build item with its own `heading`; the worksheet gives each one its own section. The second experiment's results table goes in `results` on its practical item (the first keeps `worksheetExtras.results`). Never more than two.
 - **Always build exactly 6 MCQs, as ONE block** (Patryk 2026-10-03, replaces the old 4-scattered rule: scattered MCQs make the lesson feel disjointed). Learning MCQs come straight after the Learn section, before the rest of Build. An MCQ about the experiment gets `"about": "practical"` and is shown right after the practical method slide (and its answers), before the data. The renderer does the ordering itself, so list them anywhere in `build`; just tag the experiment ones. Never fewer than 6.
-- **Writing MCQs: follow `references/mcq-rules.md`** (2026-10-10, drawn from 2,745 real AQA and OCR questions). It covers four options with similar lengths, the answer letter spread over the 6, number options smallest to largest in one unit, each wrong option one real mistake or misconception (with at least one near miss), and NOT in capitals. Never use all/none of the above.
+- **Writing MCQs: follow `references/mcq-rules.md`** (2026-10-10, drawn from 2,745 real AQA and OCR questions).
 - **Equation lessons follow I do → we do → you do:** Learn-F equation intro → `guessExample` worked example (1–2 slides) → `practiceTriangle` independent practice. This is the default sequence whenever a new equation is introduced.
 - **Source material is a floor to EXTEND, not just preserve** (confirmed 2026-07-02): beyond porting every question/table/scaffold, actively add genuine depth — historical context, the "why this mattered" layer, connections to the bigger picture — woven into the same slides. Pre-build checklist question: "what's the one thing in this topic that makes it click, that isn't in the source material yet?"
 - **Apply: minimum 3 questions per tier** unless Patryk says otherwise. One question per tier is never enough.
@@ -182,54 +181,26 @@ The renderer validates each lesson loudly (never blocks): Do Now exactly 6 · MC
     "keywords": ["optional — overrides title.keywords as the source for the support worksheet keywords box"],
     "specPoints": ["optional — spec reference strings shown in presenter notes on the Do Now slide only. Use for spec codes or statements the Do Now is testing (e.g. 'AQA P5.1 — alternating current'). Never shown to students."]
   },
-  "engage": {
-    "variant": "news | prediction | video | demo | mysteryImage | oddOneOut",
-    "hook": "Short focal statement — stat, quote, or forced-choice question. ≤120 chars. Renders at 20pt bold. Always set for new builds.",
-    "content": "2–4 sentences of supporting context. Renders at 14pt italic below the hook.",
-    "imagePlaceholder": true
-  },
+  "engage": { "...": "see slide-options-v4.md ENGAGE" },
   "learn": [
 
-// MATH MINI-SYNTAX — use in any string field containing equations (equation, q, a, steps, body, etc.)
-// Equations render in Cambria Math (ships with every MS Office → zero install on school PCs).
-// {num/den}   fraction           → "v = {s/t}",  "KE = {1/2}mv^2"  (legible diagonal in PPTX; true stacked bar in Word)
-// x^2         superscript        → "E = mc^2",   "m s^-2"
-// x_2         subscript          → "CO_2",        "H_2O"
-// ^{m s}      multi-char super   → "m^{-1} s^{-2}"
-// sqrt(...)   square root        → "sqrt(2gh)"   (√ glyph in PPTX; true radical + vinculum in Word)
-// \greek      Greek letter       → "\Delta T",    "\rho"
-// \op         operator/relation  → \times → ×  \div → ÷  \pm → ±  \cdot → ·  \to/\rightarrow → →
-//                                  \leq → ≤  \geq → ≥  \approx → ≈  \neq → ≠  \degree/\deg → °  \propto → ∝
-// RULE (Bug 53): write operators and units as SYMBOLS in model answers / working — "×" not "times",
-//   "÷" not "divide", "m/s" not "meters/second". Use the \times / \div commands or the symbol itself.
-//   The renderer also converts a small safe whitelist (meters/second→m/s, seconds→s, times→×, divide→÷)
-//   but do not rely on it for anything outside that list — author symbols directly.
-// DO NOT hand-type Unicode super/subscript glyphs (₂ ² ⁻) in source — use ^ / _ so the renderer
-//   controls them (it emits Unicode super/subscript only where a run can't carry real super/subscript).
+// MATH MINI-SYNTAX ({a/b}, ^, _, sqrt, \greek, \times ...) in any string field: slide-options-v4.md "MATH NOTATION".
 
     { "variant": "A", "heading": "...", "boxes": [ { "header": "...", "items": ["..."] } ], "keywords": ["..."], "imagePlaceholder": true, "imageDescription": "diagram of lock and key enzyme model with active site and substrate labelled", "annotationZone": false },
     // Learn (any variant): "notes": "what Patryk says (speaker notes)". Learn A also takes: "definition": {term, text, origin, examples[], notExamples[]},
     //   "examDefinition": {term, wording with {1}..{/1}, board, asked}, "misconception": {wrong, right}. See slide-options-v4.md.
     { "variant": "B", "heading": "...", "definitions": [ { "term": "Osmosis", "definition": "The net movement of water molecules from a high water concentration to a low water concentration through a partially permeable membrane." } ], "below": "content+image|image|two-column|none", "boxes": [ { "header": "...", "items": ["..."] } ] },
-    { "variant": "E", "heading": "...", "comparison": { "aTitle": "Series circuit", "bTitle": "Parallel circuit", "rows": [ { "a": "...", "b": "..." } ] } },
-    { "variant": "F", "heading": "...", "equation": "V = I × R", "components": [ { "symbol": "V", "name": "Voltage", "unit": "volts (V)" } ], "rearrangements": ["I = V / R"], "example": "..." },
-    { "variant": "G", "heading": "...", "steps": [ { "label": "Step label", "note": "brief clarification" } ] },
-    { "variant": "H", "heading": "...", "videoLink": { "text": "descriptive title (not raw URL)", "url": "https://..." }, "toWatch": ["look for 1", "look for 2"], "prompt": "optional pause/discussion prompt", "questions": [ { "q": "...", "a": "..." } ] },
-    { "variant": "I", "heading": "...", "nodes": [ { "label": "Mouth", "note": "mechanical digestion" }, { "label": "Stomach", "note": "acid + enzymes" } ], "orientation": "vertical", "cycle": false },
+    // Learn E, F, G, H, I: field lists in slide-options-v4.md.
     { "variant": "J", "heading": "...", "axes": { "x": "Force (N)", "y": "Extension (cm)" }, "features": [ { "label": "Linear region", "description": "Extension proportional to force — obeys Hooke's Law" } ], "instruction": "Sketch the graph and label these features." },
     { "variant": "K", "heading": "...", "events": [ { "year": "1803", "label": "Dalton", "detail": "Solid sphere model" }, { "year": "1911", "label": "Rutherford", "detail": "Nuclear model" } ] }
   ],
   "build": [
-    { "type": "mcq", "q": "...", "options": ["A...","B...","C...","D..."], "answer": "B", "explanation": "...", "commonError": "..." },
+    // mcq, workedExample, errorAnalysis, graphInterpret, misconception, predictThenCheck and more: field lists in slide-options-v4.md.
     { "type": "practical", "intro": "...", "worksheetIntro": false, "steps": ["..."], "equipment": ["beaker", "thermometer", "..."], "warning": "...", "imagePlaceholder": true, "questions": [ { "q": "...", "a": "..." } ] },
-    { "type": "workedExample", "worked": { "prompt": "...", "steps": ["..."] }, "yourTurn": { "prompt": "...", "answer": "..." } },
     { "type": "guessExample", "topic": "...", "given": "...", "unknown": "...", "equation": "...", "equationSymbols": { "top": "...", "bottom": ["...", "..."] }, "substitute": "...", "solve": "..." },
-    { "type": "practiceTriangle", "questions": [ { "q": "...", "a": "...", "marks": 2 } ], "equation": "...", "equationSymbols": { "top": "...", "bottom": ["...", "...", "..."] } },    { "type": "errorAnalysis", "wrongWorking": ["..."], "errorLine": 3, "fix": "..." },
-    { "type": "graphInterpret", "graphLabel": "V-t graph", "axes": { "x": "time (s)", "y": "velocity (m/s)" }, "questions": [ { "q": "...", "a": "..." } ] },
-    { "type": "misconception", "claim": "...", "whyWrong": "...", "truth": "..." },
+    { "type": "practiceTriangle", "questions": [ { "q": "...", "a": "...", "marks": 2 } ], "equation": "...", "equationSymbols": { "top": "...", "bottom": ["...", "...", "..."] } },
     { "type": "sort", "...": "see slide-options-v4.md" },
-    { "type": "trueFalse", "heading": "COMMON MISCONCEPTIONS", "statements": [ { "text": "...", "isTrue": true }, { "text": "...", "isTrue": false, "correction": "..." } ] },
-    { "type": "predictThenCheck", "setup": "One sentence of scenario context.", "prediction": "What do you predict will happen?", "reveal": "What actually happens.", "explanation": "Why it happens.", "commonError": "..." }
+    { "type": "trueFalse", "heading": "COMMON MISCONCEPTIONS", "statements": [ { "text": "...", "isTrue": true }, { "text": "...", "isTrue": false, "correction": "..." } ] }
   ],
   "apply": {
     "developing": [ { "q": "...", "a": "...", "marks": 2, "qType": "concept", "commonError": "...", "diagram": true,
@@ -260,7 +231,7 @@ The renderer validates each lesson loudly (never blocks): Do Now exactly 6 · MC
 ```
 
 Notes on key fields:
-- **`equationSymbols` (formula triangle):** one quantity on top, 2 to 4 MULTIPLIED quantities in `bottom` (`{ "top": "Ep", "bottom": ["m", "g", "h"] }`). Omit it for any other kind of equation (`a = (v − u)/t`, `Ek = ½mv²`): no triangle is drawn. Full rules in slide-options-v4.md.
+- **`equationSymbols` (formula triangle):** Full rules in slide-options-v4.md.
 - `learn[].boxes` is the preferred Learn-A form (navy-header boxes stacking rules/key info) — much better than a flat `body` string, which renders plain.
 - `apply[].diagram: true` (or a string label) emits a framed diagram box on the worksheet under that question — use for any question that refers to a circuit/diagram. `diagramLines` controls the box height.
 - `build practical` slides get an apparatus image placeholder automatically; set `imagePlaceholder: false` only if there genuinely is no apparatus. `equipment: ["..."]` lists apparatus items — rendered as a labelled amber-tinted section on the slide.
@@ -310,7 +281,7 @@ Field names are fixed. If a slide type needs something not in the schema, check 
 
 Homework: 10C2, 10S2, 11S2 = long-term exam-question booklets; 12C and 13D = every lesson (end-of-subsection textbook questions); KS3 not decided. PSHE-9AB is not science. (7BYA, 8AB, 9AB, 12D, 10C4 and 11C3 in older files are no longer his classes.)
 
-Standard lessons emit THREE files: `.pptx` + `_worksheet.docx` + `_support_worksheet.docx`. Review lessons also emit three, but different: `.pptx` + `_worksheet.docx` (the booklet) + `_answers.docx` (model-answer sheet — takes the support-worksheet slot). The support sheet is the same content with scaffolding added automatically across ALL tiers (word bank where tier-appropriate, the one GUESS row where a Year 9+ question sets `guess: true`, equation/units hint line, Do Now `hint` lines + keywords box, sentence starters, key-word definition table, practical design prompt checklist, explanation prompt chain). `differentiation: "split"` / `meta.abilityLabel` only set the filename label — they never change whether the support sheet is produced. Identical titles, identical layout family — never visibly "the easy sheet".
+The support sheet is the same content with scaffolding added automatically across ALL tiers (word bank where tier-appropriate, the one GUESS row where a Year 9+ question sets `guess: true`, equation/units hint line, Do Now `hint` lines + keywords box, sentence starters, key-word definition table, practical design prompt checklist, explanation prompt chain). `differentiation: "split"` / `meta.abilityLabel` only set the filename label — they never change whether the support sheet is produced. Identical titles, identical layout family — never visibly "the easy sheet".
 
 **Learn variant selection guide (choose the one that fits the content):**
 - A: Key info in boxes (definitions, key facts, labelled sections)
@@ -326,7 +297,7 @@ Standard lessons emit THREE files: `.pptx` + `_worksheet.docx` + `_support_works
 - K: **Timeline** — horizontal line with alternating above/below event boxes. Use for history of science, evolution of models, geological time, etc. Max 8 events.
 - L: **Labelled picture** (dual coding, Patryk's top priority): the picture carries the explanation. Labels down both sides, each joined by a line that ends exactly on its part. By default it is BUILT one part at a time (one slide per label: current part ringed in yellow with its sentence open, others grey) and ends with an all-labels slide to copy; it counts as ONE Learn item. Use for anything pupils must recognise or name the parts of (cells, organs, apparatus, the eye, a circuit, a wave). Schema and the point-checking rule: slide-options-v4.md "LEARN L". Picture sources, in order: the school's own slides (at home: `node science-lesson/references/image-library.js "<lesson folder under Lessons>"`, then look at its sheet.png once), then a diagram Claude draws with `references/diagram_gen.py` (particle boxes, atom models). A photo + model pair (shared labels pointing at both) when pupils will see the real thing. Never web or AI images.
 
-Learn H worksheet questions appear only on the worksheet (not repeated on the slide). Learn G has no worksheet output (students annotate in books). Learn I/J/K have no dedicated worksheet output — pair with a worksheet question set as needed.
+Learn G has no worksheet output (students annotate in books). Learn I/J/K have no dedicated worksheet output — pair with a worksheet question set as needed.
 
 ---
 

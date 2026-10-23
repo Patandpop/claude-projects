@@ -130,3 +130,28 @@ annotate; on the answer sheet each sample gains its `Awarded:` verdict, MPs hit/
 then the full marking panel. This is the "mark the answers" peer-assessment activity.
 
 ---
+
+### Answer sheet detail (moved word for word from worksheet-spec.md, 2026-10-23)
+
+Review lessons (`lessonType: "review"`) build `_answers.docx` instead of a support worksheet. Built
+by `buildWorksheetChildren(L, 'answers')` — it walks the SAME section/tier sequence as the worksheet
+(single source of truth), printing each question then its model answer directly below. Top banner:
+"MODEL ANSWERS — marking copy". **The Do Now section is skipped entirely in answers mode
+(2026-07-05)** — the sheet is the mark scheme for the Apply/Build sections only; Do Now answers
+already live on the DoNow Answers slide.
+
+Framework per question is picked by `answerFramework(q)` (override with `q.answerStyle`):
+
+| Framework | Trigger | Render |
+|---|---|---|
+| Filled GUESS table | `qType: "calculation"` or any GUESS field present | `guessScaffold('answer', …)` — all five cells filled from `q.given/unknown/equation/substitute/solve` (Solve falls back to `q.a`), Solve cell emphasised |
+| Indicative-content panel | `marks ≥ 6`, `contentType: "extended_writing"`, or any `q.indicativeContent` | `markingPanelDocx(q)` — navy/gold, three split sections: INDICATIVE CONTENT (bullets chunked by `ic.group`; `<u>` = must-use word only) → BANDS (`levelDescriptors`) → EXCLUSIONARY CLAIMS (`doesNotAward`) |
+| Plain callout | anything else | `q.a` / `q.modelAnswer` in a navy-border callout |
+| Graph note | `qType: "graph"` | `q.a` + "see model graph on the slide" |
+
+- Symbols/equations reuse `parseEq`/`toDocxRuns` (GUESS) and `prettyText` (prose) — × ÷ fractions and
+  super/subscripts typeset exactly as on the slides.
+- **6-mark rule:** an extended (non-calc) ≥6-mark question must carry ≥6 `indicativeContent` points;
+  shortfalls are logged non-fatally at build time.
+- The answer sheet carries no blank answer boxes, word banks, or support scaffolds — it is the mark
+  scheme, not a pupil sheet.
