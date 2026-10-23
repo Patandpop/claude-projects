@@ -74,7 +74,7 @@
       "imagePlaceholder": true,
       "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Mixtures Separating 9XS/img/image34.png",
       "imageDescription": "Exercise book page with ink spread into colours by spilled water",
-      "imageConfidence": "school",
+      "imageConfidence": "search",
       "reveal": {
         "question": "Was the black ink one substance or several?",
         "answer": "Several. Black ink is a mixture of dyes. The water carried each dye a different distance: that is chromatography."
@@ -138,7 +138,7 @@
         ],
         "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Mixtures Separating 9XS/img/image36.png",
         "imageDescription": "Filtration: mixture poured through filter paper in a funnel",
-        "imageConfidence": "school",
+        "imageConfidence": "search",
         "notes": "Why can't you filter salt water? The salt is dissolved: its particles are small enough to pass through the paper. GCSE link: C10 water purification, C4 making a salt."
       },
       {
@@ -161,7 +161,7 @@
         ],
         "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Mixtures Separating 9XS/img/image42.png",
         "imageDescription": "Paper chromatogram: spots separated above the solvent",
-        "imageConfidence": "school",
+        "imageConfidence": "search",
         "notes": "Pencil, not pen: pen ink would run too. Uses: drug tests on athletes, food colourings, crime scene inks (C8 Chemical Analysis)."
       },
       {
@@ -185,7 +185,7 @@
         ],
         "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Mixtures Separating 9XS/img/image35.jpg",
         "imageDescription": "Simple distillation apparatus with condenser and collecting flask",
-        "imageConfidence": "school",
+        "imageConfidence": "search",
         "notes": "Cold water goes in at the bottom of the condenser. Crude oil: short chains (low boiling point) come out at the top. GCSE link: C7 crude oil."
       }
     ],

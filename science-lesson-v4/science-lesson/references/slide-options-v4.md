@@ -140,6 +140,8 @@ Max 2 boxes left. Image placeholder right by default. Omit `keywords` if already
 - `misconception`: red "✗ Not quite" (crossed out) → green "✓ Actually" across the bottom. The boxes above shrink to fit.
 - `{k}word{/k}`: key word, bold with a gold underline, in any slide text (max 3 per slide, first appearance).
 - `title.knownWords` [{term, definition}]: the dark "WORDS YOU KNOW" band on the objectives slide (after the Do Now answers).
+- `title.sequence` { learn, build, apply }: the "THIS LESSON" strip at the bottom of the objectives slide (three boxes in the stage colours, always shown). One plain instruction each (rules in SKILL.md); missing lines are filled from the lesson.
+- `definition.parts` [{part, means}] + `definition.sum`: word parts as navy chips under a Learn definition (poly "many" + mer "part" → a chain of many parts). Replaces the grey `origin` text when given.
 - MCQs: `"why": {"B": "thinks two atoms means a compound", "C": "...", "D": "..."}` names the mistake each wrong option catches (required: the build's MCQ CHECK warns without it).
 
 ### LEARN B — write in book

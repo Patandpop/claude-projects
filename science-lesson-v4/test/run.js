@@ -615,6 +615,12 @@ async function main() {
       const s3 = (slides.find(s => s.n === 3) || {}).x || '';
       if (/LEARNING OBJECTIVES/.test(s3) && /WORDS YOU KNOW/.test(s3) && /WORDS FOR THIS LESSON/.test(s3)) pass('objectives slide straight after the Do Now answers (known words + lesson words)');
       else fail('slide 3 is not the new objectives slide with WORDS YOU KNOW / WORDS FOR THIS LESSON');
+      // "This lesson" (2026-10-23): Learn, Build, Apply; written lines used, a missing one filled in
+      if (/THIS LESSON/.test(s3) && />LEARN</.test(s3) && />BUILD</.test(s3) && />APPLY</.test(s3) && /compare elements and compounds/.test(s3) && /Carousel: collect information/.test(s3) && /on the worksheet questions/.test(s3))
+        pass('objectives slide: "This lesson" Learn / Build / Apply, written lines kept, Apply filled in');
+      else fail('objectives slide: "This lesson" strip missing or wrong');
+      if (/>poly</.test(all) && />mer</.test(all) && /a chain of many parts/.test(all)) pass('word parts on the Learn slide: poly + mer → a chain of many parts');
+      else fail('word parts (definition.parts) not shown on the Learn slide');
       if (/<a:uFill><a:solidFill><a:srgbClr val="F9A825"\/><\/a:solidFill><\/a:uFill><a:latin/.test(all)) pass('key words have a gold underline (uFill before latin)');
       else fail('no gold underline on {k} key words');
       if (/\{k\}|\{\/k\}|en-001/.test(all)) fail('raw {k} tag or en-001 marker left in the slides'); else pass('no raw {k} tags in the slides');
@@ -638,6 +644,9 @@ async function main() {
       const z = new AdmZip(path.join(outDir, pptx));
       const slides = z.getEntries().filter(e => /^ppt\/slides\/slide\d+\.xml$/.test(e.entryName))
         .map(e => ({ n: +e.entryName.match(/(\d+)\.xml$/)[1], x: e.getData().toString('utf8') })).sort((a, b) => a.n - b.n);
+      const obj = slides.find(s => /LEARNING OBJECTIVES/.test(s.x)) || { x: '' };
+      if (/THIS LESSON/.test(obj.x) && /Note down the key terms: the animal cell/.test(obj.x) && /Quick questions to check you(&apos;|')ve got it/.test(obj.x)) pass('"This lesson" with nothing written: filled in from the Learn headings and the quiz questions');
+      else fail('"This lesson" fallback lines missing');
       const cell = slides.filter(s => /LEARN · THE ANIMAL CELL/.test(s.x)), copy = slides.filter(s => /LEARN · COPY THE CELL/.test(s.x));
       if (cell.length === 4 && copy.length === 1) pass('Learn L: 3 labels built one at a time + the all-labels slide; build:false = one slide');
       else fail(`Learn L slide count: ${cell.length} build + ${copy.length} plain (want 4 + 1)`);

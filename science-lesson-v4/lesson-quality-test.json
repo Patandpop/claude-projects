@@ -1,0 +1,560 @@
+[
+  {
+    "meta": {
+      "class": "9XS",
+      "topic": "Atoms, elements and compounds",
+      "title": "Atoms, elements and compounds (quality fixture)",
+      "lessonType": "standard",
+      "theme": "chemistry",
+      "worksheet": "A",
+      "differentiation": "none",
+      "year": 9,
+      "subject": "Chemistry",
+      "macrotopic": "C1 Atomic Structure",
+      "lessonNumber": 1
+    },
+    "title": {
+      "objectives": [
+        "Define {k}atom{/k}, {k}element{/k} and {k}compound{/k}.",
+        "Identify {k}chemical reactions{/k} from the formation of new substances.",
+        "Use symbols, formulae and names to identify elements and compounds."
+      ],
+      "keywords": [
+        "atom",
+        "element",
+        "compound",
+        "mixture",
+        "chemical reaction",
+        "formula"
+      ],
+      "knownWords": [
+        {
+          "term": "particle",
+          "definition": "a tiny piece of matter, far too small to see. Everything is made of particles (P3 Particles)."
+        },
+        {
+          "term": "substance",
+          "definition": "a single kind of material with the same make-up all the way through, like pure water."
+        }
+      ],
+      "sequence": {
+        "learn": "Note down the key terms, then compare elements and compounds.",
+        "build": "Carousel: collect information from the sheets around the room."
+      }
+    },
+    "doNow": {
+      "variant": "A",
+      "questions": [
+        {
+          "q": "What is an atom?",
+          "a": "The smallest part of an element that can exist.",
+          "marks": 1,
+          "hint": "An atom is the s_______ part of an e_______ that can exist."
+        },
+        {
+          "q": "What is the chemical symbol for potassium?",
+          "a": "K",
+          "marks": 1
+        },
+        {
+          "q": "What is an element?",
+          "a": "A substance made of only one type of atom.",
+          "marks": 1,
+          "hint": "An element is a substance made of only o___ t___ of atom."
+        },
+        {
+          "q": "What is the chemical formula for carbon dioxide?",
+          "a": "CO_2",
+          "marks": 1
+        },
+        {
+          "q": "What is the chemical formula for water?",
+          "a": "H_2O",
+          "marks": 1
+        },
+        {
+          "q": "What are the rows and the columns of the periodic table called?",
+          "a": "Rows are periods; columns are groups.",
+          "marks": 1,
+          "hint": "Rows are p_______; columns are g_______."
+        }
+      ]
+    },
+    "engage": {
+      "variant": "prediction",
+      "title": "ONE LETTER",
+      "hook": "CO is a poisonous gas. Co is a metal used in magnets. How can one small letter change everything?",
+      "imagePlaceholder": false,
+      "reveal": {
+        "question": "Look at the capital letters.",
+        "answer": "Co is one element, cobalt. CO is a compound: one carbon atom (C) bonded to one oxygen atom (O). A new capital letter means a new element."
+      }
+    },
+    "learn": [
+      {
+        "variant": "A",
+        "heading": "Atoms and elements",
+        "boxes": [
+          {
+            "header": "Atom",
+            "items": [
+              "The smallest part of an element that can exist. All substances are made of {k}atoms{/k}."
+            ]
+          },
+          {
+            "header": "Element",
+            "items": [
+              "No chemical reaction can split an {k}element{/k} into anything simpler.",
+              "About 100 elements, all in the periodic table."
+            ]
+          }
+        ],
+        "imageConfidence": "search",
+        "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Atoms Elements Compounds 9XS/img/image31.png",
+        "imageDescription": "Periodic table with groups and periods labelled",
+        "definition": {
+          "term": "Element",
+          "text": "a substance made of only one type of atom.",
+          "origin": "Latin elementum: a basic part"
+        },
+        "notes": "Greek 'atomos' means uncuttable (a = not, tomos = cut). Democritus suggested atoms about 2400 years ago; Dalton gave the evidence in 1803 and said each element has its own kind of atom. Periodic table: rows are periods, columns are groups."
+      },
+      {
+        "variant": "A",
+        "heading": "Chemical symbols",
+        "boxes": [
+          {
+            "header": "The rules",
+            "items": [
+              "One or two letters. The first is a capital, any second letter is lower case.",
+              "Most come from the English name: H, O, Mg, Cl."
+            ]
+          },
+          {
+            "header": "From Latin names",
+            "items": [
+              "Na natrium · K kalium · Fe ferrum · Cu cuprum",
+              "Au aurum · Ag argentum · Pb plumbum · Hg hydrargyrum"
+            ]
+          }
+        ],
+        "imageConfidence": "search",
+        "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Atoms Elements Compounds 9XS/img/image24.png",
+        "imageDescription": "Magnesium periodic table tile: symbol Mg, atomic number 12",
+        "notes": "Fixture: exam wording on the slide, the plain version here.",
+        "examDefinition": {
+          "term": "Specific heat capacity",
+          "wording": "is the {1}energy{/1} needed to raise the temperature of {2}1 kg{/2} of a substance by {3}1 °C{/3}.",
+          "board": "AQA",
+          "asked": 7
+        }
+      },
+      {
+        "variant": "A",
+        "heading": "Compounds and chemical reactions",
+        "boxes": [
+          {
+            "header": "Chemical reaction",
+            "items": [
+              "Always makes a NEW substance, often with an energy change (heat, light).",
+              "Only a reaction can split a compound back into its elements."
+            ]
+          },
+          {
+            "header": "Compound",
+            "items": [
+              "Two or more elements {k}chemically combined{/k} in fixed proportions.",
+              "Different ratio, different compound: CO and CO_2."
+            ]
+          }
+        ],
+        "imageConfidence": "search",
+        "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Atoms Elements Compounds 9XS/img/image17.png",
+        "imageDescription": "Eight numbered particle diagrams, single atoms and molecules: which are elements, which are compounds?",
+        "misconception": {
+          "wrong": "A compound is just a mixture of its elements.",
+          "right": "In a compound the atoms are joined, in a fixed ratio. A mixture's parts are not joined."
+        },
+        "definition": {
+          "term": "polymer",
+          "text": "a long chain molecule made of many repeating units.",
+          "parts": [
+            {
+              "part": "poly",
+              "means": "many"
+            },
+            {
+              "part": "mer",
+              "means": "part"
+            }
+          ],
+          "sum": "a chain of many parts"
+        }
+      },
+      {
+        "variant": "H",
+        "heading": "Iron + sulfur",
+        "videoLink": {
+          "text": "Iron and sulfur react to form iron sulfide",
+          "url": "https://www.youtube.com/watch?v=A5H6DVe5FAI"
+        },
+        "toWatch": [
+          "The colour of iron and of sulfur, and which one a magnet picks up.",
+          "What happens once the reaction starts, even after the flame is removed.",
+          "The colour of the product, and whether a magnet picks it up."
+        ],
+        "prompt": "Mixture or compound? What is your evidence?",
+        "questions": [
+          {
+            "q": "Write the word equation for the reaction.",
+            "a": "iron + sulfur \\to iron sulfide"
+          },
+          {
+            "q": "Give two signs that a chemical reaction happened.",
+            "a": "It glowed (gave out heat and light); a new black solid formed that is not magnetic."
+          },
+          {
+            "q": "Why can a magnet separate the iron and sulfur mixture but not iron sulfide?",
+            "a": "In the mixture the iron is not bonded, so it keeps its magnetism. In iron sulfide the atoms are bonded into a new compound."
+          }
+        ],
+        "imageConfidence": "search",
+        "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Atoms Elements Compounds 9XS/img/image7.jpg",
+        "imageDescription": "Pile of iron filings (grey powder)"
+      }
+    ],
+    "build": [
+      {
+        "type": "mcq",
+        "q": "Which statement describes an element?",
+        "options": [
+          "A. A substance made of only one type of atom",
+          "B. Two or more elements chemically combined",
+          "C. Two substances mixed but not chemically joined",
+          "D. The smallest part of a substance that can exist"
+        ],
+        "answer": "A",
+        "explanation": "An element contains only one type of atom.",
+        "commonError": "Choosing D, which is close to the definition of an atom.",
+        "why": {
+          "B": "mixes up element and compound",
+          "C": "describes a mixture",
+          "D": "that is the definition of an atom"
+        }
+      },
+      {
+        "type": "mcq",
+        "q": "Which of these is a compound?",
+        "options": [
+          "A. O_2",
+          "B. Fe",
+          "C. He",
+          "D. H_2O"
+        ],
+        "answer": "D",
+        "explanation": "H_2O contains two elements, hydrogen and oxygen, bonded together.",
+        "commonError": "Choosing O_2 because it has two atoms; both atoms are oxygen, so it is an element.",
+        "why": {
+          "A": "thinks two atoms joined means a compound",
+          "B": "thinks a metal must be a compound",
+          "C": "picks the unfamiliar symbol"
+        }
+      },
+      {
+        "type": "mcq",
+        "q": "How many atoms are in one molecule of ethanol, C_2H_6O?",
+        "options": [
+          "A. 3",
+          "B. 8",
+          "C. 9",
+          "D. 12"
+        ],
+        "answer": "C",
+        "explanation": "2 carbon + 6 hydrogen + 1 oxygen = 9 atoms.",
+        "commonError": "Answering 8 by missing the O, which has no number so counts as 1.",
+        "why": {
+          "A": "counts the elements, not the atoms",
+          "B": "adds the numbers and forgets the O",
+          "D": "adds an extra 3 for the three elements"
+        }
+      },
+      {
+        "type": "mcq",
+        "q": "What is the difference between Co and CO?",
+        "options": [
+          "A. Co and CO are both the element cobalt.",
+          "B. Co is the element cobalt; CO is a compound.",
+          "C. Co is a compound; CO is the element cobalt.",
+          "D. Co and CO are both compounds of carbon."
+        ],
+        "answer": "B",
+        "explanation": "A new capital letter means a new element, so CO contains C and O.",
+        "commonError": "Ignoring the capital letter.",
+        "why": {
+          "A": "ignores the capital letter",
+          "C": "swaps the two",
+          "D": "reads C as carbon in both"
+        }
+      },
+      {
+        "type": "mcq",
+        "q": "Iron filings and sulfur powder are mixed but not heated. How could you separate them?",
+        "options": [
+          "A. Heat the mixture strongly",
+          "B. Pull the iron out with a magnet",
+          "C. It cannot be done without a reaction",
+          "D. Melt the iron and pour it off"
+        ],
+        "answer": "B",
+        "explanation": "In a mixture the iron is not bonded, so it keeps its magnetism.",
+        "commonError": "Choosing A: heating makes iron sulfide, a compound.",
+        "why": {
+          "A": "heating makes a compound, so they can no longer be separated",
+          "C": "thinks a mixture is already joined",
+          "D": "iron melts at 1538 °C: not practical"
+        }
+      },
+      {
+        "type": "mcq",
+        "q": "What is the chemical symbol for lead?",
+        "options": [
+          "A. Pb",
+          "B. L",
+          "C. Le",
+          "D. The Sun"
+        ],
+        "answer": "A",
+        "explanation": "Pb comes from its Latin name, plumbum.",
+        "commonError": "Using the first letters of the English name.",
+        "why": {
+          "B": "uses the English name",
+          "C": "takes the first two letters of lead"
+        }
+      },
+      {
+        "type": "sort",
+        "instruction": "Element or compound? Then look at the endings: what do -ide and -ate tell you?",
+        "items": [
+          "Lithium",
+          "Carbon monoxide",
+          "Silicon",
+          "Sodium chloride",
+          "Potassium sulfate",
+          "Lithium nitrate",
+          "Helium",
+          "Magnesium carbonate"
+        ],
+        "categories": {
+          "A": "Element",
+          "B": "Compound"
+        },
+        "sorted": {
+          "A": [
+            "Lithium",
+            "Silicon",
+            "Helium"
+          ],
+          "B": [
+            "Carbon monoxide",
+            "Sodium chloride",
+            "Potassium sulfate",
+            "Lithium nitrate",
+            "Magnesium carbonate"
+          ]
+        }
+      },
+      {
+        "type": "workedExample",
+        "worked": {
+          "prompt": "Magnesium burns in oxygen. Name the product and write the word equation.",
+          "steps": [
+            "Metal first, keeps its name: magnesium",
+            "Non-metal second, ending changes to -ide: oxygen \to oxide",
+            "magnesium + oxygen \to magnesium oxide",
+            "-ate means oxygen is in it too: potassium sulfate = K, S and O"
+          ]
+        },
+        "yourTurn": {
+          "prompt": "Sodium reacts with chlorine. Name the product and write the word equation.",
+          "answer": "sodium + chlorine \\to sodium chloride"
+        }
+      },
+      {
+        "type": "workedExample",
+        "worked": {
+          "prompt": "How many atoms of each element are in H_{2}SO_{4}?",
+          "steps": [
+            "Split at each capital letter: H_2 · S · O_4",
+            "H_2 = 2 hydrogen atoms",
+            "S = 1 sulfur atom (no number means 1)",
+            "O_4 = 4 oxygen atoms. Total = 7 atoms of 3 elements"
+          ]
+        },
+        "yourTurn": {
+          "prompt": "How many atoms of each element are in CaCO_3?",
+          "answer": "1 calcium, 1 carbon, 3 oxygen = 5 atoms of 3 elements"
+        }
+      },
+      {
+        "type": "sort",
+        "instruction": "Which show a chemical reaction? Sort them, then name the sign that a new substance formed.",
+        "items": [
+          "Toast burning",
+          "A cake baking",
+          "A car rusting",
+          "An egg boiling",
+          "Chocolate melting",
+          "Sugar dissolving in tea",
+          "Draining cooked pasta",
+          "Water boiling in a kettle"
+        ],
+        "categories": {
+          "A": "Chemical reaction (new substance)",
+          "B": "Physical change (no new substance)"
+        },
+        "sorted": {
+          "A": [
+            "Toast burning",
+            "A cake baking",
+            "A car rusting",
+            "An egg boiling"
+          ],
+          "B": [
+            "Chocolate melting",
+            "Sugar dissolving in tea",
+            "Draining cooked pasta",
+            "Water boiling in a kettle"
+          ]
+        }
+      }
+    ],
+    "apply": {
+      "developing": [
+        {
+          "q": "Define the terms atom, element and compound.",
+          "a": "Atom: smallest part of an element that can exist. Element: only one type of atom. Compound: two or more elements chemically combined.",
+          "marks": 3,
+          "qType": "concept"
+        },
+        {
+          "q": "Give the symbols for iron, sodium and lead. Why do they not match the English names?",
+          "a": "Fe, Na, Pb. They come from Latin names: ferrum, natrium, plumbum.",
+          "marks": 3,
+          "qType": "concept"
+        },
+        {
+          "q": "Sort into elements and compounds: Fe, H_2O, O_2, NaCl, N_2, CH_4.",
+          "a": "Elements: Fe, O_2, N_2. Compounds: H_2O, NaCl, CH_4.",
+          "marks": 2,
+          "qType": "concept"
+        }
+      ],
+      "reaching": [
+        {
+          "q": "How many atoms of each element are in glucose, C_6H_12O_6? How many atoms in total?",
+          "a": "6 carbon, 12 hydrogen, 6 oxygen: 24 atoms.",
+          "marks": 2,
+          "qType": "concept"
+        },
+        {
+          "q": "Draw particle diagrams of Co and CO. Explain the difference.",
+          "a": "Co: single atoms all the same, an element. CO: molecules of one C bonded to one O, a compound.",
+          "marks": 3,
+          "qType": "concept",
+          "diagram": true,
+          "diagramLines": 6
+        },
+        {
+          "q": "Name the compound formed when calcium reacts with oxygen. Write the word equation.",
+          "a": "Calcium oxide. calcium + oxygen \\to calcium oxide",
+          "marks": 2,
+          "qType": "concept"
+        }
+      ],
+      "mastering": [
+        {
+          "q": "A magnet separates iron from an iron and sulfur mixture, but not from iron sulfide. Explain why.",
+          "a": "In the mixture iron is not bonded, so keeps its properties. In iron sulfide it is bonded into a new compound with new properties.",
+          "marks": 3,
+          "qType": "extended_writing"
+        },
+        {
+          "q": "Fool's gold is FeS_2. The black solid made from iron and sulfur is FeS. Explain why these are different compounds.",
+          "a": "Compounds have fixed proportions. FeS has 1 Fe to 1 S; FeS_2 has 1 Fe to 2 S. A different ratio is a different compound.",
+          "marks": 3,
+          "qType": "extended_writing"
+        },
+        {
+          "q": "A bracket multiplies everything inside it. How many atoms are in Mg(OH)_2? Show your working.",
+          "a": "1 Mg + 2 O + 2 H = 5 atoms.",
+          "marks": 2,
+          "qType": "calculation"
+        }
+      ]
+    },
+    "image_dump": {
+      "images": [
+        {
+          "path": "C:/Users/magda/claude-projects/science-lesson-v4/Atoms Elements Compounds 9XS/img/image12.jpg",
+          "label": "Sort (chemical or physical): toast burning"
+        },
+        {
+          "path": "C:/Users/magda/claude-projects/science-lesson-v4/Atoms Elements Compounds 9XS/img/image2.jpg",
+          "label": "Sort: cake baking"
+        },
+        {
+          "path": "C:/Users/magda/claude-projects/science-lesson-v4/Atoms Elements Compounds 9XS/img/image22.png",
+          "label": "Sort: car rusting"
+        },
+        {
+          "path": "C:/Users/magda/claude-projects/science-lesson-v4/Atoms Elements Compounds 9XS/img/image5.png",
+          "label": "Sort: eggs boiling"
+        },
+        {
+          "path": "C:/Users/magda/claude-projects/science-lesson-v4/Atoms Elements Compounds 9XS/img/image28.jpg",
+          "label": "Sort: chocolate melting"
+        },
+        {
+          "path": "C:/Users/magda/claude-projects/science-lesson-v4/Atoms Elements Compounds 9XS/img/image32.png",
+          "label": "Sort: sugar dissolving in tea"
+        },
+        {
+          "path": "C:/Users/magda/claude-projects/science-lesson-v4/Atoms Elements Compounds 9XS/img/image36.png",
+          "label": "Sort: draining pasta"
+        },
+        {
+          "path": "C:/Users/magda/claude-projects/science-lesson-v4/Atoms Elements Compounds 9XS/img/image19.jpg",
+          "label": "Video slide: sulfur powder"
+        },
+        {
+          "path": "C:/Users/magda/claude-projects/science-lesson-v4/Atoms Elements Compounds 9XS/img/image13.jpg",
+          "label": "Mastering Q2: pyrite (fool's gold), FeS2. Not the black FeS made in the video"
+        },
+        {
+          "path": "C:/Users/magda/claude-projects/science-lesson-v4/Atoms Elements Compounds 9XS/img/image9.png",
+          "label": "Particle box: atoms of an element"
+        },
+        {
+          "path": "C:/Users/magda/claude-projects/science-lesson-v4/Atoms Elements Compounds 9XS/img/image4.png",
+          "label": "Particle box: molecules of an element"
+        },
+        {
+          "path": "C:/Users/magda/claude-projects/science-lesson-v4/Atoms Elements Compounds 9XS/img/image21.png",
+          "label": "Particle box: molecules of a compound"
+        },
+        {
+          "path": "C:/Users/magda/claude-projects/science-lesson-v4/Atoms Elements Compounds 9XS/img/image1.png",
+          "label": "Particle box: mixture of two elements"
+        },
+        {
+          "path": "C:/Users/magda/claude-projects/science-lesson-v4/Atoms Elements Compounds 9XS/img/image27.jpg",
+          "label": "Symbols: hydrogen tile"
+        },
+        {
+          "path": "C:/Users/magda/claude-projects/science-lesson-v4/Atoms Elements Compounds 9XS/img/image15.png",
+          "label": "Symbols: chlorine tile"
+        }
+      ]
+    }
+  }
+]

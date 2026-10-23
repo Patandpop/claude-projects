@@ -842,6 +842,9 @@ function imageOrPlaceholder(slide, item, x, y, w, h) {
     } else {
       buildWarn(`image file NOT FOUND, grey placeholder shipped instead: ${item.embeddedImagePath}`);
     }
+  } else if (item && item.embeddedImagePath) {
+    // 2026-10-23: a picture given with another imageConfidence ("school") was silently left out
+    buildWarn(`picture NOT embedded (imageConfidence is "${item.imageConfidence || ''}", must be "search"): ${item.embeddedImagePath}`);
   }
   imagePlaceholder(slide, x, y, w, h, (item && item.imageDescription) || null);
 }
@@ -1613,10 +1616,27 @@ function slideDoNowAnswers(pptx, L) {
    Dark band "WORDS YOU KNOW" (title.knownWords: [{term, definition}] — only words an earlier lesson
    taught; left out when empty), "WORDS FOR THIS LESSON" as navy tags (title.keywords minus known
    ones, no definitions), then the numbered objectives with {k} key words highlighted. */
+/* lessonSequence(L) — the "This lesson" lines (Patryk 2026-10-23): what pupils do in Learn, Build and
+   Apply. Claude writes title.sequence { learn, build, apply } (plain instructions, his voice); any line
+   left out is filled from the lesson itself. */
+function lessonSequence(L) {
+  const seq = (L.title && L.title.sequence) || {};
+  const learn = arr(L.learn), build = arr(L.build);
+  const cmp = learn.find((x) => String(x.variant || '').toUpperCase() === 'E' && x.comparison && x.comparison.aTitle);
+  const heads = learn.map((x) => stripStage(stripKeys(x.heading || x.title || ''), 'LEARN')).filter(Boolean);
+  const pr = build.find((b) => (b.type || b.variant) === 'practical');
+  const lower = (s) => String(s).charAt(0).toLowerCase() + String(s).slice(1);
+  return {
+    learn: seq.learn || (cmp ? `Note down the key terms, then compare ${lower(cmp.comparison.aTitle)} and ${lower(cmp.comparison.bTitle)}.`
+      : 'Note down the key terms' + (heads.length ? ': ' + heads.slice(0, 3).map(lower).join(', ') : '') + '.'),
+    build: seq.build || (pr ? 'Do the experiment' + (pr.heading ? ': ' + lower(stripKeys(pr.heading)) : '') + '.'
+      : build.some((b) => (b.type || b.variant) === 'workedExample') ? 'Follow the worked example, then try one yourself.' : 'Quick questions to check you\'ve got it.'),
+    apply: seq.apply || 'Use what you\'ve learnt on the worksheet questions.',
+  };
+}
 function slideObjectives(pptx, L) {
   const t = L.title || {};
   const objectives = arr(t.objectives).slice(0, 3);
-  if (!objectives.length) return;
   const known = arr(t.knownWords).filter((k) => k && k.term).slice(0, 4);
   const knownSet = new Set(known.map((k) => String(k.term).toLowerCase()));
   const lesson = arr(t.keywords).filter((w) => !knownSet.has(String(w).toLowerCase())).slice(0, 8);
@@ -1645,8 +1665,17 @@ function slideObjectives(pptx, L) {
     });
     y += 0.42 + 0.2;
   }
-  const bottom = BOT_Y - 0.15;
-  const rowH = Math.min(1.1, (bottom - y) / objectives.length);
+  // "This lesson": Learn, Build, Apply in their stage colours, across the bottom (always shown)
+  const sq = lessonSequence(L), stripH = 1.05, sy = BOT_Y - 0.12 - stripH, bw = (CW - 2 * GAP) / 3;
+  [['learn', 'LEARN'], ['build', 'BUILD'], ['apply', 'APPLY']].forEach(([k, head], i) => {
+    const bx = MX + i * (bw + GAP);
+    txt(s, head, { x: bx, y: sy, w: bw, h: 0.32, fill: { color: STAGE[k] }, color: 'FFFFFF', bold: true, fontSize: 12, charSpacing: 1, valign: 'middle', margin: 6 });
+    txt(s, prettyText(sq[k]), { x: bx, y: sy + 0.32, w: bw, h: stripH - 0.32, fill: { color: 'FFFFFF' }, line: { color: STAGE[k], width: 1.5 }, color: '1A1A2E',
+      fontSize: autoFontSize(sq[k], bw - 0.2, stripH - 0.32, { min: 13, max: 17 }), valign: 'middle', fit: 'shrink', margin: 6 });
+  });
+  txt(s, 'THIS LESSON', { x: MX, y: sy - 0.32, w: 3, h: 0.3, color: '555555', fontSize: 11, charSpacing: 1, valign: 'middle' });
+  const bottom = sy - 0.4;
+  const rowH = objectives.length ? Math.min(1.1, (bottom - y) / objectives.length) : 0;
   objectives.forEach((o, i) => {
     const ry = y + i * rowH;
     s.addShape('ellipse', { x: MX, y: ry + (rowH - 0.5) / 2, w: 0.5, h: 0.5, fill: { color: GOLD }, line: { color: NAVY, width: 1.5 } });
@@ -1952,12 +1981,27 @@ function learnTopExtras(s, item, y) {
     return y + head + bodyH + GAP;
   }
   if (df && df.text) {
+    // word parts (Patryk 2026-10-23): poly "many" + mer "part" → a chain of many parts; they replace the origin line
+    const parts = arr(df.parts).filter((p) => p && p.part);
     const line = [{ text: String(df.term || '') + '  ', options: { bold: true, color: NAVY } }, { text: prettyText(df.text), options: { color: '1A1A2E' } }]
-      .concat(df.origin ? [{ text: '   ' + prettyText(df.origin), options: { color: '666666', fontSize: 12, italic: true } }] : []);
-    const h = 0.62;
+      .concat(df.origin && !parts.length ? [{ text: '   ' + prettyText(df.origin), options: { color: '666666', fontSize: 12, italic: true } }] : []);
+    const ph = parts.length ? 0.44 : 0, h = 0.62 + ph;
     s.addShape('rect', { x: MX, y, w: CW, h, fill: { color: 'FFFFFF' }, line: { type: 'none' } });
     s.addShape('rect', { x: MX, y, w: 0.09, h, fill: { color: GOLD }, line: { type: 'none' } });
-    txt(s, line, { x: MX + 0.18, y, w: CW - 0.25, h, fontSize: autoFontSize(stripKeys(df.term + ' ' + df.text), CW - 0.25, h, { min: 13, max: 19 }), valign: 'middle', fit: 'shrink' });
+    txt(s, line, { x: MX + 0.18, y, w: CW - 0.25, h: 0.62, fontSize: autoFontSize(stripKeys(df.term + ' ' + df.text), CW - 0.25, 0.62, { min: 13, max: 19 }), valign: 'middle', fit: 'shrink' });
+    if (parts.length) {
+      let px = MX + 0.18;
+      const py = y + 0.62, maxX = MX + CW - 0.1;
+      parts.forEach((p, k) => {
+        if (k) { txt(s, '+', { x: px, y: py, w: 0.3, h: 0.36, color: NAVY, bold: true, fontSize: 16, align: 'center', valign: 'middle' }); px += 0.3; }
+        const cw = 0.3 + String(p.part).length * 0.14, mw = 0.25 + String(p.means || '').length * 0.11;
+        if (px + cw + mw > maxX) return;
+        txt(s, String(p.part), { x: px, y: py + 0.02, w: cw, h: 0.34, fill: { color: NAVY }, color: ANSWER, bold: true, fontSize: 15, align: 'center', valign: 'middle', rectRadius: 0.06, shape: 'roundRect' });
+        txt(s, String(p.means || ''), { x: px + cw + 0.05, y: py, w: mw, h: 0.38, color: '1A1A2E', italic: true, fontSize: 14, valign: 'middle' });
+        px += cw + 0.05 + mw;
+      });
+      if (df.sum && px + 1 < maxX) txt(s, '→  ' + prettyText(df.sum), { x: px + 0.1, y: py, w: maxX - px - 0.1, h: 0.38, color: NAVY, bold: true, fontSize: 14, valign: 'middle', fit: 'shrink' });
+    }
     y += h + GAP;
     const ex = arr(df.examples), no = arr(df.notExamples);
     if (ex.length || no.length) {
