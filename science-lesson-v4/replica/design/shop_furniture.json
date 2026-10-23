@@ -1,0 +1,562 @@
+{
+ "currency": "Eldritch Doubloons",
+ "note": "lock = null, {\"level\": n} or {\"outside_work\": n ticks}",
+ "items": [
+  {
+   "id": "corner_basic_1_plank_bookcase",
+   "name": "Plank bookcase",
+   "category": "corner",
+   "zone": "5 back corner",
+   "tier": "Basic",
+   "price": 0,
+   "lock": null
+  },
+  {
+   "id": "corner_basic_2_kelp_fern",
+   "name": "Potted kelp",
+   "category": "corner",
+   "zone": "5 back corner",
+   "tier": "Basic",
+   "price": 90,
+   "lock": null
+  },
+  {
+   "id": "corner_basic_3_crate_tower",
+   "name": "Crate tower",
+   "category": "corner",
+   "zone": "5 back corner",
+   "tier": "Basic",
+   "price": 110,
+   "lock": null
+  },
+  {
+   "id": "corner_nice_1_library_bookcase",
+   "name": "Library bookcase",
+   "category": "corner",
+   "zone": "5 back corner",
+   "tier": "Nice",
+   "price": 300,
+   "lock": null
+  },
+  {
+   "id": "corner_nice_2_grandfather_clock",
+   "name": "Grandfather clock",
+   "category": "corner",
+   "zone": "5 back corner",
+   "tier": "Nice",
+   "price": 280,
+   "lock": null
+  },
+  {
+   "id": "corner_nice_3_lab_cabinet",
+   "name": "Lab glass cabinet",
+   "category": "corner",
+   "zone": "5 back corner",
+   "tier": "Nice",
+   "price": 250,
+   "lock": null
+  },
+  {
+   "id": "corner_fancy_1_skeleton_model",
+   "name": "Skeleton model",
+   "category": "corner",
+   "zone": "5 back corner",
+   "tier": "Fancy",
+   "price": 550,
+   "lock": null
+  },
+  {
+   "id": "corner_fancy_2_diving_suit",
+   "name": "Brass diving suit",
+   "category": "corner",
+   "zone": "5 back corner",
+   "tier": "Fancy",
+   "price": 600,
+   "lock": null
+  },
+  {
+   "id": "corner_fancy_3_coral_tree",
+   "name": "Coral tree in a vase",
+   "category": "corner",
+   "zone": "5 back corner",
+   "tier": "Fancy",
+   "price": 520,
+   "lock": null
+  },
+  {
+   "id": "corner_eldritch_1_tentacle_clock",
+   "name": "Backwards tentacle clock",
+   "category": "corner",
+   "zone": "5 back corner",
+   "tier": "Eldritch",
+   "price": 1300,
+   "lock": {
+    "outside_work": 8
+   }
+  },
+  {
+   "id": "corner_eldritch_2_rlyeh_idol",
+   "name": "R'lyeh idol",
+   "category": "corner",
+   "zone": "5 back corner",
+   "tier": "Eldritch",
+   "price": 1400,
+   "lock": {
+    "level": 15
+   }
+  },
+  {
+   "id": "corner_eldritch_3_necronomicosy",
+   "name": "The Necronomi-cosy",
+   "category": "corner",
+   "zone": "5 back corner",
+   "tier": "Eldritch",
+   "price": 1200,
+   "lock": null
+  },
+  {
+   "id": "seats_basic_1_wooden_chair",
+   "name": "Wooden chair",
+   "category": "seats",
+   "zone": "6 furniture spot",
+   "tier": "Basic",
+   "price": 0,
+   "lock": null
+  },
+  {
+   "id": "seats_basic_2_beanbag",
+   "name": "Beanbag",
+   "category": "seats",
+   "zone": "6 furniture spot",
+   "tier": "Basic",
+   "price": 100,
+   "lock": null
+  },
+  {
+   "id": "seats_basic_3_crate_seat",
+   "name": "Fish-crate seat",
+   "category": "seats",
+   "zone": "6 furniture spot",
+   "tier": "Basic",
+   "price": 80,
+   "lock": null
+  },
+  {
+   "id": "seats_nice_1_green_armchair",
+   "name": "Green armchair",
+   "category": "seats",
+   "zone": "6 furniture spot",
+   "tier": "Nice",
+   "price": 250,
+   "lock": null
+  },
+  {
+   "id": "seats_nice_2_striped_sofa",
+   "name": "Striped sofa",
+   "category": "seats",
+   "zone": "6 furniture spot",
+   "tier": "Nice",
+   "price": 350,
+   "lock": null
+  },
+  {
+   "id": "seats_nice_3_rocking_chair",
+   "name": "Rocking chair",
+   "category": "seats",
+   "zone": "6 furniture spot",
+   "tier": "Nice",
+   "price": 220,
+   "lock": null
+  },
+  {
+   "id": "seats_fancy_1_velvet_wingback",
+   "name": "Velvet wingback",
+   "category": "seats",
+   "zone": "6 furniture spot",
+   "tier": "Fancy",
+   "price": 550,
+   "lock": null
+  },
+  {
+   "id": "seats_fancy_2_chesterfield",
+   "name": "Chesterfield sofa",
+   "category": "seats",
+   "zone": "6 furniture spot",
+   "tier": "Fancy",
+   "price": 600,
+   "lock": null
+  },
+  {
+   "id": "seats_fancy_3_clamshell_chair",
+   "name": "Clamshell chair",
+   "category": "seats",
+   "zone": "6 furniture spot",
+   "tier": "Fancy",
+   "price": 520,
+   "lock": null
+  },
+  {
+   "id": "seats_eldritch_1_armchair_of_the_deep",
+   "name": "Armchair of the deep",
+   "category": "seats",
+   "zone": "6 furniture spot",
+   "tier": "Eldritch",
+   "price": 1200,
+   "lock": null
+  },
+  {
+   "id": "seats_eldritch_2_rlyeh_throne",
+   "name": "Throne of R'lyeh",
+   "category": "seats",
+   "zone": "6 furniture spot",
+   "tier": "Eldritch",
+   "price": 1400,
+   "lock": {
+    "level": 18
+   }
+  },
+  {
+   "id": "seats_eldritch_3_shoggoth_beanbag",
+   "name": "Shoggoth beanbag",
+   "category": "seats",
+   "zone": "6 furniture spot",
+   "tier": "Eldritch",
+   "price": 1000,
+   "lock": {
+    "outside_work": 5
+   }
+  },
+  {
+   "id": "tables_basic_1_little_desk",
+   "name": "Little desk",
+   "category": "tables",
+   "zone": "6 furniture spot",
+   "tier": "Basic",
+   "price": 0,
+   "lock": null
+  },
+  {
+   "id": "tables_basic_2_barrel_table",
+   "name": "Barrel table",
+   "category": "tables",
+   "zone": "6 furniture spot",
+   "tier": "Basic",
+   "price": 90,
+   "lock": null
+  },
+  {
+   "id": "tables_basic_3_side_table",
+   "name": "Side table",
+   "category": "tables",
+   "zone": "6 furniture spot",
+   "tier": "Basic",
+   "price": 100,
+   "lock": null
+  },
+  {
+   "id": "tables_nice_1_study_table",
+   "name": "Study table",
+   "category": "tables",
+   "zone": "6 furniture spot",
+   "tier": "Nice",
+   "price": 300,
+   "lock": null
+  },
+  {
+   "id": "tables_nice_2_mosaic_coffee_table",
+   "name": "Mosaic coffee table",
+   "category": "tables",
+   "zone": "6 furniture spot",
+   "tier": "Nice",
+   "price": 250,
+   "lock": null
+  },
+  {
+   "id": "tables_nice_3_lectern",
+   "name": "Lectern",
+   "category": "tables",
+   "zone": "6 furniture spot",
+   "tier": "Nice",
+   "price": 200,
+   "lock": null
+  },
+  {
+   "id": "tables_fancy_1_lab_bench",
+   "name": "Lab bench",
+   "category": "tables",
+   "zone": "6 furniture spot",
+   "tier": "Fancy",
+   "price": 600,
+   "lock": null
+  },
+  {
+   "id": "tables_fancy_2_chart_table",
+   "name": "Captain's chart table",
+   "category": "tables",
+   "zone": "6 furniture spot",
+   "tier": "Fancy",
+   "price": 550,
+   "lock": null
+  },
+  {
+   "id": "tables_fancy_3_rolltop_bureau",
+   "name": "Roll-top bureau",
+   "category": "tables",
+   "zone": "6 furniture spot",
+   "tier": "Fancy",
+   "price": 580,
+   "lock": null
+  },
+  {
+   "id": "tables_eldritch_1_librarians_desk",
+   "name": "Librarian's desk",
+   "category": "tables",
+   "zone": "6 furniture spot",
+   "tier": "Eldritch",
+   "price": 1300,
+   "lock": {
+    "outside_work": 10
+   }
+  },
+  {
+   "id": "tables_eldritch_2_tentacle_lectern",
+   "name": "Tentacle lectern",
+   "category": "tables",
+   "zone": "6 furniture spot",
+   "tier": "Eldritch",
+   "price": 1100,
+   "lock": null
+  },
+  {
+   "id": "tables_eldritch_3_void_table",
+   "name": "Void-top table",
+   "category": "tables",
+   "zone": "6 furniture spot",
+   "tier": "Eldritch",
+   "price": 1000,
+   "lock": {
+    "level": 12
+   }
+  },
+  {
+   "id": "wall_basic_1_sea_postcard",
+   "name": "Seaside picture",
+   "category": "wall",
+   "zone": "3/4 wall hanging",
+   "tier": "Basic",
+   "price": 0,
+   "lock": null
+  },
+  {
+   "id": "wall_basic_2_cork_board",
+   "name": "Cork board",
+   "category": "wall",
+   "zone": "3/4 wall hanging",
+   "tier": "Basic",
+   "price": 80,
+   "lock": null
+  },
+  {
+   "id": "wall_basic_3_plank_shelf",
+   "name": "Plank wall shelf",
+   "category": "wall",
+   "zone": "3/4 wall hanging",
+   "tier": "Basic",
+   "price": 100,
+   "lock": null
+  },
+  {
+   "id": "wall_nice_1_periodic_table",
+   "name": "Periodic table poster",
+   "category": "wall",
+   "zone": "3/4 wall hanging",
+   "tier": "Nice",
+   "price": 150,
+   "lock": null
+  },
+  {
+   "id": "wall_nice_2_sea_map",
+   "name": "Old sea map",
+   "category": "wall",
+   "zone": "3/4 wall hanging",
+   "tier": "Nice",
+   "price": 200,
+   "lock": null
+  },
+  {
+   "id": "wall_nice_3_mounted_anchor",
+   "name": "Mounted anchor",
+   "category": "wall",
+   "zone": "3/4 wall hanging",
+   "tier": "Nice",
+   "price": 250,
+   "lock": null
+  },
+  {
+   "id": "wall_fancy_1_star_chart",
+   "name": "Star chart",
+   "category": "wall",
+   "zone": "3/4 wall hanging",
+   "tier": "Fancy",
+   "price": 500,
+   "lock": null
+  },
+  {
+   "id": "wall_fancy_2_ships_wheel",
+   "name": "Ship's wheel",
+   "category": "wall",
+   "zone": "3/4 wall hanging",
+   "tier": "Fancy",
+   "price": 550,
+   "lock": null
+  },
+  {
+   "id": "wall_fancy_3_portrait_of_ulhu",
+   "name": "Portrait of Ulhu",
+   "category": "wall",
+   "zone": "3/4 wall hanging",
+   "tier": "Fancy",
+   "price": 600,
+   "lock": null
+  },
+  {
+   "id": "wall_eldritch_1_watching_portrait",
+   "name": "The watching painting",
+   "category": "wall",
+   "zone": "3/4 wall hanging",
+   "tier": "Eldritch",
+   "price": 900,
+   "lock": null
+  },
+  {
+   "id": "wall_eldritch_2_map_of_rlyeh",
+   "name": "Map of R'lyeh",
+   "category": "wall",
+   "zone": "3/4 wall hanging",
+   "tier": "Eldritch",
+   "price": 1100,
+   "lock": {
+    "outside_work": 6
+   }
+  },
+  {
+   "id": "wall_eldritch_3_tentacle_shelf",
+   "name": "Tentacle shelf",
+   "category": "wall",
+   "zone": "3/4 wall hanging",
+   "tier": "Eldritch",
+   "price": 1000,
+   "lock": null
+  },
+  {
+   "id": "props_basic_1_mug_of_tea",
+   "name": "Mug of tea",
+   "category": "props",
+   "zone": "9 small spot",
+   "tier": "Basic",
+   "price": 0,
+   "lock": null
+  },
+  {
+   "id": "props_basic_2_candle",
+   "name": "Candle",
+   "category": "props",
+   "zone": "9 small spot",
+   "tier": "Basic",
+   "price": 80,
+   "lock": null
+  },
+  {
+   "id": "props_basic_3_book_stack",
+   "name": "Book stack",
+   "category": "props",
+   "zone": "9 small spot",
+   "tier": "Basic",
+   "price": 80,
+   "lock": null
+  },
+  {
+   "id": "props_nice_1_scallop_shell",
+   "name": "Scallop shell",
+   "category": "props",
+   "zone": "9 small spot",
+   "tier": "Nice",
+   "price": 150,
+   "lock": null
+  },
+  {
+   "id": "props_nice_2_globe",
+   "name": "Globe",
+   "category": "props",
+   "zone": "9 small spot",
+   "tier": "Nice",
+   "price": 200,
+   "lock": null
+  },
+  {
+   "id": "props_nice_3_beaker_set",
+   "name": "Beaker set",
+   "category": "props",
+   "zone": "9 small spot",
+   "tier": "Nice",
+   "price": 180,
+   "lock": null
+  },
+  {
+   "id": "props_fancy_1_newtons_cradle",
+   "name": "Newton's cradle",
+   "category": "props",
+   "zone": "9 small spot",
+   "tier": "Fancy",
+   "price": 500,
+   "lock": null
+  },
+  {
+   "id": "props_fancy_2_bunsen_burner",
+   "name": "Bunsen burner",
+   "category": "props",
+   "zone": "9 small spot",
+   "tier": "Fancy",
+   "price": 520,
+   "lock": null
+  },
+  {
+   "id": "props_fancy_3_specimen_jar",
+   "name": "Specimen jar",
+   "category": "props",
+   "zone": "9 small spot",
+   "tier": "Fancy",
+   "price": 500,
+   "lock": null
+  },
+  {
+   "id": "props_eldritch_1_bubbling_potion",
+   "name": "Bubbling potion",
+   "category": "props",
+   "zone": "9 small spot",
+   "tier": "Eldritch",
+   "price": 900,
+   "lock": null
+  },
+  {
+   "id": "props_eldritch_2_elder_candle",
+   "name": "Elder-sign candle",
+   "category": "props",
+   "zone": "9 small spot",
+   "tier": "Eldritch",
+   "price": 950,
+   "lock": null
+  },
+  {
+   "id": "props_eldritch_3_rlyeh_snow_globe",
+   "name": "R'lyeh snow globe",
+   "category": "props",
+   "zone": "9 small spot",
+   "tier": "Eldritch",
+   "price": 1000,
+   "lock": {
+    "level": 10
+   }
+  }
+ ]
+}
