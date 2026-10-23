@@ -1,0 +1,37 @@
+/* Cthulhu habit game tokens. Scoped to .game so nothing leaks into the rest of the planner.
+   UI colours point at the planner's own variables (Planner.html :root and body.light) wherever
+   the planner already has the role, so the game follows the planner's dark/light switch for free.
+   Source of truth for values and contrast: tokens.json (python contrast.py tokens.json). */
+.game {
+  /* chrome: borrowed from the planner */
+  --g-bg: var(--bg); --g-surface: var(--panel); --g-surface2: var(--panel2); --g-bar: var(--bar);
+  --g-border: var(--line); --g-text: var(--ink); --g-text-muted: var(--muted);
+  --g-accent: var(--gold); --g-on-accent: #0D1B5E;
+  --g-danger: var(--red); --g-success: var(--green);
+  /* game roles, dark (planner default) */
+  --g-border-input: #6B7799; --g-accent-text: #FABB2E; --g-focus: #FABB2E; --g-warning: #FFA726;
+  --g-coin: #FABB2E; --g-hp: #EF5350; --g-xp: #B49CFF; --g-track: #0A0F1E;
+  --g-value-bad: #EF5350; --g-value-neutral: #FABB2E; --g-value-good: #64B5F6;
+  --g-track-work: #64B5F6; --g-track-external: #FFA726; --g-track-life: #F5B8D8;
+  --g-bubble: #FFF8E7; --g-on-bubble: #2B1F2E;
+  /* room world: the same in both themes (it is a picture) */
+  --room-frame: #2B1F2E; --room-wall: #2E4A5C; --room-floor: #8A5A3C; --room-night: #1B2140;
+  --room-hud-plate: #2B1F2E; --room-hud-text: #FFF8E7;
+  /* type, space, shape, motion */
+  --g-font: "Century Gothic", "Segoe UI", sans-serif;
+  --g-xs: 11px; --g-sm: 13px; --g-base: 14px; --g-md: 16px; --g-lg: 20px; --g-coin-size: 22px; --g-xl: 28px;
+  --g-s1: 2px; --g-s2: 4px; --g-s3: 8px; --g-s4: 12px; --g-s5: 16px; --g-s6: 24px; --g-s7: 32px; --g-s8: 48px;
+  --g-r-sm: 4px; --g-r-md: 6px; --g-r-lg: 8px; --g-r-card: 10px; --g-r-pill: 12px;
+  --g-shadow-pop: 0 10px 30px rgba(0,0,0,.35); --g-shadow-pixel: 0 3px 0 #05070F;
+  --g-fast: 120ms; --g-base-t: 200ms; --g-coin-fly: 600ms; --g-ease: cubic-bezier(.2,.8,.2,1);
+  --px: 3; /* current pixel scale for the room; set by script to a whole number 1 to 5 */
+}
+body.light .game {
+  --g-border-input: #7A8499; --g-accent-text: #8A5A00; --g-focus: #0D47A1; --g-warning: #B04500;
+  --g-hp: #C62828; --g-xp: #6A45C2; --g-track: #D5DDEC;
+  --g-value-bad: #C62828; --g-value-neutral: #B07800; --g-value-good: #1565C0;
+  --g-track-work: #1565C0; --g-track-external: #C25400; --g-track-life: #B0407F;
+}
+/* pixel art: never smoothed, never scaled by a fraction */
+.game .px, .game .px img, .game canvas.px { image-rendering: pixelated; image-rendering: crisp-edges; }
+@media (prefers-reduced-motion: reduce) { .game * { animation: none !important; transition: none !important; } }

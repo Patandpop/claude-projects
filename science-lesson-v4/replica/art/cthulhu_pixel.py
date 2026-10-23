@@ -5,11 +5,15 @@ import math, os
 from PIL import Image, ImageDraw
 
 N = 32
-PAL = {
-    'o': (30, 58, 52), 'b': (95, 191, 143), 's': (62, 148, 112), 'h': (155, 227, 181),
-    'l': (207, 239, 192), 'w': (122, 92, 168), 'W': (78, 58, 117), 'e': (255, 255, 255),
+PAL = {   # Kelp Mint (Patryk's pick 2026-10-23); the first teal version is TEAL_PAL below
+    'o': (40, 70, 50), 'b': (170, 226, 190), 's': (120, 190, 150), 'h': (225, 250, 230),
+    'l': (250, 245, 215), 'w': (90, 140, 90), 'W': (60, 100, 60), 'e': (255, 255, 255),
     'p': (27, 27, 47), 'k': (242, 140, 160), 't': (120, 200, 255), 'g': (255, 214, 10),
 }
+TEAL_PAL = {'o': (30, 58, 52), 'b': (95, 191, 143), 's': (62, 148, 112), 'h': (155, 227, 181),
+            'l': (207, 239, 192), 'w': (122, 92, 168), 'W': (78, 58, 117)}
+
+SHAPE = {'head_rx': 9.5, 'head_ry': 8.5, 'body_rx': 6.5, 'body_ry': 5, 'sprout': True}   # Kelp Mint size   # variants change these
 
 def inell(x, y, cx, cy, rx, ry):
     return ((x + .5 - cx) / rx) ** 2 + ((y + .5 - cy) / ry) ** 2 <= 1
@@ -32,7 +36,7 @@ def base():
     # body
     for y in range(N):
         for x in range(N):
-            if inell(x, y, 16, 24, 7.2, 5.5): put(x, y, 's' if x > 18 or y > 27 else 'b')
+            if inell(x, y, 16, 24, SHAPE['body_rx'], SHAPE['body_ry']): put(x, y, 's' if x > 18 or y > 27 else 'b')
             if inell(x, y, 16, 25.5, 4, 3.2): put(x, y, 'l')
     # feet + arm nubs
     for x, y in [(11, 29), (12, 29), (13, 29), (19, 29), (20, 29), (21, 29), (8, 23), (8, 24), (24, 23), (24, 24)]:
@@ -40,7 +44,7 @@ def base():
     # head (octopus dome)
     for y in range(N):
         for x in range(N):
-            if inell(x, y, 16, 11, 10.5, 9): put(x, y, 's' if (x > 21 and y > 8) or y > 17 else 'b')
+            if inell(x, y, 16, 11, SHAPE['head_rx'], SHAPE['head_ry']): put(x, y, 's' if (x > 21 and y > 8) or y > 17 else 'b')
     for x, y in [(10, 5), (11, 4), (12, 4), (11, 5), (10, 6)]: put(x, y, 'h')   # shine
     # face tentacles, each wiggles and curls at the tip
     for i, tx in enumerate((10, 13, 17, 20)):
@@ -84,6 +88,9 @@ def face(g, mood):
 
 def extras(img, mood, scale):
     d = ImageDraw.Draw(img)
+    if SHAPE.get('sprout'):                          # Kelp Mint's sprout
+        for x, y, c in [(16, 2, 0), (16, 1, 0), (15, 0, 1), (14, 0, 1), (17, 1, 1), (18, 0, 1)]:
+            d.rectangle([x * scale, y * scale, (x + 1) * scale - 1, (y + 1) * scale - 1], fill=(60, 100, 60) if c == 0 else (120, 200, 110))
     if mood == 'sleepy':
         for x, y, s in [(24, 2, 5), (28, 0, 3)]:        # pixel "Z"s
             for i in range(s):
