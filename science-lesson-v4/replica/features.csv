@@ -1,19 +1,32 @@
 feature,area,priority,original,clone,notes
-Week view with real clock times per period,view,must,yes,no,KS3/Y9 vs KS4/5 P2 and P4 differ
-Today button + highlight today + current-time line,view,must,yes,no,
-Date picker to jump to any week,navigation,must,yes,no,mini calendar in Google
-Day view,view,should,yes,no,
-Month/term overview,view,could,yes,no,later
-Colour per class,view,must,yes,no,
-Click slot -> quick lesson search (type to find),edit,must,yes,no,Google quick-create; fewer clicks than topic+lesson dropdowns
-Keyboard shortcuts (J/K weeks, T today, /, Esc, ? help),edit,should,yes,no,
-Drag to move with undo toast,edit,must,yes,no,keeps his always-ask choice
-Undo (button + Ctrl+Z),edit,must,yes,partial,has Undo button
-Extras: notes/tasks/test-marking per day (all-day row),edit,should,yes,no,schedule features he asked for
-Double lessons counted once,logic,must,n/a,no,12C Tue P1+P2 bug in v1
-Unsaved-changes warning on leaving the page,safety,must,yes,partial,only on week change
-Sync saved week to a Google Calendar (dedicated Lessons calendar),integration,must,n/a,no,replace not duplicate on re-sync
-Show his other Google Calendar events (read only) in the week,integration,should,yes,no,meetings/duties next to lessons
-Search lessons across classes,navigation,could,yes,no,
-Guests / invites / Meet,skip,skip,yes,no,not needed
-Sharing calendars,skip,skip,yes,no,just him
+Habits with + and -,goals,must,Habitica,no,bad habits (e.g. Netflix binge) cost health
+Dailies on a schedule,goals,must,Habitica,no,days of week / every N days
+To-dos with checklist,goals,should,Habitica,no,
+Difficulty sets reward,goals,must,Habitica,no,4 levels
+Task value colour (red to blue),goals,should,Habitica,no,
+Streaks per daily,goals,must,Habitica,no,kind: freeze on sick/INSET/holiday
+Freeze days (Inn),goals,must,Habitica,no,planner already knows term dates
+Auto-tick from planner data,goals,must,ours,no,behaviour log / order sheet / lessons built / Friday emails
+Coins + XP + levels,progress,must,Habitica,no,own coin name and icon
+Health and gentle penalty at 0,progress,must,Habitica,no,penalty kinder than Habitica; decide with Patryk
+Work / external / life tracks,progress,must,ours,no,external work weighted higher
+Creature in a room,room,must,Focus Friend,no,our Cthulhu; moods happy/proud/sad/sleepy
+Creature reacts to ticks,room,must,Focus Friend,no,
+Evening cut-off yawn,room,should,ours,no,gentle sign only; never blocks work
+Shop of room items,shop,must,Focus Friend,no,start ~30 items
+Outfits for the creature,shop,should,Focus Friend,no,
+Items locked behind external work or level,shop,must,ours,no,
+Seasonal stock each half term,shop,should,Focus Friend,no,
+Decorate: place and move items,room,must,Focus Friend,no,slot grid
+More rooms unlocked by level,room,could,Focus Friend,no,bedroom / outside like Street View
+Real-life rewards unlocked by life goals,rewards,must,ours,no,tie to spending limits
+Boss fights for big jobs with stages,boss,should,Habitica,no,e.g. test marking in 4 stages
+Sunday review,review,should,ours,no,went well / slipped / 3 priorities
+Weekly summary card,review,should,ours,no,shareable only if he chooses
+Hide on projector,settings,must,ours,no,
+Focus timer and sessions,skip,skip,Focus Friend,skip,Patryk does not want it (2026-10-23)
+App blocking / deep focus,skip,skip,Focus Friend,skip,not wanted
+Parties guilds chat,skip,skip,Habitica,skip,solo game
+Classes mana pets mounts,skip,skip,Habitica,skip,too complex; top user complaint
+Paid currency,skip,skip,both,skip,no payments; locks come from real work
+Original art names copy,skip,skip,both,skip,we draw our own
