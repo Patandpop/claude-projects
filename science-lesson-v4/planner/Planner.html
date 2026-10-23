@@ -139,7 +139,7 @@
   .blog .r { display:flex; gap:6px; align-items:center; padding:3px 0; border-bottom:1px solid var(--line); }
   .blog .r .x { margin-left:auto; cursor:pointer; color:var(--muted); }
   .rules button { display:block; width:100%; text-align:left; margin:4px 0; }
-  .f-beh { color:var(--green); } .f-none { color:var(--muted); }
+  .f-beh { color:var(--green); } .f-none { color:var(--muted); } .f-hw { color:#1565C0; }
   .flag.f-own { color:var(--green); } .flag.f-reuse { color:var(--blue); }
   #status.dirty::before { content:"\25CF  "; color:var(--gold); }
   .menuwrap { position:relative; }
@@ -276,6 +276,7 @@
       <button id="mClaude">Send to Claude<small>build lessons or ask for changes, done at home</small></button>
       <button id="mHw">Homework quizzes<small>set them: Forms + Classroom drafts</small></button>
       <button id="mHwAll" style="display:none"></button>
+      <button id="mRes">Turn on daily results<small>class homework results each morning (no names leave school)</small></button>
       <hr>
       <button id="mAuto">Re-plan this week<small>from where each class is up to</small></button>
       <button id="mImp">Import data<small>planner-data.json from home</small></button>
@@ -459,6 +460,9 @@ function render() {
       const bh = behOf(s);   // behaviour logged in this lesson (2026-10-12)
       if (bh && (bh.p || bh.m)) flags.push('<span class="flag f-beh bjump" data-cls="' + esc(s.cls) + '" title="Positives and behaviour points logged in this lesson. Click for Behaviour">+' + bh.p + ' &minus;' + bh.m + '</span>');
       else if (bh && bh.over && S.bWeek.length) flags.push('<span class="flag f-none bjump" data-cls="' + esc(s.cls) + '" title="Nothing logged for this lesson. Click to add">no behaviour</span>');
+      const hr = s.kind === 'lesson' ? P.lastResults(S.results, s.cls, P.iso(P.addDays(mon, d))) : null;   // learning loop M8
+      if (hr) flags.push('<span class="flag f-hw" title="' + esc('Last homework: ' + hr.title + ' (due ' + hr.dueOn + '), ' + hr.done + (hr.size ? ' of ' + hr.size : '') + ' done, average ' + hr.avg + '%. Weakest: ' +
+        hr.weak.map((q) => 'Q' + q.key + ' ' + q.pct + '%' + (q.wrong && q.wrong[0] ? ' (most picked: ' + q.wrong[0].answer + ')' : '') + (q.missed && q.missed[0] ? ' (missed: ' + q.missed[0].title + ')' : '')).join('; ')) + '">HW ' + hr.avg + '%</span>');
       const L = s.kind === 'lesson' ? c.seq[s.i] || {} : null;
       const time = P.periodTime(S.data, s.cls, s.period);
       h += '<div class="slotcell" data-i="' + i + '"><div class="ev kind-' + s.kind + (S.sel === i ? ' sel' : '') + '"' + (S.readOnly ? '' : ' draggable="true"') + ' data-i="' + i + '" style="--c:' + (c.colour || '#3F51B5') + '">' +
@@ -1710,6 +1714,13 @@ item('mClaude', () => sendToClaude(null));
 // Homework quizzes (Patryk 2026-10-08): turn the homework Claude chose at home into self-marking
 // Google Forms and Classroom drafts. He checks each draft in Classroom and publishes it.
 item('mHw', () => showTab('homework'));
+// Learning loop (2026-10-22): one daily trigger reads every homework Form into class-level results
+// (no names leave school); the lesson cards then show "HW 62%" with the weakest questions.
+item('mRes', () => {
+  status('Reading homework results...');
+  run('turnOnDailyResults').then((r) => { status(''); toast('Daily results on: ' + r.homeworks + ' homework(s) read. Reload to see them on the lesson cards.'); })
+    .catch((e) => { status(''); toast('Daily results not turned on: ' + String(e.message || e).replace(/^Error:\s*/, '')); });
+});
 item('mHwAll', () => {
   status('Making homework quizzes...');
   run('makeHomework').then((res) => {
@@ -1817,7 +1828,7 @@ document.addEventListener('keydown', (e) => {
 window.addEventListener('beforeunload', (e) => { if (S.dirty) { e.preventDefault(); e.returnValue = ''; } });
 
 function onLoad(r) {
-  S.data = r.data; S.weeks = r.weeks || {}; S.learned = r.learned || {}; S.classSettings = r.classSettings || {}; S.added = r.added || []; S.behaviourUrl = r.behaviourUrl || ""; S.gradeBands = r.gradeBands || {};
+  S.data = r.data; S.results = r.results || []; S.weeks = r.weeks || {}; S.learned = r.learned || {}; S.classSettings = r.classSettings || {}; S.added = r.added || []; S.behaviourUrl = r.behaviourUrl || ""; S.gradeBands = r.gradeBands || {};
   if (S.data && S.data.classes) {
     P.applyAdded(S.data, S.added);                                          // lessons he added in the planner
     Object.values(S.weeks).forEach((w) => P.remapWeek(S.data, w));          // same lessons after a data refresh

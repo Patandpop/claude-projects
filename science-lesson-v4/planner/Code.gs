@@ -169,7 +169,7 @@ function pushState_() {
   if (!mailboxOn_()) return null;
   try {
     const a = loadAll_(false);
-    mailPost_({ op: 'write', name: 'planner-state.json', text: JSON.stringify({ saved: new Date().toISOString(), weeks: a.weeks, records: a.records, learned: a.learned, added: a.added, classSettings: a.classSettings }) });
+    mailPost_({ op: 'write', name: 'planner-state.json', text: JSON.stringify({ saved: new Date().toISOString(), weeks: a.weeks, records: a.records, learned: a.learned, added: a.added, classSettings: a.classSettings, results: readResults_() }) });   // results: class counts only (learning loop M1)
     return true;
   } catch (e) { return String(e.message || e); }
 }
@@ -419,6 +419,10 @@ function homeworkResults(k, id) {
   check_(k);
   const r = hwRows_().find((x) => x.id === id);
   if (!r || !r.formId) throw new Error('That homework has no Google Form, so there are no results to read.');
+  return formResults_(r);
+}
+function formResults_(r) {
+  const id = r.id;
   const f = FormApp.openById(r.formId);
   // Form items -> their question: "3(a). text" on page 1, "Question 3(a), mark 1 ..." on page 2
   const keyOf = (t) => { const m = /^Question\s+(\d+(?:\([a-z]+\))?)/.exec(t) || /^(\d+(?:\([a-z]+\))?)\.\s/.exec(t); return m ? m[1] : null; };
@@ -483,6 +487,56 @@ function homeworkResults(k, id) {
     wrong: Object.keys(x.wrong).map((a) => ({ answer: a, count: x.wrong[a] })).sort((a, b) => b.count - a.count).slice(0, 3),
     missed: x.points.filter((p) => p.n).map((p) => ({ title: p.title, pct: Math.round(100 * (p.n - p.yes) / p.n) })).sort((a, b) => b.pct - a.pct).slice(0, 3) }));
   return { id, cls: r.cls, title: r.title, dueOn: r.dueOn, max, size: Object.keys(roster).length || null, pupils, missing, questions };
+}
+/* ---------------------------------------------------------- learning loop, step 1 (2026-10-22)
+   specs/learning-loop.md M1/M5/M8. Once a day (dailyResults, a time trigger he turns on with
+   "Turn on daily results") every homework Form set in the last 10 weeks is read and its CLASS-LEVEL
+   results are kept in the Results tab: per question % of marks, the wrong answers picked most, the
+   mark points most missed. NO names, emails, single scores or flags: those stay in homeworkResults,
+   on the school account only. The Results tab goes home inside planner-state.json (class counts only)
+   so the next homework can revisit what each class got wrong, and the lesson cards show it. */
+const RESULTS_HEAD = ['id', 'cls', 'title', 'file', 'dueOn', 'updated', 'json'];
+function homeResults_(res, r) {
+  const done = (res.pupils || []).length;
+  const avg = done ? Math.round(res.pupils.reduce((a, p) => a + (p.pct || 0), 0) / done) : null;
+  const numberish = (a) => String(a).length <= 24 && /^[\s\d.,eE×x^+\-−/()]*[a-zA-Z%°/\s]{0,8}$/.test(String(a));
+  return { id: res.id, cls: res.cls, title: res.title, file: String((r && r.file) || ''), dueOn: res.dueOn, max: res.max,
+    size: res.size, done, late: (res.pupils || []).filter((p) => p.late).length, avg,
+    questions: (res.questions || []).map((q) => ({ key: q.key, text: String(q.text || '').slice(0, 160), kind: q.kind, max: q.max, pct: q.pct,
+      // a typed number answer is kept only if it looks like a number (never free text a pupil could put a name in)
+      wrong: (q.wrong || []).filter((w) => q.kind === 'mcq' || w.answer === '(no answer)' || numberish(w.answer)).map((w) => ({ answer: String(w.answer).slice(0, 80), count: w.count })),
+      missed: (q.missed || []).map((m) => ({ title: String(m.title || '').slice(0, 120), pct: m.pct })) })) };
+}
+function refreshResults_() {
+  const since = Utilities.formatDate(new Date(Date.now() - 70 * 864e5), TZ, 'yyyy-MM-dd');
+  const rows = hwRows_().filter((r) => r.formId && (r.setOn || r.dueOn) >= since);
+  const out = [], now = new Date().toISOString();
+  rows.forEach((r) => {
+    try { out.push(homeResults_(formResults_(r), r)); }
+    catch (e) { out.push({ id: r.id, cls: r.cls, title: r.title, file: String(r.file || ''), dueOn: r.dueOn, error: 'Form not readable' }); }
+  });
+  const sh = tab_('Results', RESULTS_HEAD);
+  if (sh.getLastRow() > 1) sh.getRange(2, 1, sh.getLastRow() - 1, RESULTS_HEAD.length).clearContent();
+  if (out.length) sh.getRange(2, 1, out.length, RESULTS_HEAD.length).setValues(out.map((o) => [o.id, o.cls, o.title, o.file, o.dueOn, now, JSON.stringify(o)]));
+  return out;
+}
+function readResults_() {
+  try {
+    const sh = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Results');
+    if (!sh || sh.getLastRow() < 2) return [];
+    return sh.getRange(2, 7, sh.getLastRow() - 1, 1).getValues().map(([j]) => { try { return JSON.parse(j); } catch (e) { return null; } }).filter(Boolean);
+  } catch (e) { return []; }   // no Results tab yet: nothing to send
+}
+// The daily time trigger (public so a trigger can call it; it only reads Forms and writes class counts).
+function dailyResults() { refreshResults_(); pushState_(); }
+// "Turn on daily results": one trigger, 6-7am, never two. Also runs it once now.
+function turnOnDailyResults(k) {
+  check_(k);
+  if (!ScriptApp.getProjectTriggers().some((t) => t.getHandlerFunction() === 'dailyResults'))
+    ScriptApp.newTrigger('dailyResults').timeBased().everyDays(1).atHour(6).create();
+  const res = refreshResults_();
+  pushState_();
+  return { on: true, homeworks: res.length };
 }
 // His grade boundaries (% for each grade), one list per key stage: { ks3: [...], ks4: [...], ks5: [...] }.
 function setGradeBands(k, bands) {
@@ -790,7 +844,7 @@ function loadAll_(withData) {
   const records = [];
   const ls = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Lessons');
   if (ls && ls.getLastRow() > 1) ls.getRange(2, 2, ls.getLastRow() - 1, 1).getValues().forEach(([json]) => { try { records.push(JSON.parse(json)); } catch (e) { /* skip */ } });
-  return { version: VERSION, data: withData && chunks ? JSON.parse(chunks) : null, weeks, learned, added, classSettings, records,
+  return { version: VERSION, data: withData && chunks ? JSON.parse(chunks) : null, weeks, learned, added, classSettings, records, results: readResults_(),
     behaviourUrl: PropertiesService.getScriptProperties().getProperty('BEHAVIOUR_URL') || '',
     gradeBands: (() => { try { return JSON.parse(PropertiesService.getScriptProperties().getProperty('GRADE_BANDS') || '{}'); } catch (e) { return {}; } })() };
 }

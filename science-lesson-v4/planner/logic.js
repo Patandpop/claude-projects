@@ -635,6 +635,19 @@
   // A homework's status (spec 1.3): drafted / scheduled / live / due / marked. row = the Homework tab
   // row; live = what Classroom says now ({ state: 'DRAFT'|'PUBLISHED', scheduled }); today = 'YYYY-MM-DD'.
   // A Form quiz counts as marked once it is due and has responses (it marks itself; spec question 6).
+  /* Learning loop M8 (2026-10-22): the class's latest homework results to show on a lesson card:
+     the newest homework due before this lesson (up to 14 days before) that pupils have done.
+     results = Results tab rows from the planner (class counts only). Returns the row plus its three
+     weakest questions, or null. */
+  function lastResults(results, cls, dateIso) {
+    const from = iso(addDays(parse(dateIso), -14));
+    const rows = (results || []).filter((r) => r && !r.error && r.cls === cls && r.done > 0 && r.dueOn && r.dueOn <= dateIso && r.dueOn >= from)
+      .sort((a, b) => (a.dueOn < b.dueOn ? 1 : -1));
+    if (!rows.length) return null;
+    const r = rows[0];
+    const weak = (r.questions || []).filter((q) => q.pct != null).slice().sort((a, b) => a.pct - b.pct).slice(0, 3);
+    return Object.assign({}, r, { weak });
+  }
   function hwStatus(row, live, today, responses) {
     if (row.status === 'marked') return 'marked';
     const state = live && live.state;
@@ -771,6 +784,6 @@
   }
 
   const api = { dueFor, nextLessonDay, lessonsOn, lessonEnd, recs, findRecord, setRecord, remapRecords, migrateMarks, cascade, revisionSlot, unitBefore, applyAdded, addedNum, remapWeek, lessonId, applyMarks, classReport, topicList, wouldSkip, setSlot, markLesson, refillClass, planFrom, periodTime, calendarEvents, DAYS, iso, parse, addDays, mondayOf, isTeachingDay, nextSchoolDay, weekLetter, progressBefore, next, autofill, moveSlot, refillAfter,
-    EXTRAS, extrasSuggested, gradeFor, hwCoverage, hwStatus, lessonSlot, testSlot, notHappened, slotDone, slotDay, fromFilled, reflowWeek, CHECKS, sheetCells, sheetModel, setsCount, printList, buildPrompt, carryForward, equipCell, lessonCell, setsLabel };
+    EXTRAS, extrasSuggested, gradeFor, hwCoverage, hwStatus, lastResults, lessonSlot, testSlot, notHappened, slotDone, slotDay, fromFilled, reflowWeek, CHECKS, sheetCells, sheetModel, setsCount, printList, buildPrompt, carryForward, equipCell, lessonCell, setsLabel };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.PlannerLogic = api;
 })(typeof window !== 'undefined' ? window : this);

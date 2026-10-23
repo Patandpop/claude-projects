@@ -88,6 +88,20 @@ check(school.pushState_() === true, 'saving at school sends planner-state.json h
 const st = JSON.parse(sync.files.find((f) => f.name === 'planner-state.json').text);
 check(st.weeks['2026-10-12'] && st.learned.a === 1, 'planner-state.json holds the saved weeks and equipment edits');
 
+// learning loop M1 (2026-10-22): what goes home is class counts only, never a name, email or single score
+const res = { id: 'h1', cls: '9XS', title: 'Atoms quiz', dueOn: '2026-10-20', max: 10, size: 28,
+  pupils: [{ name: 'Amelia Pond', email: 'apond@school.org', score: 7, pct: 70, late: false, flags: ['3'] }, { name: 'Rory Williams', email: 'rwilliams@school.org', score: 5, pct: 50, late: true, flags: [] }],
+  missing: ['Clara Oswald'],
+  questions: [{ key: '1', text: 'Which is a compound?', kind: 'mcq', max: 1, pct: 50, wrong: [{ answer: 'O2', count: 1 }], missed: [] },
+    { key: '2', text: 'Mass in g', kind: 'number', max: 2, pct: 40, wrong: [{ answer: '12 g', count: 1 }, { answer: 'ask Amelia Pond', count: 1 }], missed: [] },
+    { key: '3', text: 'Explain', kind: 'written', max: 3, pct: 30, wrong: [], missed: [{ title: 'atoms joined in a fixed ratio', pct: 80 }] }] };
+const home = school.homeResults_(res, { file: 'homework-9XS-2026-10-20.json' });
+const homeText = JSON.stringify(home);
+check(!/Amelia|Rory|Clara|@school|apond|rwilliams/i.test(homeText) && !('pupils' in home) && !('missing' in home),
+  'results for home carry no names, emails, typed free text or pupil list (class counts only)');
+check(home.done === 2 && home.avg === 60 && home.late === 1 && home.questions[0].wrong[0].answer === 'O2' && home.questions[1].wrong.length === 1,
+  'results for home keep the class numbers: 2 done, average 60%, 1 late, the wrong MCQ answer, a typed number');
+
 const out = school.sendRequest('pk', { kind: 'build', text: 'hi', lessons: [{ when: 'Thu', cls: '9XS', prompt: 'p' }] });
 check(!!out.id, '"Send to Claude" request accepted');
 const reqs = JSON.parse(sync.files.find((f) => f.name === 'requests.json').text);

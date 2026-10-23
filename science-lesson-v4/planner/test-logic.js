@@ -304,6 +304,13 @@ if (fs.existsSync(DRIVE)) {
   const bands = [{ g: '7', min: 70 }, { g: '9', min: 85 }, { g: '4', min: 40 }];
   ok(P.gradeFor(86, bands) === '9' && P.gradeFor(70, bands) === '7' && P.gradeFor(39, bands) === 'U' && P.gradeFor(50, []) === '', 'grades: from his boundaries (any order); none set = no grade, never made up');
   const row = { status: 'drafted', dueOn: '2026-10-27', formId: 'F' };
+  // learning loop M8 (2026-10-22): the lesson card shows the newest homework due in the 14 days before it
+  const resRows = [{ cls: '9XS', dueOn: '2026-10-06', done: 20, avg: 50, questions: [] },
+    { cls: '9XS', dueOn: '2026-10-19', done: 22, avg: 64, questions: [{ key: '1', pct: 80 }, { key: '2', pct: 30 }, { key: '3', pct: 55 }, { key: '4', pct: 90 }] },
+    { cls: '9XS', dueOn: '2026-10-27', done: 0, avg: null, questions: [] }, { cls: '9AS', dueOn: '2026-10-19', done: 9, avg: 70, questions: [] }];
+  const lr = P.lastResults(resRows, '9XS', '2026-10-21');
+  ok(lr && lr.dueOn === '2026-10-19' && lr.weak.map((q) => q.key).join(',') === '2,3,1', 'lesson card: newest homework due before the lesson, its 3 weakest questions first');
+  ok(P.lastResults(resRows, '9XS', '2026-11-20') === null && P.lastResults(resRows, '10C2', '2026-10-21') === null, 'lesson card: nothing older than 14 days, nothing for another class');
   ok(P.hwStatus(row, { state: 'DRAFT' }, '2026-10-20', 0) === 'drafted' && P.hwStatus(row, { state: 'DRAFT', scheduled: true }, '2026-10-20', 0) === 'scheduled', 'status: drafted, scheduled');
   ok(P.hwStatus(row, { state: 'PUBLISHED' }, '2026-10-20', 3) === 'live' && P.hwStatus(row, { state: 'PUBLISHED' }, '2026-10-27', 0) === 'due', 'status: posted = live; due day with no responses = due');
   ok(P.hwStatus(row, { state: 'PUBLISHED' }, '2026-10-27', 5) === 'marked' && P.hwStatus({ status: 'drafted', dueOn: '2026-10-27' }, { state: 'PUBLISHED' }, '2026-10-28', 0) === 'due', 'status: a due Form quiz with responses marks itself; link homework waits for his tick');
