@@ -5,17 +5,15 @@ description: "Creates lesson PowerPoints and worksheets for science lessons (phy
 
 # Science Lesson Skill — v2
 
+**Read only what this lesson needs** (the rest of the skill stays closed):
+- Every build: this file + `references/slide-options-v4.md` + `references/worksheet-spec.md` (+ `references/mcq-rules.md` when writing MCQs).
+- **Revision, test, test review or review lesson** (`lessonType` revision / test / review): read `references/review-lessons.md` first.
+- **Source PPTX/DOCX uploaded, a video lesson (Learn H), a practical that may need two lessons, or "combine lessons"**: read `references/special-lessons.md`.
+- **A build looks wrong, or Patryk asks how the builder draws something** (nav bar, colours, borders, animations, file names, fonts): `references/builder-behaviour.md`. The builder does all of that by itself; you never set it.
+
 ## HARD RULES — no exceptions
 
 **Slides**
-- Nav bar = horizontal TOP strip, 6 tabs. Never a sidebar. Never on the right.
-- **LAYOUT_WIDE = 13.33" × 7.5". Always define `var SW = 13.33; var SH = 7.5;` at top of script. Never hardcode `w: 10` — use `SW` everywhere. Full-width shapes: `w: SW`. Nav tabs: `SW / 6` each.**
-- **Tier badges (Developing/Reaching/Mastering) on Apply slide = FULL-WIDTH column headers (not pills). Width = `colW`. Pills are DOCX-only.**
-- **All content box gold borders: `line: { color: 'FABB2E', width: 2 }` (2pt = 25400 EMU). Never width 3 or 1.**
-- **Visualiser slide is MANDATORY in standard and practical lessons. Never omit. The IPEVO link `https://apps.ipevo.com/pwa/visualizer.app/` is baked into the renderer — never output "[teacher inserts]".**
-- **Do Now question numbers = gold rounded SQUARES with navy numbers. Never circles.**
-- **Title slide left column: big title (26–32pt), then Learning Objectives in a bordered box (navy `#152347` fill, gold border, 14–15pt), then Key Words in a matching bordered box (13pt). No school name anywhere in the left column.**
-- **MCQ = ONE slide.** Question + 4 coloured options + protocol strip + answer box at the bottom of the SAME slide. The renderer adds the click-to-appear animation to the answer box itself (2026-10-03); Patryk no longer adds it by hand. Never a separate answer slide.
 - **Practical/Build slides expecting apparatus (circuits, equipment setups) MUST have an image placeholder** — steps in the left ~56%, placeholder on the right.
 - No emojis. No timers. No AO1/AO2. No "Mixed Ability" written on slides.
 - **No em dashes in any generated content** — slides, worksheets, answers, model text (Patryk's rule, 2026-07-02: "refrain from using them across everything"). Use a comma, a full stop, or a hyphen instead. Keep generated prose lean — less is more; Patryk adds the more.
@@ -23,14 +21,7 @@ description: "Creates lesson PowerPoints and worksheets for science lessons (phy
 - Never abbreviate questions — full text on: Do Now slide, Do Now Answers (verbatim), Apply slide, Review (verbatim).
 - **Exactly 6 Do Now questions** (Patryk ruling 2026-07-09 — replaces the old "min 4"). All retrieval from PREVIOUSLY-TAUGHT content, never the current lesson.
 - **Calculation Do Nows get new numbers, same words (Patryk 2026-10-15).** Home builds with `doNow.auto` do this by themselves (do-now-vary.js; only when the mark scheme's one-step working checks out; real values like g = 9.8 N/kg or ice's 334 000 J/kg never change; the exam library is never changed). When you WRITE a Do Now calculation that revisits an earlier lesson or exam question, use different numbers and work the answer out again; keep the wording. `"varyNumbers": false` on `doNow` keeps the original numbers.
-- One MCQ per Build slide.
-- Purple pen bar on every Do Now Answers + every Review slide.
 - Answers = core info only, 1–3 lines. Teacher elaborates.
-- Theme colour on nav tab + header bar + bottom bar ONLY. Content box bodies = white fill + gold `#FABB2E` border. Exception: misconception callout body uses amber border `#E65100`; MCQ option cells keep their light tint of the badge colour (confirmed liked).
-- MCQ colours: A=pink, B=blue, C=green, D=yellow (see slide-options-v4.md).
-- **Click animations are automatic (2026-10-03):** every navy box with gold answer text (MCQ answers, Do Now answers, review answers, worked-answer boxes, reveals) gets an "Appear on click" animation in reading order. Learn slides and banners are never animated. Keep answers in navy/gold boxes so this works; never put an answer in another colour.
-- Review tab/title = green `#1B5E20`. Never grey.
-- Combine fill + text into one shape. No stacked rect + text box.
 - Image placeholders on any slide expecting an image.
 - **No squished text.** If a Learn or Engage slide's content would render below ~12pt or visibly cramped, split it across two slides or cut content — never let the renderer shrink it into illegibility. Prefer `boxes` (navyHeaderBox stacks) on Learn-A over a single body string.
 - **The renderer auto-shrinks (`fit: 'shrink'`) — this is the enemy, not a safety net.** When content overflows a box, PowerPoint silently drops the font, which is the "tiny text" failure. The renderer is frozen, so the fix is upstream: never hand a box more text than fits at its intended size. Hard content caps (enforce before building):
@@ -40,18 +31,8 @@ description: "Creates lesson PowerPoints and worksheets for science lessons (phy
   - **Do Now question: ≤ 120 characters.** Retrieval questions are short by nature.
   - If any text would render below **16pt on a slide** (classroom minimum; projector standard is 18pt), that is a build failure — split the slide or cut content. Verify at QA by eye on every Apply and Review slide.
 
-**File naming (renderer-enforced)**
-- PPTX: `[topic]_[ability_label].pptx` — e.g. `parallel_circuits_mixed_ability.pptx`. NO class code, NO date in any filename. `differentiation: "split"` defaults the label to `mixed_ability`; override with `meta.abilityLabel` (e.g. "higher_ability").
-- Worksheets: `[base]_worksheet.docx` (standard) and `[base]_support_worksheet.docx` (support — built for EVERY standard lesson). Review lessons build `[base]_answers.docx` (model-answer sheet) in the support slot instead. NEVER name worksheets "developing", "reaching", or "scaffolded" — students see filenames.
-
-**Classroom routine elements (baked into slides — never omit)**
-- Every Build MCQ slide: protocol strip — `THINK (silent) → DECIDE → SHOW on 3-2-1` — sits between the options and the answer box on the single MCQ slide.
-- Every Do Now slide: silent-entry footer — `Silent start · pen out · attempt all questions`.
-
 **CONTENT CHECK — the build prints a ✓/✗ report on every lesson; author so every line is ✓**
 The renderer validates each lesson loudly (never blocks): Do Now exactly 6 · MCQ count exactly 6 · Apply ≥3 per tier · Review mirrors EVERY Apply question per tier · every image slot has imageDescription or an embedded image · at least one image somewhere (empty image bank = extraction was probably skipped) · Drive meta complete (year/subject/macrotopic/lessonNumber/title — missing meta = never uploads, never reaches lesson-log) · cloze only on standard/practical. Fix the JSON until the report is clean BEFORE handing files over. `meta.macrotopic` must be the EXACT Drive folder name (e.g. "P4 Earth in Space", not "Space") or the upload will fail.
-
-The final slide of every deck is the **IMAGE BANK** (kept, not deleted): it self-assembles from every embedded image + generated graphs + `image_dump.images`. Timeline (Learn-K) events may each carry `imageDescription`/`embeddedImagePath` — the image renders opposite the event box.
 
 **Content volume & source fidelity**
 - **Mastering includes at least one SCENARIO question** (2026-10-03): an unfamiliar context the pupil has not seen in the lesson, where they must apply the idea (e.g. a new device, a real situation, a data set). Write these yourself for KS3 and A-level. (The old "student first names in Apply" idea is dropped.)
@@ -63,7 +44,7 @@ The final slide of every deck is the **IMAGE BANK** (kept, not deleted): it self
 - **Source material is a floor to EXTEND, not just preserve** (confirmed 2026-07-02): beyond porting every question/table/scaffold, actively add genuine depth — historical context, the "why this mattered" layer, connections to the bigger picture — woven into the same slides. Pre-build checklist question: "what's the one thing in this topic that makes it click, that isn't in the source material yet?"
 - **Apply: minimum 3 questions per tier** unless Patryk says otherwise. One question per tier is never enough.
 - **Apply slide = separate gold-bordered box per question (Variant A), three tiers across, questions stacking down.** Each question is its own box with a `"Q1 / Q2 / Q3"` label under a full-width tier header. This is the default and what Patryk means by "multiple boxes". The single-unified-column look (all of a tier's questions crammed into one tall box) is the failure mode he dislikes — never produce it. Use Variant B (full-width Mastering row) only when one Mastering question is genuinely long (>140 chars). The naming is now consistent between SKILL.md and slide-options-v4.md — do not reintroduce a "default to C" instruction.
-- **Review: DO NOT AUTHOR IT (2026-07-12).** The review slides are a verbatim copy of the Apply questions and answers, and build.js now makes that copy itself. **Omit the `review` field entirely** on standard/practical lessons — just make sure every Apply question carries its `a` answer (an answerless Apply question drops off the review slides, and the CONTENT CHECK flags it). Writing a review section out by hand is wasted output; if one IS authored (special case), it must mirror every Apply question per tier, verbatim. Review-TYPE lessons (`lessonType: "review"`) are unaffected — their structure is its own section below.
+- **Review: DO NOT AUTHOR IT (2026-07-12).** The review slides are a verbatim copy of the Apply questions and answers, and build.js now makes that copy itself. **Omit the `review` field entirely** on standard/practical lessons — just make sure every Apply question carries its `a` answer (an answerless Apply question drops off the review slides, and the CONTENT CHECK flags it). Writing a review section out by hand is wasted output; if one IS authored (special case), it must mirror every Apply question per tier, verbatim. Review-TYPE lessons (`lessonType: "review"`) are unaffected — their structure is in `references/review-lessons.md`.
 - **When Patryk uploads an existing resource to work from, it is a floor, not a suggestion.** Port EVERY question, every table, every scaffold, and mark every image/diagram position with a placeholder. Adapt the format to the house style — never reduce the content. If something genuinely can't fit, ask before cutting.
 - Worksheets must carry the full lesson: Do Now (with word bank/gap-fill recall for support versions), the experiment section (diagram box + results table + conclusion questions) for practical lessons, and the full Apply set. A worksheet with one question per tier is bland and wrong.
 
@@ -81,6 +62,7 @@ The final slide of every deck is the **IMAGE BANK** (kept, not deleted): it self
 - **Banned words/phrases:** "Let's explore", "delve", "It's important to note", "In this lesson we will", "fascinating", "dive into", "crucial", "key takeaway", "essentially", "in order to", "it is worth noting". Flag and replace any occurrence.
 - **No scene-setting openers** on instruction slides. Never "Here is how to...", "Welcome to...", "In today's lesson...". Start with the first actual instruction.
 - **No exclamation marks** outside the Engage slide.
+- **Never write a sentence or question in BLOCK CAPITALS** (harder to read). Short header labels are fine.
 - **Science teacher voice:** direct, plain UK English. Write as you'd say it in class. "Name two factors that affect enzyme activity." not "Students are invited to consider which factors might influence enzyme activity." Short sentences. No hedging.
 - Objectives written as plain teacher voice: "Calculate resultant force from a free-body diagram", not "Students will be able to understand...".
 
@@ -120,22 +102,8 @@ The final slide of every deck is the **IMAGE BANK** (kept, not deleted): it self
   | Etymology | Context note under a real science question — never a standalone question |
 - Do not add a `commonError` field to any question — it has been removed from the renderer.
 
-**Accessibility & readability (BDA / WCAG-aligned — applies to every resource)**
-- **Print fonts are sans-serif.** The British Dyslexia Association and accessibility guidance recommend sans-serif for readers with dyslexia/visual stress because serifs interfere with letter recognition. Slides already use Trebuchet MS (BDA-approved). **Worksheets currently use Libre Baskerville (serif) — this is the one house-style choice that works against accessibility.** Default new worksheets to a sans-serif on the BDA list (Trebuchet, Verdana, Tahoma, Open Sans) unless Patryk has confirmed he wants the serif look for a specific resource. If keeping Libre Baskerville, treat it as a deliberate exception, not the default.
-- **Body text ≥ 11pt on worksheets** (BDA recommends 12–14pt; 11pt is the floor for dense GCSE sheets). Never below. Headings ≥ 20% larger than body.
-- **Left-align all body text, ragged right — never justify.** Justification creates uneven "rivers" of space that disrupt tracking.
-- **Line length 60–75 characters.** Long lines across the full 10106 DXA width at small font exceed this and hurt readability — raise the font or narrow the column rather than run 90-character lines.
-- **Line spacing 1.5** on worksheet body (BDA preferred) — set `line: 360` not `240` on question paragraphs.
-- **Never rely on colour alone** to carry meaning. Tier badges already pair colour with a text label (Developing/Reaching/Mastering) — keep that pairing always, so a colour-blind reader still gets the tier. Avoid pure green-on-red adjacency for any colour-coded distinction.
-- **No long stretches of BLOCK CAPITALS** in body text (harder to read). Short header bars in caps (DO NOW, APPLY, PART 1) are fine; never set a sentence or question in all caps.
-
 **Build architecture**
-- No animation injection. `present_files` only.
-- **Output is portable.** `build.js` writes to the dir passed as the 2nd CLI arg, else `/mnt/user-data/outputs` if it exists, else cwd. It contains NO hardcoded Drive or Windows paths — this keeps the skill identical whether it runs on claude.ai (school) or Claude Code (home). Drive upload, if wanted, is done OUTSIDE build.js (a separate step/wrapper), never inside the frozen renderer.
-- **Where this runs (two environments, one skill file):** claude.ai (e.g. school) runs the uploaded `.skill` in a Linux sandbox — build here, then `present_files` so files can be downloaded. Claude Code (home PC) runs the same skill against local files and can additionally copy outputs to Google Drive afterwards. The skill on claude.ai goes stale only if local files change at home and the new `.skill` isn't re-uploaded — so re-package and re-upload at the end of any session that edits the skill.
-- Standard/practical/revision lessons always produce THREE files: `[base].pptx` + `[base]_worksheet.docx` + `[base]_support_worksheet.docx`. Review lessons (`lessonType: "review"`) also produce THREE files, but the third is a **model-answer sheet**: `[base].pptx` + `[base]_worksheet.docx` (the booklet) + `[base]_answers.docx` (see **Answer sheet** section). Review lessons never build a support worksheet — the answer sheet takes that slot. `differentiation: "split"` / `meta.abilityLabel` only change the filename label.
 - **Renderer is frozen.** All rendering lives in `references/build.js`. Claude NEVER rewrites renderer functions. Per build, Claude writes ONLY `lesson-content.json` (an array of 1–N lesson objects matching the schema below), then runs `node references/build.js lesson-content.json`.
-- Fallback: if `references/build.js` does not exist in this project, build the single-script way (content object at top, renderer below) and tell Patryk that generating build.js once would halve future build cost.
 - Multi-lesson batching = more objects in the JSON array. Same run. build.js wraps each lesson in try/catch so one bad lesson never kills the batch.
 - Build once. If overflow: cut per priority in worksheet-spec.md. Never resize fonts.
 
@@ -263,7 +231,6 @@ The final slide of every deck is the **IMAGE BANK** (kept, not deleted): it self
 
 Notes on key fields:
 - **`equationSymbols` (formula triangle):** one quantity on top, 2 to 4 MULTIPLIED quantities in `bottom` (`{ "top": "Ep", "bottom": ["m", "g", "h"] }`). Omit it for any other kind of equation (`a = (v − u)/t`, `Ek = ½mv²`): no triangle is drawn. Full rules in slide-options-v4.md.
-- **Image extraction (M1–M3):** When a source PPTX or DOCX is uploaded, extract images using Python's `zipfile` module before building the JSON. PPTX: extract from `ppt/media/`; DOCX: extract from `word/media/`. Write each file as `/mnt/user-data/outputs/img_1.png`, `img_2.png`, etc. Match EACH image to a slide slot by type group (real-world photo → Engage; labelled diagram → Learn A/B; apparatus setup → Build practical). **Set `embeddedImagePath` + `imageConfidence: "search"` on EVERY matched slide entry independently** — multiple `embeddedImagePath` fields per lesson are valid and expected. If Engage gets img_1.png and Learn A gets img_2.png, both entries get their own field. `image_dump` catches genuinely unmatched images only — never use it as a fallback for images that have a clear slot match. Matched images must NOT also appear in `image_dump`. The `image_dump` slide is appended last and must be deleted before sharing.
 - `learn[].boxes` is the preferred Learn-A form (navy-header boxes stacking rules/key info) — much better than a flat `body` string, which renders plain.
 - `apply[].diagram: true` (or a string label) emits a framed diagram box on the worksheet under that question — use for any question that refers to a circuit/diagram. `diagramLines` controls the box height.
 - `build practical` slides get an apparatus image placeholder automatically; set `imagePlaceholder: false` only if there genuinely is no apparatus. `equipment: ["..."]` lists apparatus items — rendered as a labelled amber-tinted section on the slide.
@@ -280,7 +247,10 @@ Field names are fixed. If a slide type needs something not in the schema, check 
 | `references/slide-options-v4.md` | Step 2 — every PPTX build |
 | `references/worksheet-spec.md` | Step 2 — every DOCX build |
 | `references/engage-library.md` | When picking an Engage mechanism — six-mechanism table, examples, and the no-repeat-consecutive-lessons rule (tag each Engage with `engageType` 1–6) |
-| `references/build.js` | Never read in full — it is frozen. Only consult its header comment for the CLI usage. |
+| `references/review-lessons.md` | Revision, test, test review and review lessons (opening, slide order, model answers, EBIs, Extension, booklet, answer sheet) |
+| `references/special-lessons.md` | Uploaded source PPTX/DOCX (image extraction), Learn H video lessons, practical sequences over two lessons, combined lessons |
+| `references/builder-behaviour.md` | Only when a build looks wrong: what the builder draws by itself (house style, file names, fonts, animations) |
+| `references/build.js` | Never read it: it is frozen. Its top comment has the CLI usage and a map of the `references/builder/` parts. |
 | `references/sol-log.md` (if present) | Step 1 — derive prior-lesson context |
 | `references/aqa-spec-extract.md` (if present) | Step 2 — align objectives + keywords to spec points |
 | `references/textbook-index.md` | When mapping lessons to textbook pages or adding "read more" references for students (Y7/Y8 = Activate 1+2; Y9 = Activate 2 + Kerboodle; Y10/Y11 = Kerboodle only) |
@@ -335,7 +305,7 @@ Learn H worksheet questions appear only on the worksheet (not repeated on the sl
 **1 — Prior context.** Patryk states prior lesson context verbally in chat (topic covered, Do Now questions used). Prefer, in order: (a) verbal statement in chat, (b) `references/sol-log.md`. Never ask for a PPTX upload for prior-context purposes. PPTX uploads ARE the source material when Patryk is basing the new lesson on a previous one — in that case treat the upload as the content floor (see Content volume & source fidelity).
 **2 — Clarify:** class · topic · title · lesson type · worksheet needed. Read both reference files.
 **3 — Build directly (standard).** Text plan first only if 6+ custom questions or unusual structure.
-**3a — Image extraction (if source PPTX or DOCX uploaded).** Before writing the JSON: use Python `zipfile` to pull images from `ppt/media/` (PPTX) or `word/media/` (DOCX) → write to `/mnt/user-data/outputs/img_1.png`, `img_2.png`, etc. Match each image to a slide slot by type (real-world photo → Engage; labelled diagram → Learn A/B). Set `embeddedImagePath` + `imageConfidence: "search"` on matched items in the JSON. Add `image_dump` as the final field on the lesson object (all images, matched or not, with slot labels or `"unassigned"`). Skip this step if no source file is uploaded — placeholder behaviour is unchanged.
+**3a — Source PPTX or DOCX uploaded:** extract and match its images before writing the JSON (steps in `references/special-lessons.md`). No upload: skip.
 **4 — Write `lesson-content.json` only** (array, 1–N lessons) → run `node references/build.js lesson-content.json` → 3 files out per lesson (PPTX + worksheet + support worksheet; review lessons swap the support worksheet for a model-answer sheet).
 **5 — QA:** convert to images. ALWAYS check: Title, Do Now, every Apply, every Review, any annotationZone slide. Sample 1-in-3 of the rest. Check specifically for squished/cramped text on Engage and Learn. Fix visible defects. One cycle only.
 **6 — `present_files`.**
@@ -344,253 +314,19 @@ Learn H worksheet questions appear only on the worksheet (not repeated on the sl
 
 ---
 
-## Image extraction — when a source file is uploaded
-
-Run this step only when Patryk uploads a PPTX or DOCX alongside the lesson request. **If no file is uploaded, skip entirely — placeholder behaviour is unchanged (no regression).**
-
-### 1 — Extract images
-
-PPTX and DOCX are ZIP archives. Use Python's `zipfile` to pull all images **before** writing the lesson JSON:
-
-```python
-import zipfile, os
-
-out_dir = "/mnt/user-data/outputs"
-# PPTX: media_prefix = "ppt/media/"
-# DOCX: media_prefix = "word/media/"
-media_prefix = "ppt/media/"
-
-with zipfile.ZipFile("uploaded.pptx") as z:
-    media = sorted(f for f in z.namelist() if f.startswith(media_prefix) and not f.endswith("/"))
-    for i, path in enumerate(media, start=1):
-        ext = os.path.splitext(path)[1] or ".png"
-        with open(f"{out_dir}/img_{i}{ext}", "wb") as f:
-            f.write(z.read(path))
-```
-
-Output: `img_1.png`, `img_2.png`, … written to `/mnt/user-data/outputs/` alongside the built PPTX/DOCX, so `build.js` can reference them by path.
-
-### 2 — Match images to slide slots
-
-Group by semantic type; assign sequentially within each group:
-
-| Image type | → Slot |
-|---|---|
-| Real-world photo — scene, object, phenomenon | Engage `imagePlaceholder` |
-| Labelled diagram, circuit diagram, apparatus setup | Learn A/B or Build practical |
-| Graph, chart, axes | Learn J or Build `graphInterpret` |
-| Genuinely ambiguous | unassigned |
-
-If a slide type has no matching image, leave its `imagePlaceholder` as-is — the grey box renders as normal.
-
-### 3 — Update matched slide entries in the JSON
-
-For each matched entry, add two fields:
-
-```json
-"embeddedImagePath": "/mnt/user-data/outputs/img_1.png",
-"imageConfidence": "search"
-```
-
-`build.js` detects `imageConfidence: "search"` and calls `addImage()` instead of the grey placeholder. Sizing (aspect-ratio-preserving fit within placeholder bounds) is handled by the renderer — no extra work needed.
-
-### 4 — Append the image_dump entry
-
-Add `image_dump` as the **final top-level field** on the lesson object (sibling of `meta`, `apply`, `review` — not inside any array):
-
-```json
-"image_dump": {
-  "images": [
-    { "path": "/mnt/user-data/outputs/img_1.png", "label": "Engage" },
-    { "path": "/mnt/user-data/outputs/img_2.png", "label": "Learn A" },
-    { "path": "/mnt/user-data/outputs/img_3.png", "label": "unassigned" }
-  ]
-}
-```
-
-Every extracted image appears here — matched ones carry their slot label, unmatched carry `"label": "unassigned"`. `build.js` renders this as a labelled grid appended as the last slide. **Always tell Patryk to delete the dump slide before sharing the lesson.**
-
----
-
 ## Lesson type → slide sequence
 
 | Type | Sequence |
 |---|---|
 | standard | Title → DoNow → DoNow Answers → Engage → Learn(1–2) → MCQ block ×6 → Build (workedExample / errorAnalysis / graphInterpret / trueFalse as topic demands) → Visualiser → Apply → Review×3 |
-| revision | Title → DoNow → DoNow Answers → **Engage (learning objectives)** → per concept: **Learn → CHECK (3 quick questions, answers on click)**, usually ×4 → Whiteboard QA rounds (if authored) → Apply → Review×3. See **Test-cycle lessons** below. |
+| revision | Title → DoNow → DoNow Answers → **Engage (learning objectives)** → per concept: **Learn → CHECK (3 quick questions, answers on click)**, usually ×4 → Whiteboard QA rounds (if authored) → Apply → Review×3. See `references/review-lessons.md` (Test-cycle lessons). |
 | test | Title/DoNow (`doNow.task`: "Look over your notes in your book", no questions) → Engage (learning objectives). PPTX only, no worksheets. |
 | practical | Title → DoNow → DoNow Answers → Engage → Learn(1–2) → Build practical (1–2) → Build Q&A → Visualiser → Apply → Review×3 |
 | whiteboard | Title → DoNow → DoNow Answers → Whiteboard QA rounds → Apply → Review×3 |
-| review | Title/DoNow (combined) → DoNow Answers (purple pen) → Learn (all — typically Learn-C 3-col; **no cap**, Bug 55) → Build items if authored (`markTheAnswers` / `modelAnswerReview`) → Visualiser → Apply (booklet instructions by tier) → Review — Developing/Reaching/Mastering. **Engage (learning objectives) after the Do Now answers when authored (2026-10-14).** Output: PPTX + review booklet DOCX + **model-answer sheet** (`_answers.docx`) — no support worksheet. See **Review lesson specification** and **Answer sheet** sections. |
+| review | Title/DoNow (combined) → DoNow Answers (purple pen) → Learn (all — typically Learn-C 3-col; **no cap**, Bug 55) → Build items if authored (`markTheAnswers` / `modelAnswerReview`) → Visualiser → Apply (booklet instructions by tier) → Review — Developing/Reaching/Mastering. **Engage (learning objectives) after the Do Now answers when authored (2026-10-14).** Output: PPTX + review booklet DOCX + **model-answer sheet** (`_answers.docx`) — no support worksheet. See `references/review-lessons.md` (Review lesson specification, Answer sheet). |
 | annotation | As standard, but `meta.annotation: true` → Learn slides and one workedExample slide include an `annotationZone` (5.5"×4" blank panel, dashed gold border, "worked live" label). Use for calculation-heavy lessons taught with the drawing tablet. After the lesson: slideshow ink → "Keep ink annotations" → export annotated PDF → post to Classroom. |
 
 Slide-type selection guidance: use `trueFalse` with `"heading": "COMMON MISCONCEPTIONS"` whenever the topic has a canonical wrong belief (heavier falls faster, current gets used up, cold flows in) — write statements that may be true or false, students evaluate each; workedExample→yourTurn for any new calculation; errorAnalysis in the lesson AFTER a calculation is introduced; graphInterpret mandatory at least once per motion/electricity/waves topic. (`type: "misconception"` still exists in the renderer but is not recommended — the standalone 3-box layout is less effective than a trueFalse evaluation activity.)
-
----
-
-## Planning practical sequences — when one practical = two lessons
-
-A multi-step or concept-heavy practical should usually NOT be forced into a single theory+practical lesson. Decide the split from the lesson sequence (no manual flag):
-
-**Default:** if the practical is short and the underlying idea is already secure, one `practical` lesson is fine.
-
-**KS3 — split into two** when the practical is multi-step and needs real concept build-up before students can just *do* it:
-- **Lesson N — build-up** (`standard` type): builds the ideas, ends by previewing the method.
-- **Lesson N+1 — the practical** (`practical` type): students walk in ready to work.
-- Naming: consecutive numbered lessons in the same macrotopic folder, e.g. `Lesson 4 - Enzymes and pH` then `Lesson 5 - Enzymes and pH practical`.
-
-**Y12/13 — demo-then-practical pattern:**
-- **Lesson N — demo lesson**: Patryk orders a demo setup and shows the technique in class.
-- **Lesson N+1 — the practical**: students run it with a **method sheet listing the CPAC skills** (Common Practical Assessment Criteria) they must hit. Always put the CPAC success criteria on the A-level method sheet.
-
-**Capstone rule (pairs with the above):** when a practical fills its whole lesson, the deep extended-writing payoff belongs in the follow-up lesson — build that follow-up (existing `revision` or `review` type) up to a genuine 6-mark extended question as the capstone, with sentence starters on the support sheet, using the class's real practical results as the data rather than generic textbook numbers.
-
-This is a planning workflow, not a renderer feature — there is no dedicated lessonType for it.
-
----
-
-## Test-cycle lessons: standard opening (Patryk 2026-10-14)
-
-Every lesson in the test cycle opens with a Do Now, then an **Engage slide that is the learning objectives** (`engage: { "title": "LEARNING OBJECTIVES", "hook": "<one line>", "content": "1. ...
-2. ...", "imagePlaceholder": false }`).
-
-| Lesson | Do Now |
-|---|---|
-| **Revision** (before the test) | 6 general questions on the topic that are NOT on the school's test (read the test in Admin/Assessment first). |
-| **Test** (`lessonType: "test"`) | `doNow.task: ["Look over your notes in your book."]`, no questions. |
-| **Test review** (marked tests back) | `doNow.task: ["Look over your test.", "Tick your WWWs and your EBIs on the front.", "Write your 3 areas of focus for today."]`, no questions. |
-
-**Revision lesson shape:** it covers the topic, leaning towards what the test examines (especially Year 10 and below). Four rounds of ONE Learn slide on one concept, each with `check: [{q, a}] ×3` (quick reminder questions; the CHECK slide follows that Learn slide, answers revealed on click). Then an extended Apply done on their own across all four concepts; Reaching and Mastering stretch into the topic's other areas (e.g. energy resources, required practicals). Set `meta.examQuestion: false` when the only exam questions available are on the class's test. A Learn-A slide with `imagePlaceholder: false` uses the full width and shows up to 3 boxes.
-
-## Review lesson specification
-
-### Slide sequence
-1. **Title / Do Now** (combined). Test-review lessons: the Do Now is the `doNow.task` steps below, then Engage = learning objectives (2026-10-14)
-2. **Do Now Answers** (purple pen bar)
-3. **Learn** (all Learn slides — typically one Learn-C 3-column revision table; **no 4-slide cap**, Bug 55)
-4. **Build items** — only if authored; review-appropriate ones (`markTheAnswers`, `modelAnswerReview`)
-5. **Visualiser**
-6. **Apply** (booklet instructions by tier — not tiered Q&A)
-7. **Review — Developing / Reaching / Mastering**
-
-Engage on review lessons = the learning objectives only (2026-10-14; it was cut before). Kept: DoNow Answers and Visualiser (mandatory).
-**Build items now render in review lessons** (the review dispatcher runs them) — the earlier "no Build
-slides" only held because none were authored. Add a `markTheAnswers` Build item to run a mark-the-answers
-peer-assessment inside a review lesson; it also prints on the booklet + answer sheet. Do not add MCQ/sort
-"quiz" Build slides to a review lesson — they don't suit the booklet format.
-
-`lessonType: "review"` in `meta`. Build the PPTX with the above sequence. Review lessons render **all**
-Learn slides (no cap — Bug 55). The review lesson is NOT a standard lesson — never use `lessonType: "standard"` for a review lesson.
-
-### Learn-C table — always 3 columns
-- Column 1: topic description (the question area being tested)
-- Column 2: booklet section reference (e.g. "Section 3")
-- Column 3: heading is exactly **"Support pages"**: page numbers only (e.g. "p. 14, p. 16"), never spread codes like "C1.6" (Patryk 2026-10-15; build.js also strips them). Never "Textbook", never "Pages".
-
-Single-test classes (one paper only): one question column ("Extend PAPER") + "Support pages". Multi-paper classes: ask Patryk which papers the class sat (Core / Extend / Challenge) before building — one column per paper.
-
-**What the renderer draws (2026-10-10):** `learn[{variant:"C", corePaper:[{q, pages}], extendPaper:[{q, pages}]}]`. Each paper is one table headed CORE PAPER / CHALLENGE PAPER, with columns Question | **Support pages**. Put the topic in `q` ("Q2 Density of an irregular object"). The text is large when there are few rows.
-
-### Test review lessons: model answers, EBI corrections, Extension (Patryk 2026-10-10)
-Patryk's review lesson runs in this order:
-1. Model answer for every test question, with the mark scheme beside it.
-2. Support pages table.
-3. Pupils correct 3 EBIs in purple pen, using the follow-up tasks on the front of the school's test.
-4. Pupils who have finished do the Extension.
-5. He helps pupils around the room.
-
-- **KS3/KS4 tests come as a Core and an Extend paper (KS5 is one paper). Cover BOTH (Patryk 2026-10-12):** match the questions by content. Usually Core opens with 2 easy questions Extend does not have, and Extend ends with 2 hard ones Core does not have; the middle is shared under different numbers (P3 Particles: Core Q4 = Extend Q1, Core Q5 = Extend Q2), and a shared question can still have a part on one paper only (Core Q4(f), Extend Q2(c)). Order: Core-only first, then shared, then Extend-only. Give every item `"core": "4(e)"` and/or `"extend": "1(e)"`; the slide says, in a bigger bar, "Core paper Question 4(e) · Challenge paper Question 1(e)" or "Core paper Question 4(f) (not on the Challenge paper)" (slides say Challenge, never Extend, per the terminology rule). Model answers for Core-only parts come from the Core mark scheme. `ebiTask.rows` get `"paper": "Core"|"Extend"` (each paper's front cover has its own tasks; the slide shows one table per paper), and the Learn-C support-pages slide gets both `corePaper` and `extendPaper`. `meta.snippetDir` = `{ "core": folder, "extend": folder }`.
-- **Model answers:** one `modelAnswerReview` per test part worth 2+ marks. Show the real question: set `meta.snippetDir` to the folder made by `paper-snippets.py` (home PC; claude.ai: skip, typed `question` instead), and tag where each mark came from with `{1}…{/1}` + `"mark": 1` on the scheme point (slide-options-v4.md, modelAnswerReview).
-- **One highlight per mark (Patryk 2026-10-15):** a model answer worth N marks shows N highlights, `{1}` to `{N}`, each matched to a scheme point with `"mark": n`. A 6-marker shows 6, levelled or not (base them on the scheme's points in order). Never fewer.
-- **Page numbers only (2026-10-15):** every `pages` field in a review lesson (support table, `ebiTask`, `extension`) is page numbers only: `"p. 78, p. 84"`, never `"P6.2 p.78"`.
-- **Quick-answer headings** in the same plain words as the slides: `"Core paper Question 4 = Challenge paper Question 1 · quick answers"`, `"Challenge paper Question 3(b) (not on the Core paper) · quick answers"`.
-- **Paper order (2026-10-15):** slides go through each paper part by part. A quick-answer table never holds a later part ahead of a model answer for an earlier one: split it (Q4(a)-(d) quick answers, Q4(e) and Q4(f) model answers, then Q4(g) quick answer). Home PC: run `node references/review-check.js lessons.json` before building; it must say clean.
-  - **Model answers here are full, well-written sentences, not terse.** Patryk's rule; it overrides the short-answer rule below for review lessons.
-  - The mark-scheme panel is verbatim from the school's mark scheme.
-- **1-mark parts (MCQ: add `"correct": "B"`, and `"qn": "1(b)"` for the paper's picture):** one `answerList` Build item per question: `{ "type": "answerList", "heading": "Q1 · QUICK ANSWERS", "rows": [{ "q": "Q1(b) When was the ice melting?", "a": "B ..." }] }`. Q | answer rows, up to 6 a slide, answers revealed on click.
-- **`ebiTask`:** `{ "rows": [{ "q": "Q1", "task": "<the test's front-grid follow-up task, VERBATIM>", "pages": "p. 80" }] }`. This gives the PURPLE PEN · CORRECT 3 EBIs slide plus the same table on the booklet.
-- **`extension`:** `[{ "subtopic", "pages", "questions": [{ "q", "a", "marks", "ref" }] }]`, up to 4 subtopic columns, numbered E1, E2, ...
-  - Use REAL exam questions: at home, run `node references/extension-pick.js <spec.json> --classes 9XS,9AS`. Never invent them.
-  - Slides: Extension (one column per subtopic; split over two slides when the text would be too small) → Extension answers.
-  - Booklet: the questions. Answer sheet: the answers.
-- **Lesson shape:** a review lesson built this way needs no `apply` or `review`. Use `meta.worksheet: "C"` and `meta.examQuestion: false`.
-- **Answer sheet:** prints every model answer plus its mark-scheme panel, the answer lists and the Extension answers.
-
-### Review booklet (the `_worksheet.docx` output)
-Set `worksheetExtras.worksheetType: "C"`. Do NOT set `navRows` — the nav/RAG table is suppressed entirely.
-
-- **Title:** `[Year group] [Subject] — EOY Test Review Questions` — never include the word "Booklet"
-- **No NAV/RAG table.** No intro paragraph above it. Students track progress on their own test paper. Never generate `navRows`.
-- **Section heading format (always two lines):**
-  ```
-  Section N — Topic name
-  Kerboodle: C1.6 p.14, C1.7 p.16
-  ```
-  Never add `(links to Q1 in your test)` or any cross-reference suffix after the topic name.
-- **No phantom figure references.** Never write "Figure 1 shows..." or "The diagram below shows..." unless a diagram is actually embedded. Rephrase as a plain statement ("An atom of nitrogen has 7 protons...").
-- **No answer space.** Students answer in exercise books. No answer boxes. No blank lines between questions. `[N marks]` sits immediately beneath the question text with no gap before the next question. Section heading → first question: one line gap maximum. Tier pill boxes: minimal padding.
-
-### Output for review lessons
-- PPTX + `[base]_worksheet.docx` (the booklet) + `[base]_answers.docx` (the model-answer sheet)
-- No `_support_worksheet.docx` — the answer sheet takes the support slot (the booklet has no answer space, so the answer sheet is the mark scheme)
-- No `_PTO` suffix anywhere in any filename — ever
-
----
-
-## Answer sheet (review lessons only)
-
-Review lessons (`lessonType: "review"`) build `[base]_answers.docx` — a model-answer / marking copy
-that mirrors the worksheet's question order for the **Apply tiers and Build questions only** (each
-question printed then its model answer directly below). **No Do Now section** (2026-07-05) — Do Now
-answers live on the DoNow Answers slide, not the marking copy. It is generated automatically from the
-same content object — no separate authoring. Built by `buildWorksheetChildren(L, 'answers')`.
-
-**Framework is chosen automatically per question** (override with `q.answerStyle`: `"guess"` |
-`"indicative"` | `"plain"` | `"graph"`):
-- **Filled GUESS table** — `qType: "calculation"` (or any GUESS field present). Fills all five cells
-  from `q.given` / `q.unknown` / `q.equation` / `q.substitute` / `q.solve` (falls back to `q.a` for
-  Solve); the Solve cell is emphasised. Author equations with the math mini-syntax (× ÷ fractions
-  typeset via Cambria Math).
-- **Indicative-content panel** — `marks ≥ 6`, or `contentType: "extended_writing"`, or any
-  `q.indicativeContent`. Navy/gold panel in three split sections (2026-07-05): **INDICATIVE CONTENT**
-  (`q.indicativeContent[]` bullets; `<u>word</u>` renders underlined ONLY when the word HAS to be
-  used) → **BANDS** (`q.levelDescriptors[]`) → **EXCLUSIONARY CLAIMS** (`q.doesNotAward[]`). Reuses
-  the same fields as the on-screen `modelAnswerReview` / `markTheAnswers` slides.
-- **Plain callout** — everything else: `q.a` (or `q.modelAnswer`) as a short navy-border answer.
-
-**Model-answer authoring rules:** short and terse (EXCEPT test review lessons: full sentences, see above), operators as symbols (× not "times", ÷ not
-"divide"), grounded in the real mark scheme — never invent marking content.
-
-**6-mark rule:** an extended (non-calculation) question worth ≥6 marks must carry ≥6
-`indicativeContent` points — match points to marks. Shortfalls are logged at build time (non-fatal).
-**Exception (2026-07-05): band-marked questions** — if `levelDescriptors` (BANDS) are present the
-rule is NOT enforced, because marks are lost via the bands, not the indicative-point count.
-
-**Indicative-content chunking (`ic.group`):** give each `indicativeContent` item an optional
-`group` (e.g. `"substitution"`, `"answer"`, `"conversion"`, or `"collision theory"`) to break the
-panel into labelled visual blocks — both on the answer sheet and the `modelAnswerReview` slide.
-`indicativeContent` items are either plain strings or `{ text, group?, dependentOn? }`.
-
-**Mark-the-answers on the sheet:** a `markTheAnswers` Build item (slide-options-v4.md) also prints in
-the BUILD section — the question, each sample answer boxed with a `Level: __  Mark: __ / N` line to
-annotate; on the answer sheet each sample gains its `Awarded:` verdict, MPs hit/missed, teacher note,
-then the full marking panel. This is the "mark the answers" peer-assessment activity.
-
----
-
-## Learn variant H — video lessons
-
-**Trigger:** use variant H whenever the lesson plan includes a video element — when `videoLink` is present OR when the lesson plan explicitly mentions a video as the primary learning activity. Never fall back to variant A when a video is the intended mechanism.
-
-**Schema:**
-```json
-{ "variant": "H", "heading": "...", "videoLink": { "text": "descriptive title", "url": "https://..." }, "toWatch": ["look for X", "look for Y"], "prompt": "optional pause prompt", "questions": [ { "q": "...", "a": "..." } ] }
-```
-
-- `questions` must be `{q, a}` objects — not bare strings. The `q` text appears on the worksheet; the `a` text appears on the answer slide.
-- `toWatch` bullets go in a **white-fill + gold-border** box (house style). Never amber or yellow fills on any Learn-H box.
-- If `questions` contains objects with answers, the renderer automatically generates an answer slide (same purple-pen / review-row format as DoNow Answers) immediately after the Learn-H slide.
-- Video questions appear on the worksheet automatically when the Learn-H item has a `questions` array (handled by `videoQSection` in the worksheet builder).
 
 ---
 
@@ -619,14 +355,6 @@ Applies to all Engage, Learn, and Build practical image placeholders.
 
 ---
 
-## Combined lesson mode
-
-Valid when Patryk says "combine lessons X and Y" or "fast-paced hour covering both", typically when adjacent lessons in the scheme have thin or repetitive content.
-
-Build a single lesson object: two Learn slides (one per topic), unified Do Now drawing from both topics, Build covering both topics, Apply and Review spanning both. Do NOT pad either topic to fill time. Same output format: PPTX + worksheets (not a double-length lesson — a merged single lesson). Normal MCQ count (6, one block) still applies across both topics combined.
-
----
-
 ## Known Bugs and fixes
 
 The bug-fix history (Bugs 1 to 61, dates, code notes) lives at home in
@@ -637,13 +365,7 @@ Never try to edit build.js from a school session.
 
 ---
 
-## Do Now question bank — spaced retrieval (engine built at home; wiring pending)
+## Do Now: automatic at home
 
-A per-class bank with a spaced-retrieval selector now EXISTS at home
-(`references/do-now-bank.js`, tested) but is not yet wired into build.js. Until it
-is, author the six Do Now questions as normal: backwards-looking, mostly recall
-(AO1), never previewing today.
+Home builds can fill the Do Now by themselves: `"doNow": { "auto": true }` with no questions picks six from what the class has covered (spaced retrieval plus one question from last year's content). On claude.ai, or whenever you write the Do Now yourself, write six as normal: backwards-looking, mostly recall, never previewing today. A Do Now written into the lesson is always used as written.
 
-When wired, the session will PICK six from the bank instead of writing them,
-leaning on older topics; for KS4 the low-demand questions will come from real AQA
-exam parts. Design and status: `specs/do-now-bank.md` (home).
