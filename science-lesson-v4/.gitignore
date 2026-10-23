@@ -43,7 +43,11 @@ scientist-league.html
 classroom-jeopardy.html
 Students*.csv
 exam-usage.json
+exam-lesson-picks.json
 homework-out/
 planner/planner-data.json
 planner/preview*.html
 planner/dist/
+
+# school pictures pulled from lesson decks (image-library.js): school files, never committed
+image-library/

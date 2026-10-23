@@ -125,6 +125,23 @@ Note `content` was dropped entirely — the original sentence was already the an
 ```
 Max 2 boxes left. Image placeholder right by default. Omit `keywords` if already embedded in box content.
 
+**Learn extras (Lesson quality A, 2026-10-19).** Optional on Learn A unless noted:
+```json
+{ "variant": "A", "heading": "Atoms and elements",
+  "definition": { "term": "Element", "text": "a substance made of only one type of atom.", "origin": "Latin elementum: a basic part",
+                  "examples": ["iron (Fe)", "oxygen (O_2)"], "notExamples": ["water (H_2O)", "air (a mixture)"] },
+  "examDefinition": { "term": "Specific heat capacity", "wording": "is the {1}energy{/1} needed to raise the temperature of {2}1 kg{/2} of a substance by {3}1 °C{/3}.", "board": "AQA", "asked": 7 },
+  "misconception": { "wrong": "A compound is just a mixture of its elements.", "right": "In a compound the atoms are joined, in a fixed ratio." },
+  "notes": "Speaker notes: the plain explanation, history, quotes (any Learn variant, and engage.notes)",
+  "boxes": [ { "header": "Element", "items": ["No chemical reaction can split an {k}element{/k} into anything simpler."] } ] }
+```
+- `definition`: white card with a gold edge at the top (term, text, small origin). `examples` / `notExamples` add green / red boxes underneath: use for the one or two terms pupils mix up.
+- `examDefinition`: "LEARN THIS WORDING" box at the top, one highlight colour per mark ({n}…{/n}), "AQA: asked 7 times" when `asked` is given. Use it instead of `definition` (not both). Wording from `exam-definition.js` only, never invented.
+- `misconception`: red "✗ Not quite" (crossed out) → green "✓ Actually" across the bottom. The boxes above shrink to fit.
+- `{k}word{/k}`: key word, bold with a gold underline, in any slide text (max 3 per slide, first appearance).
+- `title.knownWords` [{term, definition}]: the dark "WORDS YOU KNOW" band on the objectives slide (after the Do Now answers).
+- MCQs: `"why": {"B": "thinks two atoms means a compound", "C": "...", "D": "..."}` names the mistake each wrong option catches (required: the build's MCQ CHECK warns without it).
+
 ### LEARN B — write in book
 ```json
 { "variant": "B", "heading": "...", "toWrite": ["line 1", "line 2"] }
@@ -215,6 +232,18 @@ Max 4 questions. `prompt` is optional — use for mid-video checkpoint questions
 }
 ```
 Linear node chain (aliases `"FLOWCHART"`). `orientation`: `"vertical"` (default) or `"horizontal"`. Arrows between nodes are **native gold arrow shapes**; `cycle: true` adds a curved native return arrow from the last node back to the first (Bug 54). Use G for a space-filling zigzag; use I for a simple straight chain or when a cycle-return arrow is wanted.
+
+### LEARN L — labelled picture (dual coding)
+```json
+{ "variant": "L", "heading": "The animal cell", "embeddedImagePath": ".../01.jpg", "imageConfidence": "search",
+  "labels": [ { "text": "nucleus", "job": "controls the cell", "sentence": "The nucleus holds the genes that control the cell.", "x": 0.4007, "y": 0.4712 } ],
+  "build": true, "notes": "..." }
+```
+Drawn by `references/learn-pictures.js`. `x`, `y` = where the part is, as fractions of the PICTURE (0 = left/top, 1 = right/bottom), so the line ends on it at any size. Labels with x < 0.5 go in the left column, the rest on the right, stacked in the order of their points. `text` = the term (1 to 3 words), `job` = what it does (under 6 words), `sentence` = the full sentence shown when its part is built (and in the speaker notes). `build` (default true): one slide per label, then an all-labels slide; `false` = only the all-labels slide. 3 to 7 labels. Counts as one Learn item.
+
+**Check every point before building (required):**
+`python references/label_points.py picture.png --points '[["nucleus!",0.40,0.47],["cell membrane",0.04,0.55]]' --out check.png --snap edge`
+then LOOK at check.png and adjust. `--snap edge` moves a point onto the nearest outline (membranes, walls, glass); end a name with `!` to keep a point where it is (parts in the middle of a flat area: nucleus, cytoplasm). It prints the final points to paste into `labels`.
 
 ### LEARN VARIANT SELECTION GUIDE
 
@@ -421,9 +450,9 @@ indicative content points is correct; "the less the better."
 
 **Question picture from the paper (2026-10-12):** add `"snippet": "path/to/Q2a.png"`, or set `meta.snippetDir` to the folder `paper-snippets.py` wrote (looked up by `questionNumber`, e.g. `"3(a)(iii)"`). The slide then shows the REAL question, never stretched: a tall question fills the left (answer above the mark scheme on the right), a short one runs across the top (answer left, scheme right). A long scheme narrows the picture, then cuts bands to their first sentence, then splits into points | bands columns, so nothing runs off. No picture: an optional typed `"question"` goes across the top. `"snippet": false` turns a picture off for one item.
 
-**Two-paper tests (KS3/KS4 Core + Extend):** `"core": "4(e)"`, `"extend": "1(e)"` on a modelAnswerReview item or an answerList row name the question on each paper (header: CORE ONLY · Q1 / CORE Q4(e) = CHALLENGE Q1(e) / CHALLENGE ONLY · Q3; the school's Extend paper is always "Challenge" on slides); `meta.snippetDir: { core, extend }` finds the picture (Extend's for a shared question). Answer lines are cut out of the pictures by `paper-snippets.py`.
+**Two-paper tests (KS3/KS4 Core + Extend):** `"core": "4(e)"`, `"extend": "1(e)"` on a modelAnswerReview item or an answerList row name the question on each paper (header, 17pt bar since 2026-10-15: "Core paper Question 4(e) · Challenge paper Question 1(e)" / "Core paper Question 4(f) (not on the Challenge paper)" / "Challenge paper Question 3 (not on the Core paper)"; the school's Extend paper is always "Challenge" on slides); `meta.snippetDir: { core, extend }` finds the picture (Extend's for a shared question). Answer lines are cut out of the pictures by `paper-snippets.py`.
 
-**Where each mark came from (2026-10-12):** wrap the words that earn a mark in `{1}…{/1}`, `{2}…{/2}` (`{x}…{/x}` = words that lost a mark) and give the matching `indicativeContent` point `"mark": 1`. The slide draws a highlighter band in that mark's colour (yellow, green, blue, pink, orange) with a numbered circle after it; the scheme point carries the same coloured number. Works in `modelAnswer` (string or calculation lines) and `markTheAnswers` sample `text`. Tags are stripped everywhere else (worksheets, answer sheet). Making the snippets (home PC, needs PyMuPDF): convert a COPY of the test .docx to PDF, then `python paper-snippets.py paper.pdf outDir` — question pictures + `snippets.json`, local only, never Drive.
+**Where each mark came from (2026-10-12):** wrap the words that earn a mark in `{1}…{/1}`, `{2}…{/2}` (`{x}…{/x}` = words that lost a mark) and give the matching `indicativeContent` point `"mark": 1`. The slide draws a highlighter band in that mark's colour (six colours, ordered so neighbours never look alike: yellow, blue, pink, green, orange, purple; a 6-marker shows 6) with a numbered circle after it; the scheme point carries the same coloured number. Works in `modelAnswer` (string or calculation lines) and `markTheAnswers` sample `text`. Tags are stripped everywhere else (worksheets, answer sheet). Making the snippets (home PC, needs PyMuPDF): convert a COPY of the test .docx to PDF, then `python paper-snippets.py paper.pdf outDir` — question pictures + `snippets.json`, local only, never Drive.
 
 ### BUILD — answerList (review lessons)
 Short test parts answered together: Q on the left, the answer in a navy/gold box on the right (revealed on click). Up to 6 rows per slide; more rows continue on the next slide. **2026-10-12:** a row with `"qn": "1(b)"` (looked up in `meta.snippetDir`) or `"snippet"` shows the paper's question picture on the left instead of text (3 rows a slide). Multiple choice: `"correct": "B"` states the letter big, then `a` (the option text / reason). In a review lesson there is no purple-pen bar (whole-paper review).

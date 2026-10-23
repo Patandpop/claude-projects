@@ -3,6 +3,8 @@
   "entries": [
     "SKILL.md",
     "references/build.js",
+    "references/learn-pictures.js",
+    "references/label_points.py",
     "references/graph_gen.py",
     "references/handwriting_png.py",
     "references/textbook-index.js",
@@ -10,6 +12,7 @@
     "references/slide-options-v4.md",
     "references/worksheet-spec.md",
     "references/engage-library.md",
+    "references/mcq-rules.md",
     "references/starfield_header_FINAL.png",
     "references/lesson-backlog-SKILL.md",
     "references/Caveat-Regular.ttf",

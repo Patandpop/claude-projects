@@ -22,6 +22,7 @@ description: "Creates lesson PowerPoints and worksheets for science lessons (phy
 - No class name in worksheet titles.
 - Never abbreviate questions — full text on: Do Now slide, Do Now Answers (verbatim), Apply slide, Review (verbatim).
 - **Exactly 6 Do Now questions** (Patryk ruling 2026-07-09 — replaces the old "min 4"). All retrieval from PREVIOUSLY-TAUGHT content, never the current lesson.
+- **Calculation Do Nows get new numbers, same words (Patryk 2026-10-15).** Home builds with `doNow.auto` do this by themselves (do-now-vary.js; only when the mark scheme's one-step working checks out; real values like g = 9.8 N/kg or ice's 334 000 J/kg never change; the exam library is never changed). When you WRITE a Do Now calculation that revisits an earlier lesson or exam question, use different numbers and work the answer out again; keep the wording. `"varyNumbers": false` on `doNow` keeps the original numbers.
 - One MCQ per Build slide.
 - Purple pen bar on every Do Now Answers + every Review slide.
 - Answers = core info only, 1–3 lines. Teacher elaborates.
@@ -82,6 +83,17 @@ The final slide of every deck is the **IMAGE BANK** (kept, not deleted): it self
 - **No exclamation marks** outside the Engage slide.
 - **Science teacher voice:** direct, plain UK English. Write as you'd say it in class. "Name two factors that affect enzyme activity." not "Students are invited to consider which factors might influence enzyme activity." Short sentences. No hedging.
 - Objectives written as plain teacher voice: "Calculate resultant force from a free-body diagram", not "Students will be able to understand...".
+
+**Lesson quality rules (Patryk 2026-10-19, from research + 5 mock-up rounds; full record: specs/lesson-quality-learn-images-engage-mcq.md "FINAL DECISIONS")**
+- **Keep the meaning, say it plainly.** Name the thing, say what it does, cut any claim that it is important. Sentences at most 15 words (KS3), 20 (KS4), 25 (KS5). One name per idea: never swap in a synonym for a key term.
+- **About 40 words of text per Learn slide.** The slide shows, Patryk explains. Put the extra explanation, history, quotes and word origins in `notes` (speaker notes). The build warns above 45 words and when one idea is split over two Learn slides.
+- **Key words:** wrap the key term in `{k}…{/k}` the first time it appears on a slide (bold, gold underline). At most 3 per slide. Works in any slide text; worksheets show it as plain bold.
+- **Every hook is a real question the lesson answers** (see engage-library.md bank). Never a silly question with an obvious answer ("is your hair a virus?"). A lesson problem is posed as a QUESTION pupils can attempt, never a statement. If no good hook fits, leave Engage out.
+- **Exam definitions use the board's own words.** At home run `node science-lesson/references/exam-definition.js "term"` (add `--board OCR` for 12C/13D), read the hits (it can return a near miss), and put the wording in `examDefinition` with `{1}…{/1}` round each mark-earning part and the count in `asked`. On claude.ai (no library) leave `asked` out. The plain explanation goes in `notes`.
+- **Misconceptions:** when pupils commonly believe something wrong, add `misconception: {wrong, right}` to the Learn slide ("Not quite" crossed out → "Actually"). Keep it to one per slide.
+- **Objectives slide:** the build adds it after the Do Now answers. `title.knownWords` = words an EARLIER lesson taught, each with a full definition (check lesson-log / earlier lesson files; if unsure, leave the word out). `title.keywords` not in knownWords show as this lesson's words, with no definition. Put `{k}` round the key terms in `title.objectives`. Review, revision and test lessons: don't author an "Engage = objectives" slide any more; leave `engage` out and the build makes the objectives slide.
+- **Pressure is P** (P = F ÷ A) in Patryk's lessons.
+- **Answers on navy are Y5 yellow** (FFD60A), set by the build automatically; never hand-colour answers.
 - All calculation questions use physically realistic values (a 1200 kg car, a 60 W bulb — never a 10 kg car or a 3 m tall person).
 - **Backup/model data values must be clean round numbers to 2-3 sig figs.** No noise-like values (4.21, 8.38, 12.61). Use clean multiples like 4.20, 8.40, 12.60 or 4, 8, 12. Values that look like measurement noise destroy credibility. Applies to `worksheetExtras.referenceData.rows`.
 - Apply questions are tagged `"qType": "concept" | "calculation" | "practical_design" | "extended_writing"`. Tier mix: Developing ≥1 concept; Mastering ≥1 calculation (KS4) or extended reasoning (KS3).
@@ -151,6 +163,7 @@ The final slide of every deck is the **IMAGE BANK** (kept, not deleted): it self
 // Set true ONLY when a lesson genuinely needs a longer gallery of Learn slides (e.g. one
 // image per item — phases of the Moon, one slide per phase). Default false keeps the 4-cap.
   "title": { "objectives": ["..."], "keywords": ["..."] },
+  // Lesson quality A: "knownWords": [{ "term": "particle", "definition": "a tiny piece of matter..." }] (earlier lessons only)
 
 // TEXTBOOK REFERENCES (automatic) — the Apply slide + Apply worksheet section show
 // "Read more — [book] pp. X–Y" in dark blue + gold, top-right of the Apply title.
@@ -194,6 +207,8 @@ The final slide of every deck is the **IMAGE BANK** (kept, not deleted): it self
 //   controls them (it emits Unicode super/subscript only where a run can't carry real super/subscript).
 
     { "variant": "A", "heading": "...", "boxes": [ { "header": "...", "items": ["..."] } ], "keywords": ["..."], "imagePlaceholder": true, "imageDescription": "diagram of lock and key enzyme model with active site and substrate labelled", "annotationZone": false },
+    // Learn (any variant): "notes": "what Patryk says (speaker notes)". Learn A also takes: "definition": {term, text, origin, examples[], notExamples[]},
+    //   "examDefinition": {term, wording with {1}..{/1}, board, asked}, "misconception": {wrong, right}. See slide-options-v4.md.
     { "variant": "B", "heading": "...", "definitions": [ { "term": "Osmosis", "definition": "The net movement of water molecules from a high water concentration to a low water concentration through a partially permeable membrane." } ], "below": "content+image|image|two-column|none", "boxes": [ { "header": "...", "items": ["..."] } ] },
     { "variant": "E", "heading": "...", "comparison": { "aTitle": "Series circuit", "bTitle": "Parallel circuit", "rows": [ { "a": "...", "b": "..." } ] } },
     { "variant": "F", "heading": "...", "equation": "V = I × R", "components": [ { "symbol": "V", "name": "Voltage", "unit": "volts (V)" } ], "rearrangements": ["I = V / R"], "example": "..." },
@@ -306,6 +321,7 @@ Standard lessons emit THREE files: `.pptx` + `_worksheet.docx` + `_support_works
 - I: **Flowchart** — vertical (default) or horizontal step nodes with → / ↓ arrows. Supports cycle annotation. Use for processes with a clear order: digestive system, water cycle, neural pathway. Max 6 nodes.
 - J: **Graph sketch** — image/axes placeholder left, annotated feature list right. Use when the learning objective is to read or sketch a graph (Hooke's Law, V-I characteristics, distance-time, etc.).
 - K: **Timeline** — horizontal line with alternating above/below event boxes. Use for history of science, evolution of models, geological time, etc. Max 8 events.
+- L: **Labelled picture** (dual coding, Patryk's top priority): the picture carries the explanation. Labels down both sides, each joined by a line that ends exactly on its part. By default it is BUILT one part at a time (one slide per label: current part ringed in yellow with its sentence open, others grey) and ends with an all-labels slide to copy; it counts as ONE Learn item. Use for anything pupils must recognise or name the parts of (cells, organs, apparatus, the eye, a circuit, a wave). Schema and the point-checking rule: slide-options-v4.md "LEARN L". Picture sources, in order: the school's own slides (at home: `node science-lesson/references/image-library.js "<lesson folder under Lessons>"`, then look at its sheet.png once), then a diagram Claude draws. Never web or AI images.
 
 Learn H worksheet questions appear only on the worksheet (not repeated on the slide). Learn G has no worksheet output (students annotate in books). Learn I/J/K have no dedicated worksheet output — pair with a worksheet question set as needed.
 
@@ -466,7 +482,7 @@ Learn slides (no cap — Bug 55). The review lesson is NOT a standard lesson —
 ### Learn-C table — always 3 columns
 - Column 1: topic description (the question area being tested)
 - Column 2: booklet section reference (e.g. "Section 3")
-- Column 3: heading is exactly **"Support pages"** — Kerboodle page refs (e.g. "C1.6 p.14, C1.7 p.16"). Never "Textbook", never "Pages".
+- Column 3: heading is exactly **"Support pages"**: page numbers only (e.g. "p. 14, p. 16"), never spread codes like "C1.6" (Patryk 2026-10-15; build.js also strips them). Never "Textbook", never "Pages".
 
 Single-test classes (one paper only): one question column ("Extend PAPER") + "Support pages". Multi-paper classes: ask Patryk which papers the class sat (Core / Extend / Challenge) before building — one column per paper.
 
@@ -480,12 +496,16 @@ Patryk's review lesson runs in this order:
 4. Pupils who have finished do the Extension.
 5. He helps pupils around the room.
 
-- **KS3/KS4 tests come as a Core and an Extend paper (KS5 is one paper). Cover BOTH (Patryk 2026-10-12):** match the questions by content. Usually Core opens with 2 easy questions Extend does not have, and Extend ends with 2 hard ones Core does not have; the middle is shared under different numbers (P3 Particles: Core Q4 = Extend Q1, Core Q5 = Extend Q2), and a shared question can still have a part on one paper only (Core Q4(f), Extend Q2(c)). Order: Core-only first, then shared, then Extend-only. Give every item `"core": "4(e)"` and/or `"extend": "1(e)"`; the slide says CORE ONLY / CORE Q4(e) = CHALLENGE Q1(e) / CHALLENGE ONLY (slides say Challenge, never Extend, per the terminology rule). Model answers for Core-only parts come from the Core mark scheme. `ebiTask.rows` get `"paper": "Core"|"Extend"` (each paper's front cover has its own tasks; the slide shows one table per paper), and the Learn-C support-pages slide gets both `corePaper` and `extendPaper`. `meta.snippetDir` = `{ "core": folder, "extend": folder }`.
+- **KS3/KS4 tests come as a Core and an Extend paper (KS5 is one paper). Cover BOTH (Patryk 2026-10-12):** match the questions by content. Usually Core opens with 2 easy questions Extend does not have, and Extend ends with 2 hard ones Core does not have; the middle is shared under different numbers (P3 Particles: Core Q4 = Extend Q1, Core Q5 = Extend Q2), and a shared question can still have a part on one paper only (Core Q4(f), Extend Q2(c)). Order: Core-only first, then shared, then Extend-only. Give every item `"core": "4(e)"` and/or `"extend": "1(e)"`; the slide says, in a bigger bar, "Core paper Question 4(e) · Challenge paper Question 1(e)" or "Core paper Question 4(f) (not on the Challenge paper)" (slides say Challenge, never Extend, per the terminology rule). Model answers for Core-only parts come from the Core mark scheme. `ebiTask.rows` get `"paper": "Core"|"Extend"` (each paper's front cover has its own tasks; the slide shows one table per paper), and the Learn-C support-pages slide gets both `corePaper` and `extendPaper`. `meta.snippetDir` = `{ "core": folder, "extend": folder }`.
 - **Model answers:** one `modelAnswerReview` per test part worth 2+ marks. Show the real question: set `meta.snippetDir` to the folder made by `paper-snippets.py` (home PC; claude.ai: skip, typed `question` instead), and tag where each mark came from with `{1}…{/1}` + `"mark": 1` on the scheme point (slide-options-v4.md, modelAnswerReview).
+- **One highlight per mark (Patryk 2026-10-15):** a model answer worth N marks shows N highlights, `{1}` to `{N}`, each matched to a scheme point with `"mark": n`. A 6-marker shows 6, levelled or not (base them on the scheme's points in order). Never fewer.
+- **Page numbers only (2026-10-15):** every `pages` field in a review lesson (support table, `ebiTask`, `extension`) is page numbers only: `"p. 78, p. 84"`, never `"P6.2 p.78"`.
+- **Quick-answer headings** in the same plain words as the slides: `"Core paper Question 4 = Challenge paper Question 1 · quick answers"`, `"Challenge paper Question 3(b) (not on the Core paper) · quick answers"`.
+- **Paper order (2026-10-15):** slides go through each paper part by part. A quick-answer table never holds a later part ahead of a model answer for an earlier one: split it (Q4(a)-(d) quick answers, Q4(e) and Q4(f) model answers, then Q4(g) quick answer). Home PC: run `node references/review-check.js lessons.json` before building; it must say clean.
   - **Model answers here are full, well-written sentences, not terse.** Patryk's rule; it overrides the short-answer rule below for review lessons.
   - The mark-scheme panel is verbatim from the school's mark scheme.
 - **1-mark parts (MCQ: add `"correct": "B"`, and `"qn": "1(b)"` for the paper's picture):** one `answerList` Build item per question: `{ "type": "answerList", "heading": "Q1 · QUICK ANSWERS", "rows": [{ "q": "Q1(b) When was the ice melting?", "a": "B ..." }] }`. Q | answer rows, up to 6 a slide, answers revealed on click.
-- **`ebiTask`:** `{ "rows": [{ "q": "Q1", "task": "<the test's front-grid follow-up task, VERBATIM>", "pages": "P6.3 p.80" }] }`. This gives the PURPLE PEN · CORRECT 3 EBIs slide plus the same table on the booklet.
+- **`ebiTask`:** `{ "rows": [{ "q": "Q1", "task": "<the test's front-grid follow-up task, VERBATIM>", "pages": "p. 80" }] }`. This gives the PURPLE PEN · CORRECT 3 EBIs slide plus the same table on the booklet.
 - **`extension`:** `[{ "subtopic", "pages", "questions": [{ "q", "a", "marks", "ref" }] }]`, up to 4 subtopic columns, numbered E1, E2, ...
   - Use REAL exam questions: at home, run `node references/extension-pick.js <spec.json> --classes 9XS,9AS`. Never invent them.
   - Slides: Extension (one column per subtopic; split over two slides when the text would be too small) → Extension answers.

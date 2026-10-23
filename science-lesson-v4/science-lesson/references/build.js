@@ -281,6 +281,8 @@ const _RE_SCRIPT_GLYPH = /[⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻⁼⁽⁾ⁿ₀₁�
    lowered pieces at SCRIPT_SCALE of the run size (Word's default body size is 11pt = 22). */
 function docxMathRuns(text, opts) {
   const o = opts || {};
+  const ks = keySplit(text);                                     // {k}word{/k}: plain bold on worksheets
+  if (ks) return ks.flatMap((k) => docxMathRuns(k.v, k.key ? Object.assign({}, o, { bold: true }) : o));
   const segs = proseMathSegs(text);
   if (!segs) return [new TextRun(Object.assign({}, o, { text: String(text == null ? '' : text) }))];
   const scriptSize = Math.round((o.size || 22) * SCRIPT_SCALE);
@@ -549,15 +551,50 @@ function markupToDocxRuns(raw, baseOpts) {
    ========================================================================= */
 
 function txt(slide, content, o) {
-  slide.addText(proseMathRuns(content, o && o.fontSize), Object.assign({ fontFace: FONT }, o));
+  slide.addText(proseMathRuns(content, o && o.fontSize, o && o.color), Object.assign({ fontFace: FONT }, o));
 }
 
 /* proseMathRuns(content) — every slide text box passes through here (via txt), so
    maths shorthand typesets in ANY field: real super/subscript runs in the box's own
    font (Patryk 2026-10-03). Runs that are already equations (Cambria Math from
    toPptxRuns) or already raised/lowered are left exactly as they are. */
-function proseMathRuns(content, boxSize) {
+/* Key words (Lesson quality A, Patryk 2026-10-19, style 2): {k}word{/k} = bold, gold underline.
+   On a light box the word is navy; on a dark box it keeps the box's light colour. pptxgenjs can't
+   colour an underline, so the run is tagged lang="en-001" and finishText() adds the gold
+   underline to the saved file (then puts the language back to en-GB). */
+const KEY_RE = /\{k\}([\s\S]*?)\{\/k\}/g;
+const KEY_LANG = 'en-001';
+const stripKeys = (s) => String(s == null ? '' : s).replace(KEY_RE, '$1');
+const isLight = (c) => /^(FFFFFF|FFF|FFD60A|FABB2E|F9A825|C9D3F2)$/i.test(String(c || ''));
+function keySplit(text) {
+  if (typeof text !== 'string' || !text.includes('{k}')) return null;
+  const out = []; let last = 0, m;
+  KEY_RE.lastIndex = 0;
+  while ((m = KEY_RE.exec(text))) {
+    if (m.index > last) out.push({ v: text.slice(last, m.index), key: false });
+    out.push({ v: m[1], key: true });
+    last = KEY_RE.lastIndex;
+  }
+  if (last < text.length) out.push({ v: text.slice(last), key: false });
+  return out;
+}
+function keyOpts(base) {
+  return { bold: true, underline: { style: 'sng' }, lang: KEY_LANG, color: isLight(base && base.color) ? base.color : NAVY };
+}
+
+function proseMathRuns(content, boxSize, boxColor) {
   const toRuns = (text, opts) => {
+    const ks = keySplit(text);
+    if (ks) {                                                    // key words: split, then maths per piece
+      const base = Object.assign(boxColor ? { color: boxColor } : {}, opts || {});
+      const runs = ks.flatMap((k) => {
+        const o = Object.assign({}, base, { breakLine: false }, k.key ? keyOpts(base) : {});
+        return toRuns(k.v, o) || [{ text: k.v, options: o }];
+      });
+      runs[runs.length - 1].options.breakLine = !!base.breakLine;
+      runs.forEach(r => { if (!r.options.breakLine) delete r.options.breakLine; });
+      return runs;
+    }
     const segs = proseMathSegs(text);
     if (!segs) return null;
     const base = opts || {};
@@ -587,8 +624,9 @@ function proseMathRuns(content, boxSize) {
 function table(slide, rows, opts) {
   const cellMath = (cell) => {
     const size = (cell && cell.options && cell.options.fontSize) || (opts && opts.fontSize);
-    if (typeof cell === 'string') return proseMathSegs(cell) ? { text: proseMathRuns(cell, size) } : cell;
-    if (cell && cell.text != null) return Object.assign({}, cell, { text: proseMathRuns(cell.text, size) });
+    const col = (cell && cell.options && cell.options.color) || (opts && opts.color);
+    if (typeof cell === 'string') return (proseMathSegs(cell) || keySplit(cell)) ? { text: proseMathRuns(cell, size, col) } : cell;
+    if (cell && cell.text != null) return Object.assign({}, cell, { text: proseMathRuns(cell.text, size, col) });
     return cell;
   };
   slide.addTable(rows.map(r => r.map(cellMath)), opts);
@@ -632,13 +670,15 @@ function purplePenBar(slide, y) {
 }
 
 /* sectionHeader(text, colour) — returns next y */
-function sectionHeader(slide, text, colour, y, runs) {
+function sectionHeader(slide, text, colour, y, runs, big) {
+  // big: the test-review question bars (Patryk 2026-10-15: clearer and slightly bigger)
+  const h = big ? 0.5 : 0.38;
   txt(slide, runs || text, {
-    x: 0, y, w: SW, h: 0.38, fill: { color: colour },
-    color: 'FFFFFF', bold: true, fontSize: 13, align: runs ? 'left' : 'center',
+    x: 0, y, w: SW, h, fill: { color: colour },
+    color: 'FFFFFF', bold: true, fontSize: big ? 17 : 13, align: runs ? 'left' : 'center',
     valign: 'middle', margin: 8,
   });
-  return y + 0.38 + GAP;
+  return y + h + GAP;
 }
 
 /* lessonBookRef(L) — "Read more — [book] pp. X–Y" for a lesson's Apply section,
@@ -653,7 +693,7 @@ function lessonBookRef(L) {
       topic: meta.topic || meta.title, keywords: title.keywords,
       override: meta.textbookRef,
     });
-    return m ? 'Read more — ' + TBIDX.formatRef(m) : '';
+    return m ? 'Read more: ' + TBIDX.formatRef(m) : '';
   } catch (e) {
     buildWarn(`textbook reference lookup failed (${e.message || e}) — Apply slide/worksheet ships without a page ref`);
     return '';
@@ -680,9 +720,9 @@ function goldBox(slide, x, y, w, h, content, opts) {
 
 /* flattenText — extract plain string from runs array or plain string */
 function flattenText(t) {
-  if (typeof t === 'string') return t;
-  if (Array.isArray(t)) return t.map((r) => (typeof r === 'string' ? r : r.text || '')).join('');
-  return String(t || '');
+  if (typeof t === 'string') return stripKeys(t);
+  if (Array.isArray(t)) return stripKeys(t.map((r) => (typeof r === 'string' ? r : r.text || '')).join(''));
+  return stripKeys(String(t || ''));
 }
 
 /* autoFontSize — largest font size that fits text in a box of w×h inches.
@@ -728,8 +768,8 @@ function imagePlaceholder(slide, x, y, w, h, description) {
   // Always prefer a concrete suggestion of WHAT to insert. The generic fallback
   // still asks for a specific thing rather than the bare "teacher inserts".
   const label = description
-    ? `[Paste image \u2014 suggested search: ${description}]`
-    : '[Image \u2014 add imageDescription to JSON]';
+    ? `[Paste image. Suggested search: ${description}]`
+    : '[Image: add imageDescription to JSON]';
   txt(slide, label, {
     x, y, w, h, fill: { color: 'D0D0D0' },
     line: { color: '999999', width: 1, dashType: 'dash' },
@@ -1104,12 +1144,15 @@ function handwritingBlockRaster(slide, x, y, w, h, text, opts) {
 /* Mark highlighting (Patryk 2026-10-12): show WHERE each mark came from. A tagged span of
    handwriting gets a see-through highlighter band in that mark's colour and a numbered circle
    after it; the mark-scheme point with the same number carries the same colour. "x" = a mark
-   lost (red band, red cross). Colours cycle after 5. */
-const MARK_HI = ['FFF176', 'A5D6A7', '90CAF9', 'F8BBD0', 'FFCC80'];   // highlighter (light)
-const MARK_INK = ['F9A825', '2E7D32', '1565C0', 'AD1457', 'EF6C00'];  // circle (dark)
-const markCircleD = (fontSize) => Math.max(0.24, Math.min(0.34, (fontSize * 0.95) / 72));
-const markHi = (m) => (m === 'x' ? 'FFCDD2' : MARK_HI[(Number(m) - 1 + 50) % MARK_HI.length]);
-const markInk = (m) => (m === 'x' ? 'C62828' : MARK_INK[(Number(m) - 1 + 50) % MARK_INK.length]);
+   lost (red band, red cross). Six colours (2026-10-15: a 6-marker shows 6), ordered so each mark
+   looks unlike the one before it: yellow, blue, pink, green, orange, purple. Cycle after 6.
+   Circles and bands were made a little bigger and stronger the same day, to read from the back. */
+const MARK_HI = ['FFF176', '90CAF9', 'F8BBD0', 'A5D6A7', 'FFCC80', 'CE93D8'];   // highlighter (light)
+const MARK_INK = ['F9A825', '1565C0', 'AD1457', '2E7D32', 'EF6C00', '6A1B9A'];  // circle (dark)
+const markCircleD = (fontSize) => Math.max(0.28, Math.min(0.40, (fontSize * 1.1) / 72));
+const markSlot = (m, n) => (((Number(m) - 1) % n) + n) % n;   // mark 1 = first colour, whatever the list length
+const markHi = (m) => (m === 'x' ? 'FFCDD2' : MARK_HI[markSlot(m, MARK_HI.length)]);
+const markInk = (m) => (m === 'x' ? 'C62828' : MARK_INK[markSlot(m, MARK_INK.length)]);
 
 /* parseMarkWords(text) — text (string, or array of lines) with {n}…{/n} tags →
    { text: same shape, tags removed and prettyText'd, marks: one entry per word in layout
@@ -1185,7 +1228,7 @@ function drawMarkHighlights(slide, x, y, w, placed, lineH, marks, fontSize, part
     if (part === 'bands' || part === 'over') {
       slide.addShape('rect', {
         x: x + r.x0 - 0.04, y: y + r.y + lineH - bandH - 0.02, w: r.x1 - r.x0 + 0.08, h: bandH,
-        fill: { color: markHi(r.m), transparency: part === 'over' ? 50 : 0 }, line: { type: 'none' },
+        fill: { color: markHi(r.m), transparency: part === 'over' ? 35 : 0 }, line: { type: 'none' },
       });
     }
     if (part !== 'bands' && endOfSpan) {
@@ -1230,6 +1273,55 @@ function handwritingBlock(slide, x, y, w, h, text, opts) {
    animBg="1" makes the box and its text appear together. Appear is the simplest entrance effect
    and the one most likely to survive Google Slides' import. A slide that already has its own
    timing is left alone. Returns the number of boxes animated. */
+/* Lesson quality A (2026-10-19): two finishing passes on the saved file, before the animations.
+   goldUnderlines — key words ({k}) get a GOLD underline: pptxgenjs can only underline in the text
+     colour, so the runs were tagged lang="en-001"; here the tag becomes en-GB plus <a:uFill>.
+   answerYellow — Patryk's projector: answer text on navy is Y5 yellow (FFD60A), not gold, which
+     washes out with the lights on. An answer box = navy fill whose text is mostly gold (the same
+     test the reveal animations use); headers, titles and Learn slides keep gold. */
+const ANSWER = 'FFD60A';
+function isAnswerBox(sp) {
+  const spPr = (sp.match(/<p:spPr>[\s\S]*?<\/p:spPr>/) || [''])[0];
+  if (!/^<p:spPr>[\s\S]*?<a:solidFill><a:srgbClr val="0D1B5E"/.test(spPr.replace(/<a:ln[\s\S]*?<\/a:ln>/g, ''))) return false;
+  if (!/<a:rPr[^>]*>[\s\S]*?<a:srgbClr val="(FABB2E|FFD60A)"/.test(sp)) return false;
+  let gold = 0, all = 0;
+  for (const r of sp.match(/<a:r>[\s\S]*?<\/a:r>/g) || []) {
+    const raw = ((r.match(/<a:t>([^<]*)<\/a:t>/) || [])[1] || '').trim();
+    if (/^(ANSWER|Answer:?)$/.test(raw)) continue;
+    all += raw.length;
+    if (/<a:srgbClr val="(FABB2E|FFD60A)"/.test(r)) gold += raw.length;
+  }
+  if (!all || gold / all < 0.5) return false;
+  return !/IMAGE BANK|Read more/i.test((sp.match(/<a:t>([^<]*)<\/a:t>/g) || []).join(' '));
+}
+function finishText(pptxPath) {
+  const zip = new AdmZip(pptxPath);
+  let keys = 0, answers = 0;
+  for (const e of zip.getEntries()) {
+    if (!/^ppt\/slides\/slide\d+\.xml$/.test(e.entryName)) continue;
+    let xml = e.getData().toString('utf8');
+    const before = xml;
+    xml = xml.replace(/<a:rPr lang="en-001" altLang="en-US"/g, () => { keys++; return '<a:rPr lang="en-GB"'; });
+    // put the uFill in schema order: after fill/highlight, before latin/ea/cs/sym/hlinkClick
+    xml = xml.replace(/<a:rPr lang="en-GB"([^>]*)>([\s\S]*?)<\/a:rPr>/g, (m0, attrs, inner) => {
+      if (inner.includes('<a:uFill>') || !/ u="sng"/.test(attrs)) return m0;
+      const uf = '<a:uFill><a:solidFill><a:srgbClr val="F9A825"/></a:solidFill></a:uFill>';
+      const at = inner.search(/<a:(latin|ea|cs|sym|hlinkClick|hlinkMouseOver|rtl|extLst)\b/);
+      return `<a:rPr lang="en-GB"${attrs}>` + (at < 0 ? inner + uf : inner.slice(0, at) + uf + inner.slice(at)) + '</a:rPr>';
+    });
+    if (!/<a:t>LEARN [·\-:]/.test(xml)) {
+      xml = xml.replace(/<p:sp>[\s\S]*?<\/p:sp>/g, (sp) => {
+        if (!isAnswerBox(sp)) return sp;
+        answers++;
+        return sp.replace(/(<a:rPr[^>]*>(?:(?!<\/a:rPr>)[\s\S])*?<a:srgbClr val=")FABB2E/g, '$1' + ANSWER);
+      });
+    }
+    if (xml !== before) zip.updateFile(e.entryName, Buffer.from(xml, 'utf8'));
+  }
+  if (keys || answers) zip.writeZip(pptxPath);
+  return { keys, answers };
+}
+
 function addRevealAnimations(pptxPath) {
   const zip = new AdmZip(pptxPath);
   let total = 0;
@@ -1242,7 +1334,7 @@ function addRevealAnimations(pptxPath) {
     for (const sp of xml.match(/<p:sp>[\s\S]*?<\/p:sp>/g) || []) {
       const spPr = (sp.match(/<p:spPr>[\s\S]*?<\/p:spPr>/) || [''])[0];
       if (!/^<p:spPr>[\s\S]*?<a:solidFill><a:srgbClr val="0D1B5E"/.test(spPr.replace(/<a:ln[\s\S]*?<\/a:ln>/g, ''))) continue;
-      if (!/<a:rPr[^>]*>[\s\S]*?<a:srgbClr val="FABB2E"/.test(sp)) continue;
+      if (!/<a:rPr[^>]*>[\s\S]*?<a:srgbClr val="(FABB2E|FFD60A)"/.test(sp)) continue;
       if (!/<a:t>[^<]*\S/.test(sp)) continue;
       // most of the box's text must be gold (an answer), not a gold label on a white question
       let gold = 0, all = 0;
@@ -1251,7 +1343,7 @@ function addRevealAnimations(pptxPath) {
         if (/^(ANSWER|Answer:?)$/.test(raw)) continue;                  // the label on an answer box
         const t = raw.length;
         all += t;
-        if (/<a:srgbClr val="FABB2E"/.test(r)) gold += t;
+        if (/<a:srgbClr val="(FABB2E|FFD60A)"/.test(r)) gold += t;
       }
       if (!all || gold / all < 0.5) continue;
       const text = (sp.match(/<a:t>([^<]*)<\/a:t>/g) || []).join(' ');
@@ -1398,7 +1490,7 @@ function silentEntryFooter(slide) {
 
 function objectiveText(L) {
   const obj = (L.title && L.title.objectives) || L.meta.objectives || [];
-  return obj[0] || L.meta.title || L.meta.topic || '';
+  return stripKeys(obj[0] || L.meta.title || L.meta.topic || '');
 }
 
 
@@ -1516,6 +1608,54 @@ function slideDoNowAnswers(pptx, L) {
   bottomBar(s, objectiveText(L));
 }
 
+/* ---- OBJECTIVES (Lesson quality A, Patryk's O7, 2026-10-19) -------------
+   Straight after the Do Now answers, before Engage. The Do Now slide keeps its own objectives.
+   Dark band "WORDS YOU KNOW" (title.knownWords: [{term, definition}] — only words an earlier lesson
+   taught; left out when empty), "WORDS FOR THIS LESSON" as navy tags (title.keywords minus known
+   ones, no definitions), then the numbered objectives with {k} key words highlighted. */
+function slideObjectives(pptx, L) {
+  const t = L.title || {};
+  const objectives = arr(t.objectives).slice(0, 3);
+  if (!objectives.length) return;
+  const known = arr(t.knownWords).filter((k) => k && k.term).slice(0, 4);
+  const knownSet = new Set(known.map((k) => String(k.term).toLowerCase()));
+  const lesson = arr(t.keywords).filter((w) => !knownSet.has(String(w).toLowerCase())).slice(0, 8);
+  const s = pptx.addSlide();
+  s.background = { color: BG };
+  navBar(s, 'engage');
+  let y = sectionHeader(s, 'LEARNING OBJECTIVES', STAGE.engage, TOP);
+  if (known.length) {
+    const rowH = 0.42, h = 0.38 + known.length * rowH + 0.08;
+    s.addShape('rect', { x: MX, y, w: CW, h, fill: { color: NAVY }, line: { type: 'none' } });
+    txt(s, 'WORDS YOU KNOW', { x: MX + 0.15, y: y + 0.06, w: CW - 0.3, h: 0.3, color: 'C9D3F2', fontSize: 11, charSpacing: 1, valign: 'middle' });
+    known.forEach((k, i) => {
+      const line = [{ text: String(k.term), options: { bold: true, color: ANSWER } }, { text: ':  ' + prettyText(k.definition || ''), options: { color: 'FFFFFF' } }];
+      txt(s, line, { x: MX + 0.15, y: y + 0.38 + i * rowH, w: CW - 0.3, h: rowH, fontSize: autoFontSize(k.term + ': ' + (k.definition || ''), CW - 0.3, rowH, { min: 12, max: 17 }), valign: 'middle', fit: 'shrink' });
+    });
+    y += h + 0.14;
+  }
+  if (lesson.length) {
+    txt(s, 'WORDS FOR THIS LESSON', { x: MX, y, w: 2.6, h: 0.42, color: '555555', fontSize: 11, charSpacing: 1, valign: 'middle' });
+    let tx = MX + 2.65;
+    lesson.forEach((w) => {
+      const tw = Math.min(3.2, 0.35 + String(w).length * 0.13);
+      if (tx + tw > MX + CW) return;
+      txt(s, String(w), { x: tx, y: y + 0.03, w: tw, h: 0.36, fill: { color: NAVY }, color: 'FFFFFF', bold: true, fontSize: 14, align: 'center', valign: 'middle', rectRadius: 0.06, shape: pptx.ShapeType.roundRect });
+      tx += tw + 0.12;
+    });
+    y += 0.42 + 0.2;
+  }
+  const bottom = BOT_Y - 0.15;
+  const rowH = Math.min(1.1, (bottom - y) / objectives.length);
+  objectives.forEach((o, i) => {
+    const ry = y + i * rowH;
+    s.addShape('ellipse', { x: MX, y: ry + (rowH - 0.5) / 2, w: 0.5, h: 0.5, fill: { color: GOLD }, line: { color: NAVY, width: 1.5 } });
+    txt(s, String(i + 1), { x: MX, y: ry + (rowH - 0.5) / 2, w: 0.5, h: 0.5, color: NAVY, bold: true, fontSize: 18, align: 'center', valign: 'middle' });
+    txt(s, prettyText(o), { x: MX + 0.7, y: ry, w: CW - 0.7, h: rowH, color: '1A1A2E', fontSize: autoFontSize(o, CW - 0.7, rowH, { min: 16, max: 24 }), valign: 'middle', fit: 'shrink' });
+  });
+  bottomBar(s, objectiveText(L));
+}
+
 /* ---- ENGAGE ------------------------------------------------------------- */
 const ENGAGE_LABEL = {
   news: 'IN THE NEWS', news_hook: 'IN THE NEWS', prediction: 'MAKE A PREDICTION',
@@ -1525,6 +1665,7 @@ const ENGAGE_LABEL = {
 function slideEngage(pptx, L) {
   const e = L.engage; if (!e) return;
   const s = pptx.addSlide();
+  if (e.notes) s.addNotes(stripKeys(e.notes));                   // Lesson quality A
   s.background = { color: BG };
   navBar(s, 'engage');
   const heading = e.title ? ('ENGAGE \u00B7 ' + stripStage(e.title, 'ENGAGE')) : ('ENGAGE \u00B7 ' + (ENGAGE_LABEL[e.variant] || 'HOOK'));
@@ -1779,8 +1920,76 @@ function renderLearnGFlow(slide, steps, n, area) {
 }
 
 /* ---- LEARN A–D ----------------------------------------------------------- */
+/* ---- LEARN EXTRAS (Lesson quality A, Patryk's picks 2026-10-19) ---------------------------
+   examDefinition {term, wording, board, asked}: "LEARN THIS WORDING" box; wording carries {1}…{/1}
+     around each mark-earning part, drawn in the review mark colours (one per mark); the term is
+     printed bold before it. The plain explanation goes in item.notes.
+   definition {term, text, origin, examples[], notExamples[]}: white card with a gold edge (F4),
+     plus green "Examples" / red "Not examples" boxes when given (F2).
+   misconception {wrong, right}: "✗ Not quite" (crossed out) → "✓ Actually" (M7). */
+function markedRuns(text, base) {
+  const out = []; const re = /\{(\d)\}([\s\S]*?)\{\/\1\}/g; let last = 0, m;
+  const s = String(text || '');
+  while ((m = re.exec(s))) {
+    if (m.index > last) out.push({ text: prettyText(s.slice(last, m.index)), options: Object.assign({}, base) });
+    out.push({ text: prettyText(m[2]), options: Object.assign({}, base, { highlight: MARK_HI[(+m[1] - 1) % MARK_HI.length] }) });
+    last = re.lastIndex;
+  }
+  if (last < s.length) out.push({ text: prettyText(s.slice(last)), options: Object.assign({}, base) });
+  return out;
+}
+function learnTopExtras(s, item, y) {
+  const ed = item.examDefinition, df = item.definition;
+  if (ed && ed.wording) {
+    const head = 0.34, words = stripMarkTags(ed.term + ' ' + ed.wording);
+    const bodyH = Math.max(0.7, Math.min(1.3, 0.35 + Math.ceil(words.length / 70) * 0.36));
+    s.addShape('rect', { x: MX, y, w: CW, h: head + bodyH, fill: { color: 'FFFFFF' }, line: { color: NAVY, width: 2 } });
+    txt(s, 'LEARN THIS WORDING', { x: MX, y, w: CW, h: head, fill: { color: NAVY }, color: ANSWER, bold: true, fontSize: 12, charSpacing: 1, valign: 'middle', margin: 8 });
+    if (ed.asked) txt(s, `${ed.board || 'AQA'}: asked ${ed.asked} time${ed.asked === 1 ? '' : 's'}`, { x: MX + CW - 3.2, y, w: 3.1, h: head, color: 'C9D3F2', fontSize: 11, align: 'right', valign: 'middle' });
+    const fs = autoFontSize(words, CW - 0.2, bodyH, { min: 14, max: 22 });
+    txt(s, [{ text: String(ed.term) + ' ', options: { bold: true, color: NAVY } }].concat(markedRuns(ed.wording, { color: '1A1A2E' })),
+      { x: MX + 0.1, y: y + head, w: CW - 0.2, h: bodyH, fontSize: fs, valign: 'middle', fit: 'shrink' });
+    return y + head + bodyH + GAP;
+  }
+  if (df && df.text) {
+    const line = [{ text: String(df.term || '') + '  ', options: { bold: true, color: NAVY } }, { text: prettyText(df.text), options: { color: '1A1A2E' } }]
+      .concat(df.origin ? [{ text: '   ' + prettyText(df.origin), options: { color: '666666', fontSize: 12, italic: true } }] : []);
+    const h = 0.62;
+    s.addShape('rect', { x: MX, y, w: CW, h, fill: { color: 'FFFFFF' }, line: { type: 'none' } });
+    s.addShape('rect', { x: MX, y, w: 0.09, h, fill: { color: GOLD }, line: { type: 'none' } });
+    txt(s, line, { x: MX + 0.18, y, w: CW - 0.25, h, fontSize: autoFontSize(stripKeys(df.term + ' ' + df.text), CW - 0.25, h, { min: 13, max: 19 }), valign: 'middle', fit: 'shrink' });
+    y += h + GAP;
+    const ex = arr(df.examples), no = arr(df.notExamples);
+    if (ex.length || no.length) {
+      const bw = (CW - GAP) / 2, bh = 0.95;
+      [[ex, 'Examples', '2E7D32'], [no, 'Not examples', 'C62828']].forEach(([list, head, col], i) => {
+        if (!list.length) return;
+        const bx = MX + i * (bw + GAP);
+        txt(s, head, { x: bx, y, w: bw, h: 0.3, fill: { color: col }, color: 'FFFFFF', bold: true, fontSize: 12, valign: 'middle', margin: 6 });
+        txt(s, prettyText(list.join('  \u00B7  ')), { x: bx, y: y + 0.3, w: bw, h: bh - 0.3, fill: { color: 'FFFFFF' }, line: { color: col, width: 1.5 }, color: '1A1A2E', fontSize: 14, valign: 'middle', fit: 'shrink', margin: 6 });
+      });
+      y += bh + GAP;
+    }
+  }
+  return y;
+}
+function learnMisconception(s, mc, bottom) {
+  const h = 1.0, aw = 0.5, bw = (CW - aw - 2 * GAP) / 2, y = bottom - h;
+  txt(s, [{ text: '\u2717 Not quite', options: { bold: true, color: 'C62828', breakLine: true } },
+          { text: prettyText(mc.wrong || ''), options: { color: '1A1A2E', strike: 'sngStrike' } }],
+    { x: MX, y, w: bw, h, fill: { color: 'FFFFFF' }, line: { color: 'C62828', width: 1.5 }, fontSize: 18, valign: 'middle', margin: 8, fit: 'shrink' });
+  txt(s, '\u2192', { x: MX + bw + GAP, y, w: aw, h, color: NAVY, bold: true, fontSize: 28, align: 'center', valign: 'middle' });
+  txt(s, [{ text: '\u2713 Actually', options: { bold: true, color: '2E7D32', breakLine: true } },
+          { text: prettyText(mc.right || ''), options: { color: '1A1A2E' } }],
+    { x: MX + bw + aw + 2 * GAP, y, w: bw, h, fill: { color: 'FFFFFF' }, line: { color: '2E7D32', width: 1.5 }, fontSize: 18, valign: 'middle', margin: 8, fit: 'shrink' });
+  return h;
+}
+
 function slideLearn(pptx, L, item) {
   const v = String(item.variant || 'A').toUpperCase();
+  // Learn L, labelled picture (Part B 2026-10-23): drawn by learn-pictures.js, one item however many slides
+  if (v === 'L' || v === 'LABELLED_PICTURE') return require('./learn-pictures.js').labelledPicture(pptx, L, item, {
+    C: { BG, NAVY, STAGE, TOP, MX, CW, BOT_Y }, navBar, sectionHeader, bottomBar, objectiveText, stripStage, stripKeys, txt, addImageFit, imageOrPlaceholder, buildWarn });
   const map = { KEY_INFO: 'A', KEYWORDS: 'B', WRITE_IN_BOOK: 'B', REVISION_TABLE: 'C', IMAGE_COPY: 'D', COMPARISON_TABLE: 'E', EQUATION_CALLOUT: 'F', FLOW: 'G', SEQUENCE: 'G', VIDEO: 'H', FLOWCHART: 'I', GRAPH_SKETCH: 'J', TIMELINE: 'K' };
   const variant = map[v] || (['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K'].includes(v) ? v : 'A');
   const s = pptx.addSlide();
@@ -1799,7 +2008,11 @@ function slideLearn(pptx, L, item) {
     const boxes = (item.boxes || [{ header: item.heading || 'Key information', items: arr(item.body ? String(item.body).split('\n') : []) }]).slice(0, noRight ? 3 : 2);
     const kw = arr(item.keywords);
     const kwH = kw.length ? 1.0 : 0;
-    const stackH = bodyBottom - y - (kwH ? kwH + GAP : 0);
+    // Lesson quality A: exam wording / definition card on top, misconception box at the bottom
+    y = learnTopExtras(s, item, y);
+    const misH = item.misconception ? learnMisconception(s, item.misconception, bodyBottom) + GAP : 0;
+    const stackBottom = bodyBottom - misH;
+    const stackH = stackBottom - y - (kwH ? kwH + GAP : 0);
     const each = (stackH - (boxes.length - 1) * GAP) / boxes.length;
     let by = y;
     boxes.forEach((b) => {
@@ -1807,12 +2020,12 @@ function slideLearn(pptx, L, item) {
       by += each + GAP;
     });
     if (kw.length) {
-      navyHeaderBox(s, MX, bodyBottom - kwH, leftW, 'Key terms:', [kw.join('  \u00B7  ')], kwH);
+      navyHeaderBox(s, MX, stackBottom - kwH, leftW, 'Key terms:', [kw.join('  \u00B7  ')], kwH);
     }
     if (item.annotationZone) {
-      annotationZone(s, rightX, y, rightW, Math.min(4.0, bodyBottom - y));
+      annotationZone(s, rightX, y, rightW, Math.min(4.0, stackBottom - y));
     } else if (item.imagePlaceholder !== false) {
-      imageOrPlaceholder(s, item, rightX, y, rightW, bodyBottom - y);
+      imageOrPlaceholder(s, item, rightX, y, rightW, stackBottom - y);
     }
   }
 
@@ -1869,7 +2082,7 @@ function slideLearn(pptx, L, item) {
         .concat(arr(rows).map((r, i) => {
           const fill = i % 2 ? 'F5F5F5' : 'FFFFFF';
           return [{ text: r.q || '', options: { fill: { color: fill }, fontSize: fs } },
-                  { text: String(r.pages || ''), options: { fill: { color: fill }, fontSize: fs, align: 'center' } }];
+                  { text: pagesOnly(r.pages), options: { fill: { color: fill }, fontSize: fs, align: 'center' } }];
         }));
       table(s, trows, { x, y, w, colW: [w * 0.72, w * 0.28], fontFace: FONT, border: { type: 'solid', pt: 0.5, color: 'BBBBBB' }, margin: 0.04, autoPage: false });
     };
@@ -1906,8 +2119,8 @@ function slideLearn(pptx, L, item) {
     const cmpRows = arr(cmp.rows);
     const headerH = 0.42;
     const colW = (CW - 0.15) / 2;
-    txt(s, aTitle, { x: MX, y, w: colW, h: headerH, fill: { color: NAVY }, color: 'FFFFFF', bold: true, fontSize: 13, align: 'center', valign: 'middle' });
-    txt(s, bTitle, { x: MX + colW + 0.15, y, w: colW, h: headerH, fill: { color: STAGE.build }, color: 'FFFFFF', bold: true, fontSize: 13, align: 'center', valign: 'middle' });
+    txt(s, aTitle, { x: MX, y, w: colW, h: headerH, fill: { color: NAVY }, color: 'FFFFFF', bold: true, fontSize: 16, align: 'center', valign: 'middle' });
+    txt(s, bTitle, { x: MX + colW + 0.15, y, w: colW, h: headerH, fill: { color: STAGE.build }, color: 'FFFFFF', bold: true, fontSize: 16, align: 'center', valign: 'middle' });
     y += headerH + 0.06;
     const cmpAvail = BOT_Y - 0.08 - y - (cmpRows.length - 1) * 0.06;
     // Fill the slide like Do Now: floor keeps many-row tables legible, generous
@@ -1917,8 +2130,10 @@ function slideLearn(pptx, L, item) {
     let cy = y + Math.max(0, (cmpAvail - cmpBlockH) / 2);
     cmpRows.forEach((r, i) => {
       const fill = i % 2 ? 'F5F5F5' : 'FFFFFF';
-      goldBox(s, MX, cy, colW, rowH, String(r.a || ''), { fill, fontSize: 14, valign: 'middle' });
-      goldBox(s, MX + colW + 0.15, cy, colW, rowH, String(r.b || ''), { fill, fontSize: 14, valign: 'middle' });
+      // 2026-10-22: rows grow into their space (was a fixed 14pt: 7MLA animal cells table read small)
+      const fs = Math.min(...[r.a, r.b].map((t) => autoFontSize(String(t || ''), colW - 0.15, rowH, { min: 14, max: 22 })));
+      goldBox(s, MX, cy, colW, rowH, String(r.a || ''), { fill, fontSize: fs, valign: 'middle' });
+      goldBox(s, MX + colW + 0.15, cy, colW, rowH, String(r.b || ''), { fill, fontSize: fs, valign: 'middle' });
       cy += rowH + 0.06;
     });
   }
@@ -2240,6 +2455,7 @@ function slideLearn(pptx, L, item) {
     }
   }
 
+  if (item.notes) s.addNotes(stripKeys(item.notes));               // Lesson quality A: what Patryk says
   bottomBar(s, obj);
 }
 
@@ -2347,7 +2563,7 @@ function slideTrueFalse(pptx, L, item) {
     });
   });
   y = ty + rows * rowH + gapTotal + GAP;
-  txt(s, 'Decide T or F for each \u2014 be ready to justify on 3-2-1', {
+  txt(s, 'Decide T or F for each. Be ready to justify on 3-2-1', {
     x: MX, y, w: CW, h: footH, fill: { color: NAVY },
     color: 'FFFFFF', bold: true, fontSize: 12, align: 'center', valign: 'middle',
   });
@@ -2375,7 +2591,7 @@ function slideTrueFalse(pptx, L, item) {
       { text: isTrue ? '\u2713 TRUE' : '\u2717 FALSE', options: { bold: true, fontSize: 15, color: isTrue ? GREEN_OK : RED } },
     ];
     if (!isTrue && st.correction) {
-      runs.push({ text: '  \u2014  ' + st.correction, options: { fontSize: 13, italic: true, color: '333333', breakLine: false } });
+      runs.push({ text: ':  ' + st.correction, options: { fontSize: 13, italic: true, color: '333333', breakLine: false } });
     }
     goldBox(s, MX, ry, CW, rowH2, runs, { valign: 'middle', fill: verdictTint });
   });
@@ -2678,7 +2894,7 @@ function slideReformatFlowchart(pptx, L, item) {
     ], { valign: 'middle' });
   });
   const footY = y + rows * cellH + (rows - 1) * GAP + GAP;
-  txt(s, item.instruction || 'Work out the correct order — write the letters in sequence.', {
+  txt(s, item.instruction || 'Work out the correct order. Write the letters in sequence.', {
     x: MX, y: footY, w: CW, h: 0.4, fill: { color: NAVY },
     color: 'FFFFFF', bold: true, fontSize: 12, align: 'center', valign: 'middle',
   });
@@ -2733,7 +2949,7 @@ function slideAnnotatedDiagram(pptx, L, item) {
     numberBadge(s, cx, cy, d, i);
   });
   const keyX = imgX + imgW + 0.2, keyW = CW - imgW - 0.2;
-  const keyLines = labels.map((lb, i) => (i + 1) + '  —  ' + String(lb.text || ''));
+  const keyLines = labels.map((lb, i) => (i + 1) + '.  ' + String(lb.text || ''));
   goldBox(s, keyX, imgY, keyW, imgH, [
     { text: 'KEY', options: { bold: true, fontSize: 13, color: NAVY, breakLine: true, paraSpaceAfter: 8 } },
     ...keyLines.flatMap((line, i) => [{ text: line, options: { fontSize: 13, breakLine: i < keyLines.length - 1, paraSpaceAfter: 6 } }]),
@@ -2882,11 +3098,26 @@ function snippetFor(L, item, qn, opts) {
    "core": "4(e)" and/or "extend": "1(e)", and the label says which paper(s) it is on. */
 function qLabel(item) {
   const c = item.core, e = item.extend;
-  // the school calls it the Extend paper; on slides it is the CHALLENGE paper (terminology rule)
-  if (c && e) return `CORE Q${c} = CHALLENGE Q${e}`;
-  if (c) return `CORE ONLY · Q${c}`;
-  if (e) return `CHALLENGE ONLY · Q${e}`;
-  return 'Q' + (item.questionNumber || '');
+  // the school calls it the Extend paper; on slides it is the CHALLENGE paper (terminology rule).
+  // Plain words (Patryk 2026-10-15: "more explicit"), not CORE Q4(e) = CHALLENGE Q1(e).
+  if (c && e) return `Core paper Question ${c}  ·  Challenge paper Question ${e}`;
+  if (c) return `Core paper Question ${c} (not on the Challenge paper)`;
+  if (e) return `Challenge paper Question ${e} (not on the Core paper)`;
+  return 'Question ' + (item.questionNumber || '');
+}
+
+/* pagesOnly — review support pages show page numbers only (Patryk 2026-10-15: "P6.2 p.78" read as
+   a code, not a page). "P6.2 p.78, P6.3 p.80" -> "p. 78, p. 80"; "pp.78-80" -> "pp. 78–80";
+   repeats dropped. Text with no page number is left alone. */
+function pagesOnly(v) {
+  const t = String(v == null ? '' : v);
+  if (!/\bpp?\.\s*\d/i.test(t)) return t;
+  const seen = new Set();
+  return t.split(/\s*[,;]\s*/).map((bit) => {
+    const m = bit.match(/\b(pp?)\.\s*(\d+)(?:\s*[-–]\s*(\d+))?/i);
+    if (!m) return bit.replace(/\b[BCP]\d+(\.\d+)+\b\s*/g, '').trim();
+    return m[3] ? `pp. ${m[2]}–${m[3]}` : `p. ${m[2]}`;
+  }).filter((x) => x && !seen.has(x) && seen.add(x)).join(', ');
 }
 
 function slideModelAnswerReview(pptx, L, item) {
@@ -2895,8 +3126,8 @@ function slideModelAnswerReview(pptx, L, item) {
   const s = pptx.addSlide();
   s.background = { color: BG };
   navBar(s, 'build');
-  const header = 'BUILD · MODEL ANSWER — ' + qLabel(item) + marksTag(item.marks);
-  let y = sectionHeader(s, header, STAGE.build, TOP);
+  const header = 'MODEL ANSWER   ' + qLabel(item) + (item.marks ? `  ·  ${item.marks} mark${item.marks === 1 ? '' : 's'}` : '');
+  let y = sectionHeader(s, header, STAGE.build, TOP, null, true);
   const profile = item.jitterProfile != null ? item.jitterProfile : 2;
   const bottom = BOT_Y - 0.08;
 
@@ -2906,7 +3137,7 @@ function slideModelAnswerReview(pptx, L, item) {
       const rd = item.graphData;
       const pngPath = rd && rd.rows ? callGraphGen(rd, true) : null;
       if (pngPath) addImageFit(s, pngPath, x, ay, w, h);
-      else imagePlaceholder(s, x, ay, w, h, 'Model graph — add graphData to JSON');
+      else imagePlaceholder(s, x, ay, w, h, 'Model graph: add graphData to JSON');
       return;
     }
     // raw text in: handwritingBlock reads the {n} mark tags, then tidies symbols itself
@@ -3031,7 +3262,7 @@ function mtaQuestionBox(s, item, y) {
 function slideMarkTheAnswers(pptx, L, item) {
   const obj = objectiveText(L);
   const samples = arr(item.samples).slice(0, 4);
-  const header = 'BUILD · MARK THE ANSWERS — Q' + (item.questionNumber || '') + marksTag(item.marks);
+  const header = 'BUILD · MARK THE ANSWERS · Q' + (item.questionNumber || '') + marksTag(item.marks);
 
   // --- task slide: question + mark scheme, full width -------------------------
   let s = pptx.addSlide();
@@ -3131,9 +3362,9 @@ function slideWorkedExample(pptx, L, item) {
   y += 0.38 + GAP;
   const promptH = 0.85;
   const wpFs = autoFontSize(worked.prompt, colW, promptH, { min: 16, max: 24 });
-  goldBox(s, x1, y, colW, promptH, toPptxRuns(parseEq(worked.prompt || ''), { fontSize: wpFs }), { valign: 'middle' }); // Bug 53: typeset equation notation in the prompt
+  goldBox(s, x1, y, colW, promptH, prettyText(worked.prompt || ''), { fontSize: wpFs, valign: 'middle' }); // prose: x^2 / H_2SO_4 typeset by txt (2026-10-22: parseEq lowered '2SO4' as one subscript)
   const ypFs = autoFontSize(yourTurn.prompt, colW, promptH, { min: 16, max: 24 });
-  goldBox(s, x2, y, colW, promptH, toPptxRuns(parseEq(yourTurn.prompt || ''), { fontSize: ypFs }), { valign: 'middle' });
+  goldBox(s, x2, y, colW, promptH, prettyText(yourTurn.prompt || ''), { fontSize: ypFs, valign: 'middle' });
   y += promptH + GAP;
   const panelH = BOT_Y - 0.08 - y;
   if (annotate) {
@@ -3861,14 +4092,14 @@ function slideEbiTask(pptx, L) {
       let fs = 20;
       for (; fs > 10; fs--) {
         const lines = pr.reduce((n, r) => n + Math.max(Math.ceil(prettyText(r.task || '').length / Math.floor((cw[1] - 0.1) * 120 / fs)),
-          Math.ceil(String(r.pages || '').length / Math.floor((cw[2] - 0.1) * 120 / fs))), 0);
+          Math.ceil(pagesOnly(r.pages).length / Math.floor((cw[2] - 0.1) * 120 / fs))), 0);
         if ((lines * fs * 1.3) / 72 + pr.length * 0.12 <= avail * 0.92) break;
       }
       const trows = pr.map((r, i) => {
         const fill = i % 2 ? 'F5F5F5' : 'FFFFFF';
         return [{ text: String(r.q || ''), options: { fill: { color: fill }, bold: true, fontSize: fs, align: 'center', valign: 'middle' } },
           { text: prettyText(r.task || ''), options: { fill: { color: fill }, fontSize: fs, valign: 'middle' } },
-          { text: String(r.pages || ''), options: { fill: { color: fill }, fontSize: fs, align: 'center', valign: 'middle' } }];
+          { text: pagesOnly(r.pages), options: { fill: { color: fill }, fontSize: fs, align: 'center', valign: 'middle' } }];
       });
       table(s, trows, { x: tx, y: y + 0.42, w: tw, colW: cw, rowH: avail / pr.length, fontFace: FONT, border: { type: 'solid', pt: 0.5, color: 'BBBBBB' }, margin: 0.06, autoPage: false });
     });
@@ -3882,7 +4113,7 @@ function slideEbiTask(pptx, L) {
     const fill = i % 2 ? 'F5F5F5' : 'FFFFFF';
     return [{ text: String(r.q || ''), options: { fill: { color: fill }, bold: true, fontSize: fs, align: 'center' } },
       { text: prettyText(r.task || ''), options: { fill: { color: fill }, fontSize: fs } },
-      { text: String(r.pages || ''), options: { fill: { color: fill }, fontSize: fs, align: 'center' } }];
+      { text: pagesOnly(r.pages), options: { fill: { color: fill }, fontSize: fs, align: 'center' } }];
   }));
   table(s, trows, { x: MX, y, w: CW, colW: [CW * 0.12, CW * 0.68, CW * 0.2], fontFace: FONT, border: { type: 'solid', pt: 0.5, color: 'BBBBBB' }, margin: 0.05, autoPage: false });
   bottomBar(s, objectiveText(L));
@@ -3890,7 +4121,7 @@ function slideEbiTask(pptx, L) {
 // extension questions numbered E1, E2 ... across the columns (the answers slide and sheets use the same numbers)
 function extensionCols(L) {
   let n = 0;
-  return arr(L.extension).slice(0, 4).map((c) => ({ subtopic: c.subtopic || '', pages: c.pages || '', qs: arr(c.questions).map(normQ).map((q) => Object.assign({ label: 'E' + (++n), sub: c.subtopic || '' }, q)) }))
+  return arr(L.extension).slice(0, 4).map((c) => ({ subtopic: c.subtopic || '', pages: pagesOnly(c.pages), qs: arr(c.questions).map(normQ).map((q) => Object.assign({ label: 'E' + (++n), sub: c.subtopic || '' }, q)) }))
     .filter((c) => c.qs.length);
 }
 // The text size the cards of these columns would get on one slide.
@@ -3983,7 +4214,7 @@ function slideAnswerList(pptx, L, item) {
     const s = pptx.addSlide();
     s.background = { color: BG };
     navBar(s, 'build');
-    let y = sectionHeader(s, item.heading || 'QUICK ANSWERS', STAGE.build, TOP);
+    let y = sectionHeader(s, item.heading || 'QUICK ANSWERS', STAGE.build, TOP, null, isReviewLesson(L));
     if (!isReviewLesson(L)) y = purplePenBar(s, y);   // whole-paper review: no purple-pen bar (Patryk 2026-10-12)
     const bottom = BOT_Y - 0.08;
     const rowH = (bottom - y - (part.length - 1) * 0.06) / part.length;
@@ -4154,7 +4385,7 @@ function slideImageDump(pptx, L) {
   // Navy header bar with gold title — house style. Patryk KEEPS this slide (2026-07-09
   // ruling) — it is the lesson's image bank, not a delete-me artifact.
   const headerH = 0.5;
-  txt(s, 'IMAGE BANK — sources and assets used in this lesson', {
+  txt(s, 'IMAGE BANK · sources and assets used in this lesson', {
     x: 0, y: 0, w: SW, h: headerH,
     fill: { color: NAVY }, color: GOLD, bold: true,
     fontSize: 14, align: 'center', valign: 'middle',
@@ -4206,6 +4437,58 @@ function slideImageDump(pptx, L) {
    missing-image-description warning, and this surviving one, which had the
    broader/more-correct image scan but only reported a count. Merged: keeps the
    broader scan, restores the slide-name listing. */
+/* ---- Lesson quality A checks (2026-10-19) — warnings only, never block -------------------
+   mcqCheck: each wrong option must name the mistake it catches (item.why / item.wrong {B: ...}),
+     and the usual give-aways are flagged. Rules copied from mcq-written.js check(), which is not
+     packed for claude.ai. Claude rewrites weak options while writing; this reports what's left.
+   learnChecks: Learn slides over 45 words (research: about 40), two Learn slides that split one
+     idea, more than 3 key words ({k}) on a slide or the same key word twice. */
+function mcqCheck(item) {
+  const bad = [];
+  const o = mcqOptions(item.options), ans = String(item.answer || '').trim().toUpperCase().slice(0, 1);
+  const opts = ['A', 'B', 'C', 'D'].map((k) => stripKeys(String(o[k] || '')).trim());
+  if (opts.some((x) => !x)) bad.push('an option is missing');
+  if (new Set(opts.map((x) => x.toLowerCase())).size !== opts.length) bad.push('two options are the same');
+  if (opts.some((x) => /\b(all|none|both|neither) of (the|these) (above|answers|options)\b/i.test(x))) bad.push('"all/none of the above"');
+  if (!/^[A-D]$/.test(ans)) bad.push('answer is not one letter A-D');
+  const num = (x) => { const m = /^[−-]?\d[\d,]*(\.\d+)?/.exec(x.replace(/\s/g, '')); return m ? parseFloat(m[0].replace(/[,−]/g, (c) => (c === '−' ? '-' : ''))) : null; };
+  const nums = opts.map(num);
+  if (nums.every((n) => n != null)) {
+    if (!nums.every((n, i) => !i || n >= nums[i - 1])) bad.push('number options not smallest to largest');
+  } else if (/^[A-D]$/.test(ans)) {
+    const len = opts.map((x) => x.length), r = len['ABCD'.indexOf(ans)];
+    const others = len.filter((l, i) => i !== 'ABCD'.indexOf(ans));
+    if (r > 1.3 * Math.max(...others) && r - Math.max(...others) > 6) bad.push('the right answer is clearly the longest');
+  }
+  const why = item.why || item.wrong || {};
+  const missing = ['A', 'B', 'C', 'D'].filter((k) => k !== ans && !String(why[k] || '').trim());
+  if (missing.length) bad.push(`no "why" for wrong option${missing.length > 1 ? 's' : ''} ${missing.join(', ')} (name the mistake it catches)`);
+  return bad;
+}
+function learnWords(it) {
+  const parts = [];
+  arr(it.boxes).forEach((b) => parts.push(b.header || '', ...arr(b.items)));
+  ['body', 'content'].forEach((k) => it[k] && parts.push(String(it[k])));
+  return stripMarkTags(stripKeys(parts.join(' '))).split(/\s+/).filter(Boolean).length;
+}
+function learnChecks(L, lines) {
+  const learn = arr(L.learn);
+  learn.forEach((it, i) => {
+    const n = learnWords(it);
+    if (n > 45) lines.push(`  ✗ Learn ${i + 1} "${it.heading || ''}" has ${n} words of text (aim for about 40: the slide shows, you explain)`);
+    const keys = (JSON.stringify(it).match(/\{k\}([\s\S]*?)\{\/k\}/g) || []).map((k) => k.replace(/\{\/?k\}/g, '').toLowerCase());
+    if (keys.length > 3) lines.push(`  ✗ Learn ${i + 1} highlights ${keys.length} key words (soft cap 3)`);
+    if (new Set(keys).size < keys.length) lines.push(`  ✗ Learn ${i + 1} highlights the same key word twice (first appearance only)`);
+    const prev = learn[i - 1];
+    if (prev) {
+      const h0 = String(prev.heading || '').toLowerCase().split(/\s+/).slice(0, 2).join(' ');
+      const h1 = String(it.heading || '').toLowerCase();
+      if ((h0 && h0.split(' ').length === 2 && h1.startsWith(h0)) || /\((2|ii)\)|continued|part 2|2\/2/.test(h1))
+        lines.push(`  ✗ Learn ${i} and ${i + 1} look like one idea split over two slides ("${prev.heading}" / "${it.heading}")`);
+    }
+  });
+}
+
 function contentCheck(L) {
   const meta = L.meta || {};
   const type = (meta.lessonType || meta.type || 'standard').toLowerCase();
@@ -4218,7 +4501,9 @@ function contentCheck(L) {
   const must = (ok, good, bad) => { check(ok, good, bad); if (!ok) blockers.push(bad); };
 
   const dn = arr((L.doNow || {}).questions).length;
-  check(dn === 6, `Do Now ${dn}/6`, `Do Now has ${dn} question(s) — rule is exactly 6`);
+  // test and test-review lessons use doNow.task steps by design (2026-10-20: false warning on 12C Waves 1 review)
+  if (!dn && arr((L.doNow || {}).task).length) lines.push(`  ✓ Do Now is ${arr(L.doNow.task).length} steps (doNow.task)`);
+  else check(dn === 6, `Do Now ${dn}/6`, `Do Now has ${dn} question(s) — rule is exactly 6`);
 
   // review Extension (2026-10-10): every column names its support page, every question has its answer
   arr(L.extension).forEach((c, i) => {
@@ -4233,6 +4518,14 @@ function contentCheck(L) {
   if (isTeaching) {
     const mcq = arr(L.build).filter((b) => ['mcq', 'mcq_image'].includes(b.type || b.variant)).length;
     check(mcq === 6, 'MCQ count 6/6', `MCQ count ${mcq} — rule is exactly 6 (one block after Learn; experiment MCQs tagged about:"practical" go after the method slide)`);
+    // MCQ CHECK (Lesson quality A): every wrong option names its mistake; no give-aways
+    const mcqBad = [];
+    arr(L.build).filter((b) => ['mcq', 'mcq_image'].includes(b.type || b.variant)).forEach((b, i) => {
+      const bad = mcqCheck(b);
+      if (bad.length) mcqBad.push(`  ✗ MCQ CHECK · question ${i + 1}: ${bad.join('; ')}`);
+    });
+    if (mcq) { if (mcqBad.length) lines.push(...mcqBad); else lines.push('  ✓ MCQ CHECK · every wrong option names its mistake'); }
+    learnChecks(L, lines);
     TIERS.forEach((t) => {
       const a = arr((L.apply || {})[t]).length;
       check(a >= 3, `Apply ${t} ${a}/3+`, `Apply ${t} has ${a} question(s) — minimum 3 per tier`);
@@ -4431,6 +4724,9 @@ async function buildPptx(L, outPath) {
 
   slideTitleDoNow(pptx, L);                                     // questions embedded — always
   slideDoNowAnswers(pptx, L);
+  // Lesson quality A: O7 objectives + key words. Review/revision/test lessons used an authored
+  // "Engage = objectives" slide before this existed: keep that one and don't add a second.
+  if (['standard', 'practical', 'annotation'].includes(type) || !L.engage) slideObjectives(pptx, L);
 
   if (type === 'standard' || type === 'practical' || type === 'annotation') {
     slideEngage(pptx, L);
@@ -4491,6 +4787,8 @@ async function buildPptx(L, outPath) {
   await pptx.writeFile({ fileName: outPath });
   const usesHandwriting = buildItems.some((b) => ['modelAnswerReview', 'correctTheStatement', 'markTheAnswers'].includes(b.type || b.variant));
   if (usesHandwriting) embedCaveatFont(outPath);                  // M2: embed Caveat so it survives on any machine
+  try { finishText(outPath); }                                  // key-word gold underline + answer yellow
+  catch (e) { buildWarn('key-word underline / answer yellow not applied: ' + e.message); }
   try { addRevealAnimations(outPath); }                           // 2026-10-03: answer boxes appear on click
   catch (e) { buildWarn('click animations not added: ' + e.message); }
   while (_tmpFiles.length) { try { fs.unlinkSync(_tmpFiles.pop()); } catch {} }
@@ -4643,7 +4941,7 @@ function answerBox(marks) {
    diagrams the questions refer to — never strip them out. */
 function diagramBox(label, lines) {
   const n = lines || 8;
-  const kids = [P(R(label || '[Diagram \u2014 teacher inserts]', { italic: true, size: 18, color: '777777' }), { alignment: AlignmentType.CENTER })]
+  const kids = [P(R(label || '[Diagram: teacher inserts]', { italic: true, size: 18, color: '777777' }), { alignment: AlignmentType.CENTER })]
     .concat(blanks(n));
   return [spacer(), fullTable([new TableRow({
     children: [cell({
@@ -4670,7 +4968,7 @@ function diagramOrImage(prac) {
       buildWarn(`worksheet diagram image failed to embed (${prac.embeddedImagePath}): ${e.message || e} — description box shipped instead`);
     }
   }
-  return diagramBox(prac.imageDescription || '[Equipment / apparatus diagram — teacher inserts]', 8); // M6: use imageDescription in fallback
+  return diagramBox(prac.imageDescription || '[Equipment / apparatus diagram: teacher inserts]', 8); // M6: use imageDescription in fallback
 }
 
 /* contextBox(text) */
@@ -5287,7 +5585,7 @@ function buildWorksheetChildren(L, mode) {
     ch.push(fullTable([new TableRow({
       children: [cell({
         w: PAGE_W, fill: NAVY, margins: { top: 80, bottom: 80, left: 160, right: 160 },
-        children: [P([R('MODEL ANSWERS', { bold: true, size: 26, color: GOLD }), R('  —  marking copy', { size: 22, color: 'FFFFFF' })])],
+        children: [P([R('MODEL ANSWERS', { bold: true, size: 26, color: GOLD }), R('  ·  marking copy', { size: 22, color: 'FFFFFF' })])],
       })],
     })], [PAGE_W]), spacer());
   }
@@ -5401,7 +5699,7 @@ function buildWorksheetChildren(L, mode) {
       const colW = [1300, 6806, 2000];
       const rowsE = [new TableRow({ children: ['Question', 'Follow-up task', 'Support pages'].map((h, i) => cell({ w: colW[i], fill: NAVY, borders: GREY_TBL, margins: { top: 60, bottom: 60, left: 80, right: 80 },
         children: [P(R(h, { bold: true, size: 20, color: 'FFFFFF' }))] })) })];
-      ebi.forEach((r, i) => rowsE.push(new TableRow({ children: [r.q || '', r.task || '', r.pages || ''].map((v, ci) => cell({ w: colW[ci], fill: i % 2 ? 'F5F5F5' : 'FFFFFF', borders: GREY_TBL,
+      ebi.forEach((r, i) => rowsE.push(new TableRow({ children: [r.q || '', r.task || '', pagesOnly(r.pages)].map((v, ci) => cell({ w: colW[ci], fill: i % 2 ? 'F5F5F5' : 'FFFFFF', borders: GREY_TBL,
         margins: { top: 40, bottom: 40, left: 80, right: 80 }, children: [P(R(prettyText(String(v)), { size: 19, bold: ci === 0 }))] })) })));
       ch.push(fullTable(rowsE, colW, GREY_TBL), spacer());
     }
@@ -5425,7 +5723,7 @@ function buildWorksheetChildren(L, mode) {
       ch.push(...divider(mode === 'answers' ? 'EXTENSION · ANSWERS' : 'EXTENSION'));
       if (mode !== 'answers') ch.push(P(R('Finished your 3 EBIs? Pick the subtopic you got wrong and answer in your book.', { size: 20, italics: true }), { spacing: { after: GAP_SM } }));
       cols.forEach((c) => {
-        ch.push(P([R(c.subtopic, { bold: true, size: 24, color: NAVY }), ...(c.pages ? [R('    Support: ' + c.pages, { size: 20, color: '555555' })] : [])], { spacing: { before: GAP_SM, after: GAP_XS }, keepNext: true }));
+        ch.push(P([R(c.subtopic, { bold: true, size: 24, color: NAVY }), ...(c.pages ? [R('    Support: ' + pagesOnly(c.pages), { size: 20, color: '555555' })] : [])], { spacing: { before: GAP_SM, after: GAP_XS }, keepNext: true }));
         c.qs.forEach((q) => {
           ch.push(P([R(q.label + '  ', { bold: true, size: 24 }), R(prettyText(q.q), { size: 24 }), ...(q.marks ? [R(`  [${q.marks} ${q.marks > 1 ? 'marks' : 'mark'}]`, { size: 20, color: '888888' })] : [])], { spacing: { before: GAP_SM, after: GAP_SM } }));
           if (mode === 'answers') ch.push(...plainAnswerCallout(q.a));
@@ -5626,8 +5924,11 @@ async function main() {
       if (L.doNow && L.doNow.auto && !arr(L.doNow.questions).length && fs.existsSync(dnPickPath)) {
         try {
           const cls = String((L.meta || {}).class || '').split(/[\/,]/)[0].trim();
-          const r = require(dnPickPath).pick(cls, { date: (L.meta || {}).date });
+          const r = require(dnPickPath).pick(cls, { date: (L.meta || {}).date, varyNumbers: L.doNow.varyNumbers !== false });
           L.doNow.questions = r.picked.map((p) => ({ q: p.q, a: p.a, marks: p.marks || 1 }));
+          // new numbers on a calculation (2026-10-15): say so in the presenter notes, never on the slide
+          const varied = r.picked.map((p, i) => (p.varied ? `Q${i + 1}: numbers changed from ${p.varied} (same wording, answer worked out again)` : null)).filter(Boolean);
+          if (varied.length) { L.doNow.specPoints = arr(L.doNow.specPoints).concat(varied); console.log('  [do now] ' + varied.join('; ')); }
           console.log(`  [do now] ${r.picked.length} picked for ${cls} (${r.picked.map((p) => p.why).join(', ')})`);
         } catch (e) { buildWarn('automatic Do Now not picked: ' + e.message); }
       }

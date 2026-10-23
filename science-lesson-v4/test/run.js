@@ -34,6 +34,8 @@ const FIXTURES = [
   'flow-native-test.json',    // Bug 54: native flow/cycle shapes (Learn-G/I) + Bug 58 image-description placeholder
   'maths-prose-test.json',    // 2026-10-03: maths shorthand in ordinary text, prose word swaps, MCQ abbreviations
   'triangle-handwriting-test.json', // 2026-10-02: 3- and 4-cell formula triangles, picture handwriting, EOT font embed, curved graph
+  'lesson-quality-test.json',  // 2026-10-19 Lesson quality A: {k} gold underline, answer yellow, objectives slide, exam wording, misconception, notes, MCQ CHECK
+  'dual-coding-test.json',     // 2026-10-23 Part B: Learn L labelled picture (build one part at a time + all-labels slide)
 ];
 
 // Strings the RENDERER must never emit (terminology + font-glyph regressions).
@@ -533,13 +535,23 @@ async function main() {
         // 2026-10-12 redesign: question picture from the paper, mark highlights, MCQ letter,
         // no purple-pen bar on whole-paper review slides, mark tags never leak as text.
         const slides = new AdmZip(pptx).getEntries().filter((e) => /^ppt\/slides\/slide\d+\.xml$/.test(e.entryName)).map((e) => e.getData().toString('utf8'));
-        const maSlide = slides.find((x) => x.includes('Q3(a)(iii)'));
+        const maSlide = slides.find((x) => x.includes('3(a)(iii)') && x.includes('MODEL ANSWER'));
         if (maSlide && maSlide.includes('<p:pic>')) pass('model answer slide: question picture from the paper embedded');
         else fail('model answer slide: question picture (snippet) not embedded');
         if (maSlide && maSlide.includes('FFF176') && />1<\/a:t>/.test(maSlide)) pass('model answer slide: mark 1 highlighted + numbered');
         else fail('model answer slide: mark highlight / numbered circle missing');
-        if (maSlide && maSlide.includes('CHALLENGE ONLY')) pass('two-paper test: slide says which paper the question is on');
-        else fail('two-paper test: "CHALLENGE ONLY" label missing on the model answer slide');
+        if (maSlide && maSlide.includes('Challenge paper Question') && maSlide.includes('not on the Core paper')) pass('two-paper test: slide says in plain words which paper the question is on');
+        else fail('two-paper test: "Challenge paper Question ... (not on the Core paper)" label missing on the model answer slide');
+        // 2026-10-15: support pages say "p. 142", never a spread code like "C6.2 p.142"
+        if (!slides.some((x) => /[BCP]\d+\.\d+ p\./.test(x)) && slides.some((x) => x.includes('p. 142')) && slides.some((x) => x.includes('pp. 142–143'))) pass('support pages show page numbers only (no C6.2-style codes)');
+        else fail('support pages still show spread codes like "C6.2 p.142" (or the page numbers went missing)');
+        // 2026-10-15: six highlight colours, neighbours never alike; bigger plain-words question bar
+        const hiSrc = fs.readFileSync(path.join(ROOT, 'science-lesson', 'references', 'build.js'), 'utf8').match(/const MARK_HI = \[([^\]]+)\]/);
+        const hi = hiSrc ? hiSrc[1].match(/[0-9A-F]{6}/g) : [];
+        if (hi.length === 6 && new Set(hi).size === 6) pass('six different mark highlight colours');
+        else fail(`mark highlight colours: expected 6 different, found ${hi.length}`);
+        if (maSlide && /MODEL ANSWER/.test(maSlide) && /sz="1700"/.test(maSlide)) pass('model answer question bar is the bigger 17pt one');
+        else fail('model answer question bar is not 17pt');
         if (slides.some((x) => x.includes('CORE PAPER') && x.includes('CHALLENGE PAPER') && x.includes('CORRECT 3 EBIs'))) pass('EBI slide: one table per paper');
         else fail('EBI slide: Core / Extend tables missing');
         if (slides.some((x) => x.includes('QUICK ANSWERS') && x.includes('Purple pen time'))) fail('review quick answers still carry the purple-pen bar');
@@ -594,6 +606,77 @@ async function main() {
         else fail('"100 metres in 12 seconds" / "I times R" no longer converted in the Apply question');
       }
     }
+    if (fixture === 'lesson-quality-test.json') {
+      const pptx = fs.readdirSync(outDir).find(n => n.endsWith('.pptx'));
+      const z = new AdmZip(path.join(outDir, pptx));
+      const slides = z.getEntries().filter(e => /^ppt\/slides\/slide\d+\.xml$/.test(e.entryName))
+        .map(e => ({ n: +e.entryName.match(/(\d+)\.xml$/)[1], x: e.getData().toString('utf8') })).sort((a, b) => a.n - b.n);
+      const all = slides.map(s => s.x).join('');
+      const s3 = (slides.find(s => s.n === 3) || {}).x || '';
+      if (/LEARNING OBJECTIVES/.test(s3) && /WORDS YOU KNOW/.test(s3) && /WORDS FOR THIS LESSON/.test(s3)) pass('objectives slide straight after the Do Now answers (known words + lesson words)');
+      else fail('slide 3 is not the new objectives slide with WORDS YOU KNOW / WORDS FOR THIS LESSON');
+      if (/<a:uFill><a:solidFill><a:srgbClr val="F9A825"\/><\/a:solidFill><\/a:uFill><a:latin/.test(all)) pass('key words have a gold underline (uFill before latin)');
+      else fail('no gold underline on {k} key words');
+      if (/\{k\}|\{\/k\}|en-001/.test(all)) fail('raw {k} tag or en-001 marker left in the slides'); else pass('no raw {k} tags in the slides');
+      for (const f of fs.readdirSync(outDir).filter(n => n.endsWith('.docx'))) {
+        if (/\{k\}|\{\/k\}/.test(readArchiveXml(path.join(outDir, f)))) fail(`${f}: raw {k} tag on the worksheet`); else pass(`${f}: no raw {k} tags`);
+      }
+      const ans = slides.filter(s => /<a:srgbClr val="FFD60A"/.test(s.x));
+      if (ans.length && ans.every(s => !/<p:sp>(?:(?!<\/p:sp>)[\s\S])*<a:solidFill><a:srgbClr val="0D1B5E"\/>(?:(?!<\/p:sp>)[\s\S])*<a:srgbClr val="FABB2E"\/>(?:(?!<\/p:sp>)[\s\S])*<\/p:sp>/.test('') )) pass(`answer boxes use the new yellow (${ans.length} slides)`);
+      else fail('no answer box uses the new yellow FFD60A');
+      if (ans.some(s => /<p:timing/.test(s.x))) pass('yellow answer boxes still appear on click'); else fail('yellow answer boxes lost their click animation');
+      if (/LEARN THIS WORDING/.test(all) && /AQA: asked 7 times/.test(all)) pass('exam definition box with "asked 7 times"'); else fail('exam definition box missing');
+      if (/Not quite/.test(all) && /Actually/.test(all) && /strike="sngStrike"/.test(all)) pass('misconception box (Not quite, crossed out → Actually)'); else fail('misconception box missing');
+      const notes = z.getEntries().filter(e => /^ppt\/notesSlides\/notesSlide\d+\.xml$/.test(e.entryName)).map(e => e.getData().toString('utf8')).join('');
+      if (/atomos/.test(notes) && /plain version here/.test(notes)) pass('Learn notes reach the speaker notes'); else fail('Learn notes missing from the speaker notes');
+      if (/MCQ CHECK · question 6: [^\n]*no "why" for wrong option D/.test(output) && !/MCQ CHECK · question [1-5]:/.test(output)) pass('MCQ CHECK flags only the weak question (no "why" for D)');
+      else fail('MCQ CHECK did not flag exactly the weak question 6');
+    }
+
+    if (fixture === 'dual-coding-test.json') {
+      const pptx = fs.readdirSync(outDir).find(n => n.endsWith('.pptx'));
+      const z = new AdmZip(path.join(outDir, pptx));
+      const slides = z.getEntries().filter(e => /^ppt\/slides\/slide\d+\.xml$/.test(e.entryName))
+        .map(e => ({ n: +e.entryName.match(/(\d+)\.xml$/)[1], x: e.getData().toString('utf8') })).sort((a, b) => a.n - b.n);
+      const cell = slides.filter(s => /LEARN · THE ANIMAL CELL/.test(s.x)), copy = slides.filter(s => /LEARN · COPY THE CELL/.test(s.x));
+      if (cell.length === 4 && copy.length === 1) pass('Learn L: 3 labels built one at a time + the all-labels slide; build:false = one slide');
+      else fail(`Learn L slide count: ${cell.length} build + ${copy.length} plain (want 4 + 1)`);
+      if (cell[0] && /FFD60A/.test(cell[0].x) && /9E9E9E/.test(cell[0].x) && !/FFD60A/.test(cell[3].x)) pass('Learn L: current part ringed in yellow, others grey; last slide plain');
+      else fail('Learn L: yellow ring / grey labels not as designed');
+      // every line ends exactly on its point: the point = picture box + label fraction (EMU, 914400 a inch)
+      const lessonJson = JSON.parse(fs.readFileSync(path.join(ROOT, fixture), 'utf8'));
+      const labels = (Array.isArray(lessonJson) ? lessonJson[0] : lessonJson).learn[0].labels;
+      const ends = (x) => [...x.matchAll(/<p:sp>((?:(?!<\/p:sp>)[\s\S])*?prst="line"(?:(?!<\/p:sp>)[\s\S])*?)<\/p:sp>/g)].map(m => {
+        const t = m[1], fx = /flipH="1"/.test(t), fy = /flipV="1"/.test(t);
+        const [, ox, oy] = t.match(/<a:off x="(-?\d+)" y="(-?\d+)"/), [, cx, cy] = t.match(/<a:ext cx="(\d+)" cy="(\d+)"/);
+        const a = { x: +ox + (fx ? +cx : 0), y: +oy + (fy ? +cy : 0) }, b = { x: +ox + (fx ? 0 : +cx), y: +oy + (fy ? 0 : +cy) };
+        return [a, b];
+      }).flat();
+      let worst = 0;
+      for (const s of cell) {
+        const p = s.x.match(/<p:pic>(?:(?!<\/p:pic>)[\s\S])*?<a:off x="(\d+)" y="(\d+)"\/>\s*<a:ext cx="(\d+)" cy="(\d+)"/);
+        if (!p) { worst = Infinity; break; }
+        const e = ends(s.x);
+        for (const l of labels) {
+          const pt = { x: +p[1] + l.x * +p[3], y: +p[2] + l.y * +p[4] };
+          worst = Math.max(worst, Math.min(...e.map(q => Math.hypot(q.x - pt.x, q.y - pt.y))));
+        }
+      }
+      if (worst < 9144) pass(`Learn L: every line ends on its point (worst ${(worst / 914400).toFixed(3)} in)`);
+      else fail(`Learn L: a line misses its point by ${(worst / 914400).toFixed(3)} in`);
+      if (z.getEntries().some(e => /^ppt\/media\/.+\.png$/.test(e.entryName))) pass('Learn L: the picture is embedded'); else fail('Learn L: picture not embedded');
+      // labels never overlap: 7 labels crowded on one side, every one open in turn
+      const lp = require(path.join(ROOT, 'science-lesson', 'references', 'learn-pictures.js'));
+      const many = Array.from({ length: 7 }, (_, i) => ({ x: 0.2, y: 0.4 + i * 0.02 }));
+      const area = { x: 0.45, y: 1.2, w: 12.43, h: 5.8 }, box = { x: 3.5, y: 1.3, w: 6, h: 5.5 };
+      let clash = '';
+      for (let open = -1; open < many.length; open++) {
+        const r = lp.layout(many, box, area, open).map(o => o.rect).sort((a, b) => a.y - b.y);
+        r.forEach((q, i) => { if (i && q.y < r[i - 1].y + r[i - 1].h - 1e-6) clash = 'overlap with label ' + open + ' open'; if (q.y < area.y - 1e-6 || q.y + q.h > area.y + area.h + 1e-6) clash = 'outside the slide'; });
+      }
+      if (!clash) pass('Learn L: 7 crowded labels never overlap and stay on the slide'); else fail('Learn L labels: ' + clash);
+    }
+
     if (fixture === 'flow-native-test.json') {
       const pptx = path.join(outDir, baseName(lessons[0].meta) + '.pptx');
       if (!fs.existsSync(pptx)) { fail('flow-native pptx missing'); }
@@ -723,6 +806,22 @@ async function main() {
   hardFails += topicTest.fails;
   warnings  += topicTest.warns;
 
+  // Test-review lessons: paper order and one highlight per mark (review-check.js, 2026-10-15).
+  console.log('');
+  const rcTest = require(path.join(__dirname, 'review-check.test.js')).run();
+  hardFails += rcTest.fails;
+
+  // Do Now calculations: new numbers, same words, answer worked out again (do-now-vary.js, 2026-10-15).
+  console.log('');
+  const dvTest = require(path.join(__dirname, 'do-now-vary.test.js')).run();
+  hardFails += dvTest.fails;
+
+  // A rebuilt lesson keeps the exam question it got first (exam-pick.js, 2026-10-15).
+  console.log('');
+  const keepTest = require(path.join(__dirname, 'exam-pick-keep.test.js')).run();
+  hardFails += keepTest.fails;
+  warnings  += keepTest.warns;
+
   // The A-level exam reader keeps pictures, tables and multiple-choice letters (exam-library-ocr.js).
   console.log('');
   const ocrTest = require(path.join(__dirname, 'exam-library-ocr.test.js')).run();
@@ -738,6 +837,9 @@ async function main() {
   console.log('');
   const mwTest = require(path.join(__dirname, 'mcq-written.test.js')).run();
   hardFails += mwTest.fails;
+
+  // Spaced homework from class results (learning loop M6, 2026-10-22).
+  hardFails += require(path.join(__dirname, 'spaced-homework.test.js')).run().fails;
 
   // Exam practice homework papers (test-paper.js).
   console.log('');
