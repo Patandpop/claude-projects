@@ -883,12 +883,13 @@ function renderChips() {
 }
 $('chips').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; if (b.id === 'more') return classSheet(); pickClass(b.dataset.cls); });
 function pickClass(c) { if (c === S.cls) return; S.sel = []; $('selbar').classList.add('hidden'); $('search').value = ''; loadClass(c); }
+let ULHU = null;   // the Ulhu screen, made the first time its tab opens
 function setTab(t) {
   S.tab = t;
   [['log','tLog','vLog'],['day','tDay','vDay'],['fri','tFri','vFri'],['ulhu','tUlhu','vUlhu']].forEach(([k, b, v]) => { $(b).setAttribute('aria-pressed', t === k); $(v).classList.toggle('hidden', t !== k); });
   $('chips').classList.toggle('hidden', t === 'fri' || t === 'ulhu');
   $('clsTitle').textContent = t === 'fri' ? 'Friday' : t === 'ulhu' ? 'Ulhu' : S.cls;
-  if (t === 'ulhu' && !$('ulhu').firstChild) GameUI.mount($('ulhu'), call, { wide: false });
+  if (t === 'ulhu') { window.scrollTo(0, 0); if (!$('ulhu').firstChild) ULHU = GameUI.mount($('ulhu'), call, { wide: false }); else if (ULHU) setTimeout(ULHU.refit, 30); }
   renderSilence();
   if (t === 'log') renderStudents(); if (t === 'day') renderDay(); if (t === 'fri') loadFriday();
 }

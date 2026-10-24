@@ -5,7 +5,7 @@
    Lives in the planner's own Apps Script project and Google Sheet. No triggers (the day rolls over lazily
    inside gameLoad), no paid service, nothing on Drive. Every public function starts with check_(k).
    Words not symbols in sheet cells (a cell that starts + - = turns into a formula): polarity is
-   plus / minus / both. ULHU_ART (the sprites) comes from game-art.js, joined in by bundle.js.
+   plus / minus / both. The pictures live on the page (game-ulhu.js, game-pixel.js); the server sends none.
    ============================================================================ */
 
 const GAME = {
@@ -13,22 +13,23 @@ const GAME = {
   maxHp: 50,
   base: { 5: 3, 15: 6, 30: 10, 60: 16, 120: 25 },          // doubloons and XP by minutes (pay grows slower than time)
   mult: { necessary: 1, ahead: 1.5, external: 3, life: 2 },  // what kind of job it is
-  hpLoss: { 5: 2, 15: 4, 30: 6, 60: 8, 120: 12 },            // a bad habit costs health, never doubloons
+  hpLoss: { 5: 2, 15: 4, 30: 6, 60: 9, 120: 12 },            // a bad habit costs health, never doubloons
   lifeFirst: 5, lifeThree: 15,                               // life bonus: first life goal of the day, then three or more
   streakStep: 0.1, streakCap: 0.3,                           // +10% per 7 days, capped at +30%
 };
 const G_HEAD = {
   player: ['Setting', 'Value'],
-  goals: ['id', 'name', 'kind', 'polarity', 'days', 'everyN', 'minutes', 'track', 'auto', 'value', 'streak', 'best', 'lastDone', 'private', 'sittings', 'sitDone', 'due', 'archived', 'created'],
+  goals: ['id', 'name', 'kind', 'polarity', 'days', 'everyN', 'minutes', 'track', 'auto', 'value', 'streak', 'best', 'lastDone', 'private', 'sittings', 'sitDone', 'due', 'archived', 'created', 'grp', 'steps'],
   ticks: ['id', 'at', 'day', 'goalId', 'delta', 'coins', 'xp', 'hp', 'auto', 'ref', 'note'],
   freeze: ['day', 'reason', 'savedOn'],
   seen: ['lesson', 'built', 'firstBuiltOn'],
   owned: ['itemId', 'boughtOn', 'price', 'slot'],
   bosses: ['id', 'name', 'maxHp', 'stages', 'reward', 'startedOn', 'status', 'beatenOn'],
   reviews: ['week', 'wentWell', 'slipped', 'p1', 'p2', 'p3', 'savedOn'],
+  hoard: ['id', 'name', 'cost', 'claims', 'archived', 'created'],
 };
 const G_DAYF = ['day', 'lastDone', 'due', 'created', 'firstBuiltOn', 'savedOn', 'boughtOn', 'startedOn', 'beatenOn', 'week'];
-const G_TAB = { player: 'Game Player', goals: 'Game Goals', ticks: 'Game Ticks', freeze: 'Game Freeze', seen: 'Game Seen', owned: 'Game Owned', bosses: 'Game Bosses', reviews: 'Game Reviews' };
+const G_TAB = { player: 'Game Player', goals: 'Game Goals', ticks: 'Game Ticks', freeze: 'Game Freeze', seen: 'Game Seen', owned: 'Game Owned', bosses: 'Game Bosses', reviews: 'Game Reviews', hoard: 'Game Hoard' };
 
 /* ---- time: test-friendly (GAME_NOW is set only by tests), all days are London yyyy-MM-dd text ---- */
 function gNow_() { return (typeof GAME_NOW !== 'undefined' && GAME_NOW) ? new Date(GAME_NOW) : new Date(); }
@@ -39,7 +40,12 @@ function gDiff_(a, b) { const f = (k) => { const p = k.split('-').map(Number); r
 function gMonday_(key) { return gAdd_(key, 1 - gDow_(key)); }
 
 /* ---- sheet access ---- */
-function gTab_(t) { return tab_(G_TAB[t], G_HEAD[t]); }
+const G_HEADOK = {};
+function gTab_(t) {
+  const sh = tab_(G_TAB[t], G_HEAD[t]);
+  if (!G_HEADOK[t]) { G_HEADOK[t] = true; const n = G_HEAD[t].length; if (sh.getLastColumn() < n) sh.getRange(1, 1, 1, n).setValues([G_HEAD[t]]); }
+  return sh;
+}
 function gRows_(t) {
   const sh = gTab_(t), n = sh.getLastRow() - 1;
   if (n < 1) return [];
@@ -50,7 +56,7 @@ function gRows_(t) {
 function gAppend_(t, o) { gTab_(t).appendRow(G_HEAD[t].map((h) => (o[h] === undefined ? '' : o[h]))); }
 function gSet_(t, row, field, v) { gTab_(t).getRange(row, G_HEAD[t].indexOf(field) + 1).setValue(v); }
 function gPlayer_() {
-  const p = { coins: 0, xp: 0, level: 1, hp: GAME.maxHp, maxHp: GAME.maxHp, lastDay: '', deaths: 0, seeded: '', diedDay: '', levelUpDay: '', frozenOk: '' };
+  const p = { coins: 0, xp: 0, level: 1, hp: GAME.maxHp, maxHp: GAME.maxHp, lastDay: '', deaths: 0, seeded: '', diedDay: '', levelUpDay: '', frozenOk: '', groups: '', wear: '' };
   gRows_('player').forEach((r) => { const v = r.Value; p[r.Setting] = (typeof p[r.Setting] === 'number') ? Number(v) : String(v === undefined ? '' : v); });
   return p;
 }
@@ -95,6 +101,14 @@ function gPay_(goal, todayTicks, goalsById) {
   }
   return { coins: core + bonus, xp: core, bonus };
 }
+function gBlessAmt_(g) { return Math.max(2, Math.round((GAME.base[Number(g.minutes) || 15] || 6) / 2)); }
+function gBlessings_(goals) { return goals.filter((g) => g.kind === 'habit' && g.polarity !== 'minus').sort((a, b) => (a.id < b.id ? -1 : 1)); }
+function gFeatured_(goals, today) { const b = gBlessings_(goals); return b.length ? b[gDiff_('2026-01-01', today) % b.length].id : ''; }
+function gBlessCount_(goals, todayTicks) { const ids = {}; gBlessings_(goals).forEach((g) => { ids[g.id] = true; }); return todayTicks.filter((t) => ids[t.goalId]).reduce((a, t) => a + Number(t.delta), 0); }
+function gBlessPay_(g, goals, todayTicks, today) {
+  const amt = gBlessAmt_(g) * (gFeatured_(goals, today) === g.id ? 2 : 1), chain = (gBlessCount_(goals, todayTicks) + 1) % 8 === 0 ? 10 : 0;
+  return { coins: amt + chain, xp: amt * 2, bonus: chain };
+}
 function gHpLoss_(goal) { return GAME.hpLoss[Number(goal.minutes) || 15] || 4; }
 
 function gAddXp_(p, xp, today) {
@@ -111,7 +125,7 @@ function gTakeXp_(p, xp) {
 // 0 HP: level -1 (never below 1), XP to the start of that level, minus the doubloons earned in the last 7 days.
 function gDie_(p, today, ticks) {
   const since = gAdd_(today, -7);
-  const earned = ticks.filter((t) => String(t.day) > since && t.coins > 0).reduce((a, t) => a + Number(t.coins), 0);
+  const earned = ticks.filter((t) => String(t.day) > since && t.coins > 0 && !/^(buy|hoard)\|/.test(String(t.goalId))).reduce((a, t) => a + Number(t.coins), 0);
   const lost = Math.min(p.coins, earned);
   p.level = Math.max(1, p.level - 1); p.xp = 0; p.coins -= lost; p.hp = p.maxHp; p.deaths++; p.diedDay = today;
   return { lost, level: p.level };
@@ -122,7 +136,8 @@ function gGoals_() {
   return gRows_('goals').filter((g) => String(g.archived) !== 'true' && g.archived !== true).map((g) => {
     g.minutes = Number(g.minutes) || 15; g.value = Number(g.value) || 0; g.streak = Number(g.streak) || 0; g.best = Number(g.best) || 0;
     g.everyN = Number(g.everyN) || 0; g.sittings = Number(g.sittings) || 0; g.sitDone = Number(g.sitDone) || 0;
-    g.private = String(g.private) === 'true'; g.lastDone = String(g.lastDone || ''); g.due = String(g.due || ''); g.days = String(g.days || '');
+    g.private = String(g.private) === 'true'; g.lastDone = String(g.lastDone || ''); g.due = String(g.due || ''); g.days = String(g.days || ''); g.grp = String(g.grp || '');
+    try { g.steps = g.steps ? JSON.parse(g.steps) : []; } catch (e) { g.steps = []; }
     return g;
   });
 }
@@ -148,7 +163,7 @@ function gTick_(g, delta, auto, ref, note) {
     if (p.hp <= 0) out.died = gDie_(p, today, ticks);
     if (g.row) gSet_('goals', g.row, 'value', Math.max(-5, g.value - 1));
   } else {
-    const pay = g.kind === 'ghost' ? gPay_(g, gTicksToday_(ticks, today), byId) : gPay_(g, gTicksToday_(ticks, today), byId);
+    const pay = g.kind === 'habit' ? gBlessPay_(g, goals, gTicksToday_(ticks, today), today) : gPay_(g, gTicksToday_(ticks, today), byId);
     out.coins = pay.coins; out.xp = pay.xp; p.coins += pay.coins; out.up = gAddXp_(p, pay.xp, today);
     out.hp = Math.min(1, p.maxHp - p.hp); p.hp = Math.min(p.maxHp, p.hp + 1);
     if (g.row && g.kind !== 'ghost') {
@@ -283,13 +298,14 @@ function gSeed_(world, today) {
 function gSnapshot_(world, extra) {
   const today = gDay_(gNow_()), p = gPlayer_(), goals = gGoals_(), ticks = gRows_('ticks'), frozen = gFrozenDays_();
   const byId = {}; goals.forEach((g) => { byId[g.id] = g; });
-  const todayTicks = gTicksToday_(ticks, today), fz = gIsFrozen_(today, world, frozen);
+  const todayTicks = gTicksToday_(ticks, today), fz = gIsFrozen_(today, world, frozen), feat = gFeatured_(goals, today);
   const view = goals.map((g) => {
     const net = gNet_(ticks, g.id, today), pay = gPay_(g, todayTicks, byId);
     const o = { id: g.id, name: g.name, kind: g.kind, polarity: g.polarity, minutes: g.minutes, track: g.track, auto: g.auto, value: g.value, streak: g.streak, private: g.private,
-      days: g.days, everyN: g.everyN, pay: pay.coins, hpLoss: g.kind === 'habit' ? gHpLoss_(g) : 0, doneToday: net > 0, count: net };
+      days: g.days, everyN: g.everyN, pay: pay.coins, hpLoss: g.kind === 'habit' ? gHpLoss_(g) : 0, doneToday: net > 0, count: net, grp: g.grp || gDefGrp_(g), steps: g.steps };
+    if (g.kind === 'habit' && g.polarity !== 'minus') { o.featured = feat === g.id; o.pay = gBlessAmt_(g) * (o.featured ? 2 : 1); }
+    if (g.kind === 'todo') { o.due = g.due; o.doneOn = g.lastDone; o.dueToday = !g.lastDone || gDiff_(g.lastDone, today) <= 14; }
     if (g.kind === 'daily') o.dueToday = gIsDue_(g, today);
-    if (g.kind === 'todo') o.dueToday = !g.lastDone || g.lastDone === today;
     if (g.kind === 'termly') { o.sittings = g.sittings; o.sitDone = g.sitDone; o.due = g.due; o.daysLeft = g.due ? gDiff_(today, g.due) : null; o.dueToday = g.sitDone < g.sittings || g.lastDone === today; o.pay = gPay_(Object.assign({}, g, { track: g.track || 'necessary' }), todayTicks, byId).coins; }
     return o;
   });
@@ -300,11 +316,19 @@ function gSnapshot_(world, extra) {
   else if (fz || gNow_().getHours() >= 21 && !(typeof GAME_NOW !== 'undefined' && GAME_NOW)) mood = 'sleepy';
   else if (p.levelUpDay === today || (dueNec.length && dueNec.every((v) => v.doneToday))) mood = 'proud';
   else if (todayTicks.some((t) => t.delta > 0)) mood = 'happy';
-  const summoned = gLessonsAhead_(world, today).filter((L) => !L.built).slice(0, 8).map((L) => ({ name: L.name, date: L.date, ahead: L.ahead }));
-  const owned = gRows_('owned'), room = {}; owned.forEach((r) => { if (r.slot) room[r.slot] = r.itemId; });
+  const ahead = gLessonsAhead_(world, today);
+  const summoned = ahead.slice(0, 10).map((L) => ({ name: L.name, date: L.date, ahead: L.ahead, built: L.built }));
+  // Tide Charts: 1 = the next lesson is built, 2 = everything this coming week, 3 = two weeks ahead
+  const allBuilt = (days) => ahead.filter((L) => L.date <= gAdd_(today, days)).every((L) => L.built);
+  const tide = !ahead.length ? 0 : !ahead[0].built ? 0 : !allBuilt(7) ? 1 : !allBuilt(14) ? 2 : 3;
+  const mon = gMonday_(today), weekCoins = ticks.filter((t) => String(t.day) >= mon && Number(t.coins) > 0 && !/^(buy|hoard)\|/.test(String(t.goalId))).reduce((a, t) => a + Number(t.coins), 0);
+  const wearRows = gRows_('owned').filter((r) => String(r.itemId).indexOf('w:') === 0);
+  const owned = gRows_('owned').filter((r) => String(r.itemId).indexOf('w:') !== 0), room = {}; owned.forEach((r) => { if (r.slot) room[r.slot] = r.itemId; });
   const bosses = gBosses_(today), review = gReviewCard_(today, ticks, goals, bosses);
-  return gOut_(Object.assign({ bosses, review, room, owned: owned.map((r) => r.itemId), player: { coins: p.coins, xp: p.xp, level, need: gNeed_(level), hp: p.hp, maxHp: p.maxHp, deaths: p.deaths, coinName: GAME.coin }, mood, today, frozen: fz,
-    goals: view, summoned, table: { base: GAME.base, mult: GAME.mult }, art: (typeof ULHU_ART !== 'undefined') ? ULHU_ART : {} }, extra || {}));
+  const hoard = gRows_('hoard').filter((h) => String(h.archived) !== 'true').map((h) => ({ id: h.id, name: h.name, cost: Number(h.cost) || 0, claims: Number(h.claims) || 0 }));
+  return gOut_(Object.assign({ bosses: bosses.filter((b) => b.status === 'active'), beaten: gBeaten_(), review, room, owned: owned.map((r) => r.itemId), player: { coins: p.coins, xp: p.xp, level, need: gNeed_(level), hp: p.hp, maxHp: p.maxHp, deaths: p.deaths, coinName: GAME.coin }, mood, today, frozen: fz,
+    goals: view, summoned, tide, weekCoins, groups: gGroups_(p), hoard, wear: gWearState_(p, wearRows), freezes: gFreezesAhead_(world, today, frozen), blessCount: gBlessCount_(goals, todayTicks), hour: Number(Utilities.formatDate(gNow_(), TZ, 'H')),
+    table: { base: GAME.base, mult: GAME.mult, hpLoss: GAME.hpLoss } }, extra || {}));
 }
 // what goes back to the page is plain JSON (a Date or NaN inside makes Apps Script send back null)
 function gOut_(o) { return JSON.parse(JSON.stringify(o)); }
@@ -332,6 +356,7 @@ function gameTick(k, id, delta) {
     const today = gDay_(gNow_());
     if (delta < 0 && g.kind !== 'habit') { bad = 'Only a bad habit takes health.'; return; }
     if (delta > 0 && g.kind !== 'habit' && g.kind !== 'termly' && gNet_(gRows_('ticks'), g.id, today) > 0) { res = { already: true }; return; }
+    if (delta > 0 && g.kind === 'todo' && g.lastDone) { res = { already: true }; return; }
     if (g.kind === 'termly' && g.sitDone >= g.sittings) { res = { already: true }; return; }
     res = gTick_(g, delta < 0 ? -1 : 1, false, '');
   });
@@ -351,6 +376,7 @@ function gameUntick(k, id) {
     p.coins = Math.max(0, p.coins - c); gTakeXp_(p, x); p.hp = Math.max(1, Math.min(p.maxHp, p.hp - h));
     let prev = {}; try { prev = JSON.parse(t.note || '{}').prev || {}; } catch (e) { prev = {}; }
     if (g.kind === 'termly') gSet_('goals', g.row, 'sitDone', Math.max(0, g.sitDone - 1));
+    else if (g.kind === 'todo') gSet_('goals', g.row, 'lastDone', '');
     else if (g.kind !== 'habit' && prev.s !== undefined) { gSet_('goals', g.row, 'streak', prev.s); gSet_('goals', g.row, 'value', prev.v); gSet_('goals', g.row, 'lastDone', prev.ld || ''); }
     gAppend_('ticks', { id: Utilities.getUuid().slice(0, 8), at: now.toISOString(), day: today, goalId: id, delta: -1, coins: -c, xp: -x, hp: -h, auto: '', ref: '', note: JSON.stringify({ untick: t.id, name: g.name }) });
     gSavePlayer_(p);
@@ -359,6 +385,7 @@ function gameUntick(k, id) {
 }
 function gameSaveGoal(k, goal) {
   check_(k);
+  let savedId = '';
   withLock_(function () {
     const today = gDay_(gNow_()), name = String(goal.name || '').trim().slice(0, 80);
     if (!name) throw new Error('Give the ritual a name.');
@@ -369,12 +396,15 @@ function gameSaveGoal(k, goal) {
     const rec = { id: old ? old.id : 'g' + Utilities.getUuid().slice(0, 7), name, kind, polarity: ['plus', 'minus', 'both'].indexOf(goal.polarity) >= 0 ? goal.polarity : (kind === 'habit' ? 'minus' : 'plus'),
       days: String(goal.days || '').replace(/[^1-7]/g, ''), everyN: Number(goal.everyN) || '', minutes, track, auto: old ? old.auto : '', value: old ? old.value : 0, streak: old ? old.streak : 0, best: old ? old.best : 0,
       lastDone: old ? old.lastDone : '', private: goal.private ? 'true' : '', sittings: kind === 'termly' ? (Number(goal.sittings) || 1) : '', sitDone: old ? old.sitDone : (kind === 'termly' ? 0 : ''),
-      due: String(goal.due || ''), archived: '', created: old ? old.created : today };
+      due: String(goal.due || ''), archived: '', created: old ? old.created : today, grp: String(goal.grp || '').slice(0, 40),
+      steps: kind === 'todo' ? JSON.stringify((goal.steps || []).map((x) => ({ t: String(x.t || '').slice(0, 80), d: !!x.d })).filter((x) => x.t).slice(0, 12)) : '' };
+    if (kind === 'todo' && rec.due && !/^\d{4}-\d{2}-\d{2}$/.test(rec.due)) rec.due = '';
     if (kind === 'daily' && !rec.days && !rec.everyN) rec.days = '12345';
     if (old) G_HEAD.goals.forEach((h, j) => { if (String(old[h]) !== String(rec[h])) gSet_('goals', old.row, h, rec[h]); });
     else gAppend_('goals', rec);
+    savedId = rec.id;
   });
-  return gSnapshot_(gWorld_());
+  return gSnapshot_(gWorld_(), { saved: savedId });
 }
 // back = true un-archives it again (the Undo button)
 function gameArchive(k, id, back) {
@@ -485,20 +515,23 @@ function gBosses_(today) {
     let st = []; try { st = JSON.parse(b.stages || '[]'); } catch (e) { st = []; }
     const maxHp = Number(b.maxHp) || 100, dealt = st.reduce((a, x) => a + (x.done ? (x.late ? x.dmg / 2 : x.dmg) : 0), 0);
     let reward = {}; try { reward = JSON.parse(b.reward || '{}'); } catch (e) { reward = {}; }
-    return { id: b.id, name: b.name, maxHp, hp: Math.max(0, Math.round(maxHp - dealt)), status: b.status, reward: reward.coins || 0, trophy: reward.trophy || '',
+    return { id: b.id, name: b.name, maxHp, hp: b.status === 'beaten' ? 0 : Math.max(0, Math.round(maxHp - dealt)), status: b.status, reward: reward.coins || 0, trophy: reward.trophy || '', size: reward.size || 5, creature: reward.k || '',
       stages: st.map((x, i) => ({ i, name: x.name, due: x.due, done: x.done || '', late: !!x.late, overdue: !x.done && x.due && x.due < today })) };
   });
 }
 function gameBossStart(k, boss) {
   check_(k);
+  let newId = '';
   withLock_(function () {
     const today = gDay_(gNow_()), name = String(boss.name || '').trim().slice(0, 80);
     const stages = (boss.stages || []).map((x) => ({ name: String(x.name || '').trim().slice(0, 80), due: /^\d{4}-\d{2}-\d{2}$/.test(String(x.due)) ? x.due : '' })).filter((x) => x.name);
-    if (!name || stages.length < 2) throw new Error('A boss needs a name and at least two stages.');
+    if (!name || stages.length < 1) throw new Error('A boss needs a name and at least one stage.');
     const each = Math.round(100 / stages.length); stages.forEach((x, i) => { x.dmg = i === stages.length - 1 ? 100 - each * (stages.length - 1) : each; x.done = ''; });
-    gAppend_('bosses', { id: 'b' + Utilities.getUuid().slice(0, 7), name, maxHp: 100, stages: JSON.stringify(stages), reward: JSON.stringify({ coins: Math.max(100, Math.min(300, Number(boss.reward) || 200)), trophy: 'Trophy: ' + name }), startedOn: today, status: 'active', beatenOn: '' });
+    const size = [2, 5, 10, 20].indexOf(Number(boss.size)) >= 0 ? Number(boss.size) : 5, k = /^[a-z]{2,8}$/.test(String(boss.k || '')) ? boss.k : G_BOSS[size].k;
+    newId = 'b' + Utilities.getUuid().slice(0, 7);
+    gAppend_('bosses', { id: newId, name, maxHp: 100, stages: JSON.stringify(stages), reward: JSON.stringify({ coins: G_BOSS[size].gold, trophy: 'Trophy: ' + name, size, k }), startedOn: today, status: 'active', beatenOn: '' });
   });
-  return gSnapshot_(gWorld_());
+  return gSnapshot_(gWorld_(), { newBoss: newId });
 }
 function gameBossStage(k, id, i, on) {
   check_(k);
@@ -562,4 +595,151 @@ function gameReview(k, rv) {
     }
   });
   return gSnapshot_(gWorld_(), { reviewPaid: paid });
+}
+
+
+/* ---------------------------------------------------------------- redesign (Claude Design handoff, 2026-10-24)
+   Groups that fold (Teaching / Life and his own), quests with a checklist and a due date, blessings, bosses sized by
+   hours, Ulhu's wardrobe, the Hoard (real rewards he writes himself) and the Chronicle (history). */
+const G_BOSS = { 2: { k: 'spawn', gold: 60 }, 5: { k: 'shog', gold: 150 }, 10: { k: 'levi', gold: 300 }, 20: { k: 'old', gold: 600 } };
+const G_GROUPS = [
+  { id: 'teach', name: 'The Teaching Trench', plain: 'Teaching', parent: '', type: 'parent' },
+  { id: 'chores', name: 'The Drudgery Shoals', plain: 'Teaching chores', parent: 'teach', type: 'list' },
+  { id: 'summon', name: 'The Summoning Circle', plain: 'Summoned · tick themselves when built', parent: 'teach', type: 'summon' },
+  { id: 'marking', name: 'The Marking Crypt', plain: 'Book marking · termly', parent: 'teach', type: 'marking' },
+  { id: 'life', name: 'The Surface World', plain: 'Life', parent: '', type: 'list' }];
+// where a ritual or quest sits when it has no group of its own
+function gDefGrp_(g) {
+  if (g.kind === 'todo') return g.track === 'life' ? 'life' : 'teach';
+  if (g.kind === 'termly') return 'marking';
+  return g.track === 'life' ? 'life' : 'chores';
+}
+function gGroups_(p) {
+  let mine = []; try { mine = p.groups ? JSON.parse(p.groups) : []; } catch (e) { mine = []; }
+  const out = G_GROUPS.map((g) => Object.assign({}, g, (mine.find((m) => m.id === g.id) || {}).name ? { name: mine.find((m) => m.id === g.id).name } : {}));
+  mine.filter((m) => !G_GROUPS.some((g) => g.id === m.id)).forEach((m) => out.push({ id: m.id, name: m.name, plain: m.plain || 'Own group', parent: m.parent || '', type: 'list' }));
+  return out;
+}
+// new group, or a new name for any group (built-in ones keep their job, only the name changes)
+function gameGroupSave(k, grp) {
+  check_(k);
+  let id = '';
+  withLock_(function () {
+    const p = gPlayer_(); let mine = []; try { mine = p.groups ? JSON.parse(p.groups) : []; } catch (e) { mine = []; }
+    const name = String(grp.name || '').trim().slice(0, 50); if (!name) throw new Error('Give the group a name.');
+    id = grp.id || ('u' + Utilities.getUuid().slice(0, 6));
+    const old = mine.find((m) => m.id === id);
+    if (old) old.name = name;
+    else mine.push({ id, name, plain: grp.plain ? String(grp.plain).slice(0, 40) : (grp.parent === 'teach' ? 'Teaching' : grp.parent === 'life' ? 'Life' : 'Own group'), parent: grp.parent === 'teach' ? 'teach' : '' });
+    p.groups = JSON.stringify(mine); gSavePlayer_(p);
+  });
+  return gSnapshot_(gWorld_(), { saved: id });
+}
+// a step in a quest's checklist (no pay: the quest pays when it is ticked)
+function gameQuestStep(k, id, i, on) {
+  check_(k);
+  withLock_(function () {
+    const g = gGoals_().find((x) => x.id === id); if (!g || !g.steps[i]) return;
+    g.steps[i].d = !!on; gSet_('goals', g.row, 'steps', JSON.stringify(g.steps));
+  });
+  return gSnapshot_(gWorld_());
+}
+function gBeaten_() {
+  return gRows_('bosses').filter((b) => b.status === 'beaten').map((b) => {
+    let r = {}; try { r = JSON.parse(b.reward || '{}'); } catch (e) { r = {}; }
+    return { id: b.id, name: b.name, k: r.k || (G_BOSS[r.size] || G_BOSS[5]).k, on: b.beatenOn };
+  }).reverse();
+}
+// the next days that freeze themselves: INSET days and the next holiday
+function gFreezesAhead_(world, today, frozen) {
+  const out = [], d = world.data || {};
+  (d.inset || []).filter((x) => x >= today && x <= gAdd_(today, 70)).slice(0, 2).forEach((x) => out.push({ name: 'INSET day', day: x }));
+  const t = (d.terms || []).find((x) => today <= x[1]); if (t) out.push({ name: 'Holidays', day: gAdd_(t[1], 1) });
+  Object.keys(frozen).filter((x) => x >= today).slice(0, 3).forEach((x) => out.push({ name: frozen[x] === 'sick' ? 'Sick day' : 'Day off', day: x }));
+  return out.sort((a, b) => (a.day < b.day ? -1 : 1)).slice(0, 4);
+}
+
+/* ---- wardrobe: 71 outfits drawn on the page (pixel-art.js); index 0 of each kind is free. Bought ones are rows
+   "w:hat-3" in Game Owned; what he wears is the player's "wear" setting. */
+const G_WEAR = { hat: 20, top: 14, face: 13, held: 12, skin: 12 }, G_WPRICE = [0, 60, 90, 120, 180, 220, 260, 320, 400, 500, 650, 900, 1200, 1500];
+function gWearItem_(id) {
+  const m = /^(hat|top|face|held|skin)-(\d{1,2})$/.exec(String(id)); if (!m || Number(m[2]) >= G_WEAR[m[1]]) return null;
+  const i = Number(m[2]); return { id, cat: m[1], i, price: G_WPRICE[i] || 1500, lock: i >= 10 ? 8 + (i - 10) * 2 : 0 };
+}
+function gWearState_(p, rows) {
+  let wear = {}; try { wear = p.wear ? JSON.parse(p.wear) : {}; } catch (e) { wear = {}; }
+  const owned = Object.keys(G_WEAR).map((c) => c + '-0').concat(rows.map((r) => String(r.itemId).slice(2)));
+  return { on: Object.assign({ hat: 'hat-0', top: '', face: '', held: '', skin: 'skin-0' }, wear), owned };
+}
+function gameWear(k, id, on) {
+  check_(k);
+  let bad = '';
+  withLock_(function () {
+    const w = gWearItem_(id); if (!w) { bad = 'That outfit is not in the wardrobe.'; return; }
+    const p = gPlayer_(), rows = gRows_('owned'), st = gWearState_(p, rows.filter((r) => String(r.itemId).indexOf('w:') === 0));
+    if (on && st.owned.indexOf(id) < 0) {
+      if (w.lock > p.level) { bad = 'Locked: Level ' + w.lock; return; }
+      if (p.coins < w.price) { bad = 'Not enough doubloons (' + w.price + ' needed).'; return; }
+      p.coins -= w.price; const now = gNow_();
+      gAppend_('owned', { itemId: 'w:' + id, boughtOn: gDay_(now), price: w.price, slot: '' });
+      gAppend_('ticks', { id: Utilities.getUuid().slice(0, 8), at: now.toISOString(), day: gDay_(now), goalId: 'buy|w:' + id, delta: 0, coins: -w.price, xp: 0, hp: 0, auto: '', ref: '', note: JSON.stringify({ name: id }) });
+    }
+    const wear = st.on; wear[w.cat] = on ? id : (w.cat === 'skin' ? 'skin-0' : '');
+    p.wear = JSON.stringify(wear); gSavePlayer_(p);
+  });
+  if (bad) throw new Error(bad);
+  return gSnapshot_(gWorld_());
+}
+// Undo a purchase made today (shop item or outfit): the doubloons come back and the item goes
+function gameUnbuy(k, id) {
+  check_(k);
+  withLock_(function () {
+    const today = gDay_(gNow_()), rows = gRows_('owned'), key = gWearItem_(id) ? 'w:' + id : id;
+    const r = rows.filter((x) => x.itemId === key && String(x.boughtOn) === today).pop(); if (!r) return;
+    const p = gPlayer_(), price = Number(r.price) || 0; p.coins += price;
+    if (key.indexOf('w:') === 0) { let wear = {}; try { wear = p.wear ? JSON.parse(p.wear) : {}; } catch (e) { wear = {}; } Object.keys(wear).forEach((c) => { if (wear[c] === id) wear[c] = c === 'skin' ? 'skin-0' : ''; }); p.wear = JSON.stringify(wear); }
+    gSavePlayer_(p); gTab_('owned').deleteRow(r.row);
+    gAppend_('ticks', { id: Utilities.getUuid().slice(0, 8), at: gNow_().toISOString(), day: today, goalId: 'buy|' + key, delta: 0, coins: price, xp: 0, hp: 0, auto: '', ref: '', note: JSON.stringify({ name: key, undo: true }) });
+  });
+  return gSnapshot_(gWorld_());
+}
+
+/* ---- the Hoard: rewards he writes himself and buys with doubloons ---- */
+function gameHoardSave(k, h) {
+  check_(k);
+  let id = '';
+  withLock_(function () {
+    const name = String(h.name || '').trim().slice(0, 60); if (!name) throw new Error('Name the reward.');
+    const cost = Math.max(1, Math.min(5000, Math.round(Number(h.cost) || 80)));
+    const old = h.id ? gRows_('hoard').find((r) => r.id === h.id) : null;
+    if (old) { gSet_('hoard', old.row, 'name', name); gSet_('hoard', old.row, 'cost', cost); if (h.archived !== undefined) gSet_('hoard', old.row, 'archived', h.archived ? 'true' : ''); id = old.id; }
+    else { id = 'h' + Utilities.getUuid().slice(0, 7); gAppend_('hoard', { id, name, cost, claims: 0, archived: '', created: gDay_(gNow_()) }); }
+  });
+  return gSnapshot_(gWorld_(), { saved: id });
+}
+// claim = pay its cost; back = true is the Undo (gives the doubloons back)
+function gameHoardClaim(k, id, back) {
+  check_(k);
+  let bad = '';
+  withLock_(function () {
+    const r = gRows_('hoard').find((x) => x.id === id); if (!r) { bad = 'That reward is gone.'; return; }
+    const p = gPlayer_(), cost = Number(r.cost) || 0, claims = Number(r.claims) || 0, now = gNow_();
+    if (!back && p.coins < cost) { bad = 'Not enough doubloons yet (' + (cost - p.coins) + ' more).'; return; }
+    if (back && claims < 1) return;
+    p.coins += back ? cost : -cost; gSavePlayer_(p); gSet_('hoard', r.row, 'claims', claims + (back ? -1 : 1));
+    gAppend_('ticks', { id: Utilities.getUuid().slice(0, 8), at: now.toISOString(), day: gDay_(now), goalId: 'hoard|' + id, delta: 0, coins: back ? cost : -cost, xp: 0, hp: 0, auto: '', ref: '', note: JSON.stringify({ name: r.name, undo: !!back }) });
+  });
+  if (bad) throw new Error(bad);
+  return gSnapshot_(gWorld_());
+}
+
+/* ---- the Chronicle: doubloons per week (7 weeks), a 5-week streak calendar, trophies ---- */
+function gameChronicle(k) {
+  check_(k);
+  const today = gDay_(gNow_()), mon = gMonday_(today), ticks = gRows_('ticks'), world = gWorld_(), frozen = gFrozenDays_();
+  const earn = (t) => Number(t.coins) > 0 && !/^(buy|hoard)\|/.test(String(t.goalId));
+  const weeks = []; for (let i = 6; i >= 0; i--) { const m = gAdd_(mon, -7 * i), e = gAdd_(m, 6); weeks.push({ mon: m, coins: ticks.filter((t) => String(t.day) >= m && String(t.day) <= e && earn(t)).reduce((a, t) => a + Number(t.coins), 0) }); }
+  const days = []; const start = gAdd_(mon, -28);
+  for (let i = 0; i < 35; i++) { const d = gAdd_(start, i); days.push({ day: d, n: ticks.filter((t) => String(t.day) === d && Number(t.delta) > 0 && !/^(buy|hoard|review)\|/.test(String(t.goalId))).length, frozen: gIsFrozen_(d, world, frozen), future: d > today, today: d === today }); }
+  return gOut_({ weeks, days, beaten: gBeaten_() });
 }

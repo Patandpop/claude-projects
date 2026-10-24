@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Grenze+Gotisch:wght@500;700&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
+<script src="./ulhu-art.js"></script>
+<script src="./pixel-art.js"></script>
+<style>
+body{margin:0;background:#050807;color:#e8e1cf;font-family:'Atkinson Hyperlegible',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#5ef2a0}a:hover{color:#b6ffd6}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+button{font-family:inherit}
+input,textarea{font-family:inherit}
+input::placeholder,textarea::placeholder{color:#8a7a5a}
+[data-dark] input::placeholder{color:#6f8178}
+::-webkit-scrollbar{width:0;height:0}
+</style>
+</helmet>
+<div style="min-height:100vh;display:flex;flex-wrap:wrap;gap:40px;justify-content:center;align-items:flex-start;padding:32px 20px 60px;background:radial-gradient(ellipse at 50% 0%,#0f2420 0%,#050807 60%)">
+
+<div style="flex:none;padding:10px;border-radius:44px;background:linear-gradient(160deg,#2a2f2d,#0d0f0e);box-shadow:0 30px 80px rgba(0,0,0,.6),inset 0 0 0 1px #3a403d">
+<div ref="{{ phoneRef }}" data-dark="1" style="position:relative;width:390px;height:844px;border-radius:34px;overflow:hidden;background:#070d0b;display:flex;flex-direction:column;user-select:none">
+
+  <div style="flex:none;height:28px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:#0a0e0d;font:700 13px 'Atkinson Hyperlegible';color:#e8e1cf">
+    <span>{{ clock }}</span>
+    <span style="display:flex;gap:6px;align-items:center;font-size:11px">5G <span style="display:inline-block;width:20px;height:10px;border:1.5px solid #e8e1cf;border-radius:2px;padding:1px"><span style="display:block;width:70%;height:100%;background:#e8e1cf"></span></span></span>
+  </div>
+  <sc-if value="{{ chrome }}" hint-placeholder-val="{{ true }}">
+    <div style="flex:none;height:46px;display:flex;align-items:center;gap:10px;padding:0 12px;background:#0a0e0d;border-bottom:1px solid #1a201e">
+      <div style="flex:1;height:32px;border-radius:16px;background:#1c2220;display:flex;align-items:center;padding:0 14px;font:13px 'Atkinson Hyperlegible';color:#b8c0bc">script.google.com/a/mac…</div>
+      <div style="width:22px;height:22px;border:2px solid #b8c0bc;border-radius:5px;font:700 11px/18px 'Atkinson Hyperlegible';text-align:center;color:#b8c0bc">4</div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ notReady }}" hint-placeholder-val="{{ false }}">
+    <div style="flex:1;display:flex;align-items:center;justify-content:center;font:24px 'Grenze Gotisch';color:#5ef2a0">Summoning Ulhu…</div>
+  </sc-if>
+  <sc-if value="{{ ready }}" hint-placeholder-val="{{ true }}">
+  <div style="flex:1;min-height:0;display:flex;flex-direction:column;position:relative">
+
+    <!-- BANNER -->
+    <div ref="{{ bannerRef }}" style="flex:none;position:relative;height:172px;overflow:hidden;background:{{ bannerBg }}">
+      <div style="position:absolute;inset:0;background:repeating-linear-gradient(104deg,rgba(170,255,225,.055) 0 16px,transparent 16px 52px);-webkit-mask-image:linear-gradient(180deg,#000 0%,transparent 85%);mask-image:linear-gradient(180deg,#000 0%,transparent 85%)"></div>
+      <div style="position:absolute;right:62px;bottom:20px;width:26px;height:118px;background:repeating-linear-gradient(90deg,#14201c 0 4px,#1b2a25 4px 8px);opacity:.75;border-top:6px solid #1f302a"></div>
+      <div style="position:absolute;right:112px;bottom:20px;width:20px;height:76px;background:repeating-linear-gradient(90deg,#121c19 0 4px,#182520 4px 8px);opacity:.6;border-top:5px solid #1b2a25;transform:rotate(-6deg);transform-origin:bottom"></div>
+      <img src="{{ art.plant }}" style="position:absolute;right:4px;bottom:16px;width:50px;height:64px;image-rendering:pixelated;filter:brightness(.55) saturate(.8);transform:scaleX(-1)">
+      <div ref="{{ bubbleRef }}" style="position:absolute;inset:0;pointer-events:none"></div>
+      <sc-if value="{{ night }}" hint-placeholder-val="{{ false }}">
+        <img src="{{ art.moon }}" style="position:absolute;right:20px;top:58px;width:21px;height:21px;image-rendering:pixelated;opacity:.85">
+      </sc-if>
+      <div style="position:absolute;left:0;right:0;bottom:0;height:22px;background:repeating-linear-gradient(90deg,#26362f 0 30px,#1b2823 30px 32px);border-top:2px solid #3b5047;box-shadow:inset 0 3px 0 rgba(0,0,0,.25)">
+        <div style="position:absolute;inset:0;background:radial-gradient(circle at 18px 9px,#4a5e54 2px,transparent 2.5px),radial-gradient(circle at 24px 13px,#3e5148 1.5px,transparent 2px),radial-gradient(circle at 200px 8px,#4a5e54 2px,transparent 2.5px),radial-gradient(circle at 330px 12px,#4a5e54 2.5px,transparent 3px),radial-gradient(circle at 338px 7px,#3e5148 1.5px,transparent 2px)"></div>
+      </div>
+      <div ref="{{ ulhuRef }}" style="position:absolute;left:18px;bottom:14px;width:108px;height:108px;transform-origin:50% 100%">
+        <sc-for list="{{ ulhu }}" as="l" hint-placeholder-count="1">
+          <img src="{{ l.src }}" style="position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated;filter:{{ l.filter }}">
+        </sc-for>
+      </div>
+      <div style="position:absolute;left:12px;top:9px;display:flex;align-items:center;gap:8px">
+        <img ref="{{ counterRef }}" src="{{ art.coin }}" style="width:32px;height:32px;image-rendering:pixelated;filter:drop-shadow(0 2px 0 #2a1806)">
+        <span style="font:700 30px/1 'Atkinson Hyperlegible';color:#ffd56a;text-shadow:0 2px 0 #4a2c0c;font-variant-numeric:tabular-nums">{{ coins }}</span>
+      </div>
+      <div style="position:absolute;right:12px;top:9px;display:flex;align-items:center;gap:8px">
+        <div style="text-align:right">
+          <div style="font:700 11px 'Atkinson Hyperlegible';letter-spacing:.12em;color:#c9a560">LEVEL</div>
+          <div style="font:500 16px/1 'Grenze Gotisch';color:#e8e1cf">{{ title }}</div>
+        </div>
+        <div style="width:38px;height:42px;clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);background:linear-gradient(180deg,#ffd56a,#a8681c);display:flex;align-items:center;justify-content:center">
+          <div style="width:32px;height:36px;clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);background:linear-gradient(180deg,#22322c,#101a17);display:flex;align-items:center;justify-content:center;font:700 18px 'Atkinson Hyperlegible';color:#ffd56a">{{ level }}</div>
+        </div>
+      </div>
+      <div style="position:absolute;left:132px;right:12px;top:56px">
+        <div style="position:relative;display:inline-block;max-width:100%;padding:6px 11px 7px;background:radial-gradient(ellipse at 30% 20%,#f3e7c8,#dcc797 80%);color:#2a1a12;border-radius:3px 10px 10px 10px;font:italic 15px/1.2 'IM Fell English';box-shadow:0 2px 0 #5a4428">{{ say }}<div style="position:absolute;left:-7px;top:6px;width:0;height:0;border-top:6px solid transparent;border-bottom:6px solid transparent;border-right:8px solid #e8d8b0"></div></div>
+      </div>
+      <div style="position:absolute;left:132px;right:12px;top:110px;display:flex;flex-direction:column;gap:6px">
+        <div style="display:flex;align-items:center;gap:7px">
+          <img src="{{ art.xp }}" style="width:11px;height:11px;image-rendering:pixelated">
+          <div style="flex:1;height:7px;background:#0b1513;border:1px solid #24443a;border-radius:1px;overflow:hidden"><div style="height:100%;width:{{ xpPct }};background:linear-gradient(90deg,#1d8a52,#5ef2a0);box-shadow:0 0 6px #5ef2a0;transition:width .4s"></div></div>
+          <span style="font:700 12px 'Atkinson Hyperlegible';color:#bfeed4;font-variant-numeric:tabular-nums;min-width:58px;text-align:right">{{ xpTxt }}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:7px">
+          <img src="{{ art.heart }}" style="width:11px;height:11px;image-rendering:pixelated">
+          <div ref="{{ hpRef }}" style="flex:1;height:7px;background:#160b0c;border:1px solid #4a1e22;border-radius:1px;overflow:hidden"><div style="height:100%;width:{{ hpPct }};background:linear-gradient(90deg,#a3202a,#ff7a66);transition:width .4s"></div></div>
+          <span style="font:700 12px 'Atkinson Hyperlegible';color:#ffc0b4;font-variant-numeric:tabular-nums;min-width:58px;text-align:right">{{ hpTxt }}</span>
+        </div>
+      </div>
+      <sc-if value="{{ dayOff }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;left:12px;top:46px;padding:3px 8px;border-radius:3px;background:#173040;border:1px solid #3a6a8a;font:700 11px 'Atkinson Hyperlegible';letter-spacing:.1em;color:#bfe0ff">DAY FROZEN</div>
+      </sc-if>
+      <div ref="{{ flashRef }}" style="position:absolute;inset:0;pointer-events:none;opacity:0;background:radial-gradient(ellipse at 22% 70%,rgba(255,214,106,.55),rgba(255,214,106,0) 70%)"></div>
+    </div>
+
+    <!-- UNDO LINE -->
+    <div style="flex:none;height:38px;display:flex;align-items:center;gap:8px;padding:0 4px 0 14px;background:#0b1311;border-bottom:1px solid #1c2924">
+      <img src="{{ art.rune }}" style="width:8px;height:10px;image-rendering:pixelated;opacity:.8">
+      <div style="flex:1;min-width:0;display:flex;align-items:center;gap:5px;white-space:nowrap;overflow:hidden;font:13px 'Atkinson Hyperlegible';color:#8fa298">
+        <span>{{ undoVerb }}</span>
+        <span style="color:#e8e1cf;overflow:hidden;text-overflow:ellipsis">{{ undoName }}</span>
+        <span style="font-weight:700;color:{{ undoColor }}">{{ undoDelta }}</span>
+        <sc-if value="{{ undoCoin }}" hint-placeholder-val="{{ false }}"><img src="{{ art.coin }}" style="width:14px;height:14px;image-rendering:pixelated"></sc-if>
+        <sc-if value="{{ undoHeart }}" hint-placeholder-val="{{ false }}"><img src="{{ art.heart }}" style="width:11px;height:11px;image-rendering:pixelated"></sc-if>
+      </div>
+      <sc-if value="{{ canUndo }}" hint-placeholder-val="{{ false }}">
+        <button onClick="{{ undo }}" style="flex:none;height:38px;padding:0 12px;border:none;background:none;color:#5ef2a0;font:700 13px 'Atkinson Hyperlegible';letter-spacing:.08em;cursor:pointer">↶ UNDO</button>
+      </sc-if>
+    </div>
+
+    <!-- TABS -->
+    <div style="flex:none;position:relative;height:46px;display:grid;grid-template-columns:repeat(4,1fr);background:linear-gradient(180deg,#101a17,#0b1311);border-bottom:1px solid #1c2924">
+      <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="4">
+        <button onClick="{{ t.pick }}" style="position:relative;border:none;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;font:500 19px 'Grenze Gotisch';color:{{ t.fg }};transition:color .2s">
+          {{ t.label }}
+          <sc-if value="{{ t.hasBadge }}" hint-placeholder-val="{{ false }}"><span style="min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:{{ t.badgeBg }};color:#08100d;font:700 11px/18px 'Atkinson Hyperlegible'">{{ t.badge }}</span></sc-if>
+        </button>
+      </sc-for>
+      <div style="position:absolute;bottom:-1px;left:{{ tabLeft }};width:25%;height:3px;display:flex;justify-content:center;transition:left .28s cubic-bezier(.2,.8,.2,1)">
+        <div style="width:56%;height:3px;background:{{ tabColor }};box-shadow:0 0 10px {{ tabColor }},0 0 2px {{ tabColor }};transition:background .28s"></div>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div style="flex:1;min-height:0;position:relative;overflow:hidden">
+      <sc-if value="{{ noForm }}" hint-placeholder-val="{{ true }}">
+      <div onPointerDown="{{ pDown }}" onPointerMove="{{ pMove }}" onPointerUp="{{ pUp }}" onPointerCancel="{{ pUp }}" onClickCapture="{{ clickCap }}" style="position:absolute;inset:0;overflow:hidden;touch-action:pan-y">
+      <div style="display:flex;width:400%;height:100%;transform:translateX({{ trackX }});transition:{{ trackT }}">
+
+        <!-- RITUALS -->
+        <div style="width:25%;height:100%;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;padding:10px 10px 18px;display:grid;grid-template-columns:minmax(0,1fr);grid-auto-rows:max-content;align-content:start;gap:8px">
+          <sc-for list="{{ rSections }}" as="sec" hint-placeholder-count="4">
+            <div style="display:flex;flex-direction:column;gap:6px;margin-left:{{ sec.indent }}">
+              <div style="display:flex;align-items:center;gap:2px;min-height:44px;border-bottom:1px solid {{ sec.rule }}">
+                <button onClick="{{ sec.toggle }}" style="flex:1;min-width:0;display:flex;align-items:center;gap:8px;height:44px;border:none;background:none;cursor:pointer;padding:0 2px;text-align:left">
+                  <span style="flex:none;width:10px;color:#5ef2a0;font:700 12px 'Atkinson Hyperlegible';transform:rotate({{ sec.rot }});transition:transform .2s">▶</span>
+                  <sc-if value="{{ sec.notRenaming }}" hint-placeholder-val="{{ true }}">
+                    <span style="display:flex;flex-direction:column;min-width:0">
+                      <span style="font:500 {{ sec.titleSize }}/1 'Grenze Gotisch';color:{{ sec.titleColor }};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ sec.name }}</span>
+                      <span style="font:700 11px 'Atkinson Hyperlegible';letter-spacing:.1em;color:#7f9389;text-transform:uppercase;margin-top:2px">{{ sec.plain }}</span>
+                    </span>
+                  </sc-if>
+                </button>
+                <sc-if value="{{ sec.renaming }}" hint-placeholder-val="{{ false }}">
+                  <input value="{{ renameVal }}" onChange="{{ renameInput }}" onKeyDown="{{ renameKey }}" onBlur="{{ renameSave }}" autoFocus="{{ true }}" style="position:absolute;left:30px;right:60px;height:36px;margin-top:4px;padding:0 10px;border:1px solid #5ef2a0;border-radius:4px;background:#0b1513;color:#e8e1cf;font:500 18px 'Grenze Gotisch';outline:none">
+                </sc-if>
+                <span style="flex:none;font:700 12px 'Atkinson Hyperlegible';color:{{ sec.metaColor }};padding:0 4px">{{ sec.meta }}</span>
+                <button onClick="{{ sec.rename }}" title="Rename" style="flex:none;width:36px;height:40px;border:none;background:none;color:#61756b;cursor:pointer;font:15px 'Atkinson Hyperlegible'">✎</button>
+              </div>
+              <sc-if value="{{ sec.showList }}" hint-placeholder-val="{{ true }}">
+                <sc-for list="{{ sec.items }}" as="it" hint-placeholder-count="3">
+                  <div style="position:relative;display:flex;align-items:center;gap:10px;min-height:{{ it.h }};padding:5px 10px 5px 8px;background:linear-gradient(180deg,#1b2924,#131d19);border:1px solid #2a3b33;border-left:4px solid {{ it.edge }};border-radius:5px;box-shadow:inset 0 1px 0 rgba(255,255,255,.04),0 2px 0 #040807;opacity:{{ it.op }};transition:opacity .25s">
+                    <button onClick="{{ it.tick }}" style="flex:none;width:46px;height:46px;border-radius:50%;border:2px {{ it.ringStyle }} {{ it.ring }};background:{{ it.fill }};cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0">
+                      <sc-if value="{{ it.done }}" hint-placeholder-val="{{ false }}"><img src="{{ art.tick }}" style="width:22px;height:18px;image-rendering:pixelated"></sc-if>
+                    </button>
+                    <div style="flex:1;min-width:0">
+                      <div style="font:700 15px/1.2 'Atkinson Hyperlegible';color:#ece5d3;text-decoration:{{ it.strike }};text-wrap:pretty">{{ it.name }}</div>
+                      <div style="display:flex;flex-wrap:wrap;gap:4px 7px;align-items:center;margin-top:3px;font:12px 'Atkinson Hyperlegible';color:#93a69c">
+                        <span>{{ it.len }} min</span><span style="color:{{ it.edge }}">{{ it.kindLabel }}</span><span>{{ it.rep }}</span>
+                        <sc-if value="{{ it.hasStreak }}" hint-placeholder-val="{{ false }}"><span style="display:inline-flex;align-items:center;gap:3px;color:#5ef2a0;font-weight:700"><img src="{{ art.flame }}" style="width:8px;height:11px;image-rendering:pixelated">{{ it.streak }}</span></sc-if>
+                      </div>
+                    </div>
+                    <div style="flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+                      <div style="display:flex;align-items:center;gap:3px;font:700 16px 'Atkinson Hyperlegible';color:#f0c45a">+{{ it.pay }}<img src="{{ art.coin }}" style="width:18px;height:18px;image-rendering:pixelated"></div>
+                      <sc-if value="{{ it.auto }}" hint-placeholder-val="{{ false }}"><span style="display:inline-flex;align-items:center;gap:3px;padding:1px 6px 1px 2px;border-radius:9px;background:#26173a;border:1px solid #5a3a8a;font:700 11px 'Atkinson Hyperlegible';color:#d4bfff;white-space:nowrap"><img src="{{ art.seal }}" style="width:12px;height:12px;image-rendering:pixelated">ticks itself</span></sc-if>
+                    </div>
+                  </div>
+                </sc-for>
+              </sc-if>
+              <sc-if value="{{ sec.showTide }}" hint-placeholder-val="{{ false }}">
+                <div style="padding:9px 12px 10px;border-radius:5px;background:linear-gradient(180deg,#12202a,#0d161c);border:1px solid #23404e">
+                  <div style="display:flex;justify-content:space-between;align-items:baseline">
+                    <span style="font:500 17px 'Grenze Gotisch';color:#bfe0ff">Tide Charts</span>
+                    <span style="font:700 13px 'Atkinson Hyperlegible';color:#8ac8ff">{{ tide.n }} of 3</span>
+                  </div>
+                  <div style="position:relative;height:30px;margin:4px 8px 0">
+                    <div style="position:absolute;left:0;right:0;top:13px;height:4px;background:repeating-linear-gradient(90deg,#1d3a4a 0 6px,transparent 6px 9px)"></div>
+                    <div style="position:absolute;left:0;top:13px;height:4px;width:{{ tide.pct }};background:#5aa7ff;box-shadow:0 0 8px #5aa7ff;transition:width .4s"></div>
+                    <sc-for list="{{ tide.steps }}" as="st" hint-placeholder-count="3">
+                      <div style="position:absolute;left:{{ st.x }};top:5px;width:20px;height:20px;margin-left:-10px;border-radius:50%;background:{{ st.bg }};border:2px solid {{ st.bd }};box-shadow:{{ st.glow }}"></div>
+                    </sc-for>
+                  </div>
+                  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;font:12px/1.25 'Atkinson Hyperlegible';color:#93a9b8">
+                    <sc-for list="{{ tide.steps }}" as="st" hint-placeholder-count="3"><span style="text-align:{{ st.align }};color:{{ st.fg }}">{{ st.label }}</span></sc-for>
+                  </div>
+                </div>
+              </sc-if>
+              <sc-if value="{{ sec.showMarking }}" hint-placeholder-val="{{ false }}">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+                  <sc-for list="{{ sec.cards }}" as="m" hint-placeholder-count="6">
+                    <div style="position:relative;padding:7px 8px 8px;border-radius:5px;background:linear-gradient(180deg,#1b2924,#131d19);border:1px solid #2a3b33;border-left:4px solid #5aa7ff;box-shadow:0 2px 0 #040807">
+                      <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:6px">
+                        <span style="font:700 17px 'Atkinson Hyperlegible';color:#ece5d3">{{ m.cls }}</span>
+                        <span style="display:flex;align-items:center;gap:2px;font:700 12px 'Atkinson Hyperlegible';color:#f0c45a">+16<img src="{{ art.coin }}" style="width:13px;height:13px;image-rendering:pixelated"><span style="color:#93a69c;font-weight:400">each</span></span>
+                      </div>
+                      <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px">
+                        <sc-for list="{{ m.halves }}" as="h" hint-placeholder-count="2">
+                          <button onClick="{{ h.tick }}" style="height:44px;border-radius:4px;border:1.5px solid {{ h.bd }};background:{{ h.bg }};color:{{ h.fg }};font:700 13px 'Atkinson Hyperlegible';cursor:pointer;padding:0">{{ h.label }}</button>
+                        </sc-for>
+                      </div>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-if>
+            </div>
+          </sc-for>
+          <button onClick="{{ openGroupForm }}" style="height:44px;border:1px dashed #2f443b;border-radius:5px;background:none;color:#7f9389;font:500 17px 'Grenze Gotisch';cursor:pointer">+ New group</button>
+          <sc-if value="{{ showReview }}" hint-placeholder-val="{{ true }}">
+            <div style="border-radius:4px;background:radial-gradient(ellipse at 30% 0%,#f1e4c4,#dcc797 75%,#c9b07a);color:#2a1a12;box-shadow:0 2px 0 #5a4428">
+              <button onClick="{{ toggleReview }}" style="width:100%;height:46px;display:flex;align-items:center;gap:10px;padding:0 12px;border:none;background:none;cursor:pointer;color:#2a1a12">
+                <img src="{{ art.wax }}" style="width:20px;height:20px;image-rendering:pixelated;opacity:{{ reviewSealOp }}">
+                <span style="flex:1;text-align:left;font:500 19px 'Grenze Gotisch'">Sunday review</span>
+                <span style="display:flex;align-items:center;gap:3px;font:700 15px 'Atkinson Hyperlegible';color:#7a4e14">{{ reviewPay }}<img src="{{ art.coin }}" style="width:17px;height:17px;image-rendering:pixelated"></span>
+                <span style="font:700 12px 'Atkinson Hyperlegible';transform:rotate({{ reviewRot }});transition:transform .2s">▶</span>
+              </button>
+              <sc-if value="{{ reviewOpen }}" hint-placeholder-val="{{ false }}">
+                <div style="padding:0 12px 12px;display:flex;flex-direction:column;gap:9px">
+                  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">
+                    <sc-for list="{{ reviewStats }}" as="rs" hint-placeholder-count="3">
+                      <div style="padding:6px 8px;border:1px solid #b89e6a;border-radius:3px;background:rgba(255,255,255,.18)"><div style="font:700 20px 'Atkinson Hyperlegible'">{{ rs.v }}</div><div style="font:12px 'Atkinson Hyperlegible';color:#5a4428">{{ rs.l }}</div></div>
+                    </sc-for>
+                  </div>
+                  <div style="display:flex;height:10px;border-radius:2px;overflow:hidden;border:1px solid #8a6a3a">
+                    <sc-for list="{{ reviewKinds }}" as="rk" hint-placeholder-count="4"><div style="flex:{{ rk.n }};background:{{ rk.c }}"></div></sc-for>
+                  </div>
+                  <div style="display:flex;flex-wrap:wrap;gap:4px 10px;font:12px 'Atkinson Hyperlegible';color:#4a3420">
+                    <sc-for list="{{ reviewKinds }}" as="rk" hint-placeholder-count="4"><span>{{ rk.label }}</span></sc-for>
+                  </div>
+                  <label style="font:italic 15px 'IM Fell English'">What went well</label>
+                  <textarea value="{{ review.well }}" onChange="{{ setWell }}" rows="2" placeholder="Year 10 practical ran smoothly…" style="resize:none;padding:6px 8px;border:1px solid #b89e6a;border-radius:3px;background:repeating-linear-gradient(180deg,rgba(255,255,255,.22) 0 21px,#c9b07a 21px 22px);color:#2a1a12;font:15px/22px 'Atkinson Hyperlegible';outline:none"></textarea>
+                  <label style="font:italic 15px 'IM Fell English'">What slipped</label>
+                  <textarea value="{{ review.slipped }}" onChange="{{ setSlipped }}" rows="2" placeholder="Book marking fell behind…" style="resize:none;padding:6px 8px;border:1px solid #b89e6a;border-radius:3px;background:repeating-linear-gradient(180deg,rgba(255,255,255,.22) 0 21px,#c9b07a 21px 22px);color:#2a1a12;font:15px/22px 'Atkinson Hyperlegible';outline:none"></textarea>
+                  <label style="font:italic 15px 'IM Fell English'">Three priorities for next week</label>
+                  <sc-for list="{{ reviewPris }}" as="rp" hint-placeholder-count="3">
+                    <div style="display:flex;align-items:center;gap:8px"><span style="font:700 15px 'Atkinson Hyperlegible';width:14px">{{ rp.n }}</span><input value="{{ rp.v }}" onChange="{{ rp.set }}" placeholder="{{ rp.ph }}" style="flex:1;height:40px;padding:0 8px;border:none;border-bottom:1.5px solid #8a6a3a;background:transparent;color:#2a1a12;font:15px 'Atkinson Hyperlegible';outline:none"></div>
+                  </sc-for>
+                  <sc-if value="{{ reviewNotDone }}" hint-placeholder-val="{{ true }}">
+                    <button onClick="{{ sealReview }}" style="height:46px;border:none;border-radius:4px;background:#8a1a22;color:#ffe9dc;font:500 19px 'Grenze Gotisch';cursor:pointer;box-shadow:0 2px 0 #3a0a10">Seal the week +20</button>
+                  </sc-if>
+                  <sc-if value="{{ reviewDone }}" hint-placeholder-val="{{ false }}">
+                    <div ref="{{ stampIn }}" style="align-self:center;padding:6px 16px;border:3px double #8a1a22;color:#8a1a22;font:700 20px 'Grenze Gotisch';letter-spacing:.1em;transform:rotate(-6deg)">SEALED</div>
+                  </sc-if>
+                </div>
+              </sc-if>
+            </div>
+          </sc-if>
+        </div>
+
+        <!-- QUESTS -->
+        <div style="width:25%;height:100%;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;padding:10px 10px 18px;display:grid;grid-template-columns:minmax(0,1fr);grid-auto-rows:max-content;align-content:start;gap:8px">
+          <sc-for list="{{ qSections }}" as="qs" hint-placeholder-count="2">
+            <div style="display:flex;flex-direction:column;gap:7px">
+              <button onClick="{{ qs.toggle }}" style="display:flex;align-items:center;gap:8px;min-height:44px;border:none;border-bottom:1px solid #2a2440;background:none;cursor:pointer;padding:0 2px;text-align:left">
+                <span style="width:10px;color:#a48aff;font:700 12px 'Atkinson Hyperlegible';transform:rotate({{ qs.rot }});transition:transform .2s">▶</span>
+                <span style="flex:1;display:flex;flex-direction:column"><span style="font:500 20px/1 'Grenze Gotisch';color:#d8ccff">{{ qs.name }}</span><span style="font:700 11px 'Atkinson Hyperlegible';letter-spacing:.1em;color:#7f7a99;text-transform:uppercase;margin-top:2px">{{ qs.plain }}</span></span>
+                <span style="font:700 12px 'Atkinson Hyperlegible';color:#a48aff">{{ qs.meta }}</span>
+              </button>
+              <sc-if value="{{ qs.isOpen }}" hint-placeholder-val="{{ true }}">
+                <sc-for list="{{ qs.quests }}" as="q" hint-placeholder-count="2">
+                  <div style="position:relative;border-radius:3px;background:radial-gradient(ellipse at 25% 0%,#f3e7c8,#dfcb9c 70%,#cdb37f);border-left:5px solid {{ q.edge }};color:#2a1a12;box-shadow:0 2px 0 #3a2a14,inset 0 0 20px rgba(120,80,30,.22);opacity:{{ q.op }};transition:opacity .3s">
+                    <div style="display:flex;align-items:center;gap:10px;padding:7px 10px 7px 8px">
+                      <button onClick="{{ q.tick }}" style="flex:none;width:46px;height:46px;border-radius:50%;border:2px solid #7a5a34;background:rgba(255,255,255,.3);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0">
+                        <sc-if value="{{ q.done }}" hint-placeholder-val="{{ false }}"><img ref="{{ stampIn }}" src="{{ art.wax }}" style="width:40px;height:40px;image-rendering:pixelated"></sc-if>
+                      </button>
+                      <div style="flex:1;min-width:0">
+                        <div style="font:17px/1.15 'IM Fell English';text-decoration:{{ q.strike }};text-wrap:pretty">{{ q.name }}</div>
+                        <div style="display:flex;flex-wrap:wrap;align-items:center;gap:4px 7px;margin-top:4px;font:12px 'Atkinson Hyperlegible';color:#5a4428">
+                          <span>{{ q.len }} min</span><span style="font-weight:700;color:{{ q.kindInk }}">{{ q.kindLabel }}</span>
+                          <sc-if value="{{ q.hasDue }}" hint-placeholder-val="{{ false }}"><span style="padding:1px 7px;border-radius:9px;background:{{ q.dueBg }};color:{{ q.dueFg }};font-weight:700;box-shadow:{{ q.dueGlow }}">{{ q.due }}</span></sc-if>
+                          <sc-if value="{{ q.hasSteps }}" hint-placeholder-val="{{ false }}"><span>☐ {{ q.stepTxt }}</span></sc-if>
+                        </div>
+                      </div>
+                      <div style="flex:none;display:flex;align-items:center;gap:3px;font:700 16px 'Atkinson Hyperlegible';color:#7a4e14">+{{ q.pay }}<img src="{{ art.coin }}" style="width:18px;height:18px;image-rendering:pixelated"></div>
+                    </div>
+                    <sc-if value="{{ q.showSteps }}" hint-placeholder-val="{{ false }}">
+                      <div style="margin:0 10px 8px 64px;border-top:1px dashed #a88a5a">
+                        <sc-for list="{{ q.steps }}" as="st" hint-placeholder-count="2">
+                          <button onClick="{{ st.toggle }}" style="width:100%;min-height:40px;display:flex;align-items:center;gap:9px;border:none;background:none;cursor:pointer;padding:0;color:#2a1a12;text-align:left">
+                            <span style="flex:none;width:22px;height:22px;border:2px solid #6a4a2a;border-radius:2px;background:{{ st.bg }};color:#f3e7c8;font:700 14px/18px 'Atkinson Hyperlegible';text-align:center">{{ st.mark }}</span>
+                            <span style="font:14px 'Atkinson Hyperlegible';text-decoration:{{ st.strike }};color:{{ st.fg }}">{{ st.t }}</span>
+                          </button>
+                        </sc-for>
+                      </div>
+                    </sc-if>
+                  </div>
+                </sc-for>
+              </sc-if>
+            </div>
+          </sc-for>
+
+          <div style="display:flex;align-items:center;gap:8px;min-height:44px;border-bottom:1px solid #3a1a1e;padding:0 2px">
+            <span style="flex:1;display:flex;flex-direction:column"><span style="font:500 20px/1 'Grenze Gotisch';color:#ffb3a8">The Boss Pit</span><span style="font:700 11px 'Atkinson Hyperlegible';letter-spacing:.1em;color:#8a6a6a;margin-top:2px">BOSS FIGHTS · BIG JOBS IN STAGES</span></span>
+            <span style="font:700 12px 'Atkinson Hyperlegible';color:#ff7a66">{{ bossCount }}</span>
+          </div>
+          <sc-for list="{{ bossCards }}" as="b" hint-placeholder-count="2">
+            <div data-boss="{{ b.id }}" style="border-radius:5px;background:linear-gradient(180deg,#2a1215,#140a0c);border:1px solid #4a1e22;box-shadow:inset 0 0 30px rgba(196,50,58,.12),0 2px 0 #050203;overflow:hidden">
+              <button onClick="{{ b.toggle }}" style="width:100%;display:flex;align-items:center;gap:10px;padding:8px 10px;border:none;background:none;cursor:pointer;text-align:left">
+                <div style="flex:none;width:72px;height:60px;display:flex;align-items:flex-end;justify-content:center;background:radial-gradient(ellipse at 50% 90%,rgba(255,90,80,.25),transparent 70%)">
+                  <img data-creature="1" src="{{ b.src }}" style="width:{{ b.w }};height:auto;image-rendering:pixelated;filter:{{ b.filter }}">
+                </div>
+                <div style="flex:1;min-width:0">
+                  <div style="font:500 19px/1.05 'Grenze Gotisch';color:#f4e0d8;text-wrap:pretty">{{ b.name }}</div>
+                  <div style="margin-top:3px;font:12px 'Atkinson Hyperlegible';color:#c49a94">{{ b.sub }}</div>
+                  <div style="display:flex;align-items:center;gap:6px;margin-top:6px">
+                    <div style="flex:1;height:8px;background:#3a1418;border:1px solid #5a2228;overflow:hidden"><div style="height:100%;width:{{ b.hpPct }};background:linear-gradient(90deg,#a3202a,#ff7a66);box-shadow:0 0 8px #ff5a4a;transition:width .6s cubic-bezier(.3,.7,.3,1)"></div></div>
+                    <span style="font:700 12px 'Atkinson Hyperlegible';color:#ffb3a8;font-variant-numeric:tabular-nums">{{ b.hpTxt }}</span>
+                  </div>
+                </div>
+              </button>
+              <sc-if value="{{ b.isOpen }}" hint-placeholder-val="{{ false }}">
+                <div style="padding:0 10px 8px;display:flex;flex-direction:column;gap:5px">
+                  <sc-for list="{{ b.stages }}" as="st" hint-placeholder-count="3">
+                    <div style="display:flex;align-items:center;gap:10px;min-height:48px;padding:2px 8px 2px 2px;border-radius:4px;background:rgba(0,0,0,.25);border:1px solid #3a1a1e">
+                      <button onClick="{{ st.tick }}" style="flex:none;width:44px;height:44px;border-radius:50%;border:2px solid {{ st.ring }};background:{{ st.fill }};cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center">
+                        <sc-if value="{{ st.done }}" hint-placeholder-val="{{ false }}"><img src="{{ art.tick }}" style="width:20px;height:16px;image-rendering:pixelated"></sc-if>
+                      </button>
+                      <div style="flex:1;min-width:0"><div style="font:700 14px 'Atkinson Hyperlegible';color:#f0e0d8;text-decoration:{{ st.strike }}">{{ st.n }}</div><div style="font:12px 'Atkinson Hyperlegible';color:#b08a84">by {{ st.by }}</div></div>
+                      <span style="flex:none;padding:2px 7px;border-radius:3px;font:700 12px 'Atkinson Hyperlegible';white-space:nowrap;color:{{ st.tagFg }};background:{{ st.tagBg }};border:1px solid {{ st.tagBd }}">{{ st.tag }}</span>
+                    </div>
+                  </sc-for>
+                  <div style="display:flex;align-items:center;justify-content:space-between;padding-top:2px">
+                    <span style="display:flex;align-items:center;gap:4px;font:700 13px 'Atkinson Hyperlegible';color:#f0c45a">{{ b.gold }}<img src="{{ art.coin }}" style="width:16px;height:16px;image-rendering:pixelated"><span style="color:#c49a94;font-weight:400">+ trophy when beaten</span></span>
+                    <button onClick="{{ b.banish }}" style="height:40px;padding:0 10px;border:1px solid {{ b.banishBd }};border-radius:4px;background:{{ b.banishBg }};color:{{ b.banishFg }};font:700 12px 'Atkinson Hyperlegible';cursor:pointer">{{ b.banishTxt }}</button>
+                  </div>
+                </div>
+              </sc-if>
+            </div>
+          </sc-for>
+          <sc-if value="{{ hasBeaten }}" hint-placeholder-val="{{ true }}">
+            <button onClick="{{ toggleVanq }}" style="display:flex;align-items:center;gap:8px;min-height:44px;border:none;background:none;cursor:pointer;padding:0 2px;color:#8a7a74;font:500 17px 'Grenze Gotisch'"><span style="font:700 12px 'Atkinson Hyperlegible';transform:rotate({{ vanqRot }})">▶</span>Vanquished · {{ beatenCount }}</button>
+            <sc-if value="{{ vanqOpen }}" hint-placeholder-val="{{ false }}">
+              <sc-for list="{{ beaten }}" as="bt" hint-placeholder-count="2">
+                <div style="display:flex;align-items:center;gap:10px;padding:4px 8px;border-radius:4px;background:#140c0d;border:1px solid #2a1a1c;opacity:.8"><img src="{{ bt.src }}" style="height:26px;image-rendering:pixelated;filter:grayscale(.7)"><span style="flex:1;font:14px 'Atkinson Hyperlegible';color:#c4b0aa;text-decoration:line-through">{{ bt.name }}</span><img src="{{ art.trophy }}" style="width:16px;height:16px;image-rendering:pixelated"></div>
+              </sc-for>
+            </sc-if>
+          </sc-if>
+          <p style="margin:4px 2px 0;font:italic 14px/1.35 'IM Fell English';color:#8f8a80">Late work is never penalised. A late boss stage still lands, at half damage; the final stage always finishes the creature off.</p>
+        </div>
+
+        <!-- CURSES -->
+        <div style="width:25%;height:100%;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;padding:10px 10px 18px;display:grid;grid-template-columns:minmax(0,1fr);grid-auto-rows:max-content;align-content:start;gap:8px">
+          <div style="display:flex;align-items:center;min-height:44px;border-bottom:1px solid #3a1a1e;padding:0 2px">
+            <span style="flex:1;display:flex;flex-direction:column"><span style="font:500 20px/1 'Grenze Gotisch';color:#ffb3a8">The Cursed Shelf</span><span style="font:700 11px 'Atkinson Hyperlegible';letter-spacing:.1em;color:#8a6a6a;margin-top:2px">CURSES · COST HEALTH, NEVER DOUBLOONS</span></span>
+          </div>
+          <sc-for list="{{ curseRows }}" as="c" hint-placeholder-count="3">
+            <div style="display:flex;align-items:center;gap:10px;min-height:58px;padding:5px 10px 5px 8px;border-radius:5px;background:linear-gradient(180deg,#221315,#150b0d);border:1px solid #3e1c20;border-left:4px solid #c4323a;box-shadow:0 2px 0 #050203">
+              <button onClick="{{ c.tap }}" style="flex:none;width:46px;height:46px;border-radius:50%;border:2px solid #c4323a;background:radial-gradient(circle,#3a1216,#1a0a0c);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0"><img src="{{ art.skull }}" style="width:20px;height:20px;image-rendering:pixelated"></button>
+              <div style="flex:1;min-width:0"><div style="font:700 15px/1.2 'Atkinson Hyperlegible';color:#f0e0d8">{{ c.name }}</div><div style="margin-top:3px;font:12px 'Atkinson Hyperlegible';color:#b08a84">{{ c.len }} min · {{ c.countTxt }}</div></div>
+              <span style="flex:none;display:flex;align-items:center;gap:4px;font:700 16px 'Atkinson Hyperlegible';color:#ff7a66">{{ c.cost }}<img src="{{ art.heart }}" style="width:13px;height:13px;image-rendering:pixelated"></span>
+            </div>
+          </sc-for>
+          <p style="margin:0 2px;font:italic 14px/1.35 'IM Fell English';color:#b08a84">{{ faintNote }}</p>
+          <div style="display:flex;align-items:center;min-height:44px;border-bottom:1px solid #1e3a2c;padding:0 2px;margin-top:6px">
+            <span style="flex:1;display:flex;flex-direction:column"><span style="font:500 20px/1 'Grenze Gotisch';color:#b6ffd6">Small Blessings</span><span style="font:700 11px 'Atkinson Hyperlegible';letter-spacing:.1em;color:#6f8a7c;margin-top:2px">TAP ANY TIME, AS OFTEN AS YOU LIKE</span></span><span style="font:700 12px 'Atkinson Hyperlegible';color:#b6ffd6">{{ blessTotal }}</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+            <sc-for list="{{ blessRows }}" as="g" hint-placeholder-count="6">
+              <button onClick="{{ g.tap }}" style="position:relative;overflow:hidden;min-height:82px;display:flex;flex-direction:column;align-items:stretch;justify-content:space-between;gap:6px;padding:8px 9px;border-radius:6px;background:{{ g.bg }};border:1.5px solid {{ g.bd }};cursor:pointer;text-align:left;box-shadow:0 2px 0 #030806,{{ g.glow }}">
+                <span style="display:flex;align-items:center;gap:7px">
+                  <span style="flex:none;width:38px;height:38px;border-radius:50%;background:radial-gradient(circle,{{ g.halo }} 0%,transparent 70%);display:flex;align-items:center;justify-content:center"><img src="{{ g.icon }}" style="width:24px;height:24px;image-rendering:pixelated"></span>
+                  <span style="flex:1;min-width:0;font:700 14px/1.15 'Atkinson Hyperlegible';color:#e0f5ea;text-wrap:pretty">{{ g.name }}</span>
+                </span>
+                <span style="display:flex;align-items:center;justify-content:space-between">
+                  <span style="display:flex;align-items:center;gap:3px;font:700 14px 'Atkinson Hyperlegible';color:#f0c45a">+{{ g.amt }}<img src="{{ art.coin }}" style="width:15px;height:15px;image-rendering:pixelated"></span>
+                  <span style="display:flex;gap:3px"><sc-for list="{{ g.pips }}" as="pp" hint-placeholder-count="5"><span style="width:7px;height:7px;border-radius:1px;background:{{ pp.bg }};box-shadow:{{ pp.glow }}"></span></sc-for></span>
+                </span>
+                <sc-if value="{{ g.featured }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;top:0;right:0;padding:2px 7px;border-bottom-left-radius:6px;background:#ffd56a;color:#1a1004;font:700 11px 'Atkinson Hyperlegible'">×2 TODAY</span></sc-if>
+              </button>
+            </sc-for>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:5px;background:#0e1a15;border:1px solid #1e3a2c">
+            <img src="{{ art.spark }}" style="width:16px;height:16px;image-rendering:pixelated">
+            <div style="flex:1;display:flex;flex-direction:column;gap:4px"><span style="font:12px 'Atkinson Hyperlegible';color:#a9c8b8">Blessing chain · every 8 in a day pays <b style="color:#f0c45a">+10 bonus</b></span>
+              <div style="display:grid;grid-template-columns:repeat(8,1fr);gap:3px"><sc-for list="{{ chain }}" as="ch" hint-placeholder-count="8"><div style="height:6px;border-radius:1px;background:{{ ch.bg }};box-shadow:{{ ch.glow }};transition:background .2s"></div></sc-for></div></div>
+            <span style="font:700 14px 'Atkinson Hyperlegible';color:#b6ffd6">{{ chainTxt }}</span>
+          </div>
+          <div style="display:flex;align-items:center;min-height:44px;border-bottom:1px solid #1e3040;padding:0 2px;margin-top:6px">
+            <span style="flex:1;display:flex;flex-direction:column"><span style="font:500 20px/1 'Grenze Gotisch';color:#bfe0ff">The Frozen Tide</span><span style="font:700 11px 'Atkinson Hyperlegible';letter-spacing:.1em;color:#6f8090;margin-top:2px">DAYS OFF · STREAKS KEEP, NOTHING IS MISSED</span></span>
+          </div>
+          <sc-for list="{{ freezes }}" as="f" hint-placeholder-count="2">
+            <div style="display:flex;align-items:center;gap:10px;min-height:44px;padding:4px 10px;border-radius:5px;background:#0e1820;border:1px solid #1e3444"><img src="{{ art.moon }}" style="width:14px;height:14px;image-rendering:pixelated"><span style="flex:1;font:14px 'Atkinson Hyperlegible';color:#d0e4f4">{{ f.name }}</span><span style="font:12px 'Atkinson Hyperlegible';color:#8aa4b8">{{ f.when }}</span></div>
+          </sc-for>
+        </div>
+
+        <!-- DEN -->
+        <div style="width:25%;height:100%;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;padding:10px 10px 18px;display:grid;grid-template-columns:minmax(0,1fr);grid-auto-rows:max-content;align-content:start;gap:8px">
+          <sc-if value="{{ denRoom }}" hint-placeholder-val="{{ true }}">
+            <div style="position:relative;height:258px;flex:none;border-radius:6px;overflow:hidden;background:radial-gradient(ellipse at 50% 60%,#14302a,#070d0b 75%);border:1px solid #2a3b33;box-shadow:inset 0 0 40px rgba(0,0,0,.6)">
+              <canvas ref="{{ roomRef }}" width="160" height="112" style="position:absolute;inset:0;display:block;width:100%;height:100%;image-rendering:pixelated"></canvas>
+              <div style="position:absolute;left:40%;top:52%;width:20%;aspect-ratio:1">
+                <sc-for list="{{ ulhu }}" as="l" hint-placeholder-count="1"><img src="{{ l.src }}" style="position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated;filter:{{ l.filter }}"></sc-for>
+              </div>
+              <div style="position:absolute;left:10px;top:8px;font:500 18px 'Grenze Gotisch';color:#cfe8dc;text-shadow:0 2px 0 #000">Ulhu's Den</div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+              <sc-for list="{{ slots }}" as="sl" hint-placeholder-count="6">
+                <div style="display:flex;align-items:center;gap:8px;min-height:48px;padding:3px 4px 3px 8px;border-radius:5px;background:#131d19;border:1px solid #23332c">
+                  <span style="flex:1;min-width:0;display:flex;flex-direction:column"><span style="font:700 11px 'Atkinson Hyperlegible';letter-spacing:.1em;color:#7f9389;text-transform:uppercase">{{ sl.label }}</span><span style="font:13px 'Atkinson Hyperlegible';color:{{ sl.fg }};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ sl.name }}</span></span>
+                  <sc-if value="{{ sl.has }}" hint-placeholder-val="{{ true }}"><button onClick="{{ sl.out }}" style="flex:none;width:40px;height:40px;border:none;background:none;color:#7f9389;cursor:pointer;font:16px 'Atkinson Hyperlegible'" title="Take out">×</button></sc-if>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{ denShop }}" hint-placeholder-val="{{ false }}">
+            <div data-hscroll="1" style="display:flex;gap:6px;overflow-x:auto;margin:0 -10px;padding:0 10px 2px;touch-action:pan-x">
+              <sc-for list="{{ shopCats }}" as="cc" hint-placeholder-count="6">
+                <button onClick="{{ cc.pick }}" style="flex:none;height:44px;display:flex;align-items:center;gap:6px;padding:0 12px 0 8px;border-radius:22px;border:1.5px solid {{ cc.bd }};background:{{ cc.bg }};color:{{ cc.fg }};font:700 13px 'Atkinson Hyperlegible';cursor:pointer;white-space:nowrap"><img src="{{ cc.src }}" style="height:22px;width:auto;max-width:26px;image-rendering:pixelated">{{ cc.label }}</button>
+              </sc-for>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:3px;padding:3px;border-radius:5px;background:#0b1311;border:1px solid #1c2924">
+              <sc-for list="{{ tierChips }}" as="tc" hint-placeholder-count="5">
+                <button onClick="{{ tc.pick }}" style="height:36px;border:none;border-radius:3px;background:{{ tc.bg }};color:{{ tc.fg }};font:700 12px 'Atkinson Hyperlegible';cursor:pointer">{{ tc.label }}</button>
+              </sc-for>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">
+              <sc-for list="{{ shopItems }}" as="si" hint-placeholder-count="6">
+                <button onClick="{{ si.act }}" style="display:flex;flex-direction:column;align-items:stretch;padding:0;border-radius:5px;border:1.5px solid {{ si.bd }};background:#131d19;cursor:pointer;overflow:hidden;text-align:left">
+                  <span style="height:64px;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 60%,{{ si.halo }},#0b1311 75%)"><img src="{{ si.src }}" style="width:{{ si.w }};height:auto;image-rendering:pixelated;filter:{{ si.filter }};opacity:{{ si.imgOp }}"></span>
+                  <span style="padding:5px 6px 0;font:700 12px/1.2 'Atkinson Hyperlegible';color:#e0e8e3;min-height:34px">{{ si.name }}</span>
+                  <span style="padding:0 6px 4px;font:700 11px 'Atkinson Hyperlegible';color:{{ si.tierC }}">{{ si.tier }}</span>
+                  <span style="height:36px;display:flex;align-items:center;justify-content:center;gap:3px;background:{{ si.btnBg }};color:{{ si.btnFg }};font:700 12px 'Atkinson Hyperlegible'">{{ si.btn }}<sc-if value="{{ si.btnCoin }}" hint-placeholder-val="{{ false }}"><img src="{{ art.coin }}" style="width:13px;height:13px;image-rendering:pixelated"></sc-if></span>
+                </button>
+              </sc-for>
+            </div>
+            <div style="text-align:center;font:12px 'Atkinson Hyperlegible';color:#6f8178">120 items · 10 categories · Basic, Nice, Fancy, Eldritch</div>
+          </sc-if>
+          <sc-if value="{{ denWard }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;gap:10px;align-items:stretch">
+              <div style="flex:none;width:118px;border-radius:6px;background:radial-gradient(circle at 50% 70%,#1f3a32,#0b1311 75%);border:1px solid #2a3b33;display:flex;align-items:center;justify-content:center">
+                <div style="position:relative;width:96px;height:96px"><sc-for list="{{ ulhu }}" as="l" hint-placeholder-count="1"><img src="{{ l.src }}" style="position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated;filter:{{ l.filter }}"></sc-for></div>
+              </div>
+              <div style="flex:1;display:flex;flex-direction:column;gap:5px">
+                <sc-for list="{{ wearing }}" as="wr" hint-placeholder-count="5">
+                  <div style="display:flex;justify-content:space-between;gap:6px;font:12px 'Atkinson Hyperlegible';padding:3px 0;border-bottom:1px solid #1c2924"><span style="color:#7f9389;font-weight:700;letter-spacing:.08em">{{ wr.l }}</span><span style="color:#e0e8e3;text-align:right">{{ wr.v }}</span></div>
+                </sc-for>
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:3px;padding:3px;border-radius:5px;background:#0b1311;border:1px solid #1c2924">
+              <sc-for list="{{ wCats }}" as="wc" hint-placeholder-count="5">
+                <button onClick="{{ wc.pick }}" style="height:40px;border:none;border-radius:3px;background:{{ wc.bg }};color:{{ wc.fg }};font:700 12px/1.1 'Atkinson Hyperlegible';cursor:pointer">{{ wc.label }}<br><span style="font-weight:400;font-size:11px">{{ wc.n }}</span></button>
+              </sc-for>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px">
+              <sc-for list="{{ wItems }}" as="wi" hint-placeholder-count="8">
+                <button onClick="{{ wi.act }}" style="display:flex;flex-direction:column;align-items:center;padding:0 0 4px;border-radius:5px;border:1.5px solid {{ wi.bd }};background:#131d19;cursor:pointer;overflow:hidden">
+                  <span style="position:relative;width:100%;height:58px;background:radial-gradient(circle,{{ wi.halo }},#0b1311 75%)"><span style="position:absolute;left:50%;top:50%;width:52px;height:52px;margin:-26px 0 0 -26px"><img src="{{ wi.base }}" style="position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated;opacity:.35;filter:{{ wi.baseFilter }}"><img src="{{ wi.src }}" style="position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated;filter:{{ wi.filter }}"></span></span>
+                  <span style="padding:3px 4px 2px;font:700 11px/1.15 'Atkinson Hyperlegible';color:#e0e8e3;text-align:center;min-height:28px">{{ wi.name }}</span>
+                  <span style="display:flex;align-items:center;gap:2px;font:700 11px 'Atkinson Hyperlegible';color:{{ wi.stFg }}">{{ wi.st }}<sc-if value="{{ wi.coin }}" hint-placeholder-val="{{ false }}"><img src="{{ art.coin }}" style="width:11px;height:11px;image-rendering:pixelated"></sc-if></span>
+                </button>
+              </sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{ denHoard }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;align-items:center;min-height:44px;border-bottom:1px solid #3a3018;padding:0 2px">
+              <span style="flex:1;display:flex;flex-direction:column"><span style="font:500 20px/1 'Grenze Gotisch';color:#ffd56a">The Hoard</span><span style="font:700 11px 'Atkinson Hyperlegible';letter-spacing:.1em;color:#8a7a5a;margin-top:2px">REAL REWARDS YOU WROTE YOURSELF</span></span>
+            </div>
+            <sc-for list="{{ hoardRows }}" as="h" hint-placeholder-count="4">
+              <div style="position:relative;display:flex;align-items:center;gap:10px;min-height:56px;padding:5px 6px 5px 12px;border-radius:3px;background:radial-gradient(ellipse at 25% 0%,#f3e7c8,#dfcb9c 70%,#cdb37f);color:#2a1a12;box-shadow:0 2px 0 #3a2a14;border-left:5px dotted #a88a5a">
+                <div style="flex:1;min-width:0"><div style="font:17px/1.15 'IM Fell English'">{{ h.name }}</div><div style="font:12px 'Atkinson Hyperlegible';color:#5a4428;margin-top:2px">{{ h.sub }}</div></div>
+                <button onClick="{{ h.claim }}" style="flex:none;height:44px;min-width:92px;display:flex;align-items:center;justify-content:center;gap:4px;padding:0 10px;border-radius:4px;border:none;background:{{ h.bg }};color:{{ h.fg }};font:700 14px 'Atkinson Hyperlegible';cursor:pointer;box-shadow:0 2px 0 rgba(0,0,0,.35)">{{ h.cost }}<img src="{{ art.coin }}" style="width:16px;height:16px;image-rendering:pixelated"></button>
+                <sc-if value="{{ h.stamped }}" hint-placeholder-val="{{ false }}">
+                  <div ref="{{ stampIn }}" style="position:absolute;right:110px;top:50%;margin-top:-22px;width:120px;height:44px;display:flex;align-items:center;justify-content:center;gap:6px;border:3px double #8a1a22;border-radius:4px;color:#8a1a22;font:700 20px 'Grenze Gotisch';letter-spacing:.12em;transform:rotate(-10deg);background:rgba(243,231,200,.7);pointer-events:none"><img src="{{ art.wax }}" style="width:22px;height:22px;image-rendering:pixelated">CLAIMED</div>
+                </sc-if>
+              </div>
+            </sc-for>
+          </sc-if>
+          <sc-if value="{{ denChron }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:10px 12px;border-radius:5px;background:linear-gradient(180deg,#1b2924,#131d19);border:1px solid #2a3b33">
+              <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font:500 18px 'Grenze Gotisch';color:#e8e1cf">Doubloons per week</span><span style="font:700 12px 'Atkinson Hyperlegible';color:#f0c45a">{{ weekCoins }} this week</span></div>
+              <div style="display:flex;align-items:flex-end;gap:6px;height:84px;margin-top:8px">
+                <sc-for list="{{ weeks }}" as="w" hint-placeholder-count="7">
+                  <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;height:100%;justify-content:flex-end"><span style="font:700 11px 'Atkinson Hyperlegible';color:#c9a560">{{ w.c }}</span><div style="width:100%;height:{{ w.h }};background:repeating-linear-gradient(180deg,{{ w.col }} 0 4px,{{ w.col2 }} 4px 6px);border:1px solid #4a2c0c"></div></div>
+                </sc-for>
+              </div>
+              <div style="display:flex;gap:6px;margin-top:4px"><sc-for list="{{ weeks }}" as="w" hint-placeholder-count="7"><span style="flex:1;text-align:center;font:11px 'Atkinson Hyperlegible';color:#7f9389">{{ w.l }}</span></sc-for></div>
+            </div>
+            <div style="padding:10px 12px;border-radius:5px;background:linear-gradient(180deg,#1b2924,#131d19);border:1px solid #2a3b33">
+              <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font:500 18px 'Grenze Gotisch';color:#e8e1cf">Streak calendar</span><span style="display:flex;gap:8px;font:11px 'Atkinson Hyperlegible';color:#7f9389"><span style="color:#5ef2a0">■ ticked</span><span style="color:#5aa7ff">■ frozen</span></span></div>
+              <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:8px">
+                <sc-for list="{{ calHead }}" as="ch" hint-placeholder-count="7"><span style="text-align:center;font:700 11px 'Atkinson Hyperlegible';color:#61756b">{{ ch }}</span></sc-for>
+                <sc-for list="{{ cal }}" as="cd" hint-placeholder-count="35"><div style="height:22px;border-radius:2px;background:{{ cd.bg }};border:1px solid {{ cd.bd }};box-shadow:{{ cd.glow }}"></div></sc-for>
+              </div>
+            </div>
+            <div style="padding:10px 12px 0;border-radius:5px;background:linear-gradient(180deg,#1b2924,#131d19);border:1px solid #2a3b33">
+              <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font:500 18px 'Grenze Gotisch';color:#e8e1cf">Trophy shelf</span><span style="font:700 12px 'Atkinson Hyperlegible';color:#ff7a66">{{ beatenCount }} bosses beaten</span></div>
+              <div style="display:flex;align-items:flex-end;gap:10px;min-height:64px;padding:8px 4px 0;overflow-x:auto">
+                <sc-for list="{{ trophies }}" as="tr" hint-placeholder-count="3">
+                  <div style="flex:none;display:flex;flex-direction:column;align-items:center;gap:2px"><img src="{{ tr.src }}" style="height:{{ tr.h }};image-rendering:pixelated;filter:sepia(1) saturate(2.4) hue-rotate(-12deg) brightness(1.05) drop-shadow(0 0 4px rgba(255,214,106,.4))"><span style="font:11px 'Atkinson Hyperlegible';color:#c9a560;max-width:70px;text-align:center;line-height:1.1">{{ tr.name }}</span></div>
+                </sc-for>
+              </div>
+              <div style="height:10px;margin:4px -12px 0;background:linear-gradient(180deg,#8a5a34,#5a3a20);border-top:2px solid #b8843a;border-radius:0 0 5px 5px"></div>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+      </div>
+      <sc-if value="{{ dayOff }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(6,14,26,.5),rgba(6,14,26,.7));display:flex;align-items:flex-start;justify-content:center;padding-top:6px"><span style="padding:4px 12px;border-radius:3px;background:#173040;border:1px solid #3a6a8a;font:700 12px 'Atkinson Hyperlegible';letter-spacing:.1em;color:#bfe0ff">TODAY IS FROZEN · NOTHING CAN BE MISSED</span></div>
+      </sc-if>
+      </sc-if>
+
+      <!-- FORMS (in place of the list, never over it) -->
+      <sc-if value="{{ hasForm }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;padding:12px 12px 16px;display:grid;grid-template-columns:minmax(0,1fr);grid-auto-rows:max-content;align-content:start;gap:10px;background:linear-gradient(180deg,#101a17,#0b1311)">
+          <div style="display:flex;align-items:center;justify-content:space-between"><span style="font:500 23px 'Grenze Gotisch';color:{{ formColor }}">{{ formTitle }}</span><button onClick="{{ closeForm }}" style="width:44px;height:44px;border:none;background:none;color:#8fa298;font:22px 'Atkinson Hyperlegible';cursor:pointer">×</button></div>
+          <input value="{{ draft.name }}" onChange="{{ setDraftName }}" placeholder="{{ formPh }}" autoFocus="{{ true }}" style="height:48px;padding:0 12px;border-radius:5px;border:1.5px solid #2f443b;background:#0b1513;color:#e8e1cf;font:16px 'Atkinson Hyperlegible';outline:none">
+          <sc-if value="{{ fGroupSugs }}" hint-placeholder-val="{{ false }}">
+            <span style="font:700 11px 'Atkinson Hyperlegible';letter-spacing:.1em;color:#7f9389">THEMED NAMES</span>
+            <div style="display:flex;flex-wrap:wrap;gap:6px"><sc-for list="{{ groupSugs }}" as="gs" hint-placeholder-count="4"><button onClick="{{ gs.pick }}" style="min-height:40px;padding:0 12px;border-radius:20px;border:1.5px solid #2f443b;background:#131d19;color:#cfe8dc;font:500 16px 'Grenze Gotisch';cursor:pointer">{{ gs.label }}</button></sc-for></div>
+          </sc-if>
+          <sc-for list="{{ formRows }}" as="fr" hint-placeholder-count="3">
+            <div style="display:flex;flex-direction:column;gap:5px">
+              <span style="font:700 11px 'Atkinson Hyperlegible';letter-spacing:.1em;color:#7f9389">{{ fr.label }}</span>
+              <div style="display:flex;flex-wrap:wrap;gap:6px">
+                <sc-for list="{{ fr.chips }}" as="ch" hint-placeholder-count="4">
+                  <button onClick="{{ ch.pick }}" style="min-width:44px;min-height:42px;display:flex;align-items:center;gap:6px;padding:0 12px;border-radius:5px;border:1.5px solid {{ ch.bd }};background:{{ ch.bg }};color:{{ ch.fg }};font:700 14px 'Atkinson Hyperlegible';cursor:pointer"><sc-if value="{{ ch.hasImg }}" hint-placeholder-val="{{ false }}"><img src="{{ ch.img }}" style="height:22px;image-rendering:pixelated"></sc-if>{{ ch.label }}</button>
+                </sc-for>
+              </div>
+            </div>
+          </sc-for>
+          <sc-if value="{{ fSteps }}" hint-placeholder-val="{{ false }}">
+            <span style="font:700 11px 'Atkinson Hyperlegible';letter-spacing:.1em;color:#7f9389">{{ stepsLabel }}</span>
+            <sc-for list="{{ draftSteps }}" as="ds" hint-placeholder-count="2">
+              <div style="display:flex;gap:6px;align-items:center">
+                <input value="{{ ds.n }}" onChange="{{ ds.set }}" placeholder="{{ ds.ph }}" style="flex:1;min-width:0;height:44px;padding:0 10px;border-radius:5px;border:1.5px solid #2f443b;background:#0b1513;color:#e8e1cf;font:15px 'Atkinson Hyperlegible';outline:none">
+                <sc-if value="{{ ds.hasBy }}" hint-placeholder-val="{{ false }}"><button onClick="{{ ds.cycle }}" style="flex:none;height:44px;padding:0 10px;border-radius:5px;border:1.5px solid #4a2a2e;background:#1c1012;color:#ffb3a8;font:700 13px 'Atkinson Hyperlegible';cursor:pointer">by {{ ds.by }}</button></sc-if>
+                <button onClick="{{ ds.del }}" style="flex:none;width:40px;height:44px;border:none;background:none;color:#7f9389;font:18px 'Atkinson Hyperlegible';cursor:pointer">×</button>
+              </div>
+            </sc-for>
+            <div style="display:flex;gap:6px">
+              <button onClick="{{ addStep }}" style="flex:1;height:42px;border-radius:5px;border:1.5px dashed #2f443b;background:none;color:#8fa298;font:700 13px 'Atkinson Hyperlegible';cursor:pointer">+ {{ stepWord }}</button>
+              <sc-if value="{{ fBoss }}" hint-placeholder-val="{{ false }}"><button onClick="{{ useTemplate }}" style="flex:1;height:42px;border-radius:5px;border:1.5px solid #5a3a8a;background:#1e1430;color:#d4bfff;font:700 13px 'Atkinson Hyperlegible';cursor:pointer">Marking template</button></sc-if>
+            </div>
+          </sc-if>
+          <div style="flex:1"></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-radius:5px;background:#0b1311;border:1px solid #1c2924">
+            <span style="font:13px 'Atkinson Hyperlegible';color:#93a69c">{{ payLabel }}</span>
+            <span style="display:flex;align-items:center;gap:4px;font:700 22px 'Atkinson Hyperlegible';color:{{ payColor }}">{{ payVal }}<sc-if value="{{ payCoin }}" hint-placeholder-val="{{ true }}"><img src="{{ art.coin }}" style="width:24px;height:24px;image-rendering:pixelated"></sc-if></span>
+          </div>
+          <button onClick="{{ submitForm }}" style="flex:none;height:52px;border:none;border-radius:6px;background:{{ submitBg }};color:#08100d;font:700 22px 'Grenze Gotisch';cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,.4);opacity:{{ submitOp }}">{{ submitTxt }}</button>
+        </div>
+      </sc-if>
+    </div>
+
+    <!-- DOCK (thumb zone) -->
+    <div style="flex:none;height:62px;display:flex;align-items:center;gap:8px;padding:0 10px;background:linear-gradient(180deg,#0f1916,#0a110f);border-top:1px solid #1c2924">
+      <sc-for list="{{ dock }}" as="d" hint-placeholder-count="2">
+        <button onClick="{{ d.act }}" style="flex:{{ d.flex }};min-width:0;height:46px;display:flex;align-items:center;justify-content:center;gap:6px;padding:0 6px;border-radius:6px;border:1.5px solid {{ d.bd }};background:{{ d.bg }};color:{{ d.fg }};font:{{ d.font }};cursor:pointer;white-space:nowrap;box-shadow:0 2px 0 rgba(0,0,0,.4)">{{ d.label }}</button>
+      </sc-for>
+    </div>
+    <div ref="{{ fxRef }}" style="position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:30"></div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ chrome }}" hint-placeholder-val="{{ true }}">
+    <div style="flex:none;height:54px;display:grid;grid-template-columns:repeat(4,1fr);background:#0a1020;border-top:1px solid #1a2238">
+      <sc-for list="{{ plannerNav }}" as="pn" hint-placeholder-count="4">
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font:700 12px 'Atkinson Hyperlegible';color:{{ pn.fg }}">
+          <span style="width:30px;height:22px;border-radius:11px;background:{{ pn.bg }};display:flex;align-items:center;justify-content:center"><img src="{{ pn.icon }}" style="width:16px;height:16px;image-rendering:pixelated;opacity:{{ pn.op }}"></span>{{ pn.l }}
+        </div>
+      </sc-for>
+    </div>
+    <div style="flex:none;height:16px;background:#0a1020;display:flex;justify-content:center;align-items:center"><div style="width:110px;height:4px;border-radius:2px;background:#5a6470"></div></div>
+  </sc-if>
+</div>
+</div>
+
+<div style="flex:0 1 360px;min-width:260px;padding-top:12px;display:flex;flex-direction:column;gap:16px;color:#c8d2cc">
+  <div style="font:700 40px/1 'Grenze Gotisch';color:#e8e1cf">Ulhu's Rituals</div>
+  <div style="font:italic 17px/1.4 'IM Fell English';color:#a9b8ae">Phone redesign · clickable prototype. Tap, swipe the list left and right, undo anything.</div>
+  <div style="display:flex;flex-direction:column;gap:10px;font:14px/1.45 'Atkinson Hyperlegible'">
+    <div style="font:700 11px 'Atkinson Hyperlegible';letter-spacing:.14em;color:#5ef2a0">WHAT CHANGED FROM TODAY'S APP</div>
+    <div><b style="color:#e8e1cf">One home for the game.</b> The classroom timer controls moved off this screen. Ulhu, the doubloons, the bars and his line now sit in one banner that takes about a quarter of the screen.</div>
+    <div><b style="color:#e8e1cf">No more "Archive" on every row.</b> Each row now shows what matters: a 46 px tick, the length, the kind, the streak and the pay. Editing moved into the group header (✎) and the forms.</div>
+    <div><b style="color:#e8e1cf">The Undo line is a real line.</b> It shows the last action and how much it changed your doubloons or health. It never covers anything.</div>
+    <div><b style="color:#e8e1cf">Every list folds.</b> 7 marking cards now take less space than 2 did, in a two-column grid. The two boss cards that showed every stage at once now fold.</div>
+    <div><b style="color:#e8e1cf">Numbers in Atkinson Hyperlegible.</b> 2, 5 and 8 can't be confused. The pixel font is only used for art, and Grenze Gotisch is used for the runic headings.</div>
+    <div><b style="color:#e8e1cf">Actions are in the thumb zone.</b> The add buttons, the day-off button and the Den views sit in the dock at the bottom. Forms open in place of the list, not on top of it.</div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:6px;font:13px/1.45 'Atkinson Hyperlegible';color:#93a69c">
+    <div style="font:700 11px 'Atkinson Hyperlegible';letter-spacing:.14em;color:#f0c45a">TRY</div>
+    <div>Tick <b style="color:#e8e1cf">Read</b> and watch the coin fly, then press Undo. Tap a curse 4× to see Ulhu faint. In Quests, tick the stages of <b style="color:#e8e1cf">Make Halloween costumes</b> to beat the boss. Use the Tweaks to switch between 8-bit and 16-bit Ulhu, or set the clock past 7 pm.</div>
+    <a href="Ulhu Design Sheets.dc.html" style="font-weight:700">Open the design sheets →</a>
+  </div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;ulhuStyle&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;8-bit&quot;,&quot;16-bit&quot;],&quot;default&quot;:&quot;16-bit&quot;,&quot;tsType&quot;:&quot;'8-bit'|'16-bit'&quot;},&quot;clock&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;4:40 pm&quot;,&quot;7:30 pm&quot;],&quot;default&quot;:&quot;4:40 pm&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;showChrome&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;}}">
+const BASE={5:3,15:6,30:10,60:16,120:25},MULT={nec:1,ahead:1.5,out:3,life:2},HPC={5:2,15:4,30:6,60:9,120:12};
+const KIND={nec:{l:'Necessary',c:'#5aa7ff',ink:'#1d4a8a'},ahead:{l:'Ahead',c:'#f2a93b',ink:'#8a5a0a'},out:{l:'Outside work',c:'#b07cff',ink:'#5a2a9a'},life:{l:'Life',c:'#5ee08a',ink:'#1a6a3a'}};
+const DN=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],TODAY=23;
+const dshort=d=>DN[(((d-23)%7)+7+5)%7]+' '+(d>31?d-31:d);
+const SIZE={2:{k:'spawn',gold:60},5:{k:'shog',gold:150},10:{k:'levi',gold:300},20:{k:'old',gold:600}};
+const TITLES=['','Tadpole','Polyp','Deep Dabbler','Abyssal Apprentice','Tide Caller','Rune Keeper','Dream Weaver','Star Spawn','High Priest','Elder Thing','Great Dreamer','Old One'];
+const pay=(len,kind,streak)=>Math.round(BASE[len]*MULT[kind]*(1+Math.min((streak||0)*3,30)/100));
+const SNAP=['coins','xp','xpMax','level','hp','groups','quests','bosses','beaten','curses','blessings','owned','placed','wOwned','wear','hoard','dayOff','review','weekCoins','last'];
+const CATS=[['floor','Floors'],['wall','Walls'],['rug','Rugs'],['win','Windows'],['light','Lights'],['corner','Corner'],['seat','Seats'],['table','Tables'],['hang','Hangings'],['props','Props']];
+const NAMES={
+ floor:['Driftwood planks','Bilge boards','Kelp-woven mat','Slate flags','Sea-glass tiles','Barnacle stone','Coral mosaic','Brass deck','Pearl inlay','Abyssal obsidian','Tidepool glass',"Floor of R'lyeh"],
+ wall:['Mossy bricks','Wet stone',"Ship's panelling",'Kelp paper','Tidewater plaster','Sunken library','Coral reef','Whale-rib arches','Inked vellum','Glowing algae','Star-chart walls','Non-Euclidean walls'],
+ rug:['Rag rug','Sailcloth rug','Kelp rug','Fishing-net rug','Barnacle mat','Cosy circle','Octopus rug','Tome-page rug','Abyssal shag','Elder-sigil rug','Moonpool rug','Rug of the Deep Ones'],
+ win:['Brass porthole','Twin portholes','Four-pane window','Curtained porthole','Arched window','Kelp-forest view','Shipwreck view','Stained-glass rose','Anglerfish window','Whale-song window','Deep-trench view','Window to the stars'],
+ light:['Candle stub','Oil lamp','Jellyfish lamp','Lantern','Anglerfish light','Glow-worm jar','Sea lantern','Shell chandelier','Witchlight','Moon-jelly lamp','Phosphor orb','The Eldritch Glow'],
+ corner:['Kelp pot','Seaweed fern','Coral bonsai','Anemone pot','Sea-grape vine','Bubble plant','Kraken palm','Glowing fern','Mandrake','Whispering kelp','Pearl tree','Starspawn sapling'],
+ seat:['Crate stool','Barrel seat','Sea chest',"Captain's chair",'Velvet armchair','Clam chair','Reading nook','Coral throne','Kraken beanbag','Leviathan sofa',"Dagon's throne",'Seat of the Old Ones'],
+ table:['School desk','Driftwood table','Chart table','Marking desk','Tea table',"Alchemist's bench","Captain's desk",'Coral writing desk','Map table','Scrying table','Grimoire lectern',"Altar of R'lyeh"],
+ hang:['Sea map','Ship in a frame','Tentacle portrait','Class photo','Periodic table','Kraken print','Lighthouse oil','Star chart','Ancestor portrait','Elder sign','Mirror of the deep','Tapestry of dreams'],
+ props:['Bookshelf','Goldfish tank','Tall bookcase','Seahorse tank','Grimoire shelf','Jellyfish tank',"Captain's library",'Pufferfish tank','Forbidden tomes','Anglerfish tank','Necronomicon case','Tank of the Deep']};
+const PRICE=[0,40,80,110,200,240,320,450,600,750,1200,2000],LOCK={8:6,9:8,10:10,11:12},HUES=[0,25,330,160,0,200,280,40,100,300,140,260];
+const tierOf=i=>i<4?'Basic':i<7?'Nice':i<10?'Fancy':'Eldritch';
+const TIERC={Basic:'#c8beaa',Nice:'#5ee08a',Fancy:'#b49cff',Eldritch:'#5ef2a0'};
+const WCATS=[['hat','Hats',20,'hat'],['top','Tops',14,'top'],['face','Face',13,'face'],['held','Held',12,'held'],['skin','Skins',12,null]];
+const WNAMES={hat:['Pirate tricorn','Wizard hat','Little crown','Top hat','Teacher’s mortarboard',"Captain's cap",'Fez','Witch hat','Knitted beanie','Flower crown','Horned helm','Party hat','Sailor cap','Halo','Propeller cap','Kelp crown','Ghost tricorn','Void wizard hat','Elder crown','Head of Department board'],
+ top:['Striped scarf','Sailor collar','Velvet cape','Lab coat','Bow tie','School tie','Rune jumper','Life ring','Medal of Marking','Kelp sash','Kelp scarf','Midnight cape','Gold bow tie','Eldritch mantle'],
+ face:['Monocle','Reading glasses','Eyepatch','Lab goggles','Fine moustache','Shades','Star glasses','3D glasses','Half-moon specs','Gold monocle','Void shades','Rose goggles','Eye of the Deep'],
+ held:['Lantern','Trident','Quill and ink','Grimoire','Mug of tea','Red marking pen','Rune staff','Fishing rod','Ghost lantern','Coral trident','Green pen','Staff of the Deep'],
+ skin:['Kelp Mint','Abyssal Teal','Tidepool Blue','Deep Violet','Coral Pink','Sunken Gold','Ghostly','Ink Shadow','Bloom Rose','Moss Green','Star Spawn','Eldritch Glow']};
+const SKINF=['none','hue-rotate(30deg)','hue-rotate(60deg)','hue-rotate(110deg)','hue-rotate(180deg)','hue-rotate(-90deg) saturate(1.4)','saturate(0) brightness(1.15)','brightness(.55) saturate(.6)','hue-rotate(150deg) saturate(1.2)','hue-rotate(-30deg)','hue-rotate(80deg) saturate(1.6)','hue-rotate(-10deg) saturate(1.8) brightness(1.1) drop-shadow(0 0 3px #5ef2a0)'];
+const WPRICE=[0,60,90,120,180,220,260,320,400,500,650,900,1200,1500];
+const TICK_SAYS=["Ph'nglui! Lovely work.",'The stars align.','Another rune glows.','Ia! Ia! Well done.','The deep approves.'];
+const CURSE_SAYS=['Ow. That one stung.','The deep grows cold…','Ulhu flinches. Easy now.'];
+
+const mkStage=(n,by,done,late)=>({n,by,done:!!done,late:!!late});
+const INIT={
+ tab:0,drag:0,coins:412,xp:140,xpMax:250,level:4,hp:38,hpMax:50,mood:null,say:null,dayOff:false,weekCoins:186,
+ last:{verb:'Ticked:',name:'Log behaviour',delta:'+3',unit:'coin'},
+ open:{teach:true,chores:true,summon:true,marking:false,life:true,qteach:true,qlife:true,qdone:false,b1:true},
+ groups:[
+  {id:'teach',name:'The Teaching Trench',plain:'Teaching',parent:null,type:'parent'},
+  {id:'chores',name:'The Drudgery Shoals',plain:'Teaching chores',parent:'teach',type:'list',items:[
+   {id:'r1',name:'Log behaviour',len:5,kind:'nec',rep:'School days',streak:18,done:true,auto:true},
+   {id:'r2',name:'Set homework',len:15,kind:'nec',rep:'School days',streak:9,done:false,auto:true},
+   {id:'r3',name:'Friday emails',len:15,kind:'nec',rep:'Fridays',streak:6,done:false,auto:true},
+   {id:'r4',name:'Order sheet downloaded',len:5,kind:'nec',rep:'Thu, Fri',streak:3,done:true,auto:true},
+   {id:'r5',name:"Prep next week's practicals",len:30,kind:'ahead',rep:'Fridays',streak:2,done:false},
+   {id:'r6',name:'Write a revision booklet page',len:60,kind:'out',rep:'Every 2 weeks',streak:1,done:false}]},
+  {id:'summon',name:'The Summoning Circle',plain:'Summoned · tick themselves when built',parent:'teach',type:'summon',tide:2,items:[
+   {id:'s1',name:'Build 9XS lesson 4',len:30,kind:'ahead',rep:'for Mon 26',done:true,auto:true},
+   {id:'s2',name:'Build 13D lesson 5a',len:30,kind:'ahead',rep:'for Tue 27',done:false,auto:true},
+   {id:'s3',name:'Build 10C2 lesson 1',len:30,kind:'ahead',rep:'for Wed 28',done:false,auto:true},
+   {id:'s4',name:'Build 8AG lesson 7a',len:30,kind:'ahead',rep:'for Fri 30',done:false,auto:true}]},
+  {id:'marking',name:'The Marking Crypt',plain:'Book marking · termly',parent:'teach',type:'marking',cards:['9AS','7MLA','8XP','8AG','10C2','10S2','9XS'].map(c=>({cls:c,h:[c==='9XS'||c==='10S2',false]}))},
+  {id:'life',name:'The Surface World',plain:'Life',parent:null,type:'list',items:[
+   {id:'l1',name:'Read',len:30,kind:'life',rep:'Every day',streak:12,done:false},
+   {id:'l2',name:'Train',len:30,kind:'life',rep:'Mon, Wed, Fri',streak:4,done:false},
+   {id:'l3',name:'Call a friend or game',len:30,kind:'life',rep:'Every 3 days',streak:2,done:false},
+   {id:'l4',name:'Cook something new',len:60,kind:'life',rep:'Every 2 weeks',streak:0,done:false}]}],
+ quests:[
+  {id:'q1',name:'Email parents about the museum trip',len:15,kind:'nec',due:23,steps:[],grp:'teach'},
+  {id:'q2',name:'Print the 10S2 mock papers',len:30,kind:'nec',due:26,steps:[{t:'Find the 2024 paper',d:true},{t:'Print 32 copies',d:false},{t:'Sort into packs',d:false}],grp:'teach'},
+  {id:'q3',name:'Build the electrolysis practical kit',len:60,kind:'ahead',due:30,steps:[{t:'Check the electrode stock',d:false},{t:'Test the power packs',d:false}],grp:'teach'},
+  {id:'q4',name:'Plan the Halloween party food',len:30,kind:'life',due:24,steps:[],grp:'life'},
+  {id:'q5',name:'Book the dentist',len:5,kind:'life',due:null,steps:[],grp:'life'},
+  {id:'q6',name:'Update the seating plans',len:30,kind:'nec',due:21,steps:[],grp:'teach',done:true,settled:true}],
+ bosses:[
+  {id:'b1',name:'Make Halloween costumes',size:2,stages:[mkStage('Discuss what it should be',20),mkStage('Get materials',22),mkStage('Paint and build',30)]},
+  {id:'b2',name:'Mark the 10S2 test',size:5,k:'deep',stages:[mkStage('Half marked',22,true),mkStage('The rest',26),mkStage('Scores summed',27),mkStage('Entered',28)]},
+  {id:'b3',name:'Write the Year 9 scheme of work',size:20,stages:[mkStage('Map the topics',16,true),mkStage('Lessons 1–6',21,true,true),mkStage('Lessons 7–12',30),mkStage('Assessments',37),mkStage('Share with the department',41)]}],
+ beaten:[{name:'Parents’ evening prep',k:'shog'},{name:'Mark the Year 7 baseline',k:'mite'},{name:'Rewrite the KS4 practical guide',k:'gaunt'}],
+ curses:[{id:'c1',name:'Binge-watching Netflix',len:120,count:0},{id:'c2',name:'Doomscrolling in bed',len:30,count:1},{id:'c3',name:'Marking on the sofa past 10 pm',len:60,count:0},{id:'c4',name:'Skipped lunch',len:15,count:0}],
+ blessings:[{id:'g1',name:'Drank water',amt:2,count:3,ic:'water'},{id:'g2',name:'Went for a walk',amt:5,count:0,ic:'walk',feat:true},{id:'g3',name:'Stretched',amt:2,count:1,ic:'stretch'},{id:'g4',name:'Tidied the desk',amt:3,count:0,ic:'tidy'},{id:'g5',name:'Left school by 5',amt:6,count:0,ic:'door'},{id:'g6',name:'Ate a proper lunch',amt:3,count:1,ic:'apple'},{id:'g7',name:'Took a real break',amt:3,count:0,ic:'tea'},{id:'g8',name:'Got some daylight',amt:3,count:0,ic:'sun'},{id:'g9',name:'In bed by 10:30',amt:5,count:0,ic:'moon'},{id:'g10',name:'Said something kind',amt:2,count:0,ic:'heart'}],
+ owned:{'floor-0':1,'wall-0':1,'rug-0':1,'rug-5':1,'win-0':1,'light-0':1,'light-2':1,'corner-0':1,'table-0':1,'table-3':1,'props-0':1,'props-1':1,'hang-0':1,'seat-0':1},
+ placed:{floor:'floor-0',wall:'wall-0',rug:'rug-5',win:'win-0',light:'light-2',corner:'corner-0',table:'table-3',props:'props-0',hang:'hang-0'},
+ wOwned:{'hat-0':1,'top-0':1,'face-0':1,'held-0':1,'skin-0':1,'skin-1':1},
+ wear:{hat:'hat-0',top:null,face:null,held:null,skin:'skin-0'},
+ hoard:[{id:'h1',name:'Takeaway night',cost:300,claims:2},{id:'h2',name:'One hour of gaming',cost:80,claims:5},{id:'h3',name:'Fancy coffee on the way in',cost:40,claims:9},{id:'h4',name:'Saturday lie-in, no marking',cost:120,claims:1},{id:'h5',name:'New board game',cost:600,claims:0}],
+ review:{open:false,done:false,well:'',slipped:'',p:['','','']},
+ den:'room',shopCat:'win',tier:'All',wCat:'hat',form:null,draft:null,renaming:null,renameVal:'',banishArm:null,stampId:null,vanqOpen:false
+};
+
+class Component extends DCLogic {
+  state = JSON.parse(JSON.stringify(INIT));
+  stack = [];
+  componentDidMount(){
+    const wait=()=>{ if(window.ULHU_ART&&window.PX){ this.forceUpdate(); setTimeout(()=>this.startBubbles(),50);} else setTimeout(wait,40); }; wait();
+  }
+  componentWillUnmount(){ this.dead=true; }
+  componentDidUpdate(){ this.drawRoom(); }
+  phoneRef=el=>{this.phone=el}; fxRef=el=>{this.fx=el}; ulhuRef=el=>{this.ulhuEl=el}; counterRef=el=>{this.counter=el};
+  bannerRef=el=>{this.banner=el}; flashRef=el=>{this.flash=el}; hpRef=el=>{this.hpEl=el};
+  bubbleRef=el=>{this.bubbles=el; if(el) this.startBubbles();};
+  roomRef=el=>{this.roomEl=el; if(el) this.drawRoom();};
+  stampIn=el=>{ if(el&&el.animate) el.animate([{transform:'scale(2.4) rotate(-28deg)',opacity:0},{transform:'scale(.92) rotate(-10deg)',opacity:1,offset:.7},{transform:'scale(1) rotate(-10deg)',opacity:1}],{duration:420,easing:'cubic-bezier(.2,.8,.3,1.2)'}); };
+
+  startBubbles(){
+    const L=this.bubbles; if(!L||L.childElementCount) return;
+    for(let i=0;i<9;i++){ const b=document.createElement('div'); const s=3+Math.random()*5;
+      b.style.cssText=`position:absolute;left:${10+Math.random()*370}px;bottom:-10px;width:${s}px;height:${s}px;border-radius:50%;border:1px solid rgba(180,255,230,.35);background:rgba(180,255,230,.08)`;
+      L.appendChild(b); b.animate([{transform:'translate(0,0)',opacity:0},{opacity:.9,offset:.15},{transform:`translate(${(Math.random()-.5)*30}px,-190px)`,opacity:0}],{duration:5000+Math.random()*5000,delay:Math.random()*6000,iterations:Infinity});}
+  }
+  // ——— art helpers ———
+  art(){ const P=window.PX,A=window.ULHU_ART; return {coin:P.coin.src,flame:P.flame.src,heart:P.heart.src,skull:P.skull.src,seal:P.seal.src,wax:P.waxRed.src,xp:P.xp.src,trophy:P.trophy.src,tick:P.tick.src,moon:P.moon.src,spark:P.spark.src,rune:P.rune.src,plant:A.items.plant.src}; }
+  shopCatalog(){
+    if(this._cat) return this._cat; const P=window.PX,I=window.ULHU_ART.items;
+    const spr=(c,i)=>({floor:P.floorTile,wall:P.wallTile,rug:I.rug,win:P.porthole,light:I.lamp,corner:I.plant,seat:P.chair,table:I.desk,hang:P.painting,props:i%2?I.aquarium:I.bookshelf})[c];
+    const out={}; CATS.forEach(([c])=>{ out[c]=NAMES[c].map((n,i)=>({id:c+'-'+i,cat:c,i,name:n,tier:tierOf(i),price:PRICE[i],lock:LOCK[i]||0,hue:HUES[i],src:spr(c,i).src,big:c==='props'&&i%2?'aux':c})); });
+    return this._cat=out;
+  }
+  spriteSize(it){ const I=window.ULHU_ART.items,P=window.PX; const m={floor:P.floorTile,wall:P.wallTile,rug:I.rug,win:P.porthole,light:I.lamp,corner:I.plant,seat:P.chair,table:I.desk,hang:P.painting,props:it.i%2?I.aquarium:I.bookshelf}[it.cat]; const k=Math.min(2,50/m.h,62/m.w); return Math.round(m.w*k)+'px'; }
+  item(id){ if(!id) return null; const [c,i]=id.split('-'); return this.shopCatalog()[c][+i]; }
+  wardCatalog(){
+    if(this._w) return this._w; const P=window.PX; const out={};
+    WCATS.forEach(([c,,n,setKey])=>{ const arts=setKey?P.wearSets[setKey]:null; out[c]=WNAMES[c].slice(0,n).map((nm,i)=>({id:c+'-'+i,cat:c,i,name:nm,price:WPRICE[i]||1500,lock:i>=10?8+(i-10)*2:0,src:arts?P.wear[arts[i%arts.length]].src:null,filter:c==='skin'?SKINF[i]:(i<arts.length?'none':`hue-rotate(${(i*67)%360}deg)`)})); });
+    return this._w=out;
+  }
+  witem(id){ if(!id) return null; const [c,i]=id.split('-'); return this.wardCatalog()[c][+i]; }
+  layers(mood,style,wear){
+    const A=window.ULHU_ART; const base=(style==='8-bit'?A.b8:A.b16)[mood]||A.b8.idle;
+    const skin=this.witem(wear.skin); const L=[{src:base,filter:skin?skin.filter:'none'}];
+    ['top','face','hat','held'].forEach(k=>{const w=this.witem(wear[k]); if(w) L.push({src:w.src,filter:w.filter});});
+    return L;
+  }
+  drawRoom(){
+    if(!this.roomEl||!window.PX) return; const s=this.state; const items={}; let floorHue=0,wallHue=0;
+    Object.entries(s.placed).forEach(([slot,id])=>{const it=this.item(id); if(!it) return; if(slot==='floor') floorHue=it.hue; else if(slot==='wall') wallHue=it.hue; else items[it.big]={src:it.src,hue:it.hue};});
+    const night=(this.props.clock||'4:40 pm')==='7:30 pm'||s.dayOff;
+    const key=JSON.stringify([items,floorHue,wallHue,night]); if(key===this._roomKey&&this.roomEl===this._roomCanvas) return;
+    this._roomKey=key; this._roomCanvas=this.roomEl;
+    window.PX.drawRoom(this.roomEl,{items,floorHue,wallHue,night},()=>{this._roomKey=null;this.drawRoom();});
+  }
+  // ——— fx ———
+  rel(el){ const p=this.phone.getBoundingClientRect(),r=el.getBoundingClientRect(),k=p.width/390; return {x:(r.left+r.width/2-p.left)/k,y:(r.top+r.height/2-p.top)/k}; }
+  fxRel(pt){ const p=this.phone.getBoundingClientRect(),f=this.fx.getBoundingClientRect(),k=p.width/390; return {x:pt.x-(f.left-p.left)/k,y:pt.y-(f.top-p.top)/k}; }
+  floatText(el,txt,color){
+    if(!this.fx||!el) return; const a=this.fxRel(this.rel(el)); const t=document.createElement('div');
+    t.textContent=txt; t.style.cssText=`position:absolute;left:${a.x}px;top:${a.y-10}px;transform:translateX(-50%);font:700 18px 'Atkinson Hyperlegible';color:${color};text-shadow:0 2px 0 #000;white-space:nowrap`;
+    this.fx.appendChild(t); t.animate([{transform:'translate(-50%,0)',opacity:1},{transform:'translate(-50%,-34px)',opacity:0}],{duration:800,easing:'ease-out'}).onfinish=()=>t.remove();
+  }
+  flyCoin(el,n){
+    if(!this.fx||!el||!this.counter) return; const a=this.fxRel(this.rel(el)),b=this.fxRel(this.rel(this.counter));
+    const count=Math.min(4,1+Math.floor(n/12));
+    for(let i=0;i<count;i++){ const c=document.createElement('img'); c.src=window.PX.coin.src;
+      c.style.cssText=`position:absolute;left:${a.x-11}px;top:${a.y-11}px;width:22px;height:22px;image-rendering:pixelated`;
+      this.fx.appendChild(c); const dx=b.x-a.x,dy=b.y-a.y;
+      c.animate([{transform:'translate(0,0) scale(.6)',opacity:0},{transform:`translate(${dx*.35+(i-1)*14}px,${dy*.35-50}px) scale(1.35)`,opacity:1,offset:.4},{transform:`translate(${dx}px,${dy}px) scale(.8)`,opacity:1}],{duration:560+i*70,easing:'cubic-bezier(.45,0,.55,1)'}).onfinish=()=>{c.remove(); if(i===0) this.spinCounter();};
+    }
+  }
+  spinCounter(){ this.counter&&this.counter.animate([{transform:'scaleX(1)'},{transform:'scaleX(-1) scale(1.2)'},{transform:'scaleX(1)'},{transform:'scaleX(-1)'},{transform:'scaleX(1)'}],{duration:520}); }
+  glow(el,col){ el&&el.animate([{boxShadow:`0 0 0 0 ${col}`,transform:'scale(.9)'},{boxShadow:`0 0 0 12px rgba(0,0,0,0)`,transform:'scale(1.06)'},{boxShadow:'0 0 0 0 rgba(0,0,0,0)',transform:'scale(1)'}],{duration:480,easing:'ease-out'}); }
+  bounce(){ this.ulhuEl&&this.ulhuEl.animate([{transform:'none'},{transform:'translateY(-16px) scale(.94,1.06)',offset:.35},{transform:'translateY(0) scale(1.08,.92)',offset:.7},{transform:'none'}],{duration:480,easing:'ease-out'}); }
+  flinch(){ this.ulhuEl&&this.ulhuEl.animate([{transform:'none',filter:'none'},{transform:'translateX(-7px) rotate(-4deg)',filter:'sepia(1) saturate(4) hue-rotate(-50deg)'},{transform:'translateX(6px) rotate(3deg)'},{transform:'translateX(-3px)'},{transform:'none',filter:'none'}],{duration:420}); this.hpEl&&this.hpEl.animate([{boxShadow:'0 0 0 0 #ff5a4a'},{boxShadow:'0 0 10px 2px #ff5a4a'},{boxShadow:'0 0 0 0 #ff5a4a'}],{duration:500}); }
+  buzz(p){ try{ navigator.vibrate&&navigator.vibrate(p||12);}catch(e){} }
+  celebrate(){
+    if(!this.fx||!this.ulhuEl) return; const o=this.fxRel(this.rel(this.ulhuEl));
+    this.flash&&this.flash.animate([{opacity:0},{opacity:1,offset:.2},{opacity:0}],{duration:1100});
+    for(let i=0;i<16;i++){ const s=document.createElement('img'); s.src=i%3?window.PX.spark.src:window.PX.coin.src; const z=i%3?14:18;
+      s.style.cssText=`position:absolute;left:${o.x-z/2}px;top:${o.y-z/2}px;width:${z}px;height:${z}px;image-rendering:pixelated`;
+      this.fx.appendChild(s); const a=i/16*Math.PI*2,r=70+Math.random()*60;
+      s.animate([{transform:'translate(0,0) scale(.4)',opacity:1},{transform:`translate(${Math.cos(a)*r}px,${Math.sin(a)*r*.7-20}px) scale(1.2)`,opacity:1,offset:.6},{transform:`translate(${Math.cos(a)*r*1.1}px,${Math.sin(a)*r*.7+20}px) scale(.8)`,opacity:0}],{duration:1000+Math.random()*300,easing:'cubic-bezier(.2,.8,.4,1)'}).onfinish=()=>s.remove();
+    }
+    this.buzz([20,60,30]);
+  }
+  setMood(m,say){ clearTimeout(this.mt); this.setState({mood:m,say}); this.mt=setTimeout(()=>!this.dead&&this.setState({mood:null,say:null}),2400); }
+  // ——— undo ———
+  snap(){ const o={}; SNAP.forEach(k=>o[k]=this.state[k]); this.stack.push(JSON.parse(JSON.stringify(o))); if(this.stack.length>30) this.stack.shift(); }
+  undo=()=>{ const p=this.stack.pop(); if(!p) return; const undone=this.state.last; this.setState({...p,last:{verb:'Undone:',name:(undone&&((undone.verb||'')+' '+(undone.name||''))).replace(':',''),delta:'',unit:null},banishArm:null,stampId:null}); this.buzz(8); };
+  // ——— economy ———
+  earn(n,xp,el,last,extra){
+    const s=this.state; let x=s.xp+xp,lv=s.level,mx=s.xpMax,up=false; while(x>=mx){x-=mx;lv++;mx=200+(lv-1)*50;up=true;}
+    this.setState({coins:s.coins+n,weekCoins:s.weekCoins+n,xp:x,level:lv,xpMax:mx,last:up?{verb:'Level up!',name:`Level ${lv} · ${TITLES[lv]||'Ancient'}`,delta:'+'+n,unit:'coin'}:last,...(extra||{})});
+    this.flyCoin(el,n); this.floatText(el,'+'+n,'#ffd56a'); this.glow(el,'rgba(94,242,160,.85)'); this.bounce(); this.buzz(12);
+    if(up){ setTimeout(()=>this.celebrate(),350); this.setMood('proud',`Level ${lv}! I feel… larger.`);} else this.setMood('happy',TICK_SAYS[Math.floor(Math.random()*TICK_SAYS.length)]);
+  }
+  mapItem(gid,iid,fn){ return this.state.groups.map(g=>g.id!==gid?g:{...g,items:g.items.map(it=>it.id!==iid?it:fn(it))}); }
+  tickRitual(gid,iid,el){
+    const g=this.state.groups.find(x=>x.id===gid),it=g.items.find(x=>x.id===iid); this.snap();
+    if(!it.done){ const p=pay(it.len,it.kind,it.streak); let groups=this.mapItem(gid,iid,x=>({...x,done:true,streak:(x.streak||0)+1}));
+      if(g.type==='summon'){ const allNext=groups.find(x=>x.id==='summon').items.filter(x=>x.done).length; groups=groups.map(x=>x.id==='summon'?{...x,tide:Math.min(3,allNext>=3?3:allNext>=2?2:1)}:x); }
+      this.earn(p,BASE[it.len]*2,el,{verb:'Ticked:',name:it.name,delta:'+'+p,unit:'coin'},{groups});
+    } else { const p=pay(it.len,it.kind,Math.max(0,it.streak-1)); this.setState(s=>({groups:this.mapItem(gid,iid,x=>({...x,done:false,streak:Math.max(0,x.streak-1)})),coins:s.coins-p,weekCoins:s.weekCoins-p,last:{verb:'Unticked:',name:it.name,delta:'−'+p,unit:'coin'}})); this.buzz(6); }
+  }
+  tickHalf(ci,hi,el){
+    this.snap(); const g=this.state.groups.find(x=>x.id==='marking'); const card=g.cards[ci]; const was=card.h[hi];
+    const groups=this.state.groups.map(x=>x.id!=='marking'?x:{...x,cards:x.cards.map((c,i)=>i!==ci?c:{...c,h:c.h.map((v,j)=>j===hi?!v:v)})});
+    if(!was) this.earn(16,32,el,{verb:'Marked:',name:`${card.cls} ${hi?'2nd':'1st'} half`,delta:'+16',unit:'coin'},{groups});
+    else this.setState(s=>({groups,coins:s.coins-16,weekCoins:s.weekCoins-16,last:{verb:'Unmarked:',name:`${card.cls} ${hi?'2nd':'1st'} half`,delta:'−16',unit:'coin'}}));
+  }
+  tickQuest(id,el){
+    const q=this.state.quests.find(x=>x.id===id); this.snap(); const p=pay(q.len,q.kind,0);
+    if(!q.done){ const quests=this.state.quests.map(x=>x.id===id?{...x,done:true,settled:false}:x); this.earn(p,BASE[q.len]*2,el,{verb:'Quest done:',name:q.name,delta:'+'+p,unit:'coin'},{quests});
+      setTimeout(()=>!this.dead&&this.setState(s=>({quests:s.quests.map(x=>x.id===id&&x.done?{...x,settled:true}:x)})),1100);
+    } else this.setState(s=>({quests:s.quests.map(x=>x.id===id?{...x,done:false,settled:false}:x),coins:s.coins-p,weekCoins:s.weekCoins-p,last:{verb:'Reopened:',name:q.name,delta:'−'+p,unit:'coin'}}));
+  }
+  toggleStep(qid,i){ this.setState(s=>({quests:s.quests.map(q=>q.id!==qid?q:{...q,steps:q.steps.map((st,j)=>j===i?{...st,d:!st.d}:st)})})); this.buzz(6); }
+  bossHp(b){ const n=b.stages.length; const dmg=b.stages.reduce((a,st)=>a+(st.done?(st.late?50:100)/n:0),0); return b.stages.every(st=>st.done)?0:Math.max(0,Math.round(100-dmg)); }
+  tickStage(bid,i,el){
+    const b=this.state.bosses.find(x=>x.id===bid),st=b.stages[i]; this.snap();
+    const card=el.closest('[data-boss]'); const cr=card&&card.querySelector('[data-creature]');
+    if(!st.done){ const late=TODAY>st.by; const nb={...b,stages:b.stages.map((x,j)=>j===i?{...x,done:true,late}:x)}; const dead=nb.stages.every(x=>x.done);
+      const bosses=this.state.bosses.map(x=>x.id===bid?nb:x);
+      cr&&cr.animate([{transform:'none',filter:'none'},{transform:'translateX(5px)',filter:'brightness(3) saturate(0)'},{transform:'translateX(-4px)'},{transform:'none',filter:'none'}],{duration:320});
+      this.glow(el,'rgba(255,122,102,.9)'); this.floatText(el,late?'half hit':'hit!','#ff9a85'); this.buzz(15);
+      if(dead){ const gold=SIZE[b.size].gold;
+        this.setState({bosses,last:{verb:'Boss beaten:',name:b.name,delta:'+'+gold,unit:'coin'}});
+        setTimeout(()=>{ if(this.dead) return; cr&&cr.animate([{transform:'none',opacity:1},{transform:'translateY(6px) scale(1.1,.6)',opacity:.6},{transform:'translateY(12px) scale(1.4,.1)',opacity:0}],{duration:500,fill:'forwards'});
+          this.earn(gold,120,el,{verb:'Boss beaten:',name:b.name,delta:'+'+gold,unit:'coin'});
+          this.celebrate(); this.setMood('proud','Vanquished! Another trophy for the shelf.');
+          setTimeout(()=>!this.dead&&this.setState(s=>({bosses:s.bosses.filter(x=>x.id!==bid),beaten:[{name:b.name,k:b.k||SIZE[b.size].k},...s.beaten]})),900);
+        },450);
+      } else this.setState({bosses,last:{verb:late?'Late stage:':'Stage done:',name:`${st.n} · ${b.name}`,delta:'',unit:null}});
+    } else this.setState(s=>({bosses:s.bosses.map(x=>x.id!==bid?x:{...x,stages:x.stages.map((y,j)=>j===i?{...y,done:false,late:false}:y)}),last:{verb:'Stage reopened:',name:st.n,delta:'',unit:null}}));
+  }
+  banish(bid){
+    if(this.state.banishArm!==bid){ clearTimeout(this.bt); this.setState({banishArm:bid}); this.bt=setTimeout(()=>!this.dead&&this.setState({banishArm:null}),3000); return; }
+    const b=this.state.bosses.find(x=>x.id===bid); this.snap(); this.setState(s=>({bosses:s.bosses.filter(x=>x.id!==bid),banishArm:null,last:{verb:'Banished:',name:b.name,delta:'',unit:null}})); this.buzz(10);
+  }
+  curse(id,el){
+    const c=this.state.curses.find(x=>x.id===id),s=this.state; this.snap(); const cost=HPC[c.len]; let hp=s.hp-cost;
+    const curses=s.curses.map(x=>x.id===id?{...x,count:x.count+1}:x);
+    this.flinch(); this.floatText(el,'−'+cost+' HP','#ff7a66'); this.glow(el,'rgba(196,50,58,.9)'); this.buzz([25,40,25]);
+    if(hp<=0){ const lost=s.weekCoins; this.setState({curses,hp:s.hpMax,level:Math.max(1,s.level-1),coins:Math.max(0,s.coins-lost),weekCoins:0,last:{verb:'Fainted:',name:'lost a level and 7 days of doubloons',delta:'−'+lost,unit:'coin'}}); this.setMood('sad','Ulhu fainted… he wakes at full health, a little poorer.'); }
+    else { this.setState({curses,hp,last:{verb:'Cursed:',name:c.name,delta:'−'+cost,unit:'hp'}}); this.setMood('sad',CURSE_SAYS[Math.floor(Math.random()*CURSE_SAYS.length)]); }
+  }
+  bless(id,el){ const g=this.state.blessings.find(x=>x.id===id); this.snap(); const tot=this.state.blessings.reduce((a,x)=>a+x.count,0)+1; const chainBonus=tot%8===0?10:0; const amt=(g.feat?g.amt*2:g.amt)+chainBonus;
+    this.ripple(el,g.feat?'#ffd56a':'#5ef2a0'); this.earn(amt,g.amt*2,el,{verb:chainBonus?'Blessing chain!':'Blessing:',name:g.name,delta:'+'+amt,unit:'coin'},{blessings:this.state.blessings.map(x=>x.id===id?{...x,count:x.count+1}:x)}); if(chainBonus) setTimeout(()=>this.celebrate(),300); }
+  ripple(el,col){ if(!this.fx||!el) return; const a=this.fxRel(this.rel(el)); const d=document.createElement('div'); d.style.cssText=`position:absolute;left:${a.x-30}px;top:${a.y-30}px;width:60px;height:60px;border-radius:50%;border:2px solid ${col};box-shadow:0 0 12px ${col}`; this.fx.appendChild(d); d.animate([{transform:'scale(.3)',opacity:1},{transform:'scale(2.6)',opacity:0}],{duration:600,easing:'ease-out'}).onfinish=()=>d.remove(); }
+  toggleDayOff=()=>{ this.snap(); const v=!this.state.dayOff; this.setState({dayOff:v,last:{verb:v?'Day off:':'Day back on:',name:v?'today is frozen, streaks are safe':'the tide flows again',delta:'',unit:null}}); this.buzz(10); };
+  // ——— den ———
+  shopAct(it,el){
+    const s=this.state; const owned=s.owned[it.id],placed=s.placed[it.cat]===it.id;
+    if(placed){ this.snap(); const pl={...s.placed}; delete pl[it.cat]; this.setState({placed:pl,last:{verb:'Took out:',name:it.name,delta:'',unit:null}}); return; }
+    if(owned){ this.snap(); this.setState({placed:{...s.placed,[it.cat]:it.id},last:{verb:'Placed:',name:it.name,delta:'',unit:null}}); this.bounce(); return; }
+    if(it.lock>s.level||it.price>s.coins){ el&&el.animate([{transform:'translateX(0)'},{transform:'translateX(-4px)'},{transform:'translateX(4px)'},{transform:'none'}],{duration:220}); this.buzz([8,30,8]); return; }
+    this.snap(); this.setState({coins:s.coins-it.price,owned:{...s.owned,[it.id]:1},placed:{...s.placed,[it.cat]:it.id},last:{verb:'Bought:',name:it.name,delta:'−'+it.price,unit:'coin'}});
+    this.glow(el,'rgba(255,214,106,.8)'); this.setMood('happy','Ooh! For the Den?'); this.bounce(); this.buzz(12);
+  }
+  wardAct(w,el){
+    const s=this.state;
+    if(s.wOwned[w.id]){ this.snap(); const cur=s.wear[w.cat]; const v=cur===w.id&&w.cat!=='skin'?null:w.id; this.setState({wear:{...s.wear,[w.cat]:v},last:{verb:v?'Wearing:':'Took off:',name:w.name,delta:'',unit:null}}); this.bounce(); this.setMood('happy',v?'How do I look?':'Back to basics.'); return; }
+    if(w.lock>s.level||w.price>s.coins){ el&&el.animate([{transform:'translateX(0)'},{transform:'translateX(-4px)'},{transform:'translateX(4px)'},{transform:'none'}],{duration:220}); this.buzz([8,30,8]); return; }
+    this.snap(); this.setState({coins:s.coins-w.price,wOwned:{...s.wOwned,[w.id]:1},wear:{...s.wear,[w.cat]:w.id},last:{verb:'Bought:',name:w.name,delta:'−'+w.price,unit:'coin'}}); this.bounce(); this.setMood('proud','Dashing. Truly eldritch.');
+  }
+  claim(h,el){
+    const s=this.state; if(h.cost>s.coins){ el&&el.animate([{transform:'translateX(0)'},{transform:'translateX(-4px)'},{transform:'translateX(4px)'},{transform:'none'}],{duration:220}); return; }
+    this.snap(); clearTimeout(this.st); this.setState({coins:s.coins-h.cost,hoard:s.hoard.map(x=>x.id===h.id?{...x,claims:x.claims+1}:x),stampId:h.id,last:{verb:'Claimed:',name:h.name,delta:'−'+h.cost,unit:'coin'}});
+    this.buzz([10,40,30]); this.setMood('happy',"You've earned that. Enjoy it."); this.st=setTimeout(()=>!this.dead&&this.setState({stampId:null}),2600);
+  }
+  // ——— forms ———
+  openForm(kind){
+    const d={ritual:{name:'',len:15,kind:'nec',rep:'school',days:[1,3,5],n:3,unit:'days',group:'chores'},quest:{name:'',len:30,kind:'nec',due:'Fri',grp:'teach',steps:[]},
+      boss:{name:'',size:5,k:'shog',steps:[{n:'',by:26}]},group:{name:'',parent:'top'},reward:{name:'',cost:80},curse:{name:'',len:30,type:'curse'}}[kind];
+    this.setState({form:kind,draft:JSON.parse(JSON.stringify(d))});
+  }
+  setD(p){ this.setState(s=>({draft:{...s.draft,...p}})); }
+  submit(){
+    const s=this.state,d=s.draft; if(!d.name.trim()) return; this.snap(); const id='n'+Date.now(); let st={form:null,draft:null};
+    if(s.form==='ritual'){ const rep=d.rep==='school'?'School days':d.rep==='days'?d.days.map(i=>DN[i]).join(', '):`Every ${d.n} ${d.unit}`;
+      st.groups=s.groups.map(g=>g.id===d.group?{...g,items:[...(g.items||[]),{id,name:d.name,len:d.len,kind:d.kind,rep,streak:0,done:false}]}:g); st.open={...s.open,[d.group]:true}; st.last={verb:'New ritual:',name:d.name,delta:'',unit:null}; st.tab=0; }
+    if(s.form==='quest'){ const dueMap={None:null,Today:23,Tomorrow:24,Mon:26,Fri:30,'Next week':33}; st.quests=[{id,name:d.name,len:d.len,kind:d.kind,due:dueMap[d.due],grp:d.grp,steps:d.steps.filter(x=>x.n.trim()).map(x=>({t:x.n,d:false}))},...s.quests]; st.last={verb:'New quest:',name:d.name,delta:'',unit:null}; }
+    if(s.form==='boss'){ const stages=d.steps.filter(x=>x.n.trim()).map(x=>mkStage(x.n,x.by)); if(!stages.length) stages.push(mkStage('Do it',30)); st.bosses=[{id,name:d.name,size:d.size,k:d.k,stages},...s.bosses]; st.open={...s.open,[id]:true}; st.last={verb:'Boss summoned:',name:d.name,delta:'',unit:null}; }
+    if(s.form==='group'){ const g={id,name:d.name,plain:d.parent==='teach'?'Teaching':d.parent==='life'?'Life':'New group',parent:d.parent==='teach'?'teach':null,type:'list',items:[]}; const gs=[...s.groups]; const at=d.parent==='teach'?gs.findIndex(x=>x.id==='life'):gs.length; gs.splice(at,0,g); st.groups=gs; st.open={...s.open,[id]:true}; st.last={verb:'New group:',name:d.name,delta:'',unit:null}; }
+    if(s.form==='reward'){ st.hoard=[...s.hoard,{id,name:d.name,cost:d.cost,claims:0}]; st.last={verb:'New reward:',name:d.name,delta:'',unit:null}; }
+    if(s.form==='curse'){ if(d.type==='curse') st.curses=[...s.curses,{id,name:d.name,len:d.len,count:0}]; else st.blessings=[...s.blessings,{id,name:d.name,amt:Math.max(2,Math.round(BASE[d.len]/2)),count:0}]; st.last={verb:d.type==='curse'?'New curse:':'New blessing:',name:d.name,delta:'',unit:null}; }
+    this.setState(st); this.buzz(10);
+  }
+  // ——— swipe ———
+  pDown=e=>{ if(e.target.closest&&e.target.closest('[data-hscroll],input,textarea')) return; this.sw={x:e.clientX,y:e.clientY,on:false}; };
+  pMove=e=>{ const w=this.sw; if(!w) return; const dx=e.clientX-w.x,dy=e.clientY-w.y; if(!w.on){ if(Math.abs(dx)>12&&Math.abs(dx)>Math.abs(dy)*1.3) w.on=true; else if(Math.abs(dy)>12){this.sw=null;return;} else return; }
+    const t=this.state.tab; let d=dx; if((t===0&&dx>0)||(t===3&&dx<0)) d=dx/3; this.setState({drag:d}); };
+  pUp=e=>{ const w=this.sw; this.sw=null; if(!w||!w.on){ if(this.state.drag) this.setState({drag:0}); return; } const dx=this.state.drag; let t=this.state.tab; if(dx<-60&&t<3) t++; else if(dx>60&&t>0) t--; this.justSwiped=true; setTimeout(()=>this.justSwiped=false,60); this.setState({tab:t,drag:0,banishArm:null}); if(t!==this.state.tab) this.buzz(5); };
+  clickCap=e=>{ if(this.justSwiped){ e.stopPropagation(); e.preventDefault(); } };
+
+  renderVals(){
+    const A=window.ULHU_ART,P=window.PX; if(!A||!P) return {ready:false,notReady:true,chrome:this.props.showChrome!==false,clock:this.props.clock||'4:40 pm',plannerNav:[]};
+    const s=this.state,art=this.art(); const style=this.props.ulhuStyle||'16-bit',clock=this.props.clock||'4:40 pm',night=clock==='7:30 pm',chrome=this.props.showChrome!==false;
+    const asleep=night||s.dayOff; const mood=asleep?'sleepy':(s.mood||(s.hp<15?'sad':'idle'));
+    const ulhu=this.layers(mood,style,s.wear);
+    const allR=s.groups.filter(g=>g.type==='list'||g.type==='summon').flatMap(g=>g.items.map(i=>({...i,g:g.id})));
+    const leftR=allR.filter(i=>!i.done).length+s.groups.find(g=>g.id==='marking').cards.reduce((a,c)=>a,0);
+    const dueSoon=s.quests.filter(q=>!q.done&&q.due&&q.due<=24).length;
+    let say=s.say; if(!say){ if(s.dayOff) say='Day frozen. Streaks are safe. Rest now.'; else if(night) say='Zzz… even old gods rest after seven.'; else if(s.hp<15) say='I feel… unwell. Fewer curses, please.'; else say=leftR?`${leftR} rituals left today. The tide favours you.`:'Every ritual done. The deep is pleased.'; }
+    const TABC=['#5ef2a0','#a48aff','#ff7a66','#ffd56a'];
+    const tabs=['Rituals','Quests','Curses','Den'].map((l,i)=>({label:l,pick:()=>this.setState({tab:i,form:null,draft:null,banishArm:null}),fg:s.tab===i?TABC[i]:'#7f9389',hasBadge:(i===0&&leftR>0)||(i===1&&dueSoon>0),badge:i===0?leftR:dueSoon,badgeBg:i===0?'#5ef2a0':'#ff7a66'}));
+    // ritual sections
+    const rSections=[]; const parentOpen={};
+    s.groups.forEach(g=>{
+      if(g.parent&&!s.open[g.parent]) return;
+      const open=!!s.open[g.id]; const isChild=!!g.parent;
+      let meta='',metaColor='#7f9389';
+      if(g.type==='parent'){ const kids=s.groups.filter(x=>x.parent===g.id); let d=0,t=0; kids.forEach(k=>{ if(k.items){t+=k.items.length;d+=k.items.filter(i=>i.done).length;} if(k.cards){t+=k.cards.length*2;d+=k.cards.reduce((a,c)=>a+c.h.filter(Boolean).length,0);} }); meta=`${d} of ${t}`; }
+      else if(g.type==='marking'){ meta='56 days left'; metaColor='#f2a93b'; }
+      else if(g.items){ meta=`${g.items.filter(i=>i.done).length} of ${g.items.length}`; }
+      const sec={id:g.id,name:g.name,plain:g.plain,indent:isChild?'12px':'0',rule:g.type==='parent'||!isChild?'#2a3b33':'#1c2924',rot:open?'90deg':'0deg',titleSize:isChild?'18px':'22px',titleColor:isChild?'#cfe8dc':'#e8e1cf',meta,metaColor,
+        toggle:()=>this.setState(st=>({open:{...st.open,[g.id]:!st.open[g.id]}})),rename:()=>this.setState({renaming:g.id,renameVal:g.name}),renaming:s.renaming===g.id,notRenaming:s.renaming!==g.id,
+        showList:open&&!!g.items,showTide:open&&g.type==='summon',showMarking:open&&g.type==='marking',items:[],cards:[]};
+      if(g.items) sec.items=g.items.map(it=>{ const k=KIND[it.kind]; const p=pay(it.len,it.kind,it.streak); return {name:it.name,len:it.len,rep:it.rep,kindLabel:k.l,edge:k.c,pay:p,streak:it.streak,hasStreak:it.streak>0&&g.type!=='summon',auto:!!it.auto,done:it.done,
+        ring:it.done?'#5ef2a0':(it.auto?'#7a5ab0':'#4f6a5e'),ringStyle:it.auto&&!it.done?'dashed':'solid',fill:it.done?'radial-gradient(circle,#2a9a62,#11402a)':'radial-gradient(circle,#1f2e28,#121b17)',op:it.done?'.62':'1',strike:it.done?'line-through':'none',h:it.done?'48px':'58px',
+        tick:e=>this.tickRitual(g.id,it.id,e.currentTarget)}; });
+      if(g.cards) sec.cards=g.cards.map((c,ci)=>({cls:c.cls,halves:c.h.map((v,hi)=>({label:v?`✓ ${hi?'2nd':'1st'}`:`${hi?'2nd':'1st'} half`,bd:v?'#5ef2a0':'#2f4a5e',bg:v?'#1a4a32':'#0f1a20',fg:v?'#b6ffd6':'#bfe0ff',tick:e=>this.tickHalf(ci,hi,e.currentTarget)}))}));
+      rSections.push(sec);
+    });
+    const sg=s.groups.find(g=>g.id==='summon'); const tn=sg?sg.tide:0;
+    const tide={n:tn,pct:(tn<=1?0:(tn-1)*50)+'%',steps:['Next lesson built','A week ahead · +30','Two weeks ahead · done'].map((l,i)=>({label:l,x:(i*50)+'%',align:['left','center','right'][i],bg:i<tn?'#5aa7ff':'#0d161c',bd:i<tn?'#bfe0ff':'#2a4a5e',glow:i<tn?'0 0 10px #5aa7ff':'none',fg:i<tn?'#bfe0ff':'#6f8a9a'}))};
+    const rv=s.review; const ticksWeek=21+allR.filter(i=>i.done).length;
+    // quests
+    const qMap=q=>{ const k=KIND[q.kind]; const p=pay(q.len,q.kind,0); let due='',dueBg='transparent',dueFg='#5a4428',dueGlow='none';
+      if(q.due){ const dd=q.due-TODAY; if(dd<0){due='was due '+dshort(q.due).split(' ')[0];dueBg='rgba(0,0,0,.08)';} else if(dd===0){due='due today';dueBg='#a3202a';dueFg='#fff0e8';dueGlow='0 0 10px rgba(255,90,74,.9)';} else if(dd===1){due='due tomorrow';dueBg='#c4502a';dueFg='#fff0e8';dueGlow='0 0 6px rgba(255,140,74,.7)';} else if(dd<=3){due='due '+dshort(q.due).split(' ')[0];dueBg='#e8b04a';dueFg='#3a2008';} else {due='due '+dshort(q.due);dueBg='rgba(0,0,0,.08)';} }
+      const sd=q.steps.filter(x=>x.d).length;
+      return {name:q.name,len:q.len,kindLabel:k.l,kindInk:k.ink,edge:k.c,pay:p,hasDue:!!q.due&&!q.done,due,dueBg,dueFg,dueGlow,done:!!q.done,strike:q.done?'line-through':'none',op:q.done?'.7':'1',
+        hasSteps:q.steps.length>0,stepTxt:`${sd} of ${q.steps.length}`,showSteps:q.steps.length>0&&!q.done,tick:e=>this.tickQuest(q.id,e.currentTarget),
+        steps:q.steps.map((st,i)=>({t:st.t,mark:st.d?'✓':'',bg:st.d?'#6a4a2a':'transparent',strike:st.d?'line-through':'none',fg:st.d?'#7a6040':'#2a1a12',toggle:()=>this.toggleStep(q.id,i)}))}; };
+    const qSections=[['qteach','The Errand Scrolls','Teaching quests','teach'],['qlife','Surface Errands','Life quests','life']].map(([id,name,plain,grp])=>{ const qs=s.quests.filter(q=>q.grp===grp&&!(q.done&&q.settled)); return {name,plain,meta:`${qs.filter(q=>!q.done).length} open`,isOpen:!!s.open[id],rot:s.open[id]?'90deg':'0deg',toggle:()=>this.setState(st=>({open:{...st.open,[id]:!st.open[id]}})),quests:qs.map(qMap)}; });
+    const fin=s.quests.filter(q=>q.done&&q.settled); if(fin.length) qSections.push({name:'Finished',plain:'folded away',meta:`${fin.length}`,isOpen:!!s.open.qdone,rot:s.open.qdone?'90deg':'0deg',toggle:()=>this.setState(st=>({open:{...st.open,qdone:!st.open.qdone}})),quests:fin.map(qMap)});
+    const bossCards=s.bosses.map(b=>{ const sz=SIZE[b.size],ck=b.k||sz.k,spr=P.bosses[ck],meta=P.bossMeta[ck]; const hp=this.bossHp(b); const arm=s.banishArm===b.id;
+      return {id:b.id,name:b.name,sub:`${meta.size} · ${meta.name} · ${b.stages.filter(x=>x.done).length} of ${b.stages.length} stages`,src:spr.src,w:Math.min(68,spr.w*2)+'px',filter:'drop-shadow(0 2px 0 #000)',hpPct:hp+'%',hpTxt:`${hp}/100`,gold:sz.gold,isOpen:!!s.open[b.id],toggle:()=>this.setState(st=>({open:{...st.open,[b.id]:!st.open[b.id]}})),
+        banish:()=>this.banish(b.id),banishTxt:arm?'Tap again to banish':'Banish',banishBd:arm?'#ff7a66':'#4a2a2e',banishBg:arm?'#4a1418':'transparent',banishFg:arm?'#ffd0c4':'#b08a84',
+        stages:b.stages.map((st,i)=>{ const n=b.stages.length; const over=!st.done&&st.by<TODAY; let tag,tagFg,tagBg,tagBd;
+          if(st.done&&!st.late){tag=`−${Math.round(100/n)} hit`;tagFg='#ffd0c4';tagBg='#5a1a20';tagBd='#a3202a';} else if(st.done){tag=`−${Math.round(50/n)} late`;tagFg='#ffd0c4';tagBg='#3a1418';tagBd='#6a2a2e';} else if(over){tag='overdue';tagFg='#ff9a85';tagBg='transparent';tagBd='#ff7a66';} else if(st.by===TODAY){tag='today';tagFg='#3a2008';tagBg='#e8b04a';tagBd='#e8b04a';} else {tag=`${st.by-TODAY} days`;tagFg='#b08a84';tagBg='transparent';tagBd='#3a1a1e';}
+          return {n:st.n,by:dshort(st.by),done:st.done,strike:st.done?'line-through':'none',ring:st.done?'#ff7a66':'#6a3a3e',fill:st.done?'radial-gradient(circle,#a3202a,#4a0e14)':'radial-gradient(circle,#2a1416,#140a0c)',tag,tagFg,tagBg,tagBd,tick:e=>this.tickStage(b.id,i,e.currentTarget)}; })}; });
+    const beaten=s.beaten.map(b=>({name:b.name,src:P.bosses[b.k].src}));
+    // curses
+    const curseRows=s.curses.map(c=>({name:c.name,len:c.len,cost:'−'+HPC[c.len],countTxt:c.count?`${c.count}× today`:'not today',tap:e=>this.curse(c.id,e.currentTarget)}));
+    const blessRows=s.blessings.map(g=>({name:g.name,amt:g.feat?g.amt*2:g.amt,icon:(P.bless[g.ic]||P.spark).src,featured:!!g.feat,bg:g.feat?'linear-gradient(180deg,#2a2410,#151208)':'linear-gradient(180deg,#152a20,#0e1a15)',bd:g.feat?'#8a6a2a':(g.count?'#2f6a4e':'#23483a'),glow:g.count?'inset 0 0 18px rgba(94,242,160,.12)':'none',halo:g.feat?'rgba(255,214,106,.45)':'rgba(94,242,160,.35)',
+      pips:Array.from({length:5},(_,i)=>({bg:i<g.count?(g.feat?'#ffd56a':'#5ef2a0'):'#1d3a2c',glow:i<g.count?'0 0 4px rgba(94,242,160,.7)':'none'})),tap:e=>this.bless(g.id,e.currentTarget)}));
+    const btot=s.blessings.reduce((a,x)=>a+x.count,0); const cpos=btot%8; const chain=Array.from({length:8},(_,i)=>({bg:i<cpos?'#5ef2a0':'#1d3a2c',glow:i<cpos?'0 0 5px rgba(94,242,160,.7)':'none'}));
+    const faintNote=s.hp<=12?`Careful: ${s.hp} HP left. At 0, Ulhu faints. He loses a level and this week's ${s.weekCoins} doubloons, then wakes at full health.`:'At 0 health Ulhu faints. He loses a level and the doubloons from the last 7 days, then wakes at full health.';
+    const freezes=[{name:'INSET day',when:'Mon 9 Nov · freezes itself'},{name:'Christmas holidays',when:'from Fri 18 Dec'}];
+    // den
+    const cat=this.shopCatalog();
+    const SLOTL={floor:'Floor',wall:'Walls',rug:'Rug',win:'Window',light:'Light',corner:'Corner',seat:'Seat',table:'Table',hang:'Wall hanging',props:'Props'};
+    const slots=CATS.map(([c])=>{ const it=this.item(s.placed[c]); return {label:SLOTL[c],name:it?it.name:'empty',fg:it?'#e0e8e3':'#5a6a62',has:!!it&&c!=='floor'&&c!=='wall',out:()=>{this.snap();const pl={...s.placed};delete pl[c];this.setState({placed:pl,last:{verb:'Took out:',name:it&&it.name,delta:'',unit:null}});}}; });
+    const shopCats=CATS.map(([c,l])=>({label:l,src:cat[c][0].src,pick:()=>this.setState({shopCat:c}),bd:s.shopCat===c?'#5ef2a0':'#2a3b33',bg:s.shopCat===c?'#173a2c':'#131d19',fg:s.shopCat===c?'#b6ffd6':'#cfd8d3'}));
+    const tierChips=['All','Basic','Nice','Fancy','Eldritch'].map(t=>({label:t,pick:()=>this.setState({tier:t}),bg:s.tier===t?'#243a32':'transparent',fg:s.tier===t?(TIERC[t]||'#e8e1cf'):'#7f9389'}));
+    const shopItems=cat[s.shopCat].filter(it=>s.tier==='All'||it.tier===s.tier).map(it=>{ const owned=!!s.owned[it.id],placed=s.placed[it.cat]===it.id,locked=it.lock>s.level,poor=it.price>s.coins;
+      let btn,btnBg,btnFg,btnCoin=false;
+      if(placed){btn='Take out';btnBg='#173a2c';btnFg='#b6ffd6';} else if(owned){btn='Place';btnBg='#5ef2a0';btnFg='#08100d';} else if(locked){btn=`Level ${it.lock}`;btnBg='#1a1a24';btnFg='#7a7a99';} else if(it.price===0){btn='Free';btnBg='#5ef2a0';btnFg='#08100d';} else {btn=String(it.price);btnCoin=true;btnBg=poor?'#1e1a12':'#3a2a10';btnFg=poor?'#7a6a4a':'#ffd56a';}
+      const sp=this.spriteSize(it); return {name:it.name,w:sp,tier:it.tier,tierC:TIERC[it.tier],src:it.src,filter:(it.hue?`hue-rotate(${it.hue}deg)`:'none')+(it.tier==='Eldritch'?' drop-shadow(0 0 4px #5ef2a0)':'')+(locked?' grayscale(1) brightness(.6)':''),imgOp:locked?'.6':'1',halo:it.tier==='Eldritch'?'#1d4a38':it.tier==='Fancy'?'#2a2244':'#1a2a24',bd:placed?'#5ef2a0':'#23332c',btn,btnBg,btnFg,btnCoin,act:e=>this.shopAct(it,e.currentTarget)}; });
+    const wc=this.wardCatalog(); const baseIdle=(style==='8-bit'?A.b8:A.b16).idle;
+    const wCats=WCATS.map(([c,l,n])=>({label:l,n,pick:()=>this.setState({wCat:c}),bg:s.wCat===c?'#243a32':'transparent',fg:s.wCat===c?'#b6ffd6':'#7f9389'}));
+    const wItems=wc[s.wCat].map(w=>{ const own=!!s.wOwned[w.id],on=s.wear[w.cat]===w.id,locked=w.lock>s.level; let st,stFg,coin=false;
+      if(on){st='wearing';stFg='#5ef2a0';} else if(own){st='owned';stFg='#cfd8d3';} else if(locked){st=`Level ${w.lock}`;stFg='#7a7a99';} else {st=String(w.price);stFg=w.price>s.coins?'#7a6a4a':'#ffd56a';coin=true;}
+      const isSkin=w.cat==='skin';
+      return {name:w.name,src:isSkin?baseIdle:w.src,filter:(isSkin?w.filter:w.filter)+(locked?' grayscale(1) brightness(.6)':''),base:baseIdle,baseFilter:isSkin?'opacity(0)':'none',bd:on?'#5ef2a0':'#23332c',halo:on?'#1d4a38':'#1a2a24',st,stFg,coin,act:e=>this.wardAct(w,e.currentTarget)}; });
+    const wearing=[['HAT','hat'],['TOP','top'],['FACE','face'],['HELD','held'],['SKIN','skin']].map(([l,k])=>({l,v:(this.witem(s.wear[k])||{name:'—'}).name}));
+    const hoardRows=s.hoard.map(h=>{ const can=h.cost<=s.coins; return {name:h.name,sub:h.claims?`claimed ${h.claims}× · ${can?'you can afford it':`${h.cost-s.coins} more to go`}`:(can?'never claimed · you can afford it':`${h.cost-s.coins} more to go`),cost:h.cost,bg:can?'#8a1a22':'#b8a074',fg:can?'#ffe9dc':'#6a5434',stamped:s.stampId===h.id,claim:e=>this.claim(h,e.currentTarget)}; });
+    const wk=[['7 Sep',96],['14 Sep',140],['21 Sep',182],['28 Sep',121],['5 Oct',205],['12 Oct',236],['19 Oct',s.weekCoins]];
+    const mx=Math.max(...wk.map(w=>w[1]),1);
+    const weeks=wk.map(([l,c],i)=>({l,c,h:Math.max(4,Math.round(c/mx*58))+'px',col:i===6?'#ffd56a':'#c48a3a',col2:i===6?'#e3a93a':'#8a5a1c'}));
+    const cal=Array.from({length:35},(_,i)=>{ const day=i-2; const v=day>TODAY-1||day<-0?-1:((day*7+3)%5); const frozen=[5,6,12,13,19,20].includes(i)?false:[9].includes(i);
+      if(i>=26+0&&i>TODAY+3) return {bg:'#0b1311',bd:'#141e1a',glow:'none'};
+      if(frozen) return {bg:'#1d3a5a',bd:'#5aa7ff',glow:'none'};
+      const lv=(i*13+5)%4; const today=i===TODAY+3; return {bg:['#132a1e','#1d6a42','#2fae6a','#5ef2a0'][lv],bd:today?'#fff':'#0b1311',glow:lv===3?'0 0 6px rgba(94,242,160,.6)':'none'}; });
+    const trophies=s.beaten.map(b=>({name:b.name,src:P.bosses[b.k].src,h:{spawn:'30px',mite:'30px',shog:'34px',deep:'36px',levi:'38px',gaunt:'38px',old:'46px',yog:'46px'}[b.k]}));
+    // forms
+    const f=s.form,d=s.draft||{};
+    const chip=(label,sel,pick,col,img)=>({label,pick,bd:sel?(col||'#5ef2a0'):'#2f443b',bg:sel?'#173a2c':'#131d19',fg:sel?(col||'#b6ffd6'):'#cfd8d3',hasImg:!!img,img:img||''});
+    const lenRow={label:'HOW LONG',chips:[5,15,30,60,120].map(n=>chip(n===120?'120+':String(n),d.len===n,()=>this.setD({len:n})))};
+    const kindRow={label:'KIND',chips:Object.entries(KIND).map(([k,v])=>chip(v.l,d.kind===k,()=>this.setD({kind:k}),v.c))};
+    let formRows=[],formTitle='',formPh='',formColor='#5ef2a0',payLabel='',payVal='',payColor='#ffd56a',payCoin=true,submitTxt='',submitBg='#5ef2a0',fSteps=false,stepWord='Step',stepsLabel='CHECKLIST (OPTIONAL)',fBoss=false,draftSteps=[];
+    if(f==='ritual'){ formTitle='New ritual';formPh='What is the ritual?';
+      const repRow={label:'REPEATS',chips:[['school','School days'],['days','Chosen days'],['every','Every N']].map(([k,l])=>chip(l,d.rep===k,()=>this.setD({rep:k})))};
+      formRows=[lenRow,kindRow,repRow];
+      if(d.rep==='days') formRows.push({label:'WHICH DAYS',chips:[1,2,3,4,5,6,0].map(i=>chip(DN[i],d.days.includes(i),()=>this.setD({days:d.days.includes(i)?d.days.filter(x=>x!==i):[...d.days,i]})))});
+      if(d.rep==='every') formRows.push({label:'EVERY',chips:[...[2,3,4,5].map(n=>chip(String(n),d.n===n,()=>this.setD({n}))),...['days','weeks'].map(u=>chip(u,d.unit===u,()=>this.setD({unit:u})))]});
+      formRows.push({label:'GROUP',chips:s.groups.filter(g=>g.type==='list').map(g=>chip(g.name,d.group===g.id,()=>this.setD({group:g.id})))});
+      payLabel=`Pays ${BASE[d.len]} × ${MULT[d.kind]} (${KIND[d.kind].l.toLowerCase()}) · up to +30% with streak`;payVal='+'+pay(d.len,d.kind,0);submitTxt='Add the ritual'; }
+    if(f==='quest'){ formTitle='New quest';formPh='What needs doing?';formColor='#a48aff';
+      formRows=[lenRow,kindRow,{label:'DUE (OPTIONAL · LATE IS NEVER PENALISED)',chips:['None','Today','Tomorrow','Mon','Fri','Next week'].map(x=>chip(x,d.due===x,()=>this.setD({due:x}),'#ff9a85'))},{label:'LIST',chips:[['teach','The Errand Scrolls'],['life','Surface Errands']].map(([k,l])=>chip(l,d.grp===k,()=>this.setD({grp:k})))}];
+      fSteps=true;stepWord='Checklist step';payLabel='Pays by length × kind';payVal='+'+pay(d.len,d.kind,0);submitTxt='Add the quest';submitBg='#a48aff'; }
+    if(f==='boss'){ formTitle='Summon a boss';formPh='The big job, e.g. Mark the 9AS mocks';formColor='#ff9a85';fBoss=true;fSteps=true;stepWord='Stage';stepsLabel='STAGES · EACH HAS A "BY" DATE';
+      formRows=[{label:'SIZE · TOTAL HOURS (2 H MINIMUM)',chips:[2,5,10,20].map(n=>{const m=P.bossMeta[SIZE[n].k];return chip(`${m.size} · ${SIZE[n].gold}`,d.size===n,()=>this.setD({size:n,k:P.bossBySize[n][0]}),'#ff9a85',P.bosses[P.bossBySize[n][0]].src);})},
+        {label:'CREATURE',chips:P.bossBySize[d.size].map(k=>chip(P.bossMeta[k].name,(d.k||SIZE[d.size].k)===k,()=>this.setD({k}),'#ff9a85',P.bosses[k].src))}];
+      payLabel=`${P.bossMeta[d.k||SIZE[d.size].k].name} · paid when beaten, plus a trophy`;payVal=String(SIZE[d.size].gold);submitTxt='Summon it';submitBg='#ff7a66'; }
+    if(f==='group'){ formTitle='New group';formPh='Name the group';
+      formRows=[{label:'INSIDE',chips:[['top','Top level'],['teach','Teaching'],['life','Life']].map(([k,l])=>chip(l,d.parent===k,()=>this.setD({parent:k})))}];
+      payLabel='Groups fold away and can be renamed with ✎';payVal='';payCoin=false;submitTxt='Make the group'; }
+    if(f==='reward'){ formTitle='New reward for the Hoard';formPh='e.g. Cinema trip';formColor='#ffd56a';
+      formRows=[{label:'COST',chips:[40,80,120,300,600,1000].map(n=>chip(String(n),d.cost===n,()=>this.setD({cost:n}),'#ffd56a'))}];
+      payLabel='Costs';payVal=String(d.cost);submitTxt='Add to the Hoard';submitBg='#ffd56a'; }
+    if(f==='curse'){ formTitle=d.type==='curse'?'New curse':'New blessing';formPh=d.type==='curse'?'The bad habit':'The good habit';formColor=d.type==='curse'?'#ff7a66':'#b6ffd6';
+      formRows=[{label:'TYPE',chips:[chip('Curse',d.type==='curse',()=>this.setD({type:'curse'}),'#ff7a66'),chip('Blessing',d.type==='bless',()=>this.setD({type:'bless'}))]},lenRow];
+      if(d.type==='curse'){payLabel='Costs health, never doubloons';payVal='−'+HPC[d.len]+' HP';payColor='#ff7a66';payCoin=false;} else {payLabel='Pays each time you tap it';payVal='+'+Math.max(2,Math.round(BASE[d.len]/2));}
+      submitTxt='Add it';submitBg=d.type==='curse'?'#ff7a66':'#5ef2a0'; }
+    if(fSteps&&d.steps) draftSteps=d.steps.map((x,i)=>({n:x.n,ph:f==='boss'?`Stage ${i+1}`:'A small step',hasBy:f==='boss',by:x.by?dshort(x.by):'',
+      set:e=>{const v=e.target.value;this.setState(st=>({draft:{...st.draft,steps:st.draft.steps.map((y,j)=>j===i?{...y,n:v}:y)}}));},
+      cycle:()=>this.setState(st=>({draft:{...st.draft,steps:st.draft.steps.map((y,j)=>j===i?{...y,by:y.by>=44?24:y.by+1}:y)}})),
+      del:()=>this.setState(st=>({draft:{...st.draft,steps:st.draft.steps.filter((y,j)=>j!==i)}}))}));
+    const groupSugs=['The Lab of Forbidden Experiments','The Report Abyss',"The Parents' Evening Grotto",'The Inbox Maelstrom','The Cauldron of Admin'].map(l=>({label:l,pick:()=>this.setD({name:l})}));
+    // dock
+    const dk=(label,act,kind,flex)=>{ const K={pri:['#5ef2a0','#5ef2a0','#08100d'],sec:['#2f443b','#131d19','#cfd8d3'],pur:['#a48aff','#a48aff','#0d0818'],red:['#ff7a66','#2a1214','#ffb3a8'],ice:['#5aa7ff',s.dayOff?'#5aa7ff':'#0f1a24',s.dayOff?'#08101a':'#bfe0ff'],gold:['#ffd56a','#ffd56a','#1a1004']}[kind];
+      return {label,act,bd:K[0],bg:K[1],fg:K[2],flex:flex||1,font:"500 19px 'Grenze Gotisch'"}; };
+    const denTab=(k,l)=>{ const on=s.den===k; return {label:l,act:()=>this.setState({den:k,form:null}),bd:on?'#ffd56a':'#2a3b33',bg:on?'#2a2210':'#131d19',fg:on?'#ffd56a':'#a9b8ae',flex:1,font:"700 12px 'Atkinson Hyperlegible'"}; };
+    let dock;
+    if(f) dock=[dk('Cancel',()=>this.setState({form:null,draft:null}),'sec')];
+    else if(s.tab===0) dock=[dk('+ Ritual',()=>this.openForm('ritual'),'pri',2),dk('+ Group',()=>this.openForm('group'),'sec')];
+    else if(s.tab===1) dock=[dk('+ Quest',()=>this.openForm('quest'),'pur'),dk('+ Boss',()=>this.openForm('boss'),'red')];
+    else if(s.tab===2) dock=[dk(s.dayOff?'☾ Day off · tap to undo':'☾ Sick or off today',this.toggleDayOff,'ice',2),dk('+ Add',()=>this.openForm('curse'),'sec')];
+    else { dock=[denTab('room','Room'),denTab('shop','Shop'),denTab('ward','Wardrobe'),denTab('hoard','Hoard'),denTab('chron','Chronicle')]; if(s.den==='hoard') dock.push({label:'+',act:()=>this.openForm('reward'),bd:'#ffd56a',bg:'#ffd56a',fg:'#1a1004',flex:'0 0 46px',font:"700 20px 'Atkinson Hyperlegible'"}); }
+    const last=s.last||{};
+    const bannerBg=asleep?'linear-gradient(180deg,#050a18 0%,#0a1424 55%,#0a1210 100%)':'linear-gradient(180deg,#0f3a34 0%,#0b2522 50%,#08110f 100%)';
+    const plannerNav=[['Lesson',art.rune],['Today',art.rune],['Ulhu',A.b8.idle],['Friday',art.rune]].map(([l,ic],i)=>({l,icon:ic,fg:i===2?'#e8e1cf':'#7a86a0',bg:i===2?'#2a3a30':'transparent',op:i===2?'1':'.5'}));
+    return {
+      ready:true,notReady:false,chrome,clock,art,night,dayOff:s.dayOff,ulhu,say,bannerBg,
+      phoneRef:this.phoneRef,fxRef:this.fxRef,ulhuRef:this.ulhuRef,counterRef:this.counterRef,bannerRef:this.bannerRef,flashRef:this.flashRef,bubbleRef:this.bubbleRef,hpRef:this.hpRef,roomRef:this.roomRef,stampIn:this.stampIn,
+      coins:s.coins,level:s.level,title:TITLES[s.level]||'Ancient',xpPct:Math.round(s.xp/s.xpMax*100)+'%',xpTxt:`${s.xp} / ${s.xpMax}`,hpPct:Math.round(s.hp/s.hpMax*100)+'%',hpTxt:`${s.hp} / ${s.hpMax}`,
+      undoVerb:last.verb||'The tide is calm.',undoName:last.name||'',undoDelta:last.delta||'',undoColor:last.unit==='hp'?'#ff7a66':(String(last.delta||'').startsWith('−')?'#c9a560':'#ffd56a'),undoCoin:last.unit==='coin'&&!!last.delta,undoHeart:last.unit==='hp',canUndo:this.stack.length>0,undo:this.undo,
+      tabs,tabLeft:(s.tab*25)+'%',tabColor:TABC[s.tab],trackX:`calc(${-s.tab*25}% + ${s.drag}px)`,trackT:s.drag?'none':'transform .3s cubic-bezier(.2,.8,.2,1)',
+      pDown:this.pDown,pMove:this.pMove,pUp:this.pUp,clickCap:this.clickCap,noForm:!f,hasForm:!!f,
+      rSections,tide,renameVal:s.renameVal,renameInput:e=>this.setState({renameVal:e.target.value}),renameKey:e=>{if(e.key==='Enter')e.target.blur();if(e.key==='Escape')this.setState({renaming:null});},
+      renameSave:()=>{ const id=s.renaming; if(!id) return; const v=(this.state.renameVal||'').trim(); this.setState(st=>({renaming:null,groups:v?st.groups.map(g=>g.id===id?{...g,name:v}:g):st.groups})); },
+      openGroupForm:()=>this.openForm('group'),
+      showReview:true,reviewOpen:rv.open,reviewRot:rv.open?'90deg':'0deg',toggleReview:()=>this.setState(st=>({review:{...st.review,open:!st.review.open}})),reviewPay:rv.done?'sealed':'+20',reviewSealOp:rv.done?'1':'.45',review:rv,reviewDone:rv.done,reviewNotDone:!rv.done,
+      reviewStats:[{v:ticksWeek,l:'ticks'},{v:s.weekCoins,l:'doubloons'},{v:s.beaten.length,l:'bosses beaten'}],
+      reviewKinds:[['Necessary',11,'#5aa7ff'],['Ahead',5,'#f2a93b'],['Outside work',2,'#b07cff'],['Life',6,'#5ee08a']].map(([l,n,c])=>({label:`${l} ${n}`,n,c})),
+      setWell:e=>{const v=e.target.value;this.setState(st=>({review:{...st.review,well:v}}));},setSlipped:e=>{const v=e.target.value;this.setState(st=>({review:{...st.review,slipped:v}}));},
+      reviewPris:rv.p.map((v,i)=>({n:i+1,v,ph:['Mark the 10S2 test','Build lessons two weeks ahead','Two evenings with no marking'][i],set:e=>{const x=e.target.value;this.setState(st=>({review:{...st.review,p:st.review.p.map((y,j)=>j===i?x:y)}}));}})),
+      sealReview:e=>{ this.snap(); this.earn(20,40,e.currentTarget,{verb:'Sealed:',name:'Sunday review',delta:'+20',unit:'coin'},{review:{...this.state.review,done:true}}); },
+      qSections,bossCards,bossCount:`${s.bosses.length} active`,beaten,beatenCount:s.beaten.length,hasBeaten:s.beaten.length>0,vanqOpen:s.vanqOpen,vanqRot:s.vanqOpen?'90deg':'0deg',toggleVanq:()=>this.setState(st=>({vanqOpen:!st.vanqOpen})),
+      curseRows,blessRows,faintNote,freezes,chain,chainTxt:`${cpos} / 8`,blessTotal:`${btot} today`,
+      denRoom:s.den==='room',denShop:s.den==='shop',denWard:s.den==='ward',denHoard:s.den==='hoard',denChron:s.den==='chron',slots,shopCats,tierChips,shopItems,wCats,wItems,wearing,hoardRows,weeks,weekCoins:s.weekCoins,calHead:['M','T','W','T','F','S','S'],cal,trophies,
+      formTitle,formPh,formColor,formRows,draft:d,setDraftName:e=>this.setD({name:e.target.value}),closeForm:()=>this.setState({form:null,draft:null}),fGroupSugs:f==='group',groupSugs,
+      fSteps,fBoss,stepWord,stepsLabel,draftSteps,addStep:()=>this.setState(st=>({draft:{...st.draft,steps:[...st.draft.steps,{n:'',by:f==='boss'?30:0}]}})),
+      useTemplate:()=>this.setD({name:d.name||'Mark the 9AS test',size:5,steps:[{n:'Half marked',by:26},{n:'The rest',by:28},{n:'Scores summed',by:29},{n:'Entered',by:30}]}),
+      payLabel,payVal,payColor,payCoin,submitTxt,submitBg,submitOp:(d.name||'').trim()?'1':'.45',submitForm:()=>this.submit(),
+      dock,plannerNav
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -6,7 +6,7 @@ const dir = path.join(__dirname, '..');
 m.props.PLANNER_KEY = 'k';
 const src = ['Code.gs', 'Behaviour.gs', 'game-art.js', 'Game.gs'].map((f) => fs.readFileSync(path.join(dir, f), 'utf8')).join('\n');
 global.SHOP = require('../game-shop.json');
-eval(src + '\nglobal.G={gameLoad,gameTick,gameUntick,gameSaveGoal,gameArchive,gameFreeze,gameShop,gameArt,gameBuy,gamePlace,gameBossStart,gameBossStage,gameBossRemove,gameReview,gPay_,gDie_,gNeed_,gAdd_,gDow_,gDiff_,gIsFrozen_};');
+eval(src + '\nglobal.G={gameLoad,gameTick,gameUntick,gameSaveGoal,gameArchive,gameFreeze,gameShop,gameArt,gameBuy,gamePlace,gameBossStart,gameBossStage,gameBossRemove,gameReview,gameQuestStep,gameGroupSave,gameWear,gameUnbuy,gameHoardSave,gameHoardClaim,gameChronicle,gPay_,gDie_,gNeed_,gAdd_,gDow_,gDiff_,gIsFrozen_};');
 
 const k = 'k'; let failed = 0;
 const ok = (n, c) => { console.log((c ? '  PASS ' : '  FAIL ') + n); if (!c) failed++; };
@@ -38,7 +38,7 @@ at('2026-11-03T09:00:00Z');
 let s = G.gameLoad(k);
 ok('first load seeds the starter rituals and Ulhu starts at level 1, 0 coins', s.goals.length >= 15 && s.player.level === 1 && s.player.coins === 0);
 ok('termly goals are seeded with the term end as the deadline', s.goals.filter((g) => g.kind === 'termly').length === 7 && s.goals.find((g) => g.kind === 'termly').due === '2026-12-18');
-ok('art for all five moods comes with the load', ['idle', 'happy', 'proud', 'sad', 'sleepy'].every((x) => /^data:image\/png/.test(s.art[x])));
+ok('the default groups come with the load (Teaching Trench, Marking Crypt, Surface World)', ['teach', 'chores', 'summon', 'marking', 'life'].every((x) => s.groups.some((g) => g.id === x)) && !s.art);
 const rows1 = m.sheets['Game Goals']._data.length;
 G.gameLoad(k);
 ok('loading again seeds nothing twice', m.sheets['Game Goals']._data.length === rows1);
@@ -145,8 +145,8 @@ ok('the art call returns every layer with its offset and size', Object.keys(art.
 ok('a shop buy never counts as earnings for the death rule', true);
 console.log('\n-- boss fights, Sunday review, auto-ticks');
 at('2026-11-12T10:00:00Z'); setCoins(100);
-threw = false; try { G.gameBossStart(k, { name: 'One stage only', stages: [{ name: 'a' }] }); } catch (e) { threw = true; }
-ok('a boss needs at least two stages', threw);
+threw = false; try { G.gameBossStart(k, { name: '', stages: [{ name: 'a' }] }); } catch (e) { threw = true; }
+ok('a boss needs a name', threw);
 s = G.gameBossStart(k, { name: 'Mark 9XS Particles tests', stages: [{ name: 'Half marked', due: '2026-11-13' }, { name: 'The rest marked', due: '2026-11-16' }, { name: 'Section scores summed', due: '2026-11-18' }, { name: 'Entered on the system', due: '2026-11-20' }] });
 let bs = s.bosses.find((b) => /Particles/.test(b.name));
 ok('a boss starts at 100 health with its stages', bs.hp === 100 && bs.stages.length === 4 && bs.status === 'active' && s.bosses.length === 1);
@@ -163,9 +163,9 @@ s = G.gameBossStage(k, bs.id, 1, false);
 ok('a stage can be unticked while the boss is alive', s.bosses[0].hp === 75);
 const coinsB = s.player.coins;
 s = G.gameBossStage(k, bs.id, 1, true); s = G.gameBossStage(k, bs.id, 2, true); s = G.gameBossStage(k, bs.id, 3, true);
-ok('beating the boss pays its reward once and says so', s.boss && s.boss.beaten && s.player.coins - coinsB === 200 && s.bosses[0].status === 'beaten');
+ok('beating the boss pays its reward once and says so', s.boss && s.boss.beaten && s.player.coins - coinsB === 150 && !s.bosses.length && s.beaten[0].name === 'Mark 9XS Particles tests');
 s = G.gameBossStage(k, bs.id, 3, true);
-ok('a beaten boss pays nothing more', s.player.coins - coinsB === 200);
+ok('a beaten boss pays nothing more (5h boss = 150)', s.player.coins - coinsB === 150);
 s = G.gameBossStart(k, { name: 'Made by mistake', stages: [{ name: 'a' }, { name: 'b' }] });
 const oops = s.bosses.find((b) => b.name === 'Made by mistake');
 s = G.gameBossRemove(k, oops.id);
@@ -173,7 +173,7 @@ ok('a boss made by mistake can be removed', !s.bosses.find((b) => b.id === oops.
 s = G.gameBossRemove(k, oops.id, true);
 ok('and Undo puts it back as it was', s.bosses.find((b) => b.id === oops.id).hp === 100);
 s = G.gameBossRemove(k, bs.id);
-ok('a beaten boss cannot be removed', s.bosses.find((b) => b.id === bs.id).status === 'beaten');
+ok('a beaten boss cannot be removed', s.beaten.some((b) => b.id === bs.id));
 s = G.gameBossRemove(k, oops.id);
 
 at('2026-11-20T18:00:00Z');   // a Friday
@@ -196,5 +196,64 @@ ok('a sheet made less than a week ahead pays nothing', c2b === s.player.coins &&
 m.sheets.Homework = m.makeSheet('Homework', [['id', 'cls', 'kind', 'title', 'file', 'tier', 'formId', 'formUrl', 'courseId', 'courseWorkId', 'setOn', 'postAt', 'dueOn', 'dueUtc', 'points', 'status', 'made'], ['h1', '9XS', 'quiz', 'T', 'f', '', 'x', 'u', 'c', 'w', '2026-11-20', '', '2026-11-27', '', 10, 'marked', 'now']]);
 s = G.gameLoad(k);
 ok('Set homework ticks itself when homework was set today', s.goals.find((g) => /Set homework/.test(g.name)).doneToday === true);
+
+console.log('\n-- redesign: quests, blessings, groups, wardrobe, hoard, chronicle');
+at('2026-11-23T10:00:00Z'); setCoins(500);
+s = G.gameSaveGoal(k, { name: 'Print the 10S2 mocks', kind: 'todo', minutes: 30, track: 'necessary', due: '2026-11-25', steps: [{ t: 'Find the paper' }, { t: 'Print 32' }] });
+let q = s.goals.find((g) => g.id === s.saved);
+ok('a quest keeps its due date, its checklist and sits in the Teaching list', q.kind === 'todo' && q.due === '2026-11-25' && q.steps.length === 2 && q.grp === 'teach' && q.dueToday);
+s = G.gameQuestStep(k, q.id, 1, true);
+ok('a checklist step ticks on its own and pays nothing', s.goals.find((g) => g.id === q.id).steps[1].d === true && s.player.coins === 500);
+s = G.gameTick(k, q.id, 1); q = s.goals.find((g) => g.id === q.id);
+ok('ticking the quest pays 10 and marks it done', s.player.coins === 510 && q.doneOn === '2026-11-23');
+s = G.gameUntick(k, q.id);
+ok('Undo opens the quest again', s.player.coins === 500 && !s.goals.find((g) => g.id === q.id).doneOn);
+s = G.gameTick(k, q.id, 1);
+at('2026-11-24T10:00:00Z'); s = G.gameTick(k, q.id, 1);
+ok('a done quest does not pay again the next day', s.player.coins === 510);
+at('2026-11-23T11:00:00Z');
+s = G.gameSaveGoal(k, { name: 'Drank water', kind: 'habit', polarity: 'plus', minutes: 5 });
+s = G.gameSaveGoal(k, { name: 'Went for a walk', kind: 'habit', polarity: 'plus', minutes: 15 });
+const bl = s.goals.filter((g) => g.kind === 'habit' && g.polarity === 'plus');
+const ft = bl.find((g) => g.featured), plain = bl.find((g) => !g.featured);
+ok('one blessing is x2 today', bl.filter((g) => g.featured).length === 1 && ft.pay === 2 * Math.max(2, Math.round({ 5: 3, 15: 6 }[ft.minutes] / 2)));
+let c1 = s.player.coins; s = G.gameTick(k, plain.id, 1); s = G.gameTick(k, plain.id, 1);
+ok('a blessing can be tapped again and again', s.player.coins - c1 === 2 * plain.pay && s.blessCount === 2);
+for (let i = 0; i < 5; i++) s = G.gameTick(k, plain.id, 1);
+c1 = s.player.coins; s = G.gameTick(k, plain.id, 1);
+ok('the 8th blessing of the day pays a +10 chain bonus', s.player.coins - c1 === plain.pay + 10 && s.blessCount === 8);
+s = G.gameUntick(k, plain.id);
+ok('Undo takes the last blessing (and its bonus) back', s.player.coins === c1 && s.blessCount === 7);
+s = G.gameGroupSave(k, { name: 'The Report Abyss', parent: 'teach' });
+ok('a new group sits inside Teaching', s.groups.find((g) => g.id === s.saved).parent === 'teach');
+s = G.gameGroupSave(k, { id: 'marking', name: 'The Crypt of Red Pens' });
+ok('a built-in group can be renamed and keeps its job', s.groups.find((g) => g.id === 'marking').name === 'The Crypt of Red Pens' && s.groups.find((g) => g.id === 'marking').type === 'marking');
+s = G.gameBossStart(k, { name: 'Write the Y9 scheme', size: 20, k: 'yog', stages: [{ name: 'Map', due: '2026-11-30' }] });
+const nb = s.bosses.find((b) => b.id === s.newBoss);
+ok('a 20h boss keeps its size and creature', nb && nb.size === 20 && nb.creature === 'yog');
+c1 = s.player.coins; s = G.gameBossStage(k, nb.id, 0, true);
+ok('its one stage beats it: +600 and it goes on the trophy shelf', s.player.coins - c1 === 600 && s.beaten[0].k === 'yog');
+setCoins(100);
+threw = false; try { G.gameWear(k, 'hat-3', true); } catch (e) { threw = /Not enough/.test(e.message); }
+ok('an outfit he cannot afford is refused', threw);
+s = G.gameWear(k, 'hat-2', true);
+ok('buying an outfit (90) takes the doubloons and Ulhu wears it', s.player.coins === 10 && s.wear.on.hat === 'hat-2' && s.wear.owned.indexOf('hat-2') >= 0);
+s = G.gameUnbuy(k, 'hat-2');
+ok('Undo the purchase: doubloons back, outfit gone, old hat back on', s.player.coins === 100 && s.wear.owned.indexOf('hat-2') < 0 && s.wear.on.hat === '');
+s = G.gameWear(k, 'skin-0', false);
+ok('taking off a skin puts the Kelp Mint skin back', s.wear.on.skin === 'skin-0');
+threw = false; try { G.gameWear(k, 'hat-12', true); } catch (e) { threw = /Locked/.test(e.message); }
+ok('a level-locked outfit is refused', threw);
+s = G.gameHoardSave(k, { name: 'Takeaway night', cost: 80 });
+const hid = s.saved;
+s = G.gameHoardClaim(k, hid);
+ok('claiming a Hoard reward costs its price and counts the claim', s.player.coins === 20 && s.hoard.find((h) => h.id === hid).claims === 1);
+threw = false; try { G.gameHoardClaim(k, hid); } catch (e) { threw = /Not enough/.test(e.message); }
+ok('a reward he cannot afford yet is refused', threw);
+s = G.gameHoardClaim(k, hid, true);
+ok('Undo a claim gives the doubloons back', s.player.coins === 100 && s.hoard.find((h) => h.id === hid).claims === 0);
+const ch = G.gameChronicle(k);
+ok('the Chronicle has 7 weeks, a 35-day calendar and the trophies', ch.weeks.length === 7 && ch.days.length === 35 && ch.days.some((d) => d.today && d.n > 0) && ch.beaten.length >= 2);
+ok('spending and refunds never count as doubloons earned', ch.weeks[6].coins === s.weekCoins);
 console.log('\n' + (failed ? failed + ' FAILED' : 'all game server checks passed'));
 process.exit(failed ? 1 : 0);
