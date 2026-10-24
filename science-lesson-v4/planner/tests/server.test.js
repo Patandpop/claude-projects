@@ -7,7 +7,7 @@ m.sheets.Students._data[0].push('Support');
 m.sheets.Students._data.forEach((r, i) => { if (i) r.push(i === 1 ? 'prompt' : ''); });
 // one project since 2026-10-12: the planner's Code.gs and Behaviour.gs load together (a clash would break this)
 eval(fs.readFileSync(path.join(__dirname, '..', 'Code.gs'), 'utf8') + '\n' + fs.readFileSync(path.join(__dirname, '..', 'Behaviour.gs'), 'utf8') +
-  '\nglobal.api={init,openClass,logEvent,logMany,removeMany,getBoard,setMode,endMode,getMode,setTimer,adjustTimer,stopTimer,submitResult,getSilence,getFriday,positivesOver,setSupport,setPause,mergeBehaviourData,behaviourWeek,sameClass_,lessonMcqs,saveVote,removeVote};');
+  '\nglobal.api={init,openClass,logEvent,logMany,removeMany,getBoard,setMode,endMode,getMode,setTimer,adjustTimer,stopTimer,submitResult,getSilence,getFriday,positivesOver,setSupport,setPause,mergeBehaviourData,behaviourWeek,sameClass_,lessonMcqs,saveVote,removeVote,setLost};');
 const k = 'k', out = []; let failed = 0;
 const ok = (n, c) => { out.push((c ? 'PASS ' : 'FAIL ') + n); if (!c) failed++; };
 
@@ -73,6 +73,17 @@ ok('ending a silence clears a pause', md.paused === false && !m.props.PAUSE);
 api.stopTimer(k);
 
 ok('Friday goal is a fixed 80% and this class hit it', api.getFriday(k).find(c => c.cls === '7BYA').goal.status === 'hit');
+// time lost (2026-10-24): one tap counts up, a second tap saves the seconds; the Friday goal includes it
+md = api.setLost(k, '7BYA', true); ok('Talking: the count starts and the phone and board see it', md.lost && md.lost.cls === '7BYA');
+md = api.setLost(k, '7BYA', true); ok('a second start does not restart the count', md.lost.start === JSON.parse(m.props.LOST).start);
+m.props.LOST = JSON.stringify({ cls: '7BYA', start: Date.now() - 40000 });
+md = api.setLost(k, '7BYA', false); ok('stopping saves the seconds lost', !md.lost && m.sheets['Time Lost']._data.slice(-1)[0][2] === 40);
+let fg = api.getFriday(k).find(c => c.cls === '7BYA').goal;
+ok('the Friday goal shows time lost against the weekly allowance (3 min)', fg.lost === 40 && fg.lostMax === 180 && fg.status === 'hit');
+m.props.LOST = JSON.stringify({ cls: '7BYA', start: Date.now() - 200000 }); api.setLost(k, '7BYA', false);
+ok('more than 3 minutes lost in the week misses the goal', api.getFriday(k).find(c => c.cls === '7BYA').goal.status === 'missed');
+m.props.LOST = JSON.stringify({ cls: '7BYA', start: Date.now() - 2000000 });
+ok('a count left running over 30 minutes is dropped', !api.getMode(k).lost);
 ok('positivesOver counts', api.positivesOver(k, '7BYA', 5).length >= 1);
 ok('setSupport writes the Support column', api.setSupport(k, '7BYA', 'Tom Browning', 'extend') === 'extend' && m.sheets.Students._data[2][6] === 'extend');
 // one app (2026-10-12)

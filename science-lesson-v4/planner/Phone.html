@@ -226,6 +226,12 @@
   .st small { display:block; font-size:12px; color:var(--warn-text); font-weight:800; }
   .sug { font-size:12px; color:var(--sodium-text); font-weight:800; background:var(--sodium-wash); padding:3px 7px; border-radius:999px; }
 
+  /* time lost (2026-10-24): one tap when someone talks, red and counting up; tap again to stop */
+  .talk { width:100%; margin-top:6px; border:1.5px solid #E5484D; background:transparent; color:#FF8A8E; border-radius:12px; padding:10px; font-weight:800; font-size:15px; }
+  .lostp { width:100%; display:flex; align-items:center; gap:12px; border:0; border-radius:14px; padding:12px 16px; background:#B4232A; color:#fff; text-align:left; animation:lostIn .15s ease-out; }
+  .lostp .face { font-size:34px; line-height:1; } .lostp .grow { flex:1; } .lostp small { display:block; font-size:12px; opacity:.85; font-weight:600; }
+  .lostp b { font-family:var(--display); font-size:40px; font-variant-numeric:tabular-nums; }
+  @keyframes lostIn { from { transform:scale(.97); opacity:.6; } to { transform:none; opacity:1; } }
   /* ABCD card votes (specs/learning-loop.md M3, Patryk's feedback 2026-10-22): replaces the seating plan */
   .abcdBtn { border:1.5px solid var(--line); background:var(--plate); border-radius:10px; padding:6px 12px; font-weight:800; font-size:14px; color:var(--ink); }
   .abcdBtn[aria-pressed="true"] { background:var(--ink); color:var(--on-ink); border-color:var(--ink); }
@@ -240,7 +246,6 @@
   .vres { text-align:center; font-family:var(--display); font-size:40px; font-weight:800; margin:10px 0 4px; min-height:48px; }
   .vres.hint { font-family:var(--text); font-size:15px; font-weight:400; color:var(--soft); }
   .vres .r { color:var(--ok); }
-  .vadj { display:flex; gap:10px; } .vadj button { flex:1; border:0; border-radius:14px; padding:16px 8px; font-weight:800; font-size:18px; color:#fff; }
   .vbtns { display:flex; gap:10px; margin-top:10px; } .vbtns button { flex:1; }
   .cta { width:100%; border:0; border-radius:14px; padding:15px; font-weight:800; font-size:17px; background:var(--ink); color:var(--on-ink); margin-top:6px; }
   .cta.alt { background:var(--plate); color:var(--ink); border:1px solid var(--line); }
@@ -301,6 +306,8 @@
     <p class="note" style="text-align:center;margin-top:24px">App version 22</p>
   </section>
 
+  <section id="vUlhu" class="hidden"><div id="ulhu"></div></section>
+
   <section id="vFri" class="hidden">
     <div id="fri"></div>
     <div id="friList" class="hidden">
@@ -325,12 +332,14 @@
 <nav>
   <button id="tLog" aria-pressed="true"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="3" y="4" width="7" height="6" rx="1.5"/><rect x="14" y="4" width="7" height="6" rx="1.5"/><rect x="3" y="14" width="7" height="6" rx="1.5"/><rect x="14" y="14" width="7" height="6" rx="1.5"/></svg>Lesson</button>
   <button id="tDay" aria-pressed="false"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"/></svg>Today</button>
+  <button id="tUlhu" aria-pressed="false"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M12 3c-4 0-7 3-7 7 0 2 .8 3.6 2 4.8V20l3-2 2 1.5 2-1.5 3 2v-5.2c1.2-1.200 2-2.800 2-4.800 0-4-3-7-7-7z"/><circle cx="9.500" cy="10" r="1" fill="currentColor"/><circle cx="14.500" cy="10" r="1" fill="currentColor"/></svg>Ulhu</button>
   <button id="tFri" aria-pressed="false"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>Friday</button>
 </nav>
 
 <div class="scrim" id="scrim"></div>
 <div class="sheet" id="sheet" role="dialog" aria-modal="true"><div class="grab"></div><div id="sheetBody"></div><button class="cancel" id="close">Cancel</button></div>
 
+<!--GAME_UI-->
 <script>
 const KEY = document.body.dataset.key;
 const $ = id => document.getElementById(id);
@@ -480,24 +489,17 @@ function renderVote() {
     `<div class="vgrid" id="vgrid">` + ['A', 'B', 'C', 'D'].map((L, k) => `<div class="vl${pair.includes(L) ? ' on' : pair.length ? ' dim' : ''}" data-l="${L}" style="grid-area:${L};background:${VCOL[L]}">` +
       `${L === right ? '<span class="tick">&#10003;</span>' : ''}<b>${L}</b>${q && q.o[k] ? `<small>${esc(q.o[k])}</small>` : ''}</div>`).join('') + `</div>` +
     `<div class="vres${sp ? '' : ' hint'}">${sp ? splitText(sp, right) : 'Tap a letter, or drag from one letter to another'}</div>` +
-    (pair.length === 2 && !V.live ? `<div class="vadj"><button id="vMoreA" style="background:${VCOL[pair[0]]}">&#9664; more ${pair[0]}</button><button id="vMoreB" style="background:${VCOL[pair[1]]}">more ${pair[1]} &#9654;</button></div>` : '') +
-    `<div class="vbtns"><button class="cta alt" id="vSkip">Skip</button><button class="cta" id="vNext">${V.i + 1 >= n ? 'Done' : 'Next question'}</button></div>`;
+    `<div class="vbtns"><button class="cta alt" id="vSkip">Skip</button>${V.saved[V.i] && !V.live ? '<button class="cta alt" id="vUndo">Undo</button>' : ''}<button class="cta" id="vNext">${V.i + 1 >= n ? 'Done' : 'Next question'}</button></div>`;
   $('vPrev').onclick = () => { if (V.i > 0) { V.i--; renderVote(); } };
   $('vNext2').onclick = $('vSkip').onclick = () => voteGo(1);
   $('vNext').onclick = () => voteGo(1);
-  if ($('vMoreA')) { $('vMoreA').onclick = () => voteNudge(pair, -5); $('vMoreB').onclick = () => voteNudge(pair, 5); }
+  if ($('vUndo')) $('vUndo').onclick = () => voteUndoNow();
   voteGestures();
 }
 function voteGo(d) {
   const V = S.vote, n = voteQs() ? voteQs().length : 12;
   if (V.i + d >= n) { snack('All questions done'); voteOn(false); return; }
   V.i = Math.max(0, V.i + d); renderVote();
-}
-// the later letter's share goes up by d (the pair always adds to 100)
-function voteNudge(pair, d) {
-  const sp = Object.assign({}, (S.vote.saved[S.vote.i] || {}).split);
-  const b = Math.max(5, Math.min(95, (sp[pair[1]] || 0) + d));
-  saveVote({ [pair[0]]: 100 - b, [pair[1]]: b }, true);
 }
 function voteGestures() {
   const g = $('vgrid'); if (!g) return;
@@ -507,10 +509,22 @@ function voteGestures() {
   const share = (x) => { const r = g.getBoundingClientRect(); return Math.max(5, Math.min(95, Math.round(((x - r.left) / r.width) * 20) * 5)); };
   const show = (sp) => { V.live = sp; const res = $('vote').querySelector('.vres'); res.classList.remove('hint'); res.innerHTML = splitText(sp, (voteQs() || [])[V.i] ? voteQs()[V.i].a : '');
     g.querySelectorAll('.vl').forEach((el) => { const on = sp[el.dataset.l] != null; el.classList.toggle('on', on); el.classList.toggle('dim', !on); }); };
-  g.onpointerdown = (e) => { start = letterAt(e.clientX, e.clientY); pair = null; if (!start) return; g.setPointerCapture(e.pointerId); show({ [start]: 100 }); };
+  // the pair is picked by the DIRECTION of the drag once the finger leaves the start card (Patryk 2026-10-24):
+  // a slant means the diagonal letter, even if the finger crosses a neighbour on the way
+  const POS = { B: [0, 0], C: [1, 0], A: [0, 1], D: [1, 1] };
+  const aim = (dx, dy) => {
+    const p = POS[start], ang = Math.atan2(Math.abs(dy), Math.abs(dx)) * 180 / Math.PI;
+    const c = p[0] + (ang < 65 ? Math.sign(dx) : 0), r = p[1] + (ang > 25 ? Math.sign(dy) : 0);
+    return Object.keys(POS).find((L) => L !== start && POS[L][0] === c && POS[L][1] === r) || null;
+  };
+  let x0 = 0, y0 = 0;
+  g.onpointerdown = (e) => { start = letterAt(e.clientX, e.clientY); pair = null; x0 = e.clientX; y0 = e.clientY; if (!start) return; g.setPointerCapture(e.pointerId); show({ [start]: 100 }); };
   g.onpointermove = (e) => {
     if (!start) return;
-    if (!pair) { const L = letterAt(e.clientX, e.clientY); if (L && L !== start) pair = [start, L].sort(); else return; }
+    if (!pair) {
+      if (letterAt(e.clientX, e.clientY) === start || Math.hypot(e.clientX - x0, e.clientY - y0) < 30) return;
+      const L = aim(e.clientX - x0, e.clientY - y0); if (!L) return; pair = [start, L].sort();
+    }
     const b = share(e.clientX); show({ [pair[0]]: 100 - b, [pair[1]]: b });
   };
   g.onpointerup = g.onpointercancel = (e) => {
@@ -527,21 +541,14 @@ async function saveVote(sp, adjust) {
   try {
     const r = await call('saveVote', { id: prev ? prev.id : null, cls: S.cls, key: V.data.key || '', title: V.data.title || '', q: i, question: q ? q.q : '', right: q ? q.a : '', split: sp, why: q ? q.why : {} });
     V.saved[i].id = r.id;
-    if (!adjust) voteSnack('Saved Q' + (i + 1) + (r.pctRight !== '' ? ': ' + r.pctRight + '% right' : ''), i, r.id);
   } catch (e) { V.saved[i] = prev; renderVote(); snack('Not saved: no signal. Try again.'); }
 }
-// undo for 5 seconds (its own button handler, so the behaviour undo is untouched)
-let voteUndo = null;
-function voteSnack(text, i, id) {
-  voteUndo = { i, id }; snack(text, ['vote']);
+// Undo sits in the button row (no pop-up, Patryk 2026-10-24): it clears this question's saved vote
+async function voteUndoNow() {
+  const V = S.vote, i = V.i, prev = V.saved[i]; if (!prev) return;
+  delete V.saved[i]; renderVote();
+  try { if (prev.id) await call('removeVote', prev.id); } catch (e) { V.saved[i] = prev; renderVote(); snack('Undo failed. Check your connection.'); }
 }
-const behUndo = $('snackUndo').onclick;
-$('snackUndo').onclick = async () => {
-  if (snackIds[0] !== 'vote') return behUndo();
-  $('snack').classList.remove('show');
-  const u = voteUndo; voteUndo = null; if (!u) return;
-  try { await call('removeVote', u.id); delete S.vote.saved[u.i]; S.vote.i = u.i; renderVote(); snack('Undone'); } catch (e) { snack('Undo failed. Check your connection.'); }
-};
 $('mAbcd').onclick = () => voteOn(!S.vote.on);
 
 $('search').oninput = renderStudents;
@@ -668,10 +675,13 @@ function silText() {
   return {
     set: mmss(SET), left: t ? mmss(Math.max(0, Math.ceil((t.paused ? t.left || 0 : t.end - now) / 1000))) : '',
     stime: sec < 0 ? String(-sec) : mmss(Math.max(0, sec)),
+    lost: m.lost ? mmss(Math.max(0, Math.floor((now - m.lost.start) / 1000))) : '',
     sword: m.paused ? 'Paused' : m.live === 'red' ? 'Tripped' : m.live === 'amber' ? 'Getting loud' : sec < 0 ? 'Counting down' : 'Listening'
   };
 }
 function silHTML(m, t) {
+  if (m.lost) return `<button class="lostp" data-lost="0"><span class="face">&#9785;</span><span class="grow">Time lost<small>tap when they are back on task</small></span><b data-k="lost"></b></button>`;
+  const talk = `<button class="talk" data-lost="1">Talking: count the time lost</button>`;
   if (m.mode === 'teaching') {
     let h = `<div class="modes3"><button data-mode="countdown">Countdown<small>3, 2, 1, ends when quiet</small></button>
       <button data-mode="entry">Silent entry<small>softer limit, ends when quiet</small></button></div>`;
@@ -681,19 +691,19 @@ function silHTML(m, t) {
     else h += `<div class="trun"><button data-t="-30">&minus;30s</button><span class="tt"><b data-k="left"></b><small>${esc(t.label || 'Timer')}${m.paused ? ' · paused' : ''}</small></span>
       <button data-t="+30">+30s</button><button class="pz" data-pause="${m.paused ? 0 : 1}">${m.paused ? 'Resume' : 'Pause'}</button><button class="x" data-t="stop" aria-label="Stop timer">&#x2715;</button></div>
       <div class="go2"><button class="gw wide" data-mode="work">Start silent work with this timer</button></div>`;
-    return h;
+    return h + talk;
   }
   // running: one big panel in place of the timer row, with large End and cancel buttons
   return `<div class="live big ${m.live || 'quiet'}"><span class="lbl">${esc(m.label || '')}<small data-k="sword"></small></span><span class="t" data-k="stime"></span>
     ${t ? `<span class="tmr">Timer <span data-k="left"></span> left <button class="adj" data-t="-30">&minus;30s</button><button class="adj" data-t="+30">+30s</button></span>` : ''}
-    <div class="btns"><button class="pz big" data-pause="${m.paused ? 0 : 1}">${m.paused ? '&#9654; Resume' : '&#10074;&#10074; Pause'}</button><button class="end" data-end="0">End</button><button class="cx" data-end="1" aria-label="Cancel, don't count">&#x2715; Cancel</button></div></div>`;
+    <div class="btns"><button class="pz big" data-pause="${m.paused ? 0 : 1}">${m.paused ? '&#9654; Resume' : '&#10074;&#10074; Pause'}</button><button class="end" data-end="0">End</button><button class="cx" data-end="1" aria-label="Cancel, don't count">&#x2715; Cancel</button></div></div>${talk}`;
 }
 function renderSilence(force) {
   const m = S.mode, box = $('silence');
-  if (S.tab === 'fri') { box.classList.add('hidden'); silKey = ''; return; }
+  if (S.tab === 'fri' || S.tab === 'ulhu') { box.classList.add('hidden'); silKey = ''; return; }
   box.classList.remove('hidden');
   const t = timerOn(m.timer) ? m.timer : null;
-  const key = [m.mode, m.sid || '', m.label || '', t ? 'T' + (t.label || '') : '-', m.paused ? 'P' : ''].join('|');
+  const key = [m.lost ? 'L' : '', m.mode, m.sid || '', m.label || '', t ? 'T' + (t.label || '') : '-', m.paused ? 'P' : ''].join('|');
   if (force === true || key !== silKey) { silKey = key; box.innerHTML = silHTML(m, t); }
   const x = silText();
   box.querySelectorAll('[data-k]').forEach(el => { const v = x[el.dataset.k]; if (v !== undefined && el.textContent !== v) el.textContent = v; });
@@ -714,6 +724,12 @@ $('silence').addEventListener('click', async e => {
   const b = e.target.closest('button'); if (!b) return;
   const now = Date.now() + offset, t = timerOn(S.mode.timer) ? S.mode.timer : null;
   // Pause / Resume (2026-10-08): the board stops listening and the timer freezes; resume carries on
+  if (b.dataset.lost) {
+    const on = b.dataset.lost === '1';
+    optimistic({ lost: on ? { cls: S.cls, start: now } : null }); scheduleMode();
+    try { await act('setLost', S.cls, on); } catch (err) { snack('Not sent: no signal. Tap again.'); refreshMode(); }
+    return;
+  }
   if (b.dataset.pause) {
     const on = b.dataset.pause === '1';
     optimistic({ paused: on, pausedAt: on ? now : null,
@@ -769,7 +785,7 @@ function applyMode(m) {
 }
 function scheduleMode() {
   clearTimeout(modeTimer); clearInterval(tick);
-  const active = S.mode.mode !== 'teaching' || timerOn(S.mode.timer);
+  const active = S.mode.mode !== 'teaching' || timerOn(S.mode.timer) || !!S.mode.lost;
   if (active) tick = setInterval(renderSilence, 500);
   modeTimer = setTimeout(async () => {
     const my = actSeq;
@@ -806,10 +822,9 @@ $('ranges').onclick = e => { const b = e.target.closest('button'); if (!b) retur
 /* ---------- Friday ---------- */
 const MAX = 3;
 function goalChip(g, f) {
-  const fn = f ? ', fortnight' : '';
-  if (g.status === 'hit') return `<span class="goal hit">Silent ${g.pct}%</span>`;
-  if (g.status === 'missed') return `<span class="goal missed">Silent ${g.pct}%</span>`;
-  return `<span class="goal hit">No silence data</span>`;   // counts as meeting the goal
+  const lost = g.lost ? ` · ${mmss(g.lost)} lost` : '';
+  const sil = g.pct != null ? `Silent ${g.pct}%` : 'No silence data';
+  return `<span class="goal ${g.status === 'missed' ? 'missed' : 'hit'}">${sil}${lost}</span>`;   // counts as meeting the goal
 }
 async function loadFriday() {
   $('fri').innerHTML = '<p class="note">Loading</p>';
@@ -870,13 +885,14 @@ $('chips').addEventListener('click', e => { const b = e.target.closest('button')
 function pickClass(c) { if (c === S.cls) return; S.sel = []; $('selbar').classList.add('hidden'); $('search').value = ''; loadClass(c); }
 function setTab(t) {
   S.tab = t;
-  [['log','tLog','vLog'],['day','tDay','vDay'],['fri','tFri','vFri']].forEach(([k, b, v]) => { $(b).setAttribute('aria-pressed', t === k); $(v).classList.toggle('hidden', t !== k); });
-  $('chips').classList.toggle('hidden', t === 'fri');
-  $('clsTitle').textContent = t === 'fri' ? 'Friday' : S.cls;
+  [['log','tLog','vLog'],['day','tDay','vDay'],['fri','tFri','vFri'],['ulhu','tUlhu','vUlhu']].forEach(([k, b, v]) => { $(b).setAttribute('aria-pressed', t === k); $(v).classList.toggle('hidden', t !== k); });
+  $('chips').classList.toggle('hidden', t === 'fri' || t === 'ulhu');
+  $('clsTitle').textContent = t === 'fri' ? 'Friday' : t === 'ulhu' ? 'Ulhu' : S.cls;
+  if (t === 'ulhu' && !$('ulhu').firstChild) GameUI.mount($('ulhu'), call, { wide: false });
   renderSilence();
   if (t === 'log') renderStudents(); if (t === 'day') renderDay(); if (t === 'fri') loadFriday();
 }
-$('tLog').onclick = () => setTab('log'); $('tDay').onclick = () => setTab('day'); $('tFri').onclick = () => setTab('fri');
+$('tLog').onclick = () => setTab('log'); $('tDay').onclick = () => setTab('day'); $('tFri').onclick = () => setTab('fri'); $('tUlhu').onclick = () => setTab('ulhu');
 $('refresh').onclick = () => { if (S.tab === 'fri') loadFriday(); else loadClass(S.cls); };
 function render() { if (S.tab === 'log') renderStudents(); if (S.tab === 'day') renderDay(); }
 

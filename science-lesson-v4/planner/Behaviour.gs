@@ -34,7 +34,7 @@ const MODES = {
   work:      { label: 'Silent work',  max: 1200 },
   entry:     { label: 'Silent entry', max: 900 }   // ends itself once the class is silent, like the countdown
 };
-const DEFAULTS = { STANDARD: 90, STEP: 3, SENSITIVITY: 'Medium', COUNTDOWN_SECS: 3, EMAIL_GAP_DAYS: 21 };
+const DEFAULTS = { STANDARD: 90, STEP: 3, SENSITIVITY: 'Medium', COUNTDOWN_SECS: 3, EMAIL_GAP_DAYS: 21, LOST_GOAL_SECS: 180 };
 const LOG_TAIL = 8000;
 // Sheets reads a cell that starts with + or - as a formula, which turned every saved positive into #ERROR!.
 // So the Log stores words, and the app turns them back into symbols when it reads.
@@ -283,6 +283,30 @@ function setMode(k, mode, cls, secs) {
   return modeState_();
 }
 
+/* ---------- time lost (Patryk 2026-10-24) ----------
+   One tap on the phone when someone talks: the board turns red and counts up the seconds lost, in silent
+   work or in ordinary teaching. A second tap stops it and saves the seconds to the "Time Lost" tab.
+   A count left running more than 30 minutes is dropped (forgotten, not real). */
+const LOST_MAX = 1800;
+function setLost(k, cls, on) {
+  check_(k);
+  const props = PropertiesService.getScriptProperties(), now = Date.now();
+  const L = JSON.parse(props.getProperty('LOST') || 'null');
+  if (on && !L) props.setProperty('LOST', JSON.stringify({ cls: cls, start: now }));
+  if (!on && L) {
+    props.deleteProperty('LOST');
+    const secs = Math.round((now - L.start) / 1000);
+    if (secs >= 1 && secs <= LOST_MAX) tab_('Time Lost', ['when', 'class', 'seconds']).appendRow([new Date(L.start), L.cls, secs]);
+  }
+  return modeState_();
+}
+function readLost_() {
+  const sh = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Time Lost');
+  if (!sh || sh.getLastRow() < 2) return [];
+  return sh.getRange(2, 1, sh.getLastRow() - 1, 3).getValues().filter(r => r[0] instanceof Date)
+    .map(r => ({ at: r[0], cls: String(r[1]), secs: Number(r[2]) || 0 }));
+}
+
 /** Blue border (prompt), purple border (extend) or none, saved in the Support column of the Students tab. */
 function setSupport(k, cls, name, val) {
   check_(k);
@@ -469,6 +493,8 @@ function modeState_() {
   }
   if (m.mode !== 'teaching') m.label = m.title || MODES[m.mode].label;
   m.timer = timer;
+  const lost = JSON.parse(props.getProperty('LOST') || 'null');
+  m.lost = lost && Date.now() - lost.start < LOST_MAX * 1000 ? lost : null;
   m.paused = !!pause; m.pausedAt = pause ? pause.at : null;
   m.board = Number(CacheService.getScriptCache().get('boardSeen')) || 0;   // when the board page last checked in (for the phone's dot)
   m.now = Date.now();
@@ -503,7 +529,7 @@ function getFriday(k) {
   const s = settings_();
   const std = Number(s.STANDARD) || 90, step = Number(s.STEP) || 3, gap = Number(s.EMAIL_GAP_DAYS) || 21;
   const now = new Date();
-  const studs = students_(), log = readLog_(), sessions = readSessions_(), emails = readEmails_();
+  const studs = students_(), log = readLog_(), sessions = readSessions_(), emails = readEmails_(), lostRows = readLost_();
   return classOrder_().map(cls => {
     const cur = periodKey_(cls, now);
     const per = {};
@@ -515,12 +541,17 @@ function getFriday(k) {
     });
     const pct = pk => 100 * (1 - per[pk].red / per[pk].mon);
     const earlier = Object.keys(per).map(Number).filter(pk => pk < cur && per[pk].mon > 0).sort((a, b) => a - b);
-    // goal: 80% of silent time quiet. No silences recorded counts as meeting it.
+    // goal (2026-10-24): 80% of silent time quiet AND no more than LOST_GOAL_SECS lost to talking this
+    // week (twice that for a fortnightly class). No silences recorded counts as meeting the silent part.
+    const fort = FORTNIGHTLY.indexOf(cls) !== -1, lostMax = (Number(s.LOST_GOAL_SECS) || 180) * (fort ? 2 : 1);
+    const lostNow = lostRows.filter(x => sameClass_(x.cls, cls) && periodKey_(cls, x.at) === cur).reduce((n, x) => n + x.secs, 0);
     let goal = { status: 'nodata', target: 80 };
     if (per[cur] && per[cur].mon > 0) {
       const now_ = Math.round(pct(cur));
       goal = { status: now_ >= 80 ? 'hit' : 'missed', pct: now_, target: 80 };
     }
+    goal.lost = lostNow; goal.lostMax = lostMax;
+    if (lostNow > lostMax) goal.status = 'missed';
     const last = {};
     emails.forEach(e => { if (e.cls === cls && (!last[e.name] || e.date > last[e.name])) last[e.name] = e.date; });
     const pos = {};

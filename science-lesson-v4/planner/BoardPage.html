@@ -80,6 +80,7 @@ const TEXT = '"Atkinson Hyperlegible Next","Atkinson Hyperlegible","Segoe UI",sa
 let cls = '', names = [], rows = {}, firstLoad = true, offline = false, lastDraw = performance.now();
 var pushFrame = () => {};
 let TIMER = null;    // { kind, label, endLocal, total }
+let LOST = null;     // time lost (2026-10-24): { startLocal } while the phone's Talking count runs
 let RESULT = null;   // end-of-silent-work count up: { pct, hist, total, at }
 let LEVEL = 0;       // smoothed room level: 1 = exactly at the limit
 let sparks = [];
@@ -255,6 +256,18 @@ function drawResult(now) {
   }
   g.globalAlpha = 1;
 }
+// time lost: red, a sad face, the seconds counting up. Wins over every other screen while it runs.
+function drawLost(now) {
+  g.fillStyle = RED; g.fillRect(0, 0, W, H);
+  const sec = Math.max(0, Math.floor((Date.now() - LOST.startLocal) / 1000));
+  g.strokeStyle = CHALK; g.lineWidth = 2.4; g.fillStyle = CHALK;
+  g.beginPath(); g.arc(34, 39, 20, 0, Math.PI * 2); g.stroke();
+  g.beginPath(); g.arc(27, 33, 2.4, 0, Math.PI * 2); g.arc(41, 33, 2.4, 0, Math.PI * 2); g.fill();
+  g.beginPath(); g.arc(34, 53, 9, Math.PI * 1.15, Math.PI * 1.85); g.stroke();
+  T('Time lost', 66, 22, 11, 'rgba(234,242,250,.85)');
+  const sc = 1 + 0.03 * Math.max(0, Math.sin(now / 250));
+  g.save(); g.translate(66, 62); g.scale(sc, sc); T(mmss(sec), 0, 0, 40, CHALK); g.restore();
+}
 function drawTimerOnly(now) {
   navyBg();
   const tLeft = (TIMER.endLocal - Date.now()) / 1000, over = tLeft <= 0, last = tLeft > 0 && tLeft <= 10;
@@ -270,6 +283,7 @@ function draw() {
   g.setTransform(SCALE, 0, 0, SCALE, 0, 0);
   if (RESULT && Date.now() - RESULT.at < (6 + RESULT.pre) * 1000) { drawResult(now); pushFrame(); return; }
   RESULT = null;
+  if (LOST) { drawLost(now); pushFrame(); return; }
   if (PAUSED && TIMER && TIMER.left != null) TIMER.endLocal = Date.now() + TIMER.left;   // frozen timer
   if (sess) {
     if (sess.phase === 'count') drawCountdown(now);
@@ -362,6 +376,7 @@ async function poll() {
     const m = d.mode || { mode: 'teaching' };
     TIMER = m.timer ? { kind: m.timer.kind, label: m.timer.label, total: m.timer.total, endLocal: m.timer.end - offset } : null;
     if (TIMER && m.timer.paused) TIMER.left = m.timer.left;
+    LOST = m.lost ? { startLocal: m.lost.start - offset } : null;
     // a P pressed here wins for a few seconds over a reply that left before the server knew
     if (Date.now() - pauseToggledAt > 4000) setPaused(!!m.paused);
     else if (PAUSED && TIMER && TIMER.left == null) TIMER.left = Math.max(0, TIMER.endLocal - Date.now());

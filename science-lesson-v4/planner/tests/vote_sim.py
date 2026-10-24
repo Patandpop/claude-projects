@@ -1,6 +1,6 @@
 """ABCD card votes on the phone (2026-10-23, specs/learning-loop.md M3 + Patryk's feedback). Runs Phone.html in
 headless Chromium against a fake server: tap = 100% one letter, drag between two letters then slide = the split
-(pair in letter order), bottom buttons move the split, Skip, Undo, and the seating plan coming back.
+(pair in letter order), diagonal drags, Skip, the Undo button, and the seating plan coming back.
 Run:  python tests/vote_sim.py   (needs playwright + chromium, like phone_sim.py). Synthetic data only."""
 import os, json, tempfile
 from playwright.sync_api import sync_playwright
@@ -18,6 +18,7 @@ const H={init:()=>({classes:['7MLA'],today:['7MLA'],week:'B',active:'7MLA',rules
  lessonMcqs:()=>({key:'Y7/B1/L4',title:'Specialised Cells',today:true,mcq:MCQ}),
  saveVote:(v)=>{ const id=v.id||('v'+(++N)); window.VOTES=window.VOTES.filter(x=>x.id!==id).concat([Object.assign({},v,{id})]);
    return {id,pctRight:v.right?(v.split[v.right]||0):'',mainWrong:''}; },
+ setLost:(c,on)=>{ window.LOST=on; return Object.assign(st(),{lost:on?{cls:c,start:Date.now()}:null}); },
  removeVote:(id)=>{ window.VOTES=window.VOTES.filter(x=>x.id!==id); return true; }};
 window.google={script:{run:{withSuccessHandler(ok){return {withFailureHandler(fail){return new Proxy({},{get(_,fn){return function(k,...a){
   setTimeout(()=>{ try{ ok(H[fn](...a)); }catch(e){fail(e);} }, 60); }}})}}}}}};
@@ -54,17 +55,29 @@ with sync_playwright() as p:
     v = [x for x in pg.evaluate('VOTES') if x['q'] == 1]
     check('drag C to A shows "A | C" in letter order while dragging', live.index('A') < live.index('C'))
     check('sliding right gives the later letter more: A 30% | C 70%', len(v) == 1 and v[0]['split'] == {'A': 30, 'C': 70})
-    pg.click('#vMoreA'); pg.wait_for_timeout(300)
-    v = [x for x in pg.evaluate('VOTES') if x['q'] == 1]
-    check('the bottom button moves the split (more A: 35 / 65), same vote updated', len(v) == 1 and v[0]['split'] == {'A': 35, 'C': 65})
+    pg.click('#vUndo'); pg.wait_for_timeout(300)
+    check('the Undo button (no pop-up) clears this question', not [x for x in pg.evaluate('VOTES') if x['q'] == 1] and not pg.is_visible('#snack.show'))
+    def drag(f, t):
+        pg.mouse.move(f['x'] + f['width'] / 2, f['y'] + f['height'] / 2); pg.mouse.down()
+        pg.mouse.move(t['x'] + t['width'] / 2, t['y'] + t['height'] / 2, steps=8); pg.mouse.up(); pg.wait_for_timeout(300)
+        return sorted([x for x in pg.evaluate('VOTES') if x['q'] == 1][0]['split'].keys())
+    check('a slanted drag A to C picks the diagonal pair A | C', drag(box('A'), box('C')) == ['A', 'C'])
+    check('a flat drag A to D picks A | D', drag(box('A'), box('D')) == ['A', 'D'])
+    check('a straight-up drag A to B picks A | B', drag(box('A'), box('B')) == ['A', 'B'])
+    check('a slanted drag D to B picks B | D', drag(box('D'), box('B')) == ['B', 'D'])
+    check('no fine-adjust buttons', pg.locator('#vMoreA').count() == 0)
     pg.click('#vSkip'); pg.wait_for_timeout(200)
     check('Skip moves on without saving', 'Q3 of 3' in pg.inner_text('.vq') and len(pg.evaluate('VOTES')) == 2)
     d = box('D'); pg.mouse.click(d['x'] + 20, d['y'] + 20); pg.wait_for_timeout(300)
     check('a third vote is saved', len(pg.evaluate('VOTES')) == 3)
-    pg.click('#snackUndo'); pg.wait_for_timeout(300)
+    pg.click('#vUndo'); pg.wait_for_timeout(300)
     check('Undo removes the last vote', len(pg.evaluate('VOTES')) == 2)
     pg.click('#mAbcd'); pg.wait_for_timeout(200)
     check('ABCD off: the seating plan is back', pg.is_visible('#studs') and not pg.is_visible('#vgrid'))
+    pg.click('.talk'); pg.wait_for_timeout(1300)
+    check('Talking: one tap turns the panel red and counts up at once', pg.is_visible('.lostp') and pg.evaluate('LOST') is True and pg.inner_text('.lostp b').startswith('0:0'))
+    pg.click('.lostp'); pg.wait_for_timeout(300)
+    check('a second tap stops it', not pg.is_visible('.lostp') and pg.evaluate('LOST') is False)
     check('no page errors', not errs)
     if errs: print(errs)
     b.close()

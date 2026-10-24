@@ -83,3 +83,9 @@ Today nothing about what pupils actually learnt flows back into the lessons, hom
 - Storage: "MCQ Votes" tab (id, when, class, lesson, title, q, question, right, split, % right, main wrong, misconception from `why`). No pupil names. `saveVote` (same id = update), `removeVote`. Behaviour version 23.
 - Tests: tests/server.test.js (ABCD checks), tests/vote_sim.py (13 checks in headless Chromium).
 - **Next:** the silent-work / interruption indicator (feedback above; scoring still to design), then M10 Friday message drafts, then votes feeding the planner's lesson card (M8 uses homework only so far).
+
+## Built 2026-10-24 (Patryk's feedback on the ABCD cards + time lost)
+- ABCD: the pair is chosen by the drag's DIRECTION once the finger leaves the start card (a slant = the diagonal letter, even when it crosses a neighbour). The "more A / more C" buttons are gone (a rough estimate is enough). Undo is a button in the bottom row (clears this question's vote), no pop-up.
+- Time lost: a "Talking: count the time lost" button under the timer controls (in teaching and during a silence). One tap: the phone panel and the board go red with a sad face and count up the seconds at once; a second tap stops and saves to the "Time Lost" tab. A count left over 30 min is dropped. Tap-driven (he hears it); the board's microphone is not used for this.
+- Weekly goal (decided here, change LOST_GOAL_SECS in Behaviour Settings to tune): met when silent time is 80%+ (or no silences) AND no more than 3 minutes lost to talking that week (6 for a fortnightly class). The Friday chip shows "Silent 85% · 1:20 lost".
+- Tests: server.test.js (time lost + goal), vote_sim.py 20/20.
