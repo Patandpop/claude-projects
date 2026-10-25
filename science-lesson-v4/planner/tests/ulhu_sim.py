@@ -3,7 +3,7 @@ Run: python tests/ulhu_sim.py  (add --shots DIR to save screenshots). Synthetic 
 import os, sys, subprocess, time
 from playwright.sync_api import sync_playwright
 P = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '/'; SP = sys.argv[1] if len(sys.argv) > 1 and not sys.argv[1].startswith('--') else __import__('tempfile').mkdtemp()
-js = ''.join(open(P + f, encoding='utf-8').read() + '\n' for f in ['game-ulhu.js', 'game-pixel.js', 'game-ui.js'])
+js = ''.join(open(P + f, encoding='utf-8').read() + '\n' for f in ['game-ulhu.js', 'game-pixel.js', 'game-runes.js', 'game-ui.js'])
 page = '''<!doctype html><meta charset="utf-8"><meta name=viewport content="width=device-width,initial-scale=1"><body style="margin:0;background:#0d1b3a">
 <div style="height:60px;background:#0a1020;color:#fff">8AG header</div><div id=u></div><nav style="position:fixed;bottom:0;left:0;right:0;height:62px;background:#0a1020"></nav>
 <script>window.CALLS=[];function call(fn,...args){CALLS.push(fn);return fetch('/c',{method:'POST',body:JSON.stringify({fn,args})}).then(r=>r.json()).then(x=>{if(x.err)throw new Error(x.err);return x.ok;});}</script>
@@ -22,6 +22,9 @@ try:
         check('banner shows coins, level title and Ulhu', pg.inner_text('.uz-coins b') == '437' and pg.locator('.uz-me img').count() >= 1)
         check('four tabs, Rituals first with a count badge', pg.locator('.uz-tabs button').count() == 4 and pg.locator('.uz-tabs button b').count() >= 1)
         check('groups: Teaching Trench, Drudgery Shoals, Summoning Circle, Marking Crypt, Surface World', all(t in pg.inner_text('.uz-pane >> nth=0') for t in ['The Teaching Trench', 'The Drudgery Shoals', 'The Summoning Circle', 'The Marking Crypt', 'The Surface World']))
+        sizes = pg.evaluate("[...document.querySelectorAll('img[alt=runes]')].map(i => i.src)")
+        check('the currency is runes: single runes, the cairn and the portal all appear', len(sizes) > 5 and pg.evaluate("[RUNES.pick(6,'x').src, RUNES.pick(25).src, RUNES.pick(600).src].every((s, i, a) => a.indexOf(s) === i)") and pg.evaluate("RUNES.pick(25).src") in sizes)
+        check('the same row keeps the same rune between repaints', pg.evaluate("RUNES.pick(6,'g1').src === RUNES.pick(6,'g1').src"))
         check('Tide Charts card and the Sunday review at the bottom', 'Tide Charts' in pg.inner_text('.uz-pane >> nth=0') and pg.locator('.uz-rv').count() == 1)
         if shots: pg.screenshot(path=os.path.join(SP, 's1.png'))
         c0 = int(pg.inner_text('.uz-coins b'))
@@ -79,7 +82,7 @@ try:
         c4 = int(pg.inner_text('.uz-coins b')); pg.locator('[data-a=claim]').nth(1).click(); pg.wait_for_timeout(900)
         check('claiming a Hoard reward costs its price and stamps CLAIMED', int(pg.inner_text('.uz-coins b')) == c4 - 80)
         pg.click('.uz-dock [data-v=chron]'); pg.wait_for_timeout(900)
-        check('the Chronicle: weeks, calendar, trophies', 'Doubloons per week' in pg.inner_text('.uz-pane >> nth=3') and 'Streak calendar' in pg.inner_text('.uz-pane >> nth=3'))
+        check('the Chronicle: weeks, calendar, trophies', 'Runes per week' in pg.inner_text('.uz-pane >> nth=3') and 'Streak calendar' in pg.inner_text('.uz-pane >> nth=3'))
         if shots: pg.screenshot(path=os.path.join(SP, 's7.png'))
         h = pg.evaluate("document.querySelector('.uz').getBoundingClientRect().height")
         check('fills the screen between the header and the bottom bar', 780 > h > 600)

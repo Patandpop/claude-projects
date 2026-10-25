@@ -179,7 +179,10 @@
     }
     const A = root.ULHU_ART, P = root.PX;
     const IMG = { coin: P.coin.src, flame: P.flame.src, heart: P.heart.src, skull: P.skull.src, seal: P.seal.src, wax: P.waxRed.src, xp: P.xp.src, trophy: P.trophy.src, tick: P.tick.src, moon: P.moon.src, spark: P.spark.src, rune: P.rune.src, plant: A.items.plant.src };
-    const coin = (z) => '<img src="' + IMG.coin + '" style="width:' + z + 'px;height:' + z + 'px" alt="">';
+    // the currency is runes (2026-10-25): one rune under 15, the cairn for 15-99, the rune portal for 100+
+    const RN = root.RUNES;
+    const coin = (z, n, key) => { const s = RN ? RN.pick(n, key) : P.coin, k = s.h >= 34 ? 1.35 : s.h > 24 ? 1.2 : 1; return '<img src="' + s.src + '" style="width:' + Math.round(z * k * s.w / s.h) + 'px;height:' + Math.round(z * k) + 'px;object-fit:contain" alt="runes">'; };
+    if (RN) IMG.coin = RN.ones[0].src;
     let style = '16-bit'; try { style = localStorage.getItem('ulhuStyle') || '16-bit'; } catch (e) { /* private window */ }
     const V = { tab: 0, open: { teach: 1, chores: 1, summon: 1, marking: 0, life: 1, qteach: 1, qlife: 1, qdone: 0 }, den: 'room', shopCat: 'floors', tier: 'All', wCat: 'hat', form: null, draft: null, renaming: null, banishArm: null, stamp: null, vanq: false, rvOpen: false, mood: null, say: null, last: null, drag: 0, settling: {} };
     let D = null, SHOP = null, ROOM = null, CHRON = null, seq = 0, err = '';
@@ -234,7 +237,7 @@
       t.style.cssText = 'position:absolute;left:' + a.x + 'px;top:' + (a.y - 10) + 'px;transform:translateX(-50%);font:700 18px var(--a);color:' + col + ';text-shadow:0 2px 0 #000;white-space:nowrap';
       fx.appendChild(t); anim(t, [{ transform: 'translate(-50%,0)', opacity: 1 }, { transform: 'translate(-50%,-34px)', opacity: 0 }], { duration: 800, easing: 'ease-out' }).onfinish = () => t.remove(); }
     function flyCoin(r, n) { if (!r) return; const a = rel(r), b = rel($('.uz-ctr').getBoundingClientRect());
-      for (let i = 0; i < Math.min(4, 1 + Math.floor(n / 12)); i++) { const c = document.createElement('img'); c.src = IMG.coin;
+      for (let i = 0; i < Math.min(4, 1 + Math.floor(n / 12)); i++) { const c = document.createElement('img'); c.src = RN ? RN.any().src : IMG.coin;
         c.style.cssText = 'position:absolute;left:' + (a.x - 11) + 'px;top:' + (a.y - 11) + 'px;width:22px;height:22px'; fx.appendChild(c); const dx = b.x - a.x, dy = b.y - a.y;
         anim(c, [{ transform: 'translate(0,0) scale(.6)', opacity: 0 }, { transform: 'translate(' + (dx * 0.35 + (i - 1) * 14) + 'px,' + (dy * 0.35 - 50) + 'px) scale(1.35)', opacity: 1, offset: 0.4 }, { transform: 'translate(' + dx + 'px,' + dy + 'px) scale(.8)', opacity: 1 }], { duration: 560 + i * 70, easing: 'cubic-bezier(.45,0,.55,1)' }).onfinish = () => { c.remove(); if (i === 0) anim($('.uz-ctr'), [{ transform: 'scaleX(1)' }, { transform: 'scaleX(-1) scale(1.2)' }, { transform: 'scaleX(1)' }, { transform: 'scaleX(-1)' }, { transform: 'scaleX(1)' }], { duration: 520 }); }; } }
     const glow = (k, col) => { const n = k && box.querySelector('[data-fx="' + k + '"]'); anim(n, [{ boxShadow: '0 0 0 0 ' + col, transform: 'scale(.9)' }, { boxShadow: '0 0 0 12px rgba(0,0,0,0)', transform: 'scale(1.06)' }, { boxShadow: '0 0 0 0 rgba(0,0,0,0)', transform: 'scale(1)' }], { duration: 480, easing: 'ease-out' }); };
@@ -245,7 +248,7 @@
     function ripple(r, col) { if (!r) return; const a = rel(r), d = document.createElement('div'); d.style.cssText = 'position:absolute;left:' + (a.x - 30) + 'px;top:' + (a.y - 30) + 'px;width:60px;height:60px;border-radius:50%;border:2px solid ' + col + ';box-shadow:0 0 12px ' + col; fx.appendChild(d); anim(d, [{ transform: 'scale(.3)', opacity: 1 }, { transform: 'scale(2.6)', opacity: 0 }], { duration: 600, easing: 'ease-out' }).onfinish = () => d.remove(); }
     function celebrate() {
       const o = rel(me.getBoundingClientRect()); anim($('.uz-flash'), [{ opacity: 0 }, { opacity: 1, offset: 0.2 }, { opacity: 0 }], { duration: 1100 });
-      for (let i = 0; i < 16; i++) { const s = document.createElement('img'), z = i % 3 ? 14 : 18; s.src = i % 3 ? IMG.spark : IMG.coin;
+      for (let i = 0; i < 16; i++) { const s = document.createElement('img'), z = i % 3 ? 14 : 18; s.src = i % 3 ? IMG.spark : (RN ? RN.any().src : IMG.coin);
         s.style.cssText = 'position:absolute;left:' + (o.x - z / 2) + 'px;top:' + (o.y - z / 2) + 'px;width:' + z + 'px;height:' + z + 'px'; fx.appendChild(s); const a = i / 16 * Math.PI * 2, r = 70 + Math.random() * 60;
         anim(s, [{ transform: 'translate(0,0) scale(.4)', opacity: 1 }, { transform: 'translate(' + (Math.cos(a) * r) + 'px,' + (Math.sin(a) * r * 0.7 - 20) + 'px) scale(1.2)', opacity: 1, offset: 0.6 }, { transform: 'translate(' + (Math.cos(a) * r * 1.1) + 'px,' + (Math.sin(a) * r * 0.7 + 20) + 'px) scale(.8)', opacity: 0 }], { duration: 1000 + Math.random() * 300, easing: 'cubic-bezier(.2,.8,.4,1)' }).onfinish = () => s.remove(); }
       buzz([20, 60, 30]);
@@ -304,7 +307,7 @@
     function paintTop() {
       const L = V.last || {}, cn = L.unit === 'coin' && L.delta, col = L.unit === 'hp' ? '#ff7a66' : String(L.delta || '').charAt(0) === '−' ? '#c9a560' : '#ffd56a';
       $('.uz-undo').innerHTML = '<img src="' + IMG.rune + '" style="width:8px;height:10px;opacity:.8" alt=""><div class="t"><span>' + esc(L.verb || 'The tide is calm.') + '</span><span class="n">' + esc(L.name || '') + '</span><span style="font-weight:700;color:' + col + '">' + esc(L.delta || '') + '</span>' +
-        (cn ? coin(14) : '') + (L.unit === 'hp' ? '<img src="' + IMG.heart + '" style="width:11px;height:11px" alt="">' : '') + '</div>' + (stack.length ? '<button data-a="undo">↶ UNDO</button>' : '');
+        (cn ? coin(14, String(L.delta).replace(/[^0-9]/g, ''), L.name) : '') + (L.unit === 'hp' ? '<img src="' + IMG.heart + '" style="width:11px;height:11px" alt="">' : '') + '</div>' + (stack.length ? '<button data-a="undo">↶ UNDO</button>' : '');
       const left = ritualsLeft(), soon = D.goals.filter((g) => g.kind === 'todo' && !g.doneOn && g.due && diff(D.today, g.due) <= 1).length;
       $('.uz-tabs').innerHTML = ['Rituals', 'Quests', 'Curses', 'Den'].map((l, i) => '<button data-a="tab" data-v="' + i + '" style="color:' + (V.tab === i ? TABC[i] : '#7f9389') + '">' + l +
         ((i === 0 && left) || (i === 1 && soon) ? '<b style="background:' + (i === 0 ? '#5ef2a0' : '#ff7a66') + '">' + (i === 0 ? left : soon) + '</b>' : '') + '</button>').join('') +
@@ -330,7 +333,7 @@
       return '<div class="uz-row' + (on ? ' done' : '') + '" style="--e:' + k.c + '"><button class="uz-tk' + (on ? ' on' : g.auto ? ' auto' : '') + '" data-a="tick" data-id="' + g.id + '" data-fx="' + g.id + '" aria-label="' + esc(g.name) + '">' + (on ? '<img src="' + IMG.tick + '" alt="">' : '') + '</button>' +
         '<div class="uz-mid"><div class="nm">' + esc(g.name) + '</div><div class="uz-sub"><span>' + g.minutes + ' min</span><span style="color:' + k.c + '">' + k.l + '</span><span>' + esc(rep(g)) + '</span>' +
         (g.streak > 0 ? '<span class="uz-flame"><img src="' + IMG.flame + '" alt="">' + g.streak + '</span>' : '') + '</div></div>' +
-        '<div class="uz-pay"><span>+' + g.pay + coin(18) + '</span>' + (g.auto ? '<span class="uz-seal"><img src="' + IMG.seal + '" alt="">ticks itself</span>' : '') + '</div>' + archBtn(g.id) + '</div>';
+        '<div class="uz-pay"><span>+' + g.pay + coin(18, g.pay, g.id) + '</span>' + (g.auto ? '<span class="uz-seal"><img src="' + IMG.seal + '" alt="">ticks itself</span>' : '') + '</div>' + archBtn(g.id) + '</div>';
     }
     function header(id, name, plain, meta, metaCol, child) {
       const open = !!V.open[id];
@@ -364,7 +367,7 @@
           if (g.type === 'marking') h += '<div class="uz-mk">' + marking.map((m) => {
             const n = m.sittings || 1, cls = m.name.replace(/^Mark\s+/i, '').replace(/\s+books\b.*$/i, '');
             const lab = (i) => n === 1 ? 'Marked' : n === 2 ? (i ? '2nd half' : '1st half') : 'Part ' + (i + 1);
-            return '<div class="uz-mc"><div class="hd"><b>' + esc(cls) + '</b><span>+' + m.pay + coin(13) + '<span style="color:#93a69c;font-weight:400">each</span></span></div><div class="uz-hv" style="grid-template-columns:repeat(' + Math.min(n, 2) + ',1fr)">' +
+            return '<div class="uz-mc"><div class="hd"><b>' + esc(cls) + '</b><span>+' + m.pay + coin(13, m.pay, m.id) + '<span style="color:#93a69c;font-weight:400">each</span></span></div><div class="uz-hv" style="grid-template-columns:repeat(' + Math.min(n, 2) + ',1fr)">' +
               Array.from({ length: n }, (_, i) => { const on = i < m.sitDone, a = on ? (i === m.sitDone - 1 ? 'untick' : '') : (i === m.sitDone ? 'tick' : '');
                 return '<button class="' + (on ? 'on' : '') + '"' + (a ? ' data-a="' + a + '" data-id="' + m.id + '" data-fx="' + m.id + i + '"' : '') + '>' + (on ? '✓ ' : '') + lab(i) + '</button>'; }).join('') + '</div>' +
               (V.edit ? '<button class="uz-pen" data-a="arch" data-id="' + m.id + '" style="width:auto;height:30px">Archive</button>' : '') + '</div>';
@@ -383,9 +386,9 @@
       const v = V.rv, kinds = [['Necessary', st.necessary, '#5aa7ff'], ['Ahead', st.ahead, '#f2a93b'], ['Outside work', st.outside, '#b07cff'], ['Life', st.life, '#5ee08a']];
       const beatenWk = (D.beaten || []).filter((b) => b.on && b.on >= rv.week).length;
       let h = '<div class="uz-parch uz-rv"><button data-a="rvopen"><img src="' + IMG.wax + '" style="width:20px;height:20px;opacity:' + (rv.saved ? 1 : 0.45) + '" alt=""><span style="flex:1;text-align:left;font:500 19px var(--g)">Sunday review</span>' +
-        '<span style="display:flex;align-items:center;gap:3px;font:700 15px var(--a);color:#7a4e14">' + (rv.saved ? 'sealed' : '+20') + coin(17) + '</span><span style="font:700 12px var(--a);transform:rotate(' + (V.rvOpen ? 90 : 0) + 'deg);transition:transform .2s">▶</span></button>';
+        '<span style="display:flex;align-items:center;gap:3px;font:700 15px var(--a);color:#7a4e14">' + (rv.saved ? 'sealed' : '+20') + coin(17, 20) + '</span><span style="font:700 12px var(--a);transform:rotate(' + (V.rvOpen ? 90 : 0) + 'deg);transition:transform .2s">▶</span></button>';
       if (V.rvOpen) h += '<div style="padding:0 12px 12px;display:flex;flex-direction:column;gap:9px"><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">' +
-        [[st.ticks, 'ticks'], [st.coins, 'doubloons'], [beatenWk, 'bosses beaten']].map(([n, l]) => '<div style="padding:6px 8px;border:1px solid #b89e6a;border-radius:3px;background:rgba(255,255,255,.18)"><div style="font:700 20px var(--a)">' + n + '</div><div style="font:12px var(--a);color:#5a4428">' + l + '</div></div>').join('') + '</div>' +
+        [[st.ticks, 'ticks'], [st.coins, 'runes'], [beatenWk, 'bosses beaten']].map(([n, l]) => '<div style="padding:6px 8px;border:1px solid #b89e6a;border-radius:3px;background:rgba(255,255,255,.18)"><div style="font:700 20px var(--a)">' + n + '</div><div style="font:12px var(--a);color:#5a4428">' + l + '</div></div>').join('') + '</div>' +
         '<div style="display:flex;height:10px;border-radius:2px;overflow:hidden;border:1px solid #8a6a3a">' + kinds.map((k) => '<div style="flex:' + (k[1] || 0) + ';background:' + k[2] + '"></div>').join('') + '</div>' +
         '<div style="display:flex;flex-wrap:wrap;gap:4px 10px;font:12px var(--a);color:#4a3420">' + kinds.map((k) => '<span>' + k[0] + ' ' + k[1] + '</span>').join('') + '</div>' +
         '<label>What went well</label><textarea rows="2" data-rv="wentWell" placeholder="Year 10 practical ran smoothly…">' + esc(v.wentWell) + '</textarea>' +
@@ -406,7 +409,7 @@
       const k = KIND[q.track] || KIND.necessary, done = !!q.doneOn, sd = q.steps.filter((x) => x.d).length;
       return '<div class="uz-parch uz-q' + (done ? ' done' : '') + '" style="--e:' + k.c + '"><div class="top"><button class="uz-tk" data-a="tick" data-id="' + q.id + '" data-fx="' + q.id + '" aria-label="' + esc(q.name) + '">' + (done ? '<img class="uz-stamp" data-q="' + q.id + '" src="' + IMG.wax + '" alt="">' : '') + '</button>' +
         '<div class="uz-mid"><div class="nm">' + esc(q.name) + '</div><div class="uz-sub"><span>' + q.minutes + ' min</span><span style="font-weight:700;color:' + k.ink + '">' + k.l + '</span>' + (q.due && !done ? dueChip(q.due) : '') + (q.steps.length ? '<span>☐ ' + sd + ' of ' + q.steps.length + '</span>' : '') + '</div></div>' +
-        '<div style="flex:none;display:flex;align-items:center;gap:3px;font:700 16px var(--a);color:#7a4e14">+' + q.pay + coin(18) + '</div>' + archBtn(q.id, '#7a5a34') + '</div>' +
+        '<div style="flex:none;display:flex;align-items:center;gap:3px;font:700 16px var(--a);color:#7a4e14">+' + q.pay + coin(18, q.pay, q.id) + '</div>' + archBtn(q.id, '#7a5a34') + '</div>' +
         (q.steps.length && !done ? '<div class="uz-steps">' + q.steps.map((s, i) => '<button data-a="step" data-id="' + q.id + '" data-v="' + i + '"><i style="background:' + (s.d ? '#6a4a2a' : 'transparent') + '">' + (s.d ? '✓' : '') + '</i><span style="font:14px var(--a);text-decoration:' + (s.d ? 'line-through' : 'none') + ';color:' + (s.d ? '#7a6040' : '#2a1a12') + '">' + esc(s.t) + '</span></button>').join('') + '</div>' : '') + '</div>';
     }
     const creature = (b) => b.creature || SIZE[b.size || 5].k;
@@ -422,7 +425,7 @@
           return '<div class="uz-st"><button class="uz-tk' + (st.done ? ' on' : '') + '" data-a="stage" data-id="' + b.id + '" data-v="' + i + '" data-fx="' + b.id + 's' + i + '">' + (st.done ? '<img src="' + IMG.tick + '" style="width:20px;height:16px" alt="">' : '') + '</button>' +
             '<div style="flex:1;min-width:0"><div style="font:700 14px var(--a);color:#f0e0d8;text-decoration:' + (st.done ? 'line-through' : 'none') + '">' + esc(st.name) + '</div><div style="font:12px var(--a);color:#b08a84">' + (st.due ? 'by ' + dshort(st.due) : '') + '</div></div>' +
             '<span class="uz-tag" style="color:' + f + ';background:' + bg + ';border-color:' + bd + '">' + tag + '</span></div>';
-        }).join('') + '<div style="display:flex;align-items:center;justify-content:space-between;padding-top:2px"><span style="display:flex;align-items:center;gap:4px;font:700 13px var(--a);color:#f0c45a">' + b.reward + coin(16) + '<span style="color:#c49a94;font-weight:400">+ trophy when beaten</span></span>' +
+        }).join('') + '<div style="display:flex;align-items:center;justify-content:space-between;padding-top:2px"><span style="display:flex;align-items:center;gap:4px;font:700 13px var(--a);color:#f0c45a">' + b.reward + coin(16, b.reward) + '<span style="color:#c49a94;font-weight:400">+ trophy when beaten</span></span>' +
           '<button data-a="banish" data-id="' + b.id + '" style="height:40px;padding:0 10px;border:1px solid ' + (arm ? '#ff7a66' : '#4a2a2e') + ';border-radius:4px;background:' + (arm ? '#4a1418' : 'transparent') + ';color:' + (arm ? '#ffd0c4' : '#b08a84') + ';font:700 12px var(--a)">' + (arm ? 'Tap again to banish' : 'Banish') + '</button></div></div>' : '') + '</div>';
     }
     function quests() {
@@ -450,16 +453,16 @@
     const blessIcon = (g) => { const m = BLESS_IC.find((x) => x[1].test(g.name)); return (m && P.bless[m[0]] ? P.bless[m[0]] : P.spark).src; };
     function curses() {
       const cs = D.goals.filter(isCurse), bs = D.goals.filter(isBless), cnt = D.blessCount || 0, cpos = cnt % 8, p = D.player;
-      let h = '<div class="uz-cap" style="border-color:#3a1a1e"><span><b style="color:#ffb3a8">The Cursed Shelf</b><small style="color:#8a6a6a">CURSES · COST HEALTH, NEVER DOUBLOONS</small></span></div>';
+      let h = '<div class="uz-cap" style="border-color:#3a1a1e"><span><b style="color:#ffb3a8">The Cursed Shelf</b><small style="color:#8a6a6a">CURSES · COST HEALTH, NEVER RUNES</small></span></div>';
       h += cs.map((c) => '<div class="uz-curse"><button class="uz-tk" data-a="curse" data-id="' + c.id + '" data-fx="' + c.id + '" aria-label="Slipped: ' + esc(c.name) + '"><img src="' + IMG.skull + '" alt=""></button>' +
         '<div class="uz-mid"><div class="nm" style="color:#f0e0d8">' + esc(c.name) + '</div><div class="uz-sub" style="color:#b08a84">' + c.minutes + ' min · ' + (c.count ? c.count + '× today' : 'not today') + '</div></div>' +
         '<span style="flex:none;display:flex;align-items:center;gap:4px;font:700 16px var(--a);color:#ff7a66">−' + c.hpLoss + '<img src="' + IMG.heart + '" style="width:13px;height:13px" alt=""></span>' + archBtn(c.id) + '</div>').join('') || '<p class="uz-p" style="color:#b08a84">No curses. Tap + Add.</p>';
-      h += '<p class="uz-p" style="color:#b08a84">' + (p.hp <= 12 ? 'Careful: ' + p.hp + ' HP left. At 0, Ulhu faints. He loses a level and the doubloons from the last 7 days, then wakes at full health.' : 'At 0 health Ulhu faints. He loses a level and the doubloons from the last 7 days, then wakes at full health.') + '</p>';
+      h += '<p class="uz-p" style="color:#b08a84">' + (p.hp <= 12 ? 'Careful: ' + p.hp + ' HP left. At 0, Ulhu faints. He loses a level and the runes from the last 7 days, then wakes at full health.' : 'At 0 health Ulhu faints. He loses a level and the runes from the last 7 days, then wakes at full health.') + '</p>';
       h += '<div class="uz-cap" style="border-color:#1e3a2c;margin-top:6px"><span><b style="color:#b6ffd6">Small Blessings</b><small style="color:#6f8a7c">TAP ANY TIME, AS OFTEN AS YOU LIKE</small></span><span style="font:700 12px var(--a);color:#b6ffd6">' + cnt + ' today</span></div>';
       h += bs.length ? '<div class="uz-bl">' + bs.map((g) => { const f = g.featured, n = g.count || 0;
         return '<button class="uz-bt" data-a="bless" data-id="' + g.id + '" data-fx="' + g.id + '" style="background:' + (f ? 'linear-gradient(180deg,#2a2410,#151208)' : 'linear-gradient(180deg,#152a20,#0e1a15)') + ';border:1.5px solid ' + (f ? '#8a6a2a' : n ? '#2f6a4e' : '#23483a') + (n ? ';box-shadow:0 2px 0 #030806,inset 0 0 18px rgba(94,242,160,.12)' : '') + '">' +
           '<span style="display:flex;align-items:center;gap:7px"><span class="uz-halo" style="background:radial-gradient(circle,' + (f ? 'rgba(255,214,106,.45)' : 'rgba(94,242,160,.35)') + ' 0%,transparent 70%)"><img src="' + blessIcon(g) + '" alt=""></span><span style="flex:1;min-width:0;font:700 14px/1.15 var(--a);color:#e0f5ea">' + esc(g.name) + '</span></span>' +
-          '<span style="display:flex;align-items:center;justify-content:space-between"><span style="display:flex;align-items:center;gap:3px;font:700 14px var(--a);color:#f0c45a">+' + g.pay + coin(15) + '</span><span style="display:flex;gap:3px">' +
+          '<span style="display:flex;align-items:center;justify-content:space-between"><span style="display:flex;align-items:center;gap:3px;font:700 14px var(--a);color:#f0c45a">+' + g.pay + coin(15, g.pay, g.id) + '</span><span style="display:flex;gap:3px">' +
           [0, 1, 2, 3, 4].map((i) => '<span style="width:7px;height:7px;border-radius:1px;background:' + (i < n ? (f ? '#ffd56a' : '#5ef2a0') : '#1d3a2c') + ';box-shadow:' + (i < n ? '0 0 4px rgba(94,242,160,.7)' : 'none') + '"></span>').join('') + '</span></span>' +
           (f ? '<span class="uz-x2">×2 TODAY</span>' : '') + '</button>'; }).join('') + '</div>' : '<p class="uz-p" style="color:#6f8a7c">No blessings yet. Tap + Add, then Blessing (e.g. Drank water, Went for a walk).</p>';
       if (V.edit && bs.length) h += '<div class="uz-chips">' + bs.map((g) => '<button data-a="arch" data-id="' + g.id + '">× ' + esc(g.name) + '</button>').join('') + '</div>';
@@ -505,7 +508,7 @@
           return '<button class="uz-card" data-a="shop" data-id="' + i.id + '" data-fx="' + i.id + '" style="border-color:' + (placed ? '#5ef2a0' : '#23332c') + '"><span style="height:64px;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 60%,' + (i.tier === 'Eldritch' ? '#1d4a38' : i.tier === 'Fancy' ? '#2a2244' : '#1a2a24') + ',#0b1311 75%)">' +
             (L ? '<img src="' + L.art + '" style="width:' + Math.round(L.w * z) + 'px;height:auto;filter:' + (i.tier === 'Eldritch' ? 'drop-shadow(0 0 4px #5ef2a0)' : 'none') + (lk ? ' grayscale(1) brightness(.6)' : '') + '" alt="">' : '') + '</span>' +
             '<span style="padding:5px 6px 0;font:700 12px/1.2 var(--a);color:#e0e8e3;min-height:34px">' + esc(i.name) + '</span><span style="padding:0 6px 4px;font:700 11px var(--a);color:' + TIERC[i.tier] + '">' + i.tier + '</span>' +
-            '<span style="height:36px;display:flex;align-items:center;justify-content:center;gap:3px;background:' + bg + ';color:' + fg + ';font:700 12px var(--a);padding:0 4px;text-align:center">' + btn + (cn ? coin(13) : '') + '</span></button>';
+            '<span style="height:36px;display:flex;align-items:center;justify-content:center;gap:3px;background:' + bg + ';color:' + fg + ';font:700 12px var(--a);padding:0 4px;text-align:center">' + btn + (cn ? coin(13, i.price, i.id) : '') + '</span></button>';
         }).join('') + '</div><div style="text-align:center;font:12px var(--a);color:#6f8178">' + SHOP.items.length + ' items · 10 categories · Basic, Nice, Fancy, Eldritch</div>';
       }
       if (V.den === 'ward') {
@@ -517,7 +520,7 @@
           let st, fg, cn = false; if (on) { st = 'wearing'; fg = '#5ef2a0'; } else if (own) { st = 'owned'; fg = '#cfd8d3'; } else if (lk) { st = 'Level ' + w.lock; fg = '#7a7a99'; } else { st = String(w.price); fg = w.price > D.player.coins ? '#7a6a4a' : '#ffd56a'; cn = true; }
           return '<button class="uz-card" data-a="wear" data-id="' + w.id + '" data-fx="' + w.id + '" style="align-items:center;padding:0 0 4px;border-color:' + (on ? '#5ef2a0' : '#23332c') + '"><span style="position:relative;width:100%;height:58px;background:radial-gradient(circle,' + (on ? '#1d4a38' : '#1a2a24') + ',#0b1311 75%)"><span style="position:absolute;left:50%;top:50%;width:52px;height:52px;margin:-26px 0 0 -26px">' +
             '<img src="' + baseIdle + '" class="uz-lay" style="opacity:' + (sk ? 1 : 0.35) + ';filter:' + (sk ? w.filter : 'none') + gr + '" alt="">' + (sk ? '' : '<img src="' + w.src + '" class="uz-lay" style="filter:' + w.filter + gr + '" alt="">') + '</span></span>' +
-            '<span style="padding:3px 4px 2px;font:700 11px/1.15 var(--a);color:#e0e8e3;text-align:center;min-height:28px">' + esc(w.name) + '</span><span style="display:flex;align-items:center;gap:2px;font:700 11px var(--a);color:' + fg + '">' + st + (cn ? coin(11) : '') + '</span></button>'; }).join('') + '</div>';
+            '<span style="padding:3px 4px 2px;font:700 11px/1.15 var(--a);color:#e0e8e3;text-align:center;min-height:28px">' + esc(w.name) + '</span><span style="display:flex;align-items:center;gap:2px;font:700 11px var(--a);color:' + fg + '">' + st + (cn ? coin(11, w.price, w.id) : '') + '</span></button>'; }).join('') + '</div>';
       }
       if (V.den === 'hoard') {
         h += '<div class="uz-cap" style="border-color:#3a3018"><span><b style="color:#ffd56a">The Hoard</b><small style="color:#8a7a5a">REAL REWARDS YOU WROTE YOURSELF</small></span></div>';
@@ -525,15 +528,15 @@
           return '<div class="uz-parch" style="position:relative;display:flex;align-items:center;gap:10px;min-height:56px;padding:5px 6px 5px 12px;border-left:5px dotted #a88a5a"><div style="flex:1;min-width:0"><div style="font:17px/1.15 var(--f)">' + esc(r.name) + '</div><div style="font:12px var(--a);color:#5a4428;margin-top:2px">' +
             (r.claims ? 'claimed ' + r.claims + '× · ' + (can ? 'you can afford it' : more + ' more to go') : (can ? 'never claimed · you can afford it' : more + ' more to go')) + '</div></div>' +
             (V.edit ? '<button class="uz-pen" data-a="harch" data-id="' + r.id + '" style="color:#7a5a34">×</button>' : '') +
-            '<button data-a="claim" data-id="' + r.id + '" data-fx="' + r.id + '" style="flex:none;height:44px;min-width:92px;display:flex;align-items:center;justify-content:center;gap:4px;padding:0 10px;border-radius:4px;border:none;background:' + (can ? '#8a1a22' : '#b8a074') + ';color:' + (can ? '#ffe9dc' : '#6a5434') + ';font:700 14px var(--a);box-shadow:0 2px 0 rgba(0,0,0,.35)">' + r.cost + coin(16) + '</button>' +
+            '<button data-a="claim" data-id="' + r.id + '" data-fx="' + r.id + '" style="flex:none;height:44px;min-width:92px;display:flex;align-items:center;justify-content:center;gap:4px;padding:0 10px;border-radius:4px;border:none;background:' + (can ? '#8a1a22' : '#b8a074') + ';color:' + (can ? '#ffe9dc' : '#6a5434') + ';font:700 14px var(--a);box-shadow:0 2px 0 rgba(0,0,0,.35)">' + r.cost + coin(16, r.cost, r.id) + '</button>' +
             (V.stamp === r.id ? '<div class="uz-stampbox" style="position:absolute;right:110px;top:50%;margin-top:-22px;width:120px;height:44px;display:flex;align-items:center;justify-content:center;gap:6px;border:3px double #8a1a22;border-radius:4px;color:#8a1a22;font:700 20px var(--g);letter-spacing:.12em;transform:rotate(-10deg);background:rgba(243,231,200,.7);pointer-events:none"><img src="' + IMG.wax + '" style="width:22px;height:22px" alt="">CLAIMED</div>' : '') + '</div>'; }).join('') ||
-          '<p class="uz-p" style="color:#8a7a5a">Write a reward you would really like with the + in the dock. Spend doubloons on it when you have earned it.</p>';
+          '<p class="uz-p" style="color:#8a7a5a">Write a reward you would really like with the + in the dock. Spend runes on it when you have earned it.</p>';
         if ((D.hoard || []).length) h += '<button class="uz-new" data-a="edit" style="font:700 13px var(--a)">' + (V.edit ? 'Done editing' : 'Edit (remove rewards)') + '</button>';
       }
       if (V.den === 'chron') {
         if (!CHRON) return '<p class="uz-p" style="color:#7f9389">Reading the Chronicle…</p>';
         const mx = Math.max.apply(null, CHRON.weeks.map((w) => w.coins).concat([1]));
-        h += '<div class="uz-stone"><div class="hd"><b>Doubloons per week</b><span style="font:700 12px var(--a);color:#f0c45a">' + D.weekCoins + ' this week</span></div><div style="display:flex;align-items:flex-end;gap:6px;height:84px;margin-top:8px">' +
+        h += '<div class="uz-stone"><div class="hd"><b>Runes per week</b><span style="font:700 12px var(--a);color:#f0c45a">' + D.weekCoins + ' this week</span></div><div style="display:flex;align-items:flex-end;gap:6px;height:84px;margin-top:8px">' +
           CHRON.weeks.map((w, i) => { const last = i === CHRON.weeks.length - 1; return '<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;height:100%;justify-content:flex-end"><span style="font:700 11px var(--a);color:#c9a560">' + w.coins + '</span><div style="width:100%;height:' + Math.max(4, Math.round(w.coins / mx * 58)) + 'px;background:repeating-linear-gradient(180deg,' + (last ? '#ffd56a' : '#c48a3a') + ' 0 4px,' + (last ? '#e3a93a' : '#8a5a1c') + ' 4px 6px);border:1px solid #4a2c0c"></div></div>'; }).join('') + '</div>' +
           '<div style="display:flex;gap:6px;margin-top:4px">' + CHRON.weeks.map((w) => { const d = dt(w.mon); return '<span style="flex:1;text-align:center;font:11px var(--a);color:#7f9389">' + d.getUTCDate() + ' ' + MON[d.getUTCMonth()] + '</span>'; }).join('') + '</div></div>';
         h += '<div class="uz-stone"><div class="hd"><b>Streak calendar</b><span style="display:flex;gap:8px;font:11px var(--a);color:#7f9389"><span style="color:#5ef2a0">■ ticked</span><span style="color:#5aa7ff">■ frozen</span></span></div><div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:8px">' +
@@ -586,7 +589,7 @@
         rows = row('COST', [40, 80, 120, 300, 600, 1000].map((n) => chip(String(n), d.cost === n, 'd', 'cost:' + n, '#ffd56a'))); payL = 'Costs'; payV = String(d.cost); go = 'Add to the Hoard'; goBg = '#ffd56a'; }
       if (f === 'curse') { const cu = d.type === 'curse'; title = cu ? 'New curse' : 'New blessing'; ph = cu ? 'The bad habit' : 'The good habit'; col = cu ? '#ff7a66' : '#b6ffd6';
         rows = row('TYPE', [chip('Curse', cu, 'd', 'type:curse', '#ff7a66'), chip('Blessing', !cu, 'd', 'type:bless')]) + lenRow;
-        if (cu) { payL = 'Costs health, never doubloons'; payV = '−' + D.table.hpLoss[d.len] + ' HP'; payC = '#ff7a66'; payCoin = false; } else { payL = 'Pays each time you tap it'; payV = '+' + Math.max(2, Math.round(D.table.base[d.len] / 2)); }
+        if (cu) { payL = 'Costs health, never runes'; payV = '−' + D.table.hpLoss[d.len] + ' HP'; payC = '#ff7a66'; payCoin = false; } else { payL = 'Pays each time you tap it'; payV = '+' + Math.max(2, Math.round(D.table.base[d.len] / 2)); }
         go = 'Add it'; goBg = cu ? '#ff7a66' : '#5ef2a0'; }
       if (steps) steps = '<span class="uz-lbl">' + steps + '</span>' + d.steps.map((s, i) => '<div class="uz-srow"><input data-step="' + i + '" value="' + esc(s.n) + '" placeholder="' + (f === 'boss' ? 'Stage ' + (i + 1) : 'A small step') + '">' +
         (f === 'boss' ? '<button data-a="sby" data-v="' + i + '" style="flex:none;height:44px;padding:0 10px;border-radius:5px;border:1.5px solid #4a2a2e;background:#1c1012;color:#ffb3a8;font:700 13px var(--a)">by ' + dshort(s.by) + '</button>' : '') +
@@ -595,7 +598,7 @@
         (f === 'boss' ? '<button data-a="tmpl" style="flex:1;height:42px;border-radius:5px;border:1.5px solid #5a3a8a;background:#1e1430;color:#d4bfff;font:700 13px var(--a)">Marking template</button>' : '') + '</div>';
       return '<div class="uz-form"><div style="display:flex;align-items:center;justify-content:space-between"><span style="font:500 23px var(--g);color:' + col + '">' + title + '</span><button data-a="close" style="width:44px;height:44px;border:none;background:none;color:#8fa298;font:22px var(--a)">×</button></div>' +
         '<input data-name="1" value="' + esc(d.name) + '" placeholder="' + ph + '">' + rows + steps + '<div style="flex:1"></div>' +
-        '<div class="uz-total"><span style="font:13px var(--a);color:#93a69c">' + payL + '</span><span style="display:flex;align-items:center;gap:4px;font:700 22px var(--a);color:' + payC + '">' + payV + (payCoin && payV ? coin(24) : '') + '</span></div>' +
+        '<div class="uz-total"><span style="font:13px var(--a);color:#93a69c">' + payL + '</span><span style="display:flex;align-items:center;gap:4px;font:700 22px var(--a);color:' + payC + '">' + payV + (payCoin && payV ? coin(24, String(payV).replace(/[^0-9]/g, ''), f) : '') + '</span></div>' +
         '<button class="uz-go" data-a="submit" style="background:' + goBg + ';opacity:' + (d.name.trim() ? 1 : 0.45) + '">' + go + '</button></div>';
     }
     function submit() {
@@ -724,7 +727,7 @@
         const g = goal(id), cost = g.hpLoss; let faint = false;
         act({ verb: 'Cursed:', name: g.name, delta: '−' + cost, unit: 'hp' }, ['gameUntick', id], 'gameTick', [id, -1], (d) => { const x = d.goals.find((y) => y.id === id); x.count = (x.count || 0) + 1; d.player.hp -= cost; if (d.player.hp <= 0) { faint = true; d.player.hp = d.player.maxHp; d.player.level = Math.max(1, d.player.level - 1); } });
         flinch(); floatText(r, '−' + cost + ' HP', '#ff7a66'); glow(k, 'rgba(196,50,58,.9)'); buzz([25, 40, 25]);
-        if (faint) { V.last = { verb: 'Fainted:', name: 'lost a level and 7 days of doubloons' }; paintTop(); setMood('sad', 'Ulhu fainted… he wakes at full health, a little poorer.'); } else setMood('sad', CURSE_SAYS[Math.floor(Math.random() * CURSE_SAYS.length)]);
+        if (faint) { V.last = { verb: 'Fainted:', name: 'lost a level and 7 days of runes' }; paintTop(); setMood('sad', 'Ulhu fainted… he wakes at full health, a little poorer.'); } else setMood('sad', CURSE_SAYS[Math.floor(Math.random() * CURSE_SAYS.length)]);
         return;
       }
       if (a === 'bless') {

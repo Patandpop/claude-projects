@@ -9,7 +9,7 @@
    ============================================================================ */
 
 const GAME = {
-  coin: 'Eldritch Doubloons',
+  coin: 'Runes',                                             // the currency (Eldritch Doubloons until 2026-10-25)
   maxHp: 50,
   base: { 5: 3, 15: 6, 30: 10, 60: 16, 120: 25 },          // doubloons and XP by minutes (pay grows slower than time)
   mult: { necessary: 1, ahead: 1.5, external: 3, life: 2 },  // what kind of job it is
@@ -479,7 +479,7 @@ function gameBuy(k, id) {
     if (owned.some((r) => r.itemId === id)) { bad = 'Ulhu already has that.'; return; }
     const lk = gLock_(it.lock, p, gRows_('ticks'), gGoals_());
     if (!lk.ok) { bad = 'Locked: ' + lk.why; return; }
-    if (p.coins < it.price) { bad = 'Not enough doubloons (' + it.price + ' needed).'; return; }
+    if (p.coins < it.price) { bad = 'Not enough runes (' + it.price + ' needed).'; return; }
     const taken = {}; owned.forEach((r) => { if (r.slot) taken[r.slot] = true; });
     const slot = it.slots.filter((x) => !taken[x])[0] || '';       // it goes straight into an empty slot, else the drawer
     p.coins -= it.price; gSavePlayer_(p);
@@ -679,7 +679,7 @@ function gameWear(k, id, on) {
     const p = gPlayer_(), rows = gRows_('owned'), st = gWearState_(p, rows.filter((r) => String(r.itemId).indexOf('w:') === 0));
     if (on && st.owned.indexOf(id) < 0) {
       if (w.lock > p.level) { bad = 'Locked: Level ' + w.lock; return; }
-      if (p.coins < w.price) { bad = 'Not enough doubloons (' + w.price + ' needed).'; return; }
+      if (p.coins < w.price) { bad = 'Not enough runes (' + w.price + ' needed).'; return; }
       p.coins -= w.price; const now = gNow_();
       gAppend_('owned', { itemId: 'w:' + id, boughtOn: gDay_(now), price: w.price, slot: '' });
       gAppend_('ticks', { id: Utilities.getUuid().slice(0, 8), at: now.toISOString(), day: gDay_(now), goalId: 'buy|w:' + id, delta: 0, coins: -w.price, xp: 0, hp: 0, auto: '', ref: '', note: JSON.stringify({ name: id }) });
@@ -724,7 +724,7 @@ function gameHoardClaim(k, id, back) {
   withLock_(function () {
     const r = gRows_('hoard').find((x) => x.id === id); if (!r) { bad = 'That reward is gone.'; return; }
     const p = gPlayer_(), cost = Number(r.cost) || 0, claims = Number(r.claims) || 0, now = gNow_();
-    if (!back && p.coins < cost) { bad = 'Not enough doubloons yet (' + (cost - p.coins) + ' more).'; return; }
+    if (!back && p.coins < cost) { bad = 'Not enough runes yet (' + (cost - p.coins) + ' more).'; return; }
     if (back && claims < 1) return;
     p.coins += back ? cost : -cost; gSavePlayer_(p); gSet_('hoard', r.row, 'claims', claims + (back ? -1 : 1));
     gAppend_('ticks', { id: Utilities.getUuid().slice(0, 8), at: now.toISOString(), day: gDay_(now), goalId: 'hoard|' + id, delta: 0, coins: back ? cost : -cost, xp: 0, hp: 0, auto: '', ref: '', note: JSON.stringify({ name: r.name, undo: !!back }) });
