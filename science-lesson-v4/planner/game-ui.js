@@ -1,6 +1,6 @@
 /* Ulhu's Rituals: the screen, shared by the planner (laptop) and the phone page.
    Rebuilt 2026-10-24 from Patryk's Claude Design handoff (replica/design/claude-design-handoff/README.md):
-   banner with Ulhu, one-line Undo, four swipeable tabs (Rituals, Quests, Curses, Den), a dock of buttons in
+   banner with Ulhu, one-line Undo, four swipeable tabs (Rituals, Quests, Omens, Den), a dock of buttons in
    the thumb zone, forms that open in place of the list. Every tap shows at once (with coins flying, Ulhu
    bouncing, a short buzz); the server (Game.gs) catches up and its reply replaces the numbers.
    bundle.js pastes game-ulhu.js (Ulhu's sprites, 8-bit and 16-bit), game-pixel.js (PX: coin, bosses,
@@ -311,7 +311,7 @@
       $('.uz-undo').innerHTML = '<img src="' + IMG.rune + '" style="width:8px;height:10px;opacity:.8" alt=""><div class="t"><span>' + esc(L.verb || 'The tide is calm.') + '</span><span class="n">' + esc(L.name || '') + '</span><span style="font-weight:700;color:' + col + '">' + esc(L.delta || '') + '</span>' +
         (cn ? coin(14, String(L.delta).replace(/[^0-9]/g, ''), L.name) : '') + (L.unit === 'hp' ? '<img src="' + IMG.heart + '" style="width:11px;height:11px" alt="">' : '') + '</div>' + (stack.length ? '<button data-a="undo">↶ UNDO</button>' : '');
       const left = ritualsLeft(), soon = D.goals.filter((g) => g.kind === 'todo' && !g.doneOn && g.due && diff(D.today, g.due) <= 1).length;
-      $('.uz-tabs').innerHTML = ['Rituals', 'Quests', 'Curses', 'Den'].map((l, i) => '<button data-a="tab" data-v="' + i + '" style="color:' + (V.tab === i ? TABC[i] : '#7f9389') + '">' + l +
+      $('.uz-tabs').innerHTML = ['Rituals', 'Quests', 'Omens', 'Den'].map((l, i) => '<button data-a="tab" data-v="' + i + '" style="color:' + (V.tab === i ? TABC[i] : '#7f9389') + '">' + l +
         ((i === 0 && left) || (i === 1 && soon) ? '<b style="background:' + (i === 0 ? '#5ef2a0' : '#ff7a66') + '">' + (i === 0 ? left : soon) + '</b>' : '') + '</button>').join('') +
         '<div class="uz-ink" style="left:' + (V.tab * 25) + '%"><i style="background:' + TABC[V.tab] + ';box-shadow:0 0 10px ' + TABC[V.tab] + ',0 0 2px ' + TABC[V.tab] + '"></i></div>';
       const K = { pri: ['#5ef2a0', '#5ef2a0', '#08100d'], sec: ['#2f443b', '#131d19', '#cfd8d3'], pur: ['#a48aff', '#a48aff', '#0d0818'], red: ['#ff7a66', '#2a1214', '#ffb3a8'], ice: ['#5aa7ff', D.frozen ? '#5aa7ff' : '#0f1a24', D.frozen ? '#08101a' : '#bfe0ff'] };
@@ -450,7 +450,7 @@
       return h;
     }
 
-    /* ---------- Curses (and Blessings) ---------- */
+    /* ---------- Omens (curses and blessings; tab renamed by Patryk 2026-10-25) ---------- */
     const isBless = (g) => g.kind === 'habit' && g.polarity !== 'minus', isCurse = (g) => g.kind === 'habit' && g.polarity !== 'plus';
     const blessIcon = (g) => { const m = BLESS_IC.find((x) => x[1].test(g.name)); return (m && P.bless[m[0]] ? P.bless[m[0]] : P.spark).src; };
     function curses() {
