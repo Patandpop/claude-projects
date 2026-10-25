@@ -181,7 +181,7 @@
     const IMG = { coin: P.coin.src, flame: P.flame.src, heart: P.heart.src, skull: P.skull.src, seal: P.seal.src, wax: P.waxRed.src, xp: P.xp.src, trophy: P.trophy.src, tick: P.tick.src, moon: P.moon.src, spark: P.spark.src, rune: P.rune.src, plant: A.items.plant.src };
     // the currency is runes (2026-10-25): one rune under 15, the cairn for 15-99, the rune portal for 100+
     const RN = root.RUNES;
-    const coin = (z, n, key) => { const s = RN ? RN.pick(n, key) : P.coin, k = s.h >= 34 ? 1.35 : s.h > 24 ? 1.2 : 1; return '<img src="' + s.src + '" style="width:' + Math.round(z * k * s.w / s.h) + 'px;height:' + Math.round(z * k) + 'px;object-fit:contain" alt="runes">'; };
+    const coin = (z, n, key, kind) => { const s = RN ? RN.pick(n, key, kind) : P.coin, k = s.h >= 34 ? 1.35 : s.h > 24 ? 1.2 : 1; return '<img src="' + s.src + '" style="width:' + Math.round(z * k * s.w / s.h) + 'px;height:' + Math.round(z * k) + 'px;object-fit:contain" alt="runes">'; };
     if (RN) IMG.coin = RN.ones[0].src;
     let style = '16-bit'; try { style = localStorage.getItem('ulhuStyle') || '16-bit'; } catch (e) { /* private window */ }
     const V = { tab: 0, open: { teach: 1, chores: 1, summon: 1, marking: 0, life: 1, qteach: 1, qlife: 1, qdone: 0 }, den: 'room', shopCat: 'floors', tier: 'All', wCat: 'hat', form: null, draft: null, renaming: null, banishArm: null, stamp: null, vanq: false, rvOpen: false, mood: null, say: null, last: null, drag: 0, settling: {} };
@@ -246,8 +246,10 @@
       anim($('.hpw'), [{ boxShadow: '0 0 0 0 #ff5a4a' }, { boxShadow: '0 0 10px 2px #ff5a4a' }, { boxShadow: '0 0 0 0 #ff5a4a' }], { duration: 500 }); }
     const buzz = (p) => { try { if (navigator.vibrate) navigator.vibrate(p || 12); } catch (e) { /* no vibration */ } };
     function ripple(r, col) { if (!r) return; const a = rel(r), d = document.createElement('div'); d.style.cssText = 'position:absolute;left:' + (a.x - 30) + 'px;top:' + (a.y - 30) + 'px;width:60px;height:60px;border-radius:50%;border:2px solid ' + col + ';box-shadow:0 0 12px ' + col; fx.appendChild(d); anim(d, [{ transform: 'scale(.3)', opacity: 1 }, { transform: 'scale(2.6)', opacity: 0 }], { duration: 600, easing: 'ease-out' }).onfinish = () => d.remove(); }
-    function celebrate() {
-      const o = rel(me.getBoundingClientRect()); anim($('.uz-flash'), [{ opacity: 0 }, { opacity: 1, offset: 0.2 }, { opacity: 0 }], { duration: 1100 });
+    function celebrate(big) {
+      const o = rel(me.getBoundingClientRect());
+      if (big && RN) { const h = document.createElement('img'); h.src = RN.hoard.src; h.style.cssText = 'position:absolute;left:' + (o.x - 60) + 'px;top:' + (o.y - 60) + 'px;width:120px;height:120px;image-rendering:pixelated;filter:drop-shadow(0 0 14px #b48aff)'; fx.appendChild(h);
+        anim(h, [{ transform: 'scale(.2) rotate(-20deg)', opacity: 0 }, { transform: 'scale(1.15) rotate(4deg)', opacity: 1, offset: 0.3 }, { transform: 'scale(1)', opacity: 1, offset: 0.8 }, { transform: 'translateY(-30px) scale(.9)', opacity: 0 }], { duration: 2200, easing: 'ease-out' }).onfinish = () => h.remove(); } anim($('.uz-flash'), [{ opacity: 0 }, { opacity: 1, offset: 0.2 }, { opacity: 0 }], { duration: 1100 });
       for (let i = 0; i < 16; i++) { const s = document.createElement('img'), z = i % 3 ? 14 : 18; s.src = i % 3 ? IMG.spark : (RN ? RN.any().src : IMG.coin);
         s.style.cssText = 'position:absolute;left:' + (o.x - z / 2) + 'px;top:' + (o.y - z / 2) + 'px;width:' + z + 'px;height:' + z + 'px'; fx.appendChild(s); const a = i / 16 * Math.PI * 2, r = 70 + Math.random() * 60;
         anim(s, [{ transform: 'translate(0,0) scale(.4)', opacity: 1 }, { transform: 'translate(' + (Math.cos(a) * r) + 'px,' + (Math.sin(a) * r * 0.7 - 20) + 'px) scale(1.2)', opacity: 1, offset: 0.6 }, { transform: 'translate(' + (Math.cos(a) * r * 1.1) + 'px,' + (Math.sin(a) * r * 0.7 + 20) + 'px) scale(.8)', opacity: 0 }], { duration: 1000 + Math.random() * 300, easing: 'cubic-bezier(.2,.8,.4,1)' }).onfinish = () => s.remove(); }
@@ -425,7 +427,7 @@
           return '<div class="uz-st"><button class="uz-tk' + (st.done ? ' on' : '') + '" data-a="stage" data-id="' + b.id + '" data-v="' + i + '" data-fx="' + b.id + 's' + i + '">' + (st.done ? '<img src="' + IMG.tick + '" style="width:20px;height:16px" alt="">' : '') + '</button>' +
             '<div style="flex:1;min-width:0"><div style="font:700 14px var(--a);color:#f0e0d8;text-decoration:' + (st.done ? 'line-through' : 'none') + '">' + esc(st.name) + '</div><div style="font:12px var(--a);color:#b08a84">' + (st.due ? 'by ' + dshort(st.due) : '') + '</div></div>' +
             '<span class="uz-tag" style="color:' + f + ';background:' + bg + ';border-color:' + bd + '">' + tag + '</span></div>';
-        }).join('') + '<div style="display:flex;align-items:center;justify-content:space-between;padding-top:2px"><span style="display:flex;align-items:center;gap:4px;font:700 13px var(--a);color:#f0c45a">' + b.reward + coin(16, b.reward) + '<span style="color:#c49a94;font-weight:400">+ trophy when beaten</span></span>' +
+        }).join('') + '<div style="display:flex;align-items:center;justify-content:space-between;padding-top:2px"><span style="display:flex;align-items:center;gap:4px;font:700 13px var(--a);color:#f0c45a">' + b.reward + coin(16, b.reward, b.id, 'boss') + '<span style="color:#c49a94;font-weight:400">+ trophy when beaten</span></span>' +
           '<button data-a="banish" data-id="' + b.id + '" style="height:40px;padding:0 10px;border:1px solid ' + (arm ? '#ff7a66' : '#4a2a2e') + ';border-radius:4px;background:' + (arm ? '#4a1418' : 'transparent') + ';color:' + (arm ? '#ffd0c4' : '#b08a84') + ';font:700 12px var(--a)">' + (arm ? 'Tap again to banish' : 'Banish') + '</button></div></div>' : '') + '</div>';
     }
     function quests() {
@@ -749,7 +751,7 @@
         stack.pop();   // a beaten boss has paid out and gone to the trophy shelf: not undoable
         const cr2 = box.querySelector('[data-creature="' + id + '"]');
         anim(cr2, [{ transform: 'none', opacity: 1 }, { transform: 'translateY(6px) scale(1.1,.6)', opacity: 0.6 }, { transform: 'translateY(12px) scale(1.4,.1)', opacity: 0 }], { duration: 500, fill: 'forwards' });
-        setTimeout(() => { earnFx(r, k, bo.reward, upL); celebrate(); setMood('proud', 'Vanquished! Another trophy for the shelf.'); }, 450);
+        setTimeout(() => { earnFx(r, k, bo.reward, upL); celebrate(true); setMood('proud', 'Vanquished! Another trophy for the shelf.'); }, 450);
         setTimeout(() => { if (D.bosses.some((x) => x.id === id)) { D.bosses = D.bosses.filter((x) => x.id !== id); D.beaten = [{ id, name: bo.name, k: creature(bo), on: D.today }].concat(D.beaten || []); } CHRON = null; paint(); }, 1300);
         return;
       }

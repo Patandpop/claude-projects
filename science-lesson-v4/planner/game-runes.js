@@ -1,8 +1,8 @@
 /* Ulhu's currency: runes (chosen by Patryk 2026-10-25 over pearls, dream orbs and doubloons; mock-up rounds in
    https://claude.ai/artifact/GsrdW9MrKHRnP47yEwRA2V). Drawn on the page in the app's pixel style, nothing fetched.
-   window.RUNES.pick(amount, key): the picture for a reward of that size. Under 15 = one of his five runes (a river
-   stone, a slate shard, a cracked obsidian tile, a sandstone oval, a cracked coral stone); 15-99 = the tall cairn;
-   100+ = the portal held open by the five runes. key keeps the same rune on the same row between repaints. */
+   window.RUNES.pick(amount, key): the picture for a reward of that size. Under 30 = one of his five runes (most rewards, about 70%) (a river
+   stone, a slate shard, a cracked obsidian tile, a sandstone oval, a cracked coral stone); 30+ = the tall cairn;
+   boss treasure = the portal held open by the five runes (Patryk 2026-10-25). key keeps the same rune on the same row between repaints. */
 (function (root) {
   if (typeof document === 'undefined') return;
   const TAU = Math.PI * 2;
@@ -59,8 +59,8 @@
   const hash = (s) => { let h = 7; s = String(s); for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0; return h; };
   root.RUNES = {
     ones: ONES, hand: HAND, hoard: HOARD,
-    // the picture for a reward of n; the same key always gets the same single rune
-    pick(n, key) { n = Math.abs(Number(n) || 0); if (n >= 100) return HOARD; if (n >= 15) return HAND; return ONES[hash(key == null ? n : key) % ONES.length]; },
+    // the picture for a reward of n (kind 'boss' = the hoard); the same key always gets the same single rune
+    pick(n, key, kind) { n = Math.abs(Number(n) || 0); if (kind === 'boss') return HOARD; if (n >= 30) return HAND; return ONES[hash(key == null ? n : key) % ONES.length]; },
     any() { return ONES[Math.floor(Math.random() * ONES.length)]; }
   };
 })(typeof window !== 'undefined' ? window : this);
