@@ -317,7 +317,7 @@ function gSnapshot_(world, extra) {
   else if (p.levelUpDay === today || (dueNec.length && dueNec.every((v) => v.doneToday))) mood = 'proud';
   else if (todayTicks.some((t) => t.delta > 0)) mood = 'happy';
   const ahead = gLessonsAhead_(world, today);
-  const summoned = ahead.slice(0, 10).map((L) => ({ name: L.name, date: L.date, ahead: L.ahead, built: L.built }));
+  const summoned = ahead.slice(0, 10).map((L) => ({ name: L.name, date: L.date, ahead: L.ahead, built: L.built, pay: gPay_({ minutes: 30, track: L.ahead ? 'ahead' : 'necessary' }, [], {}).coins }));   // pay = what building it pays (gTick_ in the auto-ticks above)
   // Tide Charts: 1 = the next lesson is built, 2 = everything this coming week, 3 = two weeks ahead
   const allBuilt = (days) => ahead.filter((L) => L.date <= gAdd_(today, days)).every((L) => L.built);
   const tide = !ahead.length ? 0 : !ahead[0].built ? 0 : !allBuilt(7) ? 1 : !allBuilt(14) ? 2 : 3;

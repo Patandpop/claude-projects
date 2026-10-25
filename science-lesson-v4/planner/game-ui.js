@@ -335,7 +335,7 @@
       return '<div class="uz-row' + (on ? ' done' : '') + '" style="--e:' + k.c + '"><button class="uz-tk' + (on ? ' on' : g.auto ? ' auto' : '') + '" data-a="tick" data-id="' + g.id + '" data-fx="' + g.id + '" aria-label="' + esc(g.name) + '">' + (on ? '<img src="' + IMG.tick + '" alt="">' : '') + '</button>' +
         '<div class="uz-mid"><div class="nm">' + esc(g.name) + '</div><div class="uz-sub"><span>' + g.minutes + ' min</span><span style="color:' + k.c + '">' + k.l + '</span><span>' + esc(rep(g)) + '</span>' +
         (g.streak > 0 ? '<span class="uz-flame"><img src="' + IMG.flame + '" alt="">' + g.streak + '</span>' : '') + '</div></div>' +
-        '<div class="uz-pay"><span>+' + g.pay + coin(18, g.pay, g.id) + '</span>' + (g.auto ? '<span class="uz-seal"><img src="' + IMG.seal + '" alt="">ticks itself</span>' : '') + '</div>' + archBtn(g.id) + '</div>';
+        '<div class="uz-pay">' + (g.auto ? '<span class="uz-seal"><img src="' + IMG.seal + '" alt="">ticks itself</span>' : '') + '<span>+' + g.pay + coin(18, g.pay, g.id) + '</span></div>' + archBtn(g.id) + '</div>';
     }
     function header(id, name, plain, meta, metaCol, child) {
       const open = !!V.open[id];
@@ -359,7 +359,7 @@
           if (g.type === 'list') h += items(g.id).map(ritualRow).join('') || '<p class="uz-p" style="color:#7f9389">Nothing due today here.</p>';
           if (g.type === 'summon') {
             h += D.summoned.map((s) => '<div class="uz-row' + (s.built ? ' done' : '') + '" style="--e:' + (s.ahead ? '#f2a93b' : '#5aa7ff') + '"><span class="uz-tk' + (s.built ? ' on' : ' auto') + '">' + (s.built ? '<img src="' + IMG.tick + '" alt="">' : '') + '</span>' +
-              '<div class="uz-mid"><div class="nm">' + esc(s.name) + '</div><div class="uz-sub"><span>for ' + esc(dshort(s.date)) + '</span><span style="color:' + (s.ahead ? '#f2a93b' : '#5aa7ff') + '">' + (s.ahead ? 'Ahead' : 'Necessary') + '</span></div></div><div class="uz-pay"><span class="uz-seal"><img src="' + IMG.seal + '" alt="">ticks itself</span></div></div>').join('') || '<p class="uz-p" style="color:#7f9389">No lessons in the next two weeks.</p>';
+              '<div class="uz-mid"><div class="nm">' + esc(s.name) + '</div><div class="uz-sub"><span>for ' + esc(dshort(s.date)) + '</span><span style="color:' + (s.ahead ? '#f2a93b' : '#5aa7ff') + '">' + (s.ahead ? 'Ahead' : 'Necessary') + '</span></div></div><div class="uz-pay"><span class="uz-seal"><img src="' + IMG.seal + '" alt="">ticks itself</span>' + (s.pay ? '<span>+' + s.pay + coin(18, s.pay, s.name) + '</span>' : '') + '</div></div>').join('') || '<p class="uz-p" style="color:#7f9389">No lessons in the next two weeks.</p>';
             const n = D.tide || 0;
             h += '<div class="uz-tide"><div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font:500 17px var(--g);color:#bfe0ff">Tide Charts</span><span style="font:700 13px var(--a);color:#8ac8ff">' + n + ' of 3</span></div>' +
               '<div style="position:relative;height:30px;margin:4px 8px 0"><div style="position:absolute;left:0;right:0;top:13px;height:4px;background:repeating-linear-gradient(90deg,#1d3a4a 0 6px,transparent 6px 9px)"></div><div style="position:absolute;left:0;top:13px;height:4px;width:' + (n <= 1 ? 0 : (n - 1) * 50) + '%;background:#5aa7ff;box-shadow:0 0 8px #5aa7ff;transition:width .4s"></div>' +
