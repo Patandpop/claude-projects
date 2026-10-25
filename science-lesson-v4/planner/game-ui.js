@@ -340,7 +340,7 @@
     function header(id, name, plain, meta, metaCol, child) {
       const open = !!V.open[id];
       return '<div class="uz-h" style="border-color:' + (child ? '#1c2924' : '#2a3b33') + '"><button data-a="fold" data-v="' + id + '"><span class="uz-chev" style="transform:rotate(' + (open ? 90 : 0) + 'deg)">▶</span>' +
-        '<span class="uz-ht"><b style="font-size:' + (child ? 18 : 22) + 'px;color:' + (child ? '#cfe8dc' : '#e8e1cf') + '">' + esc(name) + '</b><small>' + esc(plain) + '</small></span></button>' +
+        '<span class="uz-ht"><b style="font-size:' + (child ? 18 : 22) + 'px;color:' + (child ? '#cfe8dc' : '#e8e1cf') + '">' + esc(name) + '</b></span></button>' +
         (V.renaming === id ? '<input class="uz-ren" data-ren="' + id + '" value="' + esc(name) + '">' : '') +
         '<span class="uz-meta" style="color:' + (metaCol || '#7f9389') + '">' + esc(meta) + '</span><button class="uz-pen" data-a="rename" data-v="' + id + '" title="Rename">✎</button></div>';
     }
@@ -435,17 +435,17 @@
       let h = '';
       [['qteach', 'The Errand Scrolls', 'Teaching quests', (q) => !isLife(q)], ['qlife', 'Surface Errands', 'Life quests', isLife]].forEach(([id, name, plain, f]) => {
         const list = qs.filter((q) => f(q) && fresh(q)).sort((a, b) => ((a.due || '9') < (b.due || '9') ? -1 : 1));
-        h += '<div class="uz-sec"><button class="uz-cap" data-a="fold" data-v="' + id + '"><span class="uz-chev" style="color:#a48aff;transform:rotate(' + (V.open[id] ? 90 : 0) + 'deg)">▶</span><span><b style="color:#d8ccff">' + name + '</b><small style="color:#7f7a99">' + plain + '</small></span><span style="font:700 12px var(--a);color:#a48aff">' + list.filter((q) => !q.doneOn).length + ' open</span></button>' +
-          (V.open[id] ? list.map(questCard).join('') || '<p class="uz-p" style="color:#7f7a99">No quests here. Tap + Quest.</p>' : '') + '</div>';
+        h += '<div class="uz-sec"><button class="uz-cap" data-a="fold" data-v="' + id + '"><span class="uz-chev" style="color:#a48aff;transform:rotate(' + (V.open[id] ? 90 : 0) + 'deg)">▶</span><span><b style="color:#d8ccff">' + name + '</b></span><span style="font:700 12px var(--a);color:#a48aff">' + list.filter((q) => !q.doneOn).length + ' open</span></button>' +
+          (V.open[id] ? list.map(questCard).join('') || '<p class="uz-p" style="color:#7f7a99">No quests here.</p>' : '') + '</div>';
       });
       const fin = qs.filter((q) => q.doneOn && !V.settling[q.id]);
-      if (fin.length) h += '<div class="uz-sec"><button class="uz-cap" data-a="fold" data-v="qdone"><span class="uz-chev" style="color:#a48aff;transform:rotate(' + (V.open.qdone ? 90 : 0) + 'deg)">▶</span><span><b style="color:#d8ccff">Finished</b><small style="color:#7f7a99">folded away</small></span><span style="font:700 12px var(--a);color:#a48aff">' + fin.length + '</span></button>' + (V.open.qdone ? fin.map(questCard).join('') : '') + '</div>';
-      h += '<div class="uz-cap" style="border-color:#3a1a1e"><span><b style="color:#ffb3a8">The Boss Pit</b><small style="color:#8a6a6a">BOSS FIGHTS · BIG JOBS IN STAGES</small></span><span style="font:700 12px var(--a);color:#ff7a66">' + D.bosses.length + ' active</span></div>';
-      h += D.bosses.map(bossCard).join('') || '<p class="uz-p" style="color:#8a6a6a">No boss yet. Tap + Boss to split a big job into stages.</p>';
+      if (fin.length) h += '<div class="uz-sec"><button class="uz-cap" data-a="fold" data-v="qdone"><span class="uz-chev" style="color:#a48aff;transform:rotate(' + (V.open.qdone ? 90 : 0) + 'deg)">▶</span><span><b style="color:#d8ccff">Finished</b></span><span style="font:700 12px var(--a);color:#a48aff">' + fin.length + '</span></button>' + (V.open.qdone ? fin.map(questCard).join('') : '') + '</div>';
+      h += '<div class="uz-cap" style="border-color:#3a1a1e"><span><b style="color:#ffb3a8">The Boss Pit</b></span><span style="font:700 12px var(--a);color:#ff7a66">' + D.bosses.length + ' active</span></div>';
+      h += D.bosses.map(bossCard).join('') || '<p class="uz-p" style="color:#8a6a6a">No bosses yet.</p>';
       const bt = D.beaten || [];
       if (bt.length) h += '<button class="uz-cap" data-a="vanq" style="border:none;color:#8a7a74;font:500 17px var(--g)"><span class="uz-chev" style="color:#8a7a74;transform:rotate(' + (V.vanq ? 90 : 0) + 'deg)">▶</span>Vanquished · ' + bt.length + '</button>' +
         (V.vanq ? bt.map((b) => '<div style="display:flex;align-items:center;gap:10px;padding:4px 8px;border-radius:4px;background:#140c0d;border:1px solid #2a1a1c;opacity:.8"><img src="' + (P.bosses[b.k] || P.bosses.spawn).src + '" style="height:26px;filter:grayscale(.7)" alt=""><span style="flex:1;font:14px var(--a);color:#c4b0aa;text-decoration:line-through">' + esc(b.name) + '</span><img src="' + IMG.trophy + '" style="width:16px;height:16px" alt=""></div>').join('') : '');
-      h += '<p class="uz-p" style="color:#8f8a80">Late work is never penalised. A late boss stage still lands, at half damage; the final stage always finishes the creature off.</p>';
+      // (the late-work rule line was removed 2026-10-25: Patryk found the small explanations cluttering)
       h += '<button class="uz-new" data-a="edit" style="font:700 13px var(--a)">' + (V.edit ? 'Done editing' : 'Edit (remove quests)') + '</button>';
       return h;
     }
@@ -455,24 +455,24 @@
     const blessIcon = (g) => { const m = BLESS_IC.find((x) => x[1].test(g.name)); return (m && P.bless[m[0]] ? P.bless[m[0]] : P.spark).src; };
     function curses() {
       const cs = D.goals.filter(isCurse), bs = D.goals.filter(isBless), cnt = D.blessCount || 0, cpos = cnt % 8, p = D.player;
-      let h = '<div class="uz-cap" style="border-color:#3a1a1e"><span><b style="color:#ffb3a8">The Cursed Shelf</b><small style="color:#8a6a6a">CURSES · COST HEALTH, NEVER RUNES</small></span></div>';
+      let h = '<div class="uz-cap" style="border-color:#3a1a1e"><span><b style="color:#ffb3a8">The Cursed Shelf</b></span></div>';
       h += cs.map((c) => '<div class="uz-curse"><button class="uz-tk" data-a="curse" data-id="' + c.id + '" data-fx="' + c.id + '" aria-label="Slipped: ' + esc(c.name) + '"><img src="' + IMG.skull + '" alt=""></button>' +
         '<div class="uz-mid"><div class="nm" style="color:#f0e0d8">' + esc(c.name) + '</div><div class="uz-sub" style="color:#b08a84">' + c.minutes + ' min · ' + (c.count ? c.count + '× today' : 'not today') + '</div></div>' +
         '<span style="flex:none;display:flex;align-items:center;gap:4px;font:700 16px var(--a);color:#ff7a66">−' + c.hpLoss + '<img src="' + IMG.heart + '" style="width:13px;height:13px" alt=""></span>' + archBtn(c.id) + '</div>').join('') || '<p class="uz-p" style="color:#b08a84">No curses. Tap + Add.</p>';
-      h += '<p class="uz-p" style="color:#b08a84">' + (p.hp <= 12 ? 'Careful: ' + p.hp + ' HP left. At 0, Ulhu faints. He loses a level and the runes from the last 7 days, then wakes at full health.' : 'At 0 health Ulhu faints. He loses a level and the runes from the last 7 days, then wakes at full health.') + '</p>';
-      h += '<div class="uz-cap" style="border-color:#1e3a2c;margin-top:6px"><span><b style="color:#b6ffd6">Small Blessings</b><small style="color:#6f8a7c">TAP ANY TIME, AS OFTEN AS YOU LIKE</small></span><span style="font:700 12px var(--a);color:#b6ffd6">' + cnt + ' today</span></div>';
+      if (p.hp <= 12) h += '<p class="uz-p" style="color:#b08a84">' + 'Careful: ' + p.hp + ' HP left.' + '</p>';
+      h += '<div class="uz-cap" style="border-color:#1e3a2c;margin-top:6px"><span><b style="color:#b6ffd6">Small Blessings</b></span><span style="font:700 12px var(--a);color:#b6ffd6">' + cnt + ' today</span></div>';
       h += bs.length ? '<div class="uz-bl">' + bs.map((g) => { const f = g.featured, n = g.count || 0;
         return '<button class="uz-bt" data-a="bless" data-id="' + g.id + '" data-fx="' + g.id + '" style="background:' + (f ? 'linear-gradient(180deg,#2a2410,#151208)' : 'linear-gradient(180deg,#152a20,#0e1a15)') + ';border:1.5px solid ' + (f ? '#8a6a2a' : n ? '#2f6a4e' : '#23483a') + (n ? ';box-shadow:0 2px 0 #030806,inset 0 0 18px rgba(94,242,160,.12)' : '') + '">' +
           '<span style="display:flex;align-items:center;gap:7px"><span class="uz-halo" style="background:radial-gradient(circle,' + (f ? 'rgba(255,214,106,.45)' : 'rgba(94,242,160,.35)') + ' 0%,transparent 70%)"><img src="' + blessIcon(g) + '" alt=""></span><span style="flex:1;min-width:0;font:700 14px/1.15 var(--a);color:#e0f5ea">' + esc(g.name) + '</span></span>' +
           '<span style="display:flex;align-items:center;justify-content:space-between"><span style="display:flex;align-items:center;gap:3px;font:700 14px var(--a);color:#f0c45a">+' + g.pay + coin(15, g.pay, g.id) + '</span><span style="display:flex;gap:3px">' +
           [0, 1, 2, 3, 4].map((i) => '<span style="width:7px;height:7px;border-radius:1px;background:' + (i < n ? (f ? '#ffd56a' : '#5ef2a0') : '#1d3a2c') + ';box-shadow:' + (i < n ? '0 0 4px rgba(94,242,160,.7)' : 'none') + '"></span>').join('') + '</span></span>' +
-          (f ? '<span class="uz-x2">×2 TODAY</span>' : '') + '</button>'; }).join('') + '</div>' : '<p class="uz-p" style="color:#6f8a7c">No blessings yet. Tap + Add, then Blessing (e.g. Drank water, Went for a walk).</p>';
+          (f ? '<span class="uz-x2">×2 TODAY</span>' : '') + '</button>'; }).join('') + '</div>' : '<p class="uz-p" style="color:#6f8a7c">No blessings yet.</p>';
       if (V.edit && bs.length) h += '<div class="uz-chips">' + bs.map((g) => '<button data-a="arch" data-id="' + g.id + '">× ' + esc(g.name) + '</button>').join('') + '</div>';
       h += '<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:5px;background:#0e1a15;border:1px solid #1e3a2c"><img src="' + IMG.spark + '" style="width:16px;height:16px" alt=""><div style="flex:1;display:flex;flex-direction:column;gap:4px"><span style="font:12px var(--a);color:#a9c8b8">Blessing chain · every 8 in a day pays <b style="color:#f0c45a">+10 bonus</b></span>' +
         '<div style="display:grid;grid-template-columns:repeat(8,1fr);gap:3px">' + Array.from({ length: 8 }, (_, i) => '<div style="height:6px;border-radius:1px;background:' + (i < cpos ? '#5ef2a0' : '#1d3a2c') + ';box-shadow:' + (i < cpos ? '0 0 5px rgba(94,242,160,.7)' : 'none') + '"></div>').join('') + '</div></div><span style="font:700 14px var(--a);color:#b6ffd6">' + cpos + ' / 8</span></div>';
-      h += '<div class="uz-cap" style="border-color:#1e3040;margin-top:6px"><span><b style="color:#bfe0ff">The Frozen Tide</b><small style="color:#6f8090">DAYS OFF · STREAKS KEEP, NOTHING IS MISSED</small></span></div>';
+      h += '<div class="uz-cap" style="border-color:#1e3040;margin-top:6px"><span><b style="color:#bfe0ff">The Frozen Tide</b></span></div>';
       h += (D.freezes || []).map((f) => '<div style="display:flex;align-items:center;gap:10px;min-height:44px;padding:4px 10px;border-radius:5px;background:#0e1820;border:1px solid #1e3444"><img src="' + IMG.moon + '" style="width:14px;height:14px" alt=""><span style="flex:1;font:14px var(--a);color:#d0e4f4">' + esc(f.name) + '</span><span style="font:12px var(--a);color:#8aa4b8">' + (f.name === 'Holidays' ? 'from ' : '') + esc(dshort(f.day)) + ' · freezes itself</span></div>').join('');
-      h += '<button class="uz-new" data-a="edit" style="font:700 13px var(--a)">' + (V.edit ? 'Done editing' : 'Edit (remove curses and blessings)') + '</button>';
+      h += '<button class="uz-new" data-a="edit" style="font:700 13px var(--a)">' + (V.edit ? 'Done editing' : 'Edit') + '</button>';
       return h;
     }
 
@@ -525,14 +525,14 @@
             '<span style="padding:3px 4px 2px;font:700 11px/1.15 var(--a);color:#e0e8e3;text-align:center;min-height:28px">' + esc(w.name) + '</span><span style="display:flex;align-items:center;gap:2px;font:700 11px var(--a);color:' + fg + '">' + st + (cn ? coin(11, w.price, w.id) : '') + '</span></button>'; }).join('') + '</div>';
       }
       if (V.den === 'hoard') {
-        h += '<div class="uz-cap" style="border-color:#3a3018"><span><b style="color:#ffd56a">The Hoard</b><small style="color:#8a7a5a">REAL REWARDS YOU WROTE YOURSELF</small></span></div>';
+        h += '<div class="uz-cap" style="border-color:#3a3018"><span><b style="color:#ffd56a">The Hoard</b></span></div>';
         h += (D.hoard || []).map((r) => { const can = r.cost <= D.player.coins, more = r.cost - D.player.coins;
           return '<div class="uz-parch" style="position:relative;display:flex;align-items:center;gap:10px;min-height:56px;padding:5px 6px 5px 12px;border-left:5px dotted #a88a5a"><div style="flex:1;min-width:0"><div style="font:17px/1.15 var(--f)">' + esc(r.name) + '</div><div style="font:12px var(--a);color:#5a4428;margin-top:2px">' +
             (r.claims ? 'claimed ' + r.claims + '× · ' + (can ? 'you can afford it' : more + ' more to go') : (can ? 'never claimed · you can afford it' : more + ' more to go')) + '</div></div>' +
             (V.edit ? '<button class="uz-pen" data-a="harch" data-id="' + r.id + '" style="color:#7a5a34">×</button>' : '') +
             '<button data-a="claim" data-id="' + r.id + '" data-fx="' + r.id + '" style="flex:none;height:44px;min-width:92px;display:flex;align-items:center;justify-content:center;gap:4px;padding:0 10px;border-radius:4px;border:none;background:' + (can ? '#8a1a22' : '#b8a074') + ';color:' + (can ? '#ffe9dc' : '#6a5434') + ';font:700 14px var(--a);box-shadow:0 2px 0 rgba(0,0,0,.35)">' + r.cost + coin(16, r.cost, r.id) + '</button>' +
             (V.stamp === r.id ? '<div class="uz-stampbox" style="position:absolute;right:110px;top:50%;margin-top:-22px;width:120px;height:44px;display:flex;align-items:center;justify-content:center;gap:6px;border:3px double #8a1a22;border-radius:4px;color:#8a1a22;font:700 20px var(--g);letter-spacing:.12em;transform:rotate(-10deg);background:rgba(243,231,200,.7);pointer-events:none"><img src="' + IMG.wax + '" style="width:22px;height:22px" alt="">CLAIMED</div>' : '') + '</div>'; }).join('') ||
-          '<p class="uz-p" style="color:#8a7a5a">Write a reward you would really like with the + in the dock. Spend runes on it when you have earned it.</p>';
+          '<p class="uz-p" style="color:#8a7a5a">No rewards yet.</p>';
         if ((D.hoard || []).length) h += '<button class="uz-new" data-a="edit" style="font:700 13px var(--a)">' + (V.edit ? 'Done editing' : 'Edit (remove rewards)') + '</button>';
       }
       if (V.den === 'chron') {
