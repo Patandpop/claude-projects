@@ -42,6 +42,7 @@ global.Utilities = { formatDate: (d, tz, f) => {
   const g = t => p.find(x => x.type === t).value;
   if (f === 'yyyy-MM-dd') return `${g('year')}-${g('month')}-${g('day')}`;
   if (f === "yyyy-MM-dd'T'HH:mm") return `${g('year')}-${g('month')}-${g('day')}T${g('hour')}:${g('minute')}`;
+  if (f === 'H') return String(Number(g('hour')));
   if (f === 'HH:mm') return `${g('hour')}:${g('minute')}`;
   if (f === 'u') return String(['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].indexOf(g('weekday')) + 1);
   if (f === 'd MMM') return `${+g('day')} ${d.toLocaleString('en-GB',{month:'short'})}`;

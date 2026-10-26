@@ -185,7 +185,7 @@
     const coin = (z, n, key, kind) => { const s = RN ? RN.pick(n, key, kind) : P.coin, k = s.h >= 34 ? 1.35 : s.h > 24 ? 1.2 : 1; return '<img src="' + s.src + '" style="width:' + Math.round(z * k * s.w / s.h) + 'px;height:' + Math.round(z * k) + 'px;object-fit:contain" alt="runes">'; };
     if (RN) IMG.coin = RN.ones[0].src;
     let style = '16-bit'; try { style = localStorage.getItem('ulhuStyle') || '16-bit'; } catch (e) { /* private window */ }
-    const V = { tab: 0, open: { teach: 1, chores: 1, summon: 1, marking: 0, life: 1, qteach: 1, qlife: 1, qdone: 0 }, den: 'room', shopCat: 'floors', tier: 'All', wCat: 'hat', form: null, draft: null, renaming: null, banishArm: null, stamp: null, vanq: false, rvOpen: false, mood: null, say: null, last: null, drag: 0, settling: {} };
+    const V = { hand: {}, tab: 0, open: { teach: 1, chores: 1, summon: 1, marking: 1, life: 1, qteach: 1, qlife: 1, qdone: 0 }, den: 'room', shopCat: 'floors', tier: 'All', wCat: 'hat', form: null, draft: null, renaming: null, banishArm: null, stamp: null, vanq: false, rvOpen: false, mood: null, say: null, last: null, drag: 0, settling: {} };
     let D = null, SHOP = null, ROOM = null, CHRON = null, seq = 0, err = '';
     const stack = [];
 
@@ -365,13 +365,25 @@
         (V.renaming === id ? '<input class="uz-ren" data-ren="' + id + '" value="' + esc(name) + '">' : '') +
         '<span class="uz-meta" style="color:' + (metaCol || '#7f9389') + '">' + esc(meta) + '</span><button class="uz-pen" data-a="rename" data-v="' + id + '" title="Rename">✎</button></div>';
     }
+    function markingCards(marking) {
+      return '<div class="uz-mk">' + marking.map((m) => {
+            const n = m.sittings || 1, cls = m.name.replace(/^Mark\s+/i, '').replace(/\s+books\b.*$/i, '');
+            const lab = (i) => n === 1 ? 'Marked' : n === 2 ? (i ? '2nd half' : '1st half') : 'Part ' + (i + 1);
+            return '<div class="uz-mc"><div class="hd"><b class="uz-ed" data-a="editg" data-id="' + m.id + '">' + esc(cls) + (m.due ? ' <small style="font:600 12px var(--a);color:#f2a93b">by ' + dshort(m.due) + '</small>' : '') + '</b><span>+' + m.pay + coin(13, m.pay, m.id) + '<span style="color:#93a69c;font-weight:400">each</span></span></div><div class="uz-hv" style="grid-template-columns:repeat(' + Math.min(n, 2) + ',1fr)">' +
+              Array.from({ length: n }, (_, i) => { const on = i < m.sitDone, a = on ? (i === m.sitDone - 1 ? 'untick' : '') : (i === m.sitDone ? 'tick' : '');
+                return '<button class="' + (on ? 'on' : '') + '"' + (a ? ' data-a="' + a + '" data-id="' + m.id + '" data-fx="' + m.id + i + '"' : '') + '>' + (on ? '✓ ' : '') + lab(i) + '</button>'; }).join('') + '</div>' +
+              (V.edit ? '<button class="uz-pen" data-a="arch" data-id="' + m.id + '" style="width:auto;height:30px">Archive</button>' : '') + '</div>';
+          }).join('') + '<button class="uz-new" data-a="form" data-v="mark">+ Class to mark</button></div>';
+    }
     function rituals() {
       const groups = D.groups, items = (gid) => dailies().filter((g) => g.grp === gid), marking = D.goals.filter((g) => g.kind === 'termly').sort((a, b) => ((a.due || '9') < (b.due || '9') ? -1 : 1));
       let h = '';
       groups.forEach((g) => {
+        if (g.type === 'marking') return;   // book marking lives in Quests now
+        if (g.type === 'list' && !V.hand[g.id]) V.open[g.id] = items(g.id).some((i) => !i.doneToday || V.settling[i.id]) ? 1 : 0;
         if (g.parent && !V.open[g.parent]) return;
         const child = !!g.parent; let meta = '', metaCol = '';
-        if (g.type === 'parent') { let d = 0, t = 0; groups.filter((x) => x.parent === g.id).forEach((x) => { if (x.type === 'list') { const it = items(x.id); t += it.length; d += it.filter((i) => i.doneToday).length; } if (x.type === 'marking') marking.forEach((m) => { t += m.sittings; d += m.sitDone; }); }); meta = d + ' of ' + t; }
+        if (g.type === 'parent') { let d = 0, t = 0; groups.filter((x) => x.parent === g.id).forEach((x) => { if (x.type === 'list') { const it = items(x.id); t += it.length; d += it.filter((i) => i.doneToday).length; } }); meta = d + ' of ' + t; }
         else if (g.type === 'marking') { const dl = marking.map((m) => m.daysLeft).filter((x) => x != null); meta = dl.length ? Math.min.apply(null, dl) + ' days left' : ''; metaCol = '#f2a93b'; }
         else if (g.type === 'summon') meta = D.summoned.filter((s) => s.built).length + ' of ' + D.summoned.length;
         else { const it = items(g.id); meta = it.length ? it.filter((i) => i.doneToday).length + ' of ' + it.length : 'none today'; }
@@ -387,14 +399,6 @@
               [0, 1, 2].map((i) => '<div style="position:absolute;left:' + i * 50 + '%;top:5px;width:20px;height:20px;margin-left:-10px;border-radius:50%;background:' + (i < n ? '#5aa7ff' : '#0d161c') + ';border:2px solid ' + (i < n ? '#bfe0ff' : '#2a4a5e') + ';box-shadow:' + (i < n ? '0 0 10px #5aa7ff' : 'none') + '"></div>').join('') + '</div>' +
               '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;font:12px/1.25 var(--a)">' + ['Next lesson built', 'A week ahead', 'Two weeks ahead · done'].map((l, i) => '<span style="text-align:' + ['left', 'center', 'right'][i] + ';color:' + (i < n ? '#bfe0ff' : '#6f8a9a') + '">' + l + '</span>').join('') + '</div></div>';
           }
-          if (g.type === 'marking') h += '<div class="uz-mk">' + marking.map((m) => {
-            const n = m.sittings || 1, cls = m.name.replace(/^Mark\s+/i, '').replace(/\s+books\b.*$/i, '');
-            const lab = (i) => n === 1 ? 'Marked' : n === 2 ? (i ? '2nd half' : '1st half') : 'Part ' + (i + 1);
-            return '<div class="uz-mc"><div class="hd"><b class="uz-ed" data-a="editg" data-id="' + m.id + '">' + esc(cls) + (m.due ? ' <small style="font:600 12px var(--a);color:#f2a93b">by ' + dshort(m.due) + '</small>' : '') + '</b><span>+' + m.pay + coin(13, m.pay, m.id) + '<span style="color:#93a69c;font-weight:400">each</span></span></div><div class="uz-hv" style="grid-template-columns:repeat(' + Math.min(n, 2) + ',1fr)">' +
-              Array.from({ length: n }, (_, i) => { const on = i < m.sitDone, a = on ? (i === m.sitDone - 1 ? 'untick' : '') : (i === m.sitDone ? 'tick' : '');
-                return '<button class="' + (on ? 'on' : '') + '"' + (a ? ' data-a="' + a + '" data-id="' + m.id + '" data-fx="' + m.id + i + '"' : '') + '>' + (on ? '✓ ' : '') + lab(i) + '</button>'; }).join('') + '</div>' +
-              (V.edit ? '<button class="uz-pen" data-a="arch" data-id="' + m.id + '" style="width:auto;height:30px">Archive</button>' : '') + '</div>';
-          }).join('') + '<button class="uz-new" data-a="form" data-v="mark">+ Class to mark</button></div>';
         }
         h += '</div>';
       });
@@ -459,6 +463,10 @@
         h += '<div class="uz-sec"><button class="uz-cap" data-a="fold" data-v="' + id + '"><span class="uz-chev" style="color:#a48aff;transform:rotate(' + (V.open[id] ? 90 : 0) + 'deg)">▶</span><span><b style="color:#d8ccff">' + name + '</b></span><span style="font:700 12px var(--a);color:#a48aff">' + list.filter((q) => !q.doneOn).length + ' open</span></button>' +
           (V.open[id] ? list.map(questCard).join('') || '<p class="uz-p" style="color:#7f7a99">No quests here.</p>' : '') + '</div>';
       });
+      const mk = D.goals.filter((g) => g.kind === 'termly').sort((a, b) => ((a.due || '9') < (b.due || '9') ? -1 : 1)), left = mk.filter((m) => m.sitDone < m.sittings);
+      if (V.open.marking === undefined) V.open.marking = 1;
+      h += '<div class="uz-sec"><button class="uz-cap" data-a="fold" data-v="marking"><span class="uz-chev" style="color:#f2a93b;transform:rotate(' + (V.open.marking ? 90 : 0) + 'deg)">▶</span><span><b style="color:#ffd9a0">Book marking</b></span><span style="font:700 12px var(--a);color:#f2a93b">' + (left.length ? left.length + ' classes left' : 'all marked') + '</span></button>' +
+        (V.open.marking ? markingCards(mk) : '') + '</div>';
       const fin = qs.filter((q) => q.doneOn && !V.settling[q.id]);
       if (fin.length) h += '<div class="uz-sec"><button class="uz-cap" data-a="fold" data-v="qdone"><span class="uz-chev" style="color:#a48aff;transform:rotate(' + (V.open.qdone ? 90 : 0) + 'deg)">▶</span><span><b style="color:#d8ccff">Finished</b></span><span style="font:700 12px var(--a);color:#a48aff">' + fin.length + '</span></button>' + (V.open.qdone ? fin.map(questCard).join('') : '') + '</div>';
       h += '<div class="uz-cap" style="border-color:#3a1a1e"><span><b style="color:#ffb3a8">The Boss Pit</b></span><span style="font:700 12px var(--a);color:#ff7a66">' + D.bosses.length + ' active</span></div>';
@@ -730,7 +738,7 @@
       const a = b.dataset.a, id = b.dataset.id, v = b.dataset.v, r = b.getBoundingClientRect(), k = b.dataset.fx;
       if (a === 'undo') return undo();
       if (a === 'tab') { V.tab = Number(v); V.form = null; V.banishArm = null; tabOpened(); return paint(); }
-      if (a === 'fold') { V.open[v] = V.open[v] === undefined && b.dataset.def ? 0 : (V.open[v] ? 0 : 1); return paint(); }
+      if (a === 'fold') { V.hand[v] = 1; V.open[v] = V.open[v] === undefined && b.dataset.def ? 0 : (V.open[v] ? 0 : 1); return paint(); }
       if (a === 'rename') { V.renaming = v; paint(); const n = body.querySelector('[data-ren]'); if (n) { n.focus(); n.select(); } return; }
       if (a === 'edit') { V.edit = !V.edit; return paint(); }
       if (a === 'vanq') { V.vanq = !V.vanq; return paint(); }

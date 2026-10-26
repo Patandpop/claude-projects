@@ -269,5 +269,10 @@ ok('spending and refunds never count as doubloons earned', ch.weeks[6].coins ===
   at('2026-11-29T10:00:00Z'); let w = W(); ok('one missed day keeps the streak and flags it', w.streak === s0 && w.miss === true);
   G.gameTick(k, w.id, 1); w = W(); ok('ticking the next day carries on and clears the flag', w.streak === s0 + 1 && w.miss === false);
   at('2026-12-02T10:00:00Z'); w = W(); ok('two missed days in a row reset the streak', w.streak === 0 && w.miss === false); }
+// life after work on a school day pays x1.5; the same in the morning or in the holidays does not
+{ const pay = (iso) => { at(iso); return G.gameLoad(k).goals.find((x) => x.name === 'Read').pay; };
+  const am = pay('2026-12-03T10:00:00Z'), pm = pay('2026-12-03T17:00:00Z'), hol = pay('2026-12-22T17:00:00Z');
+  ok('life after work pays more (Thu 5 pm vs 10 am)', pm > am);
+  ok('life in the holidays pays the normal rate, even after 4 pm', hol < pm); }
 console.log('\n' + (failed ? failed + ' FAILED' : 'all game server checks passed'));
 process.exit(failed ? 1 : 0);

@@ -15,6 +15,7 @@ const GAME = {
   mult: { necessary: 1, ahead: 1.5, external: 3, life: 2 },  // what kind of job it is
   hpLoss: { 5: 2, 15: 4, 30: 6, 60: 9, 120: 12 },            // a bad habit costs health, never doubloons
   lifeFirst: 5, lifeThree: 15,                               // life bonus: first life goal of the day, then three or more
+  afterWork: 1.5, afterHour: 16,                             // life done after work on a school day pays x1.5 (not holidays or days off)
   streakStep: 0.1, streakCap: 0.3,                           // +10% per 7 days, capped at +30%
 };
 const G_HEAD = {
@@ -92,7 +93,7 @@ function gPay_(goal, todayTicks, goalsById) {
   const base = GAME.base[m] || GAME.base[15], mult = GAME.mult[track] || 1;
   const val = Number(goal.value) || 0, red = val < 0 ? 1 + (-val) * 0.1 : 1;
   const streak = Math.min(GAME.streakCap, Math.floor((Number(goal.streak) || 0) / 7) * GAME.streakStep);
-  const core = Math.round(base * mult * red * (1 + streak));
+  const core = Math.round(base * mult * red * (1 + streak) * (track === 'life' && gAfterWork_() ? GAME.afterWork : 1));
   let bonus = 0;
   if (track === 'life') {
     const net = {};                                             // life goals done today (an untick takes one back out)
@@ -101,6 +102,15 @@ function gPay_(goal, todayTicks, goalsById) {
     if (n === 0) bonus = GAME.lifeFirst; else if (n === 2) bonus = GAME.lifeThree - GAME.lifeFirst;
   }
   return { coins: core + bonus, xp: core, bonus };
+}
+// after work = 4 pm or later on a school day that is not frozen (Patryk 2026-10-26: life after work pays extra,
+// work or life in the holidays does not). Worked out once per hour.
+let G_AW = null;
+function gAfterWork_() {
+  const now = gNow_(), day = gDay_(now), h = Number(Utilities.formatDate(now, TZ, 'H')), key = day + h;
+  if (G_AW && G_AW.key === key) return G_AW.v;
+  const v = h >= GAME.afterHour && gDow_(day) <= 5 && !gIsFrozen_(day, gWorld_(), gFrozenDays_());
+  G_AW = { key, v }; return v;
 }
 function gBlessAmt_(g) { return Math.max(2, Math.round((GAME.base[Number(g.minutes) || 15] || 6) / 2)); }
 function gBlessings_(goals) { return goals.filter((g) => g.kind === 'habit' && g.polarity !== 'minus').sort((a, b) => (a.id < b.id ? -1 : 1)); }
