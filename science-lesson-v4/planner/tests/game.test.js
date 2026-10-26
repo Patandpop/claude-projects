@@ -263,5 +263,11 @@ ok('spending and refunds never count as doubloons earned', ch.weeks[6].coins ===
   f = G.gameFreeze(k, '2026-11-25', 'off', true); ok('tapping again freezes it again', f.frozen === true);
   const e = G.gameSaveGoal(k, Object.assign({}, g.goals.find((x) => x.name === 'Train'), { name: 'Workout', private: true }));
   ok('an existing ritual can be renamed (Train to Workout) and keeps its settings', e.goals.some((x) => x.name === 'Workout' && x.track === 'life' && x.private) && !e.goals.some((x) => x.name === 'Train')); }
+// never miss twice: one missed day keeps the streak (and warns), two in a row reset it
+{ const W = () => G.gameLoad(k).goals.find((x) => x.name === 'Workout');
+  at('2026-11-26T10:00:00Z'); G.gameTick(k, W().id, 1); at('2026-11-27T10:00:00Z'); G.gameTick(k, W().id, 1); const s0 = W().streak;
+  at('2026-11-29T10:00:00Z'); let w = W(); ok('one missed day keeps the streak and flags it', w.streak === s0 && w.miss === true);
+  G.gameTick(k, w.id, 1); w = W(); ok('ticking the next day carries on and clears the flag', w.streak === s0 + 1 && w.miss === false);
+  at('2026-12-02T10:00:00Z'); w = W(); ok('two missed days in a row reset the streak', w.streak === 0 && w.miss === false); }
 console.log('\n' + (failed ? failed + ' FAILED' : 'all game server checks passed'));
 process.exit(failed ? 1 : 0);

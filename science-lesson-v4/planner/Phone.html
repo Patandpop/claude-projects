@@ -168,6 +168,7 @@
   /* bottom nav */
   nav { position:fixed; left:0; right:0; bottom:0; z-index:8; display:flex; background:var(--plate); border-top:1px solid var(--line); padding-bottom:env(safe-area-inset-bottom,0px); }
   nav button { flex:1; border:0; background:none; padding:9px 0 10px; display:flex; flex-direction:column; align-items:center; gap:3px; font-size:12px; font-weight:800; color:var(--soft); }
+  body.ulhuOn { background:#070d0b; } body.ulhuOn .top, body.ulhuOn .chips { display:none; } body.ulhuOn main { padding:0; }   /* Ulhu fills the screen edge to edge */
   #tUlhu { position:relative; } #tUlhu .ub { position:absolute; top:3px; left:calc(50% + 6px); min-width:17px; height:17px; padding:0 4px; border-radius:9px; background:#5ef2a0; color:#08100d; font:800 11px/17px system-ui,sans-serif; }
   nav button[aria-pressed="true"] { color:var(--ink); }
   nav button[aria-pressed="true"] svg { background:var(--sodium-wash); border-radius:10px; box-shadow:0 0 0 6px var(--sodium-wash); }
@@ -887,6 +888,7 @@ function pickClass(c) { if (c === S.cls) return; S.sel = []; $('selbar').classLi
 let ULHU = null;   // the Ulhu screen, made the first time its tab opens
 function setTab(t) {
   S.tab = t;
+  document.body.classList.toggle('ulhuOn', t === 'ulhu');
   [['log','tLog','vLog'],['day','tDay','vDay'],['fri','tFri','vFri'],['ulhu','tUlhu','vUlhu']].forEach(([k, b, v]) => { $(b).setAttribute('aria-pressed', t === k); $(v).classList.toggle('hidden', t !== k); });
   $('chips').classList.toggle('hidden', t === 'fri' || t === 'ulhu');
   $('clsTitle').textContent = t === 'fri' ? 'Friday' : t === 'ulhu' ? 'Ulhu' : S.cls;

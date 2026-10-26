@@ -36,7 +36,7 @@
 .uz-bar{display:flex;align-items:center;gap:7px}.uz-bar img{width:11px;height:11px}
 .uz-bar div{flex:1;height:7px;border-radius:1px;overflow:hidden}.uz-bar div i{display:block;height:100%;transition:width .4s}
 .uz-bar span{font:700 12px var(--a);font-variant-numeric:tabular-nums;min-width:58px;text-align:right}
-.uz-chip{position:absolute;left:12px;top:46px;padding:3px 8px;border-radius:3px;background:#173040;border:1px solid #3a6a8a;font:700 11px var(--a);letter-spacing:.1em;color:#bfe0ff}
+.uz-chip{position:absolute;left:50%;transform:translateX(-50%);top:12px;z-index:3;min-height:28px;padding:3px 9px;border-radius:4px;background:rgba(10,20,30,.55);border:1px solid #2a4a5e;font:700 11px var(--a);letter-spacing:.08em;color:#8aa4b8}.uz-chip.on{background:#173040;border-color:#5aa7ff;color:#bfe0ff}
 .uz-flash{position:absolute;inset:0;pointer-events:none;opacity:0;background:radial-gradient(ellipse at 22% 70%,rgba(255,214,106,.55),rgba(255,214,106,0) 70%)}
 .uz-undo{flex:none;height:38px;display:flex;align-items:center;gap:8px;padding:0 4px 0 14px;background:#0b1311;border-bottom:1px solid #1c2924}
 .uz-undo .t{flex:1;min-width:0;display:flex;align-items:center;gap:5px;white-space:nowrap;overflow:hidden;font:13px var(--a);color:#8fa298}
@@ -200,7 +200,7 @@
       '<div class="uz-say"><div></div></div>' +
       '<div class="uz-bars"><div class="uz-bar"><img src="' + IMG.xp + '" alt=""><div style="background:#0b1513;border:1px solid #24443a"><i class="xp" style="background:linear-gradient(90deg,#1d8a52,#5ef2a0);box-shadow:0 0 6px #5ef2a0"></i></div><span class="xpt" style="color:#bfeed4"></span></div>' +
       '<div class="uz-bar"><img src="' + IMG.heart + '" alt=""><div class="hpw" style="background:#160b0c;border:1px solid #4a1e22"><i class="hp" style="background:linear-gradient(90deg,#a3202a,#ff7a66)"></i></div><span class="hpt" style="color:#ffc0b4"></span></div></div>' +
-      '<div class="uz-chip" style="display:none">DAY FROZEN</div><div class="uz-flash"></div></div>' +
+      '<button class="uz-chip" data-a="dayoff">☾ DAY OFF?</button><div class="uz-flash"></div></div>' +
       '<div class="uz-undo"></div><div class="uz-tabs"></div><div class="uz-body"></div><div class="uz-dock"></div><div class="uz-fx"></div></div>';
     const box = el.firstChild, $ = (s) => box.querySelector(s);
     const ban = $('.uz-ban'), me = $('.uz-me'), fx = $('.uz-fx'), body = $('.uz-body');
@@ -318,7 +318,7 @@
       if (!D) return;
       const p = D.player, nt = night();
       ban.style.background = nt ? 'linear-gradient(180deg,#050a18 0%,#0a1424 55%,#0a1210 100%)' : 'linear-gradient(180deg,#0f3a34 0%,#0b2522 50%,#08110f 100%)';
-      $('.uz-moon').style.display = nt ? '' : 'none'; $('.uz-chip').style.display = D.frozen ? '' : 'none';
+      $('.uz-moon').style.display = nt ? '' : 'none'; const ch = $('.uz-chip'); ch.classList.toggle('on', !!D.frozen); ch.textContent = D.frozen ? '☾ DAY OFF · UNDO' : '☾ DAY OFF?';
       me.innerHTML = layers(mood());
       $('.uz-coins b').textContent = p.coins; $('.uz-lv span').textContent = TITLES[p.level] || 'Ancient'; $('.uz-hex i').textContent = p.level;
       $('.xp').style.width = Math.min(100, Math.round(100 * p.xp / p.need)) + '%'; $('.xpt').textContent = p.xp + ' / ' + p.need;
@@ -341,7 +341,7 @@
       if (V.form) h = dk('Cancel', 'close', 'sec');
       else if (V.tab === 0) h = dk('+ Ritual', 'form', 'pri', 2, 'ritual') + dk('+ Group', 'form', 'sec', 1, 'group');
       else if (V.tab === 1) h = dk('+ Quest', 'form', 'pur', 1, 'quest') + dk('+ Boss', 'form', 'red', 1, 'boss');
-      else if (V.tab === 2) h = dk(D.frozen ? '☾ Day off · tap to undo' : '☾ Sick or off today', 'dayoff', 'ice', 2) + dk('+ Add', 'form', 'sec', 1, 'curse');
+      else if (V.tab === 2) h = dk('+ Curse or blessing', 'form', 'sec', 1, 'curse');
       else h = [['room', 'Room'], ['shop', 'Shop'], ['ward', 'Wardrobe'], ['hoard', 'Hoard'], ['chron', 'Chronicle']].map(([k, l]) => '<button class="sm" data-a="den" data-v="' + k + '" style="flex:1;border-color:' + (V.den === k ? '#ffd56a' : '#2a3b33') + ';background:' + (V.den === k ? '#2a2210' : '#131d19') + ';color:' + (V.den === k ? '#ffd56a' : '#a9b8ae') + '">' + l + '</button>').join('') +
         (V.den === 'hoard' ? '<button data-a="form" data-v="reward" style="flex:0 0 46px;border-color:#ffd56a;background:#ffd56a;color:#1a1004;font:700 20px var(--a)">+</button>' : '');
       $('.uz-dock').innerHTML = h;
@@ -355,7 +355,7 @@
       const k = KIND[g.track] || KIND.necessary, on = g.doneToday;
       return '<div class="uz-row' + (on ? ' done' : '') + '" style="--e:' + k.c + '"><button class="uz-tk' + (on ? ' on' : g.auto ? ' auto' : '') + '" data-a="tick" data-id="' + g.id + '" data-fx="' + g.id + '" aria-label="' + esc(g.name) + '">' + (on ? '<img src="' + IMG.tick + '" alt="">' : '') + '</button>' +
         '<div class="uz-mid uz-ed" data-a="editg" data-id="' + g.id + '"><div class="nm">' + esc(g.name) + '</div><div class="uz-sub"><span>' + eff(g.minutes) + '</span><span style="color:' + k.c + '">' + k.l + '</span><span>' + esc(rep(g)) + '</span>' +
-        (g.streak > 0 ? '<span class="uz-flame"><img src="' + IMG.flame + '" alt="">' + g.streak + '</span>' : '') + '</div></div>' +
+        (g.streak > 0 ? '<span class="uz-flame"><img src="' + IMG.flame + '" alt="">' + g.streak + '</span>' : '') + (g.miss && !g.doneToday && !D.frozen ? '<span style="font-weight:700;color:#ff9a85">last chance today</span>' : '') + '</div></div>' +
         '<div class="uz-pay">' + (g.auto ? '<span class="uz-seal"><img src="' + IMG.seal + '" alt="">ticks itself</span>' : '') + '<span>+' + g.pay + coin(18, g.pay, g.id) + '</span></div>' + archBtn(g.id) + '</div>';
     }
     function header(id, name, plain, meta, metaCol, child) {
@@ -491,8 +491,7 @@
       if (V.edit && bs.length) h += '<div class="uz-chips">' + bs.map((g) => '<button data-a="arch" data-id="' + g.id + '">× ' + esc(g.name) + '</button>').join('') + '</div>';
       h += '<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:5px;background:#0e1a15;border:1px solid #1e3a2c"><img src="' + IMG.spark + '" style="width:16px;height:16px" alt=""><div style="flex:1;display:flex;flex-direction:column;gap:4px"><span style="font:12px var(--a);color:#a9c8b8">Blessing chain · every 8 in a day pays <b style="color:#f0c45a">+10 bonus</b></span>' +
         '<div style="display:grid;grid-template-columns:repeat(8,1fr);gap:3px">' + Array.from({ length: 8 }, (_, i) => '<div style="height:6px;border-radius:1px;background:' + (i < cpos ? '#5ef2a0' : '#1d3a2c') + ';box-shadow:' + (i < cpos ? '0 0 5px rgba(94,242,160,.7)' : 'none') + '"></div>').join('') + '</div></div><span style="font:700 14px var(--a);color:#b6ffd6">' + cpos + ' / 8</span></div>';
-      h += '<div class="uz-cap" style="border-color:#1e3040;margin-top:6px"><span><b style="color:#bfe0ff">The Frozen Tide</b></span></div>';
-      h += (D.freezes || []).map((f) => '<div style="display:flex;align-items:center;gap:10px;min-height:44px;padding:4px 10px;border-radius:5px;background:#0e1820;border:1px solid #1e3444"><img src="' + IMG.moon + '" style="width:14px;height:14px" alt=""><span style="flex:1;font:14px var(--a);color:#d0e4f4">' + esc(f.name) + '</span><span style="font:12px var(--a);color:#8aa4b8">' + (f.name === 'Holidays' ? 'from ' : '') + esc(dshort(f.day)) + ' · freezes itself</span></div>').join('');
+      // (The Frozen Tide list was removed 2026-10-26: days off are one button on the banner)
       h += '<button class="uz-new" data-a="edit" style="font:700 13px var(--a)">' + (V.edit ? 'Done editing' : 'Edit') + '</button>';
       return h;
     }
@@ -672,7 +671,7 @@
       if (V.form) body.innerHTML = form();
       else body.innerHTML = '<div class="uz-sw"><div class="uz-track" style="transform:translateX(' + (-V.tab * 25) + '%);transition:transform .3s cubic-bezier(.2,.8,.2,1)">' +
         '<div class="uz-pane">' + rituals() + '</div><div class="uz-pane">' + quests() + '</div><div class="uz-pane">' + curses() + '</div><div class="uz-pane">' + den() + '</div></div></div>' +
-        (D.frozen ? '<div class="uz-off"><span>TODAY IS FROZEN · NOTHING CAN BE MISSED</span></div>' : '');
+        '';
       if (V.form && oldForm) body.querySelector('.uz-form').scrollTop = fs;
       body.querySelectorAll('.uz-pane').forEach((p, i) => { if (keep[i]) p.scrollTop = keep[i]; });
       if (focus) { const n = body.querySelector(focus); if (n) { n.focus(); try { n.setSelectionRange(n.value.length, n.value.length); } catch (e) { /* not a text box */ } } }
