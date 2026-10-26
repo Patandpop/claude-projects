@@ -37,7 +37,8 @@ console.log('\n-- first load, ticking, unticking');
 at('2026-11-03T09:00:00Z');
 let s = G.gameLoad(k);
 ok('first load seeds the starter rituals and Ulhu starts at level 1, 0 coins', s.goals.length >= 15 && s.player.level === 1 && s.player.coins === 0);
-ok('termly goals are seeded with the term end as the deadline', s.goals.filter((g) => g.kind === 'termly').length === 7 && s.goals.find((g) => g.kind === 'termly').due === '2026-12-18');
+{ const due = {}; s.goals.filter((g) => g.kind === 'termly').forEach((g) => { due[g.name.split(' ')[1]] = g.due; });
+  ok('book marking: one class a week in his order, each due that Friday (Y9, 10C2, 10S2, 7MLA, 8XP, 8AG)', Object.keys(due).length === 7 && due['9AS'] === '2026-11-06' && due['9XS'] === '2026-11-06' && due['10C2'] === '2026-11-13' && due['10S2'] === '2026-11-20' && due['7MLA'] === '2026-11-27' && due['8XP'] === '2026-12-04' && due['8AG'] === '2026-12-11'); }
 ok('the default groups come with the load (Teaching Trench, Marking Crypt, Surface World)', ['teach', 'chores', 'summon', 'marking', 'life'].every((x) => s.groups.some((g) => g.id === x)) && !s.art);
 const rows1 = m.sheets['Game Goals']._data.length;
 G.gameLoad(k);
@@ -255,5 +256,12 @@ ok('Undo a claim gives the doubloons back', s.player.coins === 100 && s.hoard.fi
 const ch = G.gameChronicle(k);
 ok('the Chronicle has 7 weeks, a 35-day calendar and the trophies', ch.weeks.length === 7 && ch.days.length === 35 && ch.days.some((d) => d.today && d.n > 0) && ch.beaten.length >= 2);
 ok('spending and refunds never count as doubloons earned', ch.weeks[6].coins === s.weekCoins);
+// 2026-10-26: a day that freezes itself (INSET here) can be switched back on, and off again; a ritual can be renamed
+{ const g = G.gameLoad(k); at('2026-11-25T10:00:00Z'); let f = G.gameLoad(k);
+  ok('an INSET day freezes itself', f.frozen === true);
+  f = G.gameFreeze(k, '2026-11-25', 'off', false); ok('tapping it switches the day back on', f.frozen === false);
+  f = G.gameFreeze(k, '2026-11-25', 'off', true); ok('tapping again freezes it again', f.frozen === true);
+  const e = G.gameSaveGoal(k, Object.assign({}, g.goals.find((x) => x.name === 'Train'), { name: 'Workout', private: true }));
+  ok('an existing ritual can be renamed (Train to Workout) and keeps its settings', e.goals.some((x) => x.name === 'Workout' && x.track === 'life' && x.private) && !e.goals.some((x) => x.name === 'Train')); }
 console.log('\n' + (failed ? failed + ' FAILED' : 'all game server checks passed'));
 process.exit(failed ? 1 : 0);

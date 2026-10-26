@@ -56,7 +56,7 @@ function gRows_(t) {
 function gAppend_(t, o) { gTab_(t).appendRow(G_HEAD[t].map((h) => (o[h] === undefined ? '' : o[h]))); }
 function gSet_(t, row, field, v) { gTab_(t).getRange(row, G_HEAD[t].indexOf(field) + 1).setValue(v); }
 function gPlayer_() {
-  const p = { coins: 0, xp: 0, level: 1, hp: GAME.maxHp, maxHp: GAME.maxHp, lastDay: '', deaths: 0, seeded: '', diedDay: '', levelUpDay: '', frozenOk: '', groups: '', wear: '' };
+  const p = { coins: 0, xp: 0, level: 1, hp: GAME.maxHp, maxHp: GAME.maxHp, lastDay: '', deaths: 0, seeded: '', diedDay: '', levelUpDay: '', frozenOk: '', groups: '', wear: '', markPlan: '' };
   gRows_('player').forEach((r) => { const v = r.Value; p[r.Setting] = (typeof p[r.Setting] === 'number') ? Number(v) : String(v === undefined ? '' : v); });
   return p;
 }
@@ -78,6 +78,7 @@ function gWorld_() {
 function gFrozenDays_() { const s = {}; gRows_('freeze').forEach((r) => { s[String(r.day)] = r.reason || 'off'; }); return s; }
 // A weekday that is not a school day (holiday, INSET) is frozen like a sick day. Weekends are not frozen.
 function gIsFrozen_(day, world, frozen) {
+  if (frozen[day] === 'on') return false;                // a holiday or INSET day he switched back on (2026-10-26)
   if (frozen[day]) return true;
   const w = gDow_(day), d = world.data;
   if (w > 5 || !d || !(d.terms || []).length) return false;
@@ -294,6 +295,18 @@ function gSeed_(world, today) {
   seeds.forEach((s) => gAppend_('goals', s));
 }
 
+// Patryk 2026-10-26: book marking one class a week, Year 9 first, then 10C2, 10S2, Year 7, Year 8; each due the
+// Friday of its week, starting with the first school week from today. Only sets the dates (he can edit them after).
+const G_MARK_ORDER = [['9AS', 0], ['9XS', 0], ['10C2', 1], ['10S2', 2], ['7MLA', 3], ['8XP', 4], ['8AG', 5]];
+function gMarkPlan_(world, today) {
+  const t = (((world.data || {}).terms) || []).find((x) => today <= x[1]), start = t && t[0] > today ? t[0] : today;
+  let mon = gMonday_(start); if (gDow_(start) > 5) mon = gAdd_(mon, 7);
+  gGoals_().filter((g) => g.kind === 'termly').forEach((g) => {
+    const m = G_MARK_ORDER.find((x) => String(g.name).toUpperCase().split(/[^A-Z0-9]+/).indexOf(x[0]) >= 0);
+    if (m) gSet_('goals', g.row, 'due', gAdd_(mon, 4 + 7 * m[1]));
+  });
+}
+
 /* ---- public functions ---- */
 function gSnapshot_(world, extra) {
   const today = gDay_(gNow_()), p = gPlayer_(), goals = gGoals_(), ticks = gRows_('ticks'), frozen = gFrozenDays_();
@@ -341,6 +354,7 @@ function gameLoad(k) {
     if (!p.seeded) { gSeed_(world, today); p.seeded = today; p.lastDay = gAdd_(today, -1); gSavePlayer_(p); }
     gOwned_();
     gGoals_().filter((g) => g.name === 'Set homework (the classes owed it)' && !g.auto).forEach((g) => gSet_('goals', g.row, 'auto', 'homeworkSet'));
+    if (!p.markPlan) { gMarkPlan_(world, today); p.markPlan = today; gSavePlayer_(p); }
     gRollover_(world);
     const auto = []; gAutoScan_(world, today, gGoals_(), auto);
     if (auto.length) extra.auto = auto;
@@ -418,9 +432,11 @@ function gameFreeze(k, day, reason, on) {
   withLock_(function () {
     const today = gDay_(gNow_());
     if (!/^\d{4}-\d{2}-\d{2}$/.test(String(day)) || day > today || day < gAdd_(today, -7)) throw new Error('Only today or the last 7 days.');
-    const r = gRows_('freeze').find((x) => String(x.day) === day);
-    if (on && !r) gAppend_('freeze', { day, reason: ['sick', 'off', 'other'].indexOf(reason) >= 0 ? reason : 'off', savedOn: today });
-    if (!on && r) gTab_('freeze').deleteRow(r.row);
+    // his own row for the day goes; then a day that freezes itself (holiday, INSET) needs an 'on' row to unfreeze
+    const r = gRows_('freeze').find((x) => String(x.day) === day), self = gIsFrozen_(day, gWorld_(), {});
+    if (r) gTab_('freeze').deleteRow(r.row);
+    if (on && !self) gAppend_('freeze', { day, reason: ['sick', 'off', 'other'].indexOf(reason) >= 0 ? reason : 'off', savedOn: today });
+    if (!on && self) gAppend_('freeze', { day, reason: 'on', savedOn: today });
   });
   return gSnapshot_(gWorld_());
 }
@@ -655,7 +671,7 @@ function gFreezesAhead_(world, today, frozen) {
   const out = [], d = world.data || {};
   (d.inset || []).filter((x) => x >= today && x <= gAdd_(today, 70)).slice(0, 2).forEach((x) => out.push({ name: 'INSET day', day: x }));
   const t = (d.terms || []).find((x) => today <= x[1]); if (t) out.push({ name: 'Holidays', day: gAdd_(t[1], 1) });
-  Object.keys(frozen).filter((x) => x >= today).slice(0, 3).forEach((x) => out.push({ name: frozen[x] === 'sick' ? 'Sick day' : 'Day off', day: x }));
+  Object.keys(frozen).filter((x) => x >= today && frozen[x] !== 'on').slice(0, 3).forEach((x) => out.push({ name: frozen[x] === 'sick' ? 'Sick day' : 'Day off', day: x }));
   return out.sort((a, b) => (a.day < b.day ? -1 : 1)).slice(0, 4);
 }
 

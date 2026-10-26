@@ -168,6 +168,7 @@
   /* bottom nav */
   nav { position:fixed; left:0; right:0; bottom:0; z-index:8; display:flex; background:var(--plate); border-top:1px solid var(--line); padding-bottom:env(safe-area-inset-bottom,0px); }
   nav button { flex:1; border:0; background:none; padding:9px 0 10px; display:flex; flex-direction:column; align-items:center; gap:3px; font-size:12px; font-weight:800; color:var(--soft); }
+  #tUlhu { position:relative; } #tUlhu .ub { position:absolute; top:3px; left:calc(50% + 6px); min-width:17px; height:17px; padding:0 4px; border-radius:9px; background:#5ef2a0; color:#08100d; font:800 11px/17px system-ui,sans-serif; }
   nav button[aria-pressed="true"] { color:var(--ink); }
   nav button[aria-pressed="true"] svg { background:var(--sodium-wash); border-radius:10px; box-shadow:0 0 0 6px var(--sodium-wash); }
 
@@ -894,6 +895,17 @@ function setTab(t) {
   if (t === 'log') renderStudents(); if (t === 'day') renderDay(); if (t === 'fri') loadFriday();
 }
 $('tLog').onclick = () => setTab('log'); $('tDay').onclick = () => setTab('day'); $('tFri').onclick = () => setTab('fri'); $('tUlhu').onclick = () => setTab('ulhu');
+// Ulhu's badge on the bottom bar: rituals still to do today, read from the copy the Ulhu screen keeps on the phone (2026-10-26)
+function ulhuBadge() {
+  let n = 0;
+  try { const d = JSON.parse(localStorage.getItem('ulhuD') || 'null'), t = new Date(), today = t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0');
+    if (d && d.today === today && !d.frozen) n = d.goals.filter((g) => g.kind === 'daily' && g.dueToday && !g.doneToday).length; } catch (e) { n = 0; }
+  let b = $('tUlhu').querySelector('.ub'); if (!n) { if (b) b.remove(); return; }
+  if (!b) { b = document.createElement('b'); b.className = 'ub'; $('tUlhu').appendChild(b); } b.textContent = n;
+}
+ulhuBadge(); window.addEventListener('ulhuchange', ulhuBadge); document.addEventListener('visibilitychange', () => { if (!document.hidden) ulhuBadge(); });
+// the link with &tab=ulhu opens straight on Ulhu (for a home-screen shortcut)
+try { google.script.url.getLocation((l) => { if (l && l.parameter && l.parameter.tab === 'ulhu') setTab('ulhu'); }); } catch (e) { /* not inside Apps Script */ }
 $('refresh').onclick = () => { if (S.tab === 'fri') loadFriday(); else loadClass(S.cls); };
 function render() { if (S.tab === 'log') renderStudents(); if (S.tab === 'day') renderDay(); }
 
