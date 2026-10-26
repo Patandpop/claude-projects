@@ -124,6 +124,7 @@
 .uz-curse .uz-tk{border:2px solid #c4323a;background:radial-gradient(circle,#3a1216,#1a0a0c)}.uz-curse .uz-tk img{width:20px;height:20px}
 .uz-bl{display:grid;grid-template-columns:1fr 1fr;gap:6px}
 .uz-bt{position:relative;overflow:hidden;min-height:82px;display:flex;flex-direction:column;align-items:stretch;justify-content:space-between;gap:6px;padding:8px 9px;border-radius:6px;text-align:left;box-shadow:0 2px 0 #030806}
+.uz-card{flex:none;width:44px;height:60px;padding:0;border:none!important;background:none!important;border-radius:0!important;box-shadow:none!important;display:flex;align-items:center;justify-content:center}.uz-card img{width:40px!important;height:55px!important;image-rendering:pixelated;filter:drop-shadow(0 2px 0 rgba(0,0,0,.6))}
 .uz-halo{flex:none;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center}.uz-halo img{width:24px;height:24px}
 .uz-x2{position:absolute;top:0;right:0;padding:2px 7px;border-bottom-left-radius:6px;background:#ffd56a;color:#1a1004;font:700 11px var(--a)}
 .uz-card{display:flex;flex-direction:column;align-items:stretch;padding:0;border-radius:5px;border:1.5px solid #23332c;background:#131d19;overflow:hidden;text-align:left}
@@ -143,7 +144,7 @@
 .uz-lbl{font:700 11px var(--a);letter-spacing:.1em;color:#7f9389}
 .uz-chips{display:flex;flex-wrap:wrap;gap:6px}
 .uz-chips button{min-width:44px;min-height:42px;display:flex;align-items:center;gap:6px;padding:0 12px;border-radius:5px;border:1.5px solid #2f443b;background:#131d19;color:#cfd8d3;font:700 14px var(--a)}
-.uz-chips button img{height:22px}
+.uz-chips button img{height:22px;image-rendering:pixelated}
 .uz-srow{display:flex;gap:6px;align-items:center}.uz-date{display:flex;gap:6px}.uz-date input{flex:1;min-width:0;height:44px;padding:0 10px;border-radius:5px;border:1.5px solid #2f443b;background:#0b1513;color:#e8e1cf;font:15px var(--a);color-scheme:dark}.uz-date button{flex:none;height:44px;padding:0 12px;border-radius:5px;border:1.5px solid #2f443b;background:#131d19;color:#cfd8d3;font:700 13px var(--a)}.uz-ed{cursor:pointer}.uz-srow input{flex:1;min-width:0;height:44px;padding:0 10px;border-radius:5px;border:1.5px solid #2f443b;background:#0b1513;color:#e8e1cf;font:15px var(--a);outline:none}
 .uz-total{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-radius:5px;background:#0b1311;border:1px solid #1c2924}
 .uz-go{flex:none;height:52px;border:none;border-radius:6px;color:#08100d;font:700 22px var(--g);box-shadow:0 3px 0 rgba(0,0,0,.4)}
@@ -581,18 +582,17 @@
     }
     /* ---------- Omens (curses and blessings; tab renamed by Patryk 2026-10-25) ---------- */
     const isBless = (g) => g.kind === 'habit' && g.polarity !== 'minus', isCurse = (g) => g.kind === 'habit' && g.polarity !== 'plus';
-    const blessIcon = (g) => { const m = BLESS_IC.find((x) => x[1].test(g.name)); return (m && P.bless[m[0]] ? P.bless[m[0]] : P.spark).src; };
     function curses() {
       const cs = D.goals.filter(isCurse), bs = D.goals.filter(isBless), cnt = D.blessCount || 0, cpos = cnt % 8, p = D.player;
       let h = '<div class="uz-cap" style="border-color:#3a1a1e"><span><b style="color:#ffb3a8">The Cursed Shelf</b></span></div>';
-      h += cs.map((c) => '<div class="uz-curse"><button class="uz-tk" data-a="curse" data-id="' + c.id + '" data-fx="' + c.id + '" aria-label="Slipped: ' + esc(c.name) + '"><img src="' + IMG.skull + '" alt=""></button>' +
+      h += cs.map((c) => '<div class="uz-curse"><button class="uz-tk uz-card" data-a="curse" data-id="' + c.id + '" data-fx="' + c.id + '" aria-label="Slipped: ' + esc(c.name) + '"><img src="' + OMENS.card('c', OMENS.of(c)) + '" alt=""></button>' +
         '<div class="uz-mid uz-ed" data-a="editg" data-id="' + c.id + '"><div class="nm" style="color:#f0e0d8">' + esc(c.name) + '</div><div class="uz-sub" style="color:#b08a84">' + (c.count ? c.count + '× today' : 'spared today') + '</div></div>' +
         '<span style="flex:none;display:flex;align-items:center;gap:4px;font:700 16px var(--a);color:#ff7a66">−' + c.hpLoss + '<img src="' + IMG.heart + '" style="width:13px;height:13px" alt=""></span>' + archBtn(c.id) + '</div>').join('') || '<p class="uz-p" style="color:#b08a84">No curses. Tap + Add.</p>';
       if (p.hp <= 12) h += '<p class="uz-p" style="color:#b08a84">' + 'Careful: ' + p.hp + ' HP left.' + '</p>';
       h += '<div class="uz-cap" style="border-color:#1e3a2c;margin-top:6px"><span><b style="color:#b6ffd6">Small Blessings</b></span><span style="font:700 12px var(--a);color:#b6ffd6">' + cnt + ' today</span></div>';
       h += bs.length ? '<div class="uz-bl">' + bs.map((g) => { const f = false, n = g.count || 0;
         return '<button class="uz-bt" data-a="bless" data-id="' + g.id + '" data-fx="' + g.id + '" style="background:' + (f ? 'linear-gradient(180deg,#2a2410,#151208)' : 'linear-gradient(180deg,#152a20,#0e1a15)') + ';border:1.5px solid ' + (f ? '#8a6a2a' : n ? '#2f6a4e' : '#23483a') + (n ? ';box-shadow:0 2px 0 #030806,inset 0 0 18px rgba(94,242,160,.12)' : '') + '">' +
-          '<span style="display:flex;align-items:center;gap:7px"><span class="uz-halo" style="background:radial-gradient(circle,' + (f ? 'rgba(255,214,106,.45)' : 'rgba(94,242,160,.35)') + ' 0%,transparent 70%)"><img src="' + blessIcon(g) + '" alt=""></span><span style="flex:1;min-width:0;font:700 14px/1.15 var(--a);color:#e0f5ea">' + esc(g.name) + '</span></span>' +
+          '<span style="display:flex;align-items:center;gap:7px"><span class="uz-card"><img src="' + OMENS.card('b', OMENS.of(g)) + '" alt=""></span><span style="flex:1;min-width:0;font:700 14px/1.15 var(--a);color:#e0f5ea">' + esc(g.name) + '</span></span>' +
           '<span style="display:flex;align-items:center;justify-content:space-between"><span style="display:flex;align-items:center;gap:3px;font:700 14px var(--a);color:#f0c45a">+' + g.pay + coin(15, g.pay, g.id) + '</span><span style="display:flex;gap:3px">' +
           [0, 1, 2, 3, 4].map((i) => '<span style="width:7px;height:7px;border-radius:1px;background:' + (i < n ? (f ? '#ffd56a' : '#5ef2a0') : '#1d3a2c') + ';box-shadow:' + (i < n ? '0 0 4px rgba(94,242,160,.7)' : 'none') + '"></span>').join('') + '</span></span>' +
           (f ? '<span class="uz-x2">×2 TODAY</span>' : '') + '</button>'; }).join('') + '</div>' : '<p class="uz-p" style="color:#6f8a7c">No blessings yet.</p>';
@@ -756,7 +756,9 @@
       if (f === 'reward') { title = 'New reward for the Hoard'; ph = 'e.g. Cinema trip'; col = '#ffd56a';
         rows = row('COST', [40, 80, 120, 300, 600, 1000].map((n) => chip(String(n), d.cost === n, 'd', 'cost:' + n, '#ffd56a'))); payL = 'Costs'; payV = String(d.cost); go = 'Add to the Hoard'; goBg = '#ffd56a'; }
       if (f === 'curse') { const cu = d.type === 'curse'; title = (d.id ? 'Edit ' : 'New ') + (cu ? 'curse' : 'blessing'); ph = cu ? 'The bad habit' : 'The good habit'; col = cu ? '#ff7a66' : '#b6ffd6';
-        rows = row('TYPE', [chip('Curse', cu, 'd', 'type:curse', '#ff7a66'), chip('Blessing', !cu, 'd', 'type:bless')]) + lenRow;
+        const pk = OMENS.of({ polarity: cu ? 'minus' : 'plus', name: d.name, grp: d.grp0 });
+        rows = row('TYPE', [chip('Curse', cu, 'd', 'type:curse', '#ff7a66'), chip('Blessing', !cu, 'd', 'type:bless')]) + lenRow +
+          row('PICTURE', OMENS.CATS[cu ? 'c' : 'b'].map(([k, l]) => chip(l, pk === k, 'd', 'grp0:' + k, col, OMENS.card(cu ? 'c' : 'b', k))));
         if (cu) { payL = 'Costs health, never runes'; payV = '−' + D.table.hpLoss[d.len] + ' HP'; payC = '#ff7a66'; payCoin = false; } else { payL = 'Pays each time you tap it'; payV = '+' + Math.max(2, Math.round(D.table.base[d.len] / 2)); }
         go = 'Add it'; goBg = cu ? '#ff7a66' : '#5ef2a0'; }
       if (steps) steps = '<span class="uz-lbl">' + steps + '</span>' + d.steps.map((s, i) => '<div class="uz-srow"><input data-step="' + i + '" value="' + esc(s.n) + '" placeholder="' + (f === 'boss' ? 'Stage ' + (i + 1) : 'A small step') + '">' +

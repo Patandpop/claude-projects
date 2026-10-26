@@ -3,7 +3,7 @@ Run: python tests/ulhu_sim.py  (add --shots DIR to save screenshots). Synthetic 
 import os, sys, subprocess, time
 from playwright.sync_api import sync_playwright
 P = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '/'; SP = sys.argv[1] if len(sys.argv) > 1 and not sys.argv[1].startswith('--') else __import__('tempfile').mkdtemp()
-js = ''.join(open(P + f, encoding='utf-8').read() + '\n' for f in ['game-ulhu.js', 'game-pixel.js', 'game-runes.js', 'game-ui.js'])
+js = ''.join(open(P + f, encoding='utf-8').read() + '\n' for f in ['game-ulhu.js', 'game-pixel.js', 'game-runes.js', 'game-omens.js', 'game-ui.js'])
 page = '''<!doctype html><meta charset="utf-8"><meta name=viewport content="width=device-width,initial-scale=1"><body style="margin:0;background:#0d1b3a">
 <div style="height:60px;background:#0a1020;color:#fff">8AG header</div><div id=u></div><nav style="position:fixed;bottom:0;left:0;right:0;height:62px;background:#0a1020"></nav>
 <script>window.CALLS=[];function call(fn,...args){CALLS.push(fn);return fetch('/c',{method:'POST',body:JSON.stringify({fn,args})}).then(r=>r.json()).then(x=>{if(x.err)throw new Error(x.err);return x.ok;});}</script>
