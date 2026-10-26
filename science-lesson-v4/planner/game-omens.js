@@ -71,9 +71,9 @@ const OMENS = (() => {
       g.ring(19, 20, 1, '#8a2a2a'); g.ring(21, 22, 1, '#8a2a2a'); heart(g, 17, 4, '#ff7a9a'); }],
     ['touch', 'Keeping in touch', /message|text|reply|call|touch|email|whatsapp|letter/i, (g) => { g.el(8, 4, 6, 3, '#f4ecd8'); g.el(15, 11, 6, 3, '#bfe0ff'); g.el(9, 18, 6, 3, '#c8f0c8'); g.p(4, 7, '#f4ecd8'); g.p(19, 14, '#bfe0ff'); g.p(5, 21, '#c8f0c8');
       [6, 8, 10].forEach((i) => g.p(i, 4, '#e0304a')); [13, 15, 17].forEach((i) => g.p(i, 11, '#3a6ac0')); [7, 9, 11].forEach((i) => g.p(i, 18, '#3a9a3a')); }],
-    ['home', 'Tidy home', /tidy|bed|clean|hoover|hoover|laundry|dish|declutter|sort/i, (g) => { for (let j = 0; j < 8; j++) g.r(11 - j, 3 + j, 2 * (j + 1), 1, '#c84a3a'); g.r(16, 4, 2, 4, '#8a4030');
+    ['home', 'Tidy home', /tid(y|ied|ying)|makw* (the )?bed|clean|hoover|laundry|dish|declutter|sort|desk/i, (g) => { for (let j = 0; j < 8; j++) g.r(11 - j, 3 + j, 2 * (j + 1), 1, '#c84a3a'); g.r(16, 4, 2, 4, '#8a4030');
       g.r(5, 11, 14, 10, '#f0dcb0'); g.r(10, 15, 4, 6, '#7a4a2a'); g.r(15, 13, 3, 3, '#ffd860'); g.r(6, 13, 3, 3, '#ffd860'); g.p(13, 18, '#e0b040'); }],
-    ['sleep', 'Sleep', /sleep|early|wake|nap|night/i, (g) => { g.d(11, 12, 8, '#f0e6a8'); g.cut(15, 9, 7); g.p(6, 10, '#fff8d0'); g.p(6, 11, '#fff8d0');
+    ['sleep', 'Sleep', /sleep|early|wake|nap|night|bed/i, (g) => { g.d(11, 12, 8, '#f0e6a8'); g.cut(15, 9, 7); g.p(6, 10, '#fff8d0'); g.p(6, 11, '#fff8d0');
       [[18, 15], [20, 6]].forEach(([i, j]) => { g.p(i, j, '#fff'); g.p(i - 1, j, '#bfe0ff'); g.p(i + 1, j, '#bfe0ff'); g.p(i, j - 1, '#bfe0ff'); g.p(i, j + 1, '#bfe0ff'); }); }],
     ['save', 'Saving', /sav|budget|money|no spend/i, (g) => { for (let k = 0; k < 4; k++) { g.el(9, 19 - k * 3, 6, 2, '#c8962a'); g.el(9, 18 - k * 3, 5, 1, '#f4d060'); }
       g.d(18, 12, 4, '#e8b838'); g.d(18, 12, 2, '#f8d868'); g.p(18, 12, '#c8962a'); g.p(20, 4, '#fff'); g.p(19, 4, '#fff0a0'); g.p(21, 4, '#fff0a0'); }],

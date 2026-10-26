@@ -585,16 +585,20 @@
     function curses() {
       const cs = D.goals.filter(isCurse), bs = D.goals.filter(isBless), cnt = D.blessCount || 0, cpos = cnt % 8, p = D.player;
       let h = '<div class="uz-cap" style="border-color:#3a1a1e"><span><b style="color:#ffb3a8">The Cursed Shelf</b></span></div>';
-      h += cs.map((c) => '<div class="uz-curse"><button class="uz-tk uz-card" data-a="curse" data-id="' + c.id + '" data-fx="' + c.id + '" aria-label="Slipped: ' + esc(c.name) + '"><img src="' + OMENS.card('c', OMENS.of(c)) + '" alt=""></button>' +
-        '<div class="uz-mid uz-ed" data-a="editg" data-id="' + c.id + '"><div class="nm" style="color:#f0e0d8">' + esc(c.name) + '</div><div class="uz-sub" style="color:#b08a84">' + (c.count ? c.count + '× today' : 'spared today') + '</div></div>' +
-        '<span style="flex:none;display:flex;align-items:center;gap:4px;font:700 16px var(--a);color:#ff7a66">−' + c.hpLoss + '<img src="' + IMG.heart + '" style="width:13px;height:13px" alt=""></span>' + archBtn(c.id) + '</div>').join('') || '<p class="uz-p" style="color:#b08a84">No curses. Tap + Add.</p>';
+      // curses as 2-column cards like the blessings (Patryk 2026-10-26)
+      h += cs.length ? '<div class="uz-bl">' + cs.map((c) => { const n = c.count || 0;
+        return '<button class="uz-bt" data-a="curse" data-id="' + c.id + '" data-fx="' + c.id + '" aria-label="Slipped: ' + esc(c.name) + '" style="background:linear-gradient(180deg,#2a1216,#170a0c);border:1.5px solid ' + (n ? '#c4323a' : '#4a1c22') + '">' +
+          '<span style="display:flex;align-items:center;gap:7px"><span class="uz-card"><img src="' + OMENS.card('c', OMENS.of(c)) + '" alt=""></span><span style="flex:1;min-width:0;font:700 14px/1.15 var(--a);color:#f0e0d8">' + esc(c.name) + '</span></span>' +
+          '<span style="display:flex;align-items:center;justify-content:space-between"><span style="display:flex;align-items:center;gap:4px;font:700 14px var(--a);color:#ff7a66">−' + c.hpLoss + '<img src="' + IMG.heart + '" style="width:12px;height:12px" alt=""></span>' +
+          '<span style="font:12px var(--a);color:#b08a84">' + (n ? n + '× today' : 'spared today') + '</span></span></button>'; }).join('') + '</div>' : '<p class="uz-p" style="color:#b08a84">No curses. Tap + Add.</p>';
+      if (V.edit && cs.length) h += '<div class="uz-chips">' + cs.map((c) => '<button data-a="arch" data-id="' + c.id + '">× ' + esc(c.name) + '</button>').join('') + '</div>';
       if (p.hp <= 12) h += '<p class="uz-p" style="color:#b08a84">' + 'Careful: ' + p.hp + ' HP left.' + '</p>';
-      h += '<div class="uz-cap" style="border-color:#1e3a2c;margin-top:6px"><span><b style="color:#b6ffd6">Small Blessings</b></span><span style="font:700 12px var(--a);color:#b6ffd6">' + cnt + ' today</span></div>';
+      h += '<div class="uz-cap" style="border-color:#1e2e4e;margin-top:6px"><span><b style="color:#a8ccff">Small Blessings</b></span><span style="font:700 12px var(--a);color:#a8ccff">' + cnt + ' today</span></div>';
       h += bs.length ? '<div class="uz-bl">' + bs.map((g) => { const f = false, n = g.count || 0;
-        return '<button class="uz-bt" data-a="bless" data-id="' + g.id + '" data-fx="' + g.id + '" style="background:' + (f ? 'linear-gradient(180deg,#2a2410,#151208)' : 'linear-gradient(180deg,#152a20,#0e1a15)') + ';border:1.5px solid ' + (f ? '#8a6a2a' : n ? '#2f6a4e' : '#23483a') + (n ? ';box-shadow:0 2px 0 #030806,inset 0 0 18px rgba(94,242,160,.12)' : '') + '">' +
-          '<span style="display:flex;align-items:center;gap:7px"><span class="uz-card"><img src="' + OMENS.card('b', OMENS.of(g)) + '" alt=""></span><span style="flex:1;min-width:0;font:700 14px/1.15 var(--a);color:#e0f5ea">' + esc(g.name) + '</span></span>' +
+        return '<button class="uz-bt" data-a="bless" data-id="' + g.id + '" data-fx="' + g.id + '" style="background:' + (f ? 'linear-gradient(180deg,#2a2410,#151208)' : 'linear-gradient(180deg,#15243f,#0c1528)') + ';border:1.5px solid ' + (f ? '#8a6a2a' : n ? '#3a6ab0' : '#24406a') + (n ? ';box-shadow:0 2px 0 #030608,inset 0 0 18px rgba(106,184,255,.14)' : '') + '">' +
+          '<span style="display:flex;align-items:center;gap:7px"><span class="uz-card"><img src="' + OMENS.card('b', OMENS.of(g)) + '" alt=""></span><span style="flex:1;min-width:0;font:700 14px/1.15 var(--a);color:#e0ecff">' + esc(g.name) + '</span></span>' +
           '<span style="display:flex;align-items:center;justify-content:space-between"><span style="display:flex;align-items:center;gap:3px;font:700 14px var(--a);color:#f0c45a">+' + g.pay + coin(15, g.pay, g.id) + '</span><span style="display:flex;gap:3px">' +
-          [0, 1, 2, 3, 4].map((i) => '<span style="width:7px;height:7px;border-radius:1px;background:' + (i < n ? (f ? '#ffd56a' : '#5ef2a0') : '#1d3a2c') + ';box-shadow:' + (i < n ? '0 0 4px rgba(94,242,160,.7)' : 'none') + '"></span>').join('') + '</span></span>' +
+          [0, 1, 2, 3, 4].map((i) => '<span style="width:7px;height:7px;border-radius:1px;background:' + (i < n ? (f ? '#ffd56a' : '#6ab8ff') : '#1c2e4e') + ';box-shadow:' + (i < n ? '0 0 4px rgba(106,184,255,.7)' : 'none') + '"></span>').join('') + '</span></span>' +
           (f ? '<span class="uz-x2">×2 TODAY</span>' : '') + '</button>'; }).join('') + '</div>' : '<p class="uz-p" style="color:#6f8a7c">No blessings yet.</p>';
       if (V.edit && bs.length) h += '<div class="uz-chips">' + bs.map((g) => '<button data-a="arch" data-id="' + g.id + '">× ' + esc(g.name) + '</button>').join('') + '</div>';
       // (The Frozen Tide list was removed 2026-10-26: days off are one button on the banner)
@@ -904,6 +908,7 @@
         if (on) earnFx(r, k, g.pay, upL); else buzz(6); return;
       }
       if (a === 'curse') {
+        if (V.edit) { const g0 = goal(id); V.form = 'curse'; V.draft = draftOf(g0); V.orig = clone(V.draft); return paint(); }
         const g = goal(id), cost = g.hpLoss; let faint = false;
         act({ verb: 'Cursed:', name: g.name, delta: '−' + cost, unit: 'hp' }, ['gameUntick', id], 'gameTick', [id, -1], (d) => { const x = d.goals.find((y) => y.id === id); x.count = (x.count || 0) + 1; d.player.hp -= cost; if (d.player.hp <= 0) { faint = true; d.player.hp = d.player.maxHp; d.player.level = Math.max(1, d.player.level - 1); } });
         flinch(); floatText(r, '−' + cost + ' HP', '#ff7a66'); glow(k, 'rgba(196,50,58,.9)'); buzz([25, 40, 25]);
@@ -914,7 +919,7 @@
         if (V.edit) { const g0 = goal(id); V.form = 'curse'; V.draft = draftOf(g0); V.orig = clone(V.draft); return paint(); }
         const g = goal(id), chain = false, n = g.pay; let upL = false;
         act({ verb: chain ? 'Blessing chain!' : 'Blessing:', name: g.name, delta: '+' + n, unit: 'coin' }, ['gameUntick', id], 'gameTick', [id, 1], (d) => { const x = d.goals.find((y) => y.id === id); x.count = (x.count || 0) + 1; d.blessCount = (d.blessCount || 0) + 1; upL = earnLocal(d, n, g.pay); });
-        V.sayKind = 'bless'; ripple(r, '#5ef2a0'); earnFx(r, k, n, upL); return;
+        V.sayKind = 'bless'; ripple(r, '#6ab8ff'); earnFx(r, k, n, upL); return;
       }
       if (a === 'step') { const q = goal(id), i = Number(v), on = !q.steps[i].d; buzz(6);
         return act({ verb: on ? 'Step:' : 'Step reopened:', name: q.steps[i].t }, ['gameQuestStep', id, i, !on], 'gameQuestStep', [id, i, on], (d) => { d.goals.find((y) => y.id === id).steps[i].d = on; }); }
