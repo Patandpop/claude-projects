@@ -20,11 +20,11 @@
 .uz-rays{position:absolute;inset:0;background:repeating-linear-gradient(104deg,rgba(170,255,225,.055) 0 16px,transparent 16px 52px);-webkit-mask-image:linear-gradient(180deg,#000,transparent 85%);mask-image:linear-gradient(180deg,#000,transparent 85%)}
 .uz-ledge{position:absolute;left:0;right:0;bottom:0;height:22px;background:repeating-linear-gradient(90deg,#26362f 0 30px,#1b2823 30px 32px);border-top:2px solid #3b5047;box-shadow:inset 0 3px 0 rgba(0,0,0,.25)}
 .uz-ledge:after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 18px 9px,#4a5e54 2px,transparent 2.5px),radial-gradient(circle at 24px 13px,#3e5148 1.5px,transparent 2px),radial-gradient(circle at 200px 8px,#4a5e54 2px,transparent 2.5px),radial-gradient(circle at 330px 12px,#4a5e54 2.5px,transparent 3px)}
-.uz-me{position:absolute;left:18px;bottom:14px;width:108px;height:108px;transform-origin:50% 100%}
+.uz-me{position:absolute;left:14px;bottom:6px;width:100px;height:100px;transform-origin:50% 100%}
 .uz-lay{position:absolute;inset:0;width:100%;height:100%}
 .uz-coins{position:absolute;left:12px;top:9px;display:flex;align-items:center;gap:8px}
-.uz-coins img{width:32px;height:32px;filter:drop-shadow(0 2px 0 #2a1806)}
-.uz-coins b{font:700 30px/1 var(--a);color:#ffd56a;text-shadow:0 2px 0 #4a2c0c;font-variant-numeric:tabular-nums}
+.uz-coins img{width:22px;height:22px;filter:drop-shadow(0 2px 0 #2a1806)}
+.uz-coins b{font:700 22px/1 var(--a);color:#ffd56a;text-shadow:0 2px 0 #4a2c0c;font-variant-numeric:tabular-nums}
 .uz-lv{position:absolute;right:12px;top:9px;display:flex;align-items:center;gap:8px;text-align:right}
 .uz-lv small{display:block;font:700 11px var(--a);letter-spacing:.12em;color:#c9a560}.uz-lv span{font:500 16px/1 var(--g);color:#e8e1cf}
 .uz-hex{width:38px;height:42px;clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);background:linear-gradient(180deg,#ffd56a,#a8681c);display:flex;align-items:center;justify-content:center}
@@ -36,14 +36,14 @@
 .uz-bar{display:flex;align-items:center;gap:7px}.uz-bar img{width:11px;height:11px}
 .uz-bar div{flex:1;height:7px;border-radius:1px;overflow:hidden}.uz-bar div i{display:block;height:100%;transition:width .4s}
 .uz-bar span{font:700 12px var(--a);font-variant-numeric:tabular-nums;min-width:58px;text-align:right}
-.uz-chip{position:absolute;left:50%;transform:translateX(-50%);top:12px;z-index:3;min-height:28px;padding:3px 9px;border-radius:4px;background:rgba(10,20,30,.55);border:1px solid #2a4a5e;font:700 11px var(--a);letter-spacing:.08em;color:#8aa4b8}.uz-chip.on{background:#173040;border-color:#5aa7ff;color:#bfe0ff}
+.uz-moonb{position:absolute;left:50%;top:2px;transform:translateX(-50%);z-index:3;width:50px;height:50px;padding:7px;border:none;background:none;border-radius:50%}.uz-moonb img{width:36px;height:36px;display:block}
 .uz-flash{position:absolute;inset:0;pointer-events:none;opacity:0;background:radial-gradient(ellipse at 22% 70%,rgba(255,214,106,.55),rgba(255,214,106,0) 70%)}
-.uz-undo{flex:none;height:38px;display:flex;align-items:center;gap:8px;padding:0 4px 0 14px;background:#0b1311;border-bottom:1px solid #1c2924}
+.uz-undo.hide{height:0;border-bottom:0;overflow:hidden}.uz-undo{flex:none;height:38px;transition:height .25s;display:flex;align-items:center;gap:8px;padding:0 4px 0 14px;background:#0b1311;border-bottom:1px solid #1c2924}
 .uz-undo .t{flex:1;min-width:0;display:flex;align-items:center;gap:5px;white-space:nowrap;overflow:hidden;font:13px var(--a);color:#8fa298}
 .uz-undo .t .n{color:#e8e1cf;overflow:hidden;text-overflow:ellipsis}
 .uz-undo button{flex:none;height:38px;padding:0 12px;border:none;background:none;color:#5ef2a0;font:700 13px var(--a);letter-spacing:.08em}
 .uz-tabs{flex:none;position:relative;height:46px;display:grid;grid-template-columns:repeat(4,1fr);background:linear-gradient(180deg,#101a17,#0b1311);border-bottom:1px solid #1c2924}
-.uz-tabs button{position:relative;border:none;background:none;display:flex;align-items:center;justify-content:center;gap:5px;font:500 19px var(--g);transition:color .2s}
+.uz-tabs button{position:relative;border:none;background:none;display:flex;align-items:center;justify-content:center;gap:5px;font:500 18px var(--g);white-space:nowrap;padding:0 2px;transition:color .2s}
 .uz-tabs b{min-width:18px;height:18px;padding:0 5px;border-radius:9px;color:#08100d;font:700 11px/18px var(--a)}
 .uz-ink{position:absolute;bottom:-1px;width:25%;height:3px;display:flex;justify-content:center;transition:left .28s cubic-bezier(.2,.8,.2,1)}
 .uz-ink i{width:56%;height:3px;transition:background .28s}
@@ -64,6 +64,20 @@
 .uz-ren{position:absolute;left:24px;right:44px;top:4px;height:36px;padding:0 10px;border:1px solid #5ef2a0;border-radius:4px;background:#0b1513;color:#e8e1cf;font:500 18px var(--g);outline:none}
 .uz-row{position:relative;display:flex;align-items:center;gap:10px;min-height:58px;padding:5px 10px 5px 8px;background:linear-gradient(180deg,#1b2924,#131d19);border:1px solid #2a3b33;border-left:4px solid var(--e);border-radius:5px;box-shadow:inset 0 1px 0 rgba(255,255,255,.04),0 2px 0 #040807;transition:opacity .25s}
 .uz-row.done{min-height:48px;opacity:.62}.uz-row.done .nm{text-decoration:line-through}
+.uz-row.sg{background:linear-gradient(135deg,#1a1230,#0e0a1c 60%,#170f2a);border:1px solid #3a2a6a;min-height:62px}.uz-row.sg.done{opacity:1}.uz-row.sg.done .nm{text-decoration:none}.uz-row.sg .nm{color:#efe6ff}.uz-row.sg .uz-sub{color:#a99cc8}
+.uz-sig{position:relative;flex:none;width:50px;height:50px;border:none;background:none;padding:0}.uz-sig img.b{position:absolute;inset:0;width:50px;height:50px}
+.uz-sig img.f{position:absolute;width:11px;height:16px;transform:translate(-50%,-100%);transform-origin:50% 100%;animation:uzflk 1.5s ease-in-out infinite}.uz-sig img.f.e{width:8px;height:11px;animation:none;opacity:.6;filter:saturate(.55) brightness(.8)}
+@keyframes uzflk{0%,100%{transform:translate(-50%,-100%) scale(1,1)}35%{transform:translate(-50%,-100%) scale(.9,1.1)}70%{transform:translate(-50%,-100%) scale(1.08,.92)}}
+@media (prefers-reduced-motion:reduce){.uz-sig img.f{animation:none}}
+.uz-strip{display:flex;gap:2px;padding:0 0 2px 62px;margin-top:-3px}.uz-strip i{flex:1;max-width:14px;height:4px;border-radius:1px}
+.uz-sub2{display:flex;align-items:center;justify-content:space-between;padding:6px 2px 0;font:500 17px var(--g);color:#9fb4aa}
+.uz-bw{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;padding:8px 10px;border-radius:6px;background:#0c1620;border:1px solid #1e3444;font:700 13px var(--a);color:#d0e4f4}.uz-bw b{font:500 18px var(--g);color:#bfe0ff;margin-right:2px}.uz-bw span{display:flex;align-items:center;gap:4px}
+.uz-bw i{font-style:normal;padding:1px 7px;border-radius:10px;font:700 11px var(--a);border:1.5px solid #2a4a5e;color:#6f8a9a}.uz-bw i.on{border-color:#5aa7ff;background:#173040;color:#bfe0ff}
+.uz-orc{padding:10px;border-radius:8px;background:radial-gradient(ellipse at 50% 0%,#1d1440,#0a0716 70%);border:1px solid #3a2a6a;display:flex;flex-direction:column;gap:8px}
+.uz-orc h4{margin:0;font:500 21px var(--g);color:#d4bfff;display:flex;justify-content:space-between;align-items:baseline}.uz-orc h4 span{font:700 12px var(--a);color:#a99cc8}
+.uz-wk{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center;font:700 11px var(--a);color:#a99cc8}.uz-wk div{display:flex;flex-direction:column;align-items:center;gap:2px;padding:3px 0;border-radius:6px}
+.uz-wk div.t{background:rgba(164,138,255,.14);box-shadow:inset 0 0 0 1px #6a52b8;color:#efe6ff}.uz-wk img{width:38px;height:38px}.uz-wk small{font:700 11px var(--a);height:14px}
+.uz-sky{width:100%;height:auto;display:block;border-radius:6px}.uz-leg{display:flex;flex-wrap:wrap;gap:10px;font:12px var(--a);color:#a99cc8}.uz-leg span{display:flex;align-items:center;gap:4px}.uz-leg i{width:9px;height:9px;border-radius:50%;display:inline-block}
 .uz-tk{flex:none;width:46px;height:46px;border-radius:50%;border:2px solid #4f6a5e;background:radial-gradient(circle,#1f2e28,#121b17);display:flex;align-items:center;justify-content:center;padding:0}
 .uz-tk.auto{border:2px dashed #7a5ab0}.uz-tk.on{border:2px solid #5ef2a0;background:radial-gradient(circle,#2a9a62,#11402a)}
 .uz-tk img{width:22px;height:18px}
@@ -149,8 +163,36 @@
   const TITLES = ['', 'Tadpole', 'Polyp', 'Deep Dabbler', 'Abyssal Apprentice', 'Tide Caller', 'Rune Keeper', 'Dream Weaver', 'Star Spawn', 'High Priest', 'Elder Thing', 'Great Dreamer', 'Old One'];
   const SIZE = { 2: { k: 'spawn', gold: 60 }, 5: { k: 'shog', gold: 150 }, 10: { k: 'levi', gold: 300 }, 20: { k: 'old', gold: 600 } };
   const TABC = ['#5ef2a0', '#a48aff', '#ff7a66', '#ffd56a'];
-  const TICK_SAYS = ["Ph'nglui! Lovely work.", 'The stars align.', 'Another rune glows.', 'Ia! Ia! Well done.', 'The deep approves.'];
-  const CURSE_SAYS = ['Ow. That one stung.', 'The deep grows cold…', 'Ulhu flinches. Easy now.'];
+  const SAYS = {
+    morning: ['Good morning. Everything is doomed. Have some tea first.', "A new day. Same inevitable void. Let's be productive about it.", 'Rise and shine, little mortal. The abyss is patient, but your lessons are not.', 'The sun rose again. How embarrassing for it.',
+      "Another day closer to the end of all things. Let's tick some boxes.", 'I dreamt of drowned cities. Also, you have marking.', 'Morning! The stars are wrong, but the coffee is right.', "Today's forecast: tentacles, with a chance of Year 9."],
+    left: ['{n} rituals left. Resistance is adorable.', 'Only {n} left. The void can wait. Briefly.', 'So many rituals. So little sanity.', 'Your list grows like the hungry deep. Feed it.', 'Do the thing. Then the next thing. Then the heat death of the universe.',
+      "Tick one. It won't save you, but it feels nice.", 'The tide is rising. So is your to-do list.', 'I counted your tasks. I wept. Then I ate a fish.', 'Every unticked box is a tiny prophecy.', 'You are not behind. Time is merely a flat circle with a deadline.'],
+    tick: ['Ticked! One step closer to oblivion, with a sticker.', 'Ooh, productive. The Old Ones will be mildly impressed.', 'The cosmos does not care, but I do.', 'Splendid. Your doom is now slightly more organised.', "Ticked! I'd clap, but I have tentacles.",
+      'Look at you, defying entropy for a whole five minutes.', "Delicious progress. I'll file it under futile but cute.", 'Ritual complete. Somewhere, a star dies in your honour.', 'You did it! Nothing matters, and you still did it!', 'Tick. Tick. Tick. Like a clock counting down to the end. Lovely.'],
+    all: ['All appeased! Now rest, before the inevitable end of all things.', 'Everything ticked. The deep is pleased. The deep is rarely pleased.', 'Nothing left. Go outside. Look at the sky. Wonder what is behind it.', "Reward yourself. The universe certainly won't.",
+      'You have appeased me. For today. Tomorrow I hunger again.', 'Empty list. Empty void. Perfect symmetry.', 'You won today. The universe wins eventually, but not today.'],
+    curse: ["A curse? I'm not angry. I'm just eldritch.", 'Ah, Netflix. The true Old One.', 'Doomscrolling? Only I am allowed to be the doom.', "Ouch. That went straight to my soul. I don't have a soul. Still ouch.", "A small slip into the abyss. We've all been there. I live there.",
+      'Curses happen. Mostly to me, apparently.', 'I felt that in all my tentacles.', "It's fine. Everything's fine. The ocean is fine."],
+    bless: ['Water! The source of all life, and of me.', 'How delightfully mortal.', 'Blessed. Disgustingly wholesome.', 'Your bones thank you, before they return to dust.', "Another blessing. I'm almost glowing. I am glowing. That's normal.", 'Tidy desk, tidy mind, same eternal darkness.', 'Good habit detected. Suspicious. Keep going.'],
+    lowhp: ['I feel… unwell. Fewer curses, please.', 'My tentacles are wilting. Be kind to us.', 'Health is low. Even gods need a nap.', "I'm fading. Dramatically. Please tick something.", 'If I faint, I take a level with me. Just saying.'],
+    faint: ["I fainted. It was very dramatic. I've recovered. Mostly.", 'I lost a level and some runes. The deep giveth, the deep taketh.', 'Back from the brink. The abyss sends its regards.'],
+    level: ['Level up! I feel… larger. More ominous.', "I've grown! Soon I'll be the size of a small moon. Kidding. Unless?", 'New level. New horrors unlocked.', 'Ascended! The cultists will be so jealous.'],
+    streak: ['Your streak is on fire. Not literally. Probably.', 'Seven nights in a row! Consistency is the true eldritch power.', 'The flame burns on. Like the stars before they collapse.', "One missed day is forgiven. Two? I don't forgive. I just sulk."],
+    quest: ['Quest fulfilled. Sealed in wax, like a proper cursed artefact.', 'A new quest! Adventure, glory, admin.', "That quest had been waiting. It had grown teeth."],
+    boss: ['Hit! The beast trembles. So do I, but with joy.', 'A late hit is still a hit. Half a doom is still doom.'],
+    vanq: ['Vanquished! Another trophy for the shelf of futility.', "It's slain. Its cousins will come. They always come."],
+    mark: ['The books await. They whisper. Mostly spelling mistakes.', 'A stack of exercise books. A true cosmic horror.', 'Half marked! The other half grows stronger in the dark.', "All marked. I'll tell the Old Ones. They won't care. I'm proud."],
+    evening: ["It's after seven. Even old gods rest. Put the laptop down.", 'Zzz… evening work feeds the void. Feed yourself instead.', 'The day is over. Let it sink.', 'The marking will still be there tomorrow. So will I. Forever.', 'Life after work? Rare and precious. Extra runes for you.'],
+    off: ['Even ancient horrors take sick days.', 'Day off. The tide will wait. It has waited millennia.', 'Holidays! Rest your mortal frame.', "No rituals today. I'll just float here. Menacingly.", 'Rest is not lazy. Rest is strategic hibernation.'],
+    shop: ['Ooh, for the Sanctum?', 'Spend those runes before the universe ends.', 'Dashing. Truly eldritch.', "You've earned it. Probably. Who's counting? Me. I'm counting.", 'Treasure! Shiny things soothe the ancient mind.', 'Runes well spent. Runes are meaningless anyway. Enjoy.'],
+    any: ["Did you know? I'm technically older than time. I still love stickers.", "Ph'nglui mglw'nafh… sorry, I was talking to my mum.", 'If you stare into the to-do list, the to-do list stares back.', 'I am the harbinger of doom, and also your emotional support octopus.',
+      'Nothing lasts forever. Except unmarked books.', 'I believe in you. I also believe in the end of everything. Both can be true.', "You're doing great. The universe is indifferent, but I'm rooting for you.", 'Sometimes I eat a boat. We all cope differently.',
+      'The deep is dark and full of terrors. Your desk is just full.', 'Small steps. Tiny tentacles. Big doom. We move.'],
+    stars: ["A full constellation. The stars approve. I'm terrified.", 'Most of the week, kept. The heavens take note.', 'Your sky is filling with stars. Ominous. Lovely.'] };
+  const pickSay = (k) => { const L = SAYS[k]; return L[Math.floor(Math.random() * L.length)]; };
+  const TICK_SAYS = SAYS.tick;
+  const CURSE_SAYS = SAYS.curse;
   const CATS = [['floors', 'Floors'], ['wallpapers', 'Walls'], ['rugs', 'Rugs'], ['windows', 'Windows'], ['lights', 'Lights'], ['corner', 'Corner'], ['seats', 'Seats'], ['tables', 'Tables'], ['wall', 'Hangings'], ['props', 'Props']];
   const SLOTL = { floor: 'Floor', wall: 'Walls', rug: 'Rug', window: 'Window', light: 'Light', corner: 'Corner', furn: 'Furniture', hang3: 'Left wall', hang4: 'Right wall', prop: 'Props' };
   const TIERC = { Basic: '#c8beaa', Nice: '#5ee08a', Fancy: '#b49cff', Eldritch: '#5ef2a0' };
@@ -182,10 +224,46 @@
     const IMG = { coin: P.coin.src, flame: P.flame.src, heart: P.heart.src, skull: P.skull.src, seal: P.seal.src, wax: P.waxRed.src, xp: P.xp.src, trophy: P.trophy.src, tick: P.tick.src, moon: P.moon.src, spark: P.spark.src, rune: P.rune.src, plant: A.items.plant.src };
     // the currency is runes (2026-10-25): one rune under 15, the cairn for 15-99, the rune portal for 100+
     const RN = root.RUNES;
+    // ritual sigils (Patryk 2026-10-26): purple pentagram, flames on its five points when ticked; its colour grows with the
+    // streak from ember orange to eldritch green at 66 nights (a habit) and stays green; unlit = a faint tint of that colour
+    const hx = (c) => [1, 3, 5].map((i) => parseInt(c.slice(i, i + 2), 16));
+    const mixc = (a, b, t) => { const x = hx(a), y = hx(b); return '#' + x.map((v, i) => Math.round(v + (y[i] - v) * t).toString(16).padStart(2, '0')).join(''); };
+    const STOPS = [[1, '#ff6a2a'], [7, '#ffc040'], [21, '#6ab8ff'], [45, '#5adcd0'], [66, '#5ef2a0']];
+    const sCol = (n) => { n = Math.max(1, n || 1); if (n >= 66) return '#5ef2a0'; for (let i = 1; i < STOPS.length; i++) if (n <= STOPS[i][0]) return mixc(STOPS[i - 1][1], STOPS[i][1], (n - STOPS[i - 1][0]) / (STOPS[i][0] - STOPS[i - 1][0])); return '#5ef2a0'; };
+    const SPTS = [0, 1, 2, 3, 4].map((i) => [13.5 + Math.cos(i * 2 * Math.PI / 5 - Math.PI / 2) * 10, 13.5 + Math.sin(i * 2 * Math.PI / 5 - Math.PI / 2) * 10]);
+    const SIGC = {};
+    function sigilSrc(col, lit, share) {
+      const key = col + lit + share; if (SIGC[key]) return SIGC[key];
+      const c = document.createElement('canvas'); c.width = 27; c.height = 27; const x = c.getContext('2d');
+      const ring = lit ? col : mixc('#2a2050', col, .38), star = lit ? '#efe6ff' : mixc('#231a40', col, .25), dot = (X, Y, k) => { x.fillStyle = k; x.fillRect(Math.round(X), Math.round(Y), 1, 1); };
+      for (let a = 0; a < 360; a += 2.5) { const r = a * Math.PI / 180; dot(13.5 + Math.cos(r) * 12, 13.5 + Math.sin(r) * 12, ring); }
+      SPTS.forEach((pt, i) => { const q = SPTS[(i + 2) % 5]; for (let t = 0; t <= 1; t += 0.025) dot(pt[0] + (q[0] - pt[0]) * t, pt[1] + (q[1] - pt[1]) * t, star); });
+      if (share !== undefined) SPTS.forEach((pt, i) => { x.fillStyle = i < share ? col : '#2a2050'; x.fillRect(Math.round(pt[0]) - 1, Math.round(pt[1]) - 1, 3, 3); });
+      return (SIGC[key] = c.toDataURL());
+    }
+    const FLC = {};
+    function flameSrc(col) {
+      if (FLC[col]) return FLC[col];
+      const c = document.createElement('canvas'); c.width = 8; c.height = 12; const x = c.getContext('2d');
+      for (let y = 1; y < 12; y++) for (let i = 0; i < 8; i++) { const dy = (12 - y) / 12, half = Math.sin(Math.PI * Math.min(1, dy * 1.05)) * 3.4 * (1 - dy * 0.5), dx = Math.abs(i + .5 - 4);
+        if (dx <= half) { x.fillStyle = dx < half * 0.4 && dy < 0.55 ? '#ffffff' : dx < half * 0.75 ? col : mixc('#000000', col, .65); x.fillRect(i, y, 1, 1); } }
+      return (FLC[col] = c.toDataURL());
+    }
+    // a ritual's sigil button: lit with five flames, unlit and tinted, or dim embers after a missed day
+    function sigil(g, on) {
+      const n = Math.max(1, g.streak + (on ? 0 : 1)), col = sCol(n), emb = !on && g.miss && !D.frozen;
+      let h = '<button class="uz-sig" data-a="tick" data-id="' + g.id + '" data-fx="' + g.id + '" aria-label="' + esc(g.name) + '"><img class="b" src="' + sigilSrc(col, on) + '" alt=""' + (on ? ' style="filter:drop-shadow(0 0 5px ' + col + ')"' : '') + '>';
+      if (on || emb) SPTS.forEach((pt) => { h += '<img class="f' + (on ? '' : ' e') + '" src="' + flameSrc(col) + '" style="left:' + (pt[0] * 50 / 27).toFixed(1) + 'px;top:' + (pt[1] * 50 / 27 + 3).toFixed(1) + 'px" alt="">'; });
+      return h + '</button>';
+    }
+    const moonSrc = (full) => { const c = document.createElement('canvas'); c.width = 16; c.height = 16; const x = c.getContext('2d');
+      for (let y = 0; y < 16; y++) for (let i = 0; i < 16; i++) { const d = Math.hypot(i + .5 - 8, y + .5 - 8); if (d > 7 || (!full && Math.hypot(i + .5 - 11, y + .5 - 6.5) < 6.3)) continue; x.fillStyle = full ? (d > 6.2 ? '#c9b98a' : (i + y) % 5 === 0 && d < 5 ? '#d8cfa8' : '#f4ecc8') : (d > 6.2 ? '#8aa4b8' : '#cfe0ec'); x.fillRect(i, y, 1, 1); }
+      return c.toDataURL(); };
+    const MOON = { full: moonSrc(true), cres: moonSrc(false) };
     const coin = (z, n, key, kind) => { const s = RN ? RN.pick(n, key, kind) : P.coin, k = s.h >= 34 ? 1.35 : s.h > 24 ? 1.2 : 1; return '<img src="' + s.src + '" style="width:' + Math.round(z * k * s.w / s.h) + 'px;height:' + Math.round(z * k) + 'px;object-fit:contain" alt="runes">'; };
     if (RN) IMG.coin = RN.ones[0].src;
-    let style = '16-bit'; try { style = localStorage.getItem('ulhuStyle') || '16-bit'; } catch (e) { /* private window */ }
-    const V = { hand: {}, tab: 0, open: { teach: 1, chores: 1, summon: 1, marking: 1, life: 1, qteach: 1, qlife: 1, qdone: 0 }, den: 'room', shopCat: 'floors', tier: 'All', wCat: 'hat', form: null, draft: null, renaming: null, banishArm: null, stamp: null, vanq: false, rvOpen: false, mood: null, say: null, last: null, drag: 0, settling: {} };
+    const style = '16-bit';   // 16-bit only (2026-10-26)
+    const V = { hand: {}, tab: 0, open: { teach: 0, chores: 1, summon: 1, marking: 1, life: 0, qteach: 1, qlife: 1, qdone: 0 }, den: 'room', sayIx: 0, shopCat: 'floors', tier: 'All', wCat: 'hat', form: null, draft: null, renaming: null, banishArm: null, stamp: null, vanq: false, rvOpen: false, mood: null, say: null, last: null, drag: 0, settling: {} };
     let D = null, SHOP = null, ROOM = null, CHRON = null, seq = 0, err = '';
     const stack = [];
 
@@ -197,10 +275,10 @@
       '<div class="uz-ledge"></div><div class="uz-me"></div>' +
       '<div class="uz-coins"><img class="uz-ctr" src="' + IMG.coin + '" alt=""><b></b></div>' +
       '<div class="uz-lv"><div><small>LEVEL</small><span></span></div><div class="uz-hex"><i></i></div></div>' +
-      '<div class="uz-say"><div></div></div>' +
+      '<div class="uz-say" data-a="next"><div></div></div>' +
       '<div class="uz-bars"><div class="uz-bar"><img src="' + IMG.xp + '" alt=""><div style="background:#0b1513;border:1px solid #24443a"><i class="xp" style="background:linear-gradient(90deg,#1d8a52,#5ef2a0);box-shadow:0 0 6px #5ef2a0"></i></div><span class="xpt" style="color:#bfeed4"></span></div>' +
       '<div class="uz-bar"><img src="' + IMG.heart + '" alt=""><div class="hpw" style="background:#160b0c;border:1px solid #4a1e22"><i class="hp" style="background:linear-gradient(90deg,#a3202a,#ff7a66)"></i></div><span class="hpt" style="color:#ffc0b4"></span></div></div>' +
-      '<button class="uz-chip" data-a="dayoff">☾ DAY OFF?</button><div class="uz-flash"></div></div>' +
+      '<button class="uz-moonb" data-a="dayoff" aria-label="Day off"><img alt=""></button><div class="uz-flash"></div></div>' +
       '<div class="uz-undo"></div><div class="uz-tabs"></div><div class="uz-body"></div><div class="uz-dock"></div><div class="uz-fx"></div></div>';
     const box = el.firstChild, $ = (s) => box.querySelector(s);
     const ban = $('.uz-ban'), me = $('.uz-me'), fx = $('.uz-fx'), body = $('.uz-body');
@@ -304,7 +382,7 @@
     function earnLocal(d, n, xp) { const p = d.player; p.coins += n; d.weekCoins = (d.weekCoins || 0) + n; p.xp += xp; let up = false; while (p.xp >= p.need) { p.xp -= p.need; p.level++; p.need = need(p.level); p.hp = p.maxHp; up = true; } return up; }
     function earnFx(r, k, n, up) {
       flyCoin(r, n); floatText(r, '+' + n, '#ffd56a'); glow(k, 'rgba(94,242,160,.85)'); bounce(); buzz(12);
-      if (up) { setTimeout(celebrate, 350); setMood('proud', 'Level ' + D.player.level + '! I feel… larger.'); } else setMood('happy', TICK_SAYS[Math.floor(Math.random() * TICK_SAYS.length)]);
+      if (up) { setTimeout(celebrate, 350); setMood('proud', pickSay('level')); } else setMood('happy', pickSay(V.sayKind || 'tick')); V.sayKind = null;
     }
     const goal = (id) => D.goals.find((g) => g.id === id);
     function archive(id) { const g = goal(id); if (!g) return; return act({ verb: 'Archived:', name: g.name }, ['gameArchive', id, true], 'gameArchive', [id], (d) => { d.goals = d.goals.filter((x) => x.id !== id); }); }
@@ -314,35 +392,39 @@
     /* ---------- banner, undo line, tabs, dock ---------- */
     const dailies = () => D.goals.filter((g) => g.kind === 'daily' && g.dueToday);
     const ritualsLeft = () => dailies().filter((g) => !g.doneToday).length;
+    const nextJob = () => { if (!D) return null; const T = todayItems(), x = T.work.find((i) => !i.auto) || T.life[0] || T.work[0]; return x || null; };
     function paintBanner() {
       if (!D) return;
       const p = D.player, nt = night();
       ban.style.background = nt ? 'linear-gradient(180deg,#050a18 0%,#0a1424 55%,#0a1210 100%)' : 'linear-gradient(180deg,#0f3a34 0%,#0b2522 50%,#08110f 100%)';
-      $('.uz-moon').style.display = nt ? '' : 'none'; const ch = $('.uz-chip'); ch.classList.toggle('on', !!D.frozen); ch.textContent = D.frozen ? '☾ DAY OFF · UNDO' : '☾ DAY OFF?';
+      $('.uz-moon').style.display = 'none'; const mb = $('.uz-moonb img'); mb.src = D.frozen ? MOON.cres : MOON.full; mb.style.cssText = D.frozen ? 'filter:drop-shadow(0 0 8px #cfe0ec)' : 'opacity:.85'; $('.uz-moonb').setAttribute('aria-label', D.frozen ? 'Day off: tap to undo' : 'Tap for a day off');
       me.innerHTML = layers(mood());
       $('.uz-coins b').textContent = p.coins; $('.uz-lv span').textContent = TITLES[p.level] || 'Ancient'; $('.uz-hex i').textContent = p.level;
       $('.xp').style.width = Math.min(100, Math.round(100 * p.xp / p.need)) + '%'; $('.xpt').textContent = p.xp + ' / ' + p.need;
       $('.hp').style.width = Math.round(100 * p.hp / p.maxHp) + '%'; $('.hpt').textContent = p.hp + ' / ' + p.maxHp;
       let say = V.say;
-      if (!say) { const left = ritualsLeft(); if (D.frozen) say = 'Day frozen. Streaks are safe. Rest now.'; else if (D.hour >= 19) say = 'Zzz… even old gods rest after seven.'; else if (p.hp < 15) say = 'I feel… unwell. Fewer curses, please.'; else say = left ? left + ' ritual' + (left === 1 ? '' : 's') + ' left today. The tide favours you.' : 'Every ritual done. The deep is pleased.'; }
+      if (!say) { const left = todayLeft(), k = D.frozen ? 'off' : D.hour >= 19 ? 'evening' : p.hp < 15 ? 'lowhp' : !left ? 'all' : D.hour < 10 ? 'morning' : (V.sayIx + D.hour) % 3 === 2 ? 'any' : 'left', L = SAYS[k];
+        say = L[(V.sayIx + D.hour + Number(String(D.today).slice(-2))) % L.length].replace('{n}', left); }
       $('.uz-say div').textContent = say;
     }
     function paintTop() {
+      if (V.last !== V.seenLast) { V.seenLast = V.last; V.lastAt = Date.now(); clearTimeout(V.lt); if (V.last) V.lt = setTimeout(paintTop, 10000); }
+      $('.uz-undo').classList.toggle('hide', !V.last || Date.now() - V.lastAt > 9900);
       const L = V.last || {}, cn = L.unit === 'coin' && L.delta, col = L.unit === 'hp' ? '#ff7a66' : String(L.delta || '').charAt(0) === '−' ? '#c9a560' : '#ffd56a';
       $('.uz-undo').innerHTML = '<img src="' + IMG.rune + '" style="width:8px;height:10px;opacity:.8" alt=""><div class="t"><span>' + esc(L.verb || 'The tide is calm.') + '</span><span class="n">' + esc(L.name || '') + '</span><span style="font-weight:700;color:' + col + '">' + esc(L.delta || '') + '</span>' +
         (cn ? coin(14, String(L.delta).replace(/[^0-9]/g, ''), L.name) : '') + (L.unit === 'hp' ? '<img src="' + IMG.heart + '" style="width:11px;height:11px" alt="">' : '') + '</div>' + (stack.length ? '<button data-a="undo">↶ UNDO</button>' : '');
-      const left = ritualsLeft(), soon = D.goals.filter((g) => g.kind === 'todo' && !g.doneOn && g.due && diff(D.today, g.due) <= 1).length;
-      $('.uz-tabs').innerHTML = ['Rituals', 'Quests', 'Omens', 'Den'].map((l, i) => '<button data-a="tab" data-v="' + i + '" style="color:' + (V.tab === i ? TABC[i] : '#7f9389') + '">' + l +
+      const left = todayLeft(), soon = 0;
+      $('.uz-tabs').innerHTML = ['The Call', 'Grimoire', 'Omens', 'Den'].map((l, i) => '<button data-a="tab" data-v="' + i + '" style="color:' + (V.tab === i ? TABC[i] : '#7f9389') + '">' + l +
         ((i === 0 && left) || (i === 1 && soon) ? '<b style="background:' + (i === 0 ? '#5ef2a0' : '#ff7a66') + '">' + (i === 0 ? left : soon) + '</b>' : '') + '</button>').join('') +
         '<div class="uz-ink" style="left:' + (V.tab * 25) + '%"><i style="background:' + TABC[V.tab] + ';box-shadow:0 0 10px ' + TABC[V.tab] + ',0 0 2px ' + TABC[V.tab] + '"></i></div>';
       const K = { pri: ['#5ef2a0', '#5ef2a0', '#08100d'], sec: ['#2f443b', '#131d19', '#cfd8d3'], pur: ['#a48aff', '#a48aff', '#0d0818'], red: ['#ff7a66', '#2a1214', '#ffb3a8'], ice: ['#5aa7ff', D.frozen ? '#5aa7ff' : '#0f1a24', D.frozen ? '#08101a' : '#bfe0ff'] };
       const dk = (label, a, kind, flex, v) => '<button data-a="' + a + '"' + (v ? ' data-v="' + v + '"' : '') + ' style="flex:' + (flex || 1) + ';border-color:' + K[kind][0] + ';background:' + K[kind][1] + ';color:' + K[kind][2] + '">' + label + '</button>';
       let h;
       if (V.form) h = dk('Cancel', 'close', 'sec');
-      else if (V.tab === 0) h = dk('+ Ritual', 'form', 'pri', 2, 'ritual') + dk('+ Group', 'form', 'sec', 1, 'group');
-      else if (V.tab === 1) h = dk('+ Quest', 'form', 'pur', 1, 'quest') + dk('+ Boss', 'form', 'red', 1, 'boss');
+      else if (V.tab === 0) h = dk('+ Quest', 'form', 'pur', 1, 'quest') + dk('+ Ritual', 'form', 'pri', 1, 'ritual');
+      else if (V.tab === 1) h = dk('+ Ritual', 'form', 'pri', 1, 'ritual') + dk('+ Quest', 'form', 'pur', 1, 'quest') + dk('+ Boss', 'form', 'red', 1, 'boss');
       else if (V.tab === 2) h = dk('+ Curse or blessing', 'form', 'sec', 1, 'curse');
-      else h = [['room', 'Room'], ['shop', 'Shop'], ['ward', 'Wardrobe'], ['hoard', 'Hoard'], ['chron', 'Chronicle']].map(([k, l]) => '<button class="sm" data-a="den" data-v="' + k + '" style="flex:1;border-color:' + (V.den === k ? '#ffd56a' : '#2a3b33') + ';background:' + (V.den === k ? '#2a2210' : '#131d19') + ';color:' + (V.den === k ? '#ffd56a' : '#a9b8ae') + '">' + l + '</button>').join('') +
+      else h = [['room', 'Sanctum'], ['shop', 'Black Market'], ['ward', 'Cloaks'], ['hoard', 'Hoard']].map(([k, l]) => '<button class="sm" data-a="den" data-v="' + k + '" style="flex:1;border-color:' + (V.den === k ? '#ffd56a' : '#2a3b33') + ';background:' + (V.den === k ? '#2a2210' : '#131d19') + ';color:' + (V.den === k ? '#ffd56a' : '#a9b8ae') + '">' + l + '</button>').join('') +
         (V.den === 'hoard' ? '<button data-a="form" data-v="reward" style="flex:0 0 46px;border-color:#ffd56a;background:#ffd56a;color:#1a1004;font:700 20px var(--a)">+</button>' : '');
       $('.uz-dock').innerHTML = h;
     }
@@ -351,12 +433,15 @@
     const rep = (g) => { if (g.everyN) return g.everyN % 7 === 0 ? 'Every ' + (g.everyN === 7 ? 'week' : g.everyN / 7 + ' weeks') : 'Every ' + g.everyN + ' days';
       const d = String(g.days || ''); if (d === '12345') return 'School days'; if (d === '1234567') return 'Every day'; if (d.length === 1) return DN[Number(d) % 7] + 's'; return d.split('').map((x) => DN[Number(x) % 7]).join(', '); };
     const archBtn = (id, col) => V.edit ? '<button class="uz-pen" data-a="arch" data-id="' + id + '" title="Archive"' + (col ? ' style="color:' + col + '"' : '') + '>×</button>' : '';
+    const SEAL = '<span class="uz-seal"><img src="' + IMG.seal + '" alt="">it will come to pass</span>';
+    // a ritual: its sigil, its name, how often it repeats, its streak in nights, and the last 14 days as a thin strip
     function ritualRow(g) {
-      const k = KIND[g.track] || KIND.necessary, on = g.doneToday;
-      return '<div class="uz-row' + (on ? ' done' : '') + '" style="--e:' + k.c + '"><button class="uz-tk' + (on ? ' on' : g.auto ? ' auto' : '') + '" data-a="tick" data-id="' + g.id + '" data-fx="' + g.id + '" aria-label="' + esc(g.name) + '">' + (on ? '<img src="' + IMG.tick + '" alt="">' : '') + '</button>' +
-        '<div class="uz-mid uz-ed" data-a="editg" data-id="' + g.id + '"><div class="nm">' + esc(g.name) + '</div><div class="uz-sub"><span>' + eff(g.minutes) + '</span><span style="color:' + k.c + '">' + k.l + '</span><span>' + esc(rep(g)) + '</span>' +
-        (g.streak > 0 ? '<span class="uz-flame"><img src="' + IMG.flame + '" alt="">' + g.streak + '</span>' : '') + (g.miss && !g.doneToday && !D.frozen ? '<span style="font-weight:700;color:#ff9a85">last chance today</span>' : '') + '</div></div>' +
-        '<div class="uz-pay">' + (g.auto ? '<span class="uz-seal"><img src="' + IMG.seal + '" alt="">ticks itself</span>' : '') + '<span>+' + g.pay + coin(18, g.pay, g.id) + '</span></div>' + archBtn(g.id) + '</div>';
+      const on = g.doneToday, emb = !on && g.miss && !D.frozen, n = g.streak, col = sCol(Math.max(1, n + (on ? 0 : 1)));
+      const st = g.strip ? '<div class="uz-strip">' + String(g.strip).split('').map((c) => '<i style="background:' + (c === 'o' ? col : c === 'f' ? '#3a6a9a' : c === 'x' ? '#3a1418' : '#1a1430') + '"></i>').join('') + '</div>' : '';
+      return '<div class="uz-row sg' + (on ? ' done' : '') + '">' + sigil(g, on) +
+        '<div class="uz-mid uz-ed" data-a="editg" data-id="' + g.id + '"><div class="nm">' + esc(g.name) + '</div><div class="uz-sub"><span>' + (on ? 'appeased' : emb ? 'embers' : 'awaits') + '</span><span>' + esc(rep(g)) + '</span>' +
+        (n > 0 ? '<span style="font-weight:700;color:' + col + '">' + n + ' night' + (n === 1 ? '' : 's') + '</span>' : '') + '</div></div>' +
+        '<div class="uz-pay">' + (g.auto ? SEAL : '') + '<span>+' + g.pay + coin(18, g.pay, g.id) + '</span></div>' + archBtn(g.id) + '</div>' + st;
     }
     function header(id, name, plain, meta, metaCol, child) {
       const open = !!V.open[id];
@@ -375,36 +460,75 @@
               (V.edit ? '<button class="uz-pen" data-a="arch" data-id="' + m.id + '" style="width:auto;height:30px">Archive</button>' : '') + '</div>';
           }).join('') + '<button class="uz-new" data-a="form" data-v="mark">+ Class to mark</button></div>';
     }
-    function rituals() {
-      const groups = D.groups, items = (gid) => dailies().filter((g) => g.grp === gid), marking = D.goals.filter((g) => g.kind === 'termly').sort((a, b) => ((a.due || '9') < (b.due || '9') ? -1 : 1));
-      let h = '';
-      groups.forEach((g) => {
-        if (g.type === 'marking') return;   // book marking lives in Quests now
-        if (g.type === 'list' && !V.hand[g.id]) V.open[g.id] = items(g.id).some((i) => !i.doneToday || V.settling[i.id]) ? 1 : 0;
-        if (g.parent && !V.open[g.parent]) return;
-        const child = !!g.parent; let meta = '', metaCol = '';
-        if (g.type === 'parent') { let d = 0, t = 0; groups.filter((x) => x.parent === g.id).forEach((x) => { if (x.type === 'list') { const it = items(x.id); t += it.length; d += it.filter((i) => i.doneToday).length; } }); meta = d + ' of ' + t; }
-        else if (g.type === 'marking') { const dl = marking.map((m) => m.daysLeft).filter((x) => x != null); meta = dl.length ? Math.min.apply(null, dl) + ' days left' : ''; metaCol = '#f2a93b'; }
-        else if (g.type === 'summon') meta = D.summoned.filter((s) => s.built).length + ' of ' + D.summoned.length;
-        else { const it = items(g.id); meta = it.length ? it.filter((i) => i.doneToday).length + ' of ' + it.length : 'none today'; }
-        h += '<div class="uz-sec" style="margin-left:' + (child ? 12 : 0) + 'px">' + header(g.id, g.name, g.plain, meta, metaCol, child);
-        if (V.open[g.id]) {
-          if (g.type === 'list') h += items(g.id).sort((a, b) => (a.doneToday && !V.settling[a.id]) - (b.doneToday && !V.settling[b.id])).map(ritualRow).join('');
-          if (g.type === 'summon') {
-            h += D.summoned.map((s) => '<div class="uz-row' + (s.built ? ' done' : '') + '" style="--e:' + (s.ahead ? '#f2a93b' : '#5aa7ff') + '"><span class="uz-tk' + (s.built ? ' on' : ' auto') + '">' + (s.built ? '<img src="' + IMG.tick + '" alt="">' : '') + '</span>' +
-              '<div class="uz-mid"><div class="nm">' + esc(s.name) + '</div><div class="uz-sub"><span>for ' + esc(dshort(s.date)) + '</span><span style="color:' + (s.ahead ? '#f2a93b' : '#5aa7ff') + '">' + (s.ahead ? 'Ahead' : 'Necessary') + '</span></div></div><div class="uz-pay"><span class="uz-seal"><img src="' + IMG.seal + '" alt="">ticks itself</span>' + (s.pay ? '<span>+' + s.pay + coin(18, s.pay, s.name) + '</span>' : '') + '</div></div>').join('') || '<p class="uz-p" style="color:#7f9389">No lessons in the next two weeks.</p>';
-            const n = D.tide || 0;
-            h += '<div class="uz-tide"><div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font:500 17px var(--g);color:#bfe0ff">Tide Charts</span><span style="font:700 13px var(--a);color:#8ac8ff">' + n + ' of 3</span></div>' +
-              '<div style="position:relative;height:30px;margin:4px 8px 0"><div style="position:absolute;left:0;right:0;top:13px;height:4px;background:repeating-linear-gradient(90deg,#1d3a4a 0 6px,transparent 6px 9px)"></div><div style="position:absolute;left:0;top:13px;height:4px;width:' + (n <= 1 ? 0 : (n - 1) * 50) + '%;background:#5aa7ff;box-shadow:0 0 8px #5aa7ff;transition:width .4s"></div>' +
-              [0, 1, 2].map((i) => '<div style="position:absolute;left:' + i * 50 + '%;top:5px;width:20px;height:20px;margin-left:-10px;border-radius:50%;background:' + (i < n ? '#5aa7ff' : '#0d161c') + ';border:2px solid ' + (i < n ? '#bfe0ff' : '#2a4a5e') + ';box-shadow:' + (i < n ? '0 0 10px #5aa7ff' : 'none') + '"></div>').join('') + '</div>' +
-              '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;font:12px/1.25 var(--a)">' + ['Next lesson built', 'A week ahead', 'Two weeks ahead · done'].map((l, i) => '<span style="text-align:' + ['left', 'center', 'right'][i] + ';color:' + (i < n ? '#bfe0ff' : '#6f8a9a') + '">' + l + '</span>').join('') + '</div></div>';
-          }
+    const summonRow = (s) => '<div class="uz-row' + (s.built ? ' done' : '') + '" style="--e:' + (s.ahead ? '#f2a93b' : '#5aa7ff') + '"><span class="uz-tk' + (s.built ? ' on' : ' auto') + '">' + (s.built ? '<img src="' + IMG.tick + '" alt="">' : '') + '</span>' +
+              '<div class="uz-mid"><div class="nm">' + esc(s.name) + '</div><div class="uz-sub"><span>for ' + esc(dshort(s.date)) + '</span></div></div><div class="uz-pay">' + SEAL + (s.pay ? '<span>+' + s.pay + coin(18, s.pay, s.name) + '</span>' : '') + '</div></div>';
+    const nextSchool = (t) => { let d = addD(t, 1); while (dt(d).getUTCDay() % 6 === 0) d = addD(d, 1); return d; };
+    const dueTxt = (d) => { const n = diff(D.today, d); return n < 0 ? 'lurks' : n === 0 ? 'today' : n === 1 ? 'tomorrow' : n < 7 ? DN[dt(d).getUTCDay()] : dshort(d); };
+    function stageRow(b, st, i) {
+      return '<div class="uz-row" style="--e:#ff7a66"><button class="uz-tk" data-a="stage" data-id="' + b.id + '" data-v="' + i + '" data-fx="' + b.id + 's' + i + '" aria-label="' + esc(st.name) + '"></button>' +
+        '<div class="uz-mid"><div class="nm">' + esc(st.name) + '</div><div class="uz-sub"><span style="color:#ff9a85">' + esc(b.name) + '</span><span>' + dueTxt(st.due) + '</span></div></div></div>';
+    }
+    function markRow(m) {
+      const full = m.sitDone >= m.sittings;
+      return '<div class="uz-parch uz-q' + (full ? ' done' : '') + '" style="--e:#f2a93b"><div class="top"><button class="uz-tk" data-a="' + (full ? 'untick' : 'tick') + '" data-id="' + m.id + '" data-fx="' + m.id + 't" aria-label="' + esc(m.name) + '">' + (full ? '<img class="uz-stamp" src="' + IMG.wax + '" alt="">' : '') + '</button>' +
+        '<div class="uz-mid uz-ed" data-a="editg" data-id="' + m.id + '"><div class="nm">' + esc(m.name) + '</div><div class="uz-sub"><span style="font-weight:700">' + m.sitDone + '/' + m.sittings + '</span>' + (m.due && !full ? dueChip(m.due) : '') + '</div></div>' +
+        '<div style="flex:none;display:flex;align-items:center;gap:3px;font:700 16px var(--a);color:#7a4e14">+' + m.pay + coin(18, m.pay, m.id) + '</div>' + archBtn(m.id, '#7a5a34') + '</div></div>';
+    }
+    // everything due today, in the order to do it: overdue and due-today jobs, this week's marking, tomorrow's lessons, chores, then life
+    function todayItems() {
+      const t = D.today, nx = nextSchool(t), work = [], life = [], done = [];
+      D.goals.filter((g) => g.kind === 'todo' && (!g.doneOn || V.settling[g.id]) && g.due && g.due <= t).forEach((q) => work.push({ id: q.id, name: q.name, html: questCard(q) }));
+      D.bosses.forEach((b) => b.stages.forEach((st, i) => { if (!st.done && st.due && st.due <= t) work.push({ id: b.id + 's' + i, name: st.name, html: stageRow(b, st, i) }); }));
+      D.goals.filter((g) => g.kind === 'termly' && g.sitDone < g.sittings && g.due && diff(t, g.due) <= 6).sort((a, b) => (a.due < b.due ? -1 : 1)).forEach((m) => work.push({ id: m.id, name: m.name, html: markRow(m) }));
+      D.summoned.filter((x) => !x.built && x.date <= nx).forEach((x) => work.push({ id: x.name, name: x.name, html: summonRow(x), auto: true }));
+      dailies().forEach((g) => { const it = { id: g.id, name: g.name, html: ritualRow(g), auto: !!g.auto };
+        if (g.doneToday && !V.settling[g.id]) done.push(it); else (g.track === 'life' ? life : work).push(it); });
+      return { work, life, done };
+    }
+    const todayLeft = () => { if (!D) return 0; const T = todayItems(); return T.work.length + T.life.length; };
+    function today() {
+      const T = todayItems(); let h = '';
+      if (D.review && D.review.show) h += review();
+      if (T.work.length) h += '<div class="uz-cap"><span><b style="color:#cfe8dc">Toil</b></span><span style="font:700 12px var(--a);color:#5ef2a0">' + T.work.length + ' left</span></div>' + T.work.map((x) => x.html).join('');
+      if (T.life.length) h += '<div class="uz-cap" style="margin-top:6px"><span><b style="color:#b6ffd6">The Surface</b></span><span style="font:700 12px var(--a);color:#5ee08a">' + T.life.length + ' left</span></div>' + T.life.map((x) => x.html).join('');
+      if (!T.work.length && !T.life.length) h += '<p class="uz-p" style="color:#93a69c;font-size:15px;text-align:center;padding:18px 0">' + (D.frozen ? 'Day off. Rest.' : 'Nothing left today. The deep is pleased.') + '</p>';
+      if (T.done.length) h += '<button class="uz-cap" data-a="fold" data-v="tdone" style="margin-top:6px"><span class="uz-chev" style="transform:rotate(' + (V.open.tdone ? 90 : 0) + 'deg)">▶</span><span><b style="color:#93a69c">Appeased</b></span><span style="font:700 12px var(--a);color:#93a69c">' + T.done.length + '</span></button>' + (V.open.tdone ? T.done.map((x) => x.html).join('') : '');
+      return h;
+    }
+    // Breakwater: how far ahead lessons and homework are (a week ahead and two weeks ahead each pay once a week)
+    function breakwater() {
+      const L = D.tide >= 3 ? 2 : D.tide >= 2 ? 1 : 0, H = D.hw ? Math.min(2, D.hw.weeks) : null;
+      const pills = (n) => ['1 wk', '2 wks'].map((w, i) => '<i class="' + (i < n ? 'on' : '') + '">' + (i < n ? '✓ ' : '') + w + '</i>').join('');
+      return '<div class="uz-bw"><b>Breakwater</b><span>Lessons ' + pills(L) + '</span>' + (H === null ? '' : '<span>Homework ' + pills(H) + '</span>') + '</div>';
+    }
+    // which area a group belongs to: Teaching (teach and its children), Life (life and its children), or its own
+    const areaOf = (gid) => { const g = D.groups.find((x) => x.id === gid); if (!g) return gid === 'life' ? 'life' : 'teach'; return g.parent || g.id; };
+    // the Grimoire (Patryk 2026-10-26): your book by area. Each area holds its rituals, then its quests (marking and bosses
+    // are quests too), folded to one line. Vanquished (finished quests and beaten bosses) at the bottom.
+    function grimoire() {
+      const t = D.today, rits = D.goals.filter((g) => g.kind === 'daily'), qs = D.goals.filter((g) => g.kind === 'todo' && (!g.doneOn || V.settling[g.id]));
+      const marks = D.goals.filter((g) => g.kind === 'termly' && g.sitDone < g.sittings), byDue = (a, b) => ((a.due || '9') < (b.due || '9') ? -1 : 1);
+      let h = breakwater();
+      D.groups.filter((g) => !g.parent && g.type !== 'summon' && g.type !== 'marking').forEach((a) => {
+        const kids = D.groups.filter((x) => (x.id === a.id || x.parent === a.id) && x.type === 'list');
+        const r = rits.filter((g) => kids.some((x) => x.id === g.grp));
+        const q = a.id === 'teach' ? qs.filter((g) => g.grp !== 'life') : a.id === 'life' ? qs.filter((g) => g.grp === 'life') : [];
+        const mk = a.id === 'teach' ? marks : [], bo = a.id === 'teach' ? D.bosses : [], nq = q.length + mk.length + bo.length;
+        h += '<div class="uz-sec">' + header(a.id, a.name, '', r.length + ' rituals · ' + nq + ' quests', '', false);
+        if (V.open[a.id]) {
+          if (r.length) h += '<div class="uz-sub2">Rituals</div>';
+          kids.forEach((x) => { const list = r.filter((g) => g.grp === x.id).sort((p1, p2) => (p2.dueToday - p1.dueToday)); if (!list.length) return;
+            if (kids.length > 1) h += '<div class="uz-sub2" style="font-size:15px;color:#7f9389">' + esc(x.name) + '<button class="uz-pen" data-a="rename" data-v="' + x.id + '" title="Rename">✎</button></div>' + (V.renaming === x.id ? '<input class="uz-ren" data-ren="' + x.id + '" value="' + esc(x.name) + '">' : '');
+            h += list.map(ritualRow).join(''); });
+          if (nq) h += '<div class="uz-sub2">Quests</div>' + q.sort(byDue).map(questCard).join('') + mk.sort(byDue).map(markRow).join('') + bo.map(bossCard).join('');
         }
         h += '</div>';
       });
-      h += '<button class="uz-new" data-a="form" data-v="group">+ New group</button>';
-      h += '<button class="uz-new" data-a="edit" style="font:700 13px var(--a)">' + (V.edit ? 'Done editing' : 'Edit (archive rituals)') + '</button>';
-      if (D.review && D.review.show) h += review();
+      const fin = D.goals.filter((g) => (g.kind === 'todo' && g.doneOn && !V.settling[g.id]) || (g.kind === 'termly' && g.sitDone >= g.sittings)), bt = D.beaten || [];
+      if (fin.length || bt.length) h += '<button class="uz-cap" data-a="vanq" style="margin-top:4px"><span class="uz-chev" style="color:#8a7a74;transform:rotate(' + (V.vanq ? 90 : 0) + 'deg)">▶</span><span><b style="color:#c4b0aa">Vanquished</b></span><span style="font:700 12px var(--a);color:#8a7a74">' + (fin.length + bt.length) + '</span></button>' +
+        (V.vanq ? fin.map((g) => g.kind === 'termly' ? markRow(g) : questCard(g)).join('') + bt.map((b) => '<div style="display:flex;align-items:center;gap:10px;padding:4px 8px;border-radius:4px;background:#140c0d;border:1px solid #2a1a1c;opacity:.85"><img src="' + (P.bosses[b.k] || P.bosses.spawn).src + '" style="height:26px;filter:grayscale(.7)" alt=""><span style="flex:1;font:14px var(--a);color:#c4b0aa">' + esc(b.name) + '</span><img src="' + IMG.trophy + '" style="width:16px;height:16px" alt=""></div>').join('') : '');
+      h += '<button class="uz-new" data-a="form" data-v="group">+ New group</button><button class="uz-new" data-a="form" data-v="mark">+ Books to mark</button>';
+      h += '<button class="uz-new" data-a="edit" style="font:700 13px var(--a)">' + (V.edit ? 'Stop editing' : 'Edit') + '</button>';
       return h;
     }
     function review() {
@@ -429,13 +553,13 @@
     /* ---------- Quests ---------- */
     function dueChip(due) {
       const dd = diff(D.today, due); let t, bg = 'rgba(0,0,0,.08)', fg = '#5a4428', gl = 'none';
-      if (dd < 0) t = 'was due ' + DN[dt(due).getUTCDay()]; else if (dd === 0) { t = 'due today'; bg = '#a3202a'; fg = '#fff0e8'; gl = '0 0 10px rgba(255,90,74,.9)'; } else if (dd === 1) { t = 'due tomorrow'; bg = '#c4502a'; fg = '#fff0e8'; gl = '0 0 6px rgba(255,140,74,.7)'; } else if (dd <= 3) { t = 'due ' + DN[dt(due).getUTCDay()]; bg = '#e8b04a'; fg = '#3a2008'; } else t = 'due ' + dshort(due);
+      if (dd < 0) { t = 'lurks'; bg = '#3a1418'; fg = '#ffb3a8'; } else if (dd === 0) { t = 'today'; bg = '#a3202a'; fg = '#fff0e8'; gl = '0 0 10px rgba(255,90,74,.9)'; } else if (dd === 1) { t = 'tomorrow'; bg = '#c4502a'; fg = '#fff0e8'; gl = '0 0 6px rgba(255,140,74,.7)'; } else if (dd <= 6) { t = DN[dt(due).getUTCDay()]; bg = '#e8b04a'; fg = '#3a2008'; } else t = dshort(due);
       return '<span class="uz-due" style="background:' + bg + ';color:' + fg + ';box-shadow:' + gl + '">' + t + '</span>';
     }
     function questCard(q) {
       const k = KIND[q.track] || KIND.necessary, done = !!q.doneOn, sd = q.steps.filter((x) => x.d).length;
       return '<div class="uz-parch uz-q' + (done ? ' done' : '') + '" style="--e:' + k.c + '"><div class="top"><button class="uz-tk" data-a="tick" data-id="' + q.id + '" data-fx="' + q.id + '" aria-label="' + esc(q.name) + '">' + (done ? '<img class="uz-stamp" data-q="' + q.id + '" src="' + IMG.wax + '" alt="">' : '') + '</button>' +
-        '<div class="uz-mid uz-ed" data-a="editg" data-id="' + q.id + '"><div class="nm">' + esc(q.name) + '</div><div class="uz-sub"><span>' + eff(q.minutes) + '</span><span style="font-weight:700;color:' + k.ink + '">' + k.l + '</span>' + (q.due && !done ? dueChip(q.due) : '') + (q.steps.length ? '<span>☐ ' + sd + ' of ' + q.steps.length + '</span>' : '') + '</div></div>' +
+        '<div class="uz-mid uz-ed" data-a="editg" data-id="' + q.id + '"><div class="nm">' + esc(q.name) + '</div><div class="uz-sub">' + (q.due && !done ? dueChip(q.due) : '') + (q.steps.length ? '<span style="font-weight:700">' + sd + '/' + q.steps.length + '</span>' : '') + '</div></div>' +
         '<div style="flex:none;display:flex;align-items:center;gap:3px;font:700 16px var(--a);color:#7a4e14">+' + q.pay + coin(18, q.pay, q.id) + '</div>' + archBtn(q.id, '#7a5a34') + '</div>' +
         (q.steps.length && !done ? '<div class="uz-steps">' + q.steps.map((s, i) => '<button data-a="step" data-id="' + q.id + '" data-v="' + i + '"><i style="background:' + (s.d ? '#6a4a2a' : 'transparent') + '">' + (s.d ? '✓' : '') + '</i><span style="font:14px var(--a);text-decoration:' + (s.d ? 'line-through' : 'none') + ';color:' + (s.d ? '#7a6040' : '#2a1a12') + '">' + esc(s.t) + '</span></button>').join('') + '</div>' : '') + '</div>';
     }
@@ -450,35 +574,11 @@
           if (st.done && !st.late) { tag = '−' + Math.round(100 / n) + ' hit'; f = '#ffd0c4'; bg = '#5a1a20'; bd = '#a3202a'; } else if (st.done) { tag = '−' + Math.round(50 / n) + ' late'; f = '#ffd0c4'; bg = '#3a1418'; bd = '#6a2a2e'; }
           else if (over) { tag = 'overdue'; f = '#ff9a85'; bg = 'transparent'; bd = '#ff7a66'; } else if (st.due === D.today) { tag = 'today'; f = '#3a2008'; bg = '#e8b04a'; bd = '#e8b04a'; } else if (st.due) { tag = diff(D.today, st.due) + ' days'; f = '#b08a84'; bg = 'transparent'; bd = '#3a1a1e'; } else { tag = 'no date'; f = '#b08a84'; bg = 'transparent'; bd = '#3a1a1e'; }
           return '<div class="uz-st"><button class="uz-tk' + (st.done ? ' on' : '') + '" data-a="stage" data-id="' + b.id + '" data-v="' + i + '" data-fx="' + b.id + 's' + i + '">' + (st.done ? '<img src="' + IMG.tick + '" style="width:20px;height:16px" alt="">' : '') + '</button>' +
-            '<div style="flex:1;min-width:0"><div style="font:700 14px var(--a);color:#f0e0d8;text-decoration:' + (st.done ? 'line-through' : 'none') + '">' + esc(st.name) + '</div><div style="font:12px var(--a);color:#b08a84">' + (st.due ? 'by ' + dshort(st.due) : '') + '</div></div>' +
+            '<div style="flex:1;min-width:0"><div style="font:700 14px var(--a);color:#f0e0d8;text-decoration:' + (st.done ? 'line-through' : 'none') + '">' + esc(st.name) + '</div><div style="font:12px var(--a);color:#b08a84">' + (st.due ? dueTxt(st.due) : '') + '</div></div>' +
             '<span class="uz-tag" style="color:' + f + ';background:' + bg + ';border-color:' + bd + '">' + tag + '</span></div>';
         }).join('') + '<div style="display:flex;align-items:center;justify-content:space-between;padding-top:2px"><span style="display:flex;align-items:center;gap:4px;font:700 13px var(--a);color:#f0c45a">' + b.reward + coin(16, b.reward, b.id, 'boss') + '<span style="color:#c49a94;font-weight:400">+ trophy when beaten</span></span>' +
           '<button data-a="banish" data-id="' + b.id + '" style="height:40px;padding:0 10px;border:1px solid ' + (arm ? '#ff7a66' : '#4a2a2e') + ';border-radius:4px;background:' + (arm ? '#4a1418' : 'transparent') + ';color:' + (arm ? '#ffd0c4' : '#b08a84') + ';font:700 12px var(--a)">' + (arm ? 'Tap again to banish' : 'Banish') + '</button></div></div>' : '') + '</div>';
     }
-    function quests() {
-      const qs = D.goals.filter((g) => g.kind === 'todo'), isLife = (q) => q.grp === 'life', fresh = (q) => !q.doneOn || V.settling[q.id];
-      let h = '';
-      [['qteach', 'The Errand Scrolls', 'Teaching quests', (q) => !isLife(q)], ['qlife', 'Surface Errands', 'Life quests', isLife]].forEach(([id, name, plain, f]) => {
-        const list = qs.filter((q) => f(q) && fresh(q)).sort((a, b) => ((a.due || '9') < (b.due || '9') ? -1 : 1));
-        h += '<div class="uz-sec"><button class="uz-cap" data-a="fold" data-v="' + id + '"><span class="uz-chev" style="color:#a48aff;transform:rotate(' + (V.open[id] ? 90 : 0) + 'deg)">▶</span><span><b style="color:#d8ccff">' + name + '</b></span><span style="font:700 12px var(--a);color:#a48aff">' + list.filter((q) => !q.doneOn).length + ' open</span></button>' +
-          (V.open[id] ? list.map(questCard).join('') || '<p class="uz-p" style="color:#7f7a99">No quests here.</p>' : '') + '</div>';
-      });
-      const mk = D.goals.filter((g) => g.kind === 'termly').sort((a, b) => ((a.due || '9') < (b.due || '9') ? -1 : 1)), left = mk.filter((m) => m.sitDone < m.sittings);
-      if (V.open.marking === undefined) V.open.marking = 1;
-      h += '<div class="uz-sec"><button class="uz-cap" data-a="fold" data-v="marking"><span class="uz-chev" style="color:#f2a93b;transform:rotate(' + (V.open.marking ? 90 : 0) + 'deg)">▶</span><span><b style="color:#ffd9a0">Book marking</b></span><span style="font:700 12px var(--a);color:#f2a93b">' + (left.length ? left.length + ' classes left' : 'all marked') + '</span></button>' +
-        (V.open.marking ? markingCards(mk) : '') + '</div>';
-      const fin = qs.filter((q) => q.doneOn && !V.settling[q.id]);
-      if (fin.length) h += '<div class="uz-sec"><button class="uz-cap" data-a="fold" data-v="qdone"><span class="uz-chev" style="color:#a48aff;transform:rotate(' + (V.open.qdone ? 90 : 0) + 'deg)">▶</span><span><b style="color:#d8ccff">Finished</b></span><span style="font:700 12px var(--a);color:#a48aff">' + fin.length + '</span></button>' + (V.open.qdone ? fin.map(questCard).join('') : '') + '</div>';
-      h += '<div class="uz-cap" style="border-color:#3a1a1e"><span><b style="color:#ffb3a8">The Boss Pit</b></span><span style="font:700 12px var(--a);color:#ff7a66">' + D.bosses.length + ' active</span></div>';
-      h += D.bosses.map(bossCard).join('') || '<p class="uz-p" style="color:#8a6a6a">No bosses yet.</p>';
-      const bt = D.beaten || [];
-      if (bt.length) h += '<button class="uz-cap" data-a="vanq" style="border:none;color:#8a7a74;font:500 17px var(--g)"><span class="uz-chev" style="color:#8a7a74;transform:rotate(' + (V.vanq ? 90 : 0) + 'deg)">▶</span>Vanquished · ' + bt.length + '</button>' +
-        (V.vanq ? bt.map((b) => '<div style="display:flex;align-items:center;gap:10px;padding:4px 8px;border-radius:4px;background:#140c0d;border:1px solid #2a1a1c;opacity:.8"><img src="' + (P.bosses[b.k] || P.bosses.spawn).src + '" style="height:26px;filter:grayscale(.7)" alt=""><span style="flex:1;font:14px var(--a);color:#c4b0aa;text-decoration:line-through">' + esc(b.name) + '</span><img src="' + IMG.trophy + '" style="width:16px;height:16px" alt=""></div>').join('') : '');
-      // (the late-work rule line was removed 2026-10-25: Patryk found the small explanations cluttering)
-      h += '<button class="uz-new" data-a="edit" style="font:700 13px var(--a)">' + (V.edit ? 'Done editing' : 'Edit (remove quests)') + '</button>';
-      return h;
-    }
-
     /* ---------- Omens (curses and blessings; tab renamed by Patryk 2026-10-25) ---------- */
     const isBless = (g) => g.kind === 'habit' && g.polarity !== 'minus', isCurse = (g) => g.kind === 'habit' && g.polarity !== 'plus';
     const blessIcon = (g) => { const m = BLESS_IC.find((x) => x[1].test(g.name)); return (m && P.bless[m[0]] ? P.bless[m[0]] : P.spark).src; };
@@ -486,21 +586,19 @@
       const cs = D.goals.filter(isCurse), bs = D.goals.filter(isBless), cnt = D.blessCount || 0, cpos = cnt % 8, p = D.player;
       let h = '<div class="uz-cap" style="border-color:#3a1a1e"><span><b style="color:#ffb3a8">The Cursed Shelf</b></span></div>';
       h += cs.map((c) => '<div class="uz-curse"><button class="uz-tk" data-a="curse" data-id="' + c.id + '" data-fx="' + c.id + '" aria-label="Slipped: ' + esc(c.name) + '"><img src="' + IMG.skull + '" alt=""></button>' +
-        '<div class="uz-mid uz-ed" data-a="editg" data-id="' + c.id + '"><div class="nm" style="color:#f0e0d8">' + esc(c.name) + '</div><div class="uz-sub" style="color:#b08a84">' + eff(c.minutes) + ' · ' + (c.count ? c.count + '× today' : 'not today') + '</div></div>' +
+        '<div class="uz-mid uz-ed" data-a="editg" data-id="' + c.id + '"><div class="nm" style="color:#f0e0d8">' + esc(c.name) + '</div><div class="uz-sub" style="color:#b08a84">' + (c.count ? c.count + '× today' : 'spared today') + '</div></div>' +
         '<span style="flex:none;display:flex;align-items:center;gap:4px;font:700 16px var(--a);color:#ff7a66">−' + c.hpLoss + '<img src="' + IMG.heart + '" style="width:13px;height:13px" alt=""></span>' + archBtn(c.id) + '</div>').join('') || '<p class="uz-p" style="color:#b08a84">No curses. Tap + Add.</p>';
       if (p.hp <= 12) h += '<p class="uz-p" style="color:#b08a84">' + 'Careful: ' + p.hp + ' HP left.' + '</p>';
       h += '<div class="uz-cap" style="border-color:#1e3a2c;margin-top:6px"><span><b style="color:#b6ffd6">Small Blessings</b></span><span style="font:700 12px var(--a);color:#b6ffd6">' + cnt + ' today</span></div>';
-      h += bs.length ? '<div class="uz-bl">' + bs.map((g) => { const f = g.featured, n = g.count || 0;
+      h += bs.length ? '<div class="uz-bl">' + bs.map((g) => { const f = false, n = g.count || 0;
         return '<button class="uz-bt" data-a="bless" data-id="' + g.id + '" data-fx="' + g.id + '" style="background:' + (f ? 'linear-gradient(180deg,#2a2410,#151208)' : 'linear-gradient(180deg,#152a20,#0e1a15)') + ';border:1.5px solid ' + (f ? '#8a6a2a' : n ? '#2f6a4e' : '#23483a') + (n ? ';box-shadow:0 2px 0 #030806,inset 0 0 18px rgba(94,242,160,.12)' : '') + '">' +
           '<span style="display:flex;align-items:center;gap:7px"><span class="uz-halo" style="background:radial-gradient(circle,' + (f ? 'rgba(255,214,106,.45)' : 'rgba(94,242,160,.35)') + ' 0%,transparent 70%)"><img src="' + blessIcon(g) + '" alt=""></span><span style="flex:1;min-width:0;font:700 14px/1.15 var(--a);color:#e0f5ea">' + esc(g.name) + '</span></span>' +
           '<span style="display:flex;align-items:center;justify-content:space-between"><span style="display:flex;align-items:center;gap:3px;font:700 14px var(--a);color:#f0c45a">+' + g.pay + coin(15, g.pay, g.id) + '</span><span style="display:flex;gap:3px">' +
           [0, 1, 2, 3, 4].map((i) => '<span style="width:7px;height:7px;border-radius:1px;background:' + (i < n ? (f ? '#ffd56a' : '#5ef2a0') : '#1d3a2c') + ';box-shadow:' + (i < n ? '0 0 4px rgba(94,242,160,.7)' : 'none') + '"></span>').join('') + '</span></span>' +
           (f ? '<span class="uz-x2">×2 TODAY</span>' : '') + '</button>'; }).join('') + '</div>' : '<p class="uz-p" style="color:#6f8a7c">No blessings yet.</p>';
       if (V.edit && bs.length) h += '<div class="uz-chips">' + bs.map((g) => '<button data-a="arch" data-id="' + g.id + '">× ' + esc(g.name) + '</button>').join('') + '</div>';
-      h += '<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:5px;background:#0e1a15;border:1px solid #1e3a2c"><img src="' + IMG.spark + '" style="width:16px;height:16px" alt=""><div style="flex:1;display:flex;flex-direction:column;gap:4px"><span style="font:12px var(--a);color:#a9c8b8">Blessing chain · every 8 in a day pays <b style="color:#f0c45a">+10 bonus</b></span>' +
-        '<div style="display:grid;grid-template-columns:repeat(8,1fr);gap:3px">' + Array.from({ length: 8 }, (_, i) => '<div style="height:6px;border-radius:1px;background:' + (i < cpos ? '#5ef2a0' : '#1d3a2c') + ';box-shadow:' + (i < cpos ? '0 0 5px rgba(94,242,160,.7)' : 'none') + '"></div>').join('') + '</div></div><span style="font:700 14px var(--a);color:#b6ffd6">' + cpos + ' / 8</span></div>';
       // (The Frozen Tide list was removed 2026-10-26: days off are one button on the banner)
-      h += '<button class="uz-new" data-a="edit" style="font:700 13px var(--a)">' + (V.edit ? 'Done editing' : 'Edit') + '</button>';
+      h += '<button class="uz-new" data-a="edit" style="font:700 13px var(--a)">' + (V.edit ? 'Stop editing' : 'Edit') + '</button>';
       return h;
     }
 
@@ -513,17 +611,49 @@
       const me2 = u('left:' + (100 * ROOM.ulhu.x / ROOM.w) + '%;top:' + (100 * ROOM.ulhu.y / ROOM.h) + '%;width:' + (100 * 32 / ROOM.w) + '%');
       let h = '<div class="uz-scene" style="aspect-ratio:' + ROOM.w + '/' + ROOM.h + (night() ? ';filter:brightness(.7) saturate(.85)' : '') + '">', done = false;
       slots.forEach((sl) => { if (!done && (ROOM.z[sl] || 0) > 6) { h += me2; done = true; } h += put(ROOM.art[D.room[sl]][sl]); });
-      return h + (done ? '' : me2) + '<div style="position:absolute;left:10px;top:8px;font:500 18px var(--g);color:#cfe8dc;text-shadow:0 2px 0 #000">Ulhu\'s Den</div></div>';
+      return h + (done ? '' : me2) + '<div style="position:absolute;left:10px;top:8px;font:500 18px var(--g);color:#cfe8dc;text-shadow:0 2px 0 #000">Sanctum</div></div>';
+    }
+    // the Oracle (Patryk 2026-10-26): this week as small sigils (a point lights per fifth of the day's rituals), then five weeks
+    // as a star chart: all, most (three quarters or more), some, none; days you kept (most or all) join into constellations
+    const LVC = { all: '#5ef2a0', most: '#ffd56a', some: '#a48aff', none: '#2a2050' };
+    function oracle() {
+      if (!CHRON) return '<div class="uz-orc"><h4>Oracle</h4><p class="uz-p" style="color:#a99cc8">Reading the stars…</p></div>';
+      const wk = CHRON.days.slice(28), kept = CHRON.days.filter((d) => !d.future && (d.level === 'all' || d.level === 'most')).length;
+      return '<div class="uz-orc"><h4>Oracle<span>' + kept + ' kept in 5 weeks</span></h4><div class="uz-wk">' + wk.map((d) => {
+        const lab = DN[dt(d.day).getUTCDay()];
+        if (d.level === 'off') return '<div class="' + (d.today ? 't' : '') + '"><span>' + lab + '</span><img src="' + MOON.cres + '" style="width:26px;height:26px;margin:6px" alt=""><small style="color:#cfe0ec">off</small></div>';
+        if (d.future) return '<div><span>' + lab + '</span><img src="' + sigilSrc('#4a3a7a', false) + '" style="opacity:.5" alt=""><small>' + (d.later || '') + '</small></div>';
+        const col = LVC[d.level], fifth = Math.round((d.share || 0) * 5);
+        return '<div class="' + (d.today ? 't' : '') + '"><span>' + lab + '</span><img src="' + sigilSrc(col === LVC.none ? '#4a3a7a' : col, d.level === 'all', fifth) + '" alt=""' + (d.level === 'all' ? ' style="filter:drop-shadow(0 0 5px #5ef2a0)"' : '') + '><small style="color:' + (d.level === 'none' ? '#6a5a9a' : col) + '">' + (d.due ? d.n + '/' + d.due : '') + '</small></div>';
+      }).join('') + '</div><canvas class="uz-sky" width="520" height="290"></canvas>' +
+        '<div class="uz-leg">' + [['all', 'all'], ['most', 'most'], ['some', 'some'], ['none', 'none']].map(([k, l]) => '<span><i style="background:' + LVC[k] + '"></i>' + l + '</span>').join('') + '<span><i style="background:#cfe0ec"></i>day off</span></div></div>';
+    }
+    function drawSky() {
+      const c = body.querySelector('.uz-sky'); if (!c || !CHRON) return; const x = c.getContext('2d'); x.clearRect(0, 0, 520, 290); x.fillStyle = '#0a0716'; x.fillRect(0, 0, 520, 290);
+      for (let i = 0; i < 80; i++) { x.fillStyle = 'rgba(200,190,255,' + (((i * 37) % 23) / 100) + ')'; x.fillRect((i * 97) % 520, (i * 53) % 290, 1, 1); }
+      x.font = '700 12px Atkinson Hyperlegible, sans-serif'; x.textAlign = 'center'; x.fillStyle = '#a99cc8'; ['M', 'T', 'W', 'T', 'F', 'S', 'S'].forEach((d, i) => x.fillText(d, 40 + i * 70, 18));
+      const pos = (w, d) => [40 + d * 70 + ((w * 7 + d) % 3 - 1) * 9, 48 + w * 50 + ((w + d * 2) % 3 - 1) * 6], day = (w, d) => CHRON.days[w * 7 + d], kept = (o) => o && !o.future && (o.level === 'all' || o.level === 'most');
+      x.strokeStyle = 'rgba(212,191,255,.5)'; x.lineWidth = 1.5;
+      for (let w = 0; w < 5; w++) for (let d = 0; d < 6; d++) if (kept(day(w, d)) && kept(day(w, d + 1))) { const a = pos(w, d), b = pos(w, d + 1); x.beginPath(); x.moveTo(a[0], a[1]); x.lineTo(b[0], b[1]); x.stroke(); }
+      for (let w = 0; w < 5; w++) for (let d = 0; d < 7; d++) {
+        const o = day(w, d), [X, Y] = pos(w, d); if (!o) continue;
+        if (o.level === 'off') { x.fillStyle = '#cfe0ec'; x.beginPath(); x.arc(X, Y, 7, 0, Math.PI * 2); x.fill(); x.fillStyle = '#0a0716'; x.beginPath(); x.arc(X + 4, Y - 2, 6.5, 0, Math.PI * 2); x.fill(); continue; }
+        if (o.future) { const n = Math.min(10, o.later || 0); x.setLineDash([2, 3]); x.strokeStyle = '#8a7ac8'; x.beginPath(); x.arc(X, Y, 4 + n, 0, Math.PI * 2); x.stroke(); x.setLineDash([]); if (n) { x.fillStyle = '#a99cc8'; x.fillText(n, X, Y + 4); } x.strokeStyle = 'rgba(212,191,255,.5)'; continue; }
+        const L = { all: [6, 18], most: [5, 12], some: [3.5, 0], none: [2.5, 0] }[o.level] || [2.5, 0], col = LVC[o.level] || LVC.none;
+        if (L[1]) { const gr = x.createRadialGradient(X, Y, 0, X, Y, L[1]); gr.addColorStop(0, col + '99'); gr.addColorStop(1, col + '00'); x.fillStyle = gr; x.fillRect(X - L[1], Y - L[1], L[1] * 2, L[1] * 2); }
+        x.fillStyle = col; x.beginPath(); x.arc(X, Y, L[0], 0, Math.PI * 2); x.fill();
+        if (o.level === 'all') { x.fillRect(X - 10, Y - .5, 20, 1); x.fillRect(X - .5, Y - 10, 1, 20); }
+        if (o.today) { x.strokeStyle = '#efe6ff'; x.lineWidth = 2; x.beginPath(); x.arc(X, Y, 11, 0, Math.PI * 2); x.stroke(); x.lineWidth = 1.5; x.strokeStyle = 'rgba(212,191,255,.5)'; }
+      }
     }
     function den() {
-      let h = '';
+      let h = oracle();
       if (V.den === 'room') {
         h += roomHtml();
         const names = {}; (SHOP ? SHOP.items : []).forEach((i) => { names[i.id] = i.name; });
         h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">' + Object.keys(SLOTL).map((sl) => { const id = (D.room || {})[sl];
           return '<div style="display:flex;align-items:center;gap:8px;min-height:48px;padding:3px 4px 3px 8px;border-radius:5px;background:#131d19;border:1px solid #23332c"><span style="flex:1;min-width:0;display:flex;flex-direction:column"><span style="font:700 11px var(--a);letter-spacing:.1em;color:#7f9389;text-transform:uppercase">' + SLOTL[sl] + '</span><span style="font:13px var(--a);color:' + (id ? '#e0e8e3' : '#5a6a62') + ';white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + esc(id ? names[id] || 'placed' : 'empty') + '</span></span>' +
             (id && sl !== 'floor' && sl !== 'wall' ? '<button data-a="unplace" data-id="' + id + '" data-v="' + sl + '" style="flex:none;width:40px;height:40px;border:none;background:none;color:#7f9389;font:16px var(--a)" title="Take out">×</button>' : '') + '</div>'; }).join('') + '</div>';
-        h += '<div class="uz-seg" style="grid-template-columns:1fr 1fr">' + ['8-bit', '16-bit'].map((s) => '<button data-a="style" data-v="' + s + '" class="' + (style === s ? 'on' : '') + '"' + (style === s ? ' style="color:#b6ffd6"' : '') + '>' + s + ' Ulhu</button>').join('') + '</div>';
       }
       if (V.den === 'shop') {
         if (!SHOP || !ROOM) return '<p class="uz-p" style="color:#7f9389">Opening the shop…</p>';
@@ -561,22 +691,7 @@
             '<button data-a="claim" data-id="' + r.id + '" data-fx="' + r.id + '" style="flex:none;height:44px;min-width:92px;display:flex;align-items:center;justify-content:center;gap:4px;padding:0 10px;border-radius:4px;border:none;background:' + (can ? '#8a1a22' : '#b8a074') + ';color:' + (can ? '#ffe9dc' : '#6a5434') + ';font:700 14px var(--a);box-shadow:0 2px 0 rgba(0,0,0,.35)">' + r.cost + coin(16, r.cost, r.id) + '</button>' +
             (V.stamp === r.id ? '<div class="uz-stampbox" style="position:absolute;right:110px;top:50%;margin-top:-22px;width:120px;height:44px;display:flex;align-items:center;justify-content:center;gap:6px;border:3px double #8a1a22;border-radius:4px;color:#8a1a22;font:700 20px var(--g);letter-spacing:.12em;transform:rotate(-10deg);background:rgba(243,231,200,.7);pointer-events:none"><img src="' + IMG.wax + '" style="width:22px;height:22px" alt="">CLAIMED</div>' : '') + '</div>'; }).join('') ||
           '<p class="uz-p" style="color:#8a7a5a">No rewards yet.</p>';
-        if ((D.hoard || []).length) h += '<button class="uz-new" data-a="edit" style="font:700 13px var(--a)">' + (V.edit ? 'Done editing' : 'Edit (remove rewards)') + '</button>';
-      }
-      if (V.den === 'chron') {
-        if (!CHRON) return '<p class="uz-p" style="color:#7f9389">Reading the Chronicle…</p>';
-        const mx = Math.max.apply(null, CHRON.weeks.map((w) => w.coins).concat([1]));
-        h += '<div class="uz-stone"><div class="hd"><b>Runes per week</b><span style="font:700 12px var(--a);color:#f0c45a">' + D.weekCoins + ' this week</span></div><div style="display:flex;align-items:flex-end;gap:6px;height:84px;margin-top:8px">' +
-          CHRON.weeks.map((w, i) => { const last = i === CHRON.weeks.length - 1; return '<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;height:100%;justify-content:flex-end"><span style="font:700 11px var(--a);color:#c9a560">' + w.coins + '</span><div style="width:100%;height:' + Math.max(4, Math.round(w.coins / mx * 58)) + 'px;background:repeating-linear-gradient(180deg,' + (last ? '#ffd56a' : '#c48a3a') + ' 0 4px,' + (last ? '#e3a93a' : '#8a5a1c') + ' 4px 6px);border:1px solid #4a2c0c"></div></div>'; }).join('') + '</div>' +
-          '<div style="display:flex;gap:6px;margin-top:4px">' + CHRON.weeks.map((w) => { const d = dt(w.mon); return '<span style="flex:1;text-align:center;font:11px var(--a);color:#7f9389">' + d.getUTCDate() + ' ' + MON[d.getUTCMonth()] + '</span>'; }).join('') + '</div></div>';
-        h += '<div class="uz-stone"><div class="hd"><b>Streak calendar</b><span style="display:flex;gap:8px;font:11px var(--a);color:#7f9389"><span style="color:#5ef2a0">■ ticked</span><span style="color:#5aa7ff">■ frozen</span></span></div><div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:8px">' +
-          ['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((c) => '<span style="text-align:center;font:700 11px var(--a);color:#61756b">' + c + '</span>').join('') +
-          CHRON.days.map((d) => { let bg = '#0b1311', bd = d.today ? '#fff' : '#141e1a', gl = 'none';
-            if (!d.future) { if (d.frozen && !d.n) { bg = '#1d3a5a'; if (!d.today) bd = '#5aa7ff'; } else { const lv = d.n === 0 ? 0 : d.n < 3 ? 1 : d.n < 6 ? 2 : 3; bg = ['#132a1e', '#1d6a42', '#2fae6a', '#5ef2a0'][lv]; if (lv === 3) gl = '0 0 6px rgba(94,242,160,.6)'; if (!d.today) bd = '#0b1311'; } }
-            return '<div title="' + d.day + ': ' + d.n + '" style="height:22px;border-radius:2px;background:' + bg + ';border:1px solid ' + bd + ';box-shadow:' + gl + '"></div>'; }).join('') + '</div></div>';
-        h += '<div class="uz-stone" style="padding-bottom:0"><div class="hd"><b>Trophy shelf</b><span style="font:700 12px var(--a);color:#ff7a66">' + CHRON.beaten.length + ' bosses beaten</span></div><div style="display:flex;align-items:flex-end;gap:10px;min-height:64px;padding:8px 4px 0;overflow-x:auto" data-hscroll="1">' +
-          (CHRON.beaten.map((b) => '<div style="flex:none;display:flex;flex-direction:column;align-items:center;gap:2px"><img src="' + (P.bosses[b.k] || P.bosses.spawn).src + '" style="height:' + ({ spawn: 30, mite: 30, shog: 34, deep: 36, levi: 38, gaunt: 38, old: 46, yog: 46 }[b.k] || 34) + 'px;filter:sepia(1) saturate(2.4) hue-rotate(-12deg) brightness(1.05) drop-shadow(0 0 4px rgba(255,214,106,.4))" alt=""><span style="font:11px var(--a);color:#c9a560;max-width:70px;text-align:center;line-height:1.1">' + esc(b.name) + '</span></div>').join('') || '<span style="font:12px var(--a);color:#7f9389;padding-bottom:10px">Beat a boss to put its trophy here.</span>') +
-          '</div><div style="height:10px;margin:4px -12px 0;background:linear-gradient(180deg,#8a5a34,#5a3a20);border-top:2px solid #b8843a;border-radius:0 0 5px 5px"></div></div>';
+        if ((D.hoard || []).length) h += '<button class="uz-new" data-a="edit" style="font:700 13px var(--a)">' + (V.edit ? 'Stop editing' : 'Edit (remove rewards)') + '</button>';
       }
       return h;
     }
@@ -587,7 +702,7 @@
       quest: () => ({ name: '', len: 30, kind: 'necessary', due: '', grp: 'teach', steps: [] }),
       mark: () => ({ name: 'Mark  books', len: 60, sittings: 2, due: '' }),
       boss: () => ({ name: '', size: 5, k: 'shog', steps: [{ n: '', by: addD(D.today, 3) }] }),
-      group: () => ({ name: '', parent: 'top' }), reward: () => ({ name: '', cost: 80 }), curse: () => ({ name: '', len: 30, type: 'curse' }) };
+      group: () => ({ name: '', parent: 'teach' }), reward: () => ({ name: '', cost: 80 }), curse: () => ({ name: '', len: 30, type: 'curse' }) };
     const pay = (len, kind) => Math.round((D.table.base[len] || 6) * (D.table.mult[kind] || 1));
     // an existing ritual, quest, curse, blessing or marking class opened in its form (Patryk 2026-10-26: edit after setting)
     const formKind = (g) => ({ daily: 'ritual', todo: 'quest', termly: 'mark' }[g.kind] || 'curse');
@@ -599,11 +714,13 @@
       if (g.kind === 'termly') return Object.assign(base, { sittings: g.sittings || 2, due: g.due || '' });
       return Object.assign(base, { type: g.polarity === 'minus' ? 'curse' : 'bless' });
     }
+    // the pay kind: Life when it sits in the Life area, Outside work when switched on, otherwise as it was (old Ahead ones stay)
+    const trackOf = (f, d) => ((f === 'ritual' ? areaOf(d.group) : d.grp) === 'life' ? 'life' : d.kind === 'external' ? 'external' : d.kind === 'ahead' ? 'ahead' : 'necessary');
     // what the server is sent for a form (new or edited)
     function goalOf(f, d) {
       const nm = d.name.trim(), o = { id: d.id, name: nm, minutes: d.len, private: d.priv };
-      if (f === 'ritual') return Object.assign(o, { track: d.kind, kind: 'daily', grp: d.group, days: d.rep === 'school' ? '12345' : d.rep === 'days' ? d.days.map((x) => x || 7).sort().join('') : '', everyN: d.rep === 'every' ? d.n * (d.unit === 'weeks' ? 7 : 1) : '' });
-      if (f === 'quest') return Object.assign(o, { track: d.kind, kind: 'todo', grp: d.grp, due: d.due || '', steps: d.steps.filter((x) => x.n.trim()).map((x) => ({ t: x.n.trim(), d: !!x.d })) });
+      if (f === 'ritual') return Object.assign(o, { track: trackOf(f, d), kind: 'daily', grp: d.group, days: d.rep === 'school' ? '12345' : d.rep === 'days' ? d.days.map((x) => x || 7).sort().join('') : '', everyN: d.rep === 'every' ? d.n * (d.unit === 'weeks' ? 7 : 1) : '' });
+      if (f === 'quest') return Object.assign(o, { track: trackOf(f, d), kind: 'todo', grp: d.grp, due: d.due || '', steps: d.steps.filter((x) => x.n.trim()).map((x) => ({ t: x.n.trim(), d: !!x.d })) });
       if (f === 'mark') return Object.assign(o, { track: 'necessary', kind: 'termly', grp: d.grp0 || 'marking', sittings: d.sittings, due: d.due || '' });
       return Object.assign(o, { kind: 'habit', polarity: d.type === 'curse' ? 'minus' : 'plus', track: 'life', grp: d.grp0 || '' });
     }
@@ -613,18 +730,18 @@
       const chip = (label, sel, a, v, col, img) => '<button data-a="' + a + '" data-v="' + esc(v) + '" style="border-color:' + (sel ? (col || '#5ef2a0') : '#2f443b') + ';background:' + (sel ? '#173a2c' : '#131d19') + ';color:' + (sel ? (col || '#b6ffd6') : '#cfd8d3') + '">' + (img ? '<img src="' + img + '" alt="">' : '') + esc(label) + '</button>';
       const row = (label, chips) => '<div style="display:flex;flex-direction:column;gap:5px"><span class="uz-lbl">' + label + '</span><div class="uz-chips">' + chips.join('') + '</div></div>';
       const lenRow = row('SIZE', LENS.map((n) => chip(EFF[n], d.len === n, 'd', 'len:' + n)));
-      const kindRow = row('KIND', Object.keys(KIND).map((k) => chip(KIND[k].l, d.kind === k, 'd', 'kind:' + k, KIND[k].c)));
+      const outRow = '<div class="uz-chips">' + chip('Outside work', d.kind === 'external', 'd', 'kind:' + (d.kind === 'external' ? 'necessary' : 'external'), '#b07cff') + '</div>';
       let title, ph, col = '#5ef2a0', rows = '', payL = '', payV = '', payC = '#ffd56a', payCoin = true, go = '', goBg = '#5ef2a0', steps = '';
       if (f === 'ritual') { title = d.id ? 'Edit ritual' : 'New ritual'; ph = 'What is the ritual?';
-        rows = lenRow + kindRow + row('REPEATS', [['school', 'School days'], ['days', 'Chosen days'], ['every', 'Every N']].map(([k, l]) => chip(l, d.rep === k, 'd', 'rep:' + k)));
+        rows = lenRow + (areaOf(d.group) === 'life' ? '' : outRow) + row('REPEATS', [['school', 'School days'], ['days', 'Chosen days'], ['every', 'Every N']].map(([k, l]) => chip(l, d.rep === k, 'd', 'rep:' + k)));
         if (d.rep === 'days') rows += row('WHICH DAYS', [1, 2, 3, 4, 5, 6, 0].map((i) => chip(DN[i], d.days.indexOf(i) >= 0, 'dday', i)));
         if (d.rep === 'every') rows += row('EVERY', [1, 2, 3, 4, 5].map((n) => chip(String(n), d.n === n, 'd', 'n:' + n)).concat(['days', 'weeks'].map((u) => chip(u, d.unit === u, 'd', 'unit:' + u))));
         rows += row('GROUP', D.groups.filter((g) => g.type === 'list').map((g) => chip(g.name, d.group === g.id, 'd', 'group:' + g.id)));
-        payL = 'Pays ' + D.table.base[d.len] + ' × ' + D.table.mult[d.kind] + ' (' + KIND[d.kind].l.toLowerCase() + ') · up to +30% with streak'; payV = '+' + pay(d.len, d.kind); go = 'Add the ritual'; }
+        payL = 'Pays'; payV = '+' + pay(d.len, trackOf('ritual', d)); go = 'Add the ritual'; }
       if (f === 'quest') { title = d.id ? 'Edit quest' : 'New quest'; ph = 'What needs doing?'; col = '#a48aff';
-        rows = lenRow + kindRow + dateRow('DUE DATE', d.due) +
-          row('LIST', [['teach', 'The Errand Scrolls'], ['life', 'Surface Errands']].map(([k, l]) => chip(l, d.grp === k, 'd', 'grp:' + k)));
-        steps = 'CHECKLIST (OPTIONAL)'; payL = 'Pays by length × kind'; payV = '+' + pay(d.len, d.kind); go = 'Add the quest'; goBg = '#a48aff'; }
+        rows = lenRow + (d.grp === 'life' ? '' : outRow) + dateRow('DUE DATE', d.due) +
+          row('AREA', [['teach', 'Teaching'], ['life', 'Life']].map(([k, l]) => chip(l, d.grp === k, 'd', 'grp:' + k)));
+        steps = 'CHECKLIST (OPTIONAL)'; payL = 'Pays'; payV = '+' + pay(d.len, trackOf('quest', d)); go = 'Add the quest'; goBg = '#a48aff'; }
       if (f === 'boss') { title = 'Summon a boss'; ph = 'The big job, e.g. Mark the 9AS mocks'; col = '#ff9a85'; const k = d.k || SIZE[d.size].k;
         rows = row('SIZE · TOTAL HOURS (2 H MINIMUM)', [2, 5, 10, 20].map((n) => { const m = P.bossMeta[SIZE[n].k]; return chip(m.size + ' · ' + SIZE[n].gold, d.size === n, 'd', 'size:' + n, '#ff9a85', P.bosses[P.bossBySize[n][0]].src); })) +
           row('CREATURE', P.bossBySize[d.size].map((c) => chip(P.bossMeta[c].name, k === c, 'd', 'k:' + c, '#ff9a85', P.bosses[c].src)));
@@ -634,7 +751,7 @@
         payL = 'Each sitting pays'; payV = '+' + pay(d.len, 'necessary'); go = 'Add it'; goBg = '#f2a93b'; }
       if (f === 'group') { title = 'New group'; ph = 'Name the group';
         rows = '<span class="uz-lbl">THEMED NAMES</span><div class="uz-chips">' + GROUP_SUGS.map((l) => '<button data-a="d" data-v="name:' + esc(l) + '" style="border-radius:20px;font:500 16px var(--g);color:#cfe8dc">' + esc(l) + '</button>').join('') + '</div>' +
-          row('INSIDE', [['top', 'Top level'], ['teach', 'Teaching'], ['life', 'Life']].map(([k, l]) => chip(l, d.parent === k, 'd', 'parent:' + k)));
+          row('INSIDE', [['teach', 'Teaching'], ['life', 'Life'], ['top', 'Its own area']].map(([k, l]) => chip(l, d.parent === k, 'd', 'parent:' + k)));
         payL = 'Groups fold away and can be renamed with ✎'; payCoin = false; go = 'Make the group'; }
       if (f === 'reward') { title = 'New reward for the Hoard'; ph = 'e.g. Cinema trip'; col = '#ffd56a';
         rows = row('COST', [40, 80, 120, 300, 600, 1000].map((n) => chip(String(n), d.cost === n, 'd', 'cost:' + n, '#ffd56a'))); payL = 'Costs'; payV = String(d.cost); go = 'Add to the Hoard'; goBg = '#ffd56a'; }
@@ -678,11 +795,12 @@
       const focus = !ds ? '' : ds.step !== undefined ? '[data-step="' + ds.step + '"]' : ds.name ? '[data-name]' : ds.rv ? '[data-rv="' + ds.rv + '"]' : ds.rvp !== undefined ? '[data-rvp="' + ds.rvp + '"]' : ds.ren ? '[data-ren]' : '';
       if (V.form) body.innerHTML = form();
       else body.innerHTML = '<div class="uz-sw"><div class="uz-track" style="transform:translateX(' + (-V.tab * 25) + '%);transition:transform .3s cubic-bezier(.2,.8,.2,1)">' +
-        '<div class="uz-pane">' + rituals() + '</div><div class="uz-pane">' + quests() + '</div><div class="uz-pane">' + curses() + '</div><div class="uz-pane">' + den() + '</div></div></div>' +
+        '<div class="uz-pane">' + today() + '</div><div class="uz-pane">' + grimoire() + '</div><div class="uz-pane">' + curses() + '</div><div class="uz-pane">' + den() + '</div></div></div>' +
         '';
       if (V.form && oldForm) body.querySelector('.uz-form').scrollTop = fs;
       body.querySelectorAll('.uz-pane').forEach((p, i) => { if (keep[i]) p.scrollTop = keep[i]; });
       if (focus) { const n = body.querySelector(focus); if (n) { n.focus(); try { n.setSelectionRange(n.value.length, n.value.length); } catch (e) { /* not a text box */ } } }
+      drawSky();
       const sb = body.querySelector('.uz-stampbox'); if (sb && V.stampNew) { V.stampNew = false; anim(sb, [{ transform: 'scale(2.4) rotate(-28deg)', opacity: 0 }, { transform: 'scale(.92) rotate(-10deg)', opacity: 1, offset: 0.7 }, { transform: 'scale(1) rotate(-10deg)', opacity: 1 }], { duration: 420, easing: 'cubic-bezier(.2,.8,.3,1.2)' }); }
       if (V.waxNew) { const n = body.querySelector('.uz-stamp[data-q="' + V.waxNew + '"]'); if (n) { V.waxNew = null; anim(n, [{ transform: 'scale(2.4) rotate(-28deg)', opacity: 0 }, { transform: 'scale(1) rotate(-10deg)', opacity: 1 }], { duration: 420 }); } }
     }
@@ -726,9 +844,9 @@
     box.addEventListener('click', (e) => { if (swiped) { e.stopPropagation(); e.preventDefault(); } }, true);
     function tabOpened() { if (V.tab === 3) denOpened(); }
     function denOpened() {
+      if (!CHRON) call('gameChronicle').then((c) => { CHRON = c; const k = c.days.filter((d) => !d.future).slice(-7).filter((d) => d.level === 'all' || d.level === 'most').length; if (k >= 5) setMood('proud', pickSay('stars')); paint(); }).catch(() => {});
       if (!ROOM) call('gameArt').then((a) => { ROOM = a; paint(); }).catch(() => {});
       if (!SHOP) call('gameShop').then((s) => { SHOP = s; paint(); }).catch(() => {});
-      if (V.den === 'chron' && !CHRON) call('gameChronicle').then((c) => { CHRON = c; paint(); }).catch(() => {});
     }
     const shopRefresh = () => call('gameShop').then((s) => { SHOP = s; paint(); }).catch(() => {});
 
@@ -737,13 +855,15 @@
       const b = e.target.closest('[data-a]'); if (!b || !box.contains(b)) return;
       const a = b.dataset.a, id = b.dataset.id, v = b.dataset.v, r = b.getBoundingClientRect(), k = b.dataset.fx;
       if (a === 'undo') return undo();
+      if (a === 'next') { V.sayIx++; V.say = null; return paintBanner(); }
+      if (a === 'nextOld') { const nj = nextJob(); V.tab = 0; V.form = null; paint(); if (nj) { const n = body.querySelector('[data-fx="' + nj.id + '"],[data-fx="' + nj.id + 't"]'); if (n) { n.scrollIntoView({ block: 'center', behavior: 'smooth' }); glow(n.dataset.fx, 'rgba(94,242,160,.85)'); } } return; }
       if (a === 'tab') { V.tab = Number(v); V.form = null; V.banishArm = null; tabOpened(); return paint(); }
       if (a === 'fold') { V.hand[v] = 1; V.open[v] = V.open[v] === undefined && b.dataset.def ? 0 : (V.open[v] ? 0 : 1); return paint(); }
       if (a === 'rename') { V.renaming = v; paint(); const n = body.querySelector('[data-ren]'); if (n) { n.focus(); n.select(); } return; }
       if (a === 'edit') { V.edit = !V.edit; return paint(); }
       if (a === 'vanq') { V.vanq = !V.vanq; return paint(); }
       if (a === 'rvopen') { V.rvOpen = !V.rvOpen; return paint(); }
-      if (a === 'den') { V.den = v; V.form = null; if (v === 'chron') CHRON = null; denOpened(); return paint(); }
+      if (a === 'den') { V.den = v; V.form = null; denOpened(); return paint(); }
       if (a === 'cat') { V.shopCat = v; return paint(); }
       if (a === 'tier') { V.tier = v; return paint(); }
       if (a === 'wcat') { V.wCat = v; return paint(); }
@@ -765,18 +885,18 @@
         if (g.kind === 'termly') {
           const on = a === 'tick', cls = g.name.replace(/^Mark\s+/i, '').replace(/\s+books\b.*$/i, ''), half = g.sittings === 2 ? ((on ? g.sitDone : g.sitDone - 1) ? ' 2nd half' : ' 1st half') : '';
           let upL = false;
-          act({ verb: on ? 'Marked:' : 'Unmarked:', name: cls + half, delta: (on ? '+' : '−') + g.pay, unit: 'coin' }, on ? ['gameUntick', id] : ['gameTick', id, 1], on ? 'gameTick' : 'gameUntick', on ? [id, 1] : [id],
+          V.sayKind = 'mark'; act({ verb: on ? 'Marked:' : 'Unmarked:', name: cls + ' ' + (on ? g.sitDone + 1 : g.sitDone - 1) + '/' + g.sittings, delta: (on ? '+' : '−') + g.pay, unit: 'coin' }, on ? ['gameUntick', id] : ['gameTick', id, 1], on ? 'gameTick' : 'gameUntick', on ? [id, 1] : [id],
             (d) => { const x = d.goals.find((y) => y.id === id); x.sitDone += on ? 1 : -1; if (on) upL = earnLocal(d, g.pay, g.pay); else d.player.coins -= g.pay; });
           if (on) earnFx(r, k, g.pay, upL); else buzz(6); return;
         }
         if (g.kind === 'todo') {
           const on = !g.doneOn; let upL = false;
-          act({ verb: on ? 'Quest done:' : 'Reopened:', name: g.name, delta: (on ? '+' : '−') + g.pay, unit: 'coin' }, on ? ['gameUntick', id] : null, on ? 'gameTick' : 'gameUntick', on ? [id, 1] : [id],
+          act({ verb: on ? 'Fulfilled:' : 'Reopened:', name: g.name, delta: (on ? '+' : '−') + g.pay, unit: 'coin' }, on ? ['gameUntick', id] : null, on ? 'gameTick' : 'gameUntick', on ? [id, 1] : [id],
             (d) => { const x = d.goals.find((y) => y.id === id); x.doneOn = on ? d.today : ''; if (on) upL = earnLocal(d, g.pay, g.pay); else d.player.coins -= g.pay; });
-          if (on) { V.waxNew = id; V.settling[id] = 1; paint(); setTimeout(() => { delete V.settling[id]; paint(); }, 1100); earnFx(r, k, g.pay, upL); } else buzz(6); return;
+          if (on) { V.sayKind = 'quest'; V.waxNew = id; V.settling[id] = 1; paint(); setTimeout(() => { delete V.settling[id]; paint(); }, 1100); earnFx(r, k, g.pay, upL); } else buzz(6); return;
         }
         const on = !g.doneToday; let upL = false;
-        if (on) { V.settling[id] = 1; setTimeout(() => { delete V.settling[id]; paint(); }, 1100); }
+        if (on) { V.settling[id] = 1; setTimeout(() => { delete V.settling[id]; paint(); }, 1100); if ([7, 21, 66].indexOf(g.streak + 1) >= 0) V.sayKind = 'streak'; }
         act({ verb: on ? 'Ticked:' : 'Unticked:', name: g.name, delta: (on ? '+' : '−') + g.pay, unit: 'coin' }, on ? ['gameUntick', id] : ['gameTick', id, 1], on ? 'gameTick' : 'gameUntick', on ? [id, 1] : [id],
           (d) => { const x = d.goals.find((y) => y.id === id); x.doneToday = on; x.streak = Math.max(0, x.streak + (on ? 1 : -1)); if (on) upL = earnLocal(d, g.pay, g.pay); else { d.player.coins -= g.pay; d.weekCoins -= g.pay; } });
         if (on) earnFx(r, k, g.pay, upL); else buzz(6); return;
@@ -785,30 +905,30 @@
         const g = goal(id), cost = g.hpLoss; let faint = false;
         act({ verb: 'Cursed:', name: g.name, delta: '−' + cost, unit: 'hp' }, ['gameUntick', id], 'gameTick', [id, -1], (d) => { const x = d.goals.find((y) => y.id === id); x.count = (x.count || 0) + 1; d.player.hp -= cost; if (d.player.hp <= 0) { faint = true; d.player.hp = d.player.maxHp; d.player.level = Math.max(1, d.player.level - 1); } });
         flinch(); floatText(r, '−' + cost + ' HP', '#ff7a66'); glow(k, 'rgba(196,50,58,.9)'); buzz([25, 40, 25]);
-        if (faint) { V.last = { verb: 'Fainted:', name: 'lost a level and 7 days of runes' }; paintTop(); setMood('sad', 'Ulhu fainted… he wakes at full health, a little poorer.'); } else setMood('sad', CURSE_SAYS[Math.floor(Math.random() * CURSE_SAYS.length)]);
+        if (faint) { V.last = { verb: 'Fainted:', name: 'lost a level and 7 days of runes' }; paintTop(); setMood('sad', pickSay('faint')); } else setMood('sad', CURSE_SAYS[Math.floor(Math.random() * CURSE_SAYS.length)]);
         return;
       }
       if (a === 'bless') {
         if (V.edit) { const g0 = goal(id); V.form = 'curse'; V.draft = draftOf(g0); V.orig = clone(V.draft); return paint(); }
-        const g = goal(id), chain = ((D.blessCount || 0) + 1) % 8 === 0, n = g.pay + (chain ? 10 : 0); let upL = false;
+        const g = goal(id), chain = false, n = g.pay; let upL = false;
         act({ verb: chain ? 'Blessing chain!' : 'Blessing:', name: g.name, delta: '+' + n, unit: 'coin' }, ['gameUntick', id], 'gameTick', [id, 1], (d) => { const x = d.goals.find((y) => y.id === id); x.count = (x.count || 0) + 1; d.blessCount = (d.blessCount || 0) + 1; upL = earnLocal(d, n, g.pay); });
-        ripple(r, g.featured ? '#ffd56a' : '#5ef2a0'); earnFx(r, k, n, upL); if (chain) setTimeout(celebrate, 300); return;
+        V.sayKind = 'bless'; ripple(r, '#5ef2a0'); earnFx(r, k, n, upL); return;
       }
       if (a === 'step') { const q = goal(id), i = Number(v), on = !q.steps[i].d; buzz(6);
-        return act({ verb: on ? 'Step done:' : 'Step reopened:', name: q.steps[i].t }, ['gameQuestStep', id, i, !on], 'gameQuestStep', [id, i, on], (d) => { d.goals.find((y) => y.id === id).steps[i].d = on; }); }
+        return act({ verb: on ? 'Step:' : 'Step reopened:', name: q.steps[i].t }, ['gameQuestStep', id, i, !on], 'gameQuestStep', [id, i, on], (d) => { d.goals.find((y) => y.id === id).steps[i].d = on; }); }
       if (a === 'stage') {
         const bo = D.bosses.find((x) => x.id === id), i = Number(v), st = bo.stages[i], on = !st.done, cr = box.querySelector('[data-creature="' + id + '"]');
         const late = on && !!st.due && D.today > st.due, n = bo.stages.length, dead = on && bo.stages.every((x, j) => j === i || x.done);
         if (!on) return act({ verb: 'Stage reopened:', name: st.name }, ['gameBossStage', id, i, true], 'gameBossStage', [id, i, false], (d) => { const x = d.bosses.find((y) => y.id === id); x.stages[i].done = ''; x.stages[i].late = false; x.hp = Math.min(100, x.hp + Math.round((st.late ? 50 : 100) / n)); });
         anim(cr, [{ transform: 'none', filter: 'none' }, { transform: 'translateX(5px)', filter: 'brightness(3) saturate(0)' }, { transform: 'translateX(-4px)' }, { transform: 'none', filter: 'none' }], { duration: 320 });
-        glow(k, 'rgba(255,122,102,.9)'); floatText(r, late ? 'half hit' : 'hit!', '#ff9a85'); buzz(15);
-        if (!dead) return act({ verb: late ? 'Late stage:' : 'Stage done:', name: st.name + ' · ' + bo.name }, ['gameBossStage', id, i, false], 'gameBossStage', [id, i, true], (d) => { const x = d.bosses.find((y) => y.id === id); x.stages[i].done = d.today; x.stages[i].late = late; x.hp = Math.max(0, x.hp - Math.round((late ? 50 : 100) / n)); });
+        glow(k, 'rgba(255,122,102,.9)'); floatText(r, late ? 'half hit' : 'hit!', '#ff9a85'); buzz(15); setMood('happy', pickSay('boss'));
+        if (!dead) return act({ verb: late ? 'Late hit:' : 'Hit:', name: st.name + ' · ' + bo.name }, ['gameBossStage', id, i, false], 'gameBossStage', [id, i, true], (d) => { const x = d.bosses.find((y) => y.id === id); x.stages[i].done = d.today; x.stages[i].late = late; x.hp = Math.max(0, x.hp - Math.round((late ? 50 : 100) / n)); });
         let upL = false;
         act({ verb: 'Boss beaten:', name: bo.name, delta: '+' + bo.reward, unit: 'coin' }, null, 'gameBossStage', [id, i, true], (d) => { const x = d.bosses.find((y) => y.id === id); x.stages[i].done = d.today; x.hp = 0; upL = earnLocal(d, bo.reward, bo.reward); });
         stack.pop();   // a beaten boss has paid out and gone to the trophy shelf: not undoable
         const cr2 = box.querySelector('[data-creature="' + id + '"]');
         anim(cr2, [{ transform: 'none', opacity: 1 }, { transform: 'translateY(6px) scale(1.1,.6)', opacity: 0.6 }, { transform: 'translateY(12px) scale(1.4,.1)', opacity: 0 }], { duration: 500, fill: 'forwards' });
-        setTimeout(() => { earnFx(r, k, bo.reward, upL); celebrate(true); setMood('proud', 'Vanquished! Another trophy for the shelf.'); }, 450);
+        setTimeout(() => { earnFx(r, k, bo.reward, upL); celebrate(true); setMood('proud', pickSay('vanq')); }, 450);
         setTimeout(() => { if (D.bosses.some((x) => x.id === id)) { D.bosses = D.bosses.filter((x) => x.id !== id); D.beaten = [{ id, name: bo.name, k: creature(bo), on: D.today }].concat(D.beaten || []); } CHRON = null; paint(); }, 1300);
         return;
       }

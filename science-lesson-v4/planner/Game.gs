@@ -116,10 +116,7 @@ function gBlessAmt_(g) { return Math.max(2, Math.round((GAME.base[Number(g.minut
 function gBlessings_(goals) { return goals.filter((g) => g.kind === 'habit' && g.polarity !== 'minus').sort((a, b) => (a.id < b.id ? -1 : 1)); }
 function gFeatured_(goals, today) { const b = gBlessings_(goals); return b.length ? b[gDiff_('2026-01-01', today) % b.length].id : ''; }
 function gBlessCount_(goals, todayTicks) { const ids = {}; gBlessings_(goals).forEach((g) => { ids[g.id] = true; }); return todayTicks.filter((t) => ids[t.goalId]).reduce((a, t) => a + Number(t.delta), 0); }
-function gBlessPay_(g, goals, todayTicks, today) {
-  const amt = gBlessAmt_(g) * (gFeatured_(goals, today) === g.id ? 2 : 1), chain = (gBlessCount_(goals, todayTicks) + 1) % 8 === 0 ? 10 : 0;
-  return { coins: amt + chain, xp: amt * 2, bonus: chain };
-}
+function gBlessPay_(g) { const amt = gBlessAmt_(g); return { coins: amt, xp: amt * 2, bonus: 0 }; }
 function gHpLoss_(goal) { return GAME.hpLoss[Number(goal.minutes) || 15] || 4; }
 
 function gAddXp_(p, xp, today) {
@@ -318,18 +315,47 @@ function gMarkPlan_(world, today) {
   });
 }
 
+// ---- ahead charts (Patryk 2026-10-26): lessons built ahead (the Tide, 0-3) and homework set ahead (weeks) ----
+// homework: for each class set homework in the last 5 weeks, the furthest set-on date already made; the least-ahead
+// class decides how many whole weeks ahead the homework is.
+function gHwAhead_(today) {
+  let rows = []; try { rows = typeof hwRows_ === 'function' ? hwRows_() : []; } catch (e) { rows = []; }
+  const by = {};
+  rows.filter((r) => r.setOn && r.setOn >= gAdd_(today, -35) && r.status !== 'not made').forEach((r) => { if (!by[r.cls] || r.setOn > by[r.cls]) by[r.cls] = r.setOn; });
+  const cls = Object.keys(by); if (!cls.length) return null;
+  cls.sort((a, b) => (by[a] < by[b] ? -1 : 1));
+  const days = gDiff_(today, by[cls[0]]);
+  return { weeks: Math.max(0, Math.floor(days / 7)), last: cls[0] };
+}
+function gTide_(ahead, today) {
+  const allBuilt = (days) => ahead.filter((L) => L.date <= gAdd_(today, days)).every((L) => L.built);
+  return !ahead.length ? 0 : !ahead[0].built ? 0 : !allBuilt(7) ? 1 : !allBuilt(14) ? 2 : 3;
+}
+// a week ahead pays once a week, two weeks ahead pays again (lessons and homework each); never on frozen days
+function gAheadPay_(world, today, out) {
+  if (gIsFrozen_(today, world, gFrozenDays_())) return;
+  const mon = gMonday_(today), tide = gTide_(gLessonsAhead_(world, today), today), hw = gHwAhead_(today);
+  const pay = (key, name, minutes) => { const r = gTick_({ id: 'ahead|' + key, name, kind: 'ghost', minutes, track: 'ahead', streak: 0, value: 0 }, 1, true, 'ahead|' + key + '|' + mon); if (r) out.push({ name, coins: r.coins }); };
+  if (tide >= 2) pay('lessons1', 'Lessons a week ahead', 60);
+  if (tide >= 3) pay('lessons2', 'Lessons two weeks ahead', 120);
+  if (hw && hw.weeks >= 1) pay('hw1', 'Homework a week ahead', 60);
+  if (hw && hw.weeks >= 2) pay('hw2', 'Homework two weeks ahead', 120);
+}
+
 /* ---- public functions ---- */
 function gSnapshot_(world, extra) {
   const today = gDay_(gNow_()), p = gPlayer_(), goals = gGoals_(), ticks = gRows_('ticks'), frozen = gFrozenDays_();
   const byId = {}; goals.forEach((g) => { byId[g.id] = g; });
   const todayTicks = gTicksToday_(ticks, today), fz = gIsFrozen_(today, world, frozen), feat = gFeatured_(goals, today);
+  const tickDay = {}; ticks.forEach((t) => { const key = t.goalId + '|' + t.day; tickDay[key] = (tickDay[key] || 0) + Number(t.delta); });
+  const strip = (g) => { let s14 = ''; for (let i = 13; i >= 0; i--) { const d = gAdd_(today, -i); s14 += gIsFrozen_(d, world, frozen) ? 'f' : (tickDay[g.id + '|' + d] || 0) > 0 ? 'o' : (!g.everyN && gIsDue_(Object.assign({}, g, { lastDone: '' }), d) && String(g.created || '') <= d && d < today) ? 'x' : '-'; } return s14; };
   const view = goals.map((g) => {
     const net = gNet_(ticks, g.id, today), pay = gPay_(g, todayTicks, byId);
     const o = { id: g.id, name: g.name, kind: g.kind, polarity: g.polarity, minutes: g.minutes, track: g.track, auto: g.auto, value: g.value, streak: g.streak, private: g.private,
       days: g.days, everyN: g.everyN, pay: pay.coins, hpLoss: g.kind === 'habit' ? gHpLoss_(g) : 0, doneToday: net > 0, count: net, grp: g.grp || gDefGrp_(g), steps: g.steps, miss: !!g.miss };
-    if (g.kind === 'habit' && g.polarity !== 'minus') { o.featured = feat === g.id; o.pay = gBlessAmt_(g) * (o.featured ? 2 : 1); }
+    if (g.kind === 'habit' && g.polarity !== 'minus') { o.featured = false; o.pay = gBlessAmt_(g); }
     if (g.kind === 'todo') { o.due = g.due; o.doneOn = g.lastDone; o.dueToday = !g.lastDone || gDiff_(g.lastDone, today) <= 14; }
-    if (g.kind === 'daily') o.dueToday = gIsDue_(g, today);
+    if (g.kind === 'daily') { o.dueToday = gIsDue_(g, today); o.strip = strip(g); }
     if (g.kind === 'termly') { o.sittings = g.sittings; o.sitDone = g.sitDone; o.due = g.due; o.daysLeft = g.due ? gDiff_(today, g.due) : null; o.dueToday = g.sitDone < g.sittings || g.lastDone === today; o.pay = gPay_(Object.assign({}, g, { track: g.track || 'necessary' }), todayTicks, byId).coins; }
     return o;
   });
@@ -343,15 +369,14 @@ function gSnapshot_(world, extra) {
   const ahead = gLessonsAhead_(world, today);
   const summoned = ahead.slice(0, 10).map((L) => ({ name: L.name, date: L.date, ahead: L.ahead, built: L.built, pay: gPay_({ minutes: 30, track: L.ahead ? 'ahead' : 'necessary' }, [], {}).coins }));   // pay = what building it pays (gTick_ in the auto-ticks above)
   // Tide Charts: 1 = the next lesson is built, 2 = everything this coming week, 3 = two weeks ahead
-  const allBuilt = (days) => ahead.filter((L) => L.date <= gAdd_(today, days)).every((L) => L.built);
-  const tide = !ahead.length ? 0 : !ahead[0].built ? 0 : !allBuilt(7) ? 1 : !allBuilt(14) ? 2 : 3;
+  const tide = gTide_(ahead, today), hw = gHwAhead_(today);
   const mon = gMonday_(today), weekCoins = ticks.filter((t) => String(t.day) >= mon && Number(t.coins) > 0 && !/^(buy|hoard)\|/.test(String(t.goalId))).reduce((a, t) => a + Number(t.coins), 0);
   const wearRows = gRows_('owned').filter((r) => String(r.itemId).indexOf('w:') === 0);
   const owned = gRows_('owned').filter((r) => String(r.itemId).indexOf('w:') !== 0), room = {}; owned.forEach((r) => { if (r.slot) room[r.slot] = r.itemId; });
   const bosses = gBosses_(today), review = gReviewCard_(today, ticks, goals, bosses);
   const hoard = gRows_('hoard').filter((h) => String(h.archived) !== 'true').map((h) => ({ id: h.id, name: h.name, cost: Number(h.cost) || 0, claims: Number(h.claims) || 0 }));
   return gOut_(Object.assign({ bosses: bosses.filter((b) => b.status === 'active'), beaten: gBeaten_(), review, room, owned: owned.map((r) => r.itemId), player: { coins: p.coins, xp: p.xp, level, need: gNeed_(level), hp: p.hp, maxHp: p.maxHp, deaths: p.deaths, coinName: GAME.coin }, mood, today, frozen: fz,
-    goals: view, summoned, tide, weekCoins, groups: gGroups_(p), hoard, wear: gWearState_(p, wearRows), freezes: gFreezesAhead_(world, today, frozen), blessCount: gBlessCount_(goals, todayTicks), hour: Number(Utilities.formatDate(gNow_(), TZ, 'H')),
+    goals: view, summoned, tide, hw, weekCoins, groups: gGroups_(p), hoard, wear: gWearState_(p, wearRows), freezes: gFreezesAhead_(world, today, frozen), blessCount: gBlessCount_(goals, todayTicks), hour: Number(Utilities.formatDate(gNow_(), TZ, 'H')),
     table: { base: GAME.base, mult: GAME.mult, hpLoss: GAME.hpLoss } }, extra || {}));
 }
 // what goes back to the page is plain JSON (a Date or NaN inside makes Apps Script send back null)
@@ -367,7 +392,7 @@ function gameLoad(k) {
     gGoals_().filter((g) => g.name === 'Set homework (the classes owed it)' && !g.auto).forEach((g) => gSet_('goals', g.row, 'auto', 'homeworkSet'));
     if (!p.markPlan) { gMarkPlan_(world, today); p.markPlan = today; gSavePlayer_(p); }
     gRollover_(world);
-    const auto = []; gAutoScan_(world, today, gGoals_(), auto);
+    const auto = []; gAutoScan_(world, today, gGoals_(), auto); gAheadPay_(world, today, auto);
     if (auto.length) extra.auto = auto;
   });
   return gSnapshot_(gWorld_(), extra);
@@ -766,7 +791,13 @@ function gameChronicle(k) {
   const today = gDay_(gNow_()), mon = gMonday_(today), ticks = gRows_('ticks'), world = gWorld_(), frozen = gFrozenDays_();
   const earn = (t) => Number(t.coins) > 0 && !/^(buy|hoard)\|/.test(String(t.goalId));
   const weeks = []; for (let i = 6; i >= 0; i--) { const m = gAdd_(mon, -7 * i), e = gAdd_(m, 6); weeks.push({ mon: m, coins: ticks.filter((t) => String(t.day) >= m && String(t.day) <= e && earn(t)).reduce((a, t) => a + Number(t.coins), 0) }); }
-  const days = []; const start = gAdd_(mon, -28);
-  for (let i = 0; i < 35; i++) { const d = gAdd_(start, i); days.push({ day: d, n: ticks.filter((t) => String(t.day) === d && Number(t.delta) > 0 && !/^(buy|hoard|review)\|/.test(String(t.goalId))).length, frozen: gIsFrozen_(d, world, frozen), future: d > today, today: d === today }); }
+  const days = [], start = gAdd_(mon, -28), goals = gGoals_(), dailies = goals.filter((g) => g.kind === 'daily' && !g.everyN), net = {};
+  ticks.forEach((t) => { const key = t.goalId + '|' + t.day; net[key] = (net[key] || 0) + Number(t.delta); });
+  for (let i = 0; i < 35; i++) {
+    const d = gAdd_(start, i), fz = gIsFrozen_(d, world, frozen), due = dailies.filter((g) => String(g.created || '') <= d && gIsDue_(Object.assign({}, g, { lastDone: '' }), d));
+    const got = due.filter((g) => (net[g.id + '|' + d] || 0) > 0).length, share = due.length ? got / due.length : 0;
+    const later = d > today ? due.length + goals.filter((g) => g.kind === 'todo' && !g.lastDone && g.due === d).length : 0;
+    days.push({ day: d, n: got, due: due.length, share, level: fz ? 'off' : d > today ? 'future' : !due.length ? 'none' : share >= 1 ? 'all' : share >= 0.75 ? 'most' : share > 0 ? 'some' : 'none', later, frozen: fz, future: d > today, today: d === today });
+  }
   return gOut_({ weeks, days, beaten: gBeaten_() });
 }
