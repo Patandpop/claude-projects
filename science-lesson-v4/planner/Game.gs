@@ -920,7 +920,7 @@ function gameQuestStep(k, id, i, on) {
 function gBeaten_() {
   return gRows_('bosses').filter((b) => b.status === 'beaten').map((b) => {
     let r = {}; try { r = JSON.parse(b.reward || '{}'); } catch (e) { r = {}; }
-    return { id: b.id, name: b.name, k: r.k || (G_BOSS[r.size] || G_BOSS[5]).k, on: b.beatenOn };
+    return { id: b.id, name: b.name, k: r.k || (G_BOSS[r.size] || G_BOSS[5]).k, size: r.size || 5, reward: r.coins || 0, on: b.beatenOn };
   }).reverse();
 }
 // the next days that freeze themselves: INSET days and the next holiday

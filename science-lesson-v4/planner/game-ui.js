@@ -554,7 +554,7 @@
       });
       const fin = D.goals.filter((g) => (g.kind === 'todo' && g.doneOn && !V.settling[g.id]) || (g.kind === 'termly' && g.sitDone >= g.sittings)), bt = D.beaten || [];
       if (fin.length || bt.length) h += '<button class="uz-cap" data-a="vanq" style="margin-top:4px"><span class="uz-chev" style="color:#8a7a74;transform:rotate(' + (V.vanq ? 90 : 0) + 'deg)">▶</span><span><b style="color:#c4b0aa">Vanquished</b></span><span style="font:700 12px var(--a);color:#8a7a74">' + (fin.length + bt.length) + '</span></button>' +
-        (V.vanq ? fin.map((g) => g.kind === 'termly' ? markRow(g) : questCard(g)).join('') + bt.map((b) => '<div style="display:flex;align-items:center;gap:10px;padding:4px 8px;border-radius:4px;background:#140c0d;border:1px solid #2a1a1c;opacity:.85"><img src="' + (P.bosses[b.k] || P.bosses.spawn).src + '" style="height:26px;filter:grayscale(.7)" alt=""><span style="flex:1;font:14px var(--a);color:#c4b0aa">' + esc(b.name) + '</span><img src="' + IMG.trophy + '" style="width:16px;height:16px" alt=""></div>').join('') : '');
+        (V.vanq ? fin.map((g) => g.kind === 'termly' ? markRow(g) : questCard(g)).join('') + (window.TEMPLE && bt.length ? '<ol style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px">' + bt.map((b) => TEMPLE.trophy(b, { fresh: V.freshTrophy === b.id })).join('') + '</ol>' : bt.map((b) => '<div style="display:flex;align-items:center;gap:10px;padding:4px 8px;border-radius:4px;background:#140c0d;border:1px solid #2a1a1c;opacity:.85"><img src="' + (P.bosses[b.k] || P.bosses.spawn).src + '" style="height:26px;filter:grayscale(.7)" alt=""><span style="flex:1;font:14px var(--a);color:#c4b0aa">' + esc(b.name) + '</span><img src="' + IMG.trophy + '" style="width:16px;height:16px" alt=""></div>').join('')) : '');
       h += '<button class="uz-new" data-a="form" data-v="group">+ New group</button><button class="uz-new" data-a="form" data-v="mark">+ Books to mark</button>';
       h += '<button class="uz-new" data-a="edit" style="font:700 13px var(--a)">' + (V.edit ? 'Stop editing' : 'Edit') + '</button>';
       return h;
@@ -593,6 +593,9 @@
     }
     const creature = (b) => b.creature || SIZE[b.size || 5].k;
     function bossCard(b) {
+      if (window.TEMPLE) { const arm = V.banishArm === b.id;
+        return '<div class="uz-bossw" data-boss="' + b.id + '">' + TEMPLE.card(Object.assign({}, b, { k: creature(b) }), { today: D.today, stageAttrs: (i) => 'data-a="stage" data-id="' + b.id + '" data-v="' + i + '" data-fx="' + b.id + 's' + i + '"',
+          editAttrs: 'data-a="editb" data-id="' + b.id + '"', banishHtml: '<button data-a="banish" data-id="' + b.id + '" style="height:40px;padding:0 10px;border:1px solid ' + (arm ? '#ff7a66' : '#4a2a2e') + ';border-radius:4px;background:' + (arm ? '#4a1418' : 'transparent') + ';color:' + (arm ? '#ffd0c4' : '#b08a84') + ';font:700 12px var(--a)">' + (arm ? 'Tap again to banish' : 'Banish') + '</button>' }) + '</div>'; }
       const k = creature(b), spr = P.bosses[k] || P.bosses.spawn, meta = P.bossMeta[k] || P.bossMeta.spawn, n = b.stages.length, arm = V.banishArm === b.id, open = V.open[b.id] !== 0;
       return '<div class="uz-boss"><button data-a="fold" data-v="' + b.id + '" data-def="1"><div class="uz-cr"><img data-creature="' + b.id + '" src="' + spr.src + '" style="width:' + Math.min(68, spr.w * 2) + 'px;height:auto;filter:drop-shadow(0 2px 0 #000)" alt=""></div>' +
         '<div style="flex:1;min-width:0"><div style="font:500 19px/1.05 var(--g);color:#f4e0d8">' + esc(b.name) + '</div><div style="margin-top:3px;font:12px var(--a);color:#c49a94">' + esc(meta.size || b.size + 'h') + ' · ' + esc(meta.name) + ' · ' + b.stages.filter((x) => x.done).length + ' of ' + n + ' stages</div>' +
@@ -868,6 +871,7 @@
       if (focus) { const n = body.querySelector(focus); if (n) { n.focus(); try { n.setSelectionRange(n.value.length, n.value.length); } catch (e) { /* not a text box */ } } }
       drawSky();
       const sb = body.querySelector('.uz-stampbox'); if (sb && V.stampNew) { V.stampNew = false; anim(sb, [{ transform: 'scale(2.4) rotate(-28deg)', opacity: 0 }, { transform: 'scale(.92) rotate(-10deg)', opacity: 1, offset: 0.7 }, { transform: 'scale(1) rotate(-10deg)', opacity: 1 }], { duration: 420, easing: 'cubic-bezier(.2,.8,.3,1.2)' }); }
+      if (window.TEMPLE) TEMPLE.paint(body);
       if (V.waxNew) { const n = body.querySelector('.uz-stamp[data-q="' + V.waxNew + '"]'); if (n) { V.waxNew = null; anim(n, [{ transform: 'scale(2.4) rotate(-28deg)', opacity: 0 }, { transform: 'scale(1) rotate(-10deg)', opacity: 1 }], { duration: 420 }); } }
     }
 
@@ -994,6 +998,14 @@
         const bo = D.bosses.find((x) => x.id === id), i = Number(v), st = bo.stages[i], on = !st.done, cr = box.querySelector('[data-creature="' + id + '"]');
         const late = on && !!st.due && D.today > st.due, n = bo.stages.length, dead = on && bo.stages.every((x, j) => j === i || x.done);
         if (!on) return act({ verb: 'Stage reopened:', name: st.name }, ['gameBossStage', id, i, true], 'gameBossStage', [id, i, false], (d) => { const x = d.bosses.find((y) => y.id === id); x.stages[i].done = ''; x.stages[i].late = false; x.hp = Math.min(100, x.hp + Math.round((st.late ? 50 : 100) / n)); });
+        if (window.TEMPLE && !V.striking) { V.striking = true; buzz(15); setMood('happy', pickSay('boss'));
+          const save = () => { V.striking = false;
+            if (!dead) return act({ verb: late ? 'Late hit:' : 'Hit:', name: st.name + ' · ' + bo.name }, ['gameBossStage', id, i, false], 'gameBossStage', [id, i, true], (d) => { const x = d.bosses.find((y) => y.id === id); x.stages[i].done = d.today; x.stages[i].late = late; x.hp = Math.max(0, x.hp - Math.round((late ? 50 : 100) / n)); });
+            TEMPLE.beaten(id, () => { let up2 = false;
+              act({ verb: 'Vanquished:', name: bo.name, delta: '+' + bo.reward, unit: 'coin' }, null, 'gameBossStage', [id, i, true], (d) => { d.bosses = d.bosses.filter((y) => y.id !== id); d.beaten = [{ id, name: bo.name, k: creature(bo), size: bo.size, reward: bo.reward, on: d.today }].concat(d.beaten || []); up2 = earnLocal(d, bo.reward, bo.reward); });
+              stack.pop(); V.freshTrophy = id; CHRON = null; earnFx(r, k, bo.reward, up2); celebrate(true); setMood('proud', pickSay('vanq')); }); };
+          return Promise.resolve(TEMPLE.strike(id, i)).then(save, save); }
+        if (V.striking) return;
         anim(cr, [{ transform: 'none', filter: 'none' }, { transform: 'translateX(5px)', filter: 'brightness(3) saturate(0)' }, { transform: 'translateX(-4px)' }, { transform: 'none', filter: 'none' }], { duration: 320 });
         glow(k, 'rgba(255,122,102,.9)'); floatText(r, late ? 'half hit' : 'hit!', '#ff9a85'); buzz(15); setMood('happy', pickSay('boss'));
         if (!dead) return act({ verb: late ? 'Late hit:' : 'Hit:', name: st.name + ' · ' + bo.name }, ['gameBossStage', id, i, false], 'gameBossStage', [id, i, true], (d) => { const x = d.bosses.find((y) => y.id === id); x.stages[i].done = d.today; x.stages[i].late = late; x.hp = Math.max(0, x.hp - Math.round((late ? 50 : 100) / n)); });

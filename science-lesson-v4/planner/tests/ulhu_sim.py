@@ -3,7 +3,7 @@ Run: python tests/ulhu_sim.py  (add --shots DIR to save screenshots). Synthetic 
 import os, sys, subprocess, time
 from playwright.sync_api import sync_playwright
 P = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '/'; SP = sys.argv[1] if len(sys.argv) > 1 and not sys.argv[1].startswith('--') else __import__('tempfile').mkdtemp()
-js = ''.join(open(P + f, encoding='utf-8').read() + '\n' for f in ['game-ulhu.js', 'game-pixel.js', 'game-runes.js', 'game-omens.js', 'game-blood.js', 'game-ui.js'])
+js = ''.join(open(P + f, encoding='utf-8').read() + '\n' for f in ['game-ulhu.js', 'game-pixel.js', 'game-runes.js', 'game-temple.js', 'game-omens.js', 'game-blood.js', 'game-ui.js'])
 page = '''<!doctype html><meta charset="utf-8"><meta name=viewport content="width=device-width,initial-scale=1"><body style="margin:0;background:#0d1b3a">
 <div style="height:60px;background:#0a1020;color:#fff">8AG header</div><div id=u></div><nav style="position:fixed;bottom:0;left:0;right:0;height:62px;background:#0a1020"></nav>
 <script>window.CALLS=[];function call(fn,...args){CALLS.push(fn);return fetch('/c',{method:'POST',body:JSON.stringify({fn,args})}).then(r=>r.json()).then(x=>{if(x.err)throw new Error(x.err);return x.ok;});}</script>
@@ -49,9 +49,9 @@ try:
         q = pg.locator('.uz-pane >> nth=1').locator('.uz-q [data-a=tick]').first; q.click(); pg.wait_for_timeout(1600)
         check('a fulfilled quest goes to Vanquished', 'Vanquished' in pg.inner_text('.uz-pane >> nth=1'))
         pg.locator('[data-a=banish]').first.click(); pg.locator('[data-a=banish]').first.click(); pg.wait_for_timeout(700)
-        check('Banish (two taps) removes a boss, Undo brings it back', pg.locator('.uz-boss').count() == 1)
+        check('Banish (two taps) removes a boss, Undo brings it back', pg.locator('.uz-bossw').count() == 1)
         pg.click('[data-a=undo]'); pg.wait_for_timeout(800)
-        check('...and it is back', pg.locator('.uz-boss').count() == 2)
+        check('...and it is back', pg.locator('.uz-bossw').count() == 2)
         # boss form
         pg.click('.uz-dock [data-v=boss]'); pg.wait_for_timeout(200)
         pg.fill('[data-name]', 'Mark the 9AS mocks'); pg.click('[data-a=tmpl]'); pg.click('[data-v="size:10"]'); pg.wait_for_timeout(100)
@@ -60,7 +60,7 @@ try:
         pg.click('[data-a=submit]'); pg.wait_for_timeout(900)
         check('the new boss appears with its creature', 'Mark the 9AS mocks' in pg.inner_text('.uz-pane >> nth=1') and 'Drowned Leviathan' in pg.inner_text('.uz-pane >> nth=1'))
         # edit a boss after summoning it: rename it and move it to Life (Patryk 2026-10-27)
-        pg.locator('.uz-pane >> nth=1').locator('.uz-boss', has_text='Mark the 9AS mocks').locator('[data-a=editb]').click(); pg.wait_for_timeout(300)
+        pg.locator('.uz-pane >> nth=1').locator('.uz-bossw', has_text='Mark the 9AS mocks').locator('[data-a=editb]').click(); pg.wait_for_timeout(300)
         check('a boss opens in its form to edit', 'Edit boss' in pg.inner_text('.uz-form') and pg.locator('.uz-form [data-step]').count() == 4)
         pg.fill('.uz-form [data-name]', 'Mark the 9AS mock papers'); pg.click('.uz-form [data-v="grp:life"]'); pg.click('.uz-form [data-a=submit]'); pg.wait_for_timeout(1200)
         life = pg.evaluate("[...document.querySelectorAll('.uz-pane')[1].querySelectorAll('.uz-sec')].find(function(x){ return /Surface/.test(x.innerText); }).innerText")
