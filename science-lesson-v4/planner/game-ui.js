@@ -271,7 +271,13 @@
     const moonSrc = (full) => { const c = document.createElement('canvas'); c.width = 16; c.height = 16; const x = c.getContext('2d');
       for (let y = 0; y < 16; y++) for (let i = 0; i < 16; i++) { const d = Math.hypot(i + .5 - 8, y + .5 - 8); if (d > 7 || (!full && Math.hypot(i + .5 - 11, y + .5 - 6.5) < 6.3)) continue; x.fillStyle = full ? (d > 6.2 ? '#c9b98a' : (i + y) % 5 === 0 && d < 5 ? '#d8cfa8' : '#f4ecc8') : (d > 6.2 ? '#8aa4b8' : '#cfe0ec'); x.fillRect(i, y, 1, 1); }
       return c.toDataURL(); };
-    const MOON = { full: moonSrc(true), cres: moonSrc(false) };
+    // the half and dark moons (Patryk 2026-10-27: three phases, full = working, half = work rest, dark = full rest)
+    const moonPh = (lit) => { const c = document.createElement('canvas'); c.width = 16; c.height = 16; const x = c.getContext('2d');
+      for (let y = 0; y < 16; y++) for (let i = 0; i < 16; i++) { const d = Math.hypot(i + .5 - 8, y + .5 - 8); if (d > 7) continue;
+        const on = lit && i >= 8; x.fillStyle = on ? (d > 6.2 ? '#c9b98a' : '#f4ecc8') : (d > 6.2 ? '#4a5a6a' : '#1c2630'); x.fillRect(i, y, 1, 1); }
+      return c.toDataURL(); };
+    const MOON = { full: moonSrc(true), cres: moonSrc(false), half: moonPh(true), dark: moonPh(false) };
+    const PHASE = { full: ['Full moon: a working day', 'half'], half: ['Half moon: work rest, life still counts', 'dark'], dark: ['Dark moon: full rest', 'full'] };
     const coin = (z, n, key, kind) => { const s = RN ? RN.pick(n, key, kind) : P.coin, k = s.h >= 34 ? 1.35 : s.h > 24 ? 1.2 : 1; return '<img src="' + s.src + '" style="width:' + Math.round(z * k * s.w / s.h) + 'px;height:' + Math.round(z * k) + 'px;object-fit:contain" alt="runes">'; };
     if (RN) IMG.coin = RN.ones[0].src;
     const style = '16-bit';   // 16-bit only (2026-10-26)
@@ -416,7 +422,7 @@
       if (!D) return;
       const p = D.player, nt = night();
       ban.style.background = nt ? 'linear-gradient(180deg,#050a18 0%,#0a1424 55%,#0a1210 100%)' : 'linear-gradient(180deg,#0f3a34 0%,#0b2522 50%,#08110f 100%)';
-      $('.uz-moon').style.display = 'none'; const mb = $('.uz-moonb img'); mb.src = D.frozen ? MOON.cres : MOON.full; mb.style.cssText = D.frozen ? 'filter:drop-shadow(0 0 8px #cfe0ec)' : 'opacity:.85'; $('.uz-moonb').setAttribute('aria-label', D.frozen ? 'Day off: tap to undo' : 'Tap for a day off');
+      $('.uz-moon').style.display = 'none'; const mb = $('.uz-moonb img'), ph = D.moon || (D.frozen ? 'dark' : 'full'); mb.src = MOON[ph]; mb.style.cssText = ph === 'full' ? 'opacity:.85' : 'filter:drop-shadow(0 0 8px #cfe0ec)'; $('.uz-moonb').setAttribute('aria-label', PHASE[ph][0] + '. Tap to change.');
       me.innerHTML = layers(mood());
       $('.uz-coins b').textContent = p.coins; $('.uz-lv span').textContent = TITLES[p.level] || 'Ancient'; $('.uz-hex i').textContent = p.level;
       $('.xp').style.width = Math.min(100, Math.round(100 * p.xp / p.need)) + '%'; $('.xpt').textContent = p.xp + ' / ' + p.need;
@@ -941,7 +947,7 @@
       if (a === 'sdel') { V.draft.steps.splice(Number(v), 1); return paint(); }
       if (a === 'tmpl') { V.draft.name = V.draft.name || 'Mark the 9AS test'; V.draft.size = 5; V.draft.k = 'shog'; V.draft.steps = [['Half marked', 2], ['The rest', 5], ['Scores summed', 6], ['Entered', 7]].map(([n, dd]) => ({ n, by: addD(D.today, dd) })); return paint(); }
       if (a === 'submit') return submit();
-      if (a === 'dayoff') { const on = !D.frozen; return act({ verb: on ? 'Day off:' : 'Day back on:', name: on ? 'today is frozen, streaks are safe' : 'the tide flows again' }, ['gameFreeze', D.today, 'off', !on], 'gameFreeze', [D.today, 'off', on], (d) => { d.frozen = on; }); }
+      if (a === 'dayoff') { const was = D.moon || (D.frozen ? 'dark' : 'full'), nx = PHASE[was][1]; return act({ verb: 'Moon:', name: PHASE[nx][0] }, ['gameMoon', D.today, was], 'gameMoon', [D.today, nx], (d) => { d.moon = nx; d.frozen = nx !== 'full'; }); }
       if (a === 'tick' || a === 'untick') {
         const g = goal(id); if (!g) return;
         if (g.kind === 'termly') {

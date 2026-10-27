@@ -117,6 +117,11 @@ try:
         check('back online it is sent', pg.evaluate("(JSON.parse(localStorage.getItem('ulhuQ')||'[]')).length") == 0)
         h = pg.evaluate("document.querySelector('.uz').getBoundingClientRect().height")
         check('fills the screen between the header and the bottom bar', 780 > h > 600)
+        # 2026-10-27 phase 3: the moon cycles full, half, dark
+        pg.click('.uz-moonb'); pg.wait_for_timeout(900)
+        check('tapping the moon goes to half moon (work rest)', 'Half moon' in pg.inner_text('.uz-undo'))
+        pg.click('.uz-moonb'); pg.wait_for_timeout(900); pg.click('.uz-moonb'); pg.wait_for_timeout(900)
+        check('and on round to full moon again', 'Full moon' in pg.inner_text('.uz-undo'))
         # 2026-10-27 phase 1: a two-sided omen, its curse half, then its blessing half as Absolution I
         pg.click('.uz-tabs [data-v="2"]'); pg.wait_for_timeout(400); pg.click('.uz-dock [data-v=curse]'); pg.wait_for_timeout(300)
         pg.click('.uz-form [data-v="type:both"]'); pg.wait_for_timeout(200)
