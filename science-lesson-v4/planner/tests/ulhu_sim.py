@@ -3,7 +3,7 @@ Run: python tests/ulhu_sim.py  (add --shots DIR to save screenshots). Synthetic 
 import os, sys, subprocess, time
 from playwright.sync_api import sync_playwright
 P = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '/'; SP = sys.argv[1] if len(sys.argv) > 1 and not sys.argv[1].startswith('--') else __import__('tempfile').mkdtemp()
-js = ''.join(open(P + f, encoding='utf-8').read() + '\n' for f in ['game-ulhu.js', 'game-pixel.js', 'game-runes.js', 'game-omens.js', 'game-ui.js'])
+js = ''.join(open(P + f, encoding='utf-8').read() + '\n' for f in ['game-ulhu.js', 'game-pixel.js', 'game-runes.js', 'game-omens.js', 'game-blood.js', 'game-ui.js'])
 page = '''<!doctype html><meta charset="utf-8"><meta name=viewport content="width=device-width,initial-scale=1"><body style="margin:0;background:#0d1b3a">
 <div style="height:60px;background:#0a1020;color:#fff">8AG header</div><div id=u></div><nav style="position:fixed;bottom:0;left:0;right:0;height:62px;background:#0a1020"></nav>
 <script>window.CALLS=[];function call(fn,...args){CALLS.push(fn);return fetch('/c',{method:'POST',body:JSON.stringify({fn,args})}).then(r=>r.json()).then(x=>{if(x.err)throw new Error(x.err);return x.ok;});}</script>
@@ -68,7 +68,8 @@ try:
         # curses tab
         pg.click('.uz-tabs button >> nth=2'); pg.wait_for_timeout(400)
         hp0 = pg.inner_text('.hpt')
-        pg.locator('[data-a=curse]').first.click(); pg.wait_for_timeout(900)
+        pg.locator('[data-a=curse]').first.dblclick(); pg.wait_for_timeout(900)
+        check('a double tap on a curse logs it straight away (no sigils)', pg.locator('[data-sig]').count() == 0)
         check('a curse costs health, not coins', pg.inner_text('.hpt') != hp0)
         c2 = int(pg.inner_text('.uz-coins b')); pg.locator('[data-a=bless]').first.click(); pg.wait_for_timeout(900)
         check('a blessing pays', int(pg.inner_text('.uz-coins b')) > c2)
@@ -116,6 +117,20 @@ try:
         check('back online it is sent', pg.evaluate("(JSON.parse(localStorage.getItem('ulhuQ')||'[]')).length") == 0)
         h = pg.evaluate("document.querySelector('.uz').getBoundingClientRect().height")
         check('fills the screen between the header and the bottom bar', 780 > h > 600)
+        # 2026-10-27 phase 1: a two-sided omen, its curse half, then its blessing half as Absolution I
+        pg.click('.uz-tabs [data-v="2"]'); pg.wait_for_timeout(400); pg.click('.uz-dock [data-v=curse]'); pg.wait_for_timeout(300)
+        pg.click('.uz-form [data-v="type:both"]'); pg.wait_for_timeout(200)
+        pg.fill('.uz-form [data-name]', 'Junk food'); pg.fill('.uz-form [data-name2]', 'Cooked from scratch')
+        check('the form offers Both with two pictures', pg.locator('.uz-form').inner_text().count('PICTURE') == 2)
+        pg.click('.uz-form [data-a=submit]'); pg.wait_for_timeout(1200)
+        check('a two-sided omen shows under Both Ways with both names', pg.locator('.uz-two').count() == 1 and 'Cooked from scratch' in pg.inner_text('.uz-two'))
+        hpb = pg.inner_text('.hpt'); pg.click('.uz-twl'); pg.wait_for_timeout(1500)
+        check('one tap on a curse runs the blood to four sigils', pg.locator('[data-sig]').count() == 4)
+        pg.click('[data-sig=Flesh]'); pg.wait_for_timeout(1600)
+        check('picking a sigil logs it with the curse', 'Flesh' in pg.inner_text('.uz-undo'))
+        check('tapping its left half logs the curse', pg.inner_text('.hpt') != hpb and 'ABSOLUTION I' in pg.inner_text('.uz-two'))
+        pg.click('.uz-twr'); pg.wait_for_timeout(1200)
+        check('tapping its right half is Absolution I', 'Absolution I' in pg.inner_text('.uz-undo') and 'ABSOLUTION II' in pg.inner_text('.uz-two'))
         pg.click('.uz-tabs [data-v="3"]'); pg.wait_for_timeout(600); pg.click('.uz-dock [data-v="shop"]'); pg.wait_for_timeout(1200)
         check('shop cards are full size, not squashed by the omen card style', pg.evaluate("Math.min(...[...document.querySelectorAll('.uz-pane')[3].querySelectorAll('.uz-card')].map(function(c){ return c.getBoundingClientRect().width; }))") > 80)
         check('no page errors', not errs)

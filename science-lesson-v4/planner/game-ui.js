@@ -124,6 +124,17 @@
 .uz-curse .uz-tk{border:2px solid #c4323a;background:radial-gradient(circle,#3a1216,#1a0a0c)}.uz-curse .uz-tk img{width:20px;height:20px}
 .uz-bl{display:grid;grid-template-columns:1fr 1fr;gap:6px}
 .uz-bt{position:relative;overflow:hidden;min-height:82px;display:flex;flex-direction:column;align-items:stretch;justify-content:space-between;gap:6px;padding:8px 9px;border-radius:6px;text-align:left;box-shadow:0 2px 0 #030806}
+.uz-two{position:relative;display:grid;grid-template-columns:1fr 1fr;min-height:92px;border-radius:7px;box-shadow:0 2px 0 #030806}
+.uz-two button{position:relative;display:flex;flex-direction:column;justify-content:space-between;padding:8px 10px;font:700 13px var(--a);text-align:left;border:1.5px solid}
+.uz-twl{background:linear-gradient(180deg,#2a1216,#170a0c);border-right:none!important;border-radius:7px 0 0 7px;padding-right:34px!important}
+.uz-twr{background:linear-gradient(180deg,#10233a,#0b1626);border-left:none!important;border-radius:0 7px 7px 0;padding-left:34px!important;align-items:flex-end;text-align:right!important}
+.uz-two .tg{font:700 10.5px var(--a);letter-spacing:.1em}.uz-two .ft{display:flex;justify-content:space-between;gap:6px;width:100%}
+.uz-twn{position:absolute;left:0;right:0;top:24px;display:flex;justify-content:space-between;gap:56px;padding:0 10px;pointer-events:none;font:700 14px/1.15 var(--a);color:#f0e8f0}
+.uz-twm{position:absolute;left:50%;top:50%;width:48px;height:66px;margin:-33px 0 0 -24px;pointer-events:none;filter:drop-shadow(0 2px 3px rgba(0,0,0,.7))}
+.uz-twm img{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated}.uz-twm .rt{clip-path:polygon(62% 0,100% 0,100% 100%,38% 100%)}
+.uz-twm i{position:absolute;left:50%;top:0;bottom:0;width:1.5px;margin-left:-1px;background:linear-gradient(#fff3c8,#ffd890);box-shadow:0 0 5px #ffd890;transform:rotate(9.8deg);opacity:.8}
+.uz .bl-layer{background:linear-gradient(180deg,transparent 0,transparent calc(100% - 130px),rgba(4,8,7,.88) calc(100% - 96px))}
+.uz-abs{display:block;font:700 11px/1.2 var(--a);color:#ffe2a0;text-shadow:0 0 6px rgba(255,214,140,.5)}
 .uz-omc{flex:none;width:44px;height:60px;padding:0;border:none!important;background:none!important;border-radius:0!important;box-shadow:none!important;display:flex;align-items:center;justify-content:center}.uz-omc img{width:40px!important;height:55px!important;image-rendering:pixelated;filter:drop-shadow(0 2px 0 rgba(0,0,0,.6))}
 .uz-halo{flex:none;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center}.uz-halo img{width:24px;height:24px}
 .uz-x2{position:absolute;top:0;right:0;padding:2px 7px;border-bottom-left-radius:6px;background:#ffd56a;color:#1a1004;font:700 11px var(--a)}
@@ -173,8 +184,8 @@
       'Look at you, defying entropy for a whole five minutes.', "Delicious progress. I'll file it under futile but cute.", 'Ritual complete. Somewhere, a star dies in your honour.', 'You did it! Nothing matters, and you still did it!', 'Tick. Tick. Tick. Like a clock counting down to the end. Lovely.'],
     all: ['All appeased! Now rest, before the inevitable end of all things.', 'Everything ticked. The deep is pleased. The deep is rarely pleased.', 'Nothing left. Go outside. Look at the sky. Wonder what is behind it.', "Reward yourself. The universe certainly won't.",
       'You have appeased me. For today. Tomorrow I hunger again.', 'Empty list. Empty void. Perfect symmetry.', 'You won today. The universe wins eventually, but not today.'],
-    curse: ["A curse? I'm not angry. I'm just eldritch.", 'Ah, Netflix. The true Old One.', 'Doomscrolling? Only I am allowed to be the doom.', "Ouch. That went straight to my soul. I don't have a soul. Still ouch.", "A small slip into the abyss. We've all been there. I live there.",
-      'Curses happen. Mostly to me, apparently.', 'I felt that in all my tentacles.', "It's fine. Everything's fine. The ocean is fine."],
+    // an honest curse (Patryk 2026-10-27: 30 lines, dark humour, never a reminder)
+    curse: ["Delicious. Same time tomorrow?", "I felt that in all my tentacles.", "Noted in the black ledger. Lovingly.", "Ah, a fellow creature of the deep.", "The abyss thanks you for your contribution.", "Honesty. How unsettling. Keep it up.", "You confess, I feast. Everyone wins.", "Mmm. Tastes like a Thursday.", "I'll pretend I didn't enjoy that.", "Written down. Truth is my favourite flavour.", "Even gods snack. Carry on.", "The stars are not yet right. Neither are you. Fine.", "A small sin. Barely worth a sacrifice.", "Logged. The ocean doesn't judge. I do, a bit.", "Thank you for telling me. Most mortals hide.", "One curse, freshly harvested.", "You could exorcise this, you know. Or not. Your soul.", "I've seen worse. I've done worse. Before breakfast.", "The deep remembers. That's the point.", "Recorded in ink made from regret.", "Ph'nglui... no, that one's private. Logged.", "Splendid. Chaos suits you.", "An honest slip. Dishonest ones are the real horror.", "My tentacles twitch with approval. And mild concern.", "Another tally on the wall of the sunken city.", "Confession accepted. Penance optional. For now.", "Ugh, fine. It counts. Everything counts.", "Note to self: the mortal enjoys this. Investigate.", "The tide goes out, the tide comes in. You'll live.", "Truth fed to the abyss. It is full. Mostly."],
     bless: ['Water! The source of all life, and of me.', 'How delightfully mortal.', 'Blessed. Disgustingly wholesome.', 'Your bones thank you, before they return to dust.', "Another blessing. I'm almost glowing. I am glowing. That's normal.", 'Tidy desk, tidy mind, same eternal darkness.', 'Good habit detected. Suspicious. Keep going.'],
     lowhp: ['I feel… unwell. Fewer curses, please.', 'My tentacles are wilting. Be kind to us.', 'Health is low. Even gods need a nap.', "I'm fading. Dramatically. Please tick something.", 'If I faint, I take a level with me. Just saying.'],
     faint: ["I fainted. It was very dramatic. I've recovered. Mostly.", 'I lost a level and some runes. The deep giveth, the deep taketh.', 'Back from the brink. The abyss sends its regards.'],
@@ -386,6 +397,13 @@
       if (up) { setTimeout(celebrate, 350); setMood('proud', pickSay('level')); } else setMood('happy', pickSay(V.sayKind || 'tick')); V.sayKind = null;
     }
     const goal = (id) => D.goals.find((g) => g.id === id);
+    // log a curse: after its sigil is picked, or straight away on a double tap (Patryk 2026-10-27)
+    function logCurse(id, r, k, sig) {
+      const g = goal(id); if (!g) return; const cost = g.hpLoss; let faint = false;
+      act({ verb: 'Cursed:', name: (g.polarity === 'both' ? sides(g.name)[0] : g.name) + (sig ? ' · ' + sig : ''), delta: '−' + cost, unit: 'hp' }, ['gameUntick', id], 'gameTick', [id, -1, sig], (d) => { const x = d.goals.find((y) => y.id === id); x.count = (x.count || 0) + 1; if (x.polarity === 'both') x.cCount = (x.cCount || 0) + 1; d.player.hp -= cost; if (d.player.hp <= 0) { faint = true; d.player.hp = d.player.maxHp; d.player.level = Math.max(1, d.player.level - 1); } });
+      flinch(); floatText(r, '−' + cost + ' HP', '#ff7a66'); glow(k, 'rgba(196,50,58,.9)'); buzz([25, 40, 25]);
+      if (faint) { V.last = { verb: 'Fainted:', name: 'lost a level and 7 days of runes' }; paintTop(); setMood('sad', pickSay('faint')); } else setMood('sad', CURSE_SAYS[Math.floor(Math.random() * CURSE_SAYS.length)]);
+    }
     function archive(id) { const g = goal(id); if (!g) return; return act({ verb: 'Archived:', name: g.name }, ['gameArchive', id, true], 'gameArchive', [id], (d) => { d.goals = d.goals.filter((x) => x.id !== id); }); }
     // the "undo" of something new is only known when the server gives it an id
     const setRev = (rev) => { const u = stack[stack.length - 1]; if (u && !u.rev) u.rev = rev; };
@@ -585,10 +603,25 @@
           '<button data-a="banish" data-id="' + b.id + '" style="height:40px;padding:0 10px;border:1px solid ' + (arm ? '#ff7a66' : '#4a2a2e') + ';border-radius:4px;background:' + (arm ? '#4a1418' : 'transparent') + ';color:' + (arm ? '#ffd0c4' : '#b08a84') + ';font:700 12px var(--a)">' + (arm ? 'Tap again to banish' : 'Banish') + '</button></span></div></div>' : '') + '</div>';
     }
     /* ---------- Omens (curses and blessings; tab renamed by Patryk 2026-10-25) ---------- */
-    const isBless = (g) => g.kind === 'habit' && g.polarity !== 'minus', isCurse = (g) => g.kind === 'habit' && g.polarity !== 'plus';
+    const isBless = (g) => g.kind === 'habit' && g.polarity === 'plus', isCurse = (g) => g.kind === 'habit' && g.polarity === 'minus', isBoth = (g) => g.kind === 'habit' && g.polarity === 'both';
+    // a habit's picture for one side ('c' or 'b'); a two-sided habit keeps both in grp as 'curseKey|blessKey'
+    const picOf = (g, side) => { const pol = side === 'c' ? 'minus' : 'plus'; if (g.polarity !== 'both') return OMENS.of(g); const pr = String(g.grp || '').split('|'); return OMENS.of({ polarity: pol, name: g.name, grp: pr[side === 'c' ? 0 : 1] || '' }); };
+    const ROMAN = ['', 'I', 'II'];
+    const sides = (nm) => { const pr = String(nm).split(' / '); return [pr[0], pr[1] || pr[0]]; };
+    // a two-sided omen (Patryk 2026-10-27): curse half on the left, blessing half on the right, the two pictures meeting on a slanted seam
+    function twoCard(g) { const cn = g.cCount || 0, bn = g.bCount || 0, ab = g.absolve;
+      return '<div class="uz-two"><button class="uz-twl" data-a="curse" data-id="' + g.id + '" data-fx="' + g.id + '" style="border-color:' + (cn ? '#c4323a' : '#4a1c22') + '"><span class="tg" style="color:#ff7a66">CURSE</span>' +
+        '<span class="ft"><span style="color:#ff7a66">−' + g.hpLoss + ' HP</span><span style="color:#b08a84">' + (cn ? cn + '×' : '') + '</span></span></button>' +
+        '<button class="uz-twr" data-a="bless" data-id="' + g.id + '" data-fx="' + g.id + 'b" style="border-color:' + (ab ? '#d8b25a' : bn ? '#4a8ad0' : '#1f4266') + '"><span class="tg" style="color:' + (ab ? '#ffe2a0' : '#9fc8ff') + '">' + (ab ? 'ABSOLUTION ' + ROMAN[ab.stage + 1] : 'BLESSING') + '</span>' +
+        '<span class="ft"><span style="color:#b08a84">' + (bn ? bn + '×' : '') + '</span><span style="display:flex;align-items:center;gap:3px;color:#f0c45a">+' + g.pay + coin(15, g.pay, g.id) + '</span></span></button>' +
+        '<span class="uz-twn"><span>' + esc(sides(g.name)[0]) + '</span><span style="text-align:right">' + esc(sides(g.name)[1]) + '</span></span><span class="uz-twm"><img src="' + OMENS.card('c', picOf(g, 'c')) + '" alt=""><img class="rt" src="' + OMENS.card('b', picOf(g, 'b')) + '" alt=""><i></i></span></div>'; }
+    // the line on an antidote blessing while its Absolution is open
+    const absTag = (g) => g.absolve ? '<span class="uz-abs">Absolution ' + ROMAN[g.absolve.stage + 1] + ' · ' + esc(g.absolve.name) + ' · +' + (g.absolve.stage ? g.absolve.lost - Math.floor(g.absolve.lost / 2) : Math.floor(g.absolve.lost / 2)) + ' HP</span>' : '';
     function curses() {
-      const abc = (a, b) => a.name.localeCompare(b.name, 'en', { sensitivity: 'base' }), cs = D.goals.filter(isCurse).sort(abc), bs = D.goals.filter(isBless).sort(abc), cnt = D.blessCount || 0, cpos = cnt % 8, p = D.player;
-      let h = '<div class="uz-cap" style="border-color:#3a1a1e"><span><b style="color:#ffb3a8">The Cursed Shelf</b></span></div>';
+      const abc = (a, b) => a.name.localeCompare(b.name, 'en', { sensitivity: 'base' }), cs = D.goals.filter(isCurse).sort(abc), bs = D.goals.filter(isBless).sort((a, b) => (b.absolve ? 1 : 0) - (a.absolve ? 1 : 0) || abc(a, b)), two = D.goals.filter(isBoth).sort(abc), cnt = D.blessCount || 0, cpos = cnt % 8, p = D.player;
+      let h = two.length ? '<div class="uz-cap" style="border-color:#3a2a4e"><span><b style="color:#e0c8ff">Both Ways</b></span></div><div style="display:flex;flex-direction:column;gap:8px">' + two.map(twoCard).join('') + '</div>' +
+        (V.edit ? '<div class="uz-chips">' + two.map((c) => '<button data-a="arch" data-id="' + c.id + '">× ' + esc(c.name) + '</button>').join('') + '</div>' : '') : '';
+      h += '<div class="uz-cap" style="border-color:#3a1a1e;margin-top:' + (two.length ? 6 : 0) + 'px"><span><b style="color:#ffb3a8">The Cursed Shelf</b></span></div>';
       // curses as 2-column cards like the blessings (Patryk 2026-10-26)
       h += cs.length ? '<div class="uz-bl">' + cs.map((c) => { const n = c.count || 0;
         return '<button class="uz-bt" data-a="curse" data-id="' + c.id + '" data-fx="' + c.id + '" aria-label="Slipped: ' + esc(c.name) + '" style="background:linear-gradient(180deg,#2a1216,#170a0c);border:1.5px solid ' + (n ? '#c4323a' : '#4a1c22') + '">' +
@@ -599,8 +632,8 @@
       if (p.hp <= 12) h += '<p class="uz-p" style="color:#b08a84">' + 'Careful: ' + p.hp + ' HP left.' + '</p>';
       h += '<div class="uz-cap" style="border-color:#1e2e4e;margin-top:6px"><span><b style="color:#c4e0ff;text-shadow:0 0 8px rgba(140,200,255,.7)">Small Blessings</b></span><span style="font:700 12px var(--a);color:#c4e0ff">' + cnt + ' today</span></div>';
       h += bs.length ? '<div class="uz-bl">' + bs.map((g) => { const f = false, n = g.count || 0;
-        return '<button class="uz-bt" data-a="bless" data-id="' + g.id + '" data-fx="' + g.id + '" style="background:' + (f ? 'linear-gradient(180deg,#2a2410,#151208)' : 'linear-gradient(180deg,#10233a,#0b1626)') + ';border:1.5px solid ' + (f ? '#8a6a2a' : n ? '#4a8ad0' : '#1f4266') + (n ? ';box-shadow:0 0 10px rgba(110,180,255,.35)' : '') + '">' +
-          '<span style="display:flex;align-items:center;gap:7px"><span class="uz-omc"><img src="' + OMENS.card('b', OMENS.of(g)) + '" alt=""></span><span style="flex:1;min-width:0;font:700 14px/1.15 var(--a);color:#e8f2ff">' + esc(g.name) + '</span></span>' +
+        return '<button class="uz-bt" data-a="bless" data-id="' + g.id + '" data-fx="' + g.id + '" style="background:' + (f ? 'linear-gradient(180deg,#2a2410,#151208)' : 'linear-gradient(180deg,#10233a,#0b1626)') + ';border:1.5px solid ' + (g.absolve ? '#d8b25a' : f ? '#8a6a2a' : n ? '#4a8ad0' : '#1f4266') + (g.absolve ? ';box-shadow:0 0 12px rgba(255,214,140,.35)' : n ? ';box-shadow:0 0 10px rgba(110,180,255,.35)' : '') + '">' +
+          '<span style="display:flex;align-items:center;gap:7px"><span class="uz-omc"><img src="' + OMENS.card('b', OMENS.of(g)) + '" alt=""></span><span style="flex:1;min-width:0;font:700 14px/1.15 var(--a);color:#e8f2ff">' + esc(g.name) + '</span></span>' + absTag(g) +
           '<span style="display:flex;align-items:center;justify-content:space-between"><span style="display:flex;align-items:center;gap:3px;font:700 14px var(--a);color:#f0c45a">+' + g.pay + coin(15, g.pay, g.id) + '</span><span style="display:flex;gap:3px">' +
           [0, 1, 2, 3, 4].map((i) => '<span style="width:7px;height:7px;border-radius:1px;background:' + (i < n ? (f ? '#ffd56a' : '#c8e6ff') : '#2c4a7a') + ';box-shadow:' + (i < n ? '0 0 5px rgba(170,215,255,.9)' : 'none') + '"></span>').join('') + '</span></span>' +
           (f ? '<span class="uz-x2">×2 TODAY</span>' : '') + '</button>'; }).join('') + '</div>' : '<p class="uz-p" style="color:#6f8a7c">No blessings yet.</p>';
@@ -710,7 +743,7 @@
       quest: () => ({ name: '', len: 30, kind: 'necessary', due: '', grp: 'teach', steps: [] }),
       mark: () => ({ name: 'Mark  books', len: 60, sittings: 2, due: '' }),
       boss: () => ({ name: '', size: 5, k: 'shog', grp: 'teach', steps: [{ n: '', by: addD(D.today, 3) }] }),
-      group: () => ({ name: '', parent: 'teach' }), reward: () => ({ name: '', cost: 80 }), curse: () => ({ name: '', len: 30, type: 'curse' }) };
+      group: () => ({ name: '', parent: 'teach' }), reward: () => ({ name: '', cost: 80 }), curse: () => ({ name: '', name2: '', len: 30, type: 'curse', anti: '', gc: '', gb: '' }) };
     const pay = (len, kind) => Math.round((D.table.base[len] || 6) * (D.table.mult[kind] || 1));
     // an existing ritual, quest, curse, blessing or marking class opened in its form (Patryk 2026-10-26: edit after setting)
     const formKind = (g) => ({ daily: 'ritual', todo: 'quest', termly: 'mark' }[g.kind] || 'curse');
@@ -720,7 +753,8 @@
         return Object.assign(base, { kind: g.track, rep: e ? 'every' : ds === '12345' ? 'school' : 'days', days: ds.split('').map((x) => Number(x) % 7), n: e ? (e % 7 === 0 ? e / 7 : e) : 3, unit: e && e % 7 === 0 ? 'weeks' : 'days', group: g.grp }); }
       if (g.kind === 'todo') return Object.assign(base, { kind: g.track, due: g.due || '', grp: areaOf(g.grp), steps: (g.steps || []).map((x) => ({ n: x.t, d: !!x.d })) });
       if (g.kind === 'termly') return Object.assign(base, { sittings: g.sittings || 2, due: g.due || '' });
-      return Object.assign(base, { type: g.polarity === 'minus' ? 'curse' : 'bless' });
+      const two = g.polarity === 'both', pr = String(g.grp || '').split('|'), nm = String(g.name).split(' / ');
+      return Object.assign(base, { type: two ? 'both' : g.polarity === 'minus' ? 'curse' : 'bless', anti: g.anti || '', name: two ? nm[0] : g.name, name2: two ? (nm[1] || '') : '', gc: two ? pr[0] || '' : '', gb: two ? pr[1] || '' : '' });
     }
     // a boss opened in its form: stages remember their old place (i) so a stage already hit keeps its tick
     const draftOfBoss = (b) => ({ id: b.id, name: b.name, size: b.size || 5, k: b.creature || SIZE[b.size || 5].k, grp: b.grp || 'teach', steps: b.stages.map((x) => ({ n: x.name, by: x.due || '', i: x.i, d: !!x.done })) });
@@ -732,7 +766,9 @@
       if (f === 'ritual') return Object.assign(o, { track: trackOf(f, d), kind: 'daily', grp: d.group, days: d.rep === 'school' ? '12345' : d.rep === 'days' ? d.days.map((x) => x || 7).sort().join('') : '', everyN: d.rep === 'every' ? d.n * (d.unit === 'weeks' ? 7 : 1) : '' });
       if (f === 'quest') return Object.assign(o, { track: trackOf(f, d), kind: 'todo', grp: d.grp, due: d.due || '', steps: d.steps.filter((x) => x.n.trim()).map((x) => ({ t: x.n.trim(), d: !!x.d })) });
       if (f === 'mark') return Object.assign(o, { track: 'necessary', kind: 'termly', grp: d.grp0 || 'marking', sittings: d.sittings, due: d.due || '' });
-      return Object.assign(o, { kind: 'habit', polarity: d.type === 'curse' ? 'minus' : 'plus', track: 'life', grp: d.grp0 || '' });
+      const two = d.type === 'both';
+      return Object.assign(o, { kind: 'habit', polarity: two ? 'both' : d.type === 'curse' ? 'minus' : 'plus', track: 'life', grp: two ? (d.gc || '') + '|' + (d.gb || '') : d.grp0 || '', anti: d.type === 'curse' ? d.anti || '' : '',
+        name: two && (d.name2 || '').trim() ? nm + ' / ' + d.name2.trim() : nm });
     }
     const dateRow = (label, v) => '<div style="display:flex;flex-direction:column;gap:5px"><span class="uz-lbl">' + label + '</span><div class="uz-date"><input type="date" data-due="1" value="' + esc(v || '') + '">' + (v ? '<button data-a="nodue">No date</button>' : '') + '</div></div>';
     function form() {
@@ -767,12 +803,18 @@
         payL = 'Groups fold away and can be renamed with ✎'; payCoin = false; go = 'Make the group'; }
       if (f === 'reward') { title = 'New reward for the Hoard'; ph = 'e.g. Cinema trip'; col = '#ffd56a';
         rows = row('COST', [40, 80, 120, 300, 600, 1000].map((n) => chip(String(n), d.cost === n, 'd', 'cost:' + n, '#ffd56a'))); payL = 'Costs'; payV = String(d.cost); go = 'Add to the Hoard'; goBg = '#ffd56a'; }
-      if (f === 'curse') { const cu = d.type === 'curse'; title = (d.id ? 'Edit ' : 'New ') + (cu ? 'curse' : 'blessing'); ph = cu ? 'The bad habit' : 'The good habit'; col = cu ? '#ff7a66' : '#b6ffd6';
-        const pk = OMENS.of({ polarity: cu ? 'minus' : 'plus', name: d.name, grp: d.grp0 });
-        rows = row('TYPE', [chip('Curse', cu, 'd', 'type:curse', '#ff7a66'), chip('Blessing', !cu, 'd', 'type:bless')]) + lenRow +
-          row('PICTURE', OMENS.CATS[cu ? 'c' : 'b'].map(([k, l]) => chip(l, pk === k, 'd', 'grp0:' + k, col, OMENS.card(cu ? 'c' : 'b', k))));
-        if (cu) { payL = 'Costs health, never runes'; payV = '−' + D.table.hpLoss[d.len] + ' HP'; payC = '#ff7a66'; payCoin = false; } else { payL = 'Pays each time you tap it'; payV = '+' + Math.max(2, Math.round(D.table.base[d.len] / 2)); }
-        go = 'Add it'; goBg = cu ? '#ff7a66' : '#5ef2a0'; }
+      if (f === 'curse') { const cu = d.type === 'curse', two = d.type === 'both';
+        title = (d.id ? 'Edit ' : 'New ') + (two ? 'two-sided omen' : cu ? 'curse' : 'blessing'); ph = two ? 'The bad side, e.g. Junk food' : cu ? 'The bad habit' : 'The good habit'; col = two ? '#e0c8ff' : cu ? '#ff7a66' : '#b6ffd6';
+        const pics = (side, key, lbl) => { const pk = OMENS.of({ polarity: side === 'c' ? 'minus' : 'plus', name: side === 'c' ? d.name : d.name2 || d.name, grp: key });
+          return row(lbl, OMENS.CATS[side].map(([k, l]) => chip(l, pk === k, 'd', (two ? (side === 'c' ? 'gc:' : 'gb:') : 'grp0:') + k, side === 'c' ? '#ff7a66' : '#b6ffd6', OMENS.card(side, k)))); };
+        rows = row('TYPE', [chip('Curse', cu, 'd', 'type:curse', '#ff7a66'), chip('Blessing', d.type === 'bless', 'd', 'type:bless'), chip('Both', two, 'd', 'type:both', '#e0c8ff')]) +
+          (two ? '<input data-name2="1" value="' + esc(d.name2 || '') + '" placeholder="The good side, e.g. Cooked from scratch">' : '') + lenRow +
+          (two ? pics('c', d.gc, 'CURSE PICTURE') + pics('b', d.gb, 'BLESSING PICTURE') : pics(cu ? 'c' : 'b', d.grp0, 'PICTURE'));
+        // a curse's antidote: the blessing that wins its health back (Absolution); a two-sided omen is its own antidote
+        if (cu) rows += row('ANTIDOTE (WINS THE HEALTH BACK)', [chip('None', !d.anti, 'd', 'anti:', '#ffe2a0')].concat(D.goals.filter((g) => g.kind === 'habit' && g.polarity === 'plus').sort((a, b) => a.name.localeCompare(b.name)).map((g) => chip(g.name, d.anti === g.id, 'd', 'anti:' + g.id, '#ffe2a0', OMENS.card('b', OMENS.of(g))))));
+        if (two) { payL = 'Curse side costs, blessing side pays'; payV = '−' + D.table.hpLoss[d.len] + ' HP · +' + Math.max(2, Math.round(D.table.base[d.len] / 2)); payC = '#e0c8ff'; payCoin = false; }
+        else if (cu) { payL = 'Costs health, never runes'; payV = '−' + D.table.hpLoss[d.len] + ' HP'; payC = '#ff7a66'; payCoin = false; } else { payL = 'Pays each time you tap it'; payV = '+' + Math.max(2, Math.round(D.table.base[d.len] / 2)); }
+        go = 'Add it'; goBg = two ? '#c8a8ff' : cu ? '#ff7a66' : '#5ef2a0'; }
       if (steps) steps = '<span class="uz-lbl">' + steps + '</span>' + d.steps.map((s, i) => '<div class="uz-srow"><input data-step="' + i + '" value="' + esc(s.n) + '" placeholder="' + (f === 'boss' ? 'Stage ' + (i + 1) : 'A small step') + '">' +
         (f === 'boss' ? '<input type="date" data-sby="' + i + '" value="' + esc(s.by || '') + '" style="flex:none;width:150px;height:44px;padding:0 8px;border-radius:5px;border:1.5px solid #4a2a2e;background:#1c1012;color:#ffb3a8;font:700 13px var(--a);color-scheme:dark">' : '') +
         (s.d && f === 'boss' ? '<span style="flex:none;width:40px;text-align:center;color:#ff9a85;font:700 16px var(--a)" title="Already hit">✓</span>' : '<button data-a="sdel" data-v="' + i + '" style="flex:none;width:40px;height:44px;border:none;background:none;color:#7f9389;font:18px var(--a)">×</button>') + '</div>').join('') +
@@ -800,7 +842,7 @@
       if (f === 'group') return act({ verb: 'New group:', name: nm }, null, 'gameGroupSave', [{ name: nm, parent: d.parent === 'top' ? '' : d.parent }], null, (r) => { V.open[r.saved] = 1; paint(); });
       if (f === 'reward') return act({ verb: 'New reward:', name: nm }, null, 'gameHoardSave', [{ name: nm, cost: d.cost }], null, (r) => { if (r.saved) setRev(['gameHoardSave', { id: r.saved, name: nm, cost: d.cost, archived: true }]); });
       if (f === 'curse') { const cu = d.type === 'curse';
-        return act({ verb: cu ? 'New curse:' : 'New blessing:', name: nm }, null, 'gameSaveGoal', [goalOf(f, d)], null, archOnSave); }
+        return act({ verb: d.type === 'both' ? 'New omen:' : cu ? 'New curse:' : 'New blessing:', name: nm }, null, 'gameSaveGoal', [goalOf(f, d)], null, archOnSave); }
     }
 
     /* ---------- paint ---------- */
@@ -825,6 +867,7 @@
     /* ---------- typing (no repaint while typing) ---------- */
     box.addEventListener('input', (e) => {
       const t = e.target;
+      if (t.dataset.name2 && V.draft) V.draft.name2 = t.value;
       if (t.dataset.name && V.draft) { V.draft.name = t.value; const go = body.querySelector('.uz-go'); if (go) go.style.opacity = t.value.trim() ? 1 : 0.45; }
       if (t.dataset.step !== undefined && V.draft) V.draft.steps[Number(t.dataset.step)].n = t.value;
       if (t.dataset.due && V.draft) V.draft.due = t.value;
@@ -921,16 +964,21 @@
       }
       if (a === 'curse') {
         if (V.edit) { const g0 = goal(id); V.form = 'curse'; V.draft = draftOf(g0); V.orig = clone(V.draft); return paint(); }
-        const g = goal(id), cost = g.hpLoss; let faint = false;
-        act({ verb: 'Cursed:', name: g.name, delta: '−' + cost, unit: 'hp' }, ['gameUntick', id], 'gameTick', [id, -1], (d) => { const x = d.goals.find((y) => y.id === id); x.count = (x.count || 0) + 1; d.player.hp -= cost; if (d.player.hp <= 0) { faint = true; d.player.hp = d.player.maxHp; d.player.level = Math.max(1, d.player.level - 1); } });
-        flinch(); floatText(r, '−' + cost + ' HP', '#ff7a66'); glow(k, 'rgba(196,50,58,.9)'); buzz([25, 40, 25]);
-        if (faint) { V.last = { verb: 'Fainted:', name: 'lost a level and 7 days of runes' }; paintTop(); setMood('sad', pickSay('faint')); } else setMood('sad', CURSE_SAYS[Math.floor(Math.random() * CURSE_SAYS.length)]);
+        if (V.curseT && V.curseT.id === id) { clearTimeout(V.curseT.t); V.curseT = null; return logCurse(id, r, k, ''); }
+        if (V.curseT) clearTimeout(V.curseT.t);
+        V.curseT = { id, t: setTimeout(() => { V.curseT = null; const host = b.closest('.uz-pane');
+          if (window.BLOOD && host && !matchMedia('(prefers-reduced-motion: reduce)').matches) BLOOD.open(host, b, (sig) => logCurse(id, b.getBoundingClientRect(), k, sig || '')); else logCurse(id, r, k, ''); }, 260) };
         return;
       }
       if (a === 'bless') {
         if (V.edit) { const g0 = goal(id); V.form = 'curse'; V.draft = draftOf(g0); V.orig = clone(V.draft); return paint(); }
         const g = goal(id), chain = false, n = g.pay; let upL = false;
-        act({ verb: chain ? 'Blessing chain!' : 'Blessing:', name: g.name, delta: '+' + n, unit: 'coin' }, ['gameUntick', id], 'gameTick', [id, 1], (d) => { const x = d.goals.find((y) => y.id === id); x.count = (x.count || 0) + 1; d.blessCount = (d.blessCount || 0) + 1; upL = earnLocal(d, n, g.pay); });
+        const ab = g.absolve, back = ab ? (ab.stage ? ab.lost - Math.floor(ab.lost / 2) : Math.floor(ab.lost / 2)) : 0;
+        act(ab ? { verb: 'Absolution ' + ROMAN[ab.stage + 1] + ':', name: ab.name + ' · +' + back + ' HP' } : { verb: chain ? 'Blessing chain!' : 'Blessing:', name: g.polarity === 'both' ? sides(g.name)[1] : g.name, delta: '+' + n, unit: 'coin' }, ['gameUntick', id], 'gameTick', [id, 1],
+          (d) => { const x = d.goals.find((y) => y.id === id); x.count = (x.count || 0) + 1; if (x.polarity === 'both') x.bCount = (x.bCount || 0) + 1; d.blessCount = (d.blessCount || 0) + 1; upL = earnLocal(d, n, g.pay);
+            if (ab) { d.player.hp = Math.min(d.player.maxHp, d.player.hp + back); if (ab.stage) delete x.absolve; else x.absolve = Object.assign({}, ab, { stage: 1 }); } },
+          (d2) => { if (d2.last && d2.last.abs && d2.last.abs.stage === 2) { V.last = { verb: 'Absolved:', name: d2.last.abs.curse }; paintTop(); } });
+        if (ab) floatText(r, '+' + back + ' HP', '#ffe2a0');
         V.sayKind = 'bless'; ripple(r, '#bfe2ff'); earnFx(r, k, n, upL); return;
       }
       if (a === 'step') { const q = goal(id), i = Number(v), on = !q.steps[i].d; buzz(6);
