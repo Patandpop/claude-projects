@@ -57,7 +57,10 @@ const OMENS = (() => {
     ['wash', 'Washing', /shower|bath|wash|skin/i, (g) => { g.r(3, 2, 11, 2, '#a8b0bc'); g.r(3, 2, 2, 5, '#a8b0bc'); g.el(15, 6, 5, 3, '#c8d0dc'); g.r(10, 6, 11, 1, '#c8d0dc');
       [11, 13, 15, 17, 19].forEach((i) => g.p(i, 8, '#5a6a7a')); for (let k = 0; k < 5; k++) for (let j = 11; j < 22; j += 3) { g.p(11 + k * 2 - (j - 11) / 6, j, '#7ac8f0'); g.p(11 + k * 2 - (j - 11) / 6, j + 1, '#7ac8f0'); } }],
     ['food', 'Eating well', /eat|healthy|veg|fruit|salad|cook|breakfast|lunch|water|meal/i, (g) => { g.el(12, 13, 7, 9, '#3a6a2a'); g.el(12, 14, 5, 7, '#c8e070'); g.d(12, 16, 3, '#8a5a2a'); g.p(11, 15, '#b07a4a'); g.p(9, 9, '#e0f090'); }],
-    ['mind', 'Learning and puzzles', /wordle|puzzle|read|learn|study|book|proud|journal|idea|crossword|language/i, (g) => { g.d(12, 9, 7, '#fff0a0'); g.d(10, 7, 2, '#ffffff'); g.ln(10, 10, 12, 12, '#e0a020'); g.ln(12, 12, 14, 10, '#e0a020');
+    // open book (Patryk 2026-10-27: reading as a blessing)
+    ['read', 'Reading', /read|book|novel|chapter|page|kindle|library/i, (g) => { g.r(2, 9, 20, 11, '#6a2a1a'); g.r(3, 7, 8, 11, '#f4ecd8'); g.r(13, 7, 8, 11, '#f4ecd8'); g.r(3, 7, 2, 1, '#6a2a1a'); g.r(19, 7, 2, 1, '#6a2a1a');
+      g.r(11, 8, 2, 11, '#c8b898'); [10, 12, 14, 16].forEach((j) => { g.r(5, j, 5, 1, '#a89a7a'); g.r(14, j, 5, 1, '#a89a7a'); }); g.r(17, 18, 1, 4, '#a02a2a'); g.p(16, 21, '#a02a2a'); g.p(18, 21, '#a02a2a'); spark(g, 12, 3); spark(g, 4, 3); }],
+    ['mind', 'Learning and puzzles', /wordle|puzzle|learn|study|proud|journal|idea|crossword|language/i, (g) => { g.d(12, 9, 7, '#fff0a0'); g.d(10, 7, 2, '#ffffff'); g.ln(10, 10, 12, 12, '#e0a020'); g.ln(12, 12, 14, 10, '#e0a020');
       g.r(9, 15, 6, 5, '#a8a8b4'); g.r(9, 16, 6, 1, '#7a7a86'); g.r(9, 18, 6, 1, '#7a7a86'); g.r(10, 20, 4, 1, '#5a5a66'); [[2, 9], [22, 9], [4, 2], [20, 2]].forEach(([i, j]) => g.p(i, j, '#ffe066')); }],
     ['family', 'Family calls', /family|grandma|grandad|gran|nan|mum|dad|parent|brother|sister/i, (g) => { // old telephone, outline redrawn 2026-10-26: receiver lifted clear of the body
       g.r(3, 6, 5, 5, '#c03a3a'); g.r(16, 6, 5, 5, '#c03a3a'); g.r(6, 7, 12, 3, '#b02a2a'); g.r(4, 6, 16, 1, '#e06a6a');

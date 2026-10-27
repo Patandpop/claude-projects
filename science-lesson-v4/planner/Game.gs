@@ -25,7 +25,7 @@ const G_HEAD = {
   freeze: ['day', 'reason', 'savedOn'],
   seen: ['lesson', 'built', 'firstBuiltOn'],
   owned: ['itemId', 'boughtOn', 'price', 'slot'],
-  bosses: ['id', 'name', 'maxHp', 'stages', 'reward', 'startedOn', 'status', 'beatenOn'],
+  bosses: ['id', 'name', 'maxHp', 'stages', 'reward', 'startedOn', 'status', 'beatenOn', 'grp'],
   reviews: ['week', 'wentWell', 'slipped', 'p1', 'p2', 'p3', 'savedOn'],
   hoard: ['id', 'name', 'cost', 'claims', 'archived', 'created'],
 };
@@ -567,7 +567,7 @@ function gBosses_(today) {
     let st = []; try { st = JSON.parse(b.stages || '[]'); } catch (e) { st = []; }
     const maxHp = Number(b.maxHp) || 100, dealt = st.reduce((a, x) => a + (x.done ? (x.late ? x.dmg / 2 : x.dmg) : 0), 0);
     let reward = {}; try { reward = JSON.parse(b.reward || '{}'); } catch (e) { reward = {}; }
-    return { id: b.id, name: b.name, maxHp, hp: b.status === 'beaten' ? 0 : Math.max(0, Math.round(maxHp - dealt)), status: b.status, reward: reward.coins || 0, trophy: reward.trophy || '', size: reward.size || 5, creature: reward.k || '',
+    return { id: b.id, name: b.name, grp: String(b.grp || 'teach'), maxHp, hp: b.status === 'beaten' ? 0 : Math.max(0, Math.round(maxHp - dealt)), status: b.status, reward: reward.coins || 0, trophy: reward.trophy || '', size: reward.size || 5, creature: reward.k || '',
       stages: st.map((x, i) => ({ i, name: x.name, due: x.due, done: x.done || '', late: !!x.late, overdue: !x.done && x.due && x.due < today })) };
   });
 }
@@ -581,7 +581,7 @@ function gameBossStart(k, boss) {
     const each = Math.round(100 / stages.length); stages.forEach((x, i) => { x.dmg = i === stages.length - 1 ? 100 - each * (stages.length - 1) : each; x.done = ''; });
     const size = [2, 5, 10, 20].indexOf(Number(boss.size)) >= 0 ? Number(boss.size) : 5, k = /^[a-z]{2,8}$/.test(String(boss.k || '')) ? boss.k : G_BOSS[size].k;
     newId = 'b' + Utilities.getUuid().slice(0, 7);
-    gAppend_('bosses', { id: newId, name, maxHp: 100, stages: JSON.stringify(stages), reward: JSON.stringify({ coins: G_BOSS[size].gold, trophy: 'Trophy: ' + name, size, k }), startedOn: today, status: 'active', beatenOn: '' });
+    gAppend_('bosses', { id: newId, name, maxHp: 100, stages: JSON.stringify(stages), reward: JSON.stringify({ coins: G_BOSS[size].gold, trophy: 'Trophy: ' + name, size, k }), startedOn: today, status: 'active', beatenOn: '', grp: String(boss.grp || 'teach').slice(0, 40) });
   });
   return gSnapshot_(gWorld_(), { newBoss: newId });
 }
@@ -606,6 +606,25 @@ function gameBossStage(k, id, i, on) {
     }
   });
   return gSnapshot_(gWorld_(), res ? { boss: res } : null);
+}
+// edit a boss still being fought (Patryk 2026-10-27): its name, area, size and stages. A stage already hit keeps its
+// tick (stages are matched by i, their old place); the damage is shared out again across the new list of stages.
+function gameBossSave(k, boss) {
+  check_(k);
+  withLock_(function () {
+    const row = gRows_('bosses').find((b) => b.id === boss.id); if (!row || row.status !== 'active') throw new Error('That boss is gone.');
+    const name = String(boss.name || '').trim().slice(0, 80); let old = []; try { old = JSON.parse(row.stages || '[]'); } catch (e) { old = []; }
+    const st = (boss.stages || []).map((x) => { const was = x.i === undefined || x.i === null || x.i === '' ? null : old[Number(x.i)];
+      return { name: String(x.name || '').trim().slice(0, 80), due: /^\d{4}-\d{2}-\d{2}$/.test(String(x.due)) ? x.due : '', done: was ? was.done || '' : '', late: was ? !!was.late : false }; }).filter((x) => x.name);
+    if (!name || !st.length) throw new Error('A boss needs a name and at least one stage.');
+    const each = Math.round(100 / st.length); st.forEach((x, i) => { x.dmg = i === st.length - 1 ? 100 - each * (st.length - 1) : each; });
+    let rw = {}; try { rw = JSON.parse(row.reward || '{}'); } catch (e) { rw = {}; }
+    const size = [2, 5, 10, 20].indexOf(Number(boss.size)) >= 0 ? Number(boss.size) : (rw.size || 5);
+    rw = { coins: G_BOSS[size].gold, trophy: 'Trophy: ' + name, size, k: /^[a-z]{2,8}$/.test(String(boss.k || '')) ? boss.k : (rw.k || G_BOSS[size].k) };
+    gSet_('bosses', row.row, 'name', name); gSet_('bosses', row.row, 'stages', JSON.stringify(st)); gSet_('bosses', row.row, 'reward', JSON.stringify(rw));
+    gSet_('bosses', row.row, 'grp', String(boss.grp || 'teach').slice(0, 40));
+  });
+  return gSnapshot_(gWorld_());
 }
 // remove a boss made by mistake (Patryk 2026-10-24: two made by accident). Only a boss still being fought; it is
 // only marked "removed" (the row stays), so back = true puts it back exactly as it was (the Undo button).

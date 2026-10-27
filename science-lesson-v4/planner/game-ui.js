@@ -492,7 +492,10 @@
       if (D.review && D.review.show) h += review();
       if (T.work.length) h += '<div class="uz-cap"><span><b style="color:#cfe8dc">Toil</b></span><span style="font:700 12px var(--a);color:#5ef2a0">' + T.work.length + ' left</span></div>' + T.work.map((x) => x.html).join('');
       if (T.life.length) h += '<div class="uz-cap" style="margin-top:6px"><span><b style="color:#b6ffd6">The Surface</b></span><span style="font:700 12px var(--a);color:#5ee08a">' + T.life.length + ' left</span></div>' + T.life.map((x) => x.html).join('');
-      if (!T.work.length && !T.life.length) h += '<p class="uz-p" style="color:#93a69c;font-size:15px;text-align:center;padding:18px 0">' + (D.frozen ? 'Day off. Rest.' : 'Nothing left today. The deep is pleased.') + '</p>';
+      // quests not due yet, or with no date, were nowhere on this tab (Patryk 2026-10-27: "I can't see any quests")
+      const later = D.goals.filter((g) => g.kind === 'todo' && !g.doneOn && !(g.due && g.due <= D.today)).sort((a, b) => ((a.due || '9') < (b.due || '9') ? -1 : 1));
+      if (later.length) h += '<div class="uz-cap" style="margin-top:6px"><span><b style="color:#c9b8ff">Quests ahead</b></span><span style="font:700 12px var(--a);color:#a48aff">' + later.length + '</span></div>' + later.map(questCard).join('');
+      if (!T.work.length && !T.life.length && !later.length) h += '<p class="uz-p" style="color:#93a69c;font-size:15px;text-align:center;padding:18px 0">' + (D.frozen ? 'Day off. Rest.' : 'Nothing left today. The deep is pleased.') + '</p>';
       if (T.done.length) h += '<button class="uz-cap" data-a="fold" data-v="tdone" style="margin-top:6px"><span class="uz-chev" style="transform:rotate(' + (V.open.tdone ? 90 : 0) + 'deg)">▶</span><span><b style="color:#93a69c">Appeased</b></span><span style="font:700 12px var(--a);color:#93a69c">' + T.done.length + '</span></button>' + (V.open.tdone ? T.done.map((x) => x.html).join('') : '');
       return h;
     }
@@ -513,8 +516,8 @@
       D.groups.filter((g) => !g.parent && g.type !== 'summon' && g.type !== 'marking').forEach((a) => {
         const kids = D.groups.filter((x) => (x.id === a.id || x.parent === a.id) && x.type === 'list');
         const r = rits.filter((g) => kids.some((x) => x.id === g.grp));
-        const q = a.id === 'teach' ? qs.filter((g) => g.grp !== 'life') : a.id === 'life' ? qs.filter((g) => g.grp === 'life') : [];
-        const mk = a.id === 'teach' ? marks : [], bo = a.id === 'teach' ? D.bosses : [], nq = q.length + mk.length + bo.length;
+        const q = qs.filter((g) => areaOf(g.grp) === a.id);
+        const mk = a.id === 'teach' ? marks : [], bo = D.bosses.filter((b) => areaOf(b.grp || 'teach') === a.id), nq = q.length + mk.length + bo.length;
         h += '<div class="uz-sec">' + header(a.id, a.name, '', r.length + ' rituals · ' + nq + ' quests', '', false);
         if (V.open[a.id]) {
           if (r.length) h += '<div class="uz-sub2">Rituals</div>';
@@ -578,12 +581,13 @@
             '<div style="flex:1;min-width:0"><div style="font:700 14px var(--a);color:#f0e0d8;text-decoration:' + (st.done ? 'line-through' : 'none') + '">' + esc(st.name) + '</div><div style="font:12px var(--a);color:#b08a84">' + (st.due ? dueTxt(st.due) : '') + '</div></div>' +
             '<span class="uz-tag" style="color:' + f + ';background:' + bg + ';border-color:' + bd + '">' + tag + '</span></div>';
         }).join('') + '<div style="display:flex;align-items:center;justify-content:space-between;padding-top:2px"><span style="display:flex;align-items:center;gap:4px;font:700 13px var(--a);color:#f0c45a">' + b.reward + coin(16, b.reward, b.id, 'boss') + '<span style="color:#c49a94;font-weight:400">+ trophy when beaten</span></span>' +
-          '<button data-a="banish" data-id="' + b.id + '" style="height:40px;padding:0 10px;border:1px solid ' + (arm ? '#ff7a66' : '#4a2a2e') + ';border-radius:4px;background:' + (arm ? '#4a1418' : 'transparent') + ';color:' + (arm ? '#ffd0c4' : '#b08a84') + ';font:700 12px var(--a)">' + (arm ? 'Tap again to banish' : 'Banish') + '</button></div></div>' : '') + '</div>';
+          '<span style="display:flex;gap:6px"><button data-a="editb" data-id="' + b.id + '" style="height:40px;padding:0 10px;border:1px solid #4a2a2e;border-radius:4px;background:transparent;color:#ffb3a8;font:700 12px var(--a)">✎ Edit</button>' +
+          '<button data-a="banish" data-id="' + b.id + '" style="height:40px;padding:0 10px;border:1px solid ' + (arm ? '#ff7a66' : '#4a2a2e') + ';border-radius:4px;background:' + (arm ? '#4a1418' : 'transparent') + ';color:' + (arm ? '#ffd0c4' : '#b08a84') + ';font:700 12px var(--a)">' + (arm ? 'Tap again to banish' : 'Banish') + '</button></span></div></div>' : '') + '</div>';
     }
     /* ---------- Omens (curses and blessings; tab renamed by Patryk 2026-10-25) ---------- */
     const isBless = (g) => g.kind === 'habit' && g.polarity !== 'minus', isCurse = (g) => g.kind === 'habit' && g.polarity !== 'plus';
     function curses() {
-      const cs = D.goals.filter(isCurse), bs = D.goals.filter(isBless), cnt = D.blessCount || 0, cpos = cnt % 8, p = D.player;
+      const abc = (a, b) => a.name.localeCompare(b.name, 'en', { sensitivity: 'base' }), cs = D.goals.filter(isCurse).sort(abc), bs = D.goals.filter(isBless).sort(abc), cnt = D.blessCount || 0, cpos = cnt % 8, p = D.player;
       let h = '<div class="uz-cap" style="border-color:#3a1a1e"><span><b style="color:#ffb3a8">The Cursed Shelf</b></span></div>';
       // curses as 2-column cards like the blessings (Patryk 2026-10-26)
       h += cs.length ? '<div class="uz-bl">' + cs.map((c) => { const n = c.count || 0;
@@ -705,7 +709,7 @@
       ritual: () => ({ name: '', len: 15, kind: 'necessary', rep: 'school', days: [1, 3, 5], n: 3, unit: 'days', group: 'chores' }),
       quest: () => ({ name: '', len: 30, kind: 'necessary', due: '', grp: 'teach', steps: [] }),
       mark: () => ({ name: 'Mark  books', len: 60, sittings: 2, due: '' }),
-      boss: () => ({ name: '', size: 5, k: 'shog', steps: [{ n: '', by: addD(D.today, 3) }] }),
+      boss: () => ({ name: '', size: 5, k: 'shog', grp: 'teach', steps: [{ n: '', by: addD(D.today, 3) }] }),
       group: () => ({ name: '', parent: 'teach' }), reward: () => ({ name: '', cost: 80 }), curse: () => ({ name: '', len: 30, type: 'curse' }) };
     const pay = (len, kind) => Math.round((D.table.base[len] || 6) * (D.table.mult[kind] || 1));
     // an existing ritual, quest, curse, blessing or marking class opened in its form (Patryk 2026-10-26: edit after setting)
@@ -714,10 +718,12 @@
       const base = { id: g.id, name: g.name, len: g.minutes, grp0: g.grp, priv: g.private };
       if (g.kind === 'daily') { const ds = String(g.days || ''), e = Number(g.everyN) || 0;
         return Object.assign(base, { kind: g.track, rep: e ? 'every' : ds === '12345' ? 'school' : 'days', days: ds.split('').map((x) => Number(x) % 7), n: e ? (e % 7 === 0 ? e / 7 : e) : 3, unit: e && e % 7 === 0 ? 'weeks' : 'days', group: g.grp }); }
-      if (g.kind === 'todo') return Object.assign(base, { kind: g.track, due: g.due || '', grp: g.grp === 'life' ? 'life' : 'teach', steps: (g.steps || []).map((x) => ({ n: x.t, d: !!x.d })) });
+      if (g.kind === 'todo') return Object.assign(base, { kind: g.track, due: g.due || '', grp: areaOf(g.grp), steps: (g.steps || []).map((x) => ({ n: x.t, d: !!x.d })) });
       if (g.kind === 'termly') return Object.assign(base, { sittings: g.sittings || 2, due: g.due || '' });
       return Object.assign(base, { type: g.polarity === 'minus' ? 'curse' : 'bless' });
     }
+    // a boss opened in its form: stages remember their old place (i) so a stage already hit keeps its tick
+    const draftOfBoss = (b) => ({ id: b.id, name: b.name, size: b.size || 5, k: b.creature || SIZE[b.size || 5].k, grp: b.grp || 'teach', steps: b.stages.map((x) => ({ n: x.name, by: x.due || '', i: x.i, d: !!x.done })) });
     // the pay kind: Life when it sits in the Life area, Outside work when switched on, otherwise as it was (old Ahead ones stay)
     const trackOf = (f, d) => ((f === 'ritual' ? areaOf(d.group) : d.grp) === 'life' ? 'life' : d.kind === 'external' ? 'external' : d.kind === 'ahead' ? 'ahead' : 'necessary');
     // what the server is sent for a form (new or edited)
@@ -733,6 +739,8 @@
       const f = V.form, d = V.draft;
       const chip = (label, sel, a, v, col, img) => '<button data-a="' + a + '" data-v="' + esc(v) + '" style="border-color:' + (sel ? (col || '#5ef2a0') : '#2f443b') + ';background:' + (sel ? '#173a2c' : '#131d19') + ';color:' + (sel ? (col || '#b6ffd6') : '#cfd8d3') + '">' + (img ? '<img src="' + img + '" alt="">' : '') + esc(label) + '</button>';
       const row = (label, chips) => '<div style="display:flex;flex-direction:column;gap:5px"><span class="uz-lbl">' + label + '</span><div class="uz-chips">' + chips.join('') + '</div></div>';
+      // every top-level area (Teaching, Life, his own areas): where a quest or boss lives, changeable later (Patryk 2026-10-27)
+      const areaRow = (cur) => row('AREA', D.groups.filter((g) => !g.parent && g.type !== 'summon' && g.type !== 'marking').map((g) => chip(g.id === 'teach' ? 'Teaching' : g.id === 'life' ? 'Life' : g.name, cur === g.id, 'd', 'grp:' + g.id)));
       const lenRow = row('SIZE', LENS.map((n) => chip(EFF[n], d.len === n, 'd', 'len:' + n)));
       const outRow = '<div class="uz-chips">' + chip('Outside work', d.kind === 'external', 'd', 'kind:' + (d.kind === 'external' ? 'necessary' : 'external'), '#b07cff') + '</div>';
       let title, ph, col = '#5ef2a0', rows = '', payL = '', payV = '', payC = '#ffd56a', payCoin = true, go = '', goBg = '#5ef2a0', steps = '';
@@ -744,11 +752,11 @@
         payL = 'Pays'; payV = '+' + pay(d.len, trackOf('ritual', d)); go = 'Add the ritual'; }
       if (f === 'quest') { title = d.id ? 'Edit quest' : 'New quest'; ph = 'What needs doing?'; col = '#a48aff';
         rows = lenRow + (d.grp === 'life' ? '' : outRow) + dateRow('DUE DATE', d.due) +
-          row('AREA', [['teach', 'Teaching'], ['life', 'Life']].map(([k, l]) => chip(l, d.grp === k, 'd', 'grp:' + k)));
+          areaRow(d.grp);
         steps = 'CHECKLIST (OPTIONAL)'; payL = 'Pays'; payV = '+' + pay(d.len, trackOf('quest', d)); go = 'Add the quest'; goBg = '#a48aff'; }
-      if (f === 'boss') { title = 'Summon a boss'; ph = 'The big job, e.g. Mark the 9AS mocks'; col = '#ff9a85'; const k = d.k || SIZE[d.size].k;
+      if (f === 'boss') { title = d.id ? 'Edit boss' : 'Summon a boss'; ph = 'The big job, e.g. Mark the 9AS mocks'; col = '#ff9a85'; const k = d.k || SIZE[d.size].k;
         rows = row('SIZE · TOTAL HOURS (2 H MINIMUM)', [2, 5, 10, 20].map((n) => { const m = P.bossMeta[SIZE[n].k]; return chip(m.size + ' · ' + SIZE[n].gold, d.size === n, 'd', 'size:' + n, '#ff9a85', P.bosses[P.bossBySize[n][0]].src); })) +
-          row('CREATURE', P.bossBySize[d.size].map((c) => chip(P.bossMeta[c].name, k === c, 'd', 'k:' + c, '#ff9a85', P.bosses[c].src)));
+          row('CREATURE', P.bossBySize[d.size].map((c) => chip(P.bossMeta[c].name, k === c, 'd', 'k:' + c, '#ff9a85', P.bosses[c].src))) + areaRow(d.grp || 'teach');
         steps = 'STAGES · EACH HAS A "BY" DATE'; payL = P.bossMeta[k].name + ' · paid when beaten, plus a trophy'; payV = String(SIZE[d.size].gold); go = 'Summon it'; goBg = '#ff7a66'; }
       if (f === 'mark') { title = d.id ? 'Edit marking' : 'Books to mark'; ph = 'Mark 9AS books'; col = '#f2a93b';
         rows = lenRow + row('SITTINGS', [1, 2, 3].map((n) => chip(String(n), d.sittings === n, 'd', 'sittings:' + n, '#f2a93b'))) + dateRow('DUE DATE', d.due);
@@ -767,14 +775,14 @@
         go = 'Add it'; goBg = cu ? '#ff7a66' : '#5ef2a0'; }
       if (steps) steps = '<span class="uz-lbl">' + steps + '</span>' + d.steps.map((s, i) => '<div class="uz-srow"><input data-step="' + i + '" value="' + esc(s.n) + '" placeholder="' + (f === 'boss' ? 'Stage ' + (i + 1) : 'A small step') + '">' +
         (f === 'boss' ? '<input type="date" data-sby="' + i + '" value="' + esc(s.by || '') + '" style="flex:none;width:150px;height:44px;padding:0 8px;border-radius:5px;border:1.5px solid #4a2a2e;background:#1c1012;color:#ffb3a8;font:700 13px var(--a);color-scheme:dark">' : '') +
-        '<button data-a="sdel" data-v="' + i + '" style="flex:none;width:40px;height:44px;border:none;background:none;color:#7f9389;font:18px var(--a)">×</button></div>').join('') +
+        (s.d && f === 'boss' ? '<span style="flex:none;width:40px;text-align:center;color:#ff9a85;font:700 16px var(--a)" title="Already hit">✓</span>' : '<button data-a="sdel" data-v="' + i + '" style="flex:none;width:40px;height:44px;border:none;background:none;color:#7f9389;font:18px var(--a)">×</button>') + '</div>').join('') +
         '<div style="display:flex;gap:6px"><button data-a="sadd" style="flex:1;height:42px;border-radius:5px;border:1.5px dashed #2f443b;background:none;color:#8fa298;font:700 13px var(--a)">+ ' + (f === 'boss' ? 'Stage' : 'Checklist step') + '</button>' +
         (f === 'boss' ? '<button data-a="tmpl" style="flex:1;height:42px;border-radius:5px;border:1.5px solid #5a3a8a;background:#1e1430;color:#d4bfff;font:700 13px var(--a)">Marking template</button>' : '') + '</div>';
       return '<div class="uz-form"><div style="display:flex;align-items:center;justify-content:space-between"><span style="font:500 23px var(--g);color:' + col + '">' + title + '</span><button data-a="close" style="width:44px;height:44px;border:none;background:none;color:#8fa298;font:22px var(--a)">×</button></div>' +
         '<input data-name="1" value="' + esc(d.name) + '" placeholder="' + ph + '">' + rows + steps + '<div style="flex:1"></div>' +
         '<div class="uz-total"><span style="font:13px var(--a);color:#93a69c">' + payL + '</span><span style="display:flex;align-items:center;gap:4px;font:700 22px var(--a);color:' + payC + '">' + payV + (payCoin && payV ? coin(24, String(payV).replace(/[^0-9]/g, ''), f) : '') + '</span></div>' +
         '<button class="uz-go" data-a="submit" style="background:' + goBg + ';opacity:' + (d.name.trim() ? 1 : 0.45) + '">' + (d.id ? 'Save' : go) + '</button>' +
-        (d.id ? '<button data-a="farch" style="height:44px;border-radius:5px;border:1.5px solid #4a2a2e;background:none;color:#ff9a85;font:700 14px var(--a)">Archive</button>' : '') + '</div>';
+        (d.id && f !== 'boss' ? '<button data-a="farch" style="height:44px;border-radius:5px;border:1.5px solid #4a2a2e;background:none;color:#ff9a85;font:700 14px var(--a)">Archive</button>' : '') + '</div>';
     }
     function submit() {
       const f = V.form, d = V.draft; if (!d || !d.name.trim()) return;
@@ -782,10 +790,13 @@
       const archOnSave = (r) => { if (r.saved) setRev(['gameArchive', r.saved]); };
       if (d.id && /^(ritual|quest|mark|curse)$/.test(f)) { const o = V.orig; V.orig = null; return act({ verb: 'Edited:', name: nm }, o ? ['gameSaveGoal', goalOf(f, o)] : null, 'gameSaveGoal', [goalOf(f, d)]); }
       if (f === 'ritual') { V.tab = 0; V.open[d.group] = 1; return act({ verb: 'New ritual:', name: nm }, null, 'gameSaveGoal', [goalOf(f, d)], null, archOnSave); }
+      if (f === 'boss' && d.id) V.open[d.grp] = 1;
+      if (f === 'boss' && d.id) return act({ verb: 'Edited:', name: nm }, null, 'gameBossSave', [{ id: d.id, name: nm, size: d.size, k: d.k, grp: d.grp, stages: d.steps.filter((x) => x.n.trim()).map((x) => ({ name: x.n.trim(), due: x.by, i: x.i })) }]);
+      if (f === 'quest') V.open[d.grp] = 1;
       if (f === 'quest') return act({ verb: 'New quest:', name: nm }, null, 'gameSaveGoal', [goalOf(f, d)], null, archOnSave);
       if (f === 'mark') { V.open.marking = 1; return act({ verb: 'New marking:', name: nm }, null, 'gameSaveGoal', [goalOf(f, d)], null, archOnSave); }
       if (f === 'boss') { const stages = d.steps.filter((s) => s.n.trim()).map((s) => ({ name: s.n.trim(), due: s.by })); if (!stages.length) stages.push({ name: 'Do it', due: addD(D.today, 7) });
-        return act({ verb: 'Boss summoned:', name: nm }, null, 'gameBossStart', [{ name: nm, size: d.size, k: d.k || SIZE[d.size].k, stages }], null, (r) => { if (r.newBoss) { V.open[r.newBoss] = 1; setRev(['gameBossRemove', r.newBoss]); } }); }
+        return act({ verb: 'Boss summoned:', name: nm }, null, 'gameBossStart', [{ name: nm, size: d.size, k: d.k || SIZE[d.size].k, grp: d.grp || 'teach', stages }], null, (r) => { if (r.newBoss) { V.open[r.newBoss] = 1; setRev(['gameBossRemove', r.newBoss]); } }); }
       if (f === 'group') return act({ verb: 'New group:', name: nm }, null, 'gameGroupSave', [{ name: nm, parent: d.parent === 'top' ? '' : d.parent }], null, (r) => { V.open[r.saved] = 1; paint(); });
       if (f === 'reward') return act({ verb: 'New reward:', name: nm }, null, 'gameHoardSave', [{ name: nm, cost: d.cost }], null, (r) => { if (r.saved) setRev(['gameHoardSave', { id: r.saved, name: nm, cost: d.cost, archived: true }]); });
       if (f === 'curse') { const cu = d.type === 'curse';
@@ -876,6 +887,7 @@
       if (a === 'style') { style = v; try { localStorage.setItem('ulhuStyle', v); } catch (x) { /* private window */ } return paint(); }
       if (a === 'form') { V.form = v; V.draft = FORMS[v](); return paint(); }
       if (a === 'close') { V.form = null; V.draft = null; V.orig = null; return paint(); }
+      if (a === 'editb') { const bo = D.bosses.find((x) => x.id === id); if (!bo) return; V.form = 'boss'; V.draft = draftOfBoss(bo); return paint(); }
       if (a === 'editg') { const g = goal(id); if (!g) return; V.form = formKind(g); V.draft = draftOf(g); V.orig = clone(V.draft); return paint(); }
       if (a === 'nodue') { V.draft.due = ''; return paint(); }
       if (a === 'farch') { const i2 = V.draft.id; V.form = null; V.draft = null; V.orig = null; return archive(i2); }

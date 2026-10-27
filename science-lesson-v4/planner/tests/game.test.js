@@ -6,7 +6,7 @@ const dir = path.join(__dirname, '..');
 m.props.PLANNER_KEY = 'k';
 const src = ['Code.gs', 'Behaviour.gs', 'game-art.js', 'Game.gs'].map((f) => fs.readFileSync(path.join(dir, f), 'utf8')).join('\n');
 global.SHOP = require('../game-shop.json');
-eval(src + '\nglobal.G={gameLoad,gameTick,gameUntick,gameSaveGoal,gameArchive,gameFreeze,gameShop,gameArt,gameBuy,gamePlace,gameBossStart,gameBossStage,gameBossRemove,gameReview,gameQuestStep,gameGroupSave,gameWear,gameUnbuy,gameHoardSave,gameHoardClaim,gameChronicle,gPay_,gDie_,gNeed_,gAdd_,gDow_,gDiff_,gIsFrozen_};');
+eval(src + '\nglobal.G={gameLoad,gameTick,gameUntick,gameSaveGoal,gameArchive,gameFreeze,gameShop,gameArt,gameBuy,gamePlace,gameBossStart,gameBossStage,gameBossRemove,gameBossSave,gameReview,gameQuestStep,gameGroupSave,gameWear,gameUnbuy,gameHoardSave,gameHoardClaim,gameChronicle,gPay_,gDie_,gNeed_,gAdd_,gDow_,gDiff_,gIsFrozen_};');
 
 const k = 'k'; let failed = 0;
 const ok = (n, c) => { console.log((c ? '  PASS ' : '  FAIL ') + n); if (!c) failed++; };
@@ -177,6 +177,14 @@ ok('and Undo puts it back as it was', s.bosses.find((b) => b.id === oops.id).hp 
 s = G.gameBossRemove(k, bs.id);
 ok('a beaten boss cannot be removed', s.beaten.some((b) => b.id === bs.id));
 s = G.gameBossRemove(k, oops.id);
+// 2026-10-27: a boss can be edited after summoning: renamed, moved to Life, a stage added; a stage already hit keeps its tick
+s = G.gameBossStart(k, { name: 'Edit me', stages: [{ name: 'one' }, { name: 'two' }] });
+const ed = s.bosses.find((b) => b.name === 'Edit me');
+s = G.gameBossStage(k, ed.id, 0, true);
+s = G.gameBossSave(k, { id: ed.id, name: 'Edited boss', grp: 'life', size: 10, stages: [{ name: 'one', i: 0 }, { name: 'two', i: 1 }, { name: 'three' }] });
+const ed2 = s.bosses.find((b) => b.id === ed.id);
+ok('an edited boss keeps its hit stage, shares damage over the new stages and moves area', ed2.name === 'Edited boss' && ed2.grp === 'life' && ed2.stages.length === 3 && !!ed2.stages[0].done && !ed2.stages[2].done && ed2.hp === 67 && ed2.reward === 300);
+s = G.gameBossRemove(k, ed.id);
 
 at('2026-11-20T18:00:00Z');   // a Friday
 s = G.gameLoad(k);
