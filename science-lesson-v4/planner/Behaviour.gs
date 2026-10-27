@@ -92,9 +92,9 @@ function behaviourGet_(e) {
   const t = HtmlService.createTemplateFromFile('Phone');
   t.key = p.key;
   t.manifestUrl = ScriptApp.getService().getUrl() + '?api=manifest&view=phone&key=' + encodeURIComponent(p.key);   // home-screen app opens the phone page, not the planner
-  return t.evaluate().setTitle('Behaviour')
+  return withIcon_(t.evaluate().setTitle('Behaviour')
     .addMetaTag('viewport', 'width=device-width, initial-scale=1, maximum-scale=1')
-    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);     // 2026-10-09: shown inside the planner's Behaviour tab
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL));     // 2026-10-09: shown inside the planner's Behaviour tab
 }
 
 /** A gold-star icon on a navy square, as an inline SVG data URI (no image files needed). */
@@ -108,14 +108,14 @@ function starIcon_() {
 /** Web app manifest so Chrome opens this as a standalone app (no address bar) once added to the home screen. */
 function manifest_(key, view) {
   const startUrl = ScriptApp.getService().getUrl() + '?key=' + encodeURIComponent(key) + (view ? '&view=' + encodeURIComponent(view) : '');
-  const icon = starIcon_();
-  const isBoard = view === 'board';
+  const isBoard = view === 'board', ulhu = isBoard ? '' : iconUrl_();   // the phone app shows painted Ulhu (2026-10-27), the board keeps its star
+  const icon = ulhu || starIcon_(), itype = ulhu ? 'image/png' : 'image/svg+xml';
   const manifest = {
     name: isBoard ? 'Positives Board' : 'Behaviour', short_name: isBoard ? 'Board' : 'Behaviour', start_url: startUrl, scope: startUrl,
     display: 'standalone', background_color: '#EDF2F8', theme_color: '#0D2442',
     icons: [
-      { src: icon, sizes: '192x192', type: 'image/svg+xml', purpose: 'any' },
-      { src: icon, sizes: '512x512', type: 'image/svg+xml', purpose: 'any' }
+      { src: icon, sizes: ulhu ? '384x384' : '192x192', type: itype, purpose: 'any' },
+      { src: icon, sizes: ulhu ? '384x384' : '512x512', type: itype, purpose: 'any' }
     ]
   };
   return ContentService.createTextOutput(JSON.stringify(manifest)).setMimeType(ContentService.MimeType.JSON);

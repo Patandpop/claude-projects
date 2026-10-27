@@ -51,8 +51,19 @@ function doGet(e) {
   const t = HtmlService.createTemplateFromFile('Planner');
   t.key = key;
   t.appUrl = ScriptApp.getService().getUrl();
-  return t.evaluate().setTitle('Planner').setXFrameOptionsMode(HtmlService.XFrameOptionsMode.DEFAULT);
+  return withIcon_(t.evaluate().setTitle('Planner').setXFrameOptionsMode(HtmlService.XFrameOptionsMode.DEFAULT));
 }
+// the tab and home-screen icon (Patryk 2026-10-27): 'Ulhu app icon.png' in Admin/Planner Sync, shared "anyone with the link".
+// Found by name once and remembered; if it is missing or not shared, the page still opens with Google's own icon.
+function iconUrl_() {
+  try {
+    const P = PropertiesService.getScriptProperties();
+    let id = P.getProperty('ICON_ID');
+    if (!id) { const it = DriveApp.getFilesByName('Ulhu app icon.png'); if (!it.hasNext()) return ''; id = it.next().getId(); P.setProperty('ICON_ID', id); }
+    return 'https://drive.google.com/uc?id=' + id + '&export=download&format=png';
+  } catch (err) { return ''; }
+}
+function withIcon_(out) { const u = iconUrl_(); if (!u) return out; try { return out.setFaviconUrl(u); } catch (err) { return out; } }
 
 /* ------------------------------------------------------------- behaviour
    The behaviour app (Behaviour.gs, Phone.html, BoardPage.html) is part of this project since
@@ -1062,6 +1073,7 @@ function exportXlsx(k, model, title) {
     SpreadsheetApp.flush();
     const url = 'https://docs.google.com/spreadsheets/d/' + ss.getId() + '/export?format=xlsx';
     const blob = UrlFetchApp.fetch(url, { headers: { Authorization: 'Bearer ' + ScriptApp.getOAuthToken() } }).getBlob();
+    try { tab_('Log', ['when', 'what', 'where']).appendRow([new Date(), 'order sheet downloaded', title]); } catch (e) { /* the log is optional */ }   // Ulhu's order sheet ritual reads this
     return { name: title + '.xlsx', b64: Utilities.base64Encode(onePage_(blob, title).getBytes()) };
   } finally {
     file.setTrashed(true);   // the temporary sheet this function just made, nothing else
