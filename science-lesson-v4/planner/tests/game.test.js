@@ -6,7 +6,7 @@ const dir = path.join(__dirname, '..');
 m.props.PLANNER_KEY = 'k';
 const src = ['Code.gs', 'Behaviour.gs', 'game-art.js', 'Game.gs'].map((f) => fs.readFileSync(path.join(dir, f), 'utf8')).join('\n');
 global.SHOP = require('../game-shop.json');
-eval(src + '\nglobal.G={gameLoad,gameTick,gameUntick,gameSaveGoal,gameArchive,gameFreeze,gameShop,gameArt,gameBuy,gamePlace,gameBossStart,gameBossStage,gameBossRemove,gameBossSave,gameTag,gameChips,gameVespers,gameVespersUndo,gameVespersTime,gameReview,gameQuestStep,gameGroupSave,gameWear,gameUnbuy,gameHoardSave,gameHoardClaim,gameChronicle,gPay_,gDie_,gNeed_,gAdd_,gDow_,gDiff_,gIsFrozen_};');
+eval(src + '\nglobal.G={gameLoad,gameTick,gameUntick,gameSaveGoal,gameArchive,gameFreeze,gameShop,gameArt,gameBuy,gamePlace,gameBossStart,gameBossStage,gameBossRemove,gameBossSave,gameTag,gameChips,gameVespers,gameVespersUndo,gameVespersTime,gameMoon,gameReview,gameQuestStep,gameGroupSave,gameWear,gameUnbuy,gameHoardSave,gameHoardClaim,gameChronicle,gPay_,gDie_,gNeed_,gAdd_,gDow_,gDiff_,gIsFrozen_};');
 
 const k = 'k'; let failed = 0;
 const ok = (n, c) => { console.log((c ? '  PASS ' : '  FAIL ') + n); if (!c) failed++; };
@@ -21,8 +21,11 @@ ok('60 min ahead pays 24 (16 x 1.5)', G.gPay_({ minutes: 60, track: 'ahead' }, n
 ok('30 min outside work pays 30 (10 x 3)', G.gPay_({ minutes: 30, track: 'external' }, none, byId).coins === 30);
 ok('first life goal of the day pays x2 plus 5', G.gPay_({ minutes: 30, track: 'life' }, none, byId).coins === 25);
 ok('a red goal (-3) pays 1.3x', G.gPay_({ minutes: 15, track: 'necessary', value: -3 }, none, byId).coins === 8);
-ok('a 14-day streak adds 20%', G.gPay_({ minutes: 60, track: 'necessary', streak: 14 }, none, byId).coins === 19);
-ok('a 40-day streak is capped at +30%', G.gPay_({ minutes: 60, track: 'necessary', streak: 40 }, none, byId).coins === 21);
+// 2026-10-27 multipliers: x1.1 at 7 nights, x1.25 at 30, x1.5 at 66; one missed day drops a step
+ok('a 14-night streak pays x1.1', G.gPay_({ minutes: 60, track: 'necessary', streak: 14 }, none, byId).coins === 18);
+ok('a 40-night streak pays x1.25', G.gPay_({ minutes: 60, track: 'necessary', streak: 40 }, none, byId).coins === 20);
+ok('a 70-night streak (a habit) pays x1.5', G.gPay_({ minutes: 60, track: 'necessary', streak: 70 }, none, byId).coins === 24);
+ok('one missed day drops a step (70 nights, missed once: x1.25)', G.gPay_({ minutes: 60, track: 'necessary', streak: 70, miss: '2026-11-01' }, none, byId).coins === 20);
 ok('XP to the next level: 200 at level 1', G.gNeed_(1) === 200);
 const pl = { coins: 500, level: 4, xp: 10, hp: 3, maxHp: 50, deaths: 0 };
 const lost = G.gDie_(pl, '2026-11-04', [{ day: '2026-11-02', coins: 120 }, { day: '2026-10-20', coins: 400 }]);
@@ -350,5 +353,14 @@ ok('spending and refunds never count as doubloons earned', ch.weeks[6].coins ===
   ok('saving High Vespers hides it and keeps the one change', !s4.high.show);
   at('2026-12-20T20:30:00Z');
   ok('next Sunday asks about last week\'s change', (G.gameLoad(k).high.lastChange || {}).change === 'No crisps in the house'); }
+// 2026-10-27 the moon: full = working, half = work rest (life counts), dark = full rest; holidays start at half
+{ at('2026-12-21T12:00:00Z');   // a Monday in the Christmas holiday
+  let m = G.gameLoad(k);
+  ok('a holiday weekday starts at half moon', m.moon === 'half');
+  m = G.gameMoon(k, '2026-12-21', 'dark'); ok('the moon can be set to dark', m.moon === 'dark');
+  m = G.gameMoon(k, '2026-12-21', 'full'); ok('and to full (working in the holiday)', m.moon === 'full');
+  m = G.gameMoon(k, '2026-12-21', 'half'); ok('and back to half', m.moon === 'half');
+  ok('the Vespers multiplier is in the snapshot', typeof m.vMult === 'number' && m.vMult >= 1);
+  const sh = G.gameShop(k); ok('shop prices are 20% higher, rounded to 5', sh.items.every((i) => i.price % 5 === 0) && sh.items.some((i) => i.price > 0)); }
 console.log('\n' + (failed ? failed + ' FAILED' : 'all game server checks passed'));
 process.exit(failed ? 1 : 0);

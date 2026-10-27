@@ -16,7 +16,8 @@ const GAME = {
   hpLoss: { 5: 4, 15: 6, 30: 8, 60: 12, 120: 16 },           // a bad habit costs health, never runes; even so Absolution halves cleanly (2026-10-27)
   lifeFirst: 5, lifeThree: 15,                               // life bonus: first life goal of the day, then three or more
   afterWork: 1.5, afterHour: 16,                             // life done after work on a school day pays x1.5 (not holidays or days off)
-  streakStep: 0.1, streakCap: 0.3,                           // +10% per 7 days, capped at +30%
+  streakSteps: [[66, 1.5], [30, 1.25], [7, 1.1]],             // ritual streak multiplier (Patryk 2026-10-27)
+  vespersSteps: [[66, 1.25], [30, 1.2], [7, 1.1]],           // Vespers streak multiplier, on everything earned
 };
 const G_HEAD = {
   player: ['Setting', 'Value'],
@@ -84,23 +85,50 @@ function gWorld_() {
   try { const a = loadAll_(true); return { data: a.data || null, weeks: a.weeks || {} }; } catch (e) { return { data: null, weeks: {} }; }
 }
 function gFrozenDays_() { const s = {}; gRows_('freeze').forEach((r) => { s[String(r.day)] = r.reason || 'off'; }); return s; }
-// A weekday that is not a school day (holiday, INSET) is frozen like a sick day. Weekends are not frozen.
-function gIsFrozen_(day, world, frozen) {
-  if (frozen[day] === 'on') return false;                // a holiday or INSET day he switched back on (2026-10-26)
-  if (frozen[day]) return true;
+// The moon of a day (Patryk 2026-10-27): 'full' = a working day, 'half' = work rest (teaching rituals and quests pause,
+// life keeps counting), 'dark' = full rest (ill or truly off). A weekday out of term or on INSET starts at half moon.
+// His own row wins: 'on' = full, 'half' = half, any other reason (sick, off, other) = dark. Weekends start full.
+function gAutoPhase_(day, world) {
   const w = gDow_(day), d = world.data;
-  if (w > 5 || !d || !(d.terms || []).length) return false;
-  if ((d.inset || []).includes(day)) return true;
-  return !(d.terms || []).some((t) => day >= t[0] && day <= t[1]);
+  if (w > 5 || !d || !(d.terms || []).length) return 'full';
+  if ((d.inset || []).includes(day)) return 'half';
+  return (d.terms || []).some((t) => day >= t[0] && day <= t[1]) ? 'full' : 'half';
+}
+function gPhase_(day, world, frozen) {
+  const r = frozen[day];
+  if (r === 'on') return 'full';
+  if (r === 'half') return 'half';
+  if (r) return 'dark';
+  return gAutoPhase_(day, world);
+}
+// frozen for one goal: dark freezes everything; half freezes everything except life (pass the goal, or { track: 'life' }).
+// With no goal a half-moon day counts as frozen (it is not a working day).
+function gIsFrozen_(day, world, frozen, goal) {
+  const ph = gPhase_(day, world, frozen);
+  if (ph === 'dark') return true;
+  if (ph === 'half') return !(goal && goal.track === 'life');
+  return false;
 }
 
 /* ---- pay ---- */
+// the step a streak has reached (0 none, 1 = 7 nights, 2 = 30, 3 = 66), one lower after a single missed day
+function gStep_(steps, streak, missed) { let st = 0; steps.forEach((x, i) => { if (!st && streak >= x[0]) st = steps.length - i; }); return Math.max(0, st - (missed ? 1 : 0)); }
+function gStepMult_(steps, st) { return st ? steps[steps.length - st][1] : 1; }
+let G_VM = null;                                                  // the Vespers multiplier, worked out once per request
+function gVMult_() {
+  if (G_VM !== null) return G_VM;
+  try { const today = gDay_(gNow_()), p = gPlayer_(), world = gWorld_(), frozen = gFrozenDays_(), st = gVespersStreak_(p, today, world, frozen);
+    let missed = 0; const last = String(p.vLast || ''); if (last) for (let d = gAdd_(last, 1); d < gAdd_(today, 0); d = gAdd_(d, 1)) if (!gIsFrozen_(d, world, frozen, { track: 'life' })) missed++;
+    G_VM = gStepMult_(GAME.vespersSteps, gStep_(GAME.vespersSteps, st, missed === 1)); } catch (e) { G_VM = 1; }
+  return G_VM;
+}
+function gRitualMult_(goal) { return gStepMult_(GAME.streakSteps, gStep_(GAME.streakSteps, Number(goal.streak) || 0, !!goal.miss)); }
 function gPay_(goal, todayTicks, goalsById) {
   const m = Number(goal.minutes) || 15, track = goal.track || 'necessary';
   const base = GAME.base[m] || GAME.base[15], mult = GAME.mult[track] || 1;
   const val = Number(goal.value) || 0, red = val < 0 ? 1 + (-val) * 0.1 : 1;
-  const streak = Math.min(GAME.streakCap, Math.floor((Number(goal.streak) || 0) / 7) * GAME.streakStep);
-  const core = Math.round(base * mult * red * (1 + streak) * (track === 'life' && gAfterWork_() ? GAME.afterWork : 1));
+  const sm = gRitualMult_(goal) * gVMult_();
+  const core = Math.round(base * mult * red * sm * (track === 'life' && gAfterWork_() ? GAME.afterWork : 1));
   let bonus = 0;
   if (track === 'life') {
     const net = {};                                             // life goals done today (an untick takes one back out)
@@ -224,8 +252,7 @@ function gRollover_(world) {
   if (p.lastDay >= gAdd_(today, -1)) return;
   const frozen = gFrozenDays_(), goals = gGoals_(), ticks = gRows_('ticks');
   for (let d = gAdd_(p.lastDay, 1); d < today; d = gAdd_(d, 1)) {
-    const fz = gIsFrozen_(d, world, frozen);
-    if (!fz) goals.filter((g) => g.kind === 'daily' && gIsDue_(Object.assign({}, g, { lastDone: '' }), d) && !g.everyN).forEach((g) => {
+    goals.filter((g) => g.kind === 'daily' && !gIsFrozen_(d, world, frozen, g) && gIsDue_(Object.assign({}, g, { lastDone: '' }), d) && !g.everyN).forEach((g) => {
       if (gNet_(ticks, g.id, d) > 0) return;
       g.value = Math.max(-5, g.value - 1); gSet_('goals', g.row, 'value', g.value);   // missed: the goal turns redder, no health lost
       if (!g.miss) { g.miss = d; gSet_('goals', g.row, 'miss', d); return; }          // never miss twice: the first miss is forgiven
@@ -375,11 +402,11 @@ function gSnapshot_(world, extra) {
   const byId = {}; goals.forEach((g) => { byId[g.id] = g; }); const undone = gUndone_(ticks);
   const todayTicks = gTicksToday_(ticks, today), fz = gIsFrozen_(today, world, frozen), feat = gFeatured_(goals, today);
   const tickDay = {}; ticks.forEach((t) => { const key = t.goalId + '|' + t.day; tickDay[key] = (tickDay[key] || 0) + Number(t.delta); });
-  const strip = (g) => { let s14 = ''; for (let i = 13; i >= 0; i--) { const d = gAdd_(today, -i); s14 += gIsFrozen_(d, world, frozen) ? 'f' : (tickDay[g.id + '|' + d] || 0) > 0 ? 'o' : (!g.everyN && gIsDue_(Object.assign({}, g, { lastDone: '' }), d) && String(g.created || '') <= d && d < today) ? 'x' : '-'; } return s14; };
+  const strip = (g) => { let s14 = ''; for (let i = 13; i >= 0; i--) { const d = gAdd_(today, -i); s14 += gIsFrozen_(d, world, frozen, g) ? 'f' : (tickDay[g.id + '|' + d] || 0) > 0 ? 'o' : (!g.everyN && gIsDue_(Object.assign({}, g, { lastDone: '' }), d) && String(g.created || '') <= d && d < today) ? 'x' : '-'; } return s14; };
   const view = goals.map((g) => {
     const net = gNet_(ticks, g.id, today), pay = gPay_(g, todayTicks, byId);
     const o = { id: g.id, name: g.name, kind: g.kind, polarity: g.polarity, minutes: g.minutes, track: g.track, auto: g.auto, value: g.value, streak: g.streak, private: g.private,
-      days: g.days, everyN: g.everyN, pay: pay.coins, hpLoss: g.kind === 'habit' ? gHpLoss_(g) : 0, doneToday: net > 0, count: net, grp: g.grp || gDefGrp_(g), steps: g.steps, miss: !!g.miss, anti: g.anti, who: g.who };
+      days: g.days, everyN: g.everyN, pay: pay.coins, mult: g.kind === 'daily' ? gRitualMult_(g) : 1, hpLoss: g.kind === 'habit' ? gHpLoss_(g) : 0, doneToday: net > 0, count: net, grp: g.grp || gDefGrp_(g), steps: g.steps, miss: !!g.miss, anti: g.anti, who: g.who };
     if (g.kind === 'habit' && g.polarity !== 'minus') { o.featured = false; o.pay = gBlessAmt_(g); const sl = gOpenSlips_(ticks, goals, g.id, today); if (sl.length) o.absolve = sl[0]; }
     if (g.kind === 'habit' && g.polarity === 'both') { const side = (sd) => ticks.filter((t) => t.goalId === g.id && String(t.day) === today && gNote_(t).side === sd && !undone[t.id]).length; o.cCount = side('c'); o.bCount = side('b'); }
     if (g.kind === 'todo') { o.due = g.due; o.doneOn = g.lastDone; o.dueToday = !g.lastDone || gDiff_(g.lastDone, today) <= 14; }
@@ -403,7 +430,7 @@ function gSnapshot_(world, extra) {
   const owned = gRows_('owned').filter((r) => String(r.itemId).indexOf('w:') !== 0), room = {}; owned.forEach((r) => { if (r.slot) room[r.slot] = r.itemId; });
   const bosses = gBosses_(today), review = gReviewCard_(today, ticks, goals, bosses), vespers = gVespers_(today, ticks, goals, p, world, frozen), high = gHighVespers_(today, ticks, goals, world, frozen);
   const hoard = gRows_('hoard').filter((h) => String(h.archived) !== 'true').map((h) => ({ id: h.id, name: h.name, cost: Number(h.cost) || 0, claims: Number(h.claims) || 0 }));
-  return gOut_(Object.assign({ bosses: bosses.filter((b) => b.status === 'active'), beaten: gBeaten_(), review, vespers, high, whoList: G_WHO, room, owned: owned.map((r) => r.itemId), player: { coins: p.coins, xp: p.xp, level, need: gNeed_(level), hp: p.hp, maxHp: p.maxHp, deaths: p.deaths, coinName: GAME.coin }, mood, today, frozen: fz,
+  return gOut_(Object.assign({ bosses: bosses.filter((b) => b.status === 'active'), beaten: gBeaten_(), review, vespers, high, whoList: G_WHO, moon: gPhase_(today, world, frozen), vMult: gVMult_(), room, owned: owned.map((r) => r.itemId), player: { coins: p.coins, xp: p.xp, level, need: gNeed_(level), hp: p.hp, maxHp: p.maxHp, deaths: p.deaths, coinName: GAME.coin }, mood, today, frozen: fz,
     goals: view, summoned, tide, hw, weekCoins, groups: gGroups_(p), hoard, wear: gWearState_(p, wearRows), freezes: gFreezesAhead_(world, today, frozen), blessCount: gBlessCount_(goals, todayTicks), hour: Number(Utilities.formatDate(gNow_(), TZ, 'H')),
     table: { base: GAME.base, mult: GAME.mult, hpLoss: GAME.hpLoss } }, extra || {}));
 }
@@ -494,6 +521,19 @@ function gameArchive(k, id, back) {
   return gSnapshot_(gWorld_());
 }
 // a sick or off day (today or the last 7 days): streaks and colours stay as they are
+function gameMoon(k, day, phase) {
+  check_(k);
+  withLock_(function () {
+    const today = gDay_(gNow_()), world = gWorld_();
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(String(day)) || day > gAdd_(today, 60) || day < gAdd_(today, -7)) throw new Error('Only the last 7 days or the next 60.');
+    if (['full', 'half', 'dark'].indexOf(phase) < 0) throw new Error('The moon is full, half or dark.');
+    const r = gRows_('freeze').find((x) => String(x.day) === day);
+    if (r) gTab_('freeze').deleteRow(r.row);
+    if (phase !== gAutoPhase_(day, world)) gAppend_('freeze', { day, reason: phase === 'full' ? 'on' : phase === 'half' ? 'half' : 'off', savedOn: today });
+  });
+  G_VM = null;
+  return gSnapshot_(gWorld_());
+}
 function gameFreeze(k, day, reason, on) {
   check_(k);
   withLock_(function () {
@@ -514,7 +554,13 @@ function gameFreeze(k, day, reason, on) {
    layers they draw on the 128x116 room. Slots, one item each: floor, wall, rug, window, light, corner, furn, hang3,
    hang4, prop. The free starter items are owned from the first load, the first of each slot already placed.
    Locks: {level: n} or {outside_work: n} (n outside-work ticks done). Buying takes doubloons (a ticks row records it). */
-function gShop_() { return (typeof SHOP !== 'undefined' && SHOP && SHOP.items) ? SHOP : { items: [], ulhu: { x: 48, y: 60 }, w: 128, h: 116, z: {} }; }
+let G_SHOP = null;
+function gShop_() {
+  if (G_SHOP) return G_SHOP;
+  const sh = (typeof SHOP !== 'undefined' && SHOP && SHOP.items) ? SHOP : { items: [], ulhu: { x: 48, y: 60 }, w: 128, h: 116, z: {} };
+  G_SHOP = Object.assign({}, sh, { items: sh.items.map((i) => Object.assign({}, i, { price: Math.round(i.price * 1.2 / 5) * 5 })) });   // +20% (Patryk 2026-10-27)
+  return G_SHOP;
+}
 function gOwned_() {
   const rows = gRows_('owned'), have = {}, taken = {};
   rows.forEach((r) => { have[r.itemId] = r; if (r.slot) taken[r.slot] = true; });
@@ -688,7 +734,7 @@ function gVespers_(today, ticks, goals, p, world, frozen) {
 // the streak as it stands today: it only breaks after two missed evenings in a row (frozen days don't count)
 function gVespersStreak_(p, today, world, frozen) {
   const last = String(p.vLast || ''); if (!last) return 0;
-  let missed = 0; for (let d = gAdd_(last, 1); d < today; d = gAdd_(d, 1)) if (!gIsFrozen_(d, world, frozen)) missed++;
+  let missed = 0; for (let d = gAdd_(last, 1); d < today; d = gAdd_(d, 1)) if (!gIsFrozen_(d, world, frozen, { track: 'life' })) missed++;
   return missed >= 2 ? 0 : Number(p.vStreak) || 0;
 }
 function gSaveTag_(tickId, goalId, side, sig, detail, today) {
@@ -732,6 +778,7 @@ function gameVespers(k, rv) {
     gAppend_('ticks', { id: Utilities.getUuid().slice(0, 8), at: now.toISOString(), day: today, goalId: 'vespers', delta: 0, coins: pay, xp: pay, hp: 0, auto: '', ref: 'vespers|' + today, note: JSON.stringify({ name: 'Vespers' }) });
     res = { coins: pay, streak: st, up };
   });
+  G_VM = null;
   return gSnapshot_(gWorld_(), { vespersDone: res });
 }
 // Undo of Vespers: the streak and runes go back exactly; the row is marked, never deleted
@@ -746,6 +793,7 @@ function gameVespersUndo(k) {
     if (tk) gSet_('ticks', tk.row, 'ref', 'vespers-undone|' + today + '|' + tk.id);
     gAppend_('ticks', { id: Utilities.getUuid().slice(0, 8), at: now.toISOString(), day: today, goalId: 'vespers', delta: 0, coins: -GAME.base[5], xp: -GAME.base[5], hp: 0, auto: '', ref: '', note: JSON.stringify({ name: 'Vespers undone' }) });
   });
+  G_VM = null;
   return gSnapshot_(gWorld_());
 }
 function gameVespersTime(k, hm) {
@@ -775,7 +823,7 @@ function gHighVespers_(today, ticks, goals, world, frozen) {
   const grew = [], slipped = [];
   goals.filter((g) => g.kind === 'daily').forEach((g) => {
     let kept = 0, due = 0, run = 0, twice = false;
-    for (let i = 0; i < 7; i++) { const d = gAdd_(wk, i); if (d > today || gIsFrozen_(d, world, frozen) || !gIsDue_(Object.assign({}, g, { lastDone: '' }), d) || String(g.created || '') > d) continue;
+    for (let i = 0; i < 7; i++) { const d = gAdd_(wk, i); if (d > today || gIsFrozen_(d, world, frozen, g) || !gIsDue_(Object.assign({}, g, { lastDone: '' }), d) || String(g.created || '') > d) continue;
       due++; const k2 = wt.some((t) => t.goalId === g.id && String(t.day) === d); if (k2) { kept++; run = 0; } else if (++run >= 2) twice = true; }
     if (!due) return;
     if (twice) slipped.push({ name: g.name, kept, due }); else if (kept) grew.push({ name: g.name, kept, due, streak: g.streak });
