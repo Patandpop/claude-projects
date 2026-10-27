@@ -54,3 +54,11 @@ Nothing here is built yet. Build in the phases at the bottom; mock-up first for 
 - Absolution: A4a "The shell shatters" with cracks building over the two stages (I = first part near the blessing, II = completes, shards fall), stars like L3a (real four-pointed sparks), low-key lighting from L1b, "Absolved" as A1b (light dims behind the word), H3 sparks become health. Curse tiles CT1b (drip only on tap). Blessing tiles: all rejected; redo with real stained glass (many small pieces, thin lead, grouped colours forming a pattern, constellation from the pieces). Glass yellow less saturated.
 - Tablets: stone = ST3c finer polish mixed with ST3e deep bevel; pixel pentagram tick lit in chunky steps, colour = streak; multiplier = M1 studs set INTO the rim (no stray pixels above or below). Seal press = K1 from above with closing shadow, slower (~1 s finish), variants wanted. Seal spot = S6 inked ring with wax ghost but less eerie, variants wanted. Scroll P2 + E1 wooden rods + W1 seal + B2 burn from both sides (slightly slower, ash lingers).
 - PAUSED 2026-10-27: glass round 3 and tablets round 4 were stopped mid-way; resume with "carry on with the mock-ups".
+
+## Picks round 4-5 (2026-10-27, latest wins)
+- Blessing tiles: BG1 honey border night field, with star-SHAPED glass pieces (not dots), constellation lines made of narrow glass pieces along the line, background pieces light a little, constellation more, light moving left to right.
+- Absolution: X2 hairlines then the break.
+- Tablet stone: ST-final (polished deep slab). NO multiplier studs on the tick.
+- Seal: press K1a; seal spot = clean inked ring, no wax ghost; wax drop pools first, then the stamp presses it and the wax visibly spreads, slower (T1-T3 pending).
+- Sigils: Scene = S3c (tentacle rising on stage). Coven C3c three in a row, overlap fix pending (C3c-1..3).
+- Phase 1 screens built and committed 2026-10-27 (two-sided omens, blood + sigils, Absolution logic and simple gold label, antidote picker, Ulhu's 30 lines). Paste files on the desktop folder "Planner paste files" (Drive G: unavailable).
