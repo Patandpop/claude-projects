@@ -6,7 +6,7 @@ const dir = path.join(__dirname, '..');
 m.props.PLANNER_KEY = 'k';
 const src = ['Code.gs', 'Behaviour.gs', 'game-art.js', 'Game.gs'].map((f) => fs.readFileSync(path.join(dir, f), 'utf8')).join('\n');
 global.SHOP = require('../game-shop.json');
-eval(src + '\nglobal.G={gameLoad,gameTick,gameUntick,gameSaveGoal,gameArchive,gameFreeze,gameShop,gameArt,gameBuy,gamePlace,gameBossStart,gameBossStage,gameBossRemove,gameBossSave,gameReview,gameQuestStep,gameGroupSave,gameWear,gameUnbuy,gameHoardSave,gameHoardClaim,gameChronicle,gPay_,gDie_,gNeed_,gAdd_,gDow_,gDiff_,gIsFrozen_};');
+eval(src + '\nglobal.G={gameLoad,gameTick,gameUntick,gameSaveGoal,gameArchive,gameFreeze,gameShop,gameArt,gameBuy,gamePlace,gameBossStart,gameBossStage,gameBossRemove,gameBossSave,gameTag,gameChips,gameVespers,gameVespersUndo,gameVespersTime,gameReview,gameQuestStep,gameGroupSave,gameWear,gameUnbuy,gameHoardSave,gameHoardClaim,gameChronicle,gPay_,gDie_,gNeed_,gAdd_,gDow_,gDiff_,gIsFrozen_};');
 
 const k = 'k'; let failed = 0;
 const ok = (n, c) => { console.log((c ? '  PASS ' : '  FAIL ') + n); if (!c) failed++; };
@@ -315,5 +315,40 @@ ok('spending and refunds never count as doubloons earned', ch.weeks[6].coins ===
   ok('a two-sided habit counts its curse and blessing sides', pg2.cCount === 1 && pg2.bCount === 1 && s2.last.abs && s2.last.abs.stage === 1);
   s2 = G.gameUntick(k, ph);
   ok('Undo on a two-sided habit takes back the last side tapped', s2.goals.find((g) => g.id === ph).bCount === 0 && s2.goals.find((g) => g.id === ph).cCount === 1); }
+// 2026-10-27 phase 2: Vespers (evening check, its own streak, never miss twice, Undo), tags, identities and High Vespers
+{ at('2026-12-07T18:00:00Z');   // a Monday, 6 pm London
+  let v = G.gameLoad(k).vespers;
+  ok('Vespers is closed before 8 pm', v.open === false && v.done === false);
+  at('2026-12-07T20:30:00Z');
+  let s3 = G.gameSaveGoal(k, { name: 'Read a chapter', kind: 'habit', polarity: 'plus', minutes: 15, who: 'Scholar' });
+  const rd = s3.saved;
+  s3 = G.gameSaveGoal(k, { name: 'Crisps', kind: 'habit', polarity: 'minus', minutes: 5 });
+  const cr = s3.saved;
+  s3 = G.gameTick(k, cr, -1, 'Domain'); s3 = G.gameTick(k, rd, 1);
+  v = s3.vespers;
+  ok('Vespers opens at 8 pm with today\'s curse and its sigil', v.open && v.curses.some((c) => c.goalId === cr && c.sig === 'Domain'));
+  ok('and today\'s good habits', v.goods.some((c) => c.goalId === rd));
+  const coins0 = s3.player.coins, tick = v.curses.find((c) => c.goalId === cr).tickId;
+  s3 = G.gameVespers(k, { tags: [{ tickId: tick, sig: 'Domain', detail: 'Kitchen' }] });
+  ok('Vespers pays like a Tiny ritual and starts its streak', s3.player.coins === coins0 + 3 && s3.vespers.done && s3.vespers.streak === 1);
+  ok('the curse keeps its detail', s3.vespers.curses.find((c) => c.tickId === tick).detail === 'Kitchen');
+  s3 = G.gameVespersUndo(k);
+  ok('Undo takes Vespers back exactly', s3.player.coins === coins0 && !s3.vespers.done && s3.vespers.streak === 0);
+  s3 = G.gameVespers(k, { clean: false });
+  at('2026-12-09T20:30:00Z');   // Tuesday missed, Wednesday done: one miss keeps the streak
+  s3 = G.gameVespers(k, { clean: true });
+  ok('one missed evening keeps the Vespers streak', s3.vespers.streak === 2);
+  at('2026-12-12T20:30:00Z');   // Thursday and Friday missed: starts again
+  ok('two missed evenings in a row break it', G.gameLoad(k).vespers.streak === 0);
+  s3 = G.gameTag(k, '', rd, 'Scene', 'Alone');
+  at('2026-12-13T20:30:00Z');   // Sunday: High Vespers
+  const h = G.gameLoad(k).high;
+  ok('High Vespers shows on Sunday for this week', h.show && h.week === '2026-12-07' && h.days.length === 7);
+  ok('who you are becoming counts the votes', h.who.some((w) => w.who === 'Scholar' && w.votes >= 1));
+  ok('where the curses came from: Monday evening, Domain, Kitchen', h.grid[0][3] >= 1 && h.sigs.some((x) => x.name === 'Domain') && h.details.some((x) => x.name === 'Domain: Kitchen'));
+  let s4 = G.gameReview(k, { week: h.week, wentWell: 'Read', slipped: 'Crisps', change: 'No crisps in the house' });
+  ok('saving High Vespers hides it and keeps the one change', !s4.high.show);
+  at('2026-12-20T20:30:00Z');
+  ok('next Sunday asks about last week\'s change', (G.gameLoad(k).high.lastChange || {}).change === 'No crisps in the house'); }
 console.log('\n' + (failed ? failed + ' FAILED' : 'all game server checks passed'));
 process.exit(failed ? 1 : 0);

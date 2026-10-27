@@ -4,7 +4,7 @@ const P = require('path').join(__dirname, '..') + '/';
 const m = require(P + 'tests/mock-appsscript.js'), fs = require('fs'), http = require('http');
 m.props.PLANNER_KEY = 'k';
 global.SHOP = require(P + 'game-shop.json');
-const FN = ['gameLoad', 'gameTick', 'gameUntick', 'gameSaveGoal', 'gameArchive', 'gameFreeze', 'gameShop', 'gameArt', 'gameBuy', 'gamePlace', 'gameBossStart', 'gameBossStage', 'gameBossRemove', 'gameBossSave', 'gameReview', 'gameQuestStep', 'gameGroupSave', 'gameWear', 'gameUnbuy', 'gameHoardSave', 'gameHoardClaim', 'gameChronicle'];
+const FN = ['gameLoad', 'gameTick', 'gameUntick', 'gameSaveGoal', 'gameArchive', 'gameFreeze', 'gameShop', 'gameArt', 'gameBuy', 'gamePlace', 'gameBossStart', 'gameBossStage', 'gameBossRemove', 'gameBossSave', 'gameTag', 'gameChips', 'gameVespers', 'gameVespersUndo', 'gameVespersTime', 'gameReview', 'gameQuestStep', 'gameGroupSave', 'gameWear', 'gameUnbuy', 'gameHoardSave', 'gameHoardClaim', 'gameChronicle'];
 eval(['Code.gs', 'Behaviour.gs', 'Game.gs'].map((f) => fs.readFileSync(P + f, 'utf8')).join('\n') + '\nglobal.G={' + FN.join(',') + '};');
 global.GAME_WORLD = { data: { terms: [['2026-09-07', '2026-12-18']], inset: ['2026-11-09'], classes: { '9XS': { seq: [{ num: 4, built: true }, { num: 5, built: false }] }, '13D': { seq: [{ num: 5, built: false }] } } },
   weeks: { '2026-10-26': { slots: [{ kind: 'lesson', cls: '9XS', i: 0, day: 0 }, { kind: 'lesson', cls: '13D', i: 0, day: 1 }, { kind: 'lesson', cls: '9XS', i: 1, day: 4 }] } } };

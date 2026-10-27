@@ -748,7 +748,7 @@
     // an existing ritual, quest, curse, blessing or marking class opened in its form (Patryk 2026-10-26: edit after setting)
     const formKind = (g) => ({ daily: 'ritual', todo: 'quest', termly: 'mark' }[g.kind] || 'curse');
     function draftOf(g) {
-      const base = { id: g.id, name: g.name, len: g.minutes, grp0: g.grp, priv: g.private };
+      const base = { id: g.id, name: g.name, len: g.minutes, grp0: g.grp, priv: g.private, who: g.who || '' };
       if (g.kind === 'daily') { const ds = String(g.days || ''), e = Number(g.everyN) || 0;
         return Object.assign(base, { kind: g.track, rep: e ? 'every' : ds === '12345' ? 'school' : 'days', days: ds.split('').map((x) => Number(x) % 7), n: e ? (e % 7 === 0 ? e / 7 : e) : 3, unit: e && e % 7 === 0 ? 'weeks' : 'days', group: g.grp }); }
       if (g.kind === 'todo') return Object.assign(base, { kind: g.track, due: g.due || '', grp: areaOf(g.grp), steps: (g.steps || []).map((x) => ({ n: x.t, d: !!x.d })) });
@@ -762,7 +762,7 @@
     const trackOf = (f, d) => ((f === 'ritual' ? areaOf(d.group) : d.grp) === 'life' ? 'life' : d.kind === 'external' ? 'external' : d.kind === 'ahead' ? 'ahead' : 'necessary');
     // what the server is sent for a form (new or edited)
     function goalOf(f, d) {
-      const nm = d.name.trim(), o = { id: d.id, name: nm, minutes: d.len, private: d.priv };
+      const nm = d.name.trim(), o = { id: d.id, name: nm, minutes: d.len, private: d.priv, who: d.who || '' };
       if (f === 'ritual') return Object.assign(o, { track: trackOf(f, d), kind: 'daily', grp: d.group, days: d.rep === 'school' ? '12345' : d.rep === 'days' ? d.days.map((x) => x || 7).sort().join('') : '', everyN: d.rep === 'every' ? d.n * (d.unit === 'weeks' ? 7 : 1) : '' });
       if (f === 'quest') return Object.assign(o, { track: trackOf(f, d), kind: 'todo', grp: d.grp, due: d.due || '', steps: d.steps.filter((x) => x.n.trim()).map((x) => ({ t: x.n.trim(), d: !!x.d })) });
       if (f === 'mark') return Object.assign(o, { track: 'necessary', kind: 'termly', grp: d.grp0 || 'marking', sittings: d.sittings, due: d.due || '' });
@@ -815,6 +815,7 @@
         if (two) { payL = 'Curse side costs, blessing side pays'; payV = '−' + D.table.hpLoss[d.len] + ' HP · +' + Math.max(2, Math.round(D.table.base[d.len] / 2)); payC = '#e0c8ff'; payCoin = false; }
         else if (cu) { payL = 'Costs health, never runes'; payV = '−' + D.table.hpLoss[d.len] + ' HP'; payC = '#ff7a66'; payCoin = false; } else { payL = 'Pays each time you tap it'; payV = '+' + Math.max(2, Math.round(D.table.base[d.len] / 2)); }
         go = 'Add it'; goBg = two ? '#c8a8ff' : cu ? '#ff7a66' : '#5ef2a0'; }
+      if ((f === 'ritual' || f === 'quest' || (f === 'curse' && d.type !== 'curse')) && D.whoList) rows += row('WHO YOU ARE BECOMING', [chip('None', !d.who, 'd', 'who:', '#ffe2a0')].concat(D.whoList.map((w) => chip(w, d.who === w, 'd', 'who:' + w, '#ffe2a0'))));
       if (steps) steps = '<span class="uz-lbl">' + steps + '</span>' + d.steps.map((s, i) => '<div class="uz-srow"><input data-step="' + i + '" value="' + esc(s.n) + '" placeholder="' + (f === 'boss' ? 'Stage ' + (i + 1) : 'A small step') + '">' +
         (f === 'boss' ? '<input type="date" data-sby="' + i + '" value="' + esc(s.by || '') + '" style="flex:none;width:150px;height:44px;padding:0 8px;border-radius:5px;border:1.5px solid #4a2a2e;background:#1c1012;color:#ffb3a8;font:700 13px var(--a);color-scheme:dark">' : '') +
         (s.d && f === 'boss' ? '<span style="flex:none;width:40px;text-align:center;color:#ff9a85;font:700 16px var(--a)" title="Already hit">✓</span>' : '<button data-a="sdel" data-v="' + i + '" style="flex:none;width:40px;height:44px;border:none;background:none;color:#7f9389;font:18px var(--a)">×</button>') + '</div>').join('') +

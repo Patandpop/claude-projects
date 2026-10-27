@@ -20,17 +20,24 @@ const GAME = {
 };
 const G_HEAD = {
   player: ['Setting', 'Value'],
-  goals: ['id', 'name', 'kind', 'polarity', 'days', 'everyN', 'minutes', 'track', 'auto', 'value', 'streak', 'best', 'lastDone', 'private', 'sittings', 'sitDone', 'due', 'archived', 'created', 'grp', 'steps', 'miss', 'anti'],
+  goals: ['id', 'name', 'kind', 'polarity', 'days', 'everyN', 'minutes', 'track', 'auto', 'value', 'streak', 'best', 'lastDone', 'private', 'sittings', 'sitDone', 'due', 'archived', 'created', 'grp', 'steps', 'miss', 'anti', 'who'],
   ticks: ['id', 'at', 'day', 'goalId', 'delta', 'coins', 'xp', 'hp', 'auto', 'ref', 'note'],
   freeze: ['day', 'reason', 'savedOn'],
   seen: ['lesson', 'built', 'firstBuiltOn'],
   owned: ['itemId', 'boughtOn', 'price', 'slot'],
   bosses: ['id', 'name', 'maxHp', 'stages', 'reward', 'startedOn', 'status', 'beatenOn', 'grp'],
-  reviews: ['week', 'wentWell', 'slipped', 'p1', 'p2', 'p3', 'savedOn'],
+  reviews: ['week', 'wentWell', 'slipped', 'p1', 'p2', 'p3', 'savedOn', 'change', 'kept'],
   hoard: ['id', 'name', 'cost', 'claims', 'archived', 'created'],
+  // phase 2 (Patryk 2026-10-27): Vespers each evening, and the tags (sigil + detail) given to a curse or a good habit
+  vespers: ['day', 'clean', 'savedOn', 'note'],
+  tags: ['tickId', 'day', 'goalId', 'side', 'sig', 'detail', 'savedOn'],
 };
 const G_DAYF = ['day', 'lastDone', 'due', 'created', 'firstBuiltOn', 'savedOn', 'boughtOn', 'startedOn', 'beatenOn', 'week'];
-const G_TAB = { player: 'Game Player', goals: 'Game Goals', ticks: 'Game Ticks', freeze: 'Game Freeze', seen: 'Game Seen', owned: 'Game Owned', bosses: 'Game Bosses', reviews: 'Game Reviews', hoard: 'Game Hoard' };
+const G_TAB = { player: 'Game Player', goals: 'Game Goals', ticks: 'Game Ticks', freeze: 'Game Freeze', seen: 'Game Seen', owned: 'Game Owned', bosses: 'Game Bosses', reviews: 'Game Reviews', hoard: 'Game Hoard', vespers: 'Game Vespers', tags: 'Game Tags' };
+
+// who each habit makes him (Patryk 2026-10-27): every tick of a habit with one of these is a vote in High Vespers
+const G_WHO = ['Devoted', 'Wordsmith', 'Leviathan', 'Diligent', 'Steadfast', 'Scholar', 'Trusted', 'Mentor', 'Sanctified', 'Dreamer', 'Serene', 'Homeflame', 'Frugal', 'Nourished', 'Wanderer', 'Valiant'];
+const G_SIGS = ['Flesh', 'Domain', 'Scene', 'Coven'];
 
 /* ---- time: test-friendly (GAME_NOW is set only by tests), all days are London yyyy-MM-dd text ---- */
 function gNow_() { return (typeof GAME_NOW !== 'undefined' && GAME_NOW) ? new Date(GAME_NOW) : new Date(); }
@@ -57,7 +64,7 @@ function gRows_(t) {
 function gAppend_(t, o) { gTab_(t).appendRow(G_HEAD[t].map((h) => (o[h] === undefined ? '' : o[h]))); }
 function gSet_(t, row, field, v) { gTab_(t).getRange(row, G_HEAD[t].indexOf(field) + 1).setValue(v); }
 function gPlayer_() {
-  const p = { coins: 0, xp: 0, level: 1, hp: GAME.maxHp, maxHp: GAME.maxHp, lastDay: '', deaths: 0, seeded: '', diedDay: '', levelUpDay: '', frozenOk: '', groups: '', wear: '', markPlan: '' };
+  const p = { coins: 0, xp: 0, level: 1, hp: GAME.maxHp, maxHp: GAME.maxHp, lastDay: '', deaths: 0, seeded: '', diedDay: '', levelUpDay: '', frozenOk: '', groups: '', wear: '', markPlan: '', vTime: '20:00', vStreak: 0, vBest: 0, vLast: '', vPrev: '', myChips: '' };
   gRows_('player').forEach((r) => { const v = r.Value; p[r.Setting] = (typeof p[r.Setting] === 'number') ? Number(v) : String(v === undefined ? '' : v); });
   return p;
 }
@@ -144,7 +151,7 @@ function gGoals_() {
   return gRows_('goals').filter((g) => String(g.archived) !== 'true' && g.archived !== true).map((g) => {
     g.minutes = Number(g.minutes) || 15; g.value = Number(g.value) || 0; g.streak = Number(g.streak) || 0; g.best = Number(g.best) || 0;
     g.everyN = Number(g.everyN) || 0; g.sittings = Number(g.sittings) || 0; g.sitDone = Number(g.sitDone) || 0;
-    g.private = String(g.private) === 'true'; g.lastDone = String(g.lastDone || ''); g.due = String(g.due || ''); g.days = String(g.days || ''); g.grp = String(g.grp || ''); g.miss = String(g.miss || ''); g.anti = String(g.anti || '');
+    g.private = String(g.private) === 'true'; g.lastDone = String(g.lastDone || ''); g.due = String(g.due || ''); g.days = String(g.days || ''); g.grp = String(g.grp || ''); g.miss = String(g.miss || ''); g.anti = String(g.anti || ''); g.who = String(g.who || '');
     try { g.steps = g.steps ? JSON.parse(g.steps) : []; } catch (e) { g.steps = []; }
     return g;
   });
@@ -372,7 +379,7 @@ function gSnapshot_(world, extra) {
   const view = goals.map((g) => {
     const net = gNet_(ticks, g.id, today), pay = gPay_(g, todayTicks, byId);
     const o = { id: g.id, name: g.name, kind: g.kind, polarity: g.polarity, minutes: g.minutes, track: g.track, auto: g.auto, value: g.value, streak: g.streak, private: g.private,
-      days: g.days, everyN: g.everyN, pay: pay.coins, hpLoss: g.kind === 'habit' ? gHpLoss_(g) : 0, doneToday: net > 0, count: net, grp: g.grp || gDefGrp_(g), steps: g.steps, miss: !!g.miss, anti: g.anti };
+      days: g.days, everyN: g.everyN, pay: pay.coins, hpLoss: g.kind === 'habit' ? gHpLoss_(g) : 0, doneToday: net > 0, count: net, grp: g.grp || gDefGrp_(g), steps: g.steps, miss: !!g.miss, anti: g.anti, who: g.who };
     if (g.kind === 'habit' && g.polarity !== 'minus') { o.featured = false; o.pay = gBlessAmt_(g); const sl = gOpenSlips_(ticks, goals, g.id, today); if (sl.length) o.absolve = sl[0]; }
     if (g.kind === 'habit' && g.polarity === 'both') { const side = (sd) => ticks.filter((t) => t.goalId === g.id && String(t.day) === today && gNote_(t).side === sd && !undone[t.id]).length; o.cCount = side('c'); o.bCount = side('b'); }
     if (g.kind === 'todo') { o.due = g.due; o.doneOn = g.lastDone; o.dueToday = !g.lastDone || gDiff_(g.lastDone, today) <= 14; }
@@ -394,9 +401,9 @@ function gSnapshot_(world, extra) {
   const mon = gMonday_(today), weekCoins = ticks.filter((t) => String(t.day) >= mon && Number(t.coins) > 0 && !/^(buy|hoard)\|/.test(String(t.goalId))).reduce((a, t) => a + Number(t.coins), 0);
   const wearRows = gRows_('owned').filter((r) => String(r.itemId).indexOf('w:') === 0);
   const owned = gRows_('owned').filter((r) => String(r.itemId).indexOf('w:') !== 0), room = {}; owned.forEach((r) => { if (r.slot) room[r.slot] = r.itemId; });
-  const bosses = gBosses_(today), review = gReviewCard_(today, ticks, goals, bosses);
+  const bosses = gBosses_(today), review = gReviewCard_(today, ticks, goals, bosses), vespers = gVespers_(today, ticks, goals, p, world, frozen), high = gHighVespers_(today, ticks, goals, world, frozen);
   const hoard = gRows_('hoard').filter((h) => String(h.archived) !== 'true').map((h) => ({ id: h.id, name: h.name, cost: Number(h.cost) || 0, claims: Number(h.claims) || 0 }));
-  return gOut_(Object.assign({ bosses: bosses.filter((b) => b.status === 'active'), beaten: gBeaten_(), review, room, owned: owned.map((r) => r.itemId), player: { coins: p.coins, xp: p.xp, level, need: gNeed_(level), hp: p.hp, maxHp: p.maxHp, deaths: p.deaths, coinName: GAME.coin }, mood, today, frozen: fz,
+  return gOut_(Object.assign({ bosses: bosses.filter((b) => b.status === 'active'), beaten: gBeaten_(), review, vespers, high, whoList: G_WHO, room, owned: owned.map((r) => r.itemId), player: { coins: p.coins, xp: p.xp, level, need: gNeed_(level), hp: p.hp, maxHp: p.maxHp, deaths: p.deaths, coinName: GAME.coin }, mood, today, frozen: fz,
     goals: view, summoned, tide, hw, weekCoins, groups: gGroups_(p), hoard, wear: gWearState_(p, wearRows), freezes: gFreezesAhead_(world, today, frozen), blessCount: gBlessCount_(goals, todayTicks), hour: Number(Utilities.formatDate(gNow_(), TZ, 'H')),
     table: { base: GAME.base, mult: GAME.mult, hpLoss: GAME.hpLoss } }, extra || {}));
 }
@@ -470,6 +477,7 @@ function gameSaveGoal(k, goal) {
       lastDone: old ? old.lastDone : '', private: goal.private ? 'true' : '', sittings: kind === 'termly' ? (Number(goal.sittings) || 1) : '', sitDone: old ? old.sitDone : (kind === 'termly' ? 0 : ''),
       due: String(goal.due || ''), archived: '', created: old ? old.created : today, miss: old ? (old.miss || '') : '', grp: String(goal.grp || '').slice(0, 40),
       anti: kind === 'habit' ? String(goal.anti || '').slice(0, 20) : '',
+      who: G_WHO.indexOf(String(goal.who || '')) >= 0 ? goal.who : '',
       steps: kind === 'todo' ? JSON.stringify((goal.steps || []).map((x) => ({ t: String(x.t || '').slice(0, 80), d: !!x.d })).filter((x) => x.t).slice(0, 12)) : '' };
     if (kind === 'todo' && rec.due && !/^\d{4}-\d{2}-\d{2}$/.test(rec.due)) rec.due = '';
     if (kind === 'daily' && !rec.days && !rec.everyN) rec.days = '12345';
@@ -661,6 +669,129 @@ function gameBossRemove(k, id, back) {
   return gSnapshot_(gWorld_());
 }
 
+/* ---------------------------------------------------------------- Vespers (phase 2, Patryk 2026-10-27)
+   An evening tablet from vTime (default 8 pm): today's curses (with the sigil from the moment) to add detail to, and
+   today's good habits to say when they worked. "Clean today" / "That's all" ticks it: a ritual with its own streak
+   (the app-use streak), paid like a Tiny ritual, once a day. Never miss twice: one missed evening keeps the streak,
+   two in a row start it again. A frozen day is skipped. Undo reverses it exactly. */
+function gTagMap_() { const m = {}; gRows_('tags').forEach((t) => { m[String(t.tickId)] = t; }); return m; }
+function gVespers_(today, ticks, goals, p, world, frozen) {
+  const byId = {}; goals.forEach((g) => { byId[g.id] = g; });
+  const undone = gUndone_(ticks), tags = gTagMap_(), tm = (t) => Utilities.formatDate(new Date(t.at), TZ, 'HH:mm');
+  const mine = ticks.filter((t) => String(t.day) === today && byId[t.goalId] && !undone[t.id] && !gNote_(t).untick && Number(t.delta) > 0);
+  const row = (t) => { const n = gNote_(t), tg = tags[t.id] || {}; return { tickId: t.id, goalId: t.goalId, name: byId[t.goalId].name, at: tm(t), sig: tg.sig || n.sig || '', detail: tg.detail || '' }; };
+  const done = gRows_('vespers').find((r) => String(r.day) === today && String(r.clean) !== 'undone');
+  const hm = Utilities.formatDate(gNow_(), TZ, 'HH:mm');
+  return { time: p.vTime || '20:00', open: hm >= (p.vTime || '20:00'), done: !!done, streak: gVespersStreak_(p, today, world, frozen), best: Number(p.vBest) || 0,
+    curses: mine.filter((t) => gNote_(t).side === 'c').map(row), goods: mine.filter((t) => gNote_(t).side !== 'c').map(row), chips: p.myChips ? String(p.myChips).split('|') : [] };
+}
+// the streak as it stands today: it only breaks after two missed evenings in a row (frozen days don't count)
+function gVespersStreak_(p, today, world, frozen) {
+  const last = String(p.vLast || ''); if (!last) return 0;
+  let missed = 0; for (let d = gAdd_(last, 1); d < today; d = gAdd_(d, 1)) if (!gIsFrozen_(d, world, frozen)) missed++;
+  return missed >= 2 ? 0 : Number(p.vStreak) || 0;
+}
+function gSaveTag_(tickId, goalId, side, sig, detail, today) {
+  const rows = gRows_('tags'), old = rows.find((r) => String(r.tickId) === String(tickId));
+  const rec = { tickId, day: today, goalId, side, sig: G_SIGS.indexOf(sig) >= 0 ? sig : '', detail: String(detail || '').slice(0, 80), savedOn: today };
+  if (old) G_HEAD.tags.forEach((h) => { if (String(old[h]) !== String(rec[h])) gSet_('tags', old.row, h, rec[h]); });
+  else gAppend_('tags', rec);
+}
+// tag one of today's ticks (Vespers detail, or the long-press "when did this work?" on a good habit). For a long press the page
+// knows only the habit: tickId '' + goalId = that habit's latest tick today.
+function gameTag(k, tickId, goalId, sig, detail) {
+  check_(k);
+  withLock_(function () {
+    const today = gDay_(gNow_()), ticks = gRows_('ticks'), undone = gUndone_(ticks);
+    let t = tickId ? ticks.find((x) => x.id === tickId) : null;
+    if (!t && goalId) t = ticks.filter((x) => x.goalId === goalId && String(x.day) === today && !undone[x.id] && !gNote_(x).untick && Number(x.delta) > 0).pop();
+    if (!t) return;
+    gSaveTag_(t.id, t.goalId, gNote_(t).side === 'c' ? 'c' : 'b', sig, detail, today);
+  });
+  return gSnapshot_(gWorld_());
+}
+// his own detail chips (the "+ add your own" chip): saved as one list
+function gameChips(k, chips) {
+  check_(k);
+  withLock_(function () { const p = gPlayer_(); p.myChips = (chips || []).map((c) => String(c).replace(/\|/g, '').trim().slice(0, 24)).filter(Boolean).slice(0, 24).join('|'); gSavePlayer_(p); });
+  return gSnapshot_(gWorld_());
+}
+// Vespers done for today: tags in one go, then the tick of the ritual itself
+function gameVespers(k, rv) {
+  check_(k);
+  let res = null;
+  withLock_(function () {
+    const now = gNow_(), today = gDay_(now), world = gWorld_(), frozen = gFrozenDays_(), p = gPlayer_();
+    (rv && rv.tags || []).forEach((t) => { const tk = gRows_('ticks').find((x) => x.id === t.tickId); if (tk) gSaveTag_(tk.id, tk.goalId, gNote_(tk).side === 'c' ? 'c' : 'b', t.sig, t.detail, today); });
+    if (gRows_('vespers').some((r) => String(r.day) === today && String(r.clean) !== 'undone')) { res = { already: true }; return; }
+    const prev = { s: Number(p.vStreak) || 0, b: Number(p.vBest) || 0, l: String(p.vLast || '') };
+    const st = gVespersStreak_(p, today, world, frozen) + 1;
+    p.vStreak = st; p.vBest = Math.max(prev.b, st); p.vPrev = JSON.stringify(prev); p.vLast = today;
+    const pay = GAME.base[5]; p.coins += pay; const up = gAddXp_(p, pay, today); gSavePlayer_(p);
+    gAppend_('vespers', { day: today, clean: rv && rv.clean ? 'clean' : 'logged', savedOn: today, note: '' });
+    gAppend_('ticks', { id: Utilities.getUuid().slice(0, 8), at: now.toISOString(), day: today, goalId: 'vespers', delta: 0, coins: pay, xp: pay, hp: 0, auto: '', ref: 'vespers|' + today, note: JSON.stringify({ name: 'Vespers' }) });
+    res = { coins: pay, streak: st, up };
+  });
+  return gSnapshot_(gWorld_(), { vespersDone: res });
+}
+// Undo of Vespers: the streak and runes go back exactly; the row is marked, never deleted
+function gameVespersUndo(k) {
+  check_(k);
+  withLock_(function () {
+    const now = gNow_(), today = gDay_(now), r = gRows_('vespers').find((x) => String(x.day) === today && String(x.clean) !== 'undone'); if (!r) return;
+    const p = gPlayer_(); let prev = {}; try { prev = JSON.parse(p.vPrev || '{}'); } catch (e) { prev = {}; }
+    p.vStreak = prev.s || 0; p.vBest = prev.b || 0; p.vLast = prev.l || ''; p.coins = Math.max(0, p.coins - GAME.base[5]); gTakeXp_(p, GAME.base[5]); gSavePlayer_(p);
+    gSet_('vespers', r.row, 'clean', 'undone');
+    const tk = gRows_('ticks').filter((t) => t.ref === 'vespers|' + today).pop();
+    if (tk) gSet_('ticks', tk.row, 'ref', 'vespers-undone|' + today + '|' + tk.id);
+    gAppend_('ticks', { id: Utilities.getUuid().slice(0, 8), at: now.toISOString(), day: today, goalId: 'vespers', delta: 0, coins: -GAME.base[5], xp: -GAME.base[5], hp: 0, auto: '', ref: '', note: JSON.stringify({ name: 'Vespers undone' }) });
+  });
+  return gSnapshot_(gWorld_());
+}
+function gameVespersTime(k, hm) {
+  check_(k);
+  withLock_(function () { if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(String(hm))) throw new Error('Pick a time like 20:00.'); const p = gPlayer_(); p.vTime = hm; gSavePlayer_(p); });
+  return gSnapshot_(gWorld_());
+}
+
+/* ---- High Vespers: Sunday's Vespers is the weekly review, open until Tuesday night if missed. In his order:
+   the Week in Glass, who you are becoming, rituals that grew and slipped, where the curses came from, Absolutions
+   won, three lines and one change (and last week's change checked). ---- */
+const G_SLOTS = [['Morning', '05:00', '08:30'], ['School', '08:30', '15:30'], ['After school', '15:30', '18:00'], ['Evening', '18:00', '21:00'], ['Late', '21:00', '29:00']];
+function gSlot_(hm) { if (hm < '05:00') hm = String(Number(hm.slice(0, 2)) + 24) + hm.slice(2); const s = G_SLOTS.findIndex((x) => hm >= x[1] && hm < x[2]); return s < 0 ? 4 : s; }
+function gHighVespers_(today, ticks, goals, world, frozen) {
+  const dow = gDow_(today), wk = dow === 7 ? gMonday_(today) : gAdd_(gMonday_(today), -7);
+  const show = dow === 7 || dow <= 2;
+  const saved = gRows_('reviews').find((r) => String(r.week) === wk), last = gRows_('reviews').find((r) => String(r.week) === gAdd_(wk, -7));
+  const byId = {}; goals.forEach((g) => { byId[g.id] = g; });
+  const undone = gUndone_(ticks), tags = gTagMap_(), sun = gAdd_(wk, 6);
+  const wt = ticks.filter((t) => String(t.day) >= wk && String(t.day) <= sun && !undone[t.id] && !gNote_(t).untick && Number(t.delta) > 0 && byId[t.goalId]);
+  const isC = (t) => gNote_(t).side === 'c';
+  const days = []; for (let i = 0; i < 7; i++) { const d = gAdd_(wk, i), dt = wt.filter((t) => String(t.day) === d);
+    days.push({ day: d, bless: dt.filter((t) => byId[t.goalId].kind === 'habit' && !isC(t)).length, curse: dt.filter(isC).length, rituals: dt.filter((t) => byId[t.goalId].kind === 'daily').length, frozen: !!gIsFrozen_(d, world, frozen) }); }
+  const votes = {}; wt.filter((t) => !isC(t) && byId[t.goalId].who).forEach((t) => { const w = byId[t.goalId].who; votes[w] = (votes[w] || 0) + 1; });
+  const who = Object.keys(votes).map((w) => ({ who: w, votes: votes[w] })).sort((a, b) => b.votes - a.votes);
+  // rituals: kept days vs due days this week; slipped = two due days missed in a row
+  const grew = [], slipped = [];
+  goals.filter((g) => g.kind === 'daily').forEach((g) => {
+    let kept = 0, due = 0, run = 0, twice = false;
+    for (let i = 0; i < 7; i++) { const d = gAdd_(wk, i); if (d > today || gIsFrozen_(d, world, frozen) || !gIsDue_(Object.assign({}, g, { lastDone: '' }), d) || String(g.created || '') > d) continue;
+      due++; const k2 = wt.some((t) => t.goalId === g.id && String(t.day) === d); if (k2) { kept++; run = 0; } else if (++run >= 2) twice = true; }
+    if (!due) return;
+    if (twice) slipped.push({ name: g.name, kept, due }); else if (kept) grew.push({ name: g.name, kept, due, streak: g.streak });
+  });
+  // where the curses came from
+  const grid = Array.from({ length: 7 }, () => [0, 0, 0, 0, 0]), sigs = {}, dets = {};
+  wt.filter(isC).forEach((t) => { const di = gDiff_(wk, String(t.day)), hm = Utilities.formatDate(new Date(t.at), TZ, 'HH:mm'); grid[di][gSlot_(hm)]++;
+    const tg = tags[t.id] || {}, sg = tg.sig || gNote_(t).sig || ''; if (sg) sigs[sg] = (sigs[sg] || 0) + 1; if (tg.detail) { const key = (sg ? sg + ': ' : '') + tg.detail; dets[key] = (dets[key] || 0) + 1; } });
+  const top = (o) => Object.keys(o).map((x) => ({ name: x, n: o[x] })).sort((a, b) => b.n - a.n).slice(0, 5);
+  const abs = wt.filter((t) => gNote_(t).absOf);
+  return { week: wk, show: show && !saved, saved: saved ? { wentWell: saved.wentWell, slipped: saved.slipped, change: saved.change || '' } : null,
+    lastChange: last && last.change ? { change: last.change, kept: saved ? saved.kept || '' : '' } : null,
+    days, who, grew, slipped, grid, slots: G_SLOTS.map((x) => x[0]), sigs: top(sigs), details: top(dets),
+    absolutions: { n: abs.length, hp: abs.reduce((a, t) => a + Math.max(0, Number(t.hp) - 1), 0) } };
+}
+
 /* ---------------------------------------------------------------- Sunday review (slice 8)
    A card from Friday to Sunday (and Monday if the week before was not reviewed): this week's numbers, three boxes
    and the next three priorities. Saving it pays 20 once per week. */
@@ -681,7 +812,7 @@ function gameReview(k, rv) {
     const today = gDay_(gNow_()), wk = /^\d{4}-\d{2}-\d{2}$/.test(String(rv.week)) ? rv.week : gMonday_(today);
     const clip = (v) => String(v || '').slice(0, 400);
     const old = gRows_('reviews').find((r) => String(r.week) === wk);
-    const rec = { week: wk, wentWell: clip(rv.wentWell), slipped: clip(rv.slipped), p1: clip(rv.p1), p2: clip(rv.p2), p3: clip(rv.p3), savedOn: today };
+    const rec = { week: wk, wentWell: clip(rv.wentWell), slipped: clip(rv.slipped), p1: clip(rv.p1), p2: clip(rv.p2), p3: clip(rv.p3), savedOn: today, change: clip(rv.change), kept: ['Yes', 'Partly', 'No'].indexOf(rv.kept) >= 0 ? rv.kept : '' };
     if (old) G_HEAD.reviews.forEach((h) => { if (String(old[h]) !== String(rec[h])) gSet_('reviews', old.row, h, rec[h]); });
     else {
       gAppend_('reviews', rec); const p = gPlayer_(); p.coins += 20; paid = 20; gAddXp_(p, 20, today); gSavePlayer_(p);

@@ -1,5 +1,5 @@
 /* Blood and sigils (Patryk 2026-10-27, final picks from the "Blood and Sigils" mock-up):
-   blood BL8b "Soaked in", sigils F3 / D3 / S3a / C3a in the Set 3 gilded style, glow G5 "Abyssal ripple".
+   blood BL8b "Soaked in", sigils F3 / D3 / S3c / C3a in the Set 3 gilded style, glow G5 "Abyssal ripple".
    BLOOD.open(host, card, onPick): four sigils rise at the bottom of host (a position:relative, maybe scrolling, pane)
    and four spurts of blood fly from the tapped curse tile onto them. Tapping a sigil glows it, everything sinks away,
    then onPick('Flesh' | 'Domain' | 'Scene' | 'Coven'). A tap anywhere else in host, or BLOOD.close(), sinks it away
@@ -64,16 +64,16 @@ function injectCss() { if (typeof document === 'undefined' || document.getElemen
   const s = document.createElement('style'); s.id = 'blood-css'; s.textContent = CSS; (document.head || document.documentElement).appendChild(s); }
 injectCss();
 
-/* ================= the four icons (F3, D3, S3a, C3a) ================= */
+/* ================= the four icons (F3, D3, S3c, C3a) ================= */
 const VAL = (y) => '<path class="bl-f" d="M7 ' + y + 'h34v4c-2.8 2.6-5.7 2.6-8.5 0-2.8 2.6-5.7 2.6-8.5 0-2.8 2.6-5.7 2.6-8.5 0-2.8 2.6-5.7 2.6-8.5 0z"/>';
 const HOODS = '<path class="bl-i" d="M11 19c-3 0-5 4-5 8 0 3-1 5-2 7v8h9M37 19c3 0 5 4 5 8 0 3 1 5 2 7v8h-9"/><path class="bl-d" d="M24 9c-6 0-9 6-9 11 0 4-2 8-3 10v12h24V30c-1-2-3-6-3-10 0-5-3-11-9-11z"/><path class="bl-i" d="M24 9c-6 0-9 6-9 11 0 4-2 8-3 10v12h24V30c-1-2-3-6-3-10 0-5-3-11-9-11z"/><ellipse class="bl-h" cx="24" cy="21" rx="3.5" ry="4.5"/><circle class="bl-af" cx="22.6" cy="21" r=".9"/><circle class="bl-af" cx="25.4" cy="21" r=".9"/>';
 const INNER = {
   Flesh: '<path class="bl-af" d="M24 40C15 34 10 28 10 21a7 7 0 0 1 14-3 7 7 0 0 1 14 3c0 7-5 13-14 19z"/><path class="bl-i" d="M24 40C15 34 10 28 10 21a7 7 0 0 1 14-3 7 7 0 0 1 14 3c0 7-5 13-14 19z"/><path class="bl-i" stroke-width="1.5" d="M5 23c6-4 13 4 19 0s13-4 19 0M5 29c6 4 13-4 19 0s13 4 19 0M11 21l-1-3M19 24l1 3M29 22l-1-3M37 24l1 3M13 30l-1 3M21 28l1-3M31 30l-1 3M38 29l1-3"/><path class="bl-i" d="M24 4v9M20.5 7.5h7"/>',
   Domain: '<path class="bl-f" opacity=".25" d="M10 15.5L24 8.4l14 7.1z"/><path class="bl-i" d="M7 16L24 7l17 9zM7 18h34M7 37h34M5 41h38"/><path class="bl-i" stroke-width="3" d="M12 20v15M20 20v15M28 20v15M36 20v15"/><path class="bl-af" d="M22.5 26h3v9h-3z"/>',
-  Scene: '<path class="bl-f" opacity=".16" d="M24 14L17 44h14z"/><path class="bl-i" d="M5 44V15c0-5 4-9 9-9h20c5 0 9 4 9 9v29"/>' + VAL(9) + '<path class="bl-af" d="M7 13.5c2 9 3 19 1 30.5h7c-2-8-2-14 3-19-4-3-8-7-11-11.5zM41 13.5c-2 9-3 19-1 30.5h-7c2-8 2-14-3-19 4-3 8-7 11-11.5z"/><path class="bl-i" stroke-width="1.6" d="M10 27.5l6-1.5M38 27.5l-6-1.5"/><circle class="bl-f" cx="24" cy="33" r="2.6"/><path class="bl-f" d="M20 44c0-5 2-7.5 4-7.5s4 2.5 4 7.5z"/><path class="bl-i" d="M3 44.5h42"/>',
+  Scene: '<path class="bl-i" d="M6 44V13l18-6 18 6v31"/>' + VAL(13) + '<path class="bl-af" d="M7 17c1 8 2 17 0 27h5c-1-8 0-14 4-18-3-3-6-6-9-9zM41 17c-1 8-2 17 0 27h-5c1-8 0-14-4-18 3-3 6-6 9-9z"/><path class="bl-f" opacity=".14" d="M24 17l-6 27h12z"/><path class="bl-i" stroke-width="3.4" d="M23 44c-3-5 5-8 3-13s-6-4-4.5-8.5c1.2-3 5-2.6 4.5.5"/><circle class="bl-h" cx="25.6" cy="36.5" r=".9"/><circle class="bl-h" cx="24.3" cy="29.5" r=".9"/><circle class="bl-h" cx="22.4" cy="23.5" r=".8"/><path class="bl-i" d="M3 44.5h42"/>',
   Coven: '<ellipse class="bl-i" stroke-width="1.2" cx="24" cy="5.5" rx="6" ry="1.8"/>' + HOODS + '<path class="bl-i" stroke-width="1" d="M24 30.5v11"/>' };
 const NAMES = ['Flesh', 'Domain', 'Scene', 'Coven'];
-const CODES = { Flesh: 'F3', Domain: 'D3', Scene: 'S3a', Coven: 'C3a' };
+const CODES = { Flesh: 'F3', Domain: 'D3', Scene: 'S3c', Coven: 'C3a' };
 const svgOf = (n) => '<svg class="bl-ico" viewBox="0 0 48 48" aria-hidden="true" focusable="false">' + INNER[n] + '</svg>';
 const ICONS = {}; NAMES.forEach((n) => { ICONS[n] = svgOf(n); });
 const sigilHtml = (n) => '<div class="bl-slot"><button type="button" class="bl-sg" data-sig="' + n + '" aria-label="' + n + ' (' + CODES[n] + ')"><span class="bl-disc"><span class="bl-clip"><span class="bl-soakL"></span></span>' + ICONS[n] + '<span class="bl-fx"></span></span><span class="bl-lab">' + n + '</span></button></div>';
