@@ -41,3 +41,9 @@ Nothing here is built yet. Build in the phases at the bottom; mock-up first for 
 2. Vespers + High Vespers (identities, pattern grid, long-press tagging)
 3. Moon phases + multipliers + prices
 4. The new look (tablets, scroll, bosses) after the mock-ups
+
+## Mock-up picks so far (2026-10-27)
+- Blood and Sigils (https://claude.ai/artifact/TW897bZVrcPDYFo5vfxHJD): BL8b Soaked in (less splatter round the icons, never on them), sigils F3 heart in thorns, D3 temple, S3a gilded stage, C3a three gilded hoods (Set 3 gilded reliquary style), glow G5 abyssal ripple.
+- Sunken Temple (https://claude.ai/artifact/Fvtuun2mqhD9Bcveed5sHW): arena A1 Temple steps, circle B Elder Sign (behind the creature), strike S1 claw slash, ending D2 dragged down, then the trophy tarot card rises (dark outline style, K1 default, still choosing) and goes to the Vanquished list.
+- Obsidian and Parchment (https://claude.ai/artifact/Lq69u4NhgH8cyxyiUggvDD): stone ST3 dressed black stone (variants pending), pixel-style pentagram tick lit like round 1, colour = streak; P2 Touched by age + E1 turned wooden rods; W1 seal, stamp press shows handle not face (K1-K5 pending); empty spot builds on S2/S3 (S6-S10 pending); burn B2 both sides, slightly longer, ash lingers.
+- Absolution Glass (https://claude.ai/artifact/USVskdxqA4bVMgeKDNTokx): A1 light spills (Absolved must stand out), H3 sparks become health, L1 flood from a corner, less saturated yellow; round 2 pending (A1a-c, A4a-c, L1/L3 variants, CT1 calmer, BT2 made of glass).
