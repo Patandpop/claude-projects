@@ -56,7 +56,7 @@ s = G.gameTick(k, train.id, 1);
 ok('second life ritual: no bonus (20 only)', s.player.coins === 25 + 20);
 const net = s.goals.find((g) => g.name === 'Net'.length && false) || s.goals.find((g) => /Netflix/.test(g.name));
 s = G.gameTick(k, net.id, -1);
-ok('a bad habit costs health (120 min = 12) and never coins', s.player.hp === 50 - 12 + 0 && s.player.coins === 45 && s.last.bad);
+ok('a bad habit costs health (120 min = 16) and never coins', s.player.hp === 50 - 16 + 0 && s.player.coins === 45 && s.last.bad);
 const mark = s.goals.find((g) => /Mark 9AS/.test(g.name));
 s = G.gameTick(k, mark.id, 1);
 ok('a marking sitting pays and counts', s.goals.find((g) => g.id === mark.id).sitDone === 1 && s.player.coins === 45 + 16);
@@ -284,5 +284,36 @@ ok('spending and refunds never count as doubloons earned', ch.weeks[6].coins ===
   const am = pay('2026-12-03T10:00:00Z'), pm = pay('2026-12-03T17:00:00Z'), hol = pay('2026-12-22T17:00:00Z');
   ok('life after work pays more (Thu 5 pm vs 10 am)', pm > am);
   ok('life in the holidays pays the normal rate, even after 4 pm', hol < pm); }
+// 2026-10-27 Absolution: a curse with an antidote blessing; I gives back half, II the rest; Undo reverses; the window closes after the next day
+{ at('2026-12-07T10:00:00Z');
+  let s2 = G.gameSaveGoal(k, { name: 'Cooked from scratch', kind: 'habit', polarity: 'plus', minutes: 30 });
+  const cook = s2.saved;
+  s2 = G.gameSaveGoal(k, { name: 'Takeaway', kind: 'habit', polarity: 'minus', minutes: 60, anti: cook });
+  const take = s2.saved;
+  const hp0 = s2.player.hp;
+  s2 = G.gameTick(k, take, -1, 'Flesh');
+  ok('a Big curse now costs 12', s2.player.hp === hp0 - 12);
+  ok('its antidote shows an open Absolution', (s2.goals.find((g) => g.id === cook).absolve || {}).stage === 0);
+  const hp1 = s2.player.hp;
+  s2 = G.gameTick(k, cook, 1);
+  ok('Absolution I gives back half (6) plus the usual 1 (or a level-up refill)', s2.player.hp === (s2.last.up ? 50 : hp1 + 7) && s2.last.abs && s2.last.abs.stage === 1 && s2.last.abs.hp === 6);
+  const hpA = s2.player.hp, gotA = s2.last.hp;
+  s2 = G.gameUntick(k, cook);
+  ok('Undo takes Absolution I back exactly', s2.player.hp === hpA - gotA && (s2.goals.find((g) => g.id === cook).absolve || {}).stage === 0);
+  at('2026-12-08T11:00:00Z');
+  s2 = G.gameTick(k, cook, 1); s2 = G.gameTick(k, cook, 1);
+  ok('the next day Absolution II completes it', s2.last.abs && s2.last.abs.stage === 2 && !s2.goals.find((g) => g.id === cook).absolve);
+  s2 = G.gameTick(k, take, -1);
+  at('2026-12-10T09:00:00Z');
+  s2 = G.gameLoad(k);
+  ok('the window closes after the next day', !s2.goals.find((g) => g.id === cook).absolve);
+  // a two-sided habit is its own antidote and counts each side
+  s2 = G.gameSaveGoal(k, { name: 'Phone', kind: 'habit', polarity: 'both', minutes: 15 });
+  const ph = s2.saved;
+  s2 = G.gameTick(k, ph, -1, 'Scene'); s2 = G.gameTick(k, ph, 1);
+  const pg2 = s2.goals.find((g) => g.id === ph);
+  ok('a two-sided habit counts its curse and blessing sides', pg2.cCount === 1 && pg2.bCount === 1 && s2.last.abs && s2.last.abs.stage === 1);
+  s2 = G.gameUntick(k, ph);
+  ok('Undo on a two-sided habit takes back the last side tapped', s2.goals.find((g) => g.id === ph).bCount === 0 && s2.goals.find((g) => g.id === ph).cCount === 1); }
 console.log('\n' + (failed ? failed + ' FAILED' : 'all game server checks passed'));
 process.exit(failed ? 1 : 0);

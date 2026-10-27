@@ -13,14 +13,14 @@ const GAME = {
   maxHp: 50,
   base: { 5: 3, 15: 6, 30: 10, 60: 16, 120: 25 },          // doubloons and XP by minutes (pay grows slower than time)
   mult: { necessary: 1, ahead: 1.5, external: 3, life: 2 },  // what kind of job it is
-  hpLoss: { 5: 2, 15: 4, 30: 6, 60: 9, 120: 12 },            // a bad habit costs health, never doubloons
+  hpLoss: { 5: 4, 15: 6, 30: 8, 60: 12, 120: 16 },           // a bad habit costs health, never runes; even so Absolution halves cleanly (2026-10-27)
   lifeFirst: 5, lifeThree: 15,                               // life bonus: first life goal of the day, then three or more
   afterWork: 1.5, afterHour: 16,                             // life done after work on a school day pays x1.5 (not holidays or days off)
   streakStep: 0.1, streakCap: 0.3,                           // +10% per 7 days, capped at +30%
 };
 const G_HEAD = {
   player: ['Setting', 'Value'],
-  goals: ['id', 'name', 'kind', 'polarity', 'days', 'everyN', 'minutes', 'track', 'auto', 'value', 'streak', 'best', 'lastDone', 'private', 'sittings', 'sitDone', 'due', 'archived', 'created', 'grp', 'steps', 'miss'],
+  goals: ['id', 'name', 'kind', 'polarity', 'days', 'everyN', 'minutes', 'track', 'auto', 'value', 'streak', 'best', 'lastDone', 'private', 'sittings', 'sitDone', 'due', 'archived', 'created', 'grp', 'steps', 'miss', 'anti'],
   ticks: ['id', 'at', 'day', 'goalId', 'delta', 'coins', 'xp', 'hp', 'auto', 'ref', 'note'],
   freeze: ['day', 'reason', 'savedOn'],
   seen: ['lesson', 'built', 'firstBuiltOn'],
@@ -144,7 +144,7 @@ function gGoals_() {
   return gRows_('goals').filter((g) => String(g.archived) !== 'true' && g.archived !== true).map((g) => {
     g.minutes = Number(g.minutes) || 15; g.value = Number(g.value) || 0; g.streak = Number(g.streak) || 0; g.best = Number(g.best) || 0;
     g.everyN = Number(g.everyN) || 0; g.sittings = Number(g.sittings) || 0; g.sitDone = Number(g.sitDone) || 0;
-    g.private = String(g.private) === 'true'; g.lastDone = String(g.lastDone || ''); g.due = String(g.due || ''); g.days = String(g.days || ''); g.grp = String(g.grp || ''); g.miss = String(g.miss || '');
+    g.private = String(g.private) === 'true'; g.lastDone = String(g.lastDone || ''); g.due = String(g.due || ''); g.days = String(g.days || ''); g.grp = String(g.grp || ''); g.miss = String(g.miss || ''); g.anti = String(g.anti || '');
     try { g.steps = g.steps ? JSON.parse(g.steps) : []; } catch (e) { g.steps = []; }
     return g;
   });
@@ -159,6 +159,20 @@ function gIsDue_(g, day) {
 function gTicksToday_(ticks, day) { return ticks.filter((t) => String(t.day) === day); }
 function gNet_(ticks, id, day) { return ticks.filter((t) => String(t.day) === day && t.goalId === id).reduce((a, t) => a + Number(t.delta), 0); }
 
+/* ---- Absolution (Patryk 2026-10-27): a slipped curse can be won back by its antidote blessing (a two-sided habit's own
+   good side). Window = the slip day and the whole next day. Absolution I gives back half the health the slip cost,
+   Absolution II the rest. The health rides on the blessing's own tick row, so its Undo reverses it exactly. ---- */
+function gNote_(t) { try { return JSON.parse(t.note || '{}'); } catch (e) { return {}; } }
+function gUndone_(ticks) { const u = {}; ticks.forEach((t) => { const n = gNote_(t); if (n.untick) u[n.untick] = true; }); return u; }
+function gAntiOf_(g) { return g.polarity === 'both' ? g.id : String(g.anti || ''); }
+// the open slips that blessing bid can absolve, oldest first: [{ slip, curse, stage, lost, until }]
+function gOpenSlips_(ticks, goals, bid, today) {
+  const undone = gUndone_(ticks), byId = {}; goals.forEach((g) => { byId[g.id] = g; });
+  const steps = {}; ticks.forEach((t) => { const n = gNote_(t); if (n.absOf && !undone[t.id]) steps[n.absOf] = (steps[n.absOf] || 0) + 1; });
+  return ticks.filter((t) => { const n = gNote_(t); return n.side === 'c' && !undone[t.id] && n.anti === bid && String(t.day) >= gAdd_(today, -1) && (steps[t.id] || 0) < 2 && byId[t.goalId]; })
+    .map((t) => ({ slip: t.id, curse: t.goalId, name: byId[t.goalId].name, stage: steps[t.id] || 0, lost: -Number(t.hp) || 0, until: gAdd_(String(t.day), 1) }));
+}
+
 // one tick written and applied (used by manual ticks and by the auto hooks)
 function gTick_(g, delta, auto, ref, note) {
   const now = gNow_(), today = gDay_(now), p = gPlayer_(), ticks = gRows_('ticks'), goals = gGoals_();
@@ -166,14 +180,20 @@ function gTick_(g, delta, auto, ref, note) {
   if (ref && ticks.some((t) => t.ref === ref)) return null;                  // the same evidence never pays twice
   const out = { coins: 0, xp: 0, hp: 0, bad: false, up: false, died: null };
   const prev = { s: g.streak, v: g.value, ld: g.lastDone, sd: g.sitDone, m: g.miss };
+  note = Object.assign({}, note || {});
   if (delta < 0) {                                                            // a bad habit: health only
     out.bad = true; out.hp = -gHpLoss_(g); p.hp += out.hp;
+    note.side = 'c'; if (gAntiOf_(g)) note.anti = gAntiOf_(g);
     if (p.hp <= 0) out.died = gDie_(p, today, ticks);
     if (g.row) gSet_('goals', g.row, 'value', Math.max(-5, g.value - 1));
   } else {
     const pay = g.kind === 'habit' ? gBlessPay_(g, goals, gTicksToday_(ticks, today), today) : gPay_(g, gTicksToday_(ticks, today), byId);
     out.coins = pay.coins; out.xp = pay.xp; p.coins += pay.coins; out.up = gAddXp_(p, pay.xp, today);
     out.hp = Math.min(1, p.maxHp - p.hp); p.hp = Math.min(p.maxHp, p.hp + 1);
+    if (g.kind === 'habit') { note.side = 'b';
+      const open = gOpenSlips_(ticks, goals, g.id, today)[0];
+      if (open) { const back = open.stage === 0 ? Math.floor(open.lost / 2) : open.lost - Math.floor(open.lost / 2), got = Math.min(back, p.maxHp - p.hp);
+        p.hp += got; out.hp += got; note.absOf = open.slip; out.abs = { stage: open.stage + 1, hp: back, curse: open.name }; } }
     if (g.row && g.kind !== 'ghost') {
       if (g.kind === 'termly') gSet_('goals', g.row, 'sitDone', g.sitDone + 1);
       else if (gNet_(ticks, g.id, today) === 0) {                           // first tick of the day moves streak and colour
@@ -184,7 +204,7 @@ function gTick_(g, delta, auto, ref, note) {
       gSet_('goals', g.row, 'lastDone', today);
     }
   }
-  gAppend_('ticks', { id: Utilities.getUuid().slice(0, 8), at: now.toISOString(), day: today, goalId: g.id, delta: 1, coins: out.coins, xp: out.xp, hp: out.hp, auto: auto ? 'yes' : '', ref: ref || '', note: JSON.stringify(Object.assign({ prev, name: g.name }, note || {})) });
+  gAppend_('ticks', { id: Utilities.getUuid().slice(0, 8), at: now.toISOString(), day: today, goalId: g.id, delta: 1, coins: out.coins, xp: out.xp, hp: out.hp, auto: auto ? 'yes' : '', ref: ref || '', note: JSON.stringify(Object.assign({ prev, name: g.name }, note)) });
   gSavePlayer_(p);
   out.player = p;
   return out;
@@ -345,15 +365,16 @@ function gAheadPay_(world, today, out) {
 /* ---- public functions ---- */
 function gSnapshot_(world, extra) {
   const today = gDay_(gNow_()), p = gPlayer_(), goals = gGoals_(), ticks = gRows_('ticks'), frozen = gFrozenDays_();
-  const byId = {}; goals.forEach((g) => { byId[g.id] = g; });
+  const byId = {}; goals.forEach((g) => { byId[g.id] = g; }); const undone = gUndone_(ticks);
   const todayTicks = gTicksToday_(ticks, today), fz = gIsFrozen_(today, world, frozen), feat = gFeatured_(goals, today);
   const tickDay = {}; ticks.forEach((t) => { const key = t.goalId + '|' + t.day; tickDay[key] = (tickDay[key] || 0) + Number(t.delta); });
   const strip = (g) => { let s14 = ''; for (let i = 13; i >= 0; i--) { const d = gAdd_(today, -i); s14 += gIsFrozen_(d, world, frozen) ? 'f' : (tickDay[g.id + '|' + d] || 0) > 0 ? 'o' : (!g.everyN && gIsDue_(Object.assign({}, g, { lastDone: '' }), d) && String(g.created || '') <= d && d < today) ? 'x' : '-'; } return s14; };
   const view = goals.map((g) => {
     const net = gNet_(ticks, g.id, today), pay = gPay_(g, todayTicks, byId);
     const o = { id: g.id, name: g.name, kind: g.kind, polarity: g.polarity, minutes: g.minutes, track: g.track, auto: g.auto, value: g.value, streak: g.streak, private: g.private,
-      days: g.days, everyN: g.everyN, pay: pay.coins, hpLoss: g.kind === 'habit' ? gHpLoss_(g) : 0, doneToday: net > 0, count: net, grp: g.grp || gDefGrp_(g), steps: g.steps, miss: !!g.miss };
-    if (g.kind === 'habit' && g.polarity !== 'minus') { o.featured = false; o.pay = gBlessAmt_(g); }
+      days: g.days, everyN: g.everyN, pay: pay.coins, hpLoss: g.kind === 'habit' ? gHpLoss_(g) : 0, doneToday: net > 0, count: net, grp: g.grp || gDefGrp_(g), steps: g.steps, miss: !!g.miss, anti: g.anti };
+    if (g.kind === 'habit' && g.polarity !== 'minus') { o.featured = false; o.pay = gBlessAmt_(g); const sl = gOpenSlips_(ticks, goals, g.id, today); if (sl.length) o.absolve = sl[0]; }
+    if (g.kind === 'habit' && g.polarity === 'both') { const side = (sd) => ticks.filter((t) => t.goalId === g.id && String(t.day) === today && gNote_(t).side === sd && !undone[t.id]).length; o.cCount = side('c'); o.bCount = side('b'); }
     if (g.kind === 'todo') { o.due = g.due; o.doneOn = g.lastDone; o.dueToday = !g.lastDone || gDiff_(g.lastDone, today) <= 14; }
     if (g.kind === 'daily') { o.dueToday = gIsDue_(g, today); o.strip = strip(g); }
     if (g.kind === 'termly') { o.sittings = g.sittings; o.sitDone = g.sitDone; o.due = g.due; o.daysLeft = g.due ? gDiff_(today, g.due) : null; o.dueToday = g.sitDone < g.sittings || g.lastDone === today; o.pay = gPay_(Object.assign({}, g, { track: g.track || 'necessary' }), todayTicks, byId).coins; }
@@ -397,7 +418,8 @@ function gameLoad(k) {
   });
   return gSnapshot_(gWorld_(), extra);
 }
-function gameTick(k, id, delta) {
+// sig: the sigil tapped after a curse (Flesh, Domain, Scene, Coven), or '' for a double tap (Patryk 2026-10-27)
+function gameTick(k, id, delta, sig) {
   check_(k);
   let res = null, bad = null;
   withLock_(function () {
@@ -408,10 +430,10 @@ function gameTick(k, id, delta) {
     if (delta > 0 && g.kind !== 'habit' && g.kind !== 'termly' && gNet_(gRows_('ticks'), g.id, today) > 0) { res = { already: true }; return; }
     if (delta > 0 && g.kind === 'todo' && g.lastDone) { res = { already: true }; return; }
     if (g.kind === 'termly' && g.sitDone >= g.sittings) { res = { already: true }; return; }
-    res = gTick_(g, delta < 0 ? -1 : 1, false, '');
+    res = gTick_(g, delta < 0 ? -1 : 1, false, '', delta < 0 && /^(Flesh|Domain|Scene|Coven)$/.test(String(sig || '')) ? { sig } : null);
   });
   if (bad) throw new Error(bad);
-  return gSnapshot_(gWorld_(), { last: res ? { coins: res.coins || 0, hp: res.hp || 0, up: !!res.up, died: res.died || null, bad: !!res.bad } : null });
+  return gSnapshot_(gWorld_(), { last: res ? { coins: res.coins || 0, hp: res.hp || 0, up: !!res.up, died: res.died || null, bad: !!res.bad, abs: res.abs || null } : null });
 }
 // untick: writes an exact reversing row (never deletes), restores streak, colour and sittings
 function gameUntick(k, id) {
@@ -447,6 +469,7 @@ function gameSaveGoal(k, goal) {
       days: String(goal.days || '').replace(/[^1-7]/g, ''), everyN: Number(goal.everyN) || '', minutes, track, auto: old ? old.auto : '', value: old ? old.value : 0, streak: old ? old.streak : 0, best: old ? old.best : 0,
       lastDone: old ? old.lastDone : '', private: goal.private ? 'true' : '', sittings: kind === 'termly' ? (Number(goal.sittings) || 1) : '', sitDone: old ? old.sitDone : (kind === 'termly' ? 0 : ''),
       due: String(goal.due || ''), archived: '', created: old ? old.created : today, miss: old ? (old.miss || '') : '', grp: String(goal.grp || '').slice(0, 40),
+      anti: kind === 'habit' ? String(goal.anti || '').slice(0, 20) : '',
       steps: kind === 'todo' ? JSON.stringify((goal.steps || []).map((x) => ({ t: String(x.t || '').slice(0, 80), d: !!x.d })).filter((x) => x.t).slice(0, 12)) : '' };
     if (kind === 'todo' && rec.due && !/^\d{4}-\d{2}-\d{2}$/.test(rec.due)) rec.due = '';
     if (kind === 'daily' && !rec.days && !rec.everyN) rec.days = '12345';
