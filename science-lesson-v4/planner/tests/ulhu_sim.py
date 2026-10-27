@@ -116,6 +116,8 @@ try:
         check('back online it is sent', pg.evaluate("(JSON.parse(localStorage.getItem('ulhuQ')||'[]')).length") == 0)
         h = pg.evaluate("document.querySelector('.uz').getBoundingClientRect().height")
         check('fills the screen between the header and the bottom bar', 780 > h > 600)
+        pg.click('.uz-tabs [data-v="3"]'); pg.wait_for_timeout(600); pg.click('.uz-dock [data-v="shop"]'); pg.wait_for_timeout(1200)
+        check('shop cards are full size, not squashed by the omen card style', pg.evaluate("Math.min(...[...document.querySelectorAll('.uz-pane')[3].querySelectorAll('.uz-card')].map(function(c){ return c.getBoundingClientRect().width; }))") > 80)
         check('no page errors', not errs)
         if errs: print(errs[:3])
         b.close()

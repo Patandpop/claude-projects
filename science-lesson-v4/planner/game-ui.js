@@ -124,7 +124,7 @@
 .uz-curse .uz-tk{border:2px solid #c4323a;background:radial-gradient(circle,#3a1216,#1a0a0c)}.uz-curse .uz-tk img{width:20px;height:20px}
 .uz-bl{display:grid;grid-template-columns:1fr 1fr;gap:6px}
 .uz-bt{position:relative;overflow:hidden;min-height:82px;display:flex;flex-direction:column;align-items:stretch;justify-content:space-between;gap:6px;padding:8px 9px;border-radius:6px;text-align:left;box-shadow:0 2px 0 #030806}
-.uz-card{flex:none;width:44px;height:60px;padding:0;border:none!important;background:none!important;border-radius:0!important;box-shadow:none!important;display:flex;align-items:center;justify-content:center}.uz-card img{width:40px!important;height:55px!important;image-rendering:pixelated;filter:drop-shadow(0 2px 0 rgba(0,0,0,.6))}
+.uz-omc{flex:none;width:44px;height:60px;padding:0;border:none!important;background:none!important;border-radius:0!important;box-shadow:none!important;display:flex;align-items:center;justify-content:center}.uz-omc img{width:40px!important;height:55px!important;image-rendering:pixelated;filter:drop-shadow(0 2px 0 rgba(0,0,0,.6))}
 .uz-halo{flex:none;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center}.uz-halo img{width:24px;height:24px}
 .uz-x2{position:absolute;top:0;right:0;padding:2px 7px;border-bottom-left-radius:6px;background:#ffd56a;color:#1a1004;font:700 11px var(--a)}
 .uz-card{display:flex;flex-direction:column;align-items:stretch;padding:0;border-radius:5px;border:1.5px solid #23332c;background:#131d19;overflow:hidden;text-align:left}
@@ -592,7 +592,7 @@
       // curses as 2-column cards like the blessings (Patryk 2026-10-26)
       h += cs.length ? '<div class="uz-bl">' + cs.map((c) => { const n = c.count || 0;
         return '<button class="uz-bt" data-a="curse" data-id="' + c.id + '" data-fx="' + c.id + '" aria-label="Slipped: ' + esc(c.name) + '" style="background:linear-gradient(180deg,#2a1216,#170a0c);border:1.5px solid ' + (n ? '#c4323a' : '#4a1c22') + '">' +
-          '<span style="display:flex;align-items:center;gap:7px"><span class="uz-card"><img src="' + OMENS.card('c', OMENS.of(c)) + '" alt=""></span><span style="flex:1;min-width:0;font:700 14px/1.15 var(--a);color:#f0e0d8">' + esc(c.name) + '</span></span>' +
+          '<span style="display:flex;align-items:center;gap:7px"><span class="uz-omc"><img src="' + OMENS.card('c', OMENS.of(c)) + '" alt=""></span><span style="flex:1;min-width:0;font:700 14px/1.15 var(--a);color:#f0e0d8">' + esc(c.name) + '</span></span>' +
           '<span style="display:flex;align-items:center;justify-content:space-between"><span style="display:flex;align-items:center;gap:4px;font:700 14px var(--a);color:#ff7a66">−' + c.hpLoss + '<img src="' + IMG.heart + '" style="width:12px;height:12px" alt=""></span>' +
           '<span style="font:12px var(--a);color:#b08a84">' + (n ? n + '× today' : 'spared today') + '</span></span></button>'; }).join('') + '</div>' : '<p class="uz-p" style="color:#b08a84">No curses. Tap + Add.</p>';
       if (V.edit && cs.length) h += '<div class="uz-chips">' + cs.map((c) => '<button data-a="arch" data-id="' + c.id + '">× ' + esc(c.name) + '</button>').join('') + '</div>';
@@ -600,7 +600,7 @@
       h += '<div class="uz-cap" style="border-color:#1e2e4e;margin-top:6px"><span><b style="color:#c4e0ff;text-shadow:0 0 8px rgba(140,200,255,.7)">Small Blessings</b></span><span style="font:700 12px var(--a);color:#c4e0ff">' + cnt + ' today</span></div>';
       h += bs.length ? '<div class="uz-bl">' + bs.map((g) => { const f = false, n = g.count || 0;
         return '<button class="uz-bt" data-a="bless" data-id="' + g.id + '" data-fx="' + g.id + '" style="background:' + (f ? 'linear-gradient(180deg,#2a2410,#151208)' : 'linear-gradient(180deg,#10233a,#0b1626)') + ';border:1.5px solid ' + (f ? '#8a6a2a' : n ? '#4a8ad0' : '#1f4266') + (n ? ';box-shadow:0 0 10px rgba(110,180,255,.35)' : '') + '">' +
-          '<span style="display:flex;align-items:center;gap:7px"><span class="uz-card"><img src="' + OMENS.card('b', OMENS.of(g)) + '" alt=""></span><span style="flex:1;min-width:0;font:700 14px/1.15 var(--a);color:#e8f2ff">' + esc(g.name) + '</span></span>' +
+          '<span style="display:flex;align-items:center;gap:7px"><span class="uz-omc"><img src="' + OMENS.card('b', OMENS.of(g)) + '" alt=""></span><span style="flex:1;min-width:0;font:700 14px/1.15 var(--a);color:#e8f2ff">' + esc(g.name) + '</span></span>' +
           '<span style="display:flex;align-items:center;justify-content:space-between"><span style="display:flex;align-items:center;gap:3px;font:700 14px var(--a);color:#f0c45a">+' + g.pay + coin(15, g.pay, g.id) + '</span><span style="display:flex;gap:3px">' +
           [0, 1, 2, 3, 4].map((i) => '<span style="width:7px;height:7px;border-radius:1px;background:' + (i < n ? (f ? '#ffd56a' : '#c8e6ff') : '#2c4a7a') + ';box-shadow:' + (i < n ? '0 0 5px rgba(170,215,255,.9)' : 'none') + '"></span>').join('') + '</span></span>' +
           (f ? '<span class="uz-x2">×2 TODAY</span>' : '') + '</button>'; }).join('') + '</div>' : '<p class="uz-p" style="color:#6f8a7c">No blessings yet.</p>';
