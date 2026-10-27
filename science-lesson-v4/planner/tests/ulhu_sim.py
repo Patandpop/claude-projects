@@ -3,7 +3,7 @@ Run: python tests/ulhu_sim.py  (add --shots DIR to save screenshots). Synthetic 
 import os, sys, subprocess, time
 from playwright.sync_api import sync_playwright
 P = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '/'; SP = sys.argv[1] if len(sys.argv) > 1 and not sys.argv[1].startswith('--') else __import__('tempfile').mkdtemp()
-js = ''.join(open(P + f, encoding='utf-8').read() + '\n' for f in ['game-ulhu.js', 'game-pixel.js', 'game-runes.js', 'game-temple.js', 'game-omens.js', 'game-blood.js', 'game-ui.js'])
+js = ''.join(open(P + f, encoding='utf-8').read() + '\n' for f in ['game-ulhu.js', 'game-pixel.js', 'game-runes.js', 'game-temple.js', 'game-stone.js', 'game-omens.js', 'game-blood.js', 'game-ui.js'])
 page = '''<!doctype html><meta charset="utf-8"><meta name=viewport content="width=device-width,initial-scale=1"><body style="margin:0;background:#0d1b3a">
 <div style="height:60px;background:#0a1020;color:#fff">8AG header</div><div id=u></div><nav style="position:fixed;bottom:0;left:0;right:0;height:62px;background:#0a1020"></nav>
 <script>window.CALLS=[];function call(fn,...args){CALLS.push(fn);return fetch('/c',{method:'POST',body:JSON.stringify({fn,args})}).then(r=>r.json()).then(x=>{if(x.err)throw new Error(x.err);return x.ok;});}</script>
@@ -28,7 +28,7 @@ try:
         check('the Sunday review on top of The Call; Ulhu says a line of doom, not orders', pg.locator('.uz-pane >> nth=0').locator('.uz-rv').count() == 1 and len(pg.inner_text('.uz-say')) > 10 and 'Next:' not in pg.inner_text('.uz-say'))
         if shots: pg.screenshot(path=os.path.join(SP, 's1.png'))
         c0 = int(pg.inner_text('.uz-coins b'))
-        pg.locator('.uz-pane >> nth=0').locator('.uz-row:not(.done) [data-a=tick]').first.click(); pg.wait_for_timeout(80)
+        pg.locator('.uz-pane >> nth=0').locator('.uz-strow:not(.done) [data-a=tick]').first.click(); pg.wait_for_timeout(80)
         c1 = int(pg.inner_text('.uz-coins b'))
         check('a tick pays at once, before the server answers', c1 > c0 and ('Ticked:' in pg.inner_text('.uz-undo') or 'Marked:' in pg.inner_text('.uz-undo')))
         pg.wait_for_timeout(900)
@@ -95,7 +95,7 @@ try:
         if shots: pg.screenshot(path=os.path.join(SP, 's7.png'))
         # 2026-10-26: edit after setting, a date picker for quests, sizes not minutes, instant open, no-signal saving
         pg.click('.uz-tabs [data-v="1"]'); pg.wait_for_timeout(400)
-        pg.locator('.uz-pane >> nth=1').locator('.uz-row .uz-mid[data-a=editg]').first.click()
+        pg.locator('.uz-pane >> nth=1').locator('.uz-strow [data-a=editg]').first.click()
         pg.wait_for_timeout(300)
         check('tapping a ritual opens it to edit (Edit ritual, Save, Archive)', 'Edit ritual' in pg.inner_text('.uz-form') and pg.locator('.uz-form [data-a=farch]').count() == 1)
         check('sizes, not minutes', 'Medium' in pg.inner_text('.uz-form') and ' min' not in pg.inner_text('.uz-form'))
@@ -111,7 +111,7 @@ try:
         check('the phone keeps the last screen for an instant open', pg.evaluate("!!JSON.parse(localStorage.getItem('ulhuD')||'null')"))
         pg.context.set_offline(True); pg.click('.uz-tabs [data-v="0"]'); pg.wait_for_timeout(300)
         n0 = pg.evaluate("(JSON.parse(localStorage.getItem('ulhuQ')||'[]')).length")
-        pg.locator('.uz-pane >> nth=0').locator('.uz-row:not(.done) [data-a=tick]').first.click(); pg.wait_for_timeout(800)
+        pg.locator('.uz-pane >> nth=0').locator('.uz-strow:not(.done) [data-a=tick]').first.click(); pg.wait_for_timeout(800)
         check('with no signal a tick is kept on the phone, not lost', pg.evaluate("(JSON.parse(localStorage.getItem('ulhuQ')||'[]')).length") == n0 + 1 and 'Saved on the phone' in pg.inner_text('.uz-undo'))
         pg.context.set_offline(False); pg.wait_for_timeout(1500)
         check('back online it is sent', pg.evaluate("(JSON.parse(localStorage.getItem('ulhuQ')||'[]')).length") == 0)

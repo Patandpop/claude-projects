@@ -134,6 +134,7 @@
 .uz-twm img{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated}.uz-twm .rt{clip-path:polygon(62% 0,100% 0,100% 100%,38% 100%)}
 .uz-twm i{position:absolute;left:50%;top:0;bottom:0;width:1.5px;margin-left:-1px;background:linear-gradient(#fff3c8,#ffd890);box-shadow:0 0 5px #ffd890;transform:rotate(9.8deg);opacity:.8}
 .uz .bl-layer{background:linear-gradient(180deg,transparent 0,transparent calc(100% - 130px),rgba(4,8,7,.88) calc(100% - 96px))}
+.uz-strow{margin-bottom:2px}
 .uz-abs{display:block;font:700 11px/1.2 var(--a);color:#ffe2a0;text-shadow:0 0 6px rgba(255,214,140,.5)}
 .uz-omc{flex:none;width:44px;height:60px;padding:0;border:none!important;background:none!important;border-radius:0!important;box-shadow:none!important;display:flex;align-items:center;justify-content:center}.uz-omc img{width:40px!important;height:55px!important;image-rendering:pixelated;filter:drop-shadow(0 2px 0 rgba(0,0,0,.6))}
 .uz-halo{flex:none;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center}.uz-halo img{width:24px;height:24px}
@@ -463,6 +464,10 @@
     function ritualRow(g) {
       const on = g.doneToday, emb = !on && g.miss && !D.frozen, n = g.streak, col = sCol(Math.max(1, n + (on ? 0 : 1)));
       const st = g.strip ? '<div class="uz-strip">' + String(g.strip).split('').map((c) => '<i style="background:' + (c === 'o' ? col : c === 'f' ? '#3a6a9a' : c === 'x' ? '#3a1418' : '#1a1430') + '"></i>').join('') + '</div>' : '';
+      if (window.STONE) return '<div class="uz-strow' + (on ? ' done' : '') + '">' + STONE.row({ id: g.id, name: g.name, streak: n, done: on,
+          subHtml: '<span>' + (on ? 'appeased' : emb ? 'embers' : 'awaits') + '</span> <span>' + esc(rep(g)) + '</span>' + (n > 0 ? ' <span style="font-weight:700;color:' + col + '">' + n + ' night' + (n === 1 ? '' : 's') + '</span>' : ''),
+          payHtml: '<span class="uz-pay">' + (g.auto ? SEAL : '') + '<span>+' + g.pay + coin(18, g.pay, g.id) + '</span></span>' + archBtn(g.id),
+          tickAttrs: 'data-a="tick" data-id="' + g.id + '" data-fx="' + g.id + '"', bodyAttrs: 'data-a="editg" data-id="' + g.id + '"' }) + '</div>' + st;
       return '<div class="uz-row sg' + (on ? ' done' : '') + '">' + sigil(g, on) +
         '<div class="uz-mid uz-ed" data-a="editg" data-id="' + g.id + '"><div class="nm">' + esc(g.name) + '</div><div class="uz-sub"><span>' + (on ? 'appeased' : emb ? 'embers' : 'awaits') + '</span><span>' + esc(rep(g)) + '</span>' +
         (n > 0 ? '<span style="font-weight:700;color:' + col + '">' + n + ' night' + (n === 1 ? '' : 's') + '</span>' : '') + '</div></div>' +
@@ -872,6 +877,7 @@
       drawSky();
       const sb = body.querySelector('.uz-stampbox'); if (sb && V.stampNew) { V.stampNew = false; anim(sb, [{ transform: 'scale(2.4) rotate(-28deg)', opacity: 0 }, { transform: 'scale(.92) rotate(-10deg)', opacity: 1, offset: 0.7 }, { transform: 'scale(1) rotate(-10deg)', opacity: 1 }], { duration: 420, easing: 'cubic-bezier(.2,.8,.3,1.2)' }); }
       if (window.TEMPLE) TEMPLE.paint(body);
+      if (window.STONE) STONE.paint(body);
       if (V.waxNew) { const n = body.querySelector('.uz-stamp[data-q="' + V.waxNew + '"]'); if (n) { V.waxNew = null; anim(n, [{ transform: 'scale(2.4) rotate(-28deg)', opacity: 0 }, { transform: 'scale(1) rotate(-10deg)', opacity: 1 }], { duration: 420 }); } }
     }
 
@@ -959,7 +965,7 @@
           let upL = false;
           V.sayKind = 'mark'; act({ verb: on ? 'Marked:' : 'Unmarked:', name: cls + ' ' + (on ? g.sitDone + 1 : g.sitDone - 1) + '/' + g.sittings, delta: (on ? '+' : '−') + g.pay, unit: 'coin' }, on ? ['gameUntick', id] : ['gameTick', id, 1], on ? 'gameTick' : 'gameUntick', on ? [id, 1] : [id],
             (d) => { const x = d.goals.find((y) => y.id === id); x.sitDone += on ? 1 : -1; if (on) upL = earnLocal(d, g.pay, g.pay); else d.player.coins -= g.pay; });
-          if (on) earnFx(r, k, g.pay, upL); else buzz(6); return;
+          if (on) { earnFx(r, k, g.pay, upL); if (window.STONE) STONE.flare(k); } else buzz(6); return;
         }
         if (g.kind === 'todo') {
           const on = !g.doneOn; let upL = false;
@@ -971,7 +977,7 @@
         if (on) { V.settling[id] = 1; setTimeout(() => { delete V.settling[id]; paint(); }, 1100); if ([7, 21, 66].indexOf(g.streak + 1) >= 0) V.sayKind = 'streak'; }
         act({ verb: on ? 'Ticked:' : 'Unticked:', name: g.name, delta: (on ? '+' : '−') + g.pay, unit: 'coin' }, on ? ['gameUntick', id] : ['gameTick', id, 1], on ? 'gameTick' : 'gameUntick', on ? [id, 1] : [id],
           (d) => { const x = d.goals.find((y) => y.id === id); x.doneToday = on; x.streak = Math.max(0, x.streak + (on ? 1 : -1)); if (on) upL = earnLocal(d, g.pay, g.pay); else { d.player.coins -= g.pay; d.weekCoins -= g.pay; } });
-        if (on) earnFx(r, k, g.pay, upL); else buzz(6); return;
+        if (on) { earnFx(r, k, g.pay, upL); if (window.STONE) STONE.flare(k); } else buzz(6); return;
       }
       if (a === 'curse') {
         if (V.edit) { const g0 = goal(id); V.form = 'curse'; V.draft = draftOf(g0); V.orig = clone(V.draft); return paint(); }
