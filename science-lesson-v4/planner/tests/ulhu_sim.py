@@ -3,7 +3,7 @@ Run: python tests/ulhu_sim.py  (add --shots DIR to save screenshots). Synthetic 
 import os, sys, subprocess, time
 from playwright.sync_api import sync_playwright
 P = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '/'; SP = sys.argv[1] if len(sys.argv) > 1 and not sys.argv[1].startswith('--') else __import__('tempfile').mkdtemp()
-js = ''.join(open(P + f, encoding='utf-8').read() + '\n' for f in ['game-ulhu.js', 'game-pixel.js', 'game-runes.js', 'game-temple.js', 'game-stone.js', 'game-omens.js', 'game-blood.js', 'game-scroll.js', 'game-glass.js', 'game-highvespers.js', 'game-ui.js'])
+js = ''.join(open(P + f, encoding='utf-8').read() + '\n' for f in ['game-ulhu.js', 'game-pixel.js', 'game-runes.js', 'game-temple.js', 'game-stone.js', 'game-omens.js', 'game-tabs.js', 'game-blood.js', 'game-scroll.js', 'game-glass.js', 'game-highvespers.js', 'game-ui.js'])
 page = '''<!doctype html><meta charset="utf-8"><meta name=viewport content="width=device-width,initial-scale=1"><body style="margin:0;background:#0d1b3a">
 <div style="height:60px;background:#0a1020;color:#fff">8AG header</div><div id=u></div><nav style="position:fixed;bottom:0;left:0;right:0;height:62px;background:#0a1020"></nav>
 <script>window.CALLS=[];function call(fn,...args){CALLS.push(fn);return fetch('/c',{method:'POST',body:JSON.stringify({fn,args})}).then(r=>r.json()).then(x=>{if(x.err)throw new Error(x.err);return x.ok;});}</script>
@@ -20,7 +20,7 @@ try:
         errs = []; pg.on('pageerror', lambda e: errs.append(str(e)))
         pg.goto('http://localhost:8765/'); pg.wait_for_timeout(2500)
         check('banner shows coins (after-work life ticks pay x1.5 at 4.40 pm), level title and Ulhu', int(pg.inner_text('.uz-coins b')) > 400 and pg.locator('.uz-me img').count() >= 1)
-        check('four tabs, Rituals first with a count badge', pg.locator('.uz-tabs button').count() == 4 and pg.locator('.uz-tabs button b').count() >= 1)
+        check('four tabs, Rituals first with a count badge', pg.locator('.uz-tabs button').count() == 4 and pg.locator('.uz-tabs button b.bd:not([hidden])').count() >= 1)
         check('The Call has Toil; the Grimoire opens folded: Breakwater, The Teaching Trench, The Surface World', 'Toil' in pg.inner_text('.uz-pane >> nth=0') and all(t in pg.inner_text('.uz-pane >> nth=1') for t in ['Breakwater', 'The Teaching Trench', 'The Surface World']))
         sizes = pg.evaluate("[...document.querySelectorAll('img[alt=runes]')].map(i => i.src)")
         check('the currency is runes: single runes, the cairn and the portal all appear', len(sizes) > 5 and pg.evaluate("[RUNES.pick(6,'x').src, RUNES.pick(25).src, RUNES.pick(600).src].every((s, i, a) => a.indexOf(s) === i)") and pg.evaluate("RUNES.pick(25).src") in sizes)
@@ -44,7 +44,7 @@ try:
             bx = pg.locator('.uz-body').bounding_box(); y = bx['y'] + 200; x = bx['x'] + bx['width'] / 2
             pg.mouse.move(x, y); pg.mouse.down(); pg.mouse.move(x + dx / 2, y, steps=5); pg.mouse.move(x + dx, y, steps=5); pg.mouse.up(); pg.wait_for_timeout(500)
         swipe(-150)
-        check('swiping left opens Quests', pg.evaluate("getComputedStyle(document.querySelectorAll('.uz-tabs button')[1]).color") == 'rgb(164, 138, 255)')
+        check('swiping left opens Quests', pg.evaluate("document.querySelectorAll('.uz-tabs button')[1].classList.contains('on')"))
         pg.click('[data-a=fold][data-v=teach]'); pg.wait_for_timeout(300); t = pg.inner_text('.uz-pane >> nth=1')
         check('the Teaching area opens: rituals, then quests with date chips, a checklist, marking and bosses', all(x in t for x in ['Rituals', 'Quests', 'today', 'Find the 2024 paper', 'Mark 9AS books', 'Mark the 10S2 test']))
         if shots: pg.screenshot(path=os.path.join(SP, 's2.png'))
