@@ -6,10 +6,11 @@ const dir = path.join(__dirname, '..');
 m.props.PLANNER_KEY = 'k';
 const src = ['Code.gs', 'Behaviour.gs', 'game-art.js', 'Game.gs'].map((f) => fs.readFileSync(path.join(dir, f), 'utf8')).join('\n');
 global.SHOP = require('../game-shop.json');
-eval(src + '\nglobal.G={gameLoad,gameTick,gameUntick,gameSaveGoal,gameArchive,gameFreeze,gameShop,gameArt,gameBuy,gamePlace,gameBossStart,gameBossStage,gameBossRemove,gameBossSave,gameTag,gameChips,gameVespers,gameVespersUndo,gameVespersTime,gameMoon,gameReview,gameQuestStep,gameGroupSave,gameWear,gameUnbuy,gameHoardSave,gameHoardClaim,gameChronicle,gPay_,gDie_,gNeed_,gAdd_,gDow_,gDiff_,gIsFrozen_};');
+eval(src + '\nglobal.G={gameLoad,gameTick,gameUntick,gameSaveGoal,gameArchive,gameFreeze,gameShop,gameArt,gameBuy,gamePlace,gameBossStart,gameBossStage,gameBossRemove,gameBossSave,gameTag,gameChips,gameVespers,gameVespersUndo,gameVespersTime,gameMoon,gameReview,gameQuestStep,gameGroupSave,gameWear,gameUnbuy,gameHoardSave,gameHoardClaim,gameChronicle,gameAim,gPay_,gDie_,gNeed_,gAdd_,gDow_,gDiff_,gIsFrozen_};');
 
 const k = 'k'; let failed = 0;
 const ok = (n, c) => { console.log((c ? '  PASS ' : '  FAIL ') + n); if (!c) failed++; };
+const gAddDay = (d, n) => G.gAdd_(d, n);
 const at = (iso) => { global.GAME_NOW = new Date(iso).getTime(); };
 global.GAME_WORLD = { data: { terms: [['2026-09-07', '2026-10-21'], ['2026-11-02', '2026-12-18']], inset: ['2026-11-25'], classes: { '9XS': { seq: [{ num: 1, built: true }, { num: 2, built: false }, { num: 3, built: false }] } } },
   weeks: { '2026-11-02': { slots: [{ kind: 'lesson', cls: '9XS', i: 1, day: 15 }, { kind: 'lesson', cls: '9XS', i: 2, day: 40 }] } } };
@@ -59,7 +60,7 @@ s = G.gameTick(k, train.id, 1);
 ok('second life ritual: no bonus (20 only)', s.player.coins === 25 + 20);
 const net = s.goals.find((g) => g.name === 'Net'.length && false) || s.goals.find((g) => /Netflix/.test(g.name));
 s = G.gameTick(k, net.id, -1);
-ok('a bad habit costs health (120 min = 16) and never coins', s.player.hp === 50 - 16 + 0 && s.player.coins === 45 && s.last.bad);
+ok('a bad habit costs health (120 min = 16) and never coins', s.player.hp === 60 - 16 + 0 && s.player.coins === 45 && s.last.bad);
 const mark = s.goals.find((g) => /Mark 9AS/.test(g.name));
 s = G.gameTick(k, mark.id, 1);
 ok('a marking sitting pays and counts', s.goals.find((g) => g.id === mark.id).sitDone === 1 && s.player.coins === 45 + 16);
@@ -166,11 +167,13 @@ s = G.gameBossStage(k, bs.id, 1, true);
 ok('a late stage deals half (12.5, rounded)', s.bosses[0].stages[1].late === true && s.bosses[0].hp === 63 || s.bosses[0].hp === 62);
 s = G.gameBossStage(k, bs.id, 1, false);
 ok('a stage can be unticked while the boss is alive', s.bosses[0].hp === 75);
-const coinsB = s.player.coins;
+const coinsB = s.player.coins, lvB = s.player.level;
+// 2026-10-28: each new level also pours level x 10 runes onto the heap
+const gifts = (a, b) => { let n = 0; for (let L = a + 1; L <= b; L++) n += L * 10; return n; };
 s = G.gameBossStage(k, bs.id, 1, true); s = G.gameBossStage(k, bs.id, 2, true); s = G.gameBossStage(k, bs.id, 3, true);
-ok('beating the boss pays its reward once and says so', s.boss && s.boss.beaten && s.player.coins - coinsB === 150 && !s.bosses.length && s.beaten[0].name === 'Mark 9XS Particles tests');
+ok('beating the boss pays its reward once and says so', s.boss && s.boss.beaten && s.player.coins - coinsB - gifts(lvB, s.player.level) === 150 && !s.bosses.length && s.beaten[0].name === 'Mark 9XS Particles tests');
 s = G.gameBossStage(k, bs.id, 3, true);
-ok('a beaten boss pays nothing more (5h boss = 150)', s.player.coins - coinsB === 150);
+ok('a beaten boss pays nothing more (5h boss = 150)', s.player.coins - coinsB - gifts(lvB, s.player.level) === 150);
 s = G.gameBossStart(k, { name: 'Made by mistake', stages: [{ name: 'a' }, { name: 'b' }] });
 const oops = s.bosses.find((b) => b.name === 'Made by mistake');
 s = G.gameBossRemove(k, oops.id);
@@ -244,8 +247,8 @@ ok('a built-in group can be renamed and keeps its job', s.groups.find((g) => g.i
 s = G.gameBossStart(k, { name: 'Write the Y9 scheme', size: 20, k: 'yog', stages: [{ name: 'Map', due: '2026-11-30' }] });
 const nb = s.bosses.find((b) => b.id === s.newBoss);
 ok('a 20h boss keeps its size and creature', nb && nb.size === 20 && nb.creature === 'yog');
-c1 = s.player.coins; s = G.gameBossStage(k, nb.id, 0, true);
-ok('its one stage beats it: +600 and it goes on the trophy shelf', s.player.coins - c1 === 600 && s.beaten[0].k === 'yog');
+c1 = s.player.coins; const lv1 = s.player.level; s = G.gameBossStage(k, nb.id, 0, true);
+ok('its one stage beats it: +600 and it goes on the trophy shelf', s.player.coins - c1 - gifts(lv1, s.player.level) === 600 && s.beaten[0].k === 'yog');
 setCoins(100);
 threw = false; try { G.gameWear(k, 'hat-3', true); } catch (e) { threw = /Not enough/.test(e.message); }
 ok('an outfit he cannot afford is refused', threw);
@@ -299,7 +302,7 @@ ok('spending and refunds never count as doubloons earned', ch.weeks[6].coins ===
   ok('its antidote shows an open Absolution', (s2.goals.find((g) => g.id === cook).absolve || {}).stage === 0);
   const hp1 = s2.player.hp;
   s2 = G.gameTick(k, cook, 1);
-  ok('Absolution I gives back half (6) plus the usual 1 (or a level-up refill)', s2.player.hp === (s2.last.up ? 50 : hp1 + 7) && s2.last.abs && s2.last.abs.stage === 1 && s2.last.abs.hp === 6);
+  ok('Absolution I gives back half (6) plus the usual 1 (or a level-up refill)', s2.player.hp === (s2.last.up ? 60 : hp1 + 7) && s2.last.abs && s2.last.abs.stage === 1 && s2.last.abs.hp === 6);
   const hpA = s2.player.hp, gotA = s2.last.hp;
   s2 = G.gameUntick(k, cook);
   ok('Undo takes Absolution I back exactly', s2.player.hp === hpA - gotA && (s2.goals.find((g) => g.id === cook).absolve || {}).stage === 0);
@@ -362,5 +365,33 @@ ok('spending and refunds never count as doubloons earned', ch.weeks[6].coins ===
   m = G.gameMoon(k, '2026-12-21', 'half'); ok('and back to half', m.moon === 'half');
   ok('the Vespers multiplier is in the snapshot', typeof m.vMult === 'number' && m.vMult >= 1);
   const sh = G.gameShop(k); ok('shop prices are 20% higher, rounded to 5', sh.items.every((i) => i.price % 5 === 0) && sh.items.some((i) => i.price > 0)); }
+// 2026-10-28: health 60, aims with bottom lines, curse ceilings, the Rise quest, tier locks
+{ at('2027-01-04T09:00:00Z');   // a Monday (after the test terms, so a half-moon day: life still counts)
+  let s = G.gameLoad(k); const gid = (re, kind) => (s.goals.find((g) => re.test(g.name) && (!kind || g.kind === kind)) || {}).id;
+  ok('health goes up to 60 for an old player', s.player.maxHp === 60);
+  const rd = gid(/^Read/), tr = gid(/^(Train|Workout)/), ck = gid(/Cook/), nf = gid(/Netflix/);
+  ok('Write and Cook at home are added once', !!gid(/^Write$/) && !!ck && s.goals.filter((g) => g.kind === 'daily' && /Cook/.test(g.name)).length === 1);
+  ok('Read aims for 15 min a day, bottom line daily', (s.goals.find((g) => g.id === rd).aim || {}).target === 15 && s.goals.find((g) => g.id === rd).aim.floor === 7);
+  ok('Netflix has a ceiling of 2 a week', s.goals.find((g) => g.id === nf).ceil === 2);
+  for (let i = 0; i < 7; i++) { at(gAddDay('2027-01-04', i) + 'T19:00:00Z'); G.gameLoad(k); G.gameTick(k, rd, 1); G.gameAim(k, rd, 20, null);
+    if (i < 3) G.gameTick(k, tr, 1); if (i < 2) G.gameTick(k, ck, 1); if (i < 3) G.gameTick(k, nf, -1); }
+  s = G.gameLoad(k); const r = s.goals.find((g) => g.id === rd);
+  ok('today\'s minutes are kept', r.aimToday && r.aimToday.minutes === 20);
+  const h = s.high, st = (id) => (h.aims.find((a) => a.id === id) || {}).state;
+  ok('High Vespers: Read 20 min a day reaches its aim', st(rd) === 'aim');
+  ok('Train 3 times but no full session holds the bottom line', st(tr) === 'floor');
+  ok('Cook at home twice misses its bottom line of 3', st(ck) === 'miss');
+  ok('Netflix 3 times is over its ceiling', h.ceilings.some((c) => c.id === nf && c.count === 3 && c.over)); }
+{ at('2027-01-11T09:00:00Z'); let s = G.gameLoad(k); const nf = s.goals.find((g) => /Netflix/.test(g.name)).id;
+  const rs = s.goals.filter((g) => g.kind === 'daily' && g.track === 'life').slice(0, 3).map((g) => g.id);
+  let guard = 0; while (!s.last || !s.last.died) { s = G.gameTick(k, nf, -1); if (++guard > 10) break; }
+  ok('fainting opens the Rise quest', s.player.rise && !s.player.rise.done && s.player.rise.need === 3);
+  const back = s.player.rise ? s.player.rise.back : 0; s = G.gameTick(k, rs[0], 1); s = G.gameTick(k, rs[1], 1); const before = s.player.coins; s = G.gameTick(k, rs[2], 1);
+  ok('the third ritual wins back half the lost runes', s.player.rise.done && s.player.coins - before >= back && back > 0);
+  s = G.gameUntick(k, rs[2]);
+  ok('undoing it takes the payout back and reopens the quest', !s.player.rise.done && s.player.coins === before);
+  const sh = G.gameShop(k), el = sh.items.find((i) => i.tier === 'Eldritch'), ba = sh.items.find((i) => i.tier === 'Basic' && !i.locked);
+  ok('Eldritch needs level 20', el.locked && /level 20/.test(el.why));
+  ok('Basic is open from level 1', !!ba); }
 console.log('\n' + (failed ? failed + ' FAILED' : 'all game server checks passed'));
 process.exit(failed ? 1 : 0);

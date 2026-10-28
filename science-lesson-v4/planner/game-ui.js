@@ -155,6 +155,8 @@
 .uz-form>input{height:48px;padding:0 12px;border-radius:5px;border:1.5px solid #2f443b;background:#0b1513;color:#e8e1cf;font:16px var(--a);outline:none}
 .uz-lbl{font:700 11px var(--a);letter-spacing:.1em;color:#7f9389}
 .uz-chips{display:flex;flex-wrap:wrap;gap:6px}
+.uz-aim{display:flex;flex-wrap:wrap;align-items:center;gap:5px;padding:2px 0 8px 62px}.uz-aim button{height:44px;min-width:44px;padding:0 10px;border-radius:6px;border:1.5px solid #2f443b;background:#131d19;color:#cfe8dc;font:700 14px var(--a)}.uz-aim button.on{border-color:#ffd56a;background:#2a2410;color:#ffe2a0}.uz-aim span{font:600 13px var(--a);color:#8fa298;margin-left:4px}
+.uz-rise{margin:0 0 10px;padding:12px 14px;border-radius:8px;border:1.5px solid #5ef2a0;background:linear-gradient(180deg,#0c2a22,#08140f);color:#cfe8dc;font:600 15px var(--a)}.uz-rise b{font:500 21px var(--g);color:#5ef2a0;display:block}
 .uz-chips button{min-width:44px;min-height:42px;display:flex;align-items:center;gap:6px;padding:0 12px;border-radius:5px;border:1.5px solid #2f443b;background:#131d19;color:#cfd8d3;font:700 14px var(--a)}
 .uz-chips button img{height:22px;image-rendering:pixelated}
 .uz-srow{display:flex;gap:6px;align-items:center}.uz-date{display:flex;gap:6px}.uz-date input{flex:1;min-width:0;height:44px;padding:0 10px;border-radius:5px;border:1.5px solid #2f443b;background:#0b1513;color:#e8e1cf;font:15px var(--a);color-scheme:dark}.uz-date button{flex:none;height:44px;padding:0 12px;border-radius:5px;border:1.5px solid #2f443b;background:#131d19;color:#cfd8d3;font:700 13px var(--a)}.uz-ed{cursor:pointer}.uz-srow input{flex:1;min-width:0;height:44px;padding:0 10px;border-radius:5px;border:1.5px solid #2f443b;background:#0b1513;color:#e8e1cf;font:15px var(--a);outline:none}
@@ -173,7 +175,14 @@
   const EFF = { 5: 'Tiny', 15: 'Small', 30: 'Medium', 60: 'Big', 120: 'Huge' }, eff = (m) => EFF[m] || 'Small';   // size of the effort (stored as minutes)
   const DN = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  const TITLES = ['', 'Tadpole', 'Polyp', 'Deep Dabbler', 'Abyssal Apprentice', 'Tide Caller', 'Rune Keeper', 'Dream Weaver', 'Star Spawn', 'High Priest', 'Elder Thing', 'Great Dreamer', 'Old One'];
+  // 50 titles in five depths (Patryk 2026-10-28); the plaque shows the title and its depth
+  const TITLES = ['', 'Tadpole', 'Polyp', 'Brine Wriggler', 'Deep Dabbler', 'Kelp Lurker', 'Reef Creeper', 'Tide Caller', 'Shell Breaker', 'Rune Scratcher', 'Abyss Apprentice',
+    'Lantern Fish', 'Ink Scribe', 'Rune Keeper', 'Current Rider', 'Wreck Diver', 'Dream Weaver', 'Siren Singer', 'Pearl Hoarder', 'Grotto Warden', 'Deep Acolyte',
+    'Pressure Born', 'Gloom Walker', 'Cult Whisperer', 'Trench Stalker', 'Star Spawn', 'Void Oracle', 'Tentacle Lord', 'Kraken Rider', 'Leviathan Kin', 'High Priest',
+    'Sunken Bishop', "R'lyeh Mason", 'Nightmare Sower', 'Sleepless Eye', 'Elder Thing', 'Dread Admiral', 'Abyss Hierarch', 'Herald of Tides', 'Void Sovereign', 'Great Dreamer',
+    'The Stirring', 'Dreamer Awake', 'Breaker of Seals', "Lord of R'lyeh", 'Shaper of Tides', 'Star Devourer', 'Elder God', 'The Unspeakable', 'Old One', 'Great Old One'];
+  const DEPTHS = ['The Shallows', 'The Twilight', 'The Midnight', 'The Abyss', 'The Risen'];
+  const depthOf = (lv) => DEPTHS[Math.min(4, Math.floor((Math.max(1, lv) - 1) / 10))];
   const SIZE = { 2: { k: 'spawn', gold: 60 }, 5: { k: 'shog', gold: 150 }, 10: { k: 'levi', gold: 300 }, 20: { k: 'old', gold: 600 } };
   const TABC = ['#5ef2a0', '#a48aff', '#ff7a66', '#ffd56a'];
   const SAYS = {
@@ -400,7 +409,7 @@
       if (u.rev) send(u.rev[0], u.rev.slice(1));
     }
     // pay locally like the server: coins, XP, level (the reply then has the exact numbers)
-    function earnLocal(d, n, xp) { const p = d.player; p.coins += n; d.weekCoins = (d.weekCoins || 0) + n; p.xp += xp; let up = false; while (p.xp >= p.need) { p.xp -= p.need; p.level++; p.need = need(p.level); p.hp = p.maxHp; up = true; } return up; }
+    function earnLocal(d, n, xp) { const p = d.player; p.coins += n; d.weekCoins = (d.weekCoins || 0) + n; p.xp += xp; let up = false; while (p.xp >= p.need) { p.xp -= p.need; p.level++; p.need = need(p.level); p.hp = p.maxHp; p.coins += p.level * (p.gift || 10); up = true; } return up; }
     function earnFx(r, k, n, up) {
       flyCoin(r, n); floatText(r, '+' + n, '#ffd56a'); glow(k, 'rgba(94,242,160,.85)'); bounce(); buzz(12);
       if (up) { setTimeout(celebrate, 350); setMood('proud', pickSay('level')); } else setMood('happy', pickSay(V.sayKind || 'tick')); V.sayKind = null;
@@ -427,7 +436,7 @@
       ban.style.background = nt ? 'linear-gradient(180deg,#050a18 0%,#0a1424 55%,#0a1210 100%)' : 'linear-gradient(180deg,#0f3a34 0%,#0b2522 50%,#08110f 100%)';
       $('.uz-moon').style.display = 'none'; const mb = $('.uz-moonb img'), ph = D.moon || (D.frozen ? 'dark' : 'full'); mb.src = MOON[ph]; mb.style.cssText = ph === 'full' ? 'opacity:.85' : 'filter:drop-shadow(0 0 8px #cfe0ec)'; $('.uz-moonb').setAttribute('aria-label', PHASE[ph][0] + '. Tap to change.');
       me.innerHTML = layers(mood());
-      $('.uz-coins b').textContent = p.coins; $('.uz-lv span').textContent = TITLES[p.level] || 'Ancient'; $('.uz-hex i').textContent = p.level;
+      $('.uz-coins b').textContent = p.coins; $('.uz-lv span').textContent = TITLES[p.level] || 'Great Old One'; $('.uz-lv').title = depthOf(p.level); $('.uz-hex i').textContent = p.level;
       $('.xp').style.width = Math.min(100, Math.round(100 * p.xp / p.need)) + '%'; $('.xpt').textContent = p.xp + ' / ' + p.need;
       $('.hp').style.width = Math.round(100 * p.hp / p.maxHp) + '%'; $('.hpt').textContent = p.hp + ' / ' + p.maxHp;
       let say = V.say;
@@ -463,17 +472,27 @@
     const archBtn = (id, col) => V.edit ? '<button class="uz-pen" data-a="arch" data-id="' + id + '" title="Archive"' + (col ? ' style="color:' + col + '"' : '') + '>×</button>' : '';
     const SEAL = '<span class="uz-seal"><img src="' + IMG.seal + '" alt="">it will come to pass</span>';
     // a ritual: its sigil, its name, how often it repeats, its streak in nights, and the last 14 days as a thin strip
+    // after a ritual with an aim is ticked (Patryk 2026-10-28): the tick is the bottom line; a minutes dial or a
+    // "full session" mark records the aim. The phone remembers the usual minutes and sends them with the tick.
+    const USUAL = (id, v) => { const u = LS('ulhuUsual') || {}; if (v === undefined) return u[id]; u[id] = v; LS('ulhuUsual', u); };
+    function aimBar(g) {
+      if (!g.aim || !g.doneToday) return '';
+      const t = g.aimToday || {}, wk = g.aimWeek || {}, chip = (lbl, sel, a, v) => '<button class="' + (sel ? 'on' : '') + '" data-a="' + a + '" data-id="' + g.id + '" data-v="' + v + '">' + lbl + '</button>';
+      const note = g.aim.type === 'avg' ? (wk.avg || 0) + ' of ' + g.aim.target + ' min a day' : g.aim.type === 'count' ? (wk.full || 0) + ' of ' + g.aim.target + ' full this week' : (wk.days || 0) + ' of ' + g.aim.target + ' this week';
+      const chips = g.aim.type === 'avg' ? [1, 5, 15, 30, 60].map((m) => chip(m + ' min', t.minutes === m, 'aimmin', m)).join('') : g.aim.type === 'count' ? chip(t.full ? 'Full session ✓' : 'Full session?', !!t.full, 'aimfull', t.full ? 0 : 1) : '';
+      return '<div class="uz-aim">' + chips + '<span>' + note + '</span></div>';
+    }
     function ritualRow(g) {
       const on = g.doneToday, emb = !on && g.miss && !D.frozen, n = g.streak, col = sCol(Math.max(1, n + (on ? 0 : 1)));
       const st = g.strip ? '<div class="uz-strip">' + String(g.strip).split('').map((c) => '<i style="background:' + (c === 'o' ? col : c === 'f' ? '#3a6a9a' : c === 'x' ? '#3a1418' : '#1a1430') + '"></i>').join('') + '</div>' : '';
       if (window.STONE) return '<div class="uz-strow' + (on ? ' done' : '') + '">' + STONE.row({ id: g.id, name: g.name, streak: n, done: on,
           subHtml: '<span>' + (on ? 'appeased' : emb ? 'embers' : 'awaits') + '</span> <span>' + esc(rep(g)) + '</span>' + (n > 0 ? ' <span style="font-weight:700;color:' + col + '">' + n + ' night' + (n === 1 ? '' : 's') + '</span>' : ''),
           payHtml: '<span class="uz-pay">' + (g.auto ? SEAL : '') + '<span>+' + g.pay + coin(18, g.pay, g.id) + '</span></span>' + archBtn(g.id),
-          tickAttrs: 'data-a="tick" data-id="' + g.id + '" data-fx="' + g.id + '"', bodyAttrs: 'data-a="editg" data-id="' + g.id + '"' }) + '</div>' + st;
+          tickAttrs: 'data-a="tick" data-id="' + g.id + '" data-fx="' + g.id + '"', bodyAttrs: 'data-a="editg" data-id="' + g.id + '"' }) + '</div>' + st + aimBar(g);
       return '<div class="uz-row sg' + (on ? ' done' : '') + '">' + sigil(g, on) +
         '<div class="uz-mid uz-ed" data-a="editg" data-id="' + g.id + '"><div class="nm">' + esc(g.name) + '</div><div class="uz-sub"><span>' + (on ? 'appeased' : emb ? 'embers' : 'awaits') + '</span><span>' + esc(rep(g)) + '</span>' +
         (n > 0 ? '<span style="font-weight:700;color:' + col + '">' + n + ' night' + (n === 1 ? '' : 's') + '</span>' : '') + '</div></div>' +
-        '<div class="uz-pay">' + (g.auto ? SEAL : '') + '<span>+' + g.pay + coin(18, g.pay, g.id) + '</span></div>' + archBtn(g.id) + '</div>' + st;
+        '<div class="uz-pay">' + (g.auto ? SEAL : '') + '<span>+' + g.pay + coin(18, g.pay, g.id) + '</span></div>' + archBtn(g.id) + '</div>' + st + aimBar(g);
     }
     function header(id, name, plain, meta, metaCol, child) {
       const open = !!V.open[id];
@@ -520,6 +539,8 @@
     const todayLeft = () => { if (!D) return 0; const T = todayItems(); return T.work.length + T.life.length; };
     function today() {
       const T = todayItems(); let h = '';
+      const rs = D.player.rise;   // the Rise quest after fainting (Patryk 2026-10-28)
+      if (rs && !rs.done) h += '<div class="uz-rise"><b>Rise</b>Do 3 rituals today to win back ' + rs.back + ' of the lost runes. ' + Math.min(rs.got, 3) + ' of 3.</div>';
       if (D.review && D.review.show) h += review();
       if (T.work.length) h += '<div class="uz-cap"><span><b style="color:#cfe8dc">Toil</b></span><span style="font:700 12px var(--a);color:#5ef2a0">' + T.work.length + ' left</span></div>' + T.work.map((x) => x.html).join('');
       if (T.life.length) h += '<div class="uz-cap" style="margin-top:6px"><span><b style="color:#b6ffd6">The Surface</b></span><span style="font:700 12px var(--a);color:#5ee08a">' + T.life.length + ' left</span></div>' + T.life.map((x) => x.html).join('');
@@ -959,6 +980,9 @@
       if (a === 'sdel') { V.draft.steps.splice(Number(v), 1); return paint(); }
       if (a === 'tmpl') { V.draft.name = V.draft.name || 'Mark the 9AS test'; V.draft.size = 5; V.draft.k = 'shog'; V.draft.steps = [['Half marked', 2], ['The rest', 5], ['Scores summed', 6], ['Entered', 7]].map(([n, dd]) => ({ n, by: addD(D.today, dd) })); return paint(); }
       if (a === 'submit') return submit();
+      if (a === 'aimmin' || a === 'aimfull') { const g = goal(id); if (!g) return; const t0 = Object.assign({ minutes: null, full: false }, g.aimToday), m = a === 'aimmin' ? Number(v) : null, f = a === 'aimfull' ? v === '1' : null;
+        if (m !== null) USUAL(id, m); buzz(8);
+        return act({ verb: a === 'aimmin' ? 'Logged:' : 'Marked:', name: g.name + (m !== null ? ' · ' + m + ' min' : f ? ' · full session' : ' · bottom line') }, ['gameAim', id, t0.minutes, t0.full], 'gameAim', [id, m, f], (d) => { const x = d.goals.find((y) => y.id === id); x.aimToday = Object.assign({}, x.aimToday, m !== null ? { minutes: m } : { full: f }); }); }
       if (a === 'dayoff') { const was = D.moon || (D.frozen ? 'dark' : 'full'), nx = PHASE[was][1]; return act({ verb: 'Moon:', name: PHASE[nx][0] }, ['gameMoon', D.today, was], 'gameMoon', [D.today, nx], (d) => { d.moon = nx; d.frozen = nx !== 'full'; }); }
       if (a === 'tick' || a === 'untick') {
         const g = goal(id); if (!g) return;
@@ -979,7 +1003,7 @@
         if (on) { V.settling[id] = 1; setTimeout(() => { delete V.settling[id]; paint(); }, 1100); if ([7, 21, 66].indexOf(g.streak + 1) >= 0) V.sayKind = 'streak'; }
         act({ verb: on ? 'Ticked:' : 'Unticked:', name: g.name, delta: (on ? '+' : '−') + g.pay, unit: 'coin' }, on ? ['gameUntick', id] : ['gameTick', id, 1], on ? 'gameTick' : 'gameUntick', on ? [id, 1] : [id],
           (d) => { const x = d.goals.find((y) => y.id === id); x.doneToday = on; x.streak = Math.max(0, x.streak + (on ? 1 : -1)); if (on) upL = earnLocal(d, g.pay, g.pay); else { d.player.coins -= g.pay; d.weekCoins -= g.pay; } });
-        if (on) { earnFx(r, k, g.pay, upL); if (window.STONE) STONE.flare(k); } else buzz(6); return;
+        if (on) { earnFx(r, k, g.pay, upL); if (window.STONE) STONE.flare(k); if (g.aim && g.aim.type === 'avg' && USUAL(id)) { const u = USUAL(id); send('gameAim', [id, u, null]); g.aimToday = Object.assign({}, g.aimToday, { minutes: u }); } } else buzz(6); return;
       }
       if (a === 'curse') {
         if (V.edit) { const g0 = goal(id); V.form = 'curse'; V.draft = draftOf(g0); V.orig = clone(V.draft); return paint(); }
