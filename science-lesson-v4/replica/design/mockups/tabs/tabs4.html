@@ -1,0 +1,453 @@
+<title>Tabs Round Four</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Grenze+Gotisch:wght@500;700&family=IM+Fell+English:ital@0;1&display=swap">
+<style>
+/* Layout: one column of phone-width specimens. Round six: TB6c kept, three renderings of the lit niches (TB5b1) with real material textures */
+:root{
+  --bg:#070b0c; --panel:#0c1416; --line:#1c2924; --ink:#050708; --bar:#0b1311;
+  --fg:#f4ecd8; --muted:#9fb0a7; --dim:#7f9389;
+  --honey:#ffd56a; --green:#5ef2a0; --mint:#a8ffd0; --ember:#ff7a30; --jade:#c8f060;
+  --vellum:#e9dbb4; --cream:#f6e8c4; --rose:#ffb4a8; --blue-glow:#7896ff; --lamp:#ffe7a8;
+  --sea:#0f2440; --sea-d:#050c18; --wood-x:#2a160a; --glass-r:#c8302c; --glass-b:#3a5ad0;
+  --parch:#f0d9a0; --gilt:#c89a48; --inkdark:#22120a; --stone:#232b29; --stone-hi:#46524e; --stone-lo:#070a0a;
+  --gx:"Grenze Gotisch",Georgia,serif;
+  --fell:"IM Fell English",Georgia,serif;
+  --body:"Atkinson Hyperlegible",system-ui,sans-serif;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#070b0c;--panel:#0c1416;--fg:#f4ecd8;--muted:#9fb0a7;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#070b0c;--panel:#0c1416;--fg:#f4ecd8;--muted:#9fb0a7;color-scheme:dark}
+:root[data-theme="light"]{color-scheme:dark}
+
+body{background:var(--bg);color:var(--fg);font:16px/1.5 var(--body);padding-inline:16px;padding-block:28px 48px}
+.wrap{max-width:440px;margin:0 auto;display:grid;gap:28px}
+header h1{font:700 40px/1 var(--gx);color:var(--honey);margin:0 0 8px}
+header p{margin:0;color:var(--muted);font-size:15px}
+.key{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;margin-top:12px;font-size:14px;color:var(--muted)}
+.key b{color:var(--fg);font-family:var(--gx);font-weight:500;font-size:17px}
+h2{font:700 26px/1.1 var(--gx);color:var(--honey);margin:12px 0 0;border-top:1px solid var(--line);padding-top:20px}
+h2 small{display:block;font:italic 15px/1.4 var(--fell);color:var(--muted);margin-top:4px}
+.spec{display:grid;gap:8px}
+.cap{display:flex;gap:10px;align-items:baseline}
+.code{font:700 13px/1 var(--body);letter-spacing:.06em;color:var(--ink);background:var(--honey);padding:4px 7px;border-radius:2px;flex:none}
+.cap p{margin:0;font-size:14.5px;color:var(--muted)}
+.cap b{color:var(--fg)}
+.phone{border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--panel)}
+.banner{height:58px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 12px 8px;
+  background:radial-gradient(circle at 18% 30%,var(--lamp) 0 1px,transparent 1.5px),radial-gradient(circle at 63% 22%,var(--lamp) 0 1px,transparent 1.5px),radial-gradient(circle at 86% 48%,var(--mint) 0 1px,transparent 1.5px),linear-gradient(180deg,var(--sea-d),var(--sea) 70%,var(--bar))}
+.banner span{font:italic 14px/1 var(--fell);color:var(--lamp);opacity:.8}
+.banner i{font:700 13px/1 var(--body);font-style:normal;color:var(--mint);opacity:.75}
+.page{height:46px;display:flex;align-items:center;justify-content:center;font:italic 13px/1 var(--fell);color:var(--dim)}
+
+.bar{position:relative;display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}
+.bar button{position:relative;min-width:0;min-height:48px;border:0;background:none;cursor:pointer;white-space:nowrap;padding:0;font:500 17px/1 var(--gx);color:var(--dim);transition:transform .3s cubic-bezier(.3,1.3,.5,1),color .2s,box-shadow .3s,filter .35s}
+.bar button:focus-visible{outline:2px solid var(--honey);outline-offset:-3px;z-index:3}
+
+/* TB6c tide line (kept as chosen) */
+.t0{--mat:linear-gradient(90deg,#1a1d22,var(--green),var(--ember),#1a1d22);--wash:rgba(94,242,160,.18);--tc:var(--mint);--glow:var(--green)}
+.t1{--mat:linear-gradient(90deg,var(--wood-x),var(--vellum),var(--wood-x));--wash:rgba(200,140,70,.22);--tc:var(--cream);--glow:var(--vellum)}
+.t2{--mat:linear-gradient(90deg,var(--glass-r) 0 33%,var(--glass-b) 33% 66%,var(--glass-r) 66%);--wash:rgba(110,120,230,.22);--tc:var(--rose);--glow:var(--blue-glow)}
+.t3{--mat:linear-gradient(90deg,#3a2a08,var(--honey),#3a2a08);--wash:rgba(255,213,106,.17);--tc:var(--honey);--glow:var(--honey)}
+.c6{background:var(--bar);border-top:1px solid var(--line)}
+.c6 button{min-height:52px;padding-top:4px}
+.c6 svg{display:block;width:14px;height:14px;margin:0 auto 4px;shape-rendering:crispEdges}
+.c6 button:before{content:"";position:absolute;left:20%;right:20%;top:0;height:2px;background:var(--mat);opacity:.45;transition:all .25s}
+.c6 button svg{color:var(--dim);opacity:.6}
+.c6 button.on{color:var(--tc);background:linear-gradient(180deg,var(--wash),transparent 90%)}
+.c6 button.on svg{color:var(--glow);opacity:1}
+.c6 button.on:before{left:0;right:0;height:6px;opacity:1;
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='6'%3E%3Cpath d='M0 0h16v2h-2v2h-4v2h-4v-2h-4v-2h-2z'/%3E%3C/svg%3E") repeat-x 0 0/16px 6px;
+  mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='6'%3E%3Cpath d='M0 0h16v2h-2v2h-4v2h-4v-2h-4v-2h-2z'/%3E%3C/svg%3E") repeat-x 0 0/16px 6px;
+  animation:tide 3s linear infinite}
+@keyframes tide{to{-webkit-mask-position:16px 0;mask-position:16px 0}}
+
+/* the four materials */
+.n0{--glow:var(--parch);--ftc:var(--inkdark)}
+.n1{--glow:var(--gilt);--ftc:var(--cream)}
+.n2{--glow:var(--honey);--ftc:#fff}
+.n3{--glow:var(--jade);--ftc:#e8f6d8}
+.tex{position:absolute;inset:0;width:100%;height:100%;display:block}
+.px .tex{image-rendering:pixelated}
+.lb{position:relative;z-index:1;color:var(--ftc);padding:6px 14px 7px;background:radial-gradient(closest-side,rgba(4,6,6,.78),rgba(4,6,6,.5) 60%,rgba(4,6,6,0));text-shadow:0 1px 0 #000,0 0 4px #000}
+.n0 .lb{background:radial-gradient(closest-side,rgba(240,226,188,.7),rgba(240,226,188,0));text-shadow:0 0 3px rgba(250,238,205,.9)}
+
+/* A and B: the lit niche, material fills the arch */
+.nA,.nB{background:linear-gradient(180deg,#0a0e10 0 87%,#1a1f1c 87% 89%,var(--ink) 89%);gap:5px;padding:8px 6px 9px}
+.nA button,.nB button{min-height:64px;border-radius:44px 44px 3px 3px/22px 22px 3px 3px;overflow:hidden;isolation:isolate;display:flex;align-items:flex-end;justify-content:center;padding-bottom:7px;
+  box-shadow:inset 0 0 0 1px #000,inset 0 8px 12px -6px #000;filter:brightness(.55) saturate(.6)}
+.nA button.on,.nB button.on{filter:none;transform:translateY(-3px);box-shadow:inset 0 0 0 1.5px var(--glow),inset 0 8px 12px -8px rgba(0,0,0,.6),0 0 16px -2px var(--glow)}
+
+/* C: the material set back in a carved stone arch, name on a stone plate */
+.nC{gap:4px;padding:7px 5px 0;background:linear-gradient(180deg,#141b1a,#0b100f)}
+.nC button{min-height:72px;display:grid;grid-template-rows:1fr 21px;border-radius:40px 40px 0 0/22px 22px 0 0;padding:4px 4px 0;
+  background:linear-gradient(160deg,var(--stone-hi),var(--stone) 35%,#141a19);box-shadow:inset 1px 1px 0 #5c6a65,inset -1px 0 0 var(--stone-lo)}
+.nC .well{position:relative;isolation:isolate;overflow:hidden;border-radius:34px 34px 2px 2px/18px 18px 2px 2px;box-shadow:inset 0 0 0 1px #000;filter:brightness(.42) saturate(.5);transition:filter .35s}
+.nC .well:after{content:"";position:absolute;inset:0;box-shadow:inset 0 7px 10px -2px #000,inset 0 -6px 8px -4px rgba(0,0,0,.8);border-radius:inherit}
+.nC .plate{display:grid;place-items:center;font-size:16px;color:var(--muted);text-shadow:0 1px 0 #000}
+.nC button.on .well{filter:none}
+.nC button.on .well:before{content:"";position:absolute;inset:0;z-index:1;background:radial-gradient(ellipse at 50% 115%,rgba(255,200,120,.35),transparent 60%);mix-blend-mode:screen}
+.nC button.on{box-shadow:inset 1px 1px 0 #5c6a65,inset -1px 0 0 var(--stone-lo),0 0 14px -3px var(--glow)}
+.nC button.on .plate{color:var(--glow)}
+
+@media (prefers-reduced-motion: reduce){*,*:before,*:after{transition:none!important;animation:none!important}}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i0" viewBox="0 0 12 12"><path fill="currentColor" d="M2 11h3v-1h1v-2h1v-2h1v-1h1v1h1v-2h-1v-1h-3v1h-1v2h-1v2h-1v2h-1z"/></symbol>
+  <symbol id="i1" viewBox="0 0 12 12"><path fill="currentColor" fill-rule="evenodd" d="M1 2h4v1h2v-1h4v9h-4v1h-2v-1h-4zM2 3v7h3v-7zM7 3v7h3v-7z"/></symbol>
+  <symbol id="i2" viewBox="0 0 12 12"><path fill="currentColor" fill-rule="evenodd" d="M0 6h1v-1h2v-1h6v1h2v1h1v1h-1v1h-2v1h-6v-1h-2v-1h-1zM5 5v2h2v-2z"/></symbol>
+  <symbol id="i3" viewBox="0 0 12 12"><path fill="currentColor" fill-rule="evenodd" d="M5 0h2v2h2v1h1v7h-1v1h-6v-1h-1v-7h1v-1h2zM5 5v3h2v-3z"/></symbol>
+</svg>
+
+<div class="wrap">
+<header>
+  <h1>Tabs Round Six</h1>
+  <p>TB6c stays as the chosen quiet bar. Below it are three takes on the lit niches (TB5b1), each rendering the four materials in a different way. Every material is now a texture filling the alcove, not a drawn object. Tap any bar to try it.</p>
+  <div class="key">
+    <b>The Call</b><span>Aged parchment with fibres, foxing and burnt edges, an inked sigil and a small wax seal.</span>
+    <b>Grimoire</b><span>A close-up of an old book cover: dark worn leather, blind-tooled lines, worn gilt and a tarnished brass corner.</span>
+    <b>Omens</b><span>The Oracle's own cut glass, made by the same glass cutter as the Oracle window.</span>
+    <b>Den</b><span>The ruins where Ulhu lives: the carved monoliths from the lair banner in the Jade deep palette.</span>
+  </div>
+</header>
+
+<h2>Chosen quiet bar<small>Kept exactly as you saw it.</small></h2>
+<div class="spec" data-v="c6" data-ref="TB6c" data-d="<b>Tide line.</b> A dark bar where the chosen tab's top edge becomes a drifting pixel wave."></div>
+
+<h2>Lit niches, three renderings<small>Same arched alcoves; the difference is how the materials are drawn.</small></h2>
+<div class="spec" data-v="nA" data-ref="TB5b1-A" data-d="<b>Fine textures.</b> Each alcove is filled edge to edge with a finely detailed material, drawn sharp at full screen resolution. The chosen one lifts and is outlined in its own light."></div>
+<div class="spec" data-v="nB" data-ref="TB5b1-B" data-d="<b>Pixel textures.</b> The same materials, drawn in coarse pixels so they match the pixel art of the lair banner and the ruins."></div>
+<div class="spec" data-v="nC" data-ref="TB5b1-C" data-d="<b>Carved shrine.</b> The fine materials sit deeper, set back inside a carved stone arch, with the name on a stone plate below. The chosen one fills with warm candlelight."></div>
+</div>
+
+<script>
+/* The Oracle window glass: game-glass.js's own leaded-glass engine (copied for the mock-up), with day marks. */
+window.ORX = (function () {
+const RM = () => !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+const DPRf = () => Math.min(2, window.devicePixelRatio || 1);
+const esc = (s) => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
+const lerp = (a, b, t) => a + (b - a) * t;
+const PI = Math.PI, hyp = Math.hypot;
+const sstep = (t) => t * t * (3 - 2 * t);
+const eOut = (t) => 1 - Math.pow(1 - t, 3);
+// keyframes [[offset, value], ...] at t 0-1, smooth inside each step (close to the mock-up's CSS keyframes)
+const kf = (t, f) => { if (t <= f[0][0]) return f[0][1]; for (let i = 1; i < f.length; i++) if (t <= f[i][0]) return lerp(f[i - 1][1], f[i][1], sstep((t - f[i - 1][0]) / (f[i][0] - f[i - 1][0]))); return f[f.length - 1][1]; };
+function hashStr(s) { s = String(s); let h = 2166136261 >>> 0; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return (h >>> 0) % 100000 + 1; }
+function rng(seed) { let s = (seed * 2654435761) >>> 0 || 12345; return () => { s ^= s << 13; s >>>= 0; s ^= s >>> 17; s ^= s << 5; s >>>= 0; return s / 4294967296; }; }
+
+/* ---------- geometry (the mock-up's leaded glass engine, cut down to the picked designs) ---------- */
+function clip(poly, f) { const out = []; for (let k = 0; k < poly.length; k++) { const a = poly[k], b = poly[(k + 1) % poly.length], fa = f(a[0], a[1]), fb = f(b[0], b[1]);
+  if (fa <= 0) out.push(a); if ((fa < 0 && fb > 0) || (fa > 0 && fb < 0)) { const t = fa / (fa - fb); out.push([a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t]); } } return out; }
+function inside(poly, x, y) { let c = false; for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) { const xi = poly[i][0], yi = poly[i][1], xj = poly[j][0], yj = poly[j][1];
+  if (((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi)) c = !c; } return c; }
+const cen = (p) => [p.reduce((a, q) => a + q[0], 0) / p.length, p.reduce((a, q) => a + q[1], 0) / p.length];
+const area = (p) => Math.abs(p.reduce((a, q, k) => { const n = p[(k + 1) % p.length]; return a + q[0] * n[1] - n[0] * q[1]; }, 0)) / 2;
+const rectPoly = (x0, y0, x1, y1) => [[x0, y0], [x1, y0], [x1, y1], [x0, y1]];
+function vorSites(sites, r, lim) { /* Oracle copy: neighbours found through a bucket grid, so big windows cut fast */
+  const B = new Map(), key = (i, j) => i * 100003 + j, cs = lim;
+  sites.forEach((p, i) => { const k = key(Math.floor(p[0] / cs), Math.floor(p[1] / cs)); if (!B.has(k)) B.set(k, []); B.get(k).push(i); });
+  return sites.map((p, i) => { let poly = rectPoly(r[0], r[1], r[2], r[3]); const ci = Math.floor(p[0] / cs), cj = Math.floor(p[1] / cs);
+    for (let di = -1; di <= 1; di++) for (let dj = -1; dj <= 1; dj++) { const L = B.get(key(ci + di, cj + dj)); if (!L) continue;
+      L.forEach((j) => { const q = sites[j]; if (i === j || Math.abs(q[0] - p[0]) > lim || Math.abs(q[1] - p[1]) > lim) return;
+        const mx = (p[0] + q[0]) / 2, my = (p[1] + q[1]) / 2, nx = q[0] - p[0], ny = q[1] - p[1]; poly = clip(poly, (x, y) => (x - mx) * nx + (y - my) * ny); }); }
+    return poly; }); }
+function border(R, W, H, b, seg) { const out = [], run = (x0, y0, x1, y1, horiz) => { const L = horiz ? x1 - x0 : y1 - y0; let t = 0;
+  while (t < L - .5) { let e = Math.min(L, t + seg * (.75 + R() * .5)); if (L - e < seg * .4) e = L; out.push(horiz ? rectPoly(x0 + t, y0, x0 + e, y1) : rectPoly(x0, y0 + t, x1, y0 + e)); t = e; } };
+  run(0, 0, W, b, true); run(0, H - b, W, H, true); run(0, b, b, H - b, false); run(W - b, b, W, H - b, false); return out; }
+function pickStars(R, zones, gap) { const pts = [];
+  zones.forEach(([x0, y0, x1, y1, n]) => { for (let t = 0, got = 0; t < 80 && got < n; t++) { const p = [x0 + R() * (x1 - x0), y0 + R() * (y1 - y0)]; if (pts.every((q) => hyp(q[0] - p[0], q[1] - p[1]) > gap)) { pts.push(p); got++; } } });
+  if (!pts.length) return pts; const ch = [pts.shift()];
+  while (pts.length) { const l = ch[ch.length - 1]; let bi = 0, bd = 1e9; pts.forEach((s, k) => { const d = hyp(s[0] - l[0], s[1] - l[1]); if (d < bd) { bd = d; bi = k; } }); ch.push(pts.splice(bi, 1)[0]); }
+  return ch; }
+const sN = (x, y, ro, n, k, rot) => Array.from({ length: n * 2 }, (_, i) => { const a = rot + i * PI / n - PI / 2, rr = i % 2 ? ro * k : ro; return [x + Math.cos(a) * rr, y + Math.sin(a) * rr]; });
+// a five-point star of 5 rhombus pieces meeting at the centre
+const rhombi = (x, y, R0, rot) => { const d = R0 / 1.618; return [0, 1, 2, 3, 4].map((k) => { const a = rot - PI / 2 + k * 2 * PI / 5, h = PI / 5;
+  return [[x, y], [x + Math.cos(a - h) * d, y + Math.sin(a - h) * d], [x + Math.cos(a) * R0, y + Math.sin(a) * R0], [x + Math.cos(a + h) * d, y + Math.sin(a + h) * d]]; }); };
+// a crescent moon: four crescent pieces and one dark piece for the shadowed part
+function moonPieces(x, y, r, phi) { const d = .5 * r, ri = .7 * r, rho = (t) => { const a = t - phi; return d * Math.cos(a) + Math.sqrt(ri * ri - d * d * Math.sin(a) * Math.sin(a)); };
+  let al = 0; for (let k = 0; k <= 200; k++) { const a = k / 200 * PI; if (rho(phi + PI + a) < r - .01) al = a; }
+  const out = [], N = 4; for (let i = 0; i < N; i++) { const ta = phi + PI - al + 2 * al * i / N, tb = phi + PI - al + 2 * al * (i + 1) / N, q = [];
+    for (let k = 0; k <= 5; k++) { const t = ta + (tb - ta) * k / 5; q.push([x + Math.cos(t) * r, y + Math.sin(t) * r]); }
+    for (let k = 5; k >= 0; k--) { const t = ta + (tb - ta) * k / 5, rr = Math.min(r, rho(t)); q.push([x + Math.cos(t) * rr, y + Math.sin(t) * rr]); } out.push(q); }
+  out.push(Array.from({ length: 36 }, (_, k) => { const t = k / 36 * 2 * PI, rr = Math.min(r, rho(t)); return [x + Math.cos(t) * rr, y + Math.sin(t) * rr]; }));
+  return out; }
+
+// the antique palette (hue, saturation, lightness): only the families the picked designs use
+const PAL = {
+  bg: [[220, 60, 30], [228, 52, 26], [214, 64, 33], [242, 42, 28], [205, 55, 30], [256, 38, 30]],
+  border: [[36, 48, 46], [32, 44, 40], [40, 50, 52], [28, 42, 44]],
+  paleB: [[214, 54, 58], [220, 50, 62], [208, 56, 56], [224, 46, 60]], midB: [[216, 50, 50], [222, 46, 52], [210, 52, 48]],
+  haloB: [[218, 52, 37], [210, 56, 39], [226, 46, 37]], halo: [[222, 50, 35], [214, 54, 36], [230, 44, 35]],
+  star: [[42, 60, 72], [38, 56, 66], [46, 58, 76], [40, 52, 70], [36, 58, 68]],
+  cbg: [[345, 45, 20], [330, 36, 22], [352, 50, 18], [318, 30, 20]], redp: [[352, 62, 44], [2, 58, 42], [346, 56, 46]],
+  blood: [[356, 82, 56], [350, 76, 52], [4, 80, 55], [348, 72, 49]], chaloD: [[340, 40, 12], [350, 44, 14], [332, 36, 13]], shadow: [[232, 40, 11], [242, 30, 9]] };
+Object.assign(PAL, { bgD: [[226, 50, 19], [232, 44, 17], [220, 52, 21], [240, 38, 18]], ring2: [[232, 52, 31], [238, 48, 29], [226, 54, 33]],
+  aqua: [[172, 62, 64], [178, 58, 60], [168, 64, 68]], aquaL: [[176, 56, 46], [182, 50, 43], [170, 58, 49]], aquaM: [[188, 52, 31], [194, 48, 29], [184, 54, 33]], aquaD: [[198, 48, 17], [204, 44, 15], [194, 50, 19]],
+  mviolet: [[262, 34, 27], [254, 30, 25], [270, 32, 29]], mdark: [[258, 28, 9], [266, 24, 8]],
+  evil: [[148, 82, 56], [140, 78, 50], [156, 84, 62]], evilD: [[300, 34, 9], [292, 30, 8]], curseP: [[300, 42, 23], [292, 38, 21], [308, 40, 25]], restp: [[282, 32, 15], [276, 30, 13], [288, 34, 17]], restD: [[276, 30, 8], [270, 26, 7]], rest: [[218, 14, 62], [222, 12, 57], [214, 16, 66]], mshade: [[262, 30, 15], [252, 26, 13], [270, 28, 17]], bgm: [[200, 46, 29], [194, 50, 27], [206, 42, 31]],
+  today: [[36, 42, 20], [30, 38, 17]], silver: [[210, 34, 86], [204, 44, 80], [216, 28, 90]], moonp: [[240, 22, 76], [232, 26, 70], [248, 20, 80]], ember: [[30, 72, 56], [26, 68, 50], [34, 74, 60]], fut: [[228, 22, 14], [236, 18, 12]] });
+const hsl = (h, s, l) => 'hsl(' + h.toFixed(0) + ',' + clamp(s, 10, 95).toFixed(0) + '%,' + clamp(l, 4, 90).toFixed(0) + '%)';
+// one sheet of streaky glass: a linear gradient across the piece's box, six stops
+function gradSpec(R, c) { const a = R() * PI, x = Math.cos(a) * .5, y = Math.sin(a) * .5, h = c[0] + (R() - .5) * 10, s = c[1] + (R() - .5) * 12, l = c[2] + (R() - .5) * 6;
+  const st = [[0, 6], [.16 + R() * .1, -5], [.36 + R() * .1, 9], [.55 + R() * .08, -6], [.74 + R() * .1, 5], [1, -3]];
+  return { x1: .5 - x, y1: .5 - y, x2: .5 + x, y2: .5 + y, st: st.map(([o, d]) => [o, hsl(h + (R() - .5) * 8, s + (R() - .5) * 8, l + d)]) }; }
+
+function cut(o) {
+  const W = o.w, H = o.h, R = rng(o.seed || 1), b = o.border || 0, inner = [b, b, W - b, H - b], pcs = [], F = o.fit;
+  if (b) border(R, W, H, b, o.bseg || 12).forEach((p) => pcs.push({ p, fam: 'border' }));
+  let stars = o.events ? o.events.map((e) => [e.x, e.y]) : pickStars(R, o.zones || [], o.starGap || 24);
+  const sizes = o.sizes(stars.length, R);
+  stars = stars.map((s, k) => { const m = b + sizes[k] + 1.5; return [clamp(s[0], m, W - m), clamp(s[1], m, H - m)]; });
+  const s0 = o.s || 10, cols = Math.max(1, Math.round((inner[2] - inner[0]) / s0)), rows = Math.max(1, Math.round((inner[3] - inner[1]) / s0)), sx = (inner[2] - inner[0]) / cols, sy = (inner[3] - inner[1]) / rows;
+  const srot = stars.map(() => (R() - .5) * .3), motif = (k) => (o.motif ? o.motif(k) : 'star');
+  // G1: rings of pieces round every star, so their joins radiate from its points and notches; each touching piece is trimmed
+  // along the star's edge; the path is a curved run of fuller shaped pieces flowing into the ring pieces facing the next star
+  const outR = (k) => F.rings[F.rings.length - 1].r * sizes[k], sites = [], nC = o.nChain || stars.length;
+  const LK = (k) => k > 0 && k < nC && (!o.link || o.link(k));
+  const nb = stars.map((s, k) => [LK(k) ? stars[k - 1] : null, LK(k + 1) ? stars[k + 1] : null].filter(Boolean).map((q) => Math.atan2(q[1] - s[1], q[0] - s[0])));
+  stars.forEach((s, k) => { const R0 = sizes[k], a0 = srot[k] - PI / 2;
+    F.rings.forEach((rg, ri) => { const n = rg.n, off = rg.off != null ? rg.off : PI / n, ring = [];
+      for (let i = 0; i < n; i++) { const a = a0 + off + (rg.tw || 0) + i * 2 * PI / n, rr = rg.r * R0 * (1 + (ri ? (R() - .5) * (rg.jr || 0) : 0));
+        ring.push({ x: s[0] + Math.cos(a) * rr, y: s[1] + Math.sin(a) * rr, a, star: k, ri }); }
+      nb[k].forEach((na) => { let bi = 0, bd = 9; ring.forEach((p, i) => { const d = Math.abs(Math.atan2(Math.sin(p.a - na), Math.cos(p.a - na))); if (d < bd) { bd = d; bi = i; } }); ring[bi].pale = true; });
+      ring.forEach((p) => { if (stars.every((q, j) => j === k || hyp(q[0] - p.x, q[1] - p.y) > outR(j) * .92)) sites.push(p); }); }); });
+  const st = F.step, ps = [];
+  for (let k = 1; k < nC; k++) { if (!LK(k)) continue; const A = stars[k - 1], B = stars[k], L = hyp(B[0] - A[0], B[1] - A[1]) || 1, nx = -(B[1] - A[1]) / L, ny = (B[0] - A[0]) / L, bow = (F.bow || 0) * L * (k % 2 ? 1 : -1);
+    const C = [(A[0] + B[0]) / 2 + nx * bow, (A[1] + B[1]) / 2 + ny * bow], pts = [], len = [0];
+    for (let i = 0; i <= 60; i++) { const t = i / 60, u = 1 - t; pts.push([u * u * A[0] + 2 * u * t * C[0] + t * t * B[0], u * u * A[1] + 2 * u * t * C[1] + t * t * B[1]]); if (i) len.push(len[i - 1] + hyp(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1])); }
+    const T = len[60], at = (d) => { let i = 1; while (i < 60 && len[i] < d) i++; const f = (d - len[i - 1]) / ((len[i] - len[i - 1]) || 1); return [pts[i - 1][0] + (pts[i][0] - pts[i - 1][0]) * f, pts[i - 1][1] + (pts[i][1] - pts[i - 1][1]) * f, pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]]; };
+    const d0 = outR(k - 1) + st * .55, d1 = T - outR(k) - st * .55, n = Math.max(0, Math.round((d1 - d0) / st));
+    for (let i = 0; i <= n; i++) { if (d1 < d0 - st * .3) break; const d = n ? d0 + (d1 - d0) * i / n : (d0 + d1) / 2, q = at(d + (i && i < n ? (R() - .5) * st * .3 : 0)), tl = hyp(q[2], q[3]) || 1, j = (R() - .5) * (F.jag || 1.6);
+      ps.push({ x: q[0] - q[3] / tl * j, y: q[1] + q[2] / tl * j, path: true }); } }
+  const grid = []; for (let j = 0; j < rows; j++) for (let i = 0; i < cols; i++) grid.push({ x: inner[0] + (i + .5 + (R() - .5) * .8) * sx, y: inner[1] + (j + .5 + (R() - .5) * .8) * sy });
+  const keep = grid.filter((g) => ps.every((q) => hyp(q.x - g.x, q.y - g.y) > (F.clr || st)) && sites.every((q) => hyp(q.x - g.x, q.y - g.y) > s0 * .62) && stars.every((s, k) => hyp(s[0] - g.x, s[1] - g.y) > outR(k) + s0 * .45));
+  const all = keep.concat(sites, ps), polys = vorSites(all.map((q) => [q.x, q.y]), inner, 3.2 * Math.max(sx, sy));
+  const edges = []; stars.forEach((s, k) => { const sh = shapeOf(motif(k), s[0], s[1], sizes[k], srot[k]); if (!sh) return; const ol = sh.outline;
+    for (let i = 0; i < ol.length; i++) edges.push({ a: ol[i], b: ol[(i + 1) % ol.length], c: s, k }); });
+  polys.forEach((p, i) => { if (p.length < 3) return; let q = p;
+    /* Oracle: marks sit close together, so a piece is trimmed only by its nearest mark */
+    let nk = -1, nd = 1e9; stars.forEach((st, k) => { const dd = hyp(st[0] - all[i].x, st[1] - all[i].y); if (dd < nd) { nd = dd; nk = k; } });
+    edges.forEach((e) => { if (e.k !== nk) return; const m = [(e.a[0] + e.b[0]) / 2, (e.a[1] + e.b[1]) / 2]; if (q.length < 3 || !inside(q, m[0], m[1])) return;
+      const nx = e.b[1] - e.a[1], ny = e.a[0] - e.b[0], sc = Math.sign((e.c[0] - e.a[0]) * nx + (e.c[1] - e.a[1]) * ny);
+      const q2 = clip(q, (x, y) => sc * ((x - e.a[0]) * nx + (y - e.a[1]) * ny)); if (q2.length >= 3 && area(q2) > area(q) * .55) q = q2; });
+    if (q.length < 3 || area(q) < 1.2) return; const src = all[i], pale = src.path || src.pale, c = cen(q), kind = pale ? 'path' : src.ri != null ? 'ring' : 'bg';
+    if (o.famFx) { const r = o.famFx(kind, src, c); pcs.push({ p: q, fam: r.fam, path: kind === 'path' || !!r.lit, crack: !!r.crack }); return; }
+    pcs.push({ p: q, fam: pale ? (R() < (F.mix || 0) ? F.mfam : F.pfam) : (F.halo && src.ri === 0) ? F.hfam : (F.halo2 && src.ri === 1) ? 'halo' : 'bg', path: !!pale || (!!F.haloLit && src.ri === 0) }); });
+  const noWob = stars.map((s, k) => [s[0], s[1], sizes[k] * 1.12]);
+  pcs.forEach((pc) => { pc.c = cen(pc.p); });
+  const dz = o.dark; pcs.forEach((pc) => { pc.dark = !!dz && pc.c[0] > dz[0] && pc.c[0] < dz[2] && pc.c[1] > dz[1] && pc.c[1] < dz[3]; });
+  const sheets = {}, fill = (fam, dark) => { const key = fam + (dark ? 'D' : ''); if (!sheets[key]) sheets[key] = (PAL[fam] || PAL.bg).map((c) => gradSpec(R, [c[0], c[1], c[2] - (dark ? 10 : 0)])); const l = sheets[key]; return l[Math.floor(R() * l.length)]; };
+  const amp = .5, ph = (o.seed || 1) * 1.3, fld = (x, y) => [Math.sin(x * .37 + y * .11 + ph) * amp + Math.sin(y * .53 - x * .07 + ph * 2) * amp * .5, Math.cos(y * .33 + x * .13 + ph) * amp + Math.sin(x * .47 + ph * 3) * amp * .5];
+  const edgeOf = (x, y) => x < .01 || y < .01 || x > W - .01 || y > H - .01;
+  const wob = (poly) => { const out = []; poly.forEach((a, k) => { const c = poly[(k + 1) % poly.length], n = Math.max(1, Math.round(hyp(c[0] - a[0], c[1] - a[1]) / 5));
+    for (let t = 0; t < n; t++) { const x = a[0] + (c[0] - a[0]) * t / n, y = a[1] + (c[1] - a[1]) * t / n; if (edgeOf(x, y) || noWob.some((z) => hyp(x - z[0], y - z[1]) < z[2])) { out.push([x, y]); continue; } const d = fld(x, y); out.push([x + d[0], y + d[1]]); } }); return out; };
+  const pieces = pcs.map((pc) => { const pts = wob(pc.p), out = { pts, g: fill(pc.fam, pc.dark && !pc.path), role: pc.fam === 'border' || !pc.path ? 0 : 1, x: pc.c[0], y: pc.c[1] };
+    if (pc.crack) { const v = pc.p, cx = pc.c[0], cy = pc.c[1]; out.crack = []; for (let m = 0; m < 3; m++) { const q = v[Math.floor(R() * v.length)];
+      out.crack.push([[cx, cy], [cx + (q[0] - cx) * .45 + (R() - .5) * 1.6, cy + (q[1] - cy) * .45 + (R() - .5) * 1.6], [cx + (q[0] - cx) * .85, cy + (q[1] - cy) * .85]]); } }
+    return out; });
+  const starsOut = stars.map((s, k) => { const R0 = sizes[k], sf = o.motifFam ? o.motifFam(k) : 'star';
+    if (motif(k) === 'half') { /* the rest-night half moon: three lit wedges on the left, the dark half on the right */
+      const r = R0 * .95, x = s[0], y = s[1], arc = (a0, a1, n) => Array.from({ length: n + 1 }, (_, i) => { const t = a0 + (a1 - a0) * i / n; return [x + Math.cos(t) * r, y + Math.sin(t) * r]; });
+      const lit = [0, 1, 2].map((i) => [[x, y]].concat(arc(PI / 2 + i * PI / 3, PI / 2 + (i + 1) * PI / 3, 5)));
+      const dark = [[x, y - r]].concat(arc(-PI / 2, PI / 2, 12));
+      return { x, y, R0, moon: true, parts: lit.map((q) => ({ pts: q, g: fill(sf, false) })).concat([{ pts: dark, g: fill(o.halfShadow || 'shadow', false) }]), outline: arc(0, 2 * PI, 27).slice(0, 28) }; }
+    if (motif(k) === 'moon') { const mp = moonPieces(s[0], s[1], R0 * .92, o.moonRot != null ? o.moonRot : srot[k] - 2.3);
+      return { x: s[0], y: s[1], R0, moon: true, parts: mp.map((q, i) => ({ pts: q, g: fill(i === mp.length - 1 ? (o.moonShadow || 'shadow') : sf, false) })), outline: Array.from({ length: 28 }, (_, i) => [s[0] + Math.cos(i / 28 * 2 * PI) * R0 * .92, s[1] + Math.sin(i / 28 * 2 * PI) * R0 * .92]) }; }
+    const sh = shapeOf(motif(k), s[0], s[1], R0, srot[k]);
+    return { x: s[0], y: s[1], R0, parts: sh.parts.map((q) => ({ pts: q, g: fill(sf, false) })), outline: sh.outline }; });
+  const bubbles = []; for (let k = 0; k < 10; k++) bubbles.push([R() * W, R() * H, .3 + R() * .5]);
+  return { W, H, pieces, stars: starsOut, bubbles, lw: o.lw || .85, lightAt: o.lightAt || [.5, 0] };
+}
+
+/* ---------- the picked designs ---------- */
+const FIT_G1R = { rings: [{ n: 10, r: 1.5 }, { n: 10, r: 2.7, jr: .06 }], step: 7.6, clr: 7.4, bow: .12, jag: 1.6, halo: true, mix: .3, pfam: 'paleB', mfam: 'midB', hfam: 'haloB', haloLit: true, halo2: true };
+const sc = (z, W, H, w0, h0) => z.map((r) => [r[0] * W / w0, r[1] * H / h0, r[2] * W / w0, r[3] * H / h0, r[4]]);
+function cutTile(seed, W, H) { // SC2 medium stars in G1r glass, on the 170x100 tile the mock-up used, scaled to the tile
+  return cut({ w: W, h: H, seed, s: 10, border: 5.5, bseg: 12, starGap: 32, sizes: (n) => Array(n).fill(6.6), fit: FIT_G1R,
+    zones: sc([[118, 4, 166, 17, 1], [62, 60, 166, 80, 3]], W, H, 170, 100), dark: sc([[58, 18, 168, 58]], W, H, 170, 100)[0], lightAt: [.55, 0] }); }
+function cutPanel(seed, W, H) { // the Absolution glass: the same G1r cut, a little coarser, honey border band
+  return cut({ w: W, h: H, seed, s: 13, border: 5, bseg: 13, lw: .95, starGap: 38, sizes: (n) => Array(n).fill(7.5),
+    fit: { rings: FIT_G1R.rings, step: 9.6, clr: 9.4, bow: .12, jag: 2, halo: true, mix: .3, pfam: 'paleB', mfam: 'midB', hfam: 'haloB', halo2: true },
+    zones: sc([[115, 8, 185, 34, 2], [70, 90, 215, 116, 2], [60, 120, 150, 146, 1]], W, H, 224, 152), lightAt: [.3, 0] }); }
+const DW = 200, DH = 320, DB = 5;
+const hrOf = (t) => { const m = /^(\d{1,2}):(\d{2})/.exec(String(t || '')); return m ? +m[1] + +m[2] / 60 : null; };
+const yOf = (h) => DB + 16 + (clamp(h, 6.5, 22.5) - 6.5) / 16 * (DH - 2 * DB - 32);
+function dayEvents(events) {
+  const ev = (events || []).map((e) => ({ h: hrOf(e.t), kind: e.side === 'c' ? 'c' : 'b', name: e.name || '' })).filter((e) => e.h != null).sort((a, b) => a.h - b.h);
+  const out = ev.map((e, i) => ({ x: e.kind === 'b' ? DW * (.7 + ((i * 37) % 11) / 100) : DW * (.21 + ((i * 53) % 13) / 100), y: yOf(e.h), kind: e.kind, name: e.name }));
+  // two marks on the same side too close in time are nudged apart, then squeezed back into the window if they ran off the end
+  const last = { b: -99, c: -99 }; out.forEach((e) => { e.y = Math.max(e.y, last[e.kind] + 17); last[e.kind] = e.y; });
+  const top = DB + 12, bot = DH - DB - 12, mx = out.length ? out[out.length - 1].y : 0; if (mx > bot) out.forEach((e) => { e.y = top + (e.y - top) * (bot - top) / (mx - top); });
+  return out;
+}
+function cutDay(seed, ev, cracked) { // D1: a fixed middle line, blood moons left, honey stars right
+  const sz = ev.map((e) => (e.kind === 'c' ? 8.6 : 7));
+  return cut({ w: DW, h: DH, seed, s: 12, border: 5, bseg: 13, lw: .9, events: ev, nChain: ev.length, sizes: () => sz,
+    fit: { rings: [{ n: 10, r: 1.5 }, { n: 10, r: 2.6, jr: .06 }], step: 9, clr: 8.8, bow: .1, jag: 1.6 },
+    motif: (k) => (ev[k].kind === 'c' ? 'moon' : 'star'), motifFam: (k) => (ev[k].kind === 'c' ? 'blood' : 'star'),
+    famFx: (kind, src, c) => { const left = c[0] < DW / 2;
+      if (kind === 'path') return { fam: left ? 'redp' : 'paleB', crack: cracked && Math.abs(c[0] - DW / 2) < 7 && !!src.path };
+      if (kind === 'ring') return { fam: src.ri === 0 ? (left ? 'chaloD' : 'haloB') : (left ? 'cbg' : 'bg'), lit: src.ri === 0 };
+      return { fam: left ? 'cbg' : 'bg' }; }, lightAt: [.5, 0] }); }
+
+/* ---------- canvas layers ---------- */
+const LC = '#0a0b10';
+function path2(pts) { const p = new Path2D(); p.moveTo(pts[0][0], pts[0][1]); for (let i = 1; i < pts.length; i++) p.lineTo(pts[i][0], pts[i][1]); p.closePath(); return p; }
+function bbox(pts) { let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9; pts.forEach((q) => { if (q[0] < x0) x0 = q[0]; if (q[0] > x1) x1 = q[0]; if (q[1] < y0) y0 = q[1]; if (q[1] > y1) y1 = q[1]; }); return [x0, y0, x1 - x0, y1 - y0]; }
+function fillGlass(ctx, P2, pts, g) { const b = bbox(pts), gr = ctx.createLinearGradient(b[0] + g.x1 * b[2], b[1] + g.y1 * b[3], b[0] + g.x2 * b[2], b[1] + g.y2 * b[3]); g.st.forEach((s) => gr.addColorStop(s[0], s[1])); ctx.fillStyle = gr; ctx.fill(P2); }
+function layer(S) { const c = document.createElement('canvas'); c.width = S.cw; c.height = S.ch; const x = c.getContext('2d'); x.setTransform(S.k, 0, 0, S.k, S.ox, S.oy); return c; }
+// the units-to-pixels fit: the glass covers its holder (like SVG "slice"), centred
+function fitTo(S, cssW, cssH, dpr) { S.cw = Math.max(1, Math.round(cssW * dpr)); S.ch = Math.max(1, Math.round(cssH * dpr)); S.k = Math.max(S.cw / S.geo.W, S.ch / S.geo.H); S.ox = (S.cw - S.geo.W * S.k) / 2; S.oy = (S.ch - S.geo.H * S.k) / 2; S.dpr = dpr; }
+function drawTop(S) { // lead, bubbles, the soft overhead light and the frame
+  const G = S.geo, c = layer(S), x = c.getContext('2d'), lead = new Path2D(), sl = new Path2D();
+  G.pieces.forEach((p) => lead.addPath(p.P)); G.stars.forEach((s) => s.parts.forEach((q) => sl.addPath(q.P)));
+  x.lineJoin = 'round'; x.strokeStyle = LC; x.lineWidth = G.lw; x.stroke(lead); x.lineWidth = G.lw * .9; x.stroke(sl);
+  x.fillStyle = 'rgba(255,255,255,.14)'; G.bubbles.forEach((b) => { x.beginPath(); x.arc(b[0], b[1], b[2], 0, 2 * PI); x.fill(); });
+  x.save(); x.scale(G.W, G.H); const rg = x.createRadialGradient(G.lightAt[0], G.lightAt[1], 0, G.lightAt[0], G.lightAt[1], .9); rg.addColorStop(0, 'rgba(255,248,230,.2)'); rg.addColorStop(1, 'rgba(255,248,230,0)'); x.fillStyle = rg; x.fillRect(0, 0, 1, 1); x.restore();
+  x.strokeStyle = LC; x.lineWidth = 1.6; x.strokeRect(.8, .8, G.W - 1.6, G.H - 1.6);
+  return c; }
+function prep(G) { if (G.ready) return; G.pieces.forEach((p) => { p.P = path2(p.pts); }); G.stars.forEach((s) => { s.parts.forEach((q) => { q.P = path2(q.pts); }); s.O = path2(s.outline); }); G.ready = true; }
+function drawCol(S, roles) { // the glass itself, at full colour: tiles keep background, path and stars apart so each can light on its own
+  const G = S.geo, out = roles ? [layer(S), layer(S), layer(S)] : [layer(S)], ctx = out.map((c) => c.getContext('2d'));
+  G.pieces.forEach((p) => fillGlass(ctx[roles ? p.role : 0], p.P, p.pts, p.g)); G.stars.forEach((s) => s.parts.forEach((q) => fillGlass(ctx[roles ? 2 : 0], q.P, q.pts, q.g)));
+  return out; }
+/* Oracle: the day marks, all cut from the same engine. star = five honey diamonds; spark = four diamonds; gem = one diamond. */
+function shapeOf(m, x, y, R0, rot) {
+  if (m === 'moon') return null;
+  if (m === 'gem') { const q = [[x, y - R0 * 1.05], [x + R0 * .62, y], [x, y + R0 * 1.05], [x - R0 * .62, y]]; return { parts: [q], outline: q }; }
+  if (m === 'spark') { const d = R0 * .34, h = PI / 4, parts = [0, 1, 2, 3].map((k) => { const a = rot - PI / 2 + k * PI / 2, L = R0 * (k % 2 ? .74 : 1);
+      return [[x, y], [x + Math.cos(a - h) * d, y + Math.sin(a - h) * d], [x + Math.cos(a) * L, y + Math.sin(a) * L], [x + Math.cos(a + h) * d, y + Math.sin(a + h) * d]]; });
+    return { parts, outline: [].concat.apply([], parts.map((q) => [q[1], q[2]])) }; }
+  const rh = rhombi(x, y, R0, rot); return { parts: rh, outline: [].concat.apply([], rh.map((q) => [q[1], q[2]])) };
+}
+
+/* draw a cut window into a canvas: colour, a glow behind the lit marks, then lead, bubbles and the overhead light */
+function render(cv, G, cssW, cssH, o) {
+  prep(G); const S = { geo: G }; fitTo(S, cssW, cssH, DPRf()); cv.width = S.cw; cv.height = S.ch; cv.style.width = cssW + 'px'; cv.style.height = cssH + 'px';
+  const x = cv.getContext('2d'), col = drawCol(S, false)[0], top = drawTop(S);
+  x.save(); if (o.shape) { x.setTransform(S.k, 0, 0, S.k, S.ox, S.oy); x.clip(new Path2D(o.shape)); x.setTransform(1, 0, 0, 1, 0, 0); }
+  x.fillStyle = o.base || '#24356a'; x.fillRect(0, 0, S.cw, S.ch); x.drawImage(col, 0, 0);
+  if (o.dim) { x.fillStyle = 'rgba(2,3,10,' + o.dim + ')'; x.fillRect(0, 0, S.cw, S.ch);
+    x.setTransform(S.k, 0, 0, S.k, S.ox, S.oy); G.stars.forEach((s) => { if (!s.lit) return; x.save(); x.beginPath(); x.arc(s.x, s.y, s.R0 * 2.9, 0, 2 * PI); x.clip(); x.setTransform(1, 0, 0, 1, 0, 0); x.drawImage(col, 0, 0); x.restore(); }); x.setTransform(1, 0, 0, 1, 0, 0); }
+  x.drawImage(top, 0, 0);
+  x.globalCompositeOperation = 'lighter'; x.filter = 'blur(' + (o.blur || 3) * S.dpr + 'px)'; x.setTransform(S.k, 0, 0, S.k, S.ox, S.oy);
+  G.stars.forEach((s) => { if (!s.lit) return; x.globalAlpha = s.lit; s.parts.forEach((q) => fillGlass(x, q.P, q.pts, q.g)); });
+  x.restore(); return S; }
+return { cut, render, RM, cutTile };
+})();
+
+</script>
+<script>
+(function(){
+const NAMES=["The Call","Grimoire","Omens","Den"];
+/* ---------- small helpers ---------- */
+function rnd(seed){let s=seed>>>0||1;return()=>{s^=s<<13;s>>>=0;s^=s>>>17;s^=s<<5;s>>>=0;return s/4294967296;};}
+function grain(ctx,w,h,R,amt){const d=ctx.getImageData(0,0,w,h),a=d.data;for(let i=0;i<a.length;i+=4){const n=(R()-.5)*amt;a[i]+=n;a[i+1]+=n;a[i+2]+=n;}ctx.putImageData(d,0,0);}
+function blot(ctx,x,y,r,c0,c1){const g=ctx.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,c0);g.addColorStop(1,c1);ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,r,0,7);ctx.fill();}
+function vignette(ctx,w,h,c,inner){const g=ctx.createRadialGradient(w/2,h*.55,Math.min(w,h)*inner,w/2,h*.55,Math.max(w,h)*.72);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,c);ctx.fillStyle=g;ctx.fillRect(0,0,w,h);}
+
+/* ---------- The Call: aged parchment ---------- */
+function parchment(ctx,w,h,u,R){
+  let g=ctx.createLinearGradient(0,0,0,h);g.addColorStop(0,'#e6d3a4');g.addColorStop(.5,'#dcc590');g.addColorStop(1,'#cdb178');ctx.fillStyle=g;ctx.fillRect(0,0,w,h);
+  for(let i=0;i<26;i++)blot(ctx,R()*w,R()*h,(8+R()*26)*u,R()<.6?'rgba(150,108,48,.10)':'rgba(255,246,220,.12)','rgba(0,0,0,0)');
+  ctx.lineCap='round';
+  for(let i=0;i<w*h/(14*u*u);i++){const x=R()*w,y=R()*h,L=(2+R()*7)*u,a=(R()-.5)*.6;ctx.strokeStyle=R()<.7?'rgba(110,80,36,.16)':'rgba(255,248,226,.22)';ctx.lineWidth=(.25+R()*.35)*u;ctx.beginPath();ctx.moveTo(x,y);ctx.quadraticCurveTo(x+Math.cos(a)*L/2,y+Math.sin(a)*L/2+(R()-.5)*u,x+Math.cos(a)*L,y+Math.sin(a)*L);ctx.stroke();}
+  for(let i=0;i<9;i++){const x=R()*w,y=R()*h,r=(.8+R()*3.2)*u;blot(ctx,x,y,r*1.8,'rgba(150,84,30,.30)','rgba(150,84,30,0)');blot(ctx,x+(R()-.5)*r*.5,y,r*.45,'rgba(110,56,18,.35)','rgba(110,56,18,0)');}
+  grain(ctx,w,h,R,14);
+  vignette(ctx,w,h,'rgba(92,52,16,.62)',.22);
+  ctx.strokeStyle='rgba(60,30,10,.35)';ctx.lineWidth=1.2*u;ctx.strokeRect(0,0,w,h);
+  /* inked sigil, crisp and thin */
+  const cx=w/2,cy=h*.34,r=Math.min(w*.2,h*.22);ctx.strokeStyle='rgba(38,18,8,.86)';ctx.fillStyle='rgba(38,18,8,.86)';ctx.lineWidth=Math.max(.6,.55*u);
+  ctx.beginPath();ctx.arc(cx,cy,r,0,7);ctx.stroke();ctx.beginPath();ctx.arc(cx,cy,r*.78,0,7);ctx.stroke();
+  for(let k=0;k<12;k++){const a=k/12*Math.PI*2;ctx.beginPath();ctx.moveTo(cx+Math.cos(a)*r*.8,cy+Math.sin(a)*r*.8);ctx.lineTo(cx+Math.cos(a)*r*(k%3?0.9:.98),cy+Math.sin(a)*r*(k%3?0.9:.98));ctx.stroke();}
+  ctx.beginPath();for(let k=0;k<4;k++){const a=-Math.PI/2+k*Math.PI*2/3;ctx[k?'lineTo':'moveTo'](cx+Math.cos(a)*r*.74,cy+Math.sin(a)*r*.74);}ctx.stroke();
+  ctx.beginPath();ctx.moveTo(cx,cy-r*.74);ctx.lineTo(cx,cy+r*.5);ctx.stroke();
+  ctx.beginPath();ctx.arc(cx,cy+r*.06,r*.17,0,7);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(cx-r*.3,cy+r*.38);ctx.quadraticCurveTo(cx,cy+r*.18,cx+r*.3,cy+r*.38);ctx.stroke();
+  /* a small wax seal low on the right */
+  const sx=w-8.5*u,sy=h-10*u,sr=4.6*u;ctx.beginPath();for(let k=0;k<=22;k++){const a=k/22*Math.PI*2,rr=sr*(1+(R()-.5)*.16);ctx[k?'lineTo':'moveTo'](sx+Math.cos(a)*rr,sy+Math.sin(a)*rr);}
+  g=ctx.createRadialGradient(sx-sr*.35,sy-sr*.4,sr*.1,sx,sy,sr*1.1);g.addColorStop(0,'#c8322c');g.addColorStop(.6,'#8a1616');g.addColorStop(1,'#4a0808');ctx.fillStyle=g;ctx.fill();
+  ctx.strokeStyle='rgba(40,4,4,.7)';ctx.lineWidth=.5*u;ctx.beginPath();ctx.arc(sx,sy,sr*.62,0,7);ctx.stroke();
+  ctx.strokeStyle='rgba(255,150,130,.45)';ctx.beginPath();ctx.arc(sx,sy,sr*.62,3.6,4.9);ctx.stroke();
+}
+/* ---------- Grimoire: close-up of an old leather cover ---------- */
+function leather(ctx,w,h,u,R){
+  let g=ctx.createRadialGradient(w*.45,h*.35,0,w*.5,h*.5,Math.max(w,h)*.8);g.addColorStop(0,'#52281a');g.addColorStop(.55,'#2e160c');g.addColorStop(1,'#120705');ctx.fillStyle=g;ctx.fillRect(0,0,w,h);
+  const n=w*h/(7*u*u);for(let i=0;i<n;i++){const x=R()*w,y=R()*h,r=(.6+R()*1.1)*u;ctx.fillStyle='rgba(0,0,0,.28)';ctx.beginPath();ctx.ellipse(x,y,r,r*.8,R()*3,0,7);ctx.fill();ctx.fillStyle='rgba(220,150,110,.05)';ctx.beginPath();ctx.ellipse(x-.35*u,y-.35*u,r*.55,r*.4,0,0,7);ctx.fill();}
+  ctx.lineCap='round';for(let i=0;i<14;i++){let x=R()*w,y=R()*h;ctx.strokeStyle='rgba(0,0,0,.4)';ctx.lineWidth=(.3+R()*.4)*u;ctx.beginPath();ctx.moveTo(x,y);for(let k=0;k<4;k++){x+=(R()-.3)*7*u;y+=(R()-.5)*4*u;ctx.lineTo(x,y);}ctx.stroke();}
+  for(let i=0;i<5;i++){ctx.save();ctx.translate(R()*w,R()*h);ctx.rotate((R()-.5)*1.2);ctx.scale(1,.28);blot(ctx,0,0,(6+R()*10)*u,'rgba(150,96,64,.22)','rgba(150,96,64,0)');ctx.restore();}
+  for(let i=0;i<7;i++){const x=R()*w,y=R()*h,L=(4+R()*10)*u,a=(R()-.5)*1.4;ctx.strokeStyle='rgba(210,160,120,.16)';ctx.lineWidth=.35*u;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+Math.cos(a)*L,y+Math.sin(a)*L);ctx.stroke();}
+  grain(ctx,w,h,R,9);
+  /* blind tooling: debossed double rule, corner fillets, stamped dots */
+  const deb=(fn)=>{ctx.strokeStyle='rgba(0,0,0,.7)';ctx.lineWidth=.9*u;fn(0);ctx.strokeStyle='rgba(235,180,130,.22)';ctx.lineWidth=.6*u;fn(.8*u);};
+  const i1=5*u,i2=8.5*u;
+  deb(o=>{ctx.strokeRect(i1+o,i1+o,w-2*i1,h-2*i1);ctx.strokeRect(i2+o,i2+o,w-2*i2,h-2*i2);ctx.beginPath();ctx.moveTo(i1+o,h-i1+o);ctx.lineTo(i2+o,h-i2+o);ctx.moveTo(w-i1+o,h-i1+o);ctx.lineTo(w-i2+o,h-i2+o);ctx.stroke();});
+  for(let x=i2+3*u;x<w-i2-2*u;x+=4.2*u){ctx.fillStyle='rgba(0,0,0,.55)';ctx.beginPath();ctx.arc(x,(i1+i2)/2,.55*u,0,7);ctx.fill();ctx.beginPath();ctx.arc(x,h-(i1+i2)/2,.55*u,0,7);ctx.fill();}
+  /* worn gilt on the outer rule */
+  ctx.strokeStyle='rgba(206,160,76,.75)';ctx.lineWidth=.7*u;let x=i1;while(x<w-i1){const L=(2+R()*9)*u;if(R()<.45){ctx.beginPath();ctx.moveTo(x,h-i1);ctx.lineTo(Math.min(x+L,w-i1),h-i1);ctx.stroke();}x+=L;}
+  let y=i1+12*u;while(y<h-i1){const L=(2+R()*7)*u;if(R()<.4){ctx.beginPath();ctx.moveTo(i1,y);ctx.lineTo(i1,Math.min(y+L,h-i1));ctx.stroke();ctx.beginPath();ctx.moveTo(w-i1,y);ctx.lineTo(w-i1,Math.min(y+L,h-i1));ctx.stroke();}y+=L;}
+  vignette(ctx,w,h,'rgba(0,0,0,.6)',.3);
+  /* tarnished brass corners, low left and low right */
+  [[0,1],[w,-1]].forEach(([ox,dx])=>{const s=13*u;ctx.beginPath();ctx.moveTo(ox,h);ctx.lineTo(ox+dx*s,h);ctx.quadraticCurveTo(ox+dx*s*.42,h-s*.42,ox,h-s);ctx.closePath();
+    g=ctx.createLinearGradient(ox,h-s,ox+dx*s,h);g.addColorStop(0,'#3a2c14');g.addColorStop(.45,'#7e6632');g.addColorStop(.6,'#a08848');g.addColorStop(1,'#2e2210');ctx.fillStyle=g;ctx.fill();
+    ctx.strokeStyle='rgba(0,0,0,.6)';ctx.lineWidth=.6*u;ctx.stroke();
+    for(let k=0;k<5;k++)blot(ctx,ox+dx*(1+R()*s*.5),h-(1+R()*s*.5),(.6+R()*1.4)*u,'rgba(90,150,120,.45)','rgba(90,150,120,0)');
+    [[3.2,3.2],[7.5,2.3],[2.3,7.5]].forEach(([a,b])=>{const rx=ox+dx*a*u,ry=h-b*u;blot(ctx,rx,ry,1.1*u,'#c8b070','#3a2c14');});});
+}
+/* ---------- Omens: the Oracle's glass ---------- */
+function glass(cv,w,h,seed,scale){const G=ORX.cutTile(seed,170,120);ORX.render(cv,G,w*scale,h*scale,{});cv.style.width='100%';cv.style.height='100%';}
+
+/* ---------- Den: the lair ruins (lair3.html RUINS[2], Jade deep palette) ---------- */
+const hx=(h)=>[1,3,5].map((i)=>parseInt(h.slice(i,i+2),16)),toHex=(c)=>'#'+c.map((v)=>Math.max(0,Math.min(255,Math.round(v))).toString(16).padStart(2,'0')).join('');
+const mixC=(a,b,t)=>{const A=hx(a),B=hx(b);return toHex(A.map((v,i)=>v+(B[i]-v)*t));},lift=(a,t)=>mixC(a,'#ffffff',t),sink=(a,t)=>mixC(a,'#000000',t);
+function mkPal(name,top,bot,stone,glow,moss){const far=sink(mixC(top,bot,.5),.15),ledge=mixC(stone,bot,.15);return{name,top,bot,far,farHi:lift(far,.15),mid:stone,midHi:lift(stone,.22),midLo:sink(stone,.45),ledge,ledgeHi:lift(ledge,.25),ledgeLo:sink(ledge,.5),moss,glow};}
+const JADE=mkPal('Jade deep','#17684c','#020e0a','#173229','#c8f060','#5aa040');
+function lrng(seed){return function(){seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function pen(ctx){return(x,y,w,h,c)=>{ctx.fillStyle=c;ctx.fillRect(Math.round(x),Math.round(y),Math.max(1,Math.round(w)),Math.max(1,Math.round(h)));};}
+function ledge(R,r,p,W,top,from,to){R(from,top,to-from,57-top,p.ledge);R(from,top,to-from,1,p.ledgeHi);let x=from+Math.floor(r()*6);while(x<to){R(x,top+1,1,57-top-2,p.ledgeLo);x+=8+Math.floor(r()*11);}R(from,56,to-from,1,p.ledgeLo);for(let i=0;i<(to-from)/7;i++)R(from+r()*(to-from),top+2+r()*4,1,1,p.ledgeHi);for(let i=0;i<(to-from)/11;i++){const mx=from+r()*(to-from);R(mx,top-1,2+Math.floor(r()*3),1,p.moss);}}
+function kelp(R,x,base,h,p,ph){for(let j=0;j<h;j++){const xx=x+Math.round(Math.sin(j/3.2+ph)*1.4);R(xx,base-j,1,1,p.moss);if(j%4===2)R(xx+(j%8===2?1:-1),base-j,1,1,p.moss);}}
+function towers(R,r,p,W,n,base){for(let i=0;i<n;i++){const x=r()*W,w=5+Math.floor(r()*8),h=16+Math.floor(r()*26),s=(r()-.5)*.5;for(let j=0;j<h;j++){R(x+s*j,base-j,w,1,p.far);R(x+s*j,base-j,1,1,p.farHi);}for(let k=0;k<3;k++)if(r()<.5)R(x+s*(h*.6)+2+k*2,base-h*.6-k*3,1,1,p.glow);}}
+function blocksWall(R,r,p,x0,x1,top,base){R(x0,top,x1-x0,base-top,p.mid);let y=top;while(y<base){const bh=4+Math.floor(r()*3);let x=x0-Math.floor(r()*6);while(x<x1){const bw=6+Math.floor(r()*9);R(Math.max(x0,x),y,Math.min(bw,x1-Math.max(x0,x)),1,p.midHi);R(x+bw-1,y,1,bh,p.midLo);if(r()<.12)R(x+2+r()*(bw-4),y+2,1,1,p.glow);x+=bw;}R(x0,y+bh-1,x1-x0,1,p.midLo);y+=bh;}for(let i=x0;i<x1;i++)if(r()<.5)R(i,top-1,1,1,p.mid);}
+function ruins2(ctx,W,p){const R=pen(ctx),r=lrng(23);
+  const zig=(cx,base,n,w0)=>{for(let s=0;s<n;s++){const w=w0-s*7;R(cx-w/2,base-(s+1)*5,w,5,p.far);R(cx-w/2,base-(s+1)*5,w,1,p.farHi);}R(cx-1,base-n*5-3,3,3,p.far);R(cx,base-n*5-2,1,1,p.glow);};
+  zig(Math.round(W*.14),50,5,40);zig(Math.round(W*.86),50,4,34);towers(R,r,p,W,3,48);
+  const mono=(x,h,w,lean)=>{for(let j=0;j<h;j++){const xx=x+lean*j;R(xx,50-j,w,1,p.mid);R(xx,50-j,1,1,p.midHi);R(xx+w-1,50-j,1,1,p.midLo);if(j%6===3&&j>4&&j<h-3){R(xx+w/2-1,50-j,3,1,p.glow);R(xx+w/2,50-j-1,1,3,p.glow);}}for(let i=0;i<w;i++)R(x+lean*h+i,50-h-Math.floor(r()*2),1,1,p.mid);};
+  mono(Math.round(W*.02),44,9,.22);mono(Math.round(W*.2),30,7,-.1);mono(Math.round(W*.74),34,7,.12);mono(Math.round(W*.9),46,9,-.2);
+  blocksWall(R,r,p,Math.round(W*.3),Math.round(W*.7),40,50);
+  kelp(R,Math.round(W*.33),49,14,p,0);kelp(R,Math.round(W*.7),49,18,p,2);
+  ledge(R,r,p,W,50,0,W);
+  for(let i=0;i<3;i++){const x=W*(.2+i*.3);for(let k=0;k<4;k++)R(x+k,51+k,1,1,p.ledgeLo);}}
+function den(cv,w,h,pixel){const W=Math.max(40,Math.round(pixel?w/1.5:w)),H=57;cv.width=W;cv.height=H;cv.style.imageRendering='pixelated';const ctx=cv.getContext('2d');
+  const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,JADE.top);g.addColorStop(1,JADE.bot);ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  const s=ctx.createLinearGradient(W*.3,0,W*.55,H);s.addColorStop(0,'rgba(150,255,205,.14)');s.addColorStop(1,'rgba(150,255,205,0)');ctx.fillStyle=s;ctx.beginPath();ctx.moveTo(W*.35,0);ctx.lineTo(W*.55,0);ctx.lineTo(W*.75,H);ctx.lineTo(W*.45,H);ctx.fill();
+  const r=lrng(5);for(let i=0;i<10;i++){ctx.fillStyle='rgba(200,240,96,'+(.3+r()*.5)+')';ctx.fillRect(Math.round(r()*W),Math.round(r()*36),1,1);}
+  ruins2(ctx,W,JADE);}
+
+/* ---------- paint one tab ---------- */
+function paint(cv,i,v){const box=cv.parentElement,w=box.clientWidth,h=box.clientHeight;if(!w||!h)return;const pixel=v==='nB',dpr=Math.min(3,window.devicePixelRatio||1);
+  if(i===2){glass(cv,w,h,200+i*7+v.charCodeAt(1),pixel?.42:1);if(pixel)cv.style.imageRendering='pixelated';return;}
+  if(i===3){den(cv,w,h,pixel);return;}
+  const k=pixel?.6:dpr,W=Math.round(w*k),H=Math.round(h*k);cv.width=W;cv.height=H;const ctx=cv.getContext('2d'),u=W/80,R=rnd(31+i*101+v.charCodeAt(1)*7);
+  (i===0?parchment:leather)(ctx,W,H,u,R);}
+
+document.querySelectorAll(".spec").forEach(s=>{
+  const v=s.dataset.v,old=v==="c6";
+  const btns=NAMES.map((n,i)=>{let inner;
+    if(old)inner=`<svg aria-hidden="true"><use href="#i${i}"/></svg><span>${n}</span>`;
+    else if(v==="nC")inner=`<span class="well"><canvas class="tex" aria-hidden="true"></canvas></span><span class="plate">${n}</span>`;
+    else inner=`<canvas class="tex" aria-hidden="true"></canvas><span class="lb">${n}</span>`;
+    return `<button class="${old?"t":"n"}${i}${i===0?" on":""}" role="tab" aria-selected="${i===0}">${inner}</button>`;}).join("");
+  s.innerHTML=`<div class="cap"><span class="code">${s.dataset.ref}</span><p>${s.dataset.d}</p></div>
+  <div class="phone"><div class="banner"><span>The Lair of Ulhu</span><i>Depth 7</i></div>
+  <div class="bar ${v}${v==="nB"?" px":""}" role="tablist" aria-label="${s.dataset.ref} tabs">${btns}</div>
+  <div class="page"></div></div>`;
+  const bar=s.querySelector(".bar"),page=s.querySelector(".page");
+  const pick=i=>{bar.querySelectorAll("button").forEach((b,j)=>{b.classList.toggle("on",i===j);b.setAttribute("aria-selected",i===j)});page.textContent=NAMES[i]+" page would show here";};
+  bar.querySelectorAll("button").forEach((b,i)=>b.addEventListener("click",()=>pick(i)));
+  pick(0);
+});
+const all=()=>document.querySelectorAll(".bar:not(.c6)").forEach(bar=>{const v=bar.classList[1];bar.querySelectorAll("canvas.tex").forEach((cv,i)=>{try{paint(cv,i,v);}catch(e){console.error(e);}});});
+all();let t;window.addEventListener("resize",()=>{clearTimeout(t);t=setTimeout(all,200);});
+})();
+</script>
