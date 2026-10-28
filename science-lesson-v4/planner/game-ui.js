@@ -614,6 +614,10 @@
     }
     function questCard(q) {
       const k = KIND[q.track] || KIND.necessary, done = !!q.doneOn, sd = q.steps.filter((x) => x.d).length;
+      // the parchment scroll on its rods, sealed in red wax (Patryk's final picks, game-scroll.js)
+      if (window.SCROLL) return '<div class="uz-scw" data-scroll="' + q.id + '">' + SCROLL.card({ id: q.id, name: q.name, due: q.due && !done ? 'Due ' + dueTxt(q.due) : '', steps: q.steps.map((x) => ({ n: x.t, d: !!x.d })), pay: q.pay, done },
+        { attrs: (i) => 'data-a="step" data-id="' + q.id + '" data-v="' + i + '"', tickAttrs: 'data-a="tick" data-id="' + q.id + '" data-fx="' + q.id + '"', bodyAttrs: 'data-a="editg" data-id="' + q.id + '"',
+          payHtml: '<span style="display:inline-flex;align-items:center;gap:3px">+' + q.pay + coin(18, q.pay, q.id) + archBtn(q.id, '#7a5a34') + '</span>' }) + '</div>';
       return '<div class="uz-parch uz-q' + (done ? ' done' : '') + '" style="--e:' + k.c + '"><div class="top"><button class="uz-tk" data-a="tick" data-id="' + q.id + '" data-fx="' + q.id + '" aria-label="' + esc(q.name) + '">' + (done ? '<img class="uz-stamp" data-q="' + q.id + '" src="' + IMG.wax + '" alt="">' : '') + '</button>' +
         '<div class="uz-mid uz-ed" data-a="editg" data-id="' + q.id + '"><div class="nm">' + esc(q.name) + '</div><div class="uz-sub">' + (q.due && !done ? dueChip(q.due) : '') + (q.steps.length ? '<span style="font-weight:700">' + sd + '/' + q.steps.length + '</span>' : '') + '</div></div>' +
         '<div style="flex:none;display:flex;align-items:center;gap:3px;font:700 16px var(--a);color:#7a4e14">+' + q.pay + coin(18, q.pay, q.id) + '</div>' + archBtn(q.id, '#7a5a34') + '</div>' +
@@ -901,6 +905,7 @@
       const sb = body.querySelector('.uz-stampbox'); if (sb && V.stampNew) { V.stampNew = false; anim(sb, [{ transform: 'scale(2.4) rotate(-28deg)', opacity: 0 }, { transform: 'scale(.92) rotate(-10deg)', opacity: 1, offset: 0.7 }, { transform: 'scale(1) rotate(-10deg)', opacity: 1 }], { duration: 420, easing: 'cubic-bezier(.2,.8,.3,1.2)' }); }
       if (window.TEMPLE) TEMPLE.paint(body);
       if (window.STONE) STONE.paint(body);
+      if (window.SCROLL) SCROLL.paint(body);
       if (V.waxNew) { const n = body.querySelector('.uz-stamp[data-q="' + V.waxNew + '"]'); if (n) { V.waxNew = null; anim(n, [{ transform: 'scale(2.4) rotate(-28deg)', opacity: 0 }, { transform: 'scale(1) rotate(-10deg)', opacity: 1 }], { duration: 420 }); } }
     }
 
@@ -995,8 +1000,12 @@
         }
         if (g.kind === 'todo') {
           const on = !g.doneOn; let upL = false;
+          // the scroll is sealed and burns first (about 3.4 s), then it is saved and paid, so no redraw cuts the seal short
+          if (on && V.sealing === id) return;
+          if (on && window.SCROLL && V.sealed !== id) { V.sealing = id; buzz(10); return SCROLL.seal(id).then(() => { V.sealing = null; V.sealed = id; const b2 = box.querySelector('[data-a="tick"][data-id="' + id + '"]'); (b2 || b).click(); V.sealed = null; }); }
           act({ verb: on ? 'Fulfilled:' : 'Reopened:', name: g.name, delta: (on ? '+' : '−') + g.pay, unit: 'coin' }, on ? ['gameUntick', id] : null, on ? 'gameTick' : 'gameUntick', on ? [id, 1] : [id],
             (d) => { const x = d.goals.find((y) => y.id === id); x.doneOn = on ? d.today : ''; if (on) upL = earnLocal(d, g.pay, g.pay); else d.player.coins -= g.pay; });
+          if (on && window.SCROLL) { V.sayKind = 'quest'; earnFx(r, k, g.pay, upL); return; }
           if (on) { V.sayKind = 'quest'; V.waxNew = id; V.settling[id] = 1; paint(); setTimeout(() => { delete V.settling[id]; paint(); }, 1100); earnFx(r, k, g.pay, upL); } else buzz(6); return;
         }
         const on = !g.doneToday; let upL = false;
@@ -1025,6 +1034,8 @@
         V.sayKind = 'bless'; ripple(r, '#bfe2ff'); earnFx(r, k, n, upL); return;
       }
       if (a === 'step') { const q = goal(id), i = Number(v), on = !q.steps[i].d; buzz(6);
+        const go = () => act({ verb: on ? 'Step:' : 'Step reopened:', name: q.steps[i].t }, ['gameQuestStep', id, i, !on], 'gameQuestStep', [id, i, on], (d) => { d.goals.find((y) => y.id === id).steps[i].d = on; });
+        if (window.SCROLL) { SCROLL.tickStep(id, i, on); return setTimeout(go, 520); }   // let the ink tick and the strike show before the redraw
         return act({ verb: on ? 'Step:' : 'Step reopened:', name: q.steps[i].t }, ['gameQuestStep', id, i, !on], 'gameQuestStep', [id, i, on], (d) => { d.goals.find((y) => y.id === id).steps[i].d = on; }); }
       if (a === 'stage') {
         const bo = D.bosses.find((x) => x.id === id), i = Number(v), st = bo.stages[i], on = !st.done, cr = box.querySelector('[data-creature="' + id + '"]');

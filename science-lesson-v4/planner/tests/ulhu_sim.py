@@ -3,7 +3,7 @@ Run: python tests/ulhu_sim.py  (add --shots DIR to save screenshots). Synthetic 
 import os, sys, subprocess, time
 from playwright.sync_api import sync_playwright
 P = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '/'; SP = sys.argv[1] if len(sys.argv) > 1 and not sys.argv[1].startswith('--') else __import__('tempfile').mkdtemp()
-js = ''.join(open(P + f, encoding='utf-8').read() + '\n' for f in ['game-ulhu.js', 'game-pixel.js', 'game-runes.js', 'game-temple.js', 'game-stone.js', 'game-omens.js', 'game-blood.js', 'game-ui.js'])
+js = ''.join(open(P + f, encoding='utf-8').read() + '\n' for f in ['game-ulhu.js', 'game-pixel.js', 'game-runes.js', 'game-temple.js', 'game-stone.js', 'game-omens.js', 'game-blood.js', 'game-scroll.js', 'game-ui.js'])
 page = '''<!doctype html><meta charset="utf-8"><meta name=viewport content="width=device-width,initial-scale=1"><body style="margin:0;background:#0d1b3a">
 <div style="height:60px;background:#0a1020;color:#fff">8AG header</div><div id=u></div><nav style="position:fixed;bottom:0;left:0;right:0;height:62px;background:#0a1020"></nav>
 <script>window.CALLS=[];function call(fn,...args){CALLS.push(fn);return fetch('/c',{method:'POST',body:JSON.stringify({fn,args})}).then(r=>r.json()).then(x=>{if(x.err)throw new Error(x.err);return x.ok;});}</script>
@@ -44,9 +44,9 @@ try:
         pg.click('[data-a=fold][data-v=teach]'); pg.wait_for_timeout(300); t = pg.inner_text('.uz-pane >> nth=1')
         check('the Teaching area opens: rituals, then quests with date chips, a checklist, marking and bosses', all(x in t for x in ['Rituals', 'Quests', 'today', 'Find the 2024 paper', 'Mark 9AS books', 'Mark the 10S2 test']))
         if shots: pg.screenshot(path=os.path.join(SP, 's2.png'))
-        pg.locator('.uz-pane >> nth=1').locator('[data-a=step]').nth(1).click(); pg.wait_for_timeout(700)
-        check('a checklist step ticks', '2/3' in pg.inner_text('.uz-pane >> nth=1'))
-        q = pg.locator('.uz-pane >> nth=1').locator('.uz-q [data-a=tick]').first; q.click(); pg.wait_for_timeout(1600)
+        pg.locator('.uz-pane >> nth=1').locator('[data-a=step]').nth(1).click(); pg.wait_for_timeout(1400)
+        check('a checklist step ticks', any(x in pg.inner_text('.uz-pane >> nth=1') for x in ['2/3', '2 of 3']))
+        q = pg.locator('.uz-pane >> nth=1').locator('[data-scroll] [data-a=tick], .uz-q [data-a=tick]').first; q.click(); pg.wait_for_timeout(5500)   # the scroll is sealed and burns first
         check('a fulfilled quest goes to Vanquished', 'Vanquished' in pg.inner_text('.uz-pane >> nth=1'))
         pg.locator('[data-a=banish]').first.click(); pg.locator('[data-a=banish]').first.click(); pg.wait_for_timeout(700)
         check('Banish (two taps) removes a boss, Undo brings it back', pg.locator('.uz-bossw').count() == 1)
@@ -104,7 +104,7 @@ try:
         pg.click('.uz-tabs [data-v="1"]'); pg.wait_for_timeout(300); pg.click('.uz-dock [data-v=quest]'); pg.wait_for_timeout(300)
         check('the quest form has a date picker', pg.locator('.uz-form input[type=date]').count() == 1)
         pg.fill('.uz-form [data-name]', 'Order ray boxes'); pg.fill('.uz-form input[type=date]', '2026-11-20'); pg.click('.uz-form [data-a=submit]'); pg.wait_for_timeout(1200)
-        check('a quest saved with a picked date shows it', 'Order ray boxes' in pg.inner_text('.uz-pane >> nth=1') and 'Fri 20' in pg.locator('.uz-pane >> nth=1').locator('.uz-q', has_text='Order ray boxes').inner_text())
+        check('a quest saved with a picked date shows it', 'Order ray boxes' in pg.inner_text('.uz-pane >> nth=1') and 'Fri 20' in pg.locator('.uz-pane >> nth=1').locator('[data-scroll], .uz-q', has_text='Order ray boxes').first.inner_text())
         pg.click('.uz-tabs [data-v="0"]'); pg.wait_for_timeout(300)
         check('The Call lists a quest that is not due yet (Quests ahead)', 'Quests ahead' in pg.inner_text('.uz-pane >> nth=0') and 'Order ray boxes' in pg.inner_text('.uz-pane >> nth=0'))
         pg.click('.uz-tabs [data-v="1"]'); pg.wait_for_timeout(300)
