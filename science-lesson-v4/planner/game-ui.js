@@ -155,6 +155,9 @@
 .uz-form>input{height:48px;padding:0 12px;border-radius:5px;border:1.5px solid #2f443b;background:#0b1513;color:#e8e1cf;font:16px var(--a);outline:none}
 .uz-lbl{font:700 11px var(--a);letter-spacing:.1em;color:#7f9389}
 .uz-chips{display:flex;flex-wrap:wrap;gap:6px}
+.uz-bt.gl-tilebox>span:not(.gl-tile){position:relative;z-index:2}
+.uz-hvtab{display:block;width:100%;margin:0 0 10px;padding:14px;border-radius:8px;border:1.5px solid #c4323a;background:linear-gradient(180deg,#2a0c10,#12070a);text-align:left;color:#f0d8d0;font:600 14px var(--a)}.uz-hvtab b{display:block;font:500 24px var(--g);color:#ffb3a8}
+.uz-hvback{height:44px;margin:0 0 8px;padding:0 12px;border-radius:6px;border:1.5px solid #2f443b;background:#131d19;color:#cfe8dc;font:700 14px var(--a)}
 .uz-aim{display:flex;flex-wrap:wrap;align-items:center;gap:5px;padding:2px 0 8px 62px}.uz-aim button{height:44px;min-width:44px;padding:0 10px;border-radius:6px;border:1.5px solid #2f443b;background:#131d19;color:#cfe8dc;font:700 14px var(--a)}.uz-aim button.on{border-color:#ffd56a;background:#2a2410;color:#ffe2a0}.uz-aim span{font:600 13px var(--a);color:#8fa298;margin-left:4px}
 .uz-rise{margin:0 0 10px;padding:12px 14px;border-radius:8px;border:1.5px solid #5ef2a0;background:linear-gradient(180deg,#0c2a22,#08140f);color:#cfe8dc;font:600 15px var(--a)}.uz-rise b{font:500 21px var(--g);color:#5ef2a0;display:block}
 .uz-chips button{min-width:44px;min-height:42px;display:flex;align-items:center;gap:6px;padding:0 12px;border-radius:5px;border:1.5px solid #2f443b;background:#131d19;color:#cfd8d3;font:700 14px var(--a)}
@@ -541,7 +544,11 @@
       const T = todayItems(); let h = '';
       const rs = D.player.rise;   // the Rise quest after fainting (Patryk 2026-10-28)
       if (rs && !rs.done) h += '<div class="uz-rise"><b>Rise</b>Do 3 rituals today to win back ' + rs.back + ' of the lost runes. ' + Math.min(rs.got, 3) + ' of 3.</div>';
-      if (D.review && D.review.show) h += review();
+      // High Vespers (Sunday to Tuesday) replaces the old Sunday card (Patryk 2026-10-28): a tablet that opens the whole screen
+      if (window.HIGHV && D.high) {
+        if (V.hv) return '<button data-a="hvclose" class="uz-hvback">‹ Back to The Call</button>' + HIGHV.html(D.high, D.review, { attrs: { answer: 'hvans', seal: 'hvseal', pane: 'hvpane', field: 'hv' }, reward: D.high.saved ? 0 : 20 });
+        if (D.high.show) h += '<button data-a="hvopen" class="uz-hvtab"><b>High Vespers</b><span>The week is ready to be read and sealed</span></button>';
+      } else if (D.review && D.review.show) h += review();
       if (T.work.length) h += '<div class="uz-cap"><span><b style="color:#cfe8dc">Toil</b></span><span style="font:700 12px var(--a);color:#5ef2a0">' + T.work.length + ' left</span></div>' + T.work.map((x) => x.html).join('');
       if (T.life.length) h += '<div class="uz-cap" style="margin-top:6px"><span><b style="color:#b6ffd6">The Surface</b></span><span style="font:700 12px var(--a);color:#5ee08a">' + T.life.length + ' left</span></div>' + T.life.map((x) => x.html).join('');
       // quests not due yet, or with no date, were nowhere on this tab (Patryk 2026-10-27: "I can't see any quests")
@@ -672,12 +679,18 @@
       if (V.edit && cs.length) h += '<div class="uz-chips">' + cs.map((c) => '<button data-a="arch" data-id="' + c.id + '">× ' + esc(c.name) + '</button>').join('') + '</div>';
       if (p.hp <= 12) h += '<p class="uz-p" style="color:#b08a84">' + 'Careful: ' + p.hp + ' HP left.' + '</p>';
       h += '<div class="uz-cap" style="border-color:#1e2e4e;margin-top:6px"><span><b style="color:#c4e0ff;text-shadow:0 0 8px rgba(140,200,255,.7)">Small Blessings</b></span><span style="font:700 12px var(--a);color:#c4e0ff">' + cnt + ' today</span></div>';
-      h += bs.length ? '<div class="uz-bl">' + bs.map((g) => { const f = false, n = g.count || 0;
-        return '<button class="uz-bt" data-a="bless" data-id="' + g.id + '" data-fx="' + g.id + '" style="background:' + (f ? 'linear-gradient(180deg,#2a2410,#151208)' : 'linear-gradient(180deg,#10233a,#0b1626)') + ';border:1.5px solid ' + (g.absolve ? '#d8b25a' : f ? '#8a6a2a' : n ? '#4a8ad0' : '#1f4266') + (g.absolve ? ';box-shadow:0 0 12px rgba(255,214,140,.35)' : n ? ';box-shadow:0 0 10px rgba(110,180,255,.35)' : '') + '">' +
-          '<span style="display:flex;align-items:center;gap:7px"><span class="uz-omc"><img src="' + OMENS.card('b', OMENS.of(g)) + '" alt=""></span><span style="flex:1;min-width:0;font:700 14px/1.15 var(--a);color:#e8f2ff">' + esc(g.name) + '</span></span>' + absTag(g) +
+      // an open Absolution is the X2 stained-glass card, full width above the tiles (Patryk's final pick, game-glass.js)
+      const gl = !!window.GLASS, open = gl ? bs.filter((g) => g.absolve) : [];
+      if (open.length) h += '<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:8px">' + open.map((g) => { const ab = g.absolve, cu = D.goals.find((x) => x.id === ab.curse) || { name: ab.name };
+        return '<div data-abs="' + g.id + '">' + GLASS.absolution({ key: 'ab' + g.id, stage: ab.stage, hpBack: ab.lost,
+          curse: { name: ab.name, key: OMENS.of(cu), hp: ab.lost }, blessing: { name: g.name, key: OMENS.of(g), pay: g.pay, attrs: 'data-a="bless" data-id="' + g.id + '" data-fx="' + g.id + '"' } }) + '</div>'; }).join('') + '</div>';
+      const tiles = gl ? bs.filter((g) => !g.absolve) : bs;
+      h += tiles.length ? '<div class="uz-bl">' + tiles.map((g) => { const f = false, n = g.count || 0;
+        return '<button class="uz-bt' + (gl ? ' gl-tilebox' : '') + '" data-a="bless" data-id="' + g.id + '" data-fx="' + g.id + '" style="position:relative;overflow:hidden;background:' + (f ? 'linear-gradient(180deg,#2a2410,#151208)' : 'linear-gradient(180deg,#10233a,#0b1626)') + ';border:1.5px solid ' + (g.absolve ? '#d8b25a' : f ? '#8a6a2a' : n ? '#4a8ad0' : '#1f4266') + (g.absolve ? ';box-shadow:0 0 12px rgba(255,214,140,.35)' : n ? ';box-shadow:0 0 10px rgba(110,180,255,.35)' : '') + '">' +
+          (gl ? GLASS.tile({ key: 'bt' + g.id, lit: n ? 1 : 0.55 }) : '') + '<span style="display:flex;align-items:center;gap:7px"><span class="uz-omc"><img src="' + OMENS.card('b', OMENS.of(g)) + '" alt=""></span><span style="flex:1;min-width:0;font:700 14px/1.15 var(--a);color:#e8f2ff;text-shadow:0 1px 3px #000">' + esc(g.name) + '</span></span>' + absTag(g) +
           '<span style="display:flex;align-items:center;justify-content:space-between"><span style="display:flex;align-items:center;gap:3px;font:700 14px var(--a);color:#f0c45a">+' + g.pay + coin(15, g.pay, g.id) + '</span><span style="display:flex;gap:3px">' +
           [0, 1, 2, 3, 4].map((i) => '<span style="width:7px;height:7px;border-radius:1px;background:' + (i < n ? (f ? '#ffd56a' : '#c8e6ff') : '#2c4a7a') + ';box-shadow:' + (i < n ? '0 0 5px rgba(170,215,255,.9)' : 'none') + '"></span>').join('') + '</span></span>' +
-          (f ? '<span class="uz-x2">×2 TODAY</span>' : '') + '</button>'; }).join('') + '</div>' : '<p class="uz-p" style="color:#6f8a7c">No blessings yet.</p>';
+          (f ? '<span class="uz-x2">×2 TODAY</span>' : '') + '</button>'; }).join('') + '</div>' : open.length ? '' : '<p class="uz-p" style="color:#6f8a7c">No blessings yet.</p>';
       if (V.edit && bs.length) h += '<div class="uz-chips">' + bs.map((g) => '<button data-a="arch" data-id="' + g.id + '">× ' + esc(g.name) + '</button>').join('') + '</div>';
       // (The Frozen Tide list was removed 2026-10-26: days off are one button on the banner)
       h += '<button class="uz-new" data-a="edit" style="font:700 13px var(--a)">' + (V.edit ? 'Stop editing' : 'Edit') + '</button>';
@@ -906,6 +919,8 @@
       if (window.TEMPLE) TEMPLE.paint(body);
       if (window.STONE) STONE.paint(body);
       if (window.SCROLL) SCROLL.paint(body);
+      if (window.GLASS) GLASS.paint(body);
+      if (window.HIGHV && V.hv) HIGHV.paint(body);
       if (V.waxNew) { const n = body.querySelector('.uz-stamp[data-q="' + V.waxNew + '"]'); if (n) { V.waxNew = null; anim(n, [{ transform: 'scale(2.4) rotate(-28deg)', opacity: 0 }, { transform: 'scale(1) rotate(-10deg)', opacity: 1 }], { duration: 420 }); } }
     }
 
@@ -985,6 +1000,13 @@
       if (a === 'sdel') { V.draft.steps.splice(Number(v), 1); return paint(); }
       if (a === 'tmpl') { V.draft.name = V.draft.name || 'Mark the 9AS test'; V.draft.size = 5; V.draft.k = 'shog'; V.draft.steps = [['Half marked', 2], ['The rest', 5], ['Scores summed', 6], ['Entered', 7]].map(([n, dd]) => ({ n, by: addD(D.today, dd) })); return paint(); }
       if (a === 'submit') return submit();
+      if (a === 'hvopen') { V.hv = true; paint(); body.scrollTop = 0; return; }
+      if (a === 'hvclose') { V.hv = false; return paint(); }
+      if (a === 'hvpane') return;   // the High Vespers module opens its own panes
+      if (a === 'hvans') { if (window.HIGHV) HIGHV.answer('kept', v); buzz(10); return; }
+      if (a === 'hvseal') { if (!window.HIGHV) return; const rv = HIGHV.values(body), first = !D.high.saved;
+        return act({ verb: 'Sealed:', name: 'the week', delta: first ? '+20' : '', unit: 'coin' }, null, 'gameReview', [rv], (d) => { d.high.saved = { wentWell: rv.wentWell, slipped: rv.slipped, change: rv.change }; d.high.show = false; if (first) earnLocal(d, 20, 20); },
+          () => { V.hv = false; paint(); if (first) { celebrate(true); setMood('proud', pickSay('level')); } }); }
       if (a === 'aimmin' || a === 'aimfull') { const g = goal(id); if (!g) return; const t0 = Object.assign({ minutes: null, full: false }, g.aimToday), m = a === 'aimmin' ? Number(v) : null, f = a === 'aimfull' ? v === '1' : null;
         if (m !== null) USUAL(id, m); buzz(8);
         return act({ verb: a === 'aimmin' ? 'Logged:' : 'Marked:', name: g.name + (m !== null ? ' · ' + m + ' min' : f ? ' · full session' : ' · bottom line') }, ['gameAim', id, t0.minutes, t0.full], 'gameAim', [id, m, f], (d) => { const x = d.goals.find((y) => y.id === id); x.aimToday = Object.assign({}, x.aimToday, m !== null ? { minutes: m } : { full: f }); }); }
@@ -1025,6 +1047,11 @@
       if (a === 'bless') {
         if (V.edit) { const g0 = goal(id); V.form = 'curse'; V.draft = draftOf(g0); V.orig = clone(V.draft); return paint(); }
         const g = goal(id), chain = false, n = g.pay; let upL = false;
+        if (g.absolve && window.GLASS && !V.absPlay && box.querySelector('[data-abs="' + id + '"]') && !matchMedia('(prefers-reduced-motion: reduce)').matches) {   // the glass lights first, then it is saved
+          V.absPlay = id; buzz(10); let fired = false; const fire = () => { if (fired) return; fired = true; const b2 = box.querySelector('[data-a="bless"][data-id="' + id + '"]'); V.absPlay = 'go'; (b2 || b).click(); V.absPlay = null; };
+          GLASS.light('ab' + id, g.absolve.stage + 1, { to: '.hpw', onDone: fire }); setTimeout(fire, 4500); return;
+        }
+        if (V.absPlay && V.absPlay !== 'go') return;
         const ab = g.absolve, back = ab ? (ab.stage ? ab.lost - Math.floor(ab.lost / 2) : Math.floor(ab.lost / 2)) : 0;
         act(ab ? { verb: 'Absolution ' + ROMAN[ab.stage + 1] + ':', name: ab.name + ' · +' + back + ' HP' } : { verb: chain ? 'Blessing chain!' : 'Blessing:', name: g.polarity === 'both' ? sides(g.name)[1] : g.name, delta: '+' + n, unit: 'coin' }, ['gameUntick', id], 'gameTick', [id, 1],
           (d) => { const x = d.goals.find((y) => y.id === id); x.count = (x.count || 0) + 1; if (x.polarity === 'both') x.bCount = (x.bCount || 0) + 1; d.blessCount = (d.blessCount || 0) + 1; upL = earnLocal(d, n, g.pay);

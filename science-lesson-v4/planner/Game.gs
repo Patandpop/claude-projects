@@ -510,7 +510,7 @@ function gSnapshot_(world, extra) {
   const mon = gMonday_(today), weekCoins = ticks.filter((t) => String(t.day) >= mon && Number(t.coins) > 0 && !/^(buy|hoard)\|/.test(String(t.goalId))).reduce((a, t) => a + Number(t.coins), 0);
   const wearRows = gRows_('owned').filter((r) => String(r.itemId).indexOf('w:') === 0);
   const owned = gRows_('owned').filter((r) => String(r.itemId).indexOf('w:') !== 0), room = {}; owned.forEach((r) => { if (r.slot) room[r.slot] = r.itemId; });
-  const bosses = gBosses_(today), review = gReviewCard_(today, ticks, goals, bosses), vespers = gVespers_(today, ticks, goals, p, world, frozen), high = gHighVespers_(today, ticks, goals, world, frozen);
+  const bosses = gBosses_(today), review = gReviewCard_(today, ticks, goals, bosses), vespers = gVespers_(today, ticks, goals, p, world, frozen), high = gHighShape_(gHighVespers_(today, ticks, goals, world, frozen));
   const hoard = gRows_('hoard').filter((h) => String(h.archived) !== 'true').map((h) => ({ id: h.id, name: h.name, cost: Number(h.cost) || 0, claims: Number(h.claims) || 0 }));
   return gOut_(Object.assign({ bosses: bosses.filter((b) => b.status === 'active'), beaten: gBeaten_(), review, vespers, high, whoList: G_WHO, moon: gPhase_(today, world, frozen), vMult: gVMult_(), room, owned: owned.map((r) => r.itemId), player: { coins: p.coins, xp: p.xp, level, need: gNeed_(level), hp: p.hp, maxHp: p.maxHp, deaths: p.deaths, coinName: GAME.coin, gift: GAME.levelGift,
       rise: p.riseDay === today && Number(p.riseLost) > 0 ? { done: p.riseDone === today, back: Math.floor(Number(p.riseLost) / 2), got: goals.filter((x) => x.kind === 'daily' && gNet_(ticks, x.id, today) > 0).length, need: 3 } : null }, mood, today, frozen: fz,
@@ -913,7 +913,9 @@ function gHighVespers_(today, ticks, goals, world, frozen) {
   const wt = ticks.filter((t) => String(t.day) >= wk && String(t.day) <= sun && !undone[t.id] && !gNote_(t).untick && Number(t.delta) > 0 && byId[t.goalId]);
   const isC = (t) => gNote_(t).side === 'c';
   const days = []; for (let i = 0; i < 7; i++) { const d = gAdd_(wk, i), dt = wt.filter((t) => String(t.day) === d);
-    days.push({ day: d, bless: dt.filter((t) => byId[t.goalId].kind === 'habit' && !isC(t)).length, curse: dt.filter(isC).length, rituals: dt.filter((t) => byId[t.goalId].kind === 'daily').length, frozen: !!gIsFrozen_(d, world, frozen) }); }
+    const hmOf = (t) => Utilities.formatDate(new Date(t.at), TZ, 'HH:mm'), nm = (t) => { const g = byId[t.goalId]; return g.polarity === 'both' ? (String(g.name).split(' / ')[isC(t) ? 0 : 1] || g.name) : g.name; };
+    days.push({ day: d, bless: dt.filter((t) => byId[t.goalId].kind === 'habit' && !isC(t)).length, curse: dt.filter(isC).length, rituals: dt.filter((t) => byId[t.goalId].kind === 'daily').length, frozen: !!gIsFrozen_(d, world, frozen),
+      blessings: dt.filter((t) => byId[t.goalId].kind === 'habit' && !isC(t)).map(nm), curses: dt.filter(isC).map((t) => ({ name: nm(t), at: hmOf(t) })) }); }
   const votes = {}; wt.filter((t) => !isC(t) && byId[t.goalId].who).forEach((t) => { const w = byId[t.goalId].who; votes[w] = (votes[w] || 0) + 1; });
   const who = Object.keys(votes).map((w) => ({ who: w, votes: votes[w] })).sort((a, b) => b.votes - a.votes);
   // rituals: kept days vs due days this week; slipped = two due days missed in a row
@@ -923,7 +925,10 @@ function gHighVespers_(today, ticks, goals, world, frozen) {
     for (let i = 0; i < 7; i++) { const d = gAdd_(wk, i); if (d > today || gIsFrozen_(d, world, frozen, g) || !gIsDue_(Object.assign({}, g, { lastDone: '' }), d) || String(g.created || '') > d) continue;
       due++; const k2 = wt.some((t) => t.goalId === g.id && String(t.day) === d); if (k2) { kept++; run = 0; } else if (++run >= 2) twice = true; }
     if (!due) return;
-    if (twice) slipped.push({ name: g.name, kept, due }); else if (kept) grew.push({ name: g.name, kept, due, streak: g.streak });
+    const nights = []; let n = 0; for (let i = 0; i < 7; i++) { const d = gAdd_(wk, i);   // Monday to Sunday: the run that night, 'miss', 'rest' or null
+      if (d > today || String(g.created || '') > d) nights.push(null); else if (gIsFrozen_(d, world, frozen, g)) nights.push('rest'); else if (!gIsDue_(Object.assign({}, g, { lastDone: '' }), d)) nights.push(null);
+      else if (wt.some((t) => t.goalId === g.id && String(t.day) === d)) nights.push(++n); else { n = 0; nights.push('miss'); } }
+    if (twice) slipped.push({ name: g.name, kept, due, nights }); else if (kept) grew.push({ name: g.name, kept, due, streak: g.streak, nights });
   });
   // where the curses came from
   const grid = Array.from({ length: 7 }, () => [0, 0, 0, 0, 0]), sigs = {}, dets = {};
@@ -938,6 +943,13 @@ function gHighVespers_(today, ticks, goals, world, frozen) {
     // 2026-10-28: each ritual with an aim (aim reached / bottom line held / missed), and each curse with a ceiling
     aims: goals.filter((g) => g.kind === 'daily' && g.aim && String(g.created || '') <= sun).map((g) => gAimWeek_(g, wk, sun < today ? sun : today, ticks, gRows_('aims'), undone, world, frozen)),
     ceilings: goals.filter((g) => g.kind === 'habit' && g.ceil).map((g) => { const n = wt.filter((t) => t.goalId === g.id && isC(t)).length; return { id: g.id, name: g.name, count: n, ceil: g.ceil, over: n > g.ceil }; }) };
+}
+// High Vespers in the shapes the screen (game-highvespers.js) reads: rituals with aims, and curses with a ceiling
+function gHighShape_(h) {
+  if (!h) return h;
+  h.rituals = (h.aims || []).map((a) => ({ id: a.id, name: a.name, aim: a.aim, minutes: a.aim && a.aim.type === 'avg' ? a.avg : a.minutes, count: a.full, kept: a.days, floor: a.floorNeed, due: a.floorNeed, reached: a.state === 'aim', held: a.state !== 'miss' }));
+  h.curses = (h.ceilings || []).map((c) => ({ name: c.name, count: c.count, ceiling: c.ceil }));
+  return h;
 }
 
 /* ---------------------------------------------------------------- Sunday review (slice 8)
@@ -960,7 +972,10 @@ function gameReview(k, rv) {
     const today = gDay_(gNow_()), wk = /^\d{4}-\d{2}-\d{2}$/.test(String(rv.week)) ? rv.week : gMonday_(today);
     const clip = (v) => String(v || '').slice(0, 400);
     const old = gRows_('reviews').find((r) => String(r.week) === wk);
-    const rec = { week: wk, wentWell: clip(rv.wentWell), slipped: clip(rv.slipped), p1: clip(rv.p1), p2: clip(rv.p2), p3: clip(rv.p3), savedOn: today, change: clip(rv.change), kept: ['Yes', 'Partly', 'No'].indexOf(rv.kept) >= 0 ? rv.kept : '' };
+    // a field the page doesn't send keeps what was saved (High Vespers sends no priorities; the old card no change)
+    const keep = (h, v) => (rv[h] === undefined && old ? old[h] : v);
+    const rec = { week: wk, wentWell: keep('wentWell', clip(rv.wentWell)), slipped: keep('slipped', clip(rv.slipped)), p1: keep('p1', clip(rv.p1)), p2: keep('p2', clip(rv.p2)), p3: keep('p3', clip(rv.p3)), savedOn: today,
+      change: keep('change', clip(rv.change)), kept: keep('kept', ['Yes', 'Partly', 'No'].indexOf(rv.kept) >= 0 ? rv.kept : '') };
     if (old) G_HEAD.reviews.forEach((h) => { if (String(old[h]) !== String(rec[h])) gSet_('reviews', old.row, h, rec[h]); });
     else {
       gAppend_('reviews', rec); const p = gPlayer_(); p.coins += 20; paid = 20; gAddXp_(p, 20, today); gSavePlayer_(p);

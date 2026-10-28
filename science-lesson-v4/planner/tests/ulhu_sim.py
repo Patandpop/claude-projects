@@ -3,7 +3,7 @@ Run: python tests/ulhu_sim.py  (add --shots DIR to save screenshots). Synthetic 
 import os, sys, subprocess, time
 from playwright.sync_api import sync_playwright
 P = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '/'; SP = sys.argv[1] if len(sys.argv) > 1 and not sys.argv[1].startswith('--') else __import__('tempfile').mkdtemp()
-js = ''.join(open(P + f, encoding='utf-8').read() + '\n' for f in ['game-ulhu.js', 'game-pixel.js', 'game-runes.js', 'game-temple.js', 'game-stone.js', 'game-omens.js', 'game-blood.js', 'game-scroll.js', 'game-ui.js'])
+js = ''.join(open(P + f, encoding='utf-8').read() + '\n' for f in ['game-ulhu.js', 'game-pixel.js', 'game-runes.js', 'game-temple.js', 'game-stone.js', 'game-omens.js', 'game-blood.js', 'game-scroll.js', 'game-glass.js', 'game-highvespers.js', 'game-ui.js'])
 page = '''<!doctype html><meta charset="utf-8"><meta name=viewport content="width=device-width,initial-scale=1"><body style="margin:0;background:#0d1b3a">
 <div style="height:60px;background:#0a1020;color:#fff">8AG header</div><div id=u></div><nav style="position:fixed;bottom:0;left:0;right:0;height:62px;background:#0a1020"></nav>
 <script>window.CALLS=[];function call(fn,...args){CALLS.push(fn);return fetch('/c',{method:'POST',body:JSON.stringify({fn,args})}).then(r=>r.json()).then(x=>{if(x.err)throw new Error(x.err);return x.ok;});}</script>
@@ -25,7 +25,11 @@ try:
         sizes = pg.evaluate("[...document.querySelectorAll('img[alt=runes]')].map(i => i.src)")
         check('the currency is runes: single runes, the cairn and the portal all appear', len(sizes) > 5 and pg.evaluate("[RUNES.pick(6,'x').src, RUNES.pick(25).src, RUNES.pick(600).src].every((s, i, a) => a.indexOf(s) === i)") and pg.evaluate("RUNES.pick(25).src") in sizes)
         check('the same row keeps the same rune between repaints', pg.evaluate("RUNES.pick(6,'g1').src === RUNES.pick(6,'g1').src"))
-        check('the Sunday review on top of The Call; Ulhu says a line of doom, not orders', pg.locator('.uz-pane >> nth=0').locator('.uz-rv').count() == 1 and len(pg.inner_text('.uz-say')) > 10 and 'Next:' not in pg.inner_text('.uz-say'))
+        check('on a Friday there is no review card (High Vespers is Sunday to Tuesday); Ulhu says a line of doom, not orders', pg.locator('.uz-rv, .uz-hvtab').count() == 0 and len(pg.inner_text('.uz-say')) > 10 and 'Next:' not in pg.inner_text('.uz-say'))
+        pg.evaluate("(() => { const b = document.createElement('button'); b.className = 'uz-hvtab'; b.dataset.a = 'hvopen'; document.querySelector('.uz-pane').prepend(b); })()"); pg.click('.uz-hvtab'); pg.wait_for_timeout(600)
+        check('High Vespers opens full screen with its sections and a Back button', pg.locator('.uz-hvback').count() == 1 and pg.locator('.hv-sec').count() >= 2)
+        pg.click('.uz-hvback'); pg.wait_for_timeout(400)
+        check('Back returns to The Call', pg.locator('.uz-hvback').count() == 0 and 'Toil' in pg.inner_text('.uz-pane >> nth=0'))
         if shots: pg.screenshot(path=os.path.join(SP, 's1.png'))
         c0 = int(pg.inner_text('.uz-coins b'))
         pg.locator('.uz-pane >> nth=0').locator('.uz-strow:not(.done) [data-a=tick]').first.click(); pg.wait_for_timeout(80)

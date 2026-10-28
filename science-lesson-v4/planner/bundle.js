@@ -17,9 +17,12 @@ fs.writeFileSync(path.join(out, 'GameShop.gs'), '// Ulhu shop: 120 items with th
 const pack = (list) => '<script>\n' + list.map((f) => fs.readFileSync(path.join(dir, f), 'utf8')).join('\n') + '\n</script>';
 const ui = pack(['game-ulhu.js', 'game-pixel.js', 'game-runes.js', 'game-omens.js', 'game-ui.js']);
 // 2026-10-27: the looks Patryk picked (stone tablets, temple bosses, blood and sigils) are their own file, GameArt.html, so each paste stays small enough to save
-const art = pack(['game-temple.js', 'game-stone.js', 'game-blood.js', 'game-scroll.js']);
+const art = pack(['game-temple.js', 'game-stone.js', 'game-blood.js', 'game-scroll.js', 'game-glass.js']);
+// High Vespers is its own include (Sunday to Tuesday screen), so no paste file passes about 380 KB
+const hv = pack(['game-highvespers.js']);
 // 2026-10-27: the game code is its own file, GameUI.html, pulled in by include() (Planner.html at 406 KB would no longer save in the editor)
 fs.writeFileSync(path.join(out, 'GameUI.html'), ui);
 fs.writeFileSync(path.join(out, 'GameArt.html'), art);
-['Planner.html', 'Phone.html'].forEach((f) => { const t = fs.readFileSync(path.join(out, f), 'utf8'); if (!t.includes('<!--GAME_UI-->')) throw new Error(f + ' has no <!--GAME_UI--> marker'); fs.writeFileSync(path.join(out, f), t.replace('<!--GAME_UI-->', () => "<?!= include('GameUI') ?>\n<?!= include('GameArt') ?>")); });
-console.log('planner/dist/ ready: Code.gs, Planner.html, Logic.html, Behaviour.gs, Phone.html, BoardPage.html, Game.gs, GameShop.gs, GameUI.html, GameArt.html');
+fs.writeFileSync(path.join(out, 'GameHV.html'), hv);
+['Planner.html', 'Phone.html'].forEach((f) => { const t = fs.readFileSync(path.join(out, f), 'utf8'); if (!t.includes('<!--GAME_UI-->')) throw new Error(f + ' has no <!--GAME_UI--> marker'); fs.writeFileSync(path.join(out, f), t.replace('<!--GAME_UI-->', () => "<?!= include('GameUI') ?>\n<?!= include('GameArt') ?>\n<?!= include('GameHV') ?>")); });
+console.log('planner/dist/ ready: Code.gs, Planner.html, Logic.html, Behaviour.gs, Phone.html, BoardPage.html, Game.gs, GameShop.gs, GameUI.html, GameArt.html, GameHV.html');
