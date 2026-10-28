@@ -50,20 +50,26 @@ function gMonday_(key) { return gAdd_(key, 1 - gDow_(key)); }
 
 /* ---- sheet access ---- */
 const G_HEADOK = {};
+// Faster taps (Patryk 2026-10-28): within one request each tab is read from Sheets once and the planner's world once.
+// Any write to a tab forgets that tab's copy, so the next read is fresh. Every request and every lock starts clean.
+let G_C = { sh: {}, v: {}, world: null };
+function gFresh_(keepWorld) { G_C = { sh: G_C.sh, v: {}, world: keepWorld ? G_C.world : null }; if (!keepWorld) G_C.sh = {}; }
 function gTab_(t) {
-  const sh = tab_(G_TAB[t], G_HEAD[t]);
+  const sh = G_C.sh[t] || (G_C.sh[t] = tab_(G_TAB[t], G_HEAD[t]));
   if (!G_HEADOK[t]) { G_HEADOK[t] = true; const n = G_HEAD[t].length; if (sh.getLastColumn() < n) sh.getRange(1, 1, 1, n).setValues([G_HEAD[t]]); }
   return sh;
 }
 function gRows_(t) {
-  const sh = gTab_(t), n = sh.getLastRow() - 1;
+  const sh = gTab_(t), n = G_C.v[t] ? G_C.v[t].length : sh.getLastRow() - 1;
   if (n < 1) return [];
   // Google Sheets turns text like 2026-11-03 into a real date: read every date back as London yyyy-MM-dd text
   const fix = (v) => (v instanceof Date ? Utilities.formatDate(v, TZ, 'yyyy-MM-dd') : v);
-  return sh.getRange(2, 1, n, G_HEAD[t].length).getValues().map((r, i) => { const o = { row: i + 2 }; G_HEAD[t].forEach((h, j) => { o[h] = (G_DAYF.indexOf(h) >= 0 || (t === 'player' && h === 'Value')) ? fix(r[j]) : r[j]; }); return o; });
+  const vals = G_C.v[t] || (G_C.v[t] = sh.getRange(2, 1, n, G_HEAD[t].length).getValues());
+  return vals.map((r, i) => { const o = { row: i + 2 }; G_HEAD[t].forEach((h, j) => { o[h] = (G_DAYF.indexOf(h) >= 0 || (t === 'player' && h === 'Value')) ? fix(r[j]) : r[j]; }); return o; });
 }
-function gAppend_(t, o) { gTab_(t).appendRow(G_HEAD[t].map((h) => (o[h] === undefined ? '' : o[h]))); }
-function gSet_(t, row, field, v) { gTab_(t).getRange(row, G_HEAD[t].indexOf(field) + 1).setValue(v); }
+function gAppend_(t, o) { delete G_C.v[t]; gTab_(t).appendRow(G_HEAD[t].map((h) => (o[h] === undefined ? '' : o[h]))); }
+function gDel_(t, row) { delete G_C.v[t]; gTab_(t).deleteRow(row); }
+function gSet_(t, row, field, v) { delete G_C.v[t]; gTab_(t).getRange(row, G_HEAD[t].indexOf(field) + 1).setValue(v); }
 function gPlayer_() {
   const p = { coins: 0, xp: 0, level: 1, hp: GAME.maxHp, maxHp: GAME.maxHp, lastDay: '', deaths: 0, seeded: '', diedDay: '', levelUpDay: '', frozenOk: '', groups: '', wear: '', markPlan: '', vTime: '20:00', vStreak: 0, vBest: 0, vLast: '', vPrev: '', myChips: '' };
   gRows_('player').forEach((r) => { const v = r.Value; p[r.Setting] = (typeof p[r.Setting] === 'number') ? Number(v) : String(v === undefined ? '' : v); });
@@ -82,7 +88,9 @@ const gNeed_ = (level) => 150 + 50 * level;
 /* ---- the planner's world: saved weeks and Data (terms, INSET, built flags). Tests set GAME_WORLD. ---- */
 function gWorld_() {
   if (typeof GAME_WORLD !== 'undefined' && GAME_WORLD) return GAME_WORLD;
-  try { const a = loadAll_(true); return { data: a.data || null, weeks: a.weeks || {} }; } catch (e) { return { data: null, weeks: {} }; }
+  if (G_C.world) return G_C.world;
+  try { const a = loadDataWeeks_(true); G_C.world = { data: a.data || null, weeks: a.weeks || {} }; } catch (e) { return { data: null, weeks: {} }; }
+  return G_C.world;
 }
 function gFrozenDays_() { const s = {}; gRows_('freeze').forEach((r) => { s[String(r.day)] = r.reason || 'off'; }); return s; }
 // The moon of a day (Patryk 2026-10-27): 'full' = a working day, 'half' = work rest (teaching rituals and quests pause,
@@ -437,9 +445,9 @@ function gSnapshot_(world, extra) {
 // what goes back to the page is plain JSON (a Date or NaN inside makes Apps Script send back null)
 function gOut_(o) { return JSON.parse(JSON.stringify(o)); }
 function gameLoad(k) {
-  check_(k);
+  check_(k); gFresh_();
   let extra = {};
-  withLock_(function () {
+  withLock_(function () { gFresh_(true);
     const world = gWorld_(), today = gDay_(gNow_());
     const p = gPlayer_();
     if (!p.seeded) { gSeed_(world, today); p.seeded = today; p.lastDay = gAdd_(today, -1); gSavePlayer_(p); }
@@ -454,9 +462,9 @@ function gameLoad(k) {
 }
 // sig: the sigil tapped after a curse (Flesh, Domain, Scene, Coven), or '' for a double tap (Patryk 2026-10-27)
 function gameTick(k, id, delta, sig) {
-  check_(k);
+  check_(k); gFresh_();
   let res = null, bad = null;
-  withLock_(function () {
+  withLock_(function () { gFresh_(true);
     const g = gGoals_().find((x) => x.id === id);
     if (!g) { bad = 'That ritual is not in the list any more.'; return; }
     const today = gDay_(gNow_());
@@ -471,8 +479,8 @@ function gameTick(k, id, delta, sig) {
 }
 // untick: writes an exact reversing row (never deletes), restores streak, colour and sittings
 function gameUntick(k, id) {
-  check_(k);
-  withLock_(function () {
+  check_(k); gFresh_();
+  withLock_(function () { gFresh_(true);
     const g = gGoals_().find((x) => x.id === id); if (!g) return;
     const now = gNow_(), today = gDay_(now), ticks = gRows_('ticks').filter((t) => t.goalId === id && String(t.day) === today);
     const stack = [];
@@ -490,9 +498,9 @@ function gameUntick(k, id) {
   return gSnapshot_(gWorld_());
 }
 function gameSaveGoal(k, goal) {
-  check_(k);
+  check_(k); gFresh_();
   let savedId = '';
-  withLock_(function () {
+  withLock_(function () { gFresh_(true);
     const today = gDay_(gNow_()), name = String(goal.name || '').trim().slice(0, 80);
     if (!name) throw new Error('Give the ritual a name.');
     const kind = ['daily', 'habit', 'todo', 'termly'].indexOf(goal.kind) >= 0 ? goal.kind : 'daily';
@@ -516,32 +524,32 @@ function gameSaveGoal(k, goal) {
 }
 // back = true un-archives it again (the Undo button)
 function gameArchive(k, id, back) {
-  check_(k);
-  withLock_(function () { const r = gRows_('goals').find((x) => x.id === id); if (r) gSet_('goals', r.row, 'archived', back ? '' : 'true'); });
+  check_(k); gFresh_();
+  withLock_(function () { gFresh_(true); const r = gRows_('goals').find((x) => x.id === id); if (r) gSet_('goals', r.row, 'archived', back ? '' : 'true'); });
   return gSnapshot_(gWorld_());
 }
 // a sick or off day (today or the last 7 days): streaks and colours stay as they are
 function gameMoon(k, day, phase) {
-  check_(k);
-  withLock_(function () {
+  check_(k); gFresh_();
+  withLock_(function () { gFresh_(true);
     const today = gDay_(gNow_()), world = gWorld_();
     if (!/^\d{4}-\d{2}-\d{2}$/.test(String(day)) || day > gAdd_(today, 60) || day < gAdd_(today, -7)) throw new Error('Only the last 7 days or the next 60.');
     if (['full', 'half', 'dark'].indexOf(phase) < 0) throw new Error('The moon is full, half or dark.');
     const r = gRows_('freeze').find((x) => String(x.day) === day);
-    if (r) gTab_('freeze').deleteRow(r.row);
+    if (r) gDel_('freeze', r.row);
     if (phase !== gAutoPhase_(day, world)) gAppend_('freeze', { day, reason: phase === 'full' ? 'on' : phase === 'half' ? 'half' : 'off', savedOn: today });
   });
   G_VM = null;
   return gSnapshot_(gWorld_());
 }
 function gameFreeze(k, day, reason, on) {
-  check_(k);
-  withLock_(function () {
+  check_(k); gFresh_();
+  withLock_(function () { gFresh_(true);
     const today = gDay_(gNow_());
     if (!/^\d{4}-\d{2}-\d{2}$/.test(String(day)) || day > today || day < gAdd_(today, -7)) throw new Error('Only today or the last 7 days.');
     // his own row for the day goes; then a day that freezes itself (holiday, INSET) needs an 'on' row to unfreeze
     const r = gRows_('freeze').find((x) => String(x.day) === day), self = gIsFrozen_(day, gWorld_(), {});
-    if (r) gTab_('freeze').deleteRow(r.row);
+    if (r) gDel_('freeze', r.row);
     if (on && !self) gAppend_('freeze', { day, reason: ['sick', 'off', 'other'].indexOf(reason) >= 0 ? reason : 'off', savedOn: today });
     if (!on && self) gAppend_('freeze', { day, reason: 'on', savedOn: today });
   });
@@ -584,7 +592,7 @@ function gLock_(lock, p, ticks, goals) {
   return { ok: true, why: '' };
 }
 function gameShop(k) {
-  check_(k);
+  check_(k); gFresh_();
   const p = gPlayer_(), owned = gOwned_(), ticks = gRows_('ticks'), goals = gGoals_(), have = {};
   owned.forEach((r) => { have[r.itemId] = r; });
   return gOut_({ coins: p.coins, level: p.level, outside: gOutsideTicks_(ticks, goals), items: gShop_().items.map((i) => {
@@ -594,15 +602,15 @@ function gameShop(k) {
 }
 // the pictures, fetched once by the page (about 160 KB): { id: { slot: {art, ox, oy, w, h} } } plus the room geometry
 function gameArt(k) {
-  check_(k);
+  check_(k); gFresh_();
   const sh = gShop_(), art = {};
   sh.items.forEach((i) => { art[i.id] = i.layers; });
   return { w: sh.w, h: sh.h, ulhu: sh.ulhu, z: sh.z, art };
 }
 function gameBuy(k, id) {
-  check_(k);
+  check_(k); gFresh_();
   let bad = '';
-  withLock_(function () {
+  withLock_(function () { gFresh_(true);
     const it = gShop_().items.find((x) => x.id === id), p = gPlayer_(), owned = gOwned_();
     if (!it) { bad = 'That item is not in the shop.'; return; }
     if (owned.some((r) => r.itemId === id)) { bad = 'Ulhu already has that.'; return; }
@@ -620,9 +628,9 @@ function gameBuy(k, id) {
   return gSnapshot_(gWorld_());
 }
 function gamePlace(k, id, slot) {
-  check_(k);
+  check_(k); gFresh_();
   let bad = '';
-  withLock_(function () {
+  withLock_(function () { gFresh_(true);
     const it = gShop_().items.find((x) => x.id === id), rows = gRows_('owned'), r = rows.find((x) => x.itemId === id);
     if (!it || !r) { bad = 'Ulhu does not own that.'; return; }
     if (slot === '') { gSet_('owned', r.row, 'slot', ''); return; }       // back to the drawer
@@ -649,9 +657,9 @@ function gBosses_(today) {
   });
 }
 function gameBossStart(k, boss) {
-  check_(k);
+  check_(k); gFresh_();
   let newId = '';
-  withLock_(function () {
+  withLock_(function () { gFresh_(true);
     const today = gDay_(gNow_()), name = String(boss.name || '').trim().slice(0, 80);
     const stages = (boss.stages || []).map((x) => ({ name: String(x.name || '').trim().slice(0, 80), due: /^\d{4}-\d{2}-\d{2}$/.test(String(x.due)) ? x.due : '' })).filter((x) => x.name);
     if (!name || stages.length < 1) throw new Error('A boss needs a name and at least one stage.');
@@ -663,9 +671,9 @@ function gameBossStart(k, boss) {
   return gSnapshot_(gWorld_(), { newBoss: newId });
 }
 function gameBossStage(k, id, i, on) {
-  check_(k);
+  check_(k); gFresh_();
   let res = null;
-  withLock_(function () {
+  withLock_(function () { gFresh_(true);
     const row = gRows_('bosses').find((b) => b.id === id); if (!row) throw new Error('That boss is gone.');
     const st = JSON.parse(row.stages), x = st[i]; if (!x) return;
     const today = gDay_(gNow_());
@@ -687,8 +695,8 @@ function gameBossStage(k, id, i, on) {
 // edit a boss still being fought (Patryk 2026-10-27): its name, area, size and stages. A stage already hit keeps its
 // tick (stages are matched by i, their old place); the damage is shared out again across the new list of stages.
 function gameBossSave(k, boss) {
-  check_(k);
-  withLock_(function () {
+  check_(k); gFresh_();
+  withLock_(function () { gFresh_(true);
     const row = gRows_('bosses').find((b) => b.id === boss.id); if (!row || row.status !== 'active') throw new Error('That boss is gone.');
     const name = String(boss.name || '').trim().slice(0, 80); let old = []; try { old = JSON.parse(row.stages || '[]'); } catch (e) { old = []; }
     const st = (boss.stages || []).map((x) => { const was = x.i === undefined || x.i === null || x.i === '' ? null : old[Number(x.i)];
@@ -706,8 +714,8 @@ function gameBossSave(k, boss) {
 // remove a boss made by mistake (Patryk 2026-10-24: two made by accident). Only a boss still being fought; it is
 // only marked "removed" (the row stays), so back = true puts it back exactly as it was (the Undo button).
 function gameBossRemove(k, id, back) {
-  check_(k);
-  withLock_(function () {
+  check_(k); gFresh_();
+  withLock_(function () { gFresh_(true);
     const row = gRows_('bosses').find((b) => b.id === id); if (!row) throw new Error('That boss is gone.');
     if (!back && row.status === 'active') gSet_('bosses', row.row, 'status', 'removed');
     if (back && row.status === 'removed') gSet_('bosses', row.row, 'status', 'active');
@@ -746,8 +754,8 @@ function gSaveTag_(tickId, goalId, side, sig, detail, today) {
 // tag one of today's ticks (Vespers detail, or the long-press "when did this work?" on a good habit). For a long press the page
 // knows only the habit: tickId '' + goalId = that habit's latest tick today.
 function gameTag(k, tickId, goalId, sig, detail) {
-  check_(k);
-  withLock_(function () {
+  check_(k); gFresh_();
+  withLock_(function () { gFresh_(true);
     const today = gDay_(gNow_()), ticks = gRows_('ticks'), undone = gUndone_(ticks);
     let t = tickId ? ticks.find((x) => x.id === tickId) : null;
     if (!t && goalId) t = ticks.filter((x) => x.goalId === goalId && String(x.day) === today && !undone[x.id] && !gNote_(x).untick && Number(x.delta) > 0).pop();
@@ -758,15 +766,15 @@ function gameTag(k, tickId, goalId, sig, detail) {
 }
 // his own detail chips (the "+ add your own" chip): saved as one list
 function gameChips(k, chips) {
-  check_(k);
-  withLock_(function () { const p = gPlayer_(); p.myChips = (chips || []).map((c) => String(c).replace(/\|/g, '').trim().slice(0, 24)).filter(Boolean).slice(0, 24).join('|'); gSavePlayer_(p); });
+  check_(k); gFresh_();
+  withLock_(function () { gFresh_(true); const p = gPlayer_(); p.myChips = (chips || []).map((c) => String(c).replace(/\|/g, '').trim().slice(0, 24)).filter(Boolean).slice(0, 24).join('|'); gSavePlayer_(p); });
   return gSnapshot_(gWorld_());
 }
 // Vespers done for today: tags in one go, then the tick of the ritual itself
 function gameVespers(k, rv) {
-  check_(k);
+  check_(k); gFresh_();
   let res = null;
-  withLock_(function () {
+  withLock_(function () { gFresh_(true);
     const now = gNow_(), today = gDay_(now), world = gWorld_(), frozen = gFrozenDays_(), p = gPlayer_();
     (rv && rv.tags || []).forEach((t) => { const tk = gRows_('ticks').find((x) => x.id === t.tickId); if (tk) gSaveTag_(tk.id, tk.goalId, gNote_(tk).side === 'c' ? 'c' : 'b', t.sig, t.detail, today); });
     if (gRows_('vespers').some((r) => String(r.day) === today && String(r.clean) !== 'undone')) { res = { already: true }; return; }
@@ -783,8 +791,8 @@ function gameVespers(k, rv) {
 }
 // Undo of Vespers: the streak and runes go back exactly; the row is marked, never deleted
 function gameVespersUndo(k) {
-  check_(k);
-  withLock_(function () {
+  check_(k); gFresh_();
+  withLock_(function () { gFresh_(true);
     const now = gNow_(), today = gDay_(now), r = gRows_('vespers').find((x) => String(x.day) === today && String(x.clean) !== 'undone'); if (!r) return;
     const p = gPlayer_(); let prev = {}; try { prev = JSON.parse(p.vPrev || '{}'); } catch (e) { prev = {}; }
     p.vStreak = prev.s || 0; p.vBest = prev.b || 0; p.vLast = prev.l || ''; p.coins = Math.max(0, p.coins - GAME.base[5]); gTakeXp_(p, GAME.base[5]); gSavePlayer_(p);
@@ -797,8 +805,8 @@ function gameVespersUndo(k) {
   return gSnapshot_(gWorld_());
 }
 function gameVespersTime(k, hm) {
-  check_(k);
-  withLock_(function () { if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(String(hm))) throw new Error('Pick a time like 20:00.'); const p = gPlayer_(); p.vTime = hm; gSavePlayer_(p); });
+  check_(k); gFresh_();
+  withLock_(function () { gFresh_(true); if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(String(hm))) throw new Error('Pick a time like 20:00.'); const p = gPlayer_(); p.vTime = hm; gSavePlayer_(p); });
   return gSnapshot_(gWorld_());
 }
 
@@ -854,9 +862,9 @@ function gReviewCard_(today, ticks, goals, bosses) {
     stats: { ticks: done.length, coins: wt.filter((t) => Number(t.coins) > 0).reduce((a, t) => a + Number(t.coins), 0), necessary: count('necessary'), ahead: count('ahead'), outside: count('external'), life: count('life'), stages: bosses.reduce((a, b) => a + b.stages.filter((x) => x.done && x.done >= mon && x.done <= sun).length, 0) } };
 }
 function gameReview(k, rv) {
-  check_(k);
+  check_(k); gFresh_();
   let paid = 0;
-  withLock_(function () {
+  withLock_(function () { gFresh_(true);
     const today = gDay_(gNow_()), wk = /^\d{4}-\d{2}-\d{2}$/.test(String(rv.week)) ? rv.week : gMonday_(today);
     const clip = (v) => String(v || '').slice(0, 400);
     const old = gRows_('reviews').find((r) => String(r.week) === wk);
@@ -895,9 +903,9 @@ function gGroups_(p) {
 }
 // new group, or a new name for any group (built-in ones keep their job, only the name changes)
 function gameGroupSave(k, grp) {
-  check_(k);
+  check_(k); gFresh_();
   let id = '';
-  withLock_(function () {
+  withLock_(function () { gFresh_(true);
     const p = gPlayer_(); let mine = []; try { mine = p.groups ? JSON.parse(p.groups) : []; } catch (e) { mine = []; }
     const name = String(grp.name || '').trim().slice(0, 50); if (!name) throw new Error('Give the group a name.');
     id = grp.id || ('u' + Utilities.getUuid().slice(0, 6));
@@ -910,8 +918,8 @@ function gameGroupSave(k, grp) {
 }
 // a step in a quest's checklist (no pay: the quest pays when it is ticked)
 function gameQuestStep(k, id, i, on) {
-  check_(k);
-  withLock_(function () {
+  check_(k); gFresh_();
+  withLock_(function () { gFresh_(true);
     const g = gGoals_().find((x) => x.id === id); if (!g || !g.steps[i]) return;
     g.steps[i].d = !!on; gSet_('goals', g.row, 'steps', JSON.stringify(g.steps));
   });
@@ -945,9 +953,9 @@ function gWearState_(p, rows) {
   return { on: Object.assign({ hat: 'hat-0', top: '', face: '', held: '', skin: 'skin-0' }, wear), owned };
 }
 function gameWear(k, id, on) {
-  check_(k);
+  check_(k); gFresh_();
   let bad = '';
-  withLock_(function () {
+  withLock_(function () { gFresh_(true);
     const w = gWearItem_(id); if (!w) { bad = 'That outfit is not in the wardrobe.'; return; }
     const p = gPlayer_(), rows = gRows_('owned'), st = gWearState_(p, rows.filter((r) => String(r.itemId).indexOf('w:') === 0));
     if (on && st.owned.indexOf(id) < 0) {
@@ -965,13 +973,13 @@ function gameWear(k, id, on) {
 }
 // Undo a purchase made today (shop item or outfit): the doubloons come back and the item goes
 function gameUnbuy(k, id) {
-  check_(k);
-  withLock_(function () {
+  check_(k); gFresh_();
+  withLock_(function () { gFresh_(true);
     const today = gDay_(gNow_()), rows = gRows_('owned'), key = gWearItem_(id) ? 'w:' + id : id;
     const r = rows.filter((x) => x.itemId === key && String(x.boughtOn) === today).pop(); if (!r) return;
     const p = gPlayer_(), price = Number(r.price) || 0; p.coins += price;
     if (key.indexOf('w:') === 0) { let wear = {}; try { wear = p.wear ? JSON.parse(p.wear) : {}; } catch (e) { wear = {}; } Object.keys(wear).forEach((c) => { if (wear[c] === id) wear[c] = c === 'skin' ? 'skin-0' : ''; }); p.wear = JSON.stringify(wear); }
-    gSavePlayer_(p); gTab_('owned').deleteRow(r.row);
+    gSavePlayer_(p); gDel_('owned', r.row);
     gAppend_('ticks', { id: Utilities.getUuid().slice(0, 8), at: gNow_().toISOString(), day: today, goalId: 'buy|' + key, delta: 0, coins: price, xp: 0, hp: 0, auto: '', ref: '', note: JSON.stringify({ name: key, undo: true }) });
   });
   return gSnapshot_(gWorld_());
@@ -979,9 +987,9 @@ function gameUnbuy(k, id) {
 
 /* ---- the Hoard: rewards he writes himself and buys with doubloons ---- */
 function gameHoardSave(k, h) {
-  check_(k);
+  check_(k); gFresh_();
   let id = '';
-  withLock_(function () {
+  withLock_(function () { gFresh_(true);
     const name = String(h.name || '').trim().slice(0, 60); if (!name) throw new Error('Name the reward.');
     const cost = Math.max(1, Math.min(5000, Math.round(Number(h.cost) || 80)));
     const old = h.id ? gRows_('hoard').find((r) => r.id === h.id) : null;
@@ -992,9 +1000,9 @@ function gameHoardSave(k, h) {
 }
 // claim = pay its cost; back = true is the Undo (gives the doubloons back)
 function gameHoardClaim(k, id, back) {
-  check_(k);
+  check_(k); gFresh_();
   let bad = '';
-  withLock_(function () {
+  withLock_(function () { gFresh_(true);
     const r = gRows_('hoard').find((x) => x.id === id); if (!r) { bad = 'That reward is gone.'; return; }
     const p = gPlayer_(), cost = Number(r.cost) || 0, claims = Number(r.claims) || 0, now = gNow_();
     if (!back && p.coins < cost) { bad = 'Not enough runes yet (' + (cost - p.coins) + ' more).'; return; }
@@ -1008,7 +1016,7 @@ function gameHoardClaim(k, id, back) {
 
 /* ---- the Chronicle: doubloons per week (7 weeks), a 5-week streak calendar, trophies ---- */
 function gameChronicle(k) {
-  check_(k);
+  check_(k); gFresh_();
   const today = gDay_(gNow_()), mon = gMonday_(today), ticks = gRows_('ticks'), world = gWorld_(), frozen = gFrozenDays_();
   const earn = (t) => Number(t.coins) > 0 && !/^(buy|hoard)\|/.test(String(t.goalId));
   const weeks = []; for (let i = 6; i >= 0; i--) { const m = gAdd_(mon, -7 * i), e = gAdd_(m, 6); weeks.push({ mon: m, coins: ticks.filter((t) => String(t.day) >= m && String(t.day) <= e && earn(t)).reduce((a, t) => a + Number(t.coins), 0) }); }

@@ -834,15 +834,20 @@ function loadAll(k) {
   a.sync = sync;
   return a;
 }
-function loadAll_(withData) {
-  const d = sheet_('Data');
-  const chunks = d.getLastRow() > 1 ? d.getRange(2, 1, d.getLastRow() - 1, 1).getValues().map((r) => r[0]).join('') : '';
+// the Data chunks and the saved weeks: all Ulhu needs from the planner (gWorld_), and the start of loadAll_
+function loadDataWeeks_(withData) {
+  const d = sheet_('Data'), dn = d.getLastRow();
+  const chunks = withData && dn > 1 ? d.getRange(2, 1, dn - 1, 1).getValues().map((r) => r[0]).join('') : '';
   const weeks = {};
-  const w = sheet_('Weeks');
-  if (w.getLastRow() > 1) w.getRange(2, 1, w.getLastRow() - 1, 2).getValues().forEach(([m, json]) => {
+  const w = sheet_('Weeks'), wn = w.getLastRow();
+  if (wn > 1) w.getRange(2, 1, wn - 1, 2).getValues().forEach(([m, json]) => {
     const mon = m instanceof Date ? Utilities.formatDate(m, Session.getScriptTimeZone(), 'yyyy-MM-dd') : String(m);
     try { weeks[mon] = JSON.parse(json); } catch (e) { /* skip a damaged row */ }
   });
+  return { data: chunks ? JSON.parse(chunks) : null, weeks };
+}
+function loadAll_(withData) {
+  const dw = loadDataWeeks_(withData), weeks = dw.weeks;
   const learned = {};
   const q = sheet_('Equipment');
   if (q.getLastRow() > 1) q.getRange(2, 1, q.getLastRow() - 1, 3).getValues().forEach(([key, eq, sets]) => { learned[key] = { eq, sets: sets || null }; });
@@ -855,7 +860,7 @@ function loadAll_(withData) {
   const records = [];
   const ls = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Lessons');
   if (ls && ls.getLastRow() > 1) ls.getRange(2, 2, ls.getLastRow() - 1, 1).getValues().forEach(([json]) => { try { records.push(JSON.parse(json)); } catch (e) { /* skip */ } });
-  return { version: VERSION, data: withData && chunks ? JSON.parse(chunks) : null, weeks, learned, added, classSettings, records, results: readResults_(),
+  return { version: VERSION, data: dw.data, weeks, learned, added, classSettings, records, results: readResults_(),
     behaviourUrl: PropertiesService.getScriptProperties().getProperty('BEHAVIOUR_URL') || '',
     gradeBands: (() => { try { return JSON.parse(PropertiesService.getScriptProperties().getProperty('GRADE_BANDS') || '{}'); } catch (e) { return {}; } })() };
 }

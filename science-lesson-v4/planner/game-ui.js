@@ -371,9 +371,11 @@
         try { await call(q[i][0], ...q[i][1]); } catch (e) { if (isNet(e)) { LS('ulhuQ', q.slice(i).concat(LS('ulhuQ') || [])); return; } }
       }
     }
+    // one at a time, in tap order (2026-10-28): fast taps queue behind each other instead of fighting over the lock
+    let line = Promise.resolve();
     function send(fn, args, after) {
-      const my = ++seq;
-      return call(fn, ...args).then((d) => {
+      const my = ++seq, p = line.then(() => call(fn, ...args)); line = p.catch(() => null);
+      return p.then((d) => {
         if (!d) throw new Error('The planner sent nothing back. Reload, and if it keeps happening paste Game.gs again and deploy a new version.');
         if (my === seq) { D = d; err = ''; saveD(); paint(); }
         if (after) after(d);
