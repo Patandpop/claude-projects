@@ -208,7 +208,7 @@ Each look goes in its own include file. Size plan: GameGlass.html and GameVesper
   - B2 burn;
   - K-T2 tick striking the whole step;
   - WR1 ink.
-  - The "evil pact" effect is still waiting on Patryk's pick (P1-P4).
+  - The "evil pact" effect is picked and built (game-scroll.js): sea-green ring, runes and veins kept clear of the text, drying to a dark red-brown mark.
 - **3.4 Multiplier display:** rings in the rune circle, base pay counting up on tick.
 - **3.5 A pencil per group** for editing (V.edit = groupId).
 - **3.6 Vespers screen (`mockups/vespers/`).** Its way in is still being picked, so build the sheet first:
