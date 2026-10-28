@@ -225,6 +225,14 @@ Each look goes in its own include file. Size plan: GameGlass.html and GameVesper
 - **3.8 Levels to 50**, with steeper need and unlocks at 20/30/40. Patryk confirmed 28 Oct: **50 level titles**, each one named (in the eldritch style of the first 12).
 - **3.9 Quick-log omens on top of The Call** (Patryk said yes, 28 Oct). His most-used curses and blessings sit at the top, one tap each, with Absolution. Keep every animation as it is: he wants logging grand, not fast.
 - **3.10 Aims with a bottom line, compared in High Vespers** (Patryk 28 Oct). Each ritual can carry a weekly aim and a bottom line. For example, gym: aim 3 sessions, bottom line = walking into the gym 3 times; reading: aim an average of 15 min a day, bottom line = open a book and sit with it for 1 minute a day. High Vespers shows, per ritual: aim reached, bottom line held, or missed. Design this with Patryk first (the grill session is designing it), so wait for its entry in habits-v2-decisions.md.
+- **3.12 The visual grill (28 Oct), in `habits-v2-decisions.md` under "Visual grill, 28 Oct".** It covers: the living-lair banner, the full-screen level-up rite with depths, fainting with the Rise quest, the Breakwater sea wall, aims and ceilings in the Week in Glass, the text tab bar, inscribed forms, the stained-glass Oracle, the Sanctum diorama with wardrobe and hoard chests (the Cloaks and Hoard sub-tabs go), paper-golem marking bosses (plus PAG marking for 12C and 13D), the undo ink scrap, Ulhu loading animations, the quick-log glass cards and the 50 titles. Server changes in it:
+  - max health 60 (was 50);
+  - a rune gift of level x 10 at each level-up;
+  - tier level locks (Nice 5, Fancy 12, Eldritch 20, masterpieces 30/40/50);
+  - the Rise quest after fainting (3 rituals that day win back half the lost runes);
+  - aims, bottom lines and curse ceilings stored per ritual.
+
+  Build each look only after Patryk has picked from its mock-up; the pages are listed in that section as they come in.
 - **3.11 Text a couple of pixels bigger** across Ulhu, then check at 360 px and 412 px that nothing overflows or wraps badly. **No first-time hints, and keep the tab names** (Patryk 28 Oct).
 
 ### Phase 4: this half-term
