@@ -62,3 +62,10 @@ Nothing here is built yet. Build in the phases at the bottom; mock-up first for 
 - Seal: press K1a; seal spot = clean inked ring, no wax ghost; wax drop pools first, then the stamp presses it and the wax visibly spreads, slower (T1-T3 pending).
 - Sigils: Scene = S3c (tentacle rising on stage). Coven C3c three in a row, overlap fix pending (C3c-1..3).
 - Phase 1 screens built and committed 2026-10-27 (two-sided omens, blood + sigils, Absolution logic and simple gold label, antidote picker, Ulhu's 30 lines). Paste files on the desktop folder "Planner paste files" (Drive G: unavailable).
+
+## Picks round 6-7 (2026-10-28)
+- Blessing glass: SC2 all medium stars; path made of shaped pieces like the rest; surrounding glass cut to fit and bend round each star (G1-G4 pending).
+- Seal: W9 gold-flecked wax; seal impression 7 variations F1-F7 and stamp shape S1-S3 pending. T2, R2, G5 ripple after, no flash.
+- Vespers (evening): V3 night line, restyled N1-N6 pending; only the sigil picked in the moment is asked (all four if skipped); sigil names as headings, not questions (Q1-Q4 pending); good habits get positive feeling chips tied to his own cards; an entry to click into Vespers after 8 pm (E1-E5 pending).
+- High Vespers: H1 cathedral scroll; Week in Glass loved; 5 variations of every section pending, incl. Who You Are Becoming and a redesigned curse table.
+- Built into the app 2026-10-27: stone tablets (game-stone.js), temple bosses (game-temple.js), moon phases, multipliers, shop +20%. Art split into GameArt.html (new Apps Script file).
