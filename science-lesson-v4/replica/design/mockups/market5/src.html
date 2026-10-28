@@ -1,0 +1,1198 @@
+<title>Market Round Five</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Grenze+Gotisch:wght@500;700&family=IM+Fell+English:ital@0;1&display=swap">
+<style>
+/* Layout: one phone-sized frame. The plaza (bird's-eye, stalls in a ring round the ritual well) fills it; entering a stall
+   swaps the frame for the keeper's counter. One night-time underwater world, so a single dark theme. */
+:root{
+  color-scheme:dark;
+  --bg:#030b0a; --ink:#ebe3cf; --muted:#93a79d; --moss:#5ef2a0; --rune:#7dffc0; --gold:#ffd56a; --wax:#a3202a; --line:#20352e; --card1:#0f1e1a; --card2:#0a1412;
+  --g:'Grenze Gotisch',Georgia,serif; --a:'Atkinson Hyperlegible',system-ui,-apple-system,sans-serif; --f:'IM Fell English',Georgia,serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#030b0a; --ink:#ebe3cf; --muted:#93a79d; --moss:#5ef2a0; --rune:#7dffc0; --gold:#ffd56a; --wax:#a3202a; --line:#20352e; --card1:#0f1e1a; --card2:#0a1412;}}
+:root[data-theme="dark"]{--bg:#030b0a; --ink:#ebe3cf; --muted:#93a79d; --moss:#5ef2a0; --rune:#7dffc0; --gold:#ffd56a; --wax:#a3202a; --line:#20352e; --card1:#0f1e1a; --card2:#0a1412;}
+/* The drowned market is a night scene, so the light theme keeps the same dark tokens on purpose. */
+html{background:var(--bg)}
+body{background:var(--bg);color:var(--ink);font:14px/1.4 var(--a)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible{outline:2px solid var(--moss);outline-offset:2px}
+.px{image-rendering:crisp-edges;image-rendering:pixelated}
+.page{max-width:440px;margin:0 auto;padding-inline:16px;padding-block:14px 100px;overflow-x:clip}
+.top h1{margin:0;font:700 34px/1 var(--g);color:#e6ddc2;text-shadow:0 2px 0 #000,0 0 18px rgba(94,242,160,.22);text-wrap:balance}
+.top .sub{margin:4px 0 10px;color:var(--muted);font-size:13px;max-width:60ch}
+.seg{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+.seg2{grid-template-columns:1fr 1fr;margin-bottom:6px}.seg2 b{font-size:17px}
+.seg6{grid-template-columns:repeat(3,1fr)}
+.seg button.off{opacity:.38}
+.mnote{margin:0 0 6px;font-size:13px;color:#8ea89b}
+.seg button{min-height:44px;border-radius:6px;border:1px solid #20352e;background:linear-gradient(180deg,#10201b,#0a1412);padding:3px 4px;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.1}
+.seg b{font:700 15px var(--g);letter-spacing:.06em;color:#cfe6da}.seg span{font-size:13px;color:var(--muted)}
+.seg button.on{border-color:#3fbf84;background:linear-gradient(180deg,#123a2a,#0a1a14);box-shadow:0 0 14px rgba(94,242,160,.2)}
+.seg button.on b{color:var(--rune)}
+.lines{list-style:none;margin:8px 0 10px;padding:0;display:grid;gap:3px;font-size:13px;color:#7a8e84}
+.lines b{font:700 13px var(--a);color:#a9bdb2;margin-right:5px}
+.lines li.on{color:#e3dac2}.lines li.on b{color:var(--rune)}
+.grow{display:flex;align-items:center;gap:10px;margin:0 0 12px;padding:8px 10px;border-radius:6px;background:#0b1513;border:1px solid #1d2e28;font-size:13px;color:#b8c8bf}
+.grow input{flex:1;min-width:0;accent-color:#3fbf84}
+.grow output{min-width:84px;text-align:right;font:700 13px var(--a);color:var(--rune);font-variant-numeric:tabular-nums}
+
+.app{position:relative;height:700px;border-radius:14px;overflow:hidden;background:#020807;box-shadow:0 0 0 1px #17302a,0 20px 50px rgba(0,0,0,.6);isolation:isolate}
+.view{position:absolute;inset:0;transform-origin:50% 50%}
+.view>*{position:absolute}
+.lay{left:0;top:0;pointer-events:none}
+.caus{mix-blend-mode:screen;pointer-events:none}
+.vig{inset:0;pointer-events:none;background:radial-gradient(ellipse 78% 72% at 50% 50%,transparent 52%,rgba(0,0,0,.7))}
+
+/* plaza */
+#plaza{will-change:transform}
+.tilt{left:0;top:0;pointer-events:none;-webkit-mask-image:linear-gradient(180deg,#000 0,transparent 6%,transparent 94%,#000 100%);mask-image:linear-gradient(180deg,#000 0,transparent 6%,transparent 94%,#000 100%)}
+.glow{position:absolute;border-radius:50%;pointer-events:none;mix-blend-mode:screen;transform:translate(-50%,-50%)}
+.flick{animation:flick 2.3s infinite}
+@keyframes flick{0%,100%{opacity:1}23%{opacity:.8}31%{opacity:.97}52%{opacity:.86}74%{opacity:1}81%{opacity:.9}}
+.circ{animation:circ 4s ease-in-out infinite}
+@keyframes circ{50%{opacity:.7;transform:translate(-50%,-50%) scale(1.04)}}
+.jelly{position:absolute;pointer-events:none;mix-blend-mode:screen;animation:drift var(--d,14s) ease-in-out infinite alternate}
+@keyframes drift{from{transform:translate(0,0)}to{transform:translate(var(--dx,20px),var(--dy,-30px))}}
+.sign{position:absolute;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:0;width:86px;padding:2px 3px 3px;border:1px solid rgba(94,242,160,.28);border-radius:3px;background:linear-gradient(180deg,rgba(14,26,22,.92),rgba(6,12,10,.92));box-shadow:0 2px 0 #000,0 0 10px rgba(94,242,160,.12);text-align:center;z-index:5}
+.sign img{width:18px;height:18px;filter:drop-shadow(0 0 3px rgba(94,242,160,.9));animation:sig 3s ease-in-out infinite}
+@keyframes sig{50%{filter:drop-shadow(0 0 6px rgba(94,242,160,1))}}
+.sign b{font:500 12px/1 var(--g);letter-spacing:.03em;color:#d8ecdf;text-shadow:0 1px 0 #000}
+.sign small{margin-top:1px;font:italic 9px/1 var(--f);letter-spacing:.02em;color:#6fa088}
+.sign:hover,.sign:focus-visible{border-color:rgba(94,242,160,.7);box-shadow:0 2px 0 #000,0 0 16px rgba(94,242,160,.4)}
+.sign.gul img{filter:drop-shadow(0 0 3px rgba(255,214,106,.9))}.sign.gul{border-color:rgba(255,214,106,.35)}
+#walker{position:absolute;width:48px;height:48px;margin:-44px 0 0 -24px;pointer-events:none;z-index:4}
+#walker .wsh{position:absolute;left:8px;right:8px;bottom:0;height:8px;border-radius:50%;background:radial-gradient(ellipse,rgba(0,0,0,.6),transparent 70%)}
+#walker .wb{position:absolute;inset:0;transition:transform .15s}
+#walker .wb.left{transform:scaleX(-1)}
+#walker img{width:48px;height:48px;display:block;filter:drop-shadow(0 0 6px rgba(94,242,160,.35))}
+#walker.walking img{animation:waddle .34s ease-in-out infinite alternate}
+@keyframes waddle{from{transform:translateY(0) rotate(-6deg)}to{transform:translateY(-4px) rotate(6deg) scaleY(.96)}}
+.puff{position:absolute;width:8px;height:5px;border-radius:50%;background:rgba(170,220,200,.45);pointer-events:none;z-index:3;animation:puff .6s ease-out forwards}
+@keyframes puff{to{transform:translate(-50%,-6px) scale(2.2);opacity:0}}
+.tapmark{position:absolute;width:20px;height:12px;margin:-6px 0 0 -10px;border:2px solid rgba(94,242,160,.8);border-radius:50%;pointer-events:none;z-index:3;animation:tapm .7s ease-out forwards}
+@keyframes tapm{from{transform:scale(.3);opacity:1}to{transform:scale(1.4);opacity:0}}
+.hud{left:10px;right:10px;top:10px;display:flex;align-items:center;gap:6px;z-index:8}
+.runes{display:flex;align-items:center;gap:5px;height:32px;padding:0 11px 0 5px;border-radius:16px;background:rgba(4,12,10,.82);border:1px solid #2a5a46;box-shadow:0 0 12px rgba(94,242,160,.2)}
+.runes img{width:24px;height:24px;filter:drop-shadow(0 0 4px rgba(94,242,160,.8))}
+.runes b{font:700 17px/1 var(--a);color:#d8ffe8;font-variant-numeric:tabular-nums;text-shadow:0 0 8px rgba(94,242,160,.6)}
+.chip{height:26px;display:flex;align-items:center;gap:4px;padding:0 9px;border-radius:13px;background:rgba(4,10,9,.82);border:1px solid #2c4038;font:700 13px var(--a);letter-spacing:.04em;color:#cfe0d6;white-space:nowrap}
+.chip b{color:var(--gold)}
+.lorebtn{margin-left:auto;border:1px solid #6a5434;background:radial-gradient(ellipse at 30% 0%,#f3e7c8,#d8c08c);color:#2a1a10;font:700 13px var(--f);height:30px;padding:0 10px;border-radius:4px;box-shadow:0 2px 0 #000}
+.wellhint{left:50%;transform:translateX(-50%);top:48px;padding:3px 10px;border-radius:10px;background:rgba(4,10,9,.7);font-size:13px;color:#9ab8aa;white-space:nowrap;z-index:6;pointer-events:none}
+
+/* stall */
+#stall{visibility:hidden;background:#04100d}
+.sbar{left:0;right:0;top:0;height:46px;display:flex;align-items:center;gap:6px;padding:0 8px;z-index:9;background:linear-gradient(180deg,rgba(2,8,7,.95),rgba(2,8,7,.6));}
+.back{height:34px;padding:0 10px 0 8px;border-radius:5px;border:1px solid #2a4a3e;background:#0b1714;font:700 13px var(--a);color:#bfe8d2}
+.who{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.05}
+.who b{font:700 17px var(--g);color:#e6ddc2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.who span{display:flex;align-items:center;gap:3px;font:700 13px var(--a);letter-spacing:.12em;text-transform:uppercase;color:#7f9c8e}
+.who span i{width:8px;height:8px;border-radius:50%;background:#22302c;border:1px solid #3c5a4e}
+.who span i.on{background:#ff9a5a;border-color:#ffc89a;box-shadow:0 0 6px #ff9a5a}
+.scene{left:0;right:0;top:46px;height:270px;overflow:hidden}
+.scene>*{position:absolute}
+.keeper{z-index:3;pointer-events:none;animation:breathe 3.2s ease-in-out infinite;transform-origin:50% 100%}
+@keyframes breathe{50%{transform:translateY(-1.5px) scaleY(1.01)}}
+.keeper.hop{animation:hop .5s ease-out 2}
+@keyframes hop{40%{transform:translateY(-6px)}}
+.win{z-index:2;right:10px;top:8px;padding:5px;border-radius:4px;background:linear-gradient(180deg,#5a3e22,#3a2614);box-shadow:inset 0 1px 0 rgba(255,220,160,.3),0 3px 0 #000,0 0 18px rgba(0,0,0,.6)}
+.win .in{position:relative;width:128px;height:116px;overflow:hidden;background:radial-gradient(ellipse at 50% 48%,#1b3d38,#06100f 75%)}
+.win .in img{position:absolute;image-rendering:crisp-edges;image-rendering:pixelated}
+.win .in img.pv{animation:pv 1.8s ease-in-out infinite}
+@keyframes pv{50%{filter:brightness(1.25) drop-shadow(0 0 1px rgba(150,255,210,.9))}}
+.win .cap{display:block;margin-top:3px;text-align:center;font:500 13px/1 var(--g);letter-spacing:.06em;color:#f0d8a8}
+.win .in:after{content:"";position:absolute;inset:0;box-shadow:inset 0 0 18px rgba(0,0,0,.7);pointer-events:none}
+.bub{z-index:6;left:8px;top:8px;max-width:200px;transition:opacity .3s}
+.say{position:relative;padding:13px 10px 8px;border-radius:4px 10px 10px 10px;background:radial-gradient(ellipse at 25% 15%,#f6ebcd,#dccaa0 75%,#cbb588);color:#26170f;font:italic 14px/1.22 var(--f);box-shadow:0 3px 0 rgba(40,25,10,.8),0 6px 16px rgba(0,0,0,.5)}
+.say .nm{position:absolute;left:8px;top:-9px;padding:1px 8px 2px;border-radius:3px;background:#2b1a10;border:1px solid #8a6a3a;color:#ffd99a;font:500 13px/1.1 var(--g);letter-spacing:.05em;font-style:normal;white-space:nowrap}
+.say:after{content:"";position:absolute;left:34px;bottom:-8px;border-left:7px solid transparent;border-right:7px solid transparent;border-top:9px solid #d8c597}
+.usay{z-index:7;right:12px;top:150px;max-width:170px;transition:opacity .3s}
+.usay .say{font-size:13px;padding-top:12px}
+.usay .say .nm{background:#14301f;border-color:#5ef2a0;color:#b6ffd6}
+.usay .say:after{left:auto;right:30px;bottom:auto;top:-8px;border-top:none;border-bottom:9px solid #efe2bf}
+.hide{opacity:0}
+
+.ctr{left:0;right:0;top:316px;height:128px;z-index:4;touch-action:pan-y;overflow:hidden}
+.ctr img{-webkit-user-drag:none;pointer-events:none}
+.ctr{user-select:none;-webkit-user-select:none}
+.ctr .top{position:absolute;left:0;right:0;top:0;height:128px;background-size:64px 24px;image-rendering:pixelated}
+.row{position:absolute;left:0;right:0;top:0;height:118px;display:grid;grid-template-columns:repeat(5,1fr);transition:transform .35s cubic-bezier(.2,.8,.2,1),opacity .35s}
+.slot{position:relative;border:none;background:none;padding:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;transition:filter .3s}
+.slot .stand{position:relative;height:66px;width:100%;display:flex;align-items:flex-end;justify-content:center}
+.slot .lift{position:relative;transition:transform .45s cubic-bezier(.2,.9,.3,1.3);z-index:2}
+.slot .spin{display:block}
+.slot .spin img{display:block;image-rendering:crisp-edges;image-rendering:pixelated}
+.slot .shad{position:absolute;bottom:0;left:50%;width:46px;height:7px;margin-left:-23px;border-radius:50%;background:radial-gradient(ellipse,rgba(0,0,0,.6),transparent 70%);transition:transform .45s,opacity .45s}
+.slot .pr{height:46px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:5px;gap:0}
+.pr img{width:22px;height:22px;filter:drop-shadow(0 0 3px var(--rg,#7dffc0))}
+.pr span{font:700 10px/1 var(--a);color:#cfe8dc;font-variant-numeric:tabular-nums;margin-top:1px;letter-spacing:.02em}
+.pr.poor{opacity:.42}
+.pr .lk{font:700 10px var(--a);color:#a8acb8;padding:2px 5px;border-radius:2px;background:#2a2c32}
+.slot.lock .spin img{filter:grayscale(1) brightness(.42)}
+.slot .held{position:absolute;top:2px;right:2px;z-index:3;padding:1px 4px;border-radius:2px;background:#6a4a2a;color:#ffe8c0;font:700 8.5px var(--a);letter-spacing:.06em;transform:rotate(6deg)}
+.row.f .slot:not(.on){filter:brightness(.55) saturate(.8)}
+.slot.on .lift{transform:translateY(-20px) scale(1.3)}
+.slot.on .spin{animation:turn 5.5s linear infinite}
+.slot.on .shad{transform:scale(.6);opacity:.5}
+@keyframes turn{from{transform:perspective(240px) rotateY(0)}to{transform:perspective(240px) rotateY(360deg)}}
+.spot{position:absolute;top:-316px;width:110px;height:384px;margin-left:-55px;pointer-events:none;mix-blend-mode:screen;z-index:1;transition:left .35s cubic-bezier(.2,.8,.2,1),opacity .3s}
+.spot:before{content:"";position:absolute;inset:0;clip-path:polygon(42% 0,58% 0,100% 100%,0 100%);background:linear-gradient(180deg,rgba(var(--lc),.05),rgba(var(--lc),.4) 70%,rgba(var(--lc),.65));filter:blur(4px)}
+.spot:after{content:"";position:absolute;left:50%;bottom:30px;width:90px;height:22px;margin-left:-45px;border-radius:50%;background:radial-gradient(ellipse,rgba(var(--lc),.7),transparent 70%)}
+.seal{display:inline-flex;align-items:center;justify-content:center;width:42px;height:26px;clip-path:polygon(12% 18%,24% 4%,42% 10%,58% 0,74% 8%,90% 6%,96% 26%,100% 48%,94% 70%,98% 90%,78% 94%,60% 100%,42% 92%,22% 98%,8% 84%,0 62%,6% 40%);background:radial-gradient(ellipse at 38% 30%,#e0504e,#a3202a 50%,#5e0c14);color:#ffe0cc;font:700 13px/1 var(--g);text-shadow:0 1px 0 #3a0608;transform:rotate(-6deg);filter:drop-shadow(0 2px 0 rgba(0,0,0,.6))}
+.seal.in{outline:1px solid rgba(94,242,160,.8);outline-offset:1px}
+.pager{position:absolute;left:0;right:0;bottom:2px;display:flex;justify-content:center;align-items:center;gap:6px;z-index:5}
+.pager i{width:6px;height:6px;border-radius:50%;background:#2a3a34}.pager i.on{background:#7dffc0;box-shadow:0 0 6px #5ef2a0}
+.pager button{width:34px;height:22px;border:none;background:none;color:#7f9c8e;font:700 15px var(--a);padding:0}
+
+.info{left:10px;right:10px;top:450px;bottom:10px;padding:10px 12px;border-radius:8px;background:linear-gradient(180deg,rgba(16,28,25,.97),rgba(8,15,13,.97));border:1px solid #284038;z-index:5;display:flex;flex-direction:column;gap:7px}
+.info .t{display:flex;align-items:flex-start;gap:10px}
+.info h3{margin:0;font:700 23px/1.02 var(--g);color:#efe6cf;text-wrap:balance}
+.info .tier{display:block;margin-top:2px;font:700 13px var(--a);letter-spacing:.12em;text-transform:uppercase}
+.big{margin-left:auto;flex:none;display:flex;flex-direction:column;align-items:center}
+.big img{width:34px;height:34px;filter:drop-shadow(0 0 5px var(--rg,#7dffc0));animation:rg 2.6s ease-in-out infinite}
+@keyframes rg{50%{filter:drop-shadow(0 0 9px var(--rg,#7dffc0))}}
+.big span{font:700 13px var(--a);color:#d8ffe8;font-variant-numeric:tabular-nums}
+.pitch{margin:0;padding-left:10px;border-left:2px solid #6a4a2a;font:italic 15px/1.28 var(--f);color:#e6dcc0}
+.pitch small{display:block;margin-top:2px;font:700 13px var(--a);font-style:normal;letter-spacing:.1em;color:#8a7a5a;text-transform:uppercase}
+.btns{display:grid;grid-template-columns:1.25fr 1fr 1fr;gap:6px;margin-top:auto}
+.hag{border:1px solid #8a5a2a;background:linear-gradient(180deg,#2c1e10,#1a1208);color:#f0c890}
+.opp{display:flex;align-items:center;gap:12px;margin:6px 0 12px;padding:10px;border-radius:8px;background:radial-gradient(ellipse at 30% 0%,#2a1c10,#120c08 70%);border:1px solid #5a3a1e}
+.opp img{width:104px;height:92px;image-rendering:pixelated;flex:none}
+.opp p{margin:0;font:italic 16px/1.3 var(--f);color:#f0d8b0}.opp b{display:block;font:700 13px var(--a);font-style:normal;letter-spacing:.12em;text-transform:uppercase;color:#c8a070;margin-bottom:2px}
+.btns button{min-height:44px;border-radius:5px;font:700 14px var(--a)}
+.buy{border:none;background:linear-gradient(180deg,#9affcf,#3fbf84 55%,#1d7a52);color:#04140c;box-shadow:inset 0 1px 0 #e0fff0,0 2px 0 #062a1a}
+.buy:disabled{background:linear-gradient(180deg,#3a4440,#262e2a);color:#7a8a82;box-shadow:none;cursor:default}
+.ghost{border:1px solid #33463e;background:transparent;color:#b8cabf}
+.note{margin:0;font-size:13px;color:#86a093}.note b{color:#ffb48a}
+.door{position:absolute;left:14px;right:14px;top:336px;padding:16px;border-radius:8px;text-align:center;background:radial-gradient(ellipse at 50% 0%,#2a1c10,#120c08 70%);border:1px solid #5a3a1e;font:italic 17px/1.3 var(--f);color:#f0d8b0;z-index:5}
+.door img{width:60px;height:60px;image-rendering:pixelated;margin:0 6px 8px;animation:roll 2.4s ease-in-out infinite}
+.door img+img{animation-delay:-1.2s}
+@keyframes roll{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(10deg) translateY(-5px)}}
+
+.fx{inset:0;pointer-events:none;z-index:30}
+.pl{position:absolute;width:12px;height:20px;transform:translate(-50%,-80%) scale(.2);opacity:0;transition:transform .35s cubic-bezier(.2,.9,.3,1.4),opacity .25s}
+.pl.on{transform:translate(-50%,-80%) scale(1);opacity:1}
+.pl img{width:12px;height:20px;image-rendering:pixelated}
+.pl i{position:absolute;left:50%;top:60%;width:70px;height:70px;margin:-35px 0 0 -35px;border-radius:50%;background:radial-gradient(circle,rgba(255,190,100,.75),rgba(255,160,70,.18) 45%,transparent 70%);mix-blend-mode:screen}
+.card{position:absolute;z-index:40;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border-radius:6px;border:2px solid rgba(94,242,160,.6);background:linear-gradient(180deg,#0e1a16,#050b09);box-shadow:0 0 30px rgba(94,242,160,.45);backface-visibility:hidden}
+.card img{width:60%;image-rendering:pixelated;filter:drop-shadow(0 0 8px rgba(94,242,160,1))}
+.card b{font:700 20px var(--g);color:#d8ecdf}
+
+.fly{position:fixed;left:0;top:0;z-index:50;pointer-events:none;image-rendering:pixelated;transform-origin:0 0}
+.toast{position:fixed;left:50%;bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:60;transform:translate(-50%,140%);width:min(408px,calc(100% - 32px));display:flex;align-items:center;gap:8px;padding:6px 6px 6px 14px;border-radius:8px;background:#101b18;border:1px solid #2f453c;box-shadow:0 10px 26px rgba(0,0,0,.6);transition:transform .3s cubic-bezier(.2,.9,.3,1.1)}
+.toast.show{transform:translate(-50%,0)}
+.toast p{flex:1;min-width:0;margin:0;font-size:13.5px;color:#dfe8e2}
+.toast button{flex:none;min-height:40px;padding:0 14px;border:none;border-radius:5px;background:#173a2c;color:#b6ffd6;font:700 13px var(--a);letter-spacing:.08em}
+.veil{position:fixed;inset:0;z-index:70;background:rgba(2,6,5,.7);display:flex;align-items:flex-end;justify-content:center;animation:fade .25s}
+@keyframes fade{from{opacity:0}}
+.sheet{width:min(440px,100%);max-height:90vh;overflow-y:auto;padding:16px 16px calc(18px + env(safe-area-inset-bottom,0px));border-radius:14px 14px 0 0;background:linear-gradient(180deg,#13201c,#0a1210);border-top:1px solid #3a5047;animation:up .3s cubic-bezier(.2,.9,.3,1)}
+@keyframes up{from{transform:translateY(40px);opacity:.4}}
+.sheet h2{margin:0 0 6px;font:700 26px var(--g);color:#eadfc2}
+.sheet .x{float:right;width:44px;height:44px;margin:-8px -8px 0 0;border:none;background:none;color:#8ea398;font-size:22px}
+.lore p{font:16px/1.4 var(--f);color:#e2d6b8;margin:0 0 10px;max-width:60ch}
+.receipt{position:relative;margin:4px auto 12px;width:260px;padding:14px 16px 20px;background:radial-gradient(ellipse at 30% 10%,#fbf1d8,#e9d8ae 70%,#d8c08c);color:#2a1a10;font:15px/1.35 var(--f);box-shadow:0 6px 14px rgba(0,0,0,.5);clip-path:polygon(0 0,100% 0,100% 95%,94% 100%,88% 95%,80% 100%,72% 95%,64% 100%,56% 95%,48% 100%,40% 95%,32% 100%,24% 95%,16% 100%,8% 95%,0 100%);animation:rcpt .7s cubic-bezier(.2,.9,.3,1)}
+@keyframes rcpt{from{transform:translateY(-30px) scaleY(.2);opacity:0}}
+.receipt h4{margin:0 0 4px;font:700 21px var(--g);letter-spacing:.08em;text-align:center}
+.receipt .ln{border-top:1px dashed #8a6a3a;margin:6px 0}
+.receipt .bg2{font-size:20px;text-align:center}
+.receipt .sg{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:6px;font-size:13px}
+.receipt canvas{width:64px;height:64px;flex:none;filter:drop-shadow(0 2px 1px rgba(0,0,0,.45))}
+.row2{display:flex;gap:8px}.row2 button{flex:1;min-height:46px;border-radius:5px}
+.foot{margin:12px 2px 0;font-size:13px;color:#6f8178}
+.wallcaus{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:.06;mix-blend-mode:screen}
+.page{position:relative;z-index:1}
+@media (prefers-reduced-motion:reduce){.flick,.circ,.jelly,.keeper,.slot.on .spin,.sign img,.big img,.door img,.win .in img.pv{animation:none!important}}
+
+.ens{display:grid;gap:8px;margin:0 0 10px}
+.en{display:grid;grid-template-columns:1fr auto;align-items:center;gap:4px 10px;padding:9px 10px;border-radius:8px;border:1px solid var(--line);background:linear-gradient(180deg,var(--card1),var(--card2))}
+.en.on{border-color:#3fbf84;box-shadow:0 0 14px rgba(94,242,160,.18)}
+.en .eh{grid-column:1;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.en .eh b{font:700 19px/1.1 var(--g);letter-spacing:.05em;color:#cfe6da}.en.on .eh b{color:var(--rune)}
+.en .nm{font:italic 15px var(--f);color:#e3d6b4}
+.en .tag{font:700 13px var(--a);color:#2a1a10;background:var(--gold);padding:1px 8px;border-radius:10px}
+.en p{grid-column:1;margin:0;font-size:13.5px;line-height:1.35;color:#c3d2ca}
+.en .rp{grid-column:2;grid-row:1/span 2;min-height:44px;padding:0 12px;border-radius:6px;border:1px solid #2f6a52;background:#0e2a20;font:700 14px var(--a);color:var(--rune);white-space:nowrap}
+.en .rp:active{transform:translateY(1px)}
+.en.pick{border-color:#6a5a2c}.en.pick.on{border-color:var(--gold);box-shadow:0 0 14px rgba(255,213,106,.18)}
+</style>
+
+<div class="page">
+  <header class="top">
+    <h1>Market Round Five</h1>
+    <p class="sub">Round five: ways into a stall. Tap Replay on any card and Ulhu walks from the well to the Weaver's stall, then the entrance plays. You can still tap the ground or any sign in the plaza.</p>
+    <div class="ens" id="ens">
+      <article class="en pick on" data-e="3c"><div class="eh"><b>Walk + TR3c</b><span class="tag">Your pick</span></div><p>Ulhu walks to the stall, then eight mist arms burst out of the well, close over the view and open onto the counter.</p><button class="rp">&#8635; Replay</button></article>
+      <article class="en" data-e="e1"><div class="eh"><b>EN1</b><span class="nm">Low tide</span></div><p>The sea floods up over the plaza with bubbles rising, then drains away down the screen and leaves you dripping inside the stall.</p><button class="rp">&#8635; Replay</button></article>
+      <article class="en" data-e="e2"><div class="eh"><b>EN2</b><span class="nm">The ferry</span></div><p>A hooded ferryman poles a little boat up out of the well, Ulhu hops in, they sail into thickening fog, and it parts on the counter.</p><button class="rp">&#8635; Replay</button></article>
+      <article class="en" data-e="e3"><div class="eh"><b>EN3</b><span class="nm">The lure</span></div><p>The lights die, a glowing lure drops in front of the stall, a huge eye opens in the dark, and giant jaws snap shut; they open inside.</p><button class="rp">&#8635; Replay</button></article>
+    </div>
+    <label class="grow" for="slow" style="margin-bottom:12px"><input id="slow" type="checkbox" style="flex:none;width:18px;height:18px"> Slow motion, to compare the entrances</label>
+    <label class="grow" for="spent" hidden>Runes spent <input id="spent" type="range" min="0" max="6000" step="50" value="1200"><output id="spentO">1200</output></label>
+  </header>
+
+  <main class="app" id="app">
+    <section class="view" id="plaza" aria-label="The plaza">
+      <canvas id="pz" class="lay px"></canvas>
+      <canvas id="pzT" class="tilt"></canvas>
+      <div id="pzG" class="lay"></div>
+      <canvas id="pzC" class="lay caus"></canvas>
+      <canvas id="pzM" class="lay"></canvas>
+      <div class="vig"></div>
+      <div id="walker" hidden><i class="wsh"></i><div class="wb"><img class="px" alt="Ulhu"></div></div>
+      <div id="signs" class="lay" style="pointer-events:auto"></div>
+      <div class="hud"><span class="runes"><img class="px" id="runeI" alt="runes"><b id="runesN">900</b></span><span class="chip">Level <b>8</b></span><span class="chip" id="held"></span><button class="lorebtn" id="lore">The lore</button></div>
+      
+    </section>
+    <section class="view" id="stall" aria-label="Inside the stall">
+      <div class="sbar"><button class="back" id="backB">&lsaquo; Plaza</button><div class="who"><b id="kName"></b><span id="kWarm"></span></div><span class="runes"><img class="px" id="runeI2" alt="runes"><b id="runesN2">900</b></span></div>
+      <div class="scene" id="scene">
+        <canvas id="sc" class="lay px"></canvas>
+        <div id="scG" class="lay"></div>
+        <div class="win" id="win"><div class="in" id="winIn"></div><span class="cap" id="winCap">Your Sanctum</span></div>
+        <img id="keeper" class="keeper px" alt="">
+        <canvas id="scC" class="lay caus"></canvas>
+        <div class="vig" style="z-index:5"></div>
+        <div class="bub" id="bub"><div class="say"><span class="nm" id="bubN"></span><span class="tx" id="bubT"></span></div></div>
+        <div class="usay hide" id="usay"><div class="say"><span class="nm">Ulhu</span><span class="tx"></span></div></div>
+      </div>
+      <div class="ctr" id="ctr"><div class="top" id="ctrTop"></div><div class="spot" id="spot"></div><div class="row" id="row"></div><div class="pager" id="pager"></div></div>
+      <div class="info" id="info"></div>
+    </section>
+    <div class="fx lay" id="fx"></div>
+  </main>
+  <p class="foot">Mock-up only. Demo purse: 900 runes at level 8, with three room items owned and two placed. Every entrance starts with the same walk, so you compare only the way in. The back button leaves with the same effect. Nothing here touches the real game.</p>
+</div>
+<canvas id="wallcaus" class="wallcaus"></canvas>
+<div class="toast" id="toast" role="status"><p id="toastT"></p><button id="undo">UNDO</button></div>
+<div id="sheetRoot"></div>
+
+<script>/*@SHOP*/</script>
+<script>/*@ULHU*/</script>
+<script>/*@PIXEL*/</script>
+<script>/*@RUNES*/</script>
+<script>
+(function () {
+'use strict';
+const $ = (s, r) => (r || document).querySelector(s), $$ = (s, r) => [...(r || document).querySelectorAll(s)];
+const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const S = 2, PX = window.PX, UL = window.ULHU_ART, SHOP = window.SHOP, RN = window.RUNES;
+const mk = (w, h, pal, f, o) => PX.make(w, h, pal, f, o);
+const hsh = (a, b) => { let h = (a * 374761393 + b * 668265263) | 0; h = (h ^ (h >>> 13)) * 1274126177 | 0; return (h ^ (h >>> 16)) >>> 0; };
+const shash = (s) => { let h = 7; s = String(s); for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0; return h; };
+function hexRgb(h) { const n = parseInt(h.slice(1), 16); return [n >> 16, (n >> 8) & 255, n & 255]; }
+function mix(a, b, t) { const A = hexRgb(a), B = hexRgb(b); return '#' + A.map((v, i) => Math.round(v + (B[i] - v) * t).toString(16).padStart(2, '0')).join(''); }
+const BAY = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
+const dith = (x, y, f) => f * 16 > BAY[(y & 3) * 4 + (x & 3)];
+function pctx(cv, w, h, s) { s = s || S; cv.width = w; cv.height = h; cv.style.width = w * s + 'px'; cv.style.height = h * s + 'px'; const x = cv.getContext('2d'); x.imageSmoothingEnabled = false; return x; }
+function P(x) { return { px(a, b, c) { x.fillStyle = c; x.fillRect(a, b, 1, 1); }, r(a, b, w, h, c) { x.fillStyle = c; x.fillRect(a, b, w, h); } }; }
+const pick = (a) => a[Math.floor(Math.random() * a.length)];
+
+/* ---------------- shop data ---------------- */
+const ITEMS = SHOP.items, byId = {};
+ITEMS.forEach((i) => { byId[i.id] = i; });
+const SLOTOF = { floors: 'floor', rugs: 'rug', wallpapers: 'wall', windows: 'window', lights: 'light', corner: 'corner', seats: 'seat', tables: 'table', wall: 'hang', props: 'prop' };
+const ORDER = ['floor', 'wall', 'rug', 'window', 'hang', 'corner', 'seat', 'table', 'prop', 'light'];
+const Z = { floor: 0, wall: 1, rug: 2, window: 3, hang: 4, corner: 5, seat: 6, table: 6.5, prop: 7, light: 8 };
+const idOf = (c, n) => ITEMS.find((i) => i.category === c && i.name === n).id;
+const DEF = { floor: idOf('floors', 'Pine planks'), wall: idOf('wallpapers', 'Plain') };
+const layersOf = (it) => Object.values(it.layers);
+const lockLv = (i) => { const l = i.lock; if (!l) return 0; return l.min || l.level || 12; };
+const TIERG = { Basic: '#f0e4c4', Nice: '#ffae62', Fancy: '#cfe0ff', Eldritch: '#5ef2a0' };
+const tierOf = (p) => p < 200 ? 'Basic' : p < 400 ? 'Nice' : p < 700 ? 'Fancy' : 'Eldritch';
+
+const st = { runes: 900, level: 8, spent: 1200, tr: '3c', mode: 'walk', busy: false, k: null, page: 0, focus: null, hat: null, worn: {}, undo: null,
+  owned: new Set([idOf('floors', 'Grey flagstones'), idOf('seats', 'Green armchair'), idOf('lights', "Ship's lantern")]),
+  placed: { floor: idOf('floors', 'Grey flagstones'), seat: idOf('seats', 'Green armchair') }, aside: [], warm: {}, sold: {} };
+
+/* wardrobe items for the Tailor (real overlays from the game, aligned to Ulhu) */
+const WEAR = [['beanie', 'Knitted beanie', 120], ['party', 'Party hat', 100], ['fez', 'Fez', 150], ['sailor', "Sailor's cap", 160], ['tricorn', 'Tricorn', 180], ['captain', "Captain's cap", 220], ['witch', 'Witch hat', 260], ['wizard', 'Wizard hat', 280], ['tophat', 'Top hat', 300], ['horned', 'Horned helm', 450], ['crown', 'Crown', 650], ['halo', 'Halo', 900], ['kelpcrown', 'Kelp crown', 1000],
+  ['bowtie', 'Bow tie', 110], ['scarf', 'Striped scarf', 140], ['medal', 'Medal', 250], ['labcoat', 'Lab coat', 320], ['cape', 'Velvet cape', 380], ['sash', 'Kelp sash', 760],
+  ['glasses', 'Round glasses', 120], ['mustache', 'Moustache', 130], ['patch', 'Eye patch', 150], ['monocle', 'Monocle', 200], ['shades', 'Shades', 230],
+  ['mug', 'Mug of cocoa', 100], ['lantern', 'Little lantern', 220], ['tome', 'Forbidden tome', 480], ['trident', 'Trident', 520], ['staff', 'Elder staff', 900]]
+  .filter((w) => PX.wear[w[0]]).map(([k, n, p]) => ({ id: 'w-' + k, key: k, name: n, price: p, tier: tierOf(p), wear: true, part: PX.wearSets.hat.includes(k) ? 'hat' : PX.wearSets.top.includes(k) ? 'top' : PX.wearSets.face.includes(k) ? 'face' : 'held', lock: k === 'halo' ? { level: 14 } : null }));
+WEAR.forEach((w) => { byId[w.id] = w; });
+
+/* real-life rewards for the Pawnbroker, drawn as pixel things */
+const RW = (k, n, p, draw, pal) => ({ id: 'r-' + k, key: k, name: n, price: p, tier: tierOf(p), reward: true, art: mk(24, 24, pal, draw) });
+let REWARDS = [];
+
+/* ---------------- keepers ---------------- */
+const K = [
+  { id: 'pawn', name: 'The Pawnbroker', trade: 'Surface things', cats: [], ang: -90, roof: ['#2a2234', '#4a3a5a'], lamp: '170,255,210', wall: ['#141018', '#1e1826', '#28203a'] },
+  { id: 'glass', name: 'The Glassblower', trade: 'Windows and lights', cats: ['windows', 'lights'], ang: -45, roof: ['#7a3a1a', '#d8a050'], lamp: '255,170,80', wall: ['#1a1410', '#261c14', '#30241a'] },
+  { id: 'weaver', name: 'The Weaver', trade: 'Floors and rugs', cats: ['floors', 'rugs'], ang: 0, roof: ['#6a2a3a', '#d8b0a0'], lamp: '255,190,120', wall: ['#16120e', '#201812', '#2a2018'] },
+  { id: 'carp', name: 'The Carpenter', trade: 'Seats and tables', cats: ['seats', 'tables'], ang: 45, roof: ['#5a3a20', '#8a6038'], lamp: '255,200,140', wall: ['#15110c', '#1f1810', '#2b2116'] },
+  { id: 'gullet', name: "Gullet's Dice Den", trade: 'The back room', cats: [], ang: 90, roof: ['#3a3026', '#6a5a40'], lamp: '255,200,110', wall: ['#120e0a', '#1c150e', '#261c12'] },
+  { id: 'curio', name: 'The Curio Collector', trade: 'Corners and props', cats: ['corner', 'props'], ang: 135, roof: ['#3a4a5a', '#c8ccd0'], lamp: '220,240,255', wall: ['#101418', '#181e24', '#20282e'] },
+  { id: 'paint', name: 'The Fresco Painter', trade: 'Walls and hangings', cats: ['wallpapers', 'wall'], ang: 180, roof: ['#4a2a6a', '#e0c070'], lamp: '230,170,255', wall: ['#120e16', '#1c1622', '#261e2e'] },
+  { id: 'tailor', name: 'The Tailor', trade: 'Clothes for Ulhu', cats: [], ang: -135, roof: ['#1d4a42', '#c8a0c8'], lamp: '200,255,230', wall: ['#0e1614', '#14201c', '#1a2a24'] }
+];
+const KB = {}; K.forEach((k) => { KB[k.id] = k; });
+
+/* the deep folk owe the Old Ones a tithe they cannot pay alone; your runes are the only true will here, so they flatter */
+const LINES = {
+  weaver: { greet: ['Mind the threads, dear. Such a strong will on you. I can smell it from here.', 'Back to me and not that glass bully? Clever thing.', 'My favourite will in all the deep. Sit. Not on the yarn.'],
+    buy: ['Click-click. A warm floor for you, and a little will for my tithe.', 'Bless you, dear. The Old Ones will hear my name tonight.', 'I\'ll knit your name into the next one. In gold.'], back: 'Put it back gently. It frays when it\'s sad.', poor: 'Not enough will in you today, dear. Go and do your little tasks.' },
+  paint: { greet: ['Don\'t touch the walls! Wet ink. Oh, but your will, it glows.', 'You came to me before the gull? Sublime. Sublime.', 'My muse! Eight arms, all trembling for you.'],
+    buy: ['Ink well spent! The well drinks, I paint.', 'A masterpiece goes home with a monster. As it should.', 'For you I\'d paint the abyss itself. I may have.'], back: 'Philistine. Lovable, but a philistine.', poor: 'Art costs will, darling. Come back fuller.' },
+  glass: { greet: ['Stand back from the forge. That will of yours burns hotter than my lure.', 'Hm. You. The weaver sells fluff. Glass lasts.', 'Friend. I saved the clearest glass for you, and only you.'],
+    buy: ['Hot glass for cold runes. The tithe thanks you.', 'Mind it, still warm. Like my gratitude.', 'You light my forge brighter than any lure.'], back: 'Glass forgives. I don\'t. Back it goes.', poor: 'Your will runs thin. Glass won\'t blow itself. Come back.' },
+  carp: { greet: ['Hull\'s open. Mind the mast. Your will\'s worth more than my wood.', 'You. The one with will to spare. Sit.', 'Pull up a seat. I made it for you.'],
+    buy: ['Built to last. Longer than my debt, anyway.', 'Good wood for good will. Fair trade.', 'Next stool\'s on the house. Don\'t tell the gull.'], back: 'Back on the pile. It\'s seen worse.', poor: 'Wood\'s cheap. Will isn\'t. Come back richer.' },
+  curio: { greet: ['Mine! Oh. You\'re buying. Your will smells shiny.', 'Shiny one! Ignore the painter, my trinkets are realer.', 'My best one! I\'d give you my shiniest. Nearly.'],
+    buy: ['Kraa! Runes! Lovely burning runes!', 'Another trinket flies the nest. The well will hear of me.', 'For you, kraa, anything. Almost anything.'], back: 'Kraa. Back to my hoard. Mine again.', poor: 'Kraa! Empty pockets! Fill them and fly back.' },
+  tailor: { greet: ['Mmf. Pins in my mouth, darling. Such a will. Arms out.', 'Darling, the others dress you like a mop. I dress you like a god.', 'My muse returns. I saved the silk for you.'],
+    buy: ['It fits like a curse, darling.', 'Divine. Ulhu will sulk for a week.', 'Wear it into the dark, darling. Let them stare.'], back: 'Off it comes. Some things aren\'t meant to be.', poor: 'Silk costs will, darling. Come back with more.' },
+  pawn: { greet: ['I hold the surface things. Warm things. Things your will remembers.', 'Your will burns bright tonight. The surface is close.', 'You have earned more of the surface than most. Take it.'],
+    buy: ['Sealed. Show it to the one who waits above.', 'The surface owes you this. Collect it.', 'Will spent well. Well spent.'], back: 'It will wait. The surface always waits.', poor: 'The surface costs more will than you carry tonight.' },
+  gullet: { greet: ['My dear drowned friend! Please. One game. My tithe is SO overdue.', 'The others flatter you. I beg. It\'s more honest.', 'You came! You came back! Sit, sit, before the weaver sees.'] }
+};
+const PITCH = {
+  floors: ['Solid underfoot. Mostly. Don\'t stamp near the middle.', 'Pulled up from a drowned chapel. The prayers wiped right off.', 'Walk on this and your toes will thank you. In writing.'],
+  rugs: ['Barely haunted, this one.', 'Woven by me and a very patient eel.', 'Lie on it and dream of nothing at all.'],
+  wallpapers: ['Hides the damp. Hides a lot of things.', 'Pasted up with genuine whale glue. Smell it.', 'Brightens a room. Darkens a soul. Very reasonably.'],
+  windows: ['A view to drown for.', 'Only cracked a little. The sea comes in politely.', 'Stare long enough and something stares back. No extra charge.'],
+  lights: ['Burns all night on one sardine.', 'Glows soft, like a lie told kindly.', 'Lights the way to bed. And now and then to the abyss.'],
+  corner: ['Fills a corner with character. And woodworm.', 'Antique. I know because it told me.', 'Every proper lair needs one. Ask any cultist.'],
+  seats: ['It only remembers the last owner a little.', 'Shaped to your bottom, more or less.', 'Comfier than a sunken pew. I\'ve tried both.'],
+  tables: ['Put your tea here. Or your doom. Holds both.', 'From a captain who no longer needs tables.', 'The claw marks are decorative.'],
+  wall: ['Hang it high and let the guests be jealous.', 'The eyes follow you as standard.', 'Covers a crack in the wall. Or in reality.'],
+  props: ['A trinket for the discerning tentacle. Kraa.', 'Small, but it gets noticed. Like a leech.', 'Put it on the table and watch Ulhu sulk.'],
+  hat: ['A little height never hurt a horror, darling.', 'Sits like a crown. Or a curse. Same tailoring.', 'Tilt it. No, the other way. Divine.'],
+  top: ['Cut close, darling. Breathe in.', 'Hand-stitched with fishbone needles.', 'Drapes like seaweed on a corpse. Elegant.'],
+  face: ['For a face only the deep could love.', 'Frames the eyes. All of them.', 'Mysterious, darling. Nobody will know it\'s you.'],
+  held: ['Something for the claws.', 'Hold it with menace.', 'Every monster needs a prop.'],
+  reward: ['A warm thing from above. It remembers the sun.', 'The surface keeps this for you. Spend your will on it.', 'Take it up with you when you wake.']
+};
+const ULS = ['A tenth. They send a TENTH down the well. I licensed them!', 'I carved those licences myself. Do I get thanks? No.', 'Spend, spend. Your will, my market, their tithe. Hmph.', 'He flatters you. I just sulk. That\'s more honest.'];
+const PNAME = { pawn: 'Pawnbroker', glass: 'Glassblower', weaver: 'Weaver', carp: 'Carpenter', curio: 'Curio Collector', paint: 'Fresco Painter', tailor: 'Tailor', gullet: 'Gullet' };
+
+/* ---------------- sprites ---------------- */
+const SPR = {};
+function buildSprites() {
+  const g = (rows) => rows;
+  // trade sigils (carved, glowing)
+  const SIG = (draw) => mk(16, 16, { s: ['#5ef2a0', '#d8ffe8', '#1d8a52'], y: ['#ffd56a', '#fff4c8', '#a8701c'] }, draw, { ol: '#03140c' });
+  SPR.sig = {
+    pawn: SIG((A) => { A.line(8, 2, 8, 13, 's'); A.line(2, 5, 14, 5, 's'); A.line(3, 5, 1, 10, 's'); A.line(3, 5, 5, 10, 's'); A.line(1, 10, 5, 10, 's'); A.line(13, 5, 11, 10, 's'); A.line(13, 5, 15, 10, 's'); A.line(11, 10, 15, 10, 's'); A.line(5, 14, 11, 14, 's'); }),
+    glass: SIG((A) => { A.ell(8, 9, 4.5, 4.5, 's'); A.rect(7, 2, 3, 4, 's'); A.set(8, 9, null); A.set(7, 9, null); A.set(8, 8, null); A.line(8, 13, 8, 15, 's'); }),
+    weaver: SIG((A) => { A.rect(4, 2, 9, 2, 's'); A.rect(4, 12, 9, 2, 's'); A.rect(6, 4, 5, 8, 's'); for (let y = 5; y < 12; y += 2) A.line(6, y, 10, y, null); A.line(11, 7, 15, 11, 's'); }),
+    carp: SIG((A) => { A.rect(3, 2, 10, 4, 's'); A.rect(7, 6, 3, 9, 's'); A.set(3, 6, 's'); }),
+    gullet: SIG((A) => { A.rect(1, 3, 9, 9, 'y'); A.rect(7, 6, 8, 8, 'y'); [[3, 5], [7, 9], [5, 7]].forEach(([x, y]) => A.set(x, y, null)); [[9, 8], [12, 11], [9, 11], [12, 8]].forEach(([x, y]) => A.set(x, y, null)); }),
+    curio: SIG((A) => { A.ell(8, 8, 6.5, 4, 's'); A.ell(8, 8, 2.4, 2.4, null); A.set(8, 8, 's'); A.line(2, 8, 0, 8, 's'); A.line(14, 8, 15, 8, 's'); }),
+    paint: SIG((A) => { A.line(3, 13, 11, 5, 's'); A.line(4, 13, 12, 5, 's'); A.ell(12.5, 3.5, 2.6, 2.6, 's'); A.ell(3, 13, 2, 2, 's'); }),
+    tailor: SIG((A) => { A.line(3, 14, 13, 2, 's'); A.ell(12, 3, 1.6, 1.6, 's'); A.set(12, 3, null); A.line(13, 4, 8, 10, 's'); A.line(8, 10, 4, 7, 's'); A.line(4, 7, 2, 10, 's'); })
+  };
+  SPR.lantern = mk(12, 20, { i: ['#3a3a42', '#6c6c76', '#1c1c22'], G: '#ffc65e', C: '#fff6cf', y: ['#a8782a', '#e8b850', '#6a4a14'] }, (A) => {
+    A.ring(6, 1.5, 1.4, 'i'); A.tri(1, 6.5, 6, 2.5, 11, 6.5, 'i'); A.rect(2, 6, 8, 2, 'y'); A.rect(2, 8, 8, 8, 'G'); A.rect(4, 10, 4, 4, 'C'); A.rect(6, 8, 1, 8, 'i'); A.rect(1, 16, 10, 2, 'y'); });
+  SPR.die1 = mk(18, 18, { d: ['#e8dcc0', '#fffbe8', '#a89a7a'], k: '#2a1a12' }, (A) => { A.rect(1, 1, 16, 16, 'd'); [[5, 5], [12, 12], [8.5, 8.5]].forEach(([x, y]) => A.ell(x, y, 1.4, 1.4, 'k')); });
+  SPR.die2 = mk(18, 18, { d: ['#c43a3a', '#ff7a6a', '#7a1a1a'], k: '#fff0d8' }, (A) => { A.rect(1, 1, 16, 16, 'd'); [[5, 5], [12, 5], [5, 12], [12, 12]].forEach(([x, y]) => A.ell(x, y, 1.4, 1.4, 'k')); });
+  REWARDS = [
+    RW('coffee', 'Posh coffee', 120, (A) => { A.rect(6, 9, 10, 10, 'w'); A.ring(18, 13, 2.4, 'w'); A.rect(7, 9, 8, 2, 'c'); A.rect(5, 19, 14, 2, 'b'); A.line(9, 3, 10, 7, 's'); A.line(12, 2, 13, 7, 's'); }, { w: ['#e8e1cf', '#ffffff', '#a8a090'], c: '#6a3a1a', b: ['#3a5a8a', '#6a8ac0', '#1a2a4a'], s: '#cfe0e8' }),
+    RW('liein', 'Lie-in on Saturday', 200, (A) => { A.ell(12, 14, 10, 6, 'p'); A.line(4, 14, 20, 14, 'P'); A.set(9, 4, 'z'); A.rect(9, 3, 3, 1, 'z'); A.line(11, 3, 9, 6, 'z'); A.rect(9, 6, 3, 1, 'z'); A.set(15, 1, 'z'); A.rect(15, 1, 2, 1, 'z'); A.rect(15, 3, 2, 1, 'z'); A.set(16, 2, 'z'); }, { p: ['#cfd8f0', '#ffffff', '#8a94b0'], P: '#a8b4d0', z: '#ffe7a0' }),
+    RW('book', 'New book', 300, (A) => { A.rect(4, 4, 16, 17, 'r'); A.rect(17, 5, 2, 15, 'p'); A.rect(7, 8, 8, 2, 'y'); A.rect(7, 12, 6, 1, 'y'); A.rect(4, 4, 2, 17, 'R'); }, { r: ['#2a5a6a', '#4a8a9a', '#123038'], R: '#1a3a44', p: '#f0e6cc', y: '#ffd56a' }),
+    RW('bath', 'Long bath', 350, (A) => { A.ell(12, 15, 10, 5, 'w'); A.rect(2, 12, 20, 3, 'w'); A.rect(4, 12, 16, 2, 'b'); [6, 10, 15].forEach((x) => A.ell(x, 10, 1.6, 1.6, 'f')); A.rect(5, 19, 2, 3, 'g'); A.rect(17, 19, 2, 3, 'g'); }, { w: ['#e8e1cf', '#ffffff', '#a8a090'], b: '#8ad0f0', f: '#ffffff', g: '#c8a040' }),
+    RW('takeaway', 'Takeaway night', 600, (A) => { A.tri(4, 7, 20, 7, 12, 3, 'w'); A.rect(5, 7, 14, 13, 'w'); A.rect(5, 11, 14, 3, 'r'); A.line(14, 1, 19, 8, 'c'); A.line(16, 1, 20, 7, 'c'); }, { w: ['#f0ece0', '#ffffff', '#a8a490'], r: '#c4323a', c: '#c89a5a' }),
+    RW('cinema', 'Cinema trip', 750, (A) => { A.rect(2, 7, 20, 11, 'r'); A.set(2, 12, null); A.set(21, 12, null); A.line(15, 7, 15, 18, 'y'); A.rect(6, 10, 6, 1, 'y'); A.rect(6, 13, 4, 1, 'y'); A.ell(18.5, 12.5, 1.6, 1.6, 'y'); }, { r: ['#c4323a', '#ff7a6a', '#7a1a22'], y: '#ffe7a0' }),
+    RW('trip', 'Day at the seaside', 1200, (A) => { A.ell(12, 13, 9, 9, 's'); A.rect(3, 13, 18, 9, 'b'); A.ell(12, 13, 4, 4, 'y'); A.rect(3, 15, 18, 1, 'w'); A.rect(3, 18, 18, 1, 'w'); }, { s: '#ffb46a', b: '#2a6aa0', y: '#fff0a0', w: '#cfe8ff' })
+  ];
+  REWARDS.forEach((r) => { byId[r.id] = r; });
+  // a cold candle
+  SPR.candle = mk(5, 9, { w: ['#e8dcc0', '#fffbe8', '#a89a7a'], f: '#ffd56a', F: '#fff6cf' }, (A) => { A.rect(1, 4, 3, 5, 'w'); A.set(2, 1, 'f'); A.set(2, 2, 'F'); A.set(1, 2, 'f'); A.set(3, 2, 'f'); A.set(2, 3, 'f'); }, { ol: '#120b14' });
+  SPR.jelly = mk(12, 16, { j: ['#5ad0c0', '#c8fff4', '#1a6a6a'], t: '#7ae0d0' }, (A) => { A.ell(6, 5, 5, 4, 'j'); A.rect(1, 5, 10, 2, 'j'); [2, 4, 6, 8, 10].forEach((x, i) => A.line(x, 7, x + (i % 2 ? 1 : -1), 14, 't')); });
+}
+
+/* keepers: 16-bit pixel art, drawn in the same maker as Ulhu and the game items */
+const KS = {};
+function keeperSprites() {
+  const thickOf = (A) => (x0, y0, x1, y1, rr, c) => { const n = Math.ceil(Math.hypot(x1 - x0, y1 - y0)) * 2 + 1; for (let i = 0; i <= n; i++) A.ell(x0 + (x1 - x0) * i / n, y0 + (y1 - y0) * i / n, rr, rr, c); };
+  const eye = (A, x, y, r, blink, c, pup) => { A.ell(x, y, r + .8, r + .8, 'K'); if (blink) { A.line(x - r, y, x + r, y, 'k'); return; } A.ell(x, y, r, r, c || 'e'); A.rect(Math.round(x - .5 + (pup || 0)), Math.round(y - .5), Math.max(1, Math.round(r * .7)), Math.max(1, Math.round(r * .7)), 'k'); A.set(Math.round(x - r * .5), Math.round(y - r * .5), 'w'); };
+  const base = { k: '#0b0a0e', w: '#ffffff', K: '#14100e', e: ['#e6cf4e', '#fff3a0', '#a88a20'] };
+  const make3 = (id, pal, draw) => { KS[id] = {}; ['idle', 'blink', 'happy'].forEach((f) => { KS[id][f] = mk(52, 46, Object.assign({}, base, pal), (A) => draw(A, f === 'blink', f === 'happy', thickOf(A))); }); };
+
+  // 1. the Weaver: an old crab, yarn on every claw, a knitted shawl and spectacles on her eyestalks
+  make3('weaver', { c: ['#b4502e', '#ec865a', '#6a2414'], C: '#7a2a14', p: ['#6a4a8a', '#9a7ac0', '#3a2a5a'], P: '#c8b0e0', g: ['#3aa05a', '#8ae09a', '#1a5a2a'], b: ['#3a7ac0', '#8ac0ff', '#1a3a6a'], r: ['#d8b040', '#ffe08a', '#8a6a14'], y: '#d8c070', m: '#3a1008', B: '#e8e0c8' }, (A, bl, hp, th) => {
+    const cl = hp ? -5 : 0;
+    th(10, 34, 4, 26 + cl, 1.6, 'c'); th(42, 34, 48, 26 + cl, 1.6, 'c');
+    for (let i = 0; i < 3; i++) { A.line(8 - i, 30 + i * 3, 2 - i, 36 + i * 3, 'c'); A.line(44 + i, 30 + i * 3, 50 + i, 36 + i * 3, 'c'); }
+    A.ell(26, 30, 20, 11, 'c'); for (let x = 10; x < 43; x += 4) A.set(x, 22 + (x % 3), 'C');
+    [[14, 25], [36, 24], [22, 22], [31, 21]].forEach(([x, y]) => { A.ell(x, y, 1.6, 1.4, 'B'); A.set(x, y, 'K'); });
+    A.ell(26, 36, 15, 5, 'p'); for (let x = 12; x < 41; x += 2) A.set(x, 36 + (x % 4 ? 1 : 0), 'P'); A.tri(22, 39, 30, 39, 26, 45, 'p');
+    th(20, 22, 18, 10, 1.1, 'c'); th(32, 22, 34, 10, 1.1, 'c');
+    eye(A, 18, 9, 2.3, bl); eye(A, 34, 9, 2.3, bl);
+    A.ring(18, 9, 3.6, 'y'); A.ring(34, 9, 3.6, 'y'); A.line(21, 9, 31, 9, 'y');
+    A.line(23, 30, 25, 33, 'm'); A.line(29, 30, 27, 33, 'm'); if (hp) { A.set(26, 31, 'm'); A.set(26, 32, 'm'); }
+    // claws resting on the counter, each wound with yarn
+    const claw = (x, y, d) => { A.ell(x, y, 7, 5, 'c'); A.tri(x + d * 3, y - 1, x + d * 9, y - 5, x + d * 8, y + 1, 'c'); A.line(x + d * 3, y - 1, x + d * 7, y - 1, 'C'); };
+    claw(9, 40 + cl, 1); claw(43, 40 + cl, -1);
+    A.ell(6, 35 + cl, 3.6, 3.6, 'g'); A.line(4, 33 + cl, 8, 37 + cl, 'G'); A.ell(46, 35 + cl, 3.6, 3.6, 'b'); A.line(44, 33 + cl, 48, 37 + cl, 'G');
+    A.ell(26, 43, 3, 2.6, 'r'); A.line(6, 38 + cl, 14, 44, 'g'); A.line(46, 38 + cl, 38, 44, 'b'); A.line(24, 43, 18, 45, 'r');
+  });
+  // 2. the Fresco Painter: an octopus in a beret, inking with all eight arms
+  make3('paint', { o: ['#7a3a8a', '#b874c8', '#3e1a4a'], O: '#c890d8', r: ['#b8303a', '#e8645a', '#7a1a22'], b: '#8a5a2a', i: '#141024', y: '#ffd56a', g: '#5ee08a', u: '#5aa7ff', p: '#ff7ab8', m: '#2a0c22' }, (A, bl, hp, th) => {
+    const arms = [[-2.6, 'y'], [-2.2, 'g'], [-1.9, 'u'], [-.9, 'p'], [-.5, 'y'], [-1.2, null], [-1.5, null], [-2.9, 'u']];
+    arms.forEach(([a, tip], i) => { const x0 = 18 + i * 2.3, y0 = 28; let ang = a + (hp ? -.35 : 0) + (i < 4 ? 0 : .1); let x = x0, y = y0;
+      for (let k = 0; k < 13; k++) { A.ell(x, y, Math.max(.8, 2.4 - k * .13), Math.max(.8, 2.4 - k * .13), 'o'); x += Math.cos(ang) * 1.2; y += Math.sin(ang) * 1.2; ang += (i % 2 ? .06 : -.06); }
+      if (tip) { A.line(x, y, x + Math.cos(ang) * 4, y + Math.sin(ang) * 4, 'b'); A.ell(x + Math.cos(ang) * 5, y + Math.sin(ang) * 5, 1.2, 1.2, tip); } });
+    A.ell(26, 36, 14, 8, 'o'); for (let x = 14; x < 39; x += 3) A.set(x, 40, 'O');
+    A.ell(26, 20, 12.5, 12, 'o'); [[20, 13], [31, 12], [34, 18], [18, 20], [26, 10]].forEach(([x, y]) => A.set(x, y, 'O'));
+    A.ell(24, 9, 10, 3.6, 'r'); A.rect(25, 4, 2, 3, 'r');
+    eye(A, 20, 23, 3.4, bl); eye(A, 32, 23, 3.4, bl);
+    if (!bl) { A.rect(19, 23, 3, 1, 'k'); A.rect(31, 23, 3, 1, 'k'); }
+    if (hp) { A.line(23, 29, 29, 29, 'm'); A.set(22, 28, 'm'); A.set(30, 28, 'm'); } else A.line(24, 29, 28, 29, 'm');
+    [[8, 42], [44, 38], [40, 44], [12, 36]].forEach(([x, y], i) => A.ell(x, y, 1.6, 1.2, ['i', 'p', 'u', 'g'][i]));
+  });
+  // 3. the Glassblower: an anglerfish whose lure lights the forge
+  make3('glass', { d: ['#2c3a3e', '#506468', '#141c1e'], j: ['#3a4a4e', '#607478', '#1a2224'], T: '#ece6d2', L: '#fff4b0', l: '#ffd56a', F: '#3a4a4e', a: ['#6a4024', '#9a6a3a', '#3a2010'], y: ['#a8782a', '#e8b850', '#6a4a14'], G: '#ff9a3a', g: '#fff0a0', m: '#1a0608', e: ['#c8e0d0', '#ffffff', '#7a9a8a'] }, (A, bl, hp, th) => {
+    A.ell(26, 27, 19, 14, 'd'); A.ell(26, 33, 18, 8, 'j');
+    if (hp) A.ell(26, 31, 14, 4, 'm'); else A.ell(26, 30, 15, 2, 'm');
+    for (let x = 12; x <= 40; x += 3) { A.line(x, 29, x + 1, 31 + (hp ? 1 : 0), 'T'); }
+    for (let x = 14; x <= 38; x += 4) A.line(x, hp ? 34 : 32, x, hp ? 31 : 30, 'T');
+    eye(A, 17, 20, 2, bl, 'e'); eye(A, 34, 19, 1.6, bl, 'e');
+    th(26, 14, 30, 4, .9, 'F'); A.line(30, 4, 38, 2, 'F'); A.ell(39, 3, 2.6, 2.6, hp ? 'g' : 'L'); A.set(38, 2, 'w');
+    A.tri(6, 22, 10, 18, 9, 30, 'd'); A.tri(46, 22, 42, 18, 43, 30, 'd');
+    A.rect(14, 37, 24, 9, 'a'); A.line(14, 37, 10, 30, 'a'); A.line(37, 37, 41, 30, 'a');
+    A.ell(9, 40, 4, 3, 'd'); A.ell(43, 39, 4, 3, 'd');
+    th(44, 40, 51, 31, .9, 'y'); A.ell(50, 29, 2.6, 2.4, 'G'); A.set(49, 28, 'g');
+  });
+  // 4. the Carpenter: a barnacled hermit crab living in a piece of ship's hull
+  make3('carp', { h: ['#6a4426', '#9a6a3a', '#3a2210'], H: '#2e1a0c', c: ['#c4502e', '#ff8a5a', '#6a2414'], y: ['#a8782a', '#e8b850', '#6a4a14'], g: '#3a7a8a', B: '#e8e0c8', i: ['#6a6a72', '#a8a8b0', '#3a3a42'], m: '#3a1008' }, (A, bl, hp, th) => {
+    A.ell(26, 24, 23, 18, 'h'); for (let y = 10; y < 42; y += 5) A.line(4, y, 48, y + 1, 'H');
+    A.ring(40, 15, 3.4, 'y'); A.ell(40, 15, 2.2, 2.2, 'g'); A.set(39, 14, 'w');
+    [[8, 14], [12, 30], [44, 30], [20, 9], [33, 8]].forEach(([x, y]) => { A.ell(x, y, 1.8, 1.4, 'B'); A.set(x, y, 'K'); });
+    A.ell(24, 30, 10, 7, 'c'); th(20, 25, 18, 15, 1, 'c'); th(28, 25, 30, 15, 1, 'c');
+    eye(A, 18, 13, 2.2, bl); eye(A, 30, 13, 2.2, bl);
+    A.line(21, 32, 23, 34, 'm'); A.line(27, 32, 25, 34, 'm');
+    A.ell(10, 40, 6, 4.4, 'c'); A.ell(40, 40, 7, 5, 'c'); A.tri(34, 38, 30, 33, 37, 36, 'c');
+    const hy = hp ? 26 : 34; th(40, 38, 44, hy, 1, 'h'); A.rect(41, hy - 3, 8, 4, 'i');
+  });
+  // 5. the Curio Collector: a gull-thing hoarding trinkets, with a monocle and a tentacle beard
+  make3('curio', { g: ['#d8d8d0', '#ffffff', '#9a9a90'], G: ['#7a7e86', '#a8acb4', '#44484e'], y: ['#e8b030', '#ffe080', '#8a6010'], r: '#d8303a', t: ['#6a7a5a', '#9aaa8a', '#3a4a2a'], o: '#ffd56a', s: '#c8ccd4', u: '#5aa7ff', p: '#ff7ab8' }, (A, bl, hp, th) => {
+    const wy = hp ? -6 : 0;
+    A.ell(26, 36, 17, 10, 'G'); for (let i = 0; i < 5; i++) A.line(12 + i * 6, 32, 14 + i * 6, 44, 'g');
+    A.tri(4, 40 + wy, 14, 28, 18, 40, 'G'); A.tri(48, 40 + wy, 38, 28, 34, 40, 'G');
+    A.ell(26, 18, 11, 10, 'g'); A.tri(30, 18, 44, 22, 30, 24, 'y'); A.tri(38, 22, 44, 22, 41, 26, 'y'); A.set(40, 22, 'r');
+    [[24, 27], [28, 28], [32, 27]].forEach(([x, y], i) => th(x, y, x + (i - 1) * 2, y + 6, .9, 't'));
+    eye(A, 23, 15, 2, bl); A.ring(23, 15, 3.6, 'o'); A.line(20, 18, 16, 26, 'o');
+    A.line(20, 8, 18, 4, 'g'); A.line(24, 8, 24, 3, 'g');
+    // trinkets dangling from the wings
+    A.line(8, 40 + wy, 8, 45, 's'); A.ell(8, 45, 1.6, 1.6, 'o'); A.line(44, 40 + wy, 44, 44, 's'); A.rect(43, 44, 3, 2, 'u'); A.ring(14, 44, 1.6, 'o'); A.set(38, 44, 'p');
+  });
+  // 6. the Tailor: a sleek eel seamstress with pins in her mouth and a tape measure
+  make3('tailor', { e: ['#2e6a5a', '#5aa08a', '#163a30'], E: ['#e6cf4e', '#fff3a0', '#a88a20'], f: '#8a3a6a', y: '#e8d25a', Y: '#2a2a14', h: '#d0d4dc', r: '#e8414a', b: '#5aa7ff', s: ['#c8ccd4', '#ffffff', '#7a7e86'], m: '#0e2018' }, (A, bl, hp, th) => {
+    const tilt = hp ? 2 : 0;
+    for (let i = 0; i < 30; i++) { const t = i / 29, x = 30 - Math.sin(t * 3.2) * 9 + tilt * t, y = 46 - t * 36; A.ell(x, y, 5.6 - t * 1.4, 3, 'e'); if (i % 3 === 0) A.set(Math.round(x + 4 - t), Math.round(y), 'f'); }
+    A.ell(24 + tilt, 9, 8, 5, 'e'); A.tri(18 + tilt, 8, 12 + tilt, 11, 18 + tilt, 12, 'e');
+    for (let x = 22; x < 36; x += 2) A.set(x + tilt, 4, 'f');
+    if (bl) A.line(24 + tilt, 7, 27 + tilt, 7, 'k'); else { A.ell(25.5 + tilt, 7.5, 1.8, 1.4, 'E'); A.set(25 + tilt, 7, 'k'); A.set(26 + tilt, 7, 'k'); }
+    A.ring(25.5 + tilt, 7.5, 2.8, 'y');
+    A.line(13 + tilt, 11, 21 + tilt, 11, 'm');
+    [[14, 2], [16, -1], [18, 3]].forEach(([x, d], i) => { A.line(x + tilt, 11, x + tilt + d, 15, 'h'); A.set(x + tilt + d, 16, ['r', 'b', 'y'][i]); });
+    for (let x = 18; x < 36; x++) A.set(x, 17 + Math.round(Math.sin(x / 3)), (x % 3) ? 'y' : 'Y');
+    A.line(18, 17, 16, 26, 'y'); A.line(35, 18, 37, 27, 'y');
+    A.tri(14, 34, 6, 36, 13, 40, 'e'); A.tri(38, 34, 46, 36, 39, 40, 'e');
+    A.line(8, 32, 4, 40, 's'); A.line(9, 33, 6, 41, 's'); A.ring(8, 31, 1.4, 's');
+  });
+  // 7. the Pawnbroker: a hooded figure who holds the surface things
+  make3('pawn', { d: ['#2a2430', '#4a4058', '#120e16'], D: '#3a3048', v: '#050308', E: '#9cffd0', p: ['#c8c0b0', '#eee6d6', '#8a8070'], y: '#ffd56a', s: '#8a8e96' }, (A, bl, hp, th) => {
+    A.ell(26, 38, 21, 11, 'd'); for (let x = 9; x < 44; x += 5) A.line(x, 30, x - 2, 46, 'D');
+    A.ell(26, 18, 14, 15, 'd'); A.tri(26, 0, 18, 8, 34, 8, 'd'); A.ell(26, 21, 8.5, 10, 'v');
+    if (!bl) { const r = hp ? 1.5 : 1; A.ell(22.5, 20, r, r * .8, 'E'); A.ell(29.5, 20, r, r * .8, 'E'); }
+    // long pale fingers, rings, keys on a chain
+    const fing = (x, d) => { for (let i = 0; i < 4; i++) A.line(x + i * 2 * d, 38, x + i * 2.3 * d + d, 44, 'p'); A.ell(x + 3 * d, 38, 4, 2.4, 'p'); A.set(x + 2 * d, 41, 'y'); };
+    fing(8, 1); fing(44, -1);
+    A.line(20, 32, 32, 34, 's'); A.ring(32, 36, 1.4, 'y'); A.line(32, 37, 33, 41, 'y');
+    if (hp) { A.ring(26, 30, 2.4, 'y'); }
+  });
+  // 8. Gullet: the same fishmonger as the dice den
+  KS.gullet = { idle: monger('rest', 0, 0, 0), blink: monger('rest', 0, 1, 0), happy: monger('rub0', 1, 0, 0), talk: monger('rest', 1, 0, 1), lean: monger('lean', 0, 0, 0) };
+}
+
+/* ---------------- F9 seal: Ulhu in the pentagram, pressed into red wax ---------------- */
+function f9(cv, size) {
+  cv.width = cv.height = size; const g = cv.getContext('2d'), u = size / 2;
+  g.save(); g.translate(u, u);
+  const blob = []; for (let i = 0; i < 24; i++) { const a = i / 24 * Math.PI * 2, r = .9 + .06 * Math.sin(i * 2.7) + .04 * Math.cos(i * 5.1); blob.push([Math.cos(a) * r * u, Math.sin(a) * r * u]); }
+  const grd = g.createRadialGradient(-u * .3, -u * .3, u * .1, 0, 0, u); grd.addColorStop(0, '#e05050'); grd.addColorStop(.6, '#a3202a'); grd.addColorStop(1, '#5e0c14');
+  g.fillStyle = grd; g.beginPath(); blob.forEach(([x, y], i) => i ? g.lineTo(x, y) : g.moveTo(x, y)); g.closePath(); g.fill();
+  const stroke = (c, ox, oy) => { g.strokeStyle = c; g.save(); g.translate(ox, oy);
+    g.lineWidth = .07 * u; g.beginPath(); g.arc(0, 0, .68 * u, 0, 7); g.stroke();
+    g.lineWidth = .05 * u; g.beginPath(); [0, 2, 4, 1, 3, 0].forEach((k, i) => { const a = -Math.PI / 2 + k * 1.2566, x = Math.cos(a) * .64 * u, y = Math.sin(a) * .64 * u; i ? g.lineTo(x, y) : g.moveTo(x, y); }); g.stroke(); g.restore(); };
+  stroke('rgba(255,170,160,.55)', -1, -1); stroke('rgba(60,0,8,.75)', 1, 1); stroke('#c8343c', 0, 0);
+  g.restore();
+  const im = new Image(); im.onload = () => {
+    const c2 = document.createElement('canvas'); c2.width = c2.height = size; const g2 = c2.getContext('2d'); g2.imageSmoothingEnabled = false;
+    const bw = size * .5; g2.drawImage(im, u - bw / 2, u - bw / 2 + size * .02, bw, bw);
+    g2.globalCompositeOperation = 'source-in'; g2.fillStyle = '#6a0e16'; g2.fillRect(0, 0, size, size);
+    g.drawImage(c2, 1, 1); g2.globalCompositeOperation = 'source-in'; g2.fillStyle = '#d24a4a'; g2.fillRect(0, 0, size, size); g.globalAlpha = .55; g.drawImage(c2, -1, -1); g.globalAlpha = 1;
+  }; im.src = UL.b16.idle;
+}
+
+/* ---------------- Gullet (shared with the dice den) ---------------- */
+/*@GULLET*/
+
+/* ---------------- plaza ---------------- */
+let PG = null;
+const GROW = [0, 300, 900, 1800, 3000, 4500];
+const growLv = () => GROW.filter((v) => st.spent >= v).length - 1;
+/* an even ring round the well that always fits a 390px phone: one stall at the top, three down each side, one at the bottom */
+const SLOTPOS = { pawn: ['c', 0], glass: ['r', 1], weaver: ['r', 2], carp: ['r', 3], gullet: ['c', 4], curio: ['l', 3], paint: ['l', 2], tailor: ['l', 1] };
+const BW = 42, BH = 36;
+function pgeom() {
+  const w = $('#app').clientWidth, AW = Math.floor(w / S), AH = Math.floor(700 / S);
+  return { AW, AH, cx: AW / 2, cy: 194, rx: AW / 2 - 1, ry: 170, side: AW / 2 - 23 };
+}
+// returns the booth's bottom-centre in art pixels
+const stallPos = (k) => { const [col, row] = SLOTPOS[k.id]; if (col === 'c') return [PG.cx, row === 0 ? 66 : 320]; return [PG.cx + (col === 'r' ? 1 : -1) * PG.side, 128 + (row - 1) * 66]; };
+function drawPlaza() {
+  PG = pgeom(); const { AW, AH, cx, cy, rx, ry } = PG, L = growLv();
+  const cv = $('#pz'), x = pctx(cv, AW, AH), p = P(x);
+  for (let y = 0; y < AH; y++) for (let i = 0; i < AW; i++) {
+    const dx = (i - cx) / rx, dy = (y - cy) / ry, d = Math.sqrt(dx * dx + dy * dy);
+    if (d > 1) { const t = Math.min(1, (d - 1) * 6); let c = dith(i, y, t) ? '#04100f' : '#0a1e1c'; if (hsh(i >> 2, y >> 2) % 9 === 0) c = '#13302a'; if (hsh(i >> 1, y >> 1) % 31 === 0) c = '#1f4a2a'; p.px(i, y, c); continue; }
+    const r = d, ring = Math.floor(r * 9), ang = Math.atan2(dy, dx), nSeg = 6 + ring * 4, seg = Math.floor((ang + Math.PI) / (Math.PI * 2) * nSeg + ring * .5), fr = r * 9 - ring, fa = (ang + Math.PI) / (Math.PI * 2) * nSeg + ring * .5 - seg;
+    let c = ['#1d2e2a', '#22362f', '#192824', '#263b34'][hsh(ring, seg) % 4];
+    if (fr < .09 || fa < .04) c = '#0b1513'; else if (fr < .18) c = mix(c, '#3a5a4e', .35); else if (fr > .9) c = mix(c, '#000000', .3);
+    if (hsh(i, y) % 23 === 0) c = mix(c, '#000000', .3);
+    if ((fr < .1 || fa < .05) && hsh(i, y) % 3 === 0) c = '#1f4a2a';
+    if (d > .97) c = '#0e1a18';
+    p.px(i, y, c);
+  }
+  if (L >= 4) for (let k = 0; k < 10; k++) { let a = k / 10 * Math.PI * 2 + .3, r = 36; for (let s = 0; s < 80; s++) { a += Math.sin(s * .4 + k) * .03; r += 1; const px = cx + Math.cos(a) * r * .55, py = cy + Math.sin(a) * r * 1.05; if (((px - cx) / rx) ** 2 + ((py - cy) / ry) ** 2 > .92) break; p.px(Math.round(px), Math.round(py), s % 3 ? '#2a9a62' : '#5ef2a0'); } }
+  const ring2 = (R, c, sk) => { for (let a = 0; a < Math.PI * 2; a += .012) { if (sk && Math.floor(a * 12) % sk === 0) continue; p.px(Math.round(cx + Math.cos(a) * R), Math.round(cy + Math.sin(a) * R * .9), c); } };
+  ring2(34, '#5ef2a0'); ring2(29, '#2aa06a'); if (L >= 5) { ring2(37, '#2aa06a'); ring2(39, '#5ef2a0', 3); }
+  const pts = []; for (let k = 0; k < 5; k++) { const a = -Math.PI / 2 + k * Math.PI * 2 / 5; pts.push([cx + Math.cos(a) * 29, cy + Math.sin(a) * 29 * .9]); }
+  [0, 2, 4, 1, 3, 0].reduce((pr, k) => { if (pr != null) { const [x0, y0] = pts[pr], [x1, y1] = pts[k], n = 60; for (let s = 0; s <= n; s++) p.px(Math.round(x0 + (x1 - x0) * s / n), Math.round(y0 + (y1 - y0) * s / n), '#3fd08a'); } return k; }, null);
+  for (let k = 0; k < 12; k++) { const a = k / 12 * Math.PI * 2 + .26, gx = Math.round(cx + Math.cos(a) * 31.5), gy = Math.round(cy + Math.sin(a) * 31.5 * .9);
+    [[0, -1], [0, 0], [0, 1], [-1, (k % 3) - 1], [1, ((k + 1) % 3) - 1]].forEach(([a2, b2]) => p.px(gx + a2, gy + b2, '#b6ffd6')); }
+  for (let y = -16; y <= 16; y++) for (let i = -17; i <= 17; i++) { const d = Math.sqrt((i / 15.5) ** 2 + (y / 13.5) ** 2);
+    if (d > 1.08) continue; let c;
+    if (d > .82) { const seg = Math.floor((Math.atan2(y, i) + Math.PI) / (Math.PI * 2) * 14); c = (Math.abs(d - .82) < .04 || (Math.atan2(y, i) + Math.PI) / (Math.PI * 2) * 14 - seg < .08) ? '#0e1816' : (y < 0 ? '#4a6a5e' : '#2e463e'); if (d > 1.02) c = '#081210'; }
+    else { const t = d / .82; c = t < .3 ? '#2aa06a' : t < .55 ? '#0f4a36' : (dith(i + 99, y + 99, (t - .55) * 2) ? '#020807' : '#06231a'); if (y < -8 && t > .6) c = '#020605'; }
+    p.px(Math.round(cx + i), Math.round(cy + y), c); }
+  // lantern posts in the gaps between stalls (grows)
+  PG.lamps = [];
+  if (L >= 1) [[-40, 96], [40, 96], [-40, 292], [40, 292], [-44, 161], [44, 161], [-44, 227], [44, 227]].forEach(([ox, ly]) => { const lx = Math.round(cx + ox); p.r(lx, ly - 10, 1, 12, '#2a2620'); p.r(lx - 2, ly + 2, 5, 1, '#1a1612'); p.r(lx - 1, ly - 13, 3, 3, '#ffd56a'); p.px(lx, ly - 12, '#fff6cf'); PG.lamps.push([lx, ly - 12]); });
+  if (L >= 2) { const ring = [0, 1, 5, 7, 3, 2, 6, 4].map((j) => PG.lamps[j]); for (let k = 0; k < ring.length; k++) { const [x0, y0] = ring[k], [x1, y1] = ring[(k + 1) % ring.length]; for (let s = 1; s < 14; s++) { const t = s / 14, sx = x0 + (x1 - x0) * t, sy = y0 + (y1 - y0) * t + Math.sin(t * Math.PI) * 5; p.px(Math.round(sx), Math.round(sy), s % 2 ? ['#ffd56a', '#5ef2a0', '#ff9a5a'][s % 3] : '#3a3020'); } } }
+  PG.statues = [];
+  if (L >= 3) [[-24, 122], [24, 122], [-24, 270], [24, 270]].forEach(([ox, sy]) => { const sx = Math.round(cx + ox); statue(p, sx, sy); PG.statues.push([sx, sy]); });
+  PG.candles = pts.map(([px0, py0]) => [Math.round(px0), Math.round(py0)]);
+  if (L >= 5) for (let k = 0; k < 7; k++) { const a = k / 7 * Math.PI * 2 + .2; PG.candles.push([Math.round(cx + Math.cos(a) * 38), Math.round(cy + Math.sin(a) * 38 * .9)]); }
+  PG.candles.forEach(([px0, py0]) => { p.r(px0 - 1, py0 - 2, 3, 4, '#e8dcc0'); p.px(px0 - 1, py0 - 2, '#fffbe8'); p.px(px0, py0 - 3, '#ffd56a'); p.px(px0, py0 - 4, '#fff6cf'); });
+  // the stalls go on top of everything on the ground
+  PG.bglow = [];
+  K.forEach((k) => drawBooth(p, k, ...stallPos(k)));
+  const t = $('#pzT'); t.width = AW * S; t.height = AH * S; t.style.width = AW * S + 'px'; t.style.height = AH * S + 'px';
+  const tg = t.getContext('2d'); tg.imageSmoothingEnabled = false; tg.filter = 'blur(2.4px)'; tg.drawImage(cv, 0, 0, AW * S, AH * S);
+  plazaLights(); placeSigns();
+}
+function statue(p, x, y) {
+  const c = ['#2e3a36', '#4a5a54', '#1a2420'];
+  for (let j = 0; j < 4; j++) p.r(x - 4, y + j, 9, 1, c[2]); p.r(x - 3, y - 2, 7, 2, c[0]);
+  for (let j = 0; j < 9; j++) p.r(x - 3 + (j > 5 ? 1 : 0), y - 11 + j, 7 - (j > 5 ? 2 : 0), 1, j < 2 ? c[1] : c[0]);
+  p.r(x - 3, y - 15, 7, 4, c[1]); p.px(x - 2, y - 13, '#5ef2a0'); p.px(x + 2, y - 13, '#5ef2a0');
+  for (let k = -2; k <= 2; k++) p.r(x + k, y - 11, 1, 4 + Math.abs(k), c[2]);
+  p.px(x - 4, y - 16, c[1]); p.px(x + 4, y - 16, c[1]);
+}
+/* each stall from above, 42 x 36 art pixels, showing what it sells */
+function drawBooth(p, k, bx, by) {
+  bx = Math.round(bx); by = Math.round(by);
+  const ox = bx - 21, oy = by - BH, r = (x, y, w, h, c) => p.r(ox + x, oy + y, w, h, c), d = (x, y, c) => p.px(ox + x, oy + y, c);
+  const cir = (cx, cy, rx, ry, c) => { for (let y = Math.floor(cy - ry); y <= cy + ry; y++) for (let x = Math.floor(cx - rx); x <= cx + rx; x++) if (((x + .5 - cx) / rx) ** 2 + ((y + .5 - cy) / ry) ** 2 <= 1) d(x, y, c); };
+  const glow = (x, y, rgb, s) => PG.bglow.push([ox + x, oy + y, rgb, s]);
+  r(1, 33, 42, 4, 'rgba(0,0,0,.5)');
+  const counter = (x, w) => { r(x, 28, w, 6, '#4a3420'); r(x, 28, w, 1, '#8a6440'); r(x, 33, w, 1, '#24180c'); };
+  if (k.id === 'weaver') {
+    r(2, 6, 2, 22, '#4a3018'); r(38, 6, 2, 22, '#4a3018'); r(1, 4, 40, 3, '#6a4424'); r(1, 4, 40, 1, '#a8784a');
+    [['#b8442e', '#f0b860', 17], ['#2e5a98', '#e8dcc0', 21], ['#4a7a32', '#f0dca0', 14], ['#7a2e6e', '#f0b0a0', 19]].forEach(([a, b, len], i) => {
+      const x = 4 + i * 8.5 | 0; r(x, 2, 8, 2, mix(a, '#000', .35));
+      for (let y = 0; y < len; y++) { r(x, 7 + y, 8, 1, Math.floor(y / 2) % 3 === 1 ? b : a); if (y % 6 === 3) { d(x + 3, 7 + y, b); d(x + 4, 7 + y, b); } }
+      r(x, 7, 1, len, mix(a, '#000', .3)); r(x + 7, 7, 1, len, mix(a, '#fff', .15)); for (let f = 0; f < 8; f += 2) d(x + f, 7 + len, '#e8dcc0'); });
+    r(0, 21, 14, 13, '#3a2410'); r(1, 22, 12, 11, '#140e08'); for (let xx = 2; xx < 13; xx += 2) r(xx, 22, 1, 11, '#d8d0b8'); for (let y = 27; y < 33; y++) r(1, y, 12, 1, y % 2 ? '#c4502e' : '#f0b060'); r(0, 21, 14, 1, '#8a5a30');
+    counter(15, 27); [['#2e5a98', 0], ['#b8442e', 1], ['#4a7a32', 2]].forEach(([c, i]) => { r(17, 26 - i * 2, 10, 2, c); r(17, 26 - i * 2, 10, 1, mix(c, '#fff', .3)); });
+    [[31, 26, '#e8b030'], [36, 26, '#c4502e'], [33, 23, '#8a6ac0']].forEach(([x, y, c]) => { cir(x, y, 2.4, 2.4, c); d(x - 1, y - 1, mix(c, '#fff', .5)); d(x + 1, y, mix(c, '#000', .3)); });
+    glow(21, 18, '255,190,120', 70);
+  }
+  if (k.id === 'glass') {
+    for (let y = 9; y < 34; y++) for (let x = 25; x < 42; x++) { if (y < 12 && (x < 27 || x > 39)) continue; const row = Math.floor(y / 3), bx2 = (x + (row % 2) * 2) % 5; d(x, y, bx2 === 0 || y % 3 === 0 ? '#1e1e22' : ['#4a4650', '#3e3a44', '#545058'][hsh(row, x >> 2) % 3]); }
+    cir(33.5, 26, 4.6, 4, '#ff8a2a'); cir(33.5, 26.5, 3, 2.4, '#ffd070'); cir(33.5, 27, 1.6, 1.2, '#fff4c8');
+    r(30, 0, 7, 10, '#34323a'); r(30, 0, 7, 1, '#ff9a3a'); d(32, 1, '#ffd070'); d(34, 1, '#ff6a2a');
+    r(1, 2, 2, 26, '#3a2a1a'); r(22, 2, 2, 26, '#3a2a1a'); r(0, 2, 25, 2, '#5a4028'); r(0, 2, 25, 1, '#8a6440');
+    [[4, 6, '#5ad0c0'], [8, 10, '#ffb46a'], [12, 5, '#ff8ab8'], [16, 12, '#5ef2a0'], [20, 7, '#8ac8ff']].forEach(([x, dr, c]) => { r(x, 4, 1, dr, '#8a8a92'); r(x - 1, 4 + dr, 3, 1, '#c8a040'); r(x - 1, 5 + dr, 3, 4, c); d(x - 1, 5 + dr, '#ffffff'); d(x, 9 + dr, mix(c, '#000', .3)); glow(x, 7 + dr, hexRgb(c).join(','), 34); });
+    counter(0, 25); [3, 7, 11, 15, 19].forEach((x, i) => { const c = ['#5ad0c0', '#ffb46a', '#8ac8ff', '#5ef2a0', '#ff8ab8'][i]; r(x, 23, 3, 5, c); r(x + 1, 21, 1, 2, c); d(x, 23, '#fff'); });
+    glow(33, 26, '255,140,50', 80); glow(33, 1, '255,150,60', 40);
+  }
+  if (k.id === 'paint') {
+    r(0, 0, 42, 26, '#cfc4a4'); r(0, 0, 42, 1, '#efe6cc'); r(0, 25, 42, 1, '#8a8068');
+    for (let y = 2; y < 24; y++) for (let x = 2; x < 40; x++) d(x, y, y < 9 ? '#1d3c5c' : y < 16 ? '#22566a' : '#1d4a50');
+    cir(30, 8, 4.5, 4.5, '#f0a040'); cir(30, 8, 3, 3, '#ffd070');
+    cir(13, 11, 5, 4.5, '#8a4aa0'); cir(11, 10, 1.2, 1.2, '#ffd56a'); cir(15, 10, 1.2, 1.2, '#ffd56a');
+    for (let t = 0; t < 5; t++) for (let s = 0; s < 9; s++) d(Math.round(9 + t * 2 + Math.sin(s * .7 + t) * 1.5), 15 + s, '#a85ac0');
+    for (let x = 2; x < 40; x++) { d(x, 19 + Math.round(Math.sin(x * .5) * 1.2), '#5ad0c0'); d(x, 22 + Math.round(Math.sin(x * .4 + 1) * 1), '#2a8a8a'); }
+    [[22, 4], [36, 14], [6, 5]].forEach(([x, y]) => d(x, y, '#ffffff'));
+    [[5, '#f0a040', 4], [12, '#a85ac0', 6], [20, '#5ad0c0', 3], [27, '#ff7ab8', 5], [35, '#5ef2a0', 4]].forEach(([x, c, l]) => r(x, 26, 1, l, c));
+    [1, 8, 15, 22, 29, 36].forEach((x, i) => { const c = ['#ffd56a', '#5aa7ff', '#ff7ab8', '#5ee08a', '#e8645a', '#a85ac0'][i]; r(x, 29, 5, 5, '#6a6a72'); r(x, 29, 5, 1, c); r(x + 1, 28, 3, 1, c); d(x + 1, 30, c); d(x + 1, 31, c); d(x, 33, '#3a3a42'); });
+    r(17, 22, 1, 7, '#8a5a2a'); d(17, 21, '#ff7ab8');
+    glow(21, 12, '230,170,255', 70);
+  }
+  if (k.id === 'carp') {
+    for (let x = 0; x < 42; x++) { const h = Math.round(12 * Math.sqrt(Math.max(0, 1 - ((x - 20.5) / 21) ** 2))); for (let y = 12 - h; y < 12; y++) d(x, y, y % 3 === 0 ? '#2e1a0c' : (x + y) % 7 ? '#7a5030' : '#5a3a20'); }
+    r(0, 12, 42, 1, '#1e1208'); [[8, 7], [20, 3], [33, 6], [27, 9]].forEach(([x, y]) => { d(x, y, '#e8e0c8'); d(x + 1, y, '#9a9488'); });
+    r(3, 12, 2, 18, '#3a2410'); r(37, 12, 2, 18, '#3a2410');
+    for (let a = 0; a < 6.28; a += .2) d(Math.round(21 + Math.cos(a) * 4), Math.round(19 + Math.sin(a) * 4), '#8a6038');
+    for (let a = 0; a < 6.28; a += .785) for (let s = 1; s < 6; s++) d(Math.round(21 + Math.cos(a) * s), Math.round(19 + Math.sin(a) * s), '#6a4426');
+    const chair = (x, y) => { r(x, y, 7, 2, '#a07040'); r(x, y - 6, 2, 6, '#7a5030'); d(x, y + 2, '#5a3a20'); d(x + 6, y + 2, '#5a3a20'); d(x, y + 3, '#5a3a20'); d(x + 6, y + 3, '#5a3a20'); d(x + 1, y, '#c89a60'); };
+    chair(6, 30); chair(7, 24); chair(6, 18);
+    const table = (x, y, up) => { r(x, y, 12, 2, '#b07a44'); r(x, y, 12, 1, '#d8a060'); if (up) { r(x + 1, y - 4, 1, 4, '#7a5030'); r(x + 10, y - 4, 1, 4, '#7a5030'); } else { r(x + 1, y + 2, 1, 4, '#7a5030'); r(x + 10, y + 2, 1, 4, '#7a5030'); } };
+    table(27, 28); table(28, 22, false); table(27, 20, true);
+    r(16, 26, 9, 2, '#6a4426'); r(16, 30, 9, 2, '#5a3a20'); d(18, 26, '#e8e0c8');
+    glow(21, 22, '255,200,140', 70);
+  }
+  if (k.id === 'curio') {
+    for (let x = 4; x < 39; x++) { const h = Math.round(7 * Math.sqrt(Math.max(0, 1 - ((x - 21) / 17.5) ** 2))); for (let y = 7 - h; y <= 7; y++) d(x, y, Math.floor((x - 4) / 5) % 2 ? '#5a3a6a' : '#8a6a9a'); }
+    [[12, 4], [29, 5]].forEach(([x, y]) => d(x, y, '#140e18')); r(20, 7, 1, 7, '#3a2a1a');
+    for (let y = 12; y < 34; y++) { const w = Math.round(20 * Math.sqrt((y - 11) / 23)); for (let x = 21 - w; x <= 21 + w; x++) { const h2 = hsh(x * 3 + 1, y * 7); let c = ['#4a3420', '#5a4024', '#3a2818'][h2 % 3];
+      const q = h2 % 13; if (q === 0 || q === 1) c = '#ffd56a'; else if (q === 2) c = '#c89a3a'; else if (q === 3) c = '#5aa7ff'; else if (q === 4) c = '#e8414a'; else if (q === 5) c = '#5ef2a0'; else if (q === 6) c = '#c8ccd4'; else if (q === 7) c = '#ff7ab8';
+      if (x === 21 - w || x === 21 + w) c = '#24180c'; d(x, y, c); } }
+    r(10, 23, 4, 4, '#ece6d2'); d(11, 24, '#14100e'); d(13, 24, '#14100e'); d(12, 26, '#14100e');
+    for (let a = 0; a < 6.28; a += .5) d(Math.round(28 + Math.cos(a) * 3), Math.round(20 + Math.sin(a) * 3), '#e8b030'); d(28, 20, '#14100e'); d(28, 19, '#14100e');
+    for (let s = 0; s < 9; s++) d(31 + s, 16 - s * .7 | 0, '#c89a3a');
+    for (let s = 0; s < 5; s++) { d(3 + s * 2, 25, '#c8ccd4'); r(3 + s * 2, 25, 1, 7, '#8a8e96'); } r(3, 25, 9, 1, '#c8ccd4');
+    glow(21, 20, '255,220,140', 60);
+  }
+  if (k.id === 'tailor') {
+    r(1, 0, 2, 34, '#4a3018'); r(39, 0, 2, 34, '#4a3018');
+    for (let x = 3; x < 39; x++) { d(x, 3 + Math.round(2 * Math.sin(Math.PI * (x - 3) / 36)), '#c8c0a8'); d(x, 13 + Math.round(2 * Math.sin(Math.PI * (x - 3) / 36)), '#c8c0a8'); }
+    const shirt = (x, y, c) => { r(x, y, 8, 2, c); r(x + 2, y + 2, 4, 5, c); r(x + 2, y + 2, 1, 5, mix(c, '#fff', .25)); d(x + 4, y + 1, mix(c, '#000', .4)); };
+    shirt(5, 4, '#c8a0c8'); r(15, 5, 6, 2, '#e8645a'); for (let y = 7; y < 12; y++) r(15 - (y - 7) / 2 | 0, y, 6 + (y - 7), 1, '#e8645a'); r(25, 5, 7, 7, '#5a1a3a'); r(25, 5, 7, 1, '#ffd56a'); r(34, 6, 2, 4, '#5a8ad0'); r(34, 10, 3, 1, '#5a8ad0');
+    for (let x = 5; x < 14; x++) d(x, 15 + (x % 2), x % 3 ? '#3aa05a' : '#e8dcc0'); r(18, 15, 5, 2, '#3a4a7a'); r(18, 17, 2, 5, '#3a4a7a'); r(21, 17, 2, 5, '#3a4a7a'); r(26, 14, 7, 2, '#1a1a24'); r(28, 12, 3, 2, '#1a1a24');
+    cir(34.5, 26, 4.6, 7, '#e0b050'); cir(34.5, 26, 3.3, 5.7, '#b8d4dc'); for (let s = 0; s < 4; s++) d(33 + s, 22 + s, '#ffffff'); r(33, 33, 3, 1, '#8a6014');
+    cir(9, 26, 3.4, 4.6, '#c8a0c8'); d(9, 22, '#ffd56a'); r(9, 30, 1, 4, '#3a2410'); r(7, 33, 5, 1, '#3a2410'); cir(9, 20, 1.6, 1.4, '#2a2a2a');
+    r(14, 29, 15, 5, '#4a3420'); r(14, 29, 15, 1, '#8a6440'); [['#c8a0c8', 15], ['#5a8ad0', 20], ['#e8645a', 25]].forEach(([c, x]) => { r(x, 27, 4, 3, c); d(x, 27, mix(c, '#fff', .4)); });
+    glow(34, 25, '200,255,230', 50);
+  }
+  if (k.id === 'pawn') {
+    for (let y = 0; y < 9; y++) { const hw = Math.round(9 + y * 1.4); r(21 - hw, y, hw * 2, 1, y % 3 ? '#2a2234' : '#3a3048'); }
+    for (let x = 9; x < 34; x += 3) d(x, 9, '#5a4a6a'); r(20, -2, 2, 3, '#5ef2a0');
+    r(6, 8, 30, 26, '#2a1a10'); r(6, 8, 30, 1, '#5a3a20'); r(8, 10, 26, 22, '#1d3a48');
+    r(8, 17, 26, 1, '#2a1a10'); r(8, 24, 26, 1, '#2a1a10'); r(20, 10, 2, 22, '#2a1a10');
+    r(10, 13, 3, 3, '#ece6d2'); d(13, 14, '#ece6d2'); d(11, 12, '#cfe0e8');
+    r(15, 12, 3, 5, '#2a5a6a'); d(15, 12, '#ffd56a');
+    r(23, 14, 5, 2, '#c4323a'); d(26, 14, '#ffe7a0');
+    r(29, 12, 4, 4, '#f0ece0'); r(29, 14, 4, 1, '#c4323a');
+    r(10, 20, 4, 3, '#0a0e14'); d(11, 21, '#ffd56a'); d(13, 21, '#ffd56a'); d(11, 19, '#0a0e14'); d(12, 19, '#0a0e14');
+    r(15, 21, 4, 2, '#cfd8f0'); r(23, 20, 5, 3, '#ffb46a'); r(23, 22, 5, 1, '#2a6aa0'); r(29, 20, 4, 3, '#e8e1cf');
+    r(10, 27, 4, 3, '#d8a040'); r(15, 26, 3, 4, '#5a8ad0'); r(23, 27, 4, 3, '#8a3a6a'); r(29, 26, 3, 4, '#3aa05a');
+    for (let s = 0; s < 26; s += 2) { d(8 + s, 10 + Math.round(s * 22 / 26), '#9aa0aa'); d(33 - s, 10 + Math.round(s * 22 / 26), '#9aa0aa'); }
+    r(19, 19, 4, 4, '#ffd56a'); d(20, 18, '#c89a3a'); d(21, 18, '#c89a3a'); d(19, 17, '#c89a3a'); d(22, 17, '#c89a3a'); d(20, 20, '#5a3a10');
+    [[11, 11], [24, 18], [16, 25]].forEach(([x, y]) => d(x, y, 'rgba(255,255,255,.55)'));
+    glow(21, 21, '150,220,255', 60);
+  }
+  if (k.id === 'gullet') {
+    for (let y = -2; y < 26; y++) for (let x = 12; x < 42; x++) { const dd = ((x - 27) / 15) ** 2 + ((y - 12) / 13) ** 2; if (dd < 1) d(x, y, hsh(x >> 1, y >> 1) % 4 ? '#2a2a26' : '#3a3a32'); }
+    r(22, 6, 11, 18, '#1a0e06'); r(23, 7, 9, 17, '#5a3a1e'); for (let j = 0; j < 3; j++) r(23 + j * 3, 7, 1, 17, '#3a2410'); d(30, 15, '#ffd56a'); r(21, 4, 13, 2, '#6a5a40');
+    r(14, 2, 26, 1, '#3a2e22'); [16, 22, 34, 38].forEach((x, i) => { r(x, 3, 1, 2, '#3a2e22'); r(x - 1, 5, 3, 5, i % 2 ? '#c4503a' : '#9ab0b8'); d(x, 6, '#111'); d(x - 1, 10, mix(i % 2 ? '#c4503a' : '#9ab0b8', '#000', .3)); d(x + 1, 10, mix(i % 2 ? '#c4503a' : '#9ab0b8', '#000', .3)); });
+    cir(9, 28, 8.5, 4.5, '#3a2410'); cir(9, 27, 8, 4, '#6a4426'); cir(9, 27, 6, 2.6, '#2e5a3a');
+    r(4, 25, 3, 3, '#e8dcc0'); d(5, 26, '#2a1a12'); r(9, 26, 3, 3, '#c43a3a'); d(9, 26, '#fff0d8'); d(11, 28, '#fff0d8'); r(13, 22, 1, 3, '#e8dcc0'); d(13, 21, '#ffd56a');
+    r(29, 27, 12, 7, '#6a4426'); r(29, 27, 12, 1, '#9a6a3a'); r(29, 30, 12, 1, '#3a2410');
+    [[30, 25, '#9ab0b8'], [35, 25, '#c4503a'], [32, 23, '#9ab0b8'], [37, 22, '#e8b040']].forEach(([x, y, c]) => { r(x, y, 5, 2, c); d(x + 4, y - 1, c); d(x + 4, y + 2, c); d(x + 1, y, '#111'); });
+    glow(13, 23, '255,200,110', 50);
+  }
+}
+function plazaLights() {
+  const G = $('#pzG'), L = growLv(), s = S; G.style.width = PG.AW * s + 'px'; G.style.height = PG.AH * s + 'px';
+  let h = `<div class="glow circ" style="left:${PG.cx * s}px;top:${PG.cy * s}px;width:${100 * s}px;height:${92 * s}px;background:radial-gradient(ellipse,rgba(94,242,160,.5),rgba(94,242,160,.16) 45%,transparent 70%)"></div>`;
+  h += `<div class="glow" style="left:${PG.cx * s}px;top:${PG.cy * s}px;width:${36 * s}px;height:${32 * s}px;background:radial-gradient(ellipse,rgba(180,255,220,.85),rgba(94,242,160,.3) 50%,transparent 72%)" id="wellG"></div>`;
+  PG.candles.forEach(([x, y], i) => { h += `<div class="glow flick" style="left:${x * s}px;top:${(y - 3) * s}px;width:34px;height:34px;animation-delay:-${i * .37}s;background:radial-gradient(circle,rgba(255,220,140,.9),rgba(255,170,80,.25) 40%,transparent 70%)"></div>`; });
+  (PG.lamps || []).forEach(([x, y], i) => { h += `<div class="glow flick" style="left:${x * s}px;top:${y * s}px;width:70px;height:70px;animation-delay:-${i * .53}s;background:radial-gradient(circle,rgba(255,200,120,.7),rgba(255,160,70,.18) 40%,transparent 70%)"></div>`; });
+  (PG.statues || []).forEach(([x, y]) => { h += `<div class="glow" style="left:${x * s}px;top:${(y - 13) * s}px;width:26px;height:18px;background:radial-gradient(ellipse,rgba(94,242,160,.8),transparent 70%)"></div>`; });
+  PG.bglow.forEach(([x, y, rgb, sz], i) => { h += `<div class="glow flick" style="left:${x * s}px;top:${y * s}px;width:${sz}px;height:${sz}px;animation-delay:-${i * .41}s;background:radial-gradient(circle,rgba(${rgb},.6),rgba(${rgb},.14) 45%,transparent 70%)"></div>`; });
+  if (L >= 4) for (let i = 0; i < 6; i++) { const jx = PG.cx * s + [-60, 50, -30, 70, -70, 20][i], jy = [150, 200, 470, 420, 330, 560][i]; h += `<img class="jelly px" src="${SPR.jelly.src}" style="left:${jx}px;top:${jy}px;width:24px;--d:${12 + i * 2}s;--dx:${(i % 2 ? 1 : -1) * (10 + i * 2)}px;--dy:${-14 - i * 3}px;filter:drop-shadow(0 0 8px rgba(120,255,230,.9));opacity:.75">`; }
+  G.innerHTML = h;
+}
+function placeSigns() {
+  $('#signs').innerHTML = K.map((k) => { const [x, y] = stallPos(k), sx = Math.max(45, Math.min(PG.AW * S - 45, x * S));
+    return `<button class="sign${k.id === 'gullet' ? ' gul' : ''}" data-k="${k.id}" style="left:${sx}px;top:${(y + 2) * S}px"><img class="px" src="${SPR.sig[k.id].src}" alt=""><b>${k.id === 'gullet' ? "Gullet's Den" : k.name.replace(/^The /, '')}</b><small>by Ulhu's licence</small></button>`; }).join('');
+}
+
+/* ---------------- ambient light: caustics and motes ---------------- */
+const CV = { w: 140, h: 120 }; let causX = null, causImg = null;
+function causticsFrame(t) {
+  if (!causX) { causX = document.createElement('canvas'); causX.width = CV.w; causX.height = CV.h; causImg = causX.getContext('2d').createImageData(CV.w, CV.h); }
+  const d = causImg.data;
+  for (let y = 0; y < CV.h; y++) for (let x = 0; x < CV.w; x++) {
+    const u = x * .27, v = y * .31, p1 = u + .9 * Math.sin(v * .9 + t * .7), q1 = v + .9 * Math.sin(u * .8 - t * .55);
+    const a = Math.abs(Math.sin(p1 + t * .25) * Math.sin(q1 * 1.1 - t * .35)), b = Math.abs(Math.sin(p1 * .6 - q1 * .7 + t * .4));
+    const br = Math.min(1, Math.pow(1 - a, 12) * .9 + .45 * Math.pow(1 - b, 18)), k = (y * CV.w + x) * 4;
+    d[k] = 110; d[k + 1] = 255; d[k + 2] = 215; d[k + 3] = br * 255;
+  }
+  causX.getContext('2d').putImageData(causImg, 0, 0);
+}
+function paintCaus(cv, w, h, a) { if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; } cv.style.width = w + 'px'; cv.style.height = h + 'px'; cv.style.opacity = a; const x = cv.getContext('2d'); x.clearRect(0, 0, w, h); x.drawImage(causX, 0, 0, w, h); }
+const motes = []; for (let i = 0; i < 40; i++) motes.push({ x: Math.random(), y: Math.random(), v: .004 + Math.random() * .01, s: Math.random() < .2 ? 2 : 1, ph: Math.random() * 6 });
+function drawMotes(cv, W, H, t) { if (cv.width !== W || cv.height !== H) { cv.width = W; cv.height = H; } const x = cv.getContext('2d'); x.clearRect(0, 0, W, H);
+  motes.forEach((m) => { m.y -= m.v * .12; if (m.y < -.02) { m.y = 1.02; m.x = Math.random(); } const al = .25 + .35 * (.5 + .5 * Math.sin(t * 2 + m.ph)); x.fillStyle = `rgba(170,255,230,${al})`; x.fillRect(Math.round((m.x + Math.sin(t * .6 + m.ph) * .01) * W), Math.round(m.y * H), m.s, m.s); }); }
+let last = 0, tick = 0;
+function loop(ts) {
+  if (ts - last > 80) { last = ts; const t = ts / 1000;
+    causticsFrame(RM ? 2 : t * .55);
+    const W = $('#app').clientWidth;
+    if (!$('#plaza').hidden && $('#plaza').style.visibility !== 'hidden') { paintCaus($('#pzC'), W, 700, .22); drawMotes($('#pzM'), W, 700, t); }
+    if ($('#stall').style.visibility === 'visible') paintCaus($('#scC'), W, 270, .2);
+    if (tick++ % 4 === 0) paintCaus($('#wallcaus'), Math.round(Math.min(innerWidth, 900) / 3), Math.round(innerHeight / 3), ''), $('#wallcaus').style.width = '100%', $('#wallcaus').style.height = '100%';
+  }
+  requestAnimationFrame(loop);
+}
+
+/* ---------------- the Sanctum (his real room) ---------------- */
+function roomHtml(s, pvId) {
+  const ids = Object.assign({}, st.placed); if (!ids.floor) ids.floor = DEF.floor; if (!ids.wall) ids.wall = DEF.wall;
+  const pv = pvId && byId[pvId] && byId[pvId].category ? byId[pvId] : null; if (pv && st.placed[SLOTOF[pv.category]] !== pv.id) ids[SLOTOF[pv.category]] = pv.id;
+  let h = '', ud = false;
+  const ulhu = () => { let u = `<img src="${UL.b16[ulMood]}" style="left:${SHOP.ulhu.x * s}px;top:${SHOP.ulhu.y * s}px;width:${32 * s}px;height:${32 * s}px" alt="Ulhu">`;
+    Object.values(st.worn).forEach((w) => { u += `<img src="${PX.wear[byId[w].key].src}" style="left:${SHOP.ulhu.x * s}px;top:${SHOP.ulhu.y * s}px;width:${32 * s}px;height:${32 * s}px" alt="">`; }); return u; };
+  ORDER.forEach((sl) => { const id = ids[sl]; if (!id) return; if (!ud && Z[sl] > 6) { h += ulhu(); ud = true; }
+    layersOf(byId[id]).forEach((l) => { h += `<img class="${pv && pv.id === id ? 'pv' : ''}" src="${l.art}" style="left:${l.ox * s}px;top:${l.oy * s}px;width:${l.w * s}px;height:${l.h * s}px" alt="">`; }); });
+  if (!ud) h += ulhu();
+  return h;
+}
+let ulMood = 'idle';
+
+/* ---------------- stall ---------------- */
+function stockOf(k) {
+  if (k.id === 'tailor') return WEAR.slice().sort((a, b) => a.price - b.price);
+  if (k.id === 'pawn') return REWARDS.slice();
+  return ITEMS.filter((i) => k.cats.includes(i.category)).sort((a, b) => a.price - b.price || a.name.localeCompare(b.name));
+}
+const isOwned = (i) => i.reward ? false : st.owned.has(i.id);
+const isLocked = (i) => !isOwned(i) && lockLv(i) > st.level;
+const artOf = (i) => i.wear ? { art: PX.wear[i.key].src, w: 32, h: 32 } : i.reward ? { art: i.art.src, w: 24, h: 24 } : (() => { const L = layersOf(i)[0]; return { art: L.art, w: L.w, h: L.h }; })();
+const runeOf = (i) => RN.ones[shash(i.id) % RN.ones.length].src;
+const pitchOf = (i) => { const c = i.wear ? i.part : i.reward ? 'reward' : i.category; const list = PITCH[c]; return list[shash(i.id) % list.length]; };
+function thumb(i, mw, mh) {
+  const a = artOf(i); let s = Math.max(1, Math.min(3, Math.floor(Math.min(mw / a.w, mh / a.h)))); let w = a.w * s, h = a.h * s;
+  if (w > mw || h > mh) { const k = Math.min(mw / a.w, mh / a.h); w = a.w * k; h = a.h * k; }
+  if (i.wear) { s = 2; w = 64; h = 64; }
+  return `<img src="${a.art}" style="width:${Math.round(w)}px;height:${Math.round(h)}px${i.wear ? ';margin-bottom:-8px' : ''}" alt="">`;
+}
+const warmLv = (k) => Math.min(2, Math.floor((st.warm[k] || 0) / 1) > 1 ? 2 : (st.warm[k] || 0));
+
+function drawScene(k) {
+  const W = Math.floor($('#app').clientWidth / S), H = 135, cv = $('#sc'), x = pctx(cv, W, H), p = P(x), [w0, w1, w2] = k.wall;
+  for (let y = 0; y < H; y++) for (let i = 0; i < W; i++) { const pk = Math.floor(i / 9), ph = i % 9; let c = ph === 0 ? '#050403' : [w0, w1, w2][hsh(pk, y >> 3) % 3]; if (ph === 1) c = mix(c, '#ffffff', .05); if (hsh(i, y) % 29 === 0) c = mix(c, '#000', .4); p.px(i, y, c); }
+  const shelf = (sy) => { p.r(0, sy, W, 2, '#3a2818'); p.r(0, sy, W, 1, '#6a4a2a'); p.r(0, sy + 2, W, 2, 'rgba(0,0,0,.5)'); };
+  const goods = { weaver: (sx, sy, n) => { const c = ['#3aa05a', '#3a7ac0', '#d8b040', '#c4502e', '#8a6ac0'][n % 5]; p.r(sx, sy - 5, 6, 5, c); p.r(sx + 1, sy - 5, 4, 1, mix(c, '#fff', .35)); p.px(sx + 2, sy - 3, mix(c, '#000', .35)); },
+    glass: (sx, sy, n) => { const c = ['#5ad0c0', '#ffb46a', '#8ac8ff', '#5ef2a0', '#ff8ab8'][n % 5], h = 5 + n % 4; p.r(sx + 1, sy - h, 4, h, c); p.r(sx + 2, sy - h - 2, 2, 2, c); p.px(sx + 1, sy - h + 1, '#ffffff'); },
+    carp: (sx, sy, n) => { p.r(sx, sy - 2, 7, 2, '#7a5030'); if (n % 2) p.r(sx + 1, sy - 6, 2, 4, '#8a8a92'); else p.r(sx + 2, sy - 5, 1, 3, '#6a4024'); },
+    curio: (sx, sy, n) => { const c = ['#ffd56a', '#c8ccd4', '#5aa7ff', '#ff7ab8', '#e8dcc0'][n % 5]; if (n % 3 === 0) { p.r(sx + 1, sy - 4, 4, 4, c); p.px(sx + 2, sy - 3, '#000'); } else if (n % 3 === 1) { p.r(sx, sy - 3, 6, 3, '#4a3a2a'); p.px(sx + 2, sy - 4, c); } else { p.r(sx + 2, sy - 7, 2, 7, c); } },
+    paint: (sx, sy, n) => { const c = ['#ffd56a', '#5aa7ff', '#ff7ab8', '#5ee08a', '#e8645a'][n % 5]; p.r(sx, sy - 4, 5, 4, '#6a6a72'); p.r(sx, sy - 4, 5, 1, c); p.px(sx + 1, sy - 2, c); },
+    tailor: (sx, sy, n) => { const c = ['#c8a0c8', '#5a8ad0', '#e8645a', '#3aa05a', '#e8dcc0'][n % 5]; p.r(sx, sy - 4, 7, 4, c); p.r(sx, sy - 4, 7, 1, mix(c, '#fff', .3)); },
+    pawn: (sx, sy, n) => { if (n % 3 === 0) { p.r(sx, sy - 5, 7, 5, '#3a2a1a'); p.r(sx, sy - 3, 7, 1, '#ffd56a'); } else if (n % 3 === 1) { p.r(sx + 1, sy - 7, 5, 7, '#24242a'); for (let j = 0; j < 5; j++) p.px(sx + 1 + j, sy - 7 + (j % 2) * 3, '#5a5a62'); p.px(sx + 3, sy - 4, '#9cffd0'); } else { p.r(sx + 2, sy - 6, 2, 6, '#e8dcc0'); p.px(sx + 2, sy - 7, '#ffd56a'); } },
+    gullet: (sx, sy, n) => { p.r(sx + 1, sy - 6, 4, 6, ['#2f6a55', '#5a3a7a', '#7a6a2a'][n % 3]); p.px(sx + 2, sy - 4, '#9cff4a'); } };
+  [34, 70].forEach((sy, si) => { shelf(sy); for (let n = 0, sx = 3; sx < W - 72; sx += 9 + (hsh(n, si) % 4), n++) goods[k.id](sx, sy, n + si * 3); });
+  // hanging trade things from the top
+  for (let n = 0, hx = 6; hx < W - 72; hx += 16, n++) { const c = mix(k.roof[n % 2], '#000', .2); p.r(hx + 2, 0, 1, 6 + (n % 3) * 2, '#3a2a18'); if (k.id === 'weaver') { for (let y = 0; y < 10; y++) p.r(hx, 7 + (n % 3) * 2 + y, 5, 1, y % 2 ? c : mix(c, '#fff', .2)); } else if (k.id === 'glass') { p.r(hx, 7 + (n % 3) * 2, 5, 6, '#5ad0c0'); p.px(hx + 1, 8 + (n % 3) * 2, '#fff'); } else p.r(hx, 7 + (n % 3) * 2, 5, 4, c); }
+  p.r(0, H - 3, W, 3, '#000');
+  // lights and glows
+  let gh = `<div class="glow flick" style="left:30%;top:20%;width:220px;height:200px;background:radial-gradient(circle,rgba(${k.lamp},.28),transparent 65%)"></div>`;
+  if (k.id === 'glass') gh += `<div class="glow flick" id="lureG" style="left:0;top:0;width:90px;height:90px;background:radial-gradient(circle,rgba(255,240,170,.95),rgba(255,180,80,.3) 40%,transparent 70%)"></div><div class="glow flick" id="forgeG" style="left:0;top:0;width:120px;height:120px;background:radial-gradient(circle,rgba(255,140,50,.8),transparent 65%)"></div>`;
+  if (k.id === 'pawn') gh += `<div class="glow" id="eyesG" style="left:0;top:0;width:70px;height:40px;background:radial-gradient(ellipse,rgba(156,255,208,.6),transparent 70%)"></div>`;
+  $('#scG').innerHTML = gh; $('#scG').style.cssText = 'width:100%;height:100%';
+  // keeper
+  const ke = $('#keeper'), ms = 3, top = 270 - 41 * ms; ke.style.cssText = `left:${k.id === 'gullet' ? 100 : 22}px;top:${top}px;width:${52 * ms}px;height:${46 * ms}px`;
+  ke.alt = k.name;
+  if (k.id === 'glass') { const l = parseFloat(ke.style.left); $('#lureG').style.left = (l + 39 * ms) + 'px'; $('#lureG').style.top = (top + 3 * ms) + 'px'; $('#forgeG').style.left = (l + 50 * ms) + 'px'; $('#forgeG').style.top = (top + 29 * ms) + 'px'; }
+  if (k.id === 'pawn') { const l = parseFloat(ke.style.left); $('#eyesG').style.left = (l + 26 * ms) + 'px'; $('#eyesG').style.top = (top + 20 * ms) + 'px'; }
+}
+function renderWin() {
+  const k = KB[st.k], inn = $('#winIn'), i = byId[st.focus];
+  $('#win').hidden = k.id === 'gullet';
+  if (k.id === 'tailor') { // the mirror
+    $('#winCap').textContent = 'The mirror';
+    let h = `<img src="${UL.b16[ulMood]}" style="left:16px;top:10px;width:96px;height:96px" alt="Ulhu in the mirror">`;
+    const worn = Object.assign({}, st.worn); if (i && i.wear) worn[i.part] = i.id;
+    Object.values(worn).forEach((w) => { h += `<img class="${i && w === i.id && !st.owned.has(w) ? 'pv' : ''}" src="${PX.wear[byId[w].key].src}" style="left:16px;top:10px;width:96px;height:96px" alt="">`; });
+    inn.innerHTML = h + '<div style="position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.14) 40%,transparent 48%);pointer-events:none"></div>';
+    inn.style.borderRadius = '50%/42%'; $('#win').style.borderRadius = '50%/44%'; $('#win').style.background = 'linear-gradient(180deg,#e0b050,#8a6014)';
+  } else if (k.id === 'pawn') {
+    $('#winCap').textContent = 'The surface'; inn.style.borderRadius = ''; $('#win').style.borderRadius = ''; $('#win').style.background = '';
+    const stars = Array.from({ length: 18 }, (_, j) => `<i style="position:absolute;left:${(j * 37) % 124}px;top:${(j * 23) % 46}px;width:1px;height:1px;background:#e8f0ff;opacity:${.4 + (j % 3) * .2}"></i>`).join('');
+    inn.innerHTML = `<div style="position:absolute;inset:0;background:linear-gradient(180deg,#081428,#142a48 55%,#1a2e3a)"></div>${stars}<div style="position:absolute;left:94px;top:10px;width:18px;height:18px;border-radius:50%;background:#f0f4ff;box-shadow:0 0 16px 5px rgba(220,230,255,.55)"></div>` +
+      `<div style="position:absolute;left:0;right:0;bottom:0;height:30px;background:#0c1a14"></div><div style="position:absolute;left:8px;bottom:22px;width:58px;height:40px;background:#0a0e14"></div><div style="position:absolute;left:4px;bottom:62px;width:0;height:0;border-left:33px solid transparent;border-right:33px solid transparent;border-bottom:20px solid #0a0e14"></div>` +
+      `<div style="position:absolute;left:16px;bottom:40px;width:10px;height:10px;background:#ffd56a;box-shadow:0 0 10px #ffb84a"></div><div style="position:absolute;left:44px;bottom:40px;width:10px;height:10px;background:#ffd56a;box-shadow:0 0 10px #ffb84a"></div><div style="position:absolute;left:30px;bottom:22px;width:10px;height:16px;background:#3a2a18"></div>` +
+      `<div style="position:absolute;left:66px;bottom:14px;width:56px;height:6px;border-radius:50%;background:rgba(255,210,120,.25)"></div>` +
+      (i ? `<img src="${artOf(i).art}" class="pv" style="left:74px;top:56px;width:40px;height:40px;filter:drop-shadow(0 0 6px rgba(255,220,150,.7))" alt="">` : '') + '<div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 100%,rgba(255,200,120,.12),transparent 60%)"></div>';
+  } else { $('#winCap').textContent = 'Your Sanctum'; inn.style.borderRadius = ''; $('#win').style.borderRadius = ''; $('#win').style.background = ''; inn.innerHTML = roomHtml(1, i && i.category ? i.id : null); }
+}
+function warmPips() { const k = st.k, w = st.warm[k] || 0, lv = w >= 3 ? 3 : w; $('#kWarm').innerHTML = (k === 'gullet' ? 'Desperation' : 'Warmth') + ' ' + [0, 1, 2].map((j) => `<i class="${(k === 'gullet' ? 3 : lv) > j ? 'on' : ''}"></i>`).join(''); }
+let sayTok = 0;
+function say(text) {
+  const tok = ++sayTok, el = $('#bubT'); let n = 0; $('#bub').classList.remove('hide');
+  if (RM) { el.textContent = text; return; }
+  (function tick() { if (tok !== sayTok) return; n += 2; el.textContent = text.slice(0, n); if (n < text.length) setTimeout(tick, 22); })();
+}
+let uTok = 0;
+function ulhuSays(text) { const tok = ++uTok, u = $('#usay'); u.querySelector('.tx').textContent = text; u.classList.remove('hide'); ulMood = 'sad'; renderWin(); setTimeout(() => { if (tok === uTok) { u.classList.add('hide'); ulMood = 'idle'; renderWin(); } }, 3800); }
+function greetLine(k) { const w = Math.min(2, st.warm[k] || 0); return LINES[k].greet[w]; }
+let kAnim = 0;
+function keeperFrame(f) { const k = st.k; if (!k) return; const fr = KS[k][f] || KS[k].idle; $('#keeper').src = fr.src; }
+function keeperTick() { if (!st.k) return; const now = performance.now(); if (now < kAnim) return; keeperFrame(Math.random() < .12 ? 'blink' : 'idle'); if (st.k === 'gullet' && Math.random() < .2) keeperFrame('talk'); }
+function happy(ms) { kAnim = performance.now() + ms; keeperFrame('happy'); const ke = $('#keeper'); ke.classList.remove('hop'); void ke.offsetWidth; ke.classList.add('hop'); }
+
+function openStall(id) {
+  const k = KB[id]; st.k = id; st.page = 0; st.focus = null; ulMood = 'idle';
+  $('#kName').textContent = k.name; warmPips(); drawScene(k); keeperFrame('idle'); $('#bubN').textContent = PNAME[id];
+  $('#usay').classList.add('hide');
+  $('#ctr').hidden = id === 'gullet'; $('#info').hidden = id === 'gullet'; $('#stall').querySelector('.door')?.remove();
+  if (id === 'gullet') {
+    $('#stall').insertAdjacentHTML('beforeend', `<div class="door"><div><img src="${SPR.die1.src}" alt=""><img src="${SPR.die2.src}" alt=""></div>The back room: dice game coming later.<div style="margin-top:6px;font:700 11px var(--a);font-style:normal;letter-spacing:.12em;text-transform:uppercase;color:#c8a070">Your opponent: Gullet</div><div style="margin-top:10px;font:12.5px var(--a);font-style:normal;color:#b8a080">Gullet is the most desperate keeper in the market. His tithe is the most overdue.</div></div>`);
+    say(LINES.gullet.greet[Math.min(2, st.warm.gullet || 0)]); st.warm.gullet = (st.warm.gullet || 0) + 1; renderWin(); return;
+  }
+  const stock = stockOf(k); st.focus = stock.find((i) => !isOwned(i) && !isLocked(i) && i.price && i.price <= st.runes)?.id || stock[0].id; st.page = Math.floor(stock.findIndex((i) => i.id === st.focus) / 5);
+  renderRow(); renderWin(); renderInfo(); say(greetLine(id));
+}
+function renderRow(dir) {
+  const k = KB[st.k], stock = stockOf(k), pages = Math.ceil(stock.length / 5), row = $('#row');
+  st.page = Math.max(0, Math.min(pages - 1, st.page));
+  const items = stock.slice(st.page * 5, st.page * 5 + 5);
+  row.innerHTML = items.map((i) => { const own = isOwned(i), lk = isLocked(i), poor = i.price > st.runes;
+    const pr = own ? `<span class="seal${st.placed[SLOTOF[i.category]] === i.id || Object.values(st.worn).includes(i.id) ? ' in' : ''}">Yours</span>` : lk ? `<span class="lk">Level ${lockLv(i)}</span>` : `<img class="px" src="${runeOf(i)}" alt=""><span>${i.price || 'Free'}</span>`;
+    return `<button class="slot${lk ? ' lock' : ''}${i.id === st.focus ? ' on' : ''}" data-id="${i.id}" aria-label="${i.name}">${st.aside.includes(i.id) ? '<span class="held">HELD</span>' : ''}<span class="stand"><span class="shad"></span><span class="lift"><span class="spin">${thumb(i, 60, 54)}</span></span></span><span class="pr${poor && !own && !lk ? ' poor' : ''}" style="--rg:${TIERG[i.tier]}">${pr}</span></button>`; }).join('');
+  row.classList.toggle('f', !!items.find((i) => i.id === st.focus));
+  $('#pager').innerHTML = `<button data-p="-1" aria-label="Previous handful">&lsaquo;</button>` + Array.from({ length: pages }, (_, j) => `<i class="${j === st.page ? 'on' : ''}"></i>`).join('') + `<button data-p="1" aria-label="Next handful">&rsaquo;</button>`;
+  if (dir && !RM) row.animate([{ transform: `translateX(${dir * 60}px)`, opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 320, easing: 'cubic-bezier(.2,.8,.2,1)' });
+  placeSpot();
+}
+function placeSpot() { const el = $(`.slot[data-id="${st.focus}"]`), sp = $('#spot'); sp.style.setProperty('--lc', KB[st.k].lamp); if (!el) { sp.style.opacity = 0; return; } sp.style.opacity = 1; sp.style.left = (el.offsetLeft + el.offsetWidth / 2) + 'px'; }
+function renderInfo() {
+  const i = byId[st.focus], k = KB[st.k]; if (!i) return; const own = isOwned(i), lk = isLocked(i), poor = i.price > st.runes;
+  const placed = own && (i.wear ? Object.values(st.worn).includes(i.id) : st.placed[SLOTOF[i.category]] === i.id);
+  let b1, note;
+  if (own) { b1 = `<button class="buy" data-b="place">${placed ? (i.wear ? 'Take it off' : 'Take it out') : (i.wear ? 'Wear it' : 'Place it')}</button>`; note = placed ? (i.wear ? 'Ulhu is wearing it.' : 'In your Sanctum now.') : 'Yours. Tap it again to ' + (i.wear ? 'wear it.' : 'place it.'); }
+  else { b1 = `<button class="buy" data-b="buy" ${lk || poor ? 'disabled' : ''}>${i.price ? 'Buy' : 'Take it'}</button>`; note = lk ? `<b>Unlocks at level ${lockLv(i)}.</b> You are level ${st.level}.` : poor ? `<b>${i.price - st.runes} runes short.</b> Hold it to set it aside.` : `A tenth of the price sinks down the well. Hold an item to set it aside.`; }
+  $('#info').innerHTML = `<div class="t"><div style="min-width:0"><h3>${i.name}</h3><span class="tier" style="color:${TIERG[i.tier]}">${i.tier}</span></div><div class="big" style="--rg:${TIERG[i.tier]}">${own ? '<span class="seal" style="width:52px;height:32px;font-size:14px">Yours</span>' : `<img class="px" src="${runeOf(i)}" alt="rune"><span>${i.price} runes</span>`}</div></div>
+    <p class="pitch">&ldquo;${pitchOf(i)}&rdquo;<small>${k.name}</small></p><div class="btns">${b1}<button class="hag" data-b="haggle">Haggle</button><button class="ghost" data-b="back">Put back</button></div><p class="note">${note}</p>`;
+}
+function setFocus(id) {
+  if (st.busy) return; st.focus = id; $$('.slot').forEach((s) => s.classList.toggle('on', s.dataset.id === id)); $('#row').classList.add('f'); placeSpot(); renderInfo(); renderWin();
+  const i = byId[id]; if (isLocked(i)) say('Not for you yet. That one wants an older will.'); else if (Math.random() < .5) say(pitchOf(i));
+}
+function setRunes(n) { st.runes = n; $('#runesN').textContent = n; $('#runesN2').textContent = n; }
+function setSpent(n) { st.spent = Math.max(0, Math.min(6000, n)); $('#spent').value = st.spent; $('#spentO').textContent = st.spent + ' runes'; drawPlaza(); }
+function fly(src, a, b, o) {
+  o = o || {}; const im = document.createElement('img'); im.className = 'fly'; im.src = src; im.style.width = a.width + 'px'; im.style.height = a.height + 'px'; document.body.appendChild(im);
+  const sx = b.width / a.width, sy = b.height / a.height, mx = (a.left + b.left) / 2, my = Math.min(a.top, b.top) - (o.arc || 50);
+  const an = im.animate([{ transform: `translate(${a.left}px,${a.top}px)`, opacity: 1 }, { transform: `translate(${mx}px,${my}px) scale(${(1 + sx) / 2 * 1.15},${(1 + sy) / 2 * 1.15})`, offset: .45 }, { transform: `translate(${b.left}px,${b.top}px) scale(${sx},${sy})`, opacity: o.fade ? 0 : 1 }], { duration: RM ? 10 : (o.ms || 620), easing: 'cubic-bezier(.3,.7,.3,1)', fill: 'forwards' });
+  return an.finished.then(() => im);
+}
+function targetRect(i) {
+  const r = $('#winIn').getBoundingClientRect();
+  if (i.category) { const L = layersOf(i)[0]; return { left: r.left + L.ox, top: r.top + L.oy, width: L.w, height: L.h }; }
+  if (i.wear) return { left: r.left + 16, top: r.top + 10, width: 96, height: 96 };
+  return { left: r.left + 76, top: r.top + 62, width: 40, height: 40 };
+}
+async function buy() {
+  const i = byId[st.focus], k = st.k; if (st.busy || isOwned(i) || isLocked(i)) return;
+  if (i.price > st.runes) { say(LINES[k].poor); return; }
+  st.busy = true; const before = { runes: st.runes, spent: st.spent, placed: Object.assign({}, st.placed), worn: Object.assign({}, st.worn), warm: st.warm[k] || 0, aside: st.aside.slice() };
+  const slot = $(`.slot[data-id="${i.id}"]`), sr = slot.querySelector('.spin img').getBoundingClientRect(), cr = $('#ctr').getBoundingClientRect(), kr = $('#keeper').getBoundingClientRect(), pr = $('#runeI2').getBoundingClientRect();
+  // runes clink onto the counter one by one, then the keeper takes them and they burn
+  const n = Math.max(2, Math.min(6, Math.round(i.price / 150) + 2)), rs = [];
+  for (let j = 0; j < n; j++) {
+    const im = document.createElement('img'); im.className = 'fly'; im.src = RN.ones[(shash(i.id) + j) % 5].src; const tx = cr.left + 30 + j * 20, ty = cr.top + 92;
+    im.style.width = im.style.height = '20px'; document.body.appendChild(im); rs.push(im);
+    await im.animate([{ transform: `translate(${pr.left}px,${pr.top}px)` }, { transform: `translate(${(pr.left + tx) / 2}px,${ty - 60}px)`, offset: .5 }, { transform: `translate(${tx}px,${ty}px)` }, { transform: `translate(${tx}px,${ty - 5}px)`, offset: .88 }, { transform: `translate(${tx}px,${ty}px)` }], { duration: RM ? 10 : 280, easing: 'ease-in', fill: 'forwards' }).finished;
+    setRunes(st.runes - Math.round(i.price / n));
+  }
+  setRunes(before.runes - i.price); happy(1500); say(LINES[k].buy[Math.min(2, st.warm[k] || 0)]);
+  await Promise.all(rs.map((im, j) => { const fx = document.createElement('img'); fx.className = 'fly'; fx.src = PX.flame.src; fx.style.width = '14px'; fx.style.height = '18px'; document.body.appendChild(fx);
+    const m = im.getBoundingClientRect(); fx.animate([{ transform: `translate(${m.left + 3}px,${m.top - 10}px)`, opacity: 1 }, { transform: `translate(${m.left + 3}px,${m.top - 30}px) scale(1.4)`, opacity: 0 }], { duration: 600, delay: j * 60, fill: 'forwards' }).finished.then(() => fx.remove());
+    return im.animate([{ transform: `translate(${m.left}px,${m.top}px)`, opacity: 1, filter: 'drop-shadow(0 0 4px #5ef2a0)' }, { transform: `translate(${kr.left + kr.width / 2}px,${kr.top + kr.height * .55}px) scale(.4)`, opacity: 0, filter: 'drop-shadow(0 0 10px #5ef2a0)' }], { duration: RM ? 10 : 560, delay: j * 60, easing: 'ease-in', fill: 'forwards' }).finished.then(() => im.remove()); }));
+  // the item lifts off and settles into the Sanctum (or the mirror, or up to the surface)
+  st.warm[k] = (st.warm[k] || 0) + 1; warmPips();
+  if (i.reward) { st.busy = false; setSpent(st.spent + i.price); receipt(i, before); return; }
+  st.owned.add(i.id); if (i.wear) st.worn[i.part] = i.id; else st.placed[SLOTOF[i.category]] = i.id; st.aside = st.aside.filter((x) => x !== i.id);
+  const a = artOf(i), t = targetRect(i);
+  const im = await fly(a.art, { left: sr.left, top: sr.top, width: sr.width, height: sr.height }, t, { arc: 70, ms: 700 });
+  renderWin(); im.remove(); renderRow(); renderInfo(); setSpent(st.spent + i.price); st.busy = false;
+  if (Math.random() < .55) setTimeout(() => ulhuSays(pick(ULS)), 900);
+  toast(`Bought ${i.name} for ${i.price} runes.`, () => { setRunes(before.runes); setSpent(before.spent); st.owned.delete(i.id); st.placed = before.placed; st.worn = before.worn; st.warm[k] = before.warm; st.aside = before.aside; warmPips(); renderRow(); renderInfo(); renderWin(); say('Changed your mind? Your will flows back. Mine stays empty.'); });
+}
+function togglePlace() {
+  const i = byId[st.focus], wasP = Object.assign({}, st.placed), wasW = Object.assign({}, st.worn);
+  if (i.wear) { if (st.worn[i.part] === i.id) delete st.worn[i.part]; else st.worn[i.part] = i.id; }
+  else { const sl = SLOTOF[i.category]; if (st.placed[sl] === i.id) delete st.placed[sl]; else st.placed[sl] = i.id; }
+  renderRow(); renderInfo(); renderWin();
+  toast(`Changed ${i.name}.`, () => { st.placed = wasP; st.worn = wasW; renderRow(); renderInfo(); renderWin(); });
+}
+function putBack() { st.focus = null; $$('.slot').forEach((s) => s.classList.remove('on')); $('#row').classList.remove('f'); placeSpot(); renderWin(); say(LINES[st.k].back); $('#info').innerHTML = '<p class="note" style="margin:auto;text-align:center">Tap an item on the counter. Swipe the counter for the next handful.</p>'; }
+function setAside(id) {
+  const i = byId[id]; if (isOwned(i)) return; if (isLocked(i)) { say('Not for you yet. I can\'t hold what you can\'t have.'); return; }
+  if (st.aside.includes(id)) { say('Already under the counter. Safe as a sunk ship.'); return; }
+  st.aside.push(id); heldChip(); renderRow(); say('Under the counter it goes. Nobody touches it but you.');
+  toast(`Set aside ${i.name}.`, () => { st.aside = st.aside.filter((x) => x !== id); heldChip(); renderRow(); });
+}
+function heldChip() { $('#held').innerHTML = `Held <b>${st.aside.length}</b>`; }
+function receipt(i, before) {
+  const v = sheet(`<h2>${i.name}</h2><div class="receipt"><h4>Receipt</h4><div class="ln"></div><div>Taken in trade from the keeper of the Sanctum:</div><div class="bg2">${i.price} runes of will</div><div>In return, from the surface, one</div><div class="bg2"><b>${i.name}</b></div><div class="ln"></div><div class="sg"><span>Held by the Pawnbroker. Present this to the one who waits above. A tenth went down the well.</span><canvas id="f9"></canvas></div></div><div class="row2"><button class="ghost" data-x="1">Back to the counter</button></div>`);
+  f9($('#f9'), 128);
+  toast(`Paid ${i.price} runes for ${i.name}.`, () => { setRunes(before.runes); setSpent(before.spent); st.warm.pawn = before.warm; warmPips(); renderRow(); renderInfo(); });
+  renderRow(); renderInfo();
+}
+
+/* counter input: tap to focus, swipe for the next handful, hold to set aside */
+(function () {
+  const c = $('#ctr'); let sx = 0, sy = 0, lp = 0, fired = false, moved = false;
+  c.addEventListener('pointerdown', (e) => { sx = e.clientX; sy = e.clientY; fired = false; moved = false; const s = e.target.closest('.slot'); clearTimeout(lp); if (s) lp = setTimeout(() => { fired = true; setAside(s.dataset.id); }, 560); });
+  c.addEventListener('pointermove', (e) => { if (Math.hypot(e.clientX - sx, e.clientY - sy) > 10) { clearTimeout(lp); moved = true; } });
+  c.addEventListener('pointerup', (e) => { clearTimeout(lp); const dx = e.clientX - sx; if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(e.clientY - sy)) { page(dx < 0 ? 1 : -1); fired = true; } });
+  c.addEventListener('pointercancel', () => clearTimeout(lp));
+  c.addEventListener('contextmenu', (e) => e.preventDefault());
+  c.addEventListener('click', (e) => { if (st.busy) return; const pb = e.target.closest('[data-p]'); if (pb) { page(+pb.dataset.p); return; } if (fired) { fired = false; return; } const s = e.target.closest('.slot'); if (!s) return;
+    const id = s.dataset.id; if (id === st.focus && isOwned(byId[id])) togglePlace(); else setFocus(id); });
+})();
+function page(d) { const stock = stockOf(KB[st.k]), pages = Math.ceil(stock.length / 5), np = st.page + d; if (np < 0 || np >= pages) return; st.page = np; st.focus = stock[np * 5].id; renderRow(d); renderInfo(); renderWin(); }
+$('#info').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b || st.busy) return; if (b.dataset.b === 'buy') buy(); if (b.dataset.b === 'haggle') haggle(); if (b.dataset.b === 'back') putBack(); if (b.dataset.b === 'place') togglePlace(); });
+
+
+const HAGGLE = { weaver: 'She knits while she bargains and never drops a stitch.', paint: 'He haggles in ink. Every offer is a small masterpiece.', glass: 'He heats the price until you sweat.', carp: 'He says nothing, knocks on wood, and waits.', curio: 'Kraa. He will try to swap you a shiny thing instead.', tailor: 'She measures you while you argue, darling.', pawn: 'He holds the surface things, and he holds his nerve.', gullet: 'He begs, then he cheats, then he begs again.' };
+function haggle() {
+  const k = KB[st.k], i = byId[st.focus];
+  sheet(`<h2>Haggle</h2><div class="opp"><img src="${KS[k.id].idle.src}" alt="${k.name}"><div><b>Your opponent</b><p>${k.name}. ${HAGGLE[k.id]}</p></div></div><div class="opp" style="display:block;text-align:center"><p>${i ? 'Over: ' + i.name + '. ' : ''}The haggling game is coming later.</p></div><div class="row2"><button class="ghost" data-x="1">Back to the counter</button></div>`);
+  say(k.id === 'pawn' ? 'You wish to bargain with me? Interesting.' : 'Haggle? With me? Oh, I do love a fight for your will.');
+}
+/* ---------------- toast + sheets ---------------- */
+let toastT = 0;
+function toast(text, undo) { $('#toastT').textContent = text; $('#toast').classList.add('show'); st.undo = undo; clearTimeout(toastT); toastT = setTimeout(() => { $('#toast').classList.remove('show'); st.undo = null; }, 7000); }
+$('#undo').addEventListener('click', () => { if (st.undo) { const u = st.undo; st.undo = null; u(); } $('#toast').classList.remove('show'); });
+function sheet(html) { const root = $('#sheetRoot'); root.innerHTML = `<div class="veil"><div class="sheet" role="dialog" aria-modal="true"><button class="x" data-x="1" aria-label="Close">&times;</button>${html}</div></div>`; const v = root.firstChild; v.addEventListener('click', (e) => { if (e.target === v || e.target.closest('[data-x]')) root.innerHTML = ''; }); return v; }
+$('#lore').addEventListener('click', () => sheet(`<div class="lore"><h2>The Night Market</h2><p>Runes are your trapped will, and the only true will in the market.</p><p>The deep folk owe the Old Ones a tithe they can never pay alone, because they have no will left. So every keeper competes for your runes and flatters you. Gullet is the most desperate of them all.</p><p>Every stall holds a licence from Ulhu, carved into its sign. A tenth of every sale sinks down the central well to the Old Ones, which is why Ulhu sulks when you shop: he only gets a cut.</p></div>`));
+
+
+/* soft mist painting shared by the TR3 family */
+function blob(g, x, y, r, al) { r = Math.max(2, r); const gr = g.createRadialGradient(x, y, 0, x, y, r); gr.addColorStop(0, `rgba(205,255,238,${al})`); gr.addColorStop(1, 'rgba(120,220,190,0)'); g.fillStyle = gr; g.fillRect(x - r, y - r, r * 2, r * 2); }
+function ring(g, x, y, r) { g.strokeStyle = 'rgba(235,255,248,.7)'; g.lineWidth = 1.5; g.beginPath(); g.arc(x, y, r, 0, 7); g.stroke(); }
+function arm(g, bez, p, w, suck) { for (let s = 0; s <= p; s += .008) { const [x, y] = bez(s); blob(g, x, y, w * (1 - s * .72) + 3, .5 * (1 - s * .3)); if (suck && Math.round(s * 1000) % 56 === 0 && s > .05) { const [xa, ya] = bez(Math.min(1, s + .01)), nx = -(ya - y), ny = xa - x, l = Math.hypot(nx, ny) || 1; ring(g, x + nx / l * w * .45 * (1 - s * .7), y + ny / l * w * .45 * (1 - s * .7), Math.max(1.5, 4 * (1 - s * .7))); } } }
+function animate(ms, fn) { return new Promise((res) => { const T0 = performance.now(); (function fr() { const p = Math.min(1, (performance.now() - T0) / ms); fn(p); if (p < 1) requestAnimationFrame(fr); else res(); })(); }); }
+/* ---------------- transitions ---------------- */
+const app = () => $('#app'), fxL = () => $('#fx');
+const stallC = (k) => { const [x, y] = stallPos(k); return [x, y - 18]; };
+const D = (ms) => RM ? 10 : ms * (st.slow ? 4 : 1);
+function showStall() { const s = $('#stall'); s.style.visibility = 'visible'; s.style.opacity = 1; s.style.transform = ''; }
+function hideStall() { const s = $('#stall'); s.style.visibility = 'hidden'; }
+function relPt(xa, ya) { return [xa * S, ya * S]; }
+const TR = {
+  1: { // the lantern path
+    async in(k) {
+      const [x0, y0] = relPt(PG.cx, PG.cy), [x1, y1] = relPt(...stallC(k)), n = 9, f = fxL(), ctrl = [(x0 + x1) / 2 + (y1 - y0) * .25, (y0 + y1) / 2 - (x1 - x0) * .25];
+      const pts = []; for (let j = 1; j <= n; j++) { const t = j / (n + 1), a = (1 - t) * (1 - t), b = 2 * (1 - t) * t, c = t * t; pts.push([a * x0 + b * ctrl[0] + c * x1, a * y0 + b * ctrl[1] + c * y1]); }
+      f.innerHTML = pts.map(([x, y]) => `<span class="pl" style="left:${x}px;top:${y}px"><i></i><img src="${SPR.lantern.src}" alt=""></span>`).join('');
+      for (const el of $$('.pl', f)) { el.classList.add('on'); await wait(D(75)); }
+      await wait(D(200));
+      const pz = $('#plaza'); pz.style.transformOrigin = `${x1}px ${y1}px`; f.style.transformOrigin = `${x1}px ${y1}px`;
+      await Promise.all([pz.animate([{ transform: 'scale(1)', filter: 'brightness(1)' }, { transform: 'scale(3.2)', filter: 'brightness(1.6)' }], { duration: D(650), easing: 'cubic-bezier(.5,0,.8,.6)', fill: 'forwards' }).finished,
+        f.animate([{ transform: 'scale(1)' }, { transform: 'scale(3.2)' }], { duration: D(650), easing: 'cubic-bezier(.5,0,.8,.6)', fill: 'forwards' }).finished]);
+      f.innerHTML = ''; f.getAnimations().forEach((a) => a.cancel()); f.style.transformOrigin = ''; showStall();
+      await $('#stall').animate([{ opacity: 0, transform: 'scale(1.12)' }, { opacity: 1, transform: 'scale(1)' }], { duration: D(420), easing: 'ease-out' }).finished;
+      pz.getAnimations().forEach((a) => a.cancel()); pz.style.visibility = 'hidden';
+    },
+    async out(k) {
+      const pz = $('#plaza'), [x1, y1] = relPt(...stallC(k)); pz.style.visibility = 'visible'; pz.style.transformOrigin = `${x1}px ${y1}px`;
+      await $('#stall').animate([{ opacity: 1 }, { opacity: 0, transform: 'scale(.9)' }], { duration: D(300), fill: 'forwards' }).finished; hideStall(); $('#stall').getAnimations().forEach((a) => a.cancel());
+      await pz.animate([{ transform: 'scale(3.2)', filter: 'brightness(1.6)' }, { transform: 'scale(1)', filter: 'brightness(1)' }], { duration: D(600), easing: 'cubic-bezier(.2,.6,.3,1)' }).finished;
+    } },
+  2: { // the candle circle flares, down the well
+    async in(k) {
+      const pz = $('#plaza'), [x0, y0] = relPt(PG.cx, PG.cy), f = fxL();
+      f.innerHTML = `<div class="glow" style="left:${x0}px;top:${y0}px;width:60px;height:60px;background:radial-gradient(circle,rgba(200,255,230,1),rgba(94,242,160,.6) 40%,transparent 70%)"></div>`;
+      const fl = f.firstChild;
+      await fl.animate([{ transform: 'translate(-50%,-50%) scale(1)', opacity: .2 }, { transform: 'translate(-50%,-50%) scale(4)', opacity: 1 }], { duration: D(500), easing: 'ease-out', fill: 'forwards' }).finished;
+      pz.style.transformOrigin = `${x0}px ${y0}px`;
+      await Promise.all([pz.animate([{ transform: 'scale(1) rotate(0)' }, { transform: 'scale(7) rotate(70deg)', filter: 'brightness(.4) hue-rotate(20deg)' }], { duration: D(800), easing: 'cubic-bezier(.6,0,.9,.5)', fill: 'forwards' }).finished,
+        fl.animate([{ transform: 'translate(-50%,-50%) scale(4)', opacity: 1 }, { transform: 'translate(-50%,-50%) scale(30)', opacity: 1 }], { duration: D(800), easing: 'ease-in', fill: 'forwards' }).finished]);
+      showStall(); pz.style.visibility = 'hidden'; pz.getAnimations().forEach((a) => a.cancel());
+      const st2 = $('#stall'); const rip = document.createElement('div'); rip.style.cssText = 'position:absolute;inset:0;pointer-events:none;background:repeating-radial-gradient(circle at 50% 40%,rgba(150,255,220,.0) 0 18px,rgba(150,255,220,.18) 20px,rgba(150,255,220,0) 24px);z-index:20'; st2.appendChild(rip);
+      await Promise.all([st2.animate([{ transform: 'translateY(60px) scale(1.05)', filter: 'brightness(2) blur(3px)' }, { transform: 'none', filter: 'none' }], { duration: D(600), easing: 'cubic-bezier(.2,.8,.2,1)' }).finished,
+        fl.animate([{ opacity: 1 }, { opacity: 0 }], { duration: D(500), fill: 'forwards' }).finished, rip.animate([{ opacity: 1, transform: 'scale(1)' }, { opacity: 0, transform: 'scale(1.4)' }], { duration: D(700) }).finished]);
+      rip.remove(); f.innerHTML = '';
+    },
+    async out() {
+      const pz = $('#plaza'), [x0, y0] = relPt(PG.cx, PG.cy); pz.style.visibility = 'visible'; pz.style.transformOrigin = `${x0}px ${y0}px`;
+      await $('#stall').animate([{ transform: 'none', opacity: 1 }, { transform: 'translateY(80px)', opacity: 0 }], { duration: D(350), easing: 'ease-in', fill: 'forwards' }).finished; hideStall(); $('#stall').getAnimations().forEach((a) => a.cancel());
+      await pz.animate([{ transform: 'scale(7) rotate(-70deg)', filter: 'brightness(2.2)' }, { transform: 'scale(1) rotate(0)', filter: 'brightness(1)' }], { duration: D(700), easing: 'cubic-bezier(.2,.7,.3,1)' }).finished;
+    } },
+  '3a': { // a tentacle of mist reaches, wraps the stall, floods and parts
+    async in(k) {
+      const [x0, y0] = relPt(PG.cx, PG.cy), [x1, y1] = relPt(...stallC(k)), f = fxL(), W = app().clientWidth, H = 700;
+      f.innerHTML = `<canvas width="${W}" height="${H}" style="position:absolute;inset:0;width:${W}px;height:${H}px;filter:blur(3px)"></canvas><div style="position:absolute;inset:0;opacity:0;background:radial-gradient(circle at ${x1}px ${y1}px,rgba(200,255,235,.95),rgba(120,220,190,.85) 30%,rgba(40,120,100,.9) 70%)"></div>`;
+      const g = f.firstChild.getContext('2d'), mist = f.lastChild, c1 = [x0 + (x1 - x0) * .2 - 70, y0 + (y1 - y0) * .5], c2 = [x1 + 60, y1 + 50];
+      const bez = (t) => { const a = 1 - t; return [a * a * a * x0 + 3 * a * a * t * c1[0] + 3 * a * t * t * c2[0] + t * t * t * x1, a * a * a * y0 + 3 * a * a * t * c1[1] + 3 * a * t * t * c2[1] + t * t * t * y1]; };
+      const T0 = performance.now(), dur = D(900);
+      await new Promise((res) => { (function fr() { const p = Math.min(1, (performance.now() - T0) / dur); g.clearRect(0, 0, W, H);
+        arm(g, bez, p, 26, 1);
+        if (p > .75) { const q = (p - .75) / .25; for (let a = 0; a < q * Math.PI * 2.4; a += .08) { const r0 = 40 - a * 5, x = x1 + Math.cos(a) * r0, y = y1 + Math.sin(a) * r0 * .7, gr = g.createRadialGradient(x, y, 0, x, y, 12); gr.addColorStop(0, 'rgba(210,255,240,.6)'); gr.addColorStop(1, 'rgba(120,220,190,0)'); g.fillStyle = gr; g.fillRect(x - 12, y - 12, 24, 24); } }
+        if (p < 1) requestAnimationFrame(fr); else res(); })(); });
+      await mist.animate([{ opacity: 0, clipPath: `circle(5% at ${x1}px ${y1}px)` }, { opacity: 1, clipPath: `circle(150% at ${x1}px ${y1}px)` }], { duration: D(500), easing: 'ease-in', fill: 'forwards' }).finished;
+      $('#plaza').style.visibility = 'hidden'; showStall(); f.firstChild.remove();
+      await mist.animate([{ opacity: 1, filter: 'blur(0)' }, { opacity: 0, filter: 'blur(20px)' }], { duration: D(700), easing: 'ease-out', fill: 'forwards' }).finished; f.innerHTML = '';
+    },
+    async out(k) {
+      const [x1, y1] = relPt(...stallC(k)), f = fxL(); f.innerHTML = `<div style="position:absolute;inset:0;background:radial-gradient(circle at ${x1}px ${y1}px,rgba(200,255,235,.95),rgba(40,120,100,.9) 70%)"></div>`;
+      await f.firstChild.animate([{ opacity: 0 }, { opacity: 1 }], { duration: D(350), fill: 'forwards' }).finished; hideStall(); $('#plaza').style.visibility = 'visible';
+      await f.firstChild.animate([{ opacity: 1, clipPath: `circle(150% at ${x1}px ${y1}px)` }, { opacity: 0, clipPath: `circle(5% at ${x1}px ${y1}px)` }], { duration: D(600), easing: 'ease-out', fill: 'forwards' }).finished; f.innerHTML = '';
+    } },
+
+  '3b': { // coil and pull: the arm coils round the stall and drags the view in
+    async in(k) {
+      const [x0, y0] = relPt(PG.cx, PG.cy), [x1, y1] = relPt(...stallC(k)), f = fxL(), W = app().clientWidth, H = 700;
+      f.innerHTML = `<canvas width="${W}" height="${H}" style="position:absolute;inset:0;width:${W}px;height:${H}px;filter:blur(2px)"></canvas>`;
+      const g = f.firstChild.getContext('2d'), c1 = [x0 - 60, y0 + (y1 - y0) * .6], c2 = [x1 + 70, y1 + 40];
+      const bez = (t) => { const a = 1 - t; return [a * a * a * x0 + 3 * a * a * t * c1[0] + 3 * a * t * t * c2[0] + t * t * t * x1, a * a * a * y0 + 3 * a * a * t * c1[1] + 3 * a * t * t * c2[1] + t * t * t * y1]; };
+      await animate(D(1300), (p) => { g.clearRect(0, 0, W, H); const reach = Math.min(1, p / .5); arm(g, bez, reach, 24, 1);
+        if (p > .5) { const q = (p - .5) / .5, turns = q * 3; for (let a = 0; a < turns * Math.PI * 2; a += .07) { const r0 = 52 - a * 2.4, x = x1 + Math.cos(a) * r0, y = y1 + Math.sin(a) * r0 * .75; blob(g, x, y, 10 - a * .3, .55); if (Math.floor(a / .5) % 3 === 0) ring(g, x, y, 2.5); } } });
+      const pz = $('#plaza'), sx = W / 2 - x1, sy = H / 2 - y1;
+      f.insertAdjacentHTML('beforeend', `<div class="spiral" style="position:absolute;inset:-30%;opacity:0;background:repeating-conic-gradient(from 0deg at 50% 50%,rgba(200,255,235,.9) 0 18deg,rgba(60,150,120,.85) 30deg 48deg,rgba(200,255,235,.9) 60deg);filter:blur(14px)"></div>`);
+      const sp = f.lastChild;
+      await Promise.all([pz.animate([{ transform: 'none' }, { transform: `translate(${sx}px,${sy}px) scale(2.8)`, filter: 'brightness(1.4)' }], { duration: D(700), easing: 'cubic-bezier(.6,0,.8,.4)', fill: 'forwards' }).finished,
+        f.firstChild.animate([{ transform: 'none' }, { transform: `translate(${sx}px,${sy}px) scale(2.8)` }], { duration: D(700), easing: 'cubic-bezier(.6,0,.8,.4)', fill: 'forwards' }).finished,
+        sp.animate([{ opacity: 0, transform: 'rotate(0)' }, { opacity: 1, transform: 'rotate(200deg)' }], { duration: D(700), easing: 'ease-in', fill: 'forwards' }).finished]);
+      pz.style.visibility = 'hidden'; pz.getAnimations().forEach((a) => a.cancel()); f.firstChild.remove(); showStall();
+      await Promise.all([sp.animate([{ opacity: 1, transform: 'rotate(200deg) scale(1)' }, { opacity: 0, transform: 'rotate(420deg) scale(1.6)' }], { duration: D(800), easing: 'ease-out', fill: 'forwards' }).finished,
+        $('#stall').animate([{ clipPath: 'circle(0% at 50% 50%)', transform: 'rotate(-25deg) scale(.8)' }, { clipPath: 'circle(80% at 50% 50%)', transform: 'none' }], { duration: D(800), easing: 'cubic-bezier(.2,.8,.2,1)' }).finished]);
+      f.innerHTML = '';
+    },
+    async out(k) {
+      const [x1, y1] = relPt(...stallC(k)), f = fxL(), W = app().clientWidth, H = 700, pz = $('#plaza');
+      f.innerHTML = `<div style="position:absolute;inset:-30%;background:repeating-conic-gradient(from 0deg at 50% 50%,rgba(200,255,235,.9) 0 18deg,rgba(60,150,120,.85) 30deg 48deg,rgba(200,255,235,.9) 60deg);filter:blur(14px)"></div>`;
+      await f.firstChild.animate([{ opacity: 0, transform: 'rotate(0)' }, { opacity: 1, transform: 'rotate(-160deg)' }], { duration: D(450), fill: 'forwards' }).finished;
+      hideStall(); pz.style.visibility = 'visible';
+      await Promise.all([pz.animate([{ transform: `translate(${W / 2 - x1}px,${H / 2 - y1}px) scale(2.8)` }, { transform: 'none' }], { duration: D(700), easing: 'cubic-bezier(.2,.7,.3,1)' }).finished,
+        f.firstChild.animate([{ opacity: 1, transform: 'rotate(-160deg)' }, { opacity: 0, transform: 'rotate(-360deg) scale(1.5)' }], { duration: D(700), fill: 'forwards' }).finished]);
+      f.innerHTML = '';
+    } },
+  '3c': { // many arms: the well bursts into mist arms that close over the view, then open on the stall
+    async in(k) {
+      const [x0, y0] = relPt(PG.cx, PG.cy), [x1, y1] = relPt(...stallC(k)), f = fxL(), W = app().clientWidth, H = 700;
+      f.innerHTML = `<canvas width="${W}" height="${H}" style="position:absolute;inset:0;width:${W}px;height:${H}px;filter:blur(3px)"></canvas><div style="position:absolute;inset:0;opacity:0;background:radial-gradient(circle at ${x0}px ${y0}px,rgba(210,255,240,.95),rgba(110,210,180,.9) 45%,rgba(30,100,85,.95))"></div>`;
+      const g = f.firstChild.getContext('2d'), mist = f.lastChild;
+      const arms = [-2.6, -1.9, -1.2, -.5, .3, 1.1, 1.9, 2.6].map((a, i) => { const ex = x0 + Math.cos(a) * 520, ey = y0 + Math.sin(a) * 620, w = (i % 2 ? 1 : -1) * 90;
+        const c1 = [x0 + Math.cos(a + .6) * 110, y0 + Math.sin(a + .6) * 120], c2 = [(x0 + ex) / 2 + w, (y0 + ey) / 2 - w * .5];
+        return (t) => { const b = 1 - t; return [b * b * b * x0 + 3 * b * b * t * c1[0] + 3 * b * t * t * c2[0] + t * t * t * ex, b * b * b * y0 + 3 * b * b * t * c1[1] + 3 * b * t * t * c2[1] + t * t * t * ey]; }; });
+      await animate(D(1000), (p) => { g.clearRect(0, 0, W, H); const e = 1 - (1 - p) * (1 - p); arms.forEach((bz, i) => arm(g, bz, Math.min(1, e * (1 + (i % 3) * .1)), 30 + 40 * p, 1)); blob(g, x0, y0, 60 * e + 20, .8); mist.style.opacity = Math.max(0, (p - .55) / .45); });
+      mist.style.opacity = 1; $('#plaza').style.visibility = 'hidden'; showStall(); f.firstChild.remove();
+      await Promise.all([$('#stall').animate([{ clipPath: `circle(0px at ${x1}px ${y1}px)` }, { clipPath: `circle(900px at ${x1}px ${y1}px)` }], { duration: D(800), easing: 'cubic-bezier(.4,0,.2,1)' }).finished,
+        mist.animate([{ opacity: 1 }, { opacity: 0 }], { duration: D(900), easing: 'ease-in', fill: 'forwards' }).finished]);
+      f.innerHTML = '';
+    },
+    async out(k) {
+      const [x0, y0] = relPt(PG.cx, PG.cy), [x1, y1] = relPt(...stallC(k)), f = fxL(), W = app().clientWidth, H = 700;
+      f.innerHTML = `<div style="position:absolute;inset:0;background:radial-gradient(circle at ${x1}px ${y1}px,rgba(210,255,240,.95),rgba(30,100,85,.95))"></div>`;
+      await $('#stall').animate([{ clipPath: `circle(900px at ${x1}px ${y1}px)` }, { clipPath: `circle(0px at ${x1}px ${y1}px)` }], { duration: D(550), easing: 'ease-in', fill: 'forwards' }).finished;
+      hideStall(); $('#stall').getAnimations().forEach((a) => a.cancel()); $('#plaza').style.visibility = 'visible';
+      await f.firstChild.animate([{ opacity: 1, clipPath: `circle(150% at ${x0}px ${y0}px)` }, { opacity: .3, clipPath: `circle(0% at ${x0}px ${y0}px)` }], { duration: D(650), easing: 'cubic-bezier(.4,0,.6,1)', fill: 'forwards' }).finished;
+      f.innerHTML = '';
+    } },
+  4: { // the sigil sign flips over
+    async in(k) {
+      const sg = $(`.sign[data-k="${k.id}"]`), ar = app().getBoundingClientRect(), r = sg.getBoundingClientRect(), f = fxL(), W = ar.width;
+      f.innerHTML = `<div class="card" style="left:${r.left - ar.left}px;top:${r.top - ar.top}px;width:${r.width}px;height:${r.height}px"><img src="${SPR.sig[k.id].src}" alt=""><b style="font-size:13px">${k.name}</b></div>`;
+      const c = f.firstChild, cw = 170, ch = 200, tx = (W - cw) / 2 - (r.left - ar.left), ty = (700 - ch) / 2 - (r.top - ar.top);
+      sg.style.visibility = 'hidden';
+      await c.animate([{ transform: 'none' }, { transform: `translate(${tx + (cw - r.width) / 2}px,${ty + (ch - r.height) / 2}px) scale(${cw / r.width},${ch / r.height})` }], { duration: D(480), easing: 'cubic-bezier(.2,.8,.2,1)', fill: 'forwards' }).finished;
+      await c.animate([{ transform: `translate(${tx + (cw - r.width) / 2}px,${ty + (ch - r.height) / 2}px) scale(${cw / r.width},${ch / r.height}) perspective(400px) rotateY(0)` }, { transform: `translate(${tx + (cw - r.width) / 2}px,${ty + (ch - r.height) / 2}px) scale(${cw / r.width},${ch / r.height}) perspective(400px) rotateY(90deg)` }], { duration: D(260), easing: 'ease-in', fill: 'forwards' }).finished;
+      f.innerHTML = ''; sg.style.visibility = ''; showStall();
+      await $('#stall').animate([{ transform: `perspective(900px) rotateY(-90deg) scale(${cw / W})`, filter: 'brightness(1.8)' }, { transform: 'perspective(900px) rotateY(0) scale(1)', filter: 'brightness(1)' }], { duration: D(560), easing: 'cubic-bezier(.2,.8,.2,1)' }).finished;
+      $('#plaza').style.visibility = 'hidden';
+    },
+    async out(k) {
+      $('#plaza').style.visibility = 'visible';
+      await $('#stall').animate([{ transform: 'perspective(900px) rotateY(0) scale(1)' }, { transform: 'perspective(900px) rotateY(90deg) scale(.45)' }], { duration: D(380), easing: 'ease-in', fill: 'forwards' }).finished; hideStall(); $('#stall').getAnimations().forEach((a) => a.cancel());
+      const sg = $(`.sign[data-k="${k.id}"]`), ar = app().getBoundingClientRect(), r = sg.getBoundingClientRect(), f = fxL(), W = ar.width, cw = 170, ch = 200;
+      f.innerHTML = `<div class="card" style="left:${(W - cw) / 2}px;top:${(700 - ch) / 2}px;width:${cw}px;height:${ch}px"><img src="${SPR.sig[k.id].src}" alt="" style="width:60%"><b>${k.name}</b></div>`;
+      sg.style.visibility = 'hidden'; const c = f.firstChild;
+      await c.animate([{ transform: 'perspective(400px) rotateY(-90deg)' }, { transform: 'perspective(400px) rotateY(0)' }], { duration: D(240), fill: 'forwards' }).finished;
+      await c.animate([{ transform: 'none', opacity: 1 }, { transform: `translate(${r.left - ar.left - (W - cw) / 2 - (cw - r.width) / 2}px,${r.top - ar.top - (700 - ch) / 2 - (ch - r.height) / 2}px) scale(${r.width / cw},${r.height / ch})`, opacity: .9 }], { duration: D(420), easing: 'cubic-bezier(.2,.8,.2,1)', fill: 'forwards' }).finished;
+      f.innerHTML = ''; sg.style.visibility = '';
+    } }
+};
+const curTR = () => st.tr;
+async function enter(id) { if (st.busy) return; st.busy = true; const k = KB[id]; openStall(id); try { await TR[curTR()].in(k); } catch (e) { console.warn('entrance failed', e); showStall(); $('#plaza').style.visibility = 'hidden'; } st.busy = false; }
+async function leave() { if (st.busy) return; st.busy = true; const k = KB[st.k]; try { await TR[curTR()].out(k); } catch (e) { hideStall(); $('#plaza').style.visibility = 'visible'; } $('#plaza').style.visibility = 'visible'; $('#plaza').style.transform = ''; $('#stall').style.clipPath = ''; fxL().innerHTML = ''; if (st.mode === 'walk') walkerAt(k); st.k = null; st.busy = false; }
+$('#signs').addEventListener('click', (e) => { const b = e.target.closest('.sign'); if (!b) return; if (st.mode === 'walk') walkToStall(b.dataset.k); else enter(b.dataset.k); });
+$('#backB').addEventListener('click', leave);
+$$('#trs button').forEach((b) => b.addEventListener('click', () => { st.tr = b.dataset.tr; $$('#trs button').forEach((x) => x.classList.toggle('on', x === b)); $$('#trl li').forEach((l) => l.classList.toggle('on', l.dataset.l === b.dataset.tr)); }));
+$('#slow').addEventListener('change', (e) => { st.slow = e.target.checked; });
+$('#spent').addEventListener('input', (e) => { st.spent = +e.target.value; $('#spentO').textContent = st.spent + ' runes'; clearTimeout(window.__sp); window.__sp = setTimeout(() => drawPlaza(), 60); });
+
+/* ---------------- walk mode: Ulhu wanders the plaza ---------------- */
+const WK = { x: 0, y: 0, path: [], cb: null, raf: 0, last: 0, puff: 0 };
+function walkerShow() { const w = $('#walker'); w.hidden = st.mode !== 'walk'; if (!WK.x) { WK.x = PG.cx * S; WK.y = (PG.cy + 52) * S; } w.querySelector('img').src = UL.b16.idle; placeWalker(); }
+function placeWalker() { const w = $('#walker'); w.style.left = WK.x + 'px'; w.style.top = WK.y + 'px'; }
+function stallFront(k) { const [bx, by] = stallPos(k), [col] = SLOTPOS[k.id], cx = PG.cx * S;
+  if (col === 'c') return SLOTPOS[k.id][1] === 0 ? [cx + 62, (by + 16) * S] : [cx + 64, (by - 14) * S];
+  return [bx * S + (bx * S < cx ? 70 : -70), (by + 10) * S]; }
+function walkerAt(k) { const [x, y] = stallFront(k); WK.x = x; WK.y = y; placeWalker(); }
+function route(a, b) {
+  const c = [PG.cx * S, PG.cy * S], R2 = 50;
+  const hit = (() => { const dx = b[0] - a[0], dy = b[1] - a[1], l2 = dx * dx + dy * dy || 1; let t = ((c[0] - a[0]) * dx + (c[1] - a[1]) * dy) / l2; t = Math.max(0, Math.min(1, t)); return Math.hypot(a[0] + dx * t - c[0], (a[1] + dy * t - c[1]) / .9) < R2; })();
+  if (!hit) return [b];
+  const aa = Math.atan2((a[1] - c[1]) / .9, a[0] - c[0]), ab = Math.atan2((b[1] - c[1]) / .9, b[0] - c[0]); let d = ab - aa; while (d > Math.PI) d -= Math.PI * 2; while (d < -Math.PI) d += Math.PI * 2;
+  const n = Math.max(2, Math.ceil(Math.abs(d) / .3)), pts = []; for (let i = 0; i <= n; i++) { const ang = aa + d * i / n; pts.push([c[0] + Math.cos(ang) * (R2 + 6), c[1] + Math.sin(ang) * (R2 + 6) * .9]); }
+  pts.push(b); return pts;
+}
+function clampGround(x, y) {
+  const cx = PG.cx * S, cy = PG.cy * S, rx = PG.rx * S * .92, ry = PG.ry * S * .9; let dx = (x - cx) / rx, dy = (y - cy) / ry, d = Math.hypot(dx, dy); if (d > 1) { x = cx + dx / d * rx; y = cy + dy / d * ry; }
+  dx = x - cx; dy = (y - cy) / .9; d = Math.hypot(dx, dy); if (d < 46) { x = cx + dx / (d || 1) * 46; y = cy + dy / (d || 1) * 46 * .9; }
+  return [x, Math.max(70, y)];
+}
+function walkTo(x, y, cb) {
+  WK.path = route([WK.x, WK.y], [x, y]); WK.cb = cb || null; $('#walker').classList.add('walking'); $('#walker img').src = UL.b16.idle;
+  cancelAnimationFrame(WK.raf); WK.last = performance.now();
+  (function step(now) {
+    const dt = Math.min(.05, (now - WK.last) / 1000); WK.last = now; let go = 130 * dt * (st.slow ? .35 : 1);
+    while (go > 0 && WK.path.length) { const [tx, ty] = WK.path[0], dx = tx - WK.x, dy = ty - WK.y, l = Math.hypot(dx, dy);
+      if (Math.abs(dx) > 1) $('#walker .wb').classList.toggle('left', dx < 0);
+      if (l <= go) { WK.x = tx; WK.y = ty; WK.path.shift(); go -= l; } else { WK.x += dx / l * go; WK.y += dy / l * go; go = 0; } }
+    placeWalker();
+    if (now - WK.puff > 170 && !RM) { WK.puff = now; const pf = document.createElement('i'); pf.className = 'puff'; pf.style.left = WK.x + 'px'; pf.style.top = (WK.y - 3) + 'px'; $('#plaza').appendChild(pf); setTimeout(() => pf.remove(), 650); }
+    if (WK.path.length) WK.raf = requestAnimationFrame(step);
+    else { $('#walker').classList.remove('walking'); const cb = WK.cb; WK.cb = null; if (cb) cb(); }
+  })(WK.last);
+}
+function walkToStall(id) {
+  if (st.busy) return; const k = KB[id], [x, y] = stallFront(k);
+  walkTo(x, y, async () => { $('#walker img').src = UL.b16.happy; $('#walker .wb').classList.toggle('left', x > stallPos(k)[0] * S); await wait(D(350)); enter(id); });
+}
+$('#plaza').addEventListener('click', (e) => {
+  if (st.mode !== 'walk' || st.busy || e.target.closest('.sign,.hud,button')) return;
+  const r = $('#plaza').getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top, ax = x / S, ay = y / S;
+  const k = K.find((kk) => { const [bx, by] = stallPos(kk); return ax >= bx - 21 && ax <= bx + 21 && ay >= by - BH && ay <= by + 2; });
+  if (k) { walkToStall(k.id); return; }
+  const [tx, ty] = clampGround(x, y); const m = document.createElement('i'); m.className = 'tapmark'; m.style.left = tx + 'px'; m.style.top = ty + 'px'; $('#plaza').appendChild(m); setTimeout(() => m.remove(), 750);
+  walkTo(tx, ty);
+});
+$$('#mode button').forEach((b) => b.addEventListener('click', () => {
+  st.mode = b.dataset.m; $$('#mode button').forEach((x) => x.classList.toggle('on', x === b));
+  $$('#trs button').forEach((x) => x.classList.toggle('off', st.mode === 'walk' && !x.dataset.tr.startsWith('3')));
+  if (st.mode === 'walk' && !String(st.tr).startsWith('3')) $('#trs button[data-tr="3a"]').click();
+  $('#mnote').textContent = st.mode === 'walk' ? 'Tap the ground and Ulhu walks there, round the well. Tap a stall and he walks over and goes in with the mist tentacle you pick below (TR3a to TR3c).' : 'Tap a stall\'s sign to go in. Pick the transition below.';
+  walkerShow();
+}));
+let rz = 0; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { drawPlaza(); walkerShow(); if (st.k) { drawScene(KB[st.k]); renderRow(); } }, 200); });
+
+/*@EN*/
+/* ---------------- boot ---------------- */
+buildSprites(); keeperSprites();
+$('#runeI').src = RN.hand.src; $('#runeI2').src = RN.hand.src;
+$('#ctrTop').style.backgroundImage = (() => { const c = document.createElement('canvas'), x = c.getContext('2d'); c.width = 32; c.height = 12; for (let i = 0; i < 32; i++) for (let y = 0; y < 12; y++) { let col = y === 0 ? '#9a7048' : y < 3 ? '#6a4a2c' : (hsh(i >> 2, y) % 5 === 0 ? '#3e2a18' : '#4e3620'); if (i % 16 === 15) col = '#24160c'; if (y > 8) col = mix(col, '#000', .4); x.fillStyle = col; x.fillRect(i, y, 1, 1); } return `linear-gradient(180deg,transparent 64px,rgba(0,0,0,.35) 64px,transparent 80px),url(${c.toDataURL()})`; })();
+$('#ctrTop').style.backgroundSize = 'auto,64px 24px'; $('#ctrTop').style.backgroundPosition = '0 0,0 64px'; $('#ctrTop').style.backgroundRepeat = 'no-repeat,repeat';
+setRunes(900); heldChip(); setSpent(1200);
+setInterval(keeperTick, 260);
+requestAnimationFrame(loop);
+walkerShow();
+})();
+</script>

@@ -1,0 +1,509 @@
+<title>Wall, Golems and Inscriptions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Grenze+Gotisch:wght@500;700&family=IM+Fell+English:ital@0;1&display=swap">
+<style>
+/* Layout: one narrow phone column; three stacked sections, each with a variant switch above its object. */
+:root{
+  --bg:#070b0c;--panel:#0c1416;--line:#1c2924;--fg:#f4ecd8;--muted:#a9b8af;--dim:#83968c;
+  --honey:#ffd56a;--mint:#a8ffd0;--ember:#ff7a30;--blood:#ff5a4a;--parch:#f0d9a0;--inkdark:#2a160a;
+  --stone:#232b29;--stone-hi:#46524e;--stone-lo:#070a0a;--obs:#17141c;--obs-hi:#3a3446;
+  --temple:#2a0f13;--temple-lo:#120809;--gilt:#c89a48;
+  --gx:"Grenze Gotisch",Georgia,serif;--fell:"IM Fell English",Georgia,serif;--body:"Atkinson Hyperlegible",system-ui,sans-serif;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#070b0c;--panel:#0c1416;--line:#1c2924;--fg:#f4ecd8;--muted:#a9b8af;--dim:#83968c;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#070b0c;--panel:#0c1416;--line:#1c2924;--fg:#f4ecd8;--muted:#a9b8af;--dim:#83968c;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font:15px/1.45 var(--body);margin:0}
+.wrap{max-width:430px;margin:0 auto;padding-inline:16px;padding-block:22px 60px;display:flex;flex-direction:column;gap:34px}
+h1{font:700 34px/1 var(--gx);margin:0;letter-spacing:.5px;text-wrap:balance;color:var(--parch)}
+.lede{color:var(--muted);margin:8px 0 0;font-size:14px}
+h2{font:700 25px/1.05 var(--gx);margin:0;color:var(--parch);text-wrap:balance}
+.eyebrow{font:700 12.5px/1 var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+.sec{display:flex;flex-direction:column;gap:12px}
+.note{font-size:13.5px;color:var(--muted);margin:0}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button{font:700 13px var(--body);color:var(--muted);background:var(--panel);border:1px solid var(--line);border-radius:3px;padding:8px 12px;cursor:pointer}
+.seg button[aria-pressed="true"]{color:var(--bg);background:var(--parch);border-color:var(--parch)}
+.seg button:focus-visible,.chip:focus-visible,.save:focus-visible,.hit:focus-visible,summary:focus-visible,textarea:focus-visible{outline:2px solid var(--honey);outline-offset:2px}
+.vname{font:italic 15px var(--fell);color:var(--parch)}
+
+/* ---------- Sea wall ---------- */
+.wallbox{position:relative;border:1px solid var(--line);background:#050a0d;padding:0;overflow:hidden}
+.wallbox canvas{display:block;width:100%;height:auto;image-rendering:pixelated}
+.hits{position:absolute;inset:0}
+.hit{position:absolute;top:12%;height:62%;background:none;border:0;padding:0;cursor:pointer}
+.wallhead{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:-4px}
+.wallhead b{font:700 17px var(--gx);color:var(--parch);letter-spacing:.3px}
+.wallhead span{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.days{position:relative;height:18px;margin-top:-2px}
+.days span{position:absolute;transform:translateX(-50%);font:700 12.5px var(--body);color:var(--dim)}
+.tip{min-height:46px;border-left:2px solid var(--line);padding:6px 10px;font-size:14px;color:var(--muted)}
+.tip strong{color:var(--honey);font-weight:700}
+.tip.built strong{color:var(--mint)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btn{font:700 13.5px var(--body);background:none;color:var(--parch);border:1px solid var(--gilt);border-radius:3px;padding:8px 12px;cursor:pointer}
+.key{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.key i{display:inline-block;width:12px;height:12px;vertical-align:-2px;margin-right:5px;border:1px solid #000}
+
+/* ---------- Golems ---------- */
+.golems{display:flex;flex-direction:column;gap:12px}
+.golems.pg2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.gcard{position:relative;display:grid;grid-template-columns:132px 1fr;gap:12px;align-items:center;padding:10px 12px 12px 8px;
+  background:radial-gradient(130% 60% at 50% 115%,#5a0c16,rgba(58,10,16,0) 70%),linear-gradient(180deg,var(--temple),var(--temple-lo));
+  border:1px solid #4a1a1c;box-shadow:inset 0 1px 0 #5a2426,inset 0 -2px 0 #000}
+.gcard::before,.gcard::after{content:"";position:absolute;top:0;bottom:0;width:7px;background:repeating-linear-gradient(90deg,#3c1618 0 2px,#1a0a0b 2px 3px,#2e1012 3px 5px);opacity:.9}
+.gcard::before{left:0}.gcard::after{right:0}
+.gcard canvas{width:132px;height:132px;image-rendering:pixelated;display:block}
+.ginfo{min-width:0;display:flex;flex-direction:column;gap:5px;padding-right:6px}
+.gclass{font:700 13px var(--body);letter-spacing:.12em;color:#e8a89c}
+.gname{font:700 20px/1.05 var(--gx);color:#fbe3c8}
+.gtype{font-size:13px;color:#cfa79c}
+.hp{display:flex;gap:4px;flex-wrap:wrap;margin-top:3px}
+.hp i{width:22px;height:13px;display:block;background:linear-gradient(#ff7a62,#c4202a 55%,#7a0a12);box-shadow:inset 0 1px 0 #ffb09a,0 1px 0 #000}
+.hp i.gone{background:#120809 repeating-linear-gradient(115deg,transparent 0 5px,#2a1012 5px 6px);box-shadow:inset 0 0 0 1px #3a1618}
+.gleft{font-size:13px;color:#e9c9b8;font-variant-numeric:tabular-nums}
+/* PG2 altar */
+.pg2 .gcard{grid-template-columns:1fr;justify-items:center;text-align:center;padding:12px 10px 0;gap:4px}
+.pg2 .gcard canvas{width:96px;height:96px}
+.pg2 .ginfo{align-items:center;padding:0}
+.pg2 .gname{font-size:17px}
+.pg2 .plinth{width:calc(100% + 20px);margin-top:6px;padding:8px 6px 9px;background:linear-gradient(#3a2a26,#1b1312);border-top:2px solid #5a443c;display:flex;justify-content:center}
+.pg2 .hp i{width:18px}
+.gcard .plinth{display:none}.pg2 .gcard .plinth{display:flex}
+.pg2 .ginfo .hp{display:none}
+/* PG3 lamplit */
+.pg3 .gcard{background:radial-gradient(60% 70% at 18% 80%,rgba(255,150,60,.22),rgba(0,0,0,0) 70%),linear-gradient(180deg,#140707,#070303);border-color:#3a1a10}
+.pg3 .hp i:not(.gone){background:linear-gradient(#c8302c,#7a0a12);border-radius:2px 2px 6px 6px;box-shadow:inset 0 2px 0 #ff9a7a}
+.pg3 .gname{color:#ffdcae}
+
+/* ---------- Inscribed forms ---------- */
+.form{display:flex;flex-direction:column;gap:10px}
+.obj{position:relative;height:190px}
+.obj textarea{position:absolute;resize:none;border:0;background:transparent;overflow:hidden;font:22px/1.2 var(--fell);text-align:center;padding:4px 8px}
+.obj textarea::placeholder{opacity:.55;color:inherit}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{font:700 13px var(--body);border-radius:999px;padding:7px 12px;border:1px solid var(--line);background:var(--panel);color:var(--muted);cursor:pointer}
+.chip[aria-pressed="true"]{color:var(--fg);border-color:var(--chipc,var(--gilt));background:color-mix(in srgb,var(--chipc,var(--gilt)) 22%,var(--panel))}
+details{border-top:1px dashed var(--line);padding-top:6px}
+summary{cursor:pointer;font:700 13px var(--body);color:var(--dim);list-style:none;padding:4px 0}
+summary::before{content:"+ ";color:var(--gilt)}
+details[open] summary::before{content:"- "}
+details .chips{margin-top:6px}
+.saverow{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.save{font:700 17px var(--gx);letter-spacing:.4px;padding:9px 18px;border-radius:3px;cursor:pointer;border:1px solid var(--chipc,var(--gilt));color:var(--fg);background:color-mix(in srgb,var(--chipc,var(--gilt)) 30%,#000)}
+.said{font:italic 14.5px var(--fell);color:var(--muted);min-height:20px}
+
+/* ritual: obsidian tablet */
+.tablet{position:absolute;inset:0 22px;border-radius:120px 120px 6px 6px/48px 48px 6px 6px;
+  background:radial-gradient(90% 60% at 30% 10%,rgba(160,140,200,.16),rgba(0,0,0,0) 60%),linear-gradient(170deg,#2a2630,#18161c 55%,#0d0c10);
+  box-shadow:inset 2px 2px 0 #4a4258,inset -3px -3px 0 #050407,0 0 0 2px #050407,0 10px 18px rgba(0,0,0,.6);overflow:hidden}
+.tablet::before{content:"";position:absolute;inset:10px;border-radius:110px 110px 3px 3px/40px 40px 3px 3px;box-shadow:inset 1px 1px 0 #050407,inset -1px -1px 0 #3a3446}
+.tablet .sheen{position:absolute;inset:0;background:linear-gradient(115deg,rgba(255,255,255,0) 30%,rgba(220,210,255,.07) 42%,rgba(255,255,255,0) 50%)}
+.tablet textarea{inset:42px 22px 22px;color:#bdb4cc}
+.in1 .tablet textarea{color:#9a90ae;text-shadow:-1px -1px 0 #000,1px 1px 0 #5a5270}
+.in2 .tablet textarea{color:#c8ffe4;text-shadow:0 0 6px rgba(94,242,160,.7),0 0 1px #fff}
+
+/* quest: parchment scroll */
+.scroll{position:absolute;inset:14px 30px;background:
+  radial-gradient(80% 90% at 40% 45%,rgba(255,240,205,.35),rgba(240,215,160,0) 70%),
+  radial-gradient(40% 30% at 85% 80%,rgba(120,70,20,.25),rgba(0,0,0,0) 70%),
+  linear-gradient(90deg,#c9a868,#efd9a2 12%,#f3e2b2 50%,#ebd296 88%,#c4a060);
+  box-shadow:0 8px 14px rgba(0,0,0,.6);transform-origin:50% 0}
+.scroll::before,.scroll::after{content:"";position:absolute;left:-14px;right:-14px;height:16px;border-radius:8px;
+  background:linear-gradient(#e8cf94,#b08a4a 45%,#6e4c22 80%,#3a2410);box-shadow:0 3px 4px rgba(0,0,0,.5)}
+.scroll::before{top:-12px}.scroll::after{bottom:-12px}
+.scroll textarea{inset:18px 14px 14px;color:var(--inkdark)}
+.in1 .scroll textarea{color:#2a160a;text-shadow:0 0 1px rgba(42,22,10,.6)}
+.in2 .scroll textarea{color:#6a2c08;text-shadow:0 0 1px #3a1404,0 1px 0 rgba(255,230,180,.6);font-style:italic}
+.wax{position:absolute;left:50%;bottom:-6px;width:46px;height:46px;margin-left:-23px;border-radius:50%;opacity:0;pointer-events:none;
+  background:radial-gradient(circle at 38% 35%,#e05a4a,#8e1018 60%,#4a050a);box-shadow:0 0 0 3px rgba(142,16,24,.45),0 4px 6px rgba(0,0,0,.6);
+  font:700 22px/46px var(--gx);color:#3a0508;text-align:center;text-shadow:1px 1px 0 #f07a6a}
+
+/* boss: temple */
+.temple{position:absolute;inset:0 8px;background:linear-gradient(180deg,#3a1418,#1c0a0c 60%,#120708);box-shadow:0 0 0 2px #050203,0 10px 18px rgba(0,0,0,.6)}
+.temple{margin-top:18px}.temple .ped{position:absolute;left:-8px;right:-8px;top:-24px;height:40px;background:linear-gradient(#7a3034,#3a1214);clip-path:polygon(0 100%,50% 0,100% 100%);}
+.temple .ped::after{content:"";position:absolute;inset:6px 30px 4px;background:#1a0809;clip-path:polygon(0 100%,50% 0,100% 100%)}
+.temple .col{position:absolute;top:34px;bottom:0;width:26px;background:repeating-linear-gradient(90deg,#4a1c1e 0 3px,#24090b 3px 4px,#3a1416 4px 6px)}
+.temple .col.l{left:6px}.temple .col.r{right:6px}
+.temple .col::before,.temple .col::after{content:"";position:absolute;left:-3px;right:-3px;height:7px;background:#5a2428}
+.temple .col::before{top:0}.temple .col::after{bottom:0}
+.temple textarea{inset:32px 40px 14px;font-family:var(--gx);font-size:26px;letter-spacing:.5px}
+.in1 .temple textarea{color:#d8262a;text-shadow:1px 1px 0 #000,-1px -1px 0 #6a2024}
+.in2 .temple textarea{color:#ff6a50;text-shadow:0 0 8px rgba(255,60,40,.85),0 0 2px #ffd0b0}
+
+/* omens: stained glass */
+.glass{position:absolute;inset:0 10px}
+.glass svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+.glass textarea{left:15%;right:15%;top:37%;height:44%;font-size:21px}
+.curse .glass textarea{color:#0e0405;font-weight:700}
+.bless .glass textarea{color:#fff}
+.in1 .curse .glass textarea{text-shadow:0 1px 0 rgba(255,190,160,.6)}
+.in2 .curse .glass textarea{text-shadow:0 0 1px #000,0 0 10px rgba(255,210,170,.9)}
+.in1 .bless .glass textarea{text-shadow:0 1px 0 #0a1440}
+.in2 .bless .glass textarea{text-shadow:0 0 8px rgba(190,215,255,.95)}
+
+/* save animations */
+.dust{position:absolute;width:3px;height:3px;background:#c8bcd8;pointer-events:none}
+.carving .tablet{animation:carve 1.5s ease-out}
+.carving .tablet .sheen{animation:sweep 1s ease-in-out}
+.carving .dust{animation:dust 1s ease-out forwards}
+@keyframes carve{0%{transform:none}15%{transform:translateX(-2px)}25%{transform:translateX(2px)}35%{transform:none;box-shadow:inset 2px 2px 0 #4a4258,inset -3px -3px 0 #050407,0 0 0 2px #050407,0 0 26px rgba(94,242,160,.45)}100%{transform:translateY(10px) scale(.94);opacity:.35}}
+@keyframes sweep{from{transform:translateX(-100%)}to{transform:translateX(100%)}}
+@keyframes dust{from{transform:none;opacity:1}to{transform:translate(var(--dx),-40px);opacity:0}}
+.sealing .wax{animation:stamp .5s cubic-bezier(.3,1.6,.6,1) forwards}
+.sealing .scroll{animation:rollup 1.5s .5s ease-in forwards}
+@keyframes stamp{from{opacity:0;transform:scale(2.4)}to{opacity:1;transform:scale(1)}}
+@keyframes rollup{0%{transform:none}70%{transform:scaleY(.18)}100%{transform:scaleY(.18) translateY(-30px);opacity:.3}}
+.summoning .temple{animation:summon 1.6s ease-in forwards}
+@keyframes summon{0%{filter:none}10%{transform:translateX(-3px)}20%{transform:translateX(3px)}30%{transform:translateX(-2px);filter:drop-shadow(0 0 16px #ff2a1a) brightness(1.3)}60%{transform:none;filter:drop-shadow(0 0 22px #ff2a1a) brightness(1.4)}100%{transform:translateY(24px);opacity:.25;filter:brightness(.6)}}
+.lighting .glass svg{animation:light 1.4s ease-out}
+@keyframes light{0%{filter:none}35%{filter:brightness(2) saturate(1.3) drop-shadow(0 0 18px var(--glow))}100%{filter:none}}
+@media (prefers-reduced-motion: reduce){
+  .carving .tablet,.carving .tablet .sheen,.carving .dust,.sealing .wax,.sealing .scroll,.summoning .temple,.lighting .glass svg{animation:none!important}
+  .sealing .wax{opacity:1}
+}
+</style>
+
+<div class="wrap">
+<header>
+  <div class="eyebrow">Ulhu mock-up · 28 Oct</div>
+  <h1>Wall, Golems and Inscriptions</h1>
+  <p class="lede">Three pieces for the Teaching area and the add forms. Use the buttons above each one to switch between options.</p>
+</header>
+
+<!-- ============ SEA WALL ============ -->
+<section class="sec" id="wall">
+  <div class="eyebrow">1 · Teaching area, top</div>
+  <h2>The sea wall</h2>
+  <p class="note">One stone per lesson in the next two weeks. Built lessons are stones, unbuilt ones are gaps the sea breaks through. Homework is the pale mortar. Tap a gap.</p>
+  <div class="seg" id="swSeg" role="group" aria-label="Sea wall option">
+    <button aria-pressed="true" data-v="1">SW1 Harbour face</button>
+    <button aria-pressed="false" data-v="2">SW2 Seen from above</button>
+    <button aria-pressed="false" data-v="3">SW3 Day buttresses</button>
+  </div>
+  <div class="vname" id="swName"></div>
+  <div class="wallhead"><b>Sea wall · next two weeks</b><span id="wallCount"></span></div>
+  <div class="wallbox">
+    <canvas id="wallc" width="180" height="72" aria-label="Sea wall, one stone per lesson"></canvas>
+    <div class="hits" id="hits"></div>
+  </div>
+  <div class="days" id="days" aria-hidden="true"></div>
+  <div class="tip" id="tip" aria-live="polite">Tap a stone or a gap.</div>
+  <div class="row">
+    <button class="btn" id="finish">Show the finished wall</button>
+    <div class="key"><span><i style="background:#a9a488"></i>Homework set</span><span><i style="background:#121618"></i>No homework yet</span></div>
+  </div>
+</section>
+
+<!-- ============ GOLEMS ============ -->
+<section class="sec" id="golemsec">
+  <div class="eyebrow">2 · Marking</div>
+  <h2>Paper golems</h2>
+  <p class="note">One mini-boss per class, made of its own exercise books. Each red block is one marking sitting still to do. They grow up with the year group.</p>
+  <div class="seg" id="pgSeg" role="group" aria-label="Golem card option">
+    <button aria-pressed="true" data-v="1">PG1 Temple card</button>
+    <button aria-pressed="false" data-v="2">PG2 Altar</button>
+    <button aria-pressed="false" data-v="3">PG3 Candlelit</button>
+  </div>
+  <div class="vname" id="pgName"></div>
+  <div class="golems" id="golems"></div>
+</section>
+
+<!-- ============ FORMS ============ -->
+<section class="sec" id="formsec">
+  <div class="eyebrow">3 · Adding things</div>
+  <h2>Inscribed forms</h2>
+  <p class="note">The form is the object. Write straight onto it, pick options underneath, then save it into place.</p>
+  <div class="seg" id="inSeg" role="group" aria-label="Writing style">
+    <button aria-pressed="true" data-v="1">IN1 Cut into it</button>
+    <button aria-pressed="false" data-v="2">IN2 Lit from within</button>
+  </div>
+  <div class="vname" id="inName"></div>
+  <div id="forms" class="in1"></div>
+</section>
+</div>
+
+<script>
+const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+function rng(s){return function(){s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function seg(id,cb){const g=document.getElementById(id);g.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;g.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));cb(+b.dataset.v)})}
+
+/* ================= SEA WALL ================= */
+const LESSONS=[
+ ['A','Mon','P1','7MLA',1,1],['A','Mon','P4','10C2',1,1],['A','Tue','P2','13D',1,1],['A','Tue','P3','10C2',0,0],
+ ['A','Wed','P1','8XP',1,1],['A','Wed','P5','11S2',1,0],['A','Thu','P3','9AS',1,1],['A','Fri','P2','13D',1,1],
+ ['B','Mon','P1','7MLA',1,0],['B','Mon','P3','11S2',0,0],['B','Tue','P4','9AS',1,1],['B','Wed','P2','13D',0,0],
+ ['B','Thu','P1','8XP',1,0],['B','Thu','P5','10C2',0,0],['B','Fri','P1','7MLA',1,1],['B','Fri','P3','11S2',0,0]
+].map(a=>({wk:a[0],day:a[1],p:a[2],cls:a[3],built:!!a[4],hw:!!a[5]}));
+const W=180,H=72;let sw=1,finished=false,sel=-1;
+const wc=document.getElementById('wallc'),wx=wc.getContext('2d');
+const SWN={1:'Harbour face: the wall side-on, the sea in front, lanterns on the end towers.',2:'Seen from above: the same wall with its top showing, so it reads as a solid object.',3:'Day buttresses: stones grouped by school day, a pillar between days.'};
+function data(){return LESSONS.map(l=>finished?{...l,built:true,hw:true}:l)}
+function layout(){
+  const L=data(),out=[],piers=[];const T=9;
+  let pw=0,pcount=0;
+  if(sw===3){for(let i=1;i<L.length;i++)if(L[i].day!==L[i-1].day||L[i].wk!==L[i-1].wk){pcount++}pw=4}else{pcount=1;pw=3}
+  const bw=Math.floor((W-2*T-pcount*pw)/L.length);
+  const T2=T+Math.floor((W-2*T-pcount*pw-bw*L.length)/2);let x=T2;
+  L.forEach((l,i)=>{
+    const brk=i>0&&(sw===3?(l.day!==L[i-1].day||l.wk!==L[i-1].wk):l.wk!==L[i-1].wk);
+    if(brk){piers.push({x,w:pw});x+=pw}
+    out.push({...l,x,w:bw,i});x+=bw});
+  return {blocks:out,piers,T:T2,TR:W-x};
+}
+function hash(a,b){let h=(a*374761393+b*668265263)|0;h=(h^(h>>>13))*1274126177;return((h^(h>>>16))>>>0)/4294967296}
+function px(x,y,c){wx.fillStyle=c;wx.fillRect(x,y,1,1)}
+function rect(x,y,w,h,c){wx.fillStyle=c;wx.fillRect(x,y,w,h)}
+const STONE=[[78,90,86],[70,80,78],[86,96,90],[64,74,72]];
+function rgb(c,k=1){return `rgb(${Math.min(255,c[0]*k)|0},${Math.min(255,c[1]*k)|0},${Math.min(255,c[2]*k)|0})`}
+function stone(x,y,w,h,seed,lit=1){
+  const c=STONE[Math.floor(hash(seed,3)*4)];
+  for(let j=0;j<h;j++)for(let i=0;i<w;i++){
+    let k=1;if(j===0||i===0)k=1.32;else if(j===h-1||i===w-1)k=.62;
+    const n=hash(seed*31+i,j*17+seed);if(n>.86)k*=.82;else if(n<.06)k*=1.16;
+    k*=lit*(1-.12*(j/h));
+    px(x+i,y+j,rgb(c,k));}
+}
+function draw(t){
+  const {blocks,piers,T,TR}=layout();const calm=blocks.every(b=>b.built);
+  const amp=calm?.5:2.2, top=sw===2?24:20, bot=50, depth=sw===2?6:0;
+  // sky
+  for(let y=0;y<H;y++){const k=Math.floor(y/6);rect(0,y,W,1,`rgb(${7+k},${12+k*1.6|0},${16+k*2})`)}
+  // moon + stars
+  wx.fillStyle='#d8dcc8';wx.fillRect(150,6,5,5);wx.fillRect(149,7,7,3);wx.fillStyle='#9aa290';wx.fillRect(153,7,2,2);
+  for(let i=0;i<14;i++){const sx=hash(i,9)*W|0,sy=hash(i,4)*22|0;px(sx,sy,(Math.sin(t*1.3+i)>.6&&!RM)?'#cfd8c0':'#5a6a66')}
+  // back sea
+  for(let y=top+4;y<H;y++)rect(0,y,W,1,y%3?'#0b1d30':'#0e2438');
+  // towers
+  const tow=(x,tw)=>{for(let j=0;j*5<bot-top+8;j++)stone(x,top-8+j*5,tw,5,900+x+j,.9);
+    const lx=x+Math.floor(tw/2)-2;rect(lx-1,top-14,7,6,'#14100a');const g=calm?'#ffd56a':'#3a3018';rect(lx,top-13,5,4,g);
+    if(calm){wx.fillStyle='rgba(255,213,106,.16)';wx.fillRect(lx-5,top-18,15,14)}
+    rect(lx-2,top-15,9,1,'#3a3a34');rect(lx+2,top-17,1,2,'#3a3a34')};
+  tow(0,T);tow(W-TR,TR);
+  // footing (continuous)
+  for(let x=0;x<W;x+=6)stone(x,bot-2,6,5,700+x,.8);
+  // blocks
+  const bh=bot-2-top;
+  blocks.forEach(b=>{
+    if(!b.built){ // gap: back sea shows, spray
+      for(let y=top-depth;y<bot-2;y++)rect(b.x,y,b.w,1,y%2?'#0c2236':'#10283e');
+      if(!calm){const h=RM?12:((Math.sin(t*2.6+b.i*1.7)*.5+.5)*(bh+8));
+        for(let y=0;y<h;y++)for(let i=0;i<b.w;i++){const n=hash(b.i*97+i,y+(t*8|0));if(n>.35+y/h*.5)px(b.x+i,bot-3-y,n>.8?'#e8f4f0':'#8ab8c8')}
+        for(let d=0;d<5;d++){const dy=bot-3-h-hash(d,b.i+(t*6|0))*8,dx=b.x+hash(b.i,d+(t*6|0))*b.w;px(dx|0,dy|0,'#cfe6ea')}}
+      return}
+    const half=Math.floor(bh/2);
+    // two courses of ashlar
+    stone(b.x,top,b.w,half,b.i*7+1);stone(b.x,top+half,b.w,bh-half,b.i*7+2);
+    // mortar: left joint + bed joint
+    const m=b.hw?'#a9a488':'#0c0f10';
+    rect(b.x,top+half,b.w,1,m);rect(b.x,top,1,bh,m);
+    if(!b.hw){px(b.x,top+3,'#2a3230');px(b.x+1,top+half+1,'#0a0c0c')}
+    // top face for oblique
+    if(depth){for(let d=1;d<=depth;d++){for(let i=0;i<b.w;i++){const n=hash(b.i*13+i,d);rect(b.x+i+d,top-d,1,1,rgb([96,108,100],(1.15-d*.04)*(n>.85?.85:1)))}}
+      for(let d=1;d<=depth;d++)px(b.x+b.w-1+d,top-d+1,'#3a4440');
+      rect(b.x+1,top-depth/2|0,b.w-1,1,b.hw?'rgba(201,194,164,.8)':'rgba(10,12,12,.9)')}
+    else{rect(b.x,top-2,b.w,2,'#5e6a64');rect(b.x,top-2,b.w,1,'#7c8a82')}
+    if(b.i===sel){wx.strokeStyle='#ffd56a';wx.lineWidth=1;wx.strokeRect(b.x+.5,top-depth+.5,b.w-1,bh+depth-1)}
+  });
+  piers.forEach(p=>{const ph=bh+(sw===3?8:4);for(let j=0;j<ph;j+=4)stone(p.x,top-(sw===3?8:4)+j-depth,p.w,Math.min(4,ph-j),500+p.x+j,.75)});
+  if(sel>=0&&!blocks[sel].built){const b=blocks[sel];wx.strokeStyle='#ffd56a';wx.strokeRect(b.x+.5,top-depth+.5,b.w-1,bh+depth-1)}
+  // front sea
+  for(let x=0;x<W;x++){
+    const s=bot+1+Math.round(Math.sin(x*.18+t*1.6)*amp+Math.sin(x*.07-t*.9)*amp*.8);
+    for(let y=s;y<H;y++){const dd=y-s;rect(x,y,1,1,dd===0?(calm?'#4a7a8a':'#bfe0e4'):dd<3?'#1c4a64':(y%4===0?'#123650':'#0d2a42'))}
+    if(!calm&&!RM&&hash(x,(t*5|0))>.93)px(x,s-1,'#dff2f0');
+  }
+  if(calm){for(let y=bot+4;y<H;y+=2){const w=3+((y*7)%5);rect(150+Math.round(Math.sin(y+t)*1.5),y,w,1,'rgba(216,220,200,.5)')}}
+  // labels for SW3 days + hits
+  wallCount.textContent=`${blocks.filter(b=>b.built).length} of ${blocks.length} built · ${blocks.filter(b=>b.hw).length} mortared`;
+}
+const wallCount=document.getElementById('wallCount');
+function buildHits(){
+  const {blocks}=layout();const hits=document.getElementById('hits');hits.innerHTML='';
+  blocks.forEach(b=>{const h=document.createElement('button');h.className='hit';h.style.left=(b.x/W*100)+'%';h.style.width=(b.w/W*100)+'%';
+    h.setAttribute('aria-label',`${b.day} ${b.p}, ${b.cls}: ${b.built?'built':'not built'}`);
+    h.onclick=()=>{sel=b.i;const tip=document.getElementById('tip');
+      tip.className='tip'+(b.built?' built':'');
+      tip.innerHTML=b.built?`<strong>Week ${b.wk} · ${b.day} ${b.p}, ${b.cls}</strong><br>Built. ${b.hw?'Homework set, so the mortar holds.':'No homework set yet, so the mortar is still dark.'}`
+        :`<strong>Gap · Week ${b.wk} · ${b.day} ${b.p}, ${b.cls}</strong><br>This lesson is not built yet. In the planner, this opens it.`;
+      if(RM)draw(0)};hits.appendChild(h)});
+  const days=document.getElementById('days');days.innerHTML='';
+  if(sw===3){let cur='';blocks.forEach((b,i)=>{const k=b.wk+b.day;if(k===cur)return;cur=k;const grp=blocks.filter(x=>x.wk+x.day===k);const mid=(grp[0].x+grp[grp.length-1].x+grp[grp.length-1].w)/2;
+    const s=document.createElement('span');s.style.left=(mid/W*100)+'%';s.textContent=b.day[0]+(b.day==='Thu'?'h':'');days.appendChild(s)})}
+  else{const s=(t,x)=>{const e=document.createElement('span');e.style.left=x+'%';e.textContent=t;days.appendChild(e)};s('Week A',27);s('Week B',73)}
+}
+seg('swSeg',v=>{sw=v;sel=-1;document.getElementById('swName').textContent=SWN[v];buildHits();draw(performance.now()/1000)});
+document.getElementById('swName').textContent=SWN[1];
+document.getElementById('finish').onclick=e=>{finished=!finished;e.target.textContent=finished?'Show this fortnight again':'Show the finished wall';
+  document.getElementById('tip').innerHTML=finished?'<strong>The wall is whole.</strong> The bonus is paid, the lanterns light and the sea goes still.':'Tap a stone or a gap.';buildHits();draw(performance.now()/1000)};
+buildHits();
+if(RM)draw(0);else{let last=0;(function loop(ts){if(ts-last>90){last=ts;draw(ts/1000)}requestAnimationFrame(loop)})(0)}
+
+/* ================= GOLEMS (pixel renderer) ================= */
+const G=48;
+function norm(v){const m=Math.hypot(v[0],v[1],v[2]);return[v[0]/m,v[1]/m,v[2]/m]}
+const L1=norm([-.55,-.7,.6]),L2=norm([.7,.55,.3]);
+let MODE='key';
+function lit(base,n){
+  const d=Math.max(0,n[0]*L1[0]+n[1]*L1[1]+n[2]*L1[2]);
+  let k=(MODE==='rim'?.22:.34)+(MODE==='rim'?.5:.8)*d;k=Math.round(k*6)/6;
+  let c=[base[0]*k,base[1]*k,base[2]*k];
+  if(MODE==='rim'){const r=Math.max(0,n[0]*L2[0]+n[1]*L2[1]+n[2]*L2[2]);if(r>.5){const q=Math.round(r*3)/3;c=[c[0]+120*q,c[1]+62*q,c[2]+14*q]}}
+  return c;
+}
+function buf(){return{d:new Array(G*G).fill(null),z:new Float32Array(G*G).fill(-1e9),s:new Uint8Array(G*G)}}
+function put(b,x,y,c,z){x=Math.round(x);y=Math.round(y);if(x<0||y<0||x>=G||y>=G)return;const i=y*G+x;if(z>=b.z[i]){b.z[i]=z;b.d[i]=c}}
+function mix(a,b,t){return[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,a[2]+(b[2]-a[2])*t]}
+const RULE=[120,150,196],MARGIN=[200,70,70];
+function sphere(b,cx,cy,rx,ry,base,z,tex){
+  for(let y=Math.floor(cy-ry);y<=cy+ry;y++)for(let x=Math.floor(cx-rx);x<=cx+rx;x++){
+    const dx=(x+.5-cx)/rx,dy=(y+.5-cy)/ry,r2=dx*dx+dy*dy;if(r2>1)continue;const nz=Math.sqrt(1-r2);
+    let col=base;if(tex)col=tex(x,y,col,dx,dy);put(b,x,y,lit(col,[dx,dy,nz]),z+nz*rx)}
+}
+function poly(b,pts,base,n,z,tex){
+  let x0=99,x1=-1,y0=99,y1=-1;pts.forEach(p=>{x0=Math.min(x0,p[0]);x1=Math.max(x1,p[0]);y0=Math.min(y0,p[1]);y1=Math.max(y1,p[1])});
+  for(let y=Math.floor(y0);y<=y1;y++)for(let x=Math.floor(x0);x<=x1;x++){let c=false;const px=x+.5,py=y+.5;
+    for(let i=0,j=pts.length-1;i<pts.length;j=i++){const a=pts[i],q=pts[j];if((a[1]>py)!==(q[1]>py)&&px<(q[0]-a[0])*(py-a[1])/(q[1]-a[1])+a[0])c=!c}
+    if(c){let col=base,nn=n;if(tex){const r=tex(x,y,col);col=r[0];nn=r[1]||n}put(b,x,y,lit(col,nn),z)}}
+}
+function book(b,x,y,w,h,d,cover,z){
+  for(let j=0;j<h;j++)for(let i=0;i<w;i++){const edge=j===h-1||i===0||(i===w-1&&j===0);const c=edge?cover:(j%2?[214,206,184]:[196,188,166]);put(b,x+i,y+j,lit(c,[0,0,1]),z)}
+  for(let k=1;k<=d;k++){for(let i=0;i<w;i++)put(b,x+i+k,y-k,lit(cover,norm([0,-1,.25])),z-k);for(let j=0;j<h;j++)put(b,x+w-1+k,y-k+j,lit(cover,[1,0,.2]),z-k)}
+}
+function line(b,x0,y0,x1,y1,c,z){const n=Math.max(Math.abs(x1-x0),Math.abs(y1-y0));for(let i=0;i<=n;i++){const x=x0+(x1-x0)*i/n,y=y0+(y1-y0)*i/n;const k=Math.round(x),q=Math.round(y);if(b.d[q*G+k])put(b,k,q,c,z)}}
+function raw(b,x,y,c,z){put(b,x,y,c,z)}
+function shadow(b,cx,cy,rx){for(let y=-2;y<=2;y++)for(let x=-rx;x<=rx;x++){if((x/rx)**2+(y/2.2)**2<=1){const i=(cy+y)*G+cx+x;if(!b.d[i]){b.d[i]=[0,0,0];b.s[i]=1;b.z[i]=-500}}}}
+function ruled(margin){return(x,y,c)=>{let o=c;if(y%3===0)o=mix(c,RULE,.16);if(margin!==undefined&&x===margin)o=mix(o,MARGIN,.6);return o}}
+function crumple(seed){const r=rng(seed);const m={};return(x,y,c,dx,dy)=>{const k=hash(x*7+seed,y*13);return mix(c,[0,0,0],k>.8?.18:k<.12?-.08:0)}}
+function render(cv,cls){
+  const b=buf(),C=cls.cover,P=cls.paper,st=cls.stage;
+  if(st===0){
+    shadow(b,24,44,12);
+    book(b,13,39,8,3,2,C,6);book(b,27,39,8,3,2,C,6);
+    sphere(b,24,29,13,12,P,10,ruled(16));
+    sphere(b,10.5,31,3,4,P,8);sphere(b,37.5,31,3,4,P,8);
+    poly(b,[[21,18],[29,13],[28,20]],mix(P,[0,0,0],.08),norm([.2,-.8,.6]),40);
+    for(let y=34;y<=38;y++)for(let x=19;x<=29;x++){const lab=y>=35&&y<=36&&x>=21&&x<=27;raw(b,x,y,lit(lab?[238,232,214]:C,norm([(x-24)/14,.2,.9])),60)}
+    raw(b,22,36,[90,90,110],61);raw(b,23,36,[90,90,110],61);raw(b,25,36,[90,90,110],61);
+    [[19,26],[29,26]].forEach(([ex,ey])=>{for(let y=-4;y<=4;y++)for(let x=-3;x<=3;x++){const r=(x/3.5)**2+(y/4.3)**2;if(r<=1){let c=r>.62?mix(C,[20,18,26],.45):[18,16,22];raw(b,ex+x,ey+y,c,70)}}
+      raw(b,ex-1,ey-2,[250,248,236],71);raw(b,ex-2,ey-2,[250,248,236],71);raw(b,ex-1,ey-1,[250,248,236],71);raw(b,ex+1,ey+2,[170,170,180],71)});
+  }else if(st===1){
+    shadow(b,24,45,13);
+    for(let i=0;i<3;i++){book(b,15+(i%2),41-i*3,7,3,2,C,6+i);book(b,27-(i%2),41-i*3,7,3,2,C,6+i)}
+    poly(b,[[9,16],[15,7],[20,18]],mix(P,[0,0,0],.12),norm([-.3,-.5,.8]),-20,(x,y,c)=>[y%3?c:mix(c,RULE,.3)]);
+    poly(b,[[30,12],[40,6],[38,20]],mix(P,[0,0,0],.12),norm([.4,-.4,.8]),-20,(x,y,c)=>[y%3?c:mix(c,RULE,.3)]);
+    sphere(b,24,27,11,10,P,10,ruled(17));
+    sphere(b,11.5,28,3,8,P,8,(x,y,c)=>(y%4===0?mix(c,[0,0,0],.15):c));sphere(b,36.5,28,3,8,P,8,(x,y,c)=>(y%4===0?mix(c,[0,0,0],.15):c));
+    if(cls.pauldrons){book(b,8,18,9,3,2,C,30);book(b,31,18,9,3,2,C,30)}
+    sphere(b,24,13,7,6,P,16,ruled());
+    for(let y=27;y<=31;y++)for(let x=20;x<=28;x++)raw(b,x,y,lit((y===28||y===29)&&x>21&&x<27?[238,232,214]:C,[ (x-24)/12,0,1]),60);
+    [[21,12],[26,12]].forEach(([ex,ey])=>{for(let y=0;y<3;y++)for(let x=0;x<2;x++)raw(b,ex+x,ey+y,[20,18,24],70);raw(b,ex,ey,[240,236,220],71)});
+    if(cls.tick){line(b,30,22,32,24,[200,32,36],80);line(b,32,24,35,19,[200,32,36],80)}
+  }else if(st===2){
+    shadow(b,24,45,17);
+    for(let i=0;i<4;i++){book(b,12+(i%2),42-i*3,9,3,2,C,6+i);book(b,27-(i%2),42-i*3,9,3,2,C,6+i)}
+    for(let i=0;i<4;i++){const j=[0,1,-1,1][i];book(b,11+j,30-i*4,25,4,3,i%2?mix(C,[0,0,0],.2):C,20+i)}
+    sphere(b,9,17,6,5.5,P,26,crumple(3));sphere(b,39,17,6,5.5,P,26,crumple(5));
+    sphere(b,6,29,3.5,9,P,14,crumple(7));sphere(b,42,29,3.5,9,P,14,crumple(9));
+    sphere(b,24,10,6,5,P,30,ruled());
+    raw(b,20,10,[255,150,60],80);raw(b,21,10,[255,200,120],80);raw(b,27,10,[255,200,120],80);raw(b,28,10,[255,150,60],80);
+    const R=[200,30,36];
+    line(b,14,18,22,27,R,90);line(b,16,17,24,26,R,90);line(b,35,13,41,20,R,90);line(b,41,13,35,20,R,90);
+    line(b,27,22,29,24,R,90);line(b,29,24,33,19,R,90);
+    if(cls.more){line(b,5,24,8,33,R,90);line(b,13,36,20,37,R,90);line(b,30,6,26,12,R,90);for(let a=0;a<12;a++){const x=31+Math.round(Math.cos(a/12*6.28)*3),y=27+Math.round(Math.sin(a/12*6.28)*2);if(b.d[y*G+x])raw(b,x,y,R,90)}}
+  }else{
+    shadow(b,24,45,15);
+    const drape=(x,y,c)=>{const f=Math.sin(x*1.1+y*.08);const n=norm([f*.5,.1,1]);let o=c;if((y-14)%7===0)o=mix(c,[0,0,0],.25);if(y%3===0)o=mix(o,RULE,.18);return[o,n]};
+    poly(b,[[16,15],[32,15],[40,44],[8,44]],P,[0,0,1],10,drape);
+    poly(b,[[8,44],[11,40],[14,45]],P,norm([-.4,.2,.9]),11);poly(b,[[34,45],[37,40],[40,44]],P,norm([.4,.2,.9]),11);
+    poly(b,[[20,16],[23,16],[22,44],[16,44]],C,[0,0,1],20,(x,y,c)=>[(x===19||x===22)&&y%2?cls.gilt:c]);
+    poly(b,[[25,16],[28,16],[32,44],[26,44]],C,[0,0,1],20,(x,y,c)=>[(x===26||x===29)&&y%2?cls.gilt:c]);
+    sphere(b,24,12,7.5,7.5,P,22,(x,y,c)=>(y%3===0?mix(c,RULE,.2):c));
+    for(let y=-4;y<=4;y++)for(let x=-4;x<=4;x++)if((x/4)**2+(y/4.6)**2<=1)raw(b,24+x,13+y,y>2?[26,20,22]:[12,9,12],60);
+    raw(b,22,13,[236,226,190],70);raw(b,26,13,[236,226,190],70);raw(b,22,12,[150,140,110],70);raw(b,26,12,[150,140,110],70);
+    if(cls.crown){for(let x=18;x<=30;x++){raw(b,x,5,lit(cls.gilt,[0,-.3,1]),80);raw(b,x,6,lit(cls.gilt,[0,0,1]),80)}
+      [18,21,24,27,30].forEach((x,i)=>{raw(b,x,4,lit(cls.gilt,[0,-1,.5]),80);if(i%2===0)raw(b,x,3,lit(cls.gilt,[-.4,-1,.4]),80)});raw(b,24,3,[220,40,40],81);raw(b,24,4,lit(cls.gilt,[0,-1,.5]),80)}
+    for(let y=27;y<=32;y++)for(let x=14;x<=34;x++){const spine=x===24;const pg=y>27;raw(b,x,y,lit(spine?[90,70,50]:pg?((x+y)%2&&x!==15&&x!==33&&y%2===0?[150,160,190]:[238,230,206]):C,norm([(x-24)/30,0,1])),90)}
+    sphere(b,13,30,2.5,2.5,P,92);sphere(b,35,30,2.5,2.5,P,92);
+  }
+  // outline + depth edges
+  const out=b.d.slice();
+  for(let y=0;y<G;y++)for(let x=0;x<G;x++){const i=y*G+x;if(!b.d[i]||b.s[i])continue;
+    let edge=false,deep=false;[[1,0],[-1,0],[0,1],[0,-1]].forEach(([a,c])=>{const xx=x+a,yy=y+c;if(xx<0||yy<0||xx>=G||yy>=G){edge=true;return}const j=yy*G+xx;if(!b.d[j]||b.s[j])edge=true;else if(b.z[j]-b.z[i]>5)deep=true});
+    if(edge)out[i]=b.d[i].map(v=>v*.42);else if(deep)out[i]=b.d[i].map(v=>v*.7)}
+  const ctx=cv.getContext('2d'),im=ctx.createImageData(G,G);
+  for(let i=0;i<G*G;i++){const c=out[i];if(!c)continue;im.data[i*4]=c[0];im.data[i*4+1]=c[1];im.data[i*4+2]=c[2];im.data[i*4+3]=b.s[i]?110:255}
+  ctx.putImageData(im,0,0);
+}
+const CLASSES=[
+ {cls:'7MLA',yr:7,stage:0,name:'The Foundling',type:'Book marking',hp:3,done:1,cover:[46,120,104],paper:[234,226,202]},
+ {cls:'8XP',yr:8,stage:1,name:'The Folded Page',type:'Book marking',hp:3,done:0,cover:[52,84,150],paper:[230,222,198]},
+ {cls:'9AS',yr:9,stage:1,name:'The Margin-Walker',type:'Book marking',hp:3,done:2,cover:[176,126,40],paper:[226,216,190],pauldrons:1,tick:1},
+ {cls:'10C2',yr:10,stage:2,name:'The Red-Inked',type:'Book marking',hp:3,done:1,cover:[104,64,140],paper:[222,212,186]},
+ {cls:'11S2',yr:11,stage:2,name:'The Mock-Scarred',type:'Book marking',hp:4,done:2,cover:[126,30,36],paper:[216,204,176],more:1},
+ {cls:'13D',yr:13,stage:3,name:'The Crowned Examiner',type:'PAG marking, after practicals',hp:4,done:1,cover:[30,28,34],paper:[214,198,160],gilt:[214,172,84],crown:1}
+];
+const PGN={1:'Temple card: the golem beside its name, one red block per marking sitting.',2:'Altar: each golem stands on a plinth with its sittings carved into the stone, two to a row.',3:'Candlelit: the same card lit low from one side by a candle, darker and moodier.'};
+let pg=1;
+function golems(){
+  MODE=pg===3?'rim':'key';const box=document.getElementById('golems');box.className='golems pg'+pg;box.innerHTML='';
+  CLASSES.forEach(c=>{
+    const card=document.createElement('article');card.className='gcard';
+    const cv=document.createElement('canvas');cv.width=G;cv.height=G;cv.setAttribute('aria-label',`${c.name}, paper golem for ${c.cls}`);render(cv,c);
+    const hp=()=>`<div class="hp" aria-label="${c.hp-c.done} of ${c.hp} sittings left">${Array.from({length:c.hp},(_,i)=>`<i class="${i<c.done?'gone':''}"></i>`).join('')}</div>`;
+    card.innerHTML=`<div class="ginfo"><div class="gclass">${c.cls} · YEAR ${c.yr}</div><div class="gname">${c.name}</div><div class="gtype">${c.type}</div>${hp()}<div class="gleft">${c.hp-c.done} of ${c.hp} ${c.stage===3?'PAGs':'sittings'} left</div></div><div class="plinth">${hp()}</div>`;
+    card.prepend(cv);box.appendChild(card)});
+  document.getElementById('pgName').textContent=PGN[pg];
+}
+seg('pgSeg',v=>{pg=v;golems()});golems();
+
+/* ================= FORMS ================= */
+function glassSVG(id,pal,cart,glow){
+  const r=rng(id.length*977+7),Wd=340,Hd=180,cols=7,rows=4,pts=[];
+  for(let j=0;j<=rows;j++){pts[j]=[];for(let i=0;i<=cols;i++){const ex=i===0||i===cols,ey=j===0||j===rows;pts[j][i]=[i*Wd/cols+(ex?0:(r()-.5)*24),j*Hd/rows+(ey?0:(r()-.5)*20)]}}
+  let panes='',lead='';
+  for(let j=0;j<rows;j++)for(let i=0;i<cols;i++){const p=[pts[j][i],pts[j][i+1],pts[j+1][i+1],pts[j+1][i]].map(a=>a.map(v=>v.toFixed(1)).join(',')).join(' ');
+    panes+=`<polygon points="${p}" fill="${pal[Math.floor(r()*pal.length)]}"/>`;lead+=`<polygon points="${p}"/>`}
+  const arch=`M0 ${Hd}V58C0 24 120 4 170 0C220 4 340 24 340 58V${Hd}Z`;
+  return `<svg viewBox="0 0 ${Wd} ${Hd}" preserveAspectRatio="none" aria-hidden="true"><defs><clipPath id="c${id}"><path d="${arch}"/></clipPath>
+  <filter id="m${id}" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".035 .09" numOctaves="2" seed="4"/><feColorMatrix values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .3 -.1"/></filter>
+  <radialGradient id="h${id}" cx="40%" cy="20%" r="80%"><stop offset="0" stop-color="#fff" stop-opacity=".28"/><stop offset=".6" stop-color="#fff" stop-opacity="0"/></radialGradient></defs>
+  <g clip-path="url(#c${id})">${panes}<rect width="${Wd}" height="${Hd}" filter="url(#m${id})"/><rect width="${Wd}" height="${Hd}" fill="url(#h${id})"/>
+  <g fill="none" stroke="#0a0809" stroke-width="3.2" stroke-linejoin="round">${lead}</g>
+  <rect x="40" y="62" width="260" height="86" rx="6" fill="${cart}" fill-opacity=".9"/><rect x="40" y="62" width="260" height="86" rx="6" filter="url(#m${id})" opacity=".6"/><rect x="40" y="62" width="260" height="86" rx="6" fill="url(#h${id})"/><rect x="40" y="62" width="260" height="86" rx="6" fill="none" stroke="#0a0809" stroke-width="3.2"/>
+  <rect x="46" y="68" width="248" height="74" rx="4" fill="none" stroke="#fff" stroke-opacity=".12" stroke-width="1"/></g>
+  <path d="${arch}" fill="none" stroke="#1a1614" stroke-width="7"/><path d="${arch}" fill="none" stroke="#4a423a" stroke-width="2"/></svg>`;
+}
+const FORMS=[
+ {k:'ritual',label:'Ritual · obsidian tablet',obj:'<div class="tablet"><div class="sheen"></div><textarea id="f-ritual" rows="2" aria-label="Ritual name">Mark one class set before I leave</textarea></div>',
+  chips:['Weekdays','Every day','After school','Evening','Small stakes'],on:[0,2],more:['Who I am becoming: a teacher who goes home at 5','Aim: evenings free','Stack after: last bell'],save:'Carve it',anim:'carving',done:'Carved. It now sits with your rituals.',c:'#8a7aa8'},
+ {k:'quest',label:'Quest · parchment scroll',obj:'<div class="scroll"><textarea id="f-quest" rows="3" aria-label="Quest name">Write the 12C PAG 4 risk assessment</textarea></div><div class="wax">U</div>',
+  chips:['Due Fri','Teaching','Three steps','Big'],on:[0,1],more:['Link a lesson: 12C Fri P2','Aim: practicals ready a week ahead','Who I am becoming'],save:'Seal it',anim:'sealing',done:'Sealed. The scroll is on your quest board.',c:'#c89a48'},
+ {k:'boss',label:'Boss · Sunken Temple, in red',obj:'<div class="temple"><div class="ped"></div><div class="col l"></div><div class="col r"></div><textarea id="f-boss" rows="2" aria-label="Boss name">Year 11 mock marking</textarea></div>',
+  chips:['5 sittings','By 20 Nov','Teaching','Hit it weekly'],on:[0,1],more:['Aim: mocks back before parents evening','Who I am becoming'],save:'Summon it',anim:'summoning',done:'Summoned. It waits in the Sunken Temple.',c:'#d8262a'},
+ {k:'curse',cls:'curse',label:'Curse · red stained glass',obj:()=>`<div class="glass">${glassSVG('cur',['#b3202a','#cf3a2e','#8f1620','#e0573a','#a82a3a','#c22c36'],'#f07a5a')}<textarea id="f-curse" rows="2" aria-label="Curse name">Phone in bed after 10pm</textarea></div>`,
+  chips:['Small toll','Heavy toll','Evenings','Weeknights'],on:[0,2],more:['Aim: asleep by 10:30','Who I am becoming'],save:'Set the curse',anim:'lighting',done:'Set into the window. It glows when it strikes.',c:'#cf3a2e',glow:'#ff4a30'},
+ {k:'bless',cls:'bless',label:'Blessing · blue stained glass',obj:()=>`<div class="glass">${glassSVG('bless',['#1f3c9e','#2d52c4','#162c78','#3a62d8','#24409a','#2a4ab0'],'#1a3290')}<textarea id="f-bless" rows="2" aria-label="Blessing name">Walked home without the phone</textarea></div>`,
+  chips:['Small','Great','Any time','Weekends'],on:[0,2],more:['Aim: one hour outside a day','Who I am becoming'],save:'Set the blessing',anim:'lighting',done:'Set into the window. It shines when you log it.',c:'#3a62d8',glow:'#8ab0ff'}
+];
+const INN={1:'Cut into it: the words sit inside the surface, like a chisel or a pen cut them.',2:'Lit from within: the words glow out of the object as you write.'};
+const forms=document.getElementById('forms');
+forms.innerHTML=FORMS.map(f=>`<div class="form ${f.cls||''}" style="--chipc:${f.c};--glow:${f.glow||f.c}" data-k="${f.k}">
+  <div class="eyebrow">${f.label}</div>
+  <div class="obj">${typeof f.obj==='function'?f.obj():f.obj}</div>
+  <div class="chips">${f.chips.map((c,i)=>`<button class="chip" aria-pressed="${f.on.includes(i)}">${c}</button>`).join('')}</div>
+  <details><summary>More</summary><div class="chips">${f.more.map(c=>`<button class="chip" aria-pressed="false">${c}</button>`).join('')}</div></details>
+  <div class="saverow"><button class="save">${f.save}</button><span class="said" aria-live="polite"></span></div></div>`).join('<div style="height:18px"></div>');
+forms.addEventListener('click',e=>{
+  const ch=e.target.closest('.chip');if(ch){ch.setAttribute('aria-pressed',ch.getAttribute('aria-pressed')!=='true');return}
+  const sv=e.target.closest('.save');if(!sv)return;const fm=sv.closest('.form'),f=FORMS.find(x=>x.k===fm.dataset.k),said=fm.querySelector('.said');
+  if(fm.classList.contains(f.anim))return;
+  if(f.anim==='carving'&&!RM){const t=fm.querySelector('.tablet');for(let i=0;i<14;i++){const d=document.createElement('i');d.className='dust';d.style.left=(20+Math.random()*60)+'%';d.style.top=(40+Math.random()*40)+'%';d.style.setProperty('--dx',((Math.random()-.5)*40)+'px');d.style.animationDelay=(Math.random()*.4)+'s';t.appendChild(d)}}
+  fm.classList.add(f.anim);said.textContent=f.done;
+  setTimeout(()=>{fm.classList.remove(f.anim);fm.querySelectorAll('.dust').forEach(d=>d.remove());setTimeout(()=>said.textContent='',2200)},RM?600:2300);
+});
+seg('inSeg',v=>{forms.className='in'+v;document.getElementById('inName').textContent=INN[v]});
+document.getElementById('inName').textContent=INN[1];
+</script>
