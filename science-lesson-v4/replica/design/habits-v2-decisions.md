@@ -275,4 +275,4 @@ Patryk's answers, in grill order. Mock-ups follow each area.
 - **Grimoire:** pixel-art scene, **BG1 Candlelit desk** picked; T1 book + T4 animation kept. Page: https://claude.ai/artifact/2hhEpg5QBkqi7145xDtuBv
 - **Tabs:** TB6c Tide line = the minimal pick. TB5b1 Lit niches = base for the textured bar, but round five looked childish; round six (finer textures: aged parchment Call, old dark leather Grimoire, real Oracle glass Omens, lair ruins Den) in progress. Don't build the tab bar until he picks. Page: https://claude.ai/artifact/HNAaSMmUp8o1DhmHdb3uJz
 - **Market:** entrance Walk + TR3c picked; three more entrance options in progress (new page).
-- Quest pact effect: already final and built (see above).
+- Quest pact effect: already final and built (see above). Patryk 28 Oct evening: the "Your picks" preview at the top of Obsidian and Parchment is AMAZING, keep it exactly as built (game-scroll.js), no more rounds.
