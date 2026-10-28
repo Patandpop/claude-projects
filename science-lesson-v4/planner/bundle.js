@@ -15,7 +15,7 @@ fs.writeFileSync(path.join(out, 'Game.gs'), fs.readFileSync(path.join(dir, 'Game
 fs.writeFileSync(path.join(out, 'GameShop.gs'), '// Ulhu shop: 120 items with their room sprites, made by replica/art/export_shop.py\nconst SHOP = ' + fs.readFileSync(path.join(dir, 'game-shop.json'), 'utf8') + ';\n');
 // 2026-10-24 redesign: Ulhu's sprites (8 and 16-bit) and the pixel engine (coin, bosses, wardrobe, icons) go in first
 const pack = (list) => '<script>\n' + list.map((f) => fs.readFileSync(path.join(dir, f), 'utf8')).join('\n') + '\n</script>';
-const ui = pack(['game-ulhu.js', 'game-pixel.js', 'game-runes.js', 'game-omens.js', 'game-tabs.js', 'game-ui.js']);
+const ui = pack(['game-ulhu.js', 'game-pixel.js', 'game-runes.js', 'game-omens.js', 'game-tabs.js', 'game-pairs.js', 'game-ui.js']);
 // 2026-10-27: the looks Patryk picked (stone tablets, temple bosses, blood and sigils) are their own file, GameArt.html, so each paste stays small enough to save
 const art = pack(['game-temple.js', 'game-stone.js', 'game-blood.js', 'game-scroll.js', 'game-glass.js']);
 // High Vespers is its own include (Sunday to Tuesday screen), so no paste file passes about 380 KB

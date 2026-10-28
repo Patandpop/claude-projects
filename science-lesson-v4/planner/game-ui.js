@@ -242,7 +242,7 @@
   function mount(el, call, opts) {
     opts = opts || {};
     if (!document.getElementById('uz-css')) {
-      const st = document.createElement('style'); st.id = 'uz-css'; st.textContent = CSS; document.head.appendChild(st);
+      const st = document.createElement('style'); st.id = 'uz-css'; st.textContent = CSS + (window.PAIRS ? PAIRS.CSS : ''); document.head.appendChild(st);
       const ln = document.createElement('link'); ln.rel = 'stylesheet'; ln.href = FONTS; document.head.appendChild(ln);
     }
     const A = root.ULHU_ART, P = root.PX;
@@ -666,14 +666,61 @@
         '<span class="uz-twn"><span>' + esc(sides(g.name)[0]) + '</span><span style="text-align:right">' + esc(sides(g.name)[1]) + '</span></span><span class="uz-twm"><img src="' + OMENS.card('c', picOf(g, 'c')) + '" alt=""><img class="rt" src="' + OMENS.card('b', picOf(g, 'b')) + '" alt=""><i></i></span></div>'; }
     // the line on an antidote blessing while its Absolution is open
     const absTag = (g) => g.absolve ? '<span class="uz-abs">Absolution ' + ROMAN[g.absolve.stage + 1] + ' · ' + esc(g.absolve.name) + ' · +' + (g.absolve.stage ? g.absolve.lost - Math.floor(g.absolve.lost / 2) : Math.floor(g.absolve.lost / 2)) + ' HP</span>' : '';
+    /* ---------- pairing an omen with its other side (game-pairs.js, Patryk 2026-10-28 night) ---------- */
+    // the small Pair chip on a one-sided curse or blessing (a 44px tap target in the card's corner)
+    const pairChip = (g) => (window.PAIRS && !g.absolve ? '<span class="pz-pair" data-a="pair" data-id="' + g.id + '" role="button" aria-label="Pair ' + esc(g.name) + ' with its other side"><i>PAIR</i></span>' : '');
+    const pairSheet = () => { const P = V.pair, g = goal(P.id); if (!g) { V.pair = null; return ''; }
+      return PAIRS.sheet({ g, txt: P.txt, withId: P.withId, all: P.all, walk: P.walk ? { i: P.walk.i, n: P.walk.n } : null, goals: D.goals, esc, card: OMENS.card, keyOf: (x) => OMENS.of(x) }); };
+    // open the sheet on one omen; his own omen that fits best is picked first, otherwise the list's suggestion
+    function pairOpen(id, walk) { const g = goal(id); if (!g) return; const top = PAIRS.rank(g, D.goals)[0], fit = top && top.s > 0 ? top.g : null;
+      V.pair = { id, withId: fit ? fit.id : '', txt: fit ? '' : PAIRS.suggest(g)[0], all: false, walk: walk || null }; paint(); const pn = body.querySelector('.pz'); if (pn) pn.scrollTop = 0; }
+    // Pair all: the next one-sided omen still waiting, or close at the end
+    function pairNext(walk) { V.pair = null;
+      if (walk) for (let i = walk.i + 1; i < walk.ids.length; i++) { const g = goal(walk.ids[i]); if (g && g.kind === 'habit' && g.polarity !== 'both') return pairOpen(g.id, Object.assign({}, walk, { i })); }
+      paint(); }
+    // join keepId with goneId (its other side, or a duplicate), or with no goneId just save ng; id, count and history stay
+    function joinGoals(keepId, goneId, ng) { const g = goal(keepId), o = goneId ? goal(goneId) : null; if (!g) return;
+      const before = goalOf('curse', draftOf(g)); ng = ng || before;
+      const walk = V.pair && V.pair.walk, stay = !!V.pair && ng.polarity !== 'both'; V.form = null; V.draft = null; V.orig = null; V.pair = null;
+      const patch = (d) => { const x = d.goals.find((y) => y.id === keepId), y = o && d.goals.find((z) => z.id === goneId); if (!x) return;
+        if (ng.polarity === 'both' && x.polarity !== 'both') { const xc = x.count || 0, yc = y ? y.count || 0 : 0, cu = x.polarity === 'minus';
+          x.cCount = cu ? xc : yc; x.bCount = cu ? yc : xc; x.count = xc + yc; x.pay = Math.max(2, Math.round((d.table.base[x.minutes] || 6) / 2)); x.hpLoss = x.hpLoss || (y && y.hpLoss) || d.table.hpLoss[x.minutes]; }
+        else if (y) x.count = (x.count || 0) + (y.count || 0);
+        Object.assign(x, { name: ng.name, polarity: ng.polarity, grp: ng.grp, anti: ng.anti });
+        if (y) d.goals = d.goals.filter((z) => z.id !== goneId); };
+      const last = { verb: ng.polarity === 'both' && g.polarity !== 'both' ? 'Joined:' : 'Merged:', name: ng.name };
+      if (o) act(last, ['gameUnmerge', keepId, goneId, before], 'gameMergeGoals', [keepId, goneId, ng], patch);
+      else act(last, ['gameSaveGoal', before], 'gameSaveGoal', [ng], patch);
+      buzz(10); if (stay) return pairOpen(keepId, walk); if (walk) pairNext(walk); }
+    function pairTap(a, id, v) {
+      const P = V.pair;
+      if (a === 'pair') { V.curseT = null; return pairOpen(id); }
+      if (a === 'pairall') { const ids = PAIRS.lonely(D.goals).map((g) => g.id); return ids.length ? pairOpen(ids[0], { ids, i: 0, n: ids.length }) : null; }
+      if (a === 'psplit') { const d = V.draft; if (!d) return; const c = v === 'c';   // a two-sided omen back to one side: he picks which side stays
+        Object.assign(d, { type: c ? 'curse' : 'bless', name: c ? d.name : d.name2 || d.name, grp0: c ? d.gc : d.gb, name2: '', anti: '' }); return paint(); }
+      if (a === 'pdup') return joinGoals(id, v, null);
+      if (!P) return;
+      if (a === 'pclose') { V.pair = null; return paint(); }
+      if (a === 'pskip') return pairNext(P.walk);
+      if (a === 'pall') { P.all = true; return paint(); }
+      if (a === 'pwith') { P.withId = P.withId === v ? '' : v; if (!P.withId) P.txt = PAIRS.suggest(goal(P.id))[0]; return paint(); }
+      if (a === 'psug') { P.withId = ''; P.txt = v; return paint(); }
+      if (a === 'pgo') { const g = goal(P.id), o = P.withId ? goal(P.withId) : null, txt = String(o ? o.name : P.txt || '').trim(); if (!g || !txt) return;
+        const cu = g.polarity === 'minus', c = cu ? g : o, b = cu ? o : g;
+        const d = Object.assign(draftOf(g), { type: 'both', name: cu ? g.name : txt, name2: cu ? txt : g.name, who: g.who || (o && o.who) || '',
+          gc: OMENS.of(c || { polarity: 'minus', name: txt, grp: '' }), gb: OMENS.of(b || { polarity: 'plus', name: txt, grp: '' }) });
+        return joinGoals(g.id, o ? o.id : '', goalOf('curse', d)); }
+    }
     function curses() {
       const abc = (a, b) => a.name.localeCompare(b.name, 'en', { sensitivity: 'base' }), cs = D.goals.filter(isCurse).sort(abc), bs = D.goals.filter(isBless).sort((a, b) => (b.absolve ? 1 : 0) - (a.absolve ? 1 : 0) || abc(a, b)), two = D.goals.filter(isBoth).sort(abc), cnt = D.blessCount || 0, cpos = cnt % 8, p = D.player;
       let h = two.length ? '<div class="uz-cap" style="border-color:#3a2a4e"><span><b style="color:#e0c8ff">Both Ways</b></span></div><div style="display:flex;flex-direction:column;gap:8px">' + two.map(twoCard).join('') + '</div>' +
         (V.edit ? '<div class="uz-chips">' + two.map((c) => '<button data-a="arch" data-id="' + c.id + '">× ' + esc(c.name) + '</button>').join('') + '</div>' : '') : '';
+      const lone = window.PAIRS ? PAIRS.lonely(D.goals).length : 0;
+      if (lone) h = '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><button class="pz-all" data-a="pairall">Pair all · ' + lone + ' one-sided</button><span style="flex:1;font:13px/1.3 var(--a);color:#a991c8">Give each omen its other side</span></div>' + h;
       h += '<div class="uz-cap" style="border-color:#3a1a1e;margin-top:' + (two.length ? 6 : 0) + 'px"><span><b style="color:#ffb3a8">The Cursed Shelf</b></span></div>';
       // curses as 2-column cards like the blessings (Patryk 2026-10-26)
       h += cs.length ? '<div class="uz-bl">' + cs.map((c) => { const n = c.count || 0;
-        return '<button class="uz-bt" data-a="curse" data-id="' + c.id + '" data-fx="' + c.id + '" aria-label="Slipped: ' + esc(c.name) + '" style="background:linear-gradient(180deg,#2a1216,#170a0c);border:1.5px solid ' + (n ? '#c4323a' : '#4a1c22') + '">' +
+        return '<button class="uz-bt" data-a="curse" data-id="' + c.id + '" data-fx="' + c.id + '" aria-label="Slipped: ' + esc(c.name) + '" style="position:relative;background:linear-gradient(180deg,#2a1216,#170a0c);border:1.5px solid ' + (n ? '#c4323a' : '#4a1c22') + '">' + pairChip(c) +
           '<span style="display:flex;align-items:center;gap:7px"><span class="uz-omc"><img src="' + OMENS.card('c', OMENS.of(c)) + '" alt=""></span><span style="flex:1;min-width:0;font:700 14px/1.15 var(--a);color:#f0e0d8">' + esc(c.name) + '</span></span>' +
           '<span style="display:flex;align-items:center;justify-content:space-between"><span style="display:flex;align-items:center;gap:4px;font:700 14px var(--a);color:#ff7a66">−' + c.hpLoss + '<img src="' + IMG.heart + '" style="width:12px;height:12px" alt=""></span>' +
           '<span style="font:12px var(--a);color:#b08a84">' + (n ? n + '× today' : 'spared today') + '</span></span></button>'; }).join('') + '</div>' : '<p class="uz-p" style="color:#b08a84">No curses. Tap + Add.</p>';
@@ -688,7 +735,7 @@
       const tiles = gl ? bs.filter((g) => !g.absolve) : bs;
       h += tiles.length ? '<div class="uz-bl">' + tiles.map((g) => { const f = false, n = g.count || 0;
         return '<button class="uz-bt' + (gl ? ' gl-tilebox' : '') + '" data-a="bless" data-id="' + g.id + '" data-fx="' + g.id + '" style="position:relative;overflow:hidden;background:' + (f ? 'linear-gradient(180deg,#2a2410,#151208)' : 'linear-gradient(180deg,#10233a,#0b1626)') + ';border:1.5px solid ' + (g.absolve ? '#d8b25a' : f ? '#8a6a2a' : n ? '#4a8ad0' : '#1f4266') + (g.absolve ? ';box-shadow:0 0 12px rgba(255,214,140,.35)' : n ? ';box-shadow:0 0 10px rgba(110,180,255,.35)' : '') + '">' +
-          (gl ? GLASS.tile({ key: 'bt' + g.id, lit: n ? 1 : 0.55 }) : '') + '<span style="display:flex;align-items:center;gap:7px"><span class="uz-omc"><img src="' + OMENS.card('b', OMENS.of(g)) + '" alt=""></span><span style="flex:1;min-width:0;font:700 14px/1.15 var(--a);color:#e8f2ff;text-shadow:0 1px 3px #000">' + esc(g.name) + '</span></span>' + absTag(g) +
+          (gl ? GLASS.tile({ key: 'bt' + g.id, lit: n ? 1 : 0.55 }) : '') + pairChip(g) + '<span style="display:flex;align-items:center;gap:7px"><span class="uz-omc"><img src="' + OMENS.card('b', OMENS.of(g)) + '" alt=""></span><span style="flex:1;min-width:0;font:700 14px/1.15 var(--a);color:#e8f2ff;text-shadow:0 1px 3px #000">' + esc(g.name) + '</span></span>' + absTag(g) +
           '<span style="display:flex;align-items:center;justify-content:space-between"><span style="display:flex;align-items:center;gap:3px;font:700 14px var(--a);color:#f0c45a">+' + g.pay + coin(15, g.pay, g.id) + '</span><span style="display:flex;gap:3px">' +
           [0, 1, 2, 3, 4].map((i) => '<span style="width:7px;height:7px;border-radius:1px;background:' + (i < n ? (f ? '#ffd56a' : '#c8e6ff') : '#2c4a7a') + ';box-shadow:' + (i < n ? '0 0 5px rgba(170,215,255,.9)' : 'none') + '"></span>').join('') + '</span></span>' +
           (f ? '<span class="uz-x2">×2 TODAY</span>' : '') + '</button>'; }).join('') + '</div>' : open.length ? '' : '<p class="uz-p" style="color:#6f8a7c">No blessings yet.</p>';
@@ -817,7 +864,7 @@
     const trackOf = (f, d) => ((f === 'ritual' ? areaOf(d.group) : d.grp) === 'life' ? 'life' : d.kind === 'external' ? 'external' : d.kind === 'ahead' ? 'ahead' : 'necessary');
     // what the server is sent for a form (new or edited)
     function goalOf(f, d) {
-      const nm = d.name.trim(), o = { id: d.id, name: nm, minutes: d.len, private: d.priv, who: d.who || '' };
+      const nm = d.name.trim(), o = { id: d.id || d.nid, name: nm, minutes: d.len, private: d.priv, who: d.who || '' };
       if (f === 'ritual') return Object.assign(o, { track: trackOf(f, d), kind: 'daily', grp: d.group, days: d.rep === 'school' ? '12345' : d.rep === 'days' ? d.days.map((x) => x || 7).sort().join('') : '', everyN: d.rep === 'every' ? d.n * (d.unit === 'weeks' ? 7 : 1) : '' });
       if (f === 'quest') return Object.assign(o, { track: trackOf(f, d), kind: 'todo', grp: d.grp, due: d.due || '', steps: d.steps.filter((x) => x.n.trim()).map((x) => ({ t: x.n.trim(), d: !!x.d })) });
       if (f === 'mark') return Object.assign(o, { track: 'necessary', kind: 'termly', grp: d.grp0 || 'marking', sittings: d.sittings, due: d.due || '' });
@@ -867,6 +914,7 @@
           (two ? pics('c', d.gc, 'CURSE PICTURE') + pics('b', d.gb, 'BLESSING PICTURE') : pics(cu ? 'c' : 'b', d.grp0, 'PICTURE'));
         // a curse's antidote: the blessing that wins its health back (Absolution); a two-sided omen is its own antidote
         if (cu) rows += row('ANTIDOTE (WINS THE HEALTH BACK)', [chip('None', !d.anti, 'd', 'anti:', '#ffe2a0')].concat(D.goals.filter((g) => g.kind === 'habit' && g.polarity === 'plus').sort((a, b) => a.name.localeCompare(b.name)).map((g) => chip(g.name, d.anti === g.id, 'd', 'anti:' + g.id, '#ffe2a0', OMENS.card('b', OMENS.of(g))))));
+        if (d.id && window.PAIRS) rows += PAIRS.formRows(d, goal(d.id), D.goals, esc);
         if (two) { payL = 'Curse side costs, blessing side pays'; payV = '−' + D.table.hpLoss[d.len] + ' HP · +' + Math.max(2, Math.round(D.table.base[d.len] / 2)); payC = '#e0c8ff'; payCoin = false; }
         else if (cu) { payL = 'Costs health, never runes'; payV = '−' + D.table.hpLoss[d.len] + ' HP'; payC = '#ff7a66'; payCoin = false; } else { payL = 'Pays each time you tap it'; payV = '+' + Math.max(2, Math.round(D.table.base[d.len] / 2)); }
         go = 'Add it'; goBg = two ? '#c8a8ff' : cu ? '#ff7a66' : '#5ef2a0'; }
@@ -885,6 +933,8 @@
     function submit() {
       const f = V.form, d = V.draft; if (!d || !d.name.trim()) return;
       V.form = null; V.draft = null; const nm = d.name.trim();
+      // a new one gets its id here (2026-10-28): a resent or doubled save is then the same card, and Undo works before the server answers
+      if (!d.id && /^(ritual|quest|mark|curse)$/.test(f)) d.nid = 'g' + Math.random().toString(36).slice(2, 9).padEnd(7, '0');
       const archOnSave = (r) => { if (r.saved) setRev(['gameArchive', r.saved]); };
       if (d.id && /^(ritual|quest|mark|curse)$/.test(f)) { const o = V.orig; V.orig = null; return act({ verb: 'Edited:', name: nm }, o ? ['gameSaveGoal', goalOf(f, o)] : null, 'gameSaveGoal', [goalOf(f, d)]); }
       if (f === 'ritual') { V.tab = 0; V.open[d.group] = 1; return act({ verb: 'New ritual:', name: nm }, null, 'gameSaveGoal', [goalOf(f, d)], null, archOnSave); }
@@ -897,8 +947,10 @@
         return act({ verb: 'Boss summoned:', name: nm }, null, 'gameBossStart', [{ name: nm, size: d.size, k: d.k || SIZE[d.size].k, grp: d.grp || 'teach', stages }], null, (r) => { if (r.newBoss) { V.open[r.newBoss] = 1; setRev(['gameBossRemove', r.newBoss]); } }); }
       if (f === 'group') return act({ verb: 'New group:', name: nm }, null, 'gameGroupSave', [{ name: nm, parent: d.parent === 'top' ? '' : d.parent }], null, (r) => { V.open[r.saved] = 1; paint(); });
       if (f === 'reward') return act({ verb: 'New reward:', name: nm }, null, 'gameHoardSave', [{ name: nm, cost: d.cost }], null, (r) => { if (r.saved) setRev(['gameHoardSave', { id: r.saved, name: nm, cost: d.cost, archived: true }]); });
-      if (f === 'curse') { const cu = d.type === 'curse';
-        return act({ verb: d.type === 'both' ? 'New omen:' : cu ? 'New curse:' : 'New blessing:', name: nm }, null, 'gameSaveGoal', [goalOf(f, d)], null, archOnSave); }
+      if (f === 'curse') { const cu = d.type === 'curse', ng = goalOf(f, d);
+        // the new omen shows at once (a slow phone used to show nothing for seconds, so it was added twice)
+        const shown = (x) => { x.goals.push(Object.assign({}, ng, { count: 0, cCount: 0, bCount: 0, hpLoss: x.table.hpLoss[d.len], pay: Math.max(2, Math.round((x.table.base[d.len] || 6) / 2)) })); };
+        act({ verb: d.type === 'both' ? 'New omen:' : cu ? 'New curse:' : 'New blessing:', name: nm }, null, 'gameSaveGoal', [ng], shown, archOnSave); return setRev(['gameArchive', ng.id]); }
     }
 
     /* ---------- paint ---------- */
@@ -909,6 +961,7 @@
       const ae = document.activeElement, ds = ae && body.contains(ae) ? ae.dataset : null;
       const focus = !ds ? '' : ds.step !== undefined ? '[data-step="' + ds.step + '"]' : ds.name ? '[data-name]' : ds.rv ? '[data-rv="' + ds.rv + '"]' : ds.rvp !== undefined ? '[data-rvp="' + ds.rvp + '"]' : ds.ren ? '[data-ren]' : '';
       if (V.form) body.innerHTML = form();
+      else if (V.pair && window.PAIRS) body.innerHTML = pairSheet();
       else body.innerHTML = '<div class="uz-sw"><div class="uz-track" style="transform:translateX(' + (-V.tab * 25) + '%);transition:transform .3s cubic-bezier(.2,.8,.2,1)">' +
         '<div class="uz-pane">' + today() + '</div><div class="uz-pane">' + grimoire() + '</div><div class="uz-pane">' + curses() + '</div><div class="uz-pane">' + den() + '</div></div></div>' +
         '';
@@ -929,6 +982,7 @@
     box.addEventListener('input', (e) => {
       const t = e.target;
       if (t.dataset.name2 && V.draft) V.draft.name2 = t.value;
+      if (t.dataset.ptxt && V.pair) { V.pair.txt = t.value; V.pair.withId = ''; body.querySelectorAll('.pz-c.on').forEach((n) => n.classList.remove('on')); }
       if (t.dataset.name && V.draft) { V.draft.name = t.value; const go = body.querySelector('.uz-go'); if (go) go.style.opacity = t.value.trim() ? 1 : 0.45; }
       if (t.dataset.step !== undefined && V.draft) V.draft.steps[Number(t.dataset.step)].n = t.value;
       if (t.dataset.due && V.draft) V.draft.due = t.value;
@@ -976,9 +1030,10 @@
       const b = e.target.closest('[data-a]'); if (!b || !box.contains(b)) return;
       const a = b.dataset.a, id = b.dataset.id, v = b.dataset.v, r = b.getBoundingClientRect(), k = b.dataset.fx;
       if (a === 'undo') return undo();
+      if (/^(pair|pairall|pclose|pskip|pall|pwith|psug|pgo|pdup|psplit)$/.test(a) && window.PAIRS) return pairTap(a, id, v);
       if (a === 'next') { V.sayIx++; V.say = null; return paintBanner(); }
       if (a === 'nextOld') { const nj = nextJob(); V.tab = 0; V.form = null; paint(); if (nj) { const n = body.querySelector('[data-fx="' + nj.id + '"],[data-fx="' + nj.id + 't"]'); if (n) { n.scrollIntoView({ block: 'center', behavior: 'smooth' }); glow(n.dataset.fx, 'rgba(94,242,160,.85)'); } } return; }
-      if (a === 'tab') { V.tab = Number(v); V.form = null; V.banishArm = null; tabOpened(); return paint(); }
+      if (a === 'tab') { V.tab = Number(v); V.form = null; V.pair = null; V.banishArm = null; tabOpened(); return paint(); }
       if (a === 'fold') { V.hand[v] = 1; V.open[v] = V.open[v] === undefined && b.dataset.def ? 0 : (V.open[v] ? 0 : 1); return paint(); }
       if (a === 'rename') { V.renaming = v; paint(); const n = body.querySelector('[data-ren]'); if (n) { n.focus(); n.select(); } return; }
       if (a === 'edit') { V.edit = !V.edit; return paint(); }

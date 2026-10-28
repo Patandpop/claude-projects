@@ -6,7 +6,7 @@ const dir = path.join(__dirname, '..');
 m.props.PLANNER_KEY = 'k';
 const src = ['Code.gs', 'Behaviour.gs', 'game-art.js', 'Game.gs'].map((f) => fs.readFileSync(path.join(dir, f), 'utf8')).join('\n');
 global.SHOP = require('../game-shop.json');
-eval(src + '\nglobal.G={gameLoad,gameTick,gameUntick,gameSaveGoal,gameArchive,gameFreeze,gameShop,gameArt,gameBuy,gamePlace,gameBossStart,gameBossStage,gameBossRemove,gameBossSave,gameTag,gameChips,gameVespers,gameVespersUndo,gameVespersTime,gameMoon,gameReview,gameQuestStep,gameGroupSave,gameWear,gameUnbuy,gameHoardSave,gameHoardClaim,gameChronicle,gameAim,gPay_,gDie_,gNeed_,gAdd_,gDow_,gDiff_,gIsFrozen_};');
+eval(src + '\nglobal.G={gameLoad,gameTick,gameUntick,gameSaveGoal,gameArchive,gameFreeze,gameShop,gameArt,gameBuy,gamePlace,gameBossStart,gameBossStage,gameBossRemove,gameBossSave,gameTag,gameChips,gameVespers,gameVespersUndo,gameVespersTime,gameMoon,gameReview,gameQuestStep,gameGroupSave,gameWear,gameUnbuy,gameHoardSave,gameHoardClaim,gameChronicle,gameAim,gameMergeGoals,gameUnmerge,gPay_,gDie_,gNeed_,gAdd_,gDow_,gDiff_,gIsFrozen_};');
 
 const k = 'k'; let failed = 0;
 const ok = (n, c) => { console.log((c ? '  PASS ' : '  FAIL ') + n); if (!c) failed++; };
@@ -393,5 +393,57 @@ ok('spending and refunds never count as doubloons earned', ch.weeks[6].coins ===
   const sh = G.gameShop(k), el = sh.items.find((i) => i.tier === 'Eldritch'), ba = sh.items.find((i) => i.tier === 'Basic' && !i.locked);
   ok('Eldritch needs level 20', el.locked && /level 20/.test(el.why));
   ok('Basic is open from level 1', !!ba); }
+console.log('\n-- two-sided omens: pairing, joining, duplicates (2026-10-28 night)');
+{ at('2027-01-12T10:00:00Z'); let s = G.gameLoad(k);
+  const n0 = s.goals.length;
+  s = G.gameSaveGoal(k, { id: 'gpair001', name: 'Hitting Snooze', kind: 'habit', polarity: 'minus', minutes: 15 });
+  s = G.gameSaveGoal(k, { id: 'gpair001', name: 'Hitting Snooze', kind: 'habit', polarity: 'minus', minutes: 15 });
+  ok('a new omen sent twice with its phone id makes one card, not two', s.goals.filter((g) => g.name === 'Hitting Snooze').length === 1 && s.goals.find((g) => g.name === 'Hitting Snooze').id === 'gpair001');
+  s = G.gameSaveGoal(k, { name: 'hitting snooze ', kind: 'habit', polarity: 'minus', minutes: 15 });
+  ok('a second new omen with the same name and side is the same card (a double save on a slow phone)', s.goals.filter((g) => /hitting snooze/i.test(g.name)).length === 1 && s.saved === 'gpair001' && s.goals.length === n0 + 1);
+  s = G.gameSaveGoal(k, { name: 'Wake Up Early', kind: 'habit', polarity: 'plus', minutes: 15 }); const wid = s.saved;
+  s = G.gameTick(k, 'gpair001', -1); s = G.gameTick(k, wid, 1); s = G.gameTick(k, wid, 1);
+  const coins = s.player.coins, hp = s.player.hp;
+  // pair a one-sided curse by a new name only: id, ticks and count stay
+  s = G.gameSaveGoal(k, { id: 'gpair001', name: 'Hitting Snooze / Woke up early', kind: 'habit', polarity: 'both', minutes: 15, track: 'life', grp: '|' });
+  let g = s.goals.find((x) => x.id === 'gpair001');
+  ok('pairing keeps the id and turns it two-sided with its curse count', g && g.polarity === 'both' && g.cCount === 1 && g.bCount === 0);
+  // join it with the existing Wake Up Early card instead: both histories in one
+  s = G.gameSaveGoal(k, { id: 'gpair001', name: 'Hitting Snooze', kind: 'habit', polarity: 'minus', minutes: 15, track: 'life' });
+  s = G.gameMergeGoals(k, 'gpair001', wid, { name: 'Hitting Snooze / Wake Up Early', kind: 'habit', polarity: 'both', minutes: 15, track: 'life', grp: '|' });
+  g = s.goals.find((x) => x.id === 'gpair001');
+  ok('joining two cards: one two-sided omen with both counts, the other card gone', g.polarity === 'both' && g.cCount === 1 && g.bCount === 2 && !s.goals.some((x) => x.id === wid));
+  ok('...and runes and health are untouched', s.player.coins === coins && s.player.hp === hp);
+  s = G.gameMergeGoals(k, 'gpair001', wid, { name: 'Hitting Snooze / Wake Up Early', kind: 'habit', polarity: 'both', minutes: 15, track: 'life', grp: '|' });
+  ok('a resent join changes nothing', s.goals.find((x) => x.id === 'gpair001').bCount === 2);
+  s = G.gameUntick(k, 'gpair001'); g = s.goals.find((x) => x.id === 'gpair001');
+  ok('unticking the joined omen takes back a moved blessing tick', g.bCount === 1);
+  s = G.gameTick(k, 'gpair001', 1);
+  s = G.gameUnmerge(k, 'gpair001', wid, { name: 'Hitting Snooze', kind: 'habit', polarity: 'minus', minutes: 15, track: 'life' });
+  const w = s.goals.find((x) => x.id === wid); g = s.goals.find((x) => x.id === 'gpair001');
+  ok('Undo of a join gives both cards back, each with its own ticks', w && w.polarity === 'plus' && g.polarity === 'minus' && g.name === 'Hitting Snooze' && w.count >= 1);
+  // split a two-sided omen back to one side: same id, history kept
+  s = G.gameMergeGoals(k, 'gpair001', wid, { name: 'Hitting Snooze / Wake Up Early', kind: 'habit', polarity: 'both', minutes: 15, track: 'life', grp: '|' });
+  const net = s.goals.find((x) => x.id === 'gpair001').count;
+  s = G.gameSaveGoal(k, { id: 'gpair001', name: 'Wake Up Early', kind: 'habit', polarity: 'plus', minutes: 15, track: 'life' });
+  g = s.goals.find((x) => x.id === 'gpair001');
+  ok('splitting keeps the id and the count, as a one-sided blessing', g.polarity === 'plus' && g.name === 'Wake Up Early' && g.count === net);
+  // merging duplicates
+  s = G.gameSaveGoal(k, { name: 'Floss', kind: 'habit', polarity: 'plus', minutes: 5 }); const f1 = s.saved;
+  s = G.gameSaveGoal(k, { name: 'Flossing', kind: 'habit', polarity: 'plus', minutes: 5 }); const f2 = s.saved;
+  s = G.gameTick(k, f1, 1); s = G.gameTick(k, f2, 1);
+  s = G.gameMergeGoals(k, f1, f2, { name: 'Floss', kind: 'habit', polarity: 'plus', minutes: 5, track: 'life' });
+  ok('merging a duplicate keeps one card with both ticks', s.goals.find((x) => x.id === f1).count === 2 && !s.goals.some((x) => x.id === f2));
+  let threw = false; try { G.gameMergeGoals(k, f1, 'nope', {}); } catch (e) { threw = true; }
+  ok('joining with a card that is not there is refused', threw);
+  // the matcher finds his real opposites
+  const PAIRS = require('../game-pairs.js'), mk = (n, p, i) => ({ id: 'x' + i, name: n, kind: 'habit', polarity: p });
+  const gs = [mk('Hitting Snooze', 'minus', 1), mk('Leaving Dirty Dishes', 'minus', 2), mk('Ignoring Messages for 2+ Days', 'minus', 3), mk('Wake Up Early', 'plus', 4), mk('Tidied', 'plus', 5), mk('Call Friends', 'plus', 6), mk('Floss', 'plus', 7), mk('Flossing', 'plus', 8), mk('Wordle', 'plus', 9)];
+  ok('the built-in list has at least 40 pairs', PAIRS.LIST.length >= 40);
+  ok('his own omens are found as partners: Snooze/Wake Up Early, Dishes/Tidied, Messages/Call Friends', PAIRS.rank(gs[0], gs)[0].g.name === 'Wake Up Early' && PAIRS.rank(gs[1], gs)[0].g.name === 'Tidied' && PAIRS.rank(gs[2], gs)[0].g.name === 'Call Friends');
+  ok('his names get their list opposites', ['Over Agreeable|Said no kindly', 'Overspending|No-spend day', 'Lying|Told the truth when it was hard', 'Binge-watching Netflix|One episode, then stop'].every((x) => PAIRS.suggest({ name: x.split('|')[0], polarity: 'minus' })[0] === x.split('|')[1]) &&
+    ['Sleep 7.5Hrs +|Up past midnight', 'Eating Healthy|Junk or takeaway', 'Proud of Day|Wasted the day', 'Making Bed|Left the bed unmade', 'Showered|Skipped a shower', 'Brush Teeth|Skipped teeth at night', 'Floss|Skipped teeth at night'].every((x) => PAIRS.suggest({ name: x.split('|')[0], polarity: 'plus' })[0] === x.split('|')[1]));
+  ok('nothing in the list: a gentle wording', PAIRS.suggest({ name: 'Gardening', polarity: 'plus' })[0] === 'Skipped gardening' && PAIRS.suggest({ name: 'Vaping', polarity: 'minus' })[0] === 'Resisted vaping');
+  ok('Floss and Flossing are seen as duplicates, Wordle is not a duplicate of Floss', PAIRS.dupes(gs[6], gs).length === 1 && PAIRS.dupes(gs[8], gs).length === 0); }
 console.log('\n' + (failed ? failed + ' FAILED' : 'all game server checks passed'));
 process.exit(failed ? 1 : 0);

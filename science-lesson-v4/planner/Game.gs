@@ -577,14 +577,22 @@ function gameUntick(k, id) {
 function gameSaveGoal(k, goal) {
   check_(k); gFresh_();
   let savedId = '';
-  withLock_(function () { gFresh_(true);
+  withLock_(function () { gFresh_(true); savedId = gSaveGoal_(goal); });
+  return gSnapshot_(gWorld_(), { saved: savedId });
+}
+// a new goal can bring its own id from the phone (2026-10-28): a resent or doubled save then updates the same row
+// instead of making a second card, and a new ritual or omen with the same name as a live one on the same side is that one
+function gSaveGoal_(goal) {
+  {
     const today = gDay_(gNow_()), name = String(goal.name || '').trim().slice(0, 80);
     if (!name) throw new Error('Give the ritual a name.');
     const kind = ['daily', 'habit', 'todo', 'termly'].indexOf(goal.kind) >= 0 ? goal.kind : 'daily';
     const track = ['necessary', 'ahead', 'external', 'life'].indexOf(goal.track) >= 0 ? goal.track : 'necessary';
     const minutes = [5, 15, 30, 60, 120].indexOf(Number(goal.minutes)) >= 0 ? Number(goal.minutes) : 15;
-    const old = goal.id ? gRows_('goals').find((r) => r.id === goal.id) : null;
-    const rec = { id: old ? old.id : 'g' + Utilities.getUuid().slice(0, 7), name, kind, polarity: ['plus', 'minus', 'both'].indexOf(goal.polarity) >= 0 ? goal.polarity : (kind === 'habit' ? 'minus' : 'plus'),
+    let old = goal.id ? gRows_('goals').find((r) => r.id === goal.id) : null;
+    const pol0 = ['plus', 'minus', 'both'].indexOf(goal.polarity) >= 0 ? goal.polarity : (kind === 'habit' ? 'minus' : 'plus'), same = (x) => String(x).trim().toLowerCase();
+    if (!old && (kind === 'habit' || kind === 'daily')) { const twin = gGoals_().find((r) => r.kind === kind && same(r.name) === same(name) && (kind !== 'habit' || r.polarity === pol0)); if (twin) return twin.id; }
+    const rec = { id: old ? old.id : /^g[a-z0-9]{6,12}$/.test(String(goal.id || '')) ? goal.id : 'g' + Utilities.getUuid().slice(0, 7), name, kind, polarity: ['plus', 'minus', 'both'].indexOf(goal.polarity) >= 0 ? goal.polarity : (kind === 'habit' ? 'minus' : 'plus'),
       days: String(goal.days || '').replace(/[^1-7]/g, ''), everyN: Number(goal.everyN) || '', minutes, track, auto: old ? old.auto : '', value: old ? old.value : 0, streak: old ? old.streak : 0, best: old ? old.best : 0,
       lastDone: old ? old.lastDone : '', private: goal.private ? 'true' : '', sittings: kind === 'termly' ? (Number(goal.sittings) || 1) : '', sitDone: old ? old.sitDone : (kind === 'termly' ? 0 : ''),
       due: String(goal.due || ''), archived: '', created: old ? old.created : today, miss: old ? (old.miss || '') : '', grp: String(goal.grp || '').slice(0, 40),
@@ -598,9 +606,47 @@ function gameSaveGoal(k, goal) {
     if (kind === 'daily' && !rec.days && !rec.everyN) rec.days = '12345';
     if (old) G_HEAD.goals.forEach((h, j) => { if (String(old[h]) !== String(rec[h])) gSet_('goals', old.row, h, rec[h]); });
     else gAppend_('goals', rec);
-    savedId = rec.id;
+    return rec.id;
+  }
+}
+// join two omens into one (a curse and its blessing, or two duplicates), keeping both histories (Patryk 2026-10-28):
+// keepId stays and takes the saved fields in goal; goneId's ticks and tags move to keepId (marked so Undo can move them back), then goneId is archived
+function gameMergeGoals(k, keepId, goneId, goal) {
+  check_(k); gFresh_();
+  let bad = null;
+  withLock_(function () { gFresh_(true);
+    const rows = gRows_('goals'), keep = rows.find((r) => r.id === keepId), gone = rows.find((r) => r.id === goneId);
+    if (!keep || !gone || keepId === goneId) { bad = 'Those two omens are not both in the list any more.'; return; }
+    if (String(gone.archived) === 'true') return;                               // already joined (a resent tap)
+    const moved = {};
+    gRows_('ticks').forEach((t) => { const n = gNote_(t); let ch = false;
+      if (t.goalId === goneId) { gSet_('ticks', t.row, 'goalId', keepId); n.moved = goneId; moved[t.id] = 1; ch = true; }
+      if (n.anti === goneId) { n.anti = keepId; n.antiWas = goneId; ch = true; }
+      if (ch) gSet_('ticks', t.row, 'note', JSON.stringify(n)); });
+    gRows_('tags').forEach((t) => { if (t.goalId === goneId) gSet_('tags', t.row, 'goalId', keepId); });
+    gRows_('goals').forEach((r) => { if (r.id !== goneId && String(r.anti) === goneId) gSet_('goals', r.row, 'anti', keepId); });
+    gSaveGoal_(Object.assign({}, goal, { id: keepId }));
+    const k2 = gRows_('goals').find((r) => r.id === keepId); if (Number(gone.best) > Number(k2.best)) gSet_('goals', k2.row, 'best', Number(gone.best));
+    gSet_('goals', gone.row, 'archived', 'true');
   });
-  return gSnapshot_(gWorld_(), { saved: savedId });
+  if (bad) throw new Error(bad);
+  return gSnapshot_(gWorld_());
+}
+// Undo of a join: the moved ticks and tags go back, the absorbed omen returns, and the kept one gets its old fields (before)
+function gameUnmerge(k, keepId, goneId, before) {
+  check_(k); gFresh_();
+  withLock_(function () { gFresh_(true);
+    const gone = gRows_('goals').find((r) => r.id === goneId); if (!gone) return;
+    const back = {};
+    gRows_('ticks').forEach((t) => { const n = gNote_(t); let ch = false;
+      if (t.goalId === keepId && n.moved === goneId) { gSet_('ticks', t.row, 'goalId', goneId); delete n.moved; back[t.id] = 1; ch = true; }
+      if (n.antiWas === goneId) { n.anti = goneId; delete n.antiWas; ch = true; }
+      if (ch) gSet_('ticks', t.row, 'note', JSON.stringify(n)); });
+    gRows_('tags').forEach((t) => { if (back[t.tickId]) gSet_('tags', t.row, 'goalId', goneId); });
+    gSet_('goals', gone.row, 'archived', '');
+    if (before) gSaveGoal_(Object.assign({}, before, { id: keepId }));
+  });
+  return gSnapshot_(gWorld_());
 }
 // back = true un-archives it again (the Undo button)
 function gameArchive(k, id, back) {

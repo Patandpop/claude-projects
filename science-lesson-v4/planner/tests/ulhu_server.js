@@ -4,7 +4,7 @@ const P = require('path').join(__dirname, '..') + '/';
 const m = require(P + 'tests/mock-appsscript.js'), fs = require('fs'), http = require('http');
 m.props.PLANNER_KEY = 'k';
 global.SHOP = require(P + 'game-shop.json');
-const FN = ['gameLoad', 'gameTick', 'gameUntick', 'gameSaveGoal', 'gameArchive', 'gameFreeze', 'gameShop', 'gameArt', 'gameBuy', 'gamePlace', 'gameBossStart', 'gameBossStage', 'gameBossRemove', 'gameBossSave', 'gameTag', 'gameChips', 'gameVespers', 'gameVespersUndo', 'gameVespersTime', 'gameMoon', 'gameReview', 'gameQuestStep', 'gameGroupSave', 'gameWear', 'gameUnbuy', 'gameHoardSave', 'gameHoardClaim', 'gameChronicle'];
+const FN = ['gameLoad', 'gameTick', 'gameUntick', 'gameSaveGoal', 'gameArchive', 'gameFreeze', 'gameShop', 'gameArt', 'gameBuy', 'gamePlace', 'gameBossStart', 'gameBossStage', 'gameBossRemove', 'gameBossSave', 'gameTag', 'gameChips', 'gameVespers', 'gameVespersUndo', 'gameVespersTime', 'gameMoon', 'gameReview', 'gameQuestStep', 'gameGroupSave', 'gameWear', 'gameUnbuy', 'gameHoardSave', 'gameHoardClaim', 'gameChronicle', 'gameMergeGoals', 'gameUnmerge'];
 eval(['Code.gs', 'Behaviour.gs', 'Game.gs'].map((f) => fs.readFileSync(P + f, 'utf8')).join('\n') + '\nglobal.G={' + FN.join(',') + '};');
 global.GAME_WORLD = { data: { terms: [['2026-09-07', '2026-12-18']], inset: ['2026-11-09'], classes: { '9XS': { seq: [{ num: 4, built: true }, { num: 5, built: false }] }, '13D': { seq: [{ num: 5, built: false }] } } },
   weeks: { '2026-10-26': { slots: [{ kind: 'lesson', cls: '9XS', i: 0, day: 0 }, { kind: 'lesson', cls: '13D', i: 0, day: 1 }, { kind: 'lesson', cls: '9XS', i: 1, day: 4 }] } } };
@@ -18,6 +18,9 @@ G.gameSaveGoal(k, { name: 'Print the 10S2 mock papers', kind: 'todo', minutes: 3
 G.gameSaveGoal(k, { name: 'Plan the Halloween party food', kind: 'todo', minutes: 30, track: 'life', grp: 'life', due: '2026-10-24' });
 ['Drank water|5', 'Went for a walk|15', 'Stretched|5', 'Tidied the desk|15', 'Left school by 5|30', 'In bed by 10:30|30'].forEach((x) => { const [n, mm] = x.split('|'); G.gameSaveGoal(k, { name: n, kind: 'habit', polarity: 'plus', minutes: Number(mm) }); });
 G.gameSaveGoal(k, { name: 'Doomscrolling in bed', kind: 'habit', polarity: 'minus', minutes: 30 });
+// 2026-10-28 night: one-sided omens to pair (his real Hitting Snooze and Wake Up Early) and a near-duplicate (Floss, Flossing)
+G.gameSaveGoal(k, { name: 'Hitting Snooze', kind: 'habit', polarity: 'minus', minutes: 15 });
+['Wake Up Early', 'Floss', 'Flossing'].forEach((n) => G.gameSaveGoal(k, { name: n, kind: 'habit', polarity: 'plus', minutes: 5 }));
 G.gameBossStart(k, { name: 'Make Halloween costumes', size: 2, k: 'spawn', stages: [{ name: 'Discuss what it should be', due: '2026-10-20' }, { name: 'Get materials', due: '2026-10-23' }, { name: 'Paint and build', due: '2026-10-30' }] });
 const b2 = G.gameBossStart(k, { name: 'Mark the 10S2 test', size: 5, k: 'deep', stages: [{ name: 'Half marked', due: '2026-10-22' }, { name: 'The rest', due: '2026-10-26' }, { name: 'Scores summed', due: '2026-10-27' }, { name: 'Entered', due: '2026-10-28' }] }).newBoss;
 G.gameBossStage(k, b2, 0, true);
