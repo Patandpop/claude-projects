@@ -268,3 +268,11 @@ Patryk's answers, in grill order. Mock-ups follow each area.
 | III. The Midnight | 21 Pressure Born, 22 Gloom Walker, 23 Cult Whisperer, 24 Trench Stalker, 25 Star Spawn, 26 Void Oracle, 27 Tentacle Lord, 28 Kraken Rider, 29 Leviathan Kin, 30 High Priest |
 | IV. The Abyss | 31 Sunken Bishop, 32 R'lyeh Mason, 33 Nightmare Sower, 34 Sleepless Eye, 35 Elder Thing, 36 Dread Admiral, 37 Abyss Hierarch, 38 Herald of Tides, 39 Void Sovereign, 40 Great Dreamer |
 | V. The Risen | 41 The Stirring, 42 Dreamer Awake, 43 Breaker of Seals, 44 Lord of R'lyeh, 45 Shaper of Tides, 46 Star Devourer, 47 Elder God, 48 The Unspeakable, 49 Old One, 50 Great Old One |
+
+## Design picks, evening 28 Oct (mock-up working files in the 12d0aa3c session scratchpad: oracle5/, lair4/, grimoire5/, tabs4/, market5/)
+- **Oracle:** R1 blessing glass, M3 Ember middle mark, **E1 gold eye** (iris in three facet rings: soft outside, vivid inside, dark slit pupil). Glass brighter all round (canvas brightness 1.28, saturate 1.18; lit-mark glow .78/.55/.48/.22). Page: https://claude.ai/artifact/42BxcvJEAkiS6xs8vM8qTv
+- **Lair (B2 Band):** colours P2 morning, P3 day, P3 evening, P2 night; **M2 Crescent** half moon; **V1 round flask**; rune heap = the round-two pile remade: 30px runes in a pyramid, up to 21 (6-5-4-3-2-1), steps at 1/20/50/90/140/200/280/380/500/650/850/1100/1400/1750/2150/2600/3100/3600/4100/4600/5000. H4 (pile) vs H5 (pile + a tower per 500) still to pick. Page: https://claude.ai/artifact/NpevDxLcCNZSatRt69pV66
+- **Grimoire:** pixel-art scene, **BG1 Candlelit desk** picked; T1 book + T4 animation kept. Page: https://claude.ai/artifact/2hhEpg5QBkqi7145xDtuBv
+- **Tabs:** TB6c Tide line = the minimal pick. TB5b1 Lit niches = base for the textured bar, but round five looked childish; round six (finer textures: aged parchment Call, old dark leather Grimoire, real Oracle glass Omens, lair ruins Den) in progress. Don't build the tab bar until he picks. Page: https://claude.ai/artifact/HNAaSMmUp8o1DhmHdb3uJz
+- **Market:** entrance Walk + TR3c picked; three more entrance options in progress (new page).
+- Quest pact effect: already final and built (see above).
