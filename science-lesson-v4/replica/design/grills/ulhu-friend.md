@@ -1,6 +1,6 @@
 # Grilling: Goal 4, Ulhu for his friend (not a teacher)
 
-Grilled 29 Oct 2026 with Patryk, 5 rounds. Status: ready to build, once the installed-app version exists (see "Depends on").
+Grilled 29 Oct 2026 with Patryk, 5 rounds. Status: ready to build, once the installed-app version exists (see "Depends on"). LOW PRIORITY: Patryk says this can always be moved back behind other work.
 
 ## Decisions
 
