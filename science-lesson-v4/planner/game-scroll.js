@@ -262,7 +262,7 @@ const CSS = '' +
 '.sc-scroll{position:relative;padding-block:11px}' +
 '.sc-roll{position:absolute;left:0;width:100%;height:22px;z-index:3;pointer-events:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.5))}' +
 '.sc-rt{top:0}.sc-rb{bottom:0}' +
-'.sc-body{position:relative;margin:0 ' + RODM + 'px;min-height:120px}' +
+'.sc-body{position:relative;margin:0 ' + RODM + 'px;min-height:0}.sc-has-steps .sc-body{min-height:120px}' +   /* 1U.2 (Patryk 29 Oct): no empty room under a quest with no steps */
 '.sc-paper,.sc-pact{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none}' +
 '.sc-paper{background:#d9c49a}.sc-ready .sc-paper{background:none}' +
 '.sc-qc{position:relative;padding:20px 16px 18px 14px}' +
@@ -323,7 +323,7 @@ function card(q, o) {
   let pay = o.payHtml;
   if (pay == null) { pay = '+' + esc(q.pay == null ? '' : q.pay); try { const R = window.RUNES && window.RUNES.pick(q.pay, q.id); if (R && R.src) pay += '<img src="' + R.src + '" alt="runes">'; } catch (e) { /* no rune picture */ } }
   const A = ART || {}, src = (s) => (s ? ' src="' + s + '"' : '');
-  return '<div class="sc-card' + (done ? ' sc-sealed' : '') + '" data-sc-id="' + esc(q.id) + '" data-sc-due="' + esc(q.due || '') + '">' +
+  return '<div class="sc-card' + (done ? ' sc-sealed' : '') + (steps.length ? ' sc-has-steps' : '') + '" data-sc-id="' + esc(q.id) + '" data-sc-due="' + esc(q.due || '') + '">' +
     '<div class="sc-scroll"><canvas class="sc-roll sc-rt"></canvas><div class="sc-body"><canvas class="sc-paper"></canvas><canvas class="sc-pact"></canvas><div class="sc-qc"><div class="sc-top">' +
     '<button type="button" class="sc-spot" ' + ta + ' aria-label="' + (done ? 'Sealed: ' : 'Seal and finish: ') + esc(q.name) + '">' +
     '<img class="sc-gh" alt=""' + src(A.ring) + '><img class="sc-pool" alt=""' + src(A.pool) + '><img class="sc-sl" alt=""' + src(A.sl) + '><span class="sc-stamp"><i class="sc-shd"></i><img class="sc-stp" alt=""' + src(A.stamp) + '></span></button>' +

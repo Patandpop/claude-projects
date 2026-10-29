@@ -1082,6 +1082,8 @@
         const late = on && !!st.due && D.today > st.due, n = bo.stages.length, dead = on && bo.stages.every((x, j) => j === i || x.done);
         if (!on) return act({ verb: 'Stage reopened:', name: st.name }, ['gameBossStage', id, i, true], 'gameBossStage', [id, i, false], (d) => { const x = d.bosses.find((y) => y.id === id); x.stages[i].done = ''; x.stages[i].late = false; x.hp = Math.min(100, x.hp + Math.round((st.late ? 50 : 100) / n)); });
         if (window.TEMPLE && !V.striking) { V.striking = true; buzz(15); setMood('happy', pickSay('boss'));
+          // a stage row in The Call (1U.1, 2026-10-29): the claw plays on the Grimoire card, off screen, so the row itself answers the tap
+          if (!b.closest('.tp-boss')) { glow(k, 'rgba(255,122,102,.9)'); floatText(r, late ? 'half hit' : 'hit!', '#ff9a85'); }
           const save = () => { V.striking = false;
             if (!dead) return act({ verb: late ? 'Late hit:' : 'Hit:', name: st.name + ' · ' + bo.name }, ['gameBossStage', id, i, false], 'gameBossStage', [id, i, true], (d) => { const x = d.bosses.find((y) => y.id === id); x.stages[i].done = d.today; x.stages[i].late = late; x.hp = Math.max(0, x.hp - Math.round((late ? 50 : 100) / n)); });
             TEMPLE.beaten(id, () => { let up2 = false;

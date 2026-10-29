@@ -795,7 +795,7 @@
       h += '<button class="dn-booth" data-a="dn-visit" data-v="' + k.id + '" style="left:' + (100 * (x - 30) / PLAZA.w) + '%;top:' + (100 * (y - 48) / PLAZA.h) + '%;width:' + (100 * 60 / PLAZA.w) + '%;height:' + (100 * 62 / PLAZA.h) + '%" aria-label="' + k.name + ', ' + k.what + ': ' + k.trade + '"><span>' + k.name + (res ? ' <i class="' + (res === 'win' ? 'ok' : 'bad') + '">' + (res === 'win' ? '−20%' : '+10%') + '</i>' : '') + '</span></button>'; });
     h += '<div class="dn-mu" style="left:' + (100 * (PLAZA.well[0] - 14) / PLAZA.w) + '%;top:' + (100 * (PLAZA.well[1] + 4) / PLAZA.h) + '%">' + X.layers(X.mood()) + '</div>';
     h += '<button class="dn-back" data-a="den" data-v="room">‹ Sanctum</button></div>';
-    return h + '<p class="dn-note"><b>Ulhu:</b> ' + X.esc(pick(ULS)) + ' Every keeper will play you at dice once a day.</p>';
+    return h + '<p class="dn-note"><b>Ulhu:</b> ' + X.esc(pick(ULS)) + '</p>';   // 1U.3 (Patryk 29 Oct): no rules under the plaza, the keepers say what they do
   }
   function stallScene(X, k, frame, say) { const K = KB[k];
     return '<div class="dn-sc" style="--lamp:' + K.lamp + '"><img class="dn-int" src="' + interior(k).src + '" alt=""><img class="dn-kp" src="' + portrait(k, frame).src + '" alt="' + K.name + '"><div class="dn-lampg"></div>' +
@@ -804,7 +804,7 @@
     const k = X.V.stall, K = KB[k], res = (X.SHOP.haggle || {})[k], its = itemsOf(X, k);
     const say = LINE[k] || (LINE[k] = pick(K.L.arrive));
     let h = stallScene(X, k, LINE.f || 'idle', say);
-    h += '<div class="dn-kh"><span><b>' + K.name + '</b><small>' + K.what + '. ' + K.trade + '.</small></span>' +
+    h += '<div class="dn-kh"><span><b>' + K.name + '</b></span>' +   // 1U.3: no label under the name (the aria-label keeps what and trade for a screen reader)
       (res === 'win' ? '<span class="dn-badge ok">20% off today</span>' : res === 'lose' ? '<span class="dn-badge bad">10% more today</span>' : res === 'playing' ? (DG && DG.k === k ? '<button class="dn-hag" data-a="dn-resume">Back to the dice</button>' : '<span class="dn-badge bad">Walked out: 10% more</span>') : '<button class="dn-hag" data-a="dn-peek">Haggle</button>') + '</div>';
     h += '<div class="dn-wares">' + its.map((i) => {
       const key = i.id, lk = i.cat ? i.lock > X.D.player.level && !i.own : i.locked && !i.own; let a = i.cat ? (i.own ? 'wear' : 'dn-wear') : 'shop', st, cls = '';
@@ -819,9 +819,7 @@
     const want = its.filter((i) => !i.own && i.base).sort((a, b) => ((a.cat ? a.lock > X.D.player.level : a.locked) - (b.cat ? b.lock > X.D.player.level : b.locked)) || b.base - a.base).slice(0, 3);
     let h = stallScene(X, k, 'talk', LINE.peek || (LINE.peek = pick(K.L.haggle)));
     h += '<div class="dn-peek"><h3>What you play for</h3>' + want.map((i) => '<div class="dn-pk"><span class="dn-art">' + artOf(X, i, 40) + '</span><span class="dn-nm">' + X.esc(i.name) + tag(X, i.tier) + '</span><span class="dn-pp"><span>' + i.base + X.coin(12, i.base, i.id) + '</span><span class="ok">win ' + hgPrice(i.base, 'win') + '</span><span class="bad">lose ' + hgPrice(i.base, 'lose') + '</span></span></div>').join('') +
-      '<p><b>Win:</b> 20% off everything at ' + K.name + '’s stall for the rest of today. <b>Lose:</b> 10% more here today. One game a day with each keeper; walking out counts as a loss.</p>' +
-      '<p class="dn-how">Five dice each, hidden under cups. Take turns claiming “at least so many of a face” across both hands; the red Eye counts as any face. Each claim must go higher. Doubt it? Call Liar! Whoever was wrong loses a die. Lose every die and you lose.</p>' +
-      '<p class="dn-how">' + K.name + ' plays <b>' + DICE.label(s) + '</b> today. Keepers get sharper as you level up.</p>' +
+      '<p class="dn-how">Win: 20% off here today. Lose: 10% more. One game a day; walking out is a loss. ' + K.name + ' plays <b>' + DICE.label(s) + '</b>.</p>' +   // 1U.3: one line of stakes, no rulebook (the table's own hints guide each move)
       (DG && DG.err0 ? '<p class="dn-err">' + X.esc(DG.err0) + '</p>' : '') +
       '<div class="dn-two"><button class="dn-big" data-a="dn-sit">Sit down and play</button><button class="dn-go" data-a="dn-stall">Not now</button></div></div>';
     return h;

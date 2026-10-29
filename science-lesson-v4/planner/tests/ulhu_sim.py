@@ -42,6 +42,13 @@ try:
         check('1.10 coming back to a page whose day has passed reloads it from the server', pg.evaluate("CALLS.filter(c => c === 'gameLoad').length") == n_loads + 1)
         pg.click('[data-a=undo]'); pg.wait_for_timeout(900)
         check('Undo puts it back (screen and server)', int(pg.inner_text('.uz-coins b')) == c0 and 'Undone' in pg.inner_text('.uz-undo'))
+        # 1U.1 (Patryk 29 Oct): a boss stage due today sits in The Call; tapping it must land a hit
+        st = pg.locator('.uz-pane >> nth=0').locator('[data-a=stage]')
+        check('1U.1 a boss stage due today is listed in The Call', st.count() >= 1)
+        st.first.click(); pg.wait_for_timeout(1500)
+        check('...and tapping it lands a hit on the boss (screen and server)', 'hit:' in pg.inner_text('.uz-undo').lower() and 'gameBossStage' in pg.evaluate('CALLS'))
+        pg.click('[data-a=undo]'); pg.wait_for_timeout(900)
+        check('...and Undo reopens the stage', 'Undone' in pg.inner_text('.uz-undo') and pg.locator('.uz-pane >> nth=0').locator('[data-a=stage]').count() >= 1)
         # swipe to Quests
         def swipe(dx):
             bx = pg.locator('.uz-body').bounding_box(); y = bx['y'] + 200; x = bx['x'] + bx['width'] / 2
@@ -53,6 +60,8 @@ try:
         if shots: pg.screenshot(path=os.path.join(SP, 's2.png'))
         pg.locator('.uz-pane >> nth=1').locator('[data-a=step]').nth(1).click(); pg.wait_for_timeout(1400)
         check('a checklist step ticks', any(x in pg.inner_text('.uz-pane >> nth=1') for x in ['2/3', '2 of 3']))
+        hs = pg.evaluate("[...document.querySelectorAll('.uz-pane:nth-child(2) .sc-card')].map(c => [c.querySelectorAll('.sc-step').length, c.querySelector('.sc-body').offsetHeight])")
+        check('1U.2 a quest with no steps is a compact card, one with steps keeps its room: ' + str(hs), any(n == 0 and h < 110 for n, h in hs) and all(h >= 120 for n, h in hs if n) and all(h >= 80 for n, h in hs))
         q = pg.locator('.uz-pane >> nth=1').locator('[data-scroll] [data-a=tick], .uz-q [data-a=tick]').first; q.click(); pg.wait_for_timeout(5500)   # the scroll is sealed and burns first
         check('a fulfilled quest goes to Vanquished', 'Vanquished' in pg.inner_text('.uz-pane >> nth=1'))
         pg.locator('[data-a=banish]').first.click(); pg.locator('[data-a=banish]').first.click(); pg.wait_for_timeout(700)
@@ -99,6 +108,8 @@ try:
         pg.locator('[data-a=dn-chest]').nth(1).click(); pg.wait_for_timeout(300)
         c4 = coins(); pg.locator('.dn-panel [data-a=claim]').nth(1).click(); pg.wait_for_timeout(900)
         check('a chest is the Hoard: breaking its seal claims the reward (80)', coins() == c4 - 80 and 'Claimed' in pg.inner_text('.uz-undo'))
+        st1 = pg.locator('.dn-stamp').count(); pg.wait_for_timeout(1000); st2 = pg.locator('.dn-stamp').count(); pg.wait_for_timeout(1500); st3 = pg.locator('.dn-stamp').count()
+        check('1U.4 the CLAIMED stamp shows after the claim and through the server reply, then fades (%d, %d, %d)' % (st1, st2, st3), st1 == 1 and st2 == 1 and st3 == 0)
         pg.click('.uz-dock [data-a=den][data-v=market]'); pg.wait_for_timeout(1500)
         check('the Night Market has seven stalls round the well, each with its keeper', pg.locator('.dn-booth').count() == 7 and pg.locator('img.dn-plz').count() == 1 and 'Mother Skein' in pg.inner_text('.dn-mkt'))
         if shots: pg.screenshot(path=os.path.join(SP, 's6.png'))
