@@ -6,6 +6,8 @@
 //   [--subject S] [--macrotopic M] [--output dir] [--dry-run] [--classsize N] [--mixed] [--yes]
 //
 // --content  : required — path to generated content JSON (subtopics, doNow, coreQuestions, extendQuestions)
+//              each subtopic: { questionNumber, name, bookRef?, marks? }  marks = the marks that section of the
+//              test is worth (read from the paper; 2026-10-29): shown in the review table, the headings and slide 4
 // --yes      : skip confirmation prompt (N1)
 // --dry-run  : print plan without writing files (N2)
 // --mixed    : slide 4 shows two columns (CORE | EXTEND) for mixed-ability classes
@@ -267,7 +269,7 @@ function slideReviewTaskIntro(pptx, subtopics, mixed) {
     { key: 'developing', desc: 'Work through Set 1, 2, 3 for your EBI topics (left column)' },
     { key: 'reaching',   desc: 'Try the extend questions for your EBI topics (right column)' },
     // M13: exact wording from spec
-    { key: 'mastering',  desc: 'If you\'ve finished — put your hand up to help others' },
+    { key: 'mastering',  desc: 'If you\'ve finished, put your hand up to help others' },
   ];
 
   if (mixed) {
@@ -319,7 +321,7 @@ function slideReviewTaskIntro(pptx, subtopics, mixed) {
     const colW = (CW - (cols - 1) * 0.1) / cols;
     subtopics.forEach((st, i) => {
       goldBox(s, MX + i * (colW + 0.1), chipY, colW, BOT_Y - 0.08 - chipY, [
-        { text: `Q${st.questionNumber}  `, options: { bold: true, fontSize: 10, color: AMBER } },
+        { text: `Q${st.questionNumber}  ` + (st.marks ? `${st.marks} mark${st.marks == 1 ? '' : 's'}  ` : ''), options: { bold: true, fontSize: 10, color: AMBER } },
         { text: st.name, options: { bold: true, fontSize: 10, breakLine: true } },
         { text: st.bookRef || '', options: { italic: true, fontSize: 8, color: '666666' } },
       ], { fill: 'FFFFFF', valign: 'top', margin: 5 });
@@ -392,7 +394,7 @@ function subtopicHeader(st) {
     w: PAGE_W, fill: NAVY,
     margins: { top: 80, bottom: 80, left: 180, right: 180 },
     children: [
-      P(R(`Q${st.questionNumber}: ${st.name}`, { bold: true, size: 22, color: GOLD })),
+      P(R(`Q${st.questionNumber}: ${st.name}` + (st.marks ? `  (${st.marks} mark${st.marks == 1 ? '' : 's'})` : ''), { bold: true, size: 22, color: GOLD })),
       ...(st.bookRef ? [P(R(st.bookRef, { italic: true, size: 18, color: 'CCCCCC' }))] : []),
     ],
   })]})], [PAGE_W]), spacer()];
@@ -408,6 +410,24 @@ function setLabel(n) {
 
 // ── Worksheet builder ─────────────────────────────────────────────────────────
 // Single worksheet: per subtopic, two columns — core (Set 1/2/3) left | extend right
+// Workplan 2.11 (2026-10-29): the review table at the front. Each section of the test with its marks
+// available (subtopic.marks, read from the paper), a box for the pupil's own mark and an EBI tick, so they
+// see where their marks went. Without any marks in the content the column is left out.
+function marksTable(subtopics) {
+  if (!subtopics.length) return [];
+  const withMarks = subtopics.some((st) => st.marks);
+  const total = subtopics.reduce((n, st) => n + (Number(st.marks) || 0), 0);
+  const cols = withMarks ? [1100, PAGE_W - 1100 - 1500 - 1500 - 1100, 1500, 1500, 1100] : [1100, PAGE_W - 1100 - 1500 - 1100, 1500, 1100];
+  const head = withMarks ? ['Question', 'Section', 'Marks available', 'Your marks', 'EBI'] : ['Question', 'Section', 'Your marks', 'EBI'];
+  const cell = (t, w, o) => docxCell(Object.assign({ w, borders: { top: bGrey(4), bottom: bGrey(4), left: bGrey(4), right: bGrey(4) }, margins: { top: 50, bottom: 50, left: 90, right: 90 }, children: [P(R(t, Object.assign({ size: 18 }, (o || {}).run)), { alignment: (o || {}).centre ? AlignmentType.CENTER : AlignmentType.LEFT })] }, (o || {}).cell));
+  const rows = [new TableRow({ tableHeader: true, children: head.map((h, i) => cell(h, cols[i], { run: { bold: true, color: GOLD }, cell: { fill: NAVY }, centre: i !== 1 })) })];
+  subtopics.forEach((st) => rows.push(new TableRow({ cantSplit: true, children: (withMarks
+    ? [String(st.questionNumber || ''), st.name, st.marks ? String(st.marks) : '', '', '']
+    : [String(st.questionNumber || ''), st.name, '', '']).map((t, i) => cell(t, cols[i], { centre: i !== 1 })) })));
+  if (withMarks && total) rows.push(new TableRow({ cantSplit: true, children: ['', 'Total', String(total), '', ''].map((t, i) => cell(t, cols[i], { run: { bold: true }, centre: i !== 1, cell: { fill: 'F2F2F2' } })) }));
+  return [fullTable(rows, cols, GREY_TBL), spacer()];
+}
+
 function buildWorksheet(topic, subtopics, coreQuestions, extendQuestions) {
   const VERT_DIV = { style: BorderStyle.SINGLE, size: 3, color: 'DDDDDD' };
   const coreW = Math.floor(PAGE_W * 0.62);
@@ -417,6 +437,7 @@ function buildWorksheet(topic, subtopics, coreQuestions, extendQuestions) {
     ...divider(`${topic} TEST REVIEW`),
     P(R('Work through the question sets for your EBI topics. Try the extend questions (right) when done.',
       { italic: true, size: 18, color: '555555' }), { spacing: { after: 60 } }),
+    ...marksTable(subtopics),
   ];
 
   for (const st of subtopics) {
@@ -433,7 +454,7 @@ function buildWorksheet(topic, subtopics, coreQuestions, extendQuestions) {
         setQs.forEach((q, i) => coreChildren.push(docxQuestion(i + 1, q.q)));
       }
     }
-    if (!coreChildren.length) coreChildren.push(P(R('—', { size: 18, color: '888888' })));
+    if (!coreChildren.length) coreChildren.push(P(R('None', { size: 18, color: '888888' })));
 
     const extChildren = [
       new Paragraph({ children: [new TextRun({ text: 'Extend', bold: true, size: 18, color: TEAL })], spacing: { before: 0, after: 20 } }),
@@ -441,7 +462,7 @@ function buildWorksheet(topic, subtopics, coreQuestions, extendQuestions) {
     if (ext.length) {
       ext.forEach((q, i) => extChildren.push(docxQuestion(i + 1, q.q)));
     } else {
-      extChildren.push(P(R('—', { size: 18, color: '888888' })));
+      extChildren.push(P(R('None', { size: 18, color: '888888' })));
     }
 
     children.push(new Table({
@@ -456,7 +477,7 @@ function buildWorksheet(topic, subtopics, coreQuestions, extendQuestions) {
   }
 
   // M13
-  children.push(P(R('If you\'ve finished — put your hand up to help others.',
+  children.push(P(R('If you\'ve finished, put your hand up to help others.',
     { bold: true, italic: true, size: 20, color: TIER_DOCX.mastering }),
     { spacing: { before: 80, after: 60 } }));
 
@@ -616,7 +637,7 @@ async function main() {
         return c ? c.length : 0;
       });
       const ext = (coreQuestions[s.name] || {}).extend;
-      console.log(`  Q${s.questionNumber}: ${s.name}  |  Sets: ${sets.join('/')}  |  Extend: ${ext ? ext.length : 0}  |  ${s.bookRef || '(no book ref)'}`);
+      console.log(`  Q${s.questionNumber}: ${s.name}${s.marks ? ' (' + s.marks + ' marks)' : ''}  |  Sets: ${sets.join('/')}  |  Extend: ${ext ? ext.length : 0}  |  ${s.bookRef || '(no book ref)'}`);
     });
   }
   console.log('\nDo Now questions:', doNow.length);
@@ -692,4 +713,6 @@ async function main() {
   console.log('\nDone. Logged to upload-log.txt');
 }
 
-main().catch(err => { console.error(err.message || err); process.exit(1); });
+// Run as a script; required by the tests, only the builders are used (nothing is written, no Drive folder).
+if (require.main === module) main().catch(err => { console.error(err.message || err); process.exit(1); });
+else module.exports = { buildWorksheet, marksTable, slideReviewTaskIntro };

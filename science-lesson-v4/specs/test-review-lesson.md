@@ -45,6 +45,11 @@ No per-question reveal slides — review happens via visualiser. Slides are inte
 - Patryk fills ticks when marking. Students use this to navigate to their question sets.
 - Subtopic names + book reference shown in column headers: book name + page number + section title (from textbook-index.md; left blank if not found)
 
+### Review table (built 2026-10-29, workplan 2.11)
+- The worksheet opens with one row per section of the test: Question, Section, Marks available, Your marks (pupil writes it), EBI (tick), and a Total row.
+- Marks available come from `subtopics[].marks` in the content JSON (Claude reads them off the paper). Without marks the column is left out.
+- The same marks show in each section heading ("Q3: Waves (12 marks)") and on the slide 4 chips.
+
 ### Question sets (core side — side A)
 For each subtopic:
 - **Subtopic header** — name, book reference (if available)
