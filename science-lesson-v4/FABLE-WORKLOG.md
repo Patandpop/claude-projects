@@ -1,4 +1,29 @@
-# Fable work log
+# Fa
+## 29 Oct 2026, paste files: one complete set every time
+
+**What changed:** the paste-file step now always hands over every planner file (a complete set), never only the changed ones, since two partial sets on one night broke a deploy. The set goes into Admin\Planner Sync when Drive is up (the Desktop folder "Planner paste files" when it is not), named with the date and "complete set", and a line in that folder's sync-log.txt records the copy and which earlier set it replaces.
+
+**You need to:** nothing.
+
+**Save:** ec37bfea.
+
+## 29 Oct 2026, item 1.4: homework slips
+
+**What changed:** a double click on the menu's "Homework quizzes" used to start the Forms build twice; now the second click just says it is already making them. Also, undoing "marked" on a homework whose Classroom post was scheduled gives it back "scheduled" (it used to become "drafted", which made it look unposted).
+
+**You need to:** nothing now. It goes into the next complete paste set.
+
+**Save:** c89020d6.
+
+## 29 Oct 2026, item 1.3: behaviour lock and taps
+
+**What changed:** three things in the behaviour app. First, taps now take their own lock on the spreadsheet instead of the script-wide lock, so a tap never waits behind a homework Form build (which can hold the script lock for up to a minute). Second, every tap carries its own id and the moment it happened; if the phone sends the same tap again after a lost reply, the server writes it once, never a second positive or negative, and even an older phone page without ids is caught by checking the latest rows for the same moment, class, pupil and type. Third, a saved tap the server refuses three times while the connection looks fine is set aside instead of blocking the taps behind it, and the connection screen (the dot at the top) lists it with "Try again" and "Forget them". A tap that fails only because the signal dropped is never counted against. The test fixture's two pupils are now called "Test Pupil One" and "Test Pupil Two" so no name that could be real sits in the project history.
+
+**You need to:** nothing now. It goes into the next complete paste set.
+
+**Save:** 48df17e1.
+
+ble work log
 
 Plain-English record of the build list in `FABLE-WORKPLAN.md`, newest entry first. Each entry says what changed, what you need to do (if anything), and the save id in the project history.
 
@@ -12,6 +37,14 @@ Plain-English record of the build list in `FABLE-WORKPLAN.md`, newest entry firs
 - One Ulhu browser check was already failing before I started: "Banish (two taps) removes a boss, Undo brings it back" times out waiting for a click. That is in the boss code the design session owns, so I left it. The check itself still reports 75 of 76 and does not stop the run.
 
 ---
+
+## 29 Oct 2026, item 1.2: failed tick saves
+
+**What changed:** when the planner saves, three parts travel to Google: this week's plan, the lesson ticks, and any later weeks that slid along. Before, only the first part was watched; a failed tick save vanished silently. Now every part is retried once, the status reads "All changes saved" only when all three have landed, a failed part shows a red "NOT saved" naming it (and the page stays unsaved so Ctrl+S or your next change sends it again), and the "leave this page?" warning stays on while a save is still travelling. A browser test fakes each failure and checks all of this.
+
+**You need to:** nothing now. It goes into the next complete paste set.
+
+**Save:** add29c0e.
 
 ## 29 Oct 2026, items 0.2 and 1.1: planner checks inside the main test, and the homework id clash
 
