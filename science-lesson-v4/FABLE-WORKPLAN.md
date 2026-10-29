@@ -173,6 +173,23 @@ Ulhu (details: `docs/audits-2026-10-28/ulhu-deep-audit.html`):
 - **1.16 Offline ticks.** Each tick carries the client time and an action id. The server accepts a tap day up to about 36 h old and never pays twice.
 - **1.17 Faster taps.** BUILT in the design session on 28 Oct (commit 4fb55d11: per-request sheet cache with write invalidation, gWorld_ reads only Data and Weeks, client sends chained). Skip it, but don't undo it.
 
+### Phase 1U: Ulhu fixes from Patryk's phone (29 Oct, after pasting the complete set). Do these right after Phase 1, before Phase 2.
+- **1U.1 Bosses don't work in The Call** (bug). Reproduce in ulhu_sim / the phone sim first, fix, add a check. The sim's "Banish (two taps)... Undo" check is also flaky: find the real cause, don't loosen it.
+- **1U.2 Quests have too much empty space under them** (room for sub-tasks they don't have). A quest with no steps is a compact card; space for steps only when it has steps.
+- **1U.3 The Night Market is over-explained.** Cut the explaining text (rules, hints, labels) to the minimum; let the keepers' own lines carry it.
+- **1U.4 Hoard chest "CLAIMED" stamp missing about 1 time in 5** (runes are taken correctly). Find the cause.
+- **1U.5 The Lair banner picks were never built** (Patryk thought his phone had an old version; it doesn't, they are only in the mock-up). Build the B2 Band banner with: the moon in the middle; colours P2 morning, P3 day, P3 evening, P2 night; M2 Crescent half moon; V1 round flask; the rune heap = **H4 Pile** (30px runes in a pyramid up to 21, 6-5-4-3-2-1). Source: replica/design/mockups/lair/ (lair3.html, new.js). Visual: check against https://claude.ai/artifact/NpevDxLcCNZSatRt69pV66.
+- **1U.6 Rebuild the Night Market to what was designed and researched** (the build lost it). Read habits-v2-decisions.md "Merchant and haggle" and "Market rethink", and the mock-ups (replica/design/mockups/market5/, the Drowned Market and Night Market pages). Must have:
+  - a **well in the middle of the plaza**, stalls **spaced out** round it (not packed in two columns), lanterns, occult mood, HD-2D diorama lighting (light shafts, soft focus at the back);
+  - **Ulhu walks freely** around the plaza (tap anywhere to walk there, not only on stalls); walking up to a stall and tapping it goes in;
+  - the entrance into a stall is **EN1 Low tide** (Patryk's pick 29 Oct): the sea floods the plaza with bubbles, then drains down the screen leaving you dripping inside the stall;
+  - inside a stall: the **Ocarina spotlight** focus view (swipe along a shelf; the focused item lifts, spins and catches a light shaft, with its name, price and the keeper's one-line pitch, then Buy / Haggle / Put back), fewer items per stall, the keeper's idle loop and reactions;
+  - keep the seven keepers, their lines, the dice haggle rules and the server side as built.
+  Mock-up first if the plaza or spotlight changes a lot from the mock-ups; Patryk picks, then build.
+- **1U.7 (later, after 1U.1-1U.6) Ritual colour:** the ritual cards' colour feels wrong; it should match the polished stone ritual tablets (the ones he uses like coins). Mock-up 2-3 options first.
+- **1U.8 (next big Ulhu idea) A desktop version of Ulhu** for the planner on the PC: plan and mock-up first, Patryk picks.
+- Still waiting on Patryk's picks before building: Big Moments (LU/FA/DP), Wall/Golems/Inscriptions (SW/PG/IN), Grimoire BG1 (picked: build the pixel candlelit desk scene with T1 + T4 when the Grimoire/Vespers work comes up).
+
 ### Phase 2: learning loop and daily time-savers
 - **2.1 Do Now picker uses lesson-match.js and question-pool.js.** Mix: 4 short recall, one 2-mark explain, one calculation. The mix rule goes into SKILL.md only with Patryk's OK (put it on the Waiting list).
 - **2.2 MCQ votes on the next lesson card** (MCQ Votes tab, class level), plus "Put on next lesson's Do Now".

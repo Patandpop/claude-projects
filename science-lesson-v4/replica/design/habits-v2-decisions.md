@@ -281,3 +281,10 @@ Patryk's answers, in grill order. Mock-ups follow each area.
 - **Two sides: only omens get two sides.** Rituals stay as they are. Every curse should have a matching blessing (and every blessing a curse) as a two-sided omen card, with the pairing switchable on or off per omen. Existing one-sided omens need an easy way to get their opposite: the app suggests an opposite for each one-sided omen (from a built-in list of pairs, since his live data is in the sheet), one tap to accept, and he can type his own. **He must be able to edit every habit** (name, side names, sigils, antidote, archive) from tapping it.
 - **Den = the S2 Round Grotto Sanctum + the Night Market reached from it** (section 9 above: round room, Ulhu wanders, wardrobe for cloaks, hoard chests; Cloaks and Hoard sub-tabs go).
 - **Dice haggle with EVERY keeper:** each stall keeper can be challenged once a day (Swindlestones, DL1 bone on black, R3 skitter). Win: 20% off at THAT stall today. Lose: +10% there today. Each stall shows a peek of its wares before you play, so you know what you're playing for.
+
+## Patryk's phone feedback, 29 Oct midday
+- Market entrance: **EN1 Low tide** picked.
+- The built Night Market lost the research: no well in the middle, stalls packed too close, Ulhu only walks on click (can't wander), no Ocarina spotlight item view, too much explaining text. Rebuild to the "Merchant and haggle" + "Market rethink" decisions (Fable plan 1U.6).
+- Rune heap: **H4 Pile** decided. Lair banner picks to be built (1U.5).
+- Bosses don't work in The Call; quests leave empty space for sub-tasks they don't have.
+- Later: ritual colour should match the polished stone ritual tablets; then a desktop version of Ulhu.
