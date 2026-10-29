@@ -142,6 +142,18 @@ function mailGet_(params) {
   const q = Object.keys(params).map((x) => x + '=' + encodeURIComponent(params[x])).join('&');
   return mailFetch_(params.op + (params.name ? ' ' + params.name : ''), () => UrlFetchApp.fetch(p.getProperty('MAILBOX_URL') + '?key=' + encodeURIComponent(p.getProperty('MAILBOX_KEY')) + '&' + q, { muteHttpExceptions: true }));
 }
+// Several home files in one trip (workplan 4.6): { name: { found, modified, text } }. An older pasted mailbox
+// without readMany answers "Unknown request": then each file is read on its own, as before.
+function mailReadMany_(names) {
+  if (!names.length) return {};
+  try { return mailGet_({ op: 'readMany', names: names.join(',') }).files || {}; }
+  catch (e) {
+    if (!/Unknown request/.test(String(e.message || e))) throw e;
+    const out = {};
+    names.forEach((n) => { try { out[n] = mailGet_({ op: 'read', name: n }); } catch (e2) { out[n] = { found: false, text: null }; } });
+    return out;
+  }
+}
 function mailPost_(body) {
   const p = PropertiesService.getScriptProperties();
   body.key = p.getProperty('MAILBOX_KEY');
@@ -245,12 +257,14 @@ function homeworkList(k) {
   let names;
   try { names = mailGet_({ op: 'list' }).names || []; }
   catch (e) { throw new Error('The mailbox could not list the homework: ' + e.message + (/Unknown request/.test(e.message) ? '. Paste Mailbox.gs again and deploy a New version.' : '')); }
-  const madeFile = mailGet_({ op: 'read', name: 'homework-made.json' });
+  const want = names.filter((n) => HW_FILE.test(n)).slice(-12).reverse();
+  const got = mailReadMany_(['homework-made.json'].concat(want));   // one trip home, not thirteen (4.6)
+  const madeFile = got['homework-made.json'] || {};
   const made = madeFile.found ? JSON.parse(madeFile.text || '{}') : {};
   const checked = checkedList_();
-  return names.filter((n) => HW_FILE.test(n)).slice(-12).reverse().map((name) => {
+  return want.map((name) => {
     let hw = null;
-    try { hw = JSON.parse(mailGet_({ op: 'read', name }).text); } catch (e) { /* listed but unreadable */ }
+    try { hw = JSON.parse((got[name] || {}).text); } catch (e) { /* listed but unreadable */ }
     // the tab only shows the words: leave the pictures behind (12C/13D are over 1 MB of pictures,
     // which made the tab hang, Patryk 2026-10-16). The Form still gets them.
     if (hw && hw.questions) {
@@ -437,10 +451,16 @@ function homeworkStatus(k, fresh) {
   const cache = CacheService.getScriptCache();
   if (!fresh) { const hit = cache.get('hwstat'); if (hit) return JSON.parse(hit); }
   const rows = hwRows_().reverse().slice(0, 60);
+  // 4.6 (2026-10-29): only recent unmarked work is asked about. Marked work needs no Classroom or Form call;
+  // unmarked work due over 4 weeks ago is only re-checked when he presses Refresh.
+  const old = Utilities.formatDate(new Date(Date.now() - 28 * 864e5), TZ, 'yyyy-MM-dd');
+  const doneById = {}; readResults_().forEach((x) => { if (x && x.id && x.done != null) doneById[x.id] = x.done; });   // this morning's counts
   const out = rows.map((r) => {
     const o = { id: r.id, cls: r.cls, kind: r.kind, title: r.title, tier: r.tier, file: r.file, formId: r.formId, formUrl: r.formUrl, setOn: r.setOn, dueOn: r.dueOn,
       postAt: r.postAt, points: r.points, status: r.status, live: null, size: null, done: null, link: '', note: '' };
-    if (o.status !== 'marked' && r.courseId && r.courseWorkId && typeof Classroom !== 'undefined') {
+    const ask = o.status !== 'marked' && (fresh || !r.dueOn || r.dueOn >= old);
+    if (!ask && o.status !== 'marked') o.note = 'Over 4 weeks old: press Refresh to check it again';
+    if (ask && r.courseId && r.courseWorkId && typeof Classroom !== 'undefined') {
       try {
         const cw = Classroom.Courses.CourseWork.get(r.courseId, r.courseWorkId) || {};
         o.live = { state: cw.state || '', scheduled: !!cw.scheduledTime }; o.link = cw.alternateLink || '';
@@ -451,7 +471,8 @@ function homeworkStatus(k, fresh) {
         }
       } catch (e) { o.note = 'Classroom could not find it (deleted there?)'; }
     }
-    if (r.formId) { try { o.done = FormApp.openById(r.formId).getResponses().length; } catch (e) { o.note = 'The Form could not be opened'; } }
+    if (ask && r.formId) { try { o.done = FormApp.openById(r.formId).getResponses().length; } catch (e) { o.note = 'The Form could not be opened'; } }
+    else if (r.formId && doneById[r.id] != null) o.done = doneById[r.id];   // not asked again: this morning's count
     return o;
   });
   try { cache.put('hwstat', JSON.stringify(out), 300); } catch (e) { /* too big to keep: fine */ }

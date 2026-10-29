@@ -102,6 +102,15 @@ function doGet(e) {
     while (it.hasNext()) { const n = it.next().getName(); if (HOMEWORK.test(n)) names.push(n); }
     return out_({ ok: true, names: names.sort() });
   }
+  // op=readMany&names=a.json,b.json (workplan 4.6, 2026-10-29): several files in one trip, the same files op=read may read
+  if (p.op === 'readMany') {
+    const files = {};
+    String(p.names || '').split(',').map((n) => n.trim()).filter((n) => READABLE[n] || HOMEWORK.test(n)).slice(0, 40).forEach((n) => {
+      const f = readFile_(n);
+      files[n] = { found: !!f, modified: f ? f.modified : null, text: f ? f.text : null };
+    });
+    return out_({ ok: true, files: files });
+  }
   if (p.op === 'read' && (READABLE[p.name] || HOMEWORK.test(p.name || ''))) {
     const f = readFile_(p.name);
     return out_({ ok: true, name: p.name, found: !!f, modified: f ? f.modified : null, text: f ? f.text : null });

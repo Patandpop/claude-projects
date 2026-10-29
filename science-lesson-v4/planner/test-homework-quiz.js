@@ -14,6 +14,7 @@ const hw = { cls: '10C2', due: '2026-10-16', title: '10C2 homework: P1 Energy (d
   { type: 'written', text: 'Calculate the kinetic energy.', marks: 2, scheme: 'Ek = 270 (J)' },
 ] };
 const files = { 'homework-10C2-2026-10-16.json': JSON.stringify(hw) };
+const fetched = []; let oldMailbox = false;   // 4.6: which mailbox calls were made
 const posted = [];
 const props = { PLANNER_KEY: 'pk', MAILBOX_URL: 'u', MAILBOX_KEY: 'mk' };
 
@@ -74,12 +75,15 @@ const ctx = vm.createContext({
       StudentSubmissions: { list: () => ({ studentSubmissions: [{ state: 'TURNED_IN' }, { state: 'CREATED' }, { state: 'RETURNED' }] }) } },
     Students: { list: () => ({ students: [{ profile: { emailAddress: 'amy@school', name: { fullName: 'Amy Able' } } }, { profile: { emailAddress: 'ben@school', name: { fullName: 'Ben Brief' } } }, { profile: { emailAddress: 'cal@school', name: { fullName: 'Cal Absent' } } }] }) } } },
   CacheService: { getScriptCache: () => ({ get: (k) => cache[k] || null, put: (k, v) => { cache[k] = v; }, remove: (k) => { delete cache[k]; } }) },
-  UrlFetchApp: { fetch(url, opt) {
+  UrlFetchApp: { fetch(url, opt) {   // the home link (Mailbox.gs), in memory
     let res;
     if (opt && opt.method === 'post') { const b = JSON.parse(opt.payload); posted.push(b); if (b.op === 'write') files[b.name] = b.text; res = { ok: true }; }
     else {
       const q = Object.fromEntries(new URL('https://x/?' + url.split('?')[1]).searchParams);
+      fetched.push(q.op);
       if (q.op === 'list') res = { ok: true, names: Object.keys(files).filter((n) => /^homework-[A-Za-z0-9]+-\d{4}/.test(n)) };
+      else if (q.op === 'readMany' && !oldMailbox) res = { ok: true, files: Object.fromEntries(q.names.split(',').map((n) => [n, { found: n in files, text: files[n] || null }])) };
+      else if (q.op === 'readMany') res = { ok: false, error: 'Unknown request' };
       else res = { ok: true, found: q.name in files, text: files[q.name] || null };
     }
     return { getContentText: () => JSON.stringify(res) };
@@ -115,6 +119,12 @@ ctx.UrlFetchApp.fetch = mailFail;
 // the Homework tab: every quiz from home with its questions, and whether it has been made
 const list = ctx.homeworkList('pk');
 check(list.length >= 1 && list.every((x) => x.hw && Array.isArray(x.hw.questions)) && list.some((x) => x.made && x.made.form) && list.every((x) => x.name !== 'homework-made.json'), 'Homework tab: lists each quiz with its questions and which are made (not the receipt)');
+{   // 4.6 (2026-10-29): the quiz list comes home in one trip; an older mailbox without readMany still works
+  fetched.length = 0; const l1 = ctx.homeworkList('pk');
+  check(fetched.filter((x) => x === 'readMany').length === 1 && !fetched.includes('read'), 'Homework tab: the quizzes come from home in one trip (' + fetched.join(', ') + ')');
+  oldMailbox = true; fetched.length = 0; const l2 = ctx.homeworkList('pk'); oldMailbox = false;
+  check(JSON.stringify(l2) === JSON.stringify(l1) && fetched.includes('read'), 'Homework tab: an older home link without it still gives the same list, one file at a time');
+}
 // exam practice homework: a Core and a Challenge Form for the same class and day (test-paper.js, 2026-10-10)
 files['homework-10C2-2026-10-20-core.json'] = JSON.stringify({ ...hw, title: '10C2 exam practice (Core)' });
 files['homework-10C2-2026-10-20-challenge.json'] = JSON.stringify({ ...hw, title: '10C2 exam practice (Challenge)' });
@@ -340,6 +350,21 @@ check(st.length === sheets.Homework.rows.length - 1 && quizRow && quizRow.live.s
 const before = calls.cwGet;
 ctx.homeworkStatus('pk');
 check(calls.cwGet === before, 'status is kept for 5 minutes (no second round of Classroom calls)');
+{   // 4.6 (2026-10-29): only recent unmarked work is asked about; Refresh asks about all unmarked work
+  const H = sheets.Homework.rows, hd = H[0], qi = H.findIndex((r, i) => i && r[hd.indexOf('formId')] === 'RES');
+  const keep = H[qi].slice();
+  const col = (n) => hd.indexOf(n);
+  H[qi][col('dueOn')] = '2026-01-05';   // long past and not marked
+  delete cache.hwstat; let n0 = calls.openById; const a = ctx.homeworkStatus('pk');
+  const ra = a.find((x) => x.formId === 'RES');
+  check(ra.done === null && ra.live === null && /Over 4 weeks old/.test(ra.note), 'status: unmarked work over 4 weeks old is not opened again, and says so');
+  n0 = calls.openById; const b = ctx.homeworkStatus('pk', true);
+  check(calls.openById > n0 && b.find((x) => x.formId === 'RES').done === 2, 'status: Refresh still checks it');
+  H[qi][col('status')] = 'marked'; H[qi][col('dueOn')] = keep[col('dueOn')];
+  const mk = ctx.homeworkStatus('pk', true).find((x) => x.formId === 'RES');
+  check(mk.done === null && mk.live === null, 'status: marked work never opens its Form or asks Classroom');
+  H[qi] = keep; delete cache.hwstat;
+}
 const r0 = ctx.homeworkResults('pk', quizRow.id);
 const amy = r0.pupils.find((p) => p.name === 'Amy Able'), ben = r0.pupils.find((p) => p.name === 'Ben Brief');
 check(r0.max === 4 && amy.score === 3 && amy.pct === 75 && !amy.late && !amy.flags.length, 'results: score out of the Form total, %, on time');

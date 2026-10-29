@@ -27,13 +27,21 @@ Plain-English record of Lane B's work, newest entry first. Each entry says what 
 8. **Memory map: pick how the Memory tab looks.** Three layouts in one mock-up page: A, a grid (one row per topic, one coloured square per section); B, bars (each section a bar showing its %); C, a due list (reddest first, as cards). The "Suggested Do Now" box for lesson cards is the same in all three. The page is lanes/mockups/memory-tab.html in the project (I could not send it to your phone from this chat; open it on the PC, or ask the design chat to publish it). Reply A, B, C or a mix.
 
 ---
+## 30 Oct 2026, item 4.6: a faster Homework tab
+
+**What changed:** three things. The list of quizzes from home used to be fetched one file at a time (up to 13 trips to the home link); now it comes in one trip. Homework already ticked as marked no longer opens its Google Form or asks Classroom each time (its "done" count comes from the morning's results instead). And unmarked homework more than 4 weeks past its due date is only checked again when you press Refresh; until then it says "Over 4 weeks old: press Refresh to check it again". Recent work is checked exactly as before.
+
+**You need to:** nothing urgent. To get the one-trip list, paste the new Mailbox.gs into the home link's Apps Script project and deploy a new version; until you do, the planner simply reads the files one at a time as before. The rest goes into the next complete paste set (Code.gs).
+
+**Save:** see the history line "Faster Homework tab".
+
 ## 30 Oct 2026, item 4.8: planner speed, measured
 
 **What changed:** I measured the planner with a whole school year of weeks. Working out where every class is up to takes under a tenth of a second even when most of the year is still to plan, and the screens draw in a quarter of a second or less (week view 5 thousandths of a second, the Classes tab the slowest at about a quarter). So the planner's own thinking is not what makes it feel slow; the waits are the trips to Google, which items 4.6 and 4.7 are about. I added the timing test the plan asked for, so a change that makes it slow is caught, and did not add the "remember last week's answer" shortcut, since it would add a way to show stale plans for no gain you would notice.
 
 **You need to:** nothing.
 
-**Save:** see the history line "Planner speed: a whole-year timing check".
+**Save:** df7a4641.
 
 ## 30 Oct 2026, big goal 1, step 6: the phone shows what is due back
 
