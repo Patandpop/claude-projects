@@ -261,6 +261,7 @@
     .selbar, .snack { bottom:calc(44px + env(safe-area-inset-bottom,0px)); left:20%; right:20%; }
   }
   @media (prefers-reduced-motion: reduce) { .sheet,.snack,.scrim { transition:none; } .live::before,.tile.pop .star { animation:none; } }
+  .build-stamp { position:fixed; right:6px; bottom:calc(46px + env(safe-area-inset-bottom,0px)); font-size:10px; color:#888; opacity:.6; pointer-events:none; z-index:5; }
 </style>
 </head>
 <body data-key="<?= key ?>">
@@ -1017,5 +1018,6 @@ call('init').then(d => {
 }).catch((e) => { $('studs').innerHTML = '<p class="note">Could not connect. Reopen the link.</p>'; showErr('Server: ' + ((e && e.message) || e)); });
 setTimeout(() => { if (!$('when').textContent.trim()) showErr('Still waiting for Google after 20 seconds. Tap refresh.'); }, 20000);
 </script>
+<span class="build-stamp" title="when this copy of the phone page was built">{{BUILD_STAMP}}</span>
 </body>
 </html>

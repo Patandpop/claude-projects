@@ -1,31 +1,99 @@
-// node planner/bundle.js — writes planner/dist/ with the three files to paste into Apps Script:
-//   Code.gs, Planner.html, Logic.html (logic.js wrapped in a <script> tag).
+// node planner/bundle.js [--pasted] [--label "what changed"]
+//   Writes planner/dist/ with the files to paste into Apps Script: Code.gs, Planner.html, Logic.html (logic.js wrapped
+//   in a <script> tag), Behaviour.gs, Phone.html, BoardPage.html, Game.gs, GameShop.gs, GameUI.html, GameArt.html,
+//   GameHV.html, GameDen.html.
+//
+// Paste-file guard (Fable work plan 0.4, 29 Oct 2026):
+//   - comments are stripped from the pasted copies only (strip-comments.js; the sources keep every comment);
+//   - a warning is printed for any paste file over 340 KB (the editor stops saving around there);
+//   - each file's hash is compared with dist/.last-paste.json and the files changed since the last paste are listed;
+//   - Planner and Phone show the build date and time in a corner ({{BUILD_STAMP}} in the sources);
+//   - --pasted: copies the changed files for Patryk into the paste folder (PASTE_DIR, or the Desktop folder
+//     "Planner paste files") named "PASTE INTO APPS SCRIPT - <file> (<date>, <label>).txt", and records the hashes.
 'use strict';
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
+const { stripFile } = require('./strip-comments.js');
+
 const dir = __dirname, out = path.join(dir, 'dist');
+const args = process.argv.slice(2);
+const flag = (k) => args.includes(k);
+const opt = (k) => (args.includes(k) ? args[args.indexOf(k) + 1] : null);
+const LIMIT = 340 * 1024;
+const PASTE_DIR = process.env.PASTE_DIR || path.join(process.env.USERPROFILE || process.env.HOME || '', 'Desktop', 'Planner paste files');
+const read = (f) => fs.readFileSync(path.join(dir, f), 'utf8');
 fs.mkdirSync(out, { recursive: true });
-fs.copyFileSync(path.join(dir, 'Code.gs'), path.join(out, 'Code.gs'));
-fs.copyFileSync(path.join(dir, 'Planner.html'), path.join(out, 'Planner.html'));
-fs.writeFileSync(path.join(out, 'Logic.html'), '<script>\n' + fs.readFileSync(path.join(dir, 'logic.js'), 'utf8') + '\n</script>\n');
+
+const files = {};
+files['Code.gs'] = read('Code.gs');
+files['Planner.html'] = read('Planner.html');
+files['Logic.html'] = '<script>\n' + read('logic.js') + '\n</script>\n';
 // the behaviour app is part of the planner since 2026-10-12
-['Behaviour.gs', 'Phone.html', 'BoardPage.html'].forEach((f) => fs.copyFileSync(path.join(dir, f), path.join(out, f)));
-// Ulhu's Rituals (2026-10-23): Game.gs = the sprites + the server; game-ui.js goes into Planner.html and Phone.html at <!--GAME_UI-->
-fs.writeFileSync(path.join(out, 'Game.gs'), fs.readFileSync(path.join(dir, 'Game.gs'), 'utf8'));
-fs.writeFileSync(path.join(out, 'GameShop.gs'), '// Ulhu shop: 120 items with their room sprites, made by replica/art/export_shop.py\nconst SHOP = ' + fs.readFileSync(path.join(dir, 'game-shop.json'), 'utf8') + ';\n');
+['Behaviour.gs', 'Phone.html', 'BoardPage.html'].forEach((f) => { files[f] = read(f); });
+// Ulhu's Rituals (2026-10-23): Game.gs = the server; game-ui.js goes into Planner.html and Phone.html at <!--GAME_UI-->
+files['Game.gs'] = read('Game.gs');
+files['GameShop.gs'] = '// Ulhu shop: 120 items with their room sprites, made by replica/art/export_shop.py\nconst SHOP = ' + read('game-shop.json') + ';\n';
 // 2026-10-24 redesign: Ulhu's sprites (8 and 16-bit) and the pixel engine (coin, bosses, wardrobe, icons) go in first
-const pack = (list) => '<script>\n' + list.map((f) => fs.readFileSync(path.join(dir, f), 'utf8')).join('\n') + '\n</script>';
-const ui = pack(['game-ulhu.js', 'game-pixel.js', 'game-runes.js', 'game-omens.js', 'game-tabs.js', 'game-pairs.js', 'game-ui.js']);
+const pack = (list) => '<script>\n' + list.map(read).join('\n') + '\n</script>';
+files['GameUI.html'] = pack(['game-ulhu.js', 'game-pixel.js', 'game-runes.js', 'game-omens.js', 'game-tabs.js', 'game-pairs.js', 'game-ui.js']);
 // 2026-10-27: the looks Patryk picked (stone tablets, temple bosses, blood and sigils) are their own file, GameArt.html, so each paste stays small enough to save
-const art = pack(['game-temple.js', 'game-stone.js', 'game-blood.js', 'game-scroll.js', 'game-glass.js', 'game-oracle.js']);
-// High Vespers is its own include (Sunday to Tuesday screen), so no paste file passes about 380 KB
-const hv = pack(['game-highvespers.js']);
+files['GameArt.html'] = pack(['game-temple.js', 'game-stone.js', 'game-blood.js', 'game-scroll.js', 'game-glass.js', 'game-oracle.js']);
+// High Vespers is its own include (Sunday to Tuesday screen), so no paste file passes the limit
+files['GameHV.html'] = pack(['game-highvespers.js']);
 // 2026-10-28: the Den (Round Grotto, Night Market, dice with every keeper) is its own include too; it loads before GameUI's code runs
-const den = pack(['game-den.js']);
+files['GameDen.html'] = pack(['game-den.js']);
 // 2026-10-27: the game code is its own file, GameUI.html, pulled in by include() (Planner.html at 406 KB would no longer save in the editor)
-fs.writeFileSync(path.join(out, 'GameUI.html'), ui);
-fs.writeFileSync(path.join(out, 'GameArt.html'), art);
-fs.writeFileSync(path.join(out, 'GameHV.html'), hv);
-fs.writeFileSync(path.join(out, 'GameDen.html'), den);
-['Planner.html', 'Phone.html'].forEach((f) => { const t = fs.readFileSync(path.join(out, f), 'utf8'); if (!t.includes('<!--GAME_UI-->')) throw new Error(f + ' has no <!--GAME_UI--> marker'); fs.writeFileSync(path.join(out, f), t.replace('<!--GAME_UI-->', () => "<?!= include('GameUI') ?>\n<?!= include('GameArt') ?>\n<?!= include('GameHV') ?>\n<?!= include('GameDen') ?>")); });
-console.log('planner/dist/ ready: Code.gs, Planner.html, Logic.html, Behaviour.gs, Phone.html, BoardPage.html, Game.gs, GameShop.gs, GameUI.html, GameArt.html, GameHV.html, GameDen.html');
+['Planner.html', 'Phone.html'].forEach((f) => {
+  if (!files[f].includes('<!--GAME_UI-->')) throw new Error(f + ' has no <!--GAME_UI--> marker');
+  files[f] = files[f].replace('<!--GAME_UI-->', () => "<?!= include('GameUI') ?>\n<?!= include('GameArt') ?>\n<?!= include('GameHV') ?>\n<?!= include('GameDen') ?>");
+  if (!files[f].includes('{{BUILD_STAMP}}')) throw new Error(f + ' has no {{BUILD_STAMP}} marker (the build date shown in the corner)');
+});
+
+// comments out of the pasted copies (never the sources)
+const warnings = [];
+let saved = 0;
+for (const f of Object.keys(files)) {
+  const r = stripFile(f, files[f]);
+  files[f] = r.text; saved += r.saved; r.warnings.forEach((w) => warnings.push(w));
+}
+
+// hashes are taken before the build stamp goes in, so a rebuild with nothing new counts as unchanged
+const now = new Date();
+const stamp = `${now.getDate()} ${now.toLocaleString('en-GB', { month: 'short' })} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+const recPath = path.join(out, '.last-paste.json');
+let last = null;
+try { last = JSON.parse(fs.readFileSync(recPath, 'utf8')); } catch (_) { last = null; }
+const hashes = {}, changed = [], big = [];
+for (const f of Object.keys(files)) {
+  hashes[f] = crypto.createHash('sha1').update(files[f]).digest('hex').slice(0, 12);
+  files[f] = files[f].split('{{BUILD_STAMP}}').join(stamp);
+  fs.writeFileSync(path.join(out, f), files[f]);
+  const size = Buffer.byteLength(files[f]);
+  if (size > LIMIT) big.push(`${f} (${(size / 1024).toFixed(0)} KB)`);
+  if (!last || !last.files || last.files[f] !== hashes[f]) changed.push(f);
+}
+
+console.log(`planner/dist/ ready: ${Object.keys(files).join(', ')}`);
+console.log(`  build stamp ${stamp}; comments stripped from the pasted copies (${(saved / 1024).toFixed(0)} KB smaller)`);
+warnings.forEach((w) => console.log(`  WARNING ${w}`));
+if (big.length) console.log(`  WARNING over 340 KB, the editor may refuse to save: ${big.join(', ')}. Split the file (see GameArt / GameHV / GameDen).`);
+if (!last) console.log(`  never pasted yet (no dist/.last-paste.json): all ${changed.length} files count as changed since last paste`);
+else if (changed.length) console.log(`  changed since last paste: ${changed.join(', ')}  (last paste ${last.at}${last.label ? ', ' + last.label : ''})`);
+else console.log(`  nothing changed since the last paste (${last.at}${last.label ? ', ' + last.label : ''})`);
+
+if (flag('--pasted')) {
+  const label = opt('--label') || 'planner';
+  const day = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  fs.mkdirSync(PASTE_DIR, { recursive: true });
+  const copied = [];
+  for (const f of changed) {
+    const name = `PASTE INTO APPS SCRIPT - ${f} (${day}, ${label}).txt`;
+    fs.copyFileSync(path.join(out, f), path.join(PASTE_DIR, name));
+    copied.push(name);
+  }
+  fs.writeFileSync(recPath, JSON.stringify({ at: now.toISOString().slice(0, 16).replace('T', ' '), label, files: hashes }, null, 1));
+  fs.appendFileSync(path.join(out, 'paste-log.txt'), `${now.toISOString().slice(0, 16).replace('T', ' ')}  ${label}: ${copied.length ? copied.join('; ') : 'nothing to paste'}\n`);
+  console.log(copied.length ? `  for Patryk in ${PASTE_DIR}:\n    ${copied.join('\n    ')}` : '  nothing new to paste');
+  console.log('  recorded in dist/.last-paste.json');
+}

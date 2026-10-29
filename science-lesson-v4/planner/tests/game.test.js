@@ -2,7 +2,7 @@
 // Run: node planner/tests/game.test.js
 const m = require('./mock-appsscript.js');
 const fs = require('fs'), path = require('path');
-const dir = path.join(__dirname, '..');
+const dir = process.env.PLANNER_SRC || path.join(__dirname, '..');   // PLANNER_SRC: the bundle test points this at the comment-stripped copies
 m.props.PLANNER_KEY = 'k';
 const src = ['Code.gs', 'Behaviour.gs', 'game-art.js', 'Game.gs'].map((f) => fs.readFileSync(path.join(dir, f), 'utf8')).join('\n');
 global.SHOP = require('../game-shop.json');

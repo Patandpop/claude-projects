@@ -251,6 +251,7 @@
   #toast { position:fixed; bottom:18px; left:50%; transform:translateX(-50%); background:#323232; color:#fff; padding:10px 14px; border-radius:6px; font-size:13px; display:none; gap:14px; align-items:center; z-index:30; }
   #toast.on { display:flex; }
   #toast button { background:transparent; border:none; color:var(--gold); font-weight:700; padding:0; }
+  .build-stamp { position:fixed; right:6px; bottom:3px; font-size:10px; color:#888; opacity:.6; pointer-events:none; z-index:5; }
 </style>
 </head>
 <body>
@@ -1862,5 +1863,6 @@ function onLoad(r) {
 }
 run('loadAll').then(onLoad).catch((e) => status('Could not load: ' + e.message));
 </script>
+<span class="build-stamp" title="when this copy of the planner was built">{{BUILD_STAMP}}</span>
 </body>
 </html>
