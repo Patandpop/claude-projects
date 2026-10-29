@@ -131,6 +131,11 @@ ok('merge is noted in the planner Log tab, not the behaviour log', m.sheets.Log 
   ok('ABCD: undo removes the vote', api.removeVote(k, v.id) === true && m.sheets['MCQ Votes']._data.length === n - 1);
   let bad = ''; try { api.saveVote(k, { cls: '7MLA', split: {} }); } catch (e) { bad = e.message; }
   ok('ABCD: an empty vote is refused', /No letters/.test(bad));
+  // workplan 2.2 (2026-10-29): the planner gets the votes (class level) for its lesson cards
+  api.saveVote(k, { cls: '7MLA', key: lm.key, title: lm.title, q: 0, question: mcq[0].q, right: 'B', split: { A: 40, B: 60 }, why: mcq[0].why });
+  m.sheets.Equipment = m.sheets.Equipment || m.makeSheet('Equipment', [['key', 'eq', 'sets']]);
+  const pv = (api.loadAll_(true).votes || []).filter((x) => x.cls === '7MLA');
+  ok('ABCD: the planner gets each vote with its lesson, date, % right, main wrong answer and misconception (no names)', pv.length === 1 && pv[0].key === lm.key && pv[0].pct === 60 && pv[0].wrong === 'A' && pv[0].q === 1 && /^\d{4}-\d\d-\d\d$/.test(pv[0].when) && pv[0].why === 'thinks the egg swims');
 }
 
 // 1.3 (2026-10-29): a tap sent twice (the phone retries after a lost reply) is written once, and taps take the document lock

@@ -586,6 +586,20 @@ function readResults_() {
     return sh.getRange(2, 7, sh.getLastRow() - 1, 1).getValues().map(([j]) => { try { return JSON.parse(j); } catch (e) { return null; } }).filter(Boolean);
   } catch (e) { return []; }   // no Results tab yet: nothing to send
 }
+// The ABCD card votes from the behaviour app ("MCQ Votes" tab, Behaviour.gs saveVote), last 45 days,
+// for the lesson cards (workplan 2.2, 2026-10-29). Class level only: one row per question, no names.
+// [{ cls, key, title, when: 'YYYY-MM-DD', q (1-based), question, right, pct, wrong, why }]
+function readVotes_() {
+  try {
+    const sh = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('MCQ Votes');
+    if (!sh || sh.getLastRow() < 2) return [];
+    const from = Date.now() - 45 * 864e5;
+    return sh.getRange(2, 1, sh.getLastRow() - 1, 12).getValues()
+      .filter((r) => r[1] instanceof Date && r[1].getTime() >= from)
+      .map((r) => ({ cls: String(r[2]), key: String(r[3]), title: String(r[4]), when: Utilities.formatDate(r[1], TZ, 'yyyy-MM-dd'),
+        q: Number(r[5]) || 0, question: String(r[6]), right: String(r[7]), pct: r[9] === '' ? null : Number(r[9]), wrong: String(r[10]), why: String(r[11]) }));
+  } catch (e) { return []; }   // no votes tab yet
+}
 // The daily time trigger (public so a trigger can call it; it only reads Forms and writes class counts).
 function dailyResults() { refreshResults_(); pushState_(true); }
 // "Turn on daily results": one trigger, 6-7am, never two. Also runs it once now.
@@ -909,7 +923,7 @@ function loadAll_(withData) {
   const cs = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('ClassSettings');
   if (cs && cs.getLastRow() > 1) cs.getRange(2, 1, cs.getLastRow() - 1, 2).getValues().forEach(([cls, json]) => { try { classSettings[cls] = JSON.parse(json); } catch (e) { /* skip */ } });
   const lr = lessonRows_(false), records = lr.rows.map((r) => r.rec).filter(Boolean);
-  return { version: VERSION, data: dw.data, weeks, weekStamps: dw.weekStamps, lessonsStamp: lr.stamp, learned, added, classSettings, records, results: readResults_(),
+  return { version: VERSION, data: dw.data, weeks, weekStamps: dw.weekStamps, lessonsStamp: lr.stamp, learned, added, classSettings, records, results: readResults_(), votes: readVotes_(),
     behaviourUrl: PropertiesService.getScriptProperties().getProperty('BEHAVIOUR_URL') || '',
     gradeBands: (() => { try { return JSON.parse(PropertiesService.getScriptProperties().getProperty('GRADE_BANDS') || '{}'); } catch (e) { return {}; } })() };
 }

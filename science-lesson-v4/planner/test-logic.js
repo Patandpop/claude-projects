@@ -319,6 +319,23 @@ if (fs.existsSync(DRIVE)) {
   const lr = P.lastResults(resRows, '9XS', '2026-10-21');
   ok(lr && lr.dueOn === '2026-10-19' && lr.weak.map((q) => q.key).join(',') === '2,3,1', 'lesson card: newest homework due before the lesson, its 3 weakest questions first');
   ok(P.lastResults(resRows, '9XS', '2026-11-20') === null && P.lastResults(resRows, '10C2', '2026-10-21') === null, 'lesson card: nothing older than 14 days, nothing for another class');
+  // workplan 2.3 (2026-10-29): most-missed questions across classes, lowest first, nothing nobody did
+  const mm = P.mostMissed(resRows.concat([{ cls: '9AS', id: 'h9', title: 'Waves', dueOn: '2026-10-20', done: 9, questions: [{ key: '1', pct: 10 }, { key: '2', pct: 100 }] }]), { since: '2026-10-10' });
+  ok(mm.map((q) => q.cls + q.key).join(',') === '9AS1,9XS2,9XS3,9XS1,9XS4', 'most missed: every class, lowest % first, full marks and old or undone homework left out');
+  ok(P.mostMissed(resRows, { cls: '9AS' }).length === 0 && P.mostMissed(resRows, { cls: '9XS', n: 2 }).length === 2, 'most missed: one class, and a limit');
+  // workplan 2.2 (2026-10-29): ABCD card votes from the class's last voted lesson on the next lesson card
+  const vt = [{ cls: '9XS', key: 'K1', title: 'Osmosis', when: '2026-10-13', q: 1, pct: 20, right: 'B', wrong: 'A' },
+    { cls: '9XS', key: 'K2', title: 'Diffusion', when: '2026-10-19', q: 1, pct: 90, right: 'A', wrong: 'C' },
+    { cls: '9XS', key: 'K2', title: 'Diffusion', when: '2026-10-19', q: 2, pct: 40, right: 'C', wrong: 'D', why: 'thinks particles stop' },
+    { cls: '9XS', key: 'K2', title: 'Diffusion', when: '2026-10-19', q: 2, pct: 55, right: 'C', wrong: 'D', why: 'thinks particles stop' },
+    { cls: '9XS', key: 'K2', title: 'Diffusion', when: '2026-10-19', q: 3, pct: 100, right: 'D', wrong: '' },
+    { cls: '9XS', key: 'K3', title: 'Today', when: '2026-10-21', q: 1, pct: 10, right: 'A', wrong: 'B' }, { cls: '9AS', key: 'K2', title: 'Diffusion', when: '2026-10-20', q: 1, pct: 5, right: 'A', wrong: 'B' }];
+  const lv = P.lastVotes(vt, '9XS', '2026-10-21');
+  ok(lv && lv.key === 'K2' && lv.n === 3 && lv.avg === 82 && lv.weak.map((v) => v.q).join(',') === '2,1', 'lesson card: votes from the last voted lesson before it (not that day), newest vote per question, weakest first, full marks left out');
+  ok(P.lastVotes(vt, '9XS', '2026-11-20') === null && P.lastVotes(vt, '10C2', '2026-10-21') === null, 'lesson card votes: nothing older than 14 days, nothing for another class');
+  const dv = P.doNowFromVote(lv.weak[0], [{ q: 'Q one' }, { q: 'Why does diffusion stop?', o: ['never', 'heat', 'equal concentration', 'cold'], a: 'C' }]);
+  const dslot = { kind: 'lesson', cls: '9XS', i: 0, dnVotes: [dv] };
+  ok(/Put on the Do Now \(missed in the ABCD cards in Diffusion, 55% right, most picked D\): Why does diffusion stop\? Options: A never \/ B heat \/ C equal concentration \/ D cold\. Answer: C\. Misconception: thinks particles stop/.test(P.buildPrompt(data, dslot)), 'a missed vote question put on the Do Now is in the build request, with its options, answer and misconception');
   ok(P.hwStatus(row, { state: 'DRAFT' }, '2026-10-20', 0) === 'drafted' && P.hwStatus(row, { state: 'DRAFT', scheduled: true }, '2026-10-20', 0) === 'scheduled', 'status: drafted, scheduled');
   ok(P.hwStatus(row, { state: 'PUBLISHED' }, '2026-10-20', 3) === 'live' && P.hwStatus(row, { state: 'PUBLISHED' }, '2026-10-27', 0) === 'due', 'status: posted = live; due day with no responses = due');
   ok(P.hwStatus(row, { state: 'PUBLISHED' }, '2026-10-27', 5) === 'marked' && P.hwStatus({ status: 'drafted', dueOn: '2026-10-27' }, { state: 'PUBLISHED' }, '2026-10-28', 0) === 'due', 'status: a due Form quiz with responses marks itself; link homework waits for his tick');
