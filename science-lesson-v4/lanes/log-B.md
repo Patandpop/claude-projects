@@ -27,13 +27,21 @@ Plain-English record of Lane B's work, newest entry first. Each entry says what 
 8. **Memory map: pick how the Memory tab looks.** Three layouts in one mock-up page: A, a grid (one row per topic, one coloured square per section); B, bars (each section a bar showing its %); C, a due list (reddest first, as cards). The "Suggested Do Now" box for lesson cards is the same in all three. The page is lanes/mockups/memory-tab.html in the project (I could not send it to your phone from this chat; open it on the PC, or ask the design chat to publish it). Reply A, B, C or a mix.
 
 ---
+## 30 Oct 2026, item 4.7: the behaviour log stays fast
+
+**What changed:** opening a class on the phone used to read the last 8,000 rows of the behaviour log just to show today's taps. Now it reads upwards from the bottom, a few hundred rows at a time, and stops as soon as it reaches yesterday, so it reads only today's rows however long the log grows. The Friday tab and the weekly views already read a fixed slice, so they stay as they are. I did not build the per-term archive tab: with reads bounded like this the log no longer slows down as it grows, and moving old rows out would hide past weeks' behaviour from the planner's lesson cards. If the spreadsheet itself ever gets sluggish, an archive you run yourself once a term is easy to add.
+
+**You need to:** nothing now. It goes into the next complete paste set (Behaviour.gs).
+
+**Save:** see the history line "Behaviour log: today read from the bottom".
+
 ## 30 Oct 2026, item 4.6: a faster Homework tab
 
 **What changed:** three things. The list of quizzes from home used to be fetched one file at a time (up to 13 trips to the home link); now it comes in one trip. Homework already ticked as marked no longer opens its Google Form or asks Classroom each time (its "done" count comes from the morning's results instead). And unmarked homework more than 4 weeks past its due date is only checked again when you press Refresh; until then it says "Over 4 weeks old: press Refresh to check it again". Recent work is checked exactly as before.
 
 **You need to:** nothing urgent. To get the one-trip list, paste the new Mailbox.gs into the home link's Apps Script project and deploy a new version; until you do, the planner simply reads the files one at a time as before. The rest goes into the next complete paste set (Code.gs).
 
-**Save:** see the history line "Faster Homework tab".
+**Save:** cd3bc042.
 
 ## 30 Oct 2026, item 4.8: planner speed, measured
 

@@ -614,11 +614,25 @@ function refreshBoard_(cls, events) {
 
 function today_(cls) {
   const t = dayStr_(new Date());
-  return readLog_().filter(r => r.cls === cls && dayStr_(r.ts) === t).map(r => ({
+  return readToday_().filter(r => r.cls === cls && dayStr_(r.ts) === t).map(r => ({
     id: r.ts.getTime(), t: Utilities.formatDate(r.ts, TZ, 'HH:mm'), name: r.name, type: r.type, rule: r.rule
   }));
 }
 
+// Today's rows only, read upwards from the bottom of the log in chunks until a row from before today
+// (workplan 4.7, 2026-10-29): opening a class reads a few hundred rows, not the last 8000. Same shape as readLog_.
+function readToday_() {
+  const sh = bSheet_('Log'), last = sh.getLastRow();
+  if (last < 2) return [];
+  const t = dayStr_(new Date()), CHUNK = 400, rows = [];
+  for (let end = last; end >= 2; end -= CHUNK) {
+    const start = Math.max(2, end - CHUNK + 1);
+    const got = sh.getRange(start, 1, end - start + 1, 5).getValues().filter(r => r[0] instanceof Date);
+    rows.unshift(...got);
+    if (got.length && dayStr_(got[0][0]) < t) break;   // the oldest row of this chunk is from before today: done
+  }
+  return rows.map(r => ({ ts: r[0], cls: String(r[1]), name: String(r[2]), type: WORD_TYPE[String(r[3]).trim()] || '?', rule: Number(r[4]) || 0 }));
+}
 function readLog_() {
   const sh = bSheet_('Log'), last = sh.getLastRow();
   if (last < 2) return [];

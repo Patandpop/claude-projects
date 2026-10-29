@@ -244,6 +244,18 @@ ok('merge is noted in the planner Log tab, not the behaviour log', m.sheets.Log 
   delete m.props.TECH_EMAILS;
 }
 
+// 4.7 (2026-10-29): opening a class reads today's taps from the bottom of the log only, and still finds them all
+{
+  const log = m.sheets['Behaviour Log']._data, keep = log.slice();
+  const old = new Date(Date.now() - 3 * 864e5), now = Date.now();
+  log.length = 1;
+  for (let i = 0; i < 5000; i++) log.push([new Date(old.getTime() + i), '7BYA', 'Test Pupil One', 'Positive', 0, '']);
+  for (let i = 0; i < 450; i++) log.push([new Date(now - 450 + i), i % 2 ? '7BYA' : '8XP', 'Test Pupil Two', 'Positive', 0, '']);   // crosses a 400-row chunk
+  const got = api.openClass(k, '7BYA').events;
+  ok('4.7: opening a class finds all of today\'s taps for it from the bottom of a long log (225 of 450, none from earlier days)', got.length === 225);
+  log.length = 0; keep.forEach((r) => log.push(r));
+}
+
 // Memory map daily update (big goal 1, 2026-10-29): votes and homework results become evidence once, squares are
 // written, the snapshot is ready for home, and no pupil name reaches any memory tab
 {
