@@ -1749,9 +1749,12 @@ item('mRes', () => {
   run('turnOnDailyResults').then((r) => { status(''); toast('Daily results on: ' + r.homeworks + ' homework(s) read. Reload to see them on the lesson cards.'); })
     .catch((e) => { status(''); toast('Daily results not turned on: ' + String(e.message || e).replace(/^Error:\s*/, '')); });
 });
+let hwAllBusy = false;   // a double click used to start the Forms build twice (1.4, 2026-10-29)
 item('mHwAll', () => {
+  if (hwAllBusy) { toast('Already making the quizzes, one moment'); return; }
+  hwAllBusy = true;
   status('Making homework quizzes...');
-  run('makeHomework').then((res) => {
+  run('makeHomework').finally(() => { hwAllBusy = false; }).then((res) => {
     const list = Array.isArray(res) ? res : res.made;   // an older Code.gs sends just the list
     status(list.length ? list.length + ' homework quiz(zes) made' : 'No new homework from home');
     const seen = Array.isArray(res) ? null : res;

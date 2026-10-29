@@ -449,7 +449,8 @@ function markHomework(k, id, on) {
   check_(k);
   const r = hwRows_().find((x) => x.id === id);
   if (!r) throw new Error('That homework is not in the Homework tab.');
-  const st = on === false ? (r.courseWorkId ? 'drafted' : 'form only') : 'marked';
+  // undo gives back what it was: a scheduled post stays "scheduled" (1.4, 2026-10-29), a draft "drafted", a Form on its own "form only"
+  const st = on === false ? (r.courseWorkId ? (r.postAt ? 'scheduled' : 'drafted') : 'form only') : 'marked';
   tab_('Homework', HW_HEAD).getRange(r.row, HW_HEAD.indexOf('status') + 1).setValue(st);
   CacheService.getScriptCache().remove('hwstat');
   return st;

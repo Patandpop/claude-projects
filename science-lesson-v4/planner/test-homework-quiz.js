@@ -350,6 +350,9 @@ check(q1.kind === 'mcq' && q1.pct === 50 && q1.wrong[0].answer === 'Kinetic' && 
 check(q2.max === 3 && q2.pct === 83 && q2.missed[0].pct === 50 && /mark 3 of 3/.test(q2.missed[0].title) && q2.text === 'Explain why the block cools.', 'results: self-marked question %, and the mark point missed most');
 check(ctx.markHomework('pk', quizRow.id) === 'marked' && sheets.Homework.rows[1][15] === 'marked' && !cache.hwstat, 'Mark as marked saves the tick and forgets the kept status');
 check(ctx.markHomework('pk', quizRow.id, false) === 'drafted', '...and can be undone');
+// 1.4 (2026-10-29): undoing "marked" on a scheduled post gives back "scheduled", not "drafted"
+const schedRow = sheets.Homework.rows.find((r) => r[15] === 'scheduled');
+check(schedRow && ctx.markHomework('pk', schedRow[0]) === 'marked' && ctx.markHomework('pk', schedRow[0], false) === 'scheduled' && schedRow[15] === 'scheduled', 'unmarking a scheduled homework restores "scheduled"');
 const gb = ctx.setGradeBands('pk', { ks4: [{ g: '7', min: '70' }, { g: '4', min: 140 }, { g: '', min: 3 }] });
 check(gb.ks4.length === 2 && gb.ks4[0].min === 70 && gb.ks4[1].min === 100 && JSON.parse(props.GRADE_BANDS).ks3.length === 0, 'grade boundaries saved, kept between 0 and 100, blanks dropped');
 
