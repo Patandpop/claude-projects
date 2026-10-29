@@ -20,9 +20,12 @@ const ui = pack(['game-ulhu.js', 'game-pixel.js', 'game-runes.js', 'game-omens.j
 const art = pack(['game-temple.js', 'game-stone.js', 'game-blood.js', 'game-scroll.js', 'game-glass.js']);
 // High Vespers is its own include (Sunday to Tuesday screen), so no paste file passes about 380 KB
 const hv = pack(['game-highvespers.js']);
+// 2026-10-28: the Den (Round Grotto, Night Market, dice with every keeper) is its own include too; it loads before GameUI's code runs
+const den = pack(['game-den.js']);
 // 2026-10-27: the game code is its own file, GameUI.html, pulled in by include() (Planner.html at 406 KB would no longer save in the editor)
 fs.writeFileSync(path.join(out, 'GameUI.html'), ui);
 fs.writeFileSync(path.join(out, 'GameArt.html'), art);
 fs.writeFileSync(path.join(out, 'GameHV.html'), hv);
-['Planner.html', 'Phone.html'].forEach((f) => { const t = fs.readFileSync(path.join(out, f), 'utf8'); if (!t.includes('<!--GAME_UI-->')) throw new Error(f + ' has no <!--GAME_UI--> marker'); fs.writeFileSync(path.join(out, f), t.replace('<!--GAME_UI-->', () => "<?!= include('GameUI') ?>\n<?!= include('GameArt') ?>\n<?!= include('GameHV') ?>")); });
-console.log('planner/dist/ ready: Code.gs, Planner.html, Logic.html, Behaviour.gs, Phone.html, BoardPage.html, Game.gs, GameShop.gs, GameUI.html, GameArt.html, GameHV.html');
+fs.writeFileSync(path.join(out, 'GameDen.html'), den);
+['Planner.html', 'Phone.html'].forEach((f) => { const t = fs.readFileSync(path.join(out, f), 'utf8'); if (!t.includes('<!--GAME_UI-->')) throw new Error(f + ' has no <!--GAME_UI--> marker'); fs.writeFileSync(path.join(out, f), t.replace('<!--GAME_UI-->', () => "<?!= include('GameUI') ?>\n<?!= include('GameArt') ?>\n<?!= include('GameHV') ?>\n<?!= include('GameDen') ?>")); });
+console.log('planner/dist/ ready: Code.gs, Planner.html, Logic.html, Behaviour.gs, Phone.html, BoardPage.html, Game.gs, GameShop.gs, GameUI.html, GameArt.html, GameHV.html, GameDen.html');

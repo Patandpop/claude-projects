@@ -6,7 +6,7 @@ const dir = path.join(__dirname, '..');
 m.props.PLANNER_KEY = 'k';
 const src = ['Code.gs', 'Behaviour.gs', 'game-art.js', 'Game.gs'].map((f) => fs.readFileSync(path.join(dir, f), 'utf8')).join('\n');
 global.SHOP = require('../game-shop.json');
-eval(src + '\nglobal.G={gameLoad,gameTick,gameUntick,gameSaveGoal,gameArchive,gameFreeze,gameShop,gameArt,gameBuy,gamePlace,gameBossStart,gameBossStage,gameBossRemove,gameBossSave,gameTag,gameChips,gameVespers,gameVespersUndo,gameVespersTime,gameMoon,gameReview,gameQuestStep,gameGroupSave,gameWear,gameUnbuy,gameHoardSave,gameHoardClaim,gameChronicle,gameAim,gPay_,gDie_,gNeed_,gAdd_,gDow_,gDiff_,gIsFrozen_};');
+eval(src + '\nglobal.G={gameLoad,gameTick,gameUntick,gameSaveGoal,gameArchive,gameFreeze,gameShop,gameArt,gameBuy,gamePlace,gameBossStart,gameBossStage,gameBossRemove,gameBossSave,gameTag,gameChips,gameVespers,gameVespersUndo,gameVespersTime,gameMoon,gameReview,gameQuestStep,gameGroupSave,gameWear,gameUnbuy,gameHoardSave,gameHoardClaim,gameChronicle,gameAim,gameHaggle,gPay_,gDie_,gNeed_,gAdd_,gDow_,gDiff_,gIsFrozen_};');
 
 const k = 'k'; let failed = 0;
 const ok = (n, c) => { console.log((c ? '  PASS ' : '  FAIL ') + n); if (!c) failed++; };
@@ -242,6 +242,39 @@ s = G.gameUntick(k, plain.id);
 ok('Undo takes the last blessing (and its bonus) back', s.player.coins === c1 && s.blessCount === 7);
 s = G.gameGroupSave(k, { name: 'The Report Abyss', parent: 'teach' });
 ok('a new group sits inside Teaching', s.groups.find((g) => g.id === s.saved).parent === 'teach');
+console.log('\n-- dice with the keepers (once a day each)');
+{ const now0 = global.GAME_NOW; at('2026-11-05T10:00:00Z'); setCoins(5000);
+  const sh0 = G.gameShop(k), rug = sh0.items.find((i) => i.category === 'rugs' && !i.own && !i.locked && i.price >= 100), lamp = sh0.items.find((i) => i.category === 'lights' && !i.own && !i.locked && i.price >= 100);
+  ok('every item names its keeper, and nothing is haggled yet', sh0.items.every((i) => !!i.keeper) && rug.keeper === 'weaver' && lamp.keeper === 'glass' && rug.price === rug.base && !Object.keys(sh0.haggle).length);
+  let sh1 = G.gameHaggle(k, 'weaver', 'start');
+  ok('sitting down counts as a loss until it is settled (walking out costs +10%)', sh1.haggle.weaver === 'playing' && sh1.items.find((i) => i.id === rug.id).price === Math.round(rug.base * 1.1));
+  sh1 = G.gameHaggle(k, 'weaver', 'win');
+  ok('a win: 20% off every ware at that stall today', sh1.haggle.weaver === 'win' && sh1.items.find((i) => i.id === rug.id).price === Math.round(rug.base * 0.8) && sh1.items.filter((i) => i.keeper === 'weaver' && i.base).every((i) => i.price === Math.round(i.base * 0.8)));
+  ok('other stalls keep their prices', sh1.items.find((i) => i.id === lamp.id).price === lamp.base);
+  s = G.gameBuy(k, rug.id);
+  ok('buying at the weaver charges the discounted price', s.player.coins === 5000 - Math.round(rug.base * 0.8));
+  s = G.gameUnbuy(k, rug.id);
+  ok('Undo gives back what was paid', s.player.coins === 5000);
+  threw = false; try { G.gameHaggle(k, 'weaver', 'start'); } catch (e) { threw = /already played/.test(e.message); }
+  ok('a second game with the same keeper on the same day is refused', threw);
+  threw = false; try { G.gameHaggle(k, 'weaver', 'lose'); } catch (e) { threw = /settled/.test(e.message); }
+  ok('a settled game cannot be changed', threw);
+  sh1 = G.gameHaggle(k, 'glass', 'start'); sh1 = G.gameHaggle(k, 'glass', 'lose');
+  ok('another keeper can still be played the same day; a loss is +10% there', sh1.haggle.glass === 'lose' && sh1.items.find((i) => i.id === lamp.id).price === Math.round(lamp.base * 1.1) && sh1.haggle.weaver === 'win');
+  s = G.gameBuy(k, lamp.id);
+  ok('buying at the glassblower charges the surcharge', s.player.coins === 5000 - Math.round(lamp.base * 1.1));
+  sh1 = G.gameHaggle(k, 'tailor', 'start'); sh1 = G.gameHaggle(k, 'tailor', 'win'); setCoins(1000);
+  s = G.gameWear(k, 'hat-4', true);
+  ok('a win with the tailor takes 20% off an outfit (180 to 144)', s.player.coins === 1000 - 144);
+  threw = false; try { G.gameHaggle(k, 'nobody', 'start'); } catch (e) { threw = /no such keeper/.test(e.message); }
+  ok('an unknown keeper is refused', threw);
+  at('2026-11-06T10:00:00Z');
+  sh1 = G.gameShop(k);
+  ok('next day: prices are back to normal', !Object.keys(sh1.haggle).length && sh1.items.filter((i) => i.keeper === 'weaver').every((i) => i.price === i.base));
+  sh1 = G.gameHaggle(k, 'weaver', 'start');
+  ok('next day: the same keeper can be played again', sh1.haggle.weaver === 'playing');
+  G.gameHaggle(k, 'weaver', 'lose');
+  global.GAME_NOW = now0; }
 s = G.gameGroupSave(k, { id: 'marking', name: 'The Crypt of Red Pens' });
 ok('a built-in group can be renamed and keeps its job', s.groups.find((g) => g.id === 'marking').name === 'The Crypt of Red Pens' && s.groups.find((g) => g.id === 'marking').type === 'marking');
 s = G.gameBossStart(k, { name: 'Write the Y9 scheme', size: 20, k: 'yog', stages: [{ name: 'Map', due: '2026-11-30' }] });

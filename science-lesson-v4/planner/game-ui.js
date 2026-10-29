@@ -465,8 +465,7 @@
       else if (V.tab === 0) h = dk('+ Quest', 'form', 'pur', 1, 'quest') + dk('+ Ritual', 'form', 'pri', 1, 'ritual');
       else if (V.tab === 1) h = dk('+ Ritual', 'form', 'pri', 1, 'ritual') + dk('+ Quest', 'form', 'pur', 1, 'quest') + dk('+ Boss', 'form', 'red', 1, 'boss');
       else if (V.tab === 2) h = dk('+ Curse or blessing', 'form', 'sec', 1, 'curse');
-      else h = [['room', 'Sanctum'], ['shop', 'Black Market'], ['ward', 'Cloaks'], ['hoard', 'Hoard']].map(([k, l]) => '<button class="sm" data-a="den" data-v="' + k + '" style="flex:1;border-color:' + (V.den === k ? '#ffd56a' : '#2a3b33') + ';background:' + (V.den === k ? '#2a2210' : '#131d19') + ';color:' + (V.den === k ? '#ffd56a' : '#a9b8ae') + '">' + l + '</button>').join('') +
-        (V.den === 'hoard' ? '<button data-a="form" data-v="reward" style="flex:0 0 46px;border-color:#ffd56a;background:#ffd56a;color:#1a1004;font:700 20px var(--a)">+</button>' : '');
+      else h = window.UZDEN ? UZDEN.dock(X) : '';   // Sanctum, Night Market, + Reward (game-den.js)
       $('.uz-dock').innerHTML = h;
     }
 
@@ -698,17 +697,7 @@
       return h;
     }
 
-    /* ---------- Den: his real room and shop (120 drawn items), the wardrobe, the Hoard, the Chronicle ---------- */
-    function roomHtml() {
-      const u = (style2) => '<div style="position:absolute;' + style2 + ';aspect-ratio:1">' + layers(mood()) + '</div>';
-      if (!ROOM) return '<div class="uz-scene" style="height:240px">' + u('left:40%;top:40%;width:20%') + '</div>';
-      const put = (l) => '<img src="' + l.art + '" style="left:' + (100 * l.ox / ROOM.w) + '%;top:' + (100 * l.oy / ROOM.h) + '%;width:' + (100 * l.w / ROOM.w) + '%" alt="">';
-      const slots = Object.keys(D.room || {}).filter((sl) => D.room[sl] && ROOM.art[D.room[sl]] && ROOM.art[D.room[sl]][sl]).sort((a, b) => (ROOM.z[a] || 0) - (ROOM.z[b] || 0));
-      const me2 = u('left:' + (100 * ROOM.ulhu.x / ROOM.w) + '%;top:' + (100 * ROOM.ulhu.y / ROOM.h) + '%;width:' + (100 * 32 / ROOM.w) + '%');
-      let h = '<div class="uz-scene" style="aspect-ratio:' + ROOM.w + '/' + ROOM.h + (night() ? ';filter:brightness(.7) saturate(.85)' : '') + '">', done = false;
-      slots.forEach((sl) => { if (!done && (ROOM.z[sl] || 0) > 6) { h += me2; done = true; } h += put(ROOM.art[D.room[sl]][sl]); });
-      return h + (done ? '' : me2) + '<div style="position:absolute;left:10px;top:8px;font:500 18px var(--g);color:#cfe8dc;text-shadow:0 2px 0 #000">Sanctum</div></div>';
-    }
+    /* ---------- Den: the Round Grotto, the Night Market and the dice live in game-den.js (2026-10-28); the Oracle stays here ---------- */
     // the Oracle (Patryk 2026-10-26): this week as small sigils (a point lights per fifth of the day's rituals), then five weeks
     // as a star chart: all, most (three quarters or more), some, none; days you kept (most or all) join into constellations
     const LVC = { all: '#5ef2a0', most: '#ffd56a', some: '#a48aff', none: '#2a2050' };
@@ -742,55 +731,7 @@
         if (o.today) { x.strokeStyle = '#efe6ff'; x.lineWidth = 2; x.beginPath(); x.arc(X, Y, 11, 0, Math.PI * 2); x.stroke(); x.lineWidth = 1.5; x.strokeStyle = 'rgba(212,191,255,.5)'; }
       }
     }
-    function den() {
-      let h = oracle();
-      if (V.den === 'room') {
-        h += roomHtml();
-        const names = {}; (SHOP ? SHOP.items : []).forEach((i) => { names[i.id] = i.name; });
-        h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">' + Object.keys(SLOTL).map((sl) => { const id = (D.room || {})[sl];
-          return '<div style="display:flex;align-items:center;gap:8px;min-height:48px;padding:3px 4px 3px 8px;border-radius:5px;background:#131d19;border:1px solid #23332c"><span style="flex:1;min-width:0;display:flex;flex-direction:column"><span style="font:700 11px var(--a);letter-spacing:.1em;color:#7f9389;text-transform:uppercase">' + SLOTL[sl] + '</span><span style="font:13px var(--a);color:' + (id ? '#e0e8e3' : '#5a6a62') + ';white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + esc(id ? names[id] || 'placed' : 'empty') + '</span></span>' +
-            (id && sl !== 'floor' && sl !== 'wall' ? '<button data-a="unplace" data-id="' + id + '" data-v="' + sl + '" style="flex:none;width:40px;height:40px;border:none;background:none;color:#7f9389;font:16px var(--a)" title="Take out">×</button>' : '') + '</div>'; }).join('') + '</div>';
-      }
-      if (V.den === 'shop') {
-        if (!SHOP || !ROOM) return '<p class="uz-p" style="color:#7f9389">Opening the shop…</p>';
-        const icon = (c) => { const it = SHOP.items.find((i) => i.category === c), L = it && ROOM.art[it.id] && ROOM.art[it.id][it.slots[0]]; return L ? '<img src="' + L.art + '" style="height:22px;width:auto;max-width:26px" alt="">' : ''; };
-        h += '<div class="uz-hscroll" data-hscroll="1">' + CATS.map(([c, l]) => '<button class="uz-pill' + (V.shopCat === c ? ' on' : '') + '" data-a="cat" data-v="' + c + '">' + icon(c) + l + '</button>').join('') + '</div>';
-        h += '<div class="uz-seg" style="grid-template-columns:repeat(5,1fr)">' + ['All', 'Basic', 'Nice', 'Fancy', 'Eldritch'].map((t) => '<button data-a="tier" data-v="' + t + '" class="' + (V.tier === t ? 'on' : '') + '"' + (V.tier === t ? ' style="color:' + (TIERC[t] || '#e8e1cf') + '"' : '') + '>' + t + '</button>').join('') + '</div>';
-        h += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">' + SHOP.items.filter((i) => i.category === V.shopCat && (V.tier === 'All' || i.tier === V.tier)).map((i) => {
-          const L = ROOM.art[i.id] && ROOM.art[i.id][i.slots[0]], placed = !!i.slot, lk = i.locked && !i.own, poor = i.price > D.player.coins;
-          let btn, bg, fg, cn = false;
-          if (placed) { btn = 'Take out'; bg = '#173a2c'; fg = '#b6ffd6'; } else if (i.own) { btn = 'Place'; bg = '#5ef2a0'; fg = '#08100d'; } else if (lk) { btn = esc(i.why || 'Locked'); bg = '#1a1a24'; fg = '#7a7a99'; } else if (!i.price) { btn = 'Free'; bg = '#5ef2a0'; fg = '#08100d'; } else { btn = String(i.price); cn = true; bg = poor ? '#1e1a12' : '#3a2a10'; fg = poor ? '#7a6a4a' : '#ffd56a'; }
-          const z = L ? Math.min(2, 50 / L.h, 62 / L.w) : 1;
-          return '<button class="uz-card" data-a="shop" data-id="' + i.id + '" data-fx="' + i.id + '" style="border-color:' + (placed ? '#5ef2a0' : '#23332c') + '"><span style="height:64px;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 60%,' + (i.tier === 'Eldritch' ? '#1d4a38' : i.tier === 'Fancy' ? '#2a2244' : '#1a2a24') + ',#0b1311 75%)">' +
-            (L ? '<img src="' + L.art + '" style="width:' + Math.round(L.w * z) + 'px;height:auto;filter:' + (i.tier === 'Eldritch' ? 'drop-shadow(0 0 4px #5ef2a0)' : 'none') + (lk ? ' grayscale(1) brightness(.6)' : '') + '" alt="">' : '') + '</span>' +
-            '<span style="padding:5px 6px 0;font:700 12px/1.2 var(--a);color:#e0e8e3;min-height:34px">' + esc(i.name) + '</span><span style="padding:0 6px 4px;font:700 11px var(--a);color:' + TIERC[i.tier] + '">' + i.tier + '</span>' +
-            '<span style="height:36px;display:flex;align-items:center;justify-content:center;gap:3px;background:' + bg + ';color:' + fg + ';font:700 12px var(--a);padding:0 4px;text-align:center">' + btn + (cn ? coin(13, i.price, i.id) : '') + '</span></button>';
-        }).join('') + '</div><div style="text-align:center;font:12px var(--a);color:#6f8178">' + SHOP.items.length + ' items · 10 categories · Basic, Nice, Fancy, Eldritch</div>';
-      }
-      if (V.den === 'ward') {
-        const W = D.wear || { on: {}, owned: [] }, baseIdle = (style === '8-bit' ? A.b8 : A.b16).idle;
-        h += '<div style="display:flex;gap:10px;align-items:stretch"><div style="flex:none;width:118px;border-radius:6px;background:radial-gradient(circle at 50% 70%,#1f3a32,#0b1311 75%);border:1px solid #2a3b33;display:flex;align-items:center;justify-content:center"><div style="position:relative;width:96px;height:96px">' + layers(mood()) + '</div></div>' +
-          '<div style="flex:1;display:flex;flex-direction:column;gap:5px">' + [['HAT', 'hat'], ['TOP', 'top'], ['FACE', 'face'], ['HELD', 'held'], ['SKIN', 'skin']].map(([l, k]) => '<div style="display:flex;justify-content:space-between;gap:6px;font:12px var(--a);padding:3px 0;border-bottom:1px solid #1c2924"><span style="color:#7f9389;font-weight:700;letter-spacing:.08em">' + l + '</span><span style="color:#e0e8e3;text-align:right">' + esc((witem(W.on[k]) || { name: '—' }).name) + '</span></div>').join('') + '</div></div>';
-        h += '<div class="uz-seg" style="grid-template-columns:repeat(5,1fr)">' + WCATS.map(([c, l, n]) => '<button data-a="wcat" data-v="' + c + '" class="' + (V.wCat === c ? 'on' : '') + '" style="height:40px;' + (V.wCat === c ? 'color:#b6ffd6' : '') + '">' + l + '<br><span style="font-weight:400;font-size:11px">' + n + '</span></button>').join('') + '</div>';
-        h += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px">' + WNAMES[V.wCat].map((_, i) => { const w = witem(V.wCat + '-' + i), own = W.owned.indexOf(w.id) >= 0, on = W.on[w.cat] === w.id, lk = w.lock > D.player.level, sk = w.cat === 'skin', gr = lk ? ' grayscale(1) brightness(.6)' : '';
-          let st, fg, cn = false; if (on) { st = 'wearing'; fg = '#5ef2a0'; } else if (own) { st = 'owned'; fg = '#cfd8d3'; } else if (lk) { st = 'Level ' + w.lock; fg = '#7a7a99'; } else { st = String(w.price); fg = w.price > D.player.coins ? '#7a6a4a' : '#ffd56a'; cn = true; }
-          return '<button class="uz-card" data-a="wear" data-id="' + w.id + '" data-fx="' + w.id + '" style="align-items:center;padding:0 0 4px;border-color:' + (on ? '#5ef2a0' : '#23332c') + '"><span style="position:relative;width:100%;height:58px;background:radial-gradient(circle,' + (on ? '#1d4a38' : '#1a2a24') + ',#0b1311 75%)"><span style="position:absolute;left:50%;top:50%;width:52px;height:52px;margin:-26px 0 0 -26px">' +
-            '<img src="' + baseIdle + '" class="uz-lay" style="opacity:' + (sk ? 1 : 0.35) + ';filter:' + (sk ? w.filter : 'none') + gr + '" alt="">' + (sk ? '' : '<img src="' + w.src + '" class="uz-lay" style="filter:' + w.filter + gr + '" alt="">') + '</span></span>' +
-            '<span style="padding:3px 4px 2px;font:700 11px/1.15 var(--a);color:#e0e8e3;text-align:center;min-height:28px">' + esc(w.name) + '</span><span style="display:flex;align-items:center;gap:2px;font:700 11px var(--a);color:' + fg + '">' + st + (cn ? coin(11, w.price, w.id) : '') + '</span></button>'; }).join('') + '</div>';
-      }
-      if (V.den === 'hoard') {
-        h += '<div class="uz-cap" style="border-color:#3a3018"><span><b style="color:#ffd56a">The Hoard</b></span></div>';
-        h += (D.hoard || []).map((r) => { const can = r.cost <= D.player.coins, more = r.cost - D.player.coins;
-          return '<div class="uz-parch" style="position:relative;display:flex;align-items:center;gap:10px;min-height:56px;padding:5px 6px 5px 12px;border-left:5px dotted #a88a5a"><div style="flex:1;min-width:0"><div style="font:17px/1.15 var(--f)">' + esc(r.name) + '</div><div style="font:12px var(--a);color:#5a4428;margin-top:2px">' +
-            (r.claims ? 'claimed ' + r.claims + '× · ' + (can ? 'you can afford it' : more + ' more to go') : (can ? 'never claimed · you can afford it' : more + ' more to go')) + '</div></div>' +
-            (V.edit ? '<button class="uz-pen" data-a="harch" data-id="' + r.id + '" style="color:#7a5a34">×</button>' : '') +
-            '<button data-a="claim" data-id="' + r.id + '" data-fx="' + r.id + '" style="flex:none;height:44px;min-width:92px;display:flex;align-items:center;justify-content:center;gap:4px;padding:0 10px;border-radius:4px;border:none;background:' + (can ? '#8a1a22' : '#b8a074') + ';color:' + (can ? '#ffe9dc' : '#6a5434') + ';font:700 14px var(--a);box-shadow:0 2px 0 rgba(0,0,0,.35)">' + r.cost + coin(16, r.cost, r.id) + '</button>' +
-            (V.stamp === r.id ? '<div class="uz-stampbox" style="position:absolute;right:110px;top:50%;margin-top:-22px;width:120px;height:44px;display:flex;align-items:center;justify-content:center;gap:6px;border:3px double #8a1a22;border-radius:4px;color:#8a1a22;font:700 20px var(--g);letter-spacing:.12em;transform:rotate(-10deg);background:rgba(243,231,200,.7);pointer-events:none"><img src="' + IMG.wax + '" style="width:22px;height:22px" alt="">CLAIMED</div>' : '') + '</div>'; }).join('') ||
-          '<p class="uz-p" style="color:#8a7a5a">No rewards yet.</p>';
-        if ((D.hoard || []).length) h += '<button class="uz-new" data-a="edit" style="font:700 13px var(--a)">' + (V.edit ? 'Stop editing' : 'Edit (remove rewards)') + '</button>';
-      }
-      return h;
-    }
+    function den() { return window.UZDEN ? UZDEN.render(X) : oracle(); }
 
     /* ---------- forms (in place of the list, never over it) ---------- */
     const FORMS = {
@@ -916,6 +857,7 @@
       body.querySelectorAll('.uz-pane').forEach((p, i) => { if (keep[i]) p.scrollTop = keep[i]; });
       if (focus) { const n = body.querySelector(focus); if (n) { n.focus(); try { n.setSelectionRange(n.value.length, n.value.length); } catch (e) { /* not a text box */ } } }
       drawSky();
+      if (window.UZDEN) UZDEN.after(X, body);
       const sb = body.querySelector('.uz-stampbox'); if (sb && V.stampNew) { V.stampNew = false; anim(sb, [{ transform: 'scale(2.4) rotate(-28deg)', opacity: 0 }, { transform: 'scale(.92) rotate(-10deg)', opacity: 1, offset: 0.7 }, { transform: 'scale(1) rotate(-10deg)', opacity: 1 }], { duration: 420, easing: 'cubic-bezier(.2,.8,.3,1.2)' }); }
       if (window.TEMPLE) TEMPLE.paint(body);
       if (window.STONE) STONE.paint(body);
@@ -970,11 +912,14 @@
       if (!SHOP) call('gameShop').then((s) => { SHOP = s; paint(); }).catch(() => {});
     }
     const shopRefresh = () => call('gameShop').then((s) => { SHOP = s; paint(); }).catch(() => {});
+    // what the Den (game-den.js) may use
+    const X = { get D() { return D; }, V, get SHOP() { return SHOP; }, get ROOM() { return ROOM; }, setShop: (s) => { SHOP = s; }, esc, coin, layers, mood, night, act, call, paint, shake, setMood, bounce, buzz, shopRefresh, witem, WNAMES, WCATS, TIERC, IMG, A, oracle, body, fx };
 
     /* ---------- taps ---------- */
     box.addEventListener('click', (e) => {
       const b = e.target.closest('[data-a]'); if (!b || !box.contains(b)) return;
       const a = b.dataset.a, id = b.dataset.id, v = b.dataset.v, r = b.getBoundingClientRect(), k = b.dataset.fx;
+      if (window.UZDEN && UZDEN.click(X, a, id, v, b, r)) return;
       if (a === 'undo') return undo();
       if (a === 'next') { V.sayIx++; V.say = null; return paintBanner(); }
       if (a === 'nextOld') { const nj = nextJob(); V.tab = 0; V.form = null; paint(); if (nj) { const n = body.querySelector('[data-fx="' + nj.id + '"],[data-fx="' + nj.id + 't"]'); if (n) { n.scrollIntoView({ block: 'center', behavior: 'smooth' }); glow(n.dataset.fx, 'rgba(94,242,160,.85)'); } } return; }
