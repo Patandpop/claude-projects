@@ -204,7 +204,7 @@ Ulhu (details: `docs/audits-2026-10-28/ulhu-deep-audit.html`):
   - **Depth passed: DP3 The Gate** is awesome too.
   - **New faint rule (replaces "3 rituals = half the runes back"):** doing 3 rituals on the first day after fainting gives back **1/4** of the lost runes, and 3 rituals the next day gives another **1/4**, so it still stings. **Levelling up also heals.**
   - **The "Rise" tablet goes.** Instead, **3 big stars sit at the top of The Call** (no inscription) after a faint, and each one **lights up when a ritual is done**: a checklist that should feel like ATONEMENT. Each star is set in **stained glass made of many different pieces** (the Oracle glass style, glassx.js), maybe with the ritual pentagram sigil. Both days need 3 rituals (confirmed). Offer variations in the mock-up.
-- **LATER (not now): Wall / Golems / Inscriptions** (Patryk 29 Oct). Grill Patryk before each, then mock-ups, he picks, then build:
+- **LATER (not now): Wall / Golems / Inscriptions** (Patryk 29 Oct). **Grilled (2026-10-29): see replica/design/grills/wall-golems-inscriptions.md, ready to build** (mock-ups first, he picks; inscriptions dropped, replaced by on-theme form options). Grill Patryk before each, then mock-ups, he picks, then build:
   - **Paper golems:** good, except the **Year 7 golem is horrifying** (redo it cute). **Missing: a Year 12 variation for PAG marking.** Still try to improve them all.
   - **Stone inscriptions:** he doesn't know what they're meant to be. Explain the idea plainly, or rethink it.
   - **The wall (Breakwater):** its purpose and how it links to keeping ahead with lessons is unclear. **Completely revamp it in 3 different ways, one of them in the stained-glass style.**
