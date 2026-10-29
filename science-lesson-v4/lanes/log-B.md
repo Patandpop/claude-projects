@@ -23,15 +23,24 @@ Plain-English record of Lane B's work, newest entry first. Each entry says what 
 5. **Technicians' email addresses (item 2.7):** for the order sheet email draft. Send them to me, or add them as the TECH_EMAILS script property in Apps Script (commas between).
 6. **Item 2.9, the silent-work timer: what is still missing?** Most of it was built on 24 Oct: on the phone, "silent work" on/off with the colour change, the "Talking: count the time lost" tap that turns phone and board red and counts the seconds, the % of silent time, and the weekly goal (80% silent and no more than 3 minutes lost; 6 for a fortnightly class) shown on the Friday tab. The plan also asks what "earning it" gives the class: (a) positives for everyone present, (b) a line in the Friday messages home (now built, item 2.8), (c) a celebration on the board, or a mix. Tell me which, and anything about the timer that does not work the way you want, and I will make a mock-up.
 7. **Item 2.10, the "last week's homework" slide:** a builder job that needs a mock-up first. I can't publish mock-ups from this chat, so it waits; tell me if you want me to make the mock-up as a file you can open instead.
+8. **Memory map: pick how the Memory tab looks.** Three layouts in one mock-up page: A, a grid (one row per topic, one coloured square per section); B, bars (each section a bar showing its %); C, a due list (reddest first, as cards). The "Suggested Do Now" box for lesson cards is the same in all three. The page is lanes/mockups/memory-tab.html in the project (I could not send it to your phone from this chat; open it on the PC, or ask the design chat to publish it). Reply A, B, C or a mix.
 
 ---
+## 29 Oct 2026, big goal 1, step 5 (home part): the Do Now uses the memory map
+
+**What changed:** when a lesson is built, the Do Now picker now prefers questions from the parts of the specification the memory map says the class most needs back: either the ones you tick in the lesson's "Suggested Do Now" (once that box exists), or, with none ticked, the map's own reddest spots for that class. It still keeps the spacing pattern (one from last lesson, some from 2 to 4 and 5+ lessons ago, one from last year) and the question mix; it just picks within each slot from the red spots first. In a trial with two sections asked for, 4 of the 6 questions came from them. The builder side of this step (passing the ticked sections through to the slides' notes) waits with the builder plan.
+
+**You need to:** nothing.
+
+**Save:** see the history line "Do Now picker prefers the memory map's red spots".
+
 ## 29 Oct 2026, big goal 1, step 3: the memory map fills itself each morning
 
 **What changed:** the planner's 6am daily job (the one that reads homework results) now also updates the memory map. It turns every ABCD vote and every homework quiz question into a "piece of evidence" for the right part of the specification (once only: running it again adds nothing), gives every lesson you have taught its square, works out each square's colour for today, learns once a month how quickly each class forgets, and writes it all into two new tabs in the planner spreadsheet, "Memory Evidence" and "Memory Scores" (class percentages only, no names). The snapshot also goes home with the rest of the planner state, so the Do Now picker can use it later. One small change from the design: votes are linked to their spec sections when the map updates, not when you tap, so fixing a lesson's code later also fixes its old votes.
 
 **You need to:** nothing yet; the map has no screen until you pick a design (Waiting list). When you next paste, the set includes a new server file, Memory.gs, and the planner data needs re-importing from home once so it carries the spec codes.
 
-**Save:** see the history line "Memory map: the daily update".
+**Save:** 619caf2f (and f7934265 for the paste set).
 
 ## 29 Oct 2026, big goal 1, step 1: every lesson knows its part of the specification
 
@@ -39,7 +48,7 @@ Plain-English record of Lane B's work, newest entry first. Each entry says what 
 
 **You need to:** nothing.
 
-**Save:** see the history line "Memory map: spec index and lesson tags".
+**Save:** d14ab3d5.
 
 ## 29 Oct 2026, big goal 1, step 2: the memory map's fading score
 

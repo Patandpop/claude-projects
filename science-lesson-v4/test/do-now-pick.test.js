@@ -37,6 +37,12 @@ function run() {
     check(kinds.includes('calc') && kinds.includes('explain'), `${cls}: one calculation and one 2-mark explain in the six (${kinds.join(', ')})`);
     check(r.picked.every((p) => p.source !== 'AQA exam' || !lm.standalone(p.q, false)), `${cls}: every exam question stands on its own (no "in part (a)", no lost opening)`);
   }
+  // the memory map (big goal 1): sections ticked in the build request are preferred, the spacing slots stay
+  const want = ['Physics: Internal Energy', 'Chemistry: The Periodic Table'];
+  const withMap = dn.pick('9AS', { date: '2026-10-20', homeworkKeys: none, written: false, spec: want });
+  const without = dn.pick('9AS', { date: '2026-10-20', homeworkKeys: none, written: false, spec: [], memory: false });
+  check(withMap.memoryHit.length > without.memoryHit.length && withMap.memoryHit.length >= 2, `memory map sections are preferred (${withMap.memoryHit.length} of 6 from them, ${without.memoryHit.length} without)`);
+  check(withMap.picked.length === 6 && withMap.picked.some((p) => p.why === 'last lesson') && withMap.picked.some((p) => p.why === 'last year'), 'the spacing slots (last lesson, last year) still come first');
   return { fails, warns: 0 };
 }
 

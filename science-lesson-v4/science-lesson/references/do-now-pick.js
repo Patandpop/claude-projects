@@ -22,7 +22,8 @@
    library (question-pool.js); and the six aim for 4 short recall, one 2-mark explain and one
    calculation (a soft rule: a thin pool still gets six).
 
-   Usage: node references/do-now-pick.js 9XS [--date 2026-10-12] [--json]
+   Usage: node references/do-now-pick.js 9XS [--date 2026-10-12] [--spec "Physics: Internal Energy,..."] [--json]
+   --spec: the memory map's sections ticked in the build request; without it the map's own reddest for the class (planner-state.json)
    ============================================================================ */
 
 const fs = require('fs');
@@ -61,6 +62,17 @@ function homeworkKeys(cls, usage) {
   return keys;
 }
 
+// The memory map (big goal 1, 2026-10-29): a question's spec section, the same code spec-index.js gives
+// ("Physics: Internal Energy", "OCR A: Stars"), and the sections the map says this class most needs back.
+const specOf = (q) => (q.board === 'OCR A' ? 'OCR A: ' + q.topic : q.subject && q.topic ? q.subject + ': ' + q.topic : '');
+function memoryWanted(cls, date) {
+  for (const dir of [SYNC, SYNC.replace('Beechen Cliff Science\\', 'Beechen Cliff Science (1)\\')]) {
+    const st = readJson(path.join(dir, 'planner-state.json'), null);
+    const rows = st && st.memory && st.memory[cls];
+    if (rows && rows.length) return require(path.join(ROOT, 'planner', 'memory.js')).suggest(rows.map((x) => Object.assign({ cls }, x)), cls, date).filter((x) => x.ticked).map((x) => x.spec);
+  }
+  return [];
+}
 function savedWeeks() {
   for (const dir of [SYNC, SYNC.replace('Beechen Cliff Science\\', 'Beechen Cliff Science (1)\\')]) {
     const st = readJson(path.join(dir, 'planner-state.json'), null);
@@ -191,9 +203,12 @@ function pick(cls, opts) {
   const seed = [...(cls + date)].reduce((h, ch) => (h * 31 + ch.charCodeAt(0)) >>> 0, 7);
   let r = seed;
   const rand = () => ((r = (r * 1103515245 + 12345) >>> 0) / 4294967296);
+  // the memory map's spots: the codes ticked in the build request (o.spec), else the map's own reddest for this class.
+  // Preferred within each spacing slot, never forced: the spacing rule stays.
+  const want = new Set(o.spec && o.spec.length ? o.spec : o.memory === false ? [] : memoryWanted(cls, date));
   const used = new Set(), out = [];
   const take = (list, n, why) => {
-    const sorted = list.filter((x) => !used.has(x.q.id)).map((x) => [rand() + (x.q.source === 'own' ? 0.3 : 0), x]).sort((a, b) => b[0] - a[0]).map((x) => x[1]);
+    const sorted = list.filter((x) => !used.has(x.q.id)).map((x) => [rand() + (x.q.source === 'own' ? 0.3 : 0) + (want.has(specOf(x.q)) ? 1 : 0), x]).sort((a, b) => b[0] - a[0]).map((x) => x[1]);
     const lessonsUsed = new Set(out.map((x) => x.L && x.L.k));
     const room = (x) => out.filter((y) => kindOf(y.q) === kindOf(x.q)).length < MIX[kindOf(x.q)];
     sorted.sort((a, b) => room(b) - room(a));                   // the mix: a kind still wanted comes first
@@ -253,7 +268,7 @@ function pick(cls, opts) {
       const v = o.varyNumbers !== false && x.q.type === 'calculate' ? require('./do-now-vary.js').vary(x.q, seed) : null;
       return v ? { q: v.text, a: v.answer, varied: v.from } : shown(x.q);
     }).map((qa, i) => ({ ...qa, x: out[i] })).map(({ x, ...qa }) => ({ ...qa, why: x.why, lesson: x.L && x.L.title, source: x.q.source === 'own' ? 'your Do Now' : x.q.source === 'written' ? 'practice question (not a real exam)' : (x.q.board || 'AQA') + ' exam', examRef: x.q.examRef || null, marks: x.q.marks || 1 })),
-    taught: lessons.length, pool: pool.length,
+    taught: lessons.length, pool: pool.length, memory: [...want], memoryHit: out.slice(0, 6).filter((x) => want.has(specOf(x.q))).map((x) => specOf(x.q)),
   };
 }
 
@@ -285,7 +300,7 @@ function shown(q) {
 
 if (require.main === module) {
   const a = process.argv.slice(2), v = (k) => (a.includes(k) ? a[a.indexOf(k) + 1] : null);
-  const r = pick(a[0], { date: v('--date') || undefined });
+  const r = pick(a[0], { date: v('--date') || undefined, spec: v('--spec') ? v('--spec').split(',').map((x) => x.trim()).filter(Boolean) : null });
   if (a.includes('--json')) console.log(JSON.stringify(r, null, 1));
   else {
     console.log(`${a[0]}: ${r.taught} lessons taught, ${r.pool} questions match them`);
