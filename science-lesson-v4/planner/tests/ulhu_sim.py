@@ -3,7 +3,7 @@ Run: python tests/ulhu_sim.py  (add --shots DIR to save screenshots). Synthetic 
 import os, sys, subprocess, time
 from playwright.sync_api import sync_playwright
 P = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '/'; SP = sys.argv[1] if len(sys.argv) > 1 and not sys.argv[1].startswith('--') else __import__('tempfile').mkdtemp()
-js = ''.join(open(P + f, encoding='utf-8').read() + '\n' for f in ['game-ulhu.js', 'game-pixel.js', 'game-runes.js', 'game-temple.js', 'game-stone.js', 'game-omens.js', 'game-tabs.js', 'game-blood.js', 'game-scroll.js', 'game-glass.js', 'game-highvespers.js', 'game-den.js', 'game-ui.js', 'game-oracle.js', 'game-pairs.js'])
+js = ''.join(open(P + f, encoding='utf-8').read() + '\n' for f in ['game-ulhu.js', 'game-pixel.js', 'game-runes.js', 'game-temple.js', 'game-stone.js', 'game-omens.js', 'game-tabs.js', 'game-blood.js', 'game-scroll.js', 'game-glass.js', 'game-highvespers.js', 'game-lair.js', 'game-den.js', 'game-ui.js', 'game-oracle.js', 'game-pairs.js'])
 page = '''<!doctype html><meta charset="utf-8"><meta name=viewport content="width=device-width,initial-scale=1"><body style="margin:0;background:#0d1b3a">
 <div style="height:60px;background:#0a1020;color:#fff">8AG header</div><div id=u></div><nav style="position:fixed;bottom:0;left:0;right:0;height:62px;background:#0a1020"></nav>
 <script>window.CALLS=[];function call(fn,...args){CALLS.push(fn);window.ARGS=window.ARGS||[];ARGS.push(args);return fetch('/c',{method:'POST',body:JSON.stringify({fn,args})}).then(r=>r.json()).then(x=>{if(x.err)throw new Error(x.err);return x.ok;});}</script>
@@ -109,10 +109,16 @@ try:
         pg.click('[data-a=dn-ward]'); pg.wait_for_timeout(300)
         check('the wardrobe opens the cloaks he owns', 'wardrobe' in pg.inner_text('.dn-panel').lower() and pg.locator('.dn-panel [data-a=wear]').count() >= 1)
         pg.locator('[data-a=dn-chest]').nth(1).click(); pg.wait_for_timeout(300)
+        # the stamp is timed inside the page (a busy test machine made outside timings unreliable): when it first shows
+        # and when it goes, measured from the tap, with every paint (the server reply too) in between
+        pg.evaluate("(() => { window.STAMPT = { on: null, off: null, gaps: 0 }; let was = false; const t0 = { v: 0 }; window.STAMPT0 = t0;"
+                    " document.addEventListener('click', (e) => { if (e.target.closest('[data-a=claim]')) t0.v = performance.now(); }, true);"
+                    " new MutationObserver(() => { if (!t0.v) return; const on = !!document.querySelector('.dn-stamp'), t = performance.now() - t0.v;"
+                    " if (on && STAMPT.on == null) STAMPT.on = t; if (!on && was) { if (t < 2400) STAMPT.gaps++; else if (STAMPT.off == null) STAMPT.off = t; } was = on; }).observe(document.body, { childList: true, subtree: true }); })()")
         c4 = coins(); pg.locator('.dn-panel [data-a=claim]').nth(1).click(); pg.wait_for_timeout(900)
         check('a chest is the Hoard: breaking its seal claims the reward (80)', coins() == c4 - 80 and 'Claimed' in pg.inner_text('.uz-undo'))
-        st1 = pg.locator('.dn-stamp').count(); pg.wait_for_timeout(1000); st2 = pg.locator('.dn-stamp').count(); pg.wait_for_timeout(1500); st3 = pg.locator('.dn-stamp').count()
-        check('1U.4 the CLAIMED stamp shows after the claim and through the server reply, then fades (%d, %d, %d)' % (st1, st2, st3), st1 == 1 and st2 == 1 and st3 == 0)
+        pg.wait_for_function("STAMPT.off != null", timeout=8000); st = pg.evaluate("STAMPT")
+        check('1U.4 the CLAIMED stamp shows at once, stays through the server reply, then fades (%s)' % st, st['on'] is not None and st['on'] < 900 and st['gaps'] == 0 and 2400 <= st['off'] < 4500)
         pg.click('.uz-dock [data-a=den][data-v=market]'); pg.wait_for_timeout(1500)
         check('the Night Market has seven stalls round the well, each with its keeper', pg.locator('.dn-booth').count() == 7 and pg.locator('img.dn-plz').count() == 1 and 'Mother Skein' in pg.inner_text('.dn-mkt'))
         if shots: pg.screenshot(path=os.path.join(SP, 's6.png'))
@@ -124,16 +130,18 @@ try:
         # haggle with the weaver: the stake first, then the table; one claim, then walk out (a loss)
         pg.click('.uz-dock [data-a=den][data-v=market]'); pg.wait_for_timeout(500); pg.click('[data-a=dn-visit][data-v=weaver]'); pg.wait_for_timeout(2600)
         pg.click('[data-a=dn-peek]'); pg.wait_for_timeout(300)
-        check('Haggle first shows what you play for (her best wares, win and lose prices)', 'What you play for' in pg.inner_text('.dn-peek') and pg.locator('.dn-pk').count() == 3)
+        check('1U.9 Haggle first asks which ONE item you play for (up to five, the best picked, its win and lose prices)', 'What you play for' in pg.inner_text('.dn-peek') and 2 <= pg.locator('.dn-pk').count() <= 5 and pg.locator('.dn-pk.on').count() == 1 and pg.locator('.dn-pk.on .ok').count() == 1)
+        pg.locator('.dn-pk').nth(1).click(); pg.wait_for_timeout(250); hag_id = pg.locator('.dn-pk.on').get_attribute('data-id')
+        check('...tapping another item picks it instead', pg.locator('.dn-pk').nth(1).get_attribute('aria-pressed') == 'true')
         pg.click('[data-a=dn-sit]'); pg.wait_for_timeout(1800)
         check('the dice table: her portrait, five bone dice in your hand', pg.locator('.dn-kbig').count() == 1 and pg.locator('.dn-hand .dn-die').count() == 5)
         if shots: pg.screenshot(path=os.path.join(SP, 's7.png'))
         if pg.locator('[data-a=dn-claim]:not([disabled])').count(): pg.click('[data-a=dn-claim]'); pg.wait_for_timeout(1800)
         pg.click('[data-a=dn-walk]'); pg.click('[data-a=dn-walk]'); pg.wait_for_timeout(1200)
-        check('walking out settles it as a loss', 'wins the haggle' in pg.inner_text('.dn-res'))
+        check('walking out settles it as a loss: ENGULFT, then that item at its new price', 'ENGULFT' in pg.inner_text('.dn-res') and pg.locator('.dn-res .dn-newp s').count() == 1)
         pg.click('[data-a=dn-leave]'); pg.wait_for_timeout(400)
-        check('back at her stall: 10% more today, prices shown struck through, no second game', '10% more' in pg.inner_text('.dn-kh') and pg.locator('[data-a=dn-peek]').count() == 0 and pg.locator('.dn-ware s').count() >= 3)
-        check('the server refuses a second game with the same keeper today', 'already played' in pg.evaluate("call('gameHaggle', 'weaver', 'start').then(function () { return 'ok'; }, function (e) { return e.message; })"))
+        check('back at her stall: only the item played for costs 10% more, no second game', 'Engulft' in pg.inner_text('.dn-kh') and pg.locator('[data-a=dn-peek]').count() == 0 and pg.locator('.dn-ware s').count() == 1 and pg.locator('.dn-ware[data-id="' + hag_id + '"] s').count() == 1)
+        check('the server refuses a second game with the same keeper today', 'already played' in pg.evaluate("call('gameHaggle', 'weaver', 'start', '" + hag_id + "').then(function () { return 'ok'; }, function (e) { return e.message; })"))
         # a second keeper is still playable: the glassblower, played to the end
         pg.click('.uz-dock [data-a=den][data-v=market]'); pg.wait_for_timeout(500); pg.click('[data-a=dn-visit][data-v=glass]'); pg.wait_for_timeout(2600)
         pg.click('[data-a=dn-peek]'); pg.wait_for_timeout(300); pg.click('[data-a=dn-sit]'); pg.wait_for_timeout(1500)
@@ -147,7 +155,7 @@ try:
         won = pg.locator('.dn-res.ok').count() == 1
         check('a second keeper plays the same day, to the end', pg.locator('.dn-res').count() == 1)
         pg.click('[data-a=dn-leave]'); pg.wait_for_timeout(400)
-        check('the result is kept at that stall (20% off on a win, 10% more on a loss)', ('20% off' if won else '10% more') in pg.inner_text('.dn-kh'))
+        check('the result is kept at that stall, on that one item (Vanquisht and less on a win, Engulft and 10% more on a loss)', ('Vanquisht' if won else 'Engulft') in pg.inner_text('.dn-kh') and pg.locator('.dn-ware s').count() == 1)
         pg.click('.uz-dock [data-a=den][data-v=market]'); pg.wait_for_timeout(500)
         check('the plaza marks both stalls with today\'s result', pg.locator('.dn-booth i').count() == 2)
         pg.click('.uz-dock [data-a=den][data-v=room]'); pg.wait_for_timeout(600)

@@ -37,6 +37,16 @@
 .uz-bar div{flex:1;height:7px;border-radius:1px;overflow:hidden}.uz-bar div i{display:block;height:100%;transition:width .4s}
 .uz-bar span{font:700 12px var(--a);font-variant-numeric:tabular-nums;min-width:58px;text-align:right}
 .uz-moonb{position:absolute;left:50%;top:2px;transform:translateX(-50%);z-index:3;width:50px;height:50px;padding:7px;border:none;background:none;border-radius:50%}.uz-moonb img{width:36px;height:36px;display:block}
+.uz-ban.lz>.uz-rays,.uz-ban.lz>div[style*="repeating-linear-gradient"],.uz-ban.lz>img[style*="right:4px"],.uz-ban.lz>.uz-bub,.uz-ban.lz>.uz-ledge{display:none}
+.uz-ban.lz .lz-wrap{position:absolute;inset:0;height:171px;z-index:0}
+.uz-ban.lz .uz-me{left:calc(50% - 50px);bottom:10px;z-index:7}
+.uz-ban.lz .uz-coins{left:4px;top:auto;bottom:2px;width:132px;justify-content:center;gap:4px;z-index:8}.uz-ban.lz .lzb .heap .hn{display:none}
+.uz-ban.lz .uz-coins b{font:700 14px/1 var(--a);padding:2px 8px;border-radius:3px;background:linear-gradient(180deg,#3d4743,#222a27);box-shadow:inset 0 1px 0 #5a6660,0 2px 0 rgba(0,0,0,.5);text-shadow:0 1px 0 #2a1e08}.uz-ban.lz .uz-coins img{width:15px;height:15px}
+.uz-ban.lz .uz-lv{left:10px;right:auto;top:8px;z-index:8;flex-direction:row-reverse;gap:7px;padding:4px 11px 5px 6px;border-radius:30px 30px 4px 4px / 16px 16px 4px 4px;background:linear-gradient(180deg,#56645e,#2e3a35);border:1px solid #151d1a;box-shadow:inset 0 1px 0 #7a8c84,0 3px 0 rgba(0,0,0,.45);text-align:left}
+.uz-ban.lz .uz-lv small{color:#c9f5dd}.uz-ban.lz .uz-hex{width:30px;height:33px}.uz-ban.lz .uz-hex i{width:25px;height:28px}
+.uz-ban.lz .uz-say{left:calc(50% + 46px);right:8px;top:8px;z-index:9}.uz-ban.lz .uz-say div{font-size:14px;max-height:118px;overflow:hidden}.uz-ban.lz .uz-say div:before{left:auto;right:auto;top:auto;bottom:-8px;left:10px;border:none;border-top:8px solid #dcc797;border-right:8px solid transparent}
+.uz-ban.lz .uz-bars{left:auto;right:6px;top:auto;bottom:4px;width:54px;height:96px;opacity:0;pointer-events:none}.uz-ban.lz .uz-bars .hpw{position:absolute;inset:0;height:auto}
+.uz-ban.lz .uz-moonb{width:120px;height:60px;top:0;border-radius:0 0 60px 60px;z-index:6}.uz-ban.lz .uz-moonb img{display:none}
 .uz-flash{position:absolute;inset:0;pointer-events:none;opacity:0;background:radial-gradient(ellipse at 22% 70%,rgba(255,214,106,.55),rgba(255,214,106,0) 70%)}
 .uz-undo.hide{height:0;border-bottom:0;overflow:hidden}.uz-undo{flex:none;height:38px;transition:height .25s;display:flex;align-items:center;gap:8px;padding:0 4px 0 14px;background:#0b1311;border-bottom:1px solid #1c2924}
 .uz-undo .t{flex:1;min-width:0;display:flex;align-items:center;gap:5px;white-space:nowrap;overflow:hidden;font:13px var(--a);color:#8fa298}
@@ -313,6 +323,7 @@
       '<div class="uz-undo"></div><div class="uz-tabs"></div><div class="uz-body"></div><div class="uz-dock"></div><div class="uz-fx"></div></div>';
     const box = el.firstChild, $ = (s) => box.querySelector(s);
     const ban = $('.uz-ban'), me = $('.uz-me'), fx = $('.uz-fx'), body = $('.uz-body');
+    if (window.LAIR) LAIR.mount(ban);   // the Lair banner: B2 Band, his picks (game-lair.js, 1U.5)
 
     // fill the space between the page's header and its bottom bar (phone), or a fixed height (laptop)
     function fit() {
@@ -352,12 +363,12 @@
         anim(c, [{ transform: 'translate(0,0) scale(.6)', opacity: 0 }, { transform: 'translate(' + (dx * 0.35 + (i - 1) * 14) + 'px,' + (dy * 0.35 - 50) + 'px) scale(1.35)', opacity: 1, offset: 0.4 }, { transform: 'translate(' + dx + 'px,' + dy + 'px) scale(.8)', opacity: 1 }], { duration: 560 + i * 70, easing: 'cubic-bezier(.45,0,.55,1)' }).onfinish = () => { c.remove(); if (i === 0) anim($('.uz-ctr'), [{ transform: 'scaleX(1)' }, { transform: 'scaleX(-1) scale(1.2)' }, { transform: 'scaleX(1)' }, { transform: 'scaleX(-1)' }, { transform: 'scaleX(1)' }], { duration: 520 }); }; } }
     const glow = (k, col) => { const n = k && box.querySelector('[data-fx="' + k + '"]'); anim(n, [{ boxShadow: '0 0 0 0 ' + col, transform: 'scale(.9)' }, { boxShadow: '0 0 0 12px rgba(0,0,0,0)', transform: 'scale(1.06)' }, { boxShadow: '0 0 0 0 rgba(0,0,0,0)', transform: 'scale(1)' }], { duration: 480, easing: 'ease-out' }); };
     const bounce = () => anim(me, [{ transform: 'none' }, { transform: 'translateY(-16px) scale(.94,1.06)', offset: 0.35 }, { transform: 'translateY(0) scale(1.08,.92)', offset: 0.7 }, { transform: 'none' }], { duration: 480, easing: 'ease-out' });
-    function flinch() { anim(me, [{ transform: 'none', filter: 'none' }, { transform: 'translateX(-7px) rotate(-4deg)', filter: 'sepia(1) saturate(4) hue-rotate(-50deg)' }, { transform: 'translateX(6px) rotate(3deg)' }, { transform: 'translateX(-3px)' }, { transform: 'none', filter: 'none' }], { duration: 420 });
+    function flinch() { if (window.LAIR) LAIR.slip(ban); anim(me, [{ transform: 'none', filter: 'none' }, { transform: 'translateX(-7px) rotate(-4deg)', filter: 'sepia(1) saturate(4) hue-rotate(-50deg)' }, { transform: 'translateX(6px) rotate(3deg)' }, { transform: 'translateX(-3px)' }, { transform: 'none', filter: 'none' }], { duration: 420 });
       anim($('.hpw'), [{ boxShadow: '0 0 0 0 #ff5a4a' }, { boxShadow: '0 0 10px 2px #ff5a4a' }, { boxShadow: '0 0 0 0 #ff5a4a' }], { duration: 500 }); }
     const buzz = (p) => { try { if (navigator.vibrate) navigator.vibrate(p || 12); } catch (e) { /* no vibration */ } };
     function ripple(r, col) { if (!r) return; const a = rel(r), d = document.createElement('div'); d.style.cssText = 'position:absolute;left:' + (a.x - 30) + 'px;top:' + (a.y - 30) + 'px;width:60px;height:60px;border-radius:50%;border:2px solid ' + col + ';box-shadow:0 0 12px ' + col; fx.appendChild(d); anim(d, [{ transform: 'scale(.3)', opacity: 1 }, { transform: 'scale(2.6)', opacity: 0 }], { duration: 600, easing: 'ease-out' }).onfinish = () => d.remove(); }
     function celebrate(big) {
-      const o = rel(me.getBoundingClientRect());
+      const o = rel(me.getBoundingClientRect()); if (window.LAIR) LAIR.level(ban);
       if (big && RN) { const h = document.createElement('img'); h.src = RN.hoard.src; h.style.cssText = 'position:absolute;left:' + (o.x - 60) + 'px;top:' + (o.y - 60) + 'px;width:120px;height:120px;image-rendering:pixelated;filter:drop-shadow(0 0 14px #b48aff)'; fx.appendChild(h);
         anim(h, [{ transform: 'scale(.2) rotate(-20deg)', opacity: 0 }, { transform: 'scale(1.15) rotate(4deg)', opacity: 1, offset: 0.3 }, { transform: 'scale(1)', opacity: 1, offset: 0.8 }, { transform: 'translateY(-30px) scale(.9)', opacity: 0 }], { duration: 2200, easing: 'ease-out' }).onfinish = () => h.remove(); } anim($('.uz-flash'), [{ opacity: 0 }, { opacity: 1, offset: 0.2 }, { opacity: 0 }], { duration: 1100 });
       for (let i = 0; i < 16; i++) { const s = document.createElement('img'), z = i % 3 ? 14 : 18; s.src = i % 3 ? IMG.spark : (RN ? RN.any().src : IMG.coin);
@@ -449,6 +460,8 @@
       const p = D.player, nt = night();
       ban.style.background = nt ? 'linear-gradient(180deg,#050a18 0%,#0a1424 55%,#0a1210 100%)' : 'linear-gradient(180deg,#0f3a34 0%,#0b2522 50%,#08110f 100%)';
       $('.uz-moon').style.display = 'none'; const mb = $('.uz-moonb img'), ph = D.moon || (D.frozen ? 'dark' : 'full'); mb.src = MOON[ph]; mb.style.cssText = ph === 'full' ? 'opacity:.85' : 'filter:drop-shadow(0 0 8px #cfe0ec)'; $('.uz-moonb').setAttribute('aria-label', PHASE[ph][0] + '. Tap to change.');
+      if (window.LAIR) { const ph0 = D.moon || (D.frozen ? 'dark' : 'full'), lc = V.lairCoins;
+        LAIR.paint(ban, { time: LAIR.timeOf(D.hour), phase: ph0, hp: p.hp, maxHp: p.maxHp, runes: p.coins, tide: p.need ? p.xp / p.need : 0, drop: lc != null && p.coins > lc }); V.lairCoins = p.coins; }
       me.innerHTML = layers(mood());
       $('.uz-coins b').textContent = p.coins; $('.uz-lv span').textContent = TITLES[p.level] || 'Great Old One'; $('.uz-lv').title = depthOf(p.level); $('.uz-hex i').textContent = p.level;
       $('.xp').style.width = Math.min(100, Math.round(100 * p.xp / p.need)) + '%'; $('.xpt').textContent = p.xp + ' / ' + p.need;

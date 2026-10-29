@@ -41,7 +41,7 @@ files['GameUI.html'] = pack(['game-ulhu.js', 'game-pixel.js', 'game-runes.js', '
 // 2026-10-27: the looks Patryk picked (stone tablets, temple bosses, blood and sigils) are their own file, GameArt.html, so each paste stays small enough to save
 files['GameArt.html'] = pack(['game-temple.js', 'game-stone.js', 'game-blood.js', 'game-scroll.js', 'game-glass.js', 'game-oracle.js']);
 // High Vespers is its own include (Sunday to Tuesday screen), so no paste file passes the limit
-files['GameHV.html'] = pack(['game-highvespers.js']);
+files['GameHV.html'] = pack(['game-highvespers.js', 'game-lair.js']);   // the Lair banner rides here (1U.5)
 // 2026-10-28: the Den (Round Grotto, Night Market, dice with every keeper) is its own include too; it loads before GameUI's code runs
 files['GameDen.html'] = pack(['game-den.js']);
 // 2026-10-27: the game code is its own file, GameUI.html, pulled in by include() (Planner.html at 406 KB would no longer save in the editor)
