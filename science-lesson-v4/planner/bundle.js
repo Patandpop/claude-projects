@@ -34,6 +34,8 @@ files['Logic.html'] = '<script>\n' + read('logic.js') + '\n</script>\n';
 ['Behaviour.gs', 'Phone.html', 'BoardPage.html'].forEach((f) => { files[f] = read(f); });
 // Ulhu's Rituals (2026-10-23): Game.gs = the server; game-ui.js goes into Planner.html and Phone.html at <!--GAME_UI-->
 files['Game.gs'] = read('Game.gs');
+// Ulhu as a life companion (Lane D, 2026-10-29): day tags, the Ill rule, his overnight adventure; its own server file
+files['Companion.gs'] = read('Companion.gs');
 files['GameShop.gs'] = '// Ulhu shop: 120 items with their room sprites, made by replica/art/export_shop.py\nconst SHOP = ' + read('game-shop.json') + ';\n';
 // 2026-10-24 redesign: Ulhu's sprites (8 and 16-bit) and the pixel engine (coin, bosses, wardrobe, icons) go in first
 const pack = (list) => '<script>\n' + list.map(read).join('\n') + '\n</script>';
