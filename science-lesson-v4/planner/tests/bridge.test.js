@@ -51,7 +51,7 @@ r = post({ key: 'k', fn: 'gameBoom', args: [] });
 ok('a server error comes back as { ok: false, error } with its message, never a crash', r.ok === false && r.error === 'boom');
 
 // every name on the list is a real function somewhere in the server files, so a typo shows up here
-const src = ['Code.gs', 'Behaviour.gs', 'Game.gs'].map((f) => fs.readFileSync(path.join(SRC, f), 'utf8')).join('\n');
+const src = ['Code.gs', 'Behaviour.gs', 'Game.gs', 'Day.gs'].map((f) => fs.readFileSync(path.join(SRC, f), 'utf8')).join('\n');
 const missing = BRIDGE_CALLS.filter((fn) => !new RegExp('function ' + fn + '\\s*\\(').test(src));
 ok('every allowed call exists in the server files' + (missing.length ? ': missing ' + missing.join(', ') : ''), !missing.length);
 const wanted = ['init', 'openClass', 'logEvent', 'logMany', 'removeEvent', 'removeMany', 'loadAll', 'saveWeek', 'saveWeeks', 'saveLessons', 'saveLessonChanges', 'homeworkList', 'exportXlsx'];
