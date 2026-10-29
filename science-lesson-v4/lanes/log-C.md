@@ -15,6 +15,12 @@
 
 ## Entries (newest first)
 
+### 29 Oct 2026, Lane C part 2: the timer picker and the capture box, ready but not attached
+- What changed: the evening timer picker (`planner/day-timer.js`: your three likeliest jobs, then job, then class only for Marking, Building and Homework; a running chip with Stop) and the quick-capture box with the morning sort (`planner/day-capture.js`: Save or Enter, kept on the phone first so no signal loses nothing; each capture shows its suggested home with Yes or Other; Obsidian is never offered for a class or pupil capture). Both follow Light, Dark and Auto. 30 browser checks.
+- Neither is on any page yet: they go onto the day screen once you pick A, B or C, and the timer picker once you say its design is fine.
+- You need to: pick A, B or C (Waiting item 6), and say if the timer picker needs changing.
+- Save: see git log "Evening timer picker", "Quick-capture box".
+
 ### 29 Oct 2026, Lane C part 2, items 3 and 4 (behind the screen): the day screen, capture box and evening timer
 - What changed: the rules (`planner/day-logic.js`: where a capture goes, your to-do list of 7, the yesterday tag, suggested blocks with marking in frees and lesson builds after school, the workload line, nothing after 7pm, how a PC window becomes a job and class, the 2-hour stop, the fortnightly report) and the server side (`planner/Day.gs`: today's lessons and to-dos in one trip, saving and ticking, drop and move, captures, the shared timer, Done for today). 91 new checks. Captures about a pupil never go to Obsidian; Obsidian is never written until you pick the folder; the timer never stores window titles.
 - Dark mode: the day screen and the timer will follow the same Light, Dark or Auto setting as the phone page (you asked, 29 Oct). The mock-up has both.
