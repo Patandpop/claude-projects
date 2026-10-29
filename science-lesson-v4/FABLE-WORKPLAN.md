@@ -332,7 +332,7 @@ In priority order:
 3. **Ulhu as a life companion.** Knows his workload as well as his habits; a year-long story; a page showing who he is becoming over a term; sound; gentle evening nudges (never after 7pm); what he opens instead of scrolling.
 4. **Ulhu for a friend (not a teacher).** A general version with the teaching parts removed or made general, possibly a social layer (Habitica-style bosses beaten together, or better). Undecided.
 - **Goal 2 extras (Patryk 29 Oct, both wanted):**
-  - **"Where did my evening go" timer:** one tap to start ("marking 9AS", "building 10S2 lesson"), one to stop; after two weeks it shows where after-school time really goes, so the biggest drain gets automated next. Ulhu could reward days that end by 7pm.
+  - **"Where did my evening go" timer:** one tap to start ("marking 9AS", "building 10S2 lesson"), one to stop; after two weeks it shows where after-school time really goes, so the biggest drain gets automated next. Ulhu could reward days that end by 7pm. Grilled (29 Oct): see replica/design/grills/evening-timer.md, ready to build.
   - **One quick-capture box, built into the integrations:** ideas, pupil concerns, "email parent", "order beakers" typed (or shared) from the phone land in the day screen's inbox next morning, sorted by where they belong (order sheet, a lesson, a class, Obsidian).
   - Not wanted for now: whole-class feedback marking taps, home retrieval for pupils, looking back at lesson styles. Do not add them.
 5. **Colleagues using the planner.** Lowest; keep it personal for now.
