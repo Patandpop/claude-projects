@@ -10,7 +10,7 @@
 
 ## Entries (newest first)
 
-### 29 Oct, items 3, 4, 5 and 7 (server side and sound) plus four mock-ups
+### 29 Oct, items 3, 4, 5 and 7 (server side and sound) plus four mock-ups, commit 93432fcc
 - What changed: the term page's numbers (identity figures fill one pane per vote, fully lit at 30; "on your better days, these came first"; your tagged heavy days, which change nothing); the act's chapter windows (each school week's blessings, curses and rituals, sealed when High Vespers closes the week); sound for the big moments only (a tick, Vespers, a level-up, fainting, Ulhu back from the deep), with an on/off switch; and the nudge rules (at most one a day, at the time you usually tick, a real fact like "Read: 24 days", never after 7 pm, each kind switchable off).
 - Choices I made that you can change: the term page covers the current half term (the act), not the whole term; a "better day" is one in the top half of the term's days by good ticks minus twice the curses; a ritual needs three ticks in the last fortnight before it has a "usual time" for a nudge.
 - Sound on the phone: a web page cannot read Android's silent switch. Where the browser allows it the sound is marked to obey silent mode; the sure way is the sound switch, which will sit in the companion settings once the screens are picked.
