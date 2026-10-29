@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ulhu Loading Screens</title>
+<style>
+/* Mock-up for 1U.12. One dark look on purpose, like Ulhu's Lair. Each scene is one small canvas (90 x 64 pixels, drawn 4x) and one draw function. */
+:root{--bg:#0a100e;--panel:#101a17;--line:#24443a;--fg:#e8e1cf;--muted:#8fa298;--sea:#5ef2a0;
+  --gx:'Grenze Gotisch',Georgia,serif;--ax:'Atkinson Hyperlegible',system-ui,sans-serif}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.45 var(--ax)}
+main{max-width:412px;margin:0 auto;padding:18px 16px 40px}
+h1{font:600 30px/1.1 var(--gx);margin:0 0 4px;color:#d8ffe9}
+.lede{color:var(--muted);margin:0 0 18px;font-size:14px}
+h2{font:600 22px/1.1 var(--gx);color:var(--sea);margin:26px 0 10px;letter-spacing:.02em}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px;margin:0 0 14px}
+.card h3{margin:0 0 2px;font:700 14px var(--ax);display:flex;gap:8px;align-items:center}
+.tag{font:700 12px var(--ax);letter-spacing:.08em;color:#08100d;background:var(--sea);padding:2px 6px;border-radius:3px}
+.card p{margin:0 0 8px;color:var(--muted);font-size:13px}
+.stage{background:#050807;border:1px solid #17241f;border-radius:6px;padding:0;overflow:hidden}
+canvas{display:block;width:100%;aspect-ratio:90/64;image-rendering:pixelated;image-rendering:crisp-edges}
+.cap{font:500 20px/1 var(--gx);color:#cfe9da;text-align:center;padding:10px 0 12px;background:#050807;letter-spacing:.03em}
+.cap i{font-style:normal;display:inline-block;width:1.2em;text-align:left}
+.cap i:after{content:"";animation:dots 1.6s steps(4) infinite}
+@keyframes dots{0%{content:""}25%{content:"."}50%{content:".."}75%{content:"..."}}
+@media (prefers-reduced-motion:reduce){.cap i:after{animation:none;content:"..."}}
+</style>
+</head>
+<body>
+<main>
+  <h1>Ulhu loading screens</h1>
+  <p class="lede">Three scenes, two takes each. Every scene is one tiny canvas and about thirty lines of drawing, so any of them can be the real loading screen.</p>
+
+  <h2>L1 Spinning round</h2>
+  <div class="card"><h3><span class="tag">L1a</span> Turntable</h3><p>He turns on the spot like a coin, back to front, while a ring of sea light circles his feet.</p>
+    <div class="stage"><canvas data-s="spinA" width="90" height="64"></canvas><div class="cap">Ulhu is turning the tide<i></i></div></div></div>
+  <div class="card"><h3><span class="tag">L1b</span> The whirl</h3><p>Wider framing: he tumbles head over tentacles in a whirlpool, his five runes orbiting.</p>
+    <div class="stage"><canvas data-s="spinB" width="90" height="64"></canvas><div class="cap">Down the whirl we go<i></i></div></div></div>
+
+  <h2>L2 Reading a scroll</h2>
+  <div class="card"><h3><span class="tag">L2a</span> Rune by rune</h3><p>He holds the scroll wide and his eyes follow the line; each rune glows as he reads it, then the scroll flashes and starts again.</p>
+    <div class="stage"><canvas data-s="scrollA" width="90" height="64"></canvas><div class="cap">Reading the old words<i></i></div></div></div>
+  <div class="card"><h3><span class="tag">L2b</span> The runes wake</h3><p>A hanging scroll unrolls by candlelight and its runes lift off the page and drift up as sigils.</p>
+    <div class="stage"><canvas data-s="scrollB" width="90" height="64"></canvas><div class="cap">The runes are waking<i></i></div></div></div>
+
+  <h2>L3 Stirring a cauldron</h2>
+  <div class="card"><h3><span class="tag">L3a</span> The stir</h3><p>He stands behind the pot and stirs in slow circles; bubbles pop and steam curls up.</p>
+    <div class="stage"><canvas data-s="potA" width="90" height="64"></canvas><div class="cap">Something is brewing<i></i></div></div></div>
+  <div class="card"><h3><span class="tag">L3b</span> Sigil bubbles</h3><p>Close up: only his eyes peek over the rim. Big bubbles rise and burst into glowing sigils, firelight flickering on the dark.</p>
+    <div class="stage"><canvas data-s="potB" width="90" height="64"></canvas><div class="cap">Bubbles into sigils<i></i></div></div></div>
+</main>
+<script>
+const ULHU = /*__ULHU__*/;
+(function () {
+  const TAU = Math.PI * 2, W = 90, H = 64, OL = '#120b14';
+  const load = (s) => new Promise((r) => { const i = new Image(); i.onload = () => r(i); i.src = s; });
+  // five rune glyphs (5 x 5), the same family as his currency
+  const RUNE = [['..#..', '.###.', '#.#.#', '..#..', '..#..'], ['#...#', '.#.#.', '..#..', '.#.#.', '#...#'], ['.###.', '#...#', '#.#.#', '#...#', '.###.'],
+    ['#.#.#', '#.#.#', '.###.', '..#..', '.#.#.'], ['###..', '..#..', '..###', '..#..', '###..'], ['..#..', '.#.#.', '#####', '.#.#.', '..#..']];
+  let c; // the context being drawn
+  const R = (x, y, w, h, col) => { c.fillStyle = col; c.fillRect(Math.round(x), Math.round(y), w, h); };
+  const ell = (cx, cy, rx, ry, col) => { c.fillStyle = col; for (let y = Math.floor(cy - ry); y <= cy + ry; y++) { const d = 1 - ((y + .5 - cy) / ry) ** 2; if (d < 0) continue; const hw = rx * Math.sqrt(d); c.fillRect(Math.round(cx - hw), y, Math.round(hw * 2) || 1, 1); } };
+  const glyph = (x, y, i, col, halo) => { const g = RUNE[i % RUNE.length]; if (halo) { c.fillStyle = halo; for (let r = 0; r < 5; r++) for (let k = 0; k < 5; k++) if (g[r][k] === '#') c.fillRect(Math.round(x) + k - 1, Math.round(y) + r - 1, 3, 3); } c.fillStyle = col; for (let r = 0; r < 5; r++) for (let k = 0; k < 5; k++) if (g[r][k] === '#') c.fillRect(Math.round(x) + k, Math.round(y) + r, 1, 1); };
+  const sea = (top) => { for (let y = 0; y < H; y++) R(0, y, W, 1, y < top ? (y % 9 === 4 ? '#0c1a17' : '#08120f') : (y === top ? '#1d4a46' : '#0c1c18')); };
+  const ease = (p) => p < .5 ? 2 * p * p : 1 - (-2 * p + 2) ** 2 / 2;
+
+  const S = {
+    // L1a: coin-like turn. Width follows cos; the back is his own sprite in shadow.
+    spinA(t, A) {
+      sea(52); const a = t * TAU / 1.8, s = Math.cos(a), w = Math.max(2, Math.round(32 * Math.abs(s))), bob = Math.round(Math.sin(t * TAU / .9));
+      ell(45, 53, 13 - Math.abs(Math.sin(a)) * 2, 2, '#050c0a');
+      const ring = (front) => { for (let k = 0; k < 10; k++) { const q = k / 10 * TAU + t * 4.2, z = Math.sin(q); if ((z > 0) !== front) continue; R(45 + Math.cos(q) * 22, 47 + z * 5, 1 + (z > .5), 1, k % 3 ? '#2f8a72' : '#5ef2a0'); } };
+      ring(false); c.drawImage(s >= 0 ? A.U : A.back, 45 - w / 2 | 0, 18 + bob, w, 32); ring(true);
+    },
+    // L1b: tumbling in a whirlpool, runes orbiting.
+    spinB(t, A) {
+      R(0, 0, W, H, '#07110f');
+      for (let k = 0; k < 160; k++) { const r = 3 + k * .26, q = k * .42 - t * 3.2; R(45 + Math.cos(q) * r * 1.35, 32 + Math.sin(q) * r * .8, 1, 1, k % 4 ? '#163a37' : '#2f8a72'); }
+      c.save(); c.translate(45, 32); c.rotate(t * TAU / 2.2); c.drawImage(A.U, -16, -16); c.restore();
+      for (let i = 0; i < 5; i++) { const q = i / 5 * TAU - t * 1.6, on = (Math.floor(t * 2.5) % 5) === i; glyph(45 + Math.cos(q) * 34 - 2, 30 + Math.sin(q) * 20 - 2, i, on ? '#d8ffe8' : '#5ef2a0', on ? '#1d8a52' : null); }
+    },
+    // L2a: holds a wide scroll; runes light one at a time and his head follows the line.
+    scrollA(t, A) {
+      sea(60); const n = 6, p = (t / 4.8) % 1, lit = Math.floor(p * (n + 1.5)), look = Math.min(lit, n - 1);
+      c.drawImage(A.U, 29 + Math.round((look - 2.5) * .8), 6 + Math.round(Math.sin(t * 2) * .6));
+      const done = lit > n, flash = done && Math.floor(t * 8) % 2;
+      R(14, 30, 62, 14, OL); R(15, 31, 60, 12, flash ? '#fff3c4' : '#e8d6a8'); R(15, 42, 60, 1, '#c9a96a'); R(15, 31, 60, 1, '#f6ead0');
+      for (const x of [11, 75]) { R(x, 28, 4, 18, OL); R(x + 1, 29, 2, 16, '#9a6a3a'); R(x + 1, 27, 2, 2, '#e3a93a'); R(x + 1, 45, 2, 2, '#e3a93a'); R(x - 1, 34, 3, 3, '#78be96'); R(x + 2, 35, 3, 2, '#aae2be'); }
+      for (let i = 0; i < n; i++) { const on = i < lit, now = i === lit - 1 && !done; glyph(19 + i * 9, 34, i, now ? '#ffffff' : on ? '#2fbf7a' : '#8a6a3a', now ? '#a8ffd0' : null); }
+    },
+    // L2b: hanging scroll unrolls by a candle; runes lift off as sigils.
+    scrollB(t, A) {
+      const fl = Math.sin(t * 17) * .5 + Math.sin(t * 7.3) * .5;
+      for (let y = 0; y < H; y++) R(0, y, W, 1, y > 56 ? '#1a120c' : (y % 8 === 3 ? '#0e1512' : '#0a100e'));
+      ell(41, 48, 14 + fl, 10 + fl, 'rgba(255,200,90,.07)');
+      c.drawImage(A.U, 4, 24); R(38, 50, 6, 7, '#e8e1cf'); R(38, 56, 6, 1, '#a8a090'); R(40, 48 + Math.round(fl * .5), 2, 2, '#ffd56a'); R(40, 47 + Math.round(fl), 2, 1, '#ff9a5a');
+      const p = (t / 6) % 1, L = Math.round(34 * (p < .3 ? ease(p / .3) : p > .85 ? 1 - ease((p - .85) / .15) : 1));
+      R(44, 6, 34, 4, OL); R(45, 7, 32, 2, '#9a6a3a'); R(43, 7, 2, 2, '#e3a93a'); R(77, 7, 2, 2, '#e3a93a'); R(60, 2, 2, 5, '#5a3a20');
+      if (L > 0) { R(46, 10, 30, L, OL); R(47, 10, 28, L - 1, '#e8d6a8'); R(74, 10, 1, L - 1, '#c9a96a'); R(45, 9 + L, 32, 3, OL); R(46, 10 + L, 30, 1, '#9a6a3a'); }
+      for (let i = 0; i < 6; i++) { const gy = 13 + Math.floor(i / 2) * 10, gx = 51 + (i % 2) * 12; if (gy + 5 < 9 + L) glyph(gx, gy, i, '#8a6a3a'); }
+      if (p > .3 && p < .85) for (let j = 0; j < 4; j++) { const q = ((t / 2.2) + j / 4) % 1; c.globalAlpha = q < .7 ? 1 : (1 - q) / .3; glyph(53 + (j % 2) * 12 + Math.sin(q * 6 + j) * 3, 30 - q * 30, j + 2, '#d8ffe8', '#1d8a52'); c.globalAlpha = 1; }
+    },
+    // L3a: stirring behind the cauldron, bubbles pop, steam curls.
+    potA(t, A) {
+      sea(60); const a = t * TAU / 2.4, fl = .5 + Math.sin(t * 9) * .3 + Math.sin(t * 23) * .2;
+      ell(45, 61, 30 + fl * 3, 5, 'rgba(255,120,40,.12)'); ell(45, 61, 20 + fl * 2, 3.5, 'rgba(255,170,60,.18)'); // firelight on the floor
+      c.save(); c.translate(0, -6); // pot and Ulhu sit higher so the fire shows
+      for (let j = 0; j < 3; j++) { const q = (t / 3 + j / 3) % 1; c.globalAlpha = 1 - q; R(38 + j * 7 + Math.sin(q * 7 + j) * 3, 28 - q * 26, 2, 2, '#4a6a62'); c.globalAlpha = 1; }
+      c.drawImage(A.H, 29 + Math.round(Math.cos(a) * 1.5), 8);
+      const lx = 45 + Math.cos(a) * 9, ly = 37 + Math.sin(a) * 1.5;
+      R(31, 56, 4, 6, OL); R(55, 56, 4, 6, OL);
+      ell(45, 47, 21, 12, OL); ell(45, 47, 20, 11, '#2a2a34'); ell(40, 44, 10, 6, '#3a3a48');
+      ell(45, 55, 17, 3.5, 'rgba(255,80,20,' + (.30 + fl * .18).toFixed(2) + ')'); ell(45, 57, 11, 1.6, 'rgba(255,170,60,' + (.35 + fl * .25).toFixed(2) + ')'); // fire lighting the belly
+      ell(45, 36, 22, 4.5, OL); ell(45, 36, 21, 3.5, '#4a4a5a'); ell(45, 36.5, 18, 2.6, '#1d8a52'); ell(45, 36, 16, 1.6, '#2fbf7a');
+      for (let k = 0; k < 4; k++) { const q = (t / 1.3 + k * .27) % 1, bx = 33 + ((k * 37) % 24); if (q < .6) R(bx, 36 - q * 3, 2, 2, '#a8ffd0'); else if (q < .75) { R(bx - 1, 34, 1, 1, '#d8ffe8'); R(bx + 2, 34, 1, 1, '#d8ffe8'); } }
+      for (let i = 0; i < 20; i++) { const u = i / 19; R(lx + (u * (lx > 45 ? 6 : -6)), ly - u * 22, 2, 1, '#9a6a3a'); }
+      const hx = lx + (lx > 45 ? 6 : -6), hy = ly - 22; R(hx - 1, hy - 1, 3, 3, '#78be96'); R(hx, hy, 2, 2, '#aae2be');
+      c.restore();
+      // the fire in front: crossed logs, layered flame tongues (deep red, orange, gold, white-hot core) that lick the pot, embers rising
+      R(30, 60, 14, 3, OL); R(31, 61, 12, 1, '#6a4428'); R(46, 60, 14, 3, OL); R(47, 61, 12, 1, '#7a5030'); R(38, 61, 14, 2, OL); R(39, 61, 12, 1, '#5a3a20');
+      const tongue = (x, h, w, col) => { for (let y = 0; y < h; y++) { const f = y / h, hw = w * (1 - f) ** .8; R(x - hw + Math.sin(t * 14 + y * .8 + x * .7) * f * 1.6, 60 - y, Math.max(1, Math.round(hw * 2)), 1, col); } };
+      for (let k = 0; k < 8; k++) { const x = 32 + k * 3.7, n = Math.sin(t * 10 + k * 1.7) * .5 + Math.sin(t * 17 + k * 3.1) * .5, h = 8 + n * 3.5 + (k === 3 || k === 4 ? 4 : k === 0 || k === 7 ? -2 : 1);
+        tongue(x, h, 2.6, '#a82a26'); tongue(x, h * .8, 2, '#e85a28'); tongue(x, h * .58, 1.4, '#ffb03a'); tongue(x, h * .34, .9, '#ffe27a'); tongue(x, h * .14, .5, '#fff8e0'); }
+      for (let k = 0; k < 7; k++) { const q = (t / 1.6 + k / 7) % 1, ex = 30 + ((k * 41) % 30) + Math.sin(q * 8 + k) * 4, ey = 56 - q * 30; c.globalAlpha = 1 - q; R(ex, ey, 1, 1, q < .35 ? '#fff3c4' : q < .7 ? '#ffb03a' : '#e85a28'); c.globalAlpha = 1; }
+    },
+    // L3b: close-up; his eyes over the rim, big bubbles burst into sigils.
+    potB(t, A) {
+      const fl = .5 + Math.sin(t * 11) * .25 + Math.sin(t * 4.7) * .25;
+      for (let y = 0; y < H; y++) { const g = Math.max(0, (y - 20) / 44) * fl; R(0, y, W, 1, 'rgb(' + (10 + g * 60 | 0) + ',' + (16 + g * 26 | 0) + ',' + (14 + g * 8 | 0) + ')'); }
+      c.drawImage(A.U, 8, 26, 32, 32);
+      ell(45, 66, 46, 24, OL); ell(45, 66, 45, 23, '#2a2a34'); ell(30, 58, 14, 8, '#3a3a48');
+      ell(45, 44, 44, 6, OL); ell(45, 44, 43, 5, '#4a4a5a'); ell(45, 44.5, 39, 3.5, '#1d8a52'); ell(45, 44, 36, 2.2, '#2fbf7a');
+      for (let k = 0; k < 3; k++) { const q = (t / 2.6 + k / 3) % 1, x = 52 + k * 12 - 8 + Math.sin(q * 9 + k) * 2, y = 42 - q * 34, i = (k + Math.floor(t / 2.6 + k / 3)) % 6;
+        if (q < .62) { const r = 2 + q * 4; ell(x, y, r, r, '#5ef2a0'); ell(x, y, r - 1, r - 1, '#123a28'); R(x - r / 2, y - r / 2, 1, 1, '#ffffff'); }
+        else { c.globalAlpha = 1 - (q - .62) / .38; glyph(x - 2, y - 2, i, '#d8ffe8', '#1d8a52'); c.globalAlpha = 1; } }
+    }
+  };
+
+  Promise.all([load(ULHU.idle), load(ULHU.happy)]).then(([U, Hp]) => {
+    const back = document.createElement('canvas'); back.width = back.height = 32; const b = back.getContext('2d');
+    b.drawImage(U, 0, 0); b.globalCompositeOperation = 'source-atop'; b.fillStyle = 'rgba(8,24,20,.72)'; b.fillRect(0, 0, 32, 32);
+    const A = { U, H: Hp, back };
+    const list = [...document.querySelectorAll('canvas[data-s]')].map((el) => { const x = el.getContext('2d'); x.imageSmoothingEnabled = false; return { x, f: S[el.dataset.s] }; });
+    const t0 = performance.now();
+    (function frame(now) { const t = (now - t0) / 1000; for (const s of list) { c = s.x; c.clearRect(0, 0, W, H); s.f(t, A); } requestAnimationFrame(frame); })(t0);
+  });
+})();
+</script>
+</body>
+</html>
