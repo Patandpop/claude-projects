@@ -17,3 +17,15 @@ Started 2026-10-29. Builds on habits-v2-decisions.md "Merchant and haggle" and "
 - **Gullet replaces the pawnbroker** and holds the real-life treats. Still seven keepers in total (six themed stalls plus Gullet).
 - **Ready-made treat list:** to be written for Patryk to tick (nothing goes in without his tick). Mostly weekly treats (takeaway, cinema, new book), some small daily ones (coffee, an episode, an hour of a game), plus big ones (for the chest) and permissions (early night with no marking, skip a chore).
 - **Win and lose on screen:** one big eldritch word, then the item's new price glowing in runes. Nothing else.
+
+## Round 3 (2026-10-29)
+- **Dice mock-ups DR1-DR3 (replica/design/mockups/market6/dice-result.html): all rejected.** The ask was about the animation DURING the game, not a result card.
+- **The dice game view:** stays as it is, with the keeper in front across the table and Patryk looking at them (first person). During the game:
+  - **losing a die:** a wave of the tide washes over the table, in a 3D style, and sweeps that die away;
+  - **losing overall:** the tide sweeps the loser away: the keeper if Patryk wins, or Patryk (the view floods and he is swept off) if he loses.
+  - It is close to DR3 but in 3D and first person. Patryk mentioned using "the overdrive we have" for the 3D (meaning to be confirmed in round 4).
+- **Win and lose words:** strange words in an OLDEN style (archaic English), shown big, then the new price in glowing runes.
+- **Stalls from above:** a sign with the stall's title, made in the stall's own style (e.g. woven for the weaver). That is enough; no items hung out front.
+- **Walking:** tap anywhere and Ulhu walks there; tap a stall and he walks up and goes in; when idle he wanders, sits by the well, sulks near Gullet.
+- **Items:** five per stall, swiped one at a time in the Ocarina spotlight. BUT the whole selection must be visible inside the stall itself, displayed the way that stall would really show its wares (rugs laid out or hung, etc.), never a plain menu. **Personalisation per stall is key.**
+- **Text:** only the item name, price in glowing runes, the keeper's one-line pitch and Buy / Haggle / Put back. No rules, hints or labels anywhere.
