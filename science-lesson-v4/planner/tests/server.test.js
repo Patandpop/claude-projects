@@ -11,7 +11,7 @@ m.sheets.Data = m.makeSheet('Data', [['chunk'], [JSON.stringify(Object.assign({ 
 // one project since 2026-10-12: the planner's Code.gs and Behaviour.gs load together (a clash would break this)
 const SRC = process.env.PLANNER_SRC || path.join(__dirname, '..');   // PLANNER_SRC: the bundle test points this at the comment-stripped copies
 eval(fs.readFileSync(path.join(SRC, 'Code.gs'), 'utf8') + '\n' + fs.readFileSync(path.join(SRC, 'Behaviour.gs'), 'utf8') +
-  '\nglobal.api={init,openClass,logEvent,logMany,removeMany,getBoard,setMode,endMode,getMode,setTimer,adjustTimer,stopTimer,submitResult,getSilence,getFriday,positivesOver,setSupport,setPause,mergeBehaviourData,behaviourWeek,sameClass_,lessonMcqs,orderSheetDraft,saveVote,removeVote,setLost,loadAll_,saveWeek,saveWeeks,saveLessons,saveLessonChanges,weekLetter_,plannerCal_};');
+  '\nglobal.api={init,openClass,logEvent,logMany,removeMany,getBoard,setMode,endMode,getMode,setTimer,adjustTimer,stopTimer,submitResult,getSilence,getFriday,positivesOver,setSupport,setPause,mergeBehaviourData,behaviourWeek,sameClass_,lessonMcqs,orderSheetDraft,memoryUpdate_,readMemory_,saveVote,removeVote,setLost,loadAll_,saveWeek,saveWeeks,saveLessons,saveLessonChanges,weekLetter_,plannerCal_};');
 const k = 'k', out = []; let failed = 0;
 const ok = (n, c) => { out.push((c ? 'PASS ' : 'FAIL ') + n); if (!c) failed++; };
 
@@ -242,6 +242,36 @@ ok('merge is noted in the planner Log tab, not the behaviour log', m.sheets.Log 
   const logs = m.sheets.Log._data.filter((r) => r[1] === 'order sheet email drafted');
   ok('order sheet draft: to every address in TECH_EMAILS, subject is the sheet title, logged in the Log tab', !b.noAddress && drafts[1].to === 'tech.one@example.org,tech.two@example.org' && drafts[1].subj === 'Order Sheet Week B - Nov 16' && logs.length === 2);
   delete m.props.TECH_EMAILS;
+}
+
+// Memory map daily update (big goal 1, 2026-10-29): votes and homework results become evidence once, squares are
+// written, the snapshot is ready for home, and no pupil name reaches any memory tab
+{
+  global.PlannerMemory = require('../memory.js');
+  const iso = (d) => Utilities.formatDate(d, 'Europe/London', 'yyyy-MM-dd'), now0 = new Date(), today = new Date(now0.getFullYear(), now0.getMonth(), now0.getDate(), 12);   // midday: no midnight edge
+  const mon = new Date(today.getFullYear(), today.getMonth(), today.getDate() - ((today.getDay() + 6) % 7) - 7, 12);
+  const lesson = { unit: 'P3', topic: 'P3 Particles', title: 'Internal Energy', rel: 'Year 9/Physics/P3 Particles/Lesson 6 - Internal Energy', spec: ['Physics: Internal Energy'] };
+  m.sheets.Data = m.makeSheet('Data', [['chunk'], [JSON.stringify({ classes: { '9AS': { year: 9, seq: [lesson] } }, timetable: { A: [], B: [] }, specIndex: [{ code: 'Physics: Internal Energy' }],
+    hwSpec: { 'homework-9AS-test.json': { '1': ['Physics: Internal Energy'] } } })]]);
+  m.sheets.Weeks = m.makeSheet('Weeks', [['monday', 'json', 'at'], [iso(mon), JSON.stringify({ monday: iso(mon), slots: [{ cls: '9AS', day: 0, period: 1, kind: 'lesson', key: lesson.rel }] }), 1]]);
+  m.sheets['MCQ Votes'] = m.makeSheet('MCQ Votes', [['id', 'when', 'class', 'lesson', 'title', 'q', 'question', 'right', 'split', 'pctRight', 'mainWrong', 'misconception'],
+    ['v1', new Date(mon.getTime() + 864e5), '9AS', lesson.rel, 'Internal Energy', 1, 'Which?', 'B', '{"A":40,"B":60}', 60, 'A', 'thinks heat is a substance']]);
+  m.sheets.Results = m.makeSheet('Results', [['id', 'cls', 'title', 'file', 'dueOn', 'updated', 'json'],
+    ['h1', '9AS', 'Quiz', 'homework-9AS-test.json', iso(mon), '', JSON.stringify({ id: 'h1', cls: '9AS', title: 'Quiz', file: 'homework-9AS-test.json', dueOn: iso(new Date(mon.getTime() + 2 * 864e5)), done: 20,
+      questions: [{ key: '1', pct: 85, wrong: [] }, { key: '2', pct: 10, wrong: [] }] })]]);
+  const a = api.memoryUpdate_();
+  const ev = m.sheets['Memory Evidence']._data, sc = m.sheets['Memory Scores']._data;
+  ok('memory: a vote and a homework question become one evidence row each (a question with no code is left out)', a.evidence === 2 && ev.length === 3 && ev.slice(1).map((r) => r[5]).sort().join() === 'homework,vote');
+  ok('memory: the taught lesson gets its square, worked through both results', sc.length === 2 && sc[1][0] === '9AS' && sc[1][1] === 'Physics: Internal Energy' && sc[1][6] === 2);
+  const b = api.memoryUpdate_();
+  ok('memory: running the update again adds no evidence and keeps one square', b.evidence === 0 && m.sheets['Memory Evidence']._data.length === 3 && m.sheets['Memory Scores']._data.length === 2);
+  const snap = api.readMemory_();
+  ok('memory: the snapshot for home holds the class square with its recall and state', snap['9AS'] && snap['9AS'][0].spec === 'Physics: Internal Energy' && typeof snap['9AS'][0].recall === 'number');
+  const names = m.sheets.Students._data.slice(1).map((r) => String(r[1])).filter(Boolean);
+  const memTabs = ['Memory Evidence', 'Memory Scores', 'Memory Settings'].map((t) => JSON.stringify((m.sheets[t] || { _data: [] })._data)).join(' ');
+  ok('memory: no pupil name in any memory tab', names.every((nm) => !memTabs.includes(nm)));
+  m.sheets.Data = m.makeSheet('Data', [['chunk'], [JSON.stringify({ classes: {}, timetable: { A: [], B: [] } })]]);
+  ok('memory: with no spec codes imported yet it says so and writes nothing', /no spec codes/.test(api.memoryUpdate_().none || ''));
 }
 
 console.log(out.join('\n')); console.log(failed ? `\n${failed} FAILED` : '\nAll passed'); process.exit(failed ? 1 : 0);

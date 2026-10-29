@@ -190,7 +190,7 @@ function pushState_(force) {
   if (!force && c.get('pushAt')) { c.put('pushDue', '1', 21600); return 'later'; }
   try {
     const a = loadAll_(false);
-    mailPost_({ op: 'write', name: 'planner-state.json', text: JSON.stringify({ saved: new Date().toISOString(), weeks: a.weeks, records: a.records, learned: a.learned, added: a.added, classSettings: a.classSettings, results: readResults_() }) });   // results: class counts only (learning loop M1)
+    mailPost_({ op: 'write', name: 'planner-state.json', text: JSON.stringify({ saved: new Date().toISOString(), weeks: a.weeks, records: a.records, learned: a.learned, added: a.added, classSettings: a.classSettings, results: readResults_(), memory: readMemory_() }) });   // results: class counts only (learning loop M1)
     c.put('pushAt', '1', PUSH_GAP_S); c.remove('pushDue');
     return true;
   } catch (e) { return String(e.message || e); }
@@ -606,8 +606,120 @@ function hwCards_() {
   try { return hwRows_().filter((r) => r.dueOn).map((r) => ({ id: String(r.id), cls: r.cls, kind: String(r.kind || ''), title: String(r.title || ''), dueOn: r.dueOn, status: r.status })); }
   catch (e) { return []; }
 }
+/* ---------------------------------------------------------- memory map (big goal 1, 29 Oct 2026)
+   lanes/design-memory-map.md. The maths is planner/memory.js (pasted as Memory.gs, the PlannerMemory object);
+   this part only reads and writes the planner Sheet's tabs. Class level only: no pupil names in any of them.
+   Evidence comes from the ABCD card votes (each vote's lesson codes, from planner-data.json) and the
+   homework Form results (each question's code, from data.hwSpec made at home). Runs in the 06:00 daily job. */
+const MEM_EV_HEAD = ['id', 'when', 'cls', 'board', 'spec', 'source', 'pctRight', 'n', 'weight', 'qRef', 'mainWrong', 'misconception', 'guess'];
+const MEM_SC_HEAD = ['cls', 'spec', 'stability', 'difficulty', 'lastEvidence', 'lastPct', 'reps', 'lapses', 'recall', 'state', 'firstTaught', 'reteach', 'updated'];
+function memSettings_() {
+  const out = { dueBelow: 75, growth: {}, lineage: '', lineageDone: '', growthMonth: '' };
+  const sh = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Memory Settings');
+  if (sh && sh.getLastRow() > 1) sh.getRange(2, 1, sh.getLastRow() - 1, 2).getValues().forEach(([k, v]) => {
+    k = String(k).trim();
+    if (k === 'dueBelow') out.dueBelow = Number(v) || 75;
+    else if (/^growth /.test(k)) out.growth[k.slice(7)] = Number(v) || 1;
+    else if (k) out[k] = String(v);
+  });
+  return out;
+}
+function memSetting_(key, value) {
+  const sh = tab_('Memory Settings', ['key', 'value']), n = sh.getLastRow() - 1;
+  const keys = n > 0 ? sh.getRange(2, 1, n, 1).getValues().map((r) => String(r[0])) : [];
+  const at = keys.indexOf(key);
+  if (at >= 0) sh.getRange(at + 2, 2).setValue(value); else sh.appendRow([key, value]);
+}
+function memScores_() {
+  const sh = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Memory Scores');
+  if (!sh || sh.getLastRow() < 2) return [];
+  const day = (v) => (v instanceof Date ? Utilities.formatDate(v, TZ, 'yyyy-MM-dd') : String(v || ''));
+  return sh.getRange(2, 1, sh.getLastRow() - 1, MEM_SC_HEAD.length).getValues().map((r) => ({ cls: String(r[0]), spec: String(r[1]), S: Number(r[2]) || 4, D: Number(r[3]) || 5,
+    lastEvidence: day(r[4]), lastPct: r[5] === '' ? null : Number(r[5]), reps: Number(r[6]) || 0, lapses: Number(r[7]) || 0, recall: r[8] === '' ? null : Number(r[8]), state: String(r[9]),
+    firstTaught: day(r[10]), reteach: r[11] === true || r[11] === 'TRUE' }));
+}
+// One evidence row per code per question: [{ id, when, cls, spec, source, pct, n, weight, qRef, mainWrong, why, guess }]
+function memEvidence_(data) {
+  const out = [], seqKey = (L) => L.rel || L.unit + '|' + L.title;
+  const lessonOf = {};
+  Object.entries(data.classes || {}).forEach(([cls, c]) => (c.seq || []).forEach((L) => { lessonOf[cls + '|' + seqKey(L)] = L; }));
+  const vs = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('MCQ Votes');
+  if (vs && vs.getLastRow() > 1) vs.getRange(2, 1, vs.getLastRow() - 1, 12).getValues().forEach((r) => {
+    if (!(r[1] instanceof Date) || r[9] === '') return;
+    const L = lessonOf[String(r[2]) + '|' + String(r[3])];
+    ((L && L.spec) || []).forEach((code) => out.push({ id: 'v:' + r[0] + ':' + code, when: Utilities.formatDate(r[1], TZ, 'yyyy-MM-dd'), cls: String(r[2]), spec: code, source: 'vote',
+      pct: Number(r[9]), n: 'votes', weight: 1, qRef: String(r[3]) + ' Q' + r[5], mainWrong: String(r[10]), why: String(r[11]), guess: !!L.specGuess }));
+  });
+  const hw = data.hwSpec || {};
+  readResults_().forEach((r) => {
+    if (r.error || !(r.done > 0) || !r.dueOn) return;
+    const map = hw[String(r.file || '').split('/').pop()] || {};
+    (r.questions || []).forEach((q) => {
+      if (q.pct == null) return;
+      (map[String(q.key)] || []).forEach((code) => out.push({ id: 'h:' + r.id + ':' + q.key + ':' + code, when: r.dueOn, cls: r.cls, spec: code, source: 'homework',
+        pct: q.pct, n: r.done, weight: 2, qRef: r.title + ' Q' + q.key, mainWrong: q.wrong && q.wrong[0] ? String(q.wrong[0].answer) : '', why: '', guess: false }));
+    });
+  });
+  return out;
+}
+// Every lesson code taught on or before today, from the saved weeks: [{ cls, spec, date }]
+function memTaught_(data, weeks, today) {
+  const out = [], seqKey = (L) => L.rel || L.unit + '|' + L.title;
+  Object.values(weeks || {}).forEach((w) => (w.slots || []).forEach((s) => {
+    if (s.kind !== 'lesson' || !s.key || !w.monday) return;
+    const date = Utilities.formatDate(new Date(Utilities.parseDate(w.monday, TZ, 'yyyy-MM-dd').getTime() + (s.day || 0) * 864e5 + 12 * 36e5), TZ, 'yyyy-MM-dd');
+    if (date > today) return;
+    const L = (((data.classes || {})[s.cls] || {}).seq || []).find((x) => seqKey(x) === s.key);
+    ((L && L.spec) || []).forEach((code) => out.push({ cls: s.cls, spec: code, date }));
+  }));
+  return out;
+}
+// The daily update (design 6.3): new evidence appended once, every square recomputed, monthly learning, lineage.
+function memoryUpdate_() {
+  const dw = loadDataWeeks_(true), data = dw.data;
+  if (!data || !data.specIndex) return { none: 'no spec codes in the planner data yet (import planner-data.json from home)' };
+  const M = PlannerMemory, set = memSettings_();
+  const now = new Date(), today = Utilities.formatDate(now, TZ, 'yyyy-MM-dd');
+  const ev = tab_('Memory Evidence', MEM_EV_HEAD), en = ev.getLastRow() - 1;
+  const have = new Set(en > 0 ? ev.getRange(2, 1, en, 1).getValues().map((r) => String(r[0])) : []);
+  const fresh = memEvidence_(data).filter((e) => !have.has(e.id));
+  if (fresh.length) ev.getRange(ev.getLastRow() + 1, 1, fresh.length, MEM_EV_HEAD.length).setValues(fresh.map((e) =>
+    [e.id, e.when, e.cls, '', e.spec, e.source, e.pct, e.n, e.weight, e.qRef, e.mainWrong, e.why, e.guess]));
+  let scores = memScores_();
+  // September carry-forward, once a year (the lineage list is set by hand in Memory Settings)
+  const year = now.getMonth() >= 8 ? now.getFullYear() : now.getFullYear() - 1;
+  if (set.lineage && now.getMonth() >= 8) { const l = M.lineage(scores, set.lineage, year, set.lineageDone); if (l.ran) { scores = l.scores; memSetting_('lineageDone', year); } }
+  const r = M.update(scores, memTaught_(data, dw.weeks, today), fresh, { today, dueBelow: set.dueBelow, growth: set.growth });
+  // monthly learning: the first run of each month, per class, from the evidence each square last had
+  const month = today.slice(0, 7);
+  if (set.growthMonth !== month) {
+    const byCls = {};
+    r.scores.forEach((x) => { if (x.predicted != null && x.lastPct != null) (byCls[x.cls] = byCls[x.cls] || []).push({ predicted: x.predicted, pct: x.lastPct }); });
+    Object.keys(byCls).forEach((c) => memSetting_('growth ' + c, M.adjustGrowth(set.growth[c], byCls[c], set.dueBelow)));
+    memSetting_('growthMonth', month);
+  }
+  const sc = tab_('Memory Scores', MEM_SC_HEAD);
+  if (sc.getLastRow() > 1) sc.getRange(2, 1, sc.getLastRow() - 1, MEM_SC_HEAD.length).clearContent();
+  if (r.scores.length) sc.getRange(2, 1, r.scores.length, MEM_SC_HEAD.length).setValues(r.scores.map((x) =>
+    [x.cls, x.spec, Math.round(x.S * 100) / 100, Math.round(x.D * 100) / 100, x.lastEvidence || '', x.lastPct == null ? '' : Math.round(x.lastPct), x.reps, x.lapses, x.recall, x.state, x.firstTaught || '', x.reteach ? true : '', now]));
+  const red = r.scores.filter((x) => x.state === 'red').length;
+  try { tab_('Log', ['when', 'what', 'where']).appendRow([now, 'memory map updated', fresh.length + ' new evidence rows, ' + r.skipped + ' skipped, ' + r.scores.length + ' squares, ' + red + ' red']); } catch (e) { /* optional */ }
+  return { evidence: fresh.length, skipped: r.skipped, squares: r.scores.length, red };
+}
+// The snapshot that goes home (planner-state.json) and to the planner: { cls: [{ spec, recall, state, reteach, ... }] }
+function readMemory_() {
+  try {
+    const out = {};
+    memScores_().forEach((x) => { (out[x.cls] = out[x.cls] || []).push({ spec: x.spec, recall: x.recall, state: x.state, reteach: x.reteach, lastEvidence: x.lastEvidence, firstTaught: x.firstTaught, S: x.S, reps: x.reps }); });
+    return out;
+  } catch (e) { return {}; }
+}
 // The daily time trigger (public so a trigger can call it; it only reads Forms and writes class counts).
-function dailyResults() { refreshResults_(); pushState_(true); }
+function dailyResults() {
+  refreshResults_();
+  try { memoryUpdate_(); } catch (e) { try { tab_('Log', ['when', 'what', 'where']).appendRow([new Date(), 'memory map not updated', String(e.message || e)]); } catch (e2) { /* optional */ } }
+  pushState_(true);
+}
 // "Turn on daily results": one trigger, 6-7am, never two. Also runs it once now.
 function turnOnDailyResults(k) {
   check_(k);

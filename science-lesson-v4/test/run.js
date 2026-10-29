@@ -939,6 +939,10 @@ async function main() {
   console.log('');
   hardFails += (await require(path.join(__dirname, 'test-review-lesson.test.js')).run()).fails;
 
+  // The memory map's spec index and lesson tags (big goal 1, 2026-10-29).
+  console.log('');
+  { const si = require(path.join(__dirname, 'spec-index.test.js')).run(); hardFails += si.fails; warnings += si.warns; }
+
   // Smoke tests for extension-pick, homework-booklet, paper-snippets and lessonMcqs (2.13, 2026-10-29; temp folder only).
   console.log('');
   { const st = await require(path.join(__dirname, 'smoke-tools.test.js')).run(); hardFails += st.fails; warnings += st.warns; }
@@ -955,6 +959,7 @@ async function main() {
     ['planner/test-ordersheet.js',     'the order sheet drawing', true],
     ['planner/tests/server.test.js',   'the planner server and behaviour app', false],
     ['planner/tests/game.test.js',     "Ulhu's Rituals server", false],
+    ['planner/tests/memory.test.js',   'the memory map maths (fading score, suggestions, lineage)', false],
     ['planner/tests/bundle.test.js',   'the paste files (comments out, size alarm, change record, build stamp)', false],
   ];
   for (const [rel, what, needsData] of PLANNER_CHECKS) {

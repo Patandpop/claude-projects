@@ -6,7 +6,7 @@ Plain-English record of Lane B's work, newest entry first. Each entry says what 
 
 1. **Approve the builder plan for item 1.8 (A-level Drive address).** It touches the lesson builder, so it waits for your yes. The problem: for a Year 12 or 13 lesson the builder writes the wrong Drive address into the two small note files beside the lesson (it says "Year 13/Physics/Chapter 20 ...", but on Drive there is no Physics level and the chapters sit inside Module folders). The files still land in the right place, but the planner uses that note to attach each lesson's multiple-choice questions for the phone voter, so 12C and 13D lessons get none, and the school push uses the same wrong address. The plan: (1) for Year 12 or 13 the builder asks the uploader's own chapter lookup for the real folder and writes that into both notes (when Drive is not reachable it works out the module from the chapter-to-module table the October reorganisation used); (2) check the planner finds 12C and 13D lessons by that address; (3) add a 13D test lesson so it cannot slip back. Nothing on Drive is created, moved or renamed. Reply "yes to 1.8".
 2. **OK to write the Do Now mix rule into SKILL.md?** The picker now aims for 4 short recall questions, one 2-mark explain and one calculation (item 2.1). The plan says the rule only goes into the skill notes with your OK. Reply "yes to the mix rule".
-3. **Next paste set (Lane A makes it):** my planner changes from items 2.2, 2.3, 2.4, 2.7, 2.8 and 2.12 (Planner.html, Code.gs, Phone.html, Behaviour.gs) need to go into the next complete set.
+3. **Next paste set (Lane A makes it):** my planner changes from items 2.2, 2.3, 2.4, 2.7, 2.8 and 2.12 and the memory map (Planner.html, Code.gs, Phone.html, Behaviour.gs, and the new Memory.gs) need to go into the next complete set; after pasting, re-import planner-data.json from home once.
 
 4. **Approve the builder plan for items 2.5 and 2.6 (lesson builder fixes).** They touch the lesson builder, so they wait for your yes. I checked the code itself, since the two audits disagree. What I would change, one at a time, with a test for each:
    - **Sentence starters:** the standard sheet still shows them on its easiest tier (and on any 4+ mark question). Move them to the support sheet only, except where a lesson asks for them on purpose.
@@ -25,13 +25,29 @@ Plain-English record of Lane B's work, newest entry first. Each entry says what 
 7. **Item 2.10, the "last week's homework" slide:** a builder job that needs a mock-up first. I can't publish mock-ups from this chat, so it waits; tell me if you want me to make the mock-up as a file you can open instead.
 
 ---
+## 29 Oct 2026, big goal 1, step 3: the memory map fills itself each morning
+
+**What changed:** the planner's 6am daily job (the one that reads homework results) now also updates the memory map. It turns every ABCD vote and every homework quiz question into a "piece of evidence" for the right part of the specification (once only: running it again adds nothing), gives every lesson you have taught its square, works out each square's colour for today, learns once a month how quickly each class forgets, and writes it all into two new tabs in the planner spreadsheet, "Memory Evidence" and "Memory Scores" (class percentages only, no names). The snapshot also goes home with the rest of the planner state, so the Do Now picker can use it later. One small change from the design: votes are linked to their spec sections when the map updates, not when you tap, so fixing a lesson's code later also fixes its old votes.
+
+**You need to:** nothing yet; the map has no screen until you pick a design (Waiting list). When you next paste, the set includes a new server file, Memory.gs, and the planner data needs re-importing from home once so it carries the spec codes.
+
+**Save:** see the history line "Memory map: the daily update".
+
+## 29 Oct 2026, big goal 1, step 1: every lesson knows its part of the specification
+
+**What changed:** each lesson of your ten classes is now labelled with the part of the specification it teaches, worked out from the real exam questions that match the lesson: 405 lessons from their own questions, 1 by its title (marked as a guess), and 20 with no exam content (safety, assessments). The labels are the exam papers' own section names (for example "Physics: Internal Energy"), so nothing is made up; the official spec numbers can be added later. Year 7 to 9 lessons point at the GCSE sections they lead into, so a Year 9 class's map carries into Year 10; the few Year 7 to 9 topics GCSE does not cover (seasons, eclipses, history of the atom) get their own section. Each homework quiz question is labelled the same way. A test checks every lesson has a label.
+
+**You need to:** nothing.
+
+**Save:** see the history line "Memory map: spec index and lesson tags".
+
 ## 29 Oct 2026, big goal 1, step 2: the memory map's fading score
 
 **What changed:** the maths behind the memory map is built and tested, on its own for now (nothing you can see yet). For each class and each part of the specification it keeps two numbers, how long the class will remember it and how hard it is for them, and works out the predicted % remembered today: green at 85% or more, amber 75 to 84, red under 75, and "?" for taught but never checked. An ABCD vote under 75% right counts as a miss and pulls the square towards red at half strength; homework counts at full strength; a good result pushes it back up, most of all when the class was expected to have forgotten. It also picks the reddest spots for a lesson's suggested Do Now (top 6 ticked, never green or untaught), learns once a month whether its predictions for each class were too hopeful, and carries each class forward in September. One small change from the design, stated in the code: its growth number (20) did not match its own worked example, so I used the standard Anki value, which gives the example's "about 12 days" (11).
 
 **You need to:** nothing yet.
 
-**Save:** see the history line "Memory map: the fading score".
+**Save:** fb200ee4.
 
 ## 29 Oct 2026, item 2.13 (part): smoke tests for four tools
 
