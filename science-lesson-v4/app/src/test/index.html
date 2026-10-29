@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>School test</title>
+<!-- The school test page (lanes/design-installed-app.md 3.12). Two minutes on a school PC: open it, press the one
+     button, read the three results back to the chat. It decides whether the installed app can work at school
+     before anything else is built. It remembers the mailbox address in this browser, never the key. -->
+<style>
+  :root { --ink:#16213a; --soft:#5b6478; --line:#d9dee8; --ok:#1f7a45; --bad:#a3202a; --wait:#9a6a00; --bg:#f6f7fb; }
+  * { box-sizing: border-box; }
+  body { margin:0; font:16px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; color:var(--ink); background:var(--bg); }
+  main { max-width:640px; margin:0 auto; padding:20px 16px 48px; }
+  h1 { font-size:22px; margin:0 0 4px; }
+  .sub { color:var(--soft); margin:0 0 18px; }
+  ol { padding:0; margin:0; list-style:none; counter-reset:c; }
+  li { counter-increment:c; background:#fff; border:1px solid var(--line); border-radius:12px; padding:14px 14px 14px 52px; margin:0 0 12px; position:relative; }
+  li::before { content:counter(c); position:absolute; left:14px; top:13px; width:26px; height:26px; border-radius:50%; background:var(--ink); color:#fff; font-weight:700; text-align:center; line-height:26px; font-size:14px; }
+  li b { display:block; }
+  .res { margin-top:6px; font-weight:600; }
+  .ok { color:var(--ok); } .bad { color:var(--bad); } .wait { color:var(--wait); }
+  label { display:block; font-size:14px; color:var(--soft); margin:10px 0 4px; }
+  input { width:100%; font:inherit; padding:10px 12px; border:1px solid var(--line); border-radius:8px; background:#fff; }
+  button { font:inherit; font-weight:700; border:0; border-radius:10px; padding:12px 18px; cursor:pointer; }
+  .go { background:var(--ink); color:#fff; width:100%; margin:14px 0 18px; font-size:18px; }
+  .copy { background:#e6e9f1; color:var(--ink); }
+  .support { font-size:14px; color:var(--soft); }
+  .support span { display:inline-block; margin:2px 10px 2px 0; }
+  #readback { white-space:pre-wrap; background:#fff; border:1px dashed var(--line); border-radius:8px; padding:10px; font-size:14px; }
+  .stamp { position:fixed; right:6px; bottom:4px; font-size:11px; color:#99a; }
+</style>
+</head>
+<body>
+<main>
+  <h1>School test</h1>
+  <p class="sub">Open this on a school PC, press the button, then read the three results back to the chat.</p>
+
+  <label for="url">Mailbox address (the web app link ending in /exec, from your personal Apps Script)</label>
+  <input id="url" inputmode="url" autocomplete="off" placeholder="https://script.google.com/macros/s/.../exec">
+  <label for="key">Mailbox key</label>
+  <input id="key" autocomplete="off" placeholder="the MAILBOX_KEY value">
+  <button class="go" id="go">Run the test</button>
+
+  <ol>
+    <li><b>Your personal Google sign-in on this PC</b>
+      <div class="res ok" id="r1">Passed: this page opened.</div>
+      <div class="support" id="r1note"></div></li>
+    <li><b>This page can talk to your personal Apps Script</b>
+      <div class="res wait" id="r2">Not run yet: press the button.</div></li>
+    <li><b>Direct updates to the school script</b>
+      <div class="res wait" id="r3">Nothing to do here: Claude tests this from your home PC.</div></li>
+  </ol>
+
+  <p class="support" id="support"></p>
+  <p><b>To read back</b></p>
+  <div id="readback">Press "Run the test" first.</div>
+  <p><button class="copy" id="copy">Copy the results</button></p>
+</main>
+<span class="stamp">build {{BUILD_STAMP}}</span>
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var LS = { get: function (k) { try { return localStorage.getItem(k) || ''; } catch (e) { return ''; } },
+             set: function (k, v) { try { localStorage.setItem(k, v); } catch (e) {} } };
+  $('url').value = LS.get('testMailboxUrl');   // the key is never remembered on a school PC
+
+  // 1: if Cloudflare Access sits in front of the site, reaching this page means the Google sign-in worked.
+  // Access answers /cdn-cgi/access/get-identity with who is signed in; without Access that address is not there.
+  var accessOn = false;
+  $('r1note').textContent = 'Checking whether sign-in is switched on for the site...';
+  fetch('/cdn-cgi/access/get-identity', { credentials: 'same-origin' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
+    accessOn = !!(j && j.email);
+    $('r1note').textContent = accessOn ? 'Signed in through Google sign-in.' : 'Google sign-in is not switched on for the site yet; this still shows the site itself opens on this PC.';
+  }).catch(function () { $('r1note').textContent = 'Google sign-in is not switched on for the site yet; this still shows the site itself opens on this PC.'; });
+
+  // what this browser can do (push notifications, installing as an app, offline)
+  var installSeen = false;
+  window.addEventListener('beforeinstallprompt', function () { installSeen = true; supportLine(); });
+  function has(x) { return x ? 'yes' : 'no'; }
+  function supportLine() {
+    var s = {
+      'Offline files (service worker)': has('serviceWorker' in navigator),
+      'Push notifications': has('PushManager' in window && 'Notification' in window),
+      'Notifications allowed': 'Notification' in window ? Notification.permission : 'no',
+      'Install as an app offered': has(installSeen),
+      'Saved data in the browser': has((function () { try { localStorage.setItem('t', '1'); localStorage.removeItem('t'); return true; } catch (e) { return false; } })())
+    };
+    $('support').innerHTML = '<b>This browser</b><br>' + Object.keys(s).map(function (k) { return '<span>' + k + ': ' + s[k] + '</span>'; }).join('');
+    return s;
+  }
+  supportLine();
+
+  function show(id, cls, text) { var el = $(id); el.className = 'res ' + cls; el.textContent = text; }
+  function withTimeout(p, ms) { return Promise.race([p, new Promise(function (_, bad) { setTimeout(function () { bad(new Error('no answer after ' + ms / 1000 + ' seconds')); }, ms); })]); }
+
+  // 2: the two shapes Apps Script accepts from another site: a plain GET, and a POST sent as plain text.
+  // Both follow Google's redirect. The POST uses an op the mailbox does not know, so nothing is ever written.
+  function test2(url, key) {
+    var get = withTimeout(fetch(url + (url.indexOf('?') < 0 ? '?' : '&') + 'op=ping&key=' + encodeURIComponent(key), { redirect: 'follow' })
+      .then(function (r) { return r.json(); }), 20000);
+    var post = withTimeout(fetch(url, { method: 'POST', redirect: 'follow', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ key: key, op: 'schoolTest' }) }).then(function (r) { return r.json(); }), 20000);
+    return Promise.all([get.then(function (j) { return { ok: true, j: j }; }, function (e) { return { ok: false, e: e }; }),
+                        post.then(function (j) { return { ok: true, j: j }; }, function (e) { return { ok: false, e: e }; })]);
+  }
+  function verdict(g, p) {
+    if (!g.ok && !p.ok) return ['bad', 'Blocked: ' + (g.e && g.e.message || g.e) + '. The school network or browser stops this page reaching Google.'];
+    if (g.ok && g.j && g.j.ok === false && /Locked/.test(g.j.error || '')) return ['bad', 'Reached Google, but the key was not accepted. Check the key and try again.'];
+    var getOk = g.ok && g.j && g.j.ok === true;
+    var postOk = p.ok && p.j && (p.j.ok === true || /Unknown request/.test(p.j.error || ''));
+    if (getOk && postOk) return ['ok', 'Works: reading and sending both reached your personal Apps Script.'];
+    if (getOk) return ['bad', 'Half works: reading reached it, sending did not (' + (p.ok ? JSON.stringify(p.j) : (p.e && p.e.message)) + ').'];
+    return ['bad', 'Did not work: ' + (g.ok ? JSON.stringify(g.j) : (g.e && g.e.message)) + '.'];
+  }
+
+  $('go').onclick = function () {
+    var url = $('url').value.trim(), key = $('key').value.trim();
+    LS.set('testMailboxUrl', url);
+    if (!/^https:\/\/script\.google(usercontent)?\.com\//.test(url) || !key) { show('r2', 'bad', 'Paste the mailbox address (starts https://script.google.com/) and the key first.'); return; }
+    show('r2', 'wait', 'Checking...');
+    test2(url, key).then(function (res) {
+      var v = verdict(res[0], res[1]); show('r2', v[0], v[1]); readBack();
+    });
+  };
+  function readBack() {
+    var s = supportLine();
+    var t = '1. ' + $('r1').textContent + (accessOn ? ' (Google sign-in on)' : ' (Google sign-in not on yet)') + '\n' +
+            '2. ' + $('r2').textContent + '\n' +
+            '3. ' + $('r3').textContent + '\n' +
+            'Browser: ' + Object.keys(s).map(function (k) { return k + ' ' + s[k]; }).join(', ') + '\n' +
+            'Page build {{BUILD_STAMP}}';
+    $('readback').textContent = t; return t;
+  }
+  $('copy').onclick = function () {
+    var t = readBack();
+    if (navigator.clipboard) navigator.clipboard.writeText(t).then(function () { $('copy').textContent = 'Copied'; }, function () {});
+  };
+})();
+</script>
+</body>
+</html>

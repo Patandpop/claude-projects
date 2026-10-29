@@ -1,0 +1,5 @@
+# Cloudflare Pages headers for the installed app: no other site may frame it, and browsers never guess file types.
+/*
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: no-referrer
