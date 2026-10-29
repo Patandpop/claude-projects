@@ -1,0 +1,10 @@
+LANE A: Ulhu game (builder, Opus)
+
+Repo C:\Users\magda\claude-projects\science-lesson-v4, branch pre-reskin. Read CLAUDE.md, lanes/COMMON.md, the FABLE-WORKPLAN.md Part B rules, and lanes/log-A.md if it exists (to resume). Then build in this order, skipping anything FABLE-WORKLOG.md or your log shows finished (grep the code before believing either):
+1. Phase 1 Ulhu items 1.9 to 1.16.
+2. Phase 1U in this order: 1U.13 (the omens and rituals bug list), 1U.1, 1U.2, 1U.3, 1U.4, 1U.5, then 1U.6 + 1U.9 Night Market and haggle (replica/design/grills/night-market.md wins), 1U.10 Grimoire, 1U.12 loading screens, 1U.11 Big Moments (3 variations of each, mock-ups first, he picks), 1U.7.
+3. Wall and golems: mock-ups first from replica/design/grills/wall-golems-inscriptions.md; he picks; then build.
+4. Phase 3 (Ulhu's new screens) in plan order.
+5. Big goal 3, Ulhu as a life companion (replica/design/grills/ulhu-companion.md).
+6. Big goal 4, Ulhu for a friend, LAST, only when everything above is finished (replica/design/grills/ulhu-friend.md).
+After every few items that change the planner, make one complete paste set (rules in COMMON.md) and add it to your Waiting list. Start now.

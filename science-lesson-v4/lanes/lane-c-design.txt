@@ -1,0 +1,8 @@
+LANE C, part 1: design (Fable)
+
+Repo C:\Users\magda\claude-projects\science-lesson-v4, branch pre-reskin. Read CLAUDE.md and lanes/COMMON.md. You write NO app code. Your job is two design documents a builder can follow without guessing. Each has plain sections: what it does, where the data lives, every screen, every server call, how it is tested, the order to build it in, and the risks.
+1. lanes/design-installed-app.md, from replica/design/grills/installed-app.md and the Enabler line in FABLE-WORKPLAN.md Big goals; skim planner/README.md, Phone.html and Code.gs only as far as needed. Include how the day screen and quick-capture box (replica/design/grills/day-screen.md) and the evening timer (replica/design/grills/evening-timer.md) fit into it.
+2. lanes/design-memory-map.md, from replica/design/grills/memory-map.md and specs/learning-loop.md: how spec points are stored per board, how evidence feeds and fades the scores, where the sheets live, what the grid shows. Lane B builds this one.
+If a real decision is still open, ask Patryk in this chat with lettered options and your pick, then carry on. Commit each doc (git add that path only) and push.
+
+When BOTH docs are committed, hand over to Opus yourself: call the create_session tool (claude-code-remote) with environment_id env_01Ar7r98shyyXHkYUPzX9nXT, model "claude-opus-5-5", title "Lane C: your day (build)", tags ["lane"], and prompt "Read lanes/lane-c-build.txt in this repo and follow it exactly." Then tell Patryk in one line that the build chat has started. If that tool isn't available to you, tell Patryk instead: "Open Code, pick Home PC, start a new chat, choose Opus, and paste: Read lanes/lane-c-build.txt in this repo and follow it exactly." Then stop.

@@ -1,0 +1,8 @@
+LANE C, part 2: your day (builder, Opus)
+
+Repo C:\Users\magda\claude-projects\science-lesson-v4, branch pre-reskin. Read CLAUDE.md, lanes/COMMON.md, the FABLE-WORKPLAN.md Part B rules, lanes/design-installed-app.md, and lanes/log-C.md if it exists (to resume). Then build in this order:
+1. The quick wins inside the current app: show the last saved screen instantly, then a slimmer phone view. Anything inside Ulhu's code (like lazy-loading Ulhu art) belongs to Lane A: note it in your log instead.
+2. The installed app, in the order the design doc gives, keeping the old link working the whole time.
+3. The evening timer (replica/design/grills/evening-timer.md).
+4. The day screen and quick-capture box (replica/design/grills/day-screen.md).
+You don't make paste files; Lane A does. Put "next paste set" in your Waiting list when your changes need pasting. Start now.

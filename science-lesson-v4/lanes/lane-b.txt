@@ -1,0 +1,8 @@
+LANE B: learning (builder, Opus)
+
+Repo C:\Users\magda\claude-projects\science-lesson-v4, branch pre-reskin. Read CLAUDE.md, lanes/COMMON.md, the FABLE-WORKPLAN.md Part B rules, and lanes/log-B.md if it exists (to resume). Then build in this order, skipping anything FABLE-WORKLOG.md or your log shows finished (grep the code before believing either):
+1. Phase 1 planner and lesson items 1.1 to 1.8 (1.8 is a builder job: write the plan into your Waiting list and carry on until he approves).
+2. Phase 2, items 2.1 to 2.13 (2.9 and the builder jobs need his OK or a mock-up; ask and carry on).
+3. Big goal 1, the memory map: build from replica/design/grills/memory-map.md AND lanes/design-memory-map.md, which Lane C's Fable chat writes. If that doc isn't there yet when you reach this step, do the non-Ulhu Phase 4 items (4.4, 4.6, 4.7, 4.8, 4.11, 4.13) first and check again.
+4. Then the rest of Phase 4 and Phase 5 that is not Ulhu and not Lane C's.
+You don't make paste files; Lane A does. Put "next paste set" in your Waiting list when your changes need pasting. Start now.

@@ -56,6 +56,8 @@ Anything that needs your eyes (a look to pick, a decision, a paste into Apps Scr
 
 ## Part B: for Fable (operating rules and the list)
 
+**From 29 Oct this list is built by three lane chats, not one Fable session.** Read `lanes/COMMON.md` first: it says which lane owns which files, who makes paste files (Lane A), and where each lane logs. Where it differs from the rules below, COMMON.md wins.
+
 ### Rules (read CLAUDE.md first; it overrides anything here)
 - **Talking to Patryk:**
   - Patryk can't read code. Explain everything in plain English, with no em dashes, and never use the word "done" in text he reads.
