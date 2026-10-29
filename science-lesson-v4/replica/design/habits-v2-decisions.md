@@ -293,3 +293,10 @@ Patryk's answers, in grill order. Mock-ups follow each area.
 - Haggle prize (PERMANENT): win on ONE item, discount by dice left (5 or 4 = 25%, 3 = 20%, 2 = 15%, 1 = 10%); lose = +10% on that item today. Replaces the flat 20% stall discount.
 - Grimoire BG1 Candlelit desk and the book: amazing, approved. But the opened book must show the stained-glass day overview (Oracle glass style).
 - Big Moments (LU/FA/DP): liked. Wall / Golems / Inscriptions: wanted, but the mock-ups were not understandable; refine them after grilling Patryk when the time comes.
+
+### 29 Oct, Big Moments and Wall/Golems picks
+- 3 variations of each next: LU2 The Falls (the zoom-in), FA2 Ink in the Water (best), DP3 The Gate (awesome).
+- FA2: no seaweed on Ulhu afterwards; he rejuvenates bit by bit over time, with a better recovery animation.
+- Faint rule changed: 3 rituals on day 1 = 1/4 of the lost runes back, 3 rituals on day 2 = another 1/4. Levelling up also heals.
+- The Rise tablet is disliked: replace it with 3 of something at the top of The Call (no inscription) that light up as rituals are done, perhaps with the ritual pentagram sigil.
+- Golems: Year 7 is horrifying, the rest great; add a Year 12 PAG version; improve all. Stone inscription: unclear what it is. Wall: purpose and link to keeping ahead unclear; revamp it 3 ways, one in stained glass. All later.

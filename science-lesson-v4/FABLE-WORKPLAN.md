@@ -190,8 +190,16 @@ Ulhu (details: `docs/audits-2026-10-28/ulhu-deep-audit.html`):
 - **1U.8 (next big Ulhu idea) A desktop version of Ulhu** for the planner on the PC: plan and mock-up first, Patryk picks.
 - **1U.9 Haggle prize = one item, by dice kept** (Patryk 29 Oct, PERMANENT rule, do not change it, replaces the flat 20% off the whole stall). You haggle over the ONE item in the spotlight; a win takes money off that item by the dice you still have left (5 dice each): 5 or 4 left = 25%, 3 = 20%, 2 = 15%, 1 = 10% (habits-v2-decisions.md line ~121); a loss puts +10% on that item today, and that item can't be haggled again today. Update Game.gs, game-den.js and the checks.
 - **1U.10 Grimoire: BG1 Candlelit desk + the book (T1 + T4) are approved; build them.** When the book OPENS it must land on the **stained-glass day overview** (the Oracle glass style: the day's star / middle mark / moon in two rings of real stained glass, gold eye), not the current page. Mock-up the opened page first, Patryk picks, then build.
-- **Big Moments (LU/FA/DP): Patryk likes them** (29 Oct). Build them after 1U.10; show him the three sets again side by side to confirm which one of each before building.
-- **Wall / Golems / Inscriptions (SW/PG/IN): KEEP, but REFINE before building** (29 Oct: the current mock-ups "didn't make sense, not understandable"). Do NOT build the current versions and do NOT redesign on your own: when this comes up, GRILL Patryk first (what the wall is for, what golems do, what inscriptions mean to him), then mock-up, he picks, then build.
+- **1U.11 Big Moments** (Patryk 29 Oct, mock-ups replica/design/mockups/moments/). Next round = **3 variations of EACH** of these before building:
+  - **Level up: LU2 The Falls**, he likes how it zooms in.
+  - **Faint: FA2 Ink in the Water is best**, but NO seaweed left on Ulhu afterwards. Instead Ulhu **rejuvenates bit by bit over time**, with a better animation of him coming back.
+  - **Depth passed: DP3 The Gate** is awesome too.
+  - **New faint rule (replaces "3 rituals = half the runes back"):** doing 3 rituals on the first day after fainting gives back **1/4** of the lost runes, and 3 rituals the next day gives another **1/4**, so it still stings. **Levelling up also heals.**
+  - **The "Rise" tablet goes.** Instead, **3 of something sits at the top of The Call** (no inscription), and each one **lights up when a ritual is done**, maybe using the same pentagram sigil as the ritual cards. It should feel part of the rituals, not a separate explicit "do these 3 rituals" card. Offer options in the mock-up.
+- **LATER (not now): Wall / Golems / Inscriptions** (Patryk 29 Oct). Grill Patryk before each, then mock-ups, he picks, then build:
+  - **Paper golems:** good, except the **Year 7 golem is horrifying** (redo it cute). **Missing: a Year 12 variation for PAG marking.** Still try to improve them all.
+  - **Stone inscriptions:** he doesn't know what they're meant to be. Explain the idea plainly, or rethink it.
+  - **The wall (Breakwater):** its purpose and how it links to keeping ahead with lessons is unclear. **Completely revamp it in 3 different ways, one of them in the stained-glass style.**
 
 ### Phase 2: learning loop and daily time-savers
 - **2.1 Do Now picker uses lesson-match.js and question-pool.js.** Mix: 4 short recall, one 2-mark explain, one calculation. The mix rule goes into SKILL.md only with Patryk's OK (put it on the Waiting list).
