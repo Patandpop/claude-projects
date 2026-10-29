@@ -754,6 +754,8 @@ if (require.main === module) {
       filled: Object.fromEntries(ctx.sheets.map((s) => [iso(s.monday), sheetSlots(s).filter((x) => x.rawClass)
         .map((x) => ({ day: x.day, period: x.period, col: x.col, cls: x.cls || x.rawClass, text: x.lesson }))])),
     };
+    // the memory map (big goal 1): spec codes on every lesson and the spec index (spec-index.js)
+    try { console.log('  spec codes on ' + require('./spec-index.js').applyTo(out) + ' lessons'); } catch (e) { console.log('  (spec codes not added: ' + e.message + ')'); }
     fs.writeFileSync(val('export'), JSON.stringify(out));
     console.log(`planner data written: ${val('export')} (${Math.round(fs.statSync(val('export')).size / 1024)} KB, ${Object.keys(classes).length} classes, filled weeks to ${out.filledWeeks.slice(-1)[0]})`);
   } else if (val('catalogue')) {

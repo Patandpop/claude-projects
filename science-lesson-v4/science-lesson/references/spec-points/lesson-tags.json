@@ -1,0 +1,2675 @@
+{
+ "built": "2026-10-29",
+ "note": "Spec codes per lesson (spec-index.js). guess = matched by title, not by its exam questions.",
+ "tags": {
+  "Year 7/Science Skills/Introduction to Science/Lesson 1 - Introduction and Safety": {
+   "codes": [],
+   "none": "no exam questions for this kind of lesson"
+  },
+  "Year 7/Science Skills/Introduction to Science/Lesson 2 - Key Equipment": {
+   "codes": [],
+   "none": "no exam questions for this kind of lesson"
+  },
+  "Year 7/Science Skills/Introduction to Science/Lesson 3 - Measuring and Collecting Data": {
+   "codes": [
+    "Biology: Animal Tissues Organs and Organ Systems",
+    "Chemistry: Reactions of acids"
+   ],
+   "guess": false
+  },
+  "Year 7/Science Skills/Introduction to Science/Lesson 4 - Variables": {
+   "codes": [
+    "Biology: Animal Tissues Organs and Organ Systems",
+    "Biology: Photosynthesis"
+   ],
+   "guess": false
+  },
+  "Year 7/Science Skills/Introduction to Science/Lesson 5 - Results Tables": {
+   "codes": [],
+   "none": "no exam questions for this kind of lesson"
+  },
+  "Year 7/Science Skills/Introduction to Science/Lesson 6 - Bar Graphs": {
+   "codes": [
+    "Biology: Homeostasis",
+    "Biology: Hormonal Coordination in Humans"
+   ],
+   "guess": false
+  },
+  "Year 7/Science Skills/Introduction to Science/Lesson 7 - Line Graphs": {
+   "codes": [
+    "Physics: Current Potential Difference and Resistance",
+    "Chemistry: Exothermic and endothermic reactions"
+   ],
+   "guess": false
+  },
+  "Year 7/Physics/P1 Forces/Lesson 1 - Introduction to Forces": {
+   "codes": [
+    "Physics: Resultant Forces",
+    "Physics: Newtons Second Law"
+   ],
+   "guess": false
+  },
+  "Year 7/Physics/P1 Forces/Lesson 2 - Balanced and Unbalanced Forces": {
+   "codes": [
+    "Physics: Resultant Forces",
+    "Physics: Newtons Second Law"
+   ],
+   "guess": false
+  },
+  "Year 7/Physics/P1 Forces/Lesson 3 - Resultant Forces": {
+   "codes": [
+    "Physics: Resultant Forces",
+    "Physics: Newtons Second Law"
+   ],
+   "guess": false
+  },
+  "Year 7/Physics/P1 Forces/Lesson 4 - Measuring Forces (Optional)": {
+   "codes": [
+    "Physics: Forces and Elasticity"
+   ],
+   "guess": false
+  },
+  "P1 Forces#1|Assessment / marking point": {
+   "codes": [],
+   "none": "an assessment lesson"
+  },
+  "Year 7/Physics/P1 Forces/Lesson 5 - Weight Mass and Gravity": {
+   "codes": [
+    "Physics: Gravity"
+   ],
+   "guess": false
+  },
+  "Year 7/Physics/P1 Forces/Lesson 6 - Core Practical - Stretching Springs": {
+   "codes": [
+    "Physics: Forces and Elasticity"
+   ],
+   "guess": false
+  },
+  "Year 7/Physics/P1 Forces/Lesson 8 - Core Practical - Friction": {
+   "codes": [
+    "Physics: Forces and Braking",
+    "Physics: Contact and Non-Contact Forces"
+   ],
+   "guess": false
+  },
+  "Year 7/Physics/P1 Forces/Lesson 9 - Air Resistance (Optional)": {
+   "codes": [
+    "Physics: Resultant Forces",
+    "Physics: Newtons Second Law"
+   ],
+   "guess": false
+  },
+  "Year 7/Biology/B1 Cells/Lesson 1 MRS GREN": {
+   "codes": [
+    "Biology: Transport in Cells",
+    "Biology: Cell Division"
+   ],
+   "guess": false
+  },
+  "Year 7/Biology/B1 Cells/Lesson 2 - Microscopes": {
+   "codes": [
+    "Biology: Cell Structure"
+   ],
+   "guess": false
+  },
+  "Year 7/Biology/B1 Cells/Lesson 3 - Animal Cells and Plant Cells": {
+   "codes": [
+    "Biology: Cell Structure"
+   ],
+   "guess": false
+  },
+  "Year 7/Biology/B1 Cells/Lesson 4 - Specialised Cells": {
+   "codes": [
+    "Biology: Cell Structure",
+    "Biology: Plant Tissues Organs and Systems"
+   ],
+   "guess": false
+  },
+  "B1 Cells#2|Assessment/Marking Point": {
+   "codes": [],
+   "none": "an assessment lesson"
+  },
+  "Year 7/Biology/B1 Cells/Lesson 5 - Tissues": {
+   "codes": [
+    "Biology: Principles of Organisation",
+    "Biology: Plant Tissues Organs and Systems"
+   ],
+   "guess": false
+  },
+  "Year 7/Biology/B1 Cells/Lesson 6 - Unicellular vs Multicellular": {
+   "codes": [
+    "Biology: Cell Structure"
+   ],
+   "guess": false
+  },
+  "Year 7/Biology/B1 Cells/Lesson 8 - Organ Systems (Optional)": {
+   "codes": [
+    "Biology: Animal Tissues Organs and Organ Systems"
+   ],
+   "guess": false
+  },
+  "Year 7/Chemistry/C1 Particles/Lesson 1 - Properties of Matter": {
+   "codes": [
+    "Chemistry: How bonding and Structure are related to properties of substances"
+   ],
+   "guess": false
+  },
+  "Year 7/Chemistry/C1 Particles/Lesson 2 - States of Matter": {
+   "codes": [
+    "Chemistry: How bonding and Structure are related to properties of substances"
+   ],
+   "guess": false
+  },
+  "Year 7/Chemistry/C1 Particles/Lesson 3 - Using Thermometers": {
+   "codes": [
+    "Chemistry: How bonding and Structure are related to properties of substances"
+   ],
+   "guess": false
+  },
+  "Year 7/Chemistry/C1 Particles/Lesson 4 - Core Practical - Changes of State": {
+   "codes": [
+    "Chemistry: How bonding and Structure are related to properties of substances"
+   ],
+   "guess": false
+  },
+  "C1 Particles#3|Formative assessment": {
+   "codes": [],
+   "none": "an assessment lesson"
+  },
+  "Year 7/Chemistry/C1 Particles/Lesson 5 - Diffusion": {
+   "codes": [
+    "KS3: Particles"
+   ],
+   "guess": false,
+   "ks3": true
+  },
+  "Year 7/Chemistry/C1 Particles/Lesson 6 - Gas Pressure": {
+   "codes": [
+    "KS3: Particles"
+   ],
+   "guess": false,
+   "ks3": true
+  },
+  "Year 7/Chemistry/C2 Atoms, Elements, Compounds and Mixtures/Lesson 1 - Working Safely in the Lab (Optional)": {
+   "codes": [],
+   "none": "no exam questions for this kind of lesson"
+  },
+  "Year 7/Chemistry/C2 Atoms, Elements, Compounds and Mixtures/Lesson 2 - Chemical and Physical Changes (opional)": {
+   "codes": [
+    "Chemistry: Reversible reactions and dynamic equilibrium",
+    "Chemistry: Exothermic and endothermic reactions"
+   ],
+   "guess": false
+  },
+  "Year 7/Chemistry/C2 Atoms, Elements, Compounds and Mixtures/Lesson 3 - Elements": {
+   "codes": [
+    "Chemistry: The Periodic Table"
+   ],
+   "guess": false
+  },
+  "Year 7/Chemistry/C2 Atoms, Elements, Compounds and Mixtures/Lesson 4 - The Periodic Table": {
+   "codes": [
+    "Chemistry: The Periodic Table"
+   ],
+   "guess": false
+  },
+  "C2 Atoms, Elements, Compounds and Mixtures#4|Formative review": {
+   "codes": [
+    "Chemistry: The Periodic Table",
+    "Chemistry: Simple Models; Symbols; RAM; Charge; Isotopes"
+   ],
+   "guess": false
+  },
+  "Year 7/Chemistry/C2 Atoms, Elements, Compounds and Mixtures/Lesson 6 - Componds": {
+   "codes": [
+    "Chemistry: The Periodic Table"
+   ],
+   "guess": false
+  },
+  "Year 7/Chemistry/C2 Atoms, Elements, Compounds and Mixtures/Lesson 7 - Naming Compounds": {
+   "codes": [
+    "Chemistry: The Periodic Table"
+   ],
+   "guess": false
+  },
+  "Year 7/Chemistry/C2 Atoms, Elements, Compounds and Mixtures/Lesson 8 - Chemical Fromula": {
+   "codes": [
+    "Chemistry: The Periodic Table"
+   ],
+   "guess": false
+  },
+  "Year 7/Chemistry/C2 Atoms, Elements, Compounds and Mixtures/Lesson 9 - Core Practical Making Compounds": {
+   "codes": [
+    "Chemistry: The Periodic Table"
+   ],
+   "guess": false
+  },
+  "Year 7/Physics/P2 Energy/Lesson 1 - The Energy Stores": {
+   "codes": [
+    "Physics: National and Global Energy Resources",
+    "Physics: Changes in Energy"
+   ],
+   "guess": false
+  },
+  "Year 7/Physics/P2 Energy/Lesson 2 - The Joule": {
+   "codes": [
+    "Physics: National and Global Energy Resources",
+    "Physics: Efficiency"
+   ],
+   "guess": false
+  },
+  "Year 7/Physics/P2 Energy/Lesson 3 - Energy Pathways": {
+   "codes": [
+    "Physics: Temperature Changes in a System and Specific Heat Capacity",
+    "Physics: National and Global Energy Resources"
+   ],
+   "guess": false
+  },
+  "Year 7/Physics/P2 Energy/Lesson 5 - Sankey Diagrams (optional)": {
+   "codes": [
+    "Physics: National and Global Energy Resources",
+    "Physics: Efficiency"
+   ],
+   "guess": false
+  },
+  "Year 7/Physics/P2 Energy/Lesson 6 - Conduction": {
+   "codes": [
+    "Physics: Temperature Changes in a System and Specific Heat Capacity",
+    "Physics: Energy transfer in a system"
+   ],
+   "guess": false
+  },
+  "Year 7/Physics/P2 Energy/Lesson 7 - Convection": {
+   "codes": [
+    "Physics: Temperature Changes in a System and Specific Heat Capacity"
+   ],
+   "guess": false
+  },
+  "Year 7/Physics/P2 Energy/Lesson 8 - Radiation": {
+   "codes": [
+    "Physics: Temperature Changes in a System and Specific Heat Capacity",
+    "Physics: National and Global Energy Resources"
+   ],
+   "guess": false
+  },
+  "Year 7/Physics/P2 Energy/Lesson 9 - Insulation (optional)": {
+   "codes": [
+    "Physics: Temperature Changes in a System and Specific Heat Capacity",
+    "Physics: Energy transfer in a system"
+   ],
+   "guess": false
+  },
+  "Year 7/Physics/P2 Energy/Lesson 10 - Core Practical - Energy in Food": {
+   "codes": [
+    "Physics: Changes in Energy"
+   ],
+   "guess": true
+  },
+  "P2 Energy#5|Formative review": {
+   "codes": [
+    "Physics: National and Global Energy Resources",
+    "Physics: Temperature Changes in a System and Specific Heat Capacity"
+   ],
+   "guess": false
+  },
+  "Year 7/Biology/B2 Body Systems/Lesson 1 - Response to Exercise": {
+   "codes": [
+    "Biology: Respiration",
+    "Biology: Animal Tissues Organs and Organ Systems"
+   ],
+   "guess": false
+  },
+  "Year 7/Biology/B2 Body Systems/Lesson 2 - Fitness and Respiration": {
+   "codes": [
+    "Biology: Respiration",
+    "Biology: Animal Tissues Organs and Organ Systems"
+   ],
+   "guess": false
+  },
+  "Year 7/Biology/B2 Body Systems/Lesson 3 - The Structure of the Lungs": {
+   "codes": [
+    "Biology: Animal Tissues Organs and Organ Systems"
+   ],
+   "guess": false
+  },
+  "Year 7/Biology/B2 Body Systems/Lesson 4 - Breathing and the Alveoli": {
+   "codes": [
+    "Biology: Animal Tissues Organs and Organ Systems",
+    "Biology: Respiration"
+   ],
+   "guess": false
+  },
+  "Year 7/Biology/B2 Body Systems/Lesson 5 Effects of Smoking and Vaping": {
+   "codes": [
+    "Biology: Animal Tissues Organs and Organ Systems",
+    "Biology: Communicable Diseases"
+   ],
+   "guess": false
+  },
+  "Year 7/Biology/B2 Body Systems/Lesson 6 - Muscles and Antagonistic Pairs": {
+   "codes": [
+    "Biology: Respiration",
+    "Biology: Animal Tissues Organs and Organ Systems"
+   ],
+   "guess": false
+  },
+  "Year 7/Biology/B2 Body Systems/Lesson 7 - Skeletons and Joints": {
+   "codes": [
+    "Biology: Development of Understanding of Genetics and Evolution",
+    "Biology: Cell Division"
+   ],
+   "guess": false
+  },
+  "Year 7/Biology/B2 Body Systems/Lesson 8 - Core Practical - Lung Dissection": {
+   "codes": [
+    "Biology: Animal Tissues Organs and Organ Systems"
+   ],
+   "guess": false
+  },
+  "Year 7/Biology/B2 Body Systems/Lesson 9 - Drugs (Optional)": {
+   "codes": [
+    "Biology: Communicable Diseases",
+    "Biology: Hormonal Coordination in Humans"
+   ],
+   "guess": false
+  },
+  "Year 7/Chemistry/C3 Separating Mixtures/Lesson 1 - Chromatography": {
+   "codes": [
+    "Chemistry: Using the Earths resources and obtaining potable water"
+   ],
+   "guess": false
+  },
+  "Year 7/Chemistry/C3 Separating Mixtures/Lesson 2 - Solute, Solvent and Solution": {
+   "codes": [
+    "Chemistry: Using the Earths resources and obtaining potable water"
+   ],
+   "guess": false
+  },
+  "Year 7/Chemistry/C3 Separating Mixtures/Lesson 3 - Factors Affecting Solubility": {
+   "codes": [
+    "Chemistry: Using the Earths resources and obtaining potable water"
+   ],
+   "guess": false
+  },
+  "Year 7/Chemistry/C3 Separating Mixtures/Lesson 4 - Saturated Solution": {
+   "codes": [
+    "Chemistry: Using the Earths resources and obtaining potable water"
+   ],
+   "guess": false
+  },
+  "Year 7/Chemistry/C3 Separating Mixtures/Lesson 5 - Filtration (Optional)": {
+   "codes": [
+    "Chemistry: Using the Earths resources and obtaining potable water"
+   ],
+   "guess": false
+  },
+  "Year 7/Chemistry/C3 Separating Mixtures/Lesson 6 - Distillation": {
+   "codes": [
+    "Chemistry: Using the Earths resources and obtaining potable water"
+   ],
+   "guess": false
+  },
+  "Year 7/Chemistry/C3 Separating Mixtures/Lesson 7 - Separating Iron, Salt and Sand": {
+   "codes": [
+    "Chemistry: Using the Earths resources and obtaining potable water"
+   ],
+   "guess": false
+  },
+  "Year 7/Biology/B3 Human and Plant Reproduction/Lesson 1 - Puberty": {
+   "codes": [
+    "Biology: Hormonal Coordination in Humans"
+   ],
+   "guess": false
+  },
+  "Year 7/Biology/B3 Human and Plant Reproduction/Lesson 2 - The Menstrual Cycle": {
+   "codes": [
+    "Biology: Hormonal Coordination in Humans"
+   ],
+   "guess": false
+  },
+  "Year 7/Biology/B3 Human and Plant Reproduction/Lesson 3 - Fertilisation": {
+   "codes": [
+    "Biology: Reproduction",
+    "Biology: Hormonal Coordination in Humans"
+   ],
+   "guess": false
+  },
+  "Year 7/Biology/B3 Human and Plant Reproduction/Lesson 4 - Contraception": {
+   "codes": [
+    "Biology: Hormonal Coordination in Humans"
+   ],
+   "guess": false
+  },
+  "Year 7/Biology/B3 Human and Plant Reproduction/Lesson 5 - Foetal Development": {
+   "codes": [
+    "Biology: Reproduction",
+    "Biology: Hormonal Coordination in Humans"
+   ],
+   "guess": false
+  },
+  "Year 7/Biology/B3 Human and Plant Reproduction/Lesson 6 - Fertility Treatment (IVF)": {
+   "codes": [
+    "Biology: Hormonal Coordination in Humans",
+    "Biology: Reproduction"
+   ],
+   "guess": false
+  },
+  "Year 7/Biology/B3 Human and Plant Reproduction/Lesson 7 - Structure of a Flower": {
+   "codes": [
+    "Biology: Reproduction",
+    "Biology: Plant Tissues Organs and Systems"
+   ],
+   "guess": false
+  },
+  "Year 7/Biology/B3 Human and Plant Reproduction/Lesson 8 - Pollination and Fertilisation": {
+   "codes": [
+    "Biology: Reproduction"
+   ],
+   "guess": false
+  },
+  "Year 7/Physics/P3 Sound and Waves/Lesson 1 - Core Practical - Investigating Sound": {
+   "codes": [
+    "Physics: Waves in Air Fluid and Solids"
+   ],
+   "guess": false
+  },
+  "Year 7/Physics/P3 Sound and Waves/Lesson 2 - Transverse and Longitudinal": {
+   "codes": [
+    "Physics: Waves in Air Fluid and Solids"
+   ],
+   "guess": false
+  },
+  "Year 7/Physics/P3 Sound and Waves/Lesson 3 - Amplitude and Volume": {
+   "codes": [
+    "Physics: Waves in Air Fluid and Solids"
+   ],
+   "guess": false
+  },
+  "Year 7/Physics/P3 Sound and Waves/Lesson 4 - Pitch and Frequency": {
+   "codes": [
+    "Physics: Waves in Air Fluid and Solids"
+   ],
+   "guess": false
+  },
+  "Year 7/Physics/P3 Sound and Waves/Lesson 5 - The Ear": {
+   "codes": [
+    "Physics: Waves in Air Fluid and Solids"
+   ],
+   "guess": false
+  },
+  "Year 7/Physics/P3 Sound and Waves/Lesson 7 - Sound Proofing": {
+   "codes": [
+    "Physics: Waves in Air Fluid and Solids"
+   ],
+   "guess": false
+  },
+  "Year 7/Chemistry/C4 Introduction to Reactions/Lesson 1 - Conservation of Mass": {
+   "codes": [
+    "Chemistry: Reactivity of metals",
+    "Chemistry: Exothermic and endothermic reactions"
+   ],
+   "guess": false
+  },
+  "Year 7/Chemistry/C4 Introduction to Reactions/Lesson 2 - Thermal Decomposition": {
+   "codes": [
+    "Chemistry: Exothermic and endothermic reactions",
+    "Chemistry: Carbon compounds as fuels and feedstock"
+   ],
+   "guess": false
+  },
+  "Year 7/Chemistry/C4 Introduction to Reactions/Lesson 3 - Fire Triangle": {
+   "codes": [
+    "Chemistry: Carbon compounds as fuels and feedstock",
+    "Chemistry: Common atmospheric pollutants and their sources"
+   ],
+   "guess": false
+  },
+  "Year 7/Chemistry/C4 Introduction to Reactions/Lesson 4 - Combustion": {
+   "codes": [
+    "Chemistry: Carbon compounds as fuels and feedstock",
+    "Chemistry: Common atmospheric pollutants and their sources"
+   ],
+   "guess": false
+  },
+  "Year 7/Chemistry/C4 Introduction to Reactions/Lesson 5 - Incomplete Combustion": {
+   "codes": [
+    "Chemistry: Common atmospheric pollutants and their sources",
+    "Chemistry: Carbon compounds as fuels and feedstock"
+   ],
+   "guess": false
+  },
+  "Year 7/Biology/B4 Interdependence/Lesson 1 - The Wooly Mammoth": {
+   "codes": [
+    "Biology: Development of Understanding of Genetics and Evolution"
+   ],
+   "guess": false
+  },
+  "Year 7/Biology/B4 Interdependence/Lesson 2 - Physical Adaptations": {
+   "codes": [
+    "Biology: Adaptations Interdependence and Competition"
+   ],
+   "guess": false
+  },
+  "Year 7/Biology/B4 Interdependence/Lesson 3 - Behavioural  Adaptations": {
+   "codes": [
+    "Biology: Adaptations Interdependence and Competition",
+    "Biology: Classification of Living Organisms"
+   ],
+   "guess": false
+  },
+  "Year 7/Biology/B4 Interdependence/Lesson 4 - Classification": {
+   "codes": [
+    "Biology: Classification of Living Organisms",
+    "Biology: Development of Understanding of Genetics and Evolution"
+   ],
+   "guess": false
+  },
+  "Year 7/Biology/B4 Interdependence/Lesson 5 - Predator prey Relationships (optional)": {
+   "codes": [
+    "Biology: Adaptations Interdependence and Competition",
+    "Biology: Development of Understanding of Genetics and Evolution"
+   ],
+   "guess": false
+  },
+  "Year 7/Biology/B4 Interdependence/Lesson 6 - Instincts (Optional)": {
+   "codes": [],
+   "none": "no exam questions for this kind of lesson"
+  },
+  "Year 7/Biology/B4 Interdependence/Lesson 7 - Classification": {
+   "codes": [
+    "Biology: Classification of Living Organisms",
+    "Biology: Development of Understanding of Genetics and Evolution"
+   ],
+   "guess": false
+  },
+  "Year 7/Biology/B4 Interdependence/Lesson 8 - Food Chains": {
+   "codes": [
+    "Biology: Trophic Levels in an Ecosystem",
+    "Biology: Organisation of an Ecosystem"
+   ],
+   "guess": false
+  },
+  "Year 7/Biology/B4 Interdependence/Lesson 9 - Pyramids of numbers and Biomass": {
+   "codes": [
+    "Biology: Trophic Levels in an Ecosystem",
+    "Biology: Organisation of an Ecosystem"
+   ],
+   "guess": false
+  },
+  "Year 7/Biology/B4 Interdependence/Lesson 10 - Food Chains": {
+   "codes": [
+    "Biology: Trophic Levels in an Ecosystem",
+    "Biology: Organisation of an Ecosystem"
+   ],
+   "guess": false
+  },
+  "Year 7/Biology/B4 Interdependence/Lesson 11 - Pyramids of Numbers and Biomass": {
+   "codes": [
+    "Biology: Trophic Levels in an Ecosystem",
+    "Biology: Organisation of an Ecosystem"
+   ],
+   "guess": false
+  },
+  "Year 7/Biology/B4 Interdependence/Lesson 12 - Food Webs": {
+   "codes": [
+    "Biology: Organisation of an Ecosystem",
+    "Biology: Trophic Levels in an Ecosystem"
+   ],
+   "guess": false
+  },
+  "Year 7/Biology/B4 Interdependence/Lesson 13 - ICT Endangered Species (Optional)": {
+   "codes": [
+    "Biology: Development of Understanding of Genetics and Evolution",
+    "Biology: Biodiversity and Effect of Human Interaction on Ecosystems"
+   ],
+   "guess": false
+  },
+  "Year 7/Biology/B4 Interdependence/Lesson 14 - Seasonal Adaptations (Optional)": {
+   "codes": [
+    "Biology: Adaptations Interdependence and Competition",
+    "Biology: Biodiversity and Effect of Human Interaction on Ecosystems"
+   ],
+   "guess": false
+  },
+  "Year 7/Physics/P4 Earth in Space/Lesson 1 - Days and Years": {
+   "codes": [
+    "Physics: Solar System and Stability of Orbital Motions and Satellites"
+   ],
+   "guess": false
+  },
+  "Year 7/Physics/P4 Earth in Space/Lesson 2 - Phases of the Moon": {
+   "codes": [
+    "Physics: Solar System and Stability of Orbital Motions and Satellites"
+   ],
+   "guess": false
+  },
+  "Year 7/Physics/P4 Earth in Space/Lesson 3 - Eclipse": {
+   "codes": [
+    "KS3: Earth in Space"
+   ],
+   "guess": false,
+   "ks3": true
+  },
+  "Year 7/Physics/P4 Earth in Space/Lesson 4 - Seasons": {
+   "codes": [
+    "KS3: Earth in Space"
+   ],
+   "guess": false,
+   "ks3": true
+  },
+  "Year 7/Physics/P4 Earth in Space/Lesson 5 - The Planets": {
+   "codes": [
+    "Physics: Solar System and Stability of Orbital Motions and Satellites"
+   ],
+   "guess": false
+  },
+  "P4 Earth in Space#13|DIRT formative assessment": {
+   "codes": [],
+   "none": "an assessment lesson"
+  },
+  "Year 7/Physics/P4 Earth in Space/Lesson 6 - Meteors and Meteorites (optional)": {
+   "codes": [
+    "Physics: Red Shift",
+    "Physics: Solar System and Stability of Orbital Motions and Satellites"
+   ],
+   "guess": false
+  },
+  "Year 7/Physics/P4 Earth in Space/Lesson 7 - Life Cycles of Stars (optional)": {
+   "codes": [
+    "Physics: Solar System and Stability of Orbital Motions and Satellites"
+   ],
+   "guess": false
+  },
+  "Year 7/Physics/P4 Earth in Space/Lesson 8 - The universe and the big bang (optional)": {
+   "codes": [
+    "Physics: Red Shift"
+   ],
+   "guess": false
+  },
+  "Year 7/Physics/P4 Earth in Space/Lesson 9 - ICT Crater Hunting (Optional)": {
+   "codes": [
+    "Physics: Red Shift"
+   ],
+   "guess": false
+  },
+  "Year 7/Physics/P4 Earth in Space/Lesson 11 - Planet Data Analysis Task (Optional)": {
+   "codes": [
+    "Physics: Solar System and Stability of Orbital Motions and Satellites"
+   ],
+   "guess": false
+  },
+  "Year 8/Biology/B1 Respiration and Photosythesis/Lesson 1 - Aerobic Respiration": {
+   "codes": [
+    "Biology: Respiration"
+   ],
+   "guess": false
+  },
+  "Year 8/Biology/B1 Respiration and Photosythesis/Lesson 2 - Anaerobic Respiration": {
+   "codes": [
+    "Biology: Respiration"
+   ],
+   "guess": false
+  },
+  "Year 8/Biology/B1 Respiration and Photosythesis/Lesson 3 - Fermentation in Yeast Experiment": {
+   "codes": [
+    "Biology: Respiration"
+   ],
+   "guess": false
+  },
+  "Year 8/Biology/B1 Respiration and Photosythesis/Lesson 4 - Formative Assessment": {
+   "codes": [],
+   "none": "an assessment lesson"
+  },
+  "Year 8/Biology/B1 Respiration and Photosythesis/Lesson 5 - Photosythesis": {
+   "codes": [
+    "Biology: Photosynthesis"
+   ],
+   "guess": false
+  },
+  "Year 8/Biology/B1 Respiration and Photosythesis/Lesson 6 - Rate of Photosythesis Experiment": {
+   "codes": [
+    "Biology: Photosynthesis",
+    "Biology: Respiration"
+   ],
+   "guess": false
+  },
+  "Year 8/Biology/B1 Respiration and Photosythesis/Lesson 7 - Starch in Leaves": {
+   "codes": [
+    "Biology: Photosynthesis",
+    "Biology: Respiration"
+   ],
+   "guess": false
+  },
+  "Year 8/Biology/B1 Respiration and Photosythesis/Lesson 7a - Respiration and Photosynthesis Review Lesson": {
+   "codes": [
+    "Biology: Respiration",
+    "Biology: Photosynthesis"
+   ],
+   "guess": false
+  },
+  "Year 8/Physics/P1 Motion and Pressure/Lesson 1 - Calculating Pressure": {
+   "codes": [
+    "Physics: Pressure in a Fluid",
+    "Physics: Particle Model and Pressure"
+   ],
+   "guess": false
+  },
+  "Year 8/Physics/P1 Motion and Pressure/Lesson 2 - Pressure on a Surface": {
+   "codes": [
+    "Physics: Pressure in a Fluid",
+    "Physics: Particle Model and Pressure"
+   ],
+   "guess": false
+  },
+  "Year 8/Physics/P1 Motion and Pressure/Lesson 3 - Air Pressure": {
+   "codes": [
+    "Physics: Atmospheric Pressure",
+    "Physics: Pressure in a Fluid"
+   ],
+   "guess": false
+  },
+  "Year 8/Physics/P1 Motion and Pressure/Lesson 4 - Pressure in Fluids": {
+   "codes": [
+    "Physics: Pressure in a Fluid",
+    "Physics: Particle Model and Pressure"
+   ],
+   "guess": false
+  },
+  "Year 8/Physics/P1 Motion and Pressure/Lesson 5 - Calculating Speed": {
+   "codes": [
+    "Physics: Distance Time Relationship",
+    "Physics: Speed"
+   ],
+   "guess": false
+  },
+  "Year 8/Physics/P1 Motion and Pressure/Lesson 6 - Speed Investigation (optional)": {
+   "codes": [
+    "Physics: Distance Time Relationship"
+   ],
+   "guess": false
+  },
+  "Year 8/Physics/P1 Motion and Pressure/Lesson 7 - Distance vs Time Graphs": {
+   "codes": [
+    "Physics: Distance Time Relationship"
+   ],
+   "guess": false
+  },
+  "Year 8/Physics/P3 Light/Lesson 1 - Reflection": {
+   "codes": [
+    "Physics: Waves in Air Fluid and Solids",
+    "Physics: Electromagnetic Waves"
+   ],
+   "guess": false
+  },
+  "Year 8/Physics/P3 Light/Lesson 2 - Refraction": {
+   "codes": [
+    "Physics: Electromagnetic Waves",
+    "Physics: Waves in Air Fluid and Solids"
+   ],
+   "guess": false
+  },
+  "Year 8/Physics/P3 Light/Lesson 3 - Lenses": {
+   "codes": [
+    "Physics: Electromagnetic Waves"
+   ],
+   "guess": false
+  },
+  "Year 8/Physics/P3 Light/Lesson 4 - Dispersion and Colour Mixing": {
+   "codes": [
+    "Physics: Electromagnetic Waves",
+    "Physics: Waves in Air Fluid and Solids"
+   ],
+   "guess": false
+  },
+  "Year 8/Physics/P3 Light/Lesson 5 - Reflecting Colour": {
+   "codes": [
+    "Physics: Electromagnetic Waves",
+    "Physics: Waves in Air Fluid and Solids"
+   ],
+   "guess": false
+  },
+  "Year 8/Biology/B2 Health and Digestion/Lesson 1 - Nutrients": {
+   "codes": [
+    "Biology: Animal Tissues Organs and Organ Systems"
+   ],
+   "guess": false
+  },
+  "Year 8/Biology/B2 Health and Digestion/Lesson 2 - Food Tests - Glucose": {
+   "codes": [
+    "Biology: Animal Tissues Organs and Organ Systems"
+   ],
+   "guess": false
+  },
+  "Year 8/Biology/B2 Health and Digestion/Lesson 3 - Food Tests - Protein and Starch and Fats": {
+   "codes": [
+    "Biology: Animal Tissues Organs and Organ Systems"
+   ],
+   "guess": false
+  },
+  "Year 8/Biology/B2 Health and Digestion/Lesson 4 - Nutritional Value of Food (optional)": {
+   "codes": [
+    "Biology: Animal Tissues Organs and Organ Systems"
+   ],
+   "guess": false
+  },
+  "B2 Health and Digestion#3|Formative review": {
+   "codes": [
+    "Biology: Animal Tissues Organs and Organ Systems"
+   ],
+   "guess": false
+  },
+  "Year 8/Biology/B2 Health and Digestion/Lesson 5 -Digestive System": {
+   "codes": [
+    "Biology: Animal Tissues Organs and Organ Systems"
+   ],
+   "guess": false
+  },
+  "Year 8/Biology/B2 Health and Digestion/Lesson 6 - Enzymes": {
+   "codes": [
+    "Biology: Animal Tissues Organs and Organ Systems"
+   ],
+   "guess": false
+  },
+  "Year 8/Biology/B3 Inheritance, Variation and Evolution/Lesson 1 - Discontinuous Variation": {
+   "codes": [
+    "Biology: Reproduction",
+    "Biology: Variation and Evolution"
+   ],
+   "guess": false
+  },
+  "Year 8/Biology/B3 Inheritance, Variation and Evolution/Lesson 2 - Continuous Variation": {
+   "codes": [
+    "Biology: Reproduction",
+    "Biology: Variation and Evolution"
+   ],
+   "guess": false
+  },
+  "Year 8/Biology/B3 Inheritance, Variation and Evolution/Lesson 3 - Inherited and Environmental Variation": {
+   "codes": [
+    "Biology: Reproduction",
+    "Biology: Variation and Evolution"
+   ],
+   "guess": false
+  },
+  "Year 8/Biology/B3 Inheritance, Variation and Evolution/Lesson 4 - Chromosomes and Biological Sex": {
+   "codes": [
+    "Biology: Reproduction",
+    "Biology: Variation and Evolution"
+   ],
+   "guess": false
+  },
+  "Year 8/Biology/B3 Inheritance, Variation and Evolution/Lesson 5 - Classification by Common Characteristics": {
+   "codes": [
+    "Biology: Classification of Living Organisms",
+    "Biology: Development of Understanding of Genetics and Evolution"
+   ],
+   "guess": false
+  },
+  "Year 8/Biology/B3 Inheritance, Variation and Evolution/Lesson 6 - Competition and Adaptation (optional)": {
+   "codes": [
+    "Biology: Adaptations Interdependence and Competition"
+   ],
+   "guess": false
+  },
+  "Year 8/Biology/B3 Inheritance, Variation and Evolution/Lesson 7 - Adaption and Natural Selection": {
+   "codes": [
+    "Biology: Variation and Evolution",
+    "Biology: Adaptations Interdependence and Competition"
+   ],
+   "guess": false
+  },
+  "Year 8/Biology/B3 Inheritance, Variation and Evolution/Lesson 8 - Evolution": {
+   "codes": [
+    "Biology: Development of Understanding of Genetics and Evolution",
+    "Biology: Variation and Evolution"
+   ],
+   "guess": false
+  },
+  "Year 8/Biology/B3 Inheritance, Variation and Evolution/Lesson 9 - Evolutionary Trees (Optional)": {
+   "codes": [
+    "Biology: Development of Understanding of Genetics and Evolution",
+    "Biology: Variation and Evolution"
+   ],
+   "guess": false
+  },
+  "Year 8/Physics/P2 Energy Resources/Lesson 1 - Comparing Light Bulbs": {
+   "codes": [
+    "Physics: Energy Transfer",
+    "Physics: Domestic Uses and Safety"
+   ],
+   "guess": false
+  },
+  "Year 8/Physics/P2 Energy Resources/Lesson 2 - Paying for Electricity": {
+   "codes": [
+    "Physics: Energy Transfer",
+    "Physics: National and Global Energy Resources"
+   ],
+   "guess": false
+  },
+  "Year 8/Physics/P2 Energy Resources/Lesson 3 - The National Grid": {
+   "codes": [
+    "Physics: Induced Potential and Transformers and the National Grid",
+    "Physics: National and Global Energy Resources"
+   ],
+   "guess": false
+  },
+  "Year 8/Physics/P2 Energy Resources/Lesson 4 - Generating Electricity": {
+   "codes": [
+    "Physics: National and Global Energy Resources"
+   ],
+   "guess": false
+  },
+  "P2 Energy Resources#5|formative assessment": {
+   "codes": [],
+   "none": "an assessment lesson"
+  },
+  "Year 8/Physics/P2 Energy Resources/Lesson 5 - Wind Turbines": {
+   "codes": [
+    "Physics: National and Global Energy Resources"
+   ],
+   "guess": false
+  },
+  "P2 Energy Resources#5|Journey to the bottom of the sea": {
+   "codes": [
+    "Physics: Pressure in a Fluid"
+   ],
+   "guess": false
+  },
+  "Year 8/Physics/P2 Energy Resources/Lesson 6 - Solar Power": {
+   "codes": [
+    "Physics: National and Global Energy Resources",
+    "Physics: Efficiency"
+   ],
+   "guess": false
+  },
+  "Year 8/Physics/P2 Energy Resources/Lesson 7 - Other Renewables": {
+   "codes": [
+    "Physics: National and Global Energy Resources"
+   ],
+   "guess": false
+  },
+  "Year 8/Physics/P2 Energy Resources/Lesson 8 - Joule Island Pt 1 (Optional)": {
+   "codes": [
+    "Physics: National and Global Energy Resources"
+   ],
+   "guess": false
+  },
+  "P2 Energy Resources#5|Rocket propulsion": {
+   "codes": [],
+   "none": "no exam questions for this kind of lesson"
+  },
+  "Year 8/Physics/P2 Energy Resources/Lesson 9 - Joule Island Pt 2 (Optional)": {
+   "codes": [
+    "Physics: National and Global Energy Resources"
+   ],
+   "guess": false
+  },
+  "Year 8/Physics/P2 Energy Resources/Lesson 10 - Non Renewables Practical": {
+   "codes": [
+    "Physics: National and Global Energy Resources"
+   ],
+   "guess": false
+  },
+  "Year 9/Physics/P3 Particles/Lesson 1 - Required Practical Measuring Density for a Regular Shaped Object": {
+   "codes": [
+    "Physics: Changes of State and the Particle Model"
+   ],
+   "guess": false
+  },
+  "Year 9/Physics/P3 Particles/Lesson 2 - Required Practical Measuring Density for an Irregular Shaped Object": {
+   "codes": [
+    "Physics: Changes of State and the Particle Model"
+   ],
+   "guess": false
+  },
+  "Year 9/Physics/P3 Particles/Lesson 3 - Required Practical Measuring Density in Liquids": {
+   "codes": [
+    "Physics: Changes of State and the Particle Model"
+   ],
+   "guess": false
+  },
+  "Year 9/Physics/P3 Particles/Lesson 4 - Changing States": {
+   "codes": [
+    "Physics: Internal Energy",
+    "Physics: Changes of State and the Particle Model"
+   ],
+   "guess": false
+  },
+  "Year 9/Physics/P3 Particles/Lesson 5 - Cooling Curves Practical": {
+   "codes": [
+    "Physics: Changes of State and the Particle Model",
+    "Physics: Particle Model and Pressure"
+   ],
+   "guess": false
+  },
+  "P3 Particles#0|DIRT ASSESSMENT": {
+   "codes": [],
+   "none": "an assessment lesson"
+  },
+  "Year 9/Physics/P3 Particles/Lesson 6 - Internal Energy": {
+   "codes": [
+    "Physics: Changes of State and the Particle Model",
+    "Physics: Internal Energy"
+   ],
+   "guess": false
+  },
+  "Year 9/Physics/P3 Particles/Lesson 8 - Specific Heat Capacity Practical": {
+   "codes": [
+    "Physics: Temperature Changes in a System and Specific Heat Capacity",
+    "Physics: Internal Energy"
+   ],
+   "guess": false
+  },
+  "Year 9/Physics/P3 Particles/Lesson 9 - Specific Heat Capacity Theory": {
+   "codes": [
+    "Physics: Temperature Changes in a System and Specific Heat Capacity",
+    "Physics: Internal Energy"
+   ],
+   "guess": false
+  },
+  "Year 9/Physics/P3 Particles/Lesson 11 - Latent Heat Capacity Theory": {
+   "codes": [
+    "Physics: Changes of Heat and Specific Latent Heat",
+    "Physics: Changes of State and the Particle Model"
+   ],
+   "guess": false
+  },
+  "Year 9/Physics/P3 Particles/Lesson 13 - Cooling Curves Theory": {
+   "codes": [
+    "Physics: Changes of State and the Particle Model",
+    "Physics: Particle Model and Pressure"
+   ],
+   "guess": false
+  },
+  "Year 9/Physics/P3 Particles/Lesson 14 - Latent Heat Capacity Practical": {
+   "codes": [
+    "Physics: Changes of Heat and Specific Latent Heat",
+    "Physics: Changes of State and the Particle Model"
+   ],
+   "guess": false
+  },
+  "Year 9/Physics/P3 Particles/Lesson 15 - Revision Lesson": {
+   "codes": [
+    "Physics: Changes of State and the Particle Model",
+    "Physics: Internal Energy"
+   ],
+   "guess": false
+  },
+  "Year 9/Physics/P3 Particles/Lesson 16 - Particles Review": {
+   "codes": [
+    "Physics: Changes of State and the Particle Model",
+    "Physics: Internal Energy"
+   ],
+   "guess": false
+  },
+  "Year 9/Physics/P3 Particles/Lesson 17 - Test Lesson": {
+   "codes": [],
+   "none": "an assessment lesson"
+  },
+  "Year 9/Chemistry/C1 Atomic Structure/Lesson 1 - Atoms, Elements and Compounds": {
+   "codes": [
+    "Chemistry: The Periodic Table"
+   ],
+   "guess": false
+  },
+  "Year 9/Chemistry/C1 Atomic Structure/Lesson 2 - Mixtures and Separating": {
+   "codes": [
+    "Chemistry: The Periodic Table",
+    "Chemistry: Properties of Transition Metals"
+   ],
+   "guess": false
+  },
+  "Year 9/Chemistry/C1 Atomic Structure/Lesson 3 - Mixtures and Separating Techniques Practical": {
+   "codes": [
+    "Chemistry: The Periodic Table",
+    "Chemistry: Properties of Transition Metals"
+   ],
+   "guess": false
+  },
+  "Year 9/Chemistry/C1 Atomic Structure/Lesson 4 - Structure of the Atom": {
+   "codes": [
+    "Chemistry: The Periodic Table"
+   ],
+   "guess": false
+  },
+  "Year 9/Chemistry/C1 Atomic Structure/Lesson 5 - Electronic Configuration": {
+   "codes": [
+    "Chemistry: The Periodic Table"
+   ],
+   "guess": false
+  },
+  "Year 9/Chemistry/C1 Atomic Structure/Lesson 6 - Isotopes and RAM": {
+   "codes": [
+    "Chemistry: The Periodic Table"
+   ],
+   "guess": false
+  },
+  "Year 9/Chemistry/C1 Atomic Structure/lesson 7 - History of the Atom": {
+   "codes": [
+    "KS3: Atomic Structure"
+   ],
+   "guess": false,
+   "ks3": true
+  },
+  "Year 9/Chemistry/C1 Atomic Structure/Lesson 8 - Periodic Table": {
+   "codes": [
+    "Chemistry: The Periodic Table"
+   ],
+   "guess": false
+  },
+  "Year 9/Chemistry/C1 Atomic Structure/Lesson 9 - Metals and Non-Metals": {
+   "codes": [
+    "Chemistry: The Periodic Table"
+   ],
+   "guess": false
+  },
+  "Year 9/Chemistry/C1 Atomic Structure/Lesson 10 - Alkali Metals": {
+   "codes": [
+    "Chemistry: The Periodic Table"
+   ],
+   "guess": false
+  },
+  "Year 9/Chemistry/C1 Atomic Structure/Lesson 11 - Noble Gases": {
+   "codes": [
+    "Chemistry: The Periodic Table"
+   ],
+   "guess": false
+  },
+  "Year 9/Chemistry/C1 Atomic Structure/Lesson 12 - Halogens": {
+   "codes": [
+    "Chemistry: The Periodic Table"
+   ],
+   "guess": false
+  },
+  "Year 9/Chemistry/C1 Atomic Structure/Lesson 13 - Halogens and Displacement Reactions": {
+   "codes": [
+    "Chemistry: The Periodic Table",
+    "Chemistry: Reactivity of metals"
+   ],
+   "guess": false
+  },
+  "Year 9/Chemistry/C1 Atomic Structure/Lesson 14 - Revision Lesson": {
+   "codes": [
+    "Chemistry: The Periodic Table"
+   ],
+   "guess": false
+  },
+  "Year 9/Physics/P4 Atomic Strucutre/Lesson 1 - Atoms, Mass Number and Atomic Number": {
+   "codes": [
+    "Physics: Atoms and Isotopes"
+   ],
+   "guess": false
+  },
+  "Year 9/Physics/P4 Atomic Strucutre/Lesson 2 - Isotopes": {
+   "codes": [
+    "Physics: Atoms and Nuclear Radiation",
+    "Physics: Atoms and Isotopes"
+   ],
+   "guess": false
+  },
+  "Year 9/Physics/P4 Atomic Strucutre/Lesson 3 - Orbitals and Bohr Model": {
+   "codes": [
+    "Physics: Atoms and Isotopes"
+   ],
+   "guess": false
+  },
+  "Year 9/Physics/P4 Atomic Strucutre/Lesson 4 - Rutherford's Scattering Experiment": {
+   "codes": [
+    "Physics: Atoms and Isotopes"
+   ],
+   "guess": false
+  },
+  "Year 9/Physics/P4 Atomic Strucutre/Lesson 5 - History of the Atom": {
+   "codes": [
+    "Physics: Atoms and Isotopes"
+   ],
+   "guess": false
+  },
+  "Year 9/Physics/P4 Atomic Strucutre/Lesson 6 - Radiation and Properties of Radiation": {
+   "codes": [
+    "Physics: Atoms and Nuclear Radiation",
+    "Physics: Hazards and Uses of Radioactive Emissions and of Background Radiation"
+   ],
+   "guess": false
+  },
+  "Year 9/Physics/P4 Atomic Strucutre/Lesson 7 - Nuclear Equation": {
+   "codes": [
+    "Physics: Atoms and Nuclear Radiation"
+   ],
+   "guess": false
+  },
+  "Year 9/Physics/P4 Atomic Strucutre/Lesson 8 - Half Life Practical": {
+   "codes": [
+    "Physics: Atoms and Nuclear Radiation"
+   ],
+   "guess": false
+  },
+  "Year 9/Physics/P4 Atomic Strucutre/Lesson 9 - Half Life Theory": {
+   "codes": [
+    "Physics: Atoms and Nuclear Radiation"
+   ],
+   "guess": false
+  },
+  "Year 9/Physics/P4 Atomic Strucutre/Lesson 10 - Irradiation and Contamination": {
+   "codes": [
+    "Physics: Hazards and Uses of Radioactive Emissions and of Background Radiation",
+    "Physics: Atoms and Nuclear Radiation"
+   ],
+   "guess": false
+  },
+  "Year 9/Physics/P4 Atomic Strucutre/Lesson 11 - Revision": {
+   "codes": [
+    "Physics: Atoms and Nuclear Radiation",
+    "Physics: Hazards and Uses of Radioactive Emissions and of Background Radiation"
+   ],
+   "guess": false
+  },
+  "Year 9/Chemistry/C2 Bonding and Structure/Lesson 1 - Chemical Bonding": {
+   "codes": [
+    "Chemistry: How bonding and Structure are related to properties of substances",
+    "Chemistry: Structure and Bonding of Carbon"
+   ],
+   "guess": false
+  },
+  "Year 9/Chemistry/C2 Bonding and Structure/Lesson 2 - Ionic Bonding - Ions": {
+   "codes": [
+    "Chemistry: How bonding and Structure are related to properties of substances",
+    "Chemistry: Structure and Bonding of Carbon"
+   ],
+   "guess": false
+  },
+  "Year 9/Chemistry/C2 Bonding and Structure/Lesson 3 - Ionic Bonding - Structure": {
+   "codes": [
+    "Chemistry: How bonding and Structure are related to properties of substances",
+    "Chemistry: Structure and Bonding of Carbon"
+   ],
+   "guess": false
+  },
+  "Year 9/Chemistry/C2 Bonding and Structure/Lesson 4 - Covalent Bonding": {
+   "codes": [
+    "Chemistry: How bonding and Structure are related to properties of substances",
+    "Chemistry: Structure and Bonding of Carbon"
+   ],
+   "guess": false
+  },
+  "Year 9/Chemistry/C2 Bonding and Structure/Lesson 5 - Metallic Bonding": {
+   "codes": [
+    "Chemistry: How bonding and Structure are related to properties of substances",
+    "Chemistry: Structure and Bonding of Carbon"
+   ],
+   "guess": false
+  },
+  "Year 9/Chemistry/C2 Bonding and Structure/Lesson 6 - Alloys": {
+   "codes": [
+    "Chemistry: How bonding and Structure are related to properties of substances"
+   ],
+   "guess": false
+  },
+  "Year 9/Chemistry/C2 Bonding and Structure/Lesson 7 - Structure and Bonding": {
+   "codes": [
+    "Chemistry: How bonding and Structure are related to properties of substances",
+    "Chemistry: Structure and Bonding of Carbon"
+   ],
+   "guess": false
+  },
+  "Year 9/Chemistry/C2 Bonding and Structure/Lesson 8 - Investigating Properties": {
+   "codes": [
+    "Chemistry: How bonding and Structure are related to properties of substances",
+    "Chemistry: Structure and Bonding of Carbon"
+   ],
+   "guess": false
+  },
+  "Year 9/Chemistry/C2 Bonding and Structure/Lesson 9 - Explaining Properties": {
+   "codes": [
+    "Chemistry: How bonding and Structure are related to properties of substances",
+    "Chemistry: Structure and Bonding of Carbon"
+   ],
+   "guess": false
+  },
+  "Year 9/Chemistry/C2 Bonding and Structure/Lesson 10 - Changes of State": {
+   "codes": [
+    "Chemistry: How bonding and Structure are related to properties of substances"
+   ],
+   "guess": false
+  },
+  "Year 9/Chemistry/C2 Bonding and Structure/Lesson 11 - Polymers": {
+   "codes": [
+    "Chemistry: Synthetic and naturally occurring polymers"
+   ],
+   "guess": false
+  },
+  "Year 9/Chemistry/C2 Bonding and Structure/Lesson 12 - Nano Chemistry (Combined)": {
+   "codes": [
+    "Chemistry: Bulk and surface properties of matter including nanoparticles",
+    "Chemistry: Structure and Bonding of Carbon"
+   ],
+   "guess": false
+  },
+  "Year 9/Chemistry/C2 Bonding and Structure/Lesson 13 - Chemical and Empirical Formula": {
+   "codes": [
+    "Chemistry: Use of amount of substance in relation to mass of pure substances"
+   ],
+   "guess": false
+  },
+  "Year 9/Chemistry/C2 Bonding and Structure/Lesson 14 - Revision Lesson": {
+   "codes": [
+    "Chemistry: How bonding and Structure are related to properties of substances",
+    "Chemistry: Synthetic and naturally occurring polymers"
+   ],
+   "guess": false
+  },
+  "B1 Cells#1|Eukaryotic cells": {
+   "codes": [
+    "Biology: Cell Structure"
+   ],
+   "guess": false
+  },
+  "Year 9/Biology/B1 Cells/Lesson 2 - Magnification": {
+   "codes": [
+    "Biology: Cell Structure"
+   ],
+   "guess": false
+  },
+  "Year 9/Biology/B1 Cells/Lesson 3 - Using Microscopes Required Practical": {
+   "codes": [
+    "Biology: Cell Structure"
+   ],
+   "guess": false
+  },
+  "Year 9/Biology/B1 Cells/Lesson 4 - Microscope Types and Biological Drawings": {
+   "codes": [
+    "Biology: Cell Structure"
+   ],
+   "guess": false
+  },
+  "Year 9/Biology/B1 Cells/Lesson 5 - Prokaryotic Cells": {
+   "codes": [
+    "Biology: Cell Structure"
+   ],
+   "guess": false
+  },
+  "B1 Cells#1|DIRT Assessment 1": {
+   "codes": [],
+   "none": "an assessment lesson"
+  },
+  "Year 9/Biology/B1 Cells/Lesson 7 - Specialised Cells": {
+   "codes": [
+    "Biology: Cell Structure",
+    "Biology: Plant Tissues Organs and Systems"
+   ],
+   "guess": false
+  },
+  "Year 9/Biology/B1 Cells/Lesson 8 - Chromosomes": {
+   "codes": [
+    "Biology: Cell Division"
+   ],
+   "guess": false
+  },
+  "Year 9/Biology/B1 Cells/Lesson 9 - Mitosis and Cells Cycles": {
+   "codes": [
+    "Biology: Cell Division"
+   ],
+   "guess": false
+  },
+  "Year 9/Biology/B1 Cells/Lesson 10 - Stems Cells and Theraputic Cloning": {
+   "codes": [
+    "Biology: Cell Division"
+   ],
+   "guess": false
+  },
+  "B1 Cells#3|DIRT Assessment 2": {
+   "codes": [],
+   "none": "an assessment lesson"
+  },
+  "Year 9/Biology/B1 Cells/Lesson 12 - Diffusion": {
+   "codes": [
+    "Biology: Transport in Cells"
+   ],
+   "guess": false
+  },
+  "Year 9/Biology/B1 Cells/Lesson 13 - Surface Area to Volume Ratio": {
+   "codes": [
+    "Biology: Transport in Cells"
+   ],
+   "guess": false
+  },
+  "Year 9/Biology/B1 Cells/Lesson 14 - Exchange Surfaces in Multicellular Organisms": {
+   "codes": [
+    "Biology: Animal Tissues Organs and Organ Systems",
+    "Biology: Transport in Cells"
+   ],
+   "guess": false
+  },
+  "Year 9/Biology/B1 Cells/Lesson 15 - Osmosis": {
+   "codes": [
+    "Biology: Transport in Cells"
+   ],
+   "guess": false
+  },
+  "Year 9/Biology/B1 Cells/Lesson 16 - Osmosis Required Practical": {
+   "codes": [
+    "Biology: Transport in Cells"
+   ],
+   "guess": false
+  },
+  "Year 9/Biology/B1 Cells/Lesson 17 - Active Transport": {
+   "codes": [
+    "Biology: Transport in Cells"
+   ],
+   "guess": false
+  },
+  "Year 9/Biology/B2 Organisation/Lesson 1 - Cells, Tissues and Organs - Homework Setting": {
+   "codes": [
+    "Biology: Animal Tissues Organs and Organ Systems",
+    "Biology: Plant Tissues Organs and Systems"
+   ],
+   "guess": false
+  },
+  "Year 9/Biology/B2 Organisation/Lesson 2 - Digestive System and Enzymes": {
+   "codes": [
+    "Biology: Animal Tissues Organs and Organ Systems"
+   ],
+   "guess": false
+  },
+  "Year 9/Biology/B2 Organisation/Lesson 3 - Food Testing Required Practical": {
+   "codes": [
+    "Biology: Animal Tissues Organs and Organ Systems"
+   ],
+   "guess": false
+  },
+  "Year 9/Biology/B2 Organisation/Lesson 4 - Enzyme Theory": {
+   "codes": [
+    "Biology: Animal Tissues Organs and Organ Systems"
+   ],
+   "guess": false
+  },
+  "B2 Organisation#5|Assessment point 1": {
+   "codes": [],
+   "none": "an assessment lesson"
+  },
+  "Year 9/Biology/B2 Organisation/Lesson 5 - Enzyme Action Required Practical": {
+   "codes": [
+    "Biology: Animal Tissues Organs and Organ Systems"
+   ],
+   "guess": false
+  },
+  "Year 9/Biology/B2 Organisation/Lesson 6 - Organisation Review": {
+   "codes": [
+    "Biology: Animal Tissues Organs and Organ Systems"
+   ],
+   "guess": false
+  },
+  "Year 9/Biology/B2 Organisation/Lesson 7 - The Lungs": {
+   "codes": [
+    "Biology: Animal Tissues Organs and Organ Systems"
+   ],
+   "guess": false
+  },
+  "Year 9/Biology/B2 Organisation/Lesson 8 - Blood": {
+   "codes": [
+    "Biology: Animal Tissues Organs and Organ Systems"
+   ],
+   "guess": false
+  },
+  "Year 9/Biology/B2 Organisation/Lesson 9 - Blood Vessels": {
+   "codes": [
+    "Biology: Animal Tissues Organs and Organ Systems"
+   ],
+   "guess": false
+  },
+  "Year 9/Biology/B2 Organisation/Lesson 10 - The Heart and Its Blood Vessels": {
+   "codes": [
+    "Biology: Animal Tissues Organs and Organ Systems"
+   ],
+   "guess": false
+  },
+  "Year 9/Biology/B2 Organisation/Lesson 11 - Coronary Heart Disease": {
+   "codes": [
+    "Biology: Animal Tissues Organs and Organ Systems"
+   ],
+   "guess": false
+  },
+  "Year 9/Biology/B2 Organisation/Lesson 12 - Cancer": {
+   "codes": [
+    "Biology: Animal Tissues Organs and Organ Systems"
+   ],
+   "guess": false
+  },
+  "Year 9/Biology/B2 Organisation/Lesson 13 - Health Issues and Life Style": {
+   "codes": [
+    "Biology: Animal Tissues Organs and Organ Systems"
+   ],
+   "guess": false
+  },
+  "B2 Organisation#6|Assessment point 2": {
+   "codes": [],
+   "none": "an assessment lesson"
+  },
+  "Year 9/Biology/B2 Organisation/Lesson 14 - Organisation Review": {
+   "codes": [
+    "Biology: Animal Tissues Organs and Organ Systems"
+   ],
+   "guess": false
+  },
+  "Year 9/Biology/B2 Organisation/Lesson 15 - Revision": {
+   "codes": [
+    "Biology: Animal Tissues Organs and Organ Systems"
+   ],
+   "guess": false
+  },
+  "Year 10/Physics/P1 Energy/Lesson 1 - Energy Stores and Systems": {
+   "codes": [
+    "Physics: National and Global Energy Resources",
+    "Physics: Changes in Energy"
+   ],
+   "guess": false
+  },
+  "Year 10/Physics/P1 Energy/Lesson 2 - Gravitational Potential Energy": {
+   "codes": [
+    "Physics: Changes in Energy",
+    "Physics: Energy Stores and Systems"
+   ],
+   "guess": false
+  },
+  "Year 10/Physics/P1 Energy/Lesson 3 - Kinetic Energy": {
+   "codes": [
+    "Physics: Changes in Energy",
+    "Physics: Energy Stores and Systems"
+   ],
+   "guess": false
+  },
+  "Year 10/Physics/P1 Energy/Lesson 4 - Elastic Potential Energy": {
+   "codes": [
+    "Physics: Forces and Elasticity"
+   ],
+   "guess": false
+  },
+  "Year 10/Physics/P1 Energy/Lesson 5 - Specific Heat Capacity Required Practical 1": {
+   "codes": [
+    "Physics: Temperature Changes in a System and Specific Heat Capacity",
+    "Physics: Energy Changes in Systems"
+   ],
+   "guess": false
+  },
+  "Year 10/Physics/P1 Energy/Lesson 6 - Specific Heat Capacity Theory": {
+   "codes": [
+    "Physics: Temperature Changes in a System and Specific Heat Capacity",
+    "Physics: Energy Changes in Systems"
+   ],
+   "guess": false
+  },
+  "Year 10/Physics/P1 Energy/Lesson 7 - Power": {
+   "codes": [
+    "Physics: Energy Transfer",
+    "Physics: Power"
+   ],
+   "guess": false
+  },
+  "Year 10/Physics/P1 Energy/Lesson 8 - Conservation of Energy and Reducing Unwanted Heat Transfers": {
+   "codes": [
+    "Physics: Temperature Changes in a System and Specific Heat Capacity",
+    "Physics: Energy transfer in a system"
+   ],
+   "guess": false
+  },
+  "Year 10/Physics/P1 Energy/Lesson 9 - Reducing Heat Transfers Required Practical": {
+   "codes": [
+    "Physics: Temperature Changes in a System and Specific Heat Capacity",
+    "Physics: Energy transfer in a system"
+   ],
+   "guess": false
+  },
+  "Year 10/Physics/P1 Energy/Lesson 10 - Efficiency": {
+   "codes": [
+    "Physics: National and Global Energy Resources",
+    "Physics: Efficiency"
+   ],
+   "guess": false
+  },
+  "Year 10/Physics/P1 Energy/Lesson 11 - Non Renewable Resources": {
+   "codes": [
+    "Physics: National and Global Energy Resources"
+   ],
+   "guess": false
+  },
+  "Year 10/Physics/P1 Energy/Lesson 12 - Renewable Energy Resources and Environmental Factors": {
+   "codes": [
+    "Physics: National and Global Energy Resources"
+   ],
+   "guess": false
+  },
+  "Year 10/Physics/P1 Energy/Lesson 13 - P1 Energy Revision": {
+   "codes": [
+    "Physics: National and Global Energy Resources"
+   ],
+   "guess": false
+  },
+  "P2 Electricity#1|Circuit symbols": {
+   "codes": [
+    "Physics: Current Potential Difference and Resistance"
+   ],
+   "guess": false
+  },
+  "Year 10/Physics/P2 Electricity/Lesson 2 - Electrical Charge and Current Q = IT": {
+   "codes": [
+    "Physics: Current Potential Difference and Resistance",
+    "Physics: Energy Transfer"
+   ],
+   "guess": false
+  },
+  "Year 10/Physics/P2 Electricity/Lesson 3 - Ohm Law": {
+   "codes": [
+    "Physics: Current Potential Difference and Resistance"
+   ],
+   "guess": false
+  },
+  "Year 10/Physics/P2 Electricity/Lesson 4 - Required Practical 3 Investigating Resistance on Different Length Wire": {
+   "codes": [
+    "Physics: Current Potential Difference and Resistance"
+   ],
+   "guess": false
+  },
+  "P2 Electricity#1|DIRT ASSESSMENT": {
+   "codes": [],
+   "none": "an assessment lesson"
+  },
+  "Year 10/Physics/P2 Electricity/Lesson 5 - Required Practical 4 Plotting Voltage Current Graphs for a Resistor": {
+   "codes": [
+    "Physics: Current Potential Difference and Resistance",
+    "Physics: Series and Parallel Circuits"
+   ],
+   "guess": false
+  },
+  "Year 10/Physics/P2 Electricity/Lesson 6 - IV Graphs for Bulbs": {
+   "codes": [
+    "Physics: Current Potential Difference and Resistance",
+    "Physics: Energy Transfer"
+   ],
+   "guess": false
+  },
+  "Year 10/Physics/P2 Electricity/Lesson 7 - IV Graphs for Diodes": {
+   "codes": [
+    "Physics: Current Potential Difference and Resistance",
+    "Physics: Energy Transfer"
+   ],
+   "guess": false
+  },
+  "Year 10/Physics/P2 Electricity/Lesson 8 - Investigating Resistance in Thermistors and LDRS": {
+   "codes": [
+    "Physics: Current Potential Difference and Resistance"
+   ],
+   "guess": false
+  },
+  "Year 10/Physics/P2 Electricity/Lesson 9 - Current in Series and Parallel Circuits": {
+   "codes": [
+    "Physics: Current Potential Difference and Resistance",
+    "Physics: Series and Parallel Circuits"
+   ],
+   "guess": false
+  },
+  "Year 10/Physics/P2 Electricity/Lesson 10 - Voltage in Series and Parallel": {
+   "codes": [
+    "Physics: Current Potential Difference and Resistance",
+    "Physics: Series and Parallel Circuits"
+   ],
+   "guess": false
+  },
+  "Year 10/Physics/P2 Electricity/Lesson 11 - Adding Resistors in Parallel and Series Required Practical 3": {
+   "codes": [
+    "Physics: Current Potential Difference and Resistance",
+    "Physics: Series and Parallel Circuits"
+   ],
+   "guess": false
+  },
+  "Year 10/Physics/P2 Electricity/Lesson 12 - Alternating Potential Difference and Direct Potential Difference": {
+   "codes": [
+    "Physics: Domestic Uses and Safety"
+   ],
+   "guess": false
+  },
+  "Year 10/Physics/P2 Electricity/Lesson 13 - Plugs": {
+   "codes": [
+    "Physics: Domestic Uses and Safety"
+   ],
+   "guess": false
+  },
+  "Year 10/Physics/P2 Electricity/Lesson 14 - Electrical Power P=IV P=I2R": {
+   "codes": [
+    "Physics: Energy Transfer",
+    "Physics: Domestic Uses and Safety"
+   ],
+   "guess": false
+  },
+  "Year 10/Physics/P2 Electricity/Lesson 15 - Electrical Energy E =QV": {
+   "codes": [
+    "Physics: Energy Transfer"
+   ],
+   "guess": false
+  },
+  "Year 10/Physics/P2 Electricity/Lesson 16 - The National Grid": {
+   "codes": [
+    "Physics: Induced Potential and Transformers and the National Grid"
+   ],
+   "guess": false
+  },
+  "Year 10/Physics/P2 Electricity/Lesson 17 - Revision Lesson": {
+   "codes": [
+    "Physics: Current Potential Difference and Resistance",
+    "Physics: Domestic Uses and Safety"
+   ],
+   "guess": false
+  },
+  "Year 10/Chemistry/C5 Energy Changes/Lesson 0 - Self Study Unit Y11 2023": {
+   "codes": [],
+   "none": "an assessment lesson"
+  },
+  "Year 10/Chemistry/C5 Energy Changes/Lesson 1 - Energy in Reactions": {
+   "codes": [
+    "Chemistry: Exothermic and endothermic reactions"
+   ],
+   "guess": false
+  },
+  "Year 10/Chemistry/C5 Energy Changes/Lesson 2 - 3 - Exothermic or Endothermic Required Prac": {
+   "codes": [
+    "Chemistry: Exothermic and endothermic reactions"
+   ],
+   "guess": false
+  },
+  "Year 10/Chemistry/C5 Energy Changes/Lesson 4 - Energy Profiles": {
+   "codes": [
+    "Chemistry: Exothermic and endothermic reactions"
+   ],
+   "guess": false
+  },
+  "Year 10/Chemistry/C5 Energy Changes/Lesson 5 - Making and Breaking Bonds (Higher)": {
+   "codes": [
+    "Chemistry: Exothermic and endothermic reactions"
+   ],
+   "guess": false
+  },
+  "Year 10/Chemistry/C5 Energy Changes/Lesson 6 - Revision": {
+   "codes": [
+    "Chemistry: Exothermic and endothermic reactions"
+   ],
+   "guess": false
+  },
+  "Year 10/Physics/P5 Forces/Lesson 1 - Scalar and Vector Quantities": {
+   "codes": [
+    "Physics: Scalars and Vector Quantities",
+    "Physics: Velocity"
+   ],
+   "guess": false
+  },
+  "Year 10/Physics/P5 Forces/Lesson 2 - Contact and Non Contact Forces": {
+   "codes": [
+    "Physics: Contact and Non-Contact Forces",
+    "Physics: Resultant Forces"
+   ],
+   "guess": false
+  },
+  "Year 10/Physics/P5 Forces/Lesson 3 - Resolving Forces at Right Angles (Higher)": {
+   "codes": [
+    "Physics: Resultant Forces"
+   ],
+   "guess": false
+  },
+  "P5 Forces#3|Weight and mass": {
+   "codes": [
+    "Physics: Gravity"
+   ],
+   "guess": false
+  },
+  "Year 10/Physics/P5 Forces/Lesson 5 - Centre of Mass": {
+   "codes": [
+    "Physics: Gravity",
+    "Physics: Moments Levers and Gears"
+   ],
+   "guess": false
+  },
+  "Year 10/Physics/P5 Forces/Lesson 6 - Workdone and Energy Transfers": {
+   "codes": [
+    "Physics: Work Done and Energy Transfer"
+   ],
+   "guess": false
+  },
+  "Year 10/Physics/P5 Forces/Lesson 7 - Required Practical Force and Extension": {
+   "codes": [
+    "Physics: Forces and Elasticity"
+   ],
+   "guess": false
+  },
+  "Year 10/Physics/P5 Forces/Lesson 8 - Hooke - S Law Theory": {
+   "codes": [
+    "Physics: Forces and Elasticity"
+   ],
+   "guess": false
+  },
+  "Year 10/Physics/P5 Forces/Lesson 9 - Distance and Displacement": {
+   "codes": [
+    "Physics: Distance and Displacement"
+   ],
+   "guess": false
+  },
+  "Year 10/Physics/P5 Forces/Lesson 10 - Speed and Velocity": {
+   "codes": [
+    "Physics: Distance Time Relationship",
+    "Physics: Velocity"
+   ],
+   "guess": false
+  },
+  "Year 10/Physics/P5 Forces/Lesson 11 - Distance Time Graphs": {
+   "codes": [
+    "Physics: Distance Time Relationship"
+   ],
+   "guess": false
+  },
+  "Year 10/Physics/P5 Forces/Lesson 12 - Acceleration Part 1": {
+   "codes": [
+    "Physics: Acceleration"
+   ],
+   "guess": false
+  },
+  "Year 10/Physics/P5 Forces/Lesson 13 - Velocity Time Graphs": {
+   "codes": [
+    "Physics: Acceleration",
+    "Physics: Velocity"
+   ],
+   "guess": false
+  },
+  "Year 10/Physics/P5 Forces/Lesson 14 - Acceleration Part 2": {
+   "codes": [
+    "Physics: Acceleration"
+   ],
+   "guess": false
+  },
+  "Year 10/Physics/P5 Forces/Lesson 15 - Newtons First Law": {
+   "codes": [
+    "Physics: Resultant Forces"
+   ],
+   "guess": false
+  },
+  "Year 10/Physics/P5 Forces/Lesson 16 - Newtons Second Law and Third Law": {
+   "codes": [
+    "Physics: Resultant Forces",
+    "Physics: Newtons Second Law"
+   ],
+   "guess": false
+  },
+  "Year 10/Physics/P5 Forces/Lesson 17 - Required Practical Force and Acceleration": {
+   "codes": [
+    "Physics: Acceleration",
+    "Physics: Newtons Second Law"
+   ],
+   "guess": false
+  },
+  "Year 10/Physics/P5 Forces/Lesson 18 - Thinking Distance and Reaction Time": {
+   "codes": [
+    "Physics: Forces and Braking"
+   ],
+   "guess": false
+  },
+  "Year 10/Physics/P5 Forces/Lesson 19 - Braking Distance and Stopping Distance": {
+   "codes": [
+    "Physics: Forces and Braking"
+   ],
+   "guess": false
+  },
+  "Year 10/Physics/P5 Forces/Lesson 20 - Momentum and the Conservation of Momentum (Higher)": {
+   "codes": [
+    "Physics: Momentum"
+   ],
+   "guess": false
+  },
+  "Year 10/Physics/P5 Forces/Lesson 21 - Revision Lesson": {
+   "codes": [
+    "Physics: Forces and Braking",
+    "Physics: Momentum"
+   ],
+   "guess": false
+  },
+  "P5 Forces#2|Weight and mass": {
+   "codes": [
+    "Physics: Gravity"
+   ],
+   "guess": false
+  },
+  "Year 11/Physics/P6 Waves/Lesson 1 - Structure of a Wave, Longitudinal and Transverse": {
+   "codes": [
+    "Physics: Waves in Air Fluid and Solids"
+   ],
+   "guess": false
+  },
+  "Year 11/Physics/P6 Waves/Lesson 2 - Frequency and Time Period": {
+   "codes": [
+    "Physics: Waves in Air Fluid and Solids"
+   ],
+   "guess": false
+  },
+  "Year 11/Physics/P6 Waves/Lesson 3 - The Wave Equation and the Time Period of a Wave": {
+   "codes": [
+    "Physics: Electromagnetic Waves",
+    "Physics: Waves in Air Fluid and Solids"
+   ],
+   "guess": false
+  },
+  "Year 11/Physics/P6 Waves/Lesson 4 - Required Practical Measuring Frequency Wavelength and Speed of Waves": {
+   "codes": [
+    "Physics: Waves in Air Fluid and Solids"
+   ],
+   "guess": false
+  },
+  "Year 11/Physics/P6 Waves/Lesson 6 - Electromagnetic Waves and Uses": {
+   "codes": [
+    "Physics: Electromagnetic Waves"
+   ],
+   "guess": false
+  },
+  "Year 11/Physics/P6 Waves/Lesson 7 - Prop and Uses of EM Radiation 1 Reflection and Refraction": {
+   "codes": [
+    "Physics: Electromagnetic Waves",
+    "Physics: Waves in Air Fluid and Solids"
+   ],
+   "guess": false
+  },
+  "Year 11/Physics/P6 Waves/Lesson 8 - Prop and Uses of EM Radiation 2 Communication and Dangers": {
+   "codes": [
+    "Physics: Electromagnetic Waves"
+   ],
+   "guess": false
+  },
+  "Year 11/Physics/P6 Waves/Lesson 9 - Required Practical Absorbancy and Emittance": {
+   "codes": [
+    "Physics: Electromagnetic Waves",
+    "Physics: Black Body Radiation"
+   ],
+   "guess": false
+  },
+  "Year 11/Physics/P6 Waves/Lesson 11 - Lenses (Separate)": {
+   "codes": [
+    "Physics: Electromagnetic Waves"
+   ],
+   "guess": false
+  },
+  "Year 11/Physics/P6 Waves/Lesson 12 - Lens Diagrams (Separate)": {
+   "codes": [
+    "Physics: Electromagnetic Waves"
+   ],
+   "guess": false
+  },
+  "Year 11/Physics/P6 Waves/Lesson 13 - Visible Light (Separate)": {
+   "codes": [
+    "Physics: Electromagnetic Waves"
+   ],
+   "guess": false
+  },
+  "Year 11/Physics/P6 Waves/Lesson 14 - Black Body Radiation (Separate)": {
+   "codes": [
+    "Physics: Black Body Radiation"
+   ],
+   "guess": false
+  },
+  "Year 11/Physics/P6 Waves/Lesson 15 - Sound Waves and Waves for Exploration (Separate)": {
+   "codes": [
+    "Physics: Waves in Air Fluid and Solids"
+   ],
+   "guess": false
+  },
+  "Year 11/Physics/P6 Waves/Lesson 16 - Seismic Waves (Separate)": {
+   "codes": [
+    "Physics: Waves in Air Fluid and Solids"
+   ],
+   "guess": false
+  },
+  "Year 11/Physics/P6 Waves/Lesson 17 - Revision Lesson": {
+   "codes": [
+    "Physics: Electromagnetic Waves",
+    "Physics: Waves in Air Fluid and Solids"
+   ],
+   "guess": false
+  },
+  "Year 11/Physics/P7 Magnetism/Lesson 1 - Permanent Magnets": {
+   "codes": [
+    "Physics: Permanent and Induced Magnetism and Magnetic Forces and Field"
+   ],
+   "guess": false
+  },
+  "Year 11/Physics/P7 Magnetism/Lesson 2 - Magnetic Fields": {
+   "codes": [
+    "Physics: Permanent and Induced Magnetism and Magnetic Forces and Field"
+   ],
+   "guess": false
+  },
+  "Year 11/Physics/P7 Magnetism/Lesson 3 - The Motor Effect": {
+   "codes": [
+    "Physics: The Motor Effect",
+    "Physics: Permanent and Induced Magnetism and Magnetic Forces and Field"
+   ],
+   "guess": false
+  },
+  "Year 11/Physics/P7 Magnetism/Lesson 4 - Flemings Left Hand Rule (Higher)": {
+   "codes": [
+    "Physics: The Motor Effect"
+   ],
+   "guess": false
+  },
+  "Year 11/Physics/P7 Magnetism/Lesson 5 - Electric Motors (Higher)": {
+   "codes": [
+    "Physics: The Motor Effect"
+   ],
+   "guess": false
+  },
+  "Year 11/Physics/P7 Magnetism/Lesson 6 - Phys Only) Loudspeakers (Higher)": {
+   "codes": [
+    "Physics: The Motor Effect"
+   ],
+   "guess": false
+  },
+  "Year 11/Physics/P7 Magnetism/Lesson 7 - Phys Only) Induced Potential (Higher)": {
+   "codes": [
+    "Physics: Induced Potential and Transformers and the National Grid"
+   ],
+   "guess": false
+  },
+  "Year 11/Physics/P7 Magnetism/Lesson 8 - Phys Only) Generator Effect (Higher)": {
+   "codes": [
+    "Physics: Induced Potential and Transformers and the National Grid"
+   ],
+   "guess": false
+  },
+  "Year 11/Physics/P7 Magnetism/Lesson 9 - Phys Only) Microphones (Higher)": {
+   "codes": [
+    "Physics: Induced Potential and Transformers and the National Grid"
+   ],
+   "guess": false
+  },
+  "Year 11/Physics/P7 Magnetism/Lesson 10 - Phys Only) Transformers (Higher)": {
+   "codes": [
+    "Physics: Induced Potential and Transformers and the National Grid"
+   ],
+   "guess": false
+  },
+  "Year 11/Physics/P7 Magnetism/Lesson 11 - Phys Only) Transformers II (Higher)": {
+   "codes": [
+    "Physics: Induced Potential and Transformers and the National Grid"
+   ],
+   "guess": false
+  },
+  "Year 11/Physics/P7 Magnetism/Lesson 12 - Revision": {
+   "codes": [
+    "Physics: Induced Potential and Transformers and the National Grid",
+    "Physics: Permanent and Induced Magnetism and Magnetic Forces and Field"
+   ],
+   "guess": false
+  },
+  "Year 11/Physics/P8 Space/Lesson 1 - Our Solar System, Galaxies and the Universe": {
+   "codes": [
+    "Physics: Solar System and Stability of Orbital Motions and Satellites"
+   ],
+   "guess": false
+  },
+  "Year 11/Physics/P8 Space/Lesson 2 - Life Cycle of a Star": {
+   "codes": [
+    "Physics: Solar System and Stability of Orbital Motions and Satellites"
+   ],
+   "guess": false
+  },
+  "Year 11/Physics/P8 Space/Lesson 3 - Fusion Recap and the Formation of Elements": {
+   "codes": [
+    "Physics: Solar System and Stability of Orbital Motions and Satellites",
+    "Physics: Red Shift"
+   ],
+   "guess": false
+  },
+  "Year 11/Physics/P8 Space/Lesson 4 - Orbital Motion, Natural and Artificial Satellites": {
+   "codes": [
+    "Physics: Solar System and Stability of Orbital Motions and Satellites"
+   ],
+   "guess": false
+  },
+  "Year 11/Physics/P8 Space/Lesson 5 - The Big Bang and Redshift": {
+   "codes": [
+    "Physics: Red Shift"
+   ],
+   "guess": false
+  },
+  "Year 12/Module 4 - Electrons, Waves and Photons/Chapter 11 - Waves 1/Lesson 1 - Characteristics of Waves": {
+   "codes": [
+    "OCR A: Wave Motion"
+   ],
+   "guess": false
+  },
+  "Year 12/Module 4 - Electrons, Waves and Photons/Chapter 11 - Waves 1/Lesson 2 - Wave Properties and Oscilloscopes": {
+   "codes": [
+    "OCR A: Wave Motion"
+   ],
+   "guess": false
+  },
+  "Year 12/Module 4 - Electrons, Waves and Photons/Chapter 11 - Waves 1/Lesson 3 - Reflection and Refraction": {
+   "codes": [
+    "OCR A: Electromagnetic Waves",
+    "OCR A: Wave Motion"
+   ],
+   "guess": false
+  },
+  "Year 12/Module 4 - Electrons, Waves and Photons/Chapter 11 - Waves 1/Lesson 4 - Diffraction and Polarisation": {
+   "codes": [
+    "OCR A: Wave Motion",
+    "OCR A: Electromagnetic Waves"
+   ],
+   "guess": false
+  },
+  "Year 12/Module 4 - Electrons, Waves and Photons/Chapter 11 - Waves 1/Lesson 5 - Intensity": {
+   "codes": [
+    "OCR A: Wave Motion"
+   ],
+   "guess": false
+  },
+  "Year 12/Module 4 - Electrons, Waves and Photons/Chapter 11 - Waves 1/Lesson 6 - Electromagnetic Waves": {
+   "codes": [
+    "OCR A: Electromagnetic Waves"
+   ],
+   "guess": false
+  },
+  "Year 12/Module 4 - Electrons, Waves and Photons/Chapter 11 - Waves 1/Lesson 7 - Polarisation of EM Waves": {
+   "codes": [
+    "OCR A: Wave Motion",
+    "OCR A: Electromagnetic Waves"
+   ],
+   "guess": false
+  },
+  "Year 12/Module 4 - Electrons, Waves and Photons/Chapter 11 - Waves 1/Lesson 8 - Refractive Index and TIR": {
+   "codes": [
+    "OCR A: Electromagnetic Waves",
+    "OCR A: Wave Motion"
+   ],
+   "guess": false
+  },
+  "Year 12/Module 4 - Electrons, Waves and Photons/Chapter 11 - Waves 1/Lesson 9 - Waves 1 Review": {
+   "codes": [
+    "OCR A: Wave Motion",
+    "OCR A: Electromagnetic Waves"
+   ],
+   "guess": false
+  },
+  "Year 12/Module 4 - Electrons, Waves and Photons/Chapter 12 - Waves 2/Lesson 1 - Superposition": {
+   "codes": [
+    "OCR A: Superposition"
+   ],
+   "guess": false
+  },
+  "Year 12/Module 4 - Electrons, Waves and Photons/Chapter 12 - Waves 2/Lesson 2 - Interference": {
+   "codes": [
+    "OCR A: Superposition"
+   ],
+   "guess": false
+  },
+  "Year 12/Module 4 - Electrons, Waves and Photons/Chapter 12 - Waves 2/Lesson 3 - Young's Double Slits": {
+   "codes": [
+    "OCR A: Superposition"
+   ],
+   "guess": false
+  },
+  "Year 12/Module 4 - Electrons, Waves and Photons/Chapter 12 - Waves 2/Lesson 4 - Stationary Waves": {
+   "codes": [
+    "OCR A: Stationary Waves"
+   ],
+   "guess": false
+  },
+  "Year 12/Module 4 - Electrons, Waves and Photons/Chapter 12 - Waves 2/Lesson 5 - Harmonics": {
+   "codes": [
+    "OCR A: Stationary Waves"
+   ],
+   "guess": false
+  },
+  "Year 12/Module 4 - Electrons, Waves and Photons/Chapter 12 - Waves 2/Lesson 6 - Stationary Waves in Pipes": {
+   "codes": [
+    "OCR A: Stationary Waves"
+   ],
+   "guess": false
+  },
+  "Year 12/Module 4 - Electrons, Waves and Photons/Chapter 12 - Waves 2/Lesson 7 - Wavelength of Light - Link to Yr13 Content on Starlight": {
+   "codes": [
+    "OCR A: Superposition",
+    "OCR A: Electromagnetic Radiation from Stars"
+   ],
+   "guess": false
+  },
+  "Year 12/Module 4 - Electrons, Waves and Photons/Chapter 12 - Waves 2/Lesson 8 - Revision": {
+   "codes": [
+    "OCR A: Superposition",
+    "OCR A: Stationary Waves"
+   ],
+   "guess": false
+  },
+  "Year 12/Module 4 - Electrons, Waves and Photons/Chapter 8 - Charge and Current/Lesson 1 - Current and Charge": {
+   "codes": [
+    "OCR A: Charge"
+   ],
+   "guess": false
+  },
+  "Year 12/Module 4 - Electrons, Waves and Photons/Chapter 8 - Charge and Current/Lesson 2 - Moving Charges": {
+   "codes": [
+    "OCR A: Charge"
+   ],
+   "guess": false
+  },
+  "Year 12/Module 4 - Electrons, Waves and Photons/Chapter 8 - Charge and Current/Lesson 3 - Kirchhoff's 1st Law": {
+   "codes": [
+    "OCR A: Charge",
+    "OCR A: Series and Parallel Circuits"
+   ],
+   "guess": false
+  },
+  "Year 12/Module 4 - Electrons, Waves and Photons/Chapter 8 - Charge and Current/Lesson 4 - Mean Drift Velocity": {
+   "codes": [
+    "OCR A: Mean Drift Velocity"
+   ],
+   "guess": false
+  },
+  "Year 12/Module 4 - Electrons, Waves and Photons/Chapter 9 - Energy, Power and Resistance/Lesson 1 - Circuit Symbols": {
+   "codes": [
+    "OCR A: Circuit Symbols"
+   ],
+   "guess": false
+  },
+  "Year 12/Module 4 - Electrons, Waves and Photons/Chapter 9 - Energy, Power and Resistance/Lesson 2 - Potential Difference and Emf": {
+   "codes": [
+    "OCR A: E.M.F. and P.D."
+   ],
+   "guess": false
+  },
+  "Year 12/Module 4 - Electrons, Waves and Photons/Chapter 9 - Energy, Power and Resistance/Lesson 3 - The Electron Gun": {
+   "codes": [
+    "OCR A: E.M.F. and P.D."
+   ],
+   "guess": false
+  },
+  "Year 12/Module 4 - Electrons, Waves and Photons/Chapter 9 - Energy, Power and Resistance/Lesson 4 - Resistance": {
+   "codes": [
+    "OCR A: Resistance"
+   ],
+   "guess": false
+  },
+  "Year 12/Module 4 - Electrons, Waves and Photons/Chapter 9 - Energy, Power and Resistance/Lesson 5 - I-V Characteristics": {
+   "codes": [
+    "OCR A: Resistance"
+   ],
+   "guess": false
+  },
+  "Year 12/Module 4 - Electrons, Waves and Photons/Chapter 9 - Energy, Power and Resistance/Lesson 6 - Diode": {
+   "codes": [
+    "OCR A: Resistance"
+   ],
+   "guess": false
+  },
+  "Year 12/Module 4 - Electrons, Waves and Photons/Chapter 9 - Energy, Power and Resistance/Lesson 7 - Resistivity": {
+   "codes": [
+    "OCR A: Resistivity"
+   ],
+   "guess": false
+  },
+  "Year 12/Module 4 - Electrons, Waves and Photons/Chapter 9 - Energy, Power and Resistance/Lesson 8 - The Thermistor": {
+   "codes": [
+    "OCR A: Resistance",
+    "OCR A: Resistivity"
+   ],
+   "guess": false
+  },
+  "Year 12/Module 4 - Electrons, Waves and Photons/Chapter 9 - Energy, Power and Resistance/Lesson 9 - LDR's": {
+   "codes": [
+    "OCR A: Resistance"
+   ],
+   "guess": false
+  },
+  "Year 12/Module 4 - Electrons, Waves and Photons/Chapter 9 - Energy, Power and Resistance/Lesson 10 - Electrical Energy and Power": {
+   "codes": [
+    "OCR A: Power"
+   ],
+   "guess": false
+  },
+  "Year 12/Module 4 - Electrons, Waves and Photons/Chapter 9 - Energy, Power and Resistance/Lesson 11 - Paying for Electricity": {
+   "codes": [
+    "OCR A: Power"
+   ],
+   "guess": false
+  },
+  "Year 12/Module 4 - Electrons, Waves and Photons/Chapter 10 - Electrical Circuits/Lesson 1 - Kirchhoff's Laws and Circuits": {
+   "codes": [
+    "OCR A: Series and Parallel Circuits"
+   ],
+   "guess": false
+  },
+  "Year 12/Module 4 - Electrons, Waves and Photons/Chapter 10 - Electrical Circuits/Lesson 2 - Combining Resistors": {
+   "codes": [
+    "OCR A: Series and Parallel Circuits"
+   ],
+   "guess": false
+  },
+  "Year 12/Module 4 - Electrons, Waves and Photons/Chapter 10 - Electrical Circuits/Lesson 3 - Analysing Circuits": {
+   "codes": [
+    "OCR A: Series and Parallel Circuits"
+   ],
+   "guess": false
+  },
+  "Year 12/Module 4 - Electrons, Waves and Photons/Chapter 10 - Electrical Circuits/Lesson 4 - Internal Resistance": {
+   "codes": [
+    "OCR A: Internal Resistance"
+   ],
+   "guess": false
+  },
+  "Year 12/Module 4 - Electrons, Waves and Photons/Chapter 10 - Electrical Circuits/Lesson 5 - Potential Divider Circuits": {
+   "codes": [
+    "OCR A: Potential Dividers"
+   ],
+   "guess": false
+  },
+  "Year 12/Module 4 - Electrons, Waves and Photons/Chapter 10 - Electrical Circuits/Lesson 6 - Sensing Circuits": {
+   "codes": [
+    "OCR A: Potential Dividers"
+   ],
+   "guess": false
+  },
+  "Year 12/Module 4 - Electrons, Waves and Photons/Chapter 13 - Quantum Physics/Lesson 1 - The Photon Model": {
+   "codes": [
+    "OCR A: Photons"
+   ],
+   "guess": false
+  },
+  "Year 12/Module 4 - Electrons, Waves and Photons/Chapter 13 - Quantum Physics/Lesson 2 - Photoelectric Effect (Teach This First)": {
+   "codes": [
+    "OCR A: The Photoelectric Effect"
+   ],
+   "guess": false
+  },
+  "Year 12/Module 4 - Electrons, Waves and Photons/Chapter 13 - Quantum Physics/Lesson 3 - Einstein's Photoelectric Effect Equation": {
+   "codes": [
+    "OCR A: The Photoelectric Effect"
+   ],
+   "guess": false
+  },
+  "Year 12/Module 4 - Electrons, Waves and Photons/Chapter 13 - Quantum Physics/Lesson 4 - Wave - Particle Duality": {
+   "codes": [
+    "OCR A: Wave-Particle Duality"
+   ],
+   "guess": false
+  },
+  "Year 12/Module 5 - Newtonian World and Astrophysics/Chapter 14 - Thermal Physics/Lesson 1 - Temperature": {
+   "codes": [
+    "OCR A: Temperature"
+   ],
+   "guess": false
+  },
+  "Year 12/Module 5 - Newtonian World and Astrophysics/Chapter 14 - Thermal Physics/Lesson 2 - Kinetic Theory": {
+   "codes": [
+    "OCR A: Solid, Liquid and Gas"
+   ],
+   "guess": false
+  },
+  "Year 12/Module 5 - Newtonian World and Astrophysics/Chapter 14 - Thermal Physics/Lesson 3 - Internal Energy": {
+   "codes": [
+    "OCR A: Solid, Liquid and Gas"
+   ],
+   "guess": false
+  },
+  "Year 12/Module 5 - Newtonian World and Astrophysics/Chapter 14 - Thermal Physics/Lesson 4 - Specific Heat Capacity": {
+   "codes": [
+    "OCR A: Thermal Properties of Materials"
+   ],
+   "guess": false
+  },
+  "Year 12/Module 5 - Newtonian World and Astrophysics/Chapter 14 - Thermal Physics/Lesson 5 - Specific Latent Heat": {
+   "codes": [
+    "OCR A: Thermal Properties of Materials"
+   ],
+   "guess": false
+  },
+  "Year 12/Module 5 - Newtonian World and Astrophysics/Chapter 15 - Ideal Gases/Lesson 1 - Kinetic Theory of Gases": {
+   "codes": [
+    "OCR A: Ideal Gases"
+   ],
+   "guess": false
+  },
+  "Year 12/Module 5 - Newtonian World and Astrophysics/Chapter 15 - Ideal Gases/Lesson 2 - Gas Laws": {
+   "codes": [
+    "OCR A: Ideal Gases"
+   ],
+   "guess": false
+  },
+  "Year 12/Module 5 - Newtonian World and Astrophysics/Chapter 15 - Ideal Gases/Lesson 3 - Root Mean Square Speed": {
+   "codes": [
+    "OCR A: Ideal Gases"
+   ],
+   "guess": false
+  },
+  "Year 12/Module 5 - Newtonian World and Astrophysics/Chapter 15 - Ideal Gases/Lesson 4 - Boltzmann Constant": {
+   "codes": [
+    "OCR A: Ideal Gases"
+   ],
+   "guess": false
+  },
+  "Year 13/Module 5 - Newtonian World and Astrophysics/Chapter 19 - Stars/Lesson 1 - Objects in the Universe": {
+   "codes": [
+    "OCR A: Stars"
+   ],
+   "guess": false
+  },
+  "Year 13/Module 5 - Newtonian World and Astrophysics/Chapter 19 - Stars/Lesson 2 - Life Cycle of Stars": {
+   "codes": [
+    "OCR A: Stars"
+   ],
+   "guess": false
+  },
+  "Year 13/Module 5 - Newtonian World and Astrophysics/Chapter 19 - Stars/Lesson 3 - Hertzsprung-Russell": {
+   "codes": [
+    "OCR A: Stars"
+   ],
+   "guess": false
+  },
+  "Year 13/Module 5 - Newtonian World and Astrophysics/Chapter 19 - Stars/Lesson 4 - Energy Levels in Atoms": {
+   "codes": [
+    "OCR A: Electromagnetic Radiation from Stars"
+   ],
+   "guess": false
+  },
+  "Year 13/Module 5 - Newtonian World and Astrophysics/Chapter 19 - Stars/Lesson 5 - Spectra": {
+   "codes": [
+    "OCR A: Electromagnetic Radiation from Stars"
+   ],
+   "guess": false
+  },
+  "Year 13/Module 5 - Newtonian World and Astrophysics/Chapter 19 - Stars/Lesson 6 - Analysing Starlight": {
+   "codes": [
+    "OCR A: Electromagnetic Radiation from Stars"
+   ],
+   "guess": false
+  },
+  "Year 13/Module 5 - Newtonian World and Astrophysics/Chapter 19 - Stars/Lesson 7 - Stellar Luminosity": {
+   "codes": [
+    "OCR A: Electromagnetic Radiation from Stars"
+   ],
+   "guess": false
+  },
+  "Year 13/Module 5 - Newtonian World and Astrophysics/Chapter 19 - Stars/Lesson 8 - Stars Revision": {
+   "codes": [
+    "OCR A: Stars",
+    "OCR A: Electromagnetic Radiation from Stars"
+   ],
+   "guess": false
+  },
+  "Year 13/Module 5 - Newtonian World and Astrophysics/Chapter 20 - Cosmology/Lesson 1 - Astronomical Distances": {
+   "codes": [
+    "OCR A: Cosmology"
+   ],
+   "guess": false
+  },
+  "Year 13/Module 5 - Newtonian World and Astrophysics/Chapter 20 - Cosmology/Lesson 2 - The Doppler Effect": {
+   "codes": [
+    "OCR A: Cosmology"
+   ],
+   "guess": false
+  },
+  "Year 13/Module 5 - Newtonian World and Astrophysics/Chapter 20 - Cosmology/Lesson 3 - Hubble's Law": {
+   "codes": [
+    "OCR A: Cosmology"
+   ],
+   "guess": false
+  },
+  "Year 13/Module 5 - Newtonian World and Astrophysics/Chapter 20 - Cosmology/Lesson 4 - The Big Bang Theory": {
+   "codes": [
+    "OCR A: Cosmology"
+   ],
+   "guess": false
+  },
+  "Year 13/Module 5 - Newtonian World and Astrophysics/Chapter 20 - Cosmology/Lesson 5 - Evolution of the Universe": {
+   "codes": [
+    "OCR A: Cosmology"
+   ],
+   "guess": false
+  },
+  "Year 13/Module 5 - Newtonian World and Astrophysics/Chapter 20 - Cosmology/Lesson 5a - Cosmology and Space Review": {
+   "codes": [
+    "OCR A: Cosmology"
+   ],
+   "guess": false
+  },
+  "Year 13/Module 6 - Particles and Medical Physics/Chapter 24 - Particle Physics/Lesson 1 - Nuclear Model": {
+   "codes": [
+    "OCR A: The Nuclear Atom"
+   ],
+   "guess": false
+  },
+  "Year 13/Module 6 - Particles and Medical Physics/Chapter 24 - Particle Physics/Lesson 2 - Nuclear Density": {
+   "codes": [
+    "OCR A: The Nuclear Atom"
+   ],
+   "guess": false
+  },
+  "Year 13/Module 6 - Particles and Medical Physics/Chapter 24 - Particle Physics/Lesson 3 - Particle Families and Antimatter": {
+   "codes": [
+    "OCR A: Fundamental Particles"
+   ],
+   "guess": false
+  },
+  "Year 13/Module 6 - Particles and Medical Physics/Chapter 24 - Particle Physics/Lesson 4 - Quarks": {
+   "codes": [
+    "OCR A: Fundamental Particles"
+   ],
+   "guess": false
+  },
+  "Year 13/Module 6 - Particles and Medical Physics/Chapter 24 - Particle Physics/Lesson 5 - Beta Decay": {
+   "codes": [
+    "OCR A: Radioactivity",
+    "OCR A: Fundamental Particles"
+   ],
+   "guess": false
+  },
+  "Year 13/Module 6 - Particles and Medical Physics/Chapter 25 - Radioactivity/Lesson 1 - Radioactivity and Decay Equations": {
+   "codes": [
+    "OCR A: Radioactivity"
+   ],
+   "guess": false
+  },
+  "Year 13/Module 6 - Particles and Medical Physics/Chapter 25 - Radioactivity/Lesson 2 - Half-Life and Activity": {
+   "codes": [
+    "OCR A: Radioactivity"
+   ],
+   "guess": false
+  },
+  "Year 13/Module 6 - Particles and Medical Physics/Chapter 25 - Radioactivity/Lesson 3 - Radioactive Decay Calculations": {
+   "codes": [
+    "OCR A: Radioactivity"
+   ],
+   "guess": false
+  },
+  "Year 13/Module 6 - Particles and Medical Physics/Chapter 25 - Radioactivity/Lesson 4 - Modelling Radioactive Decay": {
+   "codes": [
+    "OCR A: Radioactivity"
+   ],
+   "guess": false
+  },
+  "Year 13/Module 6 - Particles and Medical Physics/Chapter 25 - Radioactivity/Lesson 5 - Radioactive Dating": {
+   "codes": [
+    "OCR A: Radioactivity"
+   ],
+   "guess": false
+  },
+  "Year 13/Module 6 - Particles and Medical Physics/Chapter 26 - Nuclear Physics/Lesson 1 - Einstein's Mass-Energy Equation": {
+   "codes": [
+    "OCR A: Nuclear Fission and Fusion"
+   ],
+   "guess": false
+  },
+  "Year 13/Module 6 - Particles and Medical Physics/Chapter 26 - Nuclear Physics/Lesson 2 - Binding Energy": {
+   "codes": [
+    "OCR A: Nuclear Fission and Fusion"
+   ],
+   "guess": false
+  },
+  "Year 13/Module 6 - Particles and Medical Physics/Chapter 26 - Nuclear Physics/Lesson 3 - Nuclear Fission": {
+   "codes": [
+    "OCR A: Nuclear Fission and Fusion"
+   ],
+   "guess": false
+  },
+  "Year 13/Module 6 - Particles and Medical Physics/Chapter 26 - Nuclear Physics/Lesson 4 - Nuclear Fusion": {
+   "codes": [
+    "OCR A: Nuclear Fission and Fusion"
+   ],
+   "guess": false
+  },
+  "Year 13/Module 6 - Particles and Medical Physics/Chapter 26 - Nuclear Physics/Lesson 5 - Chapter Summary": {
+   "codes": [
+    "OCR A: Nuclear Fission and Fusion"
+   ],
+   "guess": false
+  },
+  "Year 13/Module 6 - Particles and Medical Physics/Chapter 27 - Medical Imagining/Lesson 1 - X-rays": {
+   "codes": [
+    "OCR A: Using X-rays"
+   ],
+   "guess": false
+  },
+  "Year 13/Module 6 - Particles and Medical Physics/Chapter 27 - Medical Imagining/Lesson 2 - Interaction of X-rays with Matter": {
+   "codes": [
+    "OCR A: Using X-rays"
+   ],
+   "guess": false
+  },
+  "Year 13/Module 6 - Particles and Medical Physics/Chapter 27 - Medical Imagining/Lesson 3 - CAT Scans": {
+   "codes": [
+    "OCR A: Using X-rays"
+   ],
+   "guess": false
+  },
+  "Year 13/Module 6 - Particles and Medical Physics/Chapter 27 - Medical Imagining/Lesson 4 - The Gamma Camera": {
+   "codes": [
+    "OCR A: Diagnostic Methods in Medicine"
+   ],
+   "guess": false
+  },
+  "Year 13/Module 6 - Particles and Medical Physics/Chapter 27 - Medical Imagining/Lesson 5 - PET Scans": {
+   "codes": [
+    "OCR A: Diagnostic Methods in Medicine"
+   ],
+   "guess": false
+  },
+  "Year 13/Module 6 - Particles and Medical Physics/Chapter 27 - Medical Imagining/Lesson 6 - Ultrasound": {
+   "codes": [
+    "OCR A: Using Ultrasound"
+   ],
+   "guess": false
+  },
+  "Year 13/Module 6 - Particles and Medical Physics/Chapter 27 - Medical Imagining/Lesson 7 - Acoustic Impedance": {
+   "codes": [
+    "OCR A: Using Ultrasound"
+   ],
+   "guess": false
+  },
+  "Year 13/Module 6 - Particles and Medical Physics/Chapter 27 - Medical Imagining/Lesson 8 - Doppler Imaging": {
+   "codes": [
+    "OCR A: Using Ultrasound"
+   ],
+   "guess": false
+  }
+ }
+}

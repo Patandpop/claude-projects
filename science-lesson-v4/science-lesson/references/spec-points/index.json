@@ -1,0 +1,1382 @@
+{
+ "built": "2026-10-29",
+ "note": "Squares of the memory map: the exam library sections (spec-index.js). ref = official spec number, to fill in.",
+ "points": [
+  {
+   "code": "Biology: Photosynthesis",
+   "title": "Photosynthesis",
+   "unit": "Bioenergetics",
+   "subject": "Biology",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Biology: Respiration",
+   "title": "Respiration",
+   "unit": "Bioenergetics",
+   "subject": "Biology",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Biology: Cell Division",
+   "title": "Cell Division",
+   "unit": "Cell Biology",
+   "subject": "Biology",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Biology: Cell Structure",
+   "title": "Cell Structure",
+   "unit": "Cell Biology",
+   "subject": "Biology",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Biology: Transport in Cells",
+   "title": "Transport in Cells",
+   "unit": "Cell Biology",
+   "subject": "Biology",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Biology: Adaptations Interdependence and Competition",
+   "title": "Adaptations Interdependence and Competition",
+   "unit": "Ecology",
+   "subject": "Biology",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Biology: Biodiversity and Effect of Human Interaction on Ecosystems",
+   "title": "Biodiversity and Effect of Human Interaction on Ecosystems",
+   "unit": "Ecology",
+   "subject": "Biology",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Biology: Food Production",
+   "title": "Food Production",
+   "unit": "Ecology",
+   "subject": "Biology",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Biology: Organisation of an Ecosystem",
+   "title": "Organisation of an Ecosystem",
+   "unit": "Ecology",
+   "subject": "Biology",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Biology: Trophic Levels in an Ecosystem",
+   "title": "Trophic Levels in an Ecosystem",
+   "unit": "Ecology",
+   "subject": "Biology",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Biology: Homeostasis",
+   "title": "Homeostasis",
+   "unit": "Homeostasis and Response",
+   "subject": "Biology",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Biology: Hormonal Coordination in Humans",
+   "title": "Hormonal Coordination in Humans",
+   "unit": "Homeostasis and Response",
+   "subject": "Biology",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Biology: The Human Nervous System",
+   "title": "The Human Nervous System",
+   "unit": "Homeostasis and Response",
+   "subject": "Biology",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Biology: Communicable Diseases",
+   "title": "Communicable Diseases",
+   "unit": "Infection and Response",
+   "subject": "Biology",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Biology: Monoclonal Antibodies",
+   "title": "Monoclonal Antibodies",
+   "unit": "Infection and Response",
+   "subject": "Biology",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Biology: Plant Disease",
+   "title": "Plant Disease",
+   "unit": "Infection and Response",
+   "subject": "Biology",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Biology: Classification of Living Organisms",
+   "title": "Classification of Living Organisms",
+   "unit": "Inheritance Variation and Evolution",
+   "subject": "Biology",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Biology: Development of Understanding of Genetics and Evolution",
+   "title": "Development of Understanding of Genetics and Evolution",
+   "unit": "Inheritance Variation and Evolution",
+   "subject": "Biology",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Biology: Reproduction",
+   "title": "Reproduction",
+   "unit": "Inheritance Variation and Evolution",
+   "subject": "Biology",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Biology: Variation and Evolution",
+   "title": "Variation and Evolution",
+   "unit": "Inheritance Variation and Evolution",
+   "subject": "Biology",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Biology: Carbon compounds as fuels and feedstock",
+   "title": "Carbon compounds as fuels and feedstock",
+   "unit": "Organic Chemistry",
+   "subject": "Biology",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Biology: Synthetic and naturally occurring polymers",
+   "title": "Synthetic and naturally occurring polymers",
+   "unit": "Organic Chemistry",
+   "subject": "Biology",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Biology: Animal Tissues Organs and Organ Systems",
+   "title": "Animal Tissues Organs and Organ Systems",
+   "unit": "Organisation",
+   "subject": "Biology",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Biology: Plant Tissues Organs and Systems",
+   "title": "Plant Tissues Organs and Systems",
+   "unit": "Organisation",
+   "subject": "Biology",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Biology: Principles of Organisation",
+   "title": "Principles of Organisation",
+   "unit": "Organisation",
+   "subject": "Biology",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Chemistry: Properties of Transition Metals",
+   "title": "Properties of Transition Metals",
+   "unit": "Atomic Structure and Periodic Table",
+   "subject": "Chemistry",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Chemistry: Simple Models; Symbols; RAM; Charge; Isotopes",
+   "title": "Simple Models; Symbols; RAM; Charge; Isotopes",
+   "unit": "Atomic Structure and Periodic Table",
+   "subject": "Chemistry",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Chemistry: The Periodic Table",
+   "title": "The Periodic Table",
+   "unit": "Atomic Structure and Periodic Table",
+   "subject": "Chemistry",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Chemistry: Bulk and surface properties of matter including nanoparticles",
+   "title": "Bulk and surface properties of matter including nanoparticles",
+   "unit": "Bonding; Structure and Properties of Matter",
+   "subject": "Chemistry",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Chemistry: Chemical Bonds; Ionic; Covalent; Metallic",
+   "title": "Chemical Bonds; Ionic; Covalent; Metallic",
+   "unit": "Bonding; Structure and Properties of Matter",
+   "subject": "Chemistry",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Chemistry: How bonding and Structure are related to properties of substances",
+   "title": "How bonding and Structure are related to properties of substances",
+   "unit": "Bonding; Structure and Properties of Matter",
+   "subject": "Chemistry",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Chemistry: Structure and Bonding of Carbon",
+   "title": "Structure and Bonding of Carbon",
+   "unit": "Bonding; Structure and Properties of Matter",
+   "subject": "Chemistry",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Chemistry: Identification of ions by chemical and spectroscopic means",
+   "title": "Identification of ions by chemical and spectroscopic means",
+   "unit": "Chemical Analysis",
+   "subject": "Chemistry",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Chemistry: Purity; formulations and chromatography",
+   "title": "Purity; formulations and chromatography",
+   "unit": "Chemical Analysis",
+   "subject": "Chemistry",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Chemistry: Electrolysis",
+   "title": "Electrolysis",
+   "unit": "Chemical Changes",
+   "subject": "Chemistry",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Chemistry: Reactions of acids",
+   "title": "Reactions of acids",
+   "unit": "Chemical Changes",
+   "subject": "Chemistry",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Chemistry: Reactivity of metals",
+   "title": "Reactivity of metals",
+   "unit": "Chemical Changes",
+   "subject": "Chemistry",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Chemistry: Common atmospheric pollutants and their sources",
+   "title": "Common atmospheric pollutants and their sources",
+   "unit": "Chemistry of the atmosphere",
+   "subject": "Chemistry",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Chemistry: Chemical Cells and Fuel Cells",
+   "title": "Chemical Cells and Fuel Cells",
+   "unit": "Energy Changes",
+   "subject": "Chemistry",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Chemistry: Exothermic and endothermic reactions",
+   "title": "Exothermic and endothermic reactions",
+   "unit": "Energy Changes",
+   "subject": "Chemistry",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Chemistry: Carbon compounds as fuels and feedstock",
+   "title": "Carbon compounds as fuels and feedstock",
+   "unit": "Organic Chemistry",
+   "subject": "Chemistry",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Chemistry: Reactions of alkenes and alcohols",
+   "title": "Reactions of alkenes and alcohols",
+   "unit": "Organic Chemistry",
+   "subject": "Chemistry",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Chemistry: Synthetic and naturally occurring polymers",
+   "title": "Synthetic and naturally occurring polymers",
+   "unit": "Organic Chemistry",
+   "subject": "Chemistry",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Chemistry: Chemical measurements; conservation of mass and quantitative interpretation of chemical equations",
+   "title": "Chemical measurements; conservation of mass and quantitative interpretation of chemical equations",
+   "unit": "Quantitative Chemistry",
+   "subject": "Chemistry",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Chemistry: Use of amount of substance in relation to mass of pure substances",
+   "title": "Use of amount of substance in relation to mass of pure substances",
+   "unit": "Quantitative Chemistry",
+   "subject": "Chemistry",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Chemistry: Using amount substance; volumes",
+   "title": "Using amount substance; volumes",
+   "unit": "Quantitative Chemistry",
+   "subject": "Chemistry",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Chemistry: Using concentration of solution in mol per dm3",
+   "title": "Using concentration of solution in mol per dm3",
+   "unit": "Quantitative Chemistry",
+   "subject": "Chemistry",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Chemistry: Yield and atomic economy of chemical reactions",
+   "title": "Yield and atomic economy of chemical reactions",
+   "unit": "Quantitative Chemistry",
+   "subject": "Chemistry",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Chemistry: Rate of reaction",
+   "title": "Rate of reaction",
+   "unit": "Rate and Extent of Chemical Change",
+   "subject": "Chemistry",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Chemistry: Reversible reactions and dynamic equilibrium",
+   "title": "Reversible reactions and dynamic equilibrium",
+   "unit": "Rate and Extent of Chemical Change",
+   "subject": "Chemistry",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Chemistry: Haber process and the us of NPK fertilisers",
+   "title": "Haber process and the us of NPK fertilisers",
+   "unit": "Using Resources",
+   "subject": "Chemistry",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Chemistry: Life cycle assessment and recycling",
+   "title": "Life cycle assessment and recycling",
+   "unit": "Using Resources",
+   "subject": "Chemistry",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Chemistry: Using Materials",
+   "title": "Using Materials",
+   "unit": "Using Resources",
+   "subject": "Chemistry",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Chemistry: Using the Earths resources and obtaining potable water",
+   "title": "Using the Earths resources and obtaining potable water",
+   "unit": "Using Resources",
+   "subject": "Chemistry",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Physics: Atoms and Isotopes",
+   "title": "Atoms and Isotopes",
+   "unit": "Atomic Structure",
+   "subject": "Physics",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Physics: Atoms and Nuclear Radiation",
+   "title": "Atoms and Nuclear Radiation",
+   "unit": "Atomic Structure",
+   "subject": "Physics",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Physics: Hazards and Uses of Radioactive Emissions and of Background Radiation",
+   "title": "Hazards and Uses of Radioactive Emissions and of Background Radiation",
+   "unit": "Atomic Structure",
+   "subject": "Physics",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Physics: Nuclear Fission and Fusion",
+   "title": "Nuclear Fission and Fusion",
+   "unit": "Atomic Structure",
+   "subject": "Physics",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Physics: Current Potential Difference and Resistance",
+   "title": "Current Potential Difference and Resistance",
+   "unit": "Electricity",
+   "subject": "Physics",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Physics: Domestic Uses and Safety",
+   "title": "Domestic Uses and Safety",
+   "unit": "Electricity",
+   "subject": "Physics",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Physics: Energy Transfer",
+   "title": "Energy Transfer",
+   "unit": "Electricity",
+   "subject": "Physics",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Physics: Series and Parallel Circuits",
+   "title": "Series and Parallel Circuits",
+   "unit": "Electricity",
+   "subject": "Physics",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Physics: Static Electricity",
+   "title": "Static Electricity",
+   "unit": "Electricity",
+   "subject": "Physics",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Physics: Changes in Energy",
+   "title": "Changes in Energy",
+   "unit": "Energy",
+   "subject": "Physics",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Physics: Efficiency",
+   "title": "Efficiency",
+   "unit": "Energy",
+   "subject": "Physics",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Physics: Energy Changes in Systems",
+   "title": "Energy Changes in Systems",
+   "unit": "Energy",
+   "subject": "Physics",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Physics: Energy Stores and Systems",
+   "title": "Energy Stores and Systems",
+   "unit": "Energy",
+   "subject": "Physics",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Physics: Energy transfer in a system",
+   "title": "Energy transfer in a system",
+   "unit": "Energy",
+   "subject": "Physics",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Physics: National and Global Energy Resources",
+   "title": "National and Global Energy Resources",
+   "unit": "Energy",
+   "subject": "Physics",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Physics: Power",
+   "title": "Power",
+   "unit": "Energy",
+   "subject": "Physics",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Physics: Acceleration",
+   "title": "Acceleration",
+   "unit": "Forces",
+   "subject": "Physics",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Physics: Atmospheric Pressure",
+   "title": "Atmospheric Pressure",
+   "unit": "Forces",
+   "subject": "Physics",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Physics: Contact and Non-Contact Forces",
+   "title": "Contact and Non-Contact Forces",
+   "unit": "Forces",
+   "subject": "Physics",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Physics: Distance and Displacement",
+   "title": "Distance and Displacement",
+   "unit": "Forces",
+   "subject": "Physics",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Physics: Distance Time Relationship",
+   "title": "Distance Time Relationship",
+   "unit": "Forces",
+   "subject": "Physics",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Physics: Forces and Braking",
+   "title": "Forces and Braking",
+   "unit": "Forces",
+   "subject": "Physics",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Physics: Forces and Elasticity",
+   "title": "Forces and Elasticity",
+   "unit": "Forces",
+   "subject": "Physics",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Physics: Gravity",
+   "title": "Gravity",
+   "unit": "Forces",
+   "subject": "Physics",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Physics: Moments Levers and Gears",
+   "title": "Moments Levers and Gears",
+   "unit": "Forces",
+   "subject": "Physics",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Physics: Momentum",
+   "title": "Momentum",
+   "unit": "Forces",
+   "subject": "Physics",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Physics: Newtons First Law",
+   "title": "Newtons First Law",
+   "unit": "Forces",
+   "subject": "Physics",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Physics: Newtons Second Law",
+   "title": "Newtons Second Law",
+   "unit": "Forces",
+   "subject": "Physics",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Physics: Newtons Third Law",
+   "title": "Newtons Third Law",
+   "unit": "Forces",
+   "subject": "Physics",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Physics: Pressure in a Fluid",
+   "title": "Pressure in a Fluid",
+   "unit": "Forces",
+   "subject": "Physics",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Physics: Resultant Forces",
+   "title": "Resultant Forces",
+   "unit": "Forces",
+   "subject": "Physics",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Physics: Scalars and Vector Quantities",
+   "title": "Scalars and Vector Quantities",
+   "unit": "Forces",
+   "subject": "Physics",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Physics: Speed",
+   "title": "Speed",
+   "unit": "Forces",
+   "subject": "Physics",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Physics: Velocity",
+   "title": "Velocity",
+   "unit": "Forces",
+   "subject": "Physics",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Physics: Work Done and Energy Transfer",
+   "title": "Work Done and Energy Transfer",
+   "unit": "Forces",
+   "subject": "Physics",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Physics: Induced Potential and Transformers and the National Grid",
+   "title": "Induced Potential and Transformers and the National Grid",
+   "unit": "Magnetism",
+   "subject": "Physics",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Physics: Permanent and Induced Magnetism and Magnetic Forces and Field",
+   "title": "Permanent and Induced Magnetism and Magnetic Forces and Field",
+   "unit": "Magnetism",
+   "subject": "Physics",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Physics: The Motor Effect",
+   "title": "The Motor Effect",
+   "unit": "Magnetism",
+   "subject": "Physics",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Physics: Changes of Heat and Specific Latent Heat",
+   "title": "Changes of Heat and Specific Latent Heat",
+   "unit": "Particle Model of Matter",
+   "subject": "Physics",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Physics: Changes of State and the Particle Model",
+   "title": "Changes of State and the Particle Model",
+   "unit": "Particle Model of Matter",
+   "subject": "Physics",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Physics: Internal Energy",
+   "title": "Internal Energy",
+   "unit": "Particle Model of Matter",
+   "subject": "Physics",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Physics: Particle Model and Pressure",
+   "title": "Particle Model and Pressure",
+   "unit": "Particle Model of Matter",
+   "subject": "Physics",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Physics: Temperature Changes in a System and Specific Heat Capacity",
+   "title": "Temperature Changes in a System and Specific Heat Capacity",
+   "unit": "Particle Model of Matter",
+   "subject": "Physics",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Physics: Red Shift",
+   "title": "Red Shift",
+   "unit": "Space Physics",
+   "subject": "Physics",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Physics: Solar System and Stability of Orbital Motions and Satellites",
+   "title": "Solar System and Stability of Orbital Motions and Satellites",
+   "unit": "Space Physics",
+   "subject": "Physics",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Physics: Black Body Radiation",
+   "title": "Black Body Radiation",
+   "unit": "Waves",
+   "subject": "Physics",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Physics: Electromagnetic Waves",
+   "title": "Electromagnetic Waves",
+   "unit": "Waves",
+   "subject": "Physics",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "Physics: Waves in Air Fluid and Solids",
+   "title": "Waves in Air Fluid and Solids",
+   "unit": "Waves",
+   "subject": "Physics",
+   "board": "AQA",
+   "ref": ""
+  },
+  {
+   "code": "OCR A: Cosmology",
+   "title": "Cosmology",
+   "unit": "Astrophysics",
+   "subject": "Physics",
+   "board": "OCR A",
+   "ref": ""
+  },
+  {
+   "code": "OCR A: Electromagnetic Radiation from Stars",
+   "title": "Electromagnetic Radiation from Stars",
+   "unit": "Astrophysics",
+   "subject": "Physics",
+   "board": "OCR A",
+   "ref": ""
+  },
+  {
+   "code": "OCR A: Stars",
+   "title": "Stars",
+   "unit": "Astrophysics",
+   "subject": "Physics",
+   "board": "OCR A",
+   "ref": ""
+  },
+  {
+   "code": "OCR A: Capacitors",
+   "title": "Capacitors",
+   "unit": "Capacitors",
+   "subject": "Physics",
+   "board": "OCR A",
+   "ref": ""
+  },
+  {
+   "code": "OCR A: Charging and Discharging Capacitors",
+   "title": "Charging and Discharging Capacitors",
+   "unit": "Capacitors",
+   "subject": "Physics",
+   "board": "OCR A",
+   "ref": ""
+  },
+  {
+   "code": "OCR A: Energy",
+   "title": "Energy",
+   "unit": "Capacitors",
+   "subject": "Physics",
+   "board": "OCR A",
+   "ref": ""
+  },
+  {
+   "code": "OCR A: Charge",
+   "title": "Charge",
+   "unit": "Charge and Current",
+   "subject": "Physics",
+   "board": "OCR A",
+   "ref": ""
+  },
+  {
+   "code": "OCR A: Mean Drift Velocity",
+   "title": "Mean Drift Velocity",
+   "unit": "Charge and Current",
+   "subject": "Physics",
+   "board": "OCR A",
+   "ref": ""
+  },
+  {
+   "code": "OCR A: Centripetal Force",
+   "title": "Centripetal Force",
+   "unit": "Circular Motion",
+   "subject": "Physics",
+   "board": "OCR A",
+   "ref": ""
+  },
+  {
+   "code": "OCR A: Kinematics of Circular Motion",
+   "title": "Kinematics of Circular Motion",
+   "unit": "Circular Motion",
+   "subject": "Physics",
+   "board": "OCR A",
+   "ref": ""
+  },
+  {
+   "code": "OCR A: Coulomb's Law",
+   "title": "Coulomb's Law",
+   "unit": "Electric Fields",
+   "subject": "Physics",
+   "board": "OCR A",
+   "ref": ""
+  },
+  {
+   "code": "OCR A: Electrical Potential and Energy",
+   "title": "Electrical Potential and Energy",
+   "unit": "Electric Fields",
+   "subject": "Physics",
+   "board": "OCR A",
+   "ref": ""
+  },
+  {
+   "code": "OCR A: Point and Spherical Charges",
+   "title": "Point and Spherical Charges",
+   "unit": "Electric Fields",
+   "subject": "Physics",
+   "board": "OCR A",
+   "ref": ""
+  },
+  {
+   "code": "OCR A: Uniform Electric Field",
+   "title": "Uniform Electric Field",
+   "unit": "Electric Fields",
+   "subject": "Physics",
+   "board": "OCR A",
+   "ref": ""
+  },
+  {
+   "code": "OCR A: Internal Resistance",
+   "title": "Internal Resistance",
+   "unit": "Electrical Circuits",
+   "subject": "Physics",
+   "board": "OCR A",
+   "ref": ""
+  },
+  {
+   "code": "OCR A: Potential Dividers",
+   "title": "Potential Dividers",
+   "unit": "Electrical Circuits",
+   "subject": "Physics",
+   "board": "OCR A",
+   "ref": ""
+  },
+  {
+   "code": "OCR A: Series and Parallel Circuits",
+   "title": "Series and Parallel Circuits",
+   "unit": "Electrical Circuits",
+   "subject": "Physics",
+   "board": "OCR A",
+   "ref": ""
+  },
+  {
+   "code": "OCR A: Electromagnetism",
+   "title": "Electromagnetism",
+   "unit": "Electromagnetism",
+   "subject": "Physics",
+   "board": "OCR A",
+   "ref": ""
+  },
+  {
+   "code": "OCR A: Magnetic Fields",
+   "title": "Magnetic Fields",
+   "unit": "Electromagnetism",
+   "subject": "Physics",
+   "board": "OCR A",
+   "ref": ""
+  },
+  {
+   "code": "OCR A: Motion of Charged Particles",
+   "title": "Motion of Charged Particles",
+   "unit": "Electromagnetism",
+   "subject": "Physics",
+   "board": "OCR A",
+   "ref": ""
+  },
+  {
+   "code": "OCR A: Circuit Symbols",
+   "title": "Circuit Symbols",
+   "unit": "Energy, Power and Resistance",
+   "subject": "Physics",
+   "board": "OCR A",
+   "ref": ""
+  },
+  {
+   "code": "OCR A: E.M.F. and P.D.",
+   "title": "E.M.F. and P.D.",
+   "unit": "Energy, Power and Resistance",
+   "subject": "Physics",
+   "board": "OCR A",
+   "ref": ""
+  },
+  {
+   "code": "OCR A: Power",
+   "title": "Power",
+   "unit": "Energy, Power and Resistance",
+   "subject": "Physics",
+   "board": "OCR A",
+   "ref": ""
+  },
+  {
+   "code": "OCR A: Resistance",
+   "title": "Resistance",
+   "unit": "Energy, Power and Resistance",
+   "subject": "Physics",
+   "board": "OCR A",
+   "ref": ""
+  },
+  {
+   "code": "OCR A: Resistivity",
+   "title": "Resistivity",
+   "unit": "Energy, Power and Resistance",
+   "subject": "Physics",
+   "board": "OCR A",
+   "ref": ""
+  },
+  {
+   "code": "OCR A: Density and Pressure",
+   "title": "Density and Pressure",
+   "unit": "Forces in Action",
+   "subject": "Physics",
+   "board": "OCR A",
+   "ref": ""
+  },
+  {
+   "code": "OCR A: Dynamics",
+   "title": "Dynamics",
+   "unit": "Forces in Action",
+   "subject": "Physics",
+   "board": "OCR A",
+   "ref": ""
+  },
+  {
+   "code": "OCR A: Equilibrium",
+   "title": "Equilibrium",
+   "unit": "Forces in Action",
+   "subject": "Physics",
+   "board": "OCR A",
+   "ref": ""
+  },
+  {
+   "code": "OCR A: Motion with Non-Uniform Acceleration",
+   "title": "Motion with Non-Uniform Acceleration",
+   "unit": "Forces in Action",
+   "subject": "Physics",
+   "board": "OCR A",
+   "ref": ""
+  },
+  {
+   "code": "OCR A: Gravitational Potential and Energy",
+   "title": "Gravitational Potential and Energy",
+   "unit": "Gravitational Fields",
+   "subject": "Physics",
+   "board": "OCR A",
+   "ref": ""
+  },
+  {
+   "code": "OCR A: Newton's Law of Gravitation",
+   "title": "Newton's Law of Gravitation",
+   "unit": "Gravitational Fields",
+   "subject": "Physics",
+   "board": "OCR A",
+   "ref": ""
+  },
+  {
+   "code": "OCR A: Planetary Motion",
+   "title": "Planetary Motion",
+   "unit": "Gravitational Fields",
+   "subject": "Physics",
+   "board": "OCR A",
+   "ref": ""
+  },
+  {
+   "code": "OCR A: Point and Spherical Masses",
+   "title": "Point and Spherical Masses",
+   "unit": "Gravitational Fields",
+   "subject": "Physics",
+   "board": "OCR A",
+   "ref": ""
+  },
+  {
+   "code": "OCR A: Measurements and Uncertainties",
+   "title": "Measurements and Uncertainties",
+   "unit": "Making Measurements and Analysing Data",
+   "subject": "Physics",
+   "board": "OCR A",
+   "ref": ""
+  },
+  {
+   "code": "OCR A: Mechanical Properties of Matter",
+   "title": "Mechanical Properties of Matter",
+   "unit": "Materials",
+   "subject": "Physics",
+   "board": "OCR A",
+   "ref": ""
+  },
+  {
+   "code": "OCR A: Springs",
+   "title": "Springs",
+   "unit": "Materials",
+   "subject": "Physics",
+   "board": "OCR A",
+   "ref": ""
+  },
+  {
+   "code": "OCR A: Diagnostic Methods in Medicine",
+   "title": "Diagnostic Methods in Medicine",
+   "unit": "Medical Imaging",
+   "subject": "Physics",
+   "board": "OCR A",
+   "ref": ""
+  },
+  {
+   "code": "OCR A: Using Ultrasound",
+   "title": "Using Ultrasound",
+   "unit": "Medical Imaging",
+   "subject": "Physics",
+   "board": "OCR A",
+   "ref": ""
+  },
+  {
+   "code": "OCR A: Using X-rays",
+   "title": "Using X-rays",
+   "unit": "Medical Imaging",
+   "subject": "Physics",
+   "board": "OCR A",
+   "ref": ""
+  },
+  {
+   "code": "OCR A: Kinematics",
+   "title": "Kinematics",
+   "unit": "Motion",
+   "subject": "Physics",
+   "board": "OCR A",
+   "ref": ""
+  },
+  {
+   "code": "OCR A: Linear Motion",
+   "title": "Linear Motion",
+   "unit": "Motion",
+   "subject": "Physics",
+   "board": "OCR A",
+   "ref": ""
+  },
+  {
+   "code": "OCR A: Projectile Motion",
+   "title": "Projectile Motion",
+   "unit": "Motion",
+   "subject": "Physics",
+   "board": "OCR A",
+   "ref": ""
+  },
+  {
+   "code": "OCR A: Scalars and Vectors",
+   "title": "Scalars and Vectors",
+   "unit": "Nature of Quantities",
+   "subject": "Physics",
+   "board": "OCR A",
+   "ref": ""
+  },
+  {
+   "code": "OCR A: Collisions",
+   "title": "Collisions",
+   "unit": "Newton's Laws of Motion and Momentum",
+   "subject": "Physics",
+   "board": "OCR A",
+   "ref": ""
+  },
+  {
+   "code": "OCR A: Newton's Laws of Motion",
+   "title": "Newton's Laws of Motion",
+   "unit": "Newton's Laws of Motion and Momentum",
+   "subject": "Physics",
+   "board": "OCR A",
+   "ref": ""
+  },
+  {
+   "code": "OCR A: Fundamental Particles",
+   "title": "Fundamental Particles",
+   "unit": "Nuclear and Particle Physics",
+   "subject": "Physics",
+   "board": "OCR A",
+   "ref": ""
+  },
+  {
+   "code": "OCR A: Nuclear Fission and Fusion",
+   "title": "Nuclear Fission and Fusion",
+   "unit": "Nuclear and Particle Physics",
+   "subject": "Physics",
+   "board": "OCR A",
+   "ref": ""
+  },
+  {
+   "code": "OCR A: Radioactivity",
+   "title": "Radioactivity",
+   "unit": "Nuclear and Particle Physics",
+   "subject": "Physics",
+   "board": "OCR A",
+   "ref": ""
+  },
+  {
+   "code": "OCR A: The Nuclear Atom",
+   "title": "The Nuclear Atom",
+   "unit": "Nuclear and Particle Physics",
+   "subject": "Physics",
+   "board": "OCR A",
+   "ref": ""
+  },
+  {
+   "code": "OCR A: Damping",
+   "title": "Damping",
+   "unit": "Oscillations",
+   "subject": "Physics",
+   "board": "OCR A",
+   "ref": ""
+  },
+  {
+   "code": "OCR A: Energy of a Simple Harmonic Oscillator",
+   "title": "Energy of a Simple Harmonic Oscillator",
+   "unit": "Oscillations",
+   "subject": "Physics",
+   "board": "OCR A",
+   "ref": ""
+  },
+  {
+   "code": "OCR A: Simple Harmonic Oscillations",
+   "title": "Simple Harmonic Oscillations",
+   "unit": "Oscillations",
+   "subject": "Physics",
+   "board": "OCR A",
+   "ref": ""
+  },
+  {
+   "code": "OCR A: Physical Quantities",
+   "title": "Physical Quantities",
+   "unit": "Physical Quantities and Units",
+   "subject": "Physics",
+   "board": "OCR A",
+   "ref": ""
+  },
+  {
+   "code": "OCR A: S.I. Units",
+   "title": "S.I. Units",
+   "unit": "Physical Quantities and Units",
+   "subject": "Physics",
+   "board": "OCR A",
+   "ref": ""
+  },
+  {
+   "code": "OCR A: Photons",
+   "title": "Photons",
+   "unit": "Quantum Physics",
+   "subject": "Physics",
+   "board": "OCR A",
+   "ref": ""
+  },
+  {
+   "code": "OCR A: The Photoelectric Effect",
+   "title": "The Photoelectric Effect",
+   "unit": "Quantum Physics",
+   "subject": "Physics",
+   "board": "OCR A",
+   "ref": ""
+  },
+  {
+   "code": "OCR A: Wave-Particle Duality",
+   "title": "Wave-Particle Duality",
+   "unit": "Quantum Physics",
+   "subject": "Physics",
+   "board": "OCR A",
+   "ref": ""
+  },
+  {
+   "code": "OCR A: Ideal Gases",
+   "title": "Ideal Gases",
+   "unit": "Thermal Physics",
+   "subject": "Physics",
+   "board": "OCR A",
+   "ref": ""
+  },
+  {
+   "code": "OCR A: Solid, Liquid and Gas",
+   "title": "Solid, Liquid and Gas",
+   "unit": "Thermal Physics",
+   "subject": "Physics",
+   "board": "OCR A",
+   "ref": ""
+  },
+  {
+   "code": "OCR A: Temperature",
+   "title": "Temperature",
+   "unit": "Thermal Physics",
+   "subject": "Physics",
+   "board": "OCR A",
+   "ref": ""
+  },
+  {
+   "code": "OCR A: Thermal Properties of Materials",
+   "title": "Thermal Properties of Materials",
+   "unit": "Thermal Physics",
+   "subject": "Physics",
+   "board": "OCR A",
+   "ref": ""
+  },
+  {
+   "code": "OCR A: Electromagnetic Waves",
+   "title": "Electromagnetic Waves",
+   "unit": "Waves",
+   "subject": "Physics",
+   "board": "OCR A",
+   "ref": ""
+  },
+  {
+   "code": "OCR A: Stationary Waves",
+   "title": "Stationary Waves",
+   "unit": "Waves",
+   "subject": "Physics",
+   "board": "OCR A",
+   "ref": ""
+  },
+  {
+   "code": "OCR A: Superposition",
+   "title": "Superposition",
+   "unit": "Waves",
+   "subject": "Physics",
+   "board": "OCR A",
+   "ref": ""
+  },
+  {
+   "code": "OCR A: Wave Motion",
+   "title": "Wave Motion",
+   "unit": "Waves",
+   "subject": "Physics",
+   "board": "OCR A",
+   "ref": ""
+  },
+  {
+   "code": "OCR A: Kinetic and Potential Energies",
+   "title": "Kinetic and Potential Energies",
+   "unit": "Work, Energy and Power",
+   "subject": "Physics",
+   "board": "OCR A",
+   "ref": ""
+  },
+  {
+   "code": "OCR A: Work and Conservation of Energy",
+   "title": "Work and Conservation of Energy",
+   "unit": "Work, Energy and Power",
+   "subject": "Physics",
+   "board": "OCR A",
+   "ref": ""
+  },
+  {
+   "code": "KS3: Particles",
+   "title": "Particles",
+   "unit": "Particles",
+   "subject": "KS3",
+   "board": "KS3",
+   "ref": ""
+  },
+  {
+   "code": "KS3: Earth in Space",
+   "title": "Earth in Space",
+   "unit": "Earth in Space",
+   "subject": "KS3",
+   "board": "KS3",
+   "ref": ""
+  },
+  {
+   "code": "KS3: Atomic Structure",
+   "title": "Atomic Structure",
+   "unit": "Atomic Structure",
+   "subject": "KS3",
+   "board": "KS3",
+   "ref": ""
+  }
+ ]
+}
