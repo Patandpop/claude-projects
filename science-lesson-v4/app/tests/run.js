@@ -42,7 +42,7 @@ fs.rmSync(out, { recursive: true, force: true }); fs.rmSync(other, { recursive: 
 // Lane C's other checks: the server bridge (Day.gs), then the browser checks (python, playwright)
 const PLANNER_TESTS = path.join(APP, '..', 'planner', 'tests');
 const py = process.platform === 'win32' ? 'python' : 'python3';
-for (const [cmd, file] of [[process.execPath, path.join(__dirname, 'api.test.js')], [process.execPath, path.join(PLANNER_TESTS, 'bridge.test.js')], [py, path.join(__dirname, 'test_page_sim.py')], [py, path.join(PLANNER_TESTS, 'instant_sim.py')]]) {
+for (const [cmd, file] of [[process.execPath, path.join(__dirname, 'api.test.js')], [process.execPath, path.join(PLANNER_TESTS, 'bridge.test.js')], [process.execPath, path.join(PLANNER_TESTS, 'day-logic.test.js')], [py, path.join(__dirname, 'test_page_sim.py')], [py, path.join(PLANNER_TESTS, 'instant_sim.py')]]) {
   try { console.log(execFileSync(cmd, [file], { encoding: 'utf8' }).trim()); }
   catch (e) { console.log(String(e.stdout || '') + String(e.stderr || '')); check(false, path.basename(file)); }
 }
