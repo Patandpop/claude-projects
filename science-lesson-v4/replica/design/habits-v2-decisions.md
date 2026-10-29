@@ -301,3 +301,4 @@ Patryk's answers, in grill order. Mock-ups follow each area.
 - The Rise tablet is disliked: replace it with 3 of something at the top of The Call (no inscription) that light up as rituals are done, perhaps with the ritual pentagram sigil.
 - Golems: Year 7 is horrifying, the rest great; add a Year 12 PAG version; improve all. Stone inscription: unclear what it is. Wall: purpose and link to keeping ahead unclear; revamp it 3 ways, one in stained glass. All later.
 - Rise again (confirmed): day 2 also needs 3 rituals. The 3 marks are big stars to light, checklist style, should feel like atonement; each star surrounded by stained glass of many different pieces.
+- Loading (29 Oct): Ulhu spinning round, reading a scroll, or stirring a cauldron (spyglass dropped).
