@@ -10,9 +10,17 @@
    4. Save and Deploy. When it says Success, open the address it shows and add `/test/` on the end: that is the school test page. Paste the address into this chat.
    5. Google sign-in in front of the site (Cloudflare Access) comes after the school test, so the test also tells us whether the school PC lets you reach the site at all. I will give those steps then.
 4. **The school test** (two minutes at school) once the test page is live: open the page on a school PC, paste your mailbox address and key (the same two values in the school planner's Script properties, MAILBOX_URL and MAILBOX_KEY), press "Run the test", and read the three results back to the chat (the "Copy the results" button copies them). The page never remembers the key.
+6. **Pick a day screen layout: A, B or C** (open `lanes/mockups/day-screen.html` on the home PC; the Light/Dark switch is top right). A = the list in your grill order; B = a timeline of your day with suggestions in the free periods; C = a slim summary bar on top and big easy-to-tap to-dos. Also say if the timer picker underneath needs changing. Until you pick, I build everything behind the screen.
 5. **Next paste set** (for Lane A to make): the phone page and the planner now open instantly from their saved copy. Planner.html and Phone.html changed.
 
 ## Entries (newest first)
+
+### 29 Oct 2026, Lane C part 2, items 3 and 4 (behind the screen): the day screen, capture box and evening timer
+- What changed: the rules (`planner/day-logic.js`: where a capture goes, your to-do list of 7, the yesterday tag, suggested blocks with marking in frees and lesson builds after school, the workload line, nothing after 7pm, how a PC window becomes a job and class, the 2-hour stop, the fortnightly report) and the server side (`planner/Day.gs`: today's lessons and to-dos in one trip, saving and ticking, drop and move, captures, the shared timer, Done for today). 91 new checks. Captures about a pupil never go to Obsidian; Obsidian is never written until you pick the folder; the timer never stores window titles.
+- Dark mode: the day screen and the timer will follow the same Light, Dark or Auto setting as the phone page (you asked, 29 Oct). The mock-up has both.
+- Not yet: the screen itself (waits for your A, B or C pick), and captures for the order sheet, a class or a lesson land as labelled to-dos for now rather than inside the planner's lesson notes (that part is in the planner page, which Lane B owns).
+- You need to: pick A, B or C (Waiting item 6). Nothing to paste yet: Day.gs joins the paste set with the screen.
+- Saves: see git log "Day screen and evening timer rules", "Day.gs: the day screen".
 
 ### 29 Oct 2026, Lane C part 2, item 2 (installed app step 5, first half): talking to the server, and the outbox
 - What changed: `app/src/api.js` is the one file every app screen will use to reach the planner's server (so moving off Google one day changes one file), and `app/src/outbox.js` holds taps made without signal and sends them in order when signal returns, the same way the phone page's queue works now, never counting a tap twice and setting aside one the server keeps refusing. 22 new checks in `app/tests/api.test.js`. Nothing you can see yet.
