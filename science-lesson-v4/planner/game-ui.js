@@ -760,6 +760,7 @@
     // as a star chart: all, most (three quarters or more), some, none; days you kept (most or all) join into constellations
     const LVC = { all: '#5ef2a0', most: '#ffd56a', some: '#a48aff', none: '#2a2050' };
     function oracle() {
+      if (CHRON && window.ORACLE) return ORACLE.html(CHRON); // the stained-glass rose window (game-oracle.js, 2026-10-29); the old view below is the fallback
       if (!CHRON) return '<div class="uz-orc"><h4>Oracle</h4><p class="uz-p" style="color:#a99cc8">Reading the stars…</p></div>';
       const wk = CHRON.days.slice(28), kept = CHRON.days.filter((d) => !d.future && (d.level === 'all' || d.level === 'most')).length;
       return '<div class="uz-orc"><h4>Oracle<span>' + kept + ' kept in 5 weeks</span></h4><div class="uz-wk">' + wk.map((d) => {
@@ -974,6 +975,7 @@
       if (window.STONE) STONE.paint(body);
       if (window.SCROLL) SCROLL.paint(body);
       if (window.GLASS) GLASS.paint(body);
+      if (window.ORACLE) ORACLE.paint(body);
       if (window.HIGHV && V.hv) HIGHV.paint(body);
       if (V.waxNew) { const n = body.querySelector('.uz-stamp[data-q="' + V.waxNew + '"]'); if (n) { V.waxNew = null; anim(n, [{ transform: 'scale(2.4) rotate(-28deg)', opacity: 0 }, { transform: 'scale(1) rotate(-10deg)', opacity: 1 }], { duration: 420 }); } }
     }
