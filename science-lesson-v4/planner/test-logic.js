@@ -386,5 +386,17 @@ if (fs.existsSync(DRIVE)) {
   if (first) ok(P.extrasSuggested(data, first).memory === true, 'lesson extras: memory phrase suggested on the first lesson of a topic');
 }
 
+// Workplan 4.8 (2026-10-29): planner speed with a whole year. Measured: 8 ms to work out where every class is up to
+// with 41 saved weeks, about 90 ms when 36 weeks are not saved yet and must be planned; the screens draw in
+// 25 to 250 ms. A guard with plenty of room, so a slow change is caught.
+{
+  const yw = {}; let mm = P.parse('2026-09-07');
+  for (let k = 0; k < 41; k++) { yw[P.iso(mm)] = P.autofill(data, yw, mm, {}); mm = P.addDays(mm, 7); }
+  let t0 = Date.now(); P.progressBefore(data, yw, P.parse('2027-06-21'), {}); const saved = Date.now() - t0;
+  const few = {}; Object.keys(yw).slice(0, 5).forEach((k) => { few[k] = yw[k]; });
+  t0 = Date.now(); P.progressBefore(data, few, P.parse('2027-07-19'), {}); const unsaved = Date.now() - t0;
+  ok(saved < 400 && unsaved < 1500, `speed: a whole year of 41 weeks (${saved} ms saved, ${unsaved} ms with 36 weeks still to plan)`);
+}
+
 console.log(fails ?`\n${fails} FAILED` : '\nall planner logic checks passed');
 process.exit(fails ? 1 : 0);

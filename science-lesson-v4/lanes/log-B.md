@@ -19,6 +19,7 @@ Plain-English record of Lane B's work, newest entry first. Each entry says what 
    - **Mark totals:** "3 to 4 mark questions shown as 6" has no example yet. I would look for one in the October lessons first; if I can't find one, I'll ask you for the lesson where you saw it.
    - **2.6, a delayed multiple choice:** one question from a lesson 3 to 4 weeks ago joins the multiple-choice block (as its last question, labelled "from [lesson]"), taken from that earlier lesson's own checked questions, so the class meets it again at a spaced gap. It travels with the lesson's questions to the phone, so its ABCD vote is saved like the others.
    - **From 2.13, test lessons for this year:** a 10S2 test lesson (checks no word bank appears), a 13D one (comes with 1.8), and a build warning when lesson text has an em dash. These depend on the fixes above, so they go in with them.
+   - **From the memory map (big goal 1, step 5):** the lesson's ticked "Suggested Do Now" sections pass through to the Do Now picker and show in the Do Now slide's notes, and every multiple-choice question gets a short "why someone picks this" note on each wrong option at build time (the build check refuses one without), so the ABCD votes can say which misconception the class holds.
    Nothing on Drive changes. Reply "yes to the builder plan" (or pick which bullets).
 5. **Technicians' email addresses (item 2.7):** for the order sheet email draft. Send them to me, or add them as the TECH_EMAILS script property in Apps Script (commas between).
 6. **Item 2.9, the silent-work timer: what is still missing?** Most of it was built on 24 Oct: on the phone, "silent work" on/off with the colour change, the "Talking: count the time lost" tap that turns phone and board red and counts the seconds, the % of silent time, and the weekly goal (80% silent and no more than 3 minutes lost; 6 for a fortnightly class) shown on the Friday tab. The plan also asks what "earning it" gives the class: (a) positives for everyone present, (b) a line in the Friday messages home (now built, item 2.8), (c) a celebration on the board, or a mix. Tell me which, and anything about the timer that does not work the way you want, and I will make a mock-up.
@@ -26,13 +27,21 @@ Plain-English record of Lane B's work, newest entry first. Each entry says what 
 8. **Memory map: pick how the Memory tab looks.** Three layouts in one mock-up page: A, a grid (one row per topic, one coloured square per section); B, bars (each section a bar showing its %); C, a due list (reddest first, as cards). The "Suggested Do Now" box for lesson cards is the same in all three. The page is lanes/mockups/memory-tab.html in the project (I could not send it to your phone from this chat; open it on the PC, or ask the design chat to publish it). Reply A, B, C or a mix.
 
 ---
+## 30 Oct 2026, item 4.8: planner speed, measured
+
+**What changed:** I measured the planner with a whole school year of weeks. Working out where every class is up to takes under a tenth of a second even when most of the year is still to plan, and the screens draw in a quarter of a second or less (week view 5 thousandths of a second, the Classes tab the slowest at about a quarter). So the planner's own thinking is not what makes it feel slow; the waits are the trips to Google, which items 4.6 and 4.7 are about. I added the timing test the plan asked for, so a change that makes it slow is caught, and did not add the "remember last week's answer" shortcut, since it would add a way to show stale plans for no gain you would notice.
+
+**You need to:** nothing.
+
+**Save:** see the history line "Planner speed: a whole-year timing check".
+
 ## 30 Oct 2026, big goal 1, step 6: the phone shows what is due back
 
 **What changed:** on the phone, opening a class now shows one extra line under the seating plan: "Due back: Latent heat 48%, Particle model and pressure 58%, Transition metals ?", the class's three reddest taught spots from the memory map ("?" = taught but not checked yet). Nothing else changes, and the line is empty when nothing is due or the map has no data yet. It is kept with the class's saved copy, so it also shows with no signal.
 
 **You need to:** nothing now. It goes into the next complete paste set (Phone.html, Behaviour.gs).
 
-**Save:** see the history line "Phone: the memory map's three reddest spots".
+**Save:** 4ae98dca.
 
 ## 29 Oct 2026, big goal 1, step 5 (home part): the Do Now uses the memory map
 
