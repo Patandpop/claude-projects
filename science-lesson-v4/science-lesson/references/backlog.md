@@ -8,6 +8,18 @@ Cleaned 2026-07-02: only outstanding items below.
 
 <!-- entries appended below -->
 
+## Future goals — 2026-10-14 (Patryk; NOT started, wait for him to pick one)
+
+1. **Exam questions on worksheets:** always include them, even with an image or diagram (too many are being left out). Can be laid out two-up (question one side, image the other) to save space.
+2. **Worksheet page layout:** a table must sit on one page, never split; sub-sections must not straddle pages 2 and 3 (sub-sub-sections such as Reaching on page 2 and Master on page 3 are fine); scale sizes sensibly to fit; headings must not leave an ugly half-page gap when moved to another page.
+3. **Worksheet style (later project):** explore Canva or other tools for nicer, editable worksheets. Note only.
+4. **GUESS structure slide:** add an example question at the top and animate the steps.
+5. **Language and tone rules:** speaking tone for instructions; base the rules on concise natural voice (not restrictive controlled English like ASD-STE100), visuals over text; do deep web research on the best teaching language first. No paid API without flagging.
+6. **Gold answer boxes on slides:** hard to read on the classroom board; change for better contrast while keeping a similar look (mock colours first, check amber rules).
+7. **Equation slide:** the example at the bottom is often slightly misaligned or missized.
+
+Memory copy: `project_future_worksheet_slides_polish_2026_10_14.md`.
+
 ## Session log — 2026-10-03 (10C2 L11 Non Renewable Resources trial build — Claude Code)
 
 Found while building and rendering the trial lesson (new Apply structure). Not fixed: build.js changes need Plan Mode.
@@ -316,3 +328,6 @@ Patryk's refinement: put student FIRST NAMES into the APPLY-tier questions speci
 
 **New project idea — Photograph-and-mark test papers (2026-09)** 💡 NEXT PROJECT (Patryk's own idea, needs its own project chat)
 Workflow Patryk wants: (1) hold up a physical test paper and take a VIDEO flicking through it, papers stacked in ALPHABETICAL order (by student); (2) system splits the video into per-page photos, grouped back into each student's paper; (3) mark each paper automatically against an UPLOADED mark scheme; (4) output per-student marks/feedback. Open questions for the project chat: OCR/handwriting reading of pupil answers, page-to-student segmentation from one continuous video, mark-scheme matching (partial credit, method marks), and where results land (lesson-log? a markbook?). Relates to the exam-doc library work and the deferred markbook/seating-plan goal. Capture only — not started.
+
+- **DONE 2026-10-22 (resource words added + test). Uploader moves school resources (2026-10-20):** building 7MLA Specialised Cells moved "Specialised cells table.pptx" and "Cell Vacancies apply task.pptx" into "Beechen Cliff Original Lesson" along with the DELBAR deck. Rule: only the school's lesson deck moves; resources never move. Fix the matcher in upload-to-drive.js; ask Patryk whether to move the two files back.
+- **DONE 2026-10-22. Test-review Do Now false warning (2026-10-20):** CONTENT CHECK says "Do Now has 0 questions" on test reviews, which use doNow.task steps by design. Skip that check when doNow.task is set.

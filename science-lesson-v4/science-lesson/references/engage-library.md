@@ -55,3 +55,25 @@
 1 or 2 (strongest evidence base) > 4 (if a striking image exists) > 3 (reliable default, any topic) > 5 (only for single-reveal lessons) > 6 (pairing/fallback only)
 
 For mechanism 4: prefer real sourced images (Wikimedia Commons or clearly-licensed) over `imagePlaceholder` when a strong graph/photo genuinely exists for the topic.
+
+## Question bank: the standard to aim for (Patryk approved, 2026-10-19)
+Each is a real puzzle the lesson answers. None has an obvious answer, none is a trick.
+| Lesson | Engage question | The lesson answers it with |
+|---|---|---|
+| Pressure (Y8) | "A camel and a horse weigh about the same. On soft sand the horse sinks and the camel doesn't. How?" | Wide feet spread the force over a bigger area: less pressure. |
+| Distance–time graphs (Y8) | "This is a graph of someone's walk to school. For two minutes the line goes flat. What happened?" | Flat line: distance not changing, so they stopped. |
+| Conservation of energy (Y10) | "A dropped ball never bounces back to the height you dropped it from. Where did the missing energy go?" | Thermal store of the ball and floor, and sound. |
+| Latent heat (Y9) | "Steam at 100 °C burns far worse than water at 100 °C. They're the same temperature. Why?" | Steam gives out extra energy when it condenses on your skin. |
+| Microscopes (Y9) | "Robert Hooke saw tiny boxes in cork in 1665 and named them cells. Why couldn't he see anything inside them?" | Low resolution, and cork cells are dead and empty. |
+| Efficiency (Y10) | "An old bulb gets too hot to touch. An LED just as bright stays cool. Which one wastes more energy, and where does it go?" | The old bulb: most of its energy heats the surroundings. |
+| Non-renewables (Y10) | "Coal is made from plants that grew 300 million years ago. Is a coal power station running on sunlight?" | Yes, stored as chemical energy by the plants. |
+| Cells (Y7) | "Every living thing is made of cells. A virus has no cells at all, yet it can make you ill. So is a virus alive?" | What cells do (the life processes). |
+| Energy resources | "You charge your phone from the plug. Where was that energy before it reached the plug?" | Traced back store by store. |
+| Fool's gold (Y9) | "Gold rush miners called this 'fool's gold'. How could you prove it isn't gold?" | Weigh it (gold is about 4 times heavier) or heat it (sulfur smell): it is the compound FeS_2. The reveal answers HOW, not just what. |
+
+## Hooks to avoid
+- "Have you ever wondered…?" with no real puzzle in it, and "Imagine a world without…" openers.
+- Fun facts the lesson never comes back to (research: "seductive details" lower recall).
+- A big demo with no prediction and no explanation later: pupils remember the bang, not the science.
+- Silly questions with an obvious answer, or a statement where a question should be.
+- If no good hook fits, leave Engage out.
