@@ -21,7 +21,8 @@ const args = process.argv.slice(2);
 const flag = (k) => args.includes(k);
 const opt = (k) => (args.includes(k) ? args[args.indexOf(k) + 1] : null);
 const LIMIT = 340 * 1024;
-const PASTE_DIR = process.env.PASTE_DIR || path.join(process.env.USERPROFILE || process.env.HOME || '', 'Desktop', 'Planner paste files');
+const SYNC_DIR = 'G:/My Drive/Beechen Cliff Science/Admin/Planner Sync';   // the planner reads its files from here
+const PASTE_DIR = process.env.PASTE_DIR || (fs.existsSync(SYNC_DIR) ? SYNC_DIR : path.join(process.env.USERPROFILE || process.env.HOME || '', 'Desktop', 'Planner paste files'));
 const read = (f) => fs.readFileSync(path.join(dir, f), 'utf8');
 fs.mkdirSync(out, { recursive: true });
 
@@ -83,17 +84,24 @@ else if (changed.length) console.log(`  changed since last paste: ${changed.join
 else console.log(`  nothing changed since the last paste (${last.at}${last.label ? ', ' + last.label : ''})`);
 
 if (flag('--pasted')) {
+  // One COMPLETE set every time (rule of 29 Oct 2026, after two partial sets on one night broke a deploy): every file
+  // Patryk pastes, not only the changed ones, into Admin\Planner Sync when Drive is up (else the Desktop folder), with
+  // a line in that folder's sync-log.txt saying which set it replaces. Every Drive write is logged.
   const label = opt('--label') || 'planner';
   const day = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  const setName = `${day}, complete set, ${label}`;
   fs.mkdirSync(PASTE_DIR, { recursive: true });
   const copied = [];
-  for (const f of changed) {
-    const name = `PASTE INTO APPS SCRIPT - ${f} (${day}, ${label}).txt`;
+  for (const f of Object.keys(files)) {
+    const name = `PASTE INTO APPS SCRIPT - ${f} (${setName}).txt`;
     fs.copyFileSync(path.join(out, f), path.join(PASTE_DIR, name));
     copied.push(name);
   }
-  fs.writeFileSync(recPath, JSON.stringify({ at: now.toISOString().slice(0, 16).replace('T', ' '), label, files: hashes }, null, 1));
-  fs.appendFileSync(path.join(out, 'paste-log.txt'), `${now.toISOString().slice(0, 16).replace('T', ' ')}  ${label}: ${copied.length ? copied.join('; ') : 'nothing to paste'}\n`);
-  console.log(copied.length ? `  for Patryk in ${PASTE_DIR}:\n    ${copied.join('\n    ')}` : '  nothing new to paste');
-  console.log('  recorded in dist/.last-paste.json');
+  const when = now.toISOString().slice(0, 19);
+  const replaces = last && last.set ? `; replaces the set "${last.set}"` : '';
+  fs.appendFileSync(path.join(PASTE_DIR, 'sync-log.txt'), `${when} COPY planner/dist ${Object.keys(files).join(', ')} -> ${path.basename(PASTE_DIR)} as '... (${setName}).txt' (${changed.length ? 'changed since the last set: ' + changed.join(', ') : 'nothing changed since the last set'}${replaces})\n`);
+  fs.writeFileSync(recPath, JSON.stringify({ at: when.replace('T', ' '), label, set: setName, files: hashes }, null, 1));
+  fs.appendFileSync(path.join(out, 'paste-log.txt'), `${when.replace('T', ' ')}  complete set "${setName}" (${copied.length} files) -> ${PASTE_DIR}${replaces}\n`);
+  console.log(`  complete set "${setName}": ${copied.length} files in ${PASTE_DIR}${replaces}`);
+  console.log('  recorded in dist/.last-paste.json and the folder\'s sync-log.txt');
 }

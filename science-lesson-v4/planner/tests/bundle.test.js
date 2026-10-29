@@ -77,8 +77,14 @@ try {
   const r3 = run([]);
   ok(r3.status === 0 && /nothing changed since the last paste/.test(r3.stdout) && !/changed since last paste:/.test(r3.stdout), 'a rebuild with nothing new says nothing changed since the last paste');
   const pasteDir = path.join(require('os').tmpdir(), 'paste-test-' + process.pid);
-  const handed = fs.existsSync(pasteDir) ? fs.readdirSync(pasteDir) : [];
-  ok(handed.length >= 10 && handed.every((f) => /^PASTE INTO APPS SCRIPT - .+ \(\d{4}-\d{2}-\d{2}, test\)\.txt$/.test(f)), `--pasted copies the files for Patryk with the agreed names (${handed.length} files)`);
+  const handed = fs.existsSync(pasteDir) ? fs.readdirSync(pasteDir).filter((f) => f !== 'sync-log.txt') : [];
+  const nFiles = fs.readdirSync(dist).filter((f) => /\.(gs|html)$/.test(f) && f !== 'Mailbox.gs').length;
+  ok(handed.length === nFiles && handed.every((f) => /^PASTE INTO APPS SCRIPT - .+ \(\d{4}-\d{2}-\d{2}, complete set, test\)\.txt$/.test(f)), `--pasted hands over one COMPLETE set with the agreed names (${handed.length} files)`);
+  const slog = fs.existsSync(path.join(pasteDir, 'sync-log.txt')) ? fs.readFileSync(path.join(pasteDir, 'sync-log.txt'), 'utf8') : '';
+  ok(/COPY planner\/dist .*complete set, test/.test(slog), 'the folder\'s sync-log.txt records the copy');
+  const r4 = run(['--pasted', '--label', 'test2']);
+  const slog2 = fs.readFileSync(path.join(pasteDir, 'sync-log.txt'), 'utf8');
+  ok(r4.status === 0 && fs.readdirSync(pasteDir).filter((f) => /complete set, test2\)/.test(f)).length === nFiles && /replaces the set ".*complete set, test"/.test(slog2), 'the next set is complete again and says which set it replaces');
   fs.rmSync(pasteDir, { recursive: true, force: true });
 } finally {
   if (had !== null) fs.writeFileSync(rec, had); else if (fs.existsSync(rec)) fs.unlinkSync(rec);
