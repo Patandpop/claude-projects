@@ -188,6 +188,13 @@ Ulhu (details: `docs/audits-2026-10-28/ulhu-deep-audit.html`):
   Mock-up first if the plaza or spotlight changes a lot from the mock-ups; Patryk picks, then build.
 - **1U.7 (later, after 1U.1-1U.6) Ritual colour:** the ritual cards' colour feels wrong; it should match the polished stone ritual tablets (the ones he uses like coins). Mock-up 2-3 options first.
 - **1U.8 (next big Ulhu idea) A desktop version of Ulhu** for the planner on the PC: plan and mock-up first, Patryk picks.
+- **1U.13 Omens and rituals fixes (Patryk 29 Oct, phone):**
+  - The Absolution card does not move to the top and does not turn into the Absolution bar. Fix.
+  - Coven (reasons a bad habit happened): a chosen reason is not highlighted red. Fix.
+  - Rituals done every 1-3 days (or longer): show clearly that he is inside the allowed range, not skipping (e.g. "due by Thu", a filling window).
+  - The 2-week bar under the rituals needs improving (mock-up first).
+  - Pairs: the "Pair 8 missing" prompt belongs at the BOTTOM, not the top. Curses are all paired, so pairing should lead with curses rather than blessings.
+  - The rolling animation plays twice. Fix.
 - **1U.9 Haggle prize = one item, by dice kept** (Patryk 29 Oct, PERMANENT rule, do not change it, replaces the flat 20% off the whole stall). You haggle over the ONE item in the spotlight; a win takes money off that item by the dice you still have left (5 dice each): 5 or 4 left = 25%, 3 = 20%, 2 = 15%, 1 = 10% (habits-v2-decisions.md line ~121); a loss puts +10% on that item today, and that item can't be haggled again today. Update Game.gs, game-den.js and the checks.
 - **1U.10 Grimoire: BG1 Candlelit desk + the book (T1 + T4) are approved; build them.** **This IS the way into Vespers** (the pixel book whose tentacles drag you in, https://claude.ai/artifact/2hhEpg5QBkqi7145xDtuBv); it replaces the older W1-W7 ways in, which are superseded. When the book OPENS it must land on the **stained-glass day overview** (the Oracle glass style: the day's star / middle mark / moon in two rings of real stained glass, gold eye), not the current page. Mock-up the opened page first, Patryk picks, then build.
 - **1U.12 Loading screens (Patryk 29 Oct):** while anything loads, Ulhu is **spinning round, reading a scroll, or stirring a cauldron** (these three; the spyglass idea is dropped). Pixel style, short loops, never a plain spinner. Mock-up the three, then build.
