@@ -1,5 +1,5 @@
 // node app/tests/run.js : the installed app's checks (lanes/design-installed-app.md section 10).
-// Builds the app into a temporary folder and checks it. Then runs the browser checks (python, playwright).
+// Builds the app into a temporary folder and checks it, then runs the rest of Lane C's checks (bridge, browser sims).
 'use strict';
 const fs = require('fs');
 const os = require('os');
@@ -39,11 +39,12 @@ if (fs.existsSync(namesFile)) {
 } else console.log('SKIP the names list (app/tests/.names.txt) is not on this PC');
 fs.rmSync(out, { recursive: true, force: true }); fs.rmSync(other, { recursive: true, force: true });
 
-// browser checks
+// Lane C's other checks: the server bridge (Day.gs), then the browser checks (python, playwright)
+const PLANNER_TESTS = path.join(APP, '..', 'planner', 'tests');
 const py = process.platform === 'win32' ? 'python' : 'python3';
-for (const sim of ['test_page_sim.py']) {
-  try { console.log(execFileSync(py, [path.join(__dirname, sim)], { encoding: 'utf8' }).trim()); }
-  catch (e) { console.log(String(e.stdout || '') + String(e.stderr || '')); check(false, sim); }
+for (const [cmd, file] of [[process.execPath, path.join(PLANNER_TESTS, 'bridge.test.js')], [py, path.join(__dirname, 'test_page_sim.py')], [py, path.join(PLANNER_TESTS, 'instant_sim.py')]]) {
+  try { console.log(execFileSync(cmd, [file], { encoding: 'utf8' }).trim()); }
+  catch (e) { console.log(String(e.stdout || '') + String(e.stderr || '')); check(false, path.basename(file)); }
 }
 console.log(failed ? `\n${failed} FAILED` : '\nAll app checks passed');
 process.exit(failed ? 1 : 0);

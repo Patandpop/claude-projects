@@ -14,6 +14,12 @@
 
 ## Entries (newest first)
 
+### 29 Oct 2026, Lane C part 2, item 2 (installed app step 4, done early): the bridge
+- What changed: a new server file `planner/Day.gs` lets the installed app talk to the planner's server from outside Google's page. It only answers with the planner key, and only for the calls the pages already use (behaviour, planner, Ulhu); everything else is refused. Code.gs is untouched. New check: `planner/tests/bridge.test.js` (17 checks), run with the rest of Lane C's checks by `node app/tests/run.js`.
+- Steps 2 (moving the planner to your personal account) and 3 (the small school helper for Forms and Classroom) wait for the school test, so I built this one first because nothing waits on it.
+- You need to: nothing yet. Day.gs joins the paste set when the planner moves to your personal account, not before (it would be a new script file to make for nothing yet).
+- Save: see git log "Installed app bridge".
+
 ### 29 Oct 2026, Lane C part 2, item 2 (installed app step 1): the site and the school test page
 - What changed: a new `app/` folder holds the installed app. For now it has a holding home page and the school test page (one button: checks your personal Apps Script can be reached from that PC, both for reading and sending, without writing anything; also lists what the browser can do: notifications, installing, offline). A browser test covers every result message.
 - You need to: make the free Cloudflare account (Waiting item 3), then run the school test (item 4).
