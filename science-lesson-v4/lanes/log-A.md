@@ -5,6 +5,7 @@ Plain-English record of Lane A's work (the Ulhu game), newest entry first.
 ## Waiting on you
 
 0. **Complete paste set:** coming as soon as the other two chats have saved their half-finished planner files (I only make a set from saved work, so it never ships something half-built). This line will then say where it is.
+3. **Pick the Grimoire's opened page (1U.10).** Mock-up: `replica/design/mockups/grimoire/opened.html`. **O1** one rose window across both pages, **O2** a round window on the left page and a tall lancet window of the day on the right, **O3** three glass medallions down the gutter with the day's rituals inked either side. The book itself (BG1 desk, T1 tome, T4 chains) is already approved; I build it after your pick.
 2. **Pick the dice-game water (1U.6).** Mock-up: `replica/design/mockups/dicewater/index.html` (open it on the PC; it plays by itself, Win and Lose buttons show each ending). **W1** tide sweep, **W2** tentacle in the pool, **W3** breaking wave with a pale hand. Also pick the losing word: ENGULFT (default), FORFEIT, BEREFT, DROWNED or FORSAKEN.
 1. **Pick a 2-week bar for under the rituals (1U.13).** Mock-up file: `replica/design/mockups/ritualbar/index.html` (sent to you in the chat). **B1** two weeks of pebbles with day letters, **B2** a tide line that rises and sinks, **B3** a carved ledge on the bottom of the stone tablet. Reply with a letter, or what to mix.
 
