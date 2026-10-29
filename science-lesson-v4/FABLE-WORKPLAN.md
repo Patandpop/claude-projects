@@ -106,6 +106,7 @@ Anything that needs your eyes (a look to pick, a decision, a paste into Apps Scr
 - **The Den**: Round Grotto Sanctum, Night Market with keeper characters, dice haggle with every keeper (game-den.js plus the Den code in game-ui.js and haggle rows in Game.gs). BUILT and merged 29 Oct (b5ac8b37). Paste set "(29 Oct, Den Oracle omens)" made.
 - **The Oracle** in stained glass (game-oracle.js plus the `oracle()` function in game-ui.js). BUILT and merged 29 Oct (b5ac8b37). Paste set "(29 Oct, Den Oracle omens)" made.
 - Both are merged now, but keep your edits in game-ui.js and Game.gs small and away from the Den, shop, wardrobe, hoard and Oracle code, so the merges stay clean. Pull or merge `pre-reskin` before each new item, since the design session commits to it.
+- **Paste files: from now on only you make them, and always as one complete set** (every file Patryk pastes for the planner, not only the changed ones), named with the date and "complete set", into Admin\Planner Sync, saying which earlier set it replaces. Two partial sets on one night broke his deploy on 29 Oct.
 - Phase 0 and 1 are yours (a design-session attempt was stopped before it changed anything). The learning loop (Phase 2) is yours too.
 
 ### Phase 0: safety (do first)

@@ -4,7 +4,7 @@ Plain-English record of the build list in `FABLE-WORKPLAN.md`, newest entry firs
 
 ## Waiting on you
 
-1. **Paste three files into Apps Script and deploy a new version.** They are on the Desktop in "Planner paste files", dated 2026-10-29: Code.gs (the homework id fix), Planner.html and Phone.html (the build date in the corner). They already include everything from the 27 and 28 Oct paste files of the same names. If you never pasted the 28 Oct Game.gs and GameUI.html or the 27 Oct GameArt.html, those still need pasting too.
+1. **SUPERSEDED (design session, 29 Oct 01:5x): paste the twelve files named "(29 Oct, ONE COMPLETE SET)" in Admin\Planner Sync instead; they include these three, the Den, Oracle and omens, and a fix for a broken character in the omen code.** Old text: **Paste three files into Apps Script and deploy a new version.** They are on the Desktop in "Planner paste files", dated 2026-10-29: Code.gs (the homework id fix), Planner.html and Phone.html (the build date in the corner). They already include everything from the 27 and 28 Oct paste files of the same names. If you never pasted the 28 Oct Game.gs and GameUI.html or the 27 Oct GameArt.html, those still need pasting too.
 2. **Run the one-off homework id repair once, after pasting Code.gs.** In the Apps Script editor pick the function `fixHomeworkIds` at the top and press Run. It renumbers any homework rows that share an id (the first keeps its id) and writes each change to the Log tab. Running it twice is harmless.
 
 ## Things I noticed but did not touch
