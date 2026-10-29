@@ -331,6 +331,10 @@ In priority order:
 2. **One app that runs your day.** Each morning one screen shows what matters (lessons not built, marking due, pupils to chase, rituals) instead of hunting through tabs. Serves "not working evenings".
 3. **Ulhu as a life companion.** Knows his workload as well as his habits; a year-long story; a page showing who he is becoming over a term; sound; gentle evening nudges (never after 7pm); what he opens instead of scrolling.
 4. **Ulhu for a friend (not a teacher).** A general version with the teaching parts removed or made general, possibly a social layer (Habitica-style bosses beaten together, or better). Undecided.
+- **Goal 2 extras (Patryk 29 Oct, both wanted):**
+  - **"Where did my evening go" timer:** one tap to start ("marking 9AS", "building 10S2 lesson"), one to stop; after two weeks it shows where after-school time really goes, so the biggest drain gets automated next. Ulhu could reward days that end by 7pm.
+  - **One quick-capture box, built into the integrations:** ideas, pupil concerns, "email parent", "order beakers" typed (or shared) from the phone land in the day screen's inbox next morning, sorted by where they belong (order sheet, a lesson, a class, Obsidian).
+  - Not wanted for now: whole-class feedback marking taps, home retrieval for pupils, looking back at lesson styles. Do not add them.
 5. **Colleagues using the planner.** Lowest; keep it personal for now.
 - **Enabler: move the phone and desktop side to a proper installed app** (free hosting, Sheets/Drive stay, Apps Script becomes the data layer): no URL bar, opens instantly, no paste size limit, sound and notifications possible. Grill before 3 and 4.
 - **Quick wins now (can go in Phase 2):** Native Alpha on his phone for no URL bar (his job, no code); faster opening: show the last saved screen instantly then refresh, phone view stops loading the desktop planner, Ulhu's heavy art loads only when his tabs open.
