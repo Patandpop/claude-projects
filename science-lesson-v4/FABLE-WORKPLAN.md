@@ -184,11 +184,14 @@ Ulhu (details: `docs/audits-2026-10-28/ulhu-deep-audit.html`):
   - **Ulhu walks freely** around the plaza (tap anywhere to walk there, not only on stalls); walking up to a stall and tapping it goes in;
   - the entrance into a stall is **EN1 Low tide** (Patryk's pick 29 Oct): the sea floods the plaza with bubbles, then drains down the screen leaving you dripping inside the stall;
   - inside a stall: the **Ocarina spotlight** focus view (swipe along a shelf; the focused item lifts, spins and catches a light shaft, with its name, price and the keeper's one-line pitch, then Buy / Haggle / Put back), fewer items per stall, the keeper's idle loop and reactions;
-  - keep the seven keepers, their lines, the dice haggle rules and the server side as built.
+  - keep the seven keepers, their lines and the dice game itself; the haggle PRIZE changes (1U.9).
   Mock-up first if the plaza or spotlight changes a lot from the mock-ups; Patryk picks, then build.
 - **1U.7 (later, after 1U.1-1U.6) Ritual colour:** the ritual cards' colour feels wrong; it should match the polished stone ritual tablets (the ones he uses like coins). Mock-up 2-3 options first.
 - **1U.8 (next big Ulhu idea) A desktop version of Ulhu** for the planner on the PC: plan and mock-up first, Patryk picks.
-- Still waiting on Patryk's picks before building: Big Moments (LU/FA/DP), Wall/Golems/Inscriptions (SW/PG/IN), Grimoire BG1 (picked: build the pixel candlelit desk scene with T1 + T4 when the Grimoire/Vespers work comes up).
+- **1U.9 Haggle prize = one item, by dice kept** (Patryk 29 Oct, replaces the flat 20% off the whole stall). You haggle over the ONE item in the spotlight; a win takes money off that item by the dice you still have left (5 dice each): 5 or 4 left = 25%, 3 = 20%, 2 = 15%, 1 = 10% (habits-v2-decisions.md line ~121); a loss puts +10% on that item today, and that item can't be haggled again today. Update Game.gs, game-den.js and the checks.
+- **1U.10 Grimoire: BG1 Candlelit desk + the book (T1 + T4) are approved; build them.** When the book OPENS it must land on the **stained-glass day overview** (the Oracle glass style: the day's star / middle mark / moon in two rings of real stained glass, gold eye), not the current page. Mock-up the opened page first, Patryk picks, then build.
+- **Big Moments (LU/FA/DP): Patryk likes them** (29 Oct). Build them after 1U.10; show him the three sets again side by side to confirm which one of each before building.
+- **Wall / Golems / Inscriptions (SW/PG/IN): REJECTED** (29 Oct: "didn't make sense, not understandable"). Do not build. If the idea comes back it needs a fresh, simple explanation first.
 
 ### Phase 2: learning loop and daily time-savers
 - **2.1 Do Now picker uses lesson-match.js and question-pool.js.** Mix: 4 short recall, one 2-mark explain, one calculation. The mix rule goes into SKILL.md only with Patryk's OK (put it on the Waiting list).
