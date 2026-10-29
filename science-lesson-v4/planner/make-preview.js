@@ -41,11 +41,12 @@ window.__HW = ${JSON.stringify(hw)};
 window.google = { script: { run: (function make(ok, bad) {
   const api = {
     withSuccessHandler(f) { return make(f, bad); }, withFailureHandler(f) { return make(ok, f); },
-    loadAll() { setTimeout(() => ok({ data: window.__DATA, weeks: {}, learned: {}, added: [], hasTemplate: false }), 0); },
+    loadAll() { setTimeout(() => ok({ data: window.__DATA, weeks: {}, weekStamps: {}, lessonsStamp: 0, learned: {}, added: [], hasTemplate: false }), 0); },
     createLesson(k, info) { setTimeout(() => ok({ rec: { cls: info.cls, unit: info.unit, afterKey: info.afterKey, num: info.num, title: info.title, rel: info.makeFolder ? info.topicRel + '/' + info.folderName : null }, message: 'Added, with an empty folder on Drive: ' + info.folderName }), 0); },
     saveWeek() { setTimeout(() => ok({ saved: true }), 0); },
     saveWeeks() { setTimeout(() => ok({ saved: true }), 0); },
     saveLessons() { setTimeout(() => ok({ saved: true }), 0); },
+    saveLessonChanges(k, changes) { setTimeout(() => ok({ saved: changes.length, stamp: Date.now() }), 0); },
     // behaviour, built in (2026-10-12): a made-up class, no real names
     init() { setTimeout(() => ok({ classes: ['7ML', '8XP'], today: ['8XP'], rules: { 2: 'Work ethic', 4: 'Attention' }, version: 22 }), 0); },
     openClass(k, cls) { setTimeout(() => ok({ students: ['Ada Lovelace', 'Alan Turing', 'Marie Curie'].map((n, i) => ({ name: n, short: n.split(' ')[0] + ' ' + n.split(' ')[1][0] + '.', x: 20 + i * 30, y: 50, support: '' })), ratio: 2.6, events: (window.__EV = window.__EV || []) }), 0); },

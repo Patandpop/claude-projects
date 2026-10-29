@@ -313,7 +313,7 @@ const KEY = <?!= JSON.stringify(key) ?>;   // the key is letters and numbers onl
 const APP_URL = <?!= JSON.stringify(appUrl) ?>;   // this web app: phone page = ?key=..&view=phone, board = &view=board
 const P = window.PlannerLogic;
 const COLS = ['B', 'F', 'J', 'N', 'R'];
-let S = { data:null, weeks:{}, learned:{}, hasTemplate:false, monday:null, week:null, undo:[], sel:-1, dirty:false, saving:0, view:'week', day:0, mine:null, showMine:false, readOnly:false, chooser:{} };
+let S = { data:null, weeks:{}, weekStamps:{}, recStamp:0, learned:{}, hasTemplate:false, monday:null, week:null, undo:[], sel:-1, dirty:false, saving:0, view:'week', day:0, mine:null, showMine:false, readOnly:false, chooser:{} };
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c]));
 const status = (t) => { $('status').textContent = t; $('status').classList.toggle('dirty', S.dirty); $('status').classList.toggle('failed', /^NOT saved/.test(t)); };
@@ -386,7 +386,23 @@ function undo() {
   status('Saving...'); clearTimeout(saveTimer); saveTimer = setTimeout(save, 1200);
 }
 // One retry: a blip in the connection is the usual cause of a failed save (work plan 1.2, 2026-10-29).
-const tryTwice = (fn, ...a) => run(fn, ...a).catch(() => run(fn, ...a));
+// Not when the server says the page is out of date (1.5): sending the same save again cannot help.
+const isStale = (e) => /out of date/i.test(String((e && e.message) || e));
+const tryTwice = (fn, ...a) => run(fn, ...a).catch((e) => isStale(e) ? Promise.reject(e) : run(fn, ...a));
+// Stale-tab guard (work plan 1.5, 2026-10-29): every save carries the "saved at" stamp this page loaded for that
+// week or for the lesson ticks; the server refuses to write over anything saved since, so an old tab left open at
+// school can never wipe ticks made at home. Ticks travel as the changed records only, merged by lesson, and the
+// server sends back every record as it now stands, so ticks made elsewhere appear here without a reload.
+const weekStamp = (mon) => (S.weekStamps[mon] === undefined ? null : S.weekStamps[mon]);
+function takeRecords(r, sentJson) {
+  S.recStamp = r.stamp || S.recStamp;
+  if (!r.records) { S.recSaved = sentJson; return; }
+  const theirs = JSON.stringify(r.records);
+  if (JSON.stringify(S.data.records || []) === sentJson) {   // nothing changed here since the save left: take the merged list
+    if (theirs !== sentJson) { S.data.records = r.records; P.remapRecords(S.data); S.recSnap = JSON.stringify(S.data.records); markGaps(); render(); }
+    S.recSaved = JSON.stringify(S.data.records);
+  } else S.recSaved = theirs;   // he carried on ticking: the next save sends the difference against what the server holds
+}
 function save() {
   clearTimeout(saveTimer);
   if (S.readOnly || !S.dirty) return Promise.resolve();
@@ -396,21 +412,28 @@ function save() {
   // Three parts travel: this week, the lesson ticks, and later weeks that slid along. "All changes saved" only
   // once every part has landed; a red "NOT saved" if any part failed twice (the ticks used to fail silently);
   // and the leave-page warning stays on while any part is still travelling (S.saving).
-  const failed = [];
-  const part = (what, fn, ...a) => tryTwice(fn, ...a).then(() => true, (e) => { failed.push(what + ' (' + e.message + ')'); return false; });
+  const failed = []; let stale = false;
+  const part = (what, fn, ...a) => tryTwice(fn, ...a).then((r) => r || true, (e) => { if (isStale(e)) stale = true; failed.push(what + ' (' + e.message + ')'); return false; });
   S.saving++;
-  const week = part('this week', 'saveWeek', wk).then((ok) => { if (ok) S.weeks[wk.monday] = wk; return ok; });
-  const ticks = recs === S.recSaved ? Promise.resolve(true) : part('lesson ticks', 'saveLessons', JSON.parse(recs)).then((ok) => { if (ok) S.recSaved = recs; return ok; });
+  const week = part('this week', 'saveWeek', wk, weekStamp(wk.monday)).then((r) => { if (r) { S.weeks[wk.monday] = wk; if (r.stamp) S.weekStamps[wk.monday] = r.stamp; } return !!r; });
+  const changes = recs === S.recSaved ? [] : P.recordChanges(JSON.parse(S.recSaved || '[]'), JSON.parse(recs));
+  const ticks = !changes.length ? Promise.resolve(true) : part('lesson ticks', 'saveLessonChanges', changes, S.recStamp).then((r) => { if (r) takeRecords(r, recs); return !!r; });
   // slide-over (2026-10-12): later saved weeks re-plan now, not only when opened
   const later = week.then((ok) => {
     if (!ok) return false;
     const moved = P.cascade(S.data, S.weeks, wk.monday, todayMidnight(), S.learned);
     if (!moved.length) return true;
-    return part('later weeks', 'saveWeeks', moved).then((ok2) => { if (ok2) toast('Later weeks moved along: w/c ' + moved.map((x) => fmtDate(x.monday)).join(', ')); return ok2; });
+    return part('later weeks', 'saveWeeks', moved, moved.map((x) => weekStamp(x.monday))).then((r) => {
+      if (r) { Object.assign(S.weekStamps, r.stamps || {}); toast('Later weeks moved along: w/c ' + moved.map((x) => fmtDate(x.monday)).join(', ')); }
+      return !!r;
+    });
   });
   return Promise.all([week, ticks, later]).then(() => {
     S.saving = Math.max(0, S.saving - 1);
-    if (failed.length) {
+    if (stale) {
+      S.dirty = true;
+      status('NOT saved: this page is out of date (the planner was changed from another computer or tab). Reload the page, then make your change again');
+    } else if (failed.length) {
       S.dirty = true;   // so Ctrl+S, or the next change, sends everything again
       status('NOT saved: ' + failed.join('; ') + '. Ctrl+S to try again');
     } else if (S.week.monday === wk.monday) status(S.dirty ? 'Saving...' : 'All changes saved');
@@ -1860,14 +1883,14 @@ document.addEventListener('keydown', (e) => {
 window.addEventListener('beforeunload', (e) => { if (S.dirty || S.saving) { e.preventDefault(); e.returnValue = ''; } });   // unsaved, or a save still travelling
 
 function onLoad(r) {
-  S.data = r.data; S.results = r.results || []; S.weeks = r.weeks || {}; S.learned = r.learned || {}; S.classSettings = r.classSettings || {}; S.added = r.added || []; S.behaviourUrl = r.behaviourUrl || ""; S.gradeBands = r.gradeBands || {};
+  S.data = r.data; S.results = r.results || []; S.weeks = r.weeks || {}; S.weekStamps = r.weekStamps || {}; S.recStamp = r.lessonsStamp || 0; S.learned = r.learned || {}; S.classSettings = r.classSettings || {}; S.added = r.added || []; S.behaviourUrl = r.behaviourUrl || ""; S.gradeBands = r.gradeBands || {};
   if (S.data && S.data.classes) {
     P.applyAdded(S.data, S.added);                                          // lessons he added in the planner
     Object.values(S.weeks).forEach((w) => P.remapWeek(S.data, w));          // same lessons after a data refresh
     // shared lesson state (2026-10-12): one record per lesson; ticks saved inside old weeks move into it once
     S.data.records = r.records || []; P.remapRecords(S.data);
     const mg = P.migrateMarks(S.data, S.weeks);
-    if (mg.length) run('saveLessons', S.data.records).then(() => run('saveWeeks', mg)).catch((e) => status('Ticks not moved: ' + e.message));
+    if (mg.length) run('saveLessons', S.data.records).then((o) => { if (o && o.stamp) S.recStamp = o.stamp; S.recSaved = JSON.stringify(S.data.records); return run('saveWeeks', mg, mg.map((x) => weekStamp(x.monday))); }).then((o) => { Object.assign(S.weekStamps, (o && o.stamps) || {}); }).catch((e) => status('Ticks not moved: ' + e.message));
     S.recSnap = JSON.stringify(S.data.records); S.recSaved = mg.length ? null : S.recSnap;
   }
   if (!S.data) { status('No data yet: More → Import data, pick planner-data.json'); $('grid').innerHTML = ''; editor(); return; }

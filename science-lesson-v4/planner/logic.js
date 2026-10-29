@@ -76,6 +76,16 @@
     if (!Object.keys(r).some((f) => !['cls', 'i', 'key'].includes(f))) data.records = data.records.filter((x) => x !== r);
     return r;
   }
+  // What changed between two record lists (stale-tab guard, 1.5): every record that differs or is new, and
+  // { cls, key, removed: true } for one that is gone (its last tick taken off). Matched by class + lasting name.
+  function recordChanges(before, after) {
+    const id = (r) => r.cls + '|' + r.key;
+    const was = {}; (before || []).forEach((r) => { was[id(r)] = JSON.stringify(r); });
+    const out = [], seen = new Set();
+    (after || []).forEach((r) => { seen.add(id(r)); if (was[id(r)] !== JSON.stringify(r)) out.push(r); });
+    (before || []).forEach((r) => { if (!seen.has(id(r))) out.push({ cls: r.cls, key: r.key, removed: true }); });
+    return out;
+  }
   // After a data refresh: point every record back at the same lesson (by its lasting name).
   function remapRecords(data) {
     for (const r of data.records || []) { const seq = (data.classes[r.cls] || {}).seq || []; const k = r.key ? seq.findIndex((L) => lessonId(L) === r.key) : -1; r.i = k >= 0 ? k : null; }
@@ -783,7 +793,7 @@
     return out;
   }
 
-  const api = { dueFor, nextLessonDay, lessonsOn, lessonEnd, recs, findRecord, setRecord, remapRecords, migrateMarks, cascade, revisionSlot, unitBefore, applyAdded, addedNum, remapWeek, lessonId, applyMarks, classReport, topicList, wouldSkip, setSlot, markLesson, refillClass, planFrom, periodTime, calendarEvents, DAYS, iso, parse, addDays, mondayOf, isTeachingDay, nextSchoolDay, weekLetter, progressBefore, next, autofill, moveSlot, refillAfter,
+  const api = { dueFor, nextLessonDay, lessonsOn, lessonEnd, recs, findRecord, setRecord, recordChanges, remapRecords, migrateMarks, cascade, revisionSlot, unitBefore, applyAdded, addedNum, remapWeek, lessonId, applyMarks, classReport, topicList, wouldSkip, setSlot, markLesson, refillClass, planFrom, periodTime, calendarEvents, DAYS, iso, parse, addDays, mondayOf, isTeachingDay, nextSchoolDay, weekLetter, progressBefore, next, autofill, moveSlot, refillAfter,
     EXTRAS, extrasSuggested, gradeFor, hwCoverage, hwStatus, lastResults, lessonSlot, testSlot, notHappened, slotDone, slotDay, fromFilled, reflowWeek, CHECKS, sheetCells, sheetModel, setsCount, printList, buildPrompt, carryForward, equipCell, lessonCell, setsLabel };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.PlannerLogic = api;
 })(typeof window !== 'undefined' ? window : this);

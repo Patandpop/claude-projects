@@ -8,7 +8,7 @@ m.sheets.Students._data.forEach((r, i) => { if (i) r.push(i === 1 ? 'prompt' : '
 // one project since 2026-10-12: the planner's Code.gs and Behaviour.gs load together (a clash would break this)
 const SRC = process.env.PLANNER_SRC || path.join(__dirname, '..');   // PLANNER_SRC: the bundle test points this at the comment-stripped copies
 eval(fs.readFileSync(path.join(SRC, 'Code.gs'), 'utf8') + '\n' + fs.readFileSync(path.join(SRC, 'Behaviour.gs'), 'utf8') +
-  '\nglobal.api={init,openClass,logEvent,logMany,removeMany,getBoard,setMode,endMode,getMode,setTimer,adjustTimer,stopTimer,submitResult,getSilence,getFriday,positivesOver,setSupport,setPause,mergeBehaviourData,behaviourWeek,sameClass_,lessonMcqs,saveVote,removeVote,setLost};');
+  '\nglobal.api={init,openClass,logEvent,logMany,removeMany,getBoard,setMode,endMode,getMode,setTimer,adjustTimer,stopTimer,submitResult,getSilence,getFriday,positivesOver,setSupport,setPause,mergeBehaviourData,behaviourWeek,sameClass_,lessonMcqs,saveVote,removeVote,setLost,loadAll_,saveWeek,saveWeeks,saveLessons,saveLessonChanges};');
 const k = 'k', out = []; let failed = 0;
 const ok = (n, c) => { out.push((c ? 'PASS ' : 'FAIL ') + n); if (!c) failed++; };
 
@@ -146,6 +146,50 @@ ok('merge is noted in the planner Log tab, not the behaviour log', m.sheets.Log 
   api.logMany(k, '7BYA', ['Test Pupil One', 'Test Pupil Two'], '-', 2, t + 100, 'tap-3');
   ok('a multi-select tap sent twice is written once (two rows, not four)', log.length === n0 + 4);
   ok('taps take the document lock, never the script lock the homework Form build holds', m.lockLog.length >= 5 && m.lockLog.every((x) => x === 'document'));
+}
+
+// 1.5 (2026-10-29): two planner tabs open at once. Each save carries the stamp its page loaded; a save over a row saved
+// since is refused ("This page is out of date. Reload"); ticks travel as changed records and merge by lesson.
+{
+  m.sheets.Equipment = m.makeSheet('Equipment', [['key', 'eq', 'sets']]);
+  const rec = (key, done) => ({ cls: '7MLA', i: 0, key, done });
+  const stale = (fn) => { try { fn(); return ''; } catch (e) { return e.message; } };
+  // tab A and tab B both load with no ticks saved yet
+  const A = api.loadAll_(true), B = api.loadAll_(true);
+  ok('loadAll gives the lesson-tick stamp and a stamp per saved week', A.lessonsStamp === 0 && typeof A.weekStamps === 'object' && Object.keys(A.weeks).every((mon) => mon in A.weekStamps));
+  // A ticks lesson L3; B (older view) ticks L4: both land, and B gets A's tick back
+  const a1 = api.saveLessonChanges(k, [rec('Y7/B1/L3', true)], A.lessonsStamp);
+  const b1 = api.saveLessonChanges(k, [rec('Y7/B1/L4', true)], B.lessonsStamp);
+  ok('two tabs ticking different lessons both land (merged by lesson)', a1.records.length === 1 && b1.records.length === 2 && b1.records.some((r) => r.key === 'Y7/B1/L3' && r.done) && b1.records.some((r) => r.key === 'Y7/B1/L4'));
+  ok('the saved-at column is a number stamp, and each save gets a later one than the last', typeof m.sheets.Lessons._data[1][2] === 'number' && b1.stamp > a1.stamp && a1.stamp > 0);
+  // B still holds its OLD stamp and now unticks L3 (which A saved after B loaded): refused
+  const why = stale(() => api.saveLessonChanges(k, [{ cls: '7MLA', key: 'Y7/B1/L3', removed: true }], B.lessonsStamp));
+  ok('an old tab changing a tick saved since it loaded is refused: ' + why, /This page is out of date\. Reload/.test(why));
+  ok('...and nothing was written', m.sheets.Lessons._data.length === 3 && JSON.parse(m.sheets.Lessons._data[1][1]).done === true);
+  // after a reload (fresh stamp) the same change goes through, and the row goes
+  const B2 = api.loadAll_(true);
+  const b2 = api.saveLessonChanges(k, [{ cls: '7MLA', key: 'Y7/B1/L3', removed: true }], B2.lessonsStamp);
+  ok('after a reload the change lands, and an emptied record is dropped', b2.records.length === 1 && b2.records[0].key === 'Y7/B1/L4' && m.sheets.Lessons.getLastRow() === 2);
+  ok('an older page that sends no stamp is not checked (works as before)', api.saveLessonChanges(k, [rec('Y7/B1/L4', false)]).records[0].done === false);
+  // weeks: A saves a week; B saves the same week with its old stamp: refused; with the fresh stamp: fine
+  const mon = Object.keys(A.weeks)[0];
+  const wkA = Object.assign({}, A.weeks[mon], { note: 'from A' }), wkB = Object.assign({}, B.weeks[mon], { note: 'from B' });
+  const sa = api.saveWeek(k, wkA, A.weekStamps[mon]);
+  ok('saveWeek returns the new stamp', sa.saved === mon && sa.stamp > 0);
+  const whyW = stale(() => api.saveWeek(k, wkB, B.weekStamps[mon]));
+  ok('an old tab saving a week saved since it loaded is refused: ' + whyW, /This page is out of date\. Reload/.test(whyW) && JSON.parse(m.sheets.Weeks._data[1][1]).note === 'from A');
+  const whyN = stale(() => api.saveWeek(k, wkB, null));
+  ok('a tab that never saw a saved copy of that week is refused too', /out of date/.test(whyN));
+  const sb = api.saveWeek(k, wkB, sa.stamp);
+  ok('with the fresh stamp the save lands, with a later stamp', JSON.parse(m.sheets.Weeks._data[1][1]).note === 'from B' && sb.stamp > sa.stamp);
+  const oldRow = m.sheets.Weeks._data[1][2] = new Date(sb.stamp);   // a row saved by the OLD planner holds a date, not a number
+  ok('an old date-stamped row still reads as the same stamp', api.loadAll_(true).weekStamps[mon] === sb.stamp && oldRow instanceof Date);
+  const whyM = stale(() => api.saveWeeks(k, [wkA, { monday: '2027-01-04', slots: [] }], [sa.stamp, null]));
+  ok('a batch of later weeks with one stale week is refused whole, naming the week: ' + whyM, /out of date/.test(whyM) && whyM.includes(mon) && m.sheets.Weeks._data.length === 2);
+  const sm = api.saveWeeks(k, [wkA, { monday: '2027-01-04', slots: [] }], [sb.stamp, null]);
+  ok('a batch with fresh stamps lands and returns a stamp per week', sm.saved === 2 && sm.stamps[mon] > 0 && sm.stamps['2027-01-04'] > 0 && m.sheets.Weeks._data.length === 3);
+  ok('an older page saving weeks with no stamps is not checked', api.saveWeek(k, wkA).saved === mon);
+  ok('saves take the document lock (the one taps use), never the script lock', m.lockLog.slice(-12).every((x) => x === 'document'));
 }
 
 console.log(out.join('\n')); console.log(failed ? `\n${failed} FAILED` : '\nAll passed'); process.exit(failed ? 1 : 0);

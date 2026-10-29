@@ -873,14 +873,16 @@ function loadAll(k) {
 function loadDataWeeks_(withData) {
   const d = sheet_('Data'), dn = d.getLastRow();
   const chunks = withData && dn > 1 ? d.getRange(2, 1, dn - 1, 1).getValues().map((r) => r[0]).join('') : '';
-  const weeks = {};
+  const weeks = {}, weekStamps = {};   // weekStamps: when each week was last saved (ms), the page sends it back with a save (1.5)
   const w = sheet_('Weeks'), wn = w.getLastRow();
-  if (wn > 1) w.getRange(2, 1, wn - 1, 2).getValues().forEach(([m, json]) => {
-    const mon = m instanceof Date ? Utilities.formatDate(m, Session.getScriptTimeZone(), 'yyyy-MM-dd') : String(m);
-    try { weeks[mon] = JSON.parse(json); } catch (e) { /* skip a damaged row */ }
+  if (wn > 1) w.getRange(2, 1, wn - 1, 3).getValues().forEach(([m, json, at]) => {
+    const mon = monKey_(m);
+    try { weeks[mon] = JSON.parse(json); weekStamps[mon] = stampOf_(at); } catch (e) { /* skip a damaged row */ }
   });
-  return { data: chunks ? JSON.parse(chunks) : null, weeks };
+  return { data: chunks ? JSON.parse(chunks) : null, weeks, weekStamps };
 }
+const monKey_ = (m) => m instanceof Date ? Utilities.formatDate(m, Session.getScriptTimeZone(), 'yyyy-MM-dd') : String(m);
+const stampOf_ = (at) => at instanceof Date ? at.getTime() : (Number(at) || 0);   // old rows hold a date, new ones a number (ms)
 function loadAll_(withData) {
   const dw = loadDataWeeks_(withData), weeks = dw.weeks;
   const learned = {};
@@ -892,10 +894,8 @@ function loadAll_(withData) {
   const classSettings = {};
   const cs = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('ClassSettings');
   if (cs && cs.getLastRow() > 1) cs.getRange(2, 1, cs.getLastRow() - 1, 2).getValues().forEach(([cls, json]) => { try { classSettings[cls] = JSON.parse(json); } catch (e) { /* skip */ } });
-  const records = [];
-  const ls = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Lessons');
-  if (ls && ls.getLastRow() > 1) ls.getRange(2, 2, ls.getLastRow() - 1, 1).getValues().forEach(([json]) => { try { records.push(JSON.parse(json)); } catch (e) { /* skip */ } });
-  return { version: VERSION, data: dw.data, weeks, learned, added, classSettings, records, results: readResults_(),
+  const lr = lessonRows_(false), records = lr.rows.map((r) => r.rec).filter(Boolean);
+  return { version: VERSION, data: dw.data, weeks, weekStamps: dw.weekStamps, lessonsStamp: lr.stamp, learned, added, classSettings, records, results: readResults_(),
     behaviourUrl: PropertiesService.getScriptProperties().getProperty('BEHAVIOUR_URL') || '',
     gradeBands: (() => { try { return JSON.parse(PropertiesService.getScriptProperties().getProperty('GRADE_BANDS') || '{}'); } catch (e) { return {}; } })() };
 }
@@ -978,42 +978,106 @@ function importData_(text) {
   return { classes: Object.keys(obj.classes).length, generated: obj.generated };
 }
 
-function saveWeek(k, week) {
+/* --------------------------------------------------------- stale-tab guard
+   Work plan 1.5 (2026-10-29). Every Weeks row and every Lessons row carries the moment it was saved. The page
+   gets those stamps with loadAll and sends them back with each save; a save that would write over a row saved
+   SINCE the page loaded is refused with STALE_MSG instead, so an old planner tab left open at school can never
+   wipe ticks made at home. Lesson ticks travel as the changed records only (saveLessonChanges), merged by
+   class|lesson, so two tabs ticking different lessons both land. An older page that sends no stamps is not
+   checked (it behaves as before). A stamp is a plain number (ms) so it reads back exactly, and every write takes a
+   stamp later than any row already there, so two saves in the same moment still tell apart. */
+const STALE_MSG = 'This page is out of date. Reload';
+const stale_ = (rowAt, sent) => sent !== undefined && rowAt > 0 && (sent === null || rowAt > Number(sent));
+const nextStamp_ = (ats) => Math.max(Date.now(), ats.reduce((m, a) => Math.max(m, a), 0) + 1);
+function docLock_(fn) {
+  const lock = LockService.getDocumentLock();
+  lock.waitLock(10000);
+  try { return fn(); } finally { lock.releaseLock(); }
+}
+function saveWeek(k, week, stamp) {
   check_(k);
-  const w = sheet_('Weeks');
-  const json = JSON.stringify(week);
-  const n = w.getLastRow();
-  const mons = n > 1 ? w.getRange(2, 1, n - 1, 1).getDisplayValues().map((r) => r[0]) : [];
-  const at = mons.indexOf(week.monday);
-  const row = [week.monday, json, new Date()];
-  if (at >= 0) w.getRange(at + 2, 1, 1, 3).setValues([row]);
-  else { w.appendRow(row); w.getRange(w.getLastRow(), 1).setNumberFormat('@').setValue(week.monday); }
+  const stamps = putWeeks_([week], stamp === undefined ? undefined : [stamp]);
   const sent = pushState_();
-  return { saved: week.monday, home: sent };
+  return { saved: week.monday, home: sent, stamp: stamps[week.monday] };
 }
 
 // Several weeks at once: later weeks that slid along after a change (one push home, not one per week).
-function saveWeeks(k, weeks) {
+function saveWeeks(k, weeks, stamps) {
   check_(k);
-  const w = sheet_('Weeks');
-  (weeks || []).forEach((week) => {
-    const n = w.getLastRow();
-    const mons = n > 1 ? w.getRange(2, 1, n - 1, 1).getDisplayValues().map((r) => r[0]) : [];
-    const at = mons.indexOf(week.monday);
-    const row = [week.monday, JSON.stringify(week), new Date()];
-    if (at >= 0) w.getRange(at + 2, 1, 1, 3).setValues([row]);
-    else { w.appendRow(row); w.getRange(w.getLastRow(), 1).setNumberFormat('@').setValue(week.monday); }
-  });
-  return { saved: (weeks || []).length, home: pushState_() };
+  const out = putWeeks_(weeks || [], stamps);
+  return { saved: (weeks || []).length, home: pushState_(), stamps: out };
 }
-// Every lesson record, written whole (a few hundred short rows at most).
+// stamps[i]: the saved-at (ms) the page loaded for weeks[i], null if the page had no saved copy of that week,
+// or the whole list undefined (an older page) for no check. Returns the new stamp of every week written.
+function putWeeks_(weeks, stamps) {
+  return docLock_(() => {
+    const w = sheet_('Weeks');
+    const n = w.getLastRow();
+    const rows = n > 1 ? w.getRange(2, 1, n - 1, 3).getValues() : [];
+    const mons = rows.map((r) => monKey_(r[0]));
+    const stale = weeks.filter((week, i) => { const at = mons.indexOf(week.monday); return at >= 0 && stale_(stampOf_(rows[at][2]), stamps ? stamps[i] : undefined); });
+    if (stale.length) throw new Error(STALE_MSG + ' (w/c ' + stale.map((x) => x.monday).join(', ') + ')');
+    const now = nextStamp_(rows.map((r) => stampOf_(r[2]))), out = {};
+    weeks.forEach((week) => {
+      const at = mons.indexOf(week.monday);
+      const row = [week.monday, JSON.stringify(week), now];
+      if (at >= 0) w.getRange(at + 2, 1, 1, 3).setValues([row]);
+      else { w.appendRow(row); w.getRange(w.getLastRow(), 1).setNumberFormat('@').setValue(week.monday); mons.push(week.monday); rows.push(row); }
+      out[week.monday] = now;
+    });
+    return out;
+  });
+}
+// The Lessons tab: [class|lesson, record json, saved-at]. stamp = the latest saved-at of any row (what the page sends back).
+function lessonRows_(make) {
+  const sh = make ? tab_('Lessons', ['Lesson', 'Record', 'Saved']) : SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Lessons');
+  if (!sh) return { sh: null, rows: [], stamp: 0 };
+  const n = sh.getLastRow();
+  const rows = n > 1 ? sh.getRange(2, 1, n - 1, 3).getValues().map((r) => {
+    let rec = null; try { rec = JSON.parse(r[1]); } catch (e) { /* a damaged row is dropped on the next write */ }
+    return { id: String(r[0]), rec, at: stampOf_(r[2]) };
+  }) : [];
+  return { sh, rows, stamp: rows.reduce((m, r) => Math.max(m, r.at), 0) };
+}
+function writeLessonRows_(sh, rows) {
+  if (sh.getRange(1, 3).getValue() !== 'Saved') sh.getRange(1, 3).setValue('Saved');
+  const out = rows.map((r) => [r.id, JSON.stringify(r.rec), r.at || '']);
+  if (sh.getLastRow() > 1) sh.getRange(2, 1, sh.getLastRow() - 1, 3).clearContent();
+  if (out.length) sh.getRange(2, 1, out.length, 3).setValues(out);
+}
+// Only the lesson records that changed on the page: each a whole record, or { cls, key, removed: true } for one that
+// emptied (a tick taken off). stamp: the lessonsStamp the page loaded. Refused if any of those rows was saved since.
+// Returns every record as now stored (so the page picks up ticks made elsewhere) and the new stamp.
+function saveLessonChanges(k, changes, stamp) {
+  check_(k);
+  return docLock_(() => {
+    const { sh, rows } = lessonRows_(true);
+    const byId = {}; rows.forEach((r) => { byId[r.id] = r; });
+    const id = (c) => c.cls + '|' + c.key;
+    const stale = (changes || []).filter((c) => byId[id(c)] && stale_(byId[id(c)].at, stamp));
+    if (stale.length) throw new Error(STALE_MSG + ' (' + stale.length + ' lesson tick' + (stale.length > 1 ? 's' : '') + ' changed elsewhere)');
+    const now = nextStamp_(rows.map((r) => r.at));
+    (changes || []).forEach((c) => {
+      const r = byId[id(c)];
+      if (c.removed) { if (r) r.gone = true; return; }
+      const rec = Object.assign({}, c); delete rec.removed;
+      if (r) { r.rec = rec; r.at = now; r.gone = false; } else { byId[id(c)] = { id: id(c), rec, at: now }; rows.push(byId[id(c)]); }
+    });
+    const keep = rows.filter((r) => !r.gone && r.rec);
+    if ((changes || []).length) writeLessonRows_(sh, keep);
+    return { saved: (changes || []).length, records: keep.map((r) => r.rec), stamp: keep.reduce((m, r) => Math.max(m, r.at), 0) };
+  });
+}
+// Every lesson record, written whole (an older page, and the one-off move of ticks out of old weeks).
 function saveLessons(k, records) {
   check_(k);
-  const sh = tab_('Lessons', ['Lesson', 'Record']);
-  const rows = (records || []).map((r) => [r.cls + '|' + r.key, JSON.stringify(r)]);
-  if (sh.getLastRow() > 1) sh.getRange(2, 1, sh.getLastRow() - 1, 2).clearContent();
-  if (rows.length) sh.getRange(2, 1, rows.length, 2).setValues(rows);
-  return { saved: rows.length };
+  return docLock_(() => {
+    const { sh, rows: old } = lessonRows_(true);
+    const now = nextStamp_(old.map((r) => r.at));
+    const rows = (records || []).map((r) => ({ id: r.cls + '|' + r.key, rec: r, at: now }));
+    writeLessonRows_(sh, rows);
+    return { saved: rows.length, stamp: rows.length ? now : 0 };
+  });
 }
 
 // Per-class settings he types once (Patryk 2026-10-08): test papers core / challenge / paper size,

@@ -12,6 +12,14 @@ const ok = (c, m) => { console.log(`${c ? '  ok  ' : '  FAIL'} ${m}`); if (!c) f
 // 1. Week letters match his sheets: 7 Sep A, 14 Sep B, 19 Oct A, 2 Nov B (holiday week skipped)
 ok(P.weekLetter(data, P.parse('2026-09-07')) === 'A', 'w/c 7 Sep is Week A');
 ok(P.weekLetter(data, P.parse('2026-09-14')) === 'B', 'w/c 14 Sep is Week B');
+// stale-tab guard (1.5): only the records that changed travel, and a record that emptied is sent as removed
+{
+  const before = [{ cls: '7MLA', i: 1, key: 'a', done: true }, { cls: '7MLA', i: 2, key: 'b', done: true }, { cls: '8XP', i: 0, key: 'c', skip: true }];
+  const after = [{ cls: '7MLA', i: 1, key: 'a', done: true }, { cls: '7MLA', i: 2, key: 'b', done: false }, { cls: '9AS', i: 3, key: 'd', done: true }];
+  const ch = P.recordChanges(before, after);
+  ok(ch.length === 3 && ch.some((r) => r.key === 'b' && r.done === false) && ch.some((r) => r.key === 'd') && ch.some((r) => r.key === 'c' && r.cls === '8XP' && r.removed) && !ch.some((r) => r.key === 'a'), 'recordChanges: changed, new and removed records only');
+  ok(P.recordChanges(after, after).length === 0 && P.recordChanges(null, []).length === 0, 'recordChanges: nothing to send when nothing changed');
+}
 ok(P.weekLetter(data, P.parse('2026-10-19')) === 'A', 'w/c 19 Oct is Week A');
 ok(P.weekLetter(data, P.parse('2026-11-02')) === 'B', 'w/c 2 Nov is Week B (half term not counted)');
 

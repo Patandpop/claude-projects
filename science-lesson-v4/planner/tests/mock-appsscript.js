@@ -12,12 +12,15 @@ function makeSheet(name, rows) {
   const cell = asSheets;
   return {
     getName: () => name,
-    getLastRow: () => data.length,
+    getLastRow: () => { let n = data.length; while (n > 0 && !(data[n - 1] || []).some(v => v !== '' && v !== undefined && v !== null)) n--; return n; },   // like Sheets: the last row with anything in it
     appendRow: r => data.push(r.map(cell)),
     deleteRow: i => data.splice(i - 1, 1),
     getRange: (r, c, nr, nc) => ({
       getValues: () => data.slice(r - 1, r - 1 + nr).map(row => { const o = []; for (let j = 0; j < nc; j++) o.push(row[c - 1 + j] === undefined ? '' : row[c - 1 + j]); return o; }),
       setValues: vals => vals.forEach((v, i) => { data[r - 1 + i] = v.map(cell); }),
+      getDisplayValues: () => data.slice(r - 1, r - 1 + nr).map(row => { const o = []; for (let j = 0; j < nc; j++) { const v = row[c - 1 + j]; o.push(v === undefined ? '' : v instanceof Date ? v.toISOString().slice(0, 10) : String(v)); } return o; }),
+      setNumberFormat: () => ({ setValue: v => { while (data.length < r) data.push([]); data[r - 1][c - 1] = v; }, setValues: vals => vals.forEach((v, i) => { data[r - 1 + i] = v.slice(); }) }),
+      clearContent: () => { for (let i = 0; i < nr; i++) if (data[r - 1 + i]) for (let j = 0; j < nc; j++) data[r - 1 + i][c - 1 + j] = ''; },
       setFontWeight: () => ({}),
       getValue: () => { const row = data[r - 1] || []; return row[c - 1] === undefined ? '' : row[c - 1]; },
       setValue: v => { while (data.length < r) data.push([]); data[r - 1][c - 1] = cell(v); },
@@ -57,6 +60,6 @@ global.Utilities = { formatDate: (d, tz, f) => {
   if (f === 'd MMM') return `${+g('day')} ${d.toLocaleString('en-GB',{month:'short'})}`;
   return d.toISOString(); }, parseDate: (str) => new Date(str + 'T00:00:00'), getUuid: () => Math.random().toString(16).slice(2) + Math.random().toString(16).slice(2) };
 global.ContentService = { createTextOutput: t => ({ setMimeType: () => t }), MimeType: {} };
-global.HtmlService = {}; global.ScriptApp = { getService: () => ({ getUrl: () => 'u' }) };
+global.HtmlService = {}; global.ScriptApp = { getService: () => ({ getUrl: () => 'u' }) }; global.Session = { getScriptTimeZone: () => 'Europe/London' };
 global.Logger = { log: console.log };
 module.exports = { sheets, props, cache, old, makeSheet, asSheets, lockLog };
