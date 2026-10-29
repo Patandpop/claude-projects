@@ -302,3 +302,10 @@ Patryk's answers, in grill order. Mock-ups follow each area.
 - Golems: Year 7 is horrifying, the rest great; add a Year 12 PAG version; improve all. Stone inscription: unclear what it is. Wall: purpose and link to keeping ahead unclear; revamp it 3 ways, one in stained glass. All later.
 - Rise again (confirmed): day 2 also needs 3 rituals. The 3 marks are big stars to light, checklist style, should feel like atonement; each star surrounded by stained glass of many different pieces.
 - Loading (29 Oct): Ulhu spinning round, reading a scroll, or stirring a cauldron (spyglass dropped).
+
+## 29 Oct, late: picks on Big Moments II and Wall + Golems II
+- **Golems:** all of them are "amazing" but don't quite fit the art style. Make them a little more scuffed, parchment-like, eldritch and monster-like. Only a tiny bit.
+- **Wall:** the round-two walls are far too big for a quick glance. The new idea is a small, real stained-glass window covering two weeks: 2 rows (weeks) by 5 columns (days). Each day holds one moon per lesson that needs doing, so a day with 5 lessons has 5 moons to fill. A built lesson fills its glass. Where homework shows is still open: the inner circle of the moon, its outer ring, or the window's outside edge. Next round: 3 mock-ups of that moon window plus 3 of a compact wall. The water animation was bad.
+- **Level up:** LU2 round two was weak. The health refill spoiled the good animation. Next round: 3 wildly different level-ups, where the healing must not ruin the moment.
+- **DP3-b** is amazing, but the doors should slide in from the sides, as in the original DP3. Next round: variations of DP3-b with side doors.
+- **FA2-a** is amazing, but take the pentagram out of the middle of the stars. Next round: variations of FA2-a with no pentagram.
