@@ -1,8 +1,15 @@
-// Minimal Apps Script mock: sheets turn strings starting with + - = into #ERROR! like real Sheets.
+// Minimal Apps Script mock: sheets turn strings starting with + - = into #ERROR! like real Sheets,
+// and a typed 'YYYY-MM-DD' becomes a Date at midnight, as real Sheets does (work plan 0.2, 2026-10-29).
 const sheets = {};
+const asSheets = v => {
+  if (typeof v !== 'string') return v;
+  if (/^[+\-=]/.test(v)) return '#ERROR!';
+  if (/^\d{4}-\d{2}-\d{2}$/.test(v)) return new Date(+v.slice(0, 4), +v.slice(5, 7) - 1, +v.slice(8, 10));
+  return v;
+};
 function makeSheet(name, rows) {
   const data = rows;
-  const cell = v => (typeof v === 'string' && /^[+\-=]/.test(v)) ? '#ERROR!' : v;
+  const cell = asSheets;
   return {
     getName: () => name,
     getLastRow: () => data.length,
@@ -50,4 +57,4 @@ global.Utilities = { formatDate: (d, tz, f) => {
 global.ContentService = { createTextOutput: t => ({ setMimeType: () => t }), MimeType: {} };
 global.HtmlService = {}; global.ScriptApp = { getService: () => ({ getUrl: () => 'u' }) };
 global.Logger = { log: console.log };
-module.exports = { sheets, props, cache, old, makeSheet };
+module.exports = { sheets, props, cache, old, makeSheet, asSheets };

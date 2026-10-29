@@ -295,14 +295,16 @@ function setHomework(k, item) {
     const made = madeFile.found ? JSON.parse(madeFile.text || '{}') : {};
     const was = made[it.file];
     const sh = tab_('Homework', HW_HEAD);
-    const rows = sh.getLastRow() > 1 ? sh.getRange(2, 1, sh.getLastRow() - 1, HW_HEAD.length).getValues() : [];
+    // hwRows_ turns the Date values Sheets stores back into 'YYYY-MM-DD' (bug 1.1, audit 28 Oct: a raw string
+    // comparison against the Date never matched, so every homework set on one day got the same id "-1")
+    const rows = hwRows_();
     // a row only counts once it has its Classroom item: a "form only" row (the class was missing, Classroom
     // was off, a post time was refused) can be tried again, and the Form made then is reused (replica-test 2026-10-19)
-    const row = rows.find((r) => r[1] === it.cls && r[4] === it.file && r[9]);
+    const row = rows.find((r) => r.cls === String(it.cls) && r.file === it.file && r.courseWorkId);
     // made before (a draft from this tab, a row in the Homework tab, or a draft made by the old menu path)
     if ((was && (was.courseWorkId || was.draft === true)) || row) {
-      const on = String((was && was.at) || (row && row[16]) || '').slice(0, 10);
-      return { ok: true, already: true, formUrl: (was && was.link) || (row && row[7]) || '', editUrl: (was && was.form) || '', classroomUrl: (was && was.classroom) || '', draft: !!((was && was.courseWorkId) || (row && row[9])),
+      const on = String((was && was.at) || (row && row.made) || '').slice(0, 10);
+      return { ok: true, already: true, formUrl: (was && was.link) || (row && row.formUrl) || '', editUrl: (was && was.form) || '', classroomUrl: (was && was.classroom) || '', draft: !!((was && was.courseWorkId) || (row && row.courseWorkId)),
         why: 'Already made' + (on ? ' on ' + dayName_(on) : '') + '.' };
     }
     const hw = JSON.parse(mailGet_({ op: 'read', name: it.file }).text);
@@ -319,9 +321,8 @@ function setHomework(k, item) {
     made[it.file] = Object.assign(made[it.file] || {}, { draft: draft.ok, courseId: draft.courseId || '', courseWorkId: draft.courseWorkId || '', classroom: draft.link || '', dueOn: it.dueOn, note: [draft.ok ? '' : draft.why].concat(notes).filter(Boolean).join('. ') });
     mailPost_({ op: 'write', name: 'homework-made.json', text: JSON.stringify(made, null, 1) });
     const setOn = it.setOn || Utilities.formatDate(new Date(), TZ, 'yyyy-MM-dd');
-    const n = rows.filter((r) => r[1] === it.cls && String(r[10]) === setOn).length + 1;
     const status = draft.ok ? (draft.scheduled ? 'scheduled' : 'drafted') : 'form only';
-    sh.appendRow([it.cls + '-' + setOn + '-' + n, it.cls, it.kind || hw.kind || 'quiz', hw.title, it.file, hw.tier || '', form.getId(), form.getPublishedUrl(),
+    sh.appendRow([hwNewId_(hwRows_(), it.cls, setOn), it.cls, it.kind || hw.kind || 'quiz', hw.title, it.file, hw.tier || '', form.getId(), form.getPublishedUrl(),
       draft.courseId || '', draft.courseWorkId || '', setOn, it.post === 'schedule' ? it.postAt : '', it.dueOn, draft.dueUtc || '', info.points || totalPoints_(hw), status, new Date()]);
     CacheService.getScriptCache().remove('hwstat');
     tab_('Log', ['when', 'what', 'where']).appendRow([new Date(), 'set homework: ' + status + (notes.length ? ' (' + notes.join('; ') + ')' : ''), it.cls + ' ' + hw.title]);
@@ -348,9 +349,8 @@ function setLinkHomework_(it) {
     if (done) return { ok: true, already: true, draft: true, classroomUrl: '', why: 'Already made on ' + dayName_(String(done.setOn || done.dueOn)) + '.' };
     const draft = classroomDraft_({ cls: it.cls }, null, { due: it.dueOn, message: it.message, postAt: it.post === 'schedule' ? it.postAt : null, title, link: String(it.link || '').trim() });
     const setOn = it.setOn || Utilities.formatDate(new Date(), TZ, 'yyyy-MM-dd');
-    const n = hwRows_().filter((r) => r.cls === String(it.cls) && r.setOn === setOn).length + 1;
     const status = draft.ok ? (draft.scheduled ? 'scheduled' : 'drafted') : 'not made';
-    if (draft.ok) sh.appendRow([it.cls + '-' + setOn + '-' + n, it.cls, it.kind, title, String(it.link || ''), '', '', '', draft.courseId || '', draft.courseWorkId || '', setOn,
+    if (draft.ok) sh.appendRow([hwNewId_(hwRows_(), it.cls, setOn), it.cls, it.kind, title, String(it.link || ''), '', '', '', draft.courseId || '', draft.courseWorkId || '', setOn,
       it.post === 'schedule' ? it.postAt : '', it.dueOn, draft.dueUtc || '', '', status, new Date()]);
     CacheService.getScriptCache().remove('hwstat');
     tab_('Log', ['when', 'what', 'where']).appendRow([new Date(), 'set ' + it.kind + ' homework: ' + status, it.cls + ' ' + title]);
@@ -371,6 +371,40 @@ function hwRows_() {
     o.made = o.made instanceof Date ? o.made.toISOString() : String(o.made || '');
     return o;
   });
+}
+// The next free id for a homework set on one day: "<class>-<set on>-<n>". n counts that day's rows, then moves
+// past any id already in the tab, so two homeworks can never share an id (bug 1.1, 2026-10-29).
+function hwNewId_(rows, cls, setOn) {
+  const ids = new Set(rows.map((r) => String(r.id)));
+  let n = rows.filter((r) => r.cls === String(cls) && r.setOn === setOn).length + 1;
+  while (ids.has(cls + '-' + setOn + '-' + n)) n++;
+  return cls + '-' + setOn + '-' + n;
+}
+/* ONE-OFF, run by Patryk from the Apps Script editor (Run > fixHomeworkIds), bug 1.1 (audit 28 Oct 2026):
+   before 29 Oct every homework set on the same day for one class got the same id "...-1". This renumbers only the
+   clashing rows (the first keeps its id), writes each change to the Log tab, and says how many it changed.
+   Safe to run twice: a second run finds nothing to do. Results are rebuilt from the Homework tab each night, and the
+   page reads ids live, so nothing else needs changing. */
+function fixHomeworkIds() {
+  const sh = tab_('Homework', HW_HEAD), col = HW_HEAD.indexOf('id') + 1;
+  const rows = hwRows_(), seen = new Set(), changed = [];
+  rows.forEach((r) => {
+    let id = String(r.id);
+    if (seen.has(id)) {
+      const base = id.replace(/-\d+$/, '');
+      let n = 2; while (seen.has(base + '-' + n) || rows.some((x) => String(x.id) === base + '-' + n)) n++;
+      const fresh = base + '-' + n;
+      sh.getRange(r.row, col).setValue(fresh);
+      tab_('Log', ['when', 'what', 'where']).appendRow([new Date(), 'homework id renumbered: ' + id + ' -> ' + fresh, r.cls + ' ' + r.title]);
+      changed.push(id + ' -> ' + fresh);
+      id = fresh;
+    }
+    seen.add(id);
+  });
+  CacheService.getScriptCache().remove('hwstat');
+  const msg = changed.length ? 'Renumbered ' + changed.length + ' homework id(s): ' + changed.join(', ') : 'No clashing homework ids found. Nothing changed.';
+  if (typeof Logger !== 'undefined') Logger.log(msg);   // shows in the editor's log when run by hand
+  return msg;
 }
 // Every pupil's Classroom submission for one homework (to count hand-ins).
 function allSubs_(courseId, cwId) {

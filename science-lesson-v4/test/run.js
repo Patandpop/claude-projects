@@ -88,6 +88,7 @@ function mediaCount(file) {
 
 async function main() {
   if (!fs.existsSync(BUILD_JS)) { console.error('build.js not found at ' + BUILD_JS); process.exit(1); }
+  process.env.EXAM_USAGE_NO_BACKUP = '1';   // test writes to exam-usage.json must never become "today's backup" (exam-usage.js)
 
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'sl-regression-'));
   console.log(`\nRegression harness — output → ${DIM}${tmp}${RST}\n`);
@@ -915,6 +916,10 @@ async function main() {
   // Spaced homework from class results (learning loop M6, 2026-10-22).
   hardFails += require(path.join(__dirname, 'spaced-homework.test.js')).run().fails;
 
+  // The "never repeat a question" record: a damaged file stops the pick, writes are safe, dated backups (exam-usage.js, 2026-10-29).
+  console.log('');
+  hardFails += require(path.join(__dirname, 'exam-usage.test.js')).run().fails;
+
   // Exam practice homework papers (test-paper.js).
   console.log('');
   const paperMod = require(path.join(__dirname, 'test-paper.test.js'));
@@ -923,6 +928,29 @@ async function main() {
   warnings  += paperTest.warns;
   const paperDocx = await paperMod.runDocx();
   hardFails += paperDocx.fails;
+
+  // The planner, the behaviour app and Ulhu's server: Apps Script code run against fakes (work plan 0.2, 2026-10-29).
+  // Each is its own script that exits 1 on a failed check; its failing lines are shown here.
+  console.log('');
+  console.log('Planner, behaviour app and Ulhu checks');
+  const plannerData = fs.existsSync(path.join(ROOT, 'planner', 'planner-data.json'));
+  const PLANNER_CHECKS = [
+    ['planner/test-logic.js',          'planner logic against the exported lesson data', true],
+    ['planner/test-homework-quiz.js',  'homework quizzes (Forms, Classroom, the Homework tab)', false],
+    ['planner/test-mailbox.js',        'the home link (mailbox)', false],
+    ['planner/test-ordersheet.js',     'the order sheet drawing', true],
+    ['planner/tests/server.test.js',   'the planner server and behaviour app', false],
+    ['planner/tests/game.test.js',     "Ulhu's Rituals server", false],
+    ['planner/tests/bundle.test.js',   'the paste files (comments out, size alarm, change record, build stamp)', false],
+  ];
+  for (const [rel, what, needsData] of PLANNER_CHECKS) {
+    if (!fs.existsSync(path.join(ROOT, rel))) { warn(`${rel}: not found, skipped`); continue; }
+    if (needsData && !plannerData) { warn(`${rel}: skipped, planner/planner-data.json not exported on this PC`); continue; }
+    const r = cp.spawnSync(process.execPath, [path.join(ROOT, rel)], { cwd: ROOT, encoding: 'utf8', env: Object.assign({}, process.env, { NO_UPLOAD: '1' }) });
+    if (r.status === 0) { pass(`${rel}: ${what}`); continue; }
+    const lines = ((r.stdout || '') + '\n' + (r.stderr || '')).split('\n').filter((l) => /FAIL|✗|Error|error/.test(l)).slice(0, 8);
+    fail(`${rel}: ${what} (exit ${r.status})` + lines.map((l) => '\n      ' + l.trim()).join(''));
+  }
 
   console.log('');
   if (hardFails) {

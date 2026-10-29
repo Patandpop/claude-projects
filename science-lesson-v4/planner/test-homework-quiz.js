@@ -35,12 +35,15 @@ const form = { id: 'F1', addPageBreakItem: () => item('page'), addSectionHeaderI
 const calls = { create: 0, copy: [], openById: 0, openByUrl: 0, moved: 0 };
 let coursework = null, cwN = 0;
 const allCoursework = [];
-// fake Sheets: tabs that keep their rows
+// fake Sheets: tabs that keep their rows. A typed 'YYYY-MM-DD' becomes a Date at midnight, as in real Sheets
+// (work plan 0.2, 2026-10-29: the homework id clash only shows once the fake does this).
 const sheets = {};
+const asSheets = (v) => (typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v)) ? new Date(+v.slice(0, 4), +v.slice(5, 7) - 1, +v.slice(8, 10)) : v;
+const day = (v) => (v instanceof Date ? `${v.getFullYear()}-${String(v.getMonth() + 1).padStart(2, '0')}-${String(v.getDate()).padStart(2, '0')}` : String(v || ''));
 const sheet = (name) => {
   const rows = [];
-  return { rows, appendRow(r) { rows.push(r); }, getLastRow: () => rows.length,
-    getRange: (r, c, nr, nc) => ({ getValues: () => rows.slice(r - 1, r - 1 + (nr || 1)).map((x) => x.slice(c - 1, c - 1 + (nc || 1))), setValue: (v) => { rows[r - 1][c - 1] = v; } }) };
+  return { rows, appendRow(r) { rows.push(r.map(asSheets)); }, getLastRow: () => rows.length,
+    getRange: (r, c, nr, nc) => ({ getValues: () => rows.slice(r - 1, r - 1 + (nr || 1)).map((x) => x.slice(c - 1, c - 1 + (nc || 1))), setValue: (v) => { rows[r - 1][c - 1] = asSheets(v); } }) };
 };
 const ss = { getSheetByName: (n) => sheets[n] || null, insertSheet: (n) => (sheets[n] = sheet(n)) };
 // London time, as Apps Script's Utilities would give it
@@ -245,9 +248,22 @@ check(s1.ok && s1.draft && !s1.already && s1.formUrl && s2.ok && s2.already && /
   'set homework: the second click for the same class and quiz is refused ("Already made"), with the links');
 check(calls.copy.length === 1 && allCoursework.length === 1 && lockTaken === 2, 'two clicks make ONE Form and ONE Classroom draft (lock + receipt + Homework tab)');
 const hrows = sheets.Homework.rows;
-check(hrows.length === 2 && hrows[0][0] === 'id' && hrows[1][0] === '10C2-2026-10-19-1' && hrows[1][1] === '10C2' && hrows[1][4] === item1.file && hrows[1][5] === 'core' && hrows[1][9] === s1.courseWorkId && hrows[1][12] === '2026-10-21' && hrows[1][13] === '2026-10-21T07:00Z' && hrows[1][14] === 13 && hrows[1][15] === 'drafted',
+check(hrows.length === 2 && hrows[0][0] === 'id' && hrows[1][0] === '10C2-2026-10-19-1' && hrows[1][1] === '10C2' && hrows[1][4] === item1.file && hrows[1][5] === 'core' && hrows[1][9] === s1.courseWorkId && day(hrows[1][12]) === '2026-10-21' && hrows[1][13] === '2026-10-21T07:00Z' && hrows[1][14] === 13 && hrows[1][15] === 'drafted',
   'one row in the Homework sheet tab: id, class, file, tier, Classroom id, due, due in UTC, points, "drafted"');
 check(lastReceipt()[item1.file].courseWorkId === s1.courseWorkId, 'the receipt (homework-made.json) keeps the Classroom id');
+// bug 1.1 (audit 28 Oct): a second homework for the same class on the same day must get id -2. Sheets stores the
+// "set on" column as a Date, so a string comparison never matched and every id ended in -1.
+files['homework-10C2-2026-11-09-core.json'] = JSON.stringify({ ...v2, due: '2026-11-09' });
+const s1b = ctx.setHomework('pk', { ...item1, file: 'homework-10C2-2026-11-09-core.json', dueOn: '2026-11-09' });
+const hwIds = sheets.Homework.rows.slice(1).map((r) => r[0]);
+check(s1b.ok && !s1b.already && hwIds.join() === '10C2-2026-10-19-1,10C2-2026-10-19-2', `a second homework for the same class on the same day gets id -2, never a repeat (${hwIds.join(', ')})`);
+// the one-off repair for rows written before the fix: only the clashing row is renumbered, and the Log tab says so
+sheets.Homework.rows[2][0] = '10C2-2026-10-19-1';
+const fixMsg = ctx.fixHomeworkIds();
+const fixedIds = sheets.Homework.rows.slice(1).map((r) => r[0]);
+check(/Renumbered 1 homework id/.test(fixMsg) && fixedIds.join() === '10C2-2026-10-19-1,10C2-2026-10-19-2' && sheets.Log.rows.some((r) => /homework id renumbered: 10C2-2026-10-19-1 -> 10C2-2026-10-19-2/.test(r[1])),
+  'fixHomeworkIds (one-off, run from the editor) renumbers a clashing old row and logs it');
+check(/Nothing changed/.test(ctx.fixHomeworkIds()) && sheets.Homework.rows.slice(1).map((r) => r[0]).join() === fixedIds.join(), '...and a second run changes nothing');
 // a quiz already made from the menu (Form, no draft): only the draft is made, with the same Form
 allCoursework.length = 0; calls.create = 0; calls.copy.length = 0; calls.openByUrl = 0;
 const s3 = ctx.setHomework('pk', { cls: '10C2', file: 'homework-10C2-2026-10-26-core.json', setOn: '2026-10-20', dueOn: '2026-10-27', post: 'schedule', postAt: '2026-10-20T15:10' });
