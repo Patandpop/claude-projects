@@ -1,0 +1,318 @@
+<title>Everything Still To Build</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<style>
+/* Layout: one reading column for the story (summary, phases, clashes), the goal table breaks out wider with sticky filter chips. Palette borrowed from Patryk's own slides: navy board, answer-box yellow. */
+:root{
+  --bg:#f5f6fa; --surface:#ffffff; --ink:#151b33; --muted:#565e7a; --line:#d9dcea;
+  --navy:#0d1b5e; --yellow:#ffd60a; --accent:#2a3c9c;
+  --built:#1f7a46; --built-bg:#e2f3e8; --partly:#9a6200; --partly-bg:#fff1cc; --none:#a32a2a; --none-bg:#fbe3e3;
+  --flag:#7a2a8c; --flag-bg:#f3e3f7;
+  --display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
+  --body:"Atkinson Hyperlegible",ui-sans-serif,system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0b1024; --surface:#131a36; --ink:#e8eaf5; --muted:#a3a9c6; --line:#2a3360;
+  --navy:#ffd60a; --yellow:#ffd60a; --accent:#9fb0ff;
+  --built:#7ddc9f; --built-bg:#143523; --partly:#ffd36b; --partly-bg:#3a2e08; --none:#ff9c9c; --none-bg:#3d1616;
+  --flag:#e2a6f0; --flag-bg:#33173b; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0b1024; --surface:#131a36; --ink:#e8eaf5; --muted:#a3a9c6; --line:#2a3360;
+  --navy:#ffd60a; --yellow:#ffd60a; --accent:#9fb0ff;
+  --built:#7ddc9f; --built-bg:#143523; --partly:#ffd36b; --partly-bg:#3a2e08; --none:#ff9c9c; --none-bg:#3d1616;
+  --flag:#e2a6f0; --flag-bg:#33173b; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55;padding-inline:16px;padding-block:0 64px}
+.wrap{max-width:1180px;margin:0 auto}
+.read{max-width:760px}
+header.top{padding-block:40px 24px;border-bottom:3px solid var(--navy);margin-bottom:28px}
+.eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:700}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(2rem,5vw,3.2rem);line-height:1.05;margin:.3em 0 .35em;text-wrap:balance;color:var(--navy)}
+h2{font-family:var(--display);font-weight:800;font-size:1.6rem;margin:48px 0 12px;text-wrap:balance}
+h3{font-family:var(--display);font-weight:600;font-size:1.15rem;margin:22px 0 6px}
+p{margin:0 0 12px}
+.lede{font-size:1.1rem;color:var(--muted)}
+.star{background:var(--surface);border:1px solid var(--line);border-left:6px solid var(--yellow);padding:14px 18px;margin:18px 0}
+.tally{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0 0}
+.tile{background:var(--surface);border:1px solid var(--line);padding:10px 16px;min-width:120px}
+.tile b{display:block;font-family:var(--display);font-size:1.9rem;line-height:1.1;font-variant-numeric:tabular-nums}
+.tile span{font-size:13px;color:var(--muted)}
+.pill{display:inline-block;font-size:12px;font-weight:700;padding:2px 9px;border-radius:999px;white-space:nowrap}
+.s-built{background:var(--built-bg);color:var(--built)}
+.s-partly{background:var(--partly-bg);color:var(--partly)}
+.s-none{background:var(--none-bg);color:var(--none)}
+.fl{background:var(--flag-bg);color:var(--flag)}
+.filters{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:12px;border-bottom:1px solid var(--line);display:grid;gap:8px}
+.row{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.row .lab{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700;min-width:58px}
+.chip{font:inherit;font-size:14px;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:4px 11px;border-radius:999px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.chip:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+input#q{font:inherit;font-size:14px;padding:5px 10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:6px;min-width:0;flex:1 1 200px;max-width:320px}
+.count{font-size:14px;color:var(--muted)}
+.tablebox{overflow-x:auto;margin-top:10px;border:1px solid var(--line);background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:900px;font-size:14.5px}
+th,td{text-align:left;vertical-align:top;padding:9px 10px;border-bottom:1px solid var(--line)}
+th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:var(--surface);position:sticky;top:0}
+td.goal{font-weight:700;min-width:200px}
+td.ev{color:var(--muted);min-width:260px}
+td.c{text-align:center;font-variant-numeric:tabular-nums}
+tr.hide{display:none}
+.area{font-size:13px;white-space:nowrap}
+ol.phase,ul.list{padding-left:1.3em;margin:0 0 10px}
+ol.phase li,ul.list li{margin-bottom:8px}
+.phasegrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px}
+.phasegrid section{background:var(--surface);border:1px solid var(--line);padding:16px 18px;min-width:0}
+.phasegrid h3{margin-top:0}
+.when{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.key{font-size:14px;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+<header class="top">
+  <div class="eyebrow">Beechen Cliff science · checked against the code on 28 Oct 2026</div>
+  <h1>Everything Still To Build</h1>
+  <p class="lede read">Every goal Patryk has asked for across lessons, worksheets, homework, tests, the planner, the behaviour app, the morning brief and Ulhu. Each one was checked in the code, not just in the notes, because the old backlog often said "missing" for things that were already built.</p>
+  <div class="star read"><b>North star (21 Oct):</b> every pupil knows and still remembers the spec content, and Patryk is not working evenings to make that happen. The order below favours anything that closes the loop (what pupils get wrong drives the next lesson) or takes a morning or evening job off his plate.</div>
+  <div class="tally" id="tally"></div>
+</header>
+
+<section class="read">
+<h2>The order to build in</h2>
+<p>Three phases. Small jobs that close the learning loop or stop hand-fixing come first. Bigger jobs follow once the books index exists, because several goals need it.</p>
+</section>
+<div class="phasegrid">
+<section>
+  <div class="when">This week</div>
+  <h3>Close the loop, stop morning fixes</h3>
+  <ol class="phase">
+    <li><b>Paste and deploy the waiting planner updates</b> (Patryk, about 20 minutes). Homework and Assessment tabs, ABCD votes, results, Ulhu: all built, none live until pasted.</li>
+    <li><b>Do Now picker uses the new lesson matcher.</b> The exam board slide and exam practice already use it; the Do Now still goes off-topic, so Do Nows get hand-written.</li>
+    <li><b>MCQ votes show on the next lesson card</b>, next to the homework results that already show there.</li>
+    <li><b>One question from 3 to 4 weeks ago in the MCQ block</b>, recorded with the votes (spaced retrieval in class).</li>
+    <li><b>Exam question slide splits over two slides</b> when the question is long, instead of shrinking the text.</li>
+    <li><b>Small builder fixes</b>: graph slide title, mark-scheme panel overflow, tiny whiteboard answer text, GUESS cells filled on the standard sheet, false warning on comparison slides.</li>
+    <li><b>Friday messages home drafted</b> from the pupils he ticks (the Friday tab already makes the list; it needs the message text).</li>
+    <li><b>Marks available per section</b> in the test review table.</li>
+    <li><b>Two decisions from Patryk</b>: the 3 open questions on the 6-mark slide, and whether review lessons still need the answers sheet.</li>
+    <li><b>Save the uncommitted work</b> in git, so nothing built gets lost.</li>
+  </ol>
+</section>
+<section>
+  <div class="when">This half-term (to Christmas)</div>
+  <h3>Books, follow-ups, worksheets</h3>
+  <ol class="phase">
+    <li>CGP book scanner (marked high priority), then follow-up tasks after the Do Now, then the key-homework review inside a normal lesson.</li>
+    <li>6-mark breakdown slide, and its return as homework a few weeks later.</li>
+    <li>Worksheet page layout (tables and sections that stay together) and exam questions with pictures kept on worksheets.</li>
+    <li>Real exam MCQs first in lessons; finish Learn and Engage work (image on every Learn slide, school picture library at school).</li>
+    <li>Review lessons: extension-only sheet, bigger exam tick boxes, exam practice cover, grade at each mark once the school spreadsheets arrive.</li>
+    <li>Homework prepared a week or more ahead; silent-work scoring; Breakwater reward moment in Ulhu.</li>
+    <li>Whole-class feedback sheet: the one listed tool aimed straight at marking time.</li>
+    <li>Ulhu: Vespers and High Vespers screens once the paused mock-ups are picked.</li>
+  </ol>
+</section>
+<section>
+  <div class="when">This year</div>
+  <h3>Bigger tools, polish, the game</h3>
+  <ol class="phase">
+    <li>OCR textbook questions for 12C and 13D homework, Google Classroom drafts for lessons, an open-lesson launcher, one-press weekly printing.</li>
+    <li>Planner builds lessons it shows as NOT BUILT; Ulhu suggestions tray in the planner; free-text lesson notes that come back next year.</li>
+    <li>Behaviour: backdating and end-of-day reminder, eyes-free initials on the phone, league feed and termly tracker.</li>
+    <li>Morning brief running every day at 6am, with smoke tests.</li>
+    <li>Polish: GUESS slide, true/false reveal, header art, Greek symbols, Canva-style worksheets, teaching-language research, real data.</li>
+    <li>Ulhu extras: shop stall, haggle game, pets, potions, rooms, seasonal items.</li>
+  </ol>
+</section>
+</div>
+
+<h2 id="table">Every goal</h2>
+<p class="key read">Effort: S = one short session, M = a few sessions, L = a project. Value is to Patryk against the north star. A purple tag means a paid service or a Drive action that needs his say-so (see below the table).</p>
+<div class="filters" role="group" aria-label="Filters">
+  <div class="row" id="areaChips"><span class="lab">Area</span></div>
+  <div class="row" id="statusChips"><span class="lab">Status</span></div>
+  <div class="row"><span class="lab">Search</span><input id="q" type="search" placeholder="Search goals"><span class="count" id="shown"></span></div>
+</div>
+<div class="tablebox">
+<table>
+<thead><tr><th>Goal</th><th>Area</th><th>Status</th><th>What the code shows</th><th>Effort</th><th>Value</th><th>Needs first</th></tr></thead>
+<tbody id="rows"></tbody>
+</table>
+</div>
+
+<section class="read">
+<h2>Clashes and duplicates</h2>
+<ul class="list">
+<li><b>Review lesson answers sheet.</b> The standing output rule says a review lesson makes an answers sheet as its third file. Patryk said on 12 and 13 Oct the sheet is too long, will not be used, and answers belong on the board. One of the two has to change.</li>
+<li><b>Lesson mode in the October brief</b> lists a cold-call picker and a hinge-question tally. Patryk rejected both in July ("I choose if something needs re-teaching"). Leave them out if lesson mode is ever built.</li>
+<li><b>Voice notes for behaviour</b> (October brief) clash with his ruling against microphone-driven tools, and would likely need a paid speech service.</li>
+<li><b>Task checklist, shift planner, tasks page</b> appear in four places (tool hub notes, planner tabs plan, October brief items 8 and 16). Patryk said Ulhu's Rituals IS the task setter, so these are one goal, now inside Ulhu.</li>
+<li><b>"Open everything", "print everything", "Open lesson" and "order sheet linked to printing"</b> are the same wish in four notes: one launcher and one print run.</li>
+<li><b>Forms misconceptions dashboard, homework results a week late, and learning loop steps 5 and 8</b> describe the same thing, which is now built in the Assessment tab and on the lesson card.</li>
+<li><b>Spaced retrieval:</b> the October brief wanted Do Nows from 1, 3 weeks and 2 months back; the learning loop decided Do Nows are too narrow, and spacing now lives in homework. The in-class delayed MCQ is the agreed middle ground.</li>
+<li><b>Engage quality</b> appears in the lesson-content notes, brief item 14 and the lesson quality spec. One goal.</li>
+<li><b>Grades:</b> the Assessment tab grades from boundaries Patryk types in; the 21 Oct goal wants them from the school's spreadsheets. Same feature, different source.</li>
+<li><b>Textbooks:</b> the CGP scanner, the "Kerboodle / OCR A textbook database" in the backlog and the Y12/13 textbook snippets overlap. Separate physics keeps Kerboodle, Combined moves to CGP, A level uses OCR.</li>
+</ul>
+
+<h2>Stale or superseded</h2>
+<ul class="list">
+<li>Pupil first names inside Apply questions: dropped by Patryk on 3 Oct.</li>
+<li>Gold-on-navy contrast on the board: the answer text became a brighter yellow on 20 Oct. Only a check on the real board is left.</li>
+<li>Morning brief homework model (one fixed day per year group) predates his newer rule (set on the last lesson of the week, due about a week later).</li>
+<li>Do Now bank notes say 5 questions; the rule has been 6 since July.</li>
+<li>"No phone layout" for the planner (Oct 3) is overtaken by the phone page with Lesson, Today, Ulhu and Friday tabs.</li>
+<li>Exam practice "step 3 and 4" Forms bug: the homework rebuild of 19 Oct replaced that flow; recheck only if it shows again.</li>
+<li>Ulhu notes: the habits v2 file still opens with "nothing here is built yet", but phases 1 and 3 and most of phase 2's server side are built. Doubloons became runes, Curses became Omens, the evening cut-off bonus became life rituals paying more after 4 pm, and the hide/safe mode was dropped.</li>
+<li>The "locked items under a cloth" shop answer was picked by accident and is not a decision.</li>
+<li>The AI Google Calendar idea is a separate personal project and stays out of this list.</li>
+</ul>
+
+<h2>Paid services and Drive actions to flag</h2>
+<h3>Would need a paid service (flag before building)</h3>
+<ul class="list">
+<li>Marking pupils' written Form answers with AI. The free route is the self-mark items already built.</li>
+<li>History, context and quotes in slide notes, if it needs an API rather than free reading.</li>
+<li>Painterly Ulhu art, character art and the Biology/Chemistry header paintings: no free image generation here. Patryk is making the headers himself.</li>
+<li>Voice-note behaviour logging (speech to text).</li>
+<li>Report comments "in my voice" drafted automatically without a Claude session.</li>
+</ul>
+<h3>Would touch Drive beyond create or copy (needs Patryk's say-so)</h3>
+<ul class="list">
+<li>Cleaning up duplicate lesson folders (Year 7 B4, stray Year 9 Biology folders) and the duplicate "Beechen Cliff Science (1)" folder: these are deletes, so Patryk does them.</li>
+<li>The uploader's fix for resource decks wrongly tucked into "Beechen Cliff Original Lesson": moving them back out is a move.</li>
+<li>Renaming the "Exam Practice" folder if he prefers another name.</li>
+<li>Planner building lessons into folders that do not exist yet: making lesson folders needs his approval each time (only test review folders are standing).</li>
+<li>The Ulhu app icon needs "Anyone with the link" sharing, which Patryk sets himself.</li>
+<li>Automatic PLC copies for each pupil: copying is allowed, but anything with pupil names stays on the school account.</li>
+</ul>
+</section>
+</div>
+
+<script>
+const AREAS=["lessons","worksheets","homework","tests and reviews","planner","behaviour","brief","Ulhu game"];
+const ST={b:"built",p:"partly",n:"not started"};
+// [goal, area, status, evidence, effort, value, needs first, flag]
+const G=[
+["Do Now picks stay on topic","lessons","p","The board exam pick and exam practice use the new lesson matcher. The Do Now picker still uses old word matching, so picks drift off topic.","S","High","None",""],
+["Do Now includes one question from last year's content","lessons","b","The Do Now picker has a last-year lessons step.","","",""],
+["Exam question slide splits over two slides when long","lessons","n","The slide only shrinks the text (down to 16 point); there is no second slide.","S","Medium","None",""],
+["Small builder fixes from the October trial","lessons","p","Starters now go on the support sheet. Still open: graph slide titled \"READ THE GRAPH: ANSWERS\" on first view, GUESS cells filled on the standard sheet, false picture warning on comparison slides.","S","Medium","Plan Mode",""],
+["Mark scheme panel overflows on long schemes","lessons","n","Logged 2 Oct; no fix found.","S","Medium","None",""],
+["Whiteboard round answer text too small","lessons","n","Logged 12 Oct; no fix found.","S","Low","None",""],
+["6-mark breakdown slide (real 6-marker, sub-questions, model)","lessons","n","Build-ready spec and mock-ups exist; nothing in the builder yet.","M","High","Patryk's 3 answers",""],
+["Follow-up task after the Do Now (\"1\" book task, \"2\" exam question)","lessons","n","No follow-up slide and no planner tick box.","M","High","CGP book index",""],
+["Key-homework review inside a normal lesson","lessons","n","Spec written 23 Oct; nothing built.","M","High","Homework marked; follow-up task",""],
+["CGP book scanner (topic to page index)","lessons","n","The textbook index says CGP is out of scope. Marked high priority on 15 Oct.","M","High","Patryk at home, logged in; consent for how the login is kept",""],
+["Engage hooks that pose a real question","lessons","p","Odd-one-out and standard question formats built (20 to 23 Oct). Not yet judged by Patryk in real lessons.","M","High","His feedback",""],
+["Learn slides: picture on every slide, dual coding","lessons","p","Labelled pictures, photo and model pairs, drawn diagrams built 23 Oct. A picture on every Learn slide is not yet checked by the build.","M","High","None",""],
+["School picture library reused across lessons","lessons","p","The picture library works at home only; school sessions cannot use it.","M","Medium","None",""],
+["One hand-drawn diagram style","lessons","p","The drawing tool covers particle boxes and atom models only.","L","Medium","None",""],
+["MCQ wrong answers one mistake away (check)","lessons","b","MCQ check built into the builder 20 Oct.","","",""],
+["Real exam MCQs first in lessons","lessons","n","Learning loop step 7 not built; lessons still use written MCQs.","M","High","None",""],
+["Delayed question from 3 to 4 weeks ago in the MCQ block","lessons","n","Learning loop extra 4; not built.","S","High","None",""],
+["MCQs linked to the Learn slide and spec point they test","lessons","n","No link recorded on MCQs.","M","Medium","None",""],
+["Objectives slide with key-words panel","lessons","b","Built 20 Oct (words you know with definitions, new words without).","","",""],
+["True/false slide with a click reveal","lessons","p","The slide exists. Automatic click reveals only cover navy and yellow answer boxes, not this layout.","S","Medium","Mock-up pick",""],
+["GUESS slide with an example question and animated steps","lessons","n","No change to the GUESS slide since July.","S","Low","Mock-up pick",""],
+["Answer boxes readable on the classroom board","lessons","p","Brighter yellow answer text since 20 Oct. Not yet checked on the real board.","S","Medium","Patryk checks in class",""],
+["Equation slide example lines up","lessons","n","Not traced yet.","S","Low","An example deck",""],
+["Correct mark totals (3 to 4 mark questions shown as 6)","lessons","n","No fix found.","S","Medium","An example",""],
+["Colour-coded marks in normal lessons","lessons","p","Mark highlights built for review lessons; not on explain questions in normal lessons.","S","Medium","None",""],
+["Greek symbols in the handwriting font","lessons","n","Not fixed.","S","Low","None",""],
+["Speaking-tone language rules from research","lessons","p","Learn research and writing rules are in the skill. The wider teaching-language research is not run.","M","Medium","None",""],
+["History and context in slide notes","lessons","n","Not started.","M","Low","Free sources only","paid"],
+["Real data in lessons (\"TAP data\")","lessons","n","Source not identified yet.","M","Medium","Link from Patryk",""],
+["Slides-only extra checks and stretch tasks","lessons","n","No slides-only marker in the builder.","M","Medium","None",""],
+["Lesson checker against Patryk's own decks","lessons","n","Not started.","M","Medium","None",""],
+["Biology and Chemistry header pictures","lessons","n","One starfield picture is used for every subject.","S","Low","Patryk's artwork","paid"],
+["Word bank list read from class settings","lessons","n","The builder still names last year's classes; worked around in each lesson.","S","Low","Plan Mode",""],
+["Drive folder name matching (\"Space\" vs \"P4 Earth in Space\")","lessons","p","The uploader suggests folder names; no automatic map.","S","Low","His choice",""],
+["Trim the slide options file (token diet)","lessons","n","Last token-diet step; the file is read every build.","S","Medium","None",""],
+["Save the uncommitted work","lessons","p","Many lesson, planner and exam files are changed but not saved in git.","S","High","Patryk's OK",""],
+["Support worksheet v2","worksheets","b","Built 23 Oct (one help per question, KEYS box, word banks).","","",""],
+["Exam questions with pictures kept on worksheets, two-up","worksheets","n","The worksheet question is still dropped when it does not fit; no two-up layout.","M","High","Plan Mode",""],
+["Tables and sections stay on one page","worksheets","p","Rows do not split and headings keep with the next line. Sections can still straddle pages 2 and 3.","M","High","Plan Mode",""],
+["Purple pen table colour and straighter ruled lines","worksheets","n","Not started.","S","Low","Mock-up",""],
+["Gap-fill on more worksheet types, question variety review","worksheets","n","Gap-fill still prints on the standard sheet only.","S","Low","His choice",""],
+["Nicer editable worksheet style (Canva idea)","worksheets","n","Later project, note only.","L","Low","None",""],
+["Review sheet with extension questions only","tests and reviews","p","Extension questions on the slides built 10 Oct. The extension-only sheet is not.","M","Medium","Answers sheet decision",""],
+["Answers on the board instead of an answers sheet","tests and reviews","n","The builder still makes the answers sheet.","S","Medium","Patryk's decision",""],
+["Support pages table fills the slide","tests and reviews","n","Not changed.","S","Low","None",""],
+["Marks available per section in the review table","tests and reviews","n","No marks-per-section field.","S","Medium","None",""],
+["Grade at each mark from school spreadsheets","tests and reviews","p","Planner grades use boundaries Patryk types in. Spreadsheet import waits for the files.","S","Medium","School spreadsheets",""],
+["PLC copy for each pupil after a test","tests and reviews","n","Not started.","M","Medium","Updated PLCs","drive"],
+["Updated tests and PLCs in use","tests and reviews","n","Waiting for Patryk's new files.","S","Medium","His files",""],
+["Small graph drawn inside answer boxes","tests and reviews","n","Not started.","M","Low","None",""],
+["Pick-the-picture multiple choice","tests and reviews","p","A-level picture options print side by side. GCSE papers do not.","M","Medium","None",""],
+["Graph questions drawn on the question's own graph","tests and reviews","n","Not started.","L","Medium","None",""],
+["Exam pictures used everywhere","tests and reviews","p","Pictures in Forms since 16 Oct and on the board. Some questions are still left out.","M","Medium","None",""],
+["Bigger tick boxes on printed papers","tests and reviews","n","Not changed.","S","Medium","None",""],
+["Exam practice front cover redesign","tests and reviews","n","Still open from 12 Oct.","S","Low","Mock-up",""],
+["Swap one question out of an exam practice paper","tests and reviews","p","Pick by id and leave out words exist; no one-question swap.","S","Medium","None",""],
+["Test builder option: more weight on recent lessons","tests and reviews","n","Not built.","S","Medium","None",""],
+["Homework tab: kinds, class picker, due dates","homework","b","Built 20 Oct; waiting to be pasted.","","",""],
+["Forms results read back, most-missed questions","homework","b","Results tab, lesson card score and most-missed view built 20 to 22 Oct.","","",""],
+["Spaced homework (half new, half older)","homework","b","Built 22 Oct.","","",""],
+["Homework prepared a week or more ahead","homework","p","Posts can go out at a chosen time. Nothing makes next week's homework automatically.","M","High","Deploy first",""],
+["6-marker returns as homework without sub-questions","homework","n","Depends on the 6-mark slide.","S","Medium","6-mark slide",""],
+["OCR textbook questions for 12C and 13D","homework","n","Not started.","L","High","Textbook access",""],
+["Pre-reading section in Y9/10 homework","homework","n","Idea only; Patryk worried it bloats homework.","S","Low","His decision",""],
+["Shorter example questions in homework","homework","p","Forms now ask one part per item. Length not rechecked since.","S","Low","An example",""],
+["AI marking of written answers","homework","n","Self-mark items used instead.","M","Low","His OK on cost","paid"],
+["Paste and deploy the waiting planner updates","planner","p","Homework, Assessment, ABCD votes, results and Ulhu are built and waiting in Planner Sync.","S","High","Patryk, about 20 minutes",""],
+["MCQ votes on the next lesson card","planner","n","The lesson card shows homework results only.","S","High","Deploy first",""],
+["Collapsible \"Your week\" panel","planner","n","It is still a fixed help panel.","S","Low","None",""],
+["\"Review last lesson\" button","planner","n","The stopped-at note exists; no button uses it.","S","Medium","None",""],
+["Classes page hover details","planner","n","Not built.","S","Low","None",""],
+["Free-text lesson notes that return next year","planner","n","The lesson record has room; no box yet.","S","Medium","None",""],
+["Open-lesson launcher (slides, then worksheets)","planner","n","No launcher found.","M","Medium","None",""],
+["One press to print the week","planner","p","A print list with quantities exists; printing is by hand.","M","Medium","None",""],
+["Lessons posted to Google Classroom as drafts","planner","n","Classroom code only posts homework.","M","Medium","None",""],
+["Planner builds the lessons marked NOT BUILT","planner","p","A build request button sends the prompt; building is still by hand.","L","High","Folder approval","drive"],
+["Ulhu suggestions tray in the planner","planner","n","Not built.","M","Medium","None",""],
+["Jeopardy and memory-phrase pop-outs","planner","n","The tools exist on their own; not in the planner.","M","Low","None",""],
+["Planner on the phone","planner","p","The phone page has Lesson, Today, Ulhu and Friday. No planner editing.","L","Medium","None",""],
+["Full-screen lesson mode","planner","n","Not started.","L","Medium","Classroom PC check",""],
+["Pupil profile page","planner","n","Not started; pupil data stays on the school account.","L","Low","None",""],
+["Friday positive messages home drafted","behaviour","p","The Friday tab picks pupils and makes an email list. No drafted message text.","S","High","None",""],
+["Silent-work score","behaviour","p","Time lost and percent silent are recorded; the scoring is not designed.","S","Medium","His choice",""],
+["Research on going over the limit (earn time back)","behaviour","n","Not started.","S","Low","None",""],
+["Backdating, day picker, end-of-day reminder","behaviour","n","Not built.","M","Medium","None",""],
+["Eyes-free initials drawn on the phone","behaviour","n","Idea only.","M","Medium","None",""],
+["League feed, termly tracker export, flags","behaviour","n","Not built.","M","Medium","None",""],
+["Voice notes to log behaviour","behaviour","n","Clashes with his no-microphone ruling.","M","Low","His OK","paid"],
+["Morning brief running at 6am every day","brief","p","The brief script is built and the homework day and room are fixed. The daily run is not confirmed.","S","Medium","None",""],
+["Smoke tests for the brief, order sheet and weekly context","brief","n","Light coverage only.","S","Medium","None",""],
+["Whole-class feedback sheet builder","brief","n","Not started; aimed at marking time.","M","High","None",""],
+["Weekly check-in interview or Sunday summary","brief","n","Not started.","M","Medium","None",""],
+["Vespers and High Vespers screens","Ulhu game","p","The server side was built 27 Oct; no screens yet.","M","Medium","Paused mock-up picks",""],
+["Quest scroll, wax seal, blessing glass, Absolution glass","Ulhu game","p","Stone tablets, temple bosses, blood and sigils are built. Scroll, seal and glass are not.","M","Low","Mock-up picks",""],
+["Edit a whole group from its header pencil","Ulhu game","p","Pencils exist; the group edit mode he asked for is not confirmed on his phone.","S","Medium","Check on his phone",""],
+["Life area holds quests and bosses","Ulhu game","b","Built 27 Oct.","","",""],
+["Breakwater reward moment when ahead","Ulhu game","n","The strip only shows information.","S","Medium","His idea pick",""],
+["Key-homework and report rituals","Ulhu game","n","Not built.","S","Medium","Report dates",""],
+["Real-life rewards list","Ulhu game","p","The Hoard exists; the ideas list does not.","S","Low","None",""],
+["Shareable weekly summary card","Ulhu game","p","Oracle and High Vespers numbers exist; no card to share.","S","Low","None",""],
+["Shop as a fishmonger's stall","Ulhu game","n","Grilled 28 Oct; mock-up stopped.","L","Low","Research session",""],
+["Haggle dice game","Ulhu game","n","Planned for after the whole build.","L","Low","Shop stall",""],
+["Pets, potions, more rooms, seasonal items","Ulhu game","n","None of these in the game code.","L","Low","None",""],
+["Painterly Ulhu and character art","Ulhu game","n","Pixel art only.","L","Low","An art source","paid"]
+];
+const rows=document.getElementById('rows');
+const cls={b:"s-built",p:"s-partly",n:"s-none"};
+rows.innerHTML=G.map((g,i)=>{const f=g[7]==="paid"?' <span class="pill fl">paid service</span>':g[7]==="drive"?' <span class="pill fl">Drive say-so</span>':'';
+return `<tr data-a="${g[1]}" data-s="${g[2]}" data-i="${i}"><td class="goal">${g[0]}${f}</td><td class="area">${g[1]}</td><td><span class="pill ${cls[g[2]]}">${ST[g[2]]}</span></td><td class="ev">${g[3]}</td><td class="c">${g[4]||"·"}</td><td>${g[5]||"·"}</td><td>${g[6]||"·"}</td></tr>`}).join('');
+const t={b:0,p:0,n:0};G.forEach(g=>t[g[2]]++);
+document.getElementById('tally').innerHTML=`<div class="tile"><b>${G.length}</b><span>goals checked</span></div><div class="tile"><b>${t.n}</b><span class="pill s-none">not started</span></div><div class="tile"><b>${t.p}</b><span class="pill s-partly">partly</span></div><div class="tile"><b>${t.b}</b><span class="pill s-built">built</span></div>`;
+const sel={a:new Set(),s:new Set()};
+function chip(box,label,key,val){const b=document.createElement('button');b.className='chip';b.type='button';b.textContent=label;b.setAttribute('aria-pressed','false');b.id='chip-'+key+'-'+val.replace(/\W/g,'');b.onclick=()=>{const s=sel[key];s.has(val)?s.delete(val):s.add(val);b.setAttribute('aria-pressed',s.has(val));apply()};box.appendChild(b)}
+AREAS.forEach(a=>chip(document.getElementById('areaChips'),a,'a',a));
+Object.entries(ST).forEach(([k,v])=>chip(document.getElementById('statusChips'),v,'s',k));
+const q=document.getElementById('q');q.addEventListener('input',apply);
+function apply(){const term=q.value.trim().toLowerCase();let n=0;
+rows.querySelectorAll('tr').forEach(tr=>{const g=G[+tr.dataset.i];const ok=(!sel.a.size||sel.a.has(tr.dataset.a))&&(!sel.s.size||sel.s.has(tr.dataset.s))&&(!term||(g[0]+' '+g[3]).toLowerCase().includes(term));tr.classList.toggle('hide',!ok);if(ok)n++});
+document.getElementById('shown').textContent=`Showing ${n} of ${G.length}`}
+apply();
+</script>

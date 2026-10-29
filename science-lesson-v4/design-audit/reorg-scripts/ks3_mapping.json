@@ -1,0 +1,1900 @@
+{
+  "4_Yr_7_KS3_Biology_DELBAR_2025": {
+    "year": "Year 7",
+    "subject": "Biology",
+    "topics": {
+      "Topic 1 Cells (Autumn term)": {
+        "driveTopics": [
+          "B1 Cells"
+        ],
+        "rows": [
+          {
+            "packLesson": "Lesson 1 MRS GREN and Homework Set",
+            "files": 6,
+            "driveTopic": "B1 Cells",
+            "driveLesson": "Lesson 1 MRS GREN",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 2 Microscopes",
+            "files": 7,
+            "driveTopic": "B1 Cells",
+            "driveLesson": "Lesson 2 - Microscopes",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 3 Animal cells (Could be combined with lesson 4)",
+            "files": 4,
+            "driveTopic": "B1 Cells",
+            "driveLesson": "Lesson 3 - Animal Cells and Plant Cells",
+            "score": 0.86,
+            "kind": "MERGE"
+          },
+          {
+            "packLesson": "Lesson 4 Plants cells",
+            "files": 7,
+            "driveTopic": "B1 Cells",
+            "driveLesson": "Lesson 3 - Animal Cells and Plant Cells",
+            "score": 0.86,
+            "kind": "MERGE"
+          },
+          {
+            "packLesson": "Lesson 5 Specialised cells",
+            "files": 7,
+            "driveTopic": "B1 Cells",
+            "driveLesson": "Lesson 4 - Specialised Cells",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 7 Tissues",
+            "files": 4,
+            "driveTopic": "B1 Cells",
+            "driveLesson": "Lesson 5 - Tissues",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 8 Organ systems (Optional)",
+            "files": 6,
+            "driveTopic": "B1 Cells",
+            "driveLesson": null,
+            "score": 0.0,
+            "kind": "NEW"
+          },
+          {
+            "packLesson": "Lesson 9 Unicellular vs Multicelluar",
+            "files": 3,
+            "driveTopic": "B1 Cells",
+            "driveLesson": "Lesson 6 - Unicellular vs Multicellular",
+            "score": 0.931,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 6 Formative review",
+            "files": 3,
+            "driveTopic": "B1 Cells",
+            "driveLesson": null,
+            "score": 0.0,
+            "kind": "ASSESSMENT-BUNDLE"
+          }
+        ],
+        "topicLevelFiles": [
+          "4. Yr 7 KS3 Biology DELBAR 2025/Topic 1 Cells (Autumn term)/7A1 Cells Topic Overview.docx",
+          "4. Yr 7 KS3 Biology DELBAR 2025/Topic 1 Cells (Autumn term)/Science KS3 Cells Technicians guide.xlsx",
+          "4. Yr 7 KS3 Biology DELBAR 2025/Topic 1 Cells (Autumn term)/Lesson 3b Core prac/MNSP Year 7 biology core practical Cells.docx",
+          "4. Yr 7 KS3 Biology DELBAR 2025/Topic 1 Cells (Autumn term)/Copy of Lesson 9 Unicelluar vs multicelluar.pptx",
+          "4. Yr 7 KS3 Biology DELBAR 2025/Topic 1 Cells (Autumn term)/Copy of Lesson 7 and 8 Tissues and Organs.pptx",
+          "4. Yr 7 KS3 Biology DELBAR 2025/Topic 1 Cells (Autumn term)/Lesson 3b Core prac/Core prac- Cells.pptx"
+        ]
+      },
+      "Topic 2 Body structure and systems (Spring term)": {
+        "driveTopics": [
+          "B2 Body Systems"
+        ],
+        "rows": [
+          {
+            "packLesson": "Lesson 1 Response to exercise and Homework Set (Optional)",
+            "files": 12,
+            "driveTopic": "B2 Body Systems",
+            "driveLesson": "Lesson 1 - Response to Exercise",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 2 Fitness and Respiration",
+            "files": 6,
+            "driveTopic": "B2 Body Systems",
+            "driveLesson": "Lesson 2 - Fitness and Respiration",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 3 The structure of the lung",
+            "files": 13,
+            "driveTopic": "B2 Body Systems",
+            "driveLesson": "Lesson 3 - The Structure of the Lungs",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 4 Core practical - lung dissection",
+            "files": 7,
+            "driveTopic": "B2 Body Systems",
+            "driveLesson": null,
+            "score": 0.0,
+            "kind": "NEW"
+          },
+          {
+            "packLesson": "Lesson 5 Breathing and the alveoli",
+            "files": 8,
+            "driveTopic": "B2 Body Systems",
+            "driveLesson": "Lesson 4 - Breathing and the Alveoli",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 6 - Effects of Smoking and vaping",
+            "files": 5,
+            "driveTopic": "B2 Body Systems",
+            "driveLesson": "Lesson 5 Effects of Smoking and Vaping",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 8 Drugs (Optional)",
+            "files": 3,
+            "driveTopic": "B2 Body Systems",
+            "driveLesson": null,
+            "score": 0.0,
+            "kind": "NEW"
+          },
+          {
+            "packLesson": "Lesson 9 Muscles and antagonistic pairs",
+            "files": 8,
+            "driveTopic": "B2 Body Systems",
+            "driveLesson": "Lesson 6 - Muscles and Antagonistic Pairs",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 10 Skeletons and joints",
+            "files": 16,
+            "driveTopic": "B2 Body Systems",
+            "driveLesson": "Lesson 7 - Skeletons and Joints",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 7 Formative review",
+            "files": 4,
+            "driveTopic": "B2 Body Systems",
+            "driveLesson": null,
+            "score": 0.0,
+            "kind": "ASSESSMENT-BUNDLE"
+          }
+        ],
+        "topicLevelFiles": [
+          "4. Yr 7 KS3 Biology DELBAR 2025/Topic 2 Body structure and systems (Spring term)/_Science KS3 Body Structure and System.xlsx",
+          "4. Yr 7 KS3 Biology DELBAR 2025/Topic 2 Body structure and systems (Spring term)/7A2 Body Systems Topic Overview.docx",
+          "4. Yr 7 KS3 Biology DELBAR 2025/Topic 2 Body structure and systems (Spring term)/MNSP Year 7 biology core practical Body systems.docx"
+        ]
+      },
+      "Topic 3 Reproduction (Spring term)": {
+        "driveTopics": [
+          "B3 Human and Plant Reproduction"
+        ],
+        "rows": [
+          {
+            "packLesson": "Lesson 1 Puberty and homework setting",
+            "files": 12,
+            "driveTopic": "B3 Human and Plant Reproduction",
+            "driveLesson": "Lesson 1 - Puberty",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 2 The menstrual cycle",
+            "files": 11,
+            "driveTopic": "B3 Human and Plant Reproduction",
+            "driveLesson": "Lesson 2 - The Menstrual Cycle",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 3 Fertilisation",
+            "files": 12,
+            "driveTopic": "B3 Human and Plant Reproduction",
+            "driveLesson": "Lesson 3 - Fertilisation",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 4 Contraception",
+            "files": 3,
+            "driveTopic": "B3 Human and Plant Reproduction",
+            "driveLesson": "Lesson 4 - Contraception",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 5 Foetal development",
+            "files": 9,
+            "driveTopic": "B3 Human and Plant Reproduction",
+            "driveLesson": "Lesson 5 - Foetal Development",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 7 Fertility treatments (IVF)",
+            "files": 12,
+            "driveTopic": "B3 Human and Plant Reproduction",
+            "driveLesson": "Lesson 6 - Fertility Treatment (IVF)",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 8 Structure of a flower (Optional)",
+            "files": 6,
+            "driveTopic": "B3 Human and Plant Reproduction",
+            "driveLesson": "Lesson 7 - Structure of a Flower",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 9 Pollination and fertilisation (Optional)",
+            "files": 7,
+            "driveTopic": "B3 Human and Plant Reproduction",
+            "driveLesson": "Lesson 8 - Pollination and Fertilisation",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 6 Formative review",
+            "files": 5,
+            "driveTopic": "B3 Human and Plant Reproduction",
+            "driveLesson": null,
+            "score": 0.0,
+            "kind": "ASSESSMENT-BUNDLE"
+          }
+        ],
+        "topicLevelFiles": [
+          "4. Yr 7 KS3 Biology DELBAR 2025/Topic 3 Reproduction (Spring term)/7A2 Reproduction Topic Overview.docx",
+          "4. Yr 7 KS3 Biology DELBAR 2025/Topic 3 Reproduction (Spring term)/Science KS3 Reproduction.xlsx",
+          "4. Yr 7 KS3 Biology DELBAR 2025/Topic 3 Reproduction (Spring term)/MNSP Year 7 biology core practical Reproduction.docx"
+        ]
+      },
+      "Topic 4 Interdependence (Summer term)": {
+        "driveTopics": [
+          "B4 Interdependence"
+        ],
+        "rows": [
+          {
+            "packLesson": "Lesson 1 The Woolly Mammoth and homework set",
+            "files": 12,
+            "driveTopic": "B4 Interdependence",
+            "driveLesson": "Lesson 1 - The Wooly Mammoth",
+            "score": 0.915,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 2 Physical adaptations",
+            "files": 14,
+            "driveTopic": "B4 Interdependence",
+            "driveLesson": "Lesson 2 - Physical Adaptations",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 3 ICT Endangered Species (Optional)",
+            "files": 8,
+            "driveTopic": "B4 Interdependence",
+            "driveLesson": null,
+            "score": 0.0,
+            "kind": "NEW"
+          },
+          {
+            "packLesson": "Lesson 4 Seasonal adaptations (Optional)",
+            "files": 5,
+            "driveTopic": "B4 Interdependence",
+            "driveLesson": null,
+            "score": 0.0,
+            "kind": "NEW"
+          },
+          {
+            "packLesson": "Lesson 5 Behavioural adaptations",
+            "files": 14,
+            "driveTopic": "B4 Interdependence",
+            "driveLesson": "Lesson 3 - Behavioural  Adaptations",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 7 Predators prey relationships (Optional)",
+            "files": 7,
+            "driveTopic": "B4 Interdependence",
+            "driveLesson": "Lesson 5 - Predator prey Relationships (optional)",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 8 Instinct (Optional)",
+            "files": 4,
+            "driveTopic": "B4 Interdependence",
+            "driveLesson": "Lesson 6 - Instincts (Optional)",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 9 Classification",
+            "files": 13,
+            "driveTopic": "B4 Interdependence",
+            "driveLesson": "Lesson 4 - Classification",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 10 Food Chains",
+            "files": 9,
+            "driveTopic": "B4 Interdependence",
+            "driveLesson": "Lesson 10 - Food Chains",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 11 Pyramids of Numbers and Biomass",
+            "files": 12,
+            "driveTopic": "B4 Interdependence",
+            "driveLesson": "Lesson 11 - Pyramids of Numbers and Biomass",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 12 Food Webs",
+            "files": 13,
+            "driveTopic": "B4 Interdependence",
+            "driveLesson": "Lesson 12 - Food Webs",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 6 Formative Assessment Point 1",
+            "files": 10,
+            "driveTopic": "B4 Interdependence",
+            "driveLesson": null,
+            "score": 0.0,
+            "kind": "ASSESSMENT-BUNDLE"
+          }
+        ],
+        "topicLevelFiles": [
+          "4. Yr 7 KS3 Biology DELBAR 2025/Topic 4 Interdependence (Summer term)/Year 7 interdependence homework.docx",
+          "4. Yr 7 KS3 Biology DELBAR 2025/Topic 4 Interdependence (Summer term)/7A3 Interdependence Topic Overview.docx",
+          "4. Yr 7 KS3 Biology DELBAR 2025/Topic 4 Interdependence (Summer term)/KS3 Interdependence technicians guide.xlsx",
+          "4. Yr 7 KS3 Biology DELBAR 2025/Topic 4 Interdependence (Summer term)/MNSP Year 7 biology core practical Interdependence.docx",
+          "4. Yr 7 KS3 Biology DELBAR 2025/Topic 4 Interdependence (Summer term)/MNSP Year 7 biology core practical Interdependence (1).docx"
+        ]
+      }
+    }
+  },
+  "5_Yr_7_KS3_Chemistry_DELBAR_2025": {
+    "year": "Year 7",
+    "subject": "Chemistry",
+    "topics": {
+      "Topic 1 Atoms, elements and compounds (Autumn term)": {
+        "driveTopics": [
+          "C2 Atoms, Elements, Compounds and Mixtures"
+        ],
+        "rows": [
+          {
+            "packLesson": "Lesson 1 Working safely in the lab and Homework Set (Optional)",
+            "files": 5,
+            "driveTopic": "C2 Atoms, Elements, Compounds and Mixtures",
+            "driveLesson": "Lesson 1 - Working Safely in the Lab (Optional)",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 2 Chemical and Physical change (Optional)",
+            "files": 6,
+            "driveTopic": "C2 Atoms, Elements, Compounds and Mixtures",
+            "driveLesson": "Lesson 2 - Chemical and Physical Changes (opional)",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 3 Elements",
+            "files": 3,
+            "driveTopic": "C2 Atoms, Elements, Compounds and Mixtures",
+            "driveLesson": "Lesson 3 - Elements",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 4 The Periodic Table",
+            "files": 5,
+            "driveTopic": "C2 Atoms, Elements, Compounds and Mixtures",
+            "driveLesson": "Lesson 4 - The Periodic Table",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 6 Compounds",
+            "files": 20,
+            "driveTopic": "C2 Atoms, Elements, Compounds and Mixtures",
+            "driveLesson": "Lesson 6 - Componds",
+            "score": 0.887,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 7 Naming Compounds",
+            "files": 7,
+            "driveTopic": "C2 Atoms, Elements, Compounds and Mixtures",
+            "driveLesson": "Lesson 7 - Naming Compounds",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 8 Chemical Formula",
+            "files": 18,
+            "driveTopic": "C2 Atoms, Elements, Compounds and Mixtures",
+            "driveLesson": "Lesson 8 - Chemical Fromula",
+            "score": 0.891,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 9 Core Practical Making compounds_ Copper Sulphate",
+            "files": 6,
+            "driveTopic": "C2 Atoms, Elements, Compounds and Mixtures",
+            "driveLesson": "Lesson 9 - Core Practical Making Compounds",
+            "score": 0.86,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 5 Formative assessment",
+            "files": 3,
+            "driveTopic": "C2 Atoms, Elements, Compounds and Mixtures",
+            "driveLesson": null,
+            "score": 0.0,
+            "kind": "ASSESSMENT-BUNDLE"
+          }
+        ],
+        "topicLevelFiles": [
+          "5. Yr 7 KS3 Chemistry DELBAR 2025/Topic 1 Atoms, elements and compounds (Autumn term)/7A1 Atoms Elements Compounds Topic Overview.docx",
+          "5. Yr 7 KS3 Chemistry DELBAR 2025/Topic 1 Atoms, elements and compounds (Autumn term)/Science KS3 Atoms and Elements Technicians guide.xlsx",
+          "5. Yr 7 KS3 Chemistry DELBAR 2025/Topic 1 Atoms, elements and compounds (Autumn term)/MNSP Year 7 chemistry core practical Atoms, elements & compounds.docx"
+        ]
+      },
+      "Topic 2 Particles (Autumn term)": {
+        "driveTopics": [
+          "C1 Particles"
+        ],
+        "rows": [
+          {
+            "packLesson": "Lesson 1 Properties of matter and Homework Set",
+            "files": 4,
+            "driveTopic": "C1 Particles",
+            "driveLesson": "Lesson 1 - Properties of Matter",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 2 States of matter (misconceptions)",
+            "files": 3,
+            "driveTopic": "C1 Particles",
+            "driveLesson": "Lesson 2 - States of Matter",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 3 Using thermometers",
+            "files": 8,
+            "driveTopic": "C1 Particles",
+            "driveLesson": "Lesson 3 - Using Thermometers",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 4 Core practical - Changes of state",
+            "files": 8,
+            "driveTopic": "C1 Particles",
+            "driveLesson": "Lesson 4 - Core Practical - Changes of State",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 6 Diffusion",
+            "files": 6,
+            "driveTopic": "C1 Particles",
+            "driveLesson": "Lesson 5 - Diffusion",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 7 Gas Pressure",
+            "files": 2,
+            "driveTopic": "C1 Particles",
+            "driveLesson": "Lesson 6 - Gas Pressure",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 5 Formative assessment",
+            "files": 5,
+            "driveTopic": "C1 Particles",
+            "driveLesson": null,
+            "score": 0.0,
+            "kind": "ASSESSMENT-BUNDLE"
+          }
+        ],
+        "topicLevelFiles": [
+          "5. Yr 7 KS3 Chemistry DELBAR 2025/Topic 2 Particles (Autumn term)/Science KS3 Particles Technicians guide.xlsx",
+          "5. Yr 7 KS3 Chemistry DELBAR 2025/Topic 2 Particles (Autumn term)/7A1 Particles Topic Overview.docx"
+        ]
+      },
+      "Topic 3 Separating mixtures (Spring term)": {
+        "driveTopics": [
+          "C3 Separating Mixtures"
+        ],
+        "rows": [
+          {
+            "packLesson": "Lesson 1 Chromatography and Homework Set",
+            "files": 13,
+            "driveTopic": "C3 Separating Mixtures",
+            "driveLesson": "Lesson 1 - Chromatography",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 2 Solute, Solvent and Solution",
+            "files": 6,
+            "driveTopic": "C3 Separating Mixtures",
+            "driveLesson": "Lesson 2 - Solute, Solvent and Solution",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 3 Factors Affecting Solubility",
+            "files": 7,
+            "driveTopic": "C3 Separating Mixtures",
+            "driveLesson": "Lesson 3 - Factors Affecting Solubility",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 4 Saturated Solutions (Optional)",
+            "files": 2,
+            "driveTopic": "C3 Separating Mixtures",
+            "driveLesson": "Lesson 4 - Saturated Solution",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 6 Filtration (Optional)",
+            "files": 5,
+            "driveTopic": "C3 Separating Mixtures",
+            "driveLesson": "Lesson 5 - Filtration (Optional)",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 7 Distillation",
+            "files": 7,
+            "driveTopic": "C3 Separating Mixtures",
+            "driveLesson": "Lesson 6 - Distillation",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 8 Separating iron, salt and sand (Optional)",
+            "files": 5,
+            "driveTopic": "C3 Separating Mixtures",
+            "driveLesson": "Lesson 7 - Separating Iron, Salt and Sand",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 5 Formative review",
+            "files": 2,
+            "driveTopic": "C3 Separating Mixtures",
+            "driveLesson": null,
+            "score": 0.0,
+            "kind": "ASSESSMENT-BUNDLE"
+          }
+        ],
+        "topicLevelFiles": [
+          "5. Yr 7 KS3 Chemistry DELBAR 2025/Topic 3 Separating mixtures (Spring term)/7A2 Separating Mixtures Topic Overview.docx",
+          "5. Yr 7 KS3 Chemistry DELBAR 2025/Topic 3 Separating mixtures (Spring term)/Science KS3 Separating Mixtures Technicians guide.xlsx",
+          "5. Yr 7 KS3 Chemistry DELBAR 2025/Topic 3 Separating mixtures (Spring term)/MNSP Year 7 chemistry core Separation.docx",
+          "5. Yr 7 KS3 Chemistry DELBAR 2025/Topic 3 Separating mixtures (Spring term)/Copy of MNSP Year 7 chemistry core Separation.docx"
+        ]
+      },
+      "Topic 4 Earth Science (Summer term)": {
+        "driveTopics": [
+          "C5 Earth Science"
+        ],
+        "rows": [
+          {
+            "packLesson": "L2 Core practical - Salol crystals",
+            "files": 4,
+            "driveTopic": "C5 Earth Science",
+            "driveLesson": null,
+            "score": 0.0,
+            "kind": "NEW"
+          }
+        ],
+        "topicLevelFiles": []
+      },
+      "Topic 5 Introduction to reactions (Summer term)": {
+        "driveTopics": [
+          "C4 Introduction to Reactions"
+        ],
+        "rows": [
+          {
+            "packLesson": "Lesson 1 Conservation of mass",
+            "files": 2,
+            "driveTopic": "C4 Introduction to Reactions",
+            "driveLesson": null,
+            "score": 0.0,
+            "kind": "NEW"
+          },
+          {
+            "packLesson": "Lesson 2 Thermal decomposition",
+            "files": 1,
+            "driveTopic": "C4 Introduction to Reactions",
+            "driveLesson": null,
+            "score": 0.0,
+            "kind": "NEW"
+          },
+          {
+            "packLesson": "Lesson 3 Fire Triangle",
+            "files": 4,
+            "driveTopic": "C4 Introduction to Reactions",
+            "driveLesson": null,
+            "score": 0.0,
+            "kind": "NEW"
+          },
+          {
+            "packLesson": "Lesson 4 Combustion",
+            "files": 2,
+            "driveTopic": "C4 Introduction to Reactions",
+            "driveLesson": null,
+            "score": 0.0,
+            "kind": "NEW"
+          },
+          {
+            "packLesson": "Lesson 5 Incomplete Combustion",
+            "files": 1,
+            "driveTopic": "C4 Introduction to Reactions",
+            "driveLesson": null,
+            "score": 0.0,
+            "kind": "NEW"
+          },
+          {
+            "packLesson": "Lesson 6 Formative assessment",
+            "files": 2,
+            "driveTopic": "C4 Introduction to Reactions",
+            "driveLesson": null,
+            "score": 0.0,
+            "kind": "ASSESSMENT-BUNDLE"
+          }
+        ],
+        "topicLevelFiles": [
+          "5. Yr 7 KS3 Chemistry DELBAR 2025/Topic 5 Introduction to reactions (Summer term)/Core practical - thermal decomposition/Copy of Carbonates thermal decomposition WS.doc",
+          "5. Yr 7 KS3 Chemistry DELBAR 2025/Topic 5 Introduction to reactions (Summer term)/Core practical - thermal decomposition/Copy of Thermal Decomposition Worksheet.docx",
+          "5. Yr 7 KS3 Chemistry DELBAR 2025/Topic 5 Introduction to reactions (Summer term)/Core practical - thermal decomposition/Copy of MNSP Year 7 chemistry core intro_reactions.docx",
+          "5. Yr 7 KS3 Chemistry DELBAR 2025/Topic 5 Introduction to reactions (Summer term)/Core practical - thermal decomposition/Copy of C4.4 Thermal Decomposition.pptx",
+          "5. Yr 7 KS3 Chemistry DELBAR 2025/Topic 5 Introduction to reactions (Summer term)/Core practical - thermal decomposition/Copy of C4.4 Thermal Decomposition FCA.pptx"
+        ]
+      }
+    }
+  },
+  "6_Yr_7_KS3_Physics_DELBAR_2025": {
+    "year": "Year 7",
+    "subject": "Physics",
+    "topics": {
+      "Topic 1 Forces (Autumn term)": {
+        "driveTopics": [
+          "P1 Forces"
+        ],
+        "rows": [
+          {
+            "packLesson": "Lesson 1 Introduction to forces",
+            "files": 10,
+            "driveTopic": "P1 Forces",
+            "driveLesson": "Lesson 1 - Introduction to Forces",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 2 Balanced and unbalanced forces",
+            "files": 13,
+            "driveTopic": "P1 Forces",
+            "driveLesson": "Lesson 2 - Balanced and Unbalanced Forces",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 3 Resultant forces",
+            "files": 9,
+            "driveTopic": "P1 Forces",
+            "driveLesson": "Lesson 3 - Resultant Forces",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 4 Measuring forces (Optional)",
+            "files": 9,
+            "driveTopic": "P1 Forces",
+            "driveLesson": null,
+            "score": 0.0,
+            "kind": "NEW"
+          },
+          {
+            "packLesson": "Lesson 6 Weight mass and gravity",
+            "files": 14,
+            "driveTopic": "P1 Forces",
+            "driveLesson": "Lesson 5 - Weight Mass and Gravity",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 7 core practical - Stretching springs",
+            "files": 18,
+            "driveTopic": "P1 Forces",
+            "driveLesson": "Lesson 6 - Core Practical - Stretching Springs",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 8 Core practical - Friction",
+            "files": 8,
+            "driveTopic": "P1 Forces",
+            "driveLesson": "Lesson 8 - Core Practical - Friction",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 9 Air resistance (Optional)",
+            "files": 5,
+            "driveTopic": "P1 Forces",
+            "driveLesson": null,
+            "score": 0.0,
+            "kind": "NEW"
+          },
+          {
+            "packLesson": "Lesson 5 Formative review",
+            "files": 14,
+            "driveTopic": "P1 Forces",
+            "driveLesson": null,
+            "score": 0.0,
+            "kind": "ASSESSMENT-BUNDLE"
+          }
+        ],
+        "topicLevelFiles": [
+          "6. Yr 7 KS3 Physics DELBAR 2025/Topic 1 Forces (Autumn term)/7A1 Forces Topic Overview.docx",
+          "6. Yr 7 KS3 Physics DELBAR 2025/Topic 1 Forces (Autumn term)/Science KS3 Forces technicians guide.xlsx"
+        ]
+      },
+      "Topic 2 Energy (Spring term)": {
+        "driveTopics": [
+          "P2 Energy"
+        ],
+        "rows": [
+          {
+            "packLesson": "Lesson 1 The Energy Stores and Homework Set",
+            "files": 7,
+            "driveTopic": "P2 Energy",
+            "driveLesson": "Lesson 1 - The Energy Stores",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 2 The Joule (Optional)",
+            "files": 9,
+            "driveTopic": "P2 Energy",
+            "driveLesson": "Lesson 2 - The Joule",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 3 Energy pathways",
+            "files": 21,
+            "driveTopic": "P2 Energy",
+            "driveLesson": "Lesson 3 - Energy Pathways",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 4 Sankey diagrams (Optional)",
+            "files": 14,
+            "driveTopic": "P2 Energy",
+            "driveLesson": "Lesson 5 - Sankey Diagrams (optional)",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 5 Core practical - Energy in food",
+            "files": 5,
+            "driveTopic": "P2 Energy",
+            "driveLesson": null,
+            "score": 0.0,
+            "kind": "NEW"
+          },
+          {
+            "packLesson": "Lesson 7 Conduction",
+            "files": 7,
+            "driveTopic": "P2 Energy",
+            "driveLesson": "Lesson 6 - Conduction",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 8 Convection",
+            "files": 4,
+            "driveTopic": "P2 Energy",
+            "driveLesson": "Lesson 7 - Convection",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 9 Radiation",
+            "files": 5,
+            "driveTopic": "P2 Energy",
+            "driveLesson": "Lesson 8 - Radiation",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 10 Insulation (Optional)",
+            "files": 8,
+            "driveTopic": "P2 Energy",
+            "driveLesson": "Lesson 9 - Insulation (optional)",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 6 Formative review",
+            "files": 2,
+            "driveTopic": "P2 Energy",
+            "driveLesson": null,
+            "score": 0.0,
+            "kind": "ASSESSMENT-BUNDLE"
+          }
+        ],
+        "topicLevelFiles": [
+          "6. Yr 7 KS3 Physics DELBAR 2025/Topic 2 Energy (Spring term)/Science KS3 Energy Technicians guide.xlsx",
+          "6. Yr 7 KS3 Physics DELBAR 2025/Topic 2 Energy (Spring term)/7A2 Energy Topic Overview.docx"
+        ]
+      },
+      "Topic 3 Sound and waves (Spring term)": {
+        "driveTopics": [
+          "P3 Sound and Waves"
+        ],
+        "rows": [
+          {
+            "packLesson": "Lesson 1 Core practical - Investigating Sound and Homework Set",
+            "files": 10,
+            "driveTopic": "P3 Sound and Waves",
+            "driveLesson": "Lesson 1 - Core Practical - Investigating Sound",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 2 Transverse and Longitudinal",
+            "files": 5,
+            "driveTopic": "P3 Sound and Waves",
+            "driveLesson": "Lesson 2 - Transverse and Longitudinal",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 3 Amplitude and volume",
+            "files": 9,
+            "driveTopic": "P3 Sound and Waves",
+            "driveLesson": "Lesson 3 - Amplitude and Volume",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 4 Pitch and Frequency",
+            "files": 8,
+            "driveTopic": "P3 Sound and Waves",
+            "driveLesson": "Lesson 4 - Pitch and Frequency",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 6 The Ear",
+            "files": 9,
+            "driveTopic": "P3 Sound and Waves",
+            "driveLesson": "Lesson 5 - The Ear",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 7 Sound Proofing",
+            "files": 6,
+            "driveTopic": "P3 Sound and Waves",
+            "driveLesson": "Lesson 7 - Sound Proofing",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 5 Formative review",
+            "files": 3,
+            "driveTopic": "P3 Sound and Waves",
+            "driveLesson": null,
+            "score": 0.0,
+            "kind": "ASSESSMENT-BUNDLE"
+          }
+        ],
+        "topicLevelFiles": [
+          "6. Yr 7 KS3 Physics DELBAR 2025/Topic 3 Sound and waves (Spring term)/MNSP Year 7 physics core practical sound.docx",
+          "6. Yr 7 KS3 Physics DELBAR 2025/Topic 3 Sound and waves (Spring term)/7A2 Sound Topic Overview.docx",
+          "6. Yr 7 KS3 Physics DELBAR 2025/Topic 3 Sound and waves (Spring term)/_KS3 Sound Waves_technician guide.xlsx"
+        ]
+      },
+      "Topic 4 Space (Summer term)": {
+        "driveTopics": [
+          "P4 Earth in Space"
+        ],
+        "rows": [
+          {
+            "packLesson": "Lesson 1 Days and Years and homework setting",
+            "files": 9,
+            "driveTopic": "P4 Earth in Space",
+            "driveLesson": "Lesson 1 - Days and Years",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 2 Phases of the moon",
+            "files": 5,
+            "driveTopic": "P4 Earth in Space",
+            "driveLesson": "Lesson 2 - Phases of the Moon",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 3 Eclipse",
+            "files": 9,
+            "driveTopic": "P4 Earth in Space",
+            "driveLesson": "Lesson 3 - Eclipse",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 4 Seasons",
+            "files": 7,
+            "driveTopic": "P4 Earth in Space",
+            "driveLesson": "Lesson 4 - Seasons",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 5 The planets",
+            "files": 10,
+            "driveTopic": "P4 Earth in Space",
+            "driveLesson": "Lesson 5 - The Planets",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 7 Meteors and meteorites (Optional)",
+            "files": 4,
+            "driveTopic": "P4 Earth in Space",
+            "driveLesson": "Lesson 6 - Meteors and Meteorites (optional)",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 8 ICT Crater hunting (Optional)",
+            "files": 6,
+            "driveTopic": "P4 Earth in Space",
+            "driveLesson": null,
+            "score": 0.0,
+            "kind": "NEW"
+          },
+          {
+            "packLesson": "Lesson 9 Life cycles of stars (Optional)",
+            "files": 9,
+            "driveTopic": "P4 Earth in Space",
+            "driveLesson": "Lesson 7 - Life Cycles of Stars (optional)",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 10 The universe and the big bang (Optional)",
+            "files": 10,
+            "driveTopic": "P4 Earth in Space",
+            "driveLesson": "Lesson 8 - The universe and the big bang (optional)",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 11 Planet data analysis Task (Optional)",
+            "files": 5,
+            "driveTopic": "P4 Earth in Space",
+            "driveLesson": null,
+            "score": 0.0,
+            "kind": "NEW"
+          },
+          {
+            "packLesson": "Lesson 6 Formative Assessment point",
+            "files": 3,
+            "driveTopic": "P4 Earth in Space",
+            "driveLesson": null,
+            "score": 0.0,
+            "kind": "ASSESSMENT-BUNDLE"
+          },
+          {
+            "packLesson": "Additional",
+            "files": 0,
+            "driveTopic": "P4 Earth in Space",
+            "driveLesson": null,
+            "score": 0.0,
+            "kind": "SUPPORT"
+          }
+        ],
+        "topicLevelFiles": [
+          "6. Yr 7 KS3 Physics DELBAR 2025/Topic 4 Space (Summer term)/unorganised pre 20-05-26/Coordinates and template for drawing impact craters for google classroom.pptx",
+          "6. Yr 7 KS3 Physics DELBAR 2025/Topic 4 Space (Summer term)/unorganised pre 20-05-26/Solar and Lunar eclipses Reaching.docx",
+          "6. Yr 7 KS3 Physics DELBAR 2025/Topic 4 Space (Summer term)/unorganised pre 20-05-26/EPIBA Life cycles of stars.pptx",
+          "6. Yr 7 KS3 Physics DELBAR 2025/Topic 4 Space (Summer term)/unorganised pre 20-05-26/DELBAR Eclispes.pptx",
+          "6. Yr 7 KS3 Physics DELBAR 2025/Topic 4 Space (Summer term)/unorganised pre 20-05-26/Key events for big bang.docx",
+          "6. Yr 7 KS3 Physics DELBAR 2025/Topic 4 Space (Summer term)/unorganised pre 20-05-26/Planets laminates update (6).pptx",
+          "6. Yr 7 KS3 Physics DELBAR 2025/Topic 4 Space (Summer term)/unorganised pre 20-05-26/_Thumbs (5).db",
+          "6. Yr 7 KS3 Physics DELBAR 2025/Topic 4 Space (Summer term)/unorganised pre 20-05-26/DELBAR Seasons (1).pptx",
+          "6. Yr 7 KS3 Physics DELBAR 2025/Topic 4 Space (Summer term)/unorganised pre 20-05-26/EPIBA The Universe and the big bang.pptx",
+          "6. Yr 7 KS3 Physics DELBAR 2025/Topic 4 Space (Summer term)/unorganised pre 20-05-26/EPIBA Phases of the moon GMO (with research task).pptx",
+          "6. Yr 7 KS3 Physics DELBAR 2025/Topic 4 Space (Summer term)/unorganised pre 20-05-26/EPIBA ICT Crater hunt.pptx",
+          "6. Yr 7 KS3 Physics DELBAR 2025/Topic 4 Space (Summer term)/unorganised pre 20-05-26/EPIBA Eclipses.pptx",
+          "6. Yr 7 KS3 Physics DELBAR 2025/Topic 4 Space (Summer term)/unorganised pre 20-05-26/DELBAR Days and years.pptx",
+          "6. Yr 7 KS3 Physics DELBAR 2025/Topic 4 Space (Summer term)/unorganised pre 20-05-26/Table for data.pptx",
+          "6. Yr 7 KS3 Physics DELBAR 2025/Topic 4 Space (Summer term)/unorganised pre 20-05-26/EPIBA The planets.pptx",
+          "6. Yr 7 KS3 Physics DELBAR 2025/Topic 4 Space (Summer term)/unorganised pre 20-05-26/Space Walk Activity.pdf",
+          "6. Yr 7 KS3 Physics DELBAR 2025/Topic 4 Space (Summer term)/unorganised pre 20-05-26/L13 Planets laminates.pptx",
+          "6. Yr 7 KS3 Physics DELBAR 2025/Topic 4 Space (Summer term)/unorganised pre 20-05-26/DELBAR Developing task.doc",
+          "6. Yr 7 KS3 Physics DELBAR 2025/Topic 4 Space (Summer term)/unorganised pre 20-05-26/Comprehension worksheet.pptx",
+          "6. Yr 7 KS3 Physics DELBAR 2025/Topic 4 Space (Summer term)/unorganised pre 20-05-26/_$anets and seasons 1 DIRT.docx",
+          "6. Yr 7 KS3 Physics DELBAR 2025/Topic 4 Space (Summer term)/unorganised pre 20-05-26/DELBAR Phases of the moon.pptx",
+          "6. Yr 7 KS3 Physics DELBAR 2025/Topic 4 Space (Summer term)/unorganised pre 20-05-26/Planets and seasons 1 DIRT.docx",
+          "6. Yr 7 KS3 Physics DELBAR 2025/Topic 4 Space (Summer term)/unorganised pre 20-05-26/L13 WS.pptx",
+          "6. Yr 7 KS3 Physics DELBAR 2025/Topic 4 Space (Summer term)/unorganised pre 20-05-26/cfe2-s-36-cfe-second-level-the-big-bang-theory-powerpoint_ver_1.ppt",
+          "6. Yr 7 KS3 Physics DELBAR 2025/Topic 4 Space (Summer term)/unorganised pre 20-05-26/Planets in the Solar System AS - Data handling (1).pdf",
+          "6. Yr 7 KS3 Physics DELBAR 2025/Topic 4 Space (Summer term)/unorganised pre 20-05-26/L17 Planet postcards.pptx",
+          "6. Yr 7 KS3 Physics DELBAR 2025/Topic 4 Space (Summer term)/unorganised pre 20-05-26/L5 - Life Cycle of a Star.ppt",
+          "6. Yr 7 KS3 Physics DELBAR 2025/Topic 4 Space (Summer term)/unorganised pre 20-05-26/7A3 Space Topic Overview.docx",
+          "6. Yr 7 KS3 Physics DELBAR 2025/Topic 4 Space (Summer term)/unorganised pre 20-05-26/EPIBA Chromebook research for Google classroom.pptx",
+          "6. Yr 7 KS3 Physics DELBAR 2025/Topic 4 Space (Summer term)/unorganised pre 20-05-26/EPIBA The Universe and the big bang GMO.pptx",
+          "6. Yr 7 KS3 Physics DELBAR 2025/Topic 4 Space (Summer term)/unorganised pre 20-05-26/Planets in the Solar System GS (1).pdf",
+          "6. Yr 7 KS3 Physics DELBAR 2025/Topic 4 Space (Summer term)/unorganised pre 20-05-26/_Thumbs.db",
+          "6. Yr 7 KS3 Physics DELBAR 2025/Topic 4 Space (Summer term)/unorganised pre 20-05-26/Moon Formation Reading Activity.docx",
+          "6. Yr 7 KS3 Physics DELBAR 2025/Topic 4 Space (Summer term)/unorganised pre 20-05-26/DELBAR The Uinverse and the big bang.pptx",
+          "6. Yr 7 KS3 Physics DELBAR 2025/Topic 4 Space (Summer term)/_KS3 The Earth in Space Technicians guide.xlsx",
+          "6. Yr 7 KS3 Physics DELBAR 2025/Topic 4 Space (Summer term)/unorganised pre 20-05-26/Help Sheet.docx",
+          "6. Yr 7 KS3 Physics DELBAR 2025/Topic 4 Space (Summer term)/unorganised pre 20-05-26/DELBAR Seasons.pptx",
+          "6. Yr 7 KS3 Physics DELBAR 2025/Topic 4 Space (Summer term)/unorganised pre 20-05-26/L14 WS.pptx",
+          "6. Yr 7 KS3 Physics DELBAR 2025/Topic 4 Space (Summer term)/unorganised pre 20-05-26/DELBAR Meteorites and meteors.pptx",
+          "6. Yr 7 KS3 Physics DELBAR 2025/Topic 4 Space (Summer term)/unorganised pre 20-05-26/Planetary data cards.pdf",
+          "6. Yr 7 KS3 Physics DELBAR 2025/Topic 4 Space (Summer term)/unorganised pre 20-05-26/_$DELBAR Eclispes.pptx",
+          "6. Yr 7 KS3 Physics DELBAR 2025/Topic 4 Space (Summer term)/unorganised pre 20-05-26/Card sort activity.pptx",
+          "6. Yr 7 KS3 Physics DELBAR 2025/Topic 4 Space (Summer term)/unorganised pre 20-05-26/L17 WS.pptx",
+          "6. Yr 7 KS3 Physics DELBAR 2025/Topic 4 Space (Summer term)/unorganised pre 20-05-26/L14 seasons.pptx",
+          "6. Yr 7 KS3 Physics DELBAR 2025/Topic 4 Space (Summer term)/unorganised pre 20-05-26/Solar System GMO.pptx",
+          "6. Yr 7 KS3 Physics DELBAR 2025/Topic 4 Space (Summer term)/unorganised pre 20-05-26/Planet postcards template.pptx",
+          "6. Yr 7 KS3 Physics DELBAR 2025/Topic 4 Space (Summer term)/7A3 Space Topic Overview.docx",
+          "6. Yr 7 KS3 Physics DELBAR 2025/Topic 4 Space (Summer term)/unorganised pre 20-05-26/DELBAR ICT crater hunting.pptx",
+          "6. Yr 7 KS3 Physics DELBAR 2025/Topic 4 Space (Summer term)/unorganised pre 20-05-26/Planet Fact Book.docx",
+          "6. Yr 7 KS3 Physics DELBAR 2025/Topic 4 Space (Summer term)/unorganised pre 20-05-26/Home and Away teaching sheet.docx",
+          "6. Yr 7 KS3 Physics DELBAR 2025/Topic 4 Space (Summer term)/unorganised pre 20-05-26/DELBAR WS life cycle of a star.pptx",
+          "6. Yr 7 KS3 Physics DELBAR 2025/Topic 4 Space (Summer term)/unorganised pre 20-05-26/DELBAR The planets.pptx",
+          "6. Yr 7 KS3 Physics DELBAR 2025/Topic 4 Space (Summer term)/unorganised pre 20-05-26/Solar and Lunar eclipses Developing.docx",
+          "6. Yr 7 KS3 Physics DELBAR 2025/Topic 4 Space (Summer term)/unorganised pre 20-05-26/Planets in the Solar System GS (2).pdf",
+          "6. Yr 7 KS3 Physics DELBAR 2025/Topic 4 Space (Summer term)/unorganised pre 20-05-26/_Thumbs (4).db",
+          "6. Yr 7 KS3 Physics DELBAR 2025/Topic 4 Space (Summer term)/unorganised pre 20-05-26/The Big Bang Theory.pptx",
+          "6. Yr 7 KS3 Physics DELBAR 2025/Topic 4 Space (Summer term)/unorganised pre 20-05-26/EPIBA Meteors and meterorites - width not depth.pptx",
+          "6. Yr 7 KS3 Physics DELBAR 2025/Topic 4 Space (Summer term)/unorganised pre 20-05-26/p2_g_02_worksheet.doc",
+          "6. Yr 7 KS3 Physics DELBAR 2025/Topic 4 Space (Summer term)/unorganised pre 20-05-26/EPIBA Meteors and meterorites.pptx"
+        ]
+      }
+    }
+  },
+  "2_Year_8_Biology_DELBAR": {
+    "year": "Year 8",
+    "subject": "Biology",
+    "topics": {
+      "Topic 1 Respiration and photosynthesis Autumn": {
+        "driveTopics": [
+          "B1 Respiration and Photosythesis"
+        ],
+        "rows": [
+          {
+            "packLesson": "L1 Aerobic Respiration homework setting",
+            "files": 5,
+            "driveTopic": "B1 Respiration and Photosythesis",
+            "driveLesson": "Lesson 1 - Aerobic Respiration",
+            "score": 0.86,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "L2 Anaerobic Respiration",
+            "files": 6,
+            "driveTopic": "B1 Respiration and Photosythesis",
+            "driveLesson": "Lesson 2 - Anaerobic Respiration",
+            "score": 0.887,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "L3 Fermentation in yeast experiment",
+            "files": 6,
+            "driveTopic": "B1 Respiration and Photosythesis",
+            "driveLesson": "Lesson 3 - Fermentation in Yeast Experiment",
+            "score": 0.903,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "L5 Photosynthesis",
+            "files": 7,
+            "driveTopic": "B1 Respiration and Photosythesis",
+            "driveLesson": "Lesson 5 - Photosythesis",
+            "score": 0.823,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "L6 Rate of photosynthesis experiment",
+            "files": 6,
+            "driveTopic": "B1 Respiration and Photosythesis",
+            "driveLesson": "Lesson 6 - Rate of Photosythesis Experiment",
+            "score": 0.889,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "L7 Starch in leaves",
+            "files": 4,
+            "driveTopic": "B1 Respiration and Photosythesis",
+            "driveLesson": "Lesson 7 - Starch in Leaves",
+            "score": 0.86,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "L4 Formative assessment",
+            "files": 4,
+            "driveTopic": "B1 Respiration and Photosythesis",
+            "driveLesson": null,
+            "score": 0.0,
+            "kind": "ASSESSMENT-BUNDLE"
+          }
+        ],
+        "topicLevelFiles": [
+          "2. Year 8 Biology DELBAR/Topic 1 Respiration and photosynthesis Autumn/_Science KS3 Respiration and Photosynthesis.xlsx",
+          "2. Year 8 Biology DELBAR/Topic 1 Respiration and photosynthesis Autumn/8A1 Respiration and Photosynthesis Topic Overview.docx"
+        ]
+      },
+      "Topic 2 Health and digestion Spring": {
+        "driveTopics": [
+          "B2 Health and Digestion"
+        ],
+        "rows": [
+          {
+            "packLesson": "Lesson 1 Nutrients and homework setting",
+            "files": 13,
+            "driveTopic": "B2 Health and Digestion",
+            "driveLesson": "Lesson 1 - Nutrients",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 2 Food Tests - Glucose",
+            "files": 2,
+            "driveTopic": "B2 Health and Digestion",
+            "driveLesson": "Lesson 2 - Food Tests - Glucose",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 3 Food tests - Protein & Starch & Fats",
+            "files": 2,
+            "driveTopic": "B2 Health and Digestion",
+            "driveLesson": "Lesson 3 - Food Tests - Protein and Starch and Fats",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 4 Nutritional value of food (Optional)",
+            "files": 3,
+            "driveTopic": "B2 Health and Digestion",
+            "driveLesson": "Lesson 4 - Nutritional Value of Food (optional)",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 6 Digestive system",
+            "files": 9,
+            "driveTopic": "B2 Health and Digestion",
+            "driveLesson": "Lesson 5 -Digestive System",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 7 Enzymes",
+            "files": 11,
+            "driveTopic": "B2 Health and Digestion",
+            "driveLesson": "Lesson 6 - Enzymes",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 5 Formative review",
+            "files": 3,
+            "driveTopic": "B2 Health and Digestion",
+            "driveLesson": null,
+            "score": 0.0,
+            "kind": "ASSESSMENT-BUNDLE"
+          }
+        ],
+        "topicLevelFiles": [
+          "2. Year 8 Biology DELBAR/Topic 2 Health and digestion Spring/8A2 Health and Digestion Topic Overview.docx",
+          "2. Year 8 Biology DELBAR/Topic 2 Health and digestion Spring/Year 8 Health and digestion homework.docx",
+          "2. Year 8 Biology DELBAR/Topic 2 Health and digestion Spring/Science KS3 Technician guide Health and Digestion.xlsx"
+        ]
+      },
+      "Topic 3 Inheritance, variation and evolution Summer": {
+        "driveTopics": [
+          "B3 Inheritance, Variation and Evolution"
+        ],
+        "rows": [
+          {
+            "packLesson": "Lesson 1 Discontinuous Variation and homework setting",
+            "files": 9,
+            "driveTopic": "B3 Inheritance, Variation and Evolution",
+            "driveLesson": "Lesson 1 - Discontinuous Variation",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 2 Continuous Variation",
+            "files": 11,
+            "driveTopic": "B3 Inheritance, Variation and Evolution",
+            "driveLesson": "Lesson 2 - Continuous Variation",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 3 Inherited and environmental variation",
+            "files": 9,
+            "driveTopic": "B3 Inheritance, Variation and Evolution",
+            "driveLesson": "Lesson 3 - Inherited and Environmental Variation",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 4 Chromosomes & biological sex",
+            "files": 10,
+            "driveTopic": "B3 Inheritance, Variation and Evolution",
+            "driveLesson": "Lesson 4 - Chromosomes and Biological Sex",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 6 Classification by common characteristics",
+            "files": 12,
+            "driveTopic": "B3 Inheritance, Variation and Evolution",
+            "driveLesson": "Lesson 5 - Classification by Common Characteristics",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 7 Competition and adaptation (Optional)",
+            "files": 13,
+            "driveTopic": "B3 Inheritance, Variation and Evolution",
+            "driveLesson": "Lesson 6 - Competition and Adaptation (optional)",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 8 Adaptation and natural selection",
+            "files": 6,
+            "driveTopic": "B3 Inheritance, Variation and Evolution",
+            "driveLesson": "Lesson 7 - Adaption and Natural Selection",
+            "score": 0.915,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 9 Evolution",
+            "files": 17,
+            "driveTopic": "B3 Inheritance, Variation and Evolution",
+            "driveLesson": "Lesson 8 - Evolution",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 10 Evolutionary trees (Optional)",
+            "files": 9,
+            "driveTopic": "B3 Inheritance, Variation and Evolution",
+            "driveLesson": "Lesson 9 - Evolutionary Trees (Optional)",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 5 Formative assessment point",
+            "files": 5,
+            "driveTopic": "B3 Inheritance, Variation and Evolution",
+            "driveLesson": null,
+            "score": 0.0,
+            "kind": "ASSESSMENT-BUNDLE"
+          }
+        ],
+        "topicLevelFiles": [
+          "2. Year 8 Biology DELBAR/Topic 3 Inheritance, variation and evolution Summer/_KS3 Y8 Variation,Inhertiance and Evolution Technicians guide.xlsx",
+          "2. Year 8 Biology DELBAR/Topic 3 Inheritance, variation and evolution Summer/Year 8 Variation, inhertiance and evo homework.docx",
+          "2. Year 8 Biology DELBAR/Topic 3 Inheritance, variation and evolution Summer/8A2 Variation and Inheritance Topic Overview.docx"
+        ]
+      }
+    }
+  },
+  "3_Year_8_Chemistry_DELBAR": {
+    "year": "Year 8",
+    "subject": "Chemistry",
+    "topics": {
+      "Topic 1 Acids and alkalis Autumn": {
+        "driveTopics": [
+          "C1 Acids and Alkalis"
+        ],
+        "rows": [
+          {
+            "packLesson": "Lesson 1 Identifying acids and alkalis",
+            "files": 3,
+            "driveTopic": "C1 Acids and Alkalis",
+            "driveLesson": "Lesson 1 - Identifying Acids and Alkalis",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 2 The pH scale",
+            "files": 7,
+            "driveTopic": "C1 Acids and Alkalis",
+            "driveLesson": "Lesson 2 - The pH Scale",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 3 Neutralisation",
+            "files": 9,
+            "driveTopic": "C1 Acids and Alkalis",
+            "driveLesson": "Lesson 3 - Neutralisation",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 5 Metals and acids",
+            "files": 10,
+            "driveTopic": "C1 Acids and Alkalis",
+            "driveLesson": "Lesson 4 - Metals and Acids",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 6 Acid and carbonate reactions",
+            "files": 7,
+            "driveTopic": "C1 Acids and Alkalis",
+            "driveLesson": "Lesson 5 - Acid and Carbonate Reaction",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 7-8 Making indicators (Optional)",
+            "files": 5,
+            "driveTopic": "C1 Acids and Alkalis",
+            "driveLesson": "Lesson 6-7 - Making Indicators (optional)",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 4 Formative review",
+            "files": 3,
+            "driveTopic": "C1 Acids and Alkalis",
+            "driveLesson": null,
+            "score": 0.0,
+            "kind": "ASSESSMENT-BUNDLE"
+          }
+        ],
+        "topicLevelFiles": [
+          "3. Year 8 Chemistry DELBAR/Topic 1 Acids and alkalis Autumn/Science KS3 Acids and Alkalis technicians guide.xlsx",
+          "3. Year 8 Chemistry DELBAR/Topic 1 Acids and alkalis Autumn/8A1 Acids and Alkalis Topic Overview.docx"
+        ]
+      },
+      "Topic 2 The periodic table Autumn": {
+        "driveTopics": [
+          "C2 Periodic Table"
+        ],
+        "rows": [
+          {
+            "packLesson": "Lesson 1 Periodic table recap and homework setting",
+            "files": 23,
+            "driveTopic": "C2 Periodic Table",
+            "driveLesson": "Lesson 1 - Periodic Table Recap",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 2 Trends in the periodic table",
+            "files": 11,
+            "driveTopic": "C2 Periodic Table",
+            "driveLesson": "Lesson 2 - Trends in the Periodic Table",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 3 Group 1",
+            "files": 4,
+            "driveTopic": "C2 Periodic Table",
+            "driveLesson": "Lesson 3 - Group 1",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 5 Group 7",
+            "files": 5,
+            "driveTopic": "C2 Periodic Table",
+            "driveLesson": "Lesson 4 - Group 7",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 6 The Noble gases",
+            "files": 3,
+            "driveTopic": "C2 Periodic Table",
+            "driveLesson": "Lesson 5 - The Noble Gases",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 4 Formative review",
+            "files": 5,
+            "driveTopic": "C2 Periodic Table",
+            "driveLesson": null,
+            "score": 0.0,
+            "kind": "ASSESSMENT-BUNDLE"
+          }
+        ],
+        "topicLevelFiles": [
+          "3. Year 8 Chemistry DELBAR/Topic 2 The periodic table Autumn/Copy of 8A1 Periodic Table Topic Overview.docx"
+        ]
+      },
+      "Topic 3 Metals and non metals_chemical energy Spring": {
+        "driveTopics": [
+          "C3 Metals, Non Metals and Chemical Energy"
+        ],
+        "rows": [
+          {
+            "packLesson": "Lesson 1 Properties of metals and homework setting",
+            "files": 3,
+            "driveTopic": "C3 Metals, Non Metals and Chemical Energy",
+            "driveLesson": "Lesson 1 - Properties of Metals",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 2 Metals and oxygen",
+            "files": 7,
+            "driveTopic": "C3 Metals, Non Metals and Chemical Energy",
+            "driveLesson": "Lesson 2 - Metals and Oxygen",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 3 Reactivity of metals experiment",
+            "files": 9,
+            "driveTopic": "C3 Metals, Non Metals and Chemical Energy",
+            "driveLesson": "Lesson 3 - Reactivity of Metals Experiment",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 5 Displacement",
+            "files": 8,
+            "driveTopic": "C3 Metals, Non Metals and Chemical Energy",
+            "driveLesson": "Lesson 4 - Displacement",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 6 Displacement of salts",
+            "files": 7,
+            "driveTopic": "C3 Metals, Non Metals and Chemical Energy",
+            "driveLesson": "Lesson 5 - Displacement of Salts",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 7 Energy changes in reactions",
+            "files": 10,
+            "driveTopic": "C3 Metals, Non Metals and Chemical Energy",
+            "driveLesson": "Lesson 6 - Energy Changes in Reactions",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 8 OPTIONAL Balancing Equation (Higher Tier)",
+            "files": 9,
+            "driveTopic": "C3 Metals, Non Metals and Chemical Energy",
+            "driveLesson": "Lesson 7 - Balancing Equations (Higher Tier) (Optional)",
+            "score": 0.86,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 4 Formative marking point",
+            "files": 2,
+            "driveTopic": "C3 Metals, Non Metals and Chemical Energy",
+            "driveLesson": null,
+            "score": 0.0,
+            "kind": "ASSESSMENT-BUNDLE"
+          }
+        ],
+        "topicLevelFiles": [
+          "3. Year 8 Chemistry DELBAR/Topic 3 Metals and non metals_chemical energy Spring/Metals, nonmetals and chemical energy homework.docx",
+          "3. Year 8 Chemistry DELBAR/Topic 3 Metals and non metals_chemical energy Spring/8A2 Metals and Nonmetals Topic Overview.docx",
+          "3. Year 8 Chemistry DELBAR/Topic 3 Metals and non metals_chemical energy Spring/Science KS3 Metals, Non metals and chemical energy technicians guide.xlsx"
+        ]
+      },
+      "Topic 4 Atmosphere and resources Summer": {
+        "driveTopics": [
+          "C4 Atmosphere and Resources"
+        ],
+        "rows": [],
+        "topicLevelFiles": []
+      }
+    }
+  },
+  "4_Year_8_Physics_DELBAR": {
+    "year": "Year 8",
+    "subject": "Physics",
+    "topics": {
+      "Topic 1 Motion and pressure Autumn": {
+        "driveTopics": [
+          "P1 Motion and Pressure"
+        ],
+        "rows": [
+          {
+            "packLesson": "Lesson 1 - Calculating Pressure",
+            "files": 7,
+            "driveTopic": "P1 Motion and Pressure",
+            "driveLesson": "Lesson 1 - Calculating Pressure",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 2 - Pressure on a surface",
+            "files": 7,
+            "driveTopic": "P1 Motion and Pressure",
+            "driveLesson": "Lesson 2 - Pressure on a Surface",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 3 - Air pressure",
+            "files": 10,
+            "driveTopic": "P1 Motion and Pressure",
+            "driveLesson": "Lesson 3 - Air Pressure",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 4 - Pressure in a fluid",
+            "files": 12,
+            "driveTopic": "P1 Motion and Pressure",
+            "driveLesson": "Lesson 4 - Pressure in Fluids",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 6 - Calculating Speed",
+            "files": 7,
+            "driveTopic": "P1 Motion and Pressure",
+            "driveLesson": "Lesson 5 - Calculating Speed",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 7 - Speed investigation (Optional)",
+            "files": 10,
+            "driveTopic": "P1 Motion and Pressure",
+            "driveLesson": "Lesson 6 - Speed Investigation (optional)",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 8 - Distance VS Time graphs",
+            "files": 14,
+            "driveTopic": "P1 Motion and Pressure",
+            "driveLesson": "Lesson 7 - Distance vs Time Graphs",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 5 - Formative review",
+            "files": 15,
+            "driveTopic": "P1 Motion and Pressure",
+            "driveLesson": null,
+            "score": 0.0,
+            "kind": "ASSESSMENT-BUNDLE"
+          }
+        ],
+        "topicLevelFiles": [
+          "4. Year 8 Physics DELBAR/Topic 1 Motion and pressure Autumn/_KS3 Y8 Speed and Pressure.xlsx",
+          "4. Year 8 Physics DELBAR/Topic 1 Motion and pressure Autumn/8A1 Motion and Pressure Topic Overview.docx"
+        ]
+      },
+      "Topic 2 Energy resources Spring": {
+        "driveTopics": [
+          "P2 Energy Resources"
+        ],
+        "rows": [
+          {
+            "packLesson": "Lesson 1 Comparing light bulbs and homework setting",
+            "files": 5,
+            "driveTopic": "P2 Energy Resources",
+            "driveLesson": "Lesson 1 - Comparing Light Bulbs",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 2 Paying for electricity",
+            "files": 9,
+            "driveTopic": "P2 Energy Resources",
+            "driveLesson": "Lesson 2 - Paying for Electricity",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 3 The national grid and power stations",
+            "files": 15,
+            "driveTopic": "P2 Energy Resources",
+            "driveLesson": "Lesson 3 - The National Grid",
+            "score": 0.86,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 4 Generating electricity",
+            "files": 4,
+            "driveTopic": "P2 Energy Resources",
+            "driveLesson": "Lesson 4 - Generating Electricity",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 6 Wind turbines",
+            "files": 1,
+            "driveTopic": "P2 Energy Resources",
+            "driveLesson": "Lesson 5 - Wind Turbines",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 7 Solar power",
+            "files": 3,
+            "driveTopic": "P2 Energy Resources",
+            "driveLesson": "Lesson 6 - Solar Power",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 8 Other renewables",
+            "files": 5,
+            "driveTopic": "P2 Energy Resources",
+            "driveLesson": "Lesson 7 - Other Renewables",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 9 Non renewables practical",
+            "files": 2,
+            "driveTopic": "P2 Energy Resources",
+            "driveLesson": null,
+            "score": 0.0,
+            "kind": "NEW"
+          },
+          {
+            "packLesson": "Lesson 10 Joule Island (Optional)",
+            "files": 3,
+            "driveTopic": "P2 Energy Resources",
+            "driveLesson": "Lesson 8 - Joule Island Pt 1 (Optional)",
+            "score": 0.86,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 11 Joule Island 2 (Optional)",
+            "files": 2,
+            "driveTopic": "P2 Energy Resources",
+            "driveLesson": "Lesson 9 - Joule Island Pt 2 (Optional)",
+            "score": 0.86,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 5 Formative review",
+            "files": 3,
+            "driveTopic": "P2 Energy Resources",
+            "driveLesson": null,
+            "score": 0.0,
+            "kind": "ASSESSMENT-BUNDLE"
+          }
+        ],
+        "topicLevelFiles": [
+          "4. Year 8 Physics DELBAR/Topic 2 Energy resources Spring/_KS3 Y8 Energy Resources technicians guide.xlsx",
+          "4. Year 8 Physics DELBAR/Topic 2 Energy resources Spring/Year 8 Energy resources homework.docx",
+          "4. Year 8 Physics DELBAR/Topic 2 Energy resources Spring/8A2 Energy Resources Topic Overview.docx"
+        ]
+      },
+      "Topic 3 Light Spring": {
+        "driveTopics": [
+          "P3 Light"
+        ],
+        "rows": [
+          {
+            "packLesson": "Lesson 1 Reflection and homework setting",
+            "files": 20,
+            "driveTopic": "P3 Light",
+            "driveLesson": "Lesson 1 - Reflection",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 2 Refraction",
+            "files": 10,
+            "driveTopic": "P3 Light",
+            "driveLesson": "Lesson 2 - Refraction",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 3 Lenses",
+            "files": 9,
+            "driveTopic": "P3 Light",
+            "driveLesson": "Lesson 3 - Lenses",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 4 Dispersion and colour mixing",
+            "files": 16,
+            "driveTopic": "P3 Light",
+            "driveLesson": "Lesson 4 - Dispersion and Colour Mixing",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 6 Reflecting colour",
+            "files": 8,
+            "driveTopic": "P3 Light",
+            "driveLesson": "Lesson 5 - Reflecting Colour",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 5 Formative assessment",
+            "files": 4,
+            "driveTopic": "P3 Light",
+            "driveLesson": null,
+            "score": 0.0,
+            "kind": "ASSESSMENT-BUNDLE"
+          }
+        ],
+        "topicLevelFiles": [
+          "4. Year 8 Physics DELBAR/Topic 3 Light Spring/8A2 Light Topic Overview.docx",
+          "4. Year 8 Physics DELBAR/Topic 3 Light Spring/Year 8 Light homework.docx"
+        ]
+      },
+      "Topic 4+5 Electricity and magnetism Summer": {
+        "driveTopics": [
+          "P4 Electricity",
+          "P5 Magnets"
+        ],
+        "rows": [
+          {
+            "packLesson": "Lesson 1 Circuit Symbols",
+            "files": 8,
+            "driveTopic": "P4 Electricity",
+            "driveLesson": "Lesson 1 - Circuit Symbols",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 2 Current in series",
+            "files": 8,
+            "driveTopic": "P4 Electricity",
+            "driveLesson": "Lesson 2 - Current in Series",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 3 Current in parallel",
+            "files": 9,
+            "driveTopic": "P4 Electricity",
+            "driveLesson": "Lesson 3 - Current in Parallel",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 4 Making fruit batteries (Optional)",
+            "files": 4,
+            "driveTopic": "P4 Electricity",
+            "driveLesson": "Lesson 4 - Making Fruit Batteries (optional)",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 5 Potential difference in series and parallel",
+            "files": 8,
+            "driveTopic": "P4 Electricity",
+            "driveLesson": "Lesson 5 - Potential Difference in Series and Parallel",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 6 Circuit models",
+            "files": 7,
+            "driveTopic": "P4 Electricity",
+            "driveLesson": null,
+            "score": 0.0,
+            "kind": "NEW"
+          },
+          {
+            "packLesson": "Lesson 8 Attract and repel_using magnets",
+            "files": 9,
+            "driveTopic": "P5 Magnets",
+            "driveLesson": "Lesson 1 - Attract and Repel Using Magnets",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 9 Testing for magnetic materials",
+            "files": 2,
+            "driveTopic": "P5 Magnets",
+            "driveLesson": "Lesson 2 - Testing for Magnetic Materials",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 10 Mapping magnetic fields",
+            "files": 3,
+            "driveTopic": "P5 Magnets",
+            "driveLesson": "Lesson 3 - Mapping Magnetic Fields",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 11 Making electromagnets",
+            "files": 4,
+            "driveTopic": "P5 Magnets",
+            "driveLesson": "Lesson 4 - Making Electromagnets",
+            "score": 1.0,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 12 Changing the current into an electromagnet (Optional)",
+            "files": 2,
+            "driveTopic": "P5 Magnets",
+            "driveLesson": "Lesson 5 - Changing the Strength of an Electromagnet",
+            "score": 0.777,
+            "kind": "MATCH"
+          },
+          {
+            "packLesson": "Lesson 7 Formative Assessment",
+            "files": 1,
+            "driveTopic": "P4 Electricity",
+            "driveLesson": null,
+            "score": 0.0,
+            "kind": "ASSESSMENT-BUNDLE"
+          }
+        ],
+        "topicLevelFiles": [
+          "4. Year 8 Physics DELBAR/Topic 4+5 Electricity and magnetism Summer/Topic 4 Electricity and magnetism Summer/8A3 Electricity and magnetism Topic Overview.docx",
+          "4. Year 8 Physics DELBAR/Topic 4+5 Electricity and magnetism Summer/Topic 4 Electricity and magnetism Summer/Year 8 Electricity and magnetism homework.docx"
+        ]
+      }
+    }
+  }
+}

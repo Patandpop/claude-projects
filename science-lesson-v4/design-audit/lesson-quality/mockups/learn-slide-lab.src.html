@@ -1,0 +1,734 @@
+<title>Learn Slide Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Questrial&display=swap">
+<style>
+/* Layout: a long review sheet. Sticky picker bar, then sections of slide mock-ups in a two-up grid, each with an ID chip to quote back. */
+:root{
+  --bg:#eef1f6; --panel:#ffffff; --fg:#17203a; --muted:#56607a; --line:#d5dbe7; --accent:#b8780b; --chip:#17203a; --chipfg:#ffffff;
+  --ui:"Atkinson Hyperlegible",system-ui,sans-serif;
+  /* slide palette is fixed: it copies the real deck */
+  --navy:#0f1b5c; --navy2:#172347; --gold:#f9a826; --sky:#eaf0f8; --ink:#1b1b2f; --cream:#fffbe6; --eng:#1e5e20;
+  --red:#c62828; --blue:#1565c0; --green:#2e7d32; --purple:#6a1b9a; --grey:#6b7280;
+  --sf:"Century Gothic","Questrial",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#11151f;--panel:#1a2030;--fg:#e8ecf4;--muted:#a3adc2;--line:#2c3448;--accent:#f2b544;--chip:#f2b544;--chipfg:#11151f;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#11151f;--panel:#1a2030;--fg:#e8ecf4;--muted:#a3adc2;--line:#2c3448;--accent:#f2b544;--chip:#f2b544;--chipfg:#11151f;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--ui);font-size:16px;line-height:1.5;margin:0}
+.wrap{max-width:1240px;margin:0 auto;padding-inline:20px;padding-block:24px 80px}
+h1{font-size:2.1rem;margin:0 0 .3rem;text-wrap:balance}
+h2{font-size:1.45rem;margin:2.6rem 0 .3rem;text-wrap:balance}
+h3{font-size:1.05rem;margin:1.4rem 0 .4rem}
+p,li{max-width:72ch}
+.lead{color:var(--muted);font-size:1.05rem}
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--panel);border-bottom:1px solid var(--line);padding:10px 20px;display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center}
+.bar strong{font-size:.9rem}
+.bar button{font:inherit;font-size:.85rem;border:1px solid var(--line);background:var(--bg);color:var(--fg);border-radius:6px;padding:4px 10px;cursor:pointer}
+.bar button[aria-pressed="true"]{background:var(--chip);color:var(--chipfg);border-color:var(--chip)}
+.bar button:focus-visible,a:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:1rem}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:12px 14px}
+.stat b{display:block;font-size:1.6rem;font-variant-numeric:tabular-nums}
+.stat span{color:var(--muted);font-size:.92rem}
+.grid{display:grid;grid-template-columns:1fr;gap:22px;margin-top:1rem}
+@media (min-width:1000px){.grid{grid-template-columns:1fr 1fr}}
+figure{margin:0;min-width:0}
+figcaption{margin-top:8px;font-size:.95rem;color:var(--muted)}
+figcaption .id{display:inline-block;background:var(--chip);color:var(--chipfg);font-weight:700;border-radius:4px;padding:0 7px;margin-right:6px;font-variant-numeric:tabular-nums}
+figcaption b{color:var(--fg)}
+.note{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:6px;padding:10px 14px;margin-top:12px}
+table.cmp{border-collapse:collapse;width:100%;font-size:.95rem;background:var(--panel)}
+table.cmp td,table.cmp th{border:1px solid var(--line);padding:8px 10px;vertical-align:top;text-align:left}
+.tw{overflow-x:auto}
+.tag{display:inline-block;font-size:.78rem;border:1px solid var(--line);border-radius:999px;padding:0 8px;margin-left:4px;color:var(--muted)}
+.ok{color:#2e7d32}.bad{color:#c62828}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .ok{color:#7bd389}:root:not([data-theme="light"]) .bad{color:#ff8a80}}
+
+/* ---------- the slide ---------- */
+.slide{container-type:inline-size;aspect-ratio:16/9;width:100%;max-width:100%;border-radius:4px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.sl{height:100%;font-family:var(--sf);font-size:1.95cqw;line-height:1.28;color:var(--ink);background:var(--sky);display:grid;grid-template-rows:7.4% 1.4% 5% 1fr 5%}
+.nav{background:var(--navy2);display:grid;grid-template-columns:repeat(6,1fr);border-bottom:.25em solid var(--gold)}
+.nav span{color:#fff;font-size:.62em;display:flex;align-items:center;justify-content:center;letter-spacing:.04em}
+.nav span.on{background:var(--gold);font-weight:700;font-size:.75em}
+.nav span.on.e{background:var(--eng)}
+.sec{grid-row:3;background:var(--gold);color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:.8em;letter-spacing:.05em}
+.sec.e{background:var(--eng)}
+.bd{grid-row:4;padding:1.1% 3.3%;min-height:0;display:flex;gap:1.6%}
+.ft{grid-row:5;background:var(--navy);color:#fff;font-size:.62em;display:flex;align-items:center;padding:0 1%;gap:.6em}
+.ft i{opacity:.95}
+.col{display:flex;flex-direction:column;gap:2.5%;min-width:0}
+.box{background:#fff;border:.15em solid var(--gold);display:flex;flex-direction:column;min-height:0}
+.box h4{margin:0;background:var(--navy);color:#fff;font-size:1.05em;padding:.25em .45em}
+.box .in{padding:.35em .5em;display:flex;flex-direction:column;gap:.35em}
+.box p{margin:0}
+.big{font-size:1.5em;font-weight:700;line-height:1.15}
+.small{font-size:.86em}
+.tiny{font-size:.72em}
+.cen{text-align:center}
+.pic{background:#fff;display:flex;align-items:center;justify-content:center;min-height:0;position:relative;overflow:hidden}
+.pic img{max-width:100%;max-height:100%;display:block}
+.fill{flex:1}
+.def{background:var(--navy);color:#fff;border-left:.35em solid var(--gold);padding:.35em .6em;font-size:.9em}
+.def b{color:var(--gold)}
+.lab{position:absolute;font-size:.72em;line-height:1.1;background:rgba(255,255,255,.92);border:.1em solid var(--navy);padding:.15em .35em;border-radius:.2em;white-space:nowrap}
+.lab b{color:var(--navy)}
+.lab small{display:block;color:#444;font-size:.85em}
+.badge{position:absolute;width:1.5em;height:1.5em;border-radius:50%;background:var(--gold);color:var(--navy);font-weight:700;display:flex;align-items:center;justify-content:center;font-size:.8em;border:.12em solid var(--navy)}
+.ov{position:absolute;inset:0;width:100%;height:100%}
+.num{display:inline-flex;width:1.4em;height:1.4em;border-radius:50%;background:var(--gold);color:var(--navy);font-weight:700;align-items:center;justify-content:center;font-size:.85em;flex:none}
+.row{display:flex;gap:.5em;align-items:flex-start}
+.chips{display:flex;flex-wrap:wrap;gap:.3em}
+.chipk{background:#fff;border:.1em solid var(--navy);border-radius:.3em;padding:.1em .4em;font-size:.8em}
+.new{background:var(--gold);color:var(--navy);font-weight:700;font-size:.7em;border-radius:.2em;padding:0 .3em;margin-left:.2em}
+.eq{font-family:"Cambria Math","Cambria",serif;font-size:2.4em;font-weight:700;color:var(--navy);text-align:center;line-height:1}
+.cF{color:var(--red)}.cA{color:var(--blue)}.cP{color:var(--purple)}
+.reveal{background:var(--navy);color:var(--gold);font-weight:700;padding:.35em .6em;border:.15em solid var(--gold)}
+.ask{background:var(--cream);border:.15em solid var(--gold);padding:.4em .6em;font-weight:700;font-size:1.15em}
+
+/* key-term styles, switched for every slide by the bar (data-hl on <body>) */
+.k{font-weight:700;color:var(--navy)}
+body[data-hl="2"] .k{text-decoration:underline;text-decoration-color:var(--gold);text-decoration-thickness:.18em;text-underline-offset:.15em}
+body[data-hl="3"] .k{background:linear-gradient(transparent 40%,rgba(249,168,38,.55) 40%,rgba(249,168,38,.55) 92%,transparent 92%);padding:0 .1em}
+body[data-hl="4"] .k{background:var(--navy);color:#fff;border-radius:.25em;padding:0 .25em}
+body[data-hl="5"] .k{color:#b45309}
+body[data-hl="6"] .k{border:.12em solid var(--gold);border-radius:.2em;padding:0 .15em}
+.def .k{color:var(--gold)}
+body[data-hl="4"] .def .k{background:var(--gold);color:var(--navy)}
+body[data-hl="5"] .def .k{color:#ffcc80}
+.hlrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-top:10px}
+.hlcard{background:#fff;color:var(--ink);font-family:var(--sf);border:2px solid var(--gold);border-radius:4px;padding:10px 12px;font-size:1.05rem}
+.hlcard .tagline{font-family:var(--ui);font-size:.8rem;color:#555;margin-bottom:4px}
+.hlcard .k{font-weight:700;color:var(--navy)}
+.h2 .k{text-decoration:underline;text-decoration-color:var(--gold);text-decoration-thickness:3px;text-underline-offset:3px}
+.h3 .k{background:linear-gradient(transparent 40%,rgba(249,168,38,.55) 40%,rgba(249,168,38,.55) 92%,transparent 92%)}
+.h4 .k{background:var(--navy);color:#fff;border-radius:4px;padding:0 4px}
+.h5 .k{color:#b45309}
+.h6 .k{border:2px solid var(--gold);border-radius:3px;padding:0 2px}
+body[data-hl="7"] .k{background:#dde4f6;color:#0f1b5c;font-weight:700;border-radius:.25em;padding:0 .25em}
+.t7 .k{background:#dde4f6;color:#0f1b5c;font-weight:700;border-radius:.25em;padding:0 .25em}
+body[data-hl="8"] .k{background:#0f1b5c;color:#fff;font-weight:700;border-left:.25em solid #f9a826;padding:0 .3em}
+.t8 .k{background:#0f1b5c;color:#fff;font-weight:700;border-left:.25em solid #f9a826;padding:0 .3em}
+body[data-hl="9"] .k{background:#0f1b5c;color:#fff;font-weight:700;border-radius:1em;padding:0 .5em}
+.t9 .k{background:#0f1b5c;color:#fff;font-weight:700;border-radius:1em;padding:0 .5em}
+body[data-hl="10"] .k{border:.12em solid #0f1b5c;color:#0f1b5c;font-weight:700;border-radius:.25em;padding:0 .2em}
+.t10 .k{border:.12em solid #0f1b5c;color:#0f1b5c;font-weight:700;border-radius:.25em;padding:0 .2em}
+body[data-hl="11"] .k{background:#ffd60a;color:#0f1b5c;font-weight:700;border-radius:.2em;padding:0 .25em}
+.t11 .k{background:#ffd60a;color:#0f1b5c;font-weight:700;border-radius:.2em;padding:0 .25em}
+body[data-hl="12"] .k{background:#0f1b5c;color:#fff;font-weight:700;font-variant:small-caps;letter-spacing:.04em;border-radius:.2em;padding:0 .3em}
+.t12 .k{background:#0f1b5c;color:#fff;font-weight:700;font-variant:small-caps;letter-spacing:.04em;border-radius:.2em;padding:0 .3em}
+.t4 .k{background:var(--navy);color:#fff;border-radius:4px;padding:0 4px;font-weight:700}
+body[data-hl="7"] .def .k,body[data-hl="8"] .def .k,body[data-hl="9"] .def .k,body[data-hl="12"] .def .k{background:#ffd60a;color:#0f1b5c;border-left:0}
+body[data-hl="10"] .def .k{border-color:#ffd60a;color:#ffd60a}
+.rv1{background:var(--navy);color:var(--gold);font-weight:700;padding:.4em .6em;border:.15em solid var(--gold)}
+.rv2{background:var(--navy);color:#ffe14d;font-weight:700;padding:.4em .6em;border:.15em solid #ffe14d}
+.rv3{background:#ffd60a;color:#0f1b5c;font-weight:700;padding:.4em .6em;border:.15em solid #0f1b5c}
+.rv4{background:#fff4b3;color:#0f1b5c;font-weight:700;padding:.4em .6em;border:.2em solid var(--gold)}
+.rv5{background:#fff;color:#111;font-weight:700;padding:.4em .6em;border-left:.6em solid #ffd60a}
+.lw{background:#fff;border:.12em solid var(--navy);color:var(--navy);font-weight:700;padding:.1em .5em;border-radius:.25em}
+.lwd{background:var(--navy);color:#fff;font-weight:700;padding:.1em .5em;border-radius:.25em}
+.ph{height:100%;min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:.3em}
+.ph img{width:100%;height:100%;object-fit:cover;display:block}
+body[data-hl="13"] .k{background:#0f1b5c;color:#fff;font-weight:700;border-radius:.2em;padding:0 .25em;text-decoration:underline;text-decoration-color:#f9a826;text-decoration-thickness:.18em;text-underline-offset:.2em}
+.t13 .k{background:#0f1b5c;color:#fff;font-weight:700;border-radius:4px;padding:0 4px;text-decoration:underline;text-decoration-color:#f9a826;text-decoration-thickness:.18em;text-underline-offset:.2em}
+body[data-hl="14"] .k{background:#0f1b5c;color:#fff;font-weight:700;border-radius:1em;padding:0 .5em;text-decoration:underline;text-decoration-color:#f9a826;text-decoration-thickness:.18em;text-underline-offset:.2em}
+.t14 .k{background:#0f1b5c;color:#fff;font-weight:700;border-radius:16px;padding:0 8px;text-decoration:underline;text-decoration-color:#f9a826;text-decoration-thickness:.18em;text-underline-offset:.2em}
+.t2 .k{font-weight:700;color:#0f1b5c;text-decoration:underline;text-decoration-color:#f9a826;text-decoration-thickness:.18em;text-underline-offset:.2em}
+body[data-hl="13"] .def .k,body[data-hl="14"] .def .k{background:#ffc61a;color:#0f1b5c}
+.notes{background:var(--panel);border:1px dashed var(--line);border-top:0;padding:8px 12px;font-size:.92rem;color:var(--fg)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+ <defs>
+  <radialGradient id="gb" cx="35%" cy="35%" r="70%"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#3f6fd8"/></radialGradient>
+  <radialGradient id="gr" cx="35%" cy="35%" r="70%"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#d23a3a"/></radialGradient>
+  <radialGradient id="gk" cx="35%" cy="35%" r="70%"><stop offset="0" stop-color="#bbb"/><stop offset="1" stop-color="#111"/></radialGradient>
+  <radialGradient id="gy" cx="35%" cy="35%" r="70%"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#e2b714"/></radialGradient>
+  <radialGradient id="gs" cx="35%" cy="35%" r="70%"><stop offset="0" stop-color="#f4f4f4"/><stop offset="1" stop-color="#7d7d7d"/></radialGradient>
+  <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#0f1b5c"/></marker>
+  <marker id="arR" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#c62828"/></marker>
+  <marker id="arG" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#b8780b"/></marker>
+  <!-- particle boxes -->
+  <symbol id="pEl" viewBox="0 0 120 100"><rect x="2" y="2" width="116" height="96" fill="#fff" stroke="#0f1b5c" stroke-width="3"/><g><circle cx="25" cy="25" r="11" fill="url(#gb)"/><circle cx="60" cy="22" r="11" fill="url(#gb)"/><circle cx="95" cy="28" r="11" fill="url(#gb)"/><circle cx="35" cy="62" r="11" fill="url(#gb)"/><circle cx="72" cy="58" r="11" fill="url(#gb)"/><circle cx="98" cy="75" r="11" fill="url(#gb)"/><circle cx="20" cy="82" r="11" fill="url(#gb)"/><circle cx="55" cy="85" r="11" fill="url(#gb)"/></g></symbol>
+  <symbol id="pCo" viewBox="0 0 120 100"><rect x="2" y="2" width="116" height="96" fill="#fff" stroke="#0f1b5c" stroke-width="3"/><g><circle cx="22" cy="25" r="11" fill="url(#gr)"/><circle cx="41" cy="25" r="11" fill="url(#gk)"/><circle cx="78" cy="22" r="11" fill="url(#gr)"/><circle cx="97" cy="22" r="11" fill="url(#gk)"/><circle cx="30" cy="68" r="11" fill="url(#gr)"/><circle cx="49" cy="68" r="11" fill="url(#gk)"/><circle cx="80" cy="70" r="11" fill="url(#gr)"/><circle cx="99" cy="70" r="11" fill="url(#gk)"/></g></symbol>
+  <symbol id="pMx" viewBox="0 0 120 100"><rect x="2" y="2" width="116" height="96" fill="#fff" stroke="#0f1b5c" stroke-width="3"/><g><circle cx="24" cy="24" r="11" fill="url(#gb)"/><circle cx="64" cy="22" r="11" fill="url(#gy)"/><circle cx="83" cy="22" r="11" fill="url(#gy)"/><circle cx="30" cy="66" r="11" fill="url(#gy)"/><circle cx="49" cy="66" r="11" fill="url(#gy)"/><circle cx="88" cy="62" r="11" fill="url(#gb)"/><circle cx="62" cy="86" r="11" fill="url(#gb)"/><circle cx="100" cy="86" r="11" fill="url(#gb)"/></g></symbol>
+  <!-- atom models -->
+  <symbol id="mDal" viewBox="0 0 100 100"><circle cx="50" cy="50" r="34" fill="url(#gs)" stroke="#555" stroke-width="2"/></symbol>
+  <symbol id="mTho" viewBox="0 0 100 100"><circle cx="50" cy="50" r="38" fill="#f6c3c3" stroke="#c62828" stroke-width="2"/><g fill="#1565c0"><circle cx="35" cy="32" r="5"/><circle cx="62" cy="28" r="5"/><circle cx="70" cy="55" r="5"/><circle cx="44" cy="62" r="5"/><circle cx="28" cy="52" r="5"/><circle cx="55" cy="75" r="5"/><circle cx="52" cy="46" r="5"/></g></symbol>
+  <symbol id="mRut" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="#fff" stroke="#999" stroke-width="1.5" stroke-dasharray="3 3"/><circle cx="50" cy="50" r="5" fill="#c62828"/><g fill="#1565c0"><circle cx="22" cy="40" r="3.5"/><circle cx="72" cy="25" r="3.5"/><circle cx="78" cy="66" r="3.5"/><circle cx="35" cy="78" r="3.5"/></g></symbol>
+  <symbol id="mBoh" viewBox="0 0 100 100"><circle cx="50" cy="50" r="22" fill="none" stroke="#0f1b5c" stroke-width="1.5"/><circle cx="50" cy="50" r="40" fill="none" stroke="#0f1b5c" stroke-width="1.5"/><circle cx="50" cy="50" r="6" fill="#c62828"/><g fill="#1565c0"><circle cx="72" cy="50" r="4"/><circle cx="28" cy="50" r="4"/><circle cx="50" cy="10" r="4"/><circle cx="88" cy="62" r="4"/><circle cx="15" cy="32" r="4"/></g></symbol>
+  <symbol id="mCha" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="#0f1b5c" stroke-width="1.5"/><g><circle cx="46" cy="46" r="5" fill="#c62828"/><circle cx="55" cy="47" r="5" fill="#9e9e9e"/><circle cx="48" cy="55" r="5" fill="#9e9e9e"/><circle cx="56" cy="56" r="5" fill="#c62828"/></g><g fill="#1565c0"><circle cx="90" cy="50" r="4"/><circle cx="10" cy="50" r="4"/></g></symbol>
+  <!-- distance-time graph -->
+  <symbol id="dt" viewBox="0 0 400 300">
+   <g stroke="#dfe5ef" stroke-width="1"><path d="M130 20V260M210 20V260M290 20V260M370 20V260M50 230H380M50 200H380M50 170H380M50 140H380M50 110H380M50 80H380M50 50H380"/></g>
+   <path d="M50 20V260H385" fill="none" stroke="#0f1b5c" stroke-width="3"/>
+   <g font-family="Questrial,Century Gothic,sans-serif" font-size="13" fill="#1b1b2f"><text x="46" y="276">0</text><text x="124" y="276">10</text><text x="204" y="276">20</text><text x="284" y="276">30</text><text x="364" y="276">40</text><text x="28" y="144">40</text><text x="28" y="84">60</text><text x="28" y="204">20</text><text x="215" y="296">time (s)</text><text transform="translate(16 170) rotate(-90)">distance (m)</text></g>
+   <path d="M50 260L130 140L210 140L370 80" fill="none" stroke="#0f1b5c" stroke-width="4" stroke-linejoin="round"/>
+  </symbol>
+ </defs>
+</svg>
+
+<div class="bar" role="toolbar" aria-label="Key term style">
+ <strong>Key term style on every slide:</strong>
+ <button data-h="1">1 Bold</button><button data-h="2">2 Bold + gold underline</button><button data-h="3">3 Highlighter</button><button data-h="4">4 Navy tag</button><button data-h="5">5 Coloured</button><button data-h="6">6 Gold outline</button><button data-h="7">7 Soft navy</button><button data-h="8">8 Navy + gold edge</button><button data-h="9">9 Navy pill</button><button data-h="10">10 Navy outline</button><button data-h="11">11 Gold tag</button><button data-h="12">12 Small caps</button><button data-h="13">13 Navy tag + underline</button><button data-h="14">14 Navy pill + underline</button>
+</div>
+
+<div class="wrap">
+<h1>Learn Slide Lab</h1>
+<p class="lead"><a href="#round5">Round 5</a> is first, then <a href="#round4">round 4</a>, then <a href="#round3">round 3</a> and <a href="#round2">round 2</a>. Mock-ups for the Learn, Engage and objectives slides. Every version has an ID like <b>C2</b>. Tell me the IDs you like, and what to change. The switch at the top changes how key terms look on every slide at once.</p>
+
+<h2 id="round5">Round 5</h2>
+<p class="lead">More versions of M3 with "Not quite / Actually", and the labelled-cell slides with every line landing on its part.</p>
+<h3>Misconception box, side by side</h3>
+<p>In these, the key words in the sentence above use bold with a gold underline instead of a filled tag, so they don't fight the red and green. Inside the boxes, words are plain bold.</p><div class="grid">
+<figure><div class="slide" data-sec="LEARN · MITOCHONDRIA" data-obj="Name the parts of animal and plant cells and their jobs."><div class="bd" style=""><div class="pic" style="flex:0 0 40%"><img src="@@cell@@" alt="Animal cell"></div><div class="col fill" style="justify-content:center;gap:8%"><p style="margin:0"><span style="font-weight:700;color:#0f1b5c;text-decoration:underline;text-decoration-color:#f9a826;text-decoration-thickness:.18em;text-underline-offset:.2em">Mitochondria</span> are where <span style="font-weight:700;color:#0f1b5c;text-decoration:underline;text-decoration-color:#f9a826;text-decoration-thickness:.18em;text-underline-offset:.2em">respiration</span> happens. Respiration releases energy from glucose.</p><div style="display:grid;grid-template-columns:1fr 1fr;gap:3%"><div style="background:#fff;border:.12em solid #c62828"><div style="background:#c62828;color:#fff;font-weight:700;padding:.15em .5em">✗ Not quite</div><p style="margin:0;padding:.35em .5em">Mitochondria make energy.</p></div><div style="background:#fff;border:.12em solid #2e7d32"><div style="background:#2e7d32;color:#fff;font-weight:700;padding:.15em .5em">✓ Actually</div><p style="margin:0;padding:.35em .5em">Energy can't be made. Mitochondria <b>release</b> it from glucose.</p></div></div></div></div></div><figcaption><span class="id">M4</span><b>Coloured header strips.</b> White boxes, a red "Not quite" strip and a green "Actually" strip. Calm, and the colour is only in the headers.</figcaption></figure>
+
+<figure><div class="slide" data-sec="LEARN · MITOCHONDRIA" data-obj="Name the parts of animal and plant cells and their jobs."><div class="bd" style=""><div class="pic" style="flex:0 0 40%"><img src="@@cell@@" alt="Animal cell"></div><div class="col fill" style="justify-content:center;gap:8%"><p style="margin:0"><span style="font-weight:700;color:#0f1b5c;text-decoration:underline;text-decoration-color:#f9a826;text-decoration-thickness:.18em;text-underline-offset:.2em">Mitochondria</span> are where <span style="font-weight:700;color:#0f1b5c;text-decoration:underline;text-decoration-color:#f9a826;text-decoration-thickness:.18em;text-underline-offset:.2em">respiration</span> happens. Respiration releases energy from glucose.</p><div style="display:grid;grid-template-columns:1fr 1fr;gap:3%"><div style="background:#fdecea;padding:.4em .55em"><p style="margin:0;color:#c62828;font-weight:700">✗ Not quite</p><p style="margin:.2em 0 0">Mitochondria make energy.</p></div><div style="background:#e8f5e9;padding:.4em .55em"><p style="margin:0;color:#2e7d32;font-weight:700">✓ Actually</p><p style="margin:.2em 0 0">Energy can't be made. Mitochondria <b>release</b> it from glucose.</p></div></div></div></div></div><figcaption><span class="id">M5</span><b>Soft tinted boxes.</b> Pale red and pale green fills, no borders, with the header word in colour. The lightest-looking version.</figcaption></figure>
+
+<figure><div class="slide" data-sec="LEARN · MITOCHONDRIA" data-obj="Name the parts of animal and plant cells and their jobs."><div class="bd" style=""><div class="pic" style="flex:0 0 40%"><img src="@@cell@@" alt="Animal cell"></div><div class="col fill" style="justify-content:center;gap:8%"><p style="margin:0"><span style="font-weight:700;color:#0f1b5c;text-decoration:underline;text-decoration-color:#f9a826;text-decoration-thickness:.18em;text-underline-offset:.2em">Mitochondria</span> are where <span style="font-weight:700;color:#0f1b5c;text-decoration:underline;text-decoration-color:#f9a826;text-decoration-thickness:.18em;text-underline-offset:.2em">respiration</span> happens. Respiration releases energy from glucose.</p><div style="display:grid;grid-template-columns:1fr 1fr;gap:3%"><div style="background:#fff;border:.15em solid #0f1b5c;padding:.4em .55em"><p style="margin:0;font-weight:700;color:#0f1b5c"><span style="display:inline-flex;width:1.3em;height:1.3em;border-radius:50%;background:#c62828;color:#fff;align-items:center;justify-content:center;margin-right:.35em">✗</span>Not quite</p><p style="margin:.25em 0 0">Mitochondria make energy.</p></div><div style="background:#fff;border:.15em solid #0f1b5c;padding:.4em .55em"><p style="margin:0;font-weight:700;color:#0f1b5c"><span style="display:inline-flex;width:1.3em;height:1.3em;border-radius:50%;background:#2e7d32;color:#fff;align-items:center;justify-content:center;margin-right:.35em">✓</span>Actually</p><p style="margin:.25em 0 0">Energy can't be made. Mitochondria <b>release</b> it from glucose.</p></div></div></div></div></div><figcaption><span class="id">M6</span><b>House-style boxes with coloured marks.</b> Both boxes have the usual navy border; only the round ✗ and ✓ marks carry the colour. Fits with the rest of the deck.</figcaption></figure>
+
+<figure><div class="slide" data-sec="LEARN · MITOCHONDRIA" data-obj="Name the parts of animal and plant cells and their jobs."><div class="bd" style=""><div class="pic" style="flex:0 0 40%"><img src="@@cell@@" alt="Animal cell"></div><div class="col fill" style="justify-content:center;gap:8%"><p style="margin:0"><span style="font-weight:700;color:#0f1b5c;text-decoration:underline;text-decoration-color:#f9a826;text-decoration-thickness:.18em;text-underline-offset:.2em">Mitochondria</span> are where <span style="font-weight:700;color:#0f1b5c;text-decoration:underline;text-decoration-color:#f9a826;text-decoration-thickness:.18em;text-underline-offset:.2em">respiration</span> happens. Respiration releases energy from glucose.</p><div style="display:grid;grid-template-columns:1fr auto 1fr;gap:3%;align-items:center"><div style="background:#fff;border:.12em solid #c62828;padding:.4em .55em"><p style="margin:0;color:#c62828;font-weight:700">✗ Not quite</p><p style="margin:.2em 0 0;text-decoration:line-through;text-decoration-color:#c62828">Mitochondria make energy.</p></div><span style="font-size:1.6em;color:#0f1b5c;font-weight:700">→</span><div style="background:#fff;border:.12em solid #2e7d32;padding:.4em .55em"><p style="margin:0;color:#2e7d32;font-weight:700">✓ Actually</p><p style="margin:.2em 0 0">Energy can't be made. Mitochondria <b>release</b> it from glucose.</p></div></div></div></div></div><figcaption><span class="id">M7</span><b>Wrong → right with an arrow.</b> The wrong idea crossed out on the left, an arrow, the right idea on the right. Reads like a correction you'd write on the board.</figcaption></figure>
+
+</div>
+<h3>Labels that land exactly on their part</h3><p>Every line now ends on its part: measured from the pictures' own pixels, so the membrane line stops on the membrane, not inside the cell.</p><div class="grid">
+<figure><div class="slide" data-sec="LEARN · THE ANIMAL CELL" data-obj="Name the parts of animal and plant cells and their jobs."><div class="bd" style="padding:.5% 1%"><div class="pic fill" style="background:var(--sky)"><svg viewBox="0 0 1000 470" style="width:100%;height:100%"><image href="@@cell@@" x="40" y="20" width="600" height="436"/><ellipse cx="247" cy="223" rx="95" ry="72" fill="none" stroke="#ffd60a" stroke-width="7"/><g stroke="#0f1b5c" stroke-width="3.5" fill="none"><path d="M247 223L655 150"/></g><circle cx="247" cy="223" r="7" fill="#0f1b5c"/><g stroke="#9aa3b5" stroke-width="2.5" fill="none"><path d="M495 60L490.5 170.5"/><path d="M700 330L632.4 292.7"/><path d="M470 410L454.5 347.3"/></g><g fill="#9aa3b5"><circle cx="490.5" cy="170.5" r="5"/><circle cx="632.4" cy="292.7" r="5"/><circle cx="454.5" cy="347.3" r="5"/></g><g font-family="Questrial,Century Gothic,sans-serif"><rect x="655" y="40" width="335" height="250" rx="8" fill="#0f1b5c"/><text x="675" y="85" font-size="34" font-weight="700" fill="#ffd60a">nucleus</text><text font-size="23" fill="#fff"><tspan x="675" y="128">holds the genes. Genes are</tspan><tspan x="675" y="160">the instructions for the cell,</tspan><tspan x="675" y="192">so the nucleus controls</tspan><tspan x="675" y="224">what the cell does.</tspan></text><rect x="420" y="20" width="150" height="40" rx="5" fill="#fff" stroke="#9aa3b5" stroke-width="2"/><text x="432" y="48" font-size="21" fill="#777">mitochondria</text><rect x="680" y="330" width="170" height="40" rx="5" fill="#fff" stroke="#9aa3b5" stroke-width="2"/><text x="692" y="358" font-size="21" fill="#777">cell membrane</text><rect x="420" y="410" width="130" height="40" rx="5" fill="#fff" stroke="#9aa3b5" stroke-width="2"/><text x="432" y="438" font-size="21" fill="#777">cytoplasm</text></g></svg></div></div></div><figcaption><span class="id">X2</span><b>X1 with every label connected.</b> The part you're on has a navy line to its open sentence; the greyed labels have grey lines to their parts, ready for their turn.</figcaption></figure>
+
+<figure><div class="slide" data-sec="LEARN · PHOTO AND MODEL" data-obj="Name the parts of animal and plant cells and their jobs."><div class="bd" style="padding:.5% 1%"><div class="pic fill" style="background:var(--sky)"><svg viewBox="0 0 1000 380" style="width:100%;height:100%"><image href="@@cheek@@" x="0" y="30" width="420" height="316"/><image href="@@cell@@" x="566" y="30" width="434" height="316"/><g stroke="#0f1b5c" stroke-width="3" fill="none"><path d="M430 140L108 235"/><path d="M570 140L716 177"/><path d="M410 270L48 235"/><path d="M590 262L572.3 203.6"/></g><g fill="#0f1b5c"><circle cx="108" cy="235" r="6"/><circle cx="716" cy="177" r="6"/><circle cx="48" cy="235" r="6"/><circle cx="572.3" cy="203.6" r="6"/></g><g font-family="Questrial,Century Gothic,sans-serif"><rect x="430" y="115" width="140" height="50" rx="6" fill="#fff" stroke="#0f1b5c" stroke-width="2.5"/><text x="500" y="149" text-anchor="middle" font-size="26" font-weight="700" fill="#0f1b5c">nucleus</text><rect x="410" y="245" width="180" height="50" rx="6" fill="#fff" stroke="#0f1b5c" stroke-width="2.5"/><text x="500" y="279" text-anchor="middle" font-size="24" font-weight="700" fill="#0f1b5c">cell membrane</text><text x="210" y="372" text-anchor="middle" font-size="20" fill="#333">microscope photo, ×400</text><text x="783" y="372" text-anchor="middle" font-size="20" fill="#333">model diagram</text></g></svg></div></div></div><figcaption><span class="id">D8</span><b>D7 with exact membrane points.</b> The membrane lines now end on the cell's edge in both pictures (before, the model's line stopped inside the cytoplasm).</figcaption></figure>
+
+</div>
+<h2 id="round4">Round 4</h2>
+<p class="lead">Answer boxes now use Y5 (brightest yellow on navy, the highest contrast). Rounds 3, 2 and 1 are further down.</p>
+<h3>When something is false: one consistent box</h3>
+<p>Three ways to show a misconception. Whichever you pick is used every time, so pupils learn what the box means.</p><div class="grid">
+<figure><div class="slide" data-sec="LEARN · MITOCHONDRIA" data-obj="Name the parts of animal and plant cells and their jobs."><div class="bd" style=""><div class="pic" style="flex:0 0 42%"><img src="@@cell@@" alt="Animal cell"></div><div class="col fill" style="justify-content:center;gap:7%"><p style="margin:0"><span class="k">Mitochondria</span> are where <span class="k">respiration</span> happens. Respiration releases energy from glucose.</p><div style="display:flex;flex-direction:column;border:.15em solid #0f1b5c;background:#fff"><div style="display:flex;gap:.5em;padding:.35em .5em;border-left:.5em solid #c62828;background:#fdecea"><b style="color:#c62828;min-width:5.2em">✗ Not quite</b><span style="text-decoration:line-through;text-decoration-color:#c62828">Mitochondria make energy.</span></div><div style="display:flex;gap:.5em;padding:.35em .5em;border-left:.5em solid #2e7d32;background:#e8f5e9"><b style="color:#2e7d32;min-width:5.2em">✓ Actually</b><span>Energy can't be made. Mitochondria <b>release</b> it from glucose.</span></div></div></div></div></div><figcaption><span class="id">M1</span><b>Not quite / Actually.</b> Red row crossed out, green row underneath. Reads top to bottom: wrong, then right.</figcaption></figure>
+
+<figure><div class="slide" data-sec="LEARN · MITOCHONDRIA" data-obj="Name the parts of animal and plant cells and their jobs."><div class="bd" style=""><div class="pic" style="flex:0 0 42%"><img src="@@cell@@" alt="Animal cell"></div><div class="col fill" style="justify-content:center;gap:7%"><p style="margin:0"><span class="k">Mitochondria</span> are where <span class="k">respiration</span> happens. Respiration releases energy from glucose.</p><div style="background:#fff;border:.15em solid #c62828"><div style="background:#c62828;color:#fff;font-weight:700;padding:.15em .5em;font-size:.85em;letter-spacing:.06em">COMMON MISTAKE</div><div style="padding:.35em .5em"><p style="margin:0 0 .25em">"Mitochondria make energy."</p><p style="margin:0"><b>No:</b> energy can't be made. They <b>release</b> it from glucose.</p></div></div></div></div></div><figcaption><span class="id">M2</span><b>Common mistake banner.</b> A red label pupils learn to spot. The wrong idea in quotes, then "No:" and the correction.</figcaption></figure>
+
+<figure><div class="slide" data-sec="LEARN · MITOCHONDRIA" data-obj="Name the parts of animal and plant cells and their jobs."><div class="bd" style=""><div class="pic" style="flex:0 0 42%"><img src="@@cell@@" alt="Animal cell"></div><div class="col fill" style="justify-content:center;gap:7%"><p style="margin:0"><span class="k">Mitochondria</span> are where <span class="k">respiration</span> happens. Respiration releases energy from glucose.</p><div style="display:grid;grid-template-columns:1fr 1fr;gap:3%"><div style="background:#fff;border:.15em solid #c62828;padding:.35em .5em"><p style="margin:0;color:#c62828;font-weight:700">✗ People say</p><p style="margin:.2em 0 0">Mitochondria make energy.</p></div><div style="background:#fff;border:.15em solid #2e7d32;padding:.35em .5em"><p style="margin:0;color:#2e7d32;font-weight:700">✓ Science says</p><p style="margin:.2em 0 0">They <b>release</b> energy from glucose. Energy can't be made.</p></div></div></div></div></div><figcaption><span class="id">M3</span><b>Side by side.</b> "People say" next to "Science says". Good when the wrong idea is very common.</figcaption></figure>
+
+</div>
+<h3>Exam definitions: the wording to learn</h3>
+<p>When the exam asks for a definition, the slide shows the mark scheme's own words in a fixed "Learn this wording" box, with each mark-earning part highlighted. Your plain explanation goes in the slide notes, because you say it. The notes are shown under each slide here.</p><div class="grid">
+<figure><div class="slide" data-sec="LEARN · SPECIFIC HEAT CAPACITY" data-obj="Define specific heat capacity and use ΔE = m c Δθ."><div class="bd" style=""><div class="col fill" style="gap:4%"><div style="background:#fff;border:.18em solid #0f1b5c"><div style="background:#0f1b5c;color:#ffd60a;font-weight:700;padding:.2em .6em;font-size:.85em;letter-spacing:.05em;display:flex;justify-content:space-between"><span>LEARN THIS WORDING</span><span style="color:#c9d3f2;font-weight:400">AQA: asked 7 times</span></div><p style="margin:0;padding:.5em .6em;font-size:1.25em;line-height:1.45"><b>Specific heat capacity</b> is the <span style="background:rgba(255,214,10,.65);padding:0 .15em;border-radius:.15em">energy</span> needed to raise the temperature of <span style="background:rgba(100,170,255,.45);padding:0 .15em;border-radius:.15em">1&nbsp;kg</span> of a substance by <span style="background:rgba(255,128,170,.45);padding:0 .15em;border-radius:.15em">1&nbsp;°C</span>.</p><p class="tiny" style="margin:0;padding:0 .6em .4em;color:#555">One mark for each highlighted part.</p></div><div style="display:flex;gap:3%;flex:1;min-height:0;align-items:center"><div class="fill" style="background:#fff;border:.12em solid var(--gold);padding:.4em .6em"><p style="margin:0" class="small"><b>Water:</b> 4200 J/kg °C</p><p style="margin:.2em 0 0" class="small"><b>Copper:</b> 385 J/kg °C</p></div><p class="eq" style="font-size:1.6em;flex:1;margin:0">ΔE = m c Δθ</p></div></div></div></div><div class="notes"><b>Slide notes (what you say):</b> Water needs 4200 J to warm 1 kg by 1 °C; copper needs only 385 J. So a hot water bottle full of water stores lots of energy and stays warm for hours, while a copper pan heats up fast.</div><figcaption><span class="id">K1</span><b>Exam definition as the statement.</b> The mark scheme wording, highlighted part by part in the same colours as the review-lesson mark highlights. The everyday explanation is in the notes for you to say.</figcaption></figure>
+
+<figure><div class="slide" data-sec="LEARN · DIFFUSION" data-obj="Describe diffusion."><div class="bd" style=""><div class="col fill" style="gap:4%"><div style="background:#fff;border:.18em solid #0f1b5c"><div style="background:#0f1b5c;color:#ffd60a;font-weight:700;padding:.2em .6em;font-size:.85em;letter-spacing:.05em;display:flex;justify-content:space-between"><span>LEARN THIS WORDING</span><span style="color:#c9d3f2;font-weight:400">AQA: asked 5 times</span></div><p style="margin:0;padding:.5em .6em;font-size:1.25em;line-height:1.45"><b>Diffusion</b> is the <span style="background:rgba(255,214,10,.65);padding:0 .15em;border-radius:.15em">spreading out of particles</span> from a <span style="background:rgba(100,170,255,.45);padding:0 .15em;border-radius:.15em">high concentration to a low concentration</span>.</p></div><div class="pic fill" style="background:transparent"><svg viewBox="0 0 300 120" style="width:100%;height:100%"><rect x="5" y="10" width="120" height="100" fill="#fff" stroke="#0f1b5c" stroke-width="2.5"/><rect x="175" y="10" width="120" height="100" fill="#fff" stroke="#0f1b5c" stroke-width="2.5"/><circle cx="18" cy="25" r="6" fill="url(#gr)"/><circle cx="32" cy="40" r="6" fill="url(#gr)"/><circle cx="18" cy="58" r="6" fill="url(#gr)"/><circle cx="34" cy="72" r="6" fill="url(#gr)"/><circle cx="20" cy="95" r="6" fill="url(#gr)"/><circle cx="45" cy="22" r="6" fill="url(#gr)"/><circle cx="46" cy="55" r="6" fill="url(#gr)"/><circle cx="40" cy="92" r="6" fill="url(#gr)"/><circle cx="30" cy="88" r="6" fill="url(#gr)"/><circle cx="48" cy="80" r="6" fill="url(#gr)"/><circle cx="190" cy="25" r="6" fill="url(#gr)"/><circle cx="215" cy="70" r="6" fill="url(#gr)"/><circle cx="240" cy="30" r="6" fill="url(#gr)"/><circle cx="265" cy="85" r="6" fill="url(#gr)"/><circle cx="285" cy="45" r="6" fill="url(#gr)"/><circle cx="200" cy="95" r="6" fill="url(#gr)"/><circle cx="230" cy="50" r="6" fill="url(#gr)"/><circle cx="255" cy="20" r="6" fill="url(#gr)"/><circle cx="275" cy="100" r="6" fill="url(#gr)"/><circle cx="205" cy="50" r="6" fill="url(#gr)"/><path d="M135 60H165" stroke="#0f1b5c" stroke-width="3" marker-end="url(#ar)"/><text x="40" y="8" font-size="11" font-family="Questrial,Century Gothic,sans-serif" fill="#333">start</text><text x="205" y="8" font-size="11" font-family="Questrial,Century Gothic,sans-serif" fill="#333">later</text></svg></div></div></div></div><div class="notes"><b>Slide notes (what you say):</b> Spray perfume in one corner: the particles spread out until there are about the same number everywhere. Nobody pushes them; they move randomly, and more go from crowded to empty than the other way.</div><figcaption><span class="id">K2</span><b>Diffusion the same way.</b> The exam statement is what you put on the board and explain. The particle picture is the evidence. The "perfume across a room" explanation moves to the notes.</figcaption></figure>
+
+</div>
+<h3>Where a longer sentence goes</h3>
+<p>The nucleus sentence belongs on the labelled-cell slide (D1) as the second click on that label: first the label appears, then its one-sentence explanation opens next to it while you talk about it. The other labels stay small.</p><div class="grid">
+<figure><div class="slide" data-sec="LEARN · THE ANIMAL CELL" data-obj="Name the parts of animal and plant cells and their jobs."><div class="bd" style="padding:.5% 1%"><div class="pic fill" style="background:var(--sky)"><svg viewBox="0 0 1000 470" style="width:100%;height:100%"><image href="@@cell@@" x="40" y="20" width="600" height="436"/><ellipse cx="247" cy="223" rx="95" ry="72" fill="none" stroke="#ffd60a" stroke-width="7"/><path d="M342 223L655 120" stroke="#0f1b5c" stroke-width="3"/><circle cx="247" cy="223" r="6" fill="#0f1b5c"/><g font-family="Questrial,Century Gothic,sans-serif"><rect x="655" y="40" width="335" height="250" rx="8" fill="#0f1b5c"/><text x="675" y="85" font-size="34" font-weight="700" fill="#ffd60a">nucleus</text><text font-size="23" fill="#fff"><tspan x="675" y="128">holds the genes. Genes are</tspan><tspan x="675" y="160">the instructions for the cell,</tspan><tspan x="675" y="192">so the nucleus controls</tspan><tspan x="675" y="224">what the cell does.</tspan></text><rect x="420" y="20" width="150" height="40" rx="5" fill="#fff" stroke="#9aa3b5"/><text x="432" y="48" font-size="21" fill="#777">mitochondria</text><rect x="680" y="330" width="170" height="40" rx="5" fill="#fff" stroke="#9aa3b5"/><text x="692" y="358" font-size="21" fill="#777">cell membrane</text><rect x="420" y="410" width="130" height="40" rx="5" fill="#fff" stroke="#9aa3b5"/><text x="432" y="438" font-size="21" fill="#777">cytoplasm</text></g></svg></div></div></div><figcaption><span class="id">X1</span><b>D1, one part at a time.</b> The part you are talking about is ringed and its sentence is open; the others are greyed until their turn. One slide, five clicks, no text box elsewhere.</figcaption></figure>
+
+<figure><div class="slide" data-sec="LEARN · PHOTO AND MODEL" data-obj="Name the parts of animal and plant cells and their jobs."><div class="bd" style="padding:.5% 1%"><div class="pic fill" style="background:var(--sky)"><svg viewBox="0 0 1000 380" style="width:100%;height:100%"><image href="@@cheek@@" x="0" y="30" width="420" height="316"/><image href="@@cell@@" x="566" y="30" width="434" height="316"/><g stroke="#0f1b5c" stroke-width="3" fill="none"><path d="M430 140L120 232"/><path d="M570 140L716 177"/><path d="M425 270L52 240"/><path d="M575 270L592 222"/></g><g fill="#0f1b5c"><circle cx="108" cy="235" r="6"/><circle cx="716" cy="177" r="6"/><circle cx="50" cy="240" r="6"/><circle cx="592" cy="219" r="6"/></g><g font-family="Questrial,Century Gothic,sans-serif"><rect x="430" y="115" width="140" height="50" rx="6" fill="#fff" stroke="#0f1b5c" stroke-width="2.5"/><text x="500" y="149" text-anchor="middle" font-size="26" font-weight="700" fill="#0f1b5c">nucleus</text><rect x="410" y="245" width="180" height="50" rx="6" fill="#fff" stroke="#0f1b5c" stroke-width="2.5"/><text x="500" y="279" text-anchor="middle" font-size="24" font-weight="700" fill="#0f1b5c">cell membrane</text><text x="210" y="372" text-anchor="middle" font-size="20" fill="#333">microscope photo, ×400</text><text x="783" y="372" text-anchor="middle" font-size="20" fill="#333">model diagram</text></g></svg></div></div></div><figcaption><span class="id">D7</span><b>Photo and model, labels in the middle.</b> Each label points at the part in both pictures, so there is no key. Pupils see the real thing and the model are the same parts.</figcaption></figure>
+
+</div>
+<h3>Fool's gold in the standard boxes</h3><div class="grid">
+<figure><div class="slide" data-sec="ENGAGE · FOOL'S GOLD" data-e="1" data-obj="Define atom, element and compound."><div class="bd" style=""><div class="col fill" style="gap:3%"><div class="ask" style="font-size:1.2em">Gold rush miners called this "fool's gold". How could you prove it isn't gold?</div><div style="display:flex;gap:3%;flex:1;min-height:0"><div class="pic" style="flex:0 0 44%;background:transparent"><img src="@@pyrite@@" alt="Pyrite"></div><div class="col fill" style="justify-content:center;gap:5%"><p style="margin:0" class="small"><b>Think about:</b> what it's made of, and a test you could do.</p></div></div><div style="background:#0f1b5c;color:#ffd60a;font-weight:700;padding:.4em .6em;border:.15em solid #ffd60a"><b>Weigh it:</b> gold is about 4 times heavier than the same size of pyrite. <b>Heat it:</b> pyrite gives off a choking sulfur smell; gold doesn't change.</div></div></div></div><figcaption><span class="id">N10</span><b>N9 wording, standard layout.</b> The cream question box and the navy answer box (Y5 yellow), the same as every Engage reveal.</figcaption></figure>
+
+</div>
+<h2 id="round3">Round 3</h2>
+<p class="lead">From your second round of notes. Rounds 2 and 1 are further down.</p>
+<h3>Gold underline with the navy tag</h3>
+<p>Your combination. Also on the switch at the top as 13 and 14.</p><div class="hlrow">
+<div class="hlcard t2"><div class="tagline">2 Bold + gold underline</div>An <span class="k">element</span> is made of only one type of atom. A <span class="k">compound</span> has two or more types joined together.</div>
+<div class="hlcard t13"><div class="tagline">13 Navy tag + gold underline</div>An <span class="k">element</span> is made of only one type of atom. A <span class="k">compound</span> has two or more types joined together.</div>
+<div class="hlcard t14"><div class="tagline">14 Navy pill + gold underline</div>An <span class="k">element</span> is made of only one type of atom. A <span class="k">compound</span> has two or more types joined together.</div>
+</div>
+<h3>Answer colours between the gold and the yellow</h3>
+<p>Six steps from today's gold (Y0) to the round 2 yellow (Y5), shown both ways round. Phones and projectors show colour differently, so the best test is to open this page on the classroom projector and pick the one that reads best from the back.</p><div class="grid">
+<figure><div class="slide" data-sec="ENGAGE · ANSWER COLOURS" data-e="1" data-obj="Define atom, element and compound."><div class="bd" style=""><div class="col fill" style="gap:2.5%;justify-content:center"><div style="background:#f9a826;color:#0f1b5c;font-weight:700;padding:.3em .6em;border:.12em solid #0f1b5c;display:flex;gap:.8em"><span style="min-width:2.2em">Y0</span><span>Co is one element. CO is a compound of two.</span></div><div style="background:#fbb424;color:#0f1b5c;font-weight:700;padding:.3em .6em;border:.12em solid #0f1b5c;display:flex;gap:.8em"><span style="min-width:2.2em">Y1</span><span>Co is one element. CO is a compound of two.</span></div><div style="background:#fdbf1f;color:#0f1b5c;font-weight:700;padding:.3em .6em;border:.12em solid #0f1b5c;display:flex;gap:.8em"><span style="min-width:2.2em">Y2</span><span>Co is one element. CO is a compound of two.</span></div><div style="background:#ffc61a;color:#0f1b5c;font-weight:700;padding:.3em .6em;border:.12em solid #0f1b5c;display:flex;gap:.8em"><span style="min-width:2.2em">Y3</span><span>Co is one element. CO is a compound of two.</span></div><div style="background:#ffcd12;color:#0f1b5c;font-weight:700;padding:.3em .6em;border:.12em solid #0f1b5c;display:flex;gap:.8em"><span style="min-width:2.2em">Y4</span><span>Co is one element. CO is a compound of two.</span></div><div style="background:#ffd60a;color:#0f1b5c;font-weight:700;padding:.3em .6em;border:.12em solid #0f1b5c;display:flex;gap:.8em"><span style="min-width:2.2em">Y5</span><span>Co is one element. CO is a compound of two.</span></div></div></div></div><figcaption><span class="id">A6</span><b>Navy text on the colour.</b> Y0 at the top is today's gold; each step down is a little more yellow.</figcaption></figure>
+
+<figure><div class="slide" data-sec="ENGAGE · ANSWER COLOURS" data-e="1" data-obj="Define atom, element and compound."><div class="bd" style=""><div class="col fill" style="gap:2.5%;justify-content:center"><div style="background:#0f1b5c;color:#f9a826;font-weight:700;padding:.3em .6em;border:.12em solid #f9a826;display:flex;gap:.8em"><span style="min-width:2.2em">Y0</span><span>Co is one element. CO is a compound of two.</span></div><div style="background:#0f1b5c;color:#fbb424;font-weight:700;padding:.3em .6em;border:.12em solid #fbb424;display:flex;gap:.8em"><span style="min-width:2.2em">Y1</span><span>Co is one element. CO is a compound of two.</span></div><div style="background:#0f1b5c;color:#fdbf1f;font-weight:700;padding:.3em .6em;border:.12em solid #fdbf1f;display:flex;gap:.8em"><span style="min-width:2.2em">Y2</span><span>Co is one element. CO is a compound of two.</span></div><div style="background:#0f1b5c;color:#ffc61a;font-weight:700;padding:.3em .6em;border:.12em solid #ffc61a;display:flex;gap:.8em"><span style="min-width:2.2em">Y3</span><span>Co is one element. CO is a compound of two.</span></div><div style="background:#0f1b5c;color:#ffcd12;font-weight:700;padding:.3em .6em;border:.12em solid #ffcd12;display:flex;gap:.8em"><span style="min-width:2.2em">Y4</span><span>Co is one element. CO is a compound of two.</span></div><div style="background:#0f1b5c;color:#ffd60a;font-weight:700;padding:.3em .6em;border:.12em solid #ffd60a;display:flex;gap:.8em"><span style="min-width:2.2em">Y5</span><span>Co is one element. CO is a compound of two.</span></div></div></div></div><figcaption><span class="id">A7</span><b>The colour as text on navy.</b> The same six steps the way the deck does it now.</figcaption></figure>
+
+</div>
+<h3>Objectives: O4 with O6's word tags and highlighted key terms</h3><div class="grid">
+<figure><div class="slide" data-sec="LEARNING OBJECTIVES" data-e="1" data-obj="Define atom, element and compound."><div class="bd" style=""><div class="col fill" style="gap:3%"><div style="background:var(--navy);color:#fff;padding:.5em .7em;display:flex;flex-direction:column;gap:.3em;font-size:.86em"><p class="tiny" style="margin:0;color:#c9d3f2;letter-spacing:.05em">WORDS YOU KNOW</p><p style="margin:0"><b style="color:#ffc61a">particle</b>: a tiny piece of matter, too small to see. Everything is made of particles.</p><p style="margin:0"><b style="color:#ffc61a">substance</b>: a single kind of material with the same make-up all through, like pure water.</p><p style="margin:0"><b style="color:#ffc61a">chemical reaction</b>: a change that makes a new substance. You met this in Year 8.</p></div><div style="display:flex;gap:.5em;align-items:center;flex-wrap:wrap"><span class="tiny" style="color:#555;letter-spacing:.05em">WORDS FOR THIS LESSON</span><span class="lwd">atom</span><span class="lwd">element</span><span class="lwd">compound</span><span class="lwd">mixture</span><span class="lwd">formula</span></div><div class="col fill" style="gap:7%;justify-content:center;font-size:1.08em"><div class="row"><span class="num">1</span><p style="margin:0">Define <span class="k">atom</span>, <span class="k">element</span> and <span class="k">compound</span>.</p></div><div class="row"><span class="num">2</span><p style="margin:0">Spot a <span class="k">chemical reaction</span> from a new substance forming.</p></div><div class="row"><span class="num">3</span><p style="margin:0">Use symbols and <span class="k">formulae</span> to name elements and compounds.</p></div></div></div></div></div><figcaption><span class="id">O7</span><b>O4 + O6.</b> Dark band of words you know with full definitions, this lesson's words as navy tags, and the key terms in the objectives highlighted in the style on the switch.</figcaption></figure>
+
+<figure><div class="slide" data-sec="LEARNING OBJECTIVES" data-e="1" data-obj="Define atom, element and compound."><div class="bd" style=""><div class="col fill" style="gap:3%"><div style="background:var(--navy);color:#fff;padding:.5em .7em;font-size:.86em"><p class="tiny" style="margin:0 0 .3em;color:#c9d3f2;letter-spacing:.05em">WORDS YOU KNOW</p><div style="display:grid;grid-template-columns:auto 1fr;gap:.25em .9em"><b style="color:#ffc61a">particle</b><span>a tiny piece of matter, too small to see. Everything is made of particles.</span><b style="color:#ffc61a">substance</b><span>a single kind of material with the same make-up all through, like pure water.</span><b style="color:#ffc61a">chemical reaction</b><span>a change that makes a new substance. You met this in Year 8.</span></div></div><div style="display:flex;gap:.5em;align-items:center;flex-wrap:wrap"><span class="tiny" style="color:#555;letter-spacing:.05em">WORDS FOR THIS LESSON</span><span class="lwd">atom</span><span class="lwd">element</span><span class="lwd">compound</span><span class="lwd">mixture</span><span class="lwd">formula</span></div><div class="col fill" style="gap:7%;justify-content:center;font-size:1.08em"><div class="row"><span class="num">1</span><p style="margin:0">Define <span class="k">atom</span>, <span class="k">element</span> and <span class="k">compound</span>.</p></div><div class="row"><span class="num">2</span><p style="margin:0">Spot a <span class="k">chemical reaction</span> from a new substance forming.</p></div><div class="row"><span class="num">3</span><p style="margin:0">Use symbols and <span class="k">formulae</span> to name elements and compounds.</p></div></div></div></div></div><figcaption><span class="id">O8</span><b>Same, with the known words as a table.</b> Term on the left in the answer yellow, definition on the right: easier to scan from the back.</figcaption></figure>
+
+</div>
+<h3>Wording, third try</h3>
+<div class="tw"><table class="cmp">
+<tr><th>Round 2</th><th>Round 3</th><th>Why</th></tr>
+<tr><td>"Every living thing is made of cells. Discuss: is your hair made of cells? Is a virus?"</td><td>"Every living thing is made of cells. A virus has no cells at all, yet it can make you ill. So is a virus alive?"</td><td>One real puzzle that scientists still argue about. The lesson gives pupils what they need to argue it: what cells do.</td></tr>
+<tr><td>"Your phone and the Sun both run on energy. By the end of today you'll trace where your phone's energy came from, all the way back to the Sun."</td><td>"You charge your phone from the plug. Where was that energy before it reached the plug?"</td><td>Now a question. Pupils can guess (power station, coal, wind); the lesson traces it back store by store.</td></tr>
+</table></div>
+
+<h3>A bank of Engage questions</h3>
+<p>Each one is a real puzzle the lesson answers. None has an obvious answer, and none is a trick.</p>
+<div class="tw"><table class="cmp">
+<tr><th>Lesson</th><th>Engage question</th><th>The lesson answers it with</th></tr>
+<tr><td>Pressure (Y8)</td><td>"A camel and a horse weigh about the same. On soft sand the horse sinks and the camel doesn't. How?"</td><td>Wide feet spread the force over a bigger area: less pressure.</td></tr>
+<tr><td>Distance–time graphs (Y8)</td><td>"This is a graph of someone's walk to school. For two minutes the line goes flat. What happened?"</td><td>Flat line: distance not changing, so they stopped.</td></tr>
+<tr><td>Conservation of energy (Y10)</td><td>"A dropped ball never bounces back to the height you dropped it from. Where did the missing energy go?"</td><td>Transferred to the thermal store of the ball and floor, and to sound.</td></tr>
+<tr><td>Latent heat (Y9)</td><td>"Steam at 100 °C burns far worse than water at 100 °C. They're the same temperature. Why?"</td><td>Steam gives out extra energy when it condenses on your skin.</td></tr>
+<tr><td>Microscopes (Y9)</td><td>"Robert Hooke saw tiny boxes in cork in 1665 and named them cells. Why couldn't he see anything inside them?"</td><td>His microscope's resolution was too low, and cork cells are dead and empty.</td></tr>
+<tr><td>Efficiency (Y10)</td><td>"An old bulb gets too hot to touch. An LED just as bright stays cool. Which one wastes more energy, and where does it go?"</td><td>The old bulb: most of its energy heats the surroundings.</td></tr>
+<tr><td>Non-renewables (Y10)</td><td>"Coal is made from plants that grew 300 million years ago. Is a coal power station running on sunlight?"</td><td>Yes, stored: plants stored the Sun's energy as chemical energy.</td></tr>
+<tr><td>Elements (Y9)</td><td>"Diamond and pencil lead are both pure carbon. How can one element be so hard and so soft?"</td><td>The same atoms arranged in different ways (picked up again in bonding).</td></tr>
+<tr><td>Big Bang (Y13)</td><td>"If the Universe were infinite and unchanging, every line of sight would end on a star. So why is the night sky dark?"</td><td>A finite age and expansion: light from far enough away hasn't reached us, and red-shift dims the rest.</td></tr>
+</table></div>
+
+<h3>A bank of Learn sentences</h3>
+<p>Typical generated wording next to a plainer version that says the same science. The exam definition stays where pupils need it word for word.</p>
+<div class="tw"><table class="cmp">
+<tr><th>Generated</th><th>Plainer</th></tr>
+<tr><td>"Mitochondria are the powerhouse of the cell."</td><td>"Mitochondria are where respiration happens. Respiration releases energy from glucose." (They don't make energy, which is the misconception the old phrase plants.)</td></tr>
+<tr><td>"The nucleus plays a vital role in controlling the cell."</td><td>"The nucleus holds the genes. Genes are the instructions for the cell, so the nucleus controls what the cell does."</td></tr>
+<tr><td>"Speed is a measure of how fast something is moving."</td><td>"Speed is the distance moved each second. 3 m/s means 3 metres every second."</td></tr>
+<tr><td>"Energy is transferred between different stores in a system."</td><td>"Energy moves from one store to another. Lift a bag and energy moves from your muscles' chemical store to the bag's gravitational store."</td></tr>
+<tr><td>"Specific heat capacity is crucial in many real-world applications."</td><td>"Specific heat capacity is the energy needed to warm 1 kg of a material by 1 °C. Water needs 4200 J, which is why a hot water bottle stays warm for hours."</td></tr>
+<tr><td>"Resistance opposes the flow of current in a circuit."</td><td>"Resistance is how hard it is for current to get through a component. More resistance means less current for the same potential difference."</td></tr>
+<tr><td>"Diffusion is a fascinating process by which particles move."</td><td>"Diffusion: particles spread from where there are lots of them to where there are fewer. Exam wording: the net movement of particles from a higher to a lower concentration."</td></tr>
+<tr><td>"Dark matter remains one of the greatest mysteries in cosmology."</td><td>"Stars at the edge of galaxies orbit too fast for the mass we can see. Something we can't see must add extra mass. We call it dark matter."</td></tr>
+</table></div>
+<h3>Fixed slides</h3><div class="grid">
+<figure><div class="slide" data-sec="ENGAGE · FOOL'S GOLD" data-e="1" data-obj="Define atom, element and compound."><div class="bd" style=""><div class="pic" style="flex:0 0 44%;background:transparent"><img src="@@pyrite@@" alt="Pyrite"></div><div class="col fill" style="gap:4%;justify-content:center"><div class="ask" style="font-size:1.25em">Gold rush miners called this "fool's gold". How could you prove it isn't gold?</div><div style="background:#ffc61a;color:#0f1b5c;font-weight:700;padding:.4em .6em;border:.15em solid #0f1b5c;display:flex;flex-direction:column;gap:.3em"><span><b>Weigh it.</b> A piece of gold is about 4 times heavier than the same size of pyrite.</span><span><b>Heat it.</b> Pyrite gives off a choking sulfur smell and changes. Gold doesn't change.</span></div><p class="small" style="margin:0">Why: pyrite is a compound of iron and sulfur (FeS<sub>2</sub>). Gold is an element (Au).</p></div></div></div><figcaption><span class="id">N9</span><b>N8 that answers how.</b> The reveal gives two tests pupils could actually do, not just what it is.</figcaption></figure>
+
+<figure><div class="slide" data-sec="LEARN · PHOTO AND MODEL" data-obj="Name the parts of animal and plant cells and their jobs."><div class="bd" style=""><div class="col fill"><div class="pic fill"><img src="@@cheek@@" alt="Cheek cells"><svg class="ov" viewBox="0 0 483 363" preserveAspectRatio="xMidYMid meet"><circle cx="124" cy="236" r="16" fill="none" stroke="#c62828" stroke-width="4"/><path d="M82 150Q70 200 58 238" fill="none" stroke="#1565c0" stroke-width="4" stroke-dasharray="8 5"/></svg></div><p class="small cen" style="margin:0">Microscope photo (cheek cells, ×400)</p></div><div class="col fill"><div class="pic fill"><img src="@@cell@@" alt="Model cell"><svg class="ov" viewBox="0 0 550 400" preserveAspectRatio="xMidYMid meet"><ellipse cx="190" cy="186" rx="85" ry="65" fill="none" stroke="#c62828" stroke-width="6"/><path d="M60 80Q20 170 30 240" fill="none" stroke="#1565c0" stroke-width="6" stroke-dasharray="12 8"/></svg></div><p class="small cen" style="margin:0">Model diagram</p></div><div class="col" style="flex:0 0 24%;justify-content:center;gap:6%"><p style="margin:0"><span style="color:var(--red);font-weight:700">●</span> <span class="k">nucleus</span></p><p style="margin:0"><span style="color:var(--blue);font-weight:700">- -</span> <span class="k">cell membrane</span></p></div></div></div><figcaption><span class="id">D6</span><b>D5 without the biological drawing.</b> The microscope photo next to the school's model diagram, each part ringed in the same colour on both.</figcaption></figure>
+
+</div>
+<h2 id="round2">Round 2: your feedback</h2>
+<p class="lead">New versions from your notes. Round 1 is further down for reference.</p>
+
+<h3>Navy tag styles</h3>
+<p>Six takes on the navy tag (you liked style 4). They are also on the switch at the top, numbered 7 to 12, so you can see them on every slide. The cap of 3 per slide is a guide, not a hard rule.</p>
+<div class="hlrow">
+<div class="hlcard t4"><div class="tagline">4 Navy tag (round 1)</div>An <span class="k">element</span> is made of only one type of atom. A <span class="k">compound</span> has two or more types joined together.</div>
+<div class="hlcard t7"><div class="tagline">7 Soft navy</div>An <span class="k">element</span> is made of only one type of atom. A <span class="k">compound</span> has two or more types joined together.</div>
+<div class="hlcard t8"><div class="tagline">8 Navy with gold edge</div>An <span class="k">element</span> is made of only one type of atom. A <span class="k">compound</span> has two or more types joined together.</div>
+<div class="hlcard t9"><div class="tagline">9 Navy pill</div>An <span class="k">element</span> is made of only one type of atom. A <span class="k">compound</span> has two or more types joined together.</div>
+<div class="hlcard t10"><div class="tagline">10 Navy outline</div>An <span class="k">element</span> is made of only one type of atom. A <span class="k">compound</span> has two or more types joined together.</div>
+<div class="hlcard t11"><div class="tagline">11 Gold tag</div>An <span class="k">element</span> is made of only one type of atom. A <span class="k">compound</span> has two or more types joined together.</div>
+<div class="hlcard t12"><div class="tagline">12 Navy tag, small capitals</div>An <span class="k">element</span> is made of only one type of atom. A <span class="k">compound</span> has two or more types joined together.</div>
+</div>
+<h3>Answer and reveal boxes for the projector</h3>
+<p>Projectors wash out dark backgrounds, so gold text on navy loses contrast unless the lights are off. Dark text on a strong yellow survives best. The same answer in five colourings:</p>
+<div class="grid">
+<figure><div class="slide" data-sec="ENGAGE · ONE LETTER" data-e="1" data-obj="Define atom, element and compound."><div class="bd" style=""><div class="col fill" style="gap:4%"><div class="ask">CO is a gas that can kill you. Co is a metal in magnets. The only difference is the capital letter. What does it tell you?</div><div class="fill"></div><div class="rv1">Co is one element, cobalt. CO is a compound: one carbon atom joined to one oxygen atom. A new capital letter means a new element.</div></div></div></div><figcaption><span class="id">A1</span><b>Now.</b> Gold text on navy.</figcaption></figure>
+
+<figure><div class="slide" data-sec="ENGAGE · ONE LETTER" data-e="1" data-obj="Define atom, element and compound."><div class="bd" style=""><div class="col fill" style="gap:4%"><div class="ask">CO is a gas that can kill you. Co is a metal in magnets. The only difference is the capital letter. What does it tell you?</div><div class="fill"></div><div class="rv2">Co is one element, cobalt. CO is a compound: one carbon atom joined to one oxygen atom. A new capital letter means a new element.</div></div></div></div><figcaption><span class="id">A2</span><b>Brighter yellow text on navy.</b> Better than now, still dark.</figcaption></figure>
+
+<figure><div class="slide" data-sec="ENGAGE · ONE LETTER" data-e="1" data-obj="Define atom, element and compound."><div class="bd" style=""><div class="col fill" style="gap:4%"><div class="ask">CO is a gas that can kill you. Co is a metal in magnets. The only difference is the capital letter. What does it tell you?</div><div class="fill"></div><div class="rv3">Co is one element, cobalt. CO is a compound: one carbon atom joined to one oxygen atom. A new capital letter means a new element.</div></div></div></div><figcaption><span class="id">A3</span><b>Navy text on strong yellow.</b> My pick for a bright room: highest contrast after washout.</figcaption></figure>
+
+<figure><div class="slide" data-sec="ENGAGE · ONE LETTER" data-e="1" data-obj="Define atom, element and compound."><div class="bd" style=""><div class="col fill" style="gap:4%"><div class="ask">CO is a gas that can kill you. Co is a metal in magnets. The only difference is the capital letter. What does it tell you?</div><div class="fill"></div><div class="rv4">Co is one element, cobalt. CO is a compound: one carbon atom joined to one oxygen atom. A new capital letter means a new element.</div></div></div></div><figcaption><span class="id">A4</span><b>Navy text on pale yellow, gold border.</b> Softer, still readable.</figcaption></figure>
+
+<figure><div class="slide" data-sec="ENGAGE · ONE LETTER" data-e="1" data-obj="Define atom, element and compound."><div class="bd" style=""><div class="col fill" style="gap:4%"><div class="ask">CO is a gas that can kill you. Co is a metal in magnets. The only difference is the capital letter. What does it tell you?</div><div class="fill"></div><div class="rv5">Co is one element, cobalt. CO is a compound: one carbon atom joined to one oxygen atom. A new capital letter means a new element.</div></div></div></div><figcaption><span class="id">A5</span><b>Black on white with a thick yellow bar.</b> Plainest; the yellow only marks it as the answer.</figcaption></figure>
+
+</div>
+<h3>Objectives with key words</h3>
+<p>Two groups only. <b>Words you know</b> have a full definition, and only appear if an earlier lesson in the scheme taught them. <b>Words for this lesson</b> have no definition: the lesson teaches them. Dark colours as you suggested.</p>
+<div class="grid">
+<figure><div class="slide" data-sec="LEARNING OBJECTIVES" data-e="1" data-obj="Define atom, element and compound."><div class="bd" style=""><div class="col fill" style="gap:3%"><div style="background:var(--navy);color:#fff;padding:.5em .7em;display:flex;flex-direction:column;gap:.3em;font-size:.86em"><p class="tiny" style="margin:0;color:#c9d3f2;letter-spacing:.05em">WORDS YOU KNOW</p><p style="margin:0"><b style="color:var(--gold)">particle</b>: a tiny piece of matter, too small to see. Everything is made of them.</p><p style="margin:0"><b style="color:var(--gold)">substance</b>: a single kind of material with the same make-up all through, like pure water.</p><p style="margin:0"><b style="color:var(--gold)">chemical reaction</b>: a change that makes a new substance. You learnt this in Year 8.</p></div><div style="display:flex;gap:.5em;align-items:center;flex-wrap:wrap"><span class="tiny" style="color:#555;letter-spacing:.05em">WORDS FOR THIS LESSON</span><span class="lw">atom</span><span class="lw">element</span><span class="lw">compound</span><span class="lw">mixture</span><span class="lw">formula</span></div><div class="col fill" style="gap:6%;justify-content:center"><div class="row" style="color:var(--ink)"><span class="num">1</span><p style="margin:0">Define <b>atom</b>, <b>element</b> and <b>compound</b>.</p></div><div class="row" style="color:var(--ink)"><span class="num">2</span><p style="margin:0">Spot a chemical reaction from a new substance forming.</p></div><div class="row" style="color:var(--ink)"><span class="num">3</span><p style="margin:0">Use symbols and formulae to name elements and compounds.</p></div></div></div></div></div><figcaption><span class="id">O4</span><b>Dark band on top.</b> Words you know, with full definitions, in a navy band. This lesson's words in a row underneath. Objectives below.</figcaption></figure>
+
+<figure><div class="slide" data-sec="LEARNING OBJECTIVES" data-e="1" data-obj="Define atom, element and compound."><div class="bd" style=""><div class="col fill" style="background:var(--navy);margin:-1.1% -3.3%;padding:2% 3.3%;gap:4%"><div style="background:#22307a;padding:.5em .7em;display:grid;grid-template-columns:2fr 1fr;gap:1em;font-size:.84em;color:#fff"><div style="display:flex;flex-direction:column;gap:.3em"><p class="tiny" style="margin:0;color:#c9d3f2">WORDS YOU KNOW</p><p style="margin:0"><b style="color:var(--gold)">particle</b>: a tiny piece of matter, too small to see. Everything is made of them.</p><p style="margin:0"><b style="color:var(--gold)">substance</b>: a single kind of material with the same make-up all through, like pure water.</p><p style="margin:0"><b style="color:var(--gold)">chemical reaction</b>: a change that makes a new substance. You learnt this in Year 8.</p></div><div style="border-left:.12em solid var(--gold);padding-left:.8em;display:flex;flex-direction:column;gap:.3em"><p class="tiny" style="margin:0;color:#c9d3f2">WORDS FOR THIS LESSON</p><p style="margin:0;font-weight:700">atom</p><p style="margin:0;font-weight:700">element</p><p style="margin:0;font-weight:700">compound</p><p style="margin:0;font-weight:700">mixture</p><p style="margin:0;font-weight:700">formula</p></div></div><div class="col fill" style="gap:6%;justify-content:center"><div class="row" style="color:#fff"><span class="num">1</span><p style="margin:0">Define <b>atom</b>, <b>element</b> and <b>compound</b>.</p></div><div class="row" style="color:#fff"><span class="num">2</span><p style="margin:0">Spot a chemical reaction from a new substance forming.</p></div><div class="row" style="color:#fff"><span class="num">3</span><p style="margin:0">Use symbols and formulae to name elements and compounds.</p></div></div></div></div></div><figcaption><span class="id">O5</span><b>Whole slide dark.</b> Objectives in white on navy, key words in a lighter card at the top. Strong on a projector because the text is big and white.</figcaption></figure>
+
+<figure><div class="slide" data-sec="LEARNING OBJECTIVES" data-e="1" data-obj="Define atom, element and compound."><div class="bd" style=""><div class="col fill" style="gap:3%"><div class="box"><h4 style="font-size:.9em">Words you know</h4><div class="in" style="display:grid;grid-template-columns:auto 1fr;gap:.25em .8em;font-size:.84em"><b style="color:var(--navy)">particle</b><span>a tiny piece of matter, too small to see. Everything is made of them.</span><b style="color:var(--navy)">substance</b><span>a single kind of material with the same make-up all through, like pure water.</span><b style="color:var(--navy)">chemical reaction</b><span>a change that makes a new substance. You learnt this in Year 8.</span></div></div><div style="display:flex;gap:.5em;align-items:center;flex-wrap:wrap"><span class="tiny" style="color:#555">WORDS FOR THIS LESSON</span><span class="lwd">atom</span><span class="lwd">element</span><span class="lwd">compound</span><span class="lwd">mixture</span><span class="lwd">formula</span></div><div class="col fill" style="gap:6%;justify-content:center"><div class="row" style="color:var(--ink)"><span class="num">1</span><p style="margin:0">Define <b>atom</b>, <b>element</b> and <b>compound</b>.</p></div><div class="row" style="color:var(--ink)"><span class="num">2</span><p style="margin:0">Spot a chemical reaction from a new substance forming.</p></div><div class="row" style="color:var(--ink)"><span class="num">3</span><p style="margin:0">Use symbols and formulae to name elements and compounds.</p></div></div></div></div></div><figcaption><span class="id">O6</span><b>Definition table.</b> Words you know as a two-column table, like the definition boxes on Learn slides. This lesson's words as navy tags.</figcaption></figure>
+
+</div>
+<h3>Wording, second try</h3>
+<p>Same meaning as the original, one clear question, and where possible a problem the lesson solves at the end.</p>
+<div class="tw"><table class="cmp">
+<tr><th>Original</th><th>Round 2</th><th>What changed</th></tr>
+<tr><td>"CO is a poisonous gas. Co is a metal used in magnets. How can one small letter change everything?"</td><td>"CO is a gas that can kill you. Co is a metal in magnets. The only difference is the capital letter. What does it tell you?"</td><td>Same facts, same contrast. The question is now one you can answer by the end: a new capital means a new element.</td></tr>
+<tr><td>"Energy is all around us, powering everything from our phones to the stars."</td><td>"Your phone and the Sun both run on energy. By the end of today you'll trace where your phone's energy came from, all the way back to the Sun."</td><td>Keeps the phones-to-stars idea. Turns it into the problem the lesson solves.</td></tr>
+<tr><td>"Let's dive into the fascinating world of cells!"</td><td>"Every living thing is made of cells. Discuss: is your hair made of cells? Is a virus?"</td><td>Adds something to argue about. Both answers come up later in the topic.</td></tr>
+<tr><td>"A substance made of only ONE type of atom. It cannot be broken down into anything simpler by a chemical reaction."</td><td>"An <b>element</b> has only one type of atom, so no reaction can split it into anything simpler. The word comes from the Latin <i>elementum</i>, a basic part. In 1803 Dalton said each element has its own kind of atom."</td><td>Breaks the word down and adds where the idea came from. The history goes in the slide notes if the slide is full.</td></tr>
+<tr><td>"Today: four big ideas from P1 Energy, then you show what you know."</td><td>"Four things from P1 you need for the exam. Then a practice question on each."</td><td>Kept (you liked it).</td></tr>
+</table></div>
+<h3>Fixed and new Learn slides</h3><div class="grid">
+<figure><div class="slide" data-sec="LEARN · THE PLANT CELL" data-obj="Name the parts of animal and plant cells and their jobs."><div class="bd" style="padding:.5% 1%"><div class="pic fill" style="background:var(--sky)"><svg viewBox="0 0 1000 470" style="width:100%;height:100%"><image href="@@pcell@@" x="225" y="95" width="550" height="280"/><g stroke="#0f1b5c" stroke-width="3" fill="none"><path d="M280 313L190 380"/><path d="M500 235L500 400"/><path d="M425 140L330 60"/><path d="M640 120L700 60"/><path d="M748 200L800 230"/><path d="M760 300L800 340"/></g><g fill="#0f1b5c"><circle cx="280" cy="313" r="6"/><circle cx="500" cy="235" r="6"/><circle cx="425" cy="140" r="6"/><circle cx="640" cy="120" r="6"/><circle cx="748" cy="200" r="6"/><circle cx="760" cy="300" r="6"/></g><g font-family="Questrial,Century Gothic,sans-serif"><rect x="10" y="370" width="199" height="68" rx="6" fill="#fff" stroke="#0f1b5c" stroke-width="2.5"/><text x="21" y="398" font-size="26" font-weight="700" fill="#0f1b5c">nucleus</text><text x="21" y="426" font-size="20" fill="#333">controls the cell</text><rect x="380" y="400" width="261" height="68" rx="6" fill="#fff" stroke="#0f1b5c" stroke-width="2.5"/><text x="391" y="428" font-size="26" font-weight="700" fill="#0f1b5c">vacuole</text><text x="391" y="456" font-size="20" fill="#333">sap keeps the cell firm</text><rect x="100" y="5" width="303" height="68" rx="6" fill="#fff" stroke="#0f1b5c" stroke-width="2.5"/><text x="111" y="33" font-size="26" font-weight="700" fill="#0f1b5c">chloroplast</text><text x="111" y="61" font-size="20" fill="#333">photosynthesis happens here</text><rect x="640" y="5" width="261" height="68" rx="6" fill="#fff" stroke="#0f1b5c" stroke-width="2.5"/><text x="651" y="33" font-size="26" font-weight="700" fill="#0f1b5c">cell wall</text><text x="651" y="61" font-size="20" fill="#333">strong, keeps the shape</text><rect x="795" y="180" width="240" height="68" rx="6" fill="#fff" stroke="#0f1b5c" stroke-width="2.5"/><text x="806" y="208" font-size="26" font-weight="700" fill="#0f1b5c">cell membrane</text><text x="806" y="236" font-size="20" fill="#333">controls what gets in</text><rect x="800" y="330" width="219" height="66" rx="6" fill="#fff" stroke="#0f1b5c" stroke-width="2.5"/><text x="811" y="358" font-size="26" font-weight="700" fill="#0f1b5c">cytoplasm</text><text x="811" y="384" font-size="18" fill="#333">reactions happen here</text></g></svg></div></div></div><figcaption><span class="id">D4</span><b>D0 redone.</b> The school's plain plant cell with my labels spread round all four sides, big enough for the back row. Each label has its job in a few words.</figcaption></figure>
+
+<figure><div class="slide" data-sec="LEARN · SAME FORCE, DIFFERENT AREA" data-obj="Calculate pressure using P = F ÷ A."><div class="bd" style=""><div class="col fill" style="gap:2%"><p class="eq" style="font-size:1.6em;margin:0"><span class="cP">P</span> = <span class="cF">F</span> ÷ <span class="cA">A</span></p><div style="display:flex;gap:3%;flex:1;min-height:0"><div class="col fill"><div class="pic fill"><svg viewBox="0 0 1200 1200" style="height:100%;width:auto"><image href="@@stiletto@@" x="0" y="0" width="1200" height="1200"/><circle cx="872" cy="1050" r="48" fill="none" stroke="#1565c0" stroke-width="14"/></svg></div><p class="cen" style="margin:0"><b>Heel tip: <span class="cA">1 cm²</span></b><br><span class="cF">600 N</span> ÷ <span class="cA">0.0001 m²</span> = <b>6 000 000 Pa</b></p></div><div class="col fill"><div class="pic fill"><svg viewBox="0 0 371 535" style="height:100%;width:auto"><image href="@@welly@@" x="0" y="0" width="371" height="535"/><path d="M30 505H352" stroke="#1565c0" stroke-width="16" stroke-linecap="round" opacity=".8"/></svg></div><p class="cen" style="margin:0"><b>Welly sole: <span class="cA">200 cm²</span></b><br><span class="cF">600 N</span> ÷ <span class="cA">0.02 m²</span> = <b>30 000 Pa</b></p></div></div><div class="rv3">Same person, same force. The heel touches 200 times less area, so it presses 200 times harder.</div></div></div></div><figcaption><span class="id">E3</span><b>E2 with the school's photos.</b> The stiletto and wellington from the school's pressure lesson, with the part touching the ground marked in blue (the same blue as A in the equation).</figcaption></figure>
+
+<figure><div class="slide" data-sec="LEARN · ELEMENTS" data-obj="Define atom, element and compound."><div class="bd" style=""><div class="col fill" style="gap:3%"><div style="background:#fff;border-left:.4em solid var(--gold);padding:.4em .7em;font-size:1.05em"><b style="color:var(--navy)">Element</b>&nbsp; a substance made of only one type of atom. <span class="small" style="color:#555">Latin <i>elementum</i>: a basic part.</span></div><div style="display:flex;gap:2%;flex:1;min-height:0"><div class="pic" style="flex:0 0 46%"><svg viewBox="0 0 120 100" style="height:94%"><use href="#pEl"/></svg></div><div class="col fill" style="justify-content:center;gap:6%"><p style="margin:0">Every ball in this box is the same, so it is one <span class="k">element</span>.</p><p class="small" style="margin:0">Iron, oxygen and helium are all elements. So is O<sub>2</sub>: two atoms, but the same type.</p></div></div></div></div></div><figcaption><span class="id">F4</span><b>F1 with the definition on top.</b> White card, navy term, gold edge: no navy block. The picture and the example sit underneath it.</figcaption></figure>
+
+<figure><div class="slide" data-sec="LEARN · PHOTO, MODEL, DRAWING" data-obj="Name the parts of animal and plant cells and their jobs."><div class="bd" style=""><div class="col fill"><div class="pic fill"><img src="@@cheek@@" alt="Cheek cells"><svg class="ov" viewBox="0 0 483 363" preserveAspectRatio="xMidYMid meet"><circle cx="124" cy="236" r="16" fill="none" stroke="#c62828" stroke-width="4"/></svg></div><p class="small cen" style="margin:0">Microscope photo</p></div><div class="col fill"><div class="pic fill"><img src="@@cell@@" alt="Model cell"><svg class="ov" viewBox="0 0 550 400" preserveAspectRatio="xMidYMid meet"><ellipse cx="190" cy="186" rx="85" ry="65" fill="none" stroke="#c62828" stroke-width="6"/></svg></div><p class="small cen" style="margin:0">Model diagram</p></div><div class="col fill"><div class="pic fill"><svg viewBox="0 0 250 150" style="width:96%"><path d="M30 60C40 25 120 15 160 40C190 60 185 110 150 125C110 140 45 130 30 100C24 86 26 72 30 60Z" fill="none" stroke="#333" stroke-width="1.6"/><ellipse cx="80" cy="78" rx="18" ry="13" fill="none" stroke="#333" stroke-width="1.6"/><path d="M98 78H178" stroke="#333" stroke-width="1"/><text x="180" y="82" font-size="11" font-family="Questrial,Century Gothic,sans-serif" fill="#333">nucleus</text><path d="M152 118L178 132" stroke="#333" stroke-width="1"/><text x="140" y="146" font-size="11" font-family="Questrial,Century Gothic,sans-serif" fill="#333">cell membrane</text></svg></div><p class="small cen" style="margin:0">Biological drawing</p></div></div></div><figcaption><span class="id">D5</span><b>D2 relabelled.</b> "Model diagram", not "what we draw". A proper biological drawing is a single pencil line with no shading, so I show that as a third panel.</figcaption></figure>
+
+</div>
+<h3>Engage, fixed</h3><div class="grid">
+<figure><div class="slide" data-sec="ENGAGE · THE MAGNET TRICK" data-e="1" data-obj="Define atom, element and compound."><div class="bd" style=""><div class="col fill" style="gap:3%"><div class="ask" style="font-size:1.25em">A magnet pulls the iron out of this mixture. After heating, it can't. Where did the iron go?</div><div style="display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:2%;align-items:center;flex:1;min-height:0"><div class="ph"><img src="@@iron@@" alt="Iron filings"></div><p class="big" style="margin:0">+</p><div class="ph"><img src="@@sulfur@@" alt="Sulfur"></div><p class="big" style="margin:0">→ heat →</p><div class="ph" style="background:#2b2b2b;color:#fff;display:flex;align-items:center;justify-content:center"><span class="big">?</span></div></div><div style="display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:2%"><p class="cen" style="margin:0"><b>iron</b><br><span class="small">magnetic</span></p><span></span><p class="cen" style="margin:0"><b>sulfur</b><br><span class="small">yellow powder</span></p><span></span><p class="cen" style="margin:0"><b>?</b><br><span class="small">not magnetic</span></p></div></div></div></div><figcaption><span class="id">N5</span><b>N1 fixed.</b> The photos sit in the same-sized frames with no white boxes, and the question is at the top in large text.</figcaption></figure>
+
+<figure><div class="slide" data-sec="ENGAGE · PREDICT" data-e="1" data-obj="Calculate pressure using P = F ÷ A."><div class="bd" style=""><div class="col fill" style="gap:5%;justify-content:center"><div class="ask" style="font-size:1.35em">Someone stands on your hand. Which hurts more?</div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:3%"><div class="box"><h4 class="cen" style="font-size:1.4em">A</h4><div class="in cen" style="font-size:1.2em"><p>a stiletto heel</p></div></div><div class="box"><h4 class="cen" style="font-size:1.4em">B</h4><div class="in cen" style="font-size:1.2em"><p>a wellington boot</p></div></div><div class="box"><h4 class="cen" style="font-size:1.4em">C</h4><div class="in cen" style="font-size:1.2em"><p>the same: same person</p></div></div></div></div></div></div><figcaption><span class="id">N6</span><b>N2 with no drawing.</b> Just the question and the three choices, large. Hands up or A/B/C cards.</figcaption></figure>
+
+<figure><div class="slide" data-sec="ENGAGE · ODD ONE OUT" data-e="1" data-obj="Define atom, element and compound."><div class="bd" style=""><div class="col fill" style="gap:3%"><div class="ask" style="font-size:1.2em">Which is the odd one out? Every box is odd in some way. Find a reason for each.</div><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:2%;flex:1;min-height:0"><div class="col" style="gap:3%"><svg viewBox="0 0 120 100" style="flex:1;min-height:0"><rect x="2" y="2" width="116" height="96" fill="#fff" stroke="#0f1b5c" stroke-width="3"/><g><circle cx="25" cy="28" r="11" fill="url(#gy)"/><circle cx="62" cy="24" r="11" fill="url(#gy)"/><circle cx="95" cy="32" r="11" fill="url(#gy)"/><circle cx="40" cy="70" r="11" fill="url(#gy)"/><circle cx="82" cy="74" r="11" fill="url(#gy)"/></g></svg><p class="cen" style="margin:0"><b>A</b></p></div><div class="col" style="gap:3%"><svg viewBox="0 0 120 100" style="flex:1;min-height:0"><rect x="2" y="2" width="116" height="96" fill="#fff" stroke="#0f1b5c" stroke-width="3"/><g><circle cx="30" cy="30" r="11" fill="url(#gr)"/><circle cx="49" cy="30" r="11" fill="url(#gr)"/><circle cx="76" cy="62" r="11" fill="url(#gr)"/><circle cx="95" cy="62" r="11" fill="url(#gr)"/><circle cx="34" cy="76" r="11" fill="url(#gr)"/><circle cx="53" cy="76" r="11" fill="url(#gr)"/></g></svg><p class="cen" style="margin:0"><b>B</b></p></div><div class="col" style="gap:3%"><svg viewBox="0 0 120 100" style="flex:1;min-height:0"><rect x="2" y="2" width="116" height="96" fill="#fff" stroke="#0f1b5c" stroke-width="3"/><g><circle cx="22" cy="28" r="9" fill="url(#gb)"/><circle cx="40" cy="22" r="13" fill="url(#gr)"/><circle cx="58" cy="28" r="9" fill="url(#gb)"/><circle cx="62" cy="72" r="9" fill="url(#gb)"/><circle cx="80" cy="66" r="13" fill="url(#gr)"/><circle cx="98" cy="72" r="9" fill="url(#gb)"/></g></svg><p class="cen" style="margin:0"><b>C</b></p></div><div class="col" style="gap:3%"><svg viewBox="0 0 120 100" style="flex:1;min-height:0"><rect x="2" y="2" width="116" height="96" fill="#fff" stroke="#0f1b5c" stroke-width="3"/><g><circle cx="22" cy="26" r="11" fill="url(#gb)"/><circle cx="41" cy="26" r="11" fill="url(#gb)"/><circle cx="80" cy="24" r="11" fill="url(#gr)"/><circle cx="99" cy="24" r="11" fill="url(#gr)"/><circle cx="36" cy="72" r="11" fill="url(#gb)"/><circle cx="55" cy="72" r="11" fill="url(#gb)"/><circle cx="90" cy="76" r="11" fill="url(#gb)"/></g></svg><p class="cen" style="margin:0"><b>D</b></p></div></div></div></div></div><figcaption><span class="id">N7</span><b>N3 where every box is odd.</b> A is the only one with single atoms, B the only element in pairs, C the only compound, D the only mixture. Any answer works if the reason is right, which is the discussion. Answers (with names) go in the notes.</figcaption></figure>
+
+<figure><div class="slide" data-sec="ENGAGE · FOOL'S GOLD" data-e="1" data-obj="Define atom, element and compound."><div class="bd" style=""><div class="pic" style="flex:0 0 46%;background:transparent"><img src="@@pyrite@@" alt="Pyrite"></div><div class="col fill" style="gap:5%;justify-content:center"><div class="ask" style="font-size:1.3em">Gold rush miners called this "fool's gold". How could you prove it isn't gold?</div><p style="margin:0"><b>Think about:</b> what it is made of, and how you could test that.</p><div class="rv3">It's iron and sulfur joined: FeS<sub>2</sub>, a compound. Gold is an element, Au.</div></div></div></div><figcaption><span class="id">N8</span><b>N4 reformatted.</b> Big photo, big question, and the reveal box in the new projector yellow.</figcaption></figure>
+
+</div>
+<h3>Better story diagrams</h3><div class="grid">
+<figure><div class="slide" data-sec="LEARN · THE GOLD FOIL EXPERIMENT" data-obj="Describe how the model of the atom developed."><div class="bd" style=""><div class="col fill" style="gap:2%"><div class="pic fill" style="background:#fff"><svg viewBox="0 0 520 260" style="width:100%;height:100%"><g transform="translate(0 20)"><rect x="10" y="80" width="40" height="44" fill="#555"/><circle cx="40" cy="102" r="6" fill="#c62828"/><text x="4" y="142" font-size="12" font-family="Questrial,Century Gothic,sans-serif" fill="#333">alpha source</text><path d="M50 102H140" stroke="#c62828" stroke-width="3" marker-end="url(#arR)"/><path d="M150 40V170" stroke="#e2b714" stroke-width="6"/><text x="128" y="188" font-size="12" font-family="Questrial,Century Gothic,sans-serif" fill="#8a6d00">gold foil</text><rect x="150" y="70" width="14" height="64" fill="none" stroke="#0f1b5c" stroke-width="2" stroke-dasharray="4 3"/><path d="M164 70L250 10M164 134L250 230" stroke="#0f1b5c" stroke-width="1.5" stroke-dasharray="4 3"/></g><g transform="translate(250 10)"><rect x="0" y="0" width="260" height="240" rx="8" fill="#fff" stroke="#0f1b5c" stroke-width="2"/><circle cx="120" cy="40" r="34" fill="#fff8d6" stroke="#c9a400" stroke-width="2"/><circle cx="120" cy="40" r="4" fill="#c62828"/><circle cx="120" cy="110" r="34" fill="#fff8d6" stroke="#c9a400" stroke-width="2"/><circle cx="120" cy="110" r="4" fill="#c62828"/><circle cx="120" cy="180" r="34" fill="#fff8d6" stroke="#c9a400" stroke-width="2"/><circle cx="120" cy="180" r="4" fill="#c62828"/><circle cx="190" cy="75" r="34" fill="#fff8d6" stroke="#c9a400" stroke-width="2"/><circle cx="190" cy="75" r="4" fill="#c62828"/><circle cx="190" cy="145" r="34" fill="#fff8d6" stroke="#c9a400" stroke-width="2"/><circle cx="190" cy="145" r="4" fill="#c62828"/><circle cx="190" cy="215" r="34" fill="#fff8d6" stroke="#c9a400" stroke-width="2"/><circle cx="190" cy="215" r="4" fill="#c62828"/><g stroke-width="3" fill="none"><path d="M10 75H250" stroke="#1565c0" marker-end="url(#ar)"/><path d="M10 145H250" stroke="#1565c0" marker-end="url(#ar)"/><path d="M10 104Q170 104 245 60" stroke="#b8780b" marker-end="url(#arG)"/><path d="M10 180H180Q186 180 182 184Q150 220 20 228" stroke="#c62828" marker-end="url(#arR)"/></g><g font-size="12.5" font-family="Questrial,Century Gothic,sans-serif" font-weight="700"><text x="12" y="68" fill="#1565c0">through empty space</text><text x="200" y="52" fill="#b8780b">bent</text><text x="40" y="250" fill="#c62828">hits a nucleus: bounces back</text></g></g></svg></div><div class="rv3">Most of the atom is empty space. All the positive charge is in a tiny <b>nucleus</b>.</div></div></div></div><figcaption><span class="id">S4</span><b>Gold foil, zoomed in.</b> The real set-up on the left, and a zoom into the foil showing <i>why</i>: most alphas pass straight through the empty space inside the atoms, a few pass close to a nucleus and bend, and a rare head-on hit bounces back.</figcaption></figure>
+
+<figure><div class="slide" data-sec="LEARN · OLD MODEL, NEW MODEL" data-obj="Describe how the model of the atom developed."><div class="bd" style="align-items:stretch"><div class="col fill"><div class="pic fill" style="background:transparent"><svg viewBox="0 0 240 240" style="width:100%;height:100%"><circle cx="120" cy="120" r="90" fill="#f6c3c3" stroke="#c62828" stroke-width="3"/><text x="70" y="80" font-size="20" fill="#c62828" font-weight="700" font-family="Questrial,Century Gothic,sans-serif">+</text><text x="150" y="75" font-size="20" fill="#c62828" font-weight="700" font-family="Questrial,Century Gothic,sans-serif">+</text><text x="95" y="130" font-size="20" fill="#c62828" font-weight="700" font-family="Questrial,Century Gothic,sans-serif">+</text><text x="165" y="150" font-size="20" fill="#c62828" font-weight="700" font-family="Questrial,Century Gothic,sans-serif">+</text><text x="70" y="170" font-size="20" fill="#c62828" font-weight="700" font-family="Questrial,Century Gothic,sans-serif">+</text><text x="125" y="190" font-size="20" fill="#c62828" font-weight="700" font-family="Questrial,Century Gothic,sans-serif">+</text><text x="125" y="100" font-size="20" fill="#c62828" font-weight="700" font-family="Questrial,Century Gothic,sans-serif">+</text><circle cx="100" cy="70" r="9" fill="#1565c0"/><text x="96" y="75" font-size="14" fill="#fff" font-family="Questrial,Century Gothic,sans-serif">−</text><circle cx="180" cy="110" r="9" fill="#1565c0"/><text x="176" y="115" font-size="14" fill="#fff" font-family="Questrial,Century Gothic,sans-serif">−</text><circle cx="60" cy="125" r="9" fill="#1565c0"/><text x="56" y="130" font-size="14" fill="#fff" font-family="Questrial,Century Gothic,sans-serif">−</text><circle cx="145" cy="135" r="9" fill="#1565c0"/><text x="141" y="140" font-size="14" fill="#fff" font-family="Questrial,Century Gothic,sans-serif">−</text><circle cx="100" cy="175" r="9" fill="#1565c0"/><text x="96" y="180" font-size="14" fill="#fff" font-family="Questrial,Century Gothic,sans-serif">−</text><circle cx="170" cy="185" r="9" fill="#1565c0"/><text x="166" y="190" font-size="14" fill="#fff" font-family="Questrial,Century Gothic,sans-serif">−</text><path d="M180 110L225 60" stroke="#0f1b5c" stroke-width="1.5"/><text x="150" y="52" font-size="15" font-family="Questrial,Century Gothic,sans-serif" fill="#0f1b5c" font-weight="700">electron</text><path d="M60 200L30 228" stroke="#0f1b5c" stroke-width="1.5"/><text x="2" y="238" font-size="15" font-family="Questrial,Century Gothic,sans-serif" fill="#0f1b5c" font-weight="700">positive "dough"</text></svg></div><p class="cen" style="margin:0"><b>Plum pudding</b> (Thomson, 1897)</p></div><div class="col" style="flex:0 0 16%;justify-content:center;align-items:center"><svg viewBox="0 0 100 40" style="width:100%"><path d="M5 20H92" stroke="#c62828" stroke-width="5" marker-end="url(#arR)"/></svg><p class="small cen" style="color:var(--red);font-weight:700;margin:0">gold foil<br>evidence (1911)</p></div><div class="col fill"><div class="pic fill" style="background:transparent"><svg viewBox="0 0 240 240" style="width:100%;height:100%"><circle cx="120" cy="120" r="90" fill="#fff" stroke="#9aa3b5" stroke-width="2" stroke-dasharray="5 5"/><circle cx="120" cy="120" r="7" fill="#c62828"/><text x="115" y="124" font-size="10" fill="#fff" font-family="Questrial,Century Gothic,sans-serif">+</text><circle cx="60" cy="80" r="9" fill="#1565c0"/><text x="56" y="85" font-size="14" fill="#fff" font-family="Questrial,Century Gothic,sans-serif">−</text><circle cx="185" cy="70" r="9" fill="#1565c0"/><text x="181" y="75" font-size="14" fill="#fff" font-family="Questrial,Century Gothic,sans-serif">−</text><circle cx="195" cy="160" r="9" fill="#1565c0"/><text x="191" y="165" font-size="14" fill="#fff" font-family="Questrial,Century Gothic,sans-serif">−</text><circle cx="80" cy="185" r="9" fill="#1565c0"/><text x="76" y="190" font-size="14" fill="#fff" font-family="Questrial,Century Gothic,sans-serif">−</text><path d="M127 118L200 30" stroke="#0f1b5c" stroke-width="1.5"/><text x="150" y="22" font-size="15" font-family="Questrial,Century Gothic,sans-serif" fill="#0f1b5c" font-weight="700">nucleus</text><text x="70" y="140" font-size="13" font-family="Questrial,Century Gothic,sans-serif" fill="#555">empty space</text><path d="M195 160L228 205" stroke="#0f1b5c" stroke-width="1.5"/><text x="160" y="226" font-size="15" font-family="Questrial,Century Gothic,sans-serif" fill="#0f1b5c" font-weight="700">electron</text></svg></div><p class="cen" style="margin:0"><b>Nuclear model</b> (Rutherford, 1911)</p></div></div></div><figcaption><span class="id">S5</span><b>S3 with labelled diagrams.</b> Charges marked on both models, labels on the parts, and the evidence on the arrow.</figcaption></figure>
+
+</div><h2 style="margin-top:3.5rem">Round 1</h2>
+<h2>What goes wrong now</h2>
+<p>From the 7 lessons saved on the home PC (23 Learn slides):</p>
+<div class="stats">
+ <div class="stat"><b>9 of 23</b><span>Learn slides with any picture at all</span></div>
+ <div class="stat"><b>21 of 41</b><span>lesson key words never defined on a Learn slide</span></div>
+ <div class="stat"><b>0</b><span>Learn slides that use a definition box</span></div>
+ <div class="stat"><b>73 words</b><span>on a typical Learn slide (11 slides have more than 80)</span></div>
+</div>
+<div class="note">The pattern: two text boxes on the left, a picture on the right that nothing points at. The words carry the explanation and the picture decorates it. In the versions below the picture carries the explanation and the words label it.</div>
+
+<h2>What the research found</h2>
+<div class="note"><ul style="margin:0;padding-left:1.2em">
+<li><b>AI-sounding text</b> comes from patterns: "crucial", "delve", "plays a key role", claims that something is important, "not just X, it's Y", lists of three, "scientists believe". The fix: name the thing, say what it does, cut the importance claim.</li>
+<li><b>Sentence length:</b> at most 15 words for KS3, 20 for KS4 and 25 for KS5. One name per idea; no swapping synonyms.</li>
+<li><b>Less text:</b> you are the narration, so the slide shouldn't carry the script. Use one full-sentence headline plus a picture as the evidence, with about 40 words of text at most.</li>
+<li><b>Definitions</b> use only everyday words. The most useful extra is a "Not:" line naming the common mistake (see F2).</li>
+<li><b>Pictures:</b> labels go on the picture, not in a key beside it. No decorative pictures. Use a diagram for "how it works" and a photo for "recognise the real thing".</li>
+<li><b>Hooks that work:</b> a gap pupils can almost close, a prediction, or questions asked before teaching. A surprise only helps if the lesson explains it later.</li>
+<li><b>Hooks that fail:</b> fun facts the lesson never uses ("seductive details" lower recall), and big demos with no prediction. When no good hook fits, skip Engage.</li>
+</ul><p style="margin:.5em 0 0">Full report with sources: design-audit/lesson-quality/research.md</p></div>
+<h2>1. Key term styles</h2>
+<p>The same two sentences in six styles. Pick one with the switch at the top to see it on every slide below.</p>
+<div class="hlrow">
+ <div class="hlcard h1"><div class="tagline">1 Bold navy</div>An <span class="k">element</span> is made of only one type of atom. A <span class="k">compound</span> has two or more types joined together.</div>
+ <div class="hlcard h2"><div class="tagline">2 Bold + gold underline</div>An <span class="k">element</span> is made of only one type of atom. A <span class="k">compound</span> has two or more types joined together.</div>
+ <div class="hlcard h3"><div class="tagline">3 Highlighter pen</div>An <span class="k">element</span> is made of only one type of atom. A <span class="k">compound</span> has two or more types joined together.</div>
+ <div class="hlcard h4"><div class="tagline">4 Navy tag</div>An <span class="k">element</span> is made of only one type of atom. A <span class="k">compound</span> has two or more types joined together.</div>
+ <div class="hlcard h5"><div class="tagline">5 One colour for key terms</div>An <span class="k">element</span> is made of only one type of atom. A <span class="k">compound</span> has two or more types joined together.</div>
+ <div class="hlcard h6"><div class="tagline">6 Gold outline</div>An <span class="k">element</span> is made of only one type of atom. A <span class="k">compound</span> has two or more types joined together.</div>
+</div>
+<div class="note"><b>What the research says:</b> bold works best, at most 3 terms per slide, and only the first time a term appears. Underlining is a poor choice because it reads as a link. Colour helps only when the same colour marks the part of the picture the word names (as in E1 and D2). So style 1, with colour kept for matching words to pictures, is the evidence-based pick.</div><div class="note">The rule I would pair with any of these: only the key term is marked, the first time it appears on a slide, and at most three per slide. If everything is highlighted, nothing is.</div>
+
+<h2>2. How it is phrased</h2>
+<p>Real lines from current lessons and typical generated lines, with a plainer version. The research report will turn this into rules.</p>
+<div class="tw"><table class="cmp">
+ <tr><th>Now</th><th>Plainer</th><th>Why</th></tr>
+ <tr><td>"CO is a poisonous gas. Co is a metal used in magnets. How can one small letter change everything?"</td><td>"CO can kill you. Co is in magnets. The only difference is one capital letter. Why does that matter?"</td><td>"Change everything" is a stock phrase. The plainer one asks the real question.</td></tr>
+ <tr><td>"Energy is all around us, powering everything from our phones to the stars."</td><td>"You can't hold energy. It's a number we keep track of as it moves from one store to another."</td><td>Says what energy is, not where it is. No sweeping list.</td></tr>
+ <tr><td>"Let's dive into the fascinating world of cells!"</td><td>"Every living thing is made of cells. Today: what's inside one and what each part does."</td><td>No "dive into", no "fascinating". Tells them the plan.</td></tr>
+ <tr><td>"A substance made of only ONE type of atom. It cannot be broken down into anything simpler by a chemical reaction."</td><td>"An <b>element</b> has only one type of atom. No chemical reaction can split it into anything simpler."</td><td>Names the term it defines. Full sentence, no shouting capitals.</td></tr>
+ <tr><td>"Today: four big ideas from P1 Energy, then you show what you know."</td><td>"Four things from P1 you need for the exam. Then a practice question on each."</td><td>Concrete about what happens.</td></tr>
+</table></div>
+
+<h2>3. Normal content: atoms, elements and compounds</h2>
+<div class="grid">
+<figure><div class="slide" data-sec="LEARN · ATOMS AND ELEMENTS" data-obj="Define atom, element and compound."><div class="bd">
+ <div class="col" style="flex:0 0 54%"><div class="box fill"><h4>Atom</h4><div class="in"><p>All substances are made of atoms. An atom is the smallest part of an element that can exist.</p><p>Greek 'atomos': a (not) + tomos (cut), so 'uncuttable'. Democritus suggested atoms 2400 years ago; Dalton gave the evidence in 1803.</p></div></div>
+ <div class="box fill"><h4>Element</h4><div class="in"><p>A substance made of only ONE type of atom. It cannot be broken down into anything simpler by a chemical reaction.</p><p>About 100 elements, all in the periodic table: rows are periods, columns are groups.</p></div></div></div>
+ <div class="pic fill"><img src="@@ptable@@" alt="Periodic table"></div></div></div>
+<figcaption><span class="id">C0</span><b>Now.</b> For comparison: 70 words of text, and the periodic table doesn't point at anything the text says.</figcaption></figure>
+
+<figure><div class="slide" data-sec="LEARN · ELEMENT OR COMPOUND?" data-obj="Define atom, element and compound."><div class="bd" style="flex-direction:column;gap:2%">
+ <div class="pic fill" style="background:#fff"><img src="@@particles@@" alt="Eight particle diagrams" style="width:100%">
+  <svg class="ov" viewBox="0 0 1628 614" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><g font-family="Questrial,Century Gothic,sans-serif" font-weight="700" font-size="46">
+   <g fill="#0f1b5c"><rect x="600" y="120" width="190" height="56" rx="8" fill="#e3ebfb" stroke="#1565c0" stroke-width="3"/><text x="615" y="161" fill="#1565c0">element</text>
+   <rect x="1420" y="120" width="190" height="56" rx="8" fill="#e3ebfb" stroke="#1565c0" stroke-width="3"/><text x="1435" y="161" fill="#1565c0">element</text>
+   <rect x="565" y="470" width="190" height="56" rx="8" fill="#e3ebfb" stroke="#1565c0" stroke-width="3"/><text x="580" y="511" fill="#1565c0">element</text>
+   <rect x="1090" y="470" width="190" height="56" rx="8" fill="#e3ebfb" stroke="#1565c0" stroke-width="3"/><text x="1105" y="511" fill="#1565c0">element</text></g>
+   <g><rect x="160" y="140" width="230" height="56" rx="8" fill="#fde7e7" stroke="#c62828" stroke-width="3"/><text x="170" y="181" fill="#c62828">compound</text>
+   <rect x="1000" y="140" width="230" height="56" rx="8" fill="#fde7e7" stroke="#c62828" stroke-width="3"/><text x="1010" y="181" fill="#c62828">compound</text>
+   <rect x="300" y="545" width="230" height="56" rx="8" fill="#fde7e7" stroke="#c62828" stroke-width="3"/><text x="310" y="586" fill="#c62828">compound</text>
+   <rect x="1390" y="545" width="230" height="56" rx="8" fill="#fde7e7" stroke="#c62828" stroke-width="3"/><text x="1400" y="586" fill="#c62828">compound</text></g></g></svg></div>
+ <div style="display:flex;gap:2%;flex:none">
+  <div class="def fill"><b>Element:</b> only <span class="k">one type of atom</span>. Every ball is the same colour.</div>
+  <div class="def fill"><b>Compound:</b> two or more types of atom, <span class="k">chemically joined</span>.</div></div>
+</div></div>
+<figcaption><span class="id">C1</span><b>Annotate the school's picture.</b> The eight particle diagrams from the school slides, each tagged. The two definitions sit underneath and point at what you can see. Tags appear one at a time, so you can ask first.</figcaption></figure>
+
+<figure><div class="slide" data-sec="LEARN · THREE KINDS OF SUBSTANCE" data-obj="Define atom, element and compound."><div class="bd" style="flex-direction:column;gap:2.5%">
+ <div style="display:flex;gap:3%;flex:1;min-height:0">
+  <div class="col fill"><svg viewBox="0 0 120 100" style="width:100%;flex:1;min-height:0"><use href="#pEl"/></svg><p class="cen"><span class="k">element</span><br><span class="small">one type of atom</span></p></div>
+  <div class="col fill"><svg viewBox="0 0 120 100" style="width:100%;flex:1;min-height:0"><use href="#pCo"/></svg><p class="cen"><span class="k">compound</span><br><span class="small">different atoms joined</span></p></div>
+  <div class="col fill"><svg viewBox="0 0 120 100" style="width:100%;flex:1;min-height:0"><use href="#pMx"/></svg><p class="cen"><span class="k">mixture</span><br><span class="small">mixed, not joined</span></p></div>
+ </div>
+ <div class="def">A compound has a <b>fixed ratio</b>: every particle of carbon monoxide is one C and one O. A mixture can be any amounts.</div>
+</div></div>
+<figcaption><span class="id">C2</span><b>Three pictures, three words.</b> Diagrams I draw, all in one style. Each term has a 3-word gloss under its picture. The one sentence underneath is the thing they'd get wrong.</figcaption></figure>
+
+<figure><div class="slide" data-sec="LEARN · FROM ATOM TO COMPOUND" data-obj="Define atom, element and compound."><div class="bd">
+ <div class="col fill"><div class="row"><span class="num">1</span><b>Atom</b></div><svg viewBox="0 0 100 100" style="height:38%"><circle cx="50" cy="50" r="30" fill="url(#gb)"/></svg><p class="small">The smallest part of an element that can exist. Greek <i>atomos</i>, "uncuttable".</p></div>
+ <svg viewBox="0 0 20 40" style="width:4%;align-self:center"><path d="M2 20H18" stroke="#0f1b5c" stroke-width="3" marker-end="url(#ar)"/></svg>
+ <div class="col fill"><div class="row"><span class="num">2</span><b>Element</b></div><svg viewBox="0 0 120 100" style="height:38%"><use href="#pEl"/></svg><p class="small">Only one type of <span class="k">atom</span>. About 100 of them, all in the periodic table.</p></div>
+ <svg viewBox="0 0 20 40" style="width:4%;align-self:center"><path d="M2 20H18" stroke="#0f1b5c" stroke-width="3" marker-end="url(#ar)"/></svg>
+ <div class="col fill"><div class="row"><span class="num">3</span><b>Compound</b></div><svg viewBox="0 0 120 100" style="height:38%"><use href="#pCo"/></svg><p class="small">Two or more <span class="k">elements</span> chemically joined. Only a reaction can split them.</p></div>
+</div></div>
+<figcaption><span class="id">C3</span><b>Build it up in order.</b> Three numbered steps that reveal left to right, each with its picture. Each step uses the word defined in the step before it.</figcaption></figure>
+</div>
+
+<h2>4. Diagram lessons: the animal cell</h2>
+<div class="grid">
+<figure><div class="slide" data-sec="LEARN · PARTS OF A CELL" data-obj="Name the parts of animal and plant cells and their jobs."><div class="bd">
+ <div class="col" style="flex:0 0 42%"><div class="box fill"><h4>Cell parts</h4><div class="in small"><p>The nucleus contains genetic material that controls the activities of the cell.</p><p>The cytoplasm is a jelly-like substance where most chemical reactions happen.</p><p>The cell membrane controls what enters and leaves the cell.</p><p>Mitochondria are where respiration takes place.</p></div></div></div>
+ <div class="pic fill"><img src="@@plabel@@" alt="Labelled plant cell"></div></div></div>
+<figcaption><span class="id">D0</span><b>Now.</b> For comparison: the school's labelled picture has labels too small to read from the back, and the text repeats them in a separate box.</figcaption></figure>
+
+<figure><div class="slide" data-sec="LEARN · THE ANIMAL CELL" data-obj="Name the parts of animal and plant cells and their jobs."><div class="bd" style="padding:1% 2%">
+ <div class="pic fill" style="background:var(--sky)"><svg viewBox="0 0 1000 470" style="width:100%;height:100%"><image href="@@cell@@" x="200" y="20" width="600" height="436"/><g stroke="#0f1b5c" stroke-width="3" fill="none"><path d="M407 223L230 130"/><path d="M651 171L640 80"/><path d="M789 293L860 250"/><path d="M640 330L700 395"/></g><g fill="#0f1b5c"><circle cx="407" cy="223" r="6"/><circle cx="651" cy="171" r="6"/><circle cx="789" cy="293" r="6"/><circle cx="640" cy="330" r="6"/></g><g font-family="Questrial,Century Gothic,sans-serif"><rect x="10" y="70" width="374" height="62" rx="6" fill="#fff" stroke="#0f1b5c" stroke-width="2.5"/><text x="20" y="96" font-size="24" font-weight="700" fill="#0f1b5c">nucleus</text><text x="20" y="122" font-size="19" fill="#333">holds the genes, controls the cell</text><rect x="470" y="10" width="353" height="62" rx="6" fill="#fff" stroke="#0f1b5c" stroke-width="2.5"/><text x="480" y="36" font-size="24" font-weight="700" fill="#0f1b5c">mitochondria</text><text x="480" y="62" font-size="19" fill="#333">respiration releases energy here</text><rect x="690" y="180" width="322" height="62" rx="6" fill="#fff" stroke="#0f1b5c" stroke-width="2.5"/><text x="700" y="206" font-size="24" font-weight="700" fill="#0f1b5c">cell membrane</text><text x="700" y="232" font-size="19" fill="#333">controls what gets in and out</text><rect x="560" y="395" width="311" height="62" rx="6" fill="#fff" stroke="#0f1b5c" stroke-width="2.5"/><text x="570" y="421" font-size="24" font-weight="700" fill="#0f1b5c">cytoplasm</text><text x="570" y="447" font-size="19" fill="#333">jelly where reactions happen</text></g></svg></div></div></div>
+<figcaption><span class="id">D1</span><b>Labels on the picture.</b> The school's unlabelled cell, full size, with each label carrying its job in 6 words or fewer. Nothing else on the slide. Labels can appear one at a time.</figcaption></figure>
+
+<figure><div class="slide" data-sec="LEARN · WHAT YOU SEE, WHAT YOU DRAW" data-obj="Name the parts of animal and plant cells and their jobs."><div class="bd">
+ <div class="col fill"><div class="pic fill"><img src="@@cheek@@" alt="Cheek cells under a microscope">
+  <svg class="ov" viewBox="0 0 483 363" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><circle cx="124" cy="236" r="16" fill="none" stroke="#c62828" stroke-width="4"/><path d="M82 150Q70 200 58 238" fill="none" stroke="#1565c0" stroke-width="4" stroke-dasharray="8 5"/></svg></div>
+  <p class="small cen">Cheek cells, stained, ×400</p></div>
+ <div class="col fill"><div class="pic fill"><img src="@@cell@@" alt="Animal cell drawing">
+  <svg class="ov" viewBox="0 0 550 400" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><ellipse cx="190" cy="186" rx="85" ry="65" fill="none" stroke="#c62828" stroke-width="6"/><path d="M60 80Q20 170 30 240" fill="none" stroke="#1565c0" stroke-width="6" stroke-dasharray="12 8"/></svg></div>
+  <p class="small cen">What we draw</p></div>
+ <div class="col" style="flex:0 0 26%;justify-content:center;gap:5%"><p><span style="color:var(--red);font-weight:700">●</span> <span class="k">nucleus</span>: the dark blob in the photo</p><p><span style="color:var(--blue);font-weight:700">- -</span> <span class="k">cell membrane</span>: the thin edge</p><p class="small">Stain makes the nucleus show up.</p></div>
+</div></div>
+<figcaption><span class="id">D2</span><b>Real next to drawn.</b> The school's micrograph and the cell drawing side by side, with each part ringed in the same colour on both. It links what they'll see down the microscope to the diagram.</figcaption></figure>
+
+<figure><div class="slide" data-sec="LEARN · NAME THE PARTS" data-obj="Name the parts of animal and plant cells and their jobs."><div class="bd">
+ <div class="pic" style="flex:0 0 55%"><svg viewBox="0 0 600 436" style="width:100%;height:100%"><image href="@@cell@@" x="0" y="0" width="600" height="436"/><g font-family="Questrial,Century Gothic,sans-serif"><circle cx="207" cy="203" r="24" fill="#f9a826" stroke="#0f1b5c" stroke-width="4"/><text x="207" y="213" text-anchor="middle" font-size="28" font-weight="700" fill="#0f1b5c">1</text><circle cx="371" cy="289" r="24" fill="#f9a826" stroke="#0f1b5c" stroke-width="4"/><text x="371" y="299" text-anchor="middle" font-size="28" font-weight="700" fill="#0f1b5c">2</text><circle cx="575" cy="280" r="24" fill="#f9a826" stroke="#0f1b5c" stroke-width="4"/><text x="575" y="290" text-anchor="middle" font-size="28" font-weight="700" fill="#0f1b5c">3</text><circle cx="451" cy="151" r="24" fill="#f9a826" stroke="#0f1b5c" stroke-width="4"/><text x="451" y="161" text-anchor="middle" font-size="28" font-weight="700" fill="#0f1b5c">4</text></g></svg></div>
+ <div class="col fill" style="justify-content:center;gap:4%">
+  <div class="row"><span class="num">1</span><p><span class="k">nucleus</span>: holds the genes and controls the cell</p></div>
+  <div class="row"><span class="num">2</span><p><span class="k">cytoplasm</span>: jelly where most reactions happen</p></div>
+  <div class="row"><span class="num">3</span><p><span class="k">cell membrane</span>: controls what goes in and out</p></div>
+  <div class="row"><span class="num">4</span><p><span class="k">mitochondria</span>: where respiration happens</p></div>
+ </div></div></div>
+<figcaption><span class="id">D3</span><b>Numbers on the picture, key at the side.</b> Easy to question: hide the key and ask "what's 3?". The numbers match the order the key reveals in.</figcaption></figure>
+</div>
+
+<h2>5. Graph lessons: distance–time graphs</h2>
+<div class="grid">
+<figure><div class="slide" data-sec="LEARN · READING THE GRAPH" data-obj="Describe motion from a distance–time graph."><div class="bd" style="padding:.6% 2%">
+ <div class="pic fill" style="background:#fff"><svg viewBox="0 0 400 300" style="height:100%;width:auto">
+  <use href="#dt"/>
+  <path d="M50 260H130V140" fill="none" stroke="#b8780b" stroke-width="2.5" stroke-dasharray="6 4"/>
+  <g font-family="Questrial,Century Gothic,sans-serif" font-size="12.5" fill="#b8780b" font-weight="700"><text x="68" y="252">10 s</text><text x="134" y="205">40 m</text></g>
+  <g font-family="Questrial,Century Gothic,sans-serif" font-size="13"><rect x="140" y="30" width="118" height="44" rx="5" fill="#fff" stroke="#0f1b5c"/><text x="148" y="48" font-weight="700" fill="#0f1b5c">flat = not moving</text><text x="148" y="66" fill="#333">10 s to 20 s</text><path d="M195 74L175 135" stroke="#0f1b5c" stroke-width="1.5" marker-end="url(#ar)"/>
+  <rect x="268" y="150" width="122" height="44" rx="5" fill="#fff" stroke="#0f1b5c"/><text x="276" y="168" font-weight="700" fill="#0f1b5c">gentle = slower</text><text x="276" y="186" fill="#333">1 m/s</text><path d="M320 150L305 112" stroke="#0f1b5c" stroke-width="1.5" marker-end="url(#ar)"/>
+  <rect x="60" y="30" width="72" height="44" rx="5" fill="#fff" stroke="#0f1b5c"/><text x="66" y="48" font-weight="700" fill="#0f1b5c">steep =</text><text x="66" y="66" font-weight="700" fill="#0f1b5c">fast</text><path d="M96 74L98 185" stroke="#0f1b5c" stroke-width="1.5" marker-end="url(#ar)"/></g>
+ </svg></div>
+ <div class="col" style="flex:0 0 27%;justify-content:center;gap:4%"><div class="def"><b>Gradient</b> = how steep the line is. On this graph, gradient = <b>speed</b>.</div><p class="small">First part: <br>40 m ÷ 10 s = <b>4 m/s</b></p></div>
+</div></div>
+<figcaption><span class="id">G1</span><b>Notes on the graph.</b> The graph fills the slide. Each section has a call-out pointing at it, and the gradient triangle is drawn on with its numbers. The definition box holds the one new term.</figcaption></figure>
+
+<figure><div class="slide" data-sec="LEARN · WHAT THE LINE MEANS" data-obj="Describe motion from a distance–time graph."><div class="bd" style="flex-direction:column;gap:1.5%;padding:.6% 2%">
+ <div style="display:flex;flex:0 0 26%;min-height:0;padding:0 2% 0 12%">
+  <svg viewBox="0 0 300 70" style="width:100%;height:100%"><g stroke="#0f1b5c" stroke-width="4" fill="none" stroke-linecap="round">
+   <circle cx="45" cy="12" r="7" fill="#0f1b5c"/><path d="M45 19L42 40M42 40L30 62M42 40L56 60M44 26L28 34M44 26L60 20"/><path d="M8 20H20M4 30H18M8 40H20" stroke="#b8780b" stroke-width="3"/>
+   <circle cx="145" cy="12" r="7" fill="#0f1b5c"/><path d="M145 19V42M145 42L138 64M145 42L152 64M145 26L134 38M145 26L156 38"/>
+   <circle cx="250" cy="12" r="7" fill="#0f1b5c"/><path d="M250 19L249 42M249 42L242 64M249 42L258 63M250 26L240 38M250 26L262 34"/><path d="M220 30H230" stroke="#b8780b" stroke-width="3"/></g>
+   <g font-family="Questrial,Century Gothic,sans-serif" font-size="11" fill="#1b1b2f"><text x="68" y="44">running</text><text x="162" y="44">standing</text><text x="268" y="44">walking</text></g></svg></div>
+ <div class="pic fill" style="background:#fff"><svg viewBox="0 0 400 300" style="height:100%;width:auto"><use href="#dt"/>
+  <rect x="52" y="22" width="78" height="236" fill="#1565c0" opacity=".07"/><rect x="132" y="22" width="78" height="236" fill="#b8780b" opacity=".08"/><rect x="212" y="22" width="160" height="236" fill="#2e7d32" opacity=".07"/></svg></div>
+</div></div>
+<figcaption><span class="id">G2</span><b>The story above the graph.</b> A drawn figure over each section shows what the person is doing, lined up with that part of the line. Good for "tell me the story of this graph".</figcaption></figure>
+
+<figure><div class="slide" data-sec="LEARN · READ IT IN 3 STEPS" data-obj="Describe motion from a distance–time graph."><div class="bd">
+ <div class="pic" style="flex:0 0 52%;background:#fff"><svg viewBox="0 0 400 300" style="height:100%;width:auto"><use href="#dt"/><circle cx="210" cy="140" r="7" fill="#c62828"/><path d="M210 140V260M210 140H50" stroke="#c62828" stroke-width="2" stroke-dasharray="5 4"/></svg></div>
+ <div class="col fill" style="justify-content:center;gap:5%">
+  <div class="row"><span class="num">1</span><p>Find the time on the bottom axis.</p></div>
+  <div class="row"><span class="num">2</span><p>Go up to the line, then across.</p></div>
+  <div class="row"><span class="num">3</span><p>Read the <span class="k">distance</span>: at 20 s, 40 m from the start.</p></div>
+  <div class="def">Flat line: distance not changing, so <b>not moving</b>.</div>
+ </div></div></div>
+<figcaption><span class="id">G3</span><b>A method next to the graph.</b> The red dashed path shows steps 1 to 3 on the graph itself. Use it when the skill is reading values rather than describing motion.</figcaption></figure>
+</div>
+
+<h2>6. Equation lessons: pressure</h2>
+<div class="grid">
+<figure><div class="slide" data-sec="LEARN · CALCULATING PRESSURE" data-obj="Calculate pressure using P = F ÷ A."><div class="bd">
+ <div class="col fill"><div class="box"><h4>The equation</h4><div class="in"><p class="eq" style="font-size:1.8em">P = F ÷ A</p></div></div>
+ <div class="box fill"><h4>Components</h4><div class="in small"><p>P = pressure, pascals (Pa)</p><p>F = force, newtons (N)</p><p>A = area, metres squared (m²)</p></div></div></div>
+ <div class="pic fill"><span class="tiny" style="color:#888">image placeholder</span></div></div></div>
+<figcaption><span class="id">E0</span><b>Now.</b> For comparison: the equation and its parts are listed, and the picture is a placeholder.</figcaption></figure>
+
+<figure><div class="slide" data-sec="LEARN · PRESSURE" data-obj="Calculate pressure using P = F ÷ A."><div class="bd">
+ <div class="pic" style="flex:0 0 46%;background:#fff"><svg viewBox="0 0 220 200" style="height:96%;width:auto">
+  <path d="M10 170H210" stroke="#555" stroke-width="3"/>
+  <path d="M60 165L80 150H170L150 165Z" fill="#1565c0" opacity=".45"/><rect x="60" y="75" width="90" height="90" fill="#d9dee8" stroke="#0f1b5c" stroke-width="2.5"/><path d="M60 75L80 60H170L150 75Z" fill="#eef1f6" stroke="#0f1b5c" stroke-width="2"/><path d="M150 165L170 150V60L150 75Z" fill="#c4cad6" stroke="#0f1b5c" stroke-width="2"/>
+  <path d="M110 10V64" stroke="#c62828" stroke-width="5" marker-end="url(#arR)"/>
+  <g font-family="Questrial,Century Gothic,sans-serif" font-weight="700" font-size="16"><text x="120" y="30" fill="#c62828">F  force</text><text x="40" y="192" fill="#1565c0">A  area on the floor</text></g></svg></div>
+ <div class="col fill" style="justify-content:center;gap:5%">
+  <p class="eq"><span class="cP">P</span> = <span class="cF">F</span> ÷ <span class="cA">A</span></p>
+  <p><span class="cP"><b>P</b></span> <span class="k">pressure</span>, in pascals (Pa)</p><p><span class="cF"><b>F</b></span> force pushing down, in newtons (N)</p><p><span class="cA"><b>A</b></span> area it pushes on, in m²</p>
+  <div class="def">1 Pa = 1 N pushing on every 1 m².</div></div>
+</div></div>
+<figcaption><span class="id">E1</span><b>Colour-matched equation.</b> Each letter is the same colour as the thing it stands for in the picture: red force arrow, blue area. The picture explains the symbols.</figcaption></figure>
+
+<figure><div class="slide" data-sec="LEARN · SAME FORCE, DIFFERENT AREA" data-obj="Calculate pressure using P = F ÷ A."><div class="bd" style="flex-direction:column;gap:2%">
+ <p class="eq" style="font-size:1.7em"><span class="cP">P</span> = <span class="cF">F</span> ÷ <span class="cA">A</span></p>
+ <div style="display:flex;gap:3%;flex:1;min-height:0">
+  <div class="col fill"><svg viewBox="0 0 120 130" style="flex:1;min-height:0;width:100%"><ellipse cx="60" cy="35" rx="26" ry="30" fill="#eceff4" stroke="#0f1b5c" stroke-width="2"/><path d="M45 62Q50 92 55 106M75 62Q70 92 65 106" stroke="#0f1b5c" stroke-width="1.5" stroke-dasharray="4 3" fill="none"/><rect x="54" y="106" width="12" height="12" fill="#1565c0" stroke="#0f1b5c"/></svg>
+   <p class="cen"><b>Stiletto heel</b> <span class="small">(blue: 1 cm² touching)</span><br><span class="cF">600 N</span> ÷ <span class="cA">0.0001 m²</span> = <b>6 000 000 Pa</b></p></div>
+  <div class="col fill"><svg viewBox="0 0 120 130" style="flex:1;min-height:0;width:100%"><path d="M60 6C84 6 92 28 90 52C88 74 82 86 84 104C86 120 74 126 60 126C46 126 34 120 36 104C38 86 32 74 30 52C28 28 36 6 60 6Z" fill="#1565c0" fill-opacity=".45" stroke="#0f1b5c" stroke-width="2"/></svg>
+   <p class="cen"><b>Trainer</b> <span class="small">(blue: 150 cm² touching)</span><br><span class="cF">600 N</span> ÷ <span class="cA">0.015 m²</span> = <b>40 000 Pa</b></p></div>
+ </div>
+ <div class="reveal">Same person, same force. The heel's area is 150 times smaller, so the pressure is 150 times bigger.</div>
+</div></div>
+<figcaption><span class="id">E2</span><b>Comparison that pays off the Engage.</b> If Engage asked "stiletto or trainer: which hurts more?", this answers it with real numbers. The blue areas are drawn to show the size difference.</figcaption></figure>
+</div>
+
+<h2>7. Story lessons: how the model of the atom changed</h2>
+<div class="grid">
+<figure><div class="slide" data-sec="LEARN · THE ATOM THROUGH TIME" data-obj="Describe how the model of the atom developed."><div class="bd" style="flex-direction:column;gap:2%;padding:1% 2%">
+ <svg viewBox="0 0 1000 380" style="width:100%;flex:1;min-height:0">
+  <path d="M30 240H980" stroke="#0f1b5c" stroke-width="4" marker-end="url(#ar)"/>
+  <g font-family="Questrial,Century Gothic,sans-serif" text-anchor="middle">
+   <use href="#mDal" x="40" y="60" width="140" height="140"/><circle cx="110" cy="240" r="9" fill="#f9a826" stroke="#0f1b5c" stroke-width="2"/><text x="110" y="285" font-size="26" font-weight="700" fill="#0f1b5c">1803</text><text x="110" y="315" font-size="22" fill="#1b1b2f">Dalton</text><text x="110" y="345" font-size="19" fill="#444">solid ball</text>
+   <use href="#mTho" x="230" y="60" width="140" height="140"/><circle cx="300" cy="240" r="9" fill="#f9a826" stroke="#0f1b5c" stroke-width="2"/><text x="300" y="285" font-size="26" font-weight="700" fill="#0f1b5c">1897</text><text x="300" y="315" font-size="22" fill="#1b1b2f">Thomson</text><text x="300" y="345" font-size="19" fill="#444">electrons in a</text><text x="300" y="368" font-size="19" fill="#444">positive "pudding"</text>
+   <rect x="405" y="40" width="190" height="340" rx="12" fill="#fff6dd" stroke="#f9a826" stroke-width="4"/>
+   <use href="#mRut" x="430" y="60" width="140" height="140"/><circle cx="500" cy="240" r="9" fill="#f9a826" stroke="#0f1b5c" stroke-width="2"/><text x="500" y="285" font-size="26" font-weight="700" fill="#0f1b5c">1911</text><text x="500" y="315" font-size="22" fill="#1b1b2f">Rutherford</text><text x="500" y="345" font-size="19" fill="#444">tiny dense</text><text x="500" y="368" font-size="19" fill="#444">nucleus</text>
+   <use href="#mBoh" x="630" y="60" width="140" height="140"/><circle cx="700" cy="240" r="9" fill="#f9a826" stroke="#0f1b5c" stroke-width="2"/><text x="700" y="285" font-size="26" font-weight="700" fill="#0f1b5c">1913</text><text x="700" y="315" font-size="22" fill="#1b1b2f">Bohr</text><text x="700" y="345" font-size="19" fill="#444">electrons in shells</text>
+   <use href="#mCha" x="830" y="60" width="140" height="140"/><circle cx="900" cy="240" r="9" fill="#f9a826" stroke="#0f1b5c" stroke-width="2"/><text x="900" y="285" font-size="26" font-weight="700" fill="#0f1b5c">1932</text><text x="900" y="315" font-size="22" fill="#1b1b2f">Chadwick</text><text x="900" y="345" font-size="19" fill="#444">neutrons</text>
+  </g></svg>
+ <div class="def">Each new model came from <b>new evidence</b> the old one couldn't explain. Today: why Rutherford threw out the pudding.</div>
+</div></div>
+<figcaption><span class="id">S1</span><b>Timeline of drawn models.</b> All five models in one drawn style, with today's step boxed in gold. It works as a recap slide at the start of each lesson in the topic, with the box moving each time.</figcaption></figure>
+
+<figure><div class="slide" data-sec="LEARN · THE GOLD FOIL EXPERIMENT" data-obj="Describe how the model of the atom developed."><div class="bd">
+ <div class="pic" style="flex:0 0 52%;background:#fff"><svg viewBox="0 0 300 220" style="height:100%;width:auto">
+  <rect x="10" y="95" width="46" height="30" fill="#0f1b5c"/><text x="14" y="140" font-family="Questrial,Century Gothic,sans-serif" font-size="10" fill="#0f1b5c">alpha source</text>
+  <path d="M170 30V190" stroke="#e2b714" stroke-width="7"/><text x="150" y="205" font-family="Questrial,Century Gothic,sans-serif" font-size="10" fill="#8a6d00">thin gold foil</text>
+  <path d="M235 20A120 120 0 0 1 235 200" fill="none" stroke="#9aa3b5" stroke-width="3" stroke-dasharray="4 4"/>
+  <g stroke-width="2.5" fill="none"><path d="M56 104H262" stroke="#1565c0" marker-end="url(#ar)"/><path d="M56 112H264" stroke="#1565c0" marker-end="url(#ar)"/><path d="M56 120H262" stroke="#1565c0" marker-end="url(#ar)"/><path d="M56 108H170L245 60" stroke="#b8780b" marker-end="url(#arG)"/><path d="M56 116H170L100 175" stroke="#c62828" marker-end="url(#arR)"/></g>
+  <g font-family="Questrial,Century Gothic,sans-serif" font-size="10.5" font-weight="700"><text x="180" y="140" fill="#1565c0">most go straight through</text><text x="178" y="40" fill="#b8780b">a few bend</text><text x="60" y="190" fill="#c62828">1 in 8000 bounces back</text></g></svg></div>
+ <div class="col fill" style="justify-content:center;gap:4%">
+  <div class="box"><h4>Expected</h4><div class="in small"><p>Pudding model: charge spread out, so every alpha particle goes straight through.</p></div></div>
+  <div class="box"><h4>Saw</h4><div class="in small"><p>A few bounced <b>straight back</b>.</p></div></div>
+  <div class="box"><h4>So</h4><div class="in small"><p>The positive charge is packed into a tiny <span class="k">nucleus</span>. Most of the atom is empty space.</p></div></div>
+ </div></div></div>
+<figcaption><span class="id">S2</span><b>Expected, saw, so.</b> The drawn experiment on the left, the argument on the right in three short boxes. Slide notes carry Rutherford's real quote: "It was almost as incredible as if you fired a 15-inch shell at a piece of tissue paper and it came back and hit you."</figcaption></figure>
+
+<figure><div class="slide" data-sec="LEARN · OLD MODEL, NEW MODEL" data-obj="Describe how the model of the atom developed."><div class="bd" style="align-items:center">
+ <div class="col fill" style="align-items:center"><svg viewBox="0 0 100 100" style="width:62%"><use href="#mTho"/></svg><p class="cen"><b>Plum pudding</b> (1897)<br><span class="small">positive "dough", electrons dotted through</span></p></div>
+ <div class="col" style="flex:0 0 18%;align-items:center"><svg viewBox="0 0 100 40" style="width:100%"><path d="M5 20H92" stroke="#c62828" stroke-width="5" marker-end="url(#arR)"/></svg><p class="small cen" style="color:var(--red);font-weight:700">gold foil evidence</p></div>
+ <div class="col fill" style="align-items:center"><svg viewBox="0 0 100 100" style="width:62%"><use href="#mRut"/></svg><p class="cen"><b>Nuclear model</b> (1911)<br><span class="small">tiny positive <span class="k">nucleus</span>, mostly empty space</span></p></div>
+</div></div>
+<figcaption><span class="id">S3</span><b>Before and after.</b> Two models, with the evidence that changed them written on the arrow. Simple to copy into books.</figcaption></figure>
+</div>
+
+<h2>8. Definition box</h2>
+<p>Three ways to use it. Each key term is defined once, at the point it is first needed, in the same place on the slide every time.</p>
+<div class="grid">
+<figure><div class="slide" data-sec="LEARN · ELEMENTS" data-obj="Define atom, element and compound."><div class="bd" style="flex-direction:column;gap:2%">
+ <div style="display:flex;gap:2%;flex:1;min-height:0"><div class="pic" style="flex:0 0 48%"><svg viewBox="0 0 120 100" style="height:94%"><use href="#pEl"/></svg></div>
+ <div class="col fill" style="justify-content:center"><p>Every ball in this box is the same, so it is one <span class="k">element</span>.</p><p class="small">Iron, oxygen and helium are all elements.</p></div></div>
+ <div class="def" style="font-size:1em"><b>Element</b> &nbsp;A substance made of only one type of atom.</div></div></div>
+<figcaption><span class="id">F1</span><b>Strip along the bottom.</b> Always the same place, so pupils know where to look and what to copy.</figcaption></figure>
+
+<figure><div class="slide" data-sec="LEARN · ELEMENTS" data-obj="Define atom, element and compound."><div class="bd">
+ <div class="pic" style="flex:0 0 46%"><svg viewBox="0 0 120 100" style="height:94%"><use href="#pEl"/></svg></div>
+ <div class="col fill" style="gap:3%">
+  <div class="box"><h4>Element</h4><div class="in"><p>A substance made of only one type of atom.</p></div></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:3%;flex:1;min-height:0">
+   <div class="box"><h4 style="background:var(--green)">Examples</h4><div class="in small"><p>iron (Fe)</p><p>oxygen (O<sub>2</sub>)</p><p>helium (He)</p></div></div>
+   <div class="box"><h4 style="background:var(--red)">Not examples</h4><div class="in small"><p>water (H<sub>2</sub>O)</p><p>salt (NaCl)</p><p>air (a mixture)</p></div></div></div></div>
+</div></div>
+<figcaption><span class="id">F2</span><b>Definition with examples and non-examples.</b> A cut-down Frayer model. Best for the one or two terms per lesson that pupils mix up. O<sub>2</sub> is the deliberate trap: two atoms, still one element.</figcaption></figure>
+
+<figure><div class="slide" data-sec="LEARN · ELEMENTS" data-obj="Define atom, element and compound."><div class="bd">
+ <div class="pic" style="flex:0 0 50%"><svg viewBox="0 0 120 100" style="height:94%"><use href="#pEl"/></svg></div>
+ <div class="col fill" style="justify-content:center;gap:5%">
+  <p class="big">One type of atom.</p>
+  <p>That's what makes something an <span class="k">element</span><sup>1</sup>.</p>
+  <p class="tiny" style="border-top:.1em solid var(--navy);padding-top:.4em"><b>1 element:</b> a substance made of only one type of atom. Write this in your book.</p></div>
+</div></div>
+<figcaption><span class="id">F3</span><b>Big idea plus footnote.</b> The slide says the idea in four words; the formal definition sits underneath as a footnote to copy. Good for older classes.</figcaption></figure>
+</div>
+
+<h2>9. Objectives with a key words panel</h2>
+<p>Words from earlier lessons come with their definitions, as a reminder. New words have no definition: today's lesson teaches them.</p>
+<div class="grid">
+<figure><div class="slide" data-sec="LEARNING OBJECTIVES" data-e="1" data-obj="Define atom, element and compound."><div class="bd">
+ <div class="col fill" style="gap:4%;justify-content:center"><div class="row"><span class="num">1</span><p>Define <b>atom</b>, <b>element</b> and <b>compound</b>.</p></div><div class="row"><span class="num">2</span><p>Spot a chemical reaction from a new substance forming.</p></div><div class="row"><span class="num">3</span><p>Use symbols and formulae to name elements and compounds.</p></div></div>
+ <div class="col" style="flex:0 0 33%;background:#fff;border:.15em solid var(--gold);padding:.5em;gap:.5em">
+  <p class="small" style="font-weight:700;color:var(--navy);border-bottom:.1em solid var(--gold)">Key words</p>
+  <p class="tiny" style="color:#555">You know these</p>
+  <p class="small"><b>particle</b>: a tiny piece of matter</p><p class="small"><b>substance</b>: one kind of material</p>
+  <p class="tiny" style="color:#555;margin-top:.3em">New today</p>
+  <div class="chips"><span class="chipk">atom<span class="new">NEW</span></span><span class="chipk">element<span class="new">NEW</span></span><span class="chipk">compound<span class="new">NEW</span></span><span class="chipk">mixture<span class="new">NEW</span></span></div></div>
+</div></div>
+<figcaption><span class="id">O1</span><b>Side panel on the right.</b> Objectives on the left, key words on the right in two groups.</figcaption></figure>
+
+<figure><div class="slide" data-sec="LEARNING OBJECTIVES" data-e="1" data-obj="Define atom, element and compound."><div class="bd" style="flex-direction:column;gap:3%">
+ <div style="display:flex;gap:1.5%;background:#fff;border:.15em solid var(--gold);padding:.4em .6em;align-items:stretch">
+  <div class="fill"><p class="tiny" style="color:#555">You know these</p><p class="small"><b>particle</b>: a tiny piece of matter &nbsp;·&nbsp; <b>substance</b>: one kind of material</p></div>
+  <div style="border-left:.1em solid var(--gold);padding-left:1%"><p class="tiny" style="color:#555">New today</p><div class="chips"><span class="chipk">atom</span><span class="chipk">element</span><span class="chipk">compound</span><span class="chipk">mixture</span></div></div></div>
+ <div class="col fill" style="gap:5%;justify-content:center"><div class="row"><span class="num">1</span><p>Define <b>atom</b>, <b>element</b> and <b>compound</b>.</p></div><div class="row"><span class="num">2</span><p>Spot a chemical reaction from a new substance forming.</p></div><div class="row"><span class="num">3</span><p>Use symbols and formulae to name elements and compounds.</p></div></div>
+</div></div>
+<figcaption><span class="id">O2</span><b>Bar across the top.</b> Same two groups in one strip, objectives below. Leaves more width for long objectives.</figcaption></figure>
+
+<figure><div class="slide" data-sec="LEARN · ELEMENT OR COMPOUND?" data-obj="Define atom, element and compound."><div class="bd">
+ <div class="col fill" style="gap:3%"><div class="pic fill"><svg viewBox="0 0 120 100" style="height:94%"><use href="#pCo"/></svg></div><p>Two types of atom, joined: a <span class="k">compound</span>.</p></div>
+ <div class="col" style="flex:0 0 22%;background:#fff;border-left:.2em solid var(--gold);padding:.4em;gap:.45em">
+  <p class="tiny" style="font-weight:700;color:var(--navy)">Key words</p>
+  <p class="small" style="color:#888">atom ✓</p><p class="small" style="color:#888">element ✓</p>
+  <p class="small" style="background:var(--gold);color:var(--navy);font-weight:700;padding:.1em .3em">compound</p>
+  <p class="small">mixture</p></div>
+</div></div>
+<figcaption><span class="id">O3</span><b>The same panel on every Learn slide.</b> A slim rail on the right. Words already covered are ticked and greyed, and the word this slide teaches is lit up in gold, so pupils always see where they are in the lesson.</figcaption></figure>
+</div>
+
+<h2>10. Engage hooks</h2>
+<p>Each hook is a real question the lesson answers later. A draft menu; the research report will rank these.</p>
+<div class="grid">
+<figure><div class="slide" data-sec="ENGAGE · THE MAGNET TRICK" data-e="1" data-obj="Define atom, element and compound."><div class="bd" style="flex-direction:column;gap:2.5%">
+ <div style="display:flex;gap:3%;flex:1;min-height:0"><div class="pic fill"><img src="@@iron@@" alt="Iron filings"></div><p class="big" style="align-self:center">+</p><div class="pic fill"><img src="@@sulfur@@" alt="Sulfur powder"></div><p class="big" style="align-self:center">→ heat →</p><div class="pic fill" style="background:#2b2b2b;color:#fff"><span class="big">?</span></div></div>
+ <div class="ask">A magnet pulls the iron out of this mixture. After heating, it can't. Where did the iron go?</div>
+</div></div>
+<figcaption><span class="id">N1</span><b>A puzzle you can see.</b> Real photos from the school slides. The answer (a compound forms) comes on Learn slide 3, so the hook pays off.</figcaption></figure>
+
+<figure><div class="slide" data-sec="ENGAGE · PREDICT" data-e="1" data-obj="Calculate pressure using P = F ÷ A."><div class="bd" style="flex-direction:column;gap:3%">
+ <div class="ask">Someone stands on your hand. Which hurts more? <span class="small" style="font-weight:400">(shoes seen from underneath)</span></div>
+ <div style="display:flex;gap:3%;flex:1;min-height:0">
+  <div class="box fill"><h4>A &nbsp;Stiletto heel</h4><div class="in pic fill"><svg viewBox="0 0 120 130" style="flex:1;min-height:0;width:100%"><ellipse cx="60" cy="35" rx="26" ry="30" fill="#eceff4" stroke="#0f1b5c" stroke-width="2"/><path d="M45 62Q50 92 55 106M75 62Q70 92 65 106" stroke="#0f1b5c" stroke-width="1.5" stroke-dasharray="4 3" fill="none"/><rect x="54" y="106" width="12" height="12" fill="#1565c0" stroke="#0f1b5c"/></svg></div></div>
+  <div class="box fill"><h4>B &nbsp;Trainer</h4><div class="in pic fill"><svg viewBox="0 0 120 130" style="flex:1;min-height:0;width:100%"><path d="M60 6C84 6 92 28 90 52C88 74 82 86 84 104C86 120 74 126 60 126C46 126 34 120 36 104C38 86 32 74 30 52C28 28 36 6 60 6Z" fill="#1565c0" fill-opacity=".45" stroke="#0f1b5c" stroke-width="2"/></svg></div></div>
+  <div class="box" style="flex:0 0 22%"><h4>C</h4><div class="in"><p>Same. Same person, same weight.</p></div></div></div>
+</div></div>
+<figcaption><span class="id">N2</span><b>Predict, then find out.</b> A forced choice before any teaching, with a tempting wrong answer (C). Learn slide E2 gives the numbers.</figcaption></figure>
+
+<figure><div class="slide" data-sec="ENGAGE · ODD ONE OUT" data-e="1" data-obj="Define atom, element and compound."><div class="bd" style="flex-direction:column;gap:3%">
+ <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:2%;flex:1;min-height:0">
+  <div class="col"><svg viewBox="0 0 120 100" style="flex:1;min-height:0"><use href="#pEl"/></svg><p class="cen" style="margin:0"><b>A</b></p></div>
+  <div class="col"><svg viewBox="0 0 120 100" style="flex:1;min-height:0"><rect x="2" y="2" width="116" height="96" fill="#fff" stroke="#0f1b5c" stroke-width="3"/><g><circle cx="30" cy="30" r="11" fill="url(#gr)"/><circle cx="49" cy="30" r="11" fill="url(#gr)"/><circle cx="76" cy="62" r="11" fill="url(#gr)"/><circle cx="95" cy="62" r="11" fill="url(#gr)"/><circle cx="34" cy="76" r="11" fill="url(#gr)"/><circle cx="53" cy="76" r="11" fill="url(#gr)"/></g></svg><p class="cen" style="margin:0"><b>B</b></p></div>
+  <div class="col"><svg viewBox="0 0 120 100" style="flex:1;min-height:0"><use href="#pCo"/></svg><p class="cen" style="margin:0"><b>C</b></p></div>
+  <div class="col"><svg viewBox="0 0 120 100" style="flex:1;min-height:0"><rect x="2" y="2" width="116" height="96" fill="#fff" stroke="#0f1b5c" stroke-width="3"/><g><circle cx="25" cy="28" r="11" fill="url(#gy)"/><circle cx="62" cy="24" r="11" fill="url(#gy)"/><circle cx="95" cy="32" r="11" fill="url(#gy)"/><circle cx="40" cy="70" r="11" fill="url(#gy)"/><circle cx="82" cy="74" r="11" fill="url(#gy)"/></g></svg><p class="cen" style="margin:0"><b>D</b></p></div></div>
+ <div class="ask">Which one is the odd one out? There's more than one good answer.</div>
+</div></div>
+<figcaption><span class="id">N3</span><b>Odd one out.</b> C is the only compound, but B (pairs of atoms) is a good wrong answer. That argument is the lesson.</figcaption></figure>
+
+<figure><div class="slide" data-sec="ENGAGE · FOOL'S GOLD" data-e="1" data-obj="Define atom, element and compound."><div class="bd">
+ <div class="pic" style="flex:0 0 45%"><img src="@@pyrite@@" alt="Pyrite crystal"></div>
+ <div class="col fill" style="justify-content:center;gap:5%"><div class="ask">Miners in 1849 thought this was gold. It isn't. How could you prove it?</div><p class="small">Hint: what is it made of?</p></div>
+</div></div>
+<figcaption><span class="id">N4</span><b>A real object with a history.</b> Pyrite (FeS<sub>2</sub>) from the school slides. It links to the Mastering question on fixed proportions.</figcaption></figure>
+</div>
+
+<h3>Hooks to avoid (draft)</h3>
+<ul>
+ <li><b>"Have you ever wondered…?"</b> questions with no real puzzle in them.</li>
+ <li><b>Fun facts the lesson never comes back to.</b> Research on "seductive details" shows they lower recall.</li><li><b>A big demo with no prediction.</b> Pupils remember the bang, not the science.</li>
+ <li><b>"Imagine a world without…"</b> openers. Vague, and the class knows it's filler.</li>
+ <li><b>A question the class can answer in one word without thinking.</b></li>
+</ul>
+
+<h2>11. Multiple choice: what the check looks for</h2>
+<p>Each wrong answer gets a label for the mistake it catches. An option with no label is weak, and I rewrite it.</p>
+<div class="tw"><table class="cmp">
+ <tr><th>Question: which of these is a compound?</th><th>Weak set</th><th>Strong set</th></tr>
+ <tr><td>Right answer</td><td>H<sub>2</sub>O</td><td>H<sub>2</sub>O</td></tr>
+ <tr><td>Wrong 1</td><td>Fe <span class="tag">thinks a metal can be a compound</span></td><td>O<sub>2</sub> <span class="tag ok">two atoms, so thinks "compound"</span></td></tr>
+ <tr><td>Wrong 2</td><td class="bad">Banana <span class="tag">no mistake leads here</span></td><td>Air <span class="tag ok">mixes up mixture and compound</span></td></tr>
+ <tr><td>Wrong 3</td><td class="bad">The Sun <span class="tag">no mistake leads here</span></td><td>Co <span class="tag ok">capital letter rule</span></td></tr>
+</table></div>
+<div class="note">The check: every wrong option must name one of (1) a common mistake, (2) a faulty line of reasoning, or (3) a key idea. Options that are obviously silly, much shorter or longer than the rest, or "all of the above" fail. I fix them while writing the lesson, and the build report lists anything still weak.</div>
+
+<h2>What to send back</h2>
+<p>For example: "Highlight 3. C1 and C3. D1 for KS3, D2 for practicals. G1. E1 and E2. S2. F2 for tricky words, F1 otherwise. O3. N1, N2 and N4." Plus anything you'd change.</p>
+</div>
+
+<script>
+(function(){
+  var tabs=["DO NOW","ENGAGE","LEARN","BUILD","APPLY","REVIEW"];
+  document.querySelectorAll(".slide").forEach(function(s){
+    var e=s.dataset.e==="1", bd=s.querySelector(".bd");
+    var sl=document.createElement("div");sl.className="sl";
+    var nav='<div class="nav">'+tabs.map(function(t){var on=(e&&t==="ENGAGE")||(!e&&t==="LEARN");return '<span class="'+(on?"on"+(e?" e":""):"")+'">'+t+'</span>';}).join("")+'</div><div></div>';
+    sl.innerHTML=nav+'<div class="sec'+(e?" e":"")+'">'+s.dataset.sec+'</div>';
+    sl.appendChild(bd);
+    var ft=document.createElement("div");ft.className="ft";ft.innerHTML='<b>Learning objective:</b> <i>'+s.dataset.obj+'</i>';sl.appendChild(ft);
+    s.appendChild(sl);
+  });
+  var b=document.body, saved="1";
+  try{saved=localStorage.getItem("hl")||"1";}catch(_){}
+  function set(h){b.dataset.hl=h;document.querySelectorAll(".bar button").forEach(function(x){x.setAttribute("aria-pressed",x.dataset.h===h?"true":"false");});try{localStorage.setItem("hl",h);}catch(_){}}
+  document.querySelectorAll(".bar button").forEach(function(x){x.addEventListener("click",function(){set(x.dataset.h);});});
+  set(saved);
+})();
+</script>

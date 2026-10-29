@@ -228,3 +228,7 @@ Sources:
 Next in the replica pack: `/replica-design` (room, creature moods, coin icon, item set in one style).
 
 **Room world v2 (2026-10-23):** corner rooms, zones, upgrade lines, pets, outfits, potions, quests and the room list are in `design/world.md`. It replaces the room parts of slices 1 and 5; pets, potions, quests and new rooms become slices 9-12.
+
+**BUILT 2026-10-23 (slices 1-3 plus first rituals):** `planner/Game.gs` (server, tabs Game Player/Goals/Ticks/Freeze/Seen), `planner/game-art.js` (Ulhu sprites, joined into dist/Game.gs), `planner/game-ui.js` (one screen shared by Planner.html and Phone.html, pasted at `<!--GAME_UI-->` by bundle.js). Public functions: gameLoad, gameTick, gameUntick, gameSaveGoal, gameArchive, gameFreeze. Tests: `node planner/tests/game.test.js`. Pure maths lives inside Game.gs (no separate game-logic.js was needed).
+
+**BUILT 2026-10-23 (second round): slice 5 shop + room, slice 7 boss fights, slice 8 Sunday review, auto-ticks for homework set and order sheet.** New: `replica/art/export_shop.py` -> `planner/game-shop.json` (120 items, sprite layers with offsets) -> `dist/GameShop.gs` (const SHOP). Game.gs adds gameShop, gameArt, gameBuy, gamePlace, gameBossStart, gameBossStage, gameReview and tabs Game Owned / Game Bosses / Game Reviews. Code.gs `exportXlsx` now logs "order sheet downloaded" (read by the order sheet hook). Not yet: outfits (the 60 outfit items), real-life rewards (slice 6), pets, potions, rooms, seasonal items.

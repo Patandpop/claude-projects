@@ -1,0 +1,200 @@
+<title>Lesson Remote</title>
+<meta name="description" content="Prototype: corner-swipe MCQ votes and the silent-work timer for the behaviour app">
+<style>
+/* Layout: one full-height phone screen, two modes (MCQ vote / Silent work) on a top switch. Deliberately one dark look: it is used in a classroom, glanced at. */
+:root{
+  --bg:#0d1430; --panel:#18214a; --fg:#eef2ff; --muted:#9aa6c9; --line:#2a3566;
+  --A:#C2185B; --B:#1565C0; --C:#2E7D32; --D:#F57F17; --ok:#2e9d4f; --loud:#c62828; --gold:#ffd60a;
+  --ui:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--ui);overscroll-behavior:none}
+.app{height:100%;display:flex;flex-direction:column;max-width:520px;margin:0 auto;padding-inline:16px;padding-block:10px 12px;gap:10px}
+.top{display:flex;gap:6px}
+.top button{flex:1;font:inherit;font-weight:600;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--muted)}
+.top button[aria-pressed="true"]{background:var(--fg);color:var(--bg)}
+.info{font-size:.85rem;color:var(--muted);display:flex;justify-content:space-between;gap:8px}
+.q{font-size:1rem;line-height:1.35;background:var(--panel);border-radius:10px;padding:10px 12px;min-height:3.2em}
+.pad{position:relative;flex:1;min-height:260px;border-radius:16px;background:var(--panel);touch-action:none;user-select:none;overflow:hidden}
+.corner{position:absolute;width:42%;height:42%;display:flex;align-items:center;justify-content:center;font-size:4.2rem;font-weight:800;color:#fff;border-radius:14px;opacity:.95}
+.cA{left:4%;bottom:4%;background:var(--A)} .cB{left:4%;top:4%;background:var(--B)} .cC{right:4%;top:4%;background:var(--C)} .cD{right:4%;bottom:4%;background:var(--D)}
+.corner.hot{outline:5px solid #fff}
+svg.line{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.hint{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);text-align:center;font-size:.8rem;color:var(--muted);pointer-events:none}
+.split{display:none;flex-direction:column;gap:8px;background:var(--panel);border-radius:12px;padding:10px 12px}
+.split.on{display:flex}
+.bar{position:relative;height:56px;border-radius:12px;overflow:hidden;touch-action:none;display:flex}
+.bar .l,.bar .r{display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.3rem;color:#fff;transition:width .05s}
+.ticks{display:flex;justify-content:space-between;font-size:.75rem;color:var(--muted);padding:0 4px}
+.row{display:flex;gap:8px}
+.row button{flex:1;font:inherit;font-weight:700;padding:13px;border-radius:12px;border:0;background:var(--line);color:var(--fg)}
+.row button.go{background:var(--fg);color:var(--bg)}
+.log{font-size:.82rem;color:var(--muted);display:flex;flex-direction:column;gap:3px;max-height:7.5em;overflow:auto}
+.log b{color:var(--fg)}
+.toast{position:fixed;left:50%;top:62px;transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:10px 14px;border-radius:999px;font-weight:600;display:none;gap:12px;align-items:center;z-index:5}
+.toast.on{display:flex}
+.toast button{font:inherit;font-weight:800;border:0;background:var(--bg);color:var(--fg);border-radius:999px;padding:4px 10px}
+/* silent work */
+.quiet{flex:1;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:var(--ok);touch-action:manipulation;user-select:none;transition:background .15s}
+.quiet.loud{background:var(--loud)}
+.quiet.idle{background:var(--panel)}
+.big{font-size:4.6rem;font-weight:800;font-variant-numeric:tabular-nums;line-height:1}
+.state{font-size:1.2rem;font-weight:700;letter-spacing:.06em}
+.sub{font-size:.85rem;opacity:.9;font-variant-numeric:tabular-nums}
+[hidden]{display:none!important}
+button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="app">
+  <div class="top" role="tablist">
+    <button id="tMcq" aria-pressed="true">MCQ vote</button>
+    <button id="tQuiet" aria-pressed="false">Silent work</button>
+  </div>
+
+  <section id="mcq">
+    <div class="info"><span>9XS · Atoms, elements and compounds</span><span id="qn">Q1 of 6</span></div>
+    <div class="q" id="qtext"></div>
+  </section>
+  <div class="pad" id="pad">
+    <div class="corner cB" data-l="B">B</div><div class="corner cC" data-l="C">C</div>
+    <div class="corner cA" data-l="A">A</div><div class="corner cD" data-l="D">D</div>
+    <svg class="line" id="line"></svg>
+    <div class="hint" id="hint">Tap a corner = nearly all chose it<br>Swipe corner to corner = a split</div>
+  </div>
+  <div class="split" id="split">
+    <div class="bar" id="bar"><div class="l" id="bl"></div><div class="r" id="br"></div></div>
+    <div class="ticks"><span>90</span><span>80</span><span>70</span><span>60</span><span>50</span></div>
+    <div class="row"><button id="sCancel">Back</button><button class="go" id="sSave">Save</button></div>
+  </div>
+  <div class="row" id="mcqRow"><button id="skip">Skip</button></div>
+  <div class="log" id="log"></div>
+
+  <section id="quiet" hidden style="flex:1;display:flex;flex-direction:column;gap:10px">
+    <div class="info"><span>9XS · silent work</span><span id="qSpells">0 spells this lesson</span></div>
+    <div class="quiet idle" id="qPad" role="button" aria-label="Tap: too loud / quiet again">
+      <div class="state" id="qState">TAP TO START</div>
+      <div class="big" id="qTime">0:00</div>
+      <div class="sub" id="qSub">silent time</div>
+    </div>
+    <div class="row"><button id="qCancel">Cancel</button><button class="go" id="qStop">Stop and save</button></div>
+    <div class="log" id="qLog"></div>
+  </section>
+</div>
+<div class="toast" id="toast"><span id="tMsg"></span><button id="undo">Undo</button></div>
+
+<script>
+const MCQS = @@MCQS@@;
+const $ = (id) => document.getElementById(id);
+let qi = 0; const votes = [];
+const COL = { A: 'var(--A)', B: 'var(--B)', C: 'var(--C)', D: 'var(--D)' };
+function showQ() {
+  const m = MCQS[qi];
+  $('qn').textContent = qi < MCQS.length ? `Q${qi + 1} of ${MCQS.length}` : 'all done';
+  $('qtext').textContent = m ? m.q : 'All six done. Results go to the planner (class counts only).';
+}
+function center(l) { const r = $('pad').querySelector('[data-l="' + l + '"]').getBoundingClientRect(), p = $('pad').getBoundingClientRect(); return [r.left - p.left + r.width / 2, r.top - p.top + r.height / 2]; }
+function cornerAt(x, y) { for (const el of $('pad').querySelectorAll('.corner')) { const r = el.getBoundingClientRect(); if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) return el.dataset.l; } return null; }
+let drag = null, pending = null, share = 70;
+$('pad').addEventListener('pointerdown', (e) => {
+  if (qi >= MCQS.length) return;
+  const l = cornerAt(e.clientX, e.clientY); if (!l) return;
+  drag = { from: l, to: null }; $('pad').setPointerCapture(e.pointerId);
+  $('pad').querySelector('[data-l="' + l + '"]').classList.add('hot');
+});
+$('pad').addEventListener('pointermove', (e) => {
+  if (!drag) return;
+  const p = $('pad').getBoundingClientRect(), [x0, y0] = center(drag.from);
+  const t = cornerAt(e.clientX, e.clientY);
+  $('pad').querySelectorAll('.corner').forEach((c) => c.classList.toggle('hot', c.dataset.l === drag.from || c.dataset.l === t));
+  drag.to = t && t !== drag.from ? t : null;
+  $('line').innerHTML = `<line x1="${x0}" y1="${y0}" x2="${e.clientX - p.left}" y2="${e.clientY - p.top}" stroke="#fff" stroke-width="8" stroke-linecap="round"/>`;
+});
+$('pad').addEventListener('pointerup', () => {
+  if (!drag) return;
+  $('line').innerHTML = ''; $('pad').querySelectorAll('.corner').forEach((c) => c.classList.remove('hot'));
+  if (!drag.to) save({ [drag.from]: 100 });              // a tap: nearly everyone
+  else { pending = drag; share = 70; openSplit(); }        // a swipe: set the rough split
+  drag = null;
+});
+function openSplit() {
+  $('split').classList.add('on'); $('pad').hidden = true; $('mcqRow').hidden = true; paint();
+}
+function paint() {
+  $('bl').style.width = share + '%'; $('bl').style.background = COL[pending.from]; $('bl').textContent = pending.from + ' ' + share + '%';
+  $('br').style.width = (100 - share) + '%'; $('br').style.background = COL[pending.to]; $('br').textContent = pending.to + ' ' + (100 - share) + '%';
+}
+function slide(e) { const r = $('bar').getBoundingClientRect(); const f = 1 - (e.clientX - r.left) / r.width; share = Math.max(50, Math.min(90, Math.round((50 + f * 40 * 1.25) / 10) * 10)); paint(); }
+// the bar: slide left/right, it snaps to 90 80 70 60 50 (most-picked share)
+$('bar').addEventListener('pointerdown', (e) => { $('bar').setPointerCapture(e.pointerId); slide(e); $('bar').onpointermove = slide; });
+$('bar').addEventListener('pointerup', () => { $('bar').onpointermove = null; });
+$('sCancel').onclick = closeSplit;
+$('sSave').onclick = () => { save({ [pending.from]: share, [pending.to]: 100 - share }); closeSplit(); };
+function closeSplit() { $('split').classList.remove('on'); $('pad').hidden = false; $('mcqRow').hidden = false; pending = null; }
+let undoT = null;
+function save(split) {
+  const m = MCQS[qi]; votes.push({ qi, split, skipped: !split }); qi++;
+  const right = split ? (split[m.a] || 0) : null;
+  const main = split ? Object.keys(split).sort((a, b) => split[b] - split[a]) : [];
+  const wrongL = main.find((l) => l !== m.a);
+  $('log').insertAdjacentHTML('afterbegin', `<div id="v${votes.length}">Q${votes.length}: ${split ? `<b>${right}% right</b>` + (wrongL ? ` · ${wrongL} ${split[wrongL]}%: ${(m.why || {})[wrongL] || 'wrong'}` : '') : 'skipped'}</div>`);
+  showQ(); toast(split ? 'Saved' : 'Skipped');
+}
+$('skip').onclick = () => { if (qi < MCQS.length) save(null); };
+function toast(msg) {
+  $('tMsg').textContent = msg; $('toast').classList.add('on'); clearTimeout(undoT); undoT = setTimeout(() => $('toast').classList.remove('on'), 5000);
+}
+$('undo').onclick = () => {
+  if (mode === 'mcq' && votes.length) { votes.pop(); qi--; const el = $('v' + (votes.length + 1)); if (el) el.remove(); showQ(); }
+  else if (mode === 'quiet' && lastSpell) { spells.pop(); lastSpell = null; drawSpells(); }
+  $('toast').classList.remove('on');
+};
+showQ();
+
+/* ---- silent work: tap = too loud, tap again = quiet; Stop saves, Cancel throws away ---- */
+let mode = 'mcq', run = null, timer = null, lastSpell = null; const spells = [];
+const fmt = (s) => Math.floor(s / 60) + ':' + String(Math.floor(s % 60)).padStart(2, '0');
+function tick() {
+  if (!run) return;
+  const now = Date.now(), total = (now - run.start) / 1000, loudNow = run.loudSince ? (now - run.loudSince) / 1000 : 0;
+  const loud = run.loud + loudNow, quiet = total - loud;
+  $('qTime').textContent = fmt(quiet);
+  $('qSub').textContent = `silent ${Math.round(100 * quiet / Math.max(1, total))}% · loud ${fmt(loud)} · ${run.times} time${run.times === 1 ? '' : 's'}`;
+}
+$('qPad').onclick = () => {
+  const now = Date.now();
+  if (!run) { run = { start: now, loud: 0, loudSince: null, times: 0 }; timer = setInterval(tick, 250); }
+  else if (run.loudSince) { run.loud += (now - run.loudSince) / 1000; run.loudSince = null; }
+  else { run.loudSince = now; run.times++; }
+  $('qPad').className = 'quiet' + (run.loudSince ? ' loud' : '');
+  $('qState').textContent = run.loudSince ? 'TOO LOUD' : 'QUIET';
+  tick();
+};
+function endRun(keep) {
+  if (!run) return;
+  const now = Date.now(); if (run.loudSince) { run.loud += (now - run.loudSince) / 1000; }
+  const total = (now - run.start) / 1000;
+  if (keep) { lastSpell = { total, loud: run.loud, times: run.times }; spells.push(lastSpell); toast('Saved: ' + Math.round(100 * (total - run.loud) / Math.max(1, total)) + '% silent'); }
+  else toast('Cancelled: not recorded');
+  clearInterval(timer); run = null;
+  $('qPad').className = 'quiet idle'; $('qState').textContent = 'TAP TO START'; $('qTime').textContent = '0:00'; $('qSub').textContent = 'silent time';
+  drawSpells();
+}
+function drawSpells() {
+  const T = spells.reduce((a, s) => a + s.total, 0), Lo = spells.reduce((a, s) => a + s.loud, 0);
+  $('qSpells').textContent = spells.length + ' spell' + (spells.length === 1 ? '' : 's') + (spells.length ? ' · lesson ' + Math.round(100 * (T - Lo) / Math.max(1, T)) + '% silent' : '');
+  $('qLog').innerHTML = spells.map((s, i) => `<div>Spell ${i + 1}: <b>${fmt(s.total - s.loud)}</b> silent of ${fmt(s.total)} · too loud ${s.times}×</div>`).reverse().join('');
+}
+$('qStop').onclick = () => endRun(true);
+$('qCancel').onclick = () => endRun(false);
+function setMode(m) {
+  mode = m;
+  $('tMcq').setAttribute('aria-pressed', m === 'mcq'); $('tQuiet').setAttribute('aria-pressed', m === 'quiet');
+  if (pending) closeSplit();
+  ['mcq', 'pad', 'mcqRow', 'log'].forEach((id) => { $(id).hidden = m !== 'mcq'; });
+  $('quiet').hidden = m !== 'quiet';
+}
+$('tMcq').onclick = () => setMode('mcq'); $('tQuiet').onclick = () => setMode('quiet');
+</script>

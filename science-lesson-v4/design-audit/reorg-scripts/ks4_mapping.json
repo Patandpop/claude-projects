@@ -1,0 +1,2921 @@
+{
+  "Physics/P1 Energy": {
+    "year": "Year 10",
+    "subject": "Physics",
+    "driveTopic": "P1 Energy",
+    "existed": true,
+    "rows": [
+      {
+        "packLesson": "6.1.1.1 lesson 1 Energy stores and systems",
+        "files": 41,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 1 - Energy Stores and Systems",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "6.1.1.2 lesson 2 Gravitational potential energy",
+        "files": 23,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 14 - Gravitational Potential Energy",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "6.1.1.2 lesson 3 Kinetic energy",
+        "files": 23,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 15 - Kinetic Energy",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "6.1.1.2 lesson 4 Elastic potential energy",
+        "files": 20,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 16 - Elastic Potential Energy",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "6.1.1.3 lesson 5a specific heat capacity REQUIRED PRACTICAL 1",
+        "files": 17,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 17 - Specific Heat Capacity Required Practical 1",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "6.1.1.3 lesson 5 Specific heat capacity theory",
+        "files": 19,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 18 - Specific Heat Capacity Theory",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "6.1.1.4 lesson 6 Power",
+        "files": 17,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 19 - Power",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "6.1.2.1 lesson 7 Conservation of energy and reducing unwanted heat transfers",
+        "files": 15,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 20 - Conservation of Energy and Reducing Unwanted Heat Transfers",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "6.1.2.1 lesson 8 Reducing heat transfers REQUIRED PRACTICAL",
+        "files": 18,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 21 - Reducing Heat Transfers Required Practical",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "6.1.2.2 lesson 9 Efficiency",
+        "files": 20,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 10 - Efficiency",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "6.1.3.1 lesson 10 Non renewable resources",
+        "files": 27,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 11 - Non Renewable Resources",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "6.1.3.1 lesson 11 Renewable energy resources and environmental factors",
+        "files": 19,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 12 - Renewable Energy Resources and Environmental Factors",
+        "score": 1.0,
+        "separate": false
+      }
+    ],
+    "pseudo": [],
+    "support": [
+      "6.1.3.1b lesson 13 Revision lesson material",
+      "_Additional"
+    ]
+  },
+  "Physics/P2 Electricity": {
+    "year": "Year 10",
+    "subject": "Physics",
+    "driveTopic": "P2 Electricity",
+    "existed": true,
+    "rows": [
+      {
+        "packLesson": "6.2.1.2 lesson 2 Electrical charge and current Q = IT",
+        "files": 20,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 18 - Electrical Charge and Current Q = IT",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "6.2.1.3 lesson 3 Ohm Law",
+        "files": 25,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 19 - Ohm Law",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "6.2.1.3 lesson 4 Required practical 3 investigating resistance on different length wire",
+        "files": 13,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 20 - Required Practical 3 Investigating Resistance on Different Length Wire",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "6.2.1.4 lesson 5 Required practical 4 plotting voltage current graphs for a resistor",
+        "files": 34,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 21 - Required Practical 4 Plotting Voltage Current Graphs for a Resistor",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "6.2.1.4 Lesson 6 IV Graphs for bulbs",
+        "files": 14,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 22 - IV Graphs for Bulbs",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "6.2.1.4 Lesson 7 - IV Graphs for Diodes",
+        "files": 4,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 23 - IV Graphs for Diodes",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "6.2.1.4 lesson 8 investigating resistance in thermistors and LDRS",
+        "files": 18,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 24 - Investigating Resistance in Thermistors and LDRS",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "6.2.2.1 lesson 9 Current in series and parallel circuits",
+        "files": 31,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 25 - Current in Series and Parallel Circuits",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "6.2.2.1 lesson 10 Voltage in series and parallel",
+        "files": 18,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 10 - Voltage in Series and Parallel",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "6.2.2.1 lesson 11 Adding resistors in parallel and series REQUIRED PRACTICAL 3",
+        "files": 23,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 11 - Adding Resistors in Parallel and Series Required Practical 3",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "6.2.3.1 lesson 12 Alternating potential difference and direct potential difference",
+        "files": 21,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 12 - Alternating Potential Difference and Direct Potential Difference",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "6.2.3.2 lesson 13 Plugs",
+        "files": 19,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 13 - Plugs",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "6.2.4.1 lesson 14 electrical power P=IV P=I2R",
+        "files": 15,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 14 - Electrical Power P=IV P=I2R",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "6.2.4.1 lesson 15 electrical energy E =QV",
+        "files": 7,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 15 - Electrical Energy E =QV",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "6.2.4.2 Lesson 16 The national grid",
+        "files": 24,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 16 - The National Grid",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "6.2.5.3 lesson 17 Revision lesson",
+        "files": 25,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 17 - Revision Lesson",
+        "score": 1.0,
+        "separate": false
+      }
+    ],
+    "pseudo": [],
+    "support": [
+      "Archive",
+      "6.2.2.1. L11a Dirt homework",
+      "Useful for lessons",
+      "ARB Resources",
+      "SDB Resources",
+      "6.2.1.3a Dirt homework",
+      "6.2.1.1. lesson 1 Circuit symbols"
+    ]
+  },
+  "Physics/P3 The Particle Model": {
+    "year": "Year 9",
+    "subject": "Physics",
+    "driveTopic": "P3 Particles",
+    "existed": true,
+    "rows": [
+      {
+        "packLesson": "Lesson 1 Required_pract Measuring density in regular shaped objects and homework setting",
+        "files": 31,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 1 - Required Practical Measuring Density for a Regular Shaped Object",
+        "score": 0.86,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 2 Required_pract Measuring density in irregular shaped objects",
+        "files": 29,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 2 - Required Practical Measuring Density for an Irregular Shaped Object",
+        "score": 0.86,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 3 Required_pract Measuring density in liquids",
+        "files": 28,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 3 - Required Practical Measuring Density in Liquids",
+        "score": 0.86,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 4 Changing states",
+        "files": 24,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 4 - Changing States",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 5 Cooling curves practical",
+        "files": 18,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 5 - Cooling Curves Practical",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 6 Cooling curves theory",
+        "files": 2,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 13 - Cooling Curves Theory",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 8 Internal energy",
+        "files": 21,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 6 - Internal Energy",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 9 Specific heat capacity practical",
+        "files": 26,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 8 - Specific Heat Capacity Practical",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 10 Specific heat capacity theory",
+        "files": 26,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 9 - Specific Heat Capacity Theory",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 11 Latent heat capacity practical",
+        "files": 16,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 14 - Latent Heat Capacity Practical",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 12 Latent heat capacity theory",
+        "files": 22,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 11 - Latent Heat Capacity Theory",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 13 Revision lesson",
+        "files": 15,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 15 - Revision Lesson",
+        "score": 1.0,
+        "separate": false
+      }
+    ],
+    "pseudo": [
+      "Lesson 7 DIRT assessment Homework reminders"
+    ],
+    "support": [
+      "Additional material"
+    ]
+  },
+  "Physics/P4 Atomic structure": {
+    "year": "Year 9",
+    "subject": "Physics",
+    "driveTopic": "P4 Atomic Strucutre",
+    "existed": true,
+    "rows": [
+      {
+        "packLesson": "Lesson 1 Atoms, mass number and atomic number and homework setting",
+        "files": 23,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 1 - Atoms, Mass Number and Atomic Number",
+        "score": 0.86,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 2 Isotopes",
+        "files": 27,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 2 - Isotopes",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 3 Orbitals and Bohr model",
+        "files": 9,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 3 - Orbitals and Bohr Model",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 4 Rutherfords Scattering experiment",
+        "files": 16,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 4 - Rutherford's Scattering Experiment",
+        "score": 0.921,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 5 History of the atom",
+        "files": 26,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 5 - History of the Atom",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 6 Radiation and properties of radiation",
+        "files": 32,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 6 - Radiation and Properties of Radiation",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 7 Nuclear equations",
+        "files": 19,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 7 - Nuclear Equation",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 8 Half life practical",
+        "files": 7,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 8 - Half Life Practical",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 9 Half life theory",
+        "files": 25,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 9 - Half Life Theory",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 10 Irradiation and contamination",
+        "files": 33,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 10 - Irradiation and Contamination",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 11 Revision",
+        "files": 13,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 11 - Revision",
+        "score": 1.0,
+        "separate": false
+      }
+    ],
+    "pseudo": [
+      "1. IMPORTANT - USE OF RADIOACTIVE SOURCES IN CLASS"
+    ],
+    "support": [
+      "_Additional"
+    ]
+  },
+  "Physics/P5 Forces": {
+    "year": "Year 10",
+    "subject": "Physics",
+    "driveTopic": "P5 Forces",
+    "existed": true,
+    "rows": [
+      {
+        "packLesson": "Lesson 1 Scalar and vector quantities",
+        "files": 21,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 1 - Scalar and Vector Quantities",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 2 Contact and non contact forces",
+        "files": 18,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 2 - Contact and Non Contact Forces",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 3 HIGHER ONLY Resolving forces at right angles",
+        "files": 17,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 3 - Resolving Forces at Right Angles (Higher)",
+        "score": 0.877,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 4 Weight and mass ",
+        "files": 19,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 5 Centre of Mass",
+        "files": 7,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 5 - Centre of Mass",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 6 Workdone and energy transfers",
+        "files": 20,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 6 - Workdone and Energy Transfers",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 7a REQUIRED PRACTICAL Force and extension",
+        "files": 14,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 7 - Required Practical Force and Extension",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 7b Hooke_s law Theory",
+        "files": 19,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 8 - Hooke - S Law Theory",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 8 Distance and displacement",
+        "files": 25,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 9 - Distance and Displacement",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 9 Speed and velocity",
+        "files": 12,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 10 - Speed and Velocity",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 10 Distance time graphs",
+        "files": 45,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 11 - Distance Time Graphs",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 11 Acceleration part 1",
+        "files": 24,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 12 - Acceleration Part 1",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 12 Velocity time graphs",
+        "files": 34,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 13 - Velocity Time Graphs",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 13 Acceleration part 2",
+        "files": 26,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 14 - Acceleration Part 2",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 14 Newtons first law",
+        "files": 15,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 15 - Newtons First Law",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 15 Newtons second law and third law",
+        "files": 31,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 16 - Newtons Second Law and Third Law",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 16 REQUIRED PRACTICAL Force and acceleration",
+        "files": 18,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 17 - Required Practical Force and Acceleration",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 17 Thinking distance and reaction time",
+        "files": 11,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 18 - Thinking Distance and Reaction Time",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 18 Braking distance and stopping distance",
+        "files": 19,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 19 - Braking Distance and Stopping Distance",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 19 HIGHER ONLY Momentum and the conservation of momentum",
+        "files": 26,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 20 - Momentum and the Conservation of Momentum (Higher)",
+        "score": 0.877,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 20 Revision lesson",
+        "files": 25,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 21 - Revision Lesson",
+        "score": 1.0,
+        "separate": false
+      }
+    ],
+    "pseudo": [
+      "Lesson 7c DIRT Homework",
+      "Lesson 13a DIRT Homework 2"
+    ],
+    "support": [
+      "P5 COVID EPA",
+      "Additional material",
+      "2024 25 TEST - Physics",
+      "Forces - SEPARATE only"
+    ]
+  },
+  "Physics/P6 Waves": {
+    "year": "Year 11",
+    "subject": "Physics",
+    "driveTopic": "P6 Waves",
+    "existed": true,
+    "rows": [
+      {
+        "packLesson": "Lesson 1 Structure of a wave, longitudinal and transverse",
+        "files": 28,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 1 - Structure of a Wave, Longitudinal and Transverse",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 2 Frequency and time period",
+        "files": 22,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 2 - Frequency and Time Period",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 3 The wave equation and the time period of a wave",
+        "files": 39,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 3 - The Wave Equation and the Time Period of a Wave",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 4 REQUIRED PRACTICAL measuring frequency wavelength and speed of waves",
+        "files": 25,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 4 - Required Practical Measuring Frequency Wavelength and Speed of Waves",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 6 Electromagnetic waves and uses",
+        "files": 31,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 6 - Electromagnetic Waves and Uses",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 7 Prop and uses of EM radiation 1 reflection and refraction",
+        "files": 37,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 7 - Prop and Uses of EM Radiation 1 Reflection and Refraction",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 8 Prop and uses of EM radiation 2 communication and dangers",
+        "files": 24,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 8 - Prop and Uses of EM Radiation 2 Communication and Dangers",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 9 REQUIRED PRACTICAL Absorbancy and emittance",
+        "files": 16,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 9 - Required Practical Absorbancy and Emittance",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 11 PHYSICS ONLY Lenses",
+        "files": 11,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 11 - Lenses (Separate)",
+        "score": 1.0,
+        "separate": true
+      },
+      {
+        "packLesson": "Lesson 12 PHYSICS ONLY Lens diagrams",
+        "files": 12,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 12 - Lens Diagrams (Separate)",
+        "score": 1.0,
+        "separate": true
+      },
+      {
+        "packLesson": "Lesson 13 PHYSICS ONLY Visible Light",
+        "files": 6,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 13 - Visible Light (Separate)",
+        "score": 1.0,
+        "separate": true
+      },
+      {
+        "packLesson": "Lesson 14 PHYSICS ONLY Black body radiation",
+        "files": 1,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 14 - Black Body Radiation (Separate)",
+        "score": 1.0,
+        "separate": true
+      },
+      {
+        "packLesson": "Lesson 15 PHYSICS ONLY Sound waves and waves for exploration",
+        "files": 19,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 15 - Sound Waves and Waves for Exploration (Separate)",
+        "score": 1.0,
+        "separate": true
+      },
+      {
+        "packLesson": "Lesson 16 Seismic waves - PHYSICS ONLY",
+        "files": 3,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 16 - Seismic Waves (Separate)",
+        "score": 1.0,
+        "separate": true
+      },
+      {
+        "packLesson": "Lesson 17 Revision lesson",
+        "files": 11,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 17 - Revision Lesson",
+        "score": 1.0,
+        "separate": false
+      }
+    ],
+    "pseudo": [],
+    "support": [
+      "Additional material"
+    ]
+  },
+  "Physics/P7 Magnetism": {
+    "year": "Year 11",
+    "subject": "Physics",
+    "driveTopic": "P7 Magnetism",
+    "existed": true,
+    "rows": [
+      {
+        "packLesson": "L1 Permanent Magnets",
+        "files": 15,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 1 - Permanent Magnets",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "L2 Magnetic fields",
+        "files": 14,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 2 - Magnetic Fields",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "L3 The Motor Effect",
+        "files": 12,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 3 - The Motor Effect",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "L4 (HT) Flemings Left Hand Rule",
+        "files": 12,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 4 - Flemings Left Hand Rule (Higher)",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "L5 (HT) Electric Motors",
+        "files": 15,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 5 - Electric Motors (Higher)",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "L6 (HT Phys only) Loudspeakers",
+        "files": 4,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "L7 (HT Phys only) Induced Potential",
+        "files": 4,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 7 - Phys Only) Induced Potential (Higher)",
+        "score": 0.86,
+        "separate": false
+      },
+      {
+        "packLesson": "L8 (HT Phys only) Generator Effect",
+        "files": 4,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 8 - Phys Only) Generator Effect (Higher)",
+        "score": 0.86,
+        "separate": false
+      },
+      {
+        "packLesson": "L9 (HT Phys only) Microphones",
+        "files": 2,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "L10 (HT Phys only) Transformers",
+        "files": 8,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "L11 (HT Phys only) Transformers II",
+        "files": 5,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 11 - Phys Only) Transformers II (Higher)",
+        "score": 0.86,
+        "separate": false
+      },
+      {
+        "packLesson": "L12 Revision",
+        "files": 4,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 12 - Revision",
+        "score": 1.0,
+        "separate": false
+      }
+    ],
+    "pseudo": [
+      "L5a DIRT task",
+      "L3a DIRT task"
+    ],
+    "support": [
+      "EPA COVID",
+      "Additional material"
+    ]
+  },
+  "Physics/P8 Space": {
+    "year": "Year 11",
+    "subject": "Physics",
+    "driveTopic": "P8 Space",
+    "existed": true,
+    "rows": [
+      {
+        "packLesson": "1. Our solar system, galaxies and the universe",
+        "files": 4,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 1 - Our Solar System, Galaxies and the Universe",
+        "score": 0.922,
+        "separate": false
+      },
+      {
+        "packLesson": "2. Life cycle of a star",
+        "files": 1,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 2 - Life Cycle of a Star",
+        "score": 0.891,
+        "separate": false
+      },
+      {
+        "packLesson": "3. Fusion recap and the formation of elements",
+        "files": 1,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 3 - Fusion Recap and the Formation of Elements",
+        "score": 0.919,
+        "separate": false
+      },
+      {
+        "packLesson": "4. Orbital motion, natural and artificial satellites",
+        "files": 1,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 4 - Orbital Motion, Natural and Artificial Satellites",
+        "score": 0.928,
+        "separate": false
+      },
+      {
+        "packLesson": "5. The big bang and redshift",
+        "files": 1,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 5 - The Big Bang and Redshift",
+        "score": 0.897,
+        "separate": false
+      }
+    ],
+    "pseudo": [],
+    "support": [
+      "Additional resources",
+      "SIXCESS LITERACY"
+    ]
+  },
+  "Chemistry/C1 Atomic structure and the periodic table": {
+    "year": "Year 9",
+    "subject": "Chemistry",
+    "driveTopic": "C1 Atomic Structure",
+    "existed": true,
+    "rows": [
+      {
+        "packLesson": "Lesson 1 - Atoms, Elements and Compounds",
+        "files": 3,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 1 - Atoms, Elements and Compounds",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 2 - Mixtures and Separating",
+        "files": 4,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 2 - Mixtures and Separating",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 3 - Mixtures and Separating Techniques Practical",
+        "files": 10,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 3 - Mixtures and Separating Techniques Practical",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 4 - Structure of the Atom",
+        "files": 2,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 4 - Structure of the Atom",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 5 - Electronic Configuration",
+        "files": 4,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 5 - Electronic Configuration",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 6 - Isotopes and RAM",
+        "files": 2,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 6 - Isotopes and RAM",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 7 - History of the Atom",
+        "files": 4,
+        "kind": "MATCH",
+        "driveLesson": "lesson 7 - History of the Atom",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 8 - Periodic Table",
+        "files": 5,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 8 - Periodic Table",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 10 - Alkali Metals",
+        "files": 5,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 10 - Alkali Metals",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 11 - Noble Gases",
+        "files": 6,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 11 - Noble Gases",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 12 - Halogens",
+        "files": 2,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 12 - Halogens",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 13 - Halogens and Displacement",
+        "files": 3,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 13 - Halogens and Displacement Reactions",
+        "score": 0.86,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 14 - Revision lesson",
+        "files": 24,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 14 - Revision Lesson",
+        "score": 1.0,
+        "separate": false
+      }
+    ],
+    "pseudo": [
+      "Lesson 3b - DIRT lesson",
+      "Lesson 8b - DIRT lesson"
+    ],
+    "support": [
+      "Additional material",
+      "C1 Key documents"
+    ]
+  },
+  "Chemistry/C2 Bonding, structure and the properties of matter": {
+    "year": "Year 9",
+    "subject": "Chemistry",
+    "driveTopic": "C2 Bonding and Structure",
+    "existed": true,
+    "rows": [
+      {
+        "packLesson": "Lesson 1 - Chemical Bonding",
+        "files": 4,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 1 - Chemical Bonding",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 2 - Ionic Bonding_ Ions",
+        "files": 5,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 2 - Ionic Bonding - Ions",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 3 - Ionic Bonding_ Structure",
+        "files": 1,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 3 - Ionic Bonding - Structure",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 4 - Covalent Bonding",
+        "files": 2,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 4 - Covalent Bonding",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 5 - Metallic Bonding",
+        "files": 7,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 5 - Metallic Bonding",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 6 - Alloys",
+        "files": 1,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 6 - Alloys",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 7 - Structure and Bonding",
+        "files": 3,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 7 - Structure and Bonding",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 8 - Investigating Properties",
+        "files": 2,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 8 - Investigating Properties",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 9 - Explaining Properties",
+        "files": 2,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 9 - Explaining Properties",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 10 - Changes of State",
+        "files": 4,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 10 - Changes of State",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 11 - Polymers",
+        "files": 2,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 11 - Polymers",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 12 - Nano chemistry (Combined)",
+        "files": 3,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 12 - Nano Chemistry (Combined)",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 13 - Chemical and Empirical Formula",
+        "files": 2,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 13 - Chemical and Empirical Formula",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 14 - Revision lesson",
+        "files": 11,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 14 - Revision Lesson",
+        "score": 1.0,
+        "separate": false
+      }
+    ],
+    "pseudo": [],
+    "support": [
+      "Additional material",
+      "C2 Key documents"
+    ]
+  },
+  "Chemistry/C3 Quantitative chemistry": {
+    "year": "Year 10",
+    "subject": "Chemistry",
+    "driveTopic": "C3 Quantitative Chemistry",
+    "existed": true,
+    "rows": [
+      {
+        "packLesson": "Lesson 1_RFM",
+        "files": 8,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 2_Percentage Composition",
+        "files": 1,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 3_Conservation of Mass",
+        "files": 6,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 4_Equations and Balancing",
+        "files": 8,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 5_The Mole (HT ONLY)",
+        "files": 1,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 6_Calculations of Moles (HT ONLY)",
+        "files": 1,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 7_Reacting Masses (HT ONLY)",
+        "files": 5,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 8_Limiting Reagents (HT ONLY)",
+        "files": 10,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 9_Concentration",
+        "files": 6,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 10_Concentration and Moles (HT ONLY)",
+        "files": 6,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 11_Balancing using Moles (HT ONLY)",
+        "files": 2,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 12_Uncertainty and Range",
+        "files": 6,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 13_Percentage Yield (chem sep only)",
+        "files": 5,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": true
+      },
+      {
+        "packLesson": "Lesson 14_Atom Economy (chem sep only)",
+        "files": 2,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": true
+      },
+      {
+        "packLesson": "Lesson 15_Titration prac (chem sep only) 2324 only - moving to C4 ",
+        "files": 3,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": true
+      },
+      {
+        "packLesson": "Lesson 16_Titration (chem sep only) 2324 only- moving to C4 ",
+        "files": 7,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": true
+      },
+      {
+        "packLesson": "Lesson 17_Gas volume (chem sep only)",
+        "files": 6,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": true
+      },
+      {
+        "packLesson": "Lesson 18_Revision",
+        "files": 15,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      }
+    ],
+    "pseudo": [],
+    "support": [
+      "C3 Homeworks",
+      "C3 Key Documents",
+      "Additional material",
+      "Optional DIRT activities"
+    ]
+  },
+  "Chemistry/C4 Chemical changes": {
+    "year": "Year 10",
+    "subject": "Chemistry",
+    "driveTopic": "C4 Chemical Changes",
+    "existed": true,
+    "rows": [
+      {
+        "packLesson": "Lesson 1a Titration (2024+) (chem sep only)",
+        "files": 1,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 1 - Titration (2024+) (Chem Sep Only)",
+        "score": 1.0,
+        "separate": true
+      },
+      {
+        "packLesson": "Lesson 1 - pH Scale acids and alkalis",
+        "files": 9,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 2 - PH Scale Acids and Alkalis",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 1b - HT_Strong and Weak Acids (HIGHER ONLY SET 1_2)",
+        "files": 6,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 2 - Neutralisation and Salts",
+        "files": 6,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 4 - Neutralisation and Salts",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 3 - Carbonates and Salt Formulas",
+        "files": 2,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 5 - Carbonates and Salt Formulas",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 4 - Salt Formation (req prac)",
+        "files": 9,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 6 - Salt Formation (Req Prac)",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 5 - Reactions of Metals",
+        "files": 6,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 7 - Reactions of Metals",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 6 - Reactivity Series",
+        "files": 11,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 8 - Reactivity Series",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 6b - Properties of transition metals and nanoparticles (Separates only)",
+        "files": 3,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 9 - Properties of Transition Metals and Nanoparticles (Separate)",
+        "score": 1.0,
+        "separate": true
+      },
+      {
+        "packLesson": "Lesson 7 - Displacement Reactions",
+        "files": 2,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 10 - Displacement Reactions",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 7b - HT_Ionic equations and redox (HIGHER ONLY SET 1_2)",
+        "files": 5,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 11 - HT - Ionic Equations and Redox SET 1 - 2) (Higher)",
+        "score": 0.745,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 8 - Extraction of Metals",
+        "files": 8,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 12 - Extraction of Metals",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 9 - Electrolysis",
+        "files": 7,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 13 - Electrolysis",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 10 - Electrolysis of Aqueous Solutions (Brine req prac)",
+        "files": 9,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 14 - Electrolysis of Aqueous Solutions (Brine Req Prac)",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 11 Electrolysis of aluminium oxide",
+        "files": 6,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 15 - Electrolysis of Aluminium Oxide",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 12 - Revision",
+        "files": 14,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 16 - Revision",
+        "score": 1.0,
+        "separate": false
+      }
+    ],
+    "pseudo": [
+      "Lesson 4b DIRT (1) ",
+      "Lesson 10b DIRT (2)"
+    ],
+    "support": [
+      "C4 Key documents",
+      "C4 Homeworks",
+      "Additional material"
+    ]
+  },
+  "Chemistry/C5 Energy changes": {
+    "year": "Year 10",
+    "subject": "Chemistry",
+    "driveTopic": "C5 Energy Changes",
+    "existed": true,
+    "rows": [
+      {
+        "packLesson": "Lesson 0 Self study unit Y11 2023",
+        "files": 2,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 0 - Self Study Unit Y11 2023",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 1 - Energy In Reactions",
+        "files": 7,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 1 - Energy in Reactions",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 2_3 - Exothermic or Endothermic Required Prac",
+        "files": 14,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 4 - Energy Profiles",
+        "files": 11,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 4 - Energy Profiles",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 5 - HT Making and Breaking Bonds",
+        "files": 13,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 5 - Making and Breaking Bonds (Higher)",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 6 - Revision",
+        "files": 16,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 6 - Revision",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 7 -  CHEMISTRY ONLY Electrochemical Cells",
+        "files": 3,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 8 - Electrochemical Cells (Separate)",
+        "score": 1.0,
+        "separate": true
+      },
+      {
+        "packLesson": "Lesson 8 - CHEMISTRY ONLY Comparing Electrochemical Cells",
+        "files": 2,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 9 - Comparing Electrochemical Cells (Separate)",
+        "score": 1.0,
+        "separate": true
+      },
+      {
+        "packLesson": "Lesson 9 - CHEMISTRY ONLY Hydrogen Fuel Cells",
+        "files": 4,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 10 - Hydrogen Fuel Cells (Separate)",
+        "score": 1.0,
+        "separate": true
+      },
+      {
+        "packLesson": "Lesson 10 - CHEMISTRY ONLY HT Half Equations",
+        "files": 4,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 11 - Half Equations (Higher) (Separate)",
+        "score": 1.0,
+        "separate": true
+      }
+    ],
+    "pseudo": [
+      "Lesson 10b CHEMISTRY ONLY DIRT homework",
+      "Lesson 5b - DIRT homework"
+    ],
+    "support": [
+      "Lesson 7+ CHEM only if short on time",
+      "to be sorted VLE",
+      "C5 Key documents"
+    ]
+  },
+  "Chemistry/C6 The rate and extent of chemical change": {
+    "year": "Year 11",
+    "subject": "Chemistry",
+    "driveTopic": "C6 The rate and extent of chemical change",
+    "existed": true,
+    "rows": [
+      {
+        "packLesson": "Lesson 1 - Methods for Measuring Rate",
+        "files": 1,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 1 - Methods for Measuring Rate",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 2 - Rate of Reaction Graphs",
+        "files": 8,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 2 - Rate of Reaction Graphs",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 3 - Factors Affecting Rate and Collision Theory",
+        "files": 5,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 3 - Factors Affecting Rate and Collision Theory",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 4_5 - Required Practical Concentration (Cross)",
+        "files": 3,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 6_7 - Required Practical Concentration (Volume)",
+        "files": 5,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 8 - Surface Area and Rate",
+        "files": 2,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 8 - Surface Area and Rate",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 9 - Temperature and Rate",
+        "files": 2,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 9 - Temperature and Rate",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 11 - Catalysts",
+        "files": 6,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 11 - Catalysts",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 12 - Reversible Reactions",
+        "files": 6,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 12 - Reversible Reactions",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 13_14 - Equilibrium and Le Chatelier (SET 1_2)",
+        "files": 3,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 15 - Revision",
+        "files": 8,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 15 - Revision",
+        "score": 1.0,
+        "separate": false
+      }
+    ],
+    "pseudo": [
+      "Lesson 10 - DIRT task"
+    ],
+    "support": [
+      "Additional material"
+    ]
+  },
+  "Chemistry/C7 Organic Chemistry": {
+    "year": "Year 11",
+    "subject": "Chemistry",
+    "driveTopic": "C7 Organic Chemistry",
+    "existed": true,
+    "rows": [
+      {
+        "packLesson": "Lesson 1 - Crude Oil and homework setting",
+        "files": 5,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 1 - Crude Oil and Homework Setting",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 2 - Fractional Distillation",
+        "files": 3,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 2 - Fractional Distillation",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 3 - Alkanes",
+        "files": 4,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 3 - Alkanes",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 4 - Properties of Alkanes",
+        "files": 2,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 4 - Properties of Alkanes",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 5 - Combustion of Alkanes",
+        "files": 1,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 5 - Combustion of Alkanes",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 6 - Cracking and Alkenes",
+        "files": 5,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 6 - Cracking and Alkenes",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 7 - (Separate Only) Alkenes",
+        "files": 1,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 7 - Alkenes (Separate)",
+        "score": 1.0,
+        "separate": true
+      },
+      {
+        "packLesson": "Lesson 8 - Revision lesson (Combined)",
+        "files": 16,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 8 - Revision Lesson (Combined)",
+        "score": 1.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 8 - (Separate Only) Alkene reactions",
+        "files": 1,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 9 - Alkene Reactions (Separate)",
+        "score": 1.0,
+        "separate": true
+      },
+      {
+        "packLesson": "Lesson 9-10 - (Separate only) Alcohols and their reactions",
+        "files": 1,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 10 - 10 - Alcohols and Their Reactions (Separate)",
+        "score": 1.0,
+        "separate": true
+      },
+      {
+        "packLesson": "Lesson 11-12 (Separate only) Formation of Alcohols and Carboxylic acids",
+        "files": 1,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 11 - 12 Formation of Alcohols and Carboxylic Acids (Separate)",
+        "score": 1.0,
+        "separate": true
+      },
+      {
+        "packLesson": "Lesson 13-14 (Separate only) Addition and Condensation Polymers",
+        "files": 1,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 13 - 14 Addition and Condensation Polymers (Separate)",
+        "score": 1.0,
+        "separate": true
+      },
+      {
+        "packLesson": "Lesson 15 (Separates only) Amino acids and Natural Polymers",
+        "files": 1,
+        "kind": "MATCH",
+        "driveLesson": "Lesson 15 - Amino Acids and Natural Polymers (Separate)",
+        "score": 1.0,
+        "separate": true
+      }
+    ],
+    "pseudo": [
+      "Lesson 7 - DIRT Levelled Task"
+    ],
+    "support": [
+      "Additional Material"
+    ]
+  },
+  "Chemistry/C8 Chemical Analysis": {
+    "year": "Year 11",
+    "subject": "Chemistry",
+    "driveTopic": "C8 Chemical Analysis",
+    "existed": true,
+    "rows": [
+      {
+        "packLesson": "Lesson 1 - Purity and homework setting",
+        "files": 5,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 2 - Formulations",
+        "files": 3,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 3 - Identifying Gases",
+        "files": 5,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 4 _ 5 - Chromatography (Required Practical) (2 lessons)",
+        "files": 9,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 7 - Revision lesson (Combined)",
+        "files": 8,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 7 - Testing for Positive ions (Separate Only)",
+        "files": 1,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": true
+      },
+      {
+        "packLesson": "Lesson 8-9 - Testing for Negative Ions and Instrumental analysis (Separate Only)",
+        "files": 1,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": true
+      },
+      {
+        "packLesson": "Lesson 10 - Required Practical - Indentifying unknown compounds (Separate Only)",
+        "files": 1,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": true
+      }
+    ],
+    "pseudo": [
+      "Lesson 6 - DIRT Levelled Task"
+    ],
+    "support": [
+      "Additional"
+    ]
+  },
+  "Chemistry/C9 Atmosphere": {
+    "year": "Year 11",
+    "subject": "Chemistry",
+    "driveTopic": "C9 Atmosphere",
+    "existed": true,
+    "rows": [
+      {
+        "packLesson": "Lesson 1 - Current vs Early Atmosphere",
+        "files": 2,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 2 - Changes in CO2 and O2",
+        "files": 1,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 3 - Greenhouse Effect",
+        "files": 5,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 4 - Human Activities and Climate Change",
+        "files": 6,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 5 - Carbon Footprint (IT)",
+        "files": 3,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 6 - Pollutants from Fuels",
+        "files": 2,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 8 - Combustion",
+        "files": 1,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 9 Revision",
+        "files": 1,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      }
+    ],
+    "pseudo": [
+      "Lesson 7 - DIRT Levelled Task"
+    ],
+    "support": [
+      "ARO",
+      "Additional resources"
+    ]
+  },
+  "Chemistry/C10 Using Resources": {
+    "year": "Year 11",
+    "subject": "Chemistry",
+    "driveTopic": "C10 Using Resources",
+    "existed": true,
+    "rows": [
+      {
+        "packLesson": "Lesson 1 - Sustainable Development",
+        "files": 3,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 2 - Potable Water",
+        "files": 3,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 3 - Distillation and Desalination",
+        "files": 3,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 4 - Required Practical (Double)",
+        "files": 3,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 5 - Waste Water Treatment",
+        "files": 3,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 7 - Alternative Metal Extraction",
+        "files": 4,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 8 - 3Rs",
+        "files": 9,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 9 - Life Cycle Assessment",
+        "files": 3,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 10 - Revision",
+        "files": 5,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      }
+    ],
+    "pseudo": [
+      "Lesson 6 - DIRT Levelled Task"
+    ],
+    "support": [
+      "Additional resources",
+      "Single Science Resources SLS",
+      "C10 Single science"
+    ]
+  },
+  "Biology/B1 Cell Biology": {
+    "year": "Year 9",
+    "subject": "Biology",
+    "driveTopic": "B1 Cells",
+    "existed": true,
+    "rows": [
+      {
+        "packLesson": "L1 Eukaryotic cells ",
+        "files": 26,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "L2 Magnification",
+        "files": 25,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "L3 Using microscopes REQUIRED PRACTICAL",
+        "files": 6,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "L4 Microscope types and biological drawings",
+        "files": 19,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "L5 Prokaryotic cells",
+        "files": 20,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "L7 Specialised cells",
+        "files": 26,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "L8 Chromosomes",
+        "files": 20,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "L9 Mitosis and cells cycles",
+        "files": 22,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "L10 Stems cells and theraputic cloning",
+        "files": 45,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "L12 Diffusion",
+        "files": 44,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "L13 Surface area to volume ratio",
+        "files": 14,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "L14 Exchange surfaces in multicellular organisms",
+        "files": 2,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "L15 Osmosis",
+        "files": 2,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "L16 Osmosis REQUIRED PRACTICAL",
+        "files": 34,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "L17 Active transport",
+        "files": 3,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      }
+    ],
+    "pseudo": [
+      "L11 DIRT Task ",
+      "L6 DIRT task",
+      "L17 Revision and homework check"
+    ],
+    "support": [
+      "Development"
+    ]
+  },
+  "Biology/B2 Organisation": {
+    "year": "Year 9",
+    "subject": "Biology",
+    "driveTopic": "B2 Organisation",
+    "existed": true,
+    "rows": [
+      {
+        "packLesson": "Lesson 1 Cells, tissues and organs_homework setting",
+        "files": 18,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 2 Digestive system and enzymes",
+        "files": 43,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 3 Food testing REQUIRED PRACTICAL",
+        "files": 25,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 4 Enzyme theory",
+        "files": 16,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 5 Enzyme action REQUIRED PRACTICAL",
+        "files": 12,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 7 The Lungs",
+        "files": 12,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 8 Blood",
+        "files": 19,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 9 Blood vessels",
+        "files": 14,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 10 The heart and its blood vessels",
+        "files": 26,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 11 Coronary heart disease",
+        "files": 19,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 12 Cancer",
+        "files": 17,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 13 Health issues and life style",
+        "files": 62,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 15 Revision",
+        "files": 15,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      }
+    ],
+    "pseudo": [
+      "Lesson 6 DIRT assessment",
+      "Lesson 14 DIRT assessment"
+    ],
+    "support": [
+      "Development work"
+    ]
+  },
+  "Biology/B3 Infection and response": {
+    "year": "Year 10",
+    "subject": "Biology",
+    "driveTopic": "B3 Infection and Response",
+    "existed": true,
+    "rows": [
+      {
+        "packLesson": "L1 Infectious disease",
+        "files": 23,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "L2 Spread of disease",
+        "files": 56,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "L3 Data and disease",
+        "files": 9,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "L4 Human defences",
+        "files": 19,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "L5 Immune system",
+        "files": 15,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "L7 Vaccination",
+        "files": 30,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "L8 Painkillers and antibiotics",
+        "files": 15,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "L9 Antibiotic resistance",
+        "files": 19,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "L10 Drug development",
+        "files": 25,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "L17 SIXCESS LITERACY",
+        "files": 3,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "L18 Revision lesson",
+        "files": 21,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      }
+    ],
+    "pseudo": [
+      "L6 Homework - DIRT",
+      "L12b DIRT homework"
+    ],
+    "support": [
+      "LCH",
+      "Archive",
+      "Development work",
+      "SEPARATE SCIENCE ONLY B3"
+    ]
+  },
+  "Biology/B4 Bioenergetics and plant tissues": {
+    "year": "Year 10",
+    "subject": "Biology",
+    "driveTopic": "B4 Bioenergetics and Plants",
+    "existed": true,
+    "rows": [
+      {
+        "packLesson": "L1 Photosynthesis",
+        "files": 22,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "L2 Limiting factors",
+        "files": 22,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "L3 REQUIRED PRACTICAL - Effect of light intensity on oxygen production Elodea",
+        "files": 24,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "L4 Uses of glucose",
+        "files": 9,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "L5 Aerobic respiration",
+        "files": 14,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "L6 Anaerobic respiration",
+        "files": 11,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "L7 Response to exercise",
+        "files": 9,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "L8 Metabolism",
+        "files": 12,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 17 Plant tissues leaves gas exchange",
+        "files": 23,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "L17 Leaves",
+        "files": 14,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "L18 Stomata",
+        "files": 8,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "Lesson 18 Transpiration and xylem",
+        "files": 36,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "L19 Root hair cells and xylem",
+        "files": 16,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "L20 Transpiration",
+        "files": 19,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "L21 Phloem",
+        "files": 21,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      }
+    ],
+    "pseudo": [
+      "L8a Homework - DIRT task",
+      "L4 Homework - DIRT task"
+    ],
+    "support": [
+      "Useful for lessons",
+      "Additional Material",
+      "Additional Lesson - Testing for Starch in Leaves",
+      "Revision material",
+      "ARCHIVE"
+    ]
+  },
+  "Biology/B5 Homeostasis and response": {
+    "year": "Year 10",
+    "subject": "Biology",
+    "driveTopic": "B5 Homeostasis",
+    "existed": true,
+    "rows": [
+      {
+        "packLesson": "1 Intro to homeostasis",
+        "files": 20,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "2 Nervous System",
+        "files": 26,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "3-4 Reaction time (required practical)",
+        "files": 22,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "5 Reflex actions",
+        "files": 15,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "6 Human endocrine system",
+        "files": 21,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "7 Blood glucose",
+        "files": 21,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "8 Diabetes",
+        "files": 20,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "9 Puberty + Hormones",
+        "files": 24,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "10 Menstrual cycle",
+        "files": 26,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "11 Contraception",
+        "files": 23,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "12 HT Hormones to treat infertility",
+        "files": 16,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "13 HT Negative feedback (adrenaline and thyroxine)",
+        "files": 14,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "14 Revision lesson",
+        "files": 22,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      }
+    ],
+    "pseudo": [],
+    "support": [
+      "Additional material",
+      "5b Dirt Task",
+      "Optional DIRT tasks",
+      "Separate Bio only"
+    ]
+  },
+  "Biology/B6 Inheritance, variation and evolution": {
+    "year": "Year 11",
+    "subject": "Biology",
+    "driveTopic": "B6 Inheritance, variation and evolution",
+    "existed": true,
+    "rows": [
+      {
+        "packLesson": "B6.1 Sexual and Asexual reproduction",
+        "files": 21,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "B6.2 Meiosis",
+        "files": 39,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "B6.3 DNA and the genome",
+        "files": 36,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "B6.6 Sex determination and Embryo screening (Consider teaching in L4 or 5)",
+        "files": 2,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "B6.4 Genetic Inheritance",
+        "files": 41,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "B6.5 Genetic disorders",
+        "files": 29,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "B6.7 Variation",
+        "files": 21,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "B6.8 Evolution",
+        "files": 33,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "B6.9 Selective Breeding",
+        "files": 26,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "B6.10 Genetic Engineering",
+        "files": 24,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "B6.11 Fossils",
+        "files": 29,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "B6.12 Extinction",
+        "files": 1,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "B6.13 Resistant Bacteria",
+        "files": 25,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "B6.14 Classification of Living Organisms",
+        "files": 24,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "B6.15 Revision",
+        "files": 14,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      }
+    ],
+    "pseudo": [
+      "B6.15b DIRT Evolution"
+    ],
+    "support": [
+      "Separate Bio only "
+    ]
+  },
+  "Biology/B7 Ecology": {
+    "year": "Year 11",
+    "subject": "Biology",
+    "driveTopic": "B7 Ecology",
+    "existed": true,
+    "rows": [
+      {
+        "packLesson": "L1 Communitities, Biotic and Abiotic factors",
+        "files": 32,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "L2 Adaptations",
+        "files": 69,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "L3 Levels of Organisation",
+        "files": 43,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "L4 L5 Distribution and abundance REQUIRED PRACTICAL",
+        "files": 44,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "L6 L7 Carbon and Water cycle",
+        "files": 79,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "L10 Biodiversity",
+        "files": 36,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "L11 Waste Management _ Land use",
+        "files": 16,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "L12 Deforestation",
+        "files": 13,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "L13 Global warming",
+        "files": 29,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "L14 Maintaining biodiversity",
+        "files": 22,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      },
+      {
+        "packLesson": "L20 Ecology Revision",
+        "files": 9,
+        "kind": "NEW",
+        "driveLesson": null,
+        "score": 0.0,
+        "separate": false
+      }
+    ],
+    "pseudo": [
+      "L17a DIRT",
+      "L5a DIRT task",
+      "L14a DIRT tasks"
+    ],
+    "support": [
+      "ARCHIVE",
+      "BIO ONLY"
+    ]
+  }
+}

@@ -1,0 +1,2810 @@
+{
+  "Year 7 Pacing": {
+    "sheetFile": "sheet1.xml",
+    "patrykColumns": [
+      {
+        "column": "E",
+        "class": "7Ml",
+        "qualification": "Mixed Ability",
+        "teacher": "PTO"
+      }
+    ],
+    "blockTeachers": {
+      "E": "PTO"
+    },
+    "weeks": [
+      {
+        "weekOf": "2026-09-07",
+        "raw": "46272.0",
+        "patryk": "Intro to Science",
+        "block": {
+          "PTO": "Intro to Science"
+        }
+      },
+      {
+        "weekOf": "2026-09-14",
+        "raw": "46279.0",
+        "patryk": "",
+        "block": {
+          "PTO": ""
+        }
+      },
+      {
+        "weekOf": "2026-09-21",
+        "raw": "46286.0",
+        "patryk": "P1 Forces",
+        "block": {
+          "PTO": "P1 Forces"
+        }
+      },
+      {
+        "weekOf": "2026-09-28",
+        "raw": "46293.0",
+        "patryk": "P1 Forces",
+        "block": {
+          "PTO": "P1 Forces"
+        }
+      },
+      {
+        "weekOf": "2026-10-05",
+        "raw": "46300.0",
+        "patryk": "P1 Forces",
+        "block": {
+          "PTO": "P1 Forces"
+        }
+      },
+      {
+        "weekOf": "2026-10-12",
+        "raw": "46307.0",
+        "patryk": "B1 Cells",
+        "block": {
+          "PTO": "B1 Cells"
+        }
+      },
+      {
+        "weekOf": "2026-10-19",
+        "raw": "46314.0",
+        "patryk": "B1 Cells",
+        "block": {
+          "PTO": "B1 Cells"
+        }
+      },
+      {
+        "weekOf": "2026-10-26",
+        "raw": "46321.0",
+        "patryk": "",
+        "block": {
+          "PTO": ""
+        }
+      },
+      {
+        "weekOf": "2026-11-02",
+        "raw": "46328.0",
+        "patryk": "B1 Cells",
+        "block": {
+          "PTO": "B1 Cells"
+        }
+      },
+      {
+        "weekOf": "2026-11-09",
+        "raw": "46335.0",
+        "patryk": "C1 Particles",
+        "block": {
+          "PTO": "C1 Particles"
+        }
+      },
+      {
+        "weekOf": "2026-11-16",
+        "raw": "46342.0",
+        "patryk": "C1 Particles",
+        "block": {
+          "PTO": "C1 Particles"
+        }
+      },
+      {
+        "weekOf": "2026-11-23",
+        "raw": "46349.0",
+        "patryk": "C1 Particles",
+        "block": {
+          "PTO": "C1 Particles"
+        }
+      },
+      {
+        "weekOf": "2026-11-30",
+        "raw": "46356.0",
+        "patryk": "C1 A,E,C & M",
+        "block": {
+          "PTO": "C1 A,E,C & M"
+        }
+      },
+      {
+        "weekOf": "2026-12-07",
+        "raw": "46363.0",
+        "patryk": "C1 A,E,C & M",
+        "block": {
+          "PTO": "C1 A,E,C & M"
+        }
+      },
+      {
+        "weekOf": "2026-12-14",
+        "raw": "46370.0",
+        "patryk": "P2 Energy",
+        "block": {
+          "PTO": "P2 Energy"
+        }
+      },
+      {
+        "weekOf": "2026-12-21",
+        "raw": "46377.0",
+        "patryk": "",
+        "block": {
+          "PTO": ""
+        }
+      },
+      {
+        "weekOf": "2026-12-28",
+        "raw": "46384.0",
+        "patryk": "",
+        "block": {
+          "PTO": ""
+        }
+      },
+      {
+        "weekOf": "2027-01-04",
+        "raw": "46391.0",
+        "patryk": "P2 Energy",
+        "block": {
+          "PTO": "P2 Energy"
+        }
+      },
+      {
+        "weekOf": "2027-01-11",
+        "raw": "46398.0",
+        "patryk": "P2 Energy",
+        "block": {
+          "PTO": "P2 Energy"
+        }
+      },
+      {
+        "weekOf": "2027-01-18",
+        "raw": "46405.0",
+        "patryk": "B2 Body Systems",
+        "block": {
+          "PTO": "B2 Body Systems"
+        }
+      },
+      {
+        "weekOf": "2027-01-25",
+        "raw": "46412.0",
+        "patryk": "B2 Body Systems",
+        "block": {
+          "PTO": "B2 Body Systems"
+        }
+      },
+      {
+        "weekOf": "2027-02-01",
+        "raw": "46419.0",
+        "patryk": "C2 Separating",
+        "block": {
+          "PTO": "C2 Separating"
+        }
+      },
+      {
+        "weekOf": "2027-02-08",
+        "raw": "46426.0",
+        "patryk": "Science Fair",
+        "block": {
+          "PTO": "Science Fair"
+        }
+      },
+      {
+        "weekOf": "2027-02-15",
+        "raw": "46433.0",
+        "patryk": "",
+        "block": {
+          "PTO": ""
+        }
+      },
+      {
+        "weekOf": "2027-02-22",
+        "raw": "46440.0",
+        "patryk": "Science Fair",
+        "block": {
+          "PTO": "Science Fair"
+        }
+      },
+      {
+        "weekOf": "2027-03-01",
+        "raw": "46447.0",
+        "patryk": "C2 Separating",
+        "block": {
+          "PTO": "C2 Separating"
+        }
+      },
+      {
+        "weekOf": "2027-03-08",
+        "raw": "46454.0",
+        "patryk": "B3 Human Repro",
+        "block": {
+          "PTO": "B3 Human Repro"
+        }
+      },
+      {
+        "weekOf": "2027-03-15",
+        "raw": "46461.0",
+        "patryk": "B3 Human Repro",
+        "block": {
+          "PTO": "B3 Human Repro"
+        }
+      },
+      {
+        "weekOf": "2027-03-22",
+        "raw": "46468.0",
+        "patryk": "B3 Human Repro",
+        "block": {
+          "PTO": "B3 Human Repro"
+        }
+      },
+      {
+        "weekOf": "2027-03-29",
+        "raw": "46475.0",
+        "patryk": "",
+        "block": {
+          "PTO": ""
+        }
+      },
+      {
+        "weekOf": "2027-04-05",
+        "raw": "46482.0",
+        "patryk": "",
+        "block": {
+          "PTO": ""
+        }
+      },
+      {
+        "weekOf": "2027-04-12",
+        "raw": "46489.0",
+        "patryk": "P3 Sound Waves",
+        "block": {
+          "PTO": "P3 Sound Waves"
+        }
+      },
+      {
+        "weekOf": "2027-04-19",
+        "raw": "46496.0",
+        "patryk": "P3 Sound Waves",
+        "block": {
+          "PTO": "P3 Sound Waves"
+        }
+      },
+      {
+        "weekOf": "2027-04-26",
+        "raw": "46503.0",
+        "patryk": "C3 Reactions",
+        "block": {
+          "PTO": "C3 Reactions"
+        }
+      },
+      {
+        "weekOf": "2027-05-03",
+        "raw": "46510.0",
+        "patryk": "C3 Reactions",
+        "block": {
+          "PTO": "C3 Reactions"
+        }
+      },
+      {
+        "weekOf": "2027-05-10",
+        "raw": "46517.0",
+        "patryk": "Revision",
+        "block": {
+          "PTO": "Revision"
+        }
+      },
+      {
+        "weekOf": "2027-05-17",
+        "raw": "46524.0",
+        "patryk": "Summer Exam",
+        "block": {
+          "PTO": "Summer Exam"
+        }
+      },
+      {
+        "weekOf": "2027-05-24",
+        "raw": "46531.0",
+        "patryk": "Go through exam",
+        "block": {
+          "PTO": "Go through exam"
+        }
+      },
+      {
+        "weekOf": "2027-05-31",
+        "raw": "46538.0",
+        "patryk": "",
+        "block": {
+          "PTO": ""
+        }
+      },
+      {
+        "weekOf": "2027-06-07",
+        "raw": "46545.0",
+        "patryk": "B4 Interdep'ce",
+        "block": {
+          "PTO": "B4 Interdep'ce"
+        }
+      },
+      {
+        "weekOf": "2027-06-14",
+        "raw": "46552.0",
+        "patryk": "B4 Interdep'ce",
+        "block": {
+          "PTO": "B4 Interdep'ce"
+        }
+      },
+      {
+        "weekOf": "2027-06-21",
+        "raw": "46559.0",
+        "patryk": "B5 Plant Repro",
+        "block": {
+          "PTO": "B5 Plant Repro"
+        }
+      },
+      {
+        "weekOf": "2027-06-28",
+        "raw": "46566.0",
+        "patryk": "B5 Plant Repro",
+        "block": {
+          "PTO": "B5 Plant Repro"
+        }
+      },
+      {
+        "weekOf": "2027-07-05",
+        "raw": "46573.0",
+        "patryk": "P4 Earth In Space",
+        "block": {
+          "PTO": "P4 Earth In Space"
+        }
+      },
+      {
+        "weekOf": "2027-07-12",
+        "raw": "46580.0",
+        "patryk": "P4 Earth In Space",
+        "block": {
+          "PTO": "P4 Earth In Space"
+        }
+      },
+      {
+        "weekOf": "2027-07-19",
+        "raw": "46587.0",
+        "patryk": "",
+        "block": {
+          "PTO": ""
+        }
+      },
+      {
+        "weekOf": "2027-07-26",
+        "raw": "46594.0",
+        "patryk": "",
+        "block": {
+          "PTO": ""
+        }
+      },
+      {
+        "weekOf": "2027-08-02",
+        "raw": "46601.0",
+        "patryk": "",
+        "block": {
+          "PTO": ""
+        }
+      }
+    ]
+  },
+  "Year 8 Pacing": {
+    "sheetFile": "sheet2.xml",
+    "patrykColumns": [
+      {
+        "column": "D",
+        "class": "8XP",
+        "qualification": "HPA/MPA mixed",
+        "teacher": "PTO/SLS"
+      },
+      {
+        "column": "E",
+        "class": "8AG",
+        "qualification": "HPA/MPA mixed",
+        "teacher": "PTO/LHO"
+      }
+    ],
+    "blockTeachers": {
+      "D": "PTO/SLS",
+      "E": "PTO/LHO"
+    },
+    "weeks": [
+      {
+        "weekOf": "2026-09-07",
+        "raw": "46272.0",
+        "patryk": "C1 Acids & Alkalis",
+        "block": {
+          "PTO/SLS": "C1 Acids & Alkalis",
+          "PTO/LHO": "B1 Resp & Photo"
+        }
+      },
+      {
+        "weekOf": "2026-09-14",
+        "raw": "46279.0",
+        "patryk": "C1 Acids & Alkalis",
+        "block": {
+          "PTO/SLS": "C1 Acids & Alkalis",
+          "PTO/LHO": "B1 Resp & Photo"
+        }
+      },
+      {
+        "weekOf": "2026-09-21",
+        "raw": "46286.0",
+        "patryk": "C1 Acids & Alkalis",
+        "block": {
+          "PTO/SLS": "C1 Acids & Alkalis",
+          "PTO/LHO": "B1 Resp & Photo"
+        }
+      },
+      {
+        "weekOf": "2026-09-28",
+        "raw": "46293.0",
+        "patryk": "P1 Motion & Pressure",
+        "block": {
+          "PTO/SLS": "P1 Motion & Pressure",
+          "PTO/LHO": "C1 Acids & Alkalis"
+        }
+      },
+      {
+        "weekOf": "2026-10-05",
+        "raw": "46300.0",
+        "patryk": "P1 Motion & Pressure",
+        "block": {
+          "PTO/SLS": "P1 Motion & Pressure",
+          "PTO/LHO": "C1 Acids & Alkalis"
+        }
+      },
+      {
+        "weekOf": "2026-10-12",
+        "raw": "46307.0",
+        "patryk": "P1 Motion & Pressure",
+        "block": {
+          "PTO/SLS": "P1 Motion & Pressure",
+          "PTO/LHO": "C1 Acids & Alkalis"
+        }
+      },
+      {
+        "weekOf": "2026-10-19",
+        "raw": "46314.0",
+        "patryk": "B1 Resp & Photo",
+        "block": {
+          "PTO/SLS": "B1 Resp & Photo",
+          "PTO/LHO": "P1 Motion & Pressure"
+        }
+      },
+      {
+        "weekOf": "2026-10-26",
+        "raw": "46321.0",
+        "patryk": "",
+        "block": {
+          "PTO/SLS": "",
+          "PTO/LHO": ""
+        }
+      },
+      {
+        "weekOf": "2026-11-02",
+        "raw": "46328.0",
+        "patryk": "B1 Resp & Photo",
+        "block": {
+          "PTO/SLS": "B1 Resp & Photo",
+          "PTO/LHO": "P1 Motion & Pressure"
+        }
+      },
+      {
+        "weekOf": "2026-11-09",
+        "raw": "46335.0",
+        "patryk": "B1 Resp & Photo",
+        "block": {
+          "PTO/SLS": "B1 Resp & Photo",
+          "PTO/LHO": "P1 Motion & Pressure"
+        }
+      },
+      {
+        "weekOf": "2026-11-16",
+        "raw": "46342.0",
+        "patryk": "C1 Periodic Table",
+        "block": {
+          "PTO/SLS": "C1 Periodic Table",
+          "PTO/LHO": "C1 Periodic Table"
+        }
+      },
+      {
+        "weekOf": "2026-11-23",
+        "raw": "46349.0",
+        "patryk": "C1 Periodic Table",
+        "block": {
+          "PTO/SLS": "C1 Periodic Table",
+          "PTO/LHO": "C1 Periodic Table"
+        }
+      },
+      {
+        "weekOf": "2026-11-30",
+        "raw": "46356.0",
+        "patryk": "C1 Periodic Table",
+        "block": {
+          "PTO/SLS": "C1 Periodic Table",
+          "PTO/LHO": "C1 Periodic Table"
+        }
+      },
+      {
+        "weekOf": "2026-12-07",
+        "raw": "46363.0",
+        "patryk": "P3 Light",
+        "block": {
+          "PTO/SLS": "P3 Light",
+          "PTO/LHO": "B2 Health & Digestion"
+        }
+      },
+      {
+        "weekOf": "2026-12-14",
+        "raw": "46370.0",
+        "patryk": "P3 Light",
+        "block": {
+          "PTO/SLS": "P3 Light",
+          "PTO/LHO": "B2 Health & Digestion"
+        }
+      },
+      {
+        "weekOf": "2026-12-21",
+        "raw": "46377.0",
+        "patryk": "",
+        "block": {
+          "PTO/SLS": "",
+          "PTO/LHO": ""
+        }
+      },
+      {
+        "weekOf": "2026-12-28",
+        "raw": "46384.0",
+        "patryk": "",
+        "block": {
+          "PTO/SLS": "",
+          "PTO/LHO": ""
+        }
+      },
+      {
+        "weekOf": "2027-01-04",
+        "raw": "46391.0",
+        "patryk": "P3 Light",
+        "block": {
+          "PTO/SLS": "P3 Light",
+          "PTO/LHO": "B2 Health & Digestion"
+        }
+      },
+      {
+        "weekOf": "2027-01-11",
+        "raw": "46398.0",
+        "patryk": "B2 Health & Digestion",
+        "block": {
+          "PTO/SLS": "B2 Health & Digestion",
+          "PTO/LHO": "P3 Light"
+        }
+      },
+      {
+        "weekOf": "2027-01-18",
+        "raw": "46405.0",
+        "patryk": "B2 Health & Digestion",
+        "block": {
+          "PTO/SLS": "B2 Health & Digestion",
+          "PTO/LHO": "P3 Light"
+        }
+      },
+      {
+        "weekOf": "2027-01-25",
+        "raw": "46412.0",
+        "patryk": "B2 Health & Digestion",
+        "block": {
+          "PTO/SLS": "B2 Health & Digestion",
+          "PTO/LHO": "P3 Light"
+        }
+      },
+      {
+        "weekOf": "2027-02-01",
+        "raw": "46419.0",
+        "patryk": "C3 M, NM & Energy",
+        "block": {
+          "PTO/SLS": "C3 M, NM & Energy",
+          "PTO/LHO": "B3 Vari, Inher & Evo"
+        }
+      },
+      {
+        "weekOf": "2027-02-08",
+        "raw": "46426.0",
+        "patryk": "Science Fair",
+        "block": {
+          "PTO/SLS": "Science Fair",
+          "PTO/LHO": "Science Fair"
+        }
+      },
+      {
+        "weekOf": "2027-02-15",
+        "raw": "46433.0",
+        "patryk": "",
+        "block": {
+          "PTO/SLS": "",
+          "PTO/LHO": ""
+        }
+      },
+      {
+        "weekOf": "2027-02-22",
+        "raw": "46440.0",
+        "patryk": "Science Fair",
+        "block": {
+          "PTO/SLS": "Science Fair",
+          "PTO/LHO": "Science Fair"
+        }
+      },
+      {
+        "weekOf": "2027-03-01",
+        "raw": "46447.0",
+        "patryk": "C3 M, NM & Energy",
+        "block": {
+          "PTO/SLS": "C3 M, NM & Energy",
+          "PTO/LHO": "B3 Vari, Inher & Evo"
+        }
+      },
+      {
+        "weekOf": "2027-03-08",
+        "raw": "46454.0",
+        "patryk": "C3 M, NM & Energy",
+        "block": {
+          "PTO/SLS": "C3 M, NM & Energy",
+          "PTO/LHO": "B3 Vari, Inher & Evo"
+        }
+      },
+      {
+        "weekOf": "2027-03-15",
+        "raw": "46461.0",
+        "patryk": "B3 Vari, Inher & Evo",
+        "block": {
+          "PTO/SLS": "B3 Vari, Inher & Evo",
+          "PTO/LHO": "C3 M, NM & Energy"
+        }
+      },
+      {
+        "weekOf": "2027-03-22",
+        "raw": "46468.0",
+        "patryk": "B3 Vari, Inher & Evo",
+        "block": {
+          "PTO/SLS": "B3 Vari, Inher & Evo",
+          "PTO/LHO": "C3 M, NM & Energy"
+        }
+      },
+      {
+        "weekOf": "2027-03-29",
+        "raw": "46475.0",
+        "patryk": "",
+        "block": {
+          "PTO/SLS": "",
+          "PTO/LHO": ""
+        }
+      },
+      {
+        "weekOf": "2027-04-05",
+        "raw": "46482.0",
+        "patryk": "",
+        "block": {
+          "PTO/SLS": "",
+          "PTO/LHO": ""
+        }
+      },
+      {
+        "weekOf": "2027-04-12",
+        "raw": "46489.0",
+        "patryk": "B3 Vari, Inher & Evo",
+        "block": {
+          "PTO/SLS": "B3 Vari, Inher & Evo",
+          "PTO/LHO": "C3 M, NM & Energy"
+        }
+      },
+      {
+        "weekOf": "2027-04-19",
+        "raw": "46496.0",
+        "patryk": "P2 Energy Resources",
+        "block": {
+          "PTO/SLS": "P2 Energy Resources",
+          "PTO/LHO": "P2 Energy Resources"
+        }
+      },
+      {
+        "weekOf": "2027-04-26",
+        "raw": "46503.0",
+        "patryk": "P2 Energy Resources",
+        "block": {
+          "PTO/SLS": "P2 Energy Resources",
+          "PTO/LHO": "P2 Energy Resources"
+        }
+      },
+      {
+        "weekOf": "2027-05-03",
+        "raw": "46510.0",
+        "patryk": "P2 Energy Resources",
+        "block": {
+          "PTO/SLS": "P2 Energy Resources",
+          "PTO/LHO": "P2 Energy Resources"
+        }
+      },
+      {
+        "weekOf": "2027-05-10",
+        "raw": "46517.0",
+        "patryk": "P4 Electricity & Magnetism",
+        "block": {
+          "PTO/SLS": "P4 Electricity & Magnetism",
+          "PTO/LHO": "P4 Electricity & Magnetism"
+        }
+      },
+      {
+        "weekOf": "2027-05-17",
+        "raw": "46524.0",
+        "patryk": "Revision",
+        "block": {
+          "PTO/SLS": "Revision",
+          "PTO/LHO": "Revision"
+        }
+      },
+      {
+        "weekOf": "2027-05-24",
+        "raw": "46531.0",
+        "patryk": "Summer Exams",
+        "block": {
+          "PTO/SLS": "Summer Exams",
+          "PTO/LHO": "Summer Exams"
+        }
+      },
+      {
+        "weekOf": "2027-05-31",
+        "raw": "46538.0",
+        "patryk": "",
+        "block": {
+          "PTO/SLS": "",
+          "PTO/LHO": ""
+        }
+      },
+      {
+        "weekOf": "2027-06-07",
+        "raw": "46545.0",
+        "patryk": "Go through exam",
+        "block": {
+          "PTO/SLS": "Go through exam",
+          "PTO/LHO": "Go through exam"
+        }
+      },
+      {
+        "weekOf": "2027-06-14",
+        "raw": "46552.0",
+        "patryk": "P4 Electricity & Magnetism",
+        "block": {
+          "PTO/SLS": "P4 Electricity & Magnetism",
+          "PTO/LHO": "P4 Electricity & Magnetism"
+        }
+      },
+      {
+        "weekOf": "2027-06-21",
+        "raw": "46559.0",
+        "patryk": "P4 Electricity & Magnetism",
+        "block": {
+          "PTO/SLS": "P4 Electricity & Magnetism",
+          "PTO/LHO": "P4 Electricity & Magnetism"
+        }
+      },
+      {
+        "weekOf": "2027-06-28",
+        "raw": "46566.0",
+        "patryk": "C4 Atmosphere & Earth",
+        "block": {
+          "PTO/SLS": "C4 Atmosphere & Earth",
+          "PTO/LHO": "C4 Atmosphere & Earth"
+        }
+      },
+      {
+        "weekOf": "2027-07-05",
+        "raw": "46573.0",
+        "patryk": "C4 Atmosphere & Earth",
+        "block": {
+          "PTO/SLS": "C4 Atmosphere & Earth",
+          "PTO/LHO": "C4 Atmosphere & Earth"
+        }
+      },
+      {
+        "weekOf": "2027-07-12",
+        "raw": "46580.0",
+        "patryk": "C4 Atmosphere & Earth",
+        "block": {
+          "PTO/SLS": "C4 Atmosphere & Earth",
+          "PTO/LHO": "C4 Atmosphere & Earth"
+        }
+      },
+      {
+        "weekOf": "2027-07-19",
+        "raw": "46587.0",
+        "patryk": "",
+        "block": {
+          "PTO/SLS": "",
+          "PTO/LHO": ""
+        }
+      },
+      {
+        "weekOf": "2027-07-26",
+        "raw": "46594.0",
+        "patryk": "",
+        "block": {
+          "PTO/SLS": "",
+          "PTO/LHO": ""
+        }
+      },
+      {
+        "weekOf": "2027-08-02",
+        "raw": "46601.0",
+        "patryk": "",
+        "block": {
+          "PTO/SLS": "",
+          "PTO/LHO": ""
+        }
+      }
+    ]
+  },
+  "Year 9 Pacing": {
+    "sheetFile": "sheet3.xml",
+    "patrykColumns": [
+      {
+        "column": "D",
+        "class": "9AS",
+        "qualification": "HPA/MPA mixed",
+        "teacher": "AM/PTO"
+      },
+      {
+        "column": "G",
+        "class": "9XS",
+        "qualification": "HPA/MPA mixed",
+        "teacher": "PTO"
+      }
+    ],
+    "blockTeachers": {
+      "D": "AM/PTO",
+      "G": "PTO"
+    },
+    "weeks": [
+      {
+        "weekOf": "2026-09-07",
+        "raw": "46272.0",
+        "patryk": "P3 Particles L1-13",
+        "block": {
+          "AM/PTO": "P3 Particles L1-13",
+          "PTO": "P3 Particles L1-13"
+        }
+      },
+      {
+        "weekOf": "2026-09-14",
+        "raw": "46279.0",
+        "patryk": "P3 Particles L1-13",
+        "block": {
+          "AM/PTO": "P3 Particles L1-13",
+          "PTO": "P3 Particles L1-13"
+        }
+      },
+      {
+        "weekOf": "2026-09-21",
+        "raw": "46286.0",
+        "patryk": "P3 Particles L1-13",
+        "block": {
+          "AM/PTO": "P3 Particles L1-13",
+          "PTO": "P3 Particles L1-13"
+        }
+      },
+      {
+        "weekOf": "2026-09-28",
+        "raw": "46293.0",
+        "patryk": "P3 Particles L1-13",
+        "block": {
+          "AM/PTO": "P3 Particles L1-13",
+          "PTO": "P3 Particles L1-13"
+        }
+      },
+      {
+        "weekOf": "2026-10-05",
+        "raw": "46300.0",
+        "patryk": "P3 Particles L1-13",
+        "block": {
+          "AM/PTO": "P3 Particles L1-13",
+          "PTO": "P3 Particles L1-13"
+        }
+      },
+      {
+        "weekOf": "2026-10-12",
+        "raw": "46307.0",
+        "patryk": "B1 Cells L1-7",
+        "block": {
+          "AM/PTO": "B1 Cells L1-7",
+          "PTO": "B1 Cells L1-7"
+        }
+      },
+      {
+        "weekOf": "2026-10-19",
+        "raw": "46314.0",
+        "patryk": "B1 Cells L1-7",
+        "block": {
+          "AM/PTO": "B1 Cells L1-7",
+          "PTO": "B1 Cells L1-7"
+        }
+      },
+      {
+        "weekOf": "2026-10-26",
+        "raw": "46321.0",
+        "patryk": "",
+        "block": {
+          "AM/PTO": "",
+          "PTO": ""
+        }
+      },
+      {
+        "weekOf": "2026-11-02",
+        "raw": "46328.0",
+        "patryk": "B1 Cells L1-7",
+        "block": {
+          "AM/PTO": "B1 Cells L1-7",
+          "PTO": "B1 Cells L1-7"
+        }
+      },
+      {
+        "weekOf": "2026-11-09",
+        "raw": "46335.0",
+        "patryk": "C1 Atomic Structure L1-13",
+        "block": {
+          "AM/PTO": "C1 Atomic Structure L1-13",
+          "PTO": "C1 Atomic Structure L1-13"
+        }
+      },
+      {
+        "weekOf": "2026-11-16",
+        "raw": "46342.0",
+        "patryk": "C1 Atomic Structure L1-13",
+        "block": {
+          "AM/PTO": "C1 Atomic Structure L1-13",
+          "PTO": "C1 Atomic Structure L1-13"
+        }
+      },
+      {
+        "weekOf": "2026-11-23",
+        "raw": "46349.0",
+        "patryk": "C1 Atomic Structure L1-13",
+        "block": {
+          "AM/PTO": "C1 Atomic Structure L1-13",
+          "PTO": "C1 Atomic Structure L1-13"
+        }
+      },
+      {
+        "weekOf": "2026-11-30",
+        "raw": "46356.0",
+        "patryk": "C1 Atomic Structure L1-13",
+        "block": {
+          "AM/PTO": "C1 Atomic Structure L1-13",
+          "PTO": "C1 Atomic Structure L1-13"
+        }
+      },
+      {
+        "weekOf": "2026-12-07",
+        "raw": "46363.0",
+        "patryk": "B1 Cells L8-16",
+        "block": {
+          "AM/PTO": "B1 Cells L8-16",
+          "PTO": "B1 Cells L8-16"
+        }
+      },
+      {
+        "weekOf": "2026-12-14",
+        "raw": "46370.0",
+        "patryk": "B1 Cells L8-16",
+        "block": {
+          "AM/PTO": "B1 Cells L8-16",
+          "PTO": "B1 Cells L8-16"
+        }
+      },
+      {
+        "weekOf": "2026-12-21",
+        "raw": "46377.0",
+        "patryk": "",
+        "block": {
+          "AM/PTO": "",
+          "PTO": ""
+        }
+      },
+      {
+        "weekOf": "2026-12-28",
+        "raw": "46384.0",
+        "patryk": "",
+        "block": {
+          "AM/PTO": "",
+          "PTO": ""
+        }
+      },
+      {
+        "weekOf": "2027-01-04",
+        "raw": "46391.0",
+        "patryk": "B1 Cells L8-16",
+        "block": {
+          "AM/PTO": "B1 Cells L8-16",
+          "PTO": "B1 Cells L8-16"
+        }
+      },
+      {
+        "weekOf": "2027-01-11",
+        "raw": "46398.0",
+        "patryk": "P4 Atomic structure",
+        "block": {
+          "AM/PTO": "P4 Atomic structure",
+          "PTO": "P4 Atomic structure"
+        }
+      },
+      {
+        "weekOf": "2027-01-18",
+        "raw": "46405.0",
+        "patryk": "P4 Atomic structure",
+        "block": {
+          "AM/PTO": "P4 Atomic structure",
+          "PTO": "P4 Atomic structure"
+        }
+      },
+      {
+        "weekOf": "2027-01-25",
+        "raw": "46412.0",
+        "patryk": "P4 Atomic structure",
+        "block": {
+          "AM/PTO": "P4 Atomic structure",
+          "PTO": "P4 Atomic structure"
+        }
+      },
+      {
+        "weekOf": "2027-02-01",
+        "raw": "46419.0",
+        "patryk": "P4 Atomic structure",
+        "block": {
+          "AM/PTO": "P4 Atomic structure",
+          "PTO": "P4 Atomic structure"
+        }
+      },
+      {
+        "weekOf": "2027-02-08",
+        "raw": "46426.0",
+        "patryk": "B2 Organisation L1-7",
+        "block": {
+          "AM/PTO": "B2 Organisation L1-7",
+          "PTO": "B2 Organisation L1-7"
+        }
+      },
+      {
+        "weekOf": "2027-02-15",
+        "raw": "46433.0",
+        "patryk": "",
+        "block": {
+          "AM/PTO": "",
+          "PTO": ""
+        }
+      },
+      {
+        "weekOf": "2027-02-22",
+        "raw": "46440.0",
+        "patryk": "B2 Organisation L1-7",
+        "block": {
+          "AM/PTO": "B2 Organisation L1-7",
+          "PTO": "B2 Organisation L1-7"
+        }
+      },
+      {
+        "weekOf": "2027-03-01",
+        "raw": "46447.0",
+        "patryk": "B2 Organisation L1-7",
+        "block": {
+          "AM/PTO": "B2 Organisation L1-7",
+          "PTO": "B2 Organisation L1-7"
+        }
+      },
+      {
+        "weekOf": "2027-03-08",
+        "raw": "46454.0",
+        "patryk": "B2 Organisation L8-14",
+        "block": {
+          "AM/PTO": "B2 Organisation L8-14",
+          "PTO": "B2 Organisation L8-14"
+        }
+      },
+      {
+        "weekOf": "2027-03-15",
+        "raw": "46461.0",
+        "patryk": "B2 Organisation L8-14",
+        "block": {
+          "AM/PTO": "B2 Organisation L8-14",
+          "PTO": "B2 Organisation L8-14"
+        }
+      },
+      {
+        "weekOf": "2027-03-22",
+        "raw": "46468.0",
+        "patryk": "B2 Organisation L8-14",
+        "block": {
+          "AM/PTO": "B2 Organisation L8-14",
+          "PTO": "B2 Organisation L8-14"
+        }
+      },
+      {
+        "weekOf": "2027-03-29",
+        "raw": "46475.0",
+        "patryk": "",
+        "block": {
+          "AM/PTO": "",
+          "PTO": ""
+        }
+      },
+      {
+        "weekOf": "2027-04-05",
+        "raw": "46482.0",
+        "patryk": "",
+        "block": {
+          "AM/PTO": "",
+          "PTO": ""
+        }
+      },
+      {
+        "weekOf": "2027-04-12",
+        "raw": "46489.0",
+        "patryk": "C2 Bonding & structure L1-13",
+        "block": {
+          "AM/PTO": "C2 Bonding & structure L1-13",
+          "PTO": "C2 Bonding & structure L1-13"
+        }
+      },
+      {
+        "weekOf": "2027-04-19",
+        "raw": "46496.0",
+        "patryk": "C2 Bonding & structure L1-13",
+        "block": {
+          "AM/PTO": "C2 Bonding & structure L1-13",
+          "PTO": "C2 Bonding & structure L1-13"
+        }
+      },
+      {
+        "weekOf": "2027-04-26",
+        "raw": "46503.0",
+        "patryk": "C2 Bonding & structure L1-13",
+        "block": {
+          "AM/PTO": "C2 Bonding & structure L1-13",
+          "PTO": "C2 Bonding & structure L1-13"
+        }
+      },
+      {
+        "weekOf": "2027-05-03",
+        "raw": "46510.0",
+        "patryk": "C2 Bonding & structure L1-13",
+        "block": {
+          "AM/PTO": "C2 Bonding & structure L1-13",
+          "PTO": "C2 Bonding & structure L1-13"
+        }
+      },
+      {
+        "weekOf": "2027-05-10",
+        "raw": "46517.0",
+        "patryk": "C2 Bonding & structure L1-13",
+        "block": {
+          "AM/PTO": "C2 Bonding & structure L1-13",
+          "PTO": "C2 Bonding & structure L1-13"
+        }
+      },
+      {
+        "weekOf": "2027-05-17",
+        "raw": "46524.0",
+        "patryk": "Revision",
+        "block": {
+          "AM/PTO": "Revision",
+          "PTO": "Revision"
+        }
+      },
+      {
+        "weekOf": "2027-05-24",
+        "raw": "46531.0",
+        "patryk": "Revision",
+        "block": {
+          "AM/PTO": "Revision",
+          "PTO": "Revision"
+        }
+      },
+      {
+        "weekOf": "2027-05-31",
+        "raw": "46538.0",
+        "patryk": "",
+        "block": {
+          "AM/PTO": "",
+          "PTO": ""
+        }
+      },
+      {
+        "weekOf": "2027-06-07",
+        "raw": "46545.0",
+        "patryk": "Summer Exams",
+        "block": {
+          "AM/PTO": "Summer Exams",
+          "PTO": "Summer Exams"
+        }
+      },
+      {
+        "weekOf": "2027-06-14",
+        "raw": "46552.0",
+        "patryk": "Go through mock exam",
+        "block": {
+          "AM/PTO": "Go through mock exam",
+          "PTO": "Go through mock exam"
+        }
+      },
+      {
+        "weekOf": "2027-06-21",
+        "raw": "46559.0",
+        "patryk": "Improvement work",
+        "block": {
+          "AM/PTO": "Improvement work",
+          "PTO": "Improvement work"
+        }
+      },
+      {
+        "weekOf": "2027-06-28",
+        "raw": "46566.0",
+        "patryk": "C2 Bonding & structure L1-13",
+        "block": {
+          "AM/PTO": "C2 Bonding & structure L1-13",
+          "PTO": "C2 Bonding & structure L1-13"
+        }
+      },
+      {
+        "weekOf": "2027-07-05",
+        "raw": "46573.0",
+        "patryk": "Maths for physics",
+        "block": {
+          "AM/PTO": "Maths for physics",
+          "PTO": "Maths for physics"
+        }
+      },
+      {
+        "weekOf": "2027-07-12",
+        "raw": "46580.0",
+        "patryk": "Catch up",
+        "block": {
+          "AM/PTO": "Catch up",
+          "PTO": "Catch up"
+        }
+      },
+      {
+        "weekOf": "2027-07-19",
+        "raw": "46587.0",
+        "patryk": "",
+        "block": {
+          "AM/PTO": "",
+          "PTO": ""
+        }
+      },
+      {
+        "weekOf": "2027-07-26",
+        "raw": "46594.0",
+        "patryk": "",
+        "block": {
+          "AM/PTO": "",
+          "PTO": ""
+        }
+      },
+      {
+        "weekOf": "2027-08-02",
+        "raw": "46601.0",
+        "patryk": "",
+        "block": {
+          "AM/PTO": "",
+          "PTO": ""
+        }
+      }
+    ]
+  },
+  "Year 10 Combined Pacing": {
+    "sheetFile": "sheet4.xml",
+    "patrykColumns": [
+      {
+        "column": "D",
+        "class": "10C-2",
+        "qualification": "Combined Science",
+        "teacher": "PTO (5)"
+      }
+    ],
+    "blockTeachers": {
+      "D": "PTO (5)",
+      "E": "RBA (3)",
+      "F": "BCO (2)"
+    },
+    "weeks": [
+      {
+        "weekOf": "2026-09-07",
+        "raw": "46272.0",
+        "patryk": "P1 - Energy L1-11",
+        "block": {
+          "PTO (5)": "P1 - Energy L1-11",
+          "RBA (3)": "C4 Chem changes L1-11",
+          "BCO (2)": "B3 - Infection & response"
+        }
+      },
+      {
+        "weekOf": "2026-09-14",
+        "raw": "46279.0",
+        "patryk": "P1 - Energy L1-11",
+        "block": {
+          "PTO (5)": "P1 - Energy L1-11",
+          "RBA (3)": "C4 Chem changes L1-11",
+          "BCO (2)": "B3 - Infection & response"
+        }
+      },
+      {
+        "weekOf": "2026-09-21",
+        "raw": "46286.0",
+        "patryk": "P1 - Energy L1-11",
+        "block": {
+          "PTO (5)": "P1 - Energy L1-11",
+          "RBA (3)": "C4 Chem changes L1-11",
+          "BCO (2)": "B3 - Infection & response"
+        }
+      },
+      {
+        "weekOf": "2026-09-28",
+        "raw": "46293.0",
+        "patryk": "P1 - Energy L1-11",
+        "block": {
+          "PTO (5)": "P1 - Energy L1-11",
+          "RBA (3)": "C4 Chem changes L1-11",
+          "BCO (2)": "B3 - Infection & response"
+        }
+      },
+      {
+        "weekOf": "2026-10-05",
+        "raw": "46300.0",
+        "patryk": "P1 Assessment",
+        "block": {
+          "PTO (5)": "P1 Assessment",
+          "RBA (3)": "C4 Chem changes L1-11",
+          "BCO (2)": "B3 - Infection & response"
+        }
+      },
+      {
+        "weekOf": "2026-10-12",
+        "raw": "46307.0",
+        "patryk": "P2 Electricity L1-16",
+        "block": {
+          "PTO (5)": "P2 Electricity L1-16",
+          "RBA (3)": "C4 Chem changes L1-11",
+          "BCO (2)": "B3 - Infection & response"
+        }
+      },
+      {
+        "weekOf": "2026-10-19",
+        "raw": "46314.0",
+        "patryk": "P2 Electricity L1-16",
+        "block": {
+          "PTO (5)": "P2 Electricity L1-16",
+          "RBA (3)": "C4 Chem changes L1-11",
+          "BCO (2)": "B3 - Infection & response"
+        }
+      },
+      {
+        "weekOf": "2026-10-26",
+        "raw": "46321.0",
+        "patryk": "",
+        "block": {
+          "PTO (5)": "",
+          "RBA (3)": "",
+          "BCO (2)": ""
+        }
+      },
+      {
+        "weekOf": "2026-11-02",
+        "raw": "46328.0",
+        "patryk": "P2 Electricity L1-16",
+        "block": {
+          "PTO (5)": "P2 Electricity L1-16",
+          "RBA (3)": "C4 Chem changes L1-11",
+          "BCO (2)": "B3 - Infection & response"
+        }
+      },
+      {
+        "weekOf": "2026-11-09",
+        "raw": "46335.0",
+        "patryk": "P2 Electricity L1-16",
+        "block": {
+          "PTO (5)": "P2 Electricity L1-16",
+          "RBA (3)": "C4 Assessment",
+          "BCO (2)": "B3 - Infection & response"
+        }
+      },
+      {
+        "weekOf": "2026-11-16",
+        "raw": "46342.0",
+        "patryk": "P2 Electricity L1-16",
+        "block": {
+          "PTO (5)": "P2 Electricity L1-16",
+          "RBA (3)": "C3 - Quant Chem L1-12",
+          "BCO (2)": "B3 Assessment"
+        }
+      },
+      {
+        "weekOf": "2026-11-23",
+        "raw": "46349.0",
+        "patryk": "P2 Electricity L1-16",
+        "block": {
+          "PTO (5)": "P2 Electricity L1-16",
+          "RBA (3)": "C3 - Quant Chem L1-12",
+          "BCO (2)": "B4 Bioenergetics & plants"
+        }
+      },
+      {
+        "weekOf": "2026-11-30",
+        "raw": "46356.0",
+        "patryk": "P2 Assessment",
+        "block": {
+          "PTO (5)": "P2 Assessment",
+          "RBA (3)": "C3 - Quant Chem L1-12",
+          "BCO (2)": "B4 Bioenergetics & plants"
+        }
+      },
+      {
+        "weekOf": "2026-12-07",
+        "raw": "46363.0",
+        "patryk": "C5 Energy changes L1-5",
+        "block": {
+          "PTO (5)": "C5 Energy changes L1-5",
+          "RBA (3)": "C3 - Quant Chem L1-12",
+          "BCO (2)": "B4 Bioenergetics & plants"
+        }
+      },
+      {
+        "weekOf": "2026-12-14",
+        "raw": "46370.0",
+        "patryk": "C5 Energy changes L1-5",
+        "block": {
+          "PTO (5)": "C5 Energy changes L1-5",
+          "RBA (3)": "C3 - Quant Chem L1-12",
+          "BCO (2)": "B4 Bioenergetics & plants"
+        }
+      },
+      {
+        "weekOf": "2026-12-21",
+        "raw": "46377.0",
+        "patryk": "",
+        "block": {
+          "PTO (5)": "",
+          "RBA (3)": "",
+          "BCO (2)": ""
+        }
+      },
+      {
+        "weekOf": "2026-12-28",
+        "raw": "46384.0",
+        "patryk": "",
+        "block": {
+          "PTO (5)": "",
+          "RBA (3)": "",
+          "BCO (2)": ""
+        }
+      },
+      {
+        "weekOf": "2027-01-04",
+        "raw": "46391.0",
+        "patryk": "C5 Energy changes L1-5",
+        "block": {
+          "PTO (5)": "C5 Energy changes L1-5",
+          "RBA (3)": "C3 - Quant Chem L1-12",
+          "BCO (2)": "B4 Bioenergetics & plants"
+        }
+      },
+      {
+        "weekOf": "2027-01-11",
+        "raw": "46398.0",
+        "patryk": "C5 Assessment",
+        "block": {
+          "PTO (5)": "C5 Assessment",
+          "RBA (3)": "C3 - Quant Chem L1-12",
+          "BCO (2)": "B4 Bioenergetics & plants"
+        }
+      },
+      {
+        "weekOf": "2027-01-18",
+        "raw": "46405.0",
+        "patryk": "P5 Forces L1-20",
+        "block": {
+          "PTO (5)": "P5 Forces L1-20",
+          "RBA (3)": "C3 - Quant Chem L1-12",
+          "BCO (2)": "B4 Bioenergetics & plants"
+        }
+      },
+      {
+        "weekOf": "2027-01-25",
+        "raw": "46412.0",
+        "patryk": "P5 Forces L1-20",
+        "block": {
+          "PTO (5)": "P5 Forces L1-20",
+          "RBA (3)": "C3 Assessment",
+          "BCO (2)": "B4 Bioenergetics & plants"
+        }
+      },
+      {
+        "weekOf": "2027-02-01",
+        "raw": "46419.0",
+        "patryk": "P5 Forces L1-20",
+        "block": {
+          "PTO (5)": "P5 Forces L1-20",
+          "RBA (3)": "B5 Homeostasis & response",
+          "BCO (2)": "B4 Bioenergetics & plants"
+        }
+      },
+      {
+        "weekOf": "2027-02-08",
+        "raw": "46426.0",
+        "patryk": "P5 Forces L1-20",
+        "block": {
+          "PTO (5)": "P5 Forces L1-20",
+          "RBA (3)": "B5 Homeostasis & response",
+          "BCO (2)": "B4 Assessment"
+        }
+      },
+      {
+        "weekOf": "2027-02-15",
+        "raw": "46433.0",
+        "patryk": "",
+        "block": {
+          "PTO (5)": "",
+          "RBA (3)": "",
+          "BCO (2)": ""
+        }
+      },
+      {
+        "weekOf": "2027-02-22",
+        "raw": "46440.0",
+        "patryk": "P5 Forces L1-20",
+        "block": {
+          "PTO (5)": "P5 Forces L1-20",
+          "RBA (3)": "C6 - Rates L1-14",
+          "BCO (2)": "B5 Homeostasis & response"
+        }
+      },
+      {
+        "weekOf": "2027-03-01",
+        "raw": "46447.0",
+        "patryk": "P5 Forces L1-20",
+        "block": {
+          "PTO (5)": "P5 Forces L1-20",
+          "RBA (3)": "C6 - Rates L1-14",
+          "BCO (2)": "B5 Homeostasis & response"
+        }
+      },
+      {
+        "weekOf": "2027-03-08",
+        "raw": "46454.0",
+        "patryk": "P5 Forces L1-20",
+        "block": {
+          "PTO (5)": "P5 Forces L1-20",
+          "RBA (3)": "C6 - Rates L1-14",
+          "BCO (2)": "B5 Homeostasis & response"
+        }
+      },
+      {
+        "weekOf": "2027-03-15",
+        "raw": "46461.0",
+        "patryk": "P5 Forces L1-20",
+        "block": {
+          "PTO (5)": "P5 Forces L1-20",
+          "RBA (3)": "C6 - Rates L1-14",
+          "BCO (2)": "B5 Homeostasis & response"
+        }
+      },
+      {
+        "weekOf": "2027-03-22",
+        "raw": "46468.0",
+        "patryk": "P5 Forces L1-20",
+        "block": {
+          "PTO (5)": "P5 Forces L1-20",
+          "RBA (3)": "C6 - Rates L1-14",
+          "BCO (2)": "B5 Homeostasis & response"
+        }
+      },
+      {
+        "weekOf": "2027-03-29",
+        "raw": "46475.0",
+        "patryk": "",
+        "block": {
+          "PTO (5)": "",
+          "RBA (3)": "",
+          "BCO (2)": ""
+        }
+      },
+      {
+        "weekOf": "2027-04-05",
+        "raw": "46482.0",
+        "patryk": "",
+        "block": {
+          "PTO (5)": "",
+          "RBA (3)": "",
+          "BCO (2)": ""
+        }
+      },
+      {
+        "weekOf": "2027-04-12",
+        "raw": "46489.0",
+        "patryk": "P5 Forces L1-20",
+        "block": {
+          "PTO (5)": "P5 Forces L1-20",
+          "RBA (3)": "C6 - Rates L1-14",
+          "BCO (2)": "B5 Homeostasis & response"
+        }
+      },
+      {
+        "weekOf": "2027-04-19",
+        "raw": "46496.0",
+        "patryk": "P5 Forces L1-20",
+        "block": {
+          "PTO (5)": "P5 Forces L1-20",
+          "RBA (3)": "C6 - Rates L1-14",
+          "BCO (2)": "B5 Homeostasis & response"
+        }
+      },
+      {
+        "weekOf": "2027-04-26",
+        "raw": "46503.0",
+        "patryk": "P5 Forces L1-20",
+        "block": {
+          "PTO (5)": "P5 Forces L1-20",
+          "RBA (3)": "C6 - Rates L1-14",
+          "BCO (2)": "B5 Homeostasis & response"
+        }
+      },
+      {
+        "weekOf": "2027-05-03",
+        "raw": "46510.0",
+        "patryk": "P5 Forces L1-20",
+        "block": {
+          "PTO (5)": "P5 Forces L1-20",
+          "RBA (3)": "C6 - Rates L1-14",
+          "BCO (2)": "B5 Homeostasis & response"
+        }
+      },
+      {
+        "weekOf": "2027-05-10",
+        "raw": "46517.0",
+        "patryk": "P5 Forces L1-20",
+        "block": {
+          "PTO (5)": "P5 Forces L1-20",
+          "RBA (3)": "Revision",
+          "BCO (2)": "Revision"
+        }
+      },
+      {
+        "weekOf": "2027-05-17",
+        "raw": "46524.0",
+        "patryk": "Revision",
+        "block": {
+          "PTO (5)": "Revision",
+          "RBA (3)": "Revision",
+          "BCO (2)": "Revision"
+        }
+      },
+      {
+        "weekOf": "2027-05-24",
+        "raw": "46531.0",
+        "patryk": "Revision",
+        "block": {
+          "PTO (5)": "Revision",
+          "RBA (3)": "Revision",
+          "BCO (2)": "Bio paper 1 Mock"
+        }
+      },
+      {
+        "weekOf": "2027-05-31",
+        "raw": "46538.0",
+        "patryk": "",
+        "block": {
+          "PTO (5)": "",
+          "RBA (3)": "",
+          "BCO (2)": ""
+        }
+      },
+      {
+        "weekOf": "2027-06-07",
+        "raw": "46545.0",
+        "patryk": "Revision",
+        "block": {
+          "PTO (5)": "Revision",
+          "RBA (3)": "Revision",
+          "BCO (2)": "Go through mock exam"
+        }
+      },
+      {
+        "weekOf": "2027-06-14",
+        "raw": "46552.0",
+        "patryk": "Revision",
+        "block": {
+          "PTO (5)": "Revision",
+          "RBA (3)": "Revision",
+          "BCO (2)": "Go through mock exam"
+        }
+      },
+      {
+        "weekOf": "2027-06-21",
+        "raw": "46559.0",
+        "patryk": "Phys paper 1 Mock",
+        "block": {
+          "PTO (5)": "Phys paper 1 Mock",
+          "RBA (3)": "Chem paper 1 Mock",
+          "BCO (2)": "Improvement work"
+        }
+      },
+      {
+        "weekOf": "2027-06-28",
+        "raw": "46566.0",
+        "patryk": "Go through mock exam",
+        "block": {
+          "PTO (5)": "Go through mock exam",
+          "RBA (3)": "Go through mock exam",
+          "BCO (2)": "B5 Homeostasis & response"
+        }
+      },
+      {
+        "weekOf": "2027-07-05",
+        "raw": "46573.0",
+        "patryk": "Improvement work",
+        "block": {
+          "PTO (5)": "Improvement work",
+          "RBA (3)": "Improvement work",
+          "BCO (2)": "B5 Homeostasis & response"
+        }
+      },
+      {
+        "weekOf": "2027-07-12",
+        "raw": "46580.0",
+        "patryk": "P5 Forces L1-20",
+        "block": {
+          "PTO (5)": "P5 Forces L1-20",
+          "RBA (3)": "C6 - Rates L1-14",
+          "BCO (2)": "B5 Homeostasis & response"
+        }
+      },
+      {
+        "weekOf": "2027-07-19",
+        "raw": "46587.0",
+        "patryk": "",
+        "block": {
+          "PTO (5)": "",
+          "RBA (3)": "",
+          "BCO (2)": ""
+        }
+      },
+      {
+        "weekOf": "2027-07-26",
+        "raw": "46594.0",
+        "patryk": "Summer Holidays",
+        "block": {
+          "PTO (5)": "Summer Holidays",
+          "RBA (3)": "Summer Holidays",
+          "BCO (2)": "Summer Holidays"
+        }
+      },
+      {
+        "weekOf": "2027-08-02",
+        "raw": "46601.0",
+        "patryk": "Summer Holidays",
+        "block": {
+          "PTO (5)": "Summer Holidays",
+          "RBA (3)": "Summer Holidays",
+          "BCO (2)": "Summer Holidays"
+        }
+      }
+    ]
+  },
+  "Year 10 Separates Pacing": {
+    "sheetFile": "sheet5.xml",
+    "patrykColumns": [
+      {
+        "column": "G",
+        "class": "10S-2",
+        "qualification": "Physics Separate",
+        "teacher": "PTO"
+      }
+    ],
+    "blockTeachers": {
+      "E": "EJA",
+      "F": "LHO",
+      "G": "PTO"
+    },
+    "weeks": [
+      {
+        "weekOf": "2026-09-07",
+        "raw": "46272.0",
+        "patryk": "P1 - Energy L1-11",
+        "block": {
+          "EJA": "B3 - Infection & response",
+          "LHO": "C4 Chem changes L1-11",
+          "PTO": "P1 - Energy L1-11"
+        }
+      },
+      {
+        "weekOf": "2026-09-14",
+        "raw": "46279.0",
+        "patryk": "P1 - Energy L1-11",
+        "block": {
+          "EJA": "B3 - Infection & response",
+          "LHO": "C4 Chem changes L1-11",
+          "PTO": "P1 - Energy L1-11"
+        }
+      },
+      {
+        "weekOf": "2026-09-21",
+        "raw": "46286.0",
+        "patryk": "P4 assessment",
+        "block": {
+          "EJA": "B3 - Infection & response",
+          "LHO": "C2 assessment",
+          "PTO": "P4 assessment"
+        }
+      },
+      {
+        "weekOf": "2026-09-28",
+        "raw": "46293.0",
+        "patryk": "P1 - Energy L1-11",
+        "block": {
+          "EJA": "B1 assessment",
+          "LHO": "C4 Chem changes L1-11",
+          "PTO": "P1 - Energy L1-11"
+        }
+      },
+      {
+        "weekOf": "2026-10-05",
+        "raw": "46300.0",
+        "patryk": "P1 - Energy L1-11",
+        "block": {
+          "EJA": "B3 - Infection & response",
+          "LHO": "C4 Chem changes L1-11",
+          "PTO": "P1 - Energy L1-11"
+        }
+      },
+      {
+        "weekOf": "2026-10-12",
+        "raw": "46307.0",
+        "patryk": "P1 - Energy L1-11",
+        "block": {
+          "EJA": "B3 - Infection & response",
+          "LHO": "C4 Chem changes L1-11",
+          "PTO": "P1 - Energy L1-11"
+        }
+      },
+      {
+        "weekOf": "2026-10-19",
+        "raw": "46314.0",
+        "patryk": "P1 - Energy L1-11",
+        "block": {
+          "EJA": "B3 - Infection & response",
+          "LHO": "C4 Chem changes L1-11",
+          "PTO": "P1 - Energy L1-11"
+        }
+      },
+      {
+        "weekOf": "2026-10-26",
+        "raw": "46321.0",
+        "patryk": "",
+        "block": {
+          "EJA": "",
+          "LHO": "",
+          "PTO": ""
+        }
+      },
+      {
+        "weekOf": "2026-11-02",
+        "raw": "46328.0",
+        "patryk": "P1 - Energy L1-11",
+        "block": {
+          "EJA": "B3 - Infection & response",
+          "LHO": "C4 Chem changes L1-11",
+          "PTO": "P1 - Energy L1-11"
+        }
+      },
+      {
+        "weekOf": "2026-11-09",
+        "raw": "46335.0",
+        "patryk": "P1 Assessment",
+        "block": {
+          "EJA": "B3 - Infection & response",
+          "LHO": "C4 Assessment",
+          "PTO": "P1 Assessment"
+        }
+      },
+      {
+        "weekOf": "2026-11-16",
+        "raw": "46342.0",
+        "patryk": "P2 Electricity L1-16",
+        "block": {
+          "EJA": "B3 - Infection & response",
+          "LHO": "C3 - Quant Chem",
+          "PTO": "P2 Electricity L1-16"
+        }
+      },
+      {
+        "weekOf": "2026-11-23",
+        "raw": "46349.0",
+        "patryk": "P2 Electricity L1-16",
+        "block": {
+          "EJA": "B3 Assessment",
+          "LHO": "C3 - Quant Chem",
+          "PTO": "P2 Electricity L1-16"
+        }
+      },
+      {
+        "weekOf": "2026-11-30",
+        "raw": "46356.0",
+        "patryk": "P2 Electricity L1-16",
+        "block": {
+          "EJA": "B4 Bioenergetics & plants",
+          "LHO": "C3 - Quant Chem",
+          "PTO": "P2 Electricity L1-16"
+        }
+      },
+      {
+        "weekOf": "2026-12-07",
+        "raw": "46363.0",
+        "patryk": "P2 Electricity L1-16",
+        "block": {
+          "EJA": "B4 Bioenergetics & plants",
+          "LHO": "C3 - Quant Chem",
+          "PTO": "P2 Electricity L1-16"
+        }
+      },
+      {
+        "weekOf": "2026-12-14",
+        "raw": "46370.0",
+        "patryk": "P2 Electricity L1-16",
+        "block": {
+          "EJA": "B4 Bioenergetics & plants",
+          "LHO": "C3 - Quant Chem",
+          "PTO": "P2 Electricity L1-16"
+        }
+      },
+      {
+        "weekOf": "2026-12-21",
+        "raw": "46377.0",
+        "patryk": "",
+        "block": {
+          "EJA": "",
+          "LHO": "",
+          "PTO": ""
+        }
+      },
+      {
+        "weekOf": "2026-12-28",
+        "raw": "46384.0",
+        "patryk": "",
+        "block": {
+          "EJA": "",
+          "LHO": "",
+          "PTO": ""
+        }
+      },
+      {
+        "weekOf": "2027-01-04",
+        "raw": "46391.0",
+        "patryk": "P2 Electricity L1-16",
+        "block": {
+          "EJA": "B4 Bioenergetics & plants",
+          "LHO": "C3 - Quant Chem",
+          "PTO": "P2 Electricity L1-16"
+        }
+      },
+      {
+        "weekOf": "2027-01-11",
+        "raw": "46398.0",
+        "patryk": "P2 Electricity L1-16",
+        "block": {
+          "EJA": "B4 Bioenergetics & plants",
+          "LHO": "C3 - Quant Chem",
+          "PTO": "P2 Electricity L1-16"
+        }
+      },
+      {
+        "weekOf": "2027-01-18",
+        "raw": "46405.0",
+        "patryk": "P2 Electricity L1-16",
+        "block": {
+          "EJA": "B4 Bioenergetics & plants",
+          "LHO": "C3 - Quant Chem",
+          "PTO": "P2 Electricity L1-16"
+        }
+      },
+      {
+        "weekOf": "2027-01-25",
+        "raw": "46412.0",
+        "patryk": "P2 Electricity L1-16",
+        "block": {
+          "EJA": "B4 Bioenergetics & plants",
+          "LHO": "C3 - Quant Chem",
+          "PTO": "P2 Electricity L1-16"
+        }
+      },
+      {
+        "weekOf": "2027-02-01",
+        "raw": "46419.0",
+        "patryk": "P2 Electricity L1-16",
+        "block": {
+          "EJA": "B4 Assessment",
+          "LHO": "C3 Assessment",
+          "PTO": "P2 Electricity L1-16"
+        }
+      },
+      {
+        "weekOf": "2027-02-08",
+        "raw": "46426.0",
+        "patryk": "P2 Assessment",
+        "block": {
+          "EJA": "B5 Homeostasis & response",
+          "LHO": "C5 Energy changes L1-10",
+          "PTO": "P2 Assessment"
+        }
+      },
+      {
+        "weekOf": "2027-02-15",
+        "raw": "46433.0",
+        "patryk": "",
+        "block": {
+          "EJA": "",
+          "LHO": "",
+          "PTO": ""
+        }
+      },
+      {
+        "weekOf": "2027-02-22",
+        "raw": "46440.0",
+        "patryk": "P5 Forces L1-25",
+        "block": {
+          "EJA": "B5 Homeostasis & response",
+          "LHO": "C5 Energy changes L1-10",
+          "PTO": "P5 Forces L1-25"
+        }
+      },
+      {
+        "weekOf": "2027-03-01",
+        "raw": "46447.0",
+        "patryk": "P5 Forces L1-25",
+        "block": {
+          "EJA": "B5 Homeostasis & response",
+          "LHO": "C5 Energy changes L1-10",
+          "PTO": "P5 Forces L1-25"
+        }
+      },
+      {
+        "weekOf": "2027-03-08",
+        "raw": "46454.0",
+        "patryk": "P5 Forces L1-25",
+        "block": {
+          "EJA": "B5 Homeostasis & response",
+          "LHO": "C5 Energy changes L1-10",
+          "PTO": "P5 Forces L1-25"
+        }
+      },
+      {
+        "weekOf": "2027-03-15",
+        "raw": "46461.0",
+        "patryk": "P5 Forces L1-25",
+        "block": {
+          "EJA": "B5 Homeostasis & response",
+          "LHO": "C5 Energy changes L1-10",
+          "PTO": "P5 Forces L1-25"
+        }
+      },
+      {
+        "weekOf": "2027-03-22",
+        "raw": "46468.0",
+        "patryk": "P5 Forces L1-25",
+        "block": {
+          "EJA": "B5 Homeostasis & response",
+          "LHO": "C5 Energy changes L1-10",
+          "PTO": "P5 Forces L1-25"
+        }
+      },
+      {
+        "weekOf": "2027-03-29",
+        "raw": "46475.0",
+        "patryk": "",
+        "block": {
+          "EJA": "",
+          "LHO": "",
+          "PTO": ""
+        }
+      },
+      {
+        "weekOf": "2027-04-05",
+        "raw": "46482.0",
+        "patryk": "",
+        "block": {
+          "EJA": "",
+          "LHO": "",
+          "PTO": ""
+        }
+      },
+      {
+        "weekOf": "2027-04-12",
+        "raw": "46489.0",
+        "patryk": "P5 Forces L1-25",
+        "block": {
+          "EJA": "B5 Homeostasis & response",
+          "LHO": "C5 Energy changes L1-10",
+          "PTO": "P5 Forces L1-25"
+        }
+      },
+      {
+        "weekOf": "2027-04-19",
+        "raw": "46496.0",
+        "patryk": "P5 Forces L1-25",
+        "block": {
+          "EJA": "B5 Homeostasis & response",
+          "LHO": "C6 - Rates L1-14",
+          "PTO": "P5 Forces L1-25"
+        }
+      },
+      {
+        "weekOf": "2027-04-26",
+        "raw": "46503.0",
+        "patryk": "P5 Forces L1-25",
+        "block": {
+          "EJA": "Revision",
+          "LHO": "C6 - Rates L1-14",
+          "PTO": "P5 Forces L1-25"
+        }
+      },
+      {
+        "weekOf": "2027-05-03",
+        "raw": "46510.0",
+        "patryk": "P5 Forces L1-25",
+        "block": {
+          "EJA": "Revision",
+          "LHO": "C6 - Rates L1-14",
+          "PTO": "P5 Forces L1-25"
+        }
+      },
+      {
+        "weekOf": "2027-05-10",
+        "raw": "46517.0",
+        "patryk": "P5 Forces L1-25",
+        "block": {
+          "EJA": "Revision",
+          "LHO": "C6 - Rates L1-14",
+          "PTO": "P5 Forces L1-25"
+        }
+      },
+      {
+        "weekOf": "2027-05-17",
+        "raw": "46524.0",
+        "patryk": "Revision",
+        "block": {
+          "EJA": "Revision",
+          "LHO": "Revision",
+          "PTO": "Revision"
+        }
+      },
+      {
+        "weekOf": "2027-05-24",
+        "raw": "46531.0",
+        "patryk": "Revision",
+        "block": {
+          "EJA": "Bio paper 1 Mock",
+          "LHO": "Revision",
+          "PTO": "Revision"
+        }
+      },
+      {
+        "weekOf": "2027-05-31",
+        "raw": "46538.0",
+        "patryk": "",
+        "block": {
+          "EJA": "",
+          "LHO": "",
+          "PTO": ""
+        }
+      },
+      {
+        "weekOf": "2027-06-07",
+        "raw": "46545.0",
+        "patryk": "Revision",
+        "block": {
+          "EJA": "Go through mock exam",
+          "LHO": "Revision",
+          "PTO": "Revision"
+        }
+      },
+      {
+        "weekOf": "2027-06-14",
+        "raw": "46552.0",
+        "patryk": "Revision",
+        "block": {
+          "EJA": "Improvement work",
+          "LHO": "Chem paper 1 Mock",
+          "PTO": "Revision"
+        }
+      },
+      {
+        "weekOf": "2027-06-21",
+        "raw": "46559.0",
+        "patryk": "Phys paper 1 Mock",
+        "block": {
+          "EJA": "B7 Ecology",
+          "LHO": "Go through mock exam",
+          "PTO": "Phys paper 1 Mock"
+        }
+      },
+      {
+        "weekOf": "2027-06-28",
+        "raw": "46566.0",
+        "patryk": "Go through mock exam",
+        "block": {
+          "EJA": "B7 Ecology",
+          "LHO": "Improvement work",
+          "PTO": "Go through mock exam"
+        }
+      },
+      {
+        "weekOf": "2027-07-05",
+        "raw": "46573.0",
+        "patryk": "Improvement work",
+        "block": {
+          "EJA": "B7 Ecology",
+          "LHO": "C6 - Rates L1-14",
+          "PTO": "Improvement work"
+        }
+      },
+      {
+        "weekOf": "2027-07-12",
+        "raw": "46580.0",
+        "patryk": "P5 Forces L1-25",
+        "block": {
+          "EJA": "B7 Ecology",
+          "LHO": "C6 - Rates L1-14",
+          "PTO": "P5 Forces L1-25"
+        }
+      },
+      {
+        "weekOf": "2027-07-19",
+        "raw": "46587.0",
+        "patryk": "",
+        "block": {
+          "EJA": "",
+          "LHO": "",
+          "PTO": ""
+        }
+      },
+      {
+        "weekOf": "2027-07-26",
+        "raw": "46594.0",
+        "patryk": "",
+        "block": {
+          "EJA": "",
+          "LHO": "",
+          "PTO": ""
+        }
+      },
+      {
+        "weekOf": "2027-08-02",
+        "raw": "46601.0",
+        "patryk": "",
+        "block": {
+          "EJA": "",
+          "LHO": "",
+          "PTO": ""
+        }
+      }
+    ]
+  },
+  "Year 11 Combined Pacing": {
+    "patrykColumns": [],
+    "note": "no PTO column"
+  },
+  "Year 11 Separates Pacing": {
+    "sheetFile": "sheet8.xml",
+    "patrykColumns": [
+      {
+        "column": "G",
+        "class": "11S2",
+        "qualification": "Physics Separate",
+        "teacher": "PTO"
+      }
+    ],
+    "blockTeachers": {
+      "E": "EJA",
+      "F": "SLS",
+      "G": "PTO"
+    },
+    "weeks": [
+      {
+        "weekOf": "2026-09-07",
+        "raw": "46272.0",
+        "patryk": "Forces recap",
+        "block": {
+          "EJA": "B7 Ecology",
+          "SLS": "C7 Org Chem",
+          "PTO": "Forces recap"
+        }
+      },
+      {
+        "weekOf": "2026-09-14",
+        "raw": "46279.0",
+        "patryk": "Forces recap",
+        "block": {
+          "EJA": "B7 Ecology",
+          "SLS": "C7 Org Chem",
+          "PTO": "Forces recap"
+        }
+      },
+      {
+        "weekOf": "2026-09-21",
+        "raw": "46286.0",
+        "patryk": "P5 - Forces assessment",
+        "block": {
+          "EJA": "B7 Ecology",
+          "SLS": "C7 Org Chem",
+          "PTO": "P5 - Forces assessment"
+        }
+      },
+      {
+        "weekOf": "2026-09-28",
+        "raw": "46293.0",
+        "patryk": "P6 Waves L1-13",
+        "block": {
+          "EJA": "B6 - Inheritance L1-14",
+          "SLS": "C6 Rates assessment",
+          "PTO": "P6 Waves L1-13"
+        }
+      },
+      {
+        "weekOf": "2026-10-05",
+        "raw": "46300.0",
+        "patryk": "P6 Waves L1-13",
+        "block": {
+          "EJA": "B7 assessment",
+          "SLS": "C7 Org Chem",
+          "PTO": "P6 Waves L1-13"
+        }
+      },
+      {
+        "weekOf": "2026-10-12",
+        "raw": "46307.0",
+        "patryk": "P6 Waves L1-13",
+        "block": {
+          "EJA": "B6 - Inheritance L1-14",
+          "SLS": "C7 Org Chem",
+          "PTO": "P6 Waves L1-13"
+        }
+      },
+      {
+        "weekOf": "2026-10-19",
+        "raw": "46314.0",
+        "patryk": "P6 Waves L1-13",
+        "block": {
+          "EJA": "B6 - Inheritance L1-14",
+          "SLS": "C7 Org Chem",
+          "PTO": "P6 Waves L1-13"
+        }
+      },
+      {
+        "weekOf": "2026-10-26",
+        "raw": "46321.0",
+        "patryk": "",
+        "block": {
+          "EJA": "",
+          "SLS": "",
+          "PTO": ""
+        }
+      },
+      {
+        "weekOf": "2026-11-02",
+        "raw": "46328.0",
+        "patryk": "Revision",
+        "block": {
+          "EJA": "Revision",
+          "SLS": "Revision",
+          "PTO": "Revision"
+        }
+      },
+      {
+        "weekOf": "2026-11-09",
+        "raw": "46335.0",
+        "patryk": "Mock Exams",
+        "block": {
+          "EJA": "Mock Exams",
+          "SLS": "Mock Exams",
+          "PTO": "Mock Exams"
+        }
+      },
+      {
+        "weekOf": "2026-11-16",
+        "raw": "46342.0",
+        "patryk": "",
+        "block": {
+          "EJA": "",
+          "SLS": "",
+          "PTO": ""
+        }
+      },
+      {
+        "weekOf": "2026-11-23",
+        "raw": "46349.0",
+        "patryk": "P6 Waves L1-13",
+        "block": {
+          "EJA": "B6 - Inheritance L1-14",
+          "SLS": "C8 Chem analysis",
+          "PTO": "P6 Waves L1-13"
+        }
+      },
+      {
+        "weekOf": "2026-11-30",
+        "raw": "46356.0",
+        "patryk": "P7 Magnetism L1-11",
+        "block": {
+          "EJA": "B6 - Inheritance L1-14",
+          "SLS": "C8 Chem analysis",
+          "PTO": "P7 Magnetism L1-11"
+        }
+      },
+      {
+        "weekOf": "2026-12-07",
+        "raw": "46363.0",
+        "patryk": "P7 Magnetism L1-11",
+        "block": {
+          "EJA": "B6 - Inheritance L1-14",
+          "SLS": "C8 Chem analysis",
+          "PTO": "P7 Magnetism L1-11"
+        }
+      },
+      {
+        "weekOf": "2026-12-14",
+        "raw": "46370.0",
+        "patryk": "P7 Magnetism L1-11",
+        "block": {
+          "EJA": "B6 - Inheritance L1-14",
+          "SLS": "C9 Atmosphere",
+          "PTO": "P7 Magnetism L1-11"
+        }
+      },
+      {
+        "weekOf": "2026-12-21",
+        "raw": "46377.0",
+        "patryk": "",
+        "block": {
+          "EJA": "",
+          "SLS": "",
+          "PTO": ""
+        }
+      },
+      {
+        "weekOf": "2026-12-28",
+        "raw": "46384.0",
+        "patryk": "",
+        "block": {
+          "EJA": "",
+          "SLS": "",
+          "PTO": ""
+        }
+      },
+      {
+        "weekOf": "2027-01-04",
+        "raw": "46391.0",
+        "patryk": "P7 Magnetism L1-11",
+        "block": {
+          "EJA": "B6 - Inheritance L1-14",
+          "SLS": "C9 Atmosphere",
+          "PTO": "P7 Magnetism L1-11"
+        }
+      },
+      {
+        "weekOf": "2027-01-11",
+        "raw": "46398.0",
+        "patryk": "P7 Magnetism L1-11",
+        "block": {
+          "EJA": "B6 - Inheritance L1-14",
+          "SLS": "C9 Atmosphere",
+          "PTO": "P7 Magnetism L1-11"
+        }
+      },
+      {
+        "weekOf": "2027-01-18",
+        "raw": "46405.0",
+        "patryk": "P7 Magnetism L1-11",
+        "block": {
+          "EJA": "B6 assessment",
+          "SLS": "C7 Assessment",
+          "PTO": "P7 Magnetism L1-11"
+        }
+      },
+      {
+        "weekOf": "2027-01-25",
+        "raw": "46412.0",
+        "patryk": "P7 assessment",
+        "block": {
+          "EJA": "B5 revision",
+          "SLS": "C10 Using resources",
+          "PTO": "P7 assessment"
+        }
+      },
+      {
+        "weekOf": "2027-02-01",
+        "raw": "46419.0",
+        "patryk": "P8 Space L1-5",
+        "block": {
+          "EJA": "Revision",
+          "SLS": "C10 Using resources",
+          "PTO": "P8 Space L1-5"
+        }
+      },
+      {
+        "weekOf": "2027-02-08",
+        "raw": "46426.0",
+        "patryk": "P8 Space L1-5",
+        "block": {
+          "EJA": "Revision",
+          "SLS": "C10 Using resources",
+          "PTO": "P8 Space L1-5"
+        }
+      },
+      {
+        "weekOf": "2027-02-15",
+        "raw": "46433.0",
+        "patryk": "",
+        "block": {
+          "EJA": "",
+          "SLS": "",
+          "PTO": ""
+        }
+      },
+      {
+        "weekOf": "2027-02-22",
+        "raw": "46440.0",
+        "patryk": "Mock Exams",
+        "block": {
+          "EJA": "Mock Exams",
+          "SLS": "Mock Exams",
+          "PTO": "Mock Exams"
+        }
+      },
+      {
+        "weekOf": "2027-03-01",
+        "raw": "46447.0",
+        "patryk": "Phys paper 1 revision",
+        "block": {
+          "EJA": "Bio paper 1 revision",
+          "SLS": "Chem paper 1 revision",
+          "PTO": "Phys paper 1 revision"
+        }
+      },
+      {
+        "weekOf": "2027-03-08",
+        "raw": "46454.0",
+        "patryk": "",
+        "block": {
+          "EJA": "",
+          "SLS": "",
+          "PTO": ""
+        }
+      },
+      {
+        "weekOf": "2027-03-15",
+        "raw": "46461.0",
+        "patryk": "Phys paper 1 revision",
+        "block": {
+          "EJA": "Bio paper 1 revision",
+          "SLS": "Chem paper 1 revision",
+          "PTO": "Phys paper 1 revision"
+        }
+      },
+      {
+        "weekOf": "2027-03-22",
+        "raw": "46468.0",
+        "patryk": "Phys paper 2 revision",
+        "block": {
+          "EJA": "Bio paper 2 revision",
+          "SLS": "Chem paper 2 revision",
+          "PTO": "Phys paper 2 revision"
+        }
+      },
+      {
+        "weekOf": "2027-03-29",
+        "raw": "46475.0",
+        "patryk": "",
+        "block": {
+          "EJA": "",
+          "SLS": "",
+          "PTO": ""
+        }
+      },
+      {
+        "weekOf": "2027-04-05",
+        "raw": "46482.0",
+        "patryk": "",
+        "block": {
+          "EJA": "",
+          "SLS": "",
+          "PTO": ""
+        }
+      },
+      {
+        "weekOf": "2027-04-12",
+        "raw": "46489.0",
+        "patryk": "Phys paper 1 revision",
+        "block": {
+          "EJA": "Bio paper 1 revision",
+          "SLS": "Chem paper 1 revision",
+          "PTO": "Phys paper 1 revision"
+        }
+      },
+      {
+        "weekOf": "2027-04-19",
+        "raw": "46496.0",
+        "patryk": "Phys paper 2 revision",
+        "block": {
+          "EJA": "Bio paper 2 revision",
+          "SLS": "Chem paper 2 revision",
+          "PTO": "Phys paper 2 revision"
+        }
+      },
+      {
+        "weekOf": "2027-04-26",
+        "raw": "46503.0",
+        "patryk": "Phys paper 2 revision",
+        "block": {
+          "EJA": "Bio paper 2 revision",
+          "SLS": "Chem paper 2 revision",
+          "PTO": "Phys paper 2 revision"
+        }
+      },
+      {
+        "weekOf": "2027-05-03",
+        "raw": "46510.0",
+        "patryk": "Phys paper 1 revision",
+        "block": {
+          "EJA": "Bio paper 1 revision",
+          "SLS": "Chem paper 1 revision",
+          "PTO": "Phys paper 1 revision"
+        }
+      },
+      {
+        "weekOf": "2027-05-10",
+        "raw": "46517.0",
+        "patryk": "Exams",
+        "block": {
+          "EJA": "Exams",
+          "SLS": "Exams",
+          "PTO": "Exams"
+        }
+      },
+      {
+        "weekOf": "2027-05-17",
+        "raw": "46524.0",
+        "patryk": "Exams",
+        "block": {
+          "EJA": "Exams",
+          "SLS": "Exams",
+          "PTO": "Exams"
+        }
+      },
+      {
+        "weekOf": "2027-05-24",
+        "raw": "46531.0",
+        "patryk": "Exams",
+        "block": {
+          "EJA": "Exams",
+          "SLS": "Exams",
+          "PTO": "Exams"
+        }
+      },
+      {
+        "weekOf": "2027-05-31",
+        "raw": "46538.0",
+        "patryk": "",
+        "block": {
+          "EJA": "",
+          "SLS": "",
+          "PTO": ""
+        }
+      },
+      {
+        "weekOf": "2027-06-07",
+        "raw": "46545.0",
+        "patryk": "Exams",
+        "block": {
+          "EJA": "Exams",
+          "SLS": "Exams",
+          "PTO": "Exams"
+        }
+      },
+      {
+        "weekOf": "2027-06-14",
+        "raw": "46552.0",
+        "patryk": "Exams",
+        "block": {
+          "EJA": "Exams",
+          "SLS": "Exams",
+          "PTO": "Exams"
+        }
+      },
+      {
+        "weekOf": "2027-06-21",
+        "raw": "46559.0",
+        "patryk": "",
+        "block": {
+          "EJA": "",
+          "SLS": "",
+          "PTO": ""
+        }
+      },
+      {
+        "weekOf": "2027-06-28",
+        "raw": "46566.0",
+        "patryk": "",
+        "block": {
+          "EJA": "",
+          "SLS": "",
+          "PTO": ""
+        }
+      },
+      {
+        "weekOf": "2027-07-05",
+        "raw": "46573.0",
+        "patryk": "",
+        "block": {
+          "EJA": "",
+          "SLS": "",
+          "PTO": ""
+        }
+      },
+      {
+        "weekOf": "2027-07-12",
+        "raw": "46580.0",
+        "patryk": "",
+        "block": {
+          "EJA": "",
+          "SLS": "",
+          "PTO": ""
+        }
+      },
+      {
+        "weekOf": "2027-07-19",
+        "raw": "46587.0",
+        "patryk": "",
+        "block": {
+          "EJA": "Activites week",
+          "SLS": "",
+          "PTO": ""
+        }
+      },
+      {
+        "weekOf": "2027-07-26",
+        "raw": "46594.0",
+        "patryk": "",
+        "block": {
+          "EJA": "",
+          "SLS": "",
+          "PTO": ""
+        }
+      },
+      {
+        "weekOf": "2027-08-02",
+        "raw": "46601.0",
+        "patryk": "",
+        "block": {
+          "EJA": "",
+          "SLS": "",
+          "PTO": ""
+        }
+      }
+    ]
+  }
+}

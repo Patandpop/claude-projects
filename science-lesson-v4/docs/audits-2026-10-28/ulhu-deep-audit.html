@@ -1,0 +1,404 @@
+<title>Ulhu Deep Audit</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=IM+Fell+English:ital@0;1&display=swap">
+<style>
+/* Layout: one reading column, a top-ten ledger, then four phases of item cards, each card = verdict line + why + small "for Claude" note */
+:root{
+  --bg:#f3f1ea; --panel:#fbfaf6; --ink:#1d2421; --muted:#55615b; --line:#d9d6cb;
+  --kelp:#1f7a57; --rune:#9a6a12; --blood:#a32630; --glass:#2a5d9a; --note:#ece9df;
+  --display:'IM Fell English',Georgia,'Times New Roman',serif;
+  --body:'Atkinson Hyperlegible',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --mono:ui-monospace,'Cascadia Mono',Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0a100e; --panel:#111a17; --ink:#e6e1d2; --muted:#9aa9a1; --line:#25332d;
+  --kelp:#5ef2a0; --rune:#ffd56a; --blood:#ff7a72; --glass:#9cc6ff; --note:#16211d; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0a100e; --panel:#111a17; --ink:#e6e1d2; --muted:#9aa9a1; --line:#25332d;
+  --kelp:#5ef2a0; --rune:#ffd56a; --blood:#ff7a72; --glass:#9cc6ff; --note:#16211d; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:16px/1.6 var(--body);margin:0}
+.wrap{max-width:52rem;margin:0 auto;padding-inline:16px;padding-block:40px 64px;display:flex;flex-direction:column;gap:44px}
+h1,h2,h3{font-family:var(--display);font-weight:400;text-wrap:balance;margin:0;line-height:1.15}
+h1{font-size:clamp(2.3rem,7vw,3.4rem)}
+h2{font-size:1.9rem}
+h3{font-size:1.2rem;font-family:var(--body);font-weight:700;line-height:1.3}
+p{margin:0}
+.lede{display:flex;flex-direction:column;gap:14px}
+.eyebrow{font:700 .75rem var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--kelp)}
+.intro{color:var(--muted);max-width:40rem}
+.keys{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:.85rem;color:var(--muted)}
+.chip{display:inline-flex;align-items:center;gap:6px;font:700 .72rem var(--body);letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:3px;border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+.chip.bug{color:var(--blood);border-color:var(--blood)}
+.chip.gap{color:var(--glass);border-color:var(--glass)}
+.chip.idea{color:var(--rune);border-color:var(--rune)}
+.chip.ux{color:var(--kelp);border-color:var(--kelp)}
+.chip.paid{color:var(--bg);background:var(--blood);border-color:var(--blood)}
+section{display:flex;flex-direction:column;gap:18px}
+.sec-head{display:flex;flex-direction:column;gap:6px;border-bottom:1px solid var(--line);padding-bottom:10px}
+.sec-head p{color:var(--muted);font-size:.95rem}
+/* top ten ledger */
+ol.ten{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;border-top:1px solid var(--line)}
+ol.ten li{display:grid;grid-template-columns:2.4rem 1fr;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+ol.ten .n{font:1.6rem/1 var(--display);color:var(--rune);font-variant-numeric:tabular-nums}
+ol.ten b{display:block}
+ol.ten span{color:var(--muted);font-size:.93rem}
+/* items */
+.items{display:flex;flex-direction:column;gap:14px}
+article{background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:16px 18px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.top{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 10px}
+.top h3{flex:1 1 18rem;min-width:0}
+.why{font-style:italic;color:var(--ink)}
+.why:before{content:"Why it matters: ";font-style:normal;font-weight:700;color:var(--kelp)}
+.what{color:var(--muted)}
+.fc{font:.8rem/1.5 var(--mono);color:var(--muted);background:var(--note);border-radius:3px;padding:6px 9px;overflow-wrap:anywhere}
+.fc:before{content:"For Claude: ";font-weight:700}
+.meta{display:flex;flex-wrap:wrap;gap:6px}
+/* tables */
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:4px;background:var(--panel)}
+table{border-collapse:collapse;width:100%;font-size:.9rem;min-width:34rem}
+th,td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+th{font:700 .72rem var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+td.num{font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+tr:last-child td{border-bottom:0}
+.small{font-size:.85rem;color:var(--muted)}
+/* size bars */
+.bars{display:flex;flex-direction:column;gap:10px;background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:16px 18px}
+.bar{display:grid;grid-template-columns:8.5rem 1fr 4.5rem;gap:10px;align-items:center;font-size:.88rem}
+.bar .track{height:12px;background:var(--note);border-radius:2px;position:relative;overflow:hidden}
+.bar .fill{position:absolute;inset:0 auto 0 0;background:var(--kelp)}
+.bar .fill.warn{background:var(--rune)}
+.bar .limit{position:absolute;top:0;bottom:0;width:2px;background:var(--blood)}
+.bar .v{text-align:right;font-variant-numeric:tabular-nums}
+@media (max-width:480px){.bar{grid-template-columns:6.5rem 1fr 3.8rem}}
+ul.plain{margin:0;padding-left:1.2rem;display:flex;flex-direction:column;gap:6px}
+footer{color:var(--muted);font-size:.85rem;border-top:1px solid var(--line);padding-top:14px}
+</style>
+
+<div class="wrap">
+
+<header class="lede">
+  <div class="eyebrow">Ulhu's Rituals · read-only audit · 28 October 2026</div>
+  <h1>Ulhu Deep Audit</h1>
+  <p class="intro">A full look at the game inside your planner: what could break, what you picked that isn't in the app yet, what habit research suggests, how the rune economy behaves over a year, and how it feels on the phone. Nothing was changed. Everything is ranked by how much it helps for how much work.</p>
+  <div class="keys">
+    <span><span class="chip bug">Bug</span> something wrong today</span>
+    <span><span class="chip gap">Gap</span> picked but not built</span>
+    <span><span class="chip ux">Phone</span> comfort and access</span>
+    <span><span class="chip idea">Idea</span> optional, your call</span>
+  </div>
+  <p class="small">Paid services: none of this needs one. Everything runs in your free Apps Script and Google Sheet. The only place a cost could creep in is the future shop art, if it were ever made with a paid image tool (flagged in Later).</p>
+</header>
+
+<section>
+  <div class="sec-head"><h2>The ten that matter most</h2><p>Best value for the work, in order.</p></div>
+  <ol class="ten">
+    <li><span class="n">1</span><div><b>Most shop locks don't work.</b><span>9 of the 17 locked items can be bought at any level, so the top-tier items aren't really something to work towards.</span></div></li>
+    <li><span class="n">2</span><div><b>A morning tap can wrongly break a streak.</b><span>If the phone page stayed open overnight, a tick before the page reloads can reset or mark a streak by mistake.</span></div></li>
+    <li><span class="n">3</span><div><b>Undo after fainting is not exact.</b><span>The health comes back, the lost level and week of runes do not.</span></div></li>
+    <li><span class="n">4</span><div><b>Names starting with + - = break the sheet.</b><span>"+20 press-ups" would turn into a spreadsheet formula error.</span></div></li>
+    <li><span class="n">5</span><div><b>Reduced motion switches the sigils off.</b><span>With that phone setting on, curses never ask Flesh, Domain, Scene or Coven.</span></div></li>
+    <li><span class="n">6</span><div><b>Slips eat the life bonus.</b><span>A Netflix slip counts as "a life goal" and moves the +5 and +10 life bonuses.</span></div></li>
+    <li><span class="n">7</span><div><b>Each tap is slow to save, and fast taps can fail.</b><span>The server loads your whole planner up to three times per tap.</span></div></li>
+    <li><span class="n">8</span><div><b>No-signal ticks land on the wrong day.</b><span>An 11 pm tick sent next morning counts for the next day, and can be sent twice.</span></div></li>
+    <li><span class="n">9</span><div><b>Vespers has no screen yet.</b><span>The server side is ready; until the screen exists the Vespers streak and its multiplier stay at x1.</span></div></li>
+    <li><span class="n">10</span><div><b>A size alarm for the paste files.</b><span>GameUI is at 252 of about 380 KB, and Vespers, glass and the seal are all coming.</span></div></li>
+  </ol>
+</section>
+
+<section>
+  <div class="sec-head"><h2>Quick wins</h2><p>Small fixes, mostly under an hour each. Most are bugs that quietly affect fairness or trust.</p></div>
+  <div class="items">
+
+    <article>
+      <div class="top"><h3>Make the shop locks count</h3><div class="meta"><span class="chip bug">Bug</span><span class="chip">Small</span></div></div>
+      <p class="why">Locked Eldritch and side-work items are meant to be long-term goals; right now 9 of them are open from day one.</p>
+      <p class="what">The shop list writes locks two different ways. The server only understands one of them, so half the locks (three "needs level 15", one "level 10" and five "outside-work ticks") are ignored. The existing test passes because it happens to pick one of the items written the other way.</p>
+      <p class="fc">game-shop.json has {type:"level",min:15} and {type:"outside_work",count:N} on 9 items; gLock_ in Game.gs reads lock.level / lock.outside_work only. Normalise in gShop_(); add a test that every locked item is refused at level 1.</p>
+    </article>
+
+    <article>
+      <div class="top"><h3>Catch up the day before any tick, and refresh when the app comes back</h3><div class="meta"><span class="chip bug">Bug</span><span class="chip">Small</span></div></div>
+      <p class="why">Streaks are the heart of the game, and a wrong reset is the fastest way to stop caring about one.</p>
+      <p class="what">The day only rolls over when the whole app loads. If the phone page was left open overnight, a morning tick happens first and the catch-up runs after it, so yesterday's miss can drop the multiplier a step or reset the streak even though today is ticked. The same open page also shows yesterday's lit ticks as if they were today's, and tapping one then "unticks" nothing on the server.</p>
+      <p class="fc">Call gRollover_(gWorld_()) at the top of gameTick/gameUntick (it returns early when lastDay is current). In game-ui.js, on visibilitychange or focus, reload with gameLoad when the stored D.today is not today.</p>
+    </article>
+
+    <article>
+      <div class="top"><h3>Make Undo after fainting exact</h3><div class="meta"><span class="chip bug">Bug</span><span class="chip">Small</span></div></div>
+      <p class="why">Your rule is that every curse Undo reverses exactly; this is the one case where it doesn't, and it's the most painful one.</p>
+      <p class="what">If a curse takes Ulhu to 0 health, he loses a level and the last 7 days of runes. Undo gives back the health only. The screen briefly shows the old level, then the server's reply drops it again. Undoing a curse also leaves the card one shade redder than before.</p>
+      <p class="fc">gameUntick doesn't reverse gDie_ (store lost runes, old level and old XP in the tick note and restore them); for habits it also skips restoring prev.v (value).</p>
+    </article>
+
+    <article>
+      <div class="top"><h3>Stop names turning into spreadsheet formulas</h3><div class="meta"><span class="chip bug">Bug</span><span class="chip">Small</span></div></div>
+      <p class="why">One ritual named "+20 press-ups" or "-Netflix" would show as an error in the sheet and could break that row.</p>
+      <p class="what">Google Sheets reads any cell starting with + - = or @ as a formula. Text like "1/2" or "10" can also be turned into a date or number. This applies to ritual names, quest steps, Hoard rewards, Vespers details, your own chips and review text.</p>
+      <p class="fc">Guard in gAppend_/gSet_ for string values: prefix "'" when /^[=+\-@]/ or when the value would parse as a date/number in a text column.</p>
+    </article>
+
+    <article>
+      <div class="top"><h3>Keep the sigils for reduced motion</h3><div class="meta"><span class="chip bug">Bug</span><span class="chip ux">Phone</span><span class="chip">Small</span></div></div>
+      <p class="why">If the phone's "reduce motion" setting is ever on, every curse is logged with no sigil, and High Vespers' "where the curses came from" stays empty.</p>
+      <p class="what">The blood trail is skipped for reduced motion, and the sigil choice is skipped with it. The four sigils should still rise, just without the flying blood.</p>
+      <p class="fc">game-ui.js around line 987: BLOOD.open is bypassed when prefers-reduced-motion matches. Open it in a still mode instead (game-blood.js already reads the setting).</p>
+    </article>
+
+    <article>
+      <div class="top"><h3>Don't let curses and blessings count as life goals</h3><div class="meta"><span class="chip bug">Bug</span><span class="chip">Small</span></div></div>
+      <p class="why">The life bonus is meant to reward real life rituals; a Netflix slip shouldn't move it.</p>
+      <p class="what">The life bonus (+5 for the first life ritual of the day, +10 more at the third) counts every tap on anything filed under Life. Netflix is a Life omen, so a slip quietly skips the +5 and makes the +10 arrive early.</p>
+      <p class="fc">gPay_ life bonus: filter todayTicks to goals with kind daily/todo/termly (skip kind habit).</p>
+    </article>
+
+    <article>
+      <div class="top"><h3>A size alarm and a slimmer paste</h3><div class="meta"><span class="chip ux">Safety</span><span class="chip">Small</span></div></div>
+      <p class="why">Finding the 380 KB limit by a paste that won't save, mid-build, is the worst time to find it.</p>
+      <p class="what">The bundler should warn at about 340 KB per file and strip the long explanatory comments from the pasted copies (the repo keeps them). That alone should cut 15 to 25% from every file. See the size chart below.</p>
+      <p class="fc">planner/bundle.js: no size check today. Add a byte check per output and a comment-strip pass (local, free; terser with compress off, or a careful line-comment strip).</p>
+    </article>
+
+    <article>
+      <div class="top"><h3>Check the Apps Script time zone is London</h3><div class="meta"><span class="chip bug">Risk</span><span class="chip">1 minute</span></div></div>
+      <p class="why">If it isn't, weeks in summer time shift by a day and the "lessons built" and "behaviour logged" auto-ticks can quietly miss.</p>
+      <p class="what">The game counts days in London time, but the planner reads its week dates in the project's own time zone. In Apps Script, Project Settings, the time zone should say London.</p>
+      <p class="fc">loadAll_ in Code.gs uses Session.getScriptTimeZone(); gSnapshot_ mood uses gNow_().getHours() (script zone) rather than TZ.</p>
+    </article>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><h2>Next</h2><p>The bigger fixes, then your picks that are decided and waiting, in the order to build them.</p></div>
+  <div class="items">
+
+    <article>
+      <div class="top"><h3>Make each tap save faster, one at a time</h3><div class="meta"><span class="chip bug">Bug</span><span class="chip">Medium</span></div></div>
+      <p class="why">The screen reacts at once, but the save behind it takes seconds; tap five blessings quickly and the last ones can fail with "Not saved".</p>
+      <p class="what">Every tap re-reads around 20 sheet tabs and loads the whole planner (weeks, lessons, equipment, results) up to three times, about 2 to 4 seconds. Fast taps queue on the server and give up after 10 seconds. Fix both ends: the server reads each thing once per tap and only the planner parts it needs; the page sends taps one after another instead of all at once.</p>
+      <p class="fc">Memoise gWorld_ per execution and load only Data + Weeks; memoise gRows_ per execution (clear on write); parse tick notes once. withLock_ waitLock(10000) in Behaviour.gs. game-ui.js send(): chain calls on one promise.</p>
+    </article>
+
+    <article>
+      <div class="top"><h3>No-signal ticks: keep the right day, never twice</h3><div class="meta"><span class="chip bug">Bug</span><span class="chip">Medium</span></div></div>
+      <p class="why">A tick saved on the phone at 11 pm and sent in the morning counts for the wrong day, so yesterday shows as missed.</p>
+      <p class="what">The server stamps the day when the tick arrives, not when you tapped. And a slow reply that looks like "no signal" is saved and sent again later, so a curse could cost health twice. Each tap should carry its own time and a one-off label the server checks.</p>
+      <p class="fc">game-ui.js queue()/flush(): add client time + action id; gameTick accepts a tap day up to ~36 h old; reuse the existing ref "never pays twice" check for the id.</p>
+    </article>
+
+    <article>
+      <div class="top"><h3>Never miss twice for every-few-days rituals</h3><div class="meta"><span class="chip bug">Bug</span><span class="chip">Small</span></div></div>
+      <p class="why">"Something for Martha" (every 7 days) and "Call a friend" (every 3) can never break, so their streaks mean nothing.</p>
+      <p class="what">You asked for never-miss-twice on all daily rituals. Rituals on a repeat count are skipped by the overnight catch-up and their 14-day strip never shows a miss.</p>
+      <p class="fc">gRollover_ filters out g.everyN; a miss = everyN days pass after the last tick with no new tick.</p>
+    </article>
+
+    <article>
+      <div class="top"><h3>Build the Vespers screen</h3><div class="meta"><span class="chip gap">Gap</span><span class="chip">Medium</span></div></div>
+      <p class="why">Vespers is your app-use streak and a multiplier on everything; without a screen it can't start, and the sigil details never get filled.</p>
+      <p class="what">The server already handles Vespers, the tags, your own chips, the streak and its Undo. Build it in a plain look now with the picks you've made (E7 book way in, N1b night line leading, only the sigil picked in the moment asked, positive chips for good habits), then drop in the art still being chosen (Q3a, Q4a, book versions). Include the long-press "when did this work?" on rituals and blessings.</p>
+      <p class="fc">Server: gameVespers, gameVespersUndo, gameTag, gameChips, gameVespersTime, gVespers_ snapshot. No UI calls them yet. Put the screen in its own GameVespers.html.</p>
+    </article>
+
+    <article>
+      <div class="top"><h3>Build High Vespers and retire the old Sunday review in the same step</h3><div class="meta"><span class="chip gap">Gap</span><span class="chip bug">Clash</span><span class="chip">Medium</span></div></div>
+      <p class="why">The old review card and High Vespers save into the same weekly slot, so saving one would hide the other.</p>
+      <p class="what">Picked so far: H1 cathedral scroll, Week in Glass as WG1 glass with WG1d text, WB1, AW4c saying "Absolved", TL1, LC2 with the F9 seal. Still pending: RG8/RG9, RS7/RS8 and CC1a variations. Also, High Vespers should count as that Sunday's Vespers (it doesn't yet), and the Sunday review's +20 should move over to it.</p>
+      <p class="fc">gReviewCard_ and gHighVespers_ both key Game Reviews by the week's Monday and both save through gameReview. gameReview doesn't touch vStreak/vLast.</p>
+    </article>
+
+    <article>
+      <div class="top"><h3>Show the multipliers: rings and the count-up</h3><div class="meta"><span class="chip gap">Gap</span><span class="chip">Small</span></div></div>
+      <p class="why">Pay already changes with streaks, but you can't see why, so the multiplier can't motivate.</p>
+      <p class="what">Decided: 1, 2 or 3 rings in the rune circle, base pay shown, counting up to the total on tick, and Vespers rings inside the Vespers tablet. One question for you: "Vespers multiplier on everything" is currently not applied to blessings, boss rewards or the review. Should it be?</p>
+      <p class="fc">Snapshot sends mult per goal and vMult; game-ui.js uses neither. gBlessPay_, gameBossStage and gameReview skip gVMult_.</p>
+    </article>
+
+    <article>
+      <div class="top"><h3>Stained-glass blessings and the Absolution shell</h3><div class="meta"><span class="chip gap">Gap</span><span class="chip">Medium</span></div></div>
+      <p class="why">The Absolution moment is the reward for recovering from a slip; right now it's a simple gold label.</p>
+      <p class="what">Picked: G1 fitted leadwork with sunburst cuts, D1 day-in-glass, BG1 honey border, X2 hairlines then the break, A1b "Absolved", H3 sparks become health, the new Absolved edge line. Tweaks to carry in: brighter path, brighter pieces round each star, clearer lit and unlit edge in stages I and II, and stage II lighting only middle to end.</p>
+      <p class="fc">Source in scratchpad glass\ (d1.js ~38 KB) and highvespers\g1glass.js (~38 KB). New GameGlass.html include, not GameArt.</p>
+    </article>
+
+    <article>
+      <div class="top"><h3>The quest scroll and seal</h3><div class="meta"><span class="chip gap">Gap</span><span class="chip">Medium</span></div></div>
+      <p class="why">Quests are the one area still in the old look next to the new stone tablets and temple bosses.</p>
+      <p class="what">Picked: P2 parchment on E1 wooden rods, F9 Ulhu-in-the-pentagram seal with the original stamp back, K1a press, W9 gold-flecked wax at T2, B2 burn from both sides with lingering ash, K-T2 tick striking the whole step, WR1 writing. Still open: the "evil pact" effect that replaces the rejected mist.</p>
+      <p class="fc">Source in scratchpad tablets2\index.src.html (168 KB with all variants; only the picks are needed) and highvespers\seal.js (~29 KB). Check which game-blood.js copy is newest: the mock-up copies differ from planner\game-blood.js.</p>
+    </article>
+
+    <article>
+      <div class="top"><h3>A pencil per group for editing</h3><div class="meta"><span class="chip gap">Gap</span><span class="chip">Small</span></div></div>
+      <p class="why">You asked for this on 26 October; today there's one Edit button for the whole tab.</p>
+      <p class="what">A small pencil on each area or group header switches only that group into edit mode (rename, change, archive).</p>
+      <p class="fc">game-ui.js: V.edit is a single flag; make it V.edit = groupId.</p>
+    </article>
+
+    <article>
+      <div class="top"><h3>Phone comfort pass</h3><div class="meta"><span class="chip ux">Phone</span><span class="chip">Small</span></div></div>
+      <p class="why">The thumb targets you use most should be easy to hit while walking between classrooms.</p>
+      <ul class="plain what">
+        <li>The Undo button is 38 px tall and quest steps 40 px; the comfortable minimum is 44.</li>
+        <li>Two greys are too faint: empty room-slot text (about 3 to 1 contrast) and locked shop buttons (about 4 to 1 at 11 px).</li>
+        <li>Every tap redraws all four tabs, including the 120 shop cards, twice (once at once, once when the server answers). On an older phone this can stutter; redraw only the tab in view.</li>
+        <li>On holiday (half moon) Ulhu looks asleep all day, because any half or dark moon day counts as night.</li>
+      </ul>
+      <p class="fc">.uz-undo button height 38px, .uz-steps button min-height 40px; colours #5a6a62 on #131d19, #7a7a9a on #1a1a24; paint() rebuilds every .uz-pane; night() uses D.frozen.</p>
+    </article>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><h2>The rune economy, simulated</h2><p>Three made-up weeks of play run through the real pay rules for two school years. These are estimates from assumed habits, not your data.</p></div>
+  <div class="tbl"><table>
+    <thead><tr><th>Pace</th><th>What it assumes</th><th class="num">Runes a week</th><th class="num">Level 15 by</th><th class="num">Level by summer</th><th class="num">Whole shop + wardrobe</th></tr></thead>
+    <tbody>
+      <tr><td>Low</td><td>Half the rituals, 1 to 2 life rituals some days, 8 lessons built a week, no Vespers</td><td class="num">about 380</td><td class="num">week 19</td><td class="num">23</td><td class="num">over 2 years</td></tr>
+      <tr><td>Steady</td><td>Most rituals, reading most days, 15 lessons built, 2 marking sittings, Vespers most nights</td><td class="num">about 1,030</td><td class="num">week 8</td><td class="num">40</td><td class="num">about 94 weeks</td></tr>
+      <tr><td>Keen</td><td>Everything, 20 lessons built ahead, both ahead charts, 2 bosses a month</td><td class="num">about 1,940</td><td class="num">week 5</td><td class="num">54</td><td class="num">about 55 weeks</td></tr>
+    </tbody>
+  </table></div>
+  <div class="tbl"><table>
+    <thead><tr><th>Shop tier (prices +20%)</th><th class="num">Items</th><th class="num">Middle price</th><th class="num">Whole tier</th><th>At a steady pace</th></tr></thead>
+    <tbody>
+      <tr><td>Basic</td><td class="num">30</td><td class="num">95</td><td class="num">2,250</td><td>about 2 weeks for all of it</td></tr>
+      <tr><td>Nice</td><td class="num">30</td><td class="num">290</td><td class="num">8,605</td><td>an item every 2 days; all in about 8 weeks</td></tr>
+      <tr><td>Fancy</td><td class="num">30</td><td class="num">660</td><td class="num">19,860</td><td>an item every 4 to 5 days</td></tr>
+      <tr><td>Eldritch</td><td class="num">30</td><td class="num">1,380</td><td class="num">41,280</td><td>about one a week and a half; all in about 40 weeks</td></tr>
+      <tr><td>Wardrobe (71 outfits)</td><td class="num">71</td><td class="num">n/a</td><td class="num">41,600</td><td>outfit locks (level 8 to 16) open within the first term</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">What this shows: prices hold up well for about two school years, which is good. The weak point is levels, not runes: at a steady pace every level lock (the highest is 18) opens within about two months, and the level titles run out at 12 ("Ancient" from level 13 on). The original target was about 80 runes a day; the steady pace is nearer 150, mostly from lessons built and life rituals after work. That's fine, as long as the prices are judged against that number.</p>
+</section>
+
+<section>
+  <div class="sec-head"><h2>Paste-file sizes</h2><p>Each HTML file you paste must stay under about 380 KB (red line).</p></div>
+  <div class="bars" role="img" aria-label="File sizes against the 380 KB limit">
+    <div class="bar"><span>GameUI</span><span class="track"><span class="fill warn" style="width:66%"></span><span class="limit" style="left:99%"></span></span><span class="v">252 KB</span></div>
+    <div class="bar"><span>Planner</span><span class="track"><span class="fill" style="width:45%"></span><span class="limit" style="left:99%"></span></span><span class="v">169 KB</span></div>
+    <div class="bar"><span>GameShop</span><span class="track"><span class="fill" style="width:43%"></span><span class="limit" style="left:99%"></span></span><span class="v">163 KB</span></div>
+    <div class="bar"><span>GameArt</span><span class="track"><span class="fill" style="width:27%"></span><span class="limit" style="left:99%"></span></span><span class="v">104 KB</span></div>
+    <div class="bar"><span>Phone</span><span class="track"><span class="fill" style="width:21%"></span><span class="limit" style="left:99%"></span></span><span class="v">79 KB</span></div>
+  </div>
+  <p class="small">Coming next, roughly: glass 40 to 75 KB, seal and scroll about 30 to 50 KB, Vespers and High Vespers screens 60 to 120 KB. Put together into GameUI or GameArt they would pass the limit. Plan: two new include files (GameGlass and GameVespers), comments stripped on paste, and High Vespers fetched only on Sunday to Tuesday, the same "load only when needed" plan already chosen for the haggle game.</p>
+</section>
+
+<section>
+  <div class="sec-head"><h2>Later</h2><p>Worth doing once the picks above are in the app.</p></div>
+  <div class="items">
+    <article>
+      <div class="top"><h3>Levels that last the whole year</h3><div class="meta"><span class="chip idea">Game</span><span class="chip">Small</span></div></div>
+      <p class="why">After about two months there's nothing new to unlock by levelling, so levels stop meaning anything.</p>
+      <p class="what">Write titles up to level 50 or so, make each level need a bit more than the last, and tie new rooms and the top shop tier to levels 20, 30 and 40.</p>
+      <p class="fc">TITLES in game-ui.js (12 entries); gNeed_ = 150 + 50 x level in Game.gs.</p>
+    </article>
+    <article>
+      <div class="top"><h3>The rooms as the long goal</h3><div class="meta"><span class="chip gap">Gap</span><span class="chip">Large</span></div></div>
+      <p class="why">One room fills up within a year; the planned run of rooms gives a reason to keep going in year two.</p>
+      <p class="what">Study, Living room, Kitchen, Bedroom, Attic Observatory, Garden, Street, each opened by a big goal, as planned in the world notes. Only the first room exists.</p>
+      <p class="fc">replica/design/world.md; one 128x116 room in GameShop.gs.</p>
+    </article>
+    <article>
+      <div class="top"><h3>Stop the tick history slowing everything down</h3><div class="meta"><span class="chip bug">Risk</span><span class="chip">Medium</span></div></div>
+      <p class="why">Every tap reads every tick ever made; at about 15 a day that's roughly 10,000 rows after two years, and each tap gets slower.</p>
+      <p class="what">Keep a running weekly summary and read only the last few weeks for the day-to-day screen. Nothing needs deleting.</p>
+      <p class="fc">gRows_('ticks') read in full by gTick_, gSnapshot_, gameChronicle; gOpenSlips_ parses every note once per blessing.</p>
+    </article>
+    <article>
+      <div class="top"><h3>The merchant's stall and the haggle game</h3><div class="meta"><span class="chip gap">Gap</span><span class="chip">Large</span><span class="chip paid">Cost check</span></div></div>
+      <p class="why">The shop is the main thing runes are for, and the current shop is a plain grid.</p>
+      <p class="what">Still a starting draft: the deeper research and grilling session comes first (Zelda shops, stall, merchant, animations), then the HD-2D stall mock-up, then the dice game as its own file loaded on demand. Paid service flag: drawing the stall in code, as with everything so far, is free. Making the painterly HD-2D scene with a paid image generator would cost money; ask before going that way.</p>
+      <p class="fc">replica/design/habits-v2-decisions.md "Shop redesign" and "Merchant and haggle"; memory project_shop_redesign_grilling_later.md.</p>
+    </article>
+    <article>
+      <div class="top"><h3>The rest of the wish list</h3><div class="meta"><span class="chip gap">Gap</span></div></div>
+      <p class="why">These were all asked for and saved; listed so none of them get lost.</p>
+      <ul class="plain what">
+        <li>Seasonal items each half term, pets, potions, the aquarium upgrade line.</li>
+        <li>Key-homework and report rituals.</li>
+        <li>Breakwater that changes Ulhu's world when you're ahead (ask before designing).</li>
+        <li>The planner's "From Ulhu" tray of suggestions you choose to slot in.</li>
+        <li>Life quests and bosses in your own groups (bosses in Life work; own groups for everything do not yet).</li>
+        <li>Set-aside item with a coin bar on The Call (from the shop draft; can be built before the stall).</li>
+      </ul>
+    </article>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><h2>Habit ideas from the research</h2><p>All optional, all things you'd switch on yourself. Nothing here reminds, nags, decides for you or works after 7 pm.</p></div>
+  <div class="items">
+    <article>
+      <div class="top"><h3>A tiny version of each ritual</h3><div class="meta"><span class="chip idea">Idea</span><span class="chip">Small</span></div></div>
+      <p class="why">On a bad day the choice becomes "the tiny version" instead of "nothing", which is how streaks survive.</p>
+      <p class="what">BJ Fogg's Tiny Habits and Atomic Habits' two-minute rule both say the smallest version still builds the habit. Each ritual could carry an optional minimum ("Read one page") that keeps the streak and pays as Tiny. You pick it from a long-press; it's never offered on its own.</p>
+    </article>
+    <article>
+      <div class="top"><h3>An "after I..." line on a ritual</h3><div class="meta"><span class="chip idea">Idea</span><span class="chip">Small</span></div></div>
+      <p class="why">Habits tied to something you already do stick far better than habits tied to willpower.</p>
+      <p class="what">Fogg's anchors and Clear's habit stacking: an optional line under the ritual, such as "after I make the first coffee". Shown quietly, never sent as a reminder.</p>
+    </article>
+    <article>
+      <div class="top"><h3>Turn the one change into an if-then plan</h3><div class="meta"><span class="chip idea">Idea</span><span class="chip">Small</span></div></div>
+      <p class="why">If-then plans roughly double follow-through in studies, and you already collect the "if" part.</p>
+      <p class="what">Gollwitzer's implementation intentions (a medium-to-large effect across 94 studies, Gollwitzer and Sheeran 2006). High Vespers already knows your top curse sigil and each curse's antidote, so "Your three lines and one change" could offer the shape "When [top Scene], I will [antidote]" for you to edit or ignore.</p>
+    </article>
+    <article>
+      <div class="top"><h3>Think again about how hard fainting hits</h3><div class="meta"><span class="chip idea">Your call</span></div></div>
+      <p class="why">Research on slips says a big punishment after a lapse makes the next lapse more likely, the "might as well" spiral.</p>
+      <p class="what">Fainting costs a level and a week of runes, about 1,000 at a steady pace, which is roughly an Eldritch item. Habitica players often name "death" as the moment they quit. You chose this rule on purpose, and Absolution already softens it. Options if it ever feels too harsh: a fixed loss, or letting an Absolution still win part back after a faint.</p>
+    </article>
+    <article>
+      <div class="top"><h3>Marks past 66 nights</h3><div class="meta"><span class="chip idea">Idea</span><span class="chip">Small</span></div></div>
+      <p class="why">After 66 nights the stone stops changing, but habits keep strengthening long after.</p>
+      <p class="what">Lally's 2010 study gives 66 days as the middle, with a range of 18 to 254, and found one missed day made little difference (which backs never-miss-twice). A look-only change at 100, 200 and 365 nights, such as the cracks glowing gold, with no extra pay.</p>
+    </article>
+    <article>
+      <div class="top"><h3>Fresh starts without resets</h3><div class="meta"><span class="chip idea">Idea</span><span class="chip">Small</span></div></div>
+      <p class="why">People restart habits most readily at natural new beginnings.</p>
+      <p class="what">The fresh-start effect (Dai, Milkman and Riis, 2014): new half term, the first day back, the Monday after High Vespers. A quiet "new chapter" line in the Oracle on those days. Nothing resets.</p>
+    </article>
+    <article>
+      <div class="top"><h3>Careful with paying more for what you enjoy</h3><div class="meta"><span class="chip idea">Your call</span></div></div>
+      <p class="why">Paying for things you already love can make them start to feel like work.</p>
+      <p class="what">The overjustification effect (Deci, Koestner and Ryan 1999). Reading and time with Martha already pay double. Suggestion: don't raise life pay further; let life rituals earn mainly through identity votes and the Hoard, which fits self-determination theory's point that choice and identity keep motivation your own.</p>
+    </article>
+    <article>
+      <div class="top"><h3>A sealed-evening mark</h3><div class="meta"><span class="chip idea">Needs your OK</span></div></div>
+      <p class="why">Your big goal is not working evenings; a quiet sign that you managed it helps more than any rule.</p>
+      <p class="what">If nothing from Teaching was ticked after 7 pm, Vespers shows a lit candle. No pay, nothing blocked, nothing said if you did work. This was proposed before and you were unsure, so it only happens if you want it.</p>
+    </article>
+    <article>
+      <div class="top"><h3>Small, rare surprises</h3><div class="meta"><span class="chip idea">Idea</span><span class="chip">Small</span></div></div>
+      <p class="why">An occasional unexpected moment keeps a game fresh far longer than bigger numbers do.</p>
+      <p class="what">After a week with every ritual kept, Ulhu sometimes finds a trinket in the deep (a free cosmetic) or says a rare line. Cosmetic only, rare, never a nag. The shareable weekly card for Martha, already on your wish list, is the other half of this.</p>
+    </article>
+    <article>
+      <div class="top"><h3>Blessings have no daily ceiling</h3><div class="meta"><span class="chip idea">Your call</span></div></div>
+      <p class="why">Every blessing tap pays, so one often-tapped blessing can quietly become the biggest earner.</p>
+      <p class="what">Not a problem while you're honest with yourself, which is the point of the game. If prices ever start to feel cheap, a soft limit (say the fifth tap of a blessing in a day pays nothing) is the lever.</p>
+    </article>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><h2>What the tests don't cover yet</h2><p>All 134 server checks and the phone walk-through pass today. These are the cases nothing checks, in order of risk.</p></div>
+  <ul class="plain">
+    <li>Every locked shop item is refused at level 1 (would have caught the lock bug).</li>
+    <li>Undo after a curse that makes Ulhu faint.</li>
+    <li>A tick made before the overnight catch-up (page left open past midnight).</li>
+    <li>A no-signal tick sent the next morning, and the same tick sent twice.</li>
+    <li>Every-few-days rituals missing and breaking.</li>
+    <li>Names starting with + - = and names like "1/2".</li>
+    <li>The life bonus with a curse tapped earlier that day.</li>
+    <li>Saving the old Sunday review and High Vespers in the same week.</li>
+    <li>Reduced motion: a curse still offers the four sigils.</li>
+    <li>Five quick taps in a row all save.</li>
+    <li>Paste-file sizes stay under the limit (a check in the bundler).</li>
+    <li>Clock change weekends (end of March and October).</li>
+  </ul>
+  <p class="fc">planner/tests/game.test.js (server, mock sheet), tests/ulhu_sim.py (Playwright phone run), tests/ulhu_server.js. No test loads the real Code.gs week reading with a non-London zone.</p>
+</section>
+
+<footer>Read-only audit of planner/Game.gs, game-ui.js and the art files, the decisions file, the memory notes and the scratchpad mock-ups. No repo, git or Drive file was changed. The economy figures are a simulation with assumed habits, not your real ticks.</footer>
+</div>

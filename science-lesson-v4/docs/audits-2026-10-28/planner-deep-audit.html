@@ -1,0 +1,393 @@
+<title>Planner Deep Audit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: one reading column, ranked list first, then four tiers of items with an effort chip on each. Palette borrows the navy and gold of Patryk's own planner and behaviour apps. */
+:root {
+  --bg: #EEF2F8;
+  --surface: #FFFFFF;
+  --ink: #12233D;
+  --soft: #4F6280;
+  --line: #CCD6E4;
+  --navy: #0D2442;
+  --gold: #E0A512;
+  --gold-soft: #FFF3D1;
+  --good: #1D7A4E; --good-bg: #DDF2E6;
+  --warn: #9A5B00; --warn-bg: #FCEBC9;
+  --bad: #A3202A; --bad-bg: #F8DEDF;
+  --claude-bg: #E6ECF5;
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", Consolas, ui-monospace, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0A1829; --surface: #11233D; --ink: #EAF2FA; --soft: #9FB4CC; --line: #27456B;
+  --navy: #EAF2FA; --gold: #FFC53D; --gold-soft: #3A2E0E;
+  --good: #7FD8A8; --good-bg: #123526; --warn: #FFC870; --warn-bg: #3A2A0C; --bad: #FF9AA0; --bad-bg: #3D1418;
+  --claude-bg: #182E4D; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0A1829; --surface: #11233D; --ink: #EAF2FA; --soft: #9FB4CC; --line: #27456B;
+  --navy: #EAF2FA; --gold: #FFC53D; --gold-soft: #3A2E0E;
+  --good: #7FD8A8; --good-bg: #123526; --warn: #FFC870; --warn-bg: #3A2A0C; --bad: #FF9AA0; --bad-bg: #3D1418;
+  --claude-bg: #182E4D; color-scheme: dark }
+
+body { background: var(--bg); color: var(--ink); font: 16px/1.6 var(--f-body); }
+.wrap { max-width: 50rem; margin: 0 auto; padding-inline: 16px; padding-block: 2.5rem 4rem; display: grid; gap: 2.5rem; }
+h1, h2, h3 { font-family: var(--f-display); text-wrap: balance; margin: 0; color: var(--navy); }
+h1 { font-size: clamp(2rem, 6vw, 3rem); font-weight: 800; line-height: 1.05; letter-spacing: -0.01em; }
+h2 { font-size: 1.6rem; font-weight: 800; }
+h3 { font-size: 1.12rem; font-weight: 600; line-height: 1.3; }
+p { margin: 0; }
+.eyebrow { font: 600 0.78rem/1 var(--f-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--soft); }
+header { display: grid; gap: 0.9rem; border-bottom: 3px solid var(--gold); padding-bottom: 1.4rem; }
+.lead { font-size: 1.08rem; max-width: 65ch; }
+.facts { display: flex; flex-wrap: wrap; gap: 0.5rem 1.4rem; color: var(--soft); font-size: 0.92rem; }
+.facts b { color: var(--ink); font-variant-numeric: tabular-nums; }
+
+section { display: grid; gap: 1.1rem; }
+.sechead { display: grid; gap: 0.35rem; }
+.sechead p { color: var(--soft); max-width: 65ch; }
+
+ol.top { list-style: none; margin: 0; padding: 0; counter-reset: t; display: grid; gap: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+ol.top li { counter-increment: t; display: grid; grid-template-columns: 2.6rem 1fr auto; gap: 0.8rem; align-items: start; padding: 0.85rem 1rem; border-top: 1px solid var(--line); }
+ol.top li:first-child { border-top: 0; }
+ol.top li::before { content: counter(t); font: 800 1.35rem/1.2 var(--f-display); color: var(--gold); font-variant-numeric: tabular-nums; }
+ol.top li > div { min-width: 0; display: grid; gap: 0.15rem; }
+ol.top li span.w { color: var(--soft); font-size: 0.93rem; }
+
+.chip { display: inline-block; font: 600 0.72rem/1 var(--f-mono); letter-spacing: 0.05em; text-transform: uppercase; padding: 0.38rem 0.55rem; border-radius: 999px; white-space: nowrap; }
+.s { background: var(--good-bg); color: var(--good); }
+.m { background: var(--warn-bg); color: var(--warn); }
+.l { background: var(--bad-bg); color: var(--bad); }
+.tag { background: transparent; color: var(--soft); border: 1px solid var(--line); }
+
+.items { display: grid; gap: 0.9rem; }
+.item { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 1rem 1.1rem; display: grid; gap: 0.55rem; min-width: 0; }
+.item .meta { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.why { font-weight: 700; }
+.why::before { content: "Why it matters: "; color: var(--soft); font-weight: 400; }
+.claude { font: 0.8rem/1.55 var(--f-mono); background: var(--claude-bg); border-radius: 6px; padding: 0.55rem 0.7rem; color: var(--ink); overflow-wrap: anywhere; }
+.claude::before { content: "For Claude: "; font-weight: 600; color: var(--soft); }
+.flag { border-left: 4px solid var(--gold); background: var(--gold-soft); padding: 0.7rem 0.9rem; border-radius: 0 8px 8px 0; }
+
+.tablewrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+table { border-collapse: collapse; width: 100%; min-width: 34rem; font-size: 0.93rem; }
+th, td { text-align: left; vertical-align: top; padding: 0.6rem 0.8rem; border-top: 1px solid var(--line); }
+th { font: 600 0.75rem/1.2 var(--f-mono); letter-spacing: 0.05em; text-transform: uppercase; color: var(--soft); border-top: 0; }
+.two { display: grid; grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); gap: 0.9rem; }
+.two > div { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 1rem 1.1rem; display: grid; gap: 0.5rem; align-content: start; min-width: 0; }
+ul.plain { margin: 0; padding-left: 1.15rem; display: grid; gap: 0.45rem; }
+.key { display: flex; flex-wrap: wrap; gap: 0.5rem 1.2rem; font-size: 0.9rem; color: var(--soft); align-items: center; }
+footer { color: var(--soft); font-size: 0.88rem; border-top: 1px solid var(--line); padding-top: 1rem; }
+a { color: inherit; }
+:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+@media (max-width: 30rem) { ol.top li { grid-template-columns: 2rem 1fr; } ol.top li .chip { grid-column: 2; justify-self: start; } }
+</style>
+
+<div class="wrap">
+<header>
+  <span class="eyebrow">Planner web app · read-only review · 28 October 2026</span>
+  <h1>Planner Deep Audit</h1>
+  <p class="lead">A full read of the planner, the behaviour app inside it, and the saved goals in memory. Nothing was changed. Items are ranked by how much they help for how little work, then grouped into quick wins, next, later and ideas. Each item has one line on why it matters and a small note for Claude naming the files.</p>
+  <div class="facts">
+    <span>Planner tests run today: <b>all pass</b> (about 250 checks)</span>
+    <span>Paid API needed for the top items: <b>none</b></span>
+    <span>Pupil names in this page: <b>none</b></span>
+  </div>
+  <div class="key"><span class="chip s">Small</span> one short session and one paste <span class="chip m">Medium</span> an evening session <span class="chip l">Large</span> several sessions</div>
+</header>
+
+<section>
+  <div class="sechead"><span class="eyebrow">Ranked by value for effort</span><h2>The top 10</h2></div>
+  <ol class="top">
+    <li><div><b>Two homeworks for one class on the same day get the same label</b><span class="w">Results and "Mark as marked" can open or change the wrong one (Core and Challenge set together always clash).</span></div><span class="chip s">Small</span></li>
+    <li><div><b>An old planner tab left open can wipe newer lesson ticks</b><span class="w">Each save replaces the whole list of ticks, so a stale tab at school can undo work made at home.</span></div><span class="chip m">Medium</span></li>
+    <li><div><b>Tick saves that fail say nothing</b><span class="w">The page says "All changes saved" even when the ticks were refused.</span></div><span class="chip s">Small</span></li>
+    <li><div><b>Making a homework blocks behaviour taps, and a retried tap can count twice</b><span class="w">One shared lock and no tap ID: a double positive or a double negative is possible.</span></div><span class="chip s">Small</span></li>
+    <li><div><b>Planner tests never run with the main test command</b><span class="w">A break in the planner can slip past the "tests green before a session ends" rule.</span></div><span class="chip s">Small</span></li>
+    <li><div><b>Show what changed since the last paste, and which version is live</b><span class="w">Many built features wait days to be pasted; ten files to paste each time.</span></div><span class="chip s">Small</span></li>
+    <li><div><b>Term dates and Week A/B in one place</b><span class="w">Three copies of the dates and two separate Week A/B calculations; next September every week reads "A" until all are updated.</span></div><span class="chip s">Small</span></li>
+    <li><div><b>Homework due shows on the lesson, plus the follow-up ticks</b><span class="w">"Collect homework" stops being something to remember; a saved goal comes almost free.</span></div><span class="chip s">Small</span></li>
+    <li><div><b>Order sheet as a ready email draft to the technicians</b><span class="w">Download, open email, attach and address becomes one click and Send.</span></div><span class="chip s">Small</span></li>
+    <li><div><b>A "Today" panel: the morning brief inside the app</b><span class="w">The planner already knows the day; the separate brief was built but never ran.</span></div><span class="chip m">Medium</span></li>
+  </ol>
+</section>
+
+<section>
+  <div class="sechead"><span class="eyebrow">Group 1</span><h2>Quick wins</h2><p>Small fixes with a clear payoff. Most protect data or remove a daily annoyance.</p></div>
+  <div class="items">
+
+    <article class="item"><div class="meta"><span class="chip s">Small</span><span class="chip tag">Data safety</span></div>
+      <h3>Two homeworks for one class on the same day get the same label</h3>
+      <p class="why">Results, "Mark as marked" and the daily results can attach to the wrong homework.</p>
+      <p>When a homework is set, the planner gives it a label made of the class, the day and a count. The count never goes above 1, because Google Sheets turns the typed date into a calendar date and the comparison then never matches. So the Core and Challenge versions for 10C2 set on the same day, or a quiz and a Seneca link, share one label, and the planner always finds the first one. The rest of the Homework tab already reads the dates the right way; this one spot needs to do the same.</p>
+      <p class="claude">Code.gs setHomework: `n = rows.filter(r => String(r[10]) === setOn)` compares a Date to 'YYYY-MM-DD'. Use hwRows_() (as setLinkHomework_ does). Existing rows with clashing ids may need a one-off relabel in the sheet. The fake sheet in test-homework-quiz.js keeps dates as text, which hid this.</p>
+    </article>
+
+    <article class="item"><div class="meta"><span class="chip s">Small</span><span class="chip tag">Data safety</span></div>
+      <h3>Tick saves that fail say nothing, and closing too soon can lose them</h3>
+      <p class="why">He trusts "All changes saved"; today that can be untrue for lesson ticks and for the later weeks that slid along.</p>
+      <p>A save sends the week first, then the ticks, then any later weeks that moved. Only the first part reports a problem. The "you have unsaved changes" warning also stops as soon as the week is sent, so shutting the laptop a second later can drop the ticks. Fix: keep a red "NOT saved" message until all three parts land, retry once by itself, and keep the closing warning on until everything is sent.</p>
+      <p class="claude">Planner.html save(): run('saveLessons') has no .catch and no status; S.recSaved only updates on success. beforeunload checks S.dirty only; add an in-flight counter for saveLessons and saveWeeks.</p>
+    </article>
+
+    <article class="item"><div class="meta"><span class="chip s">Small</span><span class="chip tag">Behaviour</span></div>
+      <h3>Homework making blocks behaviour taps; a retried tap can count twice; one bad tap can jam the queue</h3>
+      <p class="why">A double negative can look like a detention, and a stuck queue means later taps never reach the sheet.</p>
+      <ul class="plain">
+        <li>Making a Google Form holds the app's single lock for up to a minute. A tap from the phone waits 10 seconds, gives up, and drops into the "no signal" queue, and the board stops updating meanwhile. Give behaviour its own lock.</li>
+        <li>If Google saved a tap but the reply was lost, the phone sends it again. Give each tap an ID and let the server ignore a repeat.</li>
+        <li>The queue sends taps in order and stops at the first failure, so a tap that always fails holds back every tap behind it. After three failed tries, set it aside and show it on the connection screen.</li>
+      </ul>
+      <p class="claude">Code.gs setHomework/setLinkHomework_ use getScriptLock().tryLock(30000) around buildQuiz_ and Classroom; Behaviour.gs withLock_ uses the same script lock with waitLock(10000). Use LockService.getDocumentLock() for behaviour, or shrink the homework lock to the receipt write. Phone.html log() and flushQueue(); Behaviour.gs logEvent/logMany: skip a row whose (tapTime, class, name, type) already exists in today's rows.</p>
+    </article>
+
+    <article class="item"><div class="meta"><span class="chip s">Small</span><span class="chip tag">Tests</span></div>
+      <h3>Put the planner tests into the main test command</h3>
+      <p class="why">The project rule is "tests green before any session ends", but the planner's tests are not part of that run.</p>
+      <p>Five planner test files exist and all pass today. They only run when someone remembers to start them by hand. Adding them to the main run makes every session check the planner too. At the same time, make the fake spreadsheet in the tests behave like the real one with dates, so slips like the homework label one show up.</p>
+      <p class="claude">Add planner/test-logic.js, test-homework-quiz.js, test-mailbox.js, test-ordersheet.js and tests/server.test.js to FIXTURES-style list in test/run.js (or a second step in the npm script). In both mocks, convert appended 'YYYY-MM-DD' strings to Date unless the cell format is '@'.</p>
+    </article>
+
+    <article class="item"><div class="meta"><span class="chip s">Small</span><span class="chip tag">Workflow</span></div>
+      <h3>Show what changed since the last paste, and which version is live at school</h3>
+      <p class="why">Built features sit unused until pasted; the memory notes say "built, not yet pasted" again and again.</p>
+      <p>Each update means pasting up to ten files into the school's Apps Script editor, with no easy way to tell whether the school copy matches home. Two small helpers: the bundle step lists only the files that changed since the last paste, and the planner and phone show a build date in the corner so a mismatch is obvious. The bundle step should also warn when a file grows near the size where the editor stops saving (one file already failed at about 400 KB; the game file is at 253 KB). Worth a five-minute check: if the school allows Google's own command-line upload tool on his account, pasting could stop altogether. It may be blocked like Drive for Desktop.</p>
+      <p class="claude">bundle.js: store file hashes in dist/.last-paste.json, print the changed list, warn above 300 KB. Code.gs VERSION is still 5; stamp a build date into Planner.html and Phone.html at bundle time. clasp needs the Apps Script API switched on for the school account.</p>
+    </article>
+
+    <article class="item"><div class="meta"><span class="chip s">Small</span><span class="chip tag">Dates</span></div>
+      <h3>Term dates and Week A/B in one place</h3>
+      <p class="why">A missed copy next September means the phone opens the wrong classes and the planner plans the wrong week.</p>
+      <p>The term dates live in three copies (the planner's data from home, the behaviour code, and the home class list), and Week A/B is worked out by two separate pieces of code that agree today. After 28 July 2027 every week reads "Week A" until each copy is updated; checked for 6, 13 and 20 September 2027. The behaviour part already reads the planner's timetable, so it can read the terms from there too. The old backup timetable in the behaviour code still lists last year's classes and can go. One test should check that both Week A/B answers match for every week of the year.</p>
+      <p class="claude">Behaviour.gs TERMS, WEEK_A_START, TIMETABLE (7BYA, PSHE-9AB), FORTNIGHTLY. Read data.terms and data.weekAStart via plannerTimetable_-style cache. Agreement test: logic.js weekLetter vs Behaviour.gs weekLetter_ over 2026-09-07..2027-07-26.</p>
+    </article>
+
+    <article class="item"><div class="meta"><span class="chip s">Small</span><span class="chip tag">Homework</span><span class="chip tag">Saved goal</span></div>
+      <h3>Homework due shows on the lesson, plus the follow-up ticks</h3>
+      <p class="why">"Collect homework" is one more thing to remember each lesson; the Homework tab already knows every due date.</p>
+      <p>On the lesson where a homework is due, the card shows "HW due: P1 Energy quiz" and the collect step is ticked in the lesson checklist, which he can untick. The same change adds the two ticks from the saved follow-up goal: "follow-up task here" (after a marked test review) and "key homework returned this lesson". Both go into the build request, so Claude adds the slide. The book page part waits for the CGP index; until then Claude picks the question at home.</p>
+      <p class="claude">logic.js CHECKS (add followUp, keyBack) and buildPrompt; Planner.html render() lesson card flags from S.hwStat by cls + dueOn; default checks.collectHw when a homework is due that day.</p>
+    </article>
+
+    <article class="item"><div class="meta"><span class="chip s">Small</span><span class="chip tag">Order sheet</span></div>
+      <h3>Order sheet as a ready email draft</h3>
+      <p class="why">Every week: download, open email, attach, address, type. This makes it one click, then he reads it and presses Send.</p>
+      <p>"Email to technicians" makes a Gmail draft on the school account with the Excel file attached and the usual short message. Nothing is sent by itself. Free; it needs one new permission the first time.</p>
+      <p class="claude">Code.gs exportXlsx already builds the blob; add GmailApp.createDraft(to, subject, body, {attachments}). Technicians' addresses as a script property (TECH_EMAILS). Log it in the Log tab the way the download is logged (the Rituals order-sheet check reads that).</p>
+    </article>
+
+    <article class="item"><div class="meta"><span class="chip s">Small</span><span class="chip tag">Speed</span></div>
+      <h3>Saving waits for the home link every time</h3>
+      <p class="why">Each tick or equipment edit also sends the whole planner state home, which adds seconds and up to 6 seconds of retry waits when Google is busy.</p>
+      <p>Send home at most once every few minutes, or once a night with the 6am results run. Home only needs it before Claude builds lessons.</p>
+      <p class="claude">pushState_ is called from saveWeek, saveWeeks, learnEquipment, saveClassSetting, createLesson, renameAdded. Throttle with a CacheService stamp, and always push from dailyResults and sendRequest.</p>
+    </article>
+
+    <article class="item"><div class="meta"><span class="chip s">Small</span><span class="chip tag">Homework</span></div>
+      <h3>Two small homework slips</h3>
+      <p class="why">Each can make a duplicate Form or show the wrong status.</p>
+      <ul class="plain">
+        <li>The menu's "Homework quizzes" button has no guard against a double click, so two Forms can be made for one quiz. The Homework tab's own button is guarded.</li>
+        <li>Unticking "Mark as marked" on a scheduled homework puts it back to "drafted" instead of "scheduled".</li>
+      </ul>
+      <p class="claude">Code.gs makeHomework: wrap in the same lock as setHomework. markHomework(on=false): restore 'scheduled' when postAt is set.</p>
+    </article>
+  </div>
+</section>
+
+<section>
+  <div class="sechead"><span class="eyebrow">Group 2</span><h2>Next</h2><p>Bigger, still high value. The first one is the most serious risk in the app.</p></div>
+  <div class="items">
+
+    <article class="item"><div class="meta"><span class="chip m">Medium</span><span class="chip tag">Data safety</span></div>
+      <h3>Stop an old planner tab overwriting newer work</h3>
+      <p class="why">This is the one path to real data loss: lesson ticks made at home can vanish without a message.</p>
+      <p>Every time the ticks are saved, the page sends its complete list and the sheet replaces what it had. If a planner tab stays open on the school computer and saves after he ticked lessons at home, its older list goes back in and the home ticks are gone. Weeks work the same way. Fix in two parts: save only the ticks that changed, and give each save a "version I started from" so the server can say "This page is out of date. Reload" instead of writing over newer work.</p>
+      <p class="claude">Code.gs saveLessons clears the Lessons tab and rewrites it from the client; saveWeek/saveWeeks have no conflict check. Add a saved-at stamp per week row and per record, a server-side merge by cls|key, and a loadAll stamp the client sends back. Test with two simulated tabs.</p>
+    </article>
+
+    <article class="item"><div class="meta"><span class="chip m">Medium</span><span class="chip tag">North star</span></div>
+      <h3>A "Today" panel: the morning brief inside the app</h3>
+      <p class="why">The separate brief was built but never ran and needs a cloud agent; the planner already holds almost everything it would say.</p>
+      <p>One screen on the laptop, and a "Today" card on the phone: today's lessons in order, the kit and printing, carry-overs from last lesson, homework due and to collect, tests coming up, last homework's weakest questions, and behaviour follow-ups such as detentions and "report to me". It only shows; he decides. Free, and no laptop needs to be on at home.</p>
+      <p class="claude">New view in Planner.html built from S.week, S.hwStat, S.results and behaviourWeek; phone card via one new server call returning today's slots (lessonMcqs already finds today's week). Keep pupil names on the school side only.</p>
+    </article>
+
+    <article class="item"><div class="meta"><span class="chip m">Medium</span><span class="chip tag">Speed</span></div>
+      <h3>Faster Homework tab</h3>
+      <p class="why">It gets slower every week, and a slow tab is a tab he stops opening.</p>
+      <p>Opening it asks the home link for each quiz one at a time (up to 13 trips), then asks Classroom and Forms about the last 60 homeworks, one by one. Fix: fetch all quizzes in one trip, and only check homework that is not yet marked and was due in the last three weeks.</p>
+      <p class="claude">Mailbox.gs: add op 'readMany'. Code.gs homeworkList (serial mailGet_), homeworkStatus (Classroom get + allSubs_ + FormApp.openById per row, 60 rows).</p>
+    </article>
+
+    <article class="item"><div class="meta"><span class="chip m">Medium</span><span class="chip tag">Behaviour</span></div>
+      <h3>The behaviour log slows down through the year</h3>
+      <p class="why">Taps feel slower each month, and by spring the older lesson cards lose their positive and negative counts.</p>
+      <p>Every tap reads the last 8,000 rows of the log. At roughly 300 taps a week that ceiling arrives around spring; after it, lesson cards for older weeks and "positives over the last N days" quietly undercount. Fix: read from the bottom only as far as today needs, and move each finished term into an archive tab in the same spreadsheet. The phone's MCQ screen also re-reads the whole 373 KB lesson data on every call; keep a cached copy.</p>
+      <p class="claude">Behaviour.gs readLog_ (LOG_TAIL 8000), today_, positivesOver, behaviourWeek; lessonMcqs parses the Data tab each call (use the CacheService pattern of plannerTimetable_).</p>
+    </article>
+
+    <article class="item"><div class="meta"><span class="chip m">Medium</span><span class="chip tag">Speed</span></div>
+      <h3>The planner page gets slower as saved weeks pile up</h3>
+      <p class="why">By summer each change could freeze the page for several seconds on a school computer.</p>
+      <p>Measured at home with a full year of saved weeks: after one change, moving the later weeks along takes about 1.8 seconds on the home PC, and it runs after every save. The planner works out each class's position by replaying every week since September, many times per click. Fix: remember each week's starting point, and only move later weeks when the change actually affects them.</p>
+      <p class="claude">logic.js progressBefore (replays from lastFilled), cascade (reflowWeek on every later saved week). Memoise progress per monday, invalidated by saves. Add a timing test with 41 weeks.</p>
+    </article>
+
+    <article class="item"><div class="meta"><span class="chip s">Small</span><span class="chip tag">Saved goal</span><span class="chip tag">Learning loop</span></div>
+      <h3>Most-missed questions, across classes</h3>
+      <p class="why">This is the "what did they get wrong" dashboard from the Forms goal, and the data already exists.</p>
+      <p>The daily results already keep, per class, the percentage for each question, the wrong answers picked most and the mark points missed. A view in the Assessment tab can list the weakest questions over the last few weeks, each with the existing "Put on next lesson's Do Now".</p>
+      <p class="claude">Planner.html Assessment tab from S.results (Results tab rows, class counts only). No new server code.</p>
+    </article>
+
+    <article class="item"><div class="meta"><span class="chip s">Small</span><span class="chip tag">Saved goal</span><span class="chip tag">Learning loop</span></div>
+      <h3>Card votes show on the next lesson</h3>
+      <p class="why">The A/B/C/D votes are saved but go nowhere yet; closing that loop is the north star.</p>
+      <p>Votes already store the percentage right and the main wrong answer for each question. Show a class's weakest votes on its next lesson card and offer them for the Do Now, just as homework results are.</p>
+      <p class="claude">Read the "MCQ Votes" tab in loadAll_ (class level only), show on the card next to "HW %", feed the Do Now picker request.</p>
+    </article>
+
+    <article class="item"><div class="meta"><span class="chip s">Small</span><span class="chip tag">Saved goal</span></div>
+      <h3>Key homework cycle reminders</h3>
+      <p class="why">Key homework should be marked within a week of setting; nothing reminds him today.</p>
+      <p>The status strip shows "Key homework, 10C2, set 6 days ago, not marked", and the lesson where it comes back gets the "key homework returned" tick from the quick win above. The review section inside a normal lesson is a separate build job for the lesson maker.</p>
+      <p class="claude">logic.js hwStatus: a 'key' row older than 5 days and not marked shows as due to mark. The in-lesson review section needs a builder part (science-lesson), not the planner.</p>
+    </article>
+
+    <article class="item"><div class="meta"><span class="chip s">Small</span><span class="chip tag">Saved goal</span></div>
+      <h3>A note for next year on each lesson</h3>
+      <p class="why">What worked and what to change is lost by next September; it was on his own list of planner gaps.</p>
+      <p>Each lesson already has one saved record keyed by its Drive folder. A short "note for next year" field there will show up whenever that lesson is planned again, for any class, and goes into the build request.</p>
+      <p class="claude">Lessons tab record field `nextYear`; show in topicList and buildPrompt. Key is lessonId (Drive rel), so it survives the class change.</p>
+    </article>
+  </div>
+</section>
+
+<section>
+  <div class="sechead"><span class="eyebrow">Group 3</span><h2>Later</h2><p>Good ideas that cost more or wait on something else.</p></div>
+  <div class="items">
+    <article class="item"><div class="meta"><span class="chip l">Large</span><span class="chip tag">Saved goal</span><span class="chip tag">Phone</span></div>
+      <h3>Eyes-free behaviour entry</h3>
+      <p class="why">Logging without looking down keeps his attention on the room.</p>
+      <p>Draw a pupil's initial with a thumb, then one tap for a positive, two for a negative. Needs a design pass first (what to show when two pupils share letters), then a careful build with the offline queue fixes above in place.</p>
+      <p class="claude">Phone.html; reuse the tap queue and the ID-based repeat check from the quick win.</p>
+    </article>
+    <article class="item"><div class="meta"><span class="chip m">Medium</span><span class="chip tag">Workflow</span></div>
+      <h3>Tomorrow's lessons built before 7pm without asking</h3>
+      <p class="why">"Do my planner requests" still needs him to start Claude at home.</p>
+      <p>A scheduled Claude session on the home PC could pick up the requests at, say, 5pm. It uses his Claude plan, not a paid API, but the PC must be awake. Respect the 7pm rule: never schedule it later.</p>
+      <p class="claude">A scheduled task firing into a session on the home PC; Remote Control launcher already exists (start-remote-control.cmd).</p>
+    </article>
+    <article class="item"><div class="meta"><span class="chip m">Medium</span><span class="chip tag">Saved goal</span></div>
+      <h3>Open the lesson folder from the planner, and post lessons to Classroom after the day</h3>
+      <p class="why">Fewer trips through Drive folders; pupils get the slides without him uploading.</p>
+      <p>The home link could look up a lesson's folder and return its address. Check first that the school browser can open his personal Drive. The Classroom post stays a draft he publishes.</p>
+      <p class="claude">Mailbox.gs new op 'folderUrl' by Lessons/rel; classroomDraft_ pattern for materials.</p>
+    </article>
+    <article class="item"><div class="meta"><span class="chip s">Small</span><span class="chip tag">Board</span></div>
+      <h3>The board asks the server every second</h3>
+      <p class="why">About 3,600 requests an hour while the board is open; if Google ever slows the app, the board freezes first.</p>
+      <p>Ask less often when nothing is happening, and quickly while a silence or timer runs. Low risk today, so later.</p>
+      <p class="claude">BoardPage.html poll() via the 1000 ms interval; back off to 3 to 5 s in teaching mode.</p>
+    </article>
+  </div>
+</section>
+
+<section>
+  <div class="sechead"><span class="eyebrow">Group 4</span><h2>Ideas and things waiting on him</h2></div>
+  <div class="items">
+    <article class="item"><div class="meta"><span class="chip tag">Needs a paid API</span></div>
+      <h3>Marking written homework answers automatically</h3>
+      <p class="why">It would save marking time, but it needs a paid service, so it is flagged here and not proposed.</p>
+      <p>The free approach already in place (pupils mark themselves against the scheme, with a flag for generous self-marks) covers most of the value.</p>
+    </article>
+    <article class="item"><div class="meta"><span class="chip tag">Waiting on files</span></div>
+      <h3>Grades at each mark, OCR textbook questions, CGP page numbers</h3>
+      <p class="why">Each depends on something he will provide or on the book scanner.</p>
+      <p>Grades need the school's assessment spreadsheets. Textbook snippet questions and "answer question X on page Y" need the scanned page index. All free once the inputs exist.</p>
+    </article>
+    <article class="item"><div class="meta"><span class="chip tag">Elsewhere</span></div>
+      <h3>Tasks and shifts</h3>
+      <p class="why">This now lives in Ulhu's Rituals, which another review covers.</p>
+      <p>Planner hooks it will want: "homework made" and "order sheet sent" events, both already written to the Log tab.</p>
+    </article>
+  </div>
+</section>
+
+<section>
+  <div class="sechead"><span class="eyebrow">Question 3</span><h2>Saved goals that are now cheap</h2><p>What already exists makes these much smaller than when they were saved.</p></div>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Goal (saved)</th><th>Already in place</th><th>Left to build</th><th>Effort</th></tr></thead>
+    <tbody>
+      <tr><td>Follow-up tasks after a review or key homework (15 Oct)</td><td>Lesson checklist ticks that feed the build request</td><td>Two new ticks, plus the book page once the CGP index exists</td><td><span class="chip s">Small</span></td></tr>
+      <tr><td>Forms misconceptions dashboard (15 Oct)</td><td>Daily class results, lesson card "HW %", most missed per homework</td><td>A cross-class "most missed" view</td><td><span class="chip s">Small</span></td></tr>
+      <tr><td>Revision set 2 weeks before a test (16 Oct)</td><td>Suggested on the Homework tab</td><td>Pre-filled as a draft for him to approve</td><td><span class="chip s">Small</span></td></tr>
+      <tr><td>Key homework cycle (23 Oct)</td><td>"Key homework" kind on the Homework tab</td><td>Mark-within-a-week reminder and "returned" tick</td><td><span class="chip s">Small</span></td></tr>
+      <tr><td>Reflection notes that return next year (5 Oct)</td><td>One saved record per lesson, keyed by its folder</td><td>One note field, shown on the lesson</td><td><span class="chip s">Small</span></td></tr>
+      <tr><td>Votes and results drive the Do Now (21 Oct)</td><td>Votes saved; "Put on next lesson's Do Now" for homework</td><td>Same button for votes</td><td><span class="chip s">Small</span></td></tr>
+      <tr><td>Test builder: more weight on recent lessons (20 Oct)</td><td>Builder with cover-taught, chapter and lesson ticks</td><td>One extra option passed to the paper maker</td><td><span class="chip s">Small</span></td></tr>
+      <tr><td>Homework tab collapsible, class picker, Seneca drafts (16 Oct)</td><td>All three are in the app now</td><td>Nothing</td><td><span class="chip tag">Built</span></td></tr>
+      <tr><td>Morning brief (summer)</td><td>Everything it needs is in the planner</td><td>The "Today" panel</td><td><span class="chip m">Medium</span></td></tr>
+      <tr><td>Eyes-free behaviour entry (21 Oct)</td><td>Phone app with offline taps</td><td>Design, then build</td><td><span class="chip l">Large</span></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section>
+  <div class="sechead"><span class="eyebrow">Question 4</span><h2>Phone and laptop</h2></div>
+  <div class="two">
+    <div>
+      <h3>Laptop</h3>
+      <ul class="plain">
+        <li>Weekly jobs hide in the "More" menu: order sheet, calendar, daily results, homework quizzes. A small "This week" strip could show what is sent and what is not (order sheet, calendar, tomorrow's lessons, homework drafted). It shows; it never acts.</li>
+        <li>Errors appear in the small status line and get covered by the next "Saved". Keep any error on screen until he closes it, as the Homework tab already does.</li>
+        <li>Keyboard shortcuts, undo and the drag questions work well. Keep them.</li>
+        <li>The README still describes the old Excel template step; tidy for Claude only.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Phone</h3>
+      <ul class="plain">
+        <li>The behaviour page is solid: it opens from a saved copy with no signal, keeps taps offline and shows errors at the top.</li>
+        <li>Missing: a read-only "Today" card (lessons, kit, homework due). That is the one planner thing he needs mid-day on the phone.</li>
+        <li>Class lists are kept on the phone for offline use. That is fine on his own locked phone; worth knowing if the phone is lost.</li>
+        <li>The connection dot turns amber whenever the board is closed, so amber often means nothing is wrong. A separate board indicator would make amber mean "taps waiting".</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sechead"><span class="eyebrow">Question 5</span><h2>Test gaps</h2></div>
+  <div class="items">
+    <article class="item">
+      <ul class="plain">
+        <li><b>Not run with the main test command.</b> Five planner test files only run by hand.</li>
+        <li><b>The fake spreadsheet is too kind.</b> It keeps dates as text; real Sheets turns them into dates. That hid the homework label clash.</li>
+        <li><b>No test for two open copies saving.</b> The overwrite risk has no check at all.</li>
+        <li><b>No test that failed saves are reported.</b> The planner page itself is only checked by screenshots.</li>
+        <li><b>No check that both Week A/B answers agree</b>, and nothing tests next September's rollover.</li>
+        <li><b>No speed test.</b> A year of saved weeks is never timed.</li>
+        <li><b>Offline taps:</b> no test for a repeated tap or a tap that always fails. The phone simulations need a browser tool that is installed at home.</li>
+      </ul>
+    </article>
+  </div>
+</section>
+
+<section>
+  <div class="sechead"><span class="eyebrow">Rules check</span><h2>Against the standing rules</h2></div>
+  <div class="items">
+    <p class="flag"><b>One rule question for Patryk:</b> the order sheet download makes a temporary Google Sheet and then puts it in the bin. It only bins its own temporary copy, but the standing rule is "never delete on Drive". Choose: keep it as it is, or leave the temporary copies in one "Planner temporary" folder that he empties himself.</p>
+    <article class="item"><ul class="plain">
+      <li><b>Drive writes:</b> the planner creates quiz Forms in one folder, lesson folders he asks for, and the Planner Sync files. All creates; nothing renamed or moved apart from the point above.</li>
+      <li><b>Paid API:</b> nothing in the top 10 needs one. Only automatic marking of written answers would, and it is listed as an idea, not a plan.</li>
+      <li><b>Pupil data:</b> names stay in the school spreadsheet and Forms. What goes home is class-level numbers, and the tests check that. Keep it that way for the Today panel and the votes.</li>
+      <li><b>Tools that decide for him:</b> every suggestion here shows information or prepares a draft. Nothing sends, posts or re-teaches by itself.</li>
+    </ul></article>
+  </div>
+</section>
+
+<footer>Read-only review of planner/Code.gs, Planner.html, logic.js, Behaviour.gs, Phone.html, BoardPage.html, Mailbox.gs, bundle.js and the tests, plus CLAUDE.md and eleven memory notes. Game files were left to the separate Ulhu review. No files, git history or Drive items were changed.</footer>
+</div>

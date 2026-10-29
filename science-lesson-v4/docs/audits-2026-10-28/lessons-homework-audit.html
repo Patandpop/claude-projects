@@ -1,0 +1,369 @@
+<title>Lessons and Homework Audit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;600;700&family=Caveat:wght@600&display=swap">
+<style>
+/* Layout: one reading column, ranked item cards grouped by when to build; navy and gold from the lesson decks. */
+:root{
+  --bg:#f6f7fb; --surface:#ffffff; --fg:#141a33; --muted:#555c78; --line:#dde1ee;
+  --navy:#0d1b5e; --gold:#b9860f; --goldfill:#fff4d6; --chip:#eef0f8;
+  --good:#2e7d32; --warn:#b45309; --bad:#b71c1c;
+  --display:"Lexend",system-ui,sans-serif; --body:"Lexend",system-ui,sans-serif; --hand:"Caveat","Comic Sans MS",cursive;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0b1030; --surface:#121a45; --fg:#eef0fa; --muted:#a9b0d0; --line:#26306a;
+  --navy:#c9d3ff; --gold:#fabb2e; --goldfill:#2a2a3a; --chip:#1b2560;
+  --good:#7fd08a; --warn:#f2b45c; --bad:#ff8a80; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0b1030; --surface:#121a45; --fg:#eef0fa; --muted:#a9b0d0; --line:#26306a;
+  --navy:#c9d3ff; --gold:#fabb2e; --goldfill:#2a2a3a; --chip:#1b2560;
+  --good:#7fd08a; --warn:#f2b45c; --bad:#ff8a80; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-weight:300;line-height:1.6;font-size:16px;margin:0}
+.wrap{max-width:860px;margin:0 auto;padding-inline:20px;padding-block:32px 64px;display:flex;flex-direction:column;gap:28px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;color:var(--navy)}
+h1{font-size:2.1rem;font-weight:700;line-height:1.15}
+h2{font-size:1.4rem;font-weight:700}
+h3{font-size:1.05rem;font-weight:600;line-height:1.35}
+p{margin:0}
+.hand{font-family:var(--hand);color:var(--gold);font-size:1.5rem;line-height:1}
+.lede{color:var(--muted);max-width:65ch}
+.top{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:20px;display:flex;flex-direction:column;gap:12px}
+.top ol{margin:0;padding-left:1.4em;display:flex;flex-direction:column;gap:6px}
+.top li::marker{color:var(--gold);font-weight:700}
+.filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.filters span{color:var(--muted);font-size:.85rem;margin-right:4px}
+.filters button{font:inherit;font-size:.85rem;border:1px solid var(--line);background:var(--surface);color:var(--fg);padding:5px 12px;border-radius:99px;cursor:pointer}
+.filters button[aria-pressed="true"]{background:var(--navy);color:var(--bg);border-color:var(--navy)}
+.filters button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+section.group{display:flex;flex-direction:column;gap:14px}
+.ghead{display:flex;flex-direction:column;gap:2px;border-bottom:2px solid var(--gold);padding-bottom:8px}
+.ghead p{color:var(--muted);font-size:.92rem}
+.item{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:16px 18px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.meta{display:flex;flex-wrap:wrap;gap:6px;font-size:.75rem}
+.meta b{font-weight:600;background:var(--chip);color:var(--fg);padding:2px 8px;border-radius:4px;letter-spacing:.02em}
+.meta .rank{background:var(--navy);color:var(--bg)}
+.meta .eff{background:var(--goldfill);color:var(--fg)}
+.why{background:var(--goldfill);border-left:3px solid var(--gold);padding:6px 10px;font-size:.93rem}
+.why strong{font-weight:600}
+.item p.body{font-size:.95rem}
+.ev{font-size:.85rem;color:var(--muted)}
+.claude{font-size:.78rem;color:var(--muted);border-top:1px dashed var(--line);padding-top:6px}
+.claude em{font-style:normal;font-weight:600}
+.flag{color:var(--bad);font-weight:600}
+.tablebox{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:8px}
+table{border-collapse:collapse;width:100%;font-size:.9rem}
+th,td{text-align:left;padding:8px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-weight:600;color:var(--navy);font-size:.8rem;letter-spacing:.04em;text-transform:uppercase}
+td.num{font-variant-numeric:tabular-nums;white-space:nowrap}
+.note{font-size:.85rem;color:var(--muted)}
+@media (prefers-reduced-motion:no-preference){.filters button{transition:background .15s}}
+</style>
+
+<div class="wrap">
+<header style="display:flex;flex-direction:column;gap:10px">
+  <span class="hand">Beechen Cliff Science, 28 October 2026</span>
+  <h1>Lessons and Homework Audit</h1>
+  <p class="lede">A read-only look at the lesson builder, the homework tools, the tests and the saved goals. Nothing was changed. Every claim about what is broken or missing was checked against the actual code, not just the backlog. Items are ranked by value for the effort they take. No pupil names or pupil data appear here.</p>
+  <p class="lede">Grounding: EEF "Improving Secondary Science" (retrieval, modelling, scaffolds that fade, feedback, language of science), EEF "Cognitive Science in the Classroom" (spacing, retrieval, cognitive load), the worked example and fading research (Sweller, Renkl), and the expertise reversal effect (help that supports a weaker pupil gets in the way of a stronger one).</p>
+</header>
+
+<section class="top" aria-labelledby="t10">
+  <h2 id="t10">Top 10 to do first</h2>
+  <ol>
+    <li>Protect the "never repeat a question" record, so homework and Do Nows can't silently start repeating questions.</li>
+    <li>Fix the wrong Drive address A-level lessons record, which stops 12C and 13D MCQs reaching the phone voter.</li>
+    <li>Make the automatic Do Now use the better lesson matcher, and mix in some harder recall.</li>
+    <li>Put sentence starters on the support sheet where they belong, and stop the standard sheet giving away calculation working.</li>
+    <li>Let the word bank follow each class's own setting, not last year's class list.</li>
+    <li>Three small slide fixes: tiny whiteboard answers, a confusing graph slide title, one false warning.</li>
+    <li>A "last week's homework" slide after the Do Now answers, from results the planner already collects.</li>
+    <li>Keep worksheet tables and sections on one page, so you stop fixing layouts by hand.</li>
+    <li>Rebuild true/false with a click reveal per statement (A for true, D for false).</li>
+    <li>Bring the test lessons up to date: this year's classes, an A-level lesson and the 4-page limit.</li>
+  </ol>
+</section>
+
+<div class="filters" role="group" aria-label="Show items about">
+  <span>Show:</span>
+  <button type="button" id="f-all" data-f="all" aria-pressed="true">Everything</button>
+  <button type="button" id="f-pupil" data-f="pupil" aria-pressed="false">What pupils see</button>
+  <button type="button" id="f-hw" data-f="hw" aria-pressed="false">Homework</button>
+  <button type="button" id="f-bug" data-f="bug" aria-pressed="false">Bugs and fragile spots</button>
+  <button type="button" id="f-time" data-f="time" aria-pressed="false">Saves your time</button>
+  <button type="button" id="f-test" data-f="test" aria-pressed="false">Tests</button>
+</div>
+
+<!-- QUICK WINS -->
+<section class="group" aria-labelledby="g1">
+  <div class="ghead"><h2 id="g1">Quick wins</h2><p>Under an hour or two each. Most are plain fixes with no design choice to make.</p></div>
+
+  <article class="item" data-tags="bug hw">
+    <div class="meta"><b class="rank">#1</b><b>Bug risk</b><b>Homework</b><b class="eff">About 45 minutes</b></div>
+    <h3>Protect the "never repeat a question" record</h3>
+    <p class="why"><strong>Why it matters:</strong> one damaged file and every class could quietly start getting questions they have already had.</p>
+    <p class="body">The list of which exam questions each class has already seen (used by homework, exam practice, Do Nows and the board exam question) is kept in one file on the home PC. It is not in the project's history, so there is no backup. If that file is ever unreadable (a half-saved write, a sync clash), the homework tools treat it as empty, carry on, and save over it with only the newest entries. Nothing warns you. Fix: refuse to save if the file could not be read, and keep a dated copy each time it changes.</p>
+    <p class="claude"><em>For Claude:</em> exam-usage.json is untracked; readJson() swallows parse errors in homework-forms.js write(), test-paper.js (~line 1081), exam-pick recordUse, extension-pick. Fail loudly on read error; write via temp file then rename; keep a rolling backup.</p>
+  </article>
+
+  <article class="item" data-tags="bug hw">
+    <div class="meta"><b class="rank">#2</b><b>Bug</b><b>A level</b><b class="eff">About 1 hour</b></div>
+    <h3>A-level lessons record the wrong Drive address</h3>
+    <p class="why"><strong>Why it matters:</strong> 12C and 13D lose the phone MCQ voter questions, and pushes to the school Drive would aim at a folder that does not exist.</p>
+    <p class="body">Every built lesson leaves a small note of where it lives on Drive. For A level it writes "Year 13, Physics, Chapter 20...", but A-level folders have no Physics level and sit inside Module folders (Hubble's Law shows this). The uploader itself finds the right chapter, so the files land correctly. But the planner uses the note to attach each lesson's MCQs for the phone voter, so A-level lessons silently get none. The school push uses the same wrong address.</p>
+    <p class="claude"><em>For Claude:</em> builder/17-main.js writes .path.txt and .manifest.json "folder" as Year/Subject/Macrotopic; reuse the uploader's chapter-by-number lookup for Year 12/13. planner-catalogue.js lessonMcqs() keys on that path.</p>
+  </article>
+
+  <article class="item" data-tags="pupil bug">
+    <div class="meta"><b class="rank">#4</b><b>Support sheets</b><b>Bug</b><b class="eff">About 1 hour</b></div>
+    <h3>Starters on the support sheet; no free working on the standard sheet</h3>
+    <p class="why"><strong>Why it matters:</strong> the pupils who need the help don't get it, and the pupils who should be stretched do.</p>
+    <p class="body">Two open backlog items from 3 October, both still in the code. (1) On a 5+ mark long answer, the support sheet swaps your own sentence starters for the generic "What changes? Why? What does this mean?" lines, while the standard sheet keeps your starters. (2) For a calculation marked as a new method, the standard sheet pre-fills the Given, Unknown, Equation and Substitute boxes even on Mastering questions, which gives the working away. Research on fading help (expertise reversal) says the stronger pupils should get the blank version. Fix: starters go to the support sheet, and pre-filled boxes only appear there.</p>
+    <p class="claude"><em>For Claude:</em> builder/16-worksheet.js, the B4 "To answer this question" branch blocks q.starters on mode 'developing'; the 'backward-fade' GUESS mode pre-fills on the standard sheet for new_procedure. Add fixture assertions for both.</p>
+  </article>
+
+  <article class="item" data-tags="pupil bug">
+    <div class="meta"><b class="rank">#5</b><b>Worksheets</b><b class="eff">About 45 minutes, Plan Mode</b></div>
+    <h3>Word bank follows each class's own setting</h3>
+    <p class="why"><strong>Why it matters:</strong> 10S2 and 11S2 are set to no word bank, but only get none if each lesson remembers to switch it off.</p>
+    <p class="body">The builder still has its own list of "no word bank" classes, and it names last year's 8AB and 9AB. Your class settings file already says which of this year's classes get one. Today the gap-fill falls back to the lesson's key words as a word bank unless the lesson turns it off by hand. Read the class settings file instead, and ask you about 9AS and 9XS, which are still marked "not decided".</p>
+    <p class="claude"><em>For Claude:</em> builder/01-core.js NO_WORD_BANK = 8AB/9AB; used in 16-worksheet.js clozeSection. Read class-defaults.json (packaged copy for claude.ai).</p>
+  </article>
+
+  <article class="item" data-tags="pupil time">
+    <div class="meta"><b class="rank">#6</b><b>Slides</b><b class="eff">About 45 minutes for all three</b></div>
+    <h3>Three small slide fixes</h3>
+    <p class="why"><strong>Why it matters:</strong> each one is either unreadable from the back or a reason you edit by hand.</p>
+    <p class="body">(1) Whiteboard round answers are fixed at a small size in a big box (open since 12 October). Size them to fill the box. (2) The graph reading slide is titled "READ THE GRAPH: ANSWERS" even when pupils first see it. Call it "READ THE GRAPH" and keep the answers on click. (3) The build check asks for a picture description on comparison slides, which have no picture. Drop that false alarm, so real warnings stand out.</p>
+    <p class="claude"><em>For Claude:</em> 12-slides-apply.js slideWhiteboardRounds (answer fontSize 15, use autoFontSize); 11-slides-maths.js line ~363 title; 13-checks.js image check should skip variant E.</p>
+  </article>
+
+  <article class="item" data-tags="test">
+    <div class="meta"><b class="rank">#10</b><b>Tests</b><b class="eff">About 2 hours</b></div>
+    <h3>Bring the test lessons up to date</h3>
+    <p class="why"><strong>Why it matters:</strong> the safety net checks last year's classes, so this year's rules can break without anyone noticing.</p>
+    <p class="body">The nine practice lessons the tests build use last year's class names (9AB, 7BYA, 11C3). None is an A-level lesson (so the address bug above was never caught), none is a "test" lesson, and the 4-page worksheet limit is switched off during tests. Add: one 10S2 lesson (no word bank), one 13D lesson, a home-only check that the standard and support sheets fit 4 pages when Word is available, and a warning for em dashes in lesson text, since that is your rule.</p>
+    <p class="claude"><em>For Claude:</em> test/run.js FIXTURES; NO_PAGECOUNT is set by the harness; BANNED_XML deliberately omits em dash, so add it as a content-check warning in 13-checks.js instead.</p>
+  </article>
+
+  <article class="item" data-tags="test hw">
+    <div class="meta"><b>Tests</b><b>Homework</b><b class="eff">About 2 hours</b></div>
+    <h3>Smoke tests for the untested homework and review tools</h3>
+    <p class="why"><strong>Why it matters:</strong> these tools change often, and a single broken line already stopped Forms files being written for three days in October.</p>
+    <p class="body">No test touches the extension question picker, the homework booklet builder, the test review lesson builder, the question picture cutter or the planner's MCQ collector. A short "does it run and produce something sensible" check for each would catch the kind of slip that silently broke Forms homework on 12 October.</p>
+    <p class="claude"><em>For Claude:</em> extension-pick.js, homework-booklet.js, test-review-lesson.js, paper-snippets.py, planner-catalogue.js lessonMcqs(). Use temp dirs, never G:.</p>
+  </article>
+</section>
+
+<!-- NEXT -->
+<section class="group" aria-labelledby="g2">
+  <div class="ghead"><h2 id="g2">Next</h2><p>Half a day to a day each. Several need a mock-up and your pick first.</p></div>
+
+  <article class="item" data-tags="pupil time">
+    <div class="meta"><b class="rank">#3</b><b>Do Now</b><b>Retrieval</b><b class="eff">Half a day</b></div>
+    <h3>Better automatic Do Now: on topic, and a little harder</h3>
+    <p class="why"><strong>Why it matters:</strong> off-topic picks mean you write the six yourself; easy one-mark recall gives less of the retrieval benefit.</p>
+    <p class="body">On 15 October a much better matcher (lesson to exam topic, with must-have words) was built for the board exam question and exam practice. The Do Now picker still uses the old word matching that gave 13D satellite questions for "Energy Levels" and 7MLA braking distance. Wire it in. Second, the learning loop notes judged Do Nows too narrow and easy, and the 9XS sample is six one-mark recall questions. Retrieval works best when it takes effort and is spread out. Suggested mix: four short recall, one two-mark "explain", one calculation with new numbers (that last part already exists).</p>
+    <p class="ev">Evidence: EEF Cognitive Science review (spaced, effortful retrieval); your 12 October off-topic examples.</p>
+    <p class="claude"><em>For Claude:</em> do-now-pick.js has no lesson-match.js or question-pool.js use (fix-later item 6 still open). Mix rule goes in SKILL.md with Patryk's OK.</p>
+  </article>
+
+  <article class="item" data-tags="pupil hw time">
+    <div class="meta"><b class="rank">#7</b><b>Feedback</b><b>Homework</b><b class="eff">Half a day</b></div>
+    <h3>A "last week's homework" slide</h3>
+    <p class="why"><strong>Why it matters:</strong> homework only improves learning if pupils see what they got wrong while it is fresh.</p>
+    <p class="body">Your 19 October ask was to show the previous week's Form results on the lesson. The planner already reads the results each day and shows "HW %" with the three weakest questions on the lesson card. The quiz files already hold the misconception behind each wrong option. So one optional slide after the Do Now answers is cheap: the three most-missed questions, the right answer, and the most common wrong answer with why it is wrong. Class totals only, never names.</p>
+    <p class="ev">Evidence: EEF secondary science recommendation on feedback; EEF feedback guidance (whole-class, task focused).</p>
+    <p class="claude"><em>For Claude:</em> data from planner-state.json results (class counts, M5/M8) and quiz "why" maps; new slide in 06-slides-opening.js, gated on a meta flag.</p>
+  </article>
+
+  <article class="item" data-tags="pupil time">
+    <div class="meta"><b class="rank">#8</b><b>Worksheets</b><b class="eff">Half a day, mock first</b></div>
+    <h3>Tables and sections stay on one page</h3>
+    <p class="why"><strong>Why it matters:</strong> you fix these by hand most mornings.</p>
+    <p class="body">Headings already stick to the next line and single rows never split, but a whole table can still break across pages, and a section can start at the foot of page 2 with its questions on page 3. Word can keep a whole table together if every row is told to stay with the next. Do the same for each section's heading plus its first question, then let the 4-page counter decide what to drop when it does not fit.</p>
+    <p class="claude"><em>For Claude:</em> 15-worksheet-parts.js uses cantSplit on rows; add keepNext on all paragraphs of every row but the last; page-count.js already reports where each section starts.</p>
+  </article>
+
+  <article class="item" data-tags="pupil">
+    <div class="meta"><b class="rank">#9</b><b>Slides</b><b>Checking for understanding</b><b class="eff">Half a day, mock first</b></div>
+    <h3>True or false with a click reveal</h3>
+    <p class="why"><strong>Why it matters:</strong> today you can't check the room statement by statement, so the slide can't steer the lesson.</p>
+    <p class="body">Your saved goal: each statement, pupils point (A for true, D for false), then a click shows TRUE or FALSE and the corrected statement. The built-in click animations now exist and are tested, so this is a layout job. It also matches the corner letters on your phone voter, so these votes could be recorded the same way later.</p>
+    <p class="ev">Evidence: whole-class response before moving on (Rosenshine, "check for understanding"); you choose when to reveal.</p>
+    <p class="claude"><em>For Claude:</em> 09-slides-build.js slideTrueFalse; reveal boxes must be navy fill with gold text so addRevealAnimations picks them up.</p>
+  </article>
+
+  <article class="item" data-tags="pupil">
+    <div class="meta"><b>Slides</b><b>Worked examples</b><b class="eff">2 to 3 hours, mock first</b></div>
+    <h3>GUESS slide with an example question and steps revealed one at a time</h3>
+    <p class="why"><strong>Why it matters:</strong> a worked example shown one step at a time keeps the load low; all five at once does not.</p>
+    <p class="body">Saved goal from 14 October. Add the example question at the top, then reveal Given, Unknown, Equation, Substitute, Solve on clicks. Pair it with the "your turn" practice that follows, which is the classic worked example then problem pair.</p>
+    <p class="claude"><em>For Claude:</em> 11-slides-maths.js slideGuessExample; reuse the reveal pass in 05-pptx-finish.js.</p>
+  </article>
+
+  <article class="item" data-tags="pupil bug">
+    <div class="meta"><b>Slides</b><b>Exam questions</b><b class="eff">2 to 3 hours</b></div>
+    <h3>Long exam questions split over two slides</h3>
+    <p class="why"><strong>Why it matters:</strong> a 7-mark question ran off the slide on 11S2, and those are the questions worth showing.</p>
+    <p class="body">The board exam question shrinks its text to a floor, then overflows. Add a second slide for the later parts when it does not fit, and the same for its mark scheme. Also check no "[FIG]" marker can leak into mark scheme text on the board.</p>
+    <p class="claude"><em>For Claude:</em> 12-slides-apply.js slideExamQuestion / slideExamMarkScheme (autoFontSize min 16, no split path); fix-later item 8.</p>
+  </article>
+
+  <article class="item" data-tags="pupil">
+    <div class="meta"><b>Engage</b><b>Rule change</b><b class="eff">1 hour to write, your OK needed</b></div>
+    <h3>Every Engage is a puzzle the lesson answers</h3>
+    <p class="why"><strong>Why it matters:</strong> you skip Engage because it reads like filler; the one that worked was a real question the lesson explained.</p>
+    <p class="body">The oil-on-water rainbow and the "CO vs Co" hook in the 9XS lesson both work because the lesson pays them off. Turn that into the rule: the Engage asks one concrete "why" or "what happens" question, plainly worded, and the Learn slide that answers it says so in its notes ("this answers the Engage question"). If no such question fits the lesson, leave Engage out instead of writing a weak one. The reveal box already exists.</p>
+    <p class="claude"><em>For Claude:</em> SKILL.md Engage rules plus engage-library.md; a content check could warn when engage.reveal is missing on a prediction Engage.</p>
+  </article>
+
+  <article class="item" data-tags="pupil">
+    <div class="meta"><b>MCQ</b><b class="eff">Half a day</b></div>
+    <h3>Catch the obviously wrong MCQ options automatically</h3>
+    <p class="why"><strong>Why it matters:</strong> one silly option turns a four-way question into a three-way guess.</p>
+    <p class="body">The build check already makes every wrong option name its mistake. Add simple checks drawn from your own analysis of real AQA and OCR multiple choice: the right answer is not the longest, number options differ by a real slip (power of ten, upside down, squared), options use the same units, and none is a joke. Flag, never block. Free, no AI service.</p>
+    <p class="claude"><em>For Claude:</em> 13-checks.js MCQ CHECK; rules from exam-library/mcq-analysis.json and mcq-rules.md.</p>
+  </article>
+
+  <article class="item" data-tags="pupil bug">
+    <div class="meta"><b>Slides</b><b>Board contrast</b><b class="eff">2 hours after you pick a colour</b></div>
+    <h3>Gold answer boxes readable with the lights on</h3>
+    <p class="why"><strong>Why it matters:</strong> answers you can't read from the back are answers pupils don't copy.</p>
+    <p class="body">Saved goal. One trap first: the built-in click animations find answer boxes by their exact navy and gold colours. Change the colour in one place only and every answer box loses its animation with no warning. Change both together and add a test that counts the animations per slide type.</p>
+    <p class="claude"><em>For Claude:</em> 05-pptx-finish.js addRevealAnimations matches 0D1B5E fill and FABB2E/FFD60A text; define them once in 01-core.js and use the constants there.</p>
+  </article>
+
+  <article class="item" data-tags="pupil">
+    <div class="meta"><b>Worksheets</b><b>Exam questions</b><b class="eff">Half to one day</b></div>
+    <h3>Exam questions with pictures on worksheets</h3>
+    <p class="why"><strong>Why it matters:</strong> diagrams are where a lot of the marks are, and today those questions are left off.</p>
+    <p class="body">Saved goal: always include the worksheet exam question even when it has a figure, laid out side by side (question one side, picture the other). The figures are already recovered from the exam library.</p>
+    <p class="claude"><em>For Claude:</em> 16-worksheet.js exam block (~line 407); figures from exam-figures.js output.</p>
+  </article>
+</section>
+
+<!-- LATER -->
+<section class="group" aria-labelledby="g3">
+  <div class="ghead"><h2 id="g3">Later</h2><p>A day or more, or waiting on something else. Specs exist for most.</p></div>
+
+  <article class="item" data-tags="pupil">
+    <div class="meta"><b>Slides</b><b>6 markers</b><b class="eff">1 day, spec and mock-ups ready</b></div>
+    <h3>The 6-mark breakdown slides</h3>
+    <p class="why"><strong>Why it matters:</strong> 6 markers are where KS4 pupils lose the most marks, and this models how to build one.</p>
+    <p class="body">Fully decided in your 23 October grill, with mock-ups drawn: a real 6 marker, 4 to 6 sub-questions with answers on click, then the model answer with each part highlighted. Comes back later as homework without the sub-questions, which is the fading step research recommends.</p>
+    <p class="claude"><em>For Claude:</em> specs/six-mark-breakdown.md; reuse mark highlights from 10-slides-answers.js.</p>
+  </article>
+
+  <article class="item" data-tags="hw time">
+    <div class="meta"><b>Books</b><b>High priority for you</b><b class="eff">1 day at home</b></div>
+    <h3>CGP book page scanner</h3>
+    <p class="why"><strong>Why it matters:</strong> it unlocks accurate page references and the follow-up book tasks.</p>
+    <p class="body">Needs your login on the home PC and a headless browser (free). Keeps only an index of headings, page numbers and where the practice questions and answers are. Ask first: what "ice books" means.</p>
+    <p class="claude"><em>For Claude:</em> project_cgp_book_scanner memory note; feeds textbook-index.md.</p>
+  </article>
+
+  <article class="item" data-tags="pupil hw time">
+    <div class="meta"><b>Review</b><b>Homework</b><b class="eff">1 to 2 days, needs the scanner</b></div>
+    <h3>Key homework review and the "1 or 2" follow-up task</h3>
+    <p class="why"><strong>Why it matters:</strong> feedback only works if pupils act on it, and you said you don't always get to this.</p>
+    <p class="body">Spec written. After marked homework or a test review, the next lesson gets a short slide: "1" a book task to fix, "2" a real exam question to extend. Planner tick boxes switch it on.</p>
+    <p class="claude"><em>For Claude:</em> specs/key-homework-review.md; follow-up tasks memory note.</p>
+  </article>
+
+  <article class="item" data-tags="pupil">
+    <div class="meta"><b>Learn slides</b><b>Dual coding</b><b class="eff">Several days, mock-ups first</b></div>
+    <h3>Learn slides: the key point said plainly, one idea per slide</h3>
+    <p class="why"><strong>Why it matters:</strong> Learn is where new knowledge goes in; your notes say key terms are undefined and content is split oddly.</p>
+    <p class="body">Your top priority is dual coding, and the labelled picture slide is a strong start. Research to apply: signal the one key sentence (bold it, put it where you'd point); keep words on the slide short because you speak the explanation (the redundancy effect); put labels on the picture, not in a separate list (split attention); one idea per slide instead of one idea spread over two. Mock-ups first, as you asked.</p>
+    <p class="claude"><em>For Claude:</em> 08-slides-learn.js; memory notes lesson content 13 Oct and Learn/Engage/MCQ 19 Oct.</p>
+  </article>
+
+  <article class="item" data-tags="hw time">
+    <div class="meta"><b>Homework</b><b>Planner</b><b class="eff">1 day</b></div>
+    <h3>The other homework kinds: Seneca, key homework, test revision</h3>
+    <p class="why"><strong>Why it matters:</strong> setting each one by hand every week adds up.</p>
+    <p class="body">Due dates and Forms quizzes are now automatic. Still missing: plain-worded Seneca drafts for Years 7 to 9, revision set two weeks before a test, and a "most missed question" view across weeks.</p>
+    <p class="claude"><em>For Claude:</em> planner Homework tab; homework automation memory note 16 Oct.</p>
+  </article>
+</section>
+
+<!-- IDEAS -->
+<section class="group" aria-labelledby="g4">
+  <div class="ghead"><h2 id="g4">Ideas</h2><p>Worth thinking about. Two would need a paid service and are flagged.</p></div>
+
+  <article class="item" data-tags="hw">
+    <div class="meta"><b>Paid service</b><b>Homework</b></div>
+    <h3>Marking written Form answers or photographed test papers</h3>
+    <p class="why"><strong>Why it matters:</strong> marking is your biggest evening cost.</p>
+    <p class="body"><span class="flag">Needs a paid AI service.</span> Reading handwriting or judging a written answer can't be handled well for free. The free alternative already in the plan: one "how many marks did you give yourself?" item per written question.</p>
+  </article>
+
+  <article class="item" data-tags="pupil">
+    <div class="meta"><b>Possibly paid</b><b>Slides</b></div>
+    <h3>History and real quotes in the slide notes</h3>
+    <p class="why"><strong>Why it matters:</strong> stories help pupils remember, and you asked for it.</p>
+    <p class="body"><span class="flag">Only paid if an automatic research service does it.</span> Claude can write short, checked history notes during a normal build at no extra cost; real quotes need a source each time, and anything unsure should be left out.</p>
+  </article>
+
+  <article class="item" data-tags="hw time">
+    <div class="meta"><b>Free</b><b>Marking</b></div>
+    <h3>Whole-class feedback sheet builder</h3>
+    <p class="why"><strong>Why it matters:</strong> the backlog calls it the one remaining tool that saves evenings.</p>
+    <p class="body">You jot the common errors while marking; it builds a one-page sheet with the fix task for each, ready for purple pen time.</p>
+  </article>
+
+  <article class="item" data-tags="pupil hw">
+    <div class="meta"><b>Free</b><b>Homework</b></div>
+    <h3>Short pre-reading in Year 9 and 10 homework for big lessons</h3>
+    <p class="why"><strong>Why it matters:</strong> pupils who have met a word once learn the lesson faster.</p>
+    <p class="body">Your own idea; your worry was bloat. Keep it to three questions on one page of the CGP book, once the scanner exists.</p>
+  </article>
+</section>
+
+<!-- TIME -->
+<section class="group" aria-labelledby="g5">
+  <div class="ghead"><h2 id="g5">Time saved for you</h2><p>Rough figures. Per lesson where the problem happens; the week assumes about 15 built lessons.</p></div>
+  <div class="tablebox"><table>
+    <thead><tr><th>Change</th><th>Per lesson</th><th>Per week</th></tr></thead>
+    <tbody>
+      <tr><td>Do Now picks on topic (no hand-writing six questions)</td><td class="num">10 min</td><td class="num">1 to 2 hours</td></tr>
+      <tr><td>Worksheet tables and sections stay on one page</td><td class="num">5 to 10 min</td><td class="num">1 to 2 hours</td></tr>
+      <tr><td>True/false and GUESS reveals built in</td><td class="num">2 to 3 min</td><td class="num">15 to 30 min</td></tr>
+      <tr><td>Long exam questions split by themselves</td><td class="num">5 min when it happens</td><td class="num">10 to 20 min</td></tr>
+      <tr><td>Last week's homework slide (no looking up results)</td><td class="num">5 min per class</td><td class="num">30 to 45 min</td></tr>
+      <tr><td>Follow-up "1 or 2" task made for you</td><td class="num">20 min per review lesson</td><td class="num">20 to 40 min</td></tr>
+      <tr><td>Word bank set by class</td><td class="num">1 to 2 min</td><td class="num">15 min</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- BACKLOG -->
+<section class="group" aria-labelledby="g6">
+  <div class="ghead"><h2 id="g6">Backlog and notes that are out of date</h2><p>Checked against the code. Tidy these so the next session doesn't rebuild something that exists.</p></div>
+  <div class="tablebox"><table>
+    <thead><tr><th>Entry</th><th>What the code shows</th></tr></thead>
+    <tbody>
+      <tr><td>Mark scheme panel runs off the slide (2 Oct)</td><td>Panels now shrink to fit. Close after one look on a long scheme.</td></tr>
+      <tr><td>Purple pen table has a green header</td><td>Header is navy and gold since July. Close.</td></tr>
+      <tr><td>Gap-fill only on standard sheets</td><td>Now a written rule in the skill. Close.</td></tr>
+      <tr><td>Graph sketch and timeline slides undocumented</td><td>Now in the skill. Picture MCQ and the two results-graph slides are still only in the backlog.</td></tr>
+      <tr><td>Memory: learning loop "nothing built"</td><td>Results reading, lesson card HW %, MCQ export, phone votes and spaced homework are all built.</td></tr>
+      <tr><td>Memory: support sheet v2 "not built"</td><td>The one-help-per-question support sheet with the KEYS box is built and tested.</td></tr>
+      <tr><td>Still open and confirmed</td><td>Starters on the wrong sheet, pre-filled working, false picture warning, graph title, tiny whiteboard answers, exam slide overflow, Do Now matching.</td></tr>
+    </tbody>
+  </table></div>
+  <p class="note">Also: many changed files are not yet saved to the project history (the git status shows homework, exam and planner files modified). A save point before the next build session would make any of the fixes above easy to undo.</p>
+</section>
+</div>
+
+<script>
+(function(){
+  var btns=document.querySelectorAll('.filters button');
+  var items=document.querySelectorAll('.item');
+  function apply(f){
+    btns.forEach(function(b){b.setAttribute('aria-pressed', String(b.dataset.f===f));});
+    items.forEach(function(it){it.hidden = !(f==='all' || (' '+it.dataset.tags+' ').indexOf(' '+f+' ')>-1);});
+  }
+  btns.forEach(function(b){b.addEventListener('click',function(){apply(b.dataset.f);});});
+})();
+</script>

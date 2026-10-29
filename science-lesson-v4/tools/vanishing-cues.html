@@ -1,0 +1,742 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Vanishing Cues</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Kalam:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F2F5F8; --grid:rgba(40,105,170,.10); --margin:#E0574B; --panel:#FFFFFF;
+  --ink:#15212D; --muted:#566473; --line:#C6D0DA; --gap:#9DAEBF;
+  --accent:#1E63D0; --on-accent:#FFFFFF; --warn:#C2410C;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0F1822; --grid:rgba(120,170,225,.07); --margin:#8A3A33; --panel:#162230;
+    --ink:#E7EEF5; --muted:#98A7B6; --line:#2A3948; --gap:#51667A;
+    --accent:#5A9BFF; --on-accent:#0B1520; --warn:#F5B301;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0F1822; --grid:rgba(120,170,225,.07); --margin:#8A3A33; --panel:#162230;
+  --ink:#E7EEF5; --muted:#98A7B6; --line:#2A3948; --gap:#51667A;
+  --accent:#5A9BFF; --on-accent:#0B1520; --warn:#F5B301;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{
+  background-color:var(--paper);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:32px 32px;
+  color:var(--ink);
+  font-family:"Archivo","Arial Narrow",Arial,system-ui,sans-serif;
+  font-size:clamp(16px,1.1vw,21px);line-height:1.4;
+  display:flex;flex-direction:column;min-height:100vh;
+}
+body::before{content:"";position:fixed;top:0;bottom:0;left:52px;width:2px;background:var(--margin);opacity:.45;pointer-events:none}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--warn);outline-offset:3px}
+.hand{font-family:"Kalam","Comic Sans MS","Segoe Print",cursive}
+
+/* Bar */
+.bar{display:flex;align-items:center;gap:1rem;padding:.6rem 1.5rem .6rem 5rem;flex-wrap:wrap}
+.brand{margin:0;font-weight:900;font-stretch:125%;font-size:1.25rem}
+.bar-status{flex:1;margin:0;text-align:center;color:var(--muted);font-weight:650;min-width:8rem}
+.bar-actions{display:flex;gap:.5rem;flex-wrap:wrap}
+.icon-btn{background:var(--panel);border:2px solid var(--line);border-radius:8px;padding:.3rem .7rem;font-size:.85rem;font-weight:650}
+.icon-btn:hover{border-color:var(--ink)}
+
+main{flex:1;display:flex;width:100%;max-width:1860px;margin:0 auto;padding:1rem 2rem 1.6rem 5rem}
+.phase{display:none;width:100%}
+.phase.active{display:flex;flex-direction:column;flex:1}
+
+.btn{border:none;border-radius:10px;padding:.8rem 1.4rem;font-weight:750;font-size:1.08rem;background:var(--ink);color:var(--paper)}
+.btn:hover{filter:brightness(1.15)}
+.btn.ghost{background:var(--panel);color:var(--ink);box-shadow:inset 0 0 0 2px var(--line)}
+.btn.ghost:hover{box-shadow:inset 0 0 0 2px var(--ink);filter:none}
+.btn.small{font-size:.92rem;padding:.5rem .9rem}
+.controls{display:flex;gap:.6rem;flex-wrap:wrap;align-items:center}
+.hint{color:var(--muted);font-size:.95rem;margin:.5rem 0 0}
+
+/* Phrase + tokens (shared by hero and run) */
+.phrase{position:relative;z-index:1;font-weight:800;font-stretch:108%;text-align:center;line-height:1.28;letter-spacing:-.01em}
+.tok{position:relative;display:inline-block;margin:.06em .19em;white-space:nowrap}
+.ch{display:inline-block;transition:opacity .18s,color .18s}
+.ch.off{opacity:0}
+.tok .line{position:absolute;left:.03em;right:.03em;bottom:.04em;height:.075em;background:var(--gap);border-radius:.05em;transform:scaleX(0);transform-origin:left center;transition:transform .5s cubic-bezier(.2,.7,.3,1) .5s}
+.tok.lined .line{transform:scaleX(1)}
+.tok.lined{cursor:help}
+.tok:hover .ch.off,.tok.peek .ch.off{opacity:.45;color:var(--accent);transition-delay:0s}
+.tok.past .ch{color:var(--gap)}
+.tok.lit .ch{color:var(--on-accent)}
+.tok.key-on .ch:not(.off){color:var(--accent)}
+.tok.key-on .line{background:var(--accent)}
+
+/* Setup */
+.setup-grid{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:3rem;align-items:start}
+.hero{font-size:clamp(3rem,6.5vw,7.5rem);text-align:left;margin:.2rem 0 .6rem;line-height:1;font-stretch:118%;font-weight:900}
+.hero .tok{margin:0 .12em 0 0}
+.lede{font-size:clamp(1.05rem,1.35vw,1.45rem);color:var(--muted);max-width:56ch;margin:0 0 1.3rem}
+textarea{width:100%;min-height:8.5rem;border:2px solid var(--line);border-radius:12px;background:var(--panel);padding:1rem 1.1rem;font-size:1.3rem;line-height:1.35;resize:vertical}
+textarea:focus{border-color:var(--accent);outline:none}
+.opts{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(0,1fr) minmax(0,.7fr) minmax(0,1.3fr);gap:.9rem;margin:1.2rem 0}
+@media (max-width:1300px){.opts{grid-template-columns:1fr 1fr}}
+.opt label{display:block;font-weight:800;margin-bottom:.35rem}
+select,input[type="number"]{width:100%;border:2px solid var(--line);border-radius:10px;background:var(--panel);padding:.55rem .7rem;font-weight:650}
+.toggle{display:flex;gap:.7rem;align-items:center;border:2px solid var(--line);border-radius:10px;background:var(--panel);padding:.55rem .8rem;font-weight:700;cursor:pointer}
+.toggle input{width:1.2rem;height:1.2rem;accent-color:var(--accent)}
+.bank{background:var(--panel);border:2px solid var(--line);border-radius:14px;padding:1.2rem 1.3rem}
+.bank h3{margin:0 0 .6rem;font-size:1.3rem;font-weight:850}
+.bank ul{list-style:none;margin:0;padding:0;max-height:32rem;overflow:auto}
+.bank li{display:flex;gap:.5rem;align-items:center;border-bottom:1px solid var(--line);padding:.45rem 0}
+.bank li:last-child{border-bottom:none}
+.bank .pick{flex:1;text-align:left;background:transparent;border:none;padding:.15rem 0;font-weight:700;line-height:1.25}
+.bank .pick:hover{color:var(--accent)}
+.bank .pick small{display:block;font-weight:500;color:var(--muted);font-size:.85rem}
+.bank .del{border:none;background:transparent;color:var(--muted);font-weight:900;font-size:1.1rem;padding:.1rem .45rem;border-radius:6px}
+.bank .del:hover{color:var(--warn)}
+
+/* Run */
+.stage-head{display:flex;justify-content:space-between;align-items:flex-end;gap:1.5rem;flex-wrap:wrap}
+.stage-title{margin:0;font-size:clamp(1.5rem,2.4vw,2.6rem);font-weight:900;font-stretch:118%;line-height:1.05}
+.stage-cue{margin:.25rem 0 0;font-size:clamp(1.15rem,1.7vw,1.9rem);color:var(--accent)}
+.voice{display:inline-flex;align-items:baseline;gap:.5rem;background:var(--panel);border:2px solid var(--line);border-radius:999px;padding:.35rem 1.1rem;font-weight:700;font-size:clamp(1rem,1.3vw,1.35rem);transition:transform .25s}
+.voice.bump{transform:scale(1.06)}
+.voice .hand{font-size:1.25em;color:var(--accent)}
+.voice[hidden]{display:none}
+.dots{display:flex;gap:.35rem;margin:.9rem 0 0}
+.dots span{height:6px;flex:1;background:var(--line);border-radius:3px;transition:background .3s}
+.dots span.done{background:var(--gap)}
+.dots span.now{background:var(--accent)}
+.dots span.w{background-image:repeating-linear-gradient(90deg,transparent 0 6px,rgba(255,255,255,.35) 6px 9px)}
+
+.stage-body{flex:1;display:grid;grid-template-columns:minmax(0,1fr);gap:2rem;align-items:center;padding:1.5rem 0}
+.stage-body.writing{grid-template-columns:minmax(0,1fr) auto}
+.canvas-wrap{position:relative;display:flex;justify-content:center}
+.canvas-wrap .phrase{max-width:27ch}
+.canvas-wrap .phrase.wide{max-width:36ch}
+#marker{position:absolute;z-index:0;background:var(--accent);border-radius:.18em;opacity:0;pointer-events:none;
+  transition:left .28s cubic-bezier(.3,.7,.2,1),top .28s cubic-bezier(.3,.7,.2,1),width .28s,height .28s,opacity .25s}
+.blank-msg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;
+  font-size:clamp(1.6rem,3vw,3.2rem);color:var(--gap);opacity:0;transition:opacity .6s .9s}
+.blank-msg.on{opacity:1}
+.pick-out{position:absolute;right:0;top:-1rem;background:var(--accent);color:var(--on-accent);border-radius:14px;padding:.6rem 1.2rem;text-align:center;font-weight:900;font-stretch:120%;z-index:3;
+  transform:scale(.6);opacity:0;transition:transform .35s cubic-bezier(.3,1.5,.5,1),opacity .2s;pointer-events:none}
+.pick-out.on{transform:scale(1);opacity:1}
+.pick-out b{display:block;font-size:clamp(3rem,7vw,6.5rem);line-height:1}
+.pick-out span{font-size:1rem}
+
+.ring{position:relative;width:clamp(180px,17vw,300px);aspect-ratio:1;display:none}
+.writing .ring{display:block}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring circle{fill:none;stroke-width:10}
+.ring .track{stroke:var(--line)}
+.ring .prog{stroke:var(--accent);stroke-linecap:round;transition:stroke .3s}
+.ring.low .prog{stroke:var(--warn)}
+.ring .num{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring .num b{font-size:clamp(2.6rem,4.5vw,4.6rem);font-weight:900;font-stretch:115%;font-variant-numeric:tabular-nums;line-height:1}
+.ring .num span{color:var(--muted);font-weight:700}
+.ring .ringbtns{display:flex;gap:.4rem;justify-content:center;margin-top:.8rem}
+
+.stage-foot{display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;border-top:2px solid var(--line);padding-top:.9rem}
+.foot-left{display:flex;align-items:center;gap:.8rem;flex-wrap:wrap;font-weight:800;color:var(--muted);font-size:1.05rem}
+.pace{display:inline-flex;align-items:center;gap:.4rem}
+.pace output{min-width:6.5ch;text-align:center;color:var(--ink)}
+
+dialog{border:none;border-radius:16px;padding:2rem 2.2rem;max-width:min(820px,92vw);background:var(--panel);color:var(--ink)}
+dialog::backdrop{background:rgba(10,15,20,.6)}
+dialog h3{margin:0 0 .8rem;font-size:1.5rem}
+dialog ol{padding-left:1.3rem;font-size:1.05rem}
+dialog li{margin-bottom:.5rem}
+
+@media (max-width:1000px){
+  .setup-grid{grid-template-columns:1fr;gap:2rem}
+  main,.bar{padding-left:1rem;padding-right:1rem}
+  body::before{display:none}
+  .stage-body.writing{grid-template-columns:1fr}
+  .ring{margin:0 auto}
+}
+@media (prefers-reduced-motion: reduce){
+  .ch,.tok .line,#marker,.voice,.blank-msg,.pick-out{transition:none}
+}
+</style>
+</head>
+<body>
+<header class="bar">
+  <p class="brand">Vanishing Cues</p>
+  <p class="bar-status" id="status">Type or pick a phrase</p>
+  <div class="bar-actions">
+    <button class="icon-btn" id="howBtn" title="How to run it (H)">How to run it</button>
+    <button class="icon-btn" id="soundBtn" title="Chime when writing time ends">Sound on</button>
+    <button class="icon-btn" id="themeBtn">Light or dark</button>
+    <button class="icon-btn" id="fsBtn" title="Full screen (F)">Full screen</button>
+  </div>
+</header>
+
+<main>
+  <!-- SETUP -->
+  <section class="phase active" id="setup">
+    <div class="setup-grid">
+      <div>
+        <div class="phrase hero" id="hero"></div>
+        <p class="lede">Read it together, pass it round the room, watch it disappear, say it, then write it. Hover over any gap to bring a word back as a hint.</p>
+        <textarea id="phrase" spellcheck="true" placeholder="An object at rest stays at rest, and an object moving at a constant velocity stays at that velocity, unless acted on by a *resultant* *force*."></textarea>
+        <p class="hint">Put stars round key words, like *resultant*. They stay on the board longest and get highlighted when marking.</p>
+        <div class="opts">
+          <div class="opt">
+            <label for="mode">How words disappear</label>
+            <select id="mode">
+              <option value="mixed">Small words first, then first letters</option>
+              <option value="random">Random, more each time</option>
+              <option value="initials">Straight to first letters</option>
+              <option value="end">From the end backwards</option>
+              <option value="start">From the start forwards</option>
+            </select>
+          </div>
+          <div class="opt">
+            <label for="chunk">One turn each is</label>
+            <select id="chunk">
+              <option value="word">One word</option>
+              <option value="pair">Two words</option>
+              <option value="clause">One clause</option>
+            </select>
+          </div>
+          <div class="opt">
+            <label for="classSize">Class size</label>
+            <input type="number" id="classSize" min="1" max="40" value="30">
+          </div>
+          <div class="opt">
+            <label>&nbsp;</label>
+            <label class="toggle"><input type="checkbox" id="writing" checked> Include writing it down</label>
+          </div>
+        </div>
+        <div class="controls">
+          <button class="btn" id="start">Start</button>
+          <button class="btn ghost" id="save">Save to bank</button>
+          <button class="btn ghost" id="clear">Clear</button>
+        </div>
+      </div>
+      <aside class="bank">
+        <h3>Phrase bank</h3>
+        <ul id="bankList"></ul>
+        <p class="hint" id="bankNote"></p>
+      </aside>
+    </div>
+  </section>
+
+  <!-- RUN -->
+  <section class="phase" id="run">
+    <div class="stage-head">
+      <div>
+        <p class="stage-title" id="stageTitle"></p>
+        <p class="stage-cue hand" id="stageCue"></p>
+      </div>
+      <span class="voice" id="voice">Say it: <span class="hand" id="voiceText"></span></span>
+    </div>
+    <div class="dots" id="dots"></div>
+    <div class="stage-body" id="stageBody">
+      <div class="canvas-wrap" id="wrap">
+        <div id="marker"></div>
+        <div class="phrase" id="canvas"></div>
+        <div class="blank-msg hand" id="blankMsg">Nothing to see here</div>
+        <div class="pick-out" id="pickOut"><b id="pickNum">7</b><span>on your own</span></div>
+      </div>
+      <div class="ring" id="ring">
+        <svg viewBox="0 0 120 120"><circle class="track" cx="60" cy="60" r="52"/><circle class="prog" id="ringProg" cx="60" cy="60" r="52"/></svg>
+        <div class="num"><b id="ringNum">1:00</b><span id="ringLabel">writing</span></div>
+        <div class="ringbtns">
+          <button class="btn ghost small" id="ringPause">Pause</button>
+          <button class="btn ghost small" id="ringAdd">+30s</button>
+        </div>
+      </div>
+    </div>
+    <div class="stage-foot">
+      <div class="foot-left" id="footLeft"></div>
+      <div class="controls">
+        <button class="btn ghost small" id="back">Back</button>
+        <button class="btn ghost small" id="repeat">Replay step</button>
+        <button class="btn" id="next">Next</button>
+        <button class="btn ghost small" id="quit">New phrase</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<dialog id="how">
+  <h3>How to run it</h3>
+  <ol>
+    <li>Read it together, one voice, on your three, two, one.</li>
+    <li>One turn each: press Space and the highlight walks round the phrase by itself. Point at who's next. Space pauses.</li>
+    <li>Words vanish. Each time, the whole phrase gets said again, gaps included. The chip at the top right says how.</li>
+    <li>First letters only, then write it down using them.</li>
+    <li>Blank board. Say it together, then pick a number for someone solo.</li>
+    <li>Write it from memory, then check. Tick each word, circle the key words they missed.</li>
+  </ol>
+  <p class="hint">Hover the mouse over a gap to show that word faintly. Keys: Space next or start/pause the walk, arrows back and forward, R replays, V changes the voice, P picks a number, Esc goes back to the phrase.</p>
+  <button class="btn" id="closeHow" style="margin-top:1rem">Close</button>
+</dialog>
+
+<script>
+(function(){
+  const $ = s => document.querySelector(s);
+  const store = {
+    get(k,d){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; }catch(e){ return d; } },
+    set(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+  };
+  const reduced = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const cssVar = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+
+  const STARTERS = [
+    ['Newton\u2019s first law','An object at rest stays at rest, and an object moving at a constant velocity stays at that velocity, unless acted on by a *resultant* *force*.'],
+    ['Newton\u2019s second law','The *acceleration* of an object is *proportional* to the *resultant* *force* acting on it, and *inversely* *proportional* to its *mass*.'],
+    ['Newton\u2019s third law','When two objects interact, they exert *equal* and *opposite* forces on each other.'],
+    ['Specific heat capacity','The *energy* needed to raise the *temperature* of one *kilogram* of a substance by one *degree* Celsius.'],
+    ['Specific latent heat','The *energy* needed to change the *state* of one *kilogram* of a substance with no change in *temperature*.'],
+    ['Conservation of energy','Energy cannot be *created* or *destroyed*, only *transferred*, *stored* or *dissipated*.'],
+    ['Half-life','The *time* taken for the number of *unstable* *nuclei* in a sample to *halve*.'],
+    ['Ohmic conductor','The *current* through an ohmic conductor is *directly* *proportional* to the *potential* *difference* across it, provided the *temperature* stays *constant*.'],
+    ['What a wave does','A wave transfers *energy* from one place to another without transferring *matter*.'],
+    ['Momentum and force','The *rate* of *change* of *momentum* of an object is *directly* *proportional* to the *resultant* *force* and acts in the *same* *direction*.']
+  ];
+  const VOICES = ['whole class','left half only','right half only','whisper it','stand up, loud','half speed','as fast as you can','back row leads','boys then girls','teacher starts, you finish'];
+
+  const S = Object.assign({ mode:'mixed', chunk:'word', classSize:30, writing:true, pace:1.3, sound:true }, store.get('vc2-settings', {}));
+  const save = () => store.set('vc2-settings', S);
+  let bank = store.get('vc2-bank', null);
+  if(!bank){ bank = STARTERS.map(([t,p]) => ({ t, p })); store.set('vc2-bank', bank); }
+
+  /* ---------- Tokens ---------- */
+  const isAlnum = c => /[\p{L}\p{N}]/u.test(c);
+  function parse(text){
+    return text.trim().split(/\s+/).filter(Boolean).map(raw => {
+      const key = raw.includes('*');
+      return { w: raw.replace(/\*/g,''), key };
+    }).filter(t => t.w.length);
+  }
+  function buildTokens(container, toks){
+    container.innerHTML = '';
+    return toks.map((t,i) => {
+      const el = document.createElement('span');
+      el.className = 'tok';
+      el.dataset.i = i;
+      const chars = [...t.w].map(c => {
+        const s = document.createElement('span');
+        s.className = 'ch';
+        s.textContent = c;
+        s.dataset.p = isAlnum(c) ? '0' : '1';
+        el.appendChild(s);
+        return s;
+      });
+      const line = document.createElement('span');
+      line.className = 'line';
+      el.appendChild(line);
+      el.addEventListener('click', () => el.classList.toggle('peek'));
+      container.appendChild(el);
+      container.appendChild(document.createTextNode(' '));
+      return { el, chars, state:'show', key:t.key, w:t.w };
+    });
+  }
+  function visibleMask(tok, state){
+    let firstDone = false;
+    return tok.chars.map(ch => {
+      const p = ch.dataset.p === '1';
+      if(state === 'show') return true;
+      if(state === 'none') return false;
+      if(state === 'gap') return p;
+      /* initial */
+      if(p) return true;
+      if(!firstDone){ firstDone = true; return true; }
+      return false;
+    });
+  }
+  function setState(tok, state, animate, delay){
+    const before = visibleMask(tok, tok.state);
+    const after = visibleMask(tok, state);
+    tok.state = state;
+    tok.el.classList.toggle('lined', state === 'gap' || state === 'initial');
+    tok.el.classList.remove('peek');
+    const accent = cssVar('--accent');
+    tok.chars.forEach((ch,j) => {
+      ch.classList.toggle('off', !after[j]);
+      if(!animate || reduced || before[j] === after[j]) return;
+      if(before[j] && !after[j]){
+        const dx = (Math.random()-.5)*60, dy = -30 - Math.random()*70, rot = (Math.random()-.5)*90;
+        ch.animate([
+          { opacity:1, transform:'none', filter:'blur(0px)' },
+          { opacity:1, transform:'translateY(-3px)', color:accent, offset:.22 },
+          { opacity:0, transform:`translate(${dx}px,${dy}px) rotate(${rot}deg) scale(.35)`, filter:'blur(7px)' }
+        ], { duration: 900 + Math.random()*500, delay: delay + j*35 + Math.random()*120, easing:'cubic-bezier(.25,.6,.3,1)', fill:'backwards' });
+      } else {
+        ch.animate([
+          { opacity:0, transform:'translateY(.35em)', filter:'blur(6px)' },
+          { opacity:1, transform:'none', filter:'blur(0px)' }
+        ], { duration:450, delay: delay + j*20, easing:'ease-out', fill:'backwards' });
+      }
+    });
+  }
+
+  /* ---------- Hero ---------- */
+  function hero(){
+    const h = $('#hero');
+    const toks = buildTokens(h, parse('Vanishing cues'));
+    setTimeout(() => setState(toks[1], 'initial', true, 0), 900);
+  }
+
+  /* ---------- Bank ---------- */
+  const esc = s => s.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
+  function renderBank(){
+    const ul = $('#bankList');
+    ul.innerHTML = '';
+    bank.forEach((item,i) => {
+      const li = document.createElement('li');
+      const b = document.createElement('button');
+      b.className = 'pick';
+      const plain = item.p.replace(/\*/g,'');
+      b.innerHTML = '<span>' + esc(item.t) + '</span><small>' + esc(plain.slice(0,70)) + (plain.length > 70 ? '\u2026' : '') + '</small>';
+      b.addEventListener('click', () => { $('#phrase').value = item.p; });
+      const d = document.createElement('button');
+      d.className = 'del'; d.textContent = '\u00d7'; d.title = 'Remove from bank';
+      d.addEventListener('click', () => { bank.splice(i,1); store.set('vc2-bank', bank); renderBank(); });
+      li.append(b, d); ul.appendChild(li);
+    });
+    $('#bankNote').textContent = bank.length + ' saved on this computer. Click one to load it.';
+  }
+
+  /* ---------- Stages ---------- */
+  let toks = [], stages = [], si = 0, voiceIdx = 0;
+
+  function hideOrder(){
+    const n = toks.length, idx = [...Array(n).keys()];
+    const rnd = () => Math.random();
+    if(S.mode === 'end') return idx.slice().reverse();
+    if(S.mode === 'start') return idx;
+    if(S.mode === 'random'){
+      const a = idx.map(i => [i, (toks[i].key ? 1 : 0) + rnd()*.99]);
+      return a.sort((x,y) => x[1]-y[1]).map(x => x[0]);
+    }
+    /* mixed: short, non-key words first; key words last */
+    const a = idx.map(i => [i, (toks[i].key ? 100 : 0) + toks[i].w.length + rnd()*3]);
+    return a.sort((x,y) => x[1]-y[1]).map(x => x[0]);
+  }
+  function writeSecs(extra){
+    return Math.min(240, Math.max(45, Math.round(toks.length * 2.6 + 20 + extra)));
+  }
+  function build(){
+    const order = hideOrder();
+    const n = toks.length;
+    const gapSet = f => new Set(order.slice(0, Math.max(1, Math.round(n*f))));
+    const gapsState = set => i => set.has(i) ? 'gap' : 'show';
+    const st = [];
+    st.push({ kind:'full', title:'Read it together', cue:'One voice, on three, two, one.', state:() => 'show' });
+    st.push({ kind:'chain', title:'One turn each', cue:'Round the room. Keep it moving.', state:() => 'show' });
+    const gaps = (f, title) => st.push({ kind:'say', title, cue:'The whole thing again, gaps and all.', state:gapsState(gapSet(f)) });
+    if(S.mode === 'mixed'){ gaps(.3, 'The small words go'); gaps(.6, 'More of it goes'); }
+    else if(S.mode === 'random'){ gaps(.25, 'A quarter gone'); gaps(.5, 'Half gone'); gaps(.75, 'Three quarters gone'); }
+    else if(S.mode === 'end'){ gaps(.33, 'The ending goes'); gaps(.66, 'Most of it goes'); }
+    else if(S.mode === 'start'){ gaps(.33, 'The opening goes'); gaps(.66, 'Most of it goes'); }
+    if(S.mode === 'mixed' || S.mode === 'initials'){
+      st.push({ kind:'say', title:'First letters only', cue:'The letters are all you get now.', state:() => 'initial' });
+    }
+    if(S.writing){
+      const prev = st[st.length-1].state;
+      st.push({ kind:'write', title:'Write it down', cue:'Books out. Use what is left on the board.', state:prev, secs:writeSecs(0) });
+    }
+    st.push({ kind:'blank', title:'Nothing on the board', cue:'Say it together, then someone on their own.', state:() => 'none' });
+    if(S.writing){
+      st.push({ kind:'write', title:'Write it from memory', cue:'Cover what you wrote before. No peeking.', state:() => 'none', secs:writeSecs(15) });
+    }
+    st.push({ kind:'check', title:'Check it', cue:'Tick each word you got. Circle the missing ones.', state:() => 'show' });
+    return st;
+  }
+
+  /* ---------- Render stage ---------- */
+  function fit(){
+    const len = toks.map(t => t.w).join(' ').length;
+    const c = $('#canvas');
+    c.classList.toggle('wide', len > 150);
+    const v = len < 55 ? 5.6 : len < 100 ? 4.6 : len < 160 ? 3.8 : len < 240 ? 3.1 : 2.6;
+    c.style.fontSize = 'clamp(1.5rem,' + v + 'vw,' + (v*1.3).toFixed(1) + 'rem)';
+  }
+  function applyStage(animate){
+    const s = stages[si];
+    let k = 0;
+    toks.forEach((t,i) => {
+      const target = s.state(i);
+      if(t.state !== target){
+        setState(t, target, animate, (reduced ? 0 : k * 70));
+        k++;
+      }
+      t.el.classList.toggle('key-on', s.kind === 'check' && t.key);
+      t.el.classList.remove('past','lit');
+    });
+  }
+  function renderStage(animate){
+    stopChain(); stopRing();
+    const s = stages[si];
+    $('#stageTitle').textContent = s.title;
+    $('#stageCue').textContent = s.cue;
+    const showVoice = s.kind === 'say' || s.kind === 'blank' || s.kind === 'full';
+    $('#voice').hidden = !showVoice;
+    $('#voiceText').textContent = s.kind === 'full' ? 'whole class' : VOICES[voiceIdx % VOICES.length];
+    $('#status').textContent = 'Step ' + (si+1) + ' of ' + stages.length;
+
+    const dots = $('#dots'); dots.innerHTML = '';
+    stages.forEach((st,i) => {
+      const d = document.createElement('span');
+      d.className = (i < si ? 'done' : i === si ? 'now' : '') + (st.kind === 'write' ? ' w' : '');
+      dots.appendChild(d);
+    });
+
+    $('#stageBody').classList.toggle('writing', s.kind === 'write');
+    $('#blankMsg').classList.toggle('on', s.kind === 'blank' || (s.kind === 'write' && s.state(0) === 'none'));
+    $('#blankMsg').textContent = s.kind === 'write' ? 'Pens moving' : 'Say it from memory';
+    $('#pickOut').classList.remove('on');
+    $('#marker').style.opacity = 0;
+
+    applyStage(animate);
+
+    const fl = $('#footLeft'); fl.innerHTML = '';
+    if(s.kind === 'chain') setupChain();
+    else if(s.kind === 'blank'){
+      const b = document.createElement('button');
+      b.className = 'btn ghost small'; b.textContent = 'Pick a number (P)';
+      b.addEventListener('click', pick);
+      fl.appendChild(b);
+    }
+    else if(s.kind === 'write') startRing(s.secs);
+    else if(s.kind === 'check'){
+      const keys = toks.filter(t => t.key).map(t => t.w.replace(/[^\p{L}\p{N}-]/gu,''));
+      fl.textContent = 'Score out of ' + toks.length + '.' + (keys.length ? ' Key words: ' + [...new Set(keys)].join(', ') + '.' : '');
+    }
+  }
+
+  /* ---------- Chain walk ---------- */
+  const chain = { groups:[], at:-1, running:false, t:null, done:false };
+  function groups(){
+    const idx = toks.map((_,i) => i);
+    if(S.chunk === 'word') return idx.map(i => [i]);
+    if(S.chunk === 'pair'){ const o = []; for(let i=0;i<idx.length;i+=2) o.push(idx.slice(i,i+2)); return o; }
+    const o = []; let cur = [];
+    toks.forEach((t,i) => { cur.push(i); if(/[,;:.!?]$/.test(t.w)){ o.push(cur); cur = []; } });
+    if(cur.length) o.push(cur);
+    return o;
+  }
+  function setupChain(){
+    chain.groups = groups(); chain.at = -1; chain.running = false; chain.done = false;
+    renderChainFoot();
+  }
+  function renderChainFoot(){
+    const fl = $('#footLeft'); fl.innerHTML = '';
+    const lab = document.createElement('span');
+    lab.id = 'chainLab';
+    fl.appendChild(lab);
+    const pace = document.createElement('span');
+    pace.className = 'pace';
+    pace.innerHTML = '<button class="btn ghost small" id="slower">Slower</button><output id="paceOut"></output><button class="btn ghost small" id="faster">Faster</button>';
+    fl.appendChild(pace);
+    $('#slower').addEventListener('click', () => { S.pace = Math.min(4, +(S.pace + .2).toFixed(1)); save(); paceLabel(); });
+    $('#faster').addEventListener('click', () => { S.pace = Math.max(.5, +(S.pace - .2).toFixed(1)); save(); paceLabel(); });
+    paceLabel(); chainLabel();
+  }
+  function paceLabel(){ const o = $('#paceOut'); if(o) o.textContent = S.pace.toFixed(1) + ' s'; }
+  function chainLabel(){
+    const l = $('#chainLab'); if(!l) return;
+    if(chain.done) l.textContent = 'Everyone had a go. Space for the next step.';
+    else if(chain.at < 0) l.textContent = 'Space to start the walk';
+    else l.textContent = 'Person ' + (chain.at+1) + ' of ' + chain.groups.length + (chain.running ? '' : ', paused');
+  }
+  function paintChain(){
+    const g = chain.groups[chain.at] || [];
+    const first = g.length ? g[0] : toks.length;
+    toks.forEach((t,i) => {
+      t.el.classList.toggle('lit', g.includes(i));
+      t.el.classList.toggle('past', i < first);
+    });
+    const m = $('#marker');
+    if(!g.length){ m.style.opacity = 0; chainLabel(); return; }
+    const wrap = $('#wrap').getBoundingClientRect();
+    let L=Infinity,T=Infinity,R=-Infinity,B=-Infinity;
+    g.forEach(i => { const r = toks[i].el.getBoundingClientRect(); L=Math.min(L,r.left); T=Math.min(T,r.top); R=Math.max(R,r.right); B=Math.max(B,r.bottom); });
+    const pad = 8;
+    m.style.left = (L - wrap.left - pad) + 'px';
+    m.style.top = (T - wrap.top - pad/2) + 'px';
+    m.style.width = (R - L + pad*2) + 'px';
+    m.style.height = (B - T + pad) + 'px';
+    m.style.opacity = 1;
+    chainLabel();
+  }
+  function chainStep(){
+    chain.at++;
+    if(chain.at >= chain.groups.length){
+      chain.running = false; chain.done = true;
+      toks.forEach(t => t.el.classList.remove('lit','past'));
+      $('#marker').style.opacity = 0;
+      chainLabel(); return;
+    }
+    paintChain();
+    if(chain.running){
+      const letters = chain.groups[chain.at].reduce((a,i) => a + toks[i].w.length, 0);
+      chain.t = setTimeout(chainStep, (S.pace + Math.max(0, letters - 5) * .06) * 1000);
+    }
+  }
+  function toggleChain(){
+    if(chain.done){ go(1); return; }
+    if(chain.running){ chain.running = false; clearTimeout(chain.t); chainLabel(); return; }
+    chain.running = true;
+    chainStep();
+  }
+  function stopChain(){ chain.running = false; clearTimeout(chain.t); }
+
+  /* ---------- Writing timer ---------- */
+  const ring = { total:0, left:0, end:0, running:false, raf:0 };
+  const CIRC = 2 * Math.PI * 52;
+  $('#ringProg').style.strokeDasharray = CIRC;
+  function startRing(secs){
+    ring.total = ring.left = secs*1000; ring.running = true; ring.end = performance.now() + ring.left;
+    $('#ringPause').textContent = 'Pause';
+    $('#ringLabel').textContent = 'writing';
+    loopRing();
+  }
+  function loopRing(){
+    if(ring.running) ring.left = Math.max(0, ring.end - performance.now());
+    const s = Math.ceil(ring.left/1000);
+    $('#ringNum').textContent = Math.floor(s/60) + ':' + String(s%60).padStart(2,'0');
+    $('#ringProg').style.strokeDashoffset = CIRC * (1 - ring.left / ring.total);
+    $('#ring').classList.toggle('low', s <= 10);
+    if(ring.running && ring.left <= 0){
+      ring.running = false; chime();
+      $('#ringLabel').textContent = 'pens down';
+      $('#stageCue').textContent = 'Pens down.';
+      return;
+    }
+    if(ring.running) ring.raf = requestAnimationFrame(loopRing);
+  }
+  function stopRing(){ ring.running = false; cancelAnimationFrame(ring.raf); }
+  $('#ringPause').addEventListener('click', () => {
+    if(ring.running){ ring.running = false; cancelAnimationFrame(ring.raf); $('#ringPause').textContent = 'Resume'; }
+    else if(ring.left > 0){ ring.running = true; ring.end = performance.now() + ring.left; $('#ringPause').textContent = 'Pause'; loopRing(); }
+  });
+  $('#ringAdd').addEventListener('click', () => {
+    ring.left += 30000; ring.total = Math.max(ring.total, ring.left);
+    if(ring.running) ring.end += 30000;
+    else { ring.running = true; ring.end = performance.now() + ring.left; $('#ringPause').textContent = 'Pause'; $('#ringLabel').textContent = 'writing'; }
+    loopRing();
+  });
+
+  /* ---------- Sound ---------- */
+  let actx = null;
+  function chime(){
+    if(!S.sound) return;
+    try{
+      actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+      [660, 880, 1320].forEach((f,i) => {
+        const o = actx.createOscillator(), g = actx.createGain(), t = actx.currentTime + i*.16;
+        o.frequency.value = f; g.gain.setValueAtTime(.16, t); g.gain.exponentialRampToValueAtTime(.0001, t + .6);
+        o.connect(g); g.connect(actx.destination); o.start(t); o.stop(t + .65);
+      });
+    }catch(e){}
+  }
+  function renderSound(){ $('#soundBtn').textContent = S.sound ? 'Sound on' : 'Sound off'; }
+
+  /* ---------- Flow ---------- */
+  function go(d){
+    const n = si + d;
+    if(n < 0 || n >= stages.length) return;
+    si = n;
+    if(d > 0) voiceIdx++;
+    renderStage(true);
+  }
+  function primary(){
+    const s = stages[si];
+    if(s.kind === 'chain') toggleChain();
+    else go(1);
+  }
+  function replay(){
+    const s = stages[si];
+    if(s.kind === 'chain'){ setupChain(); toks.forEach(t => t.el.classList.remove('lit','past')); $('#marker').style.opacity = 0; return; }
+    const prev = si > 0 ? stages[si-1] : null;
+    toks.forEach((t,i) => setState(t, prev ? prev.state(i) : 'show', false, 0));
+    requestAnimationFrame(() => renderStage(true));
+  }
+  function pick(){
+    if(stages[si].kind !== 'blank') return;
+    $('#pickNum').textContent = 1 + Math.floor(Math.random() * Math.max(1, S.classSize));
+    const p = $('#pickOut'); p.classList.remove('on'); void p.offsetWidth; p.classList.add('on');
+  }
+  function start(){
+    const text = $('#phrase').value.trim() || $('#phrase').placeholder;
+    const parsed = parse(text);
+    if(parsed.length < 3){ $('#status').textContent = 'Needs at least three words'; return; }
+    show('run');
+    toks = buildTokens($('#canvas'), parsed);
+    fit();
+    stages = build(); si = 0; voiceIdx = 0;
+    renderStage(false);
+    toks.forEach((t,k) => t.chars.forEach((ch,j) => {
+      if(!reduced) ch.animate([{opacity:0, transform:'translateY(.4em)'},{opacity:1, transform:'none'}], {duration:420, delay:k*45 + j*10, easing:'ease-out', fill:'backwards'});
+    }));
+  }
+  function show(id){ document.querySelectorAll('.phase').forEach(p => p.classList.toggle('active', p.id === id)); }
+  function toSetup(){ stopChain(); stopRing(); show('setup'); $('#status').textContent = 'Type or pick a phrase'; }
+
+  /* ---------- Wiring ---------- */
+  $('#start').addEventListener('click', start);
+  $('#clear').addEventListener('click', () => { $('#phrase').value = ''; $('#phrase').focus(); });
+  $('#save').addEventListener('click', () => {
+    const p = $('#phrase').value.trim(); if(!p) return;
+    const t = p.replace(/\*/g,'').split(/\s+/).slice(0,4).join(' ').replace(/[,.;:]$/,'');
+    bank.unshift({ t, p }); store.set('vc2-bank', bank); renderBank();
+    $('#status').textContent = 'Saved to the bank';
+  });
+  $('#mode').addEventListener('change', e => { S.mode = e.target.value; save(); });
+  $('#chunk').addEventListener('change', e => { S.chunk = e.target.value; save(); });
+  $('#classSize').addEventListener('change', e => { S.classSize = Math.max(1, Number(e.target.value) || 30); save(); });
+  $('#writing').addEventListener('change', e => { S.writing = e.target.checked; save(); });
+  $('#next').addEventListener('click', primary);
+  $('#back').addEventListener('click', () => go(-1));
+  $('#repeat').addEventListener('click', replay);
+  $('#quit').addEventListener('click', toSetup);
+  $('#soundBtn').addEventListener('click', () => { S.sound = !S.sound; save(); renderSound(); });
+
+  const how = $('#how');
+  $('#howBtn').addEventListener('click', () => how.showModal());
+  $('#closeHow').addEventListener('click', () => how.close());
+
+  const root = document.documentElement;
+  const th = store.get('vc2-theme', null); if(th) root.setAttribute('data-theme', th);
+  $('#themeBtn').addEventListener('click', () => {
+    const cur = root.getAttribute('data-theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    const nx = cur === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', nx); store.set('vc2-theme', nx);
+  });
+  const fs = () => { try{ document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen(); }catch(e){} };
+  $('#fsBtn').addEventListener('click', fs);
+  window.addEventListener('resize', () => { if(stages[si] && stages[si].kind === 'chain' && chain.at >= 0 && !chain.done) paintChain(); });
+
+  document.addEventListener('keydown', e => {
+    const tag = e.target.tagName;
+    if(tag === 'TEXTAREA' || tag === 'INPUT' || tag === 'SELECT' || how.open) return;
+    const running = $('#run').classList.contains('active');
+    const k = e.key.toLowerCase();
+    if(k === 'f'){ fs(); return; }
+    if(k === 'h'){ how.showModal(); return; }
+    if(!running) return;
+    if(k === ' '){ e.preventDefault(); primary(); }
+    else if(e.key === 'ArrowRight'){ e.preventDefault(); go(1); }
+    else if(e.key === 'ArrowLeft'){ e.preventDefault(); go(-1); }
+    else if(k === 'r') replay();
+    else if(k === 'v' && !$('#voice').hidden){ voiceIdx++; $('#voiceText').textContent = VOICES[voiceIdx % VOICES.length]; const v = $('#voice'); v.classList.remove('bump'); void v.offsetWidth; v.classList.add('bump'); setTimeout(() => v.classList.remove('bump'), 260); }
+    else if(k === 'p') pick();
+    else if(e.key === 'Escape') toSetup();
+  });
+
+  $('#mode').value = S.mode; $('#chunk').value = S.chunk; $('#classSize').value = S.classSize; $('#writing').checked = S.writing;
+  renderSound(); renderBank(); hero();
+})();
+</script>
+</body>
+</html>
