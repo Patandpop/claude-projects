@@ -38,6 +38,14 @@ Plain-English record of the build list in `FABLE-WORKPLAN.md`, newest entry firs
 
 ---
 
+## 29 Oct 2026, item 1.5: an old planner tab can no longer wipe newer ticks
+
+**What changed:** before, every save sent the whole list of lesson ticks and replaced what was there, so a planner tab left open at school could put its older list back over ticks you made at home. Now only the ticks that changed travel, and they are merged lesson by lesson, so two open copies ticking different lessons both land. Every saved week and every lesson tick carries the moment it was saved; the page gets those with the data and sends them back with each save, and the server refuses to write over anything saved since the page loaded. When that happens the page shows a red "NOT saved: this page is out of date" with "Reload the page, then make your change again", does not retry, and keeps your change unsaved so nothing is lost silently. After a successful save the page also takes in any ticks made elsewhere, so the two copies drift back together without a reload. Checked with two simulated tabs on the server side and in a real browser.
+
+**You need to:** nothing now. It goes into the next complete paste set. An older pasted planner page keeps working as before (it sends no stamps, so it is not checked).
+
+**Save:** 88ed1abd.
+
 ## 29 Oct 2026, item 1.2: failed tick saves
 
 **What changed:** when the planner saves, three parts travel to Google: this week's plan, the lesson ticks, and any later weeks that slid along. Before, only the first part was watched; a failed tick save vanished silently. Now every part is retried once, the status reads "All changes saved" only when all three have landed, a failed part shows a red "NOT saved" naming it (and the page stays unsaved so Ctrl+S or your next change sends it again), and the "leave this page?" warning stays on while a save is still travelling. A browser test fakes each failure and checks all of this.
