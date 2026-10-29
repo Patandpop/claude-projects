@@ -21,7 +21,7 @@ const MODES = {
   work:      { label: 'Silent work',  max: 1200 },
   entry:     { label: 'Silent entry', max: 900 }   // ends itself once the class is silent, like the countdown
 };
-const DEFAULTS = { STANDARD: 90, STEP: 3, SENSITIVITY: 'Medium', COUNTDOWN_SECS: 3, EMAIL_GAP_DAYS: 21, LOST_GOAL_SECS: 180 };
+const DEFAULTS = { STANDARD: 90, STEP: 3, SENSITIVITY: 'Medium', COUNTDOWN_SECS: 3, EMAIL_GAP_DAYS: 21, LOST_GOAL_SECS: 180, SIGN_OFF: '' };   // SIGN_OFF: the name under Friday messages home (2.8)
 const LOG_TAIL = 8000;
 // Sheets reads a cell that starts with + or - as a formula, which turned every saved positive into #ERROR!.
 // So the Log stores words, and the app turns them back into symbols when it reads.
@@ -552,7 +552,7 @@ function getFriday(k) {
       const days = le ? Math.floor((now - le) / 86400000) : null;
       return { name: x.name, pos: pos[x.name] || 0, emailed: le ? Utilities.formatDate(le, TZ, 'd MMM') : '', recent: days !== null && days < gap };
     });
-    return { cls: cls, fortnight: FORTNIGHTLY.indexOf(cls) !== -1, goal: goal, students: students };
+    return { cls: cls, fortnight: FORTNIGHTLY.indexOf(cls) !== -1, goal: goal, students: students, signOff: String(s.SIGN_OFF || '') };
   });
 }
 

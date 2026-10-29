@@ -317,6 +317,9 @@
       <h2>Email list</h2>
       <textarea id="listText" readonly></textarea>
       <button class="cta alt" id="copy">Copy names</button>
+      <h2>Messages home <small>(drafts: check them, then send through the school's system)</small></h2>
+      <textarea id="msgText"></textarea>
+      <button class="cta alt" id="copyMsg">Copy messages</button>
       <button class="cta" id="mark">Mark as emailed</button>
       <button class="cancel" id="backPick">Back to picking</button>
     </div>
@@ -875,7 +878,28 @@ $('makeList').onclick = () => {
   const lines = [];
   S.fri.forEach(c => { const p = S.picks[c.cls] || []; if (p.length && !S.skip[c.cls]) { lines.push(c.cls); p.forEach(n => lines.push(n)); lines.push(''); } });
   $('listText').value = lines.join('\n').trim();
+  $('msgText').value = friMessages(S.fri, S.picks, S.skip);
   $('fri').classList.add('hidden'); $('makeList').classList.add('hidden'); $('friList').classList.remove('hidden');
+};
+/* Friday messages home (workplan 2.8, 2026-10-29): one short positive message per ticked pupil, from this
+   week's positives and the class's silent-work goal. Drafts only: he edits and sends them through the
+   school's system; nothing is sent from here. Names stay on the school account (this page). */
+function firstName(n) { const t = String(n).trim(); return t.includes(',') ? t.split(',')[1].trim().split(/\s+/)[0] : t.split(/\s+/)[0]; }
+function friMessage(c, st) {
+  const f = firstName(st.name);
+  const did = st.pos > 0 ? `${f} earned ${st.pos} positive point${st.pos === 1 ? '' : 's'} in our science lessons this week` : `${f} has worked really well in our science lessons this week`;
+  const goal = c.goal && c.goal.status === 'hit' && c.goal.pct != null ? ` The class also met its silent-work goal (quiet for ${c.goal.pct}% of silent work time), and ${f} played a big part in that.` : '';
+  return `Dear parent or carer,\n\nI wanted to let you know that ${did}.${goal} Well done to ${f}.\n\nThank you,${c.signOff ? '\n' + c.signOff : ''}`;
+}
+function friMessages(fri, picks, skip) {
+  const out = [];
+  fri.forEach(c => { if (skip[c.cls]) return; (picks[c.cls] || []).forEach(n => { const st = c.students.find(x => x.name === n) || { name: n, pos: 0 }; out.push(`${c.cls}: ${n}\n${friMessage(c, st)}`); }); });
+  return out.join('\n\n----------\n\n');
+}
+$('copyMsg').onclick = async () => {
+  const ta = $('msgText');
+  try { await navigator.clipboard.writeText(ta.value); snack('Copied'); }
+  catch (e) { ta.select(); const ok = document.execCommand('copy'); snack(ok ? 'Copied' : 'Select the text and copy it'); }
 };
 $('backPick').onclick = () => { $('fri').classList.remove('hidden'); $('friList').classList.add('hidden'); renderFriday(); };
 $('copy').onclick = async () => {

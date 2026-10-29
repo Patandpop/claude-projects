@@ -77,6 +77,7 @@ ok('ending a silence clears a pause', md.paused === false && !m.props.PAUSE);
 api.stopTimer(k);
 
 ok('Friday goal is a fixed 80% and this class hit it', api.getFriday(k).find(c => c.cls === '7BYA').goal.status === 'hit');
+ok('2.8: each Friday class carries the sign-off for messages home (empty until SIGN_OFF is set)', api.getFriday(k).every(c => typeof c.signOff === 'string'));
 // time lost (2026-10-24): one tap counts up, a second tap saves the seconds; the Friday goal includes it
 md = api.setLost(k, '7BYA', true); ok('Talking: the count starts and the phone and board see it', md.lost && md.lost.cls === '7BYA');
 md = api.setLost(k, '7BYA', true); ok('a second start does not restart the count', md.lost.start === JSON.parse(m.props.LOST).start);

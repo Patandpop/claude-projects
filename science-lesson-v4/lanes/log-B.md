@@ -6,7 +6,7 @@ Plain-English record of Lane B's work, newest entry first. Each entry says what 
 
 1. **Approve the builder plan for item 1.8 (A-level Drive address).** It touches the lesson builder, so it waits for your yes. The problem: for a Year 12 or 13 lesson the builder writes the wrong Drive address into the two small note files beside the lesson (it says "Year 13/Physics/Chapter 20 ...", but on Drive there is no Physics level and the chapters sit inside Module folders). The files still land in the right place, but the planner uses that note to attach each lesson's multiple-choice questions for the phone voter, so 12C and 13D lessons get none, and the school push uses the same wrong address. The plan: (1) for Year 12 or 13 the builder asks the uploader's own chapter lookup for the real folder and writes that into both notes (when Drive is not reachable it works out the module from the chapter-to-module table the October reorganisation used); (2) check the planner finds 12C and 13D lessons by that address; (3) add a 13D test lesson so it cannot slip back. Nothing on Drive is created, moved or renamed. Reply "yes to 1.8".
 2. **OK to write the Do Now mix rule into SKILL.md?** The picker now aims for 4 short recall questions, one 2-mark explain and one calculation (item 2.1). The plan says the rule only goes into the skill notes with your OK. Reply "yes to the mix rule".
-3. **Next paste set (Lane A makes it):** my planner changes from items 2.2, 2.3, 2.4 and 2.7 (Planner.html, Code.gs) need to go into the next complete set.
+3. **Next paste set (Lane A makes it):** my planner changes from items 2.2, 2.3, 2.4, 2.7 and 2.8 (Planner.html, Code.gs, Phone.html, Behaviour.gs) need to go into the next complete set.
 
 4. **Approve the builder plan for items 2.5 and 2.6 (lesson builder fixes).** They touch the lesson builder, so they wait for your yes. I checked the code itself, since the two audits disagree. What I would change, one at a time, with a test for each:
    - **Sentence starters:** the standard sheet still shows them on its easiest tier (and on any 4+ mark question). Move them to the support sheet only, except where a lesson asks for them on purpose.
@@ -22,13 +22,21 @@ Plain-English record of Lane B's work, newest entry first. Each entry says what 
 5. **Technicians' email addresses (item 2.7):** for the order sheet email draft. Send them to me, or add them as the TECH_EMAILS script property in Apps Script (commas between).
 
 ---
+## 29 Oct 2026, item 2.8: Friday messages home, drafted
+
+**What changed:** on the phone's Friday tab, after you tick pupils and press "Make email list", a new box "Messages home" holds one short positive message for each ticked pupil, ready to check, change and copy into the school's system. Each uses the pupil's first name and how many positive points they earned this week (or "has worked really well" if none were logged), and mentions the class's silent-work goal when the class met it. You can edit the text before copying. Nothing is sent, and nothing is marked as emailed until you press "Mark as emailed" as before.
+
+**You need to:** if you want your name under the messages, add a row to the behaviour Settings tab: SIGN_OFF, then how you sign (for example "Mr Tomczynski"). Until then they end with "Thank you,".
+
+**Save:** see the history line "Friday messages home drafted".
+
 ## 29 Oct 2026, item 2.7: the order sheet as an email draft
 
 **What changed:** the planner menu has a new "Order sheet email" button beside "Technicians' Excel". It makes the same one-page order sheet and puts it in a Gmail draft (subject: the sheet's title, a two-line note, the spreadsheet attached). It never sends: you open Gmail, check it and press Send. Each draft is written in the planner's Log tab, and it counts for Ulhu's order sheet ritual like a download does.
 
 **You need to:** (1) when you paste it, Google will ask once for permission to make Gmail drafts; say yes. (2) give me the technicians' email addresses, or add them yourself in Apps Script (Project Settings, Script properties, name TECH_EMAILS, the addresses with commas between them). Until then the draft has no "To" and the planner tells you so.
 
-**Save:** see the history line "Order sheet email draft".
+**Save:** cc1df6b6.
 
 ## 29 Oct 2026, item 2.4: homework on the lesson card
 
