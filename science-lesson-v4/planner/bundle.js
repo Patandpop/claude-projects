@@ -30,6 +30,7 @@ const files = {};
 files['Code.gs'] = read('Code.gs');
 files['Planner.html'] = read('Planner.html');
 files['Logic.html'] = '<script>\n' + read('logic.js') + '\n</script>\n';
+files['Memory.gs'] = read('memory.js');   // the memory map maths (big goal 1): a server file, PlannerMemory, used by Code.gs's daily update
 // the behaviour app is part of the planner since 2026-10-12
 ['Behaviour.gs', 'Phone.html', 'BoardPage.html'].forEach((f) => { files[f] = read(f); });
 // Ulhu's Rituals (2026-10-23): Game.gs = the server; game-ui.js goes into Planner.html and Phone.html at <!--GAME_UI-->
