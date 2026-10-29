@@ -1,0 +1,189 @@
+{
+ "note": "Written by Claude, NOT real exam questions. Optional extras only (mcq-written.js).",
+ "questions": [
+  {
+   "written": true,
+   "made": "2026-10-10",
+   "board": "OCR A",
+   "level": "A",
+   "subject": "Physics",
+   "topic": "Cosmology",
+   "stem": "A galaxy is 150 Mpc from Earth. The Hubble constant is 70 km s^−1 Mpc^−1. What is the recession speed of the galaxy in km s^−1?",
+   "options": [
+    "2.1",
+    "1.1 × 10^4",
+    "1.1 × 10^7",
+    "1.1 × 10^10"
+   ],
+   "answer": "B",
+   "rule": "number options: one real slip each, smallest to largest, same unit",
+   "wrong": {
+    "A": "divided the distance by H0 instead of multiplying",
+    "C": "converted km to m but kept the unit km s^−1",
+    "D": "converted Mpc to pc before multiplying"
+   },
+   "id": "written-2026-10-10-1"
+  },
+  {
+   "written": true,
+   "made": "2026-10-10",
+   "board": "OCR A",
+   "level": "A",
+   "subject": "Physics",
+   "topic": "Stars",
+   "stem": "The peak wavelength of light from star X is 480 nm. Star Y has half the surface temperature of star X. What is the peak wavelength of light from star Y?",
+   "options": [
+    "240 nm",
+    "480 nm",
+    "960 nm",
+    "1920 nm"
+   ],
+   "answer": "C",
+   "rule": "number options: one real slip each (Wien: λ ∝ 1/T)",
+   "wrong": {
+    "A": "thought λmax is proportional to T",
+    "B": "thought λmax depends only on the element, not temperature",
+    "D": "used λmax ∝ 1/T^2"
+   },
+   "id": "written-2026-10-10-2"
+  },
+  {
+   "written": true,
+   "made": "2026-10-10",
+   "board": "OCR A",
+   "level": "A",
+   "subject": "Physics",
+   "topic": "Stars",
+   "stem": "Two stars have the same radius. Star P has twice the surface temperature of star Q. What is the luminosity of P divided by the luminosity of Q?",
+   "options": [
+    "2",
+    "4",
+    "8",
+    "16"
+   ],
+   "answer": "D",
+   "rule": "number options: wrong powers of T (Stefan: L ∝ r^2 T^4)",
+   "wrong": {
+    "A": "thought L is proportional to T",
+    "B": "squared T (confused with the r^2 term)",
+    "C": "cubed T"
+   },
+   "id": "written-2026-10-10-3"
+  },
+  {
+   "written": true,
+   "made": "2026-10-10",
+   "board": "OCR A",
+   "level": "A",
+   "subject": "Physics",
+   "topic": "Cosmology",
+   "stem": "Which observation is evidence that the Universe was once very hot and dense?",
+   "options": [
+    "the cosmic microwave background radiation",
+    "the absorption lines in the Sun's spectrum",
+    "the parallax of nearby stars over one year",
+    "the luminosity of main sequence stars"
+   ],
+   "answer": "A",
+   "rule": "word options: parallel wording, similar lengths, each a real but wrong piece of astrophysics evidence",
+   "wrong": {
+    "B": "spectral lines show what a star is made of, not the Universe's past",
+    "C": "parallax measures distance only",
+    "D": "luminosity describes single stars"
+   },
+   "id": "written-2026-10-10-4"
+  },
+  {
+   "written": true,
+   "made": "2026-10-10",
+   "board": "AQA",
+   "level": "GCSE",
+   "subject": "Physics",
+   "topic": "Energy",
+   "stem": "A car of mass 1200 kg moves at 10 m/s. What is its kinetic energy?",
+   "options": [
+    "6000 J",
+    "12 000 J",
+    "60 000 J",
+    "120 000 J"
+   ],
+   "answer": "C",
+   "rule": "number options: forgot to square v, forgot the ½, smallest to largest",
+   "wrong": {
+    "A": "did not square the speed",
+    "B": "did not square the speed and left out the ½",
+    "D": "left out the ½"
+   },
+   "id": "written-2026-10-10-5"
+  },
+  {
+   "written": true,
+   "made": "2026-10-10",
+   "board": "AQA",
+   "level": "GCSE",
+   "subject": "Physics",
+   "topic": "Energy",
+   "stem": "A kettle transfers 180 000 J of energy in 60 s. What is the power of the kettle?",
+   "options": [
+    "3 W",
+    "3000 W",
+    "180 000 W",
+    "10 800 000 W"
+   ],
+   "answer": "B",
+   "rule": "number options: power of ten, forgot to divide, multiplied instead",
+   "wrong": {
+    "A": "used 180 kJ as 180 J",
+    "C": "forgot to divide by the time",
+    "D": "multiplied by the time instead of dividing"
+   },
+   "id": "written-2026-10-10-6"
+  },
+  {
+   "written": true,
+   "made": "2026-10-10",
+   "board": "AQA",
+   "level": "GCSE",
+   "subject": "Physics",
+   "topic": "Energy",
+   "stem": "A spring is stretched. Which energy store of the spring increases?",
+   "options": [
+    "elastic potential store",
+    "gravitational potential store",
+    "thermal energy store",
+    "kinetic energy store"
+   ],
+   "answer": "A",
+   "rule": "word options: one-word near miss (elastic / gravitational potential)",
+   "wrong": {
+    "B": "mixed up the two potential stores",
+    "C": "thought stretching mainly heats the spring",
+    "D": "thought anything that moves gains kinetic energy at the end"
+   },
+   "id": "written-2026-10-10-7"
+  },
+  {
+   "written": true,
+   "made": "2026-10-10",
+   "board": "AQA",
+   "level": "GCSE",
+   "subject": "Physics",
+   "topic": "Energy",
+   "stem": "Which quantity is the energy needed to raise the temperature of 1 kg of a substance by 1 °C?",
+   "options": [
+    "specific latent heat",
+    "thermal conductivity",
+    "internal energy",
+    "specific heat capacity"
+   ],
+   "answer": "D",
+   "rule": "word options: near miss (specific latent heat), related quantities",
+   "wrong": {
+    "A": "confused raising temperature with changing state",
+    "B": "confused how fast energy flows with how much is needed",
+    "C": "picked the general term for stored particle energy"
+   },
+   "id": "written-2026-10-10-8"
+  }
+ ]
+}

@@ -35,6 +35,28 @@ const words = (s) => [...new Set(String(s || '').toLowerCase().replace(/[^a-z0-9
 const readJson = (f, d) => { try { return JSON.parse(fs.readFileSync(f, 'utf8')); } catch (_) { return d; } };
 const norm = (s) => String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
 
+// The questions this class has had (or has now) as homework or exam practice, by their wording
+// (2026-10-10): a Do Now never repeats them, so it neither gives away homework that is not yet due
+// nor counts as "retrieval" a question the pupils just did at home. exam-usage.json holds library
+// refs ("doc#Q5b", or "doc#Q5" for a whole question); the Do Now bank names questions its own way,
+// so the match is on the first words of the question.
+const HW_KEY = (s) => norm(String(s || '').replace(/\[(FIG|TABLE):\d+\]/g, ' ')).slice(0, 60);
+function homeworkKeys(cls, usage) {
+  const u = usage || readJson(path.join(ROOT, 'exam-usage.json'), {});
+  const refs = [...(u[cls + ':homework'] || []), ...(u[cls + ':test'] || [])];
+  const keys = new Set(), docs = new Map();
+  for (const r of refs) {
+    const m = /^(.*)#Q(\d+)(.*)$/.exec(String(r).replace(/\.json#Q/, '#Q'));
+    if (!m) continue;
+    if (!docs.has(m[1])) docs.set(m[1], readJson(path.join(ROOT, 'exam-library', 'docs', m[1] + '.json'), null) || readJson(path.join(ROOT, 'exam-library', 'docs-ocr', m[1] + '.json'), null));
+    const d = docs.get(m[1]);
+    if (!d) continue;
+    d.parts.filter((p) => p.question === +m[2] && (!m[3] || (p.part || '') === m[3])).forEach((p) => keys.add(HW_KEY(p.text)));
+  }
+  keys.delete('');
+  return keys;
+}
+
 function savedWeeks() {
   for (const dir of [SYNC, SYNC.replace('Beechen Cliff Science\\', 'Beechen Cliff Science (1)\\')]) {
     const st = readJson(path.join(dir, 'planner-state.json'), null);
@@ -67,18 +89,27 @@ function lessonInfo(L, year) {
 // Best matching lesson for a question (2026-10-08, tightened after "ethanol" matched Latent Heat):
 // same subject; for an AQA question and a Year 9-11 lesson, the same exam topic; then shared words,
 // with the question's own topic name counting double. Needs a real match, or the question is unused.
+// Word hits that forgive spelling slips in folder names ("Photosythesis", "Strucutre"): long words
+// match on their first 6 letters (2026-10-09: 8AG/8XP got 2 Do Now questions because of this).
+const pre = (set) => new Set([...set].filter((w) => w.length >= 6).map((w) => w.slice(0, 6)));
+const hits = (lw, set, ps) => lw.filter((w) => set.has(w) || (w.length >= 6 && ps.has(w.slice(0, 6)))).length;
 function bestLesson(q, lessons) {
-  const tw = new Set(words((q.topic || '') + ' ' + (q.lesson || '')));
+  // Your own Do Nows are ABOUT older lessons, not the lesson they were asked in (q.lesson), so only
+  // their words count (2026-10-09: none of them ever matched before).
+  const own = q.source === 'own';
+  const tw = new Set(own ? [] : words((q.topic || '') + ' ' + (q.lesson || '')));
   const xw = new Set(words(q.text || ''));
+  const tp = pre(tw), xp = pre(xw);
   let best = null, bs = 0;
   for (const L of lessons) {
     if (q.subject && L.subject && q.subject !== L.subject) continue;
     if (q.unit && L.aqa && q.board !== 'OCR A' && q.unit !== L.aqa) continue;
-    const th = L.words.filter((w) => tw.has(w)).length, xh = L.words.filter((w) => xw.has(w)).length;
+    if (own && q.askedAt && L.date && L.date >= q.askedAt) continue;   // must be taught before it was asked
+    const th = hits(L.words, tw, tp), xh = hits(L.words, xw, xp);
     const sc = 2 * th + xh;
     // Years 7-8 lessons (no exam-topic check) need the question's topic name to match too
     // the question's own words must touch the lesson too (a topic name like "Cell Structure" alone is too broad)
-    const ok = xh >= 1 && (L.aqa || q.board === 'OCR A' ? (th >= 1 ? sc >= 3 : xh >= 3) : th >= 1 && sc >= 3);
+    const ok = own ? xh >= 1 : xh >= 1 && (L.aqa || q.board === 'OCR A' ? (th >= 1 ? sc >= 3 : xh >= 3) : th >= 1 && sc >= 3);
     if (ok && sc > bs) { bs = sc; best = L; }
   }
   return best;
@@ -99,7 +130,7 @@ function pick(cls, opts) {
   const c = data.classes[cls];
   const bank = (readJson(path.join(__dirname, 'question-bank', cls + '.json'), {}).questions || []);
   const own = ((readJson(path.join(BRIEF, 'do-now-own.json'), {}).classes || {})[cls] || [])
-    .map((r, i) => ({ id: 'own-' + cls + '-' + i, text: r.q, answer: r.a, lesson: r.lesson, topic: r.lesson, source: 'own' }))
+    .map((r, i) => ({ id: 'own-' + cls + '-' + i, text: r.q, answer: r.a, lesson: r.lesson, topic: r.lesson, askedAt: r.date || null, source: 'own' }))
     .filter((q) => q.answer);
   const lessons = taughtLessons(data, cls, date, o.weeks || savedWeeks());
   if (!lessons.length) return { picked: [], why: 'nothing taught yet' };
@@ -110,8 +141,10 @@ function pick(cls, opts) {
   const recent = new Set(log.flatMap((r) => (r.doNow || []).map((q) => norm(q.q))));
 
   // A Do Now is read off the board: no figures or tables pupils can't see, and a complete answer.
-  const usable = (q) => q.source === 'own' || (!/\b(figure|fig\.|table|graph|diagram|shown|box below)\b/i.test(q.text) && String(q.answer || '').trim().length > 1 && !/[(\[]\s*$|^\d+\.$|\[FIG/.test(String(q.answer).trim()));
-  const pool = [...own, ...bank].filter((q) => !recent.has(norm(q.text)) && String(q.text).length < 400 && usable(q))
+  const usable = (q) => q.source === 'own' || (!/\b(figure|fig\.|table|graph|diagram|shown|box below)\b|\[FIG|\[TABLE/i.test(q.text) && String(q.answer || '').trim().length > 1 && !/[(\[]\s*$|^\d+\.$|\[FIG/.test(String(q.answer).trim()));
+  const hw = o.homeworkKeys || homeworkKeys(cls);
+  const notHomework = (q) => q.source === 'own' || !hw.has(HW_KEY(q.text));
+  const pool = [...own, ...bank].filter((q) => !recent.has(norm(q.text)) && String(q.text).length < 400 && usable(q) && notHomework(q))
     .map((q) => { const L = bestLesson(q, lessons); return L ? { q, L, age: ageOf.get(L.k) } : null; }).filter(Boolean);
   const seed = [...(cls + date)].reduce((h, ch) => (h * 31 + ch.charCodeAt(0)) >>> 0, 7);
   let r = seed;
@@ -133,17 +166,56 @@ function pick(cls, opts) {
   take(pool.filter((x) => x.age >= 5), 2, '5+ lessons ago');
   const prev = lastYearLessons(data, c.year);
   if (prev.length) {
-    const pv = bank.filter((q) => !recent.has(norm(q.text)) && !used.has(q.id) && usable(q)).map((q) => ({ q, L: bestLesson(q, prev) })).filter((x) => x.L)
+    const pv = bank.filter((q) => !recent.has(norm(q.text)) && !used.has(q.id) && usable(q) && notHomework(q)).map((q) => ({ q, L: bestLesson(q, prev) })).filter((x) => x.L)
       .filter((x) => x.q.passRate == null || x.q.passRate >= 50);
     take(pv.map((x) => ({ ...x, L: { k: 'prev:' + x.L.title, title: x.L.title } })), 1, 'last year');
   }
   // top up (thin bank, or Year 7 / 12): older first
   if (out.length < 6) take(pool.filter((x) => !used.has(x.q.id)).sort((a, b) => b.age - a.age), 6 - out.length, 'top-up');
+  // still short of real questions: practice questions Claude wrote to mcq-rules.md (mcq-written.js),
+  // labelled as not from a real exam (Patryk 2026-10-10: optional extras only)
+  if (out.length < 6 && o.written !== false) {
+    const mw = require('./mcq-written.js');
+    const wq = mw.forTopics(c.year >= 12 ? 'OCR A' : 'AQA', lessons.slice(-10).map((L) => L.title))
+      .filter((q) => !recent.has(norm(q.stem)) && !out.some((x) => x.q.id === q.id));
+    for (const q of wq.slice(0, 6 - out.length)) {
+      out.push({ q: { id: q.id, type: 'mcq', text: q.stem + '\n' + q.options.map((x, i) => 'ABCD'[i] + ' ' + x).join('\n'), answer: q.answer, source: 'written' }, L: { k: 'written', title: q.topic }, why: 'top-up (practice question)' });
+    }
+  }
   return {
     // mark-scheme answers carry their marks ("E = 0.25 × 334 000 1 E = 83 500 (J)"): drop the bare mark numbers
-    picked: out.slice(0, 6).map((x) => ({ q: x.q.text, a: String(x.q.answer || '').replace(/\s+1\s+(?=\S)/g, '; ').replace(/\s+1\s*$/, '').replace(/\s+for one mark$/i, ''), why: x.why, lesson: x.L && x.L.title, source: x.q.source === 'own' ? 'your Do Now' : (x.q.board || 'AQA') + ' exam', examRef: x.q.examRef || null, marks: x.q.marks || 1 })),
+    // calculations get new numbers, same words (2026-10-15; do-now-vary.js, only when provably safe;
+    // opts.varyNumbers === false keeps the exam's own numbers). The bank is never changed.
+    picked: out.slice(0, 6).map((x) => {
+      const v = o.varyNumbers !== false && x.q.type === 'calculate' ? require('./do-now-vary.js').vary(x.q, seed) : null;
+      return v ? { q: v.text, a: v.answer, varied: v.from } : shown(x.q);
+    }).map((qa, i) => ({ ...qa, x: out[i] })).map(({ x, ...qa }) => ({ ...qa, why: x.why, lesson: x.L && x.L.title, source: x.q.source === 'own' ? 'your Do Now' : x.q.source === 'written' ? 'practice question (not a real exam)' : (x.q.board || 'AQA') + ' exam', examRef: x.q.examRef || null, marks: x.q.marks || 1 })),
     taught: lessons.length, pool: pool.length,
   };
+}
+
+// What goes on the board. A multiple choice keeps its A-D letters (some OCR parts lost them on
+// reading, which left "answer: C" meaning nothing) and the answer names the option. Mark-scheme
+// answers lose their mark numbers and marking notes ("for; mark", "allow ...", "an answer of ...").
+function shown(q) {
+  let text = String(q.text || ''), a = String(q.answer || '');
+  const letter = (a.trim().match(/^([A-D])(\s+\d)?$/) || [])[1];   // "D" or "D\n1" (mark number left on)
+  const lines = text.split('\n').map((l) => l.trim()).filter(Boolean);
+  if (letter && (q.type === 'mcq' || lines.filter((l) => /^[A-D]\s+\S/.test(l)).length >= 4 || lines.length >= 5)) {
+    a = letter;
+    let opts = lines.filter((l) => /^[A-D]\s+\S/.test(l));
+    if (opts.length < 4 && lines.length >= 5) {
+      opts = lines.slice(-4).map((l, i) => 'ABCD'[i] + ' ' + l);
+      text = [...lines.slice(0, -4), ...opts].join('\n');
+    }
+    const hit = opts.find((l) => l[0] === a.trim());
+    if (hit) a = a.trim() + ': ' + hit.replace(/^[A-D]\s+/, '');
+  } else {
+    a = a.replace(/\s+1\s+(?=\S)/g, '; ').replace(/\s+1\s*$/, '').replace(/\s+for one mark$/i, '')
+      .replace(/\s*\b(allow|accept|ignore|do not accept|an answer of|award)\b[\s\S]*$/i, '')
+      .replace(/(\s*\bfor)?;?\s*mark\s*$/i, '').replace(/[\s;,]+$/, '');
+  }
+  return { q: text, a };
 }
 
 if (require.main === module) {
@@ -155,7 +227,7 @@ if (require.main === module) {
     r.picked.forEach((p, i) => console.log(`${i + 1}. [${p.why} · ${p.lesson} · ${p.source}] ${p.q}\n   → ${p.a}`));
   }
 } else module.exports = {
-  pick, bestLesson, words,
+  pick, bestLesson, words, shown, homeworkKeys, HW_KEY,
   // what a class has been taught up to a date, oldest first (shared with homework-forms.js)
   taughtFor: (cls, date) => taughtLessons(readJson(path.join(ROOT, 'planner', 'planner-data.json'), null), cls, date, savedWeeks()),
 };

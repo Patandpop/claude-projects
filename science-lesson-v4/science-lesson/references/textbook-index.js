@@ -116,6 +116,9 @@ const SAME_IDEA = [
   [/half.?life/i, 'radioactive decay'],
 ];
 // Lessons with no textbook content of their own (2026-10-08: "Introduction and Safety" got a random page).
+const NOT_THIS_IDEA = [
+  [/latent heat capacity/i, 'capacity'],
+];
 const NO_BOOK = /^(introduction\b|dirt\b|.*\b(assessment|test|revision|mock|baseline|feedback)\b)/i;
 function matchLesson(opts) {
   const o = opts || {};
@@ -137,6 +140,8 @@ function matchIn(books, o) {
   const lessonSet = new Set([].concat(tokens(o.topic), ...(Array.isArray(o.keywords) ? o.keywords : [o.keywords]).map(tokens)));
   // the books' words for the same idea (2026-10-08): "Air Resistance" is "Drag forces", microscopes are "Observing cells"
   for (const [re, add] of SAME_IDEA) if (re.test(o.topic || '')) tokens(add).forEach((t) => lessonSet.add(t));
+  // a lesson title that mixes two ideas: "Latent Heat Capacity" is specific LATENT heat (P6.5), not heat capacity
+  for (const [re, drop] of NOT_THIS_IDEA) if (re.test(o.topic || '')) tokens(drop).forEach((t) => lessonSet.delete(t));
   if (!lessonSet.size) return null;
 
   // Best cluster = run of page-adjacent qualifying sections (one chapter), scored by
@@ -144,16 +149,24 @@ function matchIn(books, o) {
   // subjects that reuse the same chapter number in the Activate books.
   let best = null; // { book, score, sections:[{code,page,shared}] }
   for (const book of books) {
-    const hits = idx.sections
-      .filter((sec) => sec.book === book)
-      .map((sec) => ({ ...sec, ...scoreTitle(tokens(sec.title), lessonSet) }))
+    const secs = idx.sections.filter((sec) => sec.book === book);
+    // a word in many section titles ("energy", "heat") says little; a rare one ("internal", "latent")
+    // says a lot (2026-10-10: "Internal Energy" went to the P1 energy chapter, pp. 4-24, not P6.4 p.82)
+    const df = new Map();
+    secs.forEach((sec) => new Set(tokens(sec.title)).forEach((t) => df.set(t, (df.get(t) || 0) + 1)));
+    const weight = (sec) => tokens(sec.title).filter((t, i, a) => lessonSet.has(t) && a.indexOf(t) === i).reduce((n, t) => n + 1 / Math.sqrt(df.get(t) || 1), 0);
+    const hits = secs
+      .map((sec) => ({ ...sec, ...scoreTitle(tokens(sec.title), lessonSet), w: weight(sec) }))
       .filter((h) => (h.strong && h.shared >= 1) || h.shared >= 2)
       .sort((a, b) => a.page - b.page);
     let run = [];
     const flush = () => {
       if (!run.length) return;
       const score = run.reduce((n, h) => n + h.shared, 0);
-      if (!best || score > best.score) best = { book, score, sections: run.slice() };
+      // each different word counts once per chapter run: nine "energy" sections are still one "energy"
+      const covered = new Set(run.flatMap((h) => tokens(h.title).filter((t) => lessonSet.has(t))));
+      const wscore = [...covered].reduce((n, t) => n + 1 / Math.sqrt(df.get(t) || 1), 0);
+      if (!best || wscore > best.wscore) best = { book, score, wscore, sections: run.slice() };   // rarer shared words win
     };
     for (const h of hits) {
       if (run.length && h.page - run[run.length - 1].page > PAGE_GAP) { flush(); run = []; }

@@ -26,6 +26,7 @@
 const fs = require('fs');
 const path = require('path');
 const { examPartsToBank } = require('./do-now-bank.js');
+const { correctDoc } = require('./exam-categories-apply.js');
 
 const ROOT = path.join(__dirname, '..', '..');
 const LIB = path.join(ROOT, 'exam-library');
@@ -51,7 +52,8 @@ function run(opts) {
   for (const f of fs.readdirSync(docsDir)) {
     if (!f.endsWith('.json')) continue;
     const index = JSON.parse(fs.readFileSync(path.join(docsDir, f), 'utf8'));
-    const picks = examPartsToBank(index, { KS: 'KS4' });
+    // exam-categories.json: questions the exam tool filed under the wrong topic move to the right one
+    const picks = correctDoc(f.replace(/\.json$/, ''), index).flatMap((ix) => examPartsToBank(ix, { KS: 'KS4' }));
     scanned += index.parts.length;
     if (!picks.length) continue;
     const key = index.subject || '?';
@@ -85,7 +87,7 @@ function run(opts) {
     const d = JSON.parse(fs.readFileSync(path.join(ocrDir, f), 'utf8'));
     for (const p of d.parts) {
       const single = p.questionTotalMarks === p.marks;
-      if (p.marks > 2 || p.hasFigure || !single || /\[FIGURE\]/.test(p.ms.text)) continue;
+      if (p.marks > 2 || p.hasFigure || !single || /\[FIG/.test(p.ms.text) || /\[TABLE/.test(p.text)) continue;
       const answer = p.mcqAnswer || p.ms.text.replace(/\s*\b[BCAM]\d\b.*$/s, '').trim();
       if (!answer || answer.length > 160) continue;
       ocr.push({ id: 'ocr-' + p.id.toLowerCase().replace(/[^a-z0-9]+/g, '-'), text: p.text, answer, type: p.mcqAnswer ? 'mcq' : 'recall',

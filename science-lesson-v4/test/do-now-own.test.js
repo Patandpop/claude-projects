@@ -34,6 +34,10 @@ function run() {
   const up = require('../science-lesson/references/upload-to-drive.js');
   const mv = up.originalsToTuck(['EPIBA Microscopy.pptx', 'Cells.pptx', 'Cells_worksheet.docx', 'Suspect cards laminates.pptx', 'Support sheet.pptx', 'Method Sheet.pptx', 'Old.ppt'], ['New.pptx']);
   check(mv.join('|') === 'EPIBA Microscopy.pptx|Old.ppt', 'uploader moves only the school deck (never our decks, laminates, support or method sheets)');
+  const ws = up.originalsToTuck(['RBA LPA Renewable sources.pptx', 'WS Renewable Resources table OCA.pptx', 'L3 WS for aliens.pptx', 'P6 L6 WS3 summary.pptx'], []);
+  check(ws.join('|') === 'RBA LPA Renewable sources.pptx', 'uploader never moves "WS" worksheets (school short form)');
+  const sc = up.originalsToTuck(['DELBAR Specialised cells.pptx', 'Specialised cells table.pptx', 'Cell Vacancies apply task.pptx', 'Specialised cells colour laminates.pptx'], []);
+  check(sc.join('|') === 'DELBAR Specialised cells.pptx', 'uploader leaves tables and tasks (7MLA Specialised Cells, 2026-10-20)');
   return { fails, warns: 0 };
 }
 

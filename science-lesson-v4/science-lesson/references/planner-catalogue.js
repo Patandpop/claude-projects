@@ -731,6 +731,11 @@ if (require.main === module) {
     try { periods = JSON.parse(fs.readFileSync(path.join(ROOT, 'classes-2026-27.json'), 'utf8')).periodStructure || {}; } catch { periods = {}; }
     const COLOURS = ['#1565C0', '#2E7D32', '#6A1B9A', '#C62828', '#EF6C00', '#00838F', '#AD1457', '#4E342E', '#283593', '#558B2F', '#5D4037'];
     Object.keys(classes).forEach((c, k) => { classes[c].colour = COLOURS[k % COLOURS.length]; });
+    // Learning loop M2 (2026-10-22): each lesson built at home carries its MCQs (question, options,
+    // right letter, the mistake each wrong option catches), so the phone voter knows them. Matched by
+    // the Drive folder the lesson was uploaded to (<name>.path.txt beside its lesson-content.json).
+    const mcqsByRel = lessonMcqs();
+    Object.values(classes).forEach((c) => (c.seq || []).forEach((L) => { if (L.rel && mcqsByRel[L.rel]) L.mcq = mcqsByRel[L.rel]; }));
     // the school's test papers per topic (Assessment tab: paper / mark scheme / PLC found)
     for (const [cls, c] of Object.entries(classes)) {
       const a = {};
@@ -782,4 +787,29 @@ if (require.main === module) {
       if (pl.note) console.log(`            ${pl.note}`);
     }
   }
+}
+
+// Learning loop M2: { "Year 9/Chemistry/C1 Atomic Structure/Lesson 1 - ...": [{ q, o: [A..D], a, why }] }
+function lessonMcqs() {
+  const out = {};
+  const strip = (s) => String(s == null ? '' : s).replace(/\{\/?k\}/g, '').replace(/^[A-D][.):]\s*/, '').trim();
+  for (const d of fs.readdirSync(ROOT, { withFileTypes: true })) {
+    if (!d.isDirectory()) continue;
+    const dir = path.join(ROOT, d.name);
+    let files; try { files = fs.readdirSync(dir); } catch (_) { continue; }
+    const pathTxt = files.find((f) => f.endsWith('.path.txt'));
+    if (!pathTxt || !files.includes('lesson-content.json')) continue;
+    const drive = fs.readFileSync(path.join(dir, pathTxt), 'utf8').trim();
+    const m = /[\\/]Lessons[\\/](.+)$/.exec(drive);
+    if (!m) continue;
+    let L; try { L = JSON.parse(fs.readFileSync(path.join(dir, 'lesson-content.json'), 'utf8')); } catch (_) { continue; }
+    L = Array.isArray(L) ? L[0] : L;
+    const items = (L && Array.isArray(L.build) ? L.build : []).filter((b) => ['mcq', 'mcq_image'].includes(b.type || b.variant));
+    if (!items.length) continue;
+    out[m[1].split(path.sep).join('/').split('\\').join('/')] = items.map((b) => {
+      const o = Array.isArray(b.options) ? b.options.map(strip) : ['A', 'B', 'C', 'D'].map((k) => strip((b.options || {})[k]));
+      return { q: strip(b.q || b.question), o, a: String(b.answer || '').trim().toUpperCase().slice(0, 1), why: b.why || b.wrong || {} };
+    });
+  }
+  return out;
 }

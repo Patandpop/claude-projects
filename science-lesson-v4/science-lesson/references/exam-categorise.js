@@ -36,7 +36,9 @@ function aqaTick(p) {
 function ocrMcq(p) {
   if (!p.mcqAnswer || !p.mcqOptions) return null;
   const lines = String(p.text).split('\n');
-  const stem = lines.filter((l) => !/^[A-D]\s+\S/.test(l)).join('\n').trim();
+  // only the option lines themselves leave the stem ("A satellite of mass ..." is part of the question)
+  const opt = new Set(p.optionsInFigure ? [] : p.mcqOptions);
+  const stem = lines.filter((l) => !opt.has(l)).join('\n').trim();
   const options = p.mcqOptions.map((o) => o.replace(/^[A-D]\s+/, ''));
   return { stem, options, answer: 'ABCD'.indexOf(p.mcqAnswer) };
 }

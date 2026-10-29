@@ -59,6 +59,9 @@ function run() {
   eq(ref(7, 'Physics', 'Air Resistance'), 'Activate 1, p. 116', 'Y7 Air Resistance → "Drag forces and friction"');
   eq(ref(7, 'Science Skills', 'Introduction and Safety'), '(none)', 'Introduction and Safety → no book page');
   eq(ref(10, 'Physics', 'Plugs'), 'AQA Physics (Kerboodle), p. 66', 'Plugs → "Cables and plugs"');
+  // 2026-10-10: rare words outweigh common ones ("internal" beats nine "energy" sections)
+  eq(ref(9, 'Physics', 'Internal Energy'), 'AQA Physics (Kerboodle), p. 82', 'Internal Energy → P6.4 (not the P1 energy chapter)');
+  eq(ref(9, 'Physics', 'Latent Heat Capacity Theory'), 'AQA Physics (Kerboodle), p. 84', '"Latent Heat Capacity" → specific latent heat P6.5 (not heat capacity P2.4)');
   eq(ref(7, 'Biology', 'Microscopes'), 'Activate 1, p. 14', 'Y7 Microscopes → "Observing cells"');
   eq(ref(9, 'Physics', 'P3 Particles Test'), '(none)', 'a test lesson → no book page');
 

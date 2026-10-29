@@ -210,7 +210,7 @@ function outputFilesFor(meta) {
 //     technicians print those from the folder.
 // Nothing is deleted or renamed; a name clash in the subfolder leaves that file where it is.
 const ORIGINALS_DIR = 'Beechen Cliff Original Lesson';
-const RESOURCE_RE = /laminat|\bA3\b|card.?sort|cards?\b|info(rmation)?.?sheets?|fact.?sheets?|help.?sheet|support.?sheet|method.?sheet|instructions?|placemat|\bmat\b|worksheet|\bWS\d*\b|timeline|template/i;
+const RESOURCE_RE = /laminat|\bA3\b|card.?sort|cards?\b|info(rmation)?.?sheets?|fact.?sheets?|help.?sheet|support.?sheet|method.?sheet|instructions?|placemat|\bmat\b|worksheet|\bWS\d*\b|timeline|template|\btables?\b|\btasks?\b|activit(y|ies)|\bquiz|homework|\bHW\b|\bquestions\b|\banswers\b|\bvacanc/i;   // 2026-10-20: tables, tasks, activities, quizzes, homework are resources (7MLA Specialised Cells)
 function originalsToTuck(names, keep) {
   const set = new Set(names.map((n) => n.toLowerCase()));
   const keepSet = new Set((keep || []).map((n) => n.toLowerCase()));

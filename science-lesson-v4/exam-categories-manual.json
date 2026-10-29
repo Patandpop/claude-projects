@@ -1,0 +1,2116 @@
+{
+ "_about": "Hand decisions on exam question labels (Claude, reading each one, 2026-10-09). exam-topic-check.js never overwrites this file. keep = the original subtopic is right, leave it. move = it is in the wrong place and this is where it belongs (the script guessed wrong).",
+ "keep": {
+  "Physics-Space-Physics-Solar-System-and-Stability-of-Orbital-Motions-and-Satellities#Q18": "read 2026-10-09: original label fits",
+  "Chemistry-Organic-Chemistry-Reactions-of-alkenes-and-alcohols#Q28": "read 2026-10-09: original label fits",
+  "Physics-Energy-Energy-Changes-in-Systems#Q16": "read 2026-10-09: original label fits",
+  "Physics-Waves-Waves-in-Air-Flid-and-Solids-1#Q11": "read 2026-10-09: original label fits",
+  "Chemistry-Organic-Chemistry-Reactions-of-alkenes-and-alcohols#Q33": "read 2026-10-09: original label fits",
+  "Chemistry-Bonding-Strucutre-and-Properties-of-Matter-Chemical-Bods-Ioninc-Covalent-Metallic-1#Q30": "read 2026-10-09: original label fits",
+  "Physics-Waves-Black-Body-Radiation#Q14": "read 2026-10-09: original label fits",
+  "Physics-Energy-Energy-transfer-in-a-system#Q29": "read 2026-10-09: original label fits",
+  "Biology-Ecology-Adaptations-Interdependence-and-Competition-2#Q37": "read 2026-10-09: original label fits",
+  "Physics-Waves-Black-Body-Radiation#Q3": "read 2026-10-09: original label fits",
+  "Chemistry-Bonding-Strucutre-and-Properties-of-Matter-How-bondin-and-strucutre-are-realted-to-properties-of-substances-2#Q52": "read 2026-10-09: original label fits",
+  "Biology-Ecology-Adaptations-Interdependence-and-Competition-2#Q28": "read 2026-10-09: original label fits",
+  "Biology-Organisation-Animal-Tissues-Organs-and-Organ-Systems-2#Q33": "read 2026-10-09: original label fits",
+  "Biology-Cell-Biology-Cell-Division#Q53": "read 2026-10-09: original label fits",
+  "Physics-Waves-Black-Body-Radiation#Q22": "read 2026-10-09: original label fits",
+  "Biology-Inheritance-Variation-and-Evolution-Reproduction-1#Q17": "read 2026-10-09: original label fits",
+  "Physics-Energy-National-and-Global-Energy-Resources-1#Q57": "read 2026-10-09: original label fits",
+  "Chemistry-Atomic-Structure-and-Periodic-Table-Simple-Models-Symbols-RAM-Charge-Isotopes-3#Q30": "read 2026-10-09: original label fits",
+  "Biology-Ecology-Adaptations-Interdependence-and-Competition-2#Q3": "read 2026-10-09: original label fits",
+  "Biology-Organisation-Animal-Tissues-Organs-and-Organ-Systems-1#Q38": "read 2026-10-09: original label fits",
+  "Physics-Waves-Electromagnetic-Waves-1#Q21": "read 2026-10-09: original label fits",
+  "Chemistry-Using-Resources-Life-cycle-assessment-and-recycling#Q32": "read 2026-10-09: original label fits",
+  "Chemistry-Atomic-Structure-and-Periodic-Table-Properties-of-Transition-Metals#Q18": "read 2026-10-09: original label fits",
+  "Chemistry-Quantative-Chemistry-Using-amount-substance-volumes#Q9": "read 2026-10-09: original label fits",
+  "Chemistry-Using-Resources-Harber-process-and-the-us-of-NPK-fertilisers#Q32": "read 2026-10-09: original label fits",
+  "Chemistry-Atomic-Structure-and-Periodic-Table-Properties-of-Transition-Metals#Q7": "read 2026-10-09: original label fits",
+  "Chemistry-Atomic-Structure-and-Periodic-Table-Simple-Models-Symbols-RAM-Charge-Isotopes-2#Q57": "read 2026-10-09: original label fits",
+  "Chemistry-Organic-Chemistry-Carbon-compounds-as-fuels-and-feedstock-2#Q2": "read 2026-10-09: original label fits",
+  "Chemistry-Quantative-Chemistry-Chemical-measurements-conservation-of-mass-and-quantitative-interpretation-of-chemical-equations-2#Q17": "read 2026-10-09: original label fits"
+ },
+ "move": {
+  "Biology-Homeostasis-and-Response-Homeostasis-1#Q59": {
+   "topic": "Organic Chemistry",
+   "subtopic": "Carbon compounds as fuels and feedstock",
+   "why": "read 2026-10-09"
+  },
+  "Physics-Energy-Energy-Stores-and-Systems#Q17": {
+   "topic": "Forces",
+   "subtopic": "Moments Levers and Gears",
+   "why": "read 2026-10-09"
+  },
+  "Chemistry-Chemical-Analysis-Identification-of-ions-by-chemical-and-spectroscopic-means#Q4": {
+   "topic": "Using Resources",
+   "subtopic": "Using Materials",
+   "why": "read 2026-10-09"
+  },
+  "Chemistry-Atomic-Structure-and-Periodic-Table-Simple-Models-Symbols-RAM-Charge-Isotopes-3#Q32": {
+   "topic": "Bonding; Structure and Properties of Matter",
+   "subtopic": "Chemical Bonds; Ionic; Covalent; Metallic",
+   "why": "read 2026-10-09"
+  },
+  "Physics-Forces-Pressure-in-a-Fluid#Q1": {
+   "topic": "Waves",
+   "subtopic": "Waves in Air Fluid and Solids",
+   "why": "read 2026-10-09"
+  },
+  "Chemistry-Quantative-Chemistry-Use-of-amount-of-substance-in-relation-to-masss-of-pure-substances#Q46": {
+   "topic": "Organic Chemistry",
+   "subtopic": "Carbon compounds as fuels and feedstock",
+   "why": "read 2026-10-09"
+  },
+  "Biology-Inheritance-Variation-and-Evolution-Reproduction-1#Q60": {
+   "topic": "Bioenergetics",
+   "subtopic": "Respiration",
+   "why": "read 2026-10-09"
+  },
+  "Chemistry-Chemistry-of-the-atmosphere-Common-atmospheric-pollutants-and-their-sources#Q24": {
+   "topic": "Chemical Changes",
+   "subtopic": "Electrolysis",
+   "why": "read 2026-10-09"
+  },
+  "Biology-Bioenergetics-Respiration-1#Q13": {
+   "topic": "Infection and Response",
+   "subtopic": "Communicable Diseases",
+   "why": "read 2026-10-09"
+  },
+  "Physics-Energy-Power#Q15": {
+   "topic": "Electricity",
+   "subtopic": "Domestic Uses and Safety",
+   "why": "read 2026-10-09"
+  },
+  "Physics-Forces-Forces-and-Elasticity#Q8": {
+   "topic": "Waves",
+   "subtopic": "Electromagnetic Waves",
+   "why": "read 2026-10-09"
+  },
+  "Chemistry-Chemical-Changes-Reactivity-of-metals-2#Q1": {
+   "topic": "Using Resources",
+   "subtopic": "Life cycle assessment and recycling",
+   "why": "read 2026-10-09"
+  },
+  "Chemistry-Atomic-Structure-and-Periodic-Table-Simple-Models-Symbols-RAM-Charge-Isotopes-1#Q19": {
+   "topic": "Organic Chemistry",
+   "subtopic": "Carbon compounds as fuels and feedstock",
+   "why": "read 2026-10-09"
+  },
+  "Biology-Bioenergetics-Respiration-2#Q7": {
+   "topic": "Organic Chemistry",
+   "subtopic": "Carbon compounds as fuels and feedstock",
+   "why": "read 2026-10-09"
+  },
+  "Chemistry-Atomic-Structure-and-Periodic-Table-Simple-Models-Symbols-RAM-Charge-Isotopes-1#Q48": {
+   "topic": "Quantitative Chemistry",
+   "subtopic": "Using amount substance; volumes",
+   "why": "read 2026-10-09"
+  },
+  "Chemistry-Energy-Changes-Exothermic-and-endothemic-reactions-2#Q28": {
+   "topic": "Chemical Changes",
+   "subtopic": "Reactions of acids",
+   "why": "read 2026-10-09"
+  },
+  "Chemistry-Rate-and-Extent-of-Chemical-Change-Reversible-reactions-and-dynamic-equilibrium-1#Q29": {
+   "topic": "Organic Chemistry",
+   "subtopic": "Synthetic and naturally occurring polymers",
+   "why": "read 2026-10-09"
+  },
+  "Chemistry-Quantative-Chemistry-Chemical-measurements-conservation-of-mass-and-quantitative-interpretation-of-chemical-equations-1#Q26": {
+   "topic": "Using Resources",
+   "subtopic": "Using Materials",
+   "why": "read 2026-10-09"
+  },
+  "Chemistry-Quantative-Chemistry-Yeild-and-atomc-economy-of-chemical-reactions#Q11": {
+   "topic": "Bonding; Structure and Properties of Matter",
+   "subtopic": "Chemical Bonds; Ionic; Covalent; Metallic",
+   "why": "read 2026-10-09"
+  },
+  "Biology-Cell-Biology-Cell-Division#Q52": {
+   "topic": "Organic Chemistry",
+   "subtopic": "Synthetic and naturally occurring polymers",
+   "why": "read 2026-10-09"
+  },
+  "Chemistry-Chemistry-of-the-atmosphere-Common-atmospheric-pollutants-and-their-sources#Q20": {
+   "topic": "Bonding; Structure and Properties of Matter",
+   "subtopic": "Chemical Bonds; Ionic; Covalent; Metallic",
+   "why": "read 2026-10-09"
+  },
+  "Chemistry-Bonding-Strucutre-and-Properties-of-Matter-Chemical-Bods-Ioninc-Covalent-Metallic-2#Q56": {
+   "topic": "Chemistry of the atmosphere",
+   "subtopic": "Common atmospheric pollutants and their sources",
+   "why": "read 2026-10-09"
+  },
+  "Physics-Waves-Electromagnetic-Waves-1#Q51": {
+   "topic": "Waves",
+   "subtopic": "Waves in Air Fluid and Solids",
+   "why": "read 2026-10-09"
+  },
+  "Chemistry-Chemical-Changes-Reactivity-of-metals-2#Q16": {
+   "topic": "Bonding; Structure and Properties of Matter",
+   "subtopic": "Chemical Bonds; Ionic; Covalent; Metallic",
+   "why": "read 2026-10-09"
+  },
+  "Chemistry-Quantative-Chemistry-Use-of-amount-of-substance-in-relation-to-masss-of-pure-substances#Q30": {
+   "topic": "Rate and Extent of Chemical Change",
+   "subtopic": "Rate of reaction",
+   "why": "read 2026-10-09"
+  },
+  "Physics-Atomic-Structure-Nuclear-Fission-and-Fusion#Q41": {
+   "topic": "Space Physics",
+   "subtopic": "Solar System and Stability of Orbital Motions and Satellites",
+   "why": "read 2026-10-09"
+  },
+  "Chemistry-Atomic-Structure-and-Periodic-Table-Simple-Models-Symbols-RAM-Charge-Isotopes-2#Q36": {
+   "topic": "Using Resources",
+   "subtopic": "Using the Earths resources and obtaining potable water",
+   "why": "read 2026-10-09"
+  },
+  "Physics-Energy-Energy-Changes-in-Systems#Q15": {
+   "topic": "Waves",
+   "subtopic": "Black Body Radiation",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Homeostasis-and-Response-Homeostasis-1#Q14": {
+   "topic": "Organisation",
+   "subtopic": "Animal Tissues Organs and Organ Systems",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Organisation-Animal-Tissues-Organs-and-Organ-Systems-3#Q21": {
+   "topic": "Infection and Response",
+   "subtopic": "Communicable Diseases",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Atomic-Structure-and-Periodic-Table-Simple-Models-Symbols-RAM-Charge-Isotopes-4#Q46": {
+   "topic": "Chemical Changes",
+   "subtopic": "Reactions of acids",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Chemical-Changes-Reactivity-of-metals-1#Q58": {
+   "topic": "Organic Chemistry",
+   "subtopic": "Synthetic and naturally occurring polymers",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Cell-Biology-Cell-Division#Q29": {
+   "topic": "Inheritance Variation and Evolution",
+   "subtopic": "Variation and Evolution",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Physics-Atomic-Structure-Nuclear-Fission-and-Fusion#Q25": {
+   "topic": "Space Physics",
+   "subtopic": "Solar System and Stability of Orbital Motions and Satellites",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Bonding-Strucutre-and-Properties-of-Matter-How-bondin-and-strucutre-are-realted-to-properties-of-substances-1#Q26": {
+   "topic": "Chemical Changes",
+   "subtopic": "Reactions of acids",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Quantative-Chemistry-Yeild-and-atomc-economy-of-chemical-reactions#Q29": {
+   "topic": "Chemical Changes",
+   "subtopic": "Reactions of acids",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Atomic-Structure-and-Periodic-Table-Simple-Models-Symbols-RAM-Charge-Isotopes-3#Q38": {
+   "topic": "Energy Changes",
+   "subtopic": "Exothermic and endothermic reactions",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Inheritance-Variation-and-Evolution-Development-of-Understanding-of-Genetics-and-Evolution-1#Q49": {
+   "topic": "Infection and Response",
+   "subtopic": "Communicable Diseases",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Physics-Atomic-Structure-Nuclear-Fission-and-Fusion#Q26": {
+   "topic": "Space Physics",
+   "subtopic": "Solar System and Stability of Orbital Motions and Satellites",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Cell-Biology-Cell-Structure-1#Q34": {
+   "topic": "Bioenergetics",
+   "subtopic": "Photosynthesis",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Bonding-Strucutre-and-Properties-of-Matter-How-bondin-and-strucutre-are-realted-to-properties-of-substances-2#Q59": {
+   "topic": "Using Resources",
+   "subtopic": "Using Materials",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Energy-Changes-Exothermic-and-endothermic-reactions-1#Q44": {
+   "topic": "Rate and Extent of Chemical Change",
+   "subtopic": "Reversible reactions and dynamic equilibrium",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Organisation-Animal-Tissues-Organs-and-Organ-Systems-1#Q2": {
+   "topic": "Ecology",
+   "subtopic": "Adaptations Interdependence and Competition",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Quantative-Chemistry-Chemical-measurements-conservation-of-mass-and-quantitative-interpretation-of-chemical-equations-2#Q28": {
+   "topic": "Chemical Changes",
+   "subtopic": "Reactions of acids",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Atomic-Structure-and-Periodic-Table-Simple-Models-Symbols-RAM-Charge-Isotopes-1#Q47": {
+   "topic": "Chemical Changes",
+   "subtopic": "Electrolysis",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Physics-Energy-Efficiency#Q7": {
+   "topic": "Electricity",
+   "subtopic": "Current Potential Difference and Resistance",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Organisation-Animal-Tissues-Organs-and-Organ-Systems-2#Q54": {
+   "topic": "Homeostasis and Response",
+   "subtopic": "Hormonal Coordination in Humans",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Organisation-Plant-Tissues-Organs-and-Systems-1#Q20": {
+   "topic": "Infection and Response",
+   "subtopic": "Plant Disease",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Physics-Atomic-Structure-Nuclear-Fission-and-Fusion#Q54": {
+   "topic": "Space Physics",
+   "subtopic": "Solar System and Stability of Orbital Motions and Satellites",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Atomic-Structure-and-Periodic-Table-Simple-Models-Symbols-RAM-Charge-Isotopes-1#Q26": {
+   "topic": "Chemical Changes",
+   "subtopic": "Reactions of acids",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Atomic-Structure-and-Periodic-Table-The-Periodic-Table-1#Q9": {
+   "topic": "Chemical Changes",
+   "subtopic": "Reactions of acids",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Bioenergetics-Respiration-1#Q9": {
+   "topic": "Ecology",
+   "subtopic": "Trophic Levels in an Ecosystem",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Using-Resources-Using-Materials#Q32": {
+   "topic": "Bonding; Structure and Properties of Matter",
+   "subtopic": "How bonding and Structure are related to properties of substances",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Inheritance-Variation-and-Evolution-Reproduction-1#Q30": {
+   "topic": "Cell Biology",
+   "subtopic": "Cell Division",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Bonding-Strucutre-and-Properties-of-Matter-How-bondin-and-strucutre-are-realted-to-properties-of-substances-3#Q16": {
+   "topic": "Chemical Changes",
+   "subtopic": "Reactions of acids",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Atomic-Structure-and-Periodic-Table-Simple-Models-Symbols-RAM-Charge-Isotopes-2#Q21": {
+   "topic": "Chemical Changes",
+   "subtopic": "Reactions of acids",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Quantative-Chemistry-Chemical-measurements-conservation-of-mass-and-quantitative-interpretation-of-chemical-equations-1#Q18": {
+   "topic": "Bonding; Structure and Properties of Matter",
+   "subtopic": "Structure and Bonding of Carbon",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Bioenergetics-Respiration-1#Q27": {
+   "topic": "Cell Biology",
+   "subtopic": "Cell Division",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Organic-Chemistry-Carbon-compounds-as-fuels-and-feedstock-2#Q8": {
+   "topic": "Chemistry of the atmosphere",
+   "subtopic": "Common atmospheric pollutants and their sources",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Bioenergetics-Photosynthesis-1#Q21": {
+   "topic": "Infection and Response",
+   "subtopic": "Communicable Diseases",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Chemical-Changes-Reactions-of-acids-1#Q55": {
+   "topic": "Chemical Analysis",
+   "subtopic": "Identification of ions by chemical and spectroscopic means",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Bioenergetics-Respiration-1#Q51": {
+   "topic": "Cell Biology",
+   "subtopic": "Cell Division",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Quantative-Chemistry-Yeild-and-atomc-economy-of-chemical-reactions#Q9": {
+   "topic": "Using Resources",
+   "subtopic": "Haber process and the us of NPK fertilisers",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Homeostasis-and-Response-The-Human-Nervious-System-1#Q58": {
+   "topic": "Infection and Response",
+   "subtopic": "Communicable Diseases",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Atomic-Structure-and-Periodic-Table-Simple-Models-Symbols-RAM-Charge-Isotopes-2#Q17": {
+   "topic": "Rate and Extent of Chemical Change",
+   "subtopic": "Reversible reactions and dynamic equilibrium",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Cell-Biology-Transport-in-Cells-1#Q24": {
+   "topic": "Infection and Response",
+   "subtopic": "Plant Disease",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Physics-Atomic-Structure-Nuclear-Fission-and-Fusion#Q32": {
+   "topic": "Space Physics",
+   "subtopic": "Solar System and Stability of Orbital Motions and Satellites",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Using-Resources-Life-cycle-assessment-and-recycling#Q31": {
+   "topic": "Organic Chemistry",
+   "subtopic": "Carbon compounds as fuels and feedstock",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Organisation-Animal-Tissues-Organs-and-Organ-Systems-1#Q48": {
+   "topic": "Inheritance Variation and Evolution",
+   "subtopic": "Reproduction",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Atomic-Structure-and-Periodic-Table-Simple-Models-Symbols-RAM-Charge-Isotopes-4#Q34": {
+   "topic": "Quantitative Chemistry",
+   "subtopic": "Chemical measurements; conservation of mass and quantitative interpretation of chemical equations",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Physics-Waves-Electromagnetic-Waves-2#Q12": {
+   "topic": "Atomic Structure",
+   "subtopic": "Hazards and Uses of Radioactive Emissions and of Background Radiation",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Infection-and-Response-Communicable-Diseases-1#Q19": {
+   "topic": "Cell Biology",
+   "subtopic": "Cell Structure",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Bonding-Strucutre-and-Properties-of-Matter-How-bondin-and-strucutre-are-realted-to-properties-of-substances-1#Q15": {
+   "topic": "Organic Chemistry",
+   "subtopic": "Reactions of alkenes and alcohols",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Cell-Biology-Transport-in-Cells-2#Q23": {
+   "topic": "Homeostasis and Response",
+   "subtopic": "Homeostasis",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Bioenergetics-Respiration-1#Q11": {
+   "topic": "Organisation",
+   "subtopic": "Animal Tissues Organs and Organ Systems",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Organisation-Animal-Tissues-Organs-and-Organ-Systems-1#Q53": {
+   "topic": "Infection and Response",
+   "subtopic": "Communicable Diseases",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Energy-Changes-Exothermic-and-endothemic-reactions-2#Q42": {
+   "topic": "Using Resources",
+   "subtopic": "Haber process and the us of NPK fertilisers",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Inheritance-Variation-and-Evolution-Variation-and-Evolution-1#Q19": {
+   "topic": "Ecology",
+   "subtopic": "Organisation of an Ecosystem",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Organic-Chemistry-Carbon-compounds-as-fuels-and-feedstock-1#Q57": {
+   "topic": "Chemistry of the atmosphere",
+   "subtopic": "Common atmospheric pollutants and their sources",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Physics-Energy-Energy-Changes-in-Systems#Q20": {
+   "topic": "Electricity",
+   "subtopic": "Current Potential Difference and Resistance",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Organisation-Animal-Tissues-Organs-and-Organ-Systems-1#Q19": {
+   "topic": "Infection and Response",
+   "subtopic": "Communicable Diseases",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Cell-Biology-Transport-in-Cells-2#Q13": {
+   "topic": "Homeostasis and Response",
+   "subtopic": "Homeostasis",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Chemistry-of-the-atmosphere-Common-atmospheric-pollutants-and-their-sources#Q9": {
+   "topic": "Organic Chemistry",
+   "subtopic": "Carbon compounds as fuels and feedstock",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Chemical-Changes-Reactions-of-acids-1#Q46": {
+   "topic": "Rate and Extent of Chemical Change",
+   "subtopic": "Reversible reactions and dynamic equilibrium",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Physics-Electricity-Domestic-Uses-and-Safety-1#Q22": {
+   "topic": "Magnetism",
+   "subtopic": "Induced Potential and Transformers and the National Grid",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Organisation-Plant-Tissues-Organs-and-Systems-1#Q30": {
+   "topic": "Infection and Response",
+   "subtopic": "Plant Disease",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Bioenergetics-Respiration-1#Q60": {
+   "topic": "Organisation",
+   "subtopic": "Animal Tissues Organs and Organ Systems",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Physics-Forces-Work-Done-and-Energy-Transfer-1#Q33": {
+   "topic": "Energy",
+   "subtopic": "Energy Stores and Systems",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Bioenergetics-Photosynthesis-1#Q14": {
+   "topic": "Cell Biology",
+   "subtopic": "Cell Structure",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Atomic-Structure-and-Periodic-Table-Simple-Models-Symbols-RAM-Charge-Isotopes-1#Q46": {
+   "topic": "Chemical Changes",
+   "subtopic": "Reactions of acids",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Atomic-Structure-and-Periodic-Table-Simple-Models-Symbols-RAM-Charge-Isotopes-1#Q60": {
+   "topic": "Energy Changes",
+   "subtopic": "Exothermic and endothermic reactions",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Chemical-Changes-Reactions-of-acids-2#Q45": {
+   "topic": "Rate and Extent of Chemical Change",
+   "subtopic": "Rate of reaction",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Using-Resources-Using-Materials#Q11": {
+   "topic": "Organic Chemistry",
+   "subtopic": "Synthetic and naturally occurring polymers",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Bonding-Strucutre-and-Properties-of-Matter-How-bondin-and-strucutre-are-realted-to-properties-of-substances-1#Q25": {
+   "topic": "Chemical Changes",
+   "subtopic": "Reactions of acids",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Inheritance-Variation-and-Evolution-Variation-and-Evolution-1#Q32": {
+   "topic": "Infection and Response",
+   "subtopic": "Communicable Diseases",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Bioenergetics-Respiration-1#Q7": {
+   "topic": "Organisation",
+   "subtopic": "Plant Tissues Organs and Systems",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Physics-Atomic-Structure-Nuclear-Fission-and-Fusion#Q21": {
+   "topic": "Space Physics",
+   "subtopic": "Solar System and Stability of Orbital Motions and Satellites",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Using-Resources-Using-the-Earths-resources-and-obtaining-potable-water#Q49": {
+   "topic": "Chemical Changes",
+   "subtopic": "Electrolysis",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Bioenergetics-Respiration-1#Q48": {
+   "topic": "Ecology",
+   "subtopic": "Trophic Levels in an Ecosystem",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Bonding-Strucutre-and-Properties-of-Matter-How-bondin-and-strucutre-are-realted-to-properties-of-substances-1#Q54": {
+   "topic": "Rate and Extent of Chemical Change",
+   "subtopic": "Rate of reaction",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Chemical-Changes-Reactivity-of-metals-1#Q27": {
+   "topic": "Energy Changes",
+   "subtopic": "Exothermic and endothermic reactions",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Quantative-Chemistry-Use-of-amount-of-substance-in-relation-to-masss-of-pure-substances#Q39": {
+   "topic": "Chemical Analysis",
+   "subtopic": "Identification of ions by chemical and spectroscopic means",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Atomic-Structure-and-Periodic-Table-Simple-Models-Symbols-RAM-Charge-Isotopes-1#Q58": {
+   "topic": "Quantitative Chemistry",
+   "subtopic": "Chemical measurements; conservation of mass and quantitative interpretation of chemical equations",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Physics-Atomic-Structure-Nuclear-Fission-and-Fusion#Q30": {
+   "topic": "Space Physics",
+   "subtopic": "Solar System and Stability of Orbital Motions and Satellites",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Physics-Energy-National-and-Global-Energy-Resources-2#Q23": {
+   "topic": "Waves",
+   "subtopic": "Waves in Air Fluid and Solids",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Bioenergetics-Photosynthesis-1#Q39": {
+   "topic": "Infection and Response",
+   "subtopic": "Plant Disease",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Atomic-Structure-and-Periodic-Table-Simple-Models-Symbols-RAM-Charge-Isotopes-1#Q9": {
+   "topic": "Organic Chemistry",
+   "subtopic": "Reactions of alkenes and alcohols",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Physics-Electricity-Energy-Transfer-1#Q51": {
+   "topic": "Particle Model of Matter",
+   "subtopic": "Changes of Heat and Specific Latent Heat",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Organic-Chemistry-Carbon-compounds-as-fuels-and-feedstock-1#Q36": {
+   "topic": "Chemistry of the atmosphere",
+   "subtopic": "Common atmospheric pollutants and their sources",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Bonding-Strucutre-and-Properties-of-Matter-How-bondin-and-strucutre-are-realted-to-properties-of-substances-1#Q31": {
+   "topic": "Quantitative Chemistry",
+   "subtopic": "Using amount substance; volumes",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Bioenergetics-Photosynthesis-1#Q15": {
+   "topic": "Infection and Response",
+   "subtopic": "Plant Disease",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Bioenergetics-Respiration-1#Q38": {
+   "topic": "Organisation",
+   "subtopic": "Animal Tissues Organs and Organ Systems",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Organisation-Plant-Tissues-Organs-and-Systems-1#Q18": {
+   "topic": "Cell Biology",
+   "subtopic": "Cell Structure",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Energy-Changes-Exothermic-and-endothermic-reactions-1#Q40": {
+   "topic": "Rate and Extent of Chemical Change",
+   "subtopic": "Reversible reactions and dynamic equilibrium",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Inheritance-Variation-and-Evolution-Variation-and-Evolution-3#Q11": {
+   "topic": "Inheritance Variation and Evolution",
+   "subtopic": "Reproduction",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Atomic-Structure-and-Periodic-Table-Simple-Models-Symbols-RAM-Charge-Isotopes-4#Q54": {
+   "topic": "Chemical Changes",
+   "subtopic": "Reactions of acids",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Chemical-Changes-Reactions-of-acids-1#Q54": {
+   "topic": "Organic Chemistry",
+   "subtopic": "Reactions of alkenes and alcohols",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Organisation-Animal-Tissues-Organs-and-Organ-Systems-1#Q8": {
+   "topic": "Homeostasis and Response",
+   "subtopic": "Hormonal Coordination in Humans",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Quantative-Chemistry-Chemical-measurements-conservation-of-mass-and-quantitative-interpretation-of-chemical-equations-2#Q14": {
+   "topic": "Using Resources",
+   "subtopic": "Using the Earths resources and obtaining potable water",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Bonding-Strucutre-and-Properties-of-Matter-Chemical-Bods-Ioninc-Covalent-Metallic-3#Q15": {
+   "topic": "Using Resources",
+   "subtopic": "Haber process and the us of NPK fertilisers",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Organisation-Animal-Tissues-Organs-and-Organ-Systems-2#Q1": {
+   "topic": "Cell Biology",
+   "subtopic": "Transport in Cells",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Physics-Electricity-Energy-Transfer-1#Q54": {
+   "topic": "Particle Model of Matter",
+   "subtopic": "Changes of Heat and Specific Latent Heat",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Quantative-Chemistry-Yeild-and-atomc-economy-of-chemical-reactions#Q22": {
+   "topic": "Using Resources",
+   "subtopic": "Haber process and the us of NPK fertilisers",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Ecology-Adaptations-Interdependence-and-Competition-1#Q55": {
+   "topic": "Inheritance Variation and Evolution",
+   "subtopic": "Variation and Evolution",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Bonding-Strucutre-and-Properties-of-Matter-How-bondin-and-strucutre-are-realted-to-properties-of-substances-1#Q37": {
+   "topic": "Energy Changes",
+   "subtopic": "Exothermic and endothermic reactions",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Cell-Biology-Transport-in-Cells-1#Q2": {
+   "topic": "Ecology",
+   "subtopic": "Adaptations Interdependence and Competition",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Physics-Space-Physics-Solar-System-and-Stability-of-Orbital-Motions-and-Satellities#Q46": {
+   "topic": "Atomic Structure",
+   "subtopic": "Nuclear Fission and Fusion",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Infection-and-Response-Monoclonal-Antibodies#Q2": {
+   "topic": "Bioenergetics",
+   "subtopic": "Respiration",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Ecology-Organisation-of-an-Ecosystem-1#Q16": {
+   "topic": "Bioenergetics",
+   "subtopic": "Respiration",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Ecology-Adaptations-Interdependence-and-Competition-1#Q41": {
+   "topic": "Inheritance Variation and Evolution",
+   "subtopic": "Development of Understanding of Genetics and Evolution",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Bonding-Strucutre-and-Properties-of-Matter-Chemical-Bods-Ioninc-Covalent-Metallic-1#Q12": {
+   "topic": "Chemical Changes",
+   "subtopic": "Reactions of acids",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Atomic-Structure-and-Periodic-Table-Simple-Models-Symbols-RAM-Charge-Isotopes-1#Q41": {
+   "topic": "Chemical Changes",
+   "subtopic": "Reactions of acids",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Chemical-Changes-Electrolysis-1#Q29": {
+   "topic": "Bonding; Structure and Properties of Matter",
+   "subtopic": "Chemical Bonds; Ionic; Covalent; Metallic",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Inheritance-Variation-and-Evolution-Reproduction-1#Q10": {
+   "topic": "Infection and Response",
+   "subtopic": "Communicable Diseases",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Rate-and-Extent-of-Chemical-Change-Rate-of-reaction-2#Q24": {
+   "topic": "Chemical Changes",
+   "subtopic": "Reactions of acids",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Cell-Biology-Cell-Structure-1#Q10": {
+   "topic": "Infection and Response",
+   "subtopic": "Communicable Diseases",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Bonding-Strucutre-and-Properties-of-Matter-Chemical-Bods-Ioninc-Covalent-Metallic-2#Q20": {
+   "topic": "Chemical Changes",
+   "subtopic": "Electrolysis",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Physics-Forces-Work-Done-and-Energy-Transfer-1#Q15": {
+   "topic": "Energy",
+   "subtopic": "Energy Stores and Systems",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Organisation-Plant-Tissues-Organs-and-Systems-1#Q11": {
+   "topic": "Infection and Response",
+   "subtopic": "Plant Disease",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Cell-Biology-Transport-in-Cells-2#Q39": {
+   "topic": "Homeostasis and Response",
+   "subtopic": "Homeostasis",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Chemical-Changes-Reactivity-of-metals-2#Q32": {
+   "topic": "Bonding; Structure and Properties of Matter",
+   "subtopic": "Chemical Bonds; Ionic; Covalent; Metallic",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Organic-Chemistry-Carbon-compounds-as-fuels-and-feedstock-1#Q31": {
+   "topic": "Bonding; Structure and Properties of Matter",
+   "subtopic": "Chemical Bonds; Ionic; Covalent; Metallic",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Atomic-Structure-and-Periodic-Table-Properties-of-Transition-Metals#Q19": {
+   "topic": "Chemical Changes",
+   "subtopic": "Reactivity of metals",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Homeostasis-and-Response-The-Human-Nervious-System-1#Q49": {
+   "topic": "Ecology",
+   "subtopic": "Adaptations Interdependence and Competition",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Quantative-Chemistry-Yeild-and-atomc-economy-of-chemical-reactions#Q15": {
+   "topic": "Bonding; Structure and Properties of Matter",
+   "subtopic": "Chemical Bonds; Ionic; Covalent; Metallic",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Bonding-Strucutre-and-Properties-of-Matter-How-bondin-and-strucutre-are-realted-to-properties-of-substances-1#Q27": {
+   "topic": "Rate and Extent of Chemical Change",
+   "subtopic": "Rate of reaction",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Quantative-Chemistry-Chemical-measurements-conservation-of-mass-and-quantitative-interpretation-of-chemical-equations-2#Q34": {
+   "topic": "Using Resources",
+   "subtopic": "Using the Earths resources and obtaining potable water",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Cell-Biology-Cell-Structure-1#Q24": {
+   "topic": "Organisation",
+   "subtopic": "Plant Tissues Organs and Systems",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Infection-and-Response-Plant-Disease#Q5": {
+   "topic": "Organisation",
+   "subtopic": "Plant Tissues Organs and Systems",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Bonding-Strucutre-and-Properties-of-Matter-Bulk-and-surface-properties-of-matter-including-nanoparticles#Q23": {
+   "topic": "Energy Changes",
+   "subtopic": "Exothermic and endothermic reactions",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Inheritance-Variation-and-Evolution-Reproduction-1#Q12": {
+   "topic": "Homeostasis and Response",
+   "subtopic": "Hormonal Coordination in Humans",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Infection-and-Response-Plant-Disease#Q19": {
+   "topic": "Bioenergetics",
+   "subtopic": "Photosynthesis",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Bioenergetics-Photosynthesis-1#Q35": {
+   "topic": "Inheritance Variation and Evolution",
+   "subtopic": "Classification of Living Organisms",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Chemical-Changes-Reactivity-of-metals-1#Q19": {
+   "topic": "Atomic Structure and Periodic Table",
+   "subtopic": "The Periodic Table",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Cell-Biology-Transport-in-Cells-2#Q31": {
+   "topic": "Homeostasis and Response",
+   "subtopic": "Homeostasis",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Organisation-Plant-Tissues-Organs-and-Systems-1#Q5": {
+   "topic": "Inheritance Variation and Evolution",
+   "subtopic": "Variation and Evolution",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Bonding-Strucutre-and-Properties-of-Matter-How-bondin-and-strucutre-are-realted-to-properties-of-substances-3#Q2": {
+   "topic": "Using Resources",
+   "subtopic": "Life cycle assessment and recycling",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Cell-Biology-Cell-Strucutre-2#Q10": {
+   "topic": "Homeostasis and Response",
+   "subtopic": "Hormonal Coordination in Humans",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Cell-Biology-Transport-in-Cells-2#Q2": {
+   "topic": "Homeostasis and Response",
+   "subtopic": "Hormonal Coordination in Humans",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Atomic-Structure-and-Periodic-Table-Simple-Models-Symbols-RAM-Charge-Isotopes-1#Q55": {
+   "topic": "Bonding; Structure and Properties of Matter",
+   "subtopic": "How bonding and Structure are related to properties of substances",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Chemical-Changes-Electrolysis-1#Q21": {
+   "topic": "Energy Changes",
+   "subtopic": "Chemical Cells and Fuel Cells",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Organisation-Animal-Tissues-Organs-and-Organ-Systems-1#Q26": {
+   "topic": "Cell Biology",
+   "subtopic": "Cell Structure",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Atomic-Structure-and-Periodic-Table-Simple-Models-Symbols-RAM-Charge-Isotopes-3#Q11": {
+   "topic": "Using Resources",
+   "subtopic": "Life cycle assessment and recycling",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Chemistry-of-the-atmosphere-Common-atmospheric-pollutants-and-their-sources#Q51": {
+   "topic": "Organic Chemistry",
+   "subtopic": "Carbon compounds as fuels and feedstock",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Organisation-Animal-Tissues-Organs-and-Organ-Systems-3#Q41": {
+   "topic": "Infection and Response",
+   "subtopic": "Communicable Diseases",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Bioenergetics-Respiration-2#Q46": {
+   "topic": "Homeostasis and Response",
+   "subtopic": "Homeostasis",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Bioenergetics-Photosynthesis-2#Q38": {
+   "topic": "Ecology",
+   "subtopic": "Organisation of an Ecosystem",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Organisation-Animal-Tissues-Organs-and-Organ-Systems-1#Q22": {
+   "topic": "Infection and Response",
+   "subtopic": "Communicable Diseases",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Atomic-Structure-and-Periodic-Table-Simple-Models-Symbols-RAM-Charge-Isotopes-1#Q2": {
+   "topic": "Chemical Changes",
+   "subtopic": "Electrolysis",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Infection-and-Response-Plant-Disease#Q22": {
+   "topic": "Bioenergetics",
+   "subtopic": "Photosynthesis",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Ecology-Organisation-of-an-Ecosystem-1#Q29": {
+   "topic": "Cell Biology",
+   "subtopic": "Transport in Cells",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Physics-Electricity-Energy-Transfer-1#Q39": {
+   "topic": "Energy",
+   "subtopic": "Energy Stores and Systems",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Chemical-Changes-Reactions-of-acids-3#Q8": {
+   "topic": "Quantitative Chemistry",
+   "subtopic": "Using concentration of solution in mol per dm3",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Quantative-Chemistry-Chemical-measurements-conservation-of-mass-and-quantitative-interpretation-of-chemical-equations-1#Q45": {
+   "topic": "Rate and Extent of Chemical Change",
+   "subtopic": "Reversible reactions and dynamic equilibrium",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Bioenergetics-Respiration-1#Q5": {
+   "topic": "Organisation",
+   "subtopic": "Animal Tissues Organs and Organ Systems",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Using-Resources-Using-Materials#Q31": {
+   "topic": "Bonding; Structure and Properties of Matter",
+   "subtopic": "Structure and Bonding of Carbon",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Quantative-Chemistry-Using-concentration-of-solution-in-mol-per-dm3#Q25": {
+   "topic": "Chemical Analysis",
+   "subtopic": "Identification of ions by chemical and spectroscopic means",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Organic-Chemistry-Synthetic-and-naturally-occuring-polymers#Q8": {
+   "topic": "Using Resources",
+   "subtopic": "Using Materials",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Cell-Biology-Transport-in-Cells-2#Q34": {
+   "topic": "Homeostasis and Response",
+   "subtopic": "Homeostasis",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Organisation-Plant-Tissues-Organs-and-Systems-1#Q14": {
+   "topic": "Cell Biology",
+   "subtopic": "Transport in Cells",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Organic-Chemistry-Carbon-compounds-as-fuels-and-feedstock-3#Q25": {
+   "topic": "Chemistry of the atmosphere",
+   "subtopic": "Common atmospheric pollutants and their sources",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Atomic-Structure-and-Periodic-Table-Simple-Models-Symbols-RAM-Charge-Isotopes-5#Q9": {
+   "topic": "Quantitative Chemistry",
+   "subtopic": "Chemical measurements; conservation of mass and quantitative interpretation of chemical equations",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Physics-Waves-Electromagnetic-Waves-2#Q58": {
+   "topic": "Waves",
+   "subtopic": "Waves in Air Fluid and Solids",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Bioenergetics-Respiration-1#Q50": {
+   "topic": "Cell Biology",
+   "subtopic": "Cell Structure",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Quantative-Chemistry-Chemical-measurements-conservation-of-mass-and-quantitative-interpretation-of-chemical-equations-2#Q42": {
+   "topic": "Using Resources",
+   "subtopic": "Haber process and the us of NPK fertilisers",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Organic-Chemistry-Carbon-compounds-as-fuels-and-feedstock-3#Q24": {
+   "topic": "Chemistry of the atmosphere",
+   "subtopic": "Common atmospheric pollutants and their sources",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Organisation-Animal-Tissues-Organs-and-Organ-Systems-1#Q33": {
+   "topic": "Cell Biology",
+   "subtopic": "Cell Structure",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Chemistry-of-the-atmosphere-Common-atmospheric-pollutants-and-their-sources#Q17": {
+   "topic": "Organic Chemistry",
+   "subtopic": "Carbon compounds as fuels and feedstock",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Physics-Forces-Work-Done-and-Energy-Transfer-1#Q40": {
+   "topic": "Energy",
+   "subtopic": "Energy Stores and Systems",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Physics-Electricity-Energy-Transfer-1#Q58": {
+   "topic": "Particle Model of Matter",
+   "subtopic": "Temperature Changes in a System and Specific Heat Capacity",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Organisation-Animal-Tissues-Organs-and-Organ-Systems-2#Q44": {
+   "topic": "Infection and Response",
+   "subtopic": "Communicable Diseases",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Rate-and-Extent-of-Chemical-Change-Rate-of-reaction-2#Q45": {
+   "topic": "Energy Changes",
+   "subtopic": "Exothermic and endothermic reactions",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Homeostasis-and-Response-Homeostasis-1#Q22": {
+   "topic": "Organisation",
+   "subtopic": "Animal Tissues Organs and Organ Systems",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Homeostasis-and-Response-Hormonal-Coordination-in-Humans-1#Q56": {
+   "topic": "Organisation",
+   "subtopic": "Animal Tissues Organs and Organ Systems",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Bioenergetics-Respiration-2#Q37": {
+   "topic": "Cell Biology",
+   "subtopic": "Transport in Cells",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Atomic-Structure-and-Periodic-Table-Properties-of-Transition-Metals#Q11": {
+   "topic": "Bonding; Structure and Properties of Matter",
+   "subtopic": "Chemical Bonds; Ionic; Covalent; Metallic",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Bioenergetics-Respiration-2#Q26": {
+   "topic": "Cell Biology",
+   "subtopic": "Cell Structure",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Organic-Chemistry-Reactions-of-alkenes-and-alcohols#Q32": {
+   "topic": "Energy Changes",
+   "subtopic": "Chemical Cells and Fuel Cells",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Atomic-Structure-and-Periodic-Table-Simple-Models-Symbols-RAM-Charge-Isotopes-3#Q22": {
+   "topic": "Quantitative Chemistry",
+   "subtopic": "Use of amount of substance in relation to mass of pure substances",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Organisation-Animal-Tissues-Organs-and-Organ-Systems-1#Q7": {
+   "topic": "Cell Biology",
+   "subtopic": "Cell Structure",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Atomic-Structure-and-Periodic-Table-Simple-Models-Symbols-RAM-Charge-Isotopes-4#Q32": {
+   "topic": "Bonding; Structure and Properties of Matter",
+   "subtopic": "Chemical Bonds; Ionic; Covalent; Metallic",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Bioenergetics-Photosynthesis-1#Q41": {
+   "topic": "Ecology",
+   "subtopic": "Organisation of an Ecosystem",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Energy-Changes-Chemical-Cells-and-Fuel-Cells#Q5": {
+   "topic": "Chemical Changes",
+   "subtopic": "Reactions of acids",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Atomic-Structure-and-Periodic-Table-Simple-Models-Symbols-RAM-Charge-Isotopes-3#Q33": {
+   "topic": "Using Resources",
+   "subtopic": "Using Materials",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Atomic-Structure-and-Periodic-Table-Simple-Models-Symbols-RAM-Charge-Isotopes-3#Q49": {
+   "topic": "Chemical Changes",
+   "subtopic": "Electrolysis",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Atomic-Structure-and-Periodic-Table-Simple-Models-Symbols-RAM-Charge-Isotopes-1#Q44": {
+   "topic": "Quantitative Chemistry",
+   "subtopic": "Chemical measurements; conservation of mass and quantitative interpretation of chemical equations",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Organisation-Plant-Tissues-Organs-and-Systems-1#Q24": {
+   "topic": "Infection and Response",
+   "subtopic": "Plant Disease",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Bioenergetics-Photosynthesis-1#Q45": {
+   "topic": "Ecology",
+   "subtopic": "Biodiversity and Effect of Human Interaction on Ecosystems",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Chemical-Changes-Reactivity-of-metals-1#Q56": {
+   "topic": "Atomic Structure and Periodic Table",
+   "subtopic": "The Periodic Table",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Cell-Biology-Cell-Strucutre-2#Q59": {
+   "topic": "Bioenergetics",
+   "subtopic": "Photosynthesis",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Atomic-Structure-and-Periodic-Table-The-Periodic-Table-1#Q6": {
+   "topic": "Chemical Changes",
+   "subtopic": "Reactions of acids",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Homeostasis-and-Response-Hormonal-Coordination-in-Humans-2#Q42": {
+   "topic": "Cell Biology",
+   "subtopic": "Transport in Cells",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Energy-Changes-Chemical-Cells-and-Fuel-Cells#Q17": {
+   "topic": "Bonding; Structure and Properties of Matter",
+   "subtopic": "How bonding and Structure are related to properties of substances",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Quantative-Chemistry-Use-of-amount-of-substance-in-relation-to-masss-of-pure-substances#Q21": {
+   "topic": "Energy Changes",
+   "subtopic": "Exothermic and endothermic reactions",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Quantative-Chemistry-Using-amount-substance-volumes#Q10": {
+   "topic": "Energy Changes",
+   "subtopic": "Exothermic and endothermic reactions",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Cell-Biology-Cell-Division#Q27": {
+   "topic": "Infection and Response",
+   "subtopic": "Plant Disease",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Physics-Magnetism-Induced-Potential-and-Transformers-and-the-National-Grid#Q8": {
+   "topic": "Waves",
+   "subtopic": "Waves in Air Fluid and Solids",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Using-Resources-Using-Materials#Q8": {
+   "topic": "Organic Chemistry",
+   "subtopic": "Reactions of alkenes and alcohols",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Using-Resources-Using-Materials#Q13": {
+   "topic": "Organic Chemistry",
+   "subtopic": "Synthetic and naturally occurring polymers",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Energy-Changes-Exothermic-and-endothermic-reactions-1#Q52": {
+   "topic": "Chemical Changes",
+   "subtopic": "Reactions of acids",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Quantative-Chemistry-Chemical-measurements-conservation-of-mass-and-quantitative-interpretation-of-chemical-equations-2#Q32": {
+   "topic": "Rate and Extent of Chemical Change",
+   "subtopic": "Reversible reactions and dynamic equilibrium",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Quantative-Chemistry-Chemical-measurements-conservation-of-mass-and-quantitative-interpretation-of-chemical-equations-1#Q28": {
+   "topic": "Organic Chemistry",
+   "subtopic": "Carbon compounds as fuels and feedstock",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Quantative-Chemistry-Chemical-measurements-conservation-of-mass-and-quantitative-interpretation-of-chemical-equations-1#Q52": {
+   "topic": "Atomic Structure and Periodic Table",
+   "subtopic": "Properties of Transition Metals",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Atomic-Structure-and-Periodic-Table-Simple-Models-Symbols-RAM-Charge-Isotopes-2#Q31": {
+   "topic": "Energy Changes",
+   "subtopic": "Exothermic and endothermic reactions",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Organic-Chemistry-Carbon-compounds-as-fuels-and-feedstock-2#Q7": {
+   "topic": "Chemistry of the atmosphere",
+   "subtopic": "Common atmospheric pollutants and their sources",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Chemical-Changes-Reactivity-of-metals-1#Q11": {
+   "topic": "Bonding; Structure and Properties of Matter",
+   "subtopic": "How bonding and Structure are related to properties of substances",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Physics-Atomic-Structure-Nuclear-Fission-and-Fusion#Q43": {
+   "topic": "Space Physics",
+   "subtopic": "Solar System and Stability of Orbital Motions and Satellites",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Bonding-Strucutre-and-Properties-of-Matter-Chemical-Bods-Ioninc-Covalent-Metallic-2#Q12": {
+   "topic": "Chemical Changes",
+   "subtopic": "Electrolysis",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Using-Resources-Life-cycle-assessment-and-recycling#Q17": {
+   "topic": "Chemical Changes",
+   "subtopic": "Reactivity of metals",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Ecology-Adaptations-Interdependence-and-Competition-3#Q16": {
+   "topic": "Inheritance Variation and Evolution",
+   "subtopic": "Variation and Evolution",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Organisation-Animal-Tissues-Organs-and-Organ-Systems-1#Q52": {
+   "topic": "Cell Biology",
+   "subtopic": "Cell Structure",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Cell-Biology-Transport-in-Cells-1#Q17": {
+   "topic": "Inheritance Variation and Evolution",
+   "subtopic": "Reproduction",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Energy-Changes-Exothermic-and-endothemic-reactions-2#Q2": {
+   "topic": "Using Resources",
+   "subtopic": "Haber process and the us of NPK fertilisers",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Bioenergetics-Respiration-3#Q6": {
+   "topic": "Homeostasis and Response",
+   "subtopic": "Homeostasis",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Cell-Biology-Transport-in-Cells-1#Q22": {
+   "topic": "Infection and Response",
+   "subtopic": "Plant Disease",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Atomic-Structure-and-Periodic-Table-Simple-Models-Symbols-RAM-Charge-Isotopes-1#Q33": {
+   "topic": "Bonding; Structure and Properties of Matter",
+   "subtopic": "Bulk and surface properties of matter including nanoparticles",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Bioenergetics-Photosynthesis-2#Q1": {
+   "topic": "Ecology",
+   "subtopic": "Organisation of an Ecosystem",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Bonding-Strucutre-and-Properties-of-Matter-How-bondin-and-strucutre-are-realted-to-properties-of-substances-3#Q21": {
+   "topic": "Quantitative Chemistry",
+   "subtopic": "Chemical measurements; conservation of mass and quantitative interpretation of chemical equations",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Quantative-Chemistry-Chemical-measurements-conservation-of-mass-and-quantitative-interpretation-of-chemical-equations-1#Q7": {
+   "topic": "Chemical Changes",
+   "subtopic": "Electrolysis",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Physics-Atomic-Structure-Nuclear-Fission-and-Fusion#Q44": {
+   "topic": "Space Physics",
+   "subtopic": "Solar System and Stability of Orbital Motions and Satellites",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Organisation-Animal-Tissues-Organs-and-Organ-Systems-2#Q3": {
+   "topic": "Homeostasis and Response",
+   "subtopic": "Hormonal Coordination in Humans",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Chemistry-of-the-atmosphere-Common-atmospheric-pollutants-and-their-sources#Q41": {
+   "topic": "Bonding; Structure and Properties of Matter",
+   "subtopic": "How bonding and Structure are related to properties of substances",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Quantative-Chemistry-Chemical-measurements-conservation-of-mass-and-quantitative-interpretation-of-chemical-equations-2#Q1": {
+   "topic": "Atomic Structure and Periodic Table",
+   "subtopic": "The Periodic Table",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Quantative-Chemistry-Use-of-amount-of-substance-in-relation-to-masss-of-pure-substances#Q43": {
+   "topic": "Atomic Structure and Periodic Table",
+   "subtopic": "The Periodic Table",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Organic-Chemistry-Carbon-compounds-as-fuels-and-feedstock-1#Q27": {
+   "topic": "Using Resources",
+   "subtopic": "Life cycle assessment and recycling",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Infection-and-Response-Communicable-Diseases-2#Q9": {
+   "topic": "Organisation",
+   "subtopic": "Animal Tissues Organs and Organ Systems",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Cell-Biology-Cell-Structure-1#Q26": {
+   "topic": "Infection and Response",
+   "subtopic": "Communicable Diseases",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Bioenergetics-Respiration-2#Q31": {
+   "topic": "Cell Biology",
+   "subtopic": "Cell Structure",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Using-Resources-Using-Materials#Q49": {
+   "topic": "Chemical Changes",
+   "subtopic": "Electrolysis",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Bonding-Strucutre-and-Properties-of-Matter-Chemical-Bods-Ioninc-Covalent-Metallic-1#Q19": {
+   "topic": "Chemical Changes",
+   "subtopic": "Reactivity of metals",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Chemical-Changes-Reactions-of-acids-3#Q28": {
+   "topic": "Rate and Extent of Chemical Change",
+   "subtopic": "Rate of reaction",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Bonding-Strucutre-and-Properties-of-Matter-How-bondin-and-strucutre-are-realted-to-properties-of-substances-2#Q7": {
+   "topic": "Using Resources",
+   "subtopic": "Using Materials",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Bioenergetics-Respiration-2#Q1": {
+   "topic": "Organisation",
+   "subtopic": "Animal Tissues Organs and Organ Systems",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Organisation-Animal-Tissues-Organs-and-Organ-Systems-4#Q47": {
+   "topic": "Homeostasis and Response",
+   "subtopic": "Homeostasis",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Cell-Biology-Cell-Structure-1#Q1": {
+   "topic": "Infection and Response",
+   "subtopic": "Communicable Diseases",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Ecology-Adaptations-Interdependence-and-Competition-1#Q10": {
+   "topic": "Inheritance Variation and Evolution",
+   "subtopic": "Variation and Evolution",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Inheritance-Variation-and-Evolution-Development-of-Understanding-of-Genetics-and-Evolution-1#Q8": {
+   "topic": "Ecology",
+   "subtopic": "Food Production",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Chemical-Changes-Reactions-of-acids-3#Q12": {
+   "topic": "Using Resources",
+   "subtopic": "Haber process and the us of NPK fertilisers",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Physics-Atomic-Structure-Nuclear-Fission-and-Fusion#Q28": {
+   "topic": "Space Physics",
+   "subtopic": "Solar System and Stability of Orbital Motions and Satellites",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Bioenergetics-Respiration-1#Q42": {
+   "topic": "Ecology",
+   "subtopic": "Organisation of an Ecosystem",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Organisation-Plant-Tissues-Organs-and-Systems-1#Q48": {
+   "topic": "Cell Biology",
+   "subtopic": "Cell Structure",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Organisation-Animal-Tissues-Organs-and-Organ-Systems-1#Q43": {
+   "topic": "Bioenergetics",
+   "subtopic": "Photosynthesis",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Organisation-Animal-Tissues-Organs-and-Organ-Systems-1#Q29": {
+   "topic": "Inheritance Variation and Evolution",
+   "subtopic": "Reproduction",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Chemical-Changes-Electrolysis-1#Q52": {
+   "topic": "Atomic Structure and Periodic Table",
+   "subtopic": "Simple Models; Symbols; RAM; Charge; Isotopes",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Cell-Biology-Cell-Division#Q19": {
+   "topic": "Infection and Response",
+   "subtopic": "Communicable Diseases",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Cell-Biology-Cell-Structure-1#Q30": {
+   "topic": "Bioenergetics",
+   "subtopic": "Respiration",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Cell-Biology-Transport-in-Cells-1#Q20": {
+   "topic": "Bioenergetics",
+   "subtopic": "Respiration",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Atomic-Structure-and-Periodic-Table-Simple-Models-Symbols-RAM-Charge-Isotopes-4#Q36": {
+   "topic": "Using Resources",
+   "subtopic": "Haber process and the us of NPK fertilisers",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Chemical-Changes-Reactivity-of-metals-1#Q22": {
+   "topic": "Quantitative Chemistry",
+   "subtopic": "Chemical measurements; conservation of mass and quantitative interpretation of chemical equations",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Ecology-Organisation-of-an-Ecosystem-3#Q22": {
+   "topic": "Organisation",
+   "subtopic": "Plant Tissues Organs and Systems",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Physics-Electricity-Current-Potential-Difference-and-Resistance-1#Q30": {
+   "topic": "Energy",
+   "subtopic": "National and Global Energy Resources",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Bioenergetics-Photosynthesis-1#Q4": {
+   "topic": "Organisation",
+   "subtopic": "Principles of Organisation",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Physics-Waves-Black-Body-Radiation#Q12": {
+   "topic": "Waves",
+   "subtopic": "Electromagnetic Waves",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Organisation-Animal-Tissues-Organs-and-Organ-Systems-1#Q6": {
+   "topic": "Cell Biology",
+   "subtopic": "Cell Division",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Quantative-Chemistry-Chemical-measurements-conservation-of-mass-and-quantitative-interpretation-of-chemical-equations-2#Q23": {
+   "topic": "Using Resources",
+   "subtopic": "Haber process and the us of NPK fertilisers",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Rate-and-Extent-of-Chemical-Change-Rate-of-reaction-2#Q41": {
+   "topic": "Chemical Changes",
+   "subtopic": "Reactions of acids",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Organic-Chemistry-Carbon-compounds-as-fuels-and-feedstock-1#Q46": {
+   "topic": "Bonding; Structure and Properties of Matter",
+   "subtopic": "Chemical Bonds; Ionic; Covalent; Metallic",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Bioenergetics-Photosynthesis-1#Q55": {
+   "topic": "Cell Biology",
+   "subtopic": "Cell Structure",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Cell-Biology-Transport-in-Cells-1#Q39": {
+   "topic": "Organisation",
+   "subtopic": "Animal Tissues Organs and Organ Systems",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Ecology-Adaptations-Interdependence-and-Competition-3#Q21": {
+   "topic": "Inheritance Variation and Evolution",
+   "subtopic": "Variation and Evolution",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Quantative-Chemistry-Use-of-amount-of-substance-in-relation-to-masss-of-pure-substances#Q17": {
+   "topic": "Chemical Changes",
+   "subtopic": "Electrolysis",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Bonding-Strucutre-and-Properties-of-Matter-Chemical-Bods-Ioninc-Covalent-Metallic-2#Q54": {
+   "topic": "Rate and Extent of Chemical Change",
+   "subtopic": "Reversible reactions and dynamic equilibrium",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Physics-Atomic-Structure-Nuclear-Fission-and-Fusion#Q22": {
+   "topic": "Space Physics",
+   "subtopic": "Solar System and Stability of Orbital Motions and Satellites",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Homeostasis-and-Response-Homeostasis-2#Q45": {
+   "topic": "Bioenergetics",
+   "subtopic": "Respiration",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Homeostasis-and-Response-The-Human-Nervious-System-2#Q27": {
+   "topic": "Bioenergetics",
+   "subtopic": "Respiration",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Physics-Atomic-Structure-Nuclear-Fission-and-Fusion#Q36": {
+   "topic": "Space Physics",
+   "subtopic": "Solar System and Stability of Orbital Motions and Satellites",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Rate-and-Extent-of-Chemical-Change-Rate-of-reaction-2#Q27": {
+   "topic": "Energy Changes",
+   "subtopic": "Exothermic and endothermic reactions",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Atomic-Structure-and-Periodic-Table-Simple-Models-Symbols-RAM-Charge-Isotopes-4#Q60": {
+   "topic": "Quantitative Chemistry",
+   "subtopic": "Chemical measurements; conservation of mass and quantitative interpretation of chemical equations",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Atomic-Structure-and-Periodic-Table-Simple-Models-Symbols-RAM-Charge-Isotopes-5#Q2": {
+   "topic": "Quantitative Chemistry",
+   "subtopic": "Chemical measurements; conservation of mass and quantitative interpretation of chemical equations",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Organisation-Animal-Tissues-Organs-and-Organ-Systems-3#Q51": {
+   "topic": "Bioenergetics",
+   "subtopic": "Respiration",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Atomic-Structure-and-Periodic-Table-Simple-Models-Symbols-RAM-Charge-Isotopes-1#Q42": {
+   "topic": "Chemical Changes",
+   "subtopic": "Electrolysis",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Physics-Waves-Black-Body-Radiation#Q1": {
+   "topic": "Space Physics",
+   "subtopic": "Solar System and Stability of Orbital Motions and Satellites",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Physics-Waves-Electromagnetic-Waves-1#Q3": {
+   "topic": "Space Physics",
+   "subtopic": "Solar System and Stability of Orbital Motions and Satellites",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Chemical-Changes-Reactions-of-acids-2#Q55": {
+   "topic": "Chemical Changes",
+   "subtopic": "Reactivity of metals",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Chemical-Analysis-Purity-formulations-and-chromatography#Q8": {
+   "topic": "Organic Chemistry",
+   "subtopic": "Reactions of alkenes and alcohols",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Organisation-Plant-Tissues-Organs-and-Systems-2#Q12": {
+   "topic": "Bioenergetics",
+   "subtopic": "Photosynthesis",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Bonding-Strucutre-and-Properties-of-Matter-How-bondin-and-strucutre-are-realted-to-properties-of-substances-2#Q1": {
+   "topic": "Rate and Extent of Chemical Change",
+   "subtopic": "Rate of reaction",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Chemistry-of-the-atmosphere-Common-atmospheric-pollutants-and-their-sources#Q34": {
+   "topic": "Energy Changes",
+   "subtopic": "Exothermic and endothermic reactions",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Chemical-Changes-Reactions-of-acids-1#Q28": {
+   "topic": "Energy Changes",
+   "subtopic": "Exothermic and endothermic reactions",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Energy-Changes-Exothermic-and-endothemic-reactions-2#Q34": {
+   "topic": "Rate and Extent of Chemical Change",
+   "subtopic": "Reversible reactions and dynamic equilibrium",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Organisation-Plant-Tissues-Organs-and-Systems-1#Q40": {
+   "topic": "Cell Biology",
+   "subtopic": "Transport in Cells",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Chemical-Changes-Reactions-of-acids-1#Q8": {
+   "topic": "Atomic Structure and Periodic Table",
+   "subtopic": "The Periodic Table",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Chemical-Changes-Reactivity-of-metals-1#Q5": {
+   "topic": "Atomic Structure and Periodic Table",
+   "subtopic": "The Periodic Table",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Bonding-Strucutre-and-Properties-of-Matter-How-bondin-and-strucutre-are-realted-to-properties-of-substances-3#Q9": {
+   "topic": "Chemical Changes",
+   "subtopic": "Reactivity of metals",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Inheritance-Variation-and-Evolution-Development-of-Understanding-of-Genetics-and-Evolution-1#Q44": {
+   "topic": "Inheritance Variation and Evolution",
+   "subtopic": "Variation and Evolution",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Using-Resources-Using-the-Earths-resources-and-obtaining-potable-water#Q21": {
+   "topic": "Chemistry of the atmosphere",
+   "subtopic": "Common atmospheric pollutants and their sources",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Physics-Energy-Efficiency#Q4": {
+   "topic": "Electricity",
+   "subtopic": "Energy Transfer",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Organisation-Plant-Tissues-Organs-and-Systems-2#Q5": {
+   "topic": "Bioenergetics",
+   "subtopic": "Photosynthesis",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Bonding-Strucutre-and-Properties-of-Matter-Chemical-Bods-Ioninc-Covalent-Metallic-2#Q11": {
+   "topic": "Organic Chemistry",
+   "subtopic": "Synthetic and naturally occurring polymers",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Using-Resources-Using-Materials#Q21": {
+   "topic": "Organic Chemistry",
+   "subtopic": "Synthetic and naturally occurring polymers",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Atomic-Structure-and-Periodic-Table-Simple-Models-Symbols-RAM-Charge-Isotopes-1#Q15": {
+   "topic": "Chemical Changes",
+   "subtopic": "Electrolysis",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Organisation-Animal-Tissues-Organs-and-Organ-Systems-2#Q20": {
+   "topic": "Bioenergetics",
+   "subtopic": "Respiration",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Atomic-Structure-and-Periodic-Table-Simple-Models-Symbols-RAM-Charge-Isotopes-4#Q20": {
+   "topic": "Quantitative Chemistry",
+   "subtopic": "Chemical measurements; conservation of mass and quantitative interpretation of chemical equations",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Using-Resources-Life-cycle-assessment-and-recycling#Q28": {
+   "topic": "Organic Chemistry",
+   "subtopic": "Synthetic and naturally occurring polymers",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Organic-Chemistry-Carbon-compounds-as-fuels-and-feedstock-1#Q6": {
+   "topic": "Chemistry of the atmosphere",
+   "subtopic": "Common atmospheric pollutants and their sources",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Quantative-Chemistry-Chemical-measurements-conservation-of-mass-and-quantitative-interpretation-of-chemical-equations-1#Q27": {
+   "topic": "Organic Chemistry",
+   "subtopic": "Reactions of alkenes and alcohols",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Chemical-Changes-Reactions-of-acids-2#Q9": {
+   "topic": "Using Resources",
+   "subtopic": "Haber process and the us of NPK fertilisers",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Chemical-Changes-Reactions-of-acids-2#Q54": {
+   "topic": "Quantitative Chemistry",
+   "subtopic": "Chemical measurements; conservation of mass and quantitative interpretation of chemical equations",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Organic-Chemistry-Carbon-compounds-as-fuels-and-feedstock-3#Q13": {
+   "topic": "Chemistry of the atmosphere",
+   "subtopic": "Common atmospheric pollutants and their sources",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Organic-Chemistry-Carbon-compounds-as-fuels-and-feedstock-3#Q14": {
+   "topic": "Chemistry of the atmosphere",
+   "subtopic": "Common atmospheric pollutants and their sources",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Organisation-Plant-Tissues-Organs-and-Systems-1#Q10": {
+   "topic": "Cell Biology",
+   "subtopic": "Cell Structure",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Bioenergetics-Respiration-3#Q8": {
+   "topic": "Homeostasis and Response",
+   "subtopic": "Homeostasis",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Organic-Chemistry-Carbon-compounds-as-fuels-and-feedstock-3#Q4": {
+   "topic": "Atomic Structure and Periodic Table",
+   "subtopic": "The Periodic Table",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Cell-Biology-Transport-in-Cells-2#Q41": {
+   "topic": "Homeostasis and Response",
+   "subtopic": "Hormonal Coordination in Humans",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Bioenergetics-Respiration-2#Q53": {
+   "topic": "Organisation",
+   "subtopic": "Animal Tissues Organs and Organ Systems",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Bioenergetics-Respiration-2#Q15": {
+   "topic": "Organisation",
+   "subtopic": "Animal Tissues Organs and Organ Systems",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Bioenergetics-Photosynthesis-2#Q7": {
+   "topic": "Organisation",
+   "subtopic": "Plant Tissues Organs and Systems",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Quantative-Chemistry-Chemical-measurements-conservation-of-mass-and-quantitative-interpretation-of-chemical-equations-2#Q11": {
+   "topic": "Atomic Structure and Periodic Table",
+   "subtopic": "Simple Models; Symbols; RAM; Charge; Isotopes",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Cell-Biology-Transport-in-Cells-2#Q58": {
+   "topic": "Organisation",
+   "subtopic": "Animal Tissues Organs and Organ Systems",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Bioenergetics-Respiration-2#Q16": {
+   "topic": "Homeostasis and Response",
+   "subtopic": "The Human Nervous System",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Cell-Biology-Cell-Structure-1#Q45": {
+   "topic": "Ecology",
+   "subtopic": "Food Production",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Cell-Biology-Cell-Structure-1#Q16": {
+   "topic": "Ecology",
+   "subtopic": "Food Production",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Infection-and-Response-Plant-Disease#Q21": {
+   "topic": "Organisation",
+   "subtopic": "Plant Tissues Organs and Systems",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Atomic-Structure-and-Periodic-Table-Simple-Models-Symbols-RAM-Charge-Isotopes-1#Q27": {
+   "topic": "Chemical Changes",
+   "subtopic": "Electrolysis",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Cell-Biology-Cell-Structure-1#Q13": {
+   "topic": "Cell Biology",
+   "subtopic": "Cell Division",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Organisation-Animal-Tissues-Organs-and-Organ-Systems-2#Q60": {
+   "topic": "Cell Biology",
+   "subtopic": "Cell Structure",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Chemical-Analysis-Identification-of-ions-by-chemical-and-spectroscopic-means#Q23": {
+   "topic": "Using Resources",
+   "subtopic": "Using the Earths resources and obtaining potable water",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Bonding-Strucutre-and-Properties-of-Matter-Chemical-Bods-Ioninc-Covalent-Metallic-2#Q48": {
+   "topic": "Quantitative Chemistry",
+   "subtopic": "Chemical measurements; conservation of mass and quantitative interpretation of chemical equations",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Cell-Biology-Cell-Division#Q22": {
+   "topic": "Inheritance Variation and Evolution",
+   "subtopic": "Reproduction",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Cell-Biology-Cell-Strucutre-2#Q5": {
+   "topic": "Inheritance Variation and Evolution",
+   "subtopic": "Reproduction",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Bioenergetics-Respiration-3#Q2": {
+   "topic": "Organisation",
+   "subtopic": "Animal Tissues Organs and Organ Systems",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Physics-Energy-Energy-Changes-in-Systems#Q1": {
+   "topic": "Particle Model of Matter",
+   "subtopic": "Temperature Changes in a System and Specific Heat Capacity",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Atomic-Structure-and-Periodic-Table-Simple-Models-Symbols-RAM-Charge-Isotopes-3#Q57": {
+   "topic": "Quantitative Chemistry",
+   "subtopic": "Chemical measurements; conservation of mass and quantitative interpretation of chemical equations",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Bonding-Strucutre-and-Properties-of-Matter-Chemical-Bods-Ioninc-Covalent-Metallic-3#Q6": {
+   "topic": "Atomic Structure and Periodic Table",
+   "subtopic": "The Periodic Table",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Ecology-Biodiversity-and-Effect-of-Human-Interaction-on-Ecosystems-1#Q30": {
+   "topic": "Inheritance Variation and Evolution",
+   "subtopic": "Variation and Evolution",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Using-Resources-Harber-process-and-the-us-of-NPK-fertilisers#Q43": {
+   "topic": "Chemistry of the atmosphere",
+   "subtopic": "Common atmospheric pollutants and their sources",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Bioenergetics-Respiration-1#Q44": {
+   "topic": "Cell Biology",
+   "subtopic": "Transport in Cells",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Cell-Biology-Cell-Strucutre-2#Q30": {
+   "topic": "Organisation",
+   "subtopic": "Plant Tissues Organs and Systems",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Bonding-Strucutre-and-Properties-of-Matter-How-bondin-and-strucutre-are-realted-to-properties-of-substances-1#Q41": {
+   "topic": "Using Resources",
+   "subtopic": "Using Materials",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Chemical-Changes-Reactions-of-acids-1#Q47": {
+   "topic": "Rate and Extent of Chemical Change",
+   "subtopic": "Rate of reaction",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Quantative-Chemistry-Chemical-measurements-conservation-of-mass-and-quantitative-interpretation-of-chemical-equations-2#Q22": {
+   "topic": "Chemistry of the atmosphere",
+   "subtopic": "Common atmospheric pollutants and their sources",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Cell-Biology-Cell-Division#Q31": {
+   "topic": "Infection and Response",
+   "subtopic": "Plant Disease",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Rate-and-Extent-of-Chemical-Change-Reversible-reactions-and-dynamic-equilibrium-2#Q16": {
+   "topic": "Using Resources",
+   "subtopic": "Haber process and the us of NPK fertilisers",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Atomic-Structure-and-Periodic-Table-Simple-Models-Symbols-RAM-Charge-Isotopes-3#Q19": {
+   "topic": "Bonding; Structure and Properties of Matter",
+   "subtopic": "Chemical Bonds; Ionic; Covalent; Metallic",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Inheritance-Variation-and-Evolution-Development-of-Understanding-of-Genetics-and-Evolution-1#Q16": {
+   "topic": "Inheritance Variation and Evolution",
+   "subtopic": "Classification of Living Organisms",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Chemical-Changes-Reactivity-of-metals-1#Q29": {
+   "topic": "Energy Changes",
+   "subtopic": "Exothermic and endothermic reactions",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Organisation-Animal-Tissues-Organs-and-Organ-Systems-1#Q17": {
+   "topic": "Cell Biology",
+   "subtopic": "Cell Division",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Chemical-Changes-Reactions-of-acids-3#Q30": {
+   "topic": "Using Resources",
+   "subtopic": "Haber process and the us of NPK fertilisers",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Bioenergetics-Respiration-2#Q40": {
+   "topic": "Homeostasis and Response",
+   "subtopic": "Homeostasis",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Atomic-Structure-and-Periodic-Table-Simple-Models-Symbols-RAM-Charge-Isotopes-1#Q24": {
+   "topic": "Chemical Changes",
+   "subtopic": "Reactivity of metals",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Organisation-Animal-Tissues-Organs-and-Organ-Systems-4#Q51": {
+   "topic": "Bioenergetics",
+   "subtopic": "Respiration",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Organisation-Animal-Tissues-Organs-and-Organ-Systems-1#Q41": {
+   "topic": "Infection and Response",
+   "subtopic": "Plant Disease",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Chemistry-of-the-atmosphere-Common-atmospheric-pollutants-and-their-sources#Q6": {
+   "topic": "Organic Chemistry",
+   "subtopic": "Carbon compounds as fuels and feedstock",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Using-Resources-Harber-process-and-the-us-of-NPK-fertilisers#Q11": {
+   "topic": "Quantitative Chemistry",
+   "subtopic": "Yield and atomic economy of chemical reactions",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Chemical-Changes-Reactivity-of-metals-1#Q36": {
+   "topic": "Bonding; Structure and Properties of Matter",
+   "subtopic": "Chemical Bonds; Ionic; Covalent; Metallic",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Physics-Waves-Waves-in-Air-Flid-and-Solids-1#Q36": {
+   "topic": "Waves",
+   "subtopic": "Electromagnetic Waves",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Using-Resources-Life-cycle-assessment-and-recycling#Q19": {
+   "topic": "Chemical Changes",
+   "subtopic": "Reactivity of metals",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Quantative-Chemistry-Using-concentration-of-solution-in-mol-per-dm3#Q24": {
+   "topic": "Chemical Analysis",
+   "subtopic": "Identification of ions by chemical and spectroscopic means",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Atomic-Structure-and-Periodic-Table-Properties-of-Transition-Metals#Q3": {
+   "topic": "Bonding; Structure and Properties of Matter",
+   "subtopic": "Bulk and surface properties of matter including nanoparticles",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Bonding-Strucutre-and-Properties-of-Matter-Chemical-Bods-Ioninc-Covalent-Metallic-3#Q21": {
+   "topic": "Rate and Extent of Chemical Change",
+   "subtopic": "Reversible reactions and dynamic equilibrium",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Quantative-Chemistry-Yeild-and-atomc-economy-of-chemical-reactions#Q8": {
+   "topic": "Using Resources",
+   "subtopic": "Haber process and the us of NPK fertilisers",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Bonding-Strucutre-and-Properties-of-Matter-How-bondin-and-strucutre-are-realted-to-properties-of-substances-3#Q20": {
+   "topic": "Atomic Structure and Periodic Table",
+   "subtopic": "The Periodic Table",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Bonding-Strucutre-and-Properties-of-Matter-Chemical-Bods-Ioninc-Covalent-Metallic-2#Q57": {
+   "topic": "Chemical Changes",
+   "subtopic": "Reactions of acids",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Quantative-Chemistry-Chemical-measurements-conservation-of-mass-and-quantitative-interpretation-of-chemical-equations-1#Q51": {
+   "topic": "Chemical Changes",
+   "subtopic": "Reactivity of metals",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Chemical-Changes-Reactivity-of-metals-2#Q27": {
+   "topic": "Using Resources",
+   "subtopic": "Using Materials",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Bioenergetics-Photosynthesis-1#Q37": {
+   "topic": "Organisation",
+   "subtopic": "Principles of Organisation",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Chemical-Changes-Electrolysis-1#Q1": {
+   "topic": "Energy Changes",
+   "subtopic": "Chemical Cells and Fuel Cells",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Ecology-Adaptations-Interdependence-and-Competition-2#Q29": {
+   "topic": "Inheritance Variation and Evolution",
+   "subtopic": "Variation and Evolution",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Organisation-Plant-Tissues-Organs-and-Systems-2#Q9": {
+   "topic": "Inheritance Variation and Evolution",
+   "subtopic": "Variation and Evolution",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Organisation-Animal-Tissues-Organs-and-Organ-Systems-3#Q5": {
+   "topic": "Homeostasis and Response",
+   "subtopic": "Hormonal Coordination in Humans",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Organisation-Animal-Tissues-Organs-and-Organ-Systems-1#Q24": {
+   "topic": "Cell Biology",
+   "subtopic": "Cell Division",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Physics-Electricity-Current-Potential-Difference-and-Resistance-1#Q59": {
+   "topic": "Electricity",
+   "subtopic": "Domestic Uses and Safety",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Chemistry-of-the-atmosphere-Common-atmospheric-pollutants-and-their-sources#Q21": {
+   "topic": "Organic Chemistry",
+   "subtopic": "Carbon compounds as fuels and feedstock",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Cell-Biology-Cell-Structure-1#Q3": {
+   "topic": "Organisation",
+   "subtopic": "Animal Tissues Organs and Organ Systems",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Inheritance-Variation-and-Evolution-Development-of-Understanding-of-Genetics-and-Evolution-1#Q50": {
+   "topic": "Ecology",
+   "subtopic": "Biodiversity and Effect of Human Interaction on Ecosystems",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Inheritance-Variation-and-Evolution-Variation-and-Evolution-1#Q52": {
+   "topic": "Ecology",
+   "subtopic": "Biodiversity and Effect of Human Interaction on Ecosystems",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Bonding-Strucutre-and-Properties-of-Matter-Chemical-Bods-Ioninc-Covalent-Metallic-2#Q21": {
+   "topic": "Quantitative Chemistry",
+   "subtopic": "Use of amount of substance in relation to mass of pure substances",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Inheritance-Variation-and-Evolution-Reproduction-3#Q4": {
+   "topic": "Cell Biology",
+   "subtopic": "Cell Structure",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Bonding-Strucutre-and-Properties-of-Matter-Structure-and-Bonding-of-Carbon#Q8": {
+   "topic": "Chemical Changes",
+   "subtopic": "Electrolysis",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Bioenergetics-Respiration-1#Q28": {
+   "topic": "Homeostasis and Response",
+   "subtopic": "Hormonal Coordination in Humans",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Chemical-Changes-Reactions-of-acids-2#Q3": {
+   "topic": "Rate and Extent of Chemical Change",
+   "subtopic": "Reversible reactions and dynamic equilibrium",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Bonding-Strucutre-and-Properties-of-Matter-Chemical-Bods-Ioninc-Covalent-Metallic-1#Q43": {
+   "topic": "Energy Changes",
+   "subtopic": "Exothermic and endothermic reactions",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Physics-Energy-Energy-Changes-in-Systems#Q8": {
+   "topic": "Particle Model of Matter",
+   "subtopic": "Temperature Changes in a System and Specific Heat Capacity",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Organisation-Animal-Tissues-Organs-and-Organ-Systems-2#Q4": {
+   "topic": "Ecology",
+   "subtopic": "Food Production",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Using-Resources-Harber-process-and-the-us-of-NPK-fertilisers#Q27": {
+   "topic": "Bonding; Structure and Properties of Matter",
+   "subtopic": "Chemical Bonds; Ionic; Covalent; Metallic",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Bonding-Strucutre-and-Properties-of-Matter-How-bondin-and-strucutre-are-realted-to-properties-of-substances-1#Q34": {
+   "topic": "Atomic Structure and Periodic Table",
+   "subtopic": "The Periodic Table",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Bonding-Strucutre-and-Properties-of-Matter-How-bondin-and-strucutre-are-realted-to-properties-of-substances-2#Q60": {
+   "topic": "Quantitative Chemistry",
+   "subtopic": "Use of amount of substance in relation to mass of pure substances",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Energy-Changes-Exothermic-and-endothemic-reactions-2#Q46": {
+   "topic": "Chemical Changes",
+   "subtopic": "Reactions of acids",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Atomic-Structure-and-Periodic-Table-Simple-Models-Symbols-RAM-Charge-Isotopes-3#Q46": {
+   "topic": "Bonding; Structure and Properties of Matter",
+   "subtopic": "Chemical Bonds; Ionic; Covalent; Metallic",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Energy-Changes-Exothermic-and-endothemic-reactions-2#Q35": {
+   "topic": "Chemical Changes",
+   "subtopic": "Reactivity of metals",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Bonding-Strucutre-and-Properties-of-Matter-Chemical-Bods-Ioninc-Covalent-Metallic-2#Q30": {
+   "topic": "Quantitative Chemistry",
+   "subtopic": "Chemical measurements; conservation of mass and quantitative interpretation of chemical equations",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Physics-Energy-Energy-Changes-in-Systems#Q5": {
+   "topic": "Particle Model of Matter",
+   "subtopic": "Temperature Changes in a System and Specific Heat Capacity",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Organisation-Animal-Tissues-Organs-and-Organ-Systems-3#Q36": {
+   "topic": "Infection and Response",
+   "subtopic": "Communicable Diseases",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Quantative-Chemistry-Chemical-measurements-conservation-of-mass-and-quantitative-interpretation-of-chemical-equations-1#Q37": {
+   "topic": "Atomic Structure and Periodic Table",
+   "subtopic": "The Periodic Table",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Organisation-Animal-Tissues-Organs-and-Organ-Systems-4#Q50": {
+   "topic": "Cell Biology",
+   "subtopic": "Cell Structure",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Bioenergetics-Photosynthesis-1#Q7": {
+   "topic": "Inheritance Variation and Evolution",
+   "subtopic": "Variation and Evolution",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Chemistry-Bonding-Strucutre-and-Properties-of-Matter-Chemical-Bods-Ioninc-Covalent-Metallic-1#Q51": {
+   "topic": "Atomic Structure and Periodic Table",
+   "subtopic": "Simple Models; Symbols; RAM; Charge; Isotopes",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Physics-Energy-Power#Q9": {
+   "topic": "Electricity",
+   "subtopic": "Domestic Uses and Safety",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Physics-Magnetism-Induced-Potential-and-Transformers-and-the-National-Grid#Q20": {
+   "topic": "Electricity",
+   "subtopic": "Domestic Uses and Safety",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Infection-and-Response-Communicable-Diseases-1#Q47": {
+   "topic": "Cell Biology",
+   "subtopic": "Cell Structure",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Biology-Infection-and-Response-Communicable-Diseases-1#Q9": {
+   "topic": "Cell Biology",
+   "subtopic": "Cell Division",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Physics-Particle-Model-of-Matter-Internal-Energy#Q8": {
+   "topic": "Waves",
+   "subtopic": "Electromagnetic Waves",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Physics-Energy-Energy-transfer-in-a-system#Q1": {
+   "topic": "Particle Model of Matter",
+   "subtopic": "Temperature Changes in a System and Specific Heat Capacity",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Physics-Energy-Energy-transfer-in-a-system#Q4": {
+   "topic": "Particle Model of Matter",
+   "subtopic": "Temperature Changes in a System and Specific Heat Capacity",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Physics-Energy-Power#Q6": {
+   "topic": "Particle Model of Matter",
+   "subtopic": "Temperature Changes in a System and Specific Heat Capacity",
+   "why": "read 2026-10-09 (borderline band)"
+  },
+  "Physics-Energy-National-and-Global-Energy-Resources-2#Q28": {
+   "topic": "Magnetism",
+   "subtopic": "Induced Potential and Transformers and the National Grid",
+   "why": "transformers (picked for 10C2 renewables, 2026-10-09)"
+  }
+ }
+}

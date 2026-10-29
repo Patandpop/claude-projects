@@ -63,6 +63,26 @@ function poolFor(cls, year) {
   return out;
 }
 
+/* Learning loop M6 (Patryk 2026-10-21): spaced homework. The class's results come home inside
+   planner-state.json (class counts only, the school planner's Results tab). Each result names its
+   quiz file, so a weak question (under 60% of marks) maps back to the lesson it tests. Returns
+   { lessonTitle: worst % } for this class. opts.results / opts.quizFiles let tests pass their own. */
+function weakLessons(cls, o) {
+  const state = o.results ? { results: o.results } : readJson(path.join(SYNC, 'planner-state.json'), {});
+  const out = {};
+  (state.results || []).filter((r) => r && r.cls === cls && !r.error && r.done > 0).forEach((r) => {
+    const quiz = (o.quizFiles && o.quizFiles[r.file]) || readJson(path.join(SYNC, r.file || '-'), null);
+    if (!quiz) return;
+    (r.questions || []).forEach((q) => {
+      const n = parseInt(q.key, 10), qq = (quiz.questions || [])[n - 1];
+      if (!qq || q.pct == null || !qq.lesson || q.pct >= 60) return;
+      out[qq.lesson] = Math.min(out[qq.lesson] == null ? 100 : out[qq.lesson], q.pct);
+    });
+  });
+  return out;
+}
+const daysBetween = (a, b) => Math.round((Date.parse(b) - Date.parse(a)) / 864e5);
+
 function choose(cls, opts) {
   const o = opts || {};
   const due = o.due || new Date(Date.now() + 7 * 864e5).toISOString().slice(0, 10);
@@ -145,6 +165,32 @@ function choose(cls, opts) {
       const have = new Set(m.map(key));
       for (const x of mcqs) { if (got >= need) break; if (have.has(key(x))) continue; have.add(key(x)); m.push(x); got++; }
     }
+  } else if (o.spaced !== false && !topicRes.length) {
+    // spaced (M6): half from the current topic, half from lessons taught 1-3, 3-6 and 6+ weeks ago,
+    // the class's weak lessons first (homework results), taking the windows in turn
+    const weak = weakLessons(cls, o);
+    const age = (x) => (x.L && x.L.date ? daysBetween(x.L.date, today) : 0);
+    const older = mcqs.filter((x) => age(x) >= 7), newer = mcqs.filter((x) => age(x) < 7);
+    const nOld = Math.min(older.length, Math.floor(count / 2));
+    const win = (x) => (age(x) < 21 ? 0 : age(x) < 42 ? 1 : 2);
+    const byWin = [[], [], []];
+    older.slice().sort((a, b) => ((weak[a.L.title] ?? 100) - (weak[b.L.title] ?? 100)) ||
+      (Math.abs((a.p.passRate || 60) - 65) - Math.abs((b.p.passRate || 60) - 65))).forEach((x) => byWin[win(x)].push(x));
+    const oldPick = [], seenL = new Set();
+    for (let i = 0, added = true; oldPick.length < nOld && added; i++) {
+      added = false;
+      for (const g of byWin) {
+        const x = g.find((y) => !oldPick.includes(y) && (i > 2 || !seenL.has(y.L.k)));
+        if (x && oldPick.length < nOld) { oldPick.push(x); seenL.add(x.L.k); added = true; }
+      }
+    }
+    m = oldPick.concat(pickSpread(newer.length ? newer : mcqs.filter((x) => !oldPick.includes(x)), count - oldPick.length, true));
+    // a new topic with few real questions: practice questions (below) fill first; then more older ones
+    const pr = o.written !== false ? mw.forTopics(year >= 12 ? 'OCR A' : 'AQA', taught.slice(-6).map((L) => L.title), { subjects: year >= 12 ? null : (classInfo(cls).patrykTeaches || null) })
+      .filter((q) => !(usage[cls + ':homework'] || []).includes(q.id)).length : 0;
+    if (m.length + pr < count) m = m.concat(pickSpread(older.filter((x) => !m.includes(x)), count - m.length - pr, false));
+    w = pickSpread(written, 2, true);
+    o._spacing = { older: m.filter((x) => age(x) >= 7).length, newer: m.filter((x) => age(x) < 7).length, weak: Object.keys(weak) };
   } else { m = pickSpread(mcqs, count, true); w = pickSpread(written, 2, true); }
   // too few REAL multiple-choice questions: top up with practice questions Claude wrote (mcq-written.js,
   // built to mcq-rules.md), always labelled as not from a real exam. Off with { written: false }.
@@ -176,7 +222,7 @@ function choose(cls, opts) {
   questions.forEach((q, i) => { q.label = 'Question ' + (i + 1); (q.markPoints || []).forEach((p, k) => { p.id = 'q' + (i + 1) + '-' + (k + 1); }); });
   const what = topicRes.length ? o.topics.join(' and ') : c.seq[taught[taught.length - 1].k].topic;
   const title = `${cls} ${what} homework quiz`;
-  return finishV2({ schema: 2, cls, due, kind: 'weekly', tier: null, board, topic: what, title, questions, left });
+  return finishV2(Object.assign({ schema: 2, cls, due, kind: 'weekly', tier: null, board, topic: what, title, questions, left }, o._spacing ? { spacing: o._spacing } : {}));
 }
 
 /* Quiz file schema 2 (2026-10-18, design-audit/homework-replica 04 section 3 and 05 section 1.1).
@@ -238,10 +284,11 @@ function write(hw, dryRun) {
 if (require.main === module) {
   const a = process.argv.slice(2), v = (k) => (a.includes(k) ? a[a.indexOf(k) + 1] : null);
   const hw = choose(a[0], { due: v('--due') || undefined, count: v('--count') ? +v('--count') : undefined,
-    topics: v('--topics') ? v('--topics').split(',') : undefined, require: v('--require') ? v('--require').split(',') : undefined, marks: v('--marks') ? +v('--marks') : undefined });
+    topics: v('--topics') ? v('--topics').split(',') : undefined, require: v('--require') ? v('--require').split(',') : undefined, marks: v('--marks') ? +v('--marks') : undefined, spaced: !a.includes('--no-spaced') });
   console.log(hw.title + `  [${hw.board}]`);
+  if (hw.spacing) console.log(`spaced: ${hw.spacing.newer} from the current topic, ${hw.spacing.older} from older lessons` + (hw.spacing.weak.length ? `; weak lessons first: ${hw.spacing.weak.join(', ')}` : '; no homework results yet, so older lessons by date only'));
   hw.questions.forEach((q, i) => console.log(`${i + 1}. (${q.type}${q.type === 'written' ? ', ' + q.marks + ' marks' : ''} · ${q.lesson}) ${q.text.slice(0, 160)}` +
     (q.type === 'mcq' ? '\n   ' + q.options.map((x, k) => (k === q.answer ? '[✓] ' : '[ ] ') + x).join('  ') : '\n   scheme: ' + q.scheme.slice(0, 160))));
   const f = write(hw, a.includes('--dry-run'));
   console.log(f ? '\nwritten: ' + f + '\nThe school planner makes the Google Form and a Classroom draft (⋯ More → Homework quizzes).' : '\n(dry run: nothing written)');
-} else module.exports = { choose, write, poolFor, formsText, supText, totalPoints, quizIntro, finishV2 };
+} else module.exports = { choose, weakLessons, write, poolFor, formsText, supText, totalPoints, quizIntro, finishV2 };
