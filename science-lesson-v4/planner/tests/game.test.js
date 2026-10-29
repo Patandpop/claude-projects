@@ -478,6 +478,9 @@ console.log('\n-- 29 Oct 2026: rollover before a tick, offline taps, exact Undo 
   // 1.15: every-few-days rituals can miss, never-miss-twice applies
   at('2027-02-10T10:00:00Z'); const ev = G.gameSaveGoal(k, { name: 'Call a friend (test)', kind: 'daily', days: '', everyN: 3, minutes: 30, track: 'life' }).saved;
   s = G.gameTick(k, ev, 1); const st1 = s.goals.find((g) => g.id === ev).streak;
+  { const w0 = s.goals.find((g) => g.id === ev).win; at('2027-02-11T10:00:00Z'); const w1 = G.gameLoad(k).goals.find((g) => g.id === ev).win;
+    at('2027-02-13T10:00:00Z'); const w3 = G.gameLoad(k).goals.find((g) => g.id === ev).win;
+    ok('1U.13 an every-3-days ritual says when it is due: by the 13th, a day into its window, then due that day', w0 && w0.by === '2027-02-13' && w0.k === 0 && w1.by === '2027-02-13' && w1.k === 1 && !w1.late && w3.k === 3 && !w3.late); at('2027-02-10T10:00:00Z'); }
   at('2027-02-14T10:00:00Z'); s = G.gameLoad(k); let g = s.goals.find((x) => x.id === ev);   // due on the 13th, missed
   ok('1.15 an every-3-days ritual not done by its due day records a forgiven miss (streak kept, the strip shows it)', g.miss === true && g.streak === st1 && st1 >= 1 && g.strip[12] === 'x');
   at('2027-02-17T10:00:00Z'); s = G.gameLoad(k); g = s.goals.find((x) => x.id === ev);   // due again on the 16th, missed again

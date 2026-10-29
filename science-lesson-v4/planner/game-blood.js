@@ -58,6 +58,12 @@ const CSS = `
 @keyframes bl-g5{30%{box-shadow:var(--bs),inset 0 0 18px rgba(94,242,160,.9),0 0 22px 4px rgba(94,242,160,.6)}}
 @keyframes bl-g5i{30%{filter:brightness(1.6) drop-shadow(0 0 5px #5ef2a0)}}
 .bl-disc.bl-grm{box-shadow:var(--bs),0 0 0 3px #5ef2a0,0 0 18px rgba(94,242,160,.8)}
+/* the chosen reason turns blood red, whichever sigil it is (Coven's figures are dark, so the soak alone hid it; 1U.13) */
+.bl-sg.bl-pick .bl-disc{--rim:#ff5a4e;box-shadow:var(--bs),0 0 0 3px #e0242e,0 0 20px 4px rgba(225,30,40,.75)}
+.bl-sg.bl-pick .bl-disc .bl-soakL{opacity:.95}
+.bl-sg.bl-pick .bl-ico{--bl-ic:#ffd2c8;--bl-hole:#3a0006;filter:drop-shadow(0 0 4px rgba(255,70,60,.95))}
+.bl-sg.bl-pick .bl-lab{color:#ff6a5e;text-shadow:0 0 8px rgba(255,40,40,.8)}
+.bl-row.bl-sink .bl-sg.bl-pick{opacity:1;transform:none;transition:none}
 @media (prefers-reduced-motion:reduce){.bl-disc.bl-soaked{animation:none}.bl-row .bl-sg,.bl-row.bl-sink .bl-sg{transition:opacity .15s}.bl-row.bl-off .bl-sg,.bl-row.bl-sink .bl-sg{transform:none}}
 `;
 function injectCss() { if (typeof document === 'undefined' || document.getElementById('blood-css')) return;
@@ -169,7 +175,7 @@ function hitFx(btn, still) { if (!btn) return; const d = btn.querySelector('.bl-
   if (!still) { d.classList.remove('bl-thd'); void d.offsetWidth; d.classList.add('bl-thd'); setTimeout(() => d.classList.remove('bl-thd'), 420); }
   if (still) d.classList.add('bl-soaked', 'bl-now'); else setTimeout(() => { if (d.isConnected) d.classList.add('bl-soaked'); }, 90); }
 function glow(btn, still) { const d = btn.querySelector('.bl-disc'), fx = d.querySelector('.bl-fx');
-  d.classList.remove('bl-g5', 'bl-grm', 'bl-thd'); void d.offsetWidth;
+  btn.classList.add('bl-pick'); d.classList.remove('bl-g5', 'bl-grm', 'bl-thd'); void d.offsetWidth;
   if (still) { d.classList.add('bl-grm'); return; }
   fx.innerHTML = '<i class="bl-rip"></i><i class="bl-rip" style="animation-delay:.12s"></i><i class="bl-rip" style="animation-delay:.24s"></i>'; d.classList.add('bl-g5'); }
 
@@ -203,7 +209,7 @@ function open(host, card, onPick) {
   const s = cur = { host, card, onPick, layer, row: layer.querySelector('.bl-row'), blood: new Blood(layer.querySelector('canvas')), state: 'open', done: false, pend: 0 };
   host.appendChild(layer); place(s);
   s.row.addEventListener('click', (e) => { const b = e.target.closest('.bl-sg'); if (!b) return; e.stopPropagation(); if (s.state !== 'open') return;
-    glow(b, RM()); finish(s, b.dataset.sig, 230); });
+    glow(b, RM()); finish(s, b.dataset.sig, 420); });
   s.onHost = (e) => { if (s.layer.contains(e.target)) return; close(); };
   s.onScroll = () => schedule(s);
   host.addEventListener('scroll', s.onScroll, { passive: true });

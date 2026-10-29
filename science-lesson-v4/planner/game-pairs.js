@@ -115,16 +115,20 @@
     const near = cands.filter((x) => x.s > 0), shown = o.all || !near.length ? cands : near.slice(0, 4);
     const chip = (lbl, on, a, v, side, key) => '<button class="pz-c' + (on ? ' on' : '') + '" data-a="' + a + '" data-v="' + e(v) + '">' + (key ? '<img src="' + o.card(side, key) + '" alt="">' : '') + '<span>' + e(lbl) + '</span></button>';
     const os = cu ? 'b' : 'c';
-    let h = '<div class="uz-form pz">' +
-      '<div class="pz-hd"><span class="pz-t">Its other side</span>' + (o.walk ? '<span class="pz-n">' + (o.walk.i + 1) + ' of ' + o.walk.n + '</span>' : '') + '<button data-a="pclose" class="pz-x" aria-label="Close">×</button></div>' +
-      '<div class="pz-om ' + (cu ? 'cu' : 'bl') + '"><img src="' + o.card(cu ? 'c' : 'b', o.keyOf(g)) + '" alt=""><span><small>' + (cu ? 'CURSE' : 'BLESSING') + '</small>' + e(g.name) + '</span></div>';
-    if (dup) h += '<div class="pz-dup"><span>Looks like a duplicate of “' + e(dup.name) + '”. Merge them?</span><button data-a="pdup" data-id="' + g.id + '" data-v="' + dup.id + '">Merge</button></div>';
-    if (cands.length) h += '<span class="uz-lbl">PAIR WITH ONE OF YOUR ' + (cu ? 'BLESSINGS' : 'CURSES') + '</span><div class="pz-cs">' +
+    // the curse always leads (Patryk 2026-10-29): a curse sits on top and asks for its blessing; a lonely blessing asks
+    // for its curse first, and the blessing itself sits underneath, the way a two-sided card reads curse then blessing
+    const om = '<div class="pz-om ' + (cu ? 'cu' : 'bl') + '"><img src="' + o.card(cu ? 'c' : 'b', o.keyOf(g)) + '" alt=""><span><small>' + (cu ? 'CURSE' : 'BLESSING') + '</small>' + e(g.name) + '</span></div>';
+    const pick = cands.length ? '<span class="uz-lbl">' + (cu ? 'PAIR WITH ONE OF YOUR BLESSINGS' : 'OR PAIR WITH ONE OF YOUR CURSES') + '</span><div class="pz-cs">' +
       shown.map((x) => chip(x.g.name, o.withId === x.g.id, 'pwith', x.g.id, os, o.keyOf(x.g))).join('') +
-      (shown.length < cands.length ? '<button class="pz-c pz-more" data-a="pall">Show all ' + cands.length + '</button>' : '') + '</div>';
-    h += '<span class="uz-lbl">' + (cands.length ? 'OR NAME A NEW ' : 'NAME ITS ') + (cu ? 'BLESSING' : 'CURSE') + '</span>' +
+      (shown.length < cands.length ? '<button class="pz-c pz-more" data-a="pall">Show all ' + cands.length + '</button>' : '') + '</div>' : '';
+    const name = '<span class="uz-lbl">' + (cu ? (cands.length ? 'OR NAME A NEW BLESSING' : 'NAME ITS BLESSING') : 'NAME THE CURSE IT ANSWERS') + '</span>' +
       '<input data-ptxt="1" value="' + e(o.withId ? '' : o.txt) + '" placeholder="' + e(suggest(g)[0]) + '">' +
-      '<div class="pz-cs">' + suggest(g).map((x) => chip(x, !o.withId && o.txt === x, 'psug', x)).join('') + '</div>' +
+      '<div class="pz-cs">' + suggest(g).map((x) => chip(x, !o.withId && o.txt === x, 'psug', x)).join('') + '</div>';
+    let h = '<div class="uz-form pz">' +
+      '<div class="pz-hd"><span class="pz-t">' + (cu ? 'Its other side' : 'Its curse') + '</span>' + (o.walk ? '<span class="pz-n">' + (o.walk.i + 1) + ' of ' + o.walk.n + '</span>' : '') + '<button data-a="pclose" class="pz-x" aria-label="Close">×</button></div>' +
+      (cu ? om : '');
+    if (dup) h += '<div class="pz-dup"><span>Looks like a duplicate of “' + e(dup.name) + '”. Merge them?</span><button data-a="pdup" data-id="' + g.id + '" data-v="' + dup.id + '">Merge</button></div>';
+    h += (cu ? pick + name : name + pick + '<span class="uz-lbl">ITS BLESSING</span>' + om) +
       '<p class="pz-p">Joined, it becomes one two-sided omen under Both Ways. Its count and history stay' + (o.withId ? ', and both cards’ histories join' : '') + '.</p>' +
       '<div style="flex:1"></div><button class="uz-go pz-go" data-a="pgo">Join them</button>' +
       (o.walk ? '<button class="pz-skip" data-a="pskip">Skip this one</button>' : '') + '</div>';

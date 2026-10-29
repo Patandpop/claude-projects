@@ -512,6 +512,8 @@ function gSnapshot_(world, extra) {
     if (g.kind === 'habit' && g.polarity === 'both') { const side = (sd) => ticks.filter((t) => t.goalId === g.id && String(t.day) === today && gNote_(t).side === sd && !undone[t.id]).length; o.cCount = side('c'); o.bCount = side('b'); }
     if (g.kind === 'todo') { o.due = g.due; o.doneOn = g.lastDone; o.dueToday = !g.lastDone || gDiff_(g.lastDone, today) <= 14; }
     if (g.kind === 'daily') { o.dueToday = gIsDue_(g, today); o.strip = strip(g);
+      // an every-few-days ritual's window (1U.13, 2026-10-29): due by which day, and how far into the window today is
+      if (g.everyN) { const last = g.lastDone || '', by = last ? gAdd_(last, g.everyN) : today; o.win = { by, n: g.everyN, k: last ? Math.min(g.everyN, gDiff_(last, today)) : g.everyN, late: by < today }; }
       if (g.aim) { const r = aimRows.find((x) => x.goalId === g.id && String(x.day) === today); o.aim = g.aim; o.aimToday = { minutes: r && r.minutes !== '' ? Number(r.minutes) : null, full: !!(r && String(r.full) === 'true') };
         o.aimWeek = gAimWeek_(g, wkMon, today, ticks, aimRows, undone, world, frozen); } }
     if (g.kind === 'habit' && g.ceil) { o.ceil = g.ceil; o.ceilWeek = ticks.filter((t) => t.goalId === g.id && String(t.day) >= wkMon && !undone[t.id] && gNote_(t).side === 'c').length; }

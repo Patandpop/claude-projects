@@ -430,7 +430,9 @@
     // log a curse: after its sigil is picked, or straight away on a double tap (Patryk 2026-10-27)
     function logCurse(id, r, k, sig) {
       const g = goal(id); if (!g) return; const cost = g.hpLoss; let faint = false;
-      act({ verb: 'Cursed:', name: (g.polarity === 'both' ? sides(g.name)[0] : g.name) + (sig ? ' · ' + sig : ''), delta: '−' + cost, unit: 'hp' }, ['gameUntick', id], 'gameTick', [id, -1, sig], (d) => { const x = d.goals.find((y) => y.id === id); x.count = (x.count || 0) + 1; if (x.polarity === 'both') x.cCount = (x.cCount || 0) + 1; d.player.hp -= cost; if (d.player.hp <= 0) { faint = true; d.player.hp = d.player.maxHp; d.player.level = Math.max(1, d.player.level - 1); } });
+      act({ verb: 'Cursed:', name: (g.polarity === 'both' ? sides(g.name)[0] : g.name) + (sig ? ' · ' + sig : ''), delta: '−' + cost, unit: 'hp' }, ['gameUntick', id], 'gameTick', [id, -1, sig], (d) => { const x = d.goals.find((y) => y.id === id); x.count = (x.count || 0) + 1; if (x.polarity === 'both') x.cCount = (x.cCount || 0) + 1; d.player.hp -= cost;
+        // its antidote opens an Absolution straight away, so the glass card rises to the top before the reply (1U.13)
+        const an = x.polarity === 'both' ? x : d.goals.find((y) => y.id === x.anti); if (an && !an.absolve) an.absolve = { slip: 'local', curse: x.id, name: x.name, stage: 0, lost: cost, until: '' }; if (d.player.hp <= 0) { faint = true; d.player.hp = d.player.maxHp; d.player.level = Math.max(1, d.player.level - 1); } });
       flinch(); floatText(r, '−' + cost + ' HP', '#ff7a66'); glow(k, 'rgba(196,50,58,.9)'); buzz([25, 40, 25]);
       if (faint) { V.last = { verb: 'Fainted:', name: 'lost a level and 7 days of runes' }; paintTop(); setMood('sad', pickSay('faint')); } else setMood('sad', CURSE_SAYS[Math.floor(Math.random() * CURSE_SAYS.length)]);
     }
@@ -494,15 +496,23 @@
       const chips = g.aim.type === 'avg' ? [1, 5, 15, 30, 60].map((m) => chip(m + ' min', t.minutes === m, 'aimmin', m)).join('') : g.aim.type === 'count' ? chip(t.full ? 'Full session ✓' : 'Full session?', !!t.full, 'aimfull', t.full ? 0 : 1) : '';
       return '<div class="uz-aim">' + chips + '<span>' + note + '</span></div>';
     }
+    // an every-few-days ritual says where he is in its window, so a quiet day reads as "inside the range", not a skip
+    // (Patryk 2026-10-29): a pip per day of the window fills as it passes; "due by Thu", "due today", "next by Sun"
+    function winHtml(g) { const w = g.win; if (!w || !w.n) return '';
+      const on = g.doneToday, k = on ? 0 : w.k, day = DN[dt(w.by).getUTCDay()], last = !on && (w.late || w.by === D.today);
+      const lbl = on ? 'next by ' + day : w.late ? 'overdue' : w.by === D.today ? 'due today' : 'due by ' + day;
+      const c = last ? '#f2a93b' : '#8fd8b0';
+      return '<span class="uz-win" title="' + esc(lbl) + '" style="display:inline-flex;align-items:center;gap:3px;font-weight:700;color:' + c + '">' +
+        Array.from({ length: Math.min(w.n, 7) }, (_, i) => '<i style="display:inline-block;width:7px;height:7px;border-radius:2px;border:1px solid ' + c + ';background:' + (i < Math.round(k * Math.min(w.n, 7) / w.n) ? c : 'transparent') + '"></i>').join('') + '<span>' + lbl + '</span></span>'; }
     function ritualRow(g) {
       const on = g.doneToday, emb = !on && g.miss && !D.frozen, n = g.streak, col = sCol(Math.max(1, n + (on ? 0 : 1)));
       const st = g.strip ? '<div class="uz-strip">' + String(g.strip).split('').map((c) => '<i style="background:' + (c === 'o' ? col : c === 'f' ? '#3a6a9a' : c === 'x' ? '#3a1418' : '#1a1430') + '"></i>').join('') + '</div>' : '';
       if (window.STONE) return '<div class="uz-strow' + (on ? ' done' : '') + '">' + STONE.row({ id: g.id, name: g.name, streak: n, done: on,
-          subHtml: '<span>' + (on ? 'appeased' : emb ? 'embers' : 'awaits') + '</span> <span>' + esc(rep(g)) + '</span>' + (n > 0 ? ' <span style="font-weight:700;color:' + col + '">' + n + ' night' + (n === 1 ? '' : 's') + '</span>' : ''),
+          subHtml: '<span>' + (on ? 'appeased' : emb ? 'embers' : 'awaits') + '</span> <span>' + esc(rep(g)) + '</span>' + (g.win ? ' ' + winHtml(g) : '') + (n > 0 ? ' <span style="font-weight:700;color:' + col + '">' + n + ' night' + (n === 1 ? '' : 's') + '</span>' : ''),
           payHtml: '<span class="uz-pay">' + (g.auto ? SEAL : '') + '<span>+' + g.pay + coin(18, g.pay, g.id) + '</span></span>' + archBtn(g.id),
           tickAttrs: 'data-a="tick" data-id="' + g.id + '" data-fx="' + g.id + '"', bodyAttrs: 'data-a="editg" data-id="' + g.id + '"' }) + '</div>' + st + aimBar(g);
       return '<div class="uz-row sg' + (on ? ' done' : '') + '">' + sigil(g, on) +
-        '<div class="uz-mid uz-ed" data-a="editg" data-id="' + g.id + '"><div class="nm">' + esc(g.name) + '</div><div class="uz-sub"><span>' + (on ? 'appeased' : emb ? 'embers' : 'awaits') + '</span><span>' + esc(rep(g)) + '</span>' +
+        '<div class="uz-mid uz-ed" data-a="editg" data-id="' + g.id + '"><div class="nm">' + esc(g.name) + '</div><div class="uz-sub"><span>' + (on ? 'appeased' : emb ? 'embers' : 'awaits') + '</span><span>' + esc(rep(g)) + '</span>' + winHtml(g) +
         (n > 0 ? '<span style="font-weight:700;color:' + col + '">' + n + ' night' + (n === 1 ? '' : 's') + '</span>' : '') + '</div></div>' +
         '<div class="uz-pay">' + (g.auto ? SEAL : '') + '<span>+' + g.pay + coin(18, g.pay, g.id) + '</span></div>' + archBtn(g.id) + '</div>' + st + aimBar(g);
     }
@@ -720,11 +730,19 @@
         return joinGoals(g.id, o ? o.id : '', goalOf('curse', d)); }
     }
     function curses() {
-      const abc = (a, b) => a.name.localeCompare(b.name, 'en', { sensitivity: 'base' }), cs = D.goals.filter(isCurse).sort(abc), bs = D.goals.filter(isBless).sort((a, b) => (b.absolve ? 1 : 0) - (a.absolve ? 1 : 0) || abc(a, b)), two = D.goals.filter(isBoth).sort(abc), cnt = D.blessCount || 0, cpos = cnt % 8, p = D.player;
-      let h = two.length ? '<div class="uz-cap" style="border-color:#3a2a4e"><span><b style="color:#e0c8ff">Both Ways</b></span></div><div style="display:flex;flex-direction:column;gap:8px">' + two.map(twoCard).join('') + '</div>' +
+      const abc = (a, b) => a.name.localeCompare(b.name, 'en', { sensitivity: 'base' }), cs = D.goals.filter(isCurse).sort(abc), bs = D.goals.filter(isBless).sort((a, b) => (b.absolve ? 1 : 0) - (a.absolve ? 1 : 0) || abc(a, b)), two = D.goals.filter((g) => isBoth(g) && !(window.GLASS && g.absolve)).sort(abc), cnt = D.blessCount || 0, cpos = cnt % 8, p = D.player;
+      // an open Absolution is the X2 stained-glass card, full width at the very top of the omens (Patryk's final pick,
+      // game-glass.js); a two-sided omen's own good side is its antidote, so it moves up too (1U.13, 2026-10-29)
+      const gl = !!window.GLASS, open = gl ? D.goals.filter((g) => g.absolve && (isBless(g) || isBoth(g))).sort(abc) : [];
+      let h = open.length ? '<div class="uz-absq" style="display:flex;flex-direction:column;gap:8px;margin-bottom:10px">' + open.map((g) => { const ab = g.absolve, two2 = isBoth(g),
+          cu = two2 ? g : D.goals.find((x) => x.id === ab.curse) || { name: ab.name, polarity: 'minus' };
+        return '<div data-abs="' + g.id + '">' + GLASS.absolution({ key: 'ab' + g.id, stage: ab.stage, hpBack: ab.lost,
+          curse: { name: two2 ? sides(g.name)[0] : ab.name, key: two2 ? picOf(g, 'c') : OMENS.of(cu), hp: ab.lost, attrs: two2 ? 'data-a="curse" data-id="' + g.id + '" data-fx="' + g.id + '"' : '' },
+          blessing: { name: two2 ? sides(g.name)[1] : g.name, key: two2 ? picOf(g, 'b') : OMENS.of(g), pay: g.pay, attrs: 'data-a="bless" data-id="' + g.id + '" data-fx="' + g.id + (two2 ? 'b' : '') + '"' } }) + '</div>'; }).join('') + '</div>' : '';
+      h += two.length ? '<div class="uz-cap" style="border-color:#3a2a4e"><span><b style="color:#e0c8ff">Both Ways</b></span></div><div style="display:flex;flex-direction:column;gap:8px">' + two.map(twoCard).join('') + '</div>' +
         (V.edit ? '<div class="uz-chips">' + two.map((c) => '<button data-a="arch" data-id="' + c.id + '">× ' + esc(c.name) + '</button>').join('') + '</div>' : '') : '';
       const lone = window.PAIRS ? PAIRS.lonely(D.goals).length : 0;
-      if (lone) h = '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><button class="pz-all" data-a="pairall">Pair all · ' + lone + ' one-sided</button><span style="flex:1;font:13px/1.3 var(--a);color:#a991c8">Give each omen its other side</span></div>' + h;
+      // the pairing prompt sits at the bottom, under the shelves (Patryk 2026-10-29)
       h += '<div class="uz-cap" style="border-color:#3a1a1e;margin-top:' + (two.length ? 6 : 0) + 'px"><span><b style="color:#ffb3a8">The Cursed Shelf</b></span></div>';
       // curses as 2-column cards like the blessings (Patryk 2026-10-26)
       h += cs.length ? '<div class="uz-bl">' + cs.map((c) => { const n = c.count || 0;
@@ -736,10 +754,6 @@
       if (p.hp <= 12) h += '<p class="uz-p" style="color:#b08a84">' + 'Careful: ' + p.hp + ' HP left.' + '</p>';
       h += '<div class="uz-cap" style="border-color:#1e2e4e;margin-top:6px"><span><b style="color:#c4e0ff;text-shadow:0 0 8px rgba(140,200,255,.7)">Small Blessings</b></span><span style="font:700 12px var(--a);color:#c4e0ff">' + cnt + ' today</span></div>';
       // an open Absolution is the X2 stained-glass card, full width above the tiles (Patryk's final pick, game-glass.js)
-      const gl = !!window.GLASS, open = gl ? bs.filter((g) => g.absolve) : [];
-      if (open.length) h += '<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:8px">' + open.map((g) => { const ab = g.absolve, cu = D.goals.find((x) => x.id === ab.curse) || { name: ab.name };
-        return '<div data-abs="' + g.id + '">' + GLASS.absolution({ key: 'ab' + g.id, stage: ab.stage, hpBack: ab.lost,
-          curse: { name: ab.name, key: OMENS.of(cu), hp: ab.lost }, blessing: { name: g.name, key: OMENS.of(g), pay: g.pay, attrs: 'data-a="bless" data-id="' + g.id + '" data-fx="' + g.id + '"' } }) + '</div>'; }).join('') + '</div>';
       const tiles = gl ? bs.filter((g) => !g.absolve) : bs;
       h += tiles.length ? '<div class="uz-bl">' + tiles.map((g) => { const f = false, n = g.count || 0;
         return '<button class="uz-bt' + (gl ? ' gl-tilebox' : '') + '" data-a="bless" data-id="' + g.id + '" data-fx="' + g.id + '" style="position:relative;overflow:hidden;background:' + (f ? 'linear-gradient(180deg,#2a2410,#151208)' : 'linear-gradient(180deg,#10233a,#0b1626)') + ';border:1.5px solid ' + (g.absolve ? '#d8b25a' : f ? '#8a6a2a' : n ? '#4a8ad0' : '#1f4266') + (g.absolve ? ';box-shadow:0 0 12px rgba(255,214,140,.35)' : n ? ';box-shadow:0 0 10px rgba(110,180,255,.35)' : '') + '">' +
@@ -749,6 +763,7 @@
           (f ? '<span class="uz-x2">×2 TODAY</span>' : '') + '</button>'; }).join('') + '</div>' : open.length ? '' : '<p class="uz-p" style="color:#6f8a7c">No blessings yet.</p>';
       if (V.edit && bs.length) h += '<div class="uz-chips">' + bs.map((g) => '<button data-a="arch" data-id="' + g.id + '">× ' + esc(g.name) + '</button>').join('') + '</div>';
       // (The Frozen Tide list was removed 2026-10-26: days off are one button on the banner)
+      if (lone) h += '<div style="display:flex;align-items:center;gap:8px;margin-top:10px"><button class="pz-all" data-a="pairall">Pair ' + lone + ' missing</button><span style="flex:1;font:13px/1.3 var(--a);color:#a991c8">Give each omen its other side</span></div>';
       h += '<button class="uz-new" data-a="edit" style="font:700 13px var(--a)">' + (V.edit ? 'Stop editing' : 'Edit') + '</button>';
       return h;
     }

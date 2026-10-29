@@ -838,7 +838,9 @@
     const st = body.querySelector('.dn-stage');
     if (st) { const w = grottoWrap(); st.appendChild(w); const md = X.mood(); if (GR.md !== md + JSON.stringify(X.D.wear)) { GR.md = md + JSON.stringify(X.D.wear); w.querySelector('.dn-u').innerHTML = X.layers(md); }
       buildGrotto(X).then(() => { if (RM) grottoTick(X, 0, 0); }); grottoLoop(X); if (RM) grottoTick(X, 0, 0); }
-    if (DG && DG.rolled && DG.phase === 'you') DG.rolled = false;
+    // the skitter roll plays on the first paint after the cups lift, once: when the keeper starts, his turn repaints
+    // the table and the roll used to play a second time (1U.13, 2026-10-29)
+    if (DG && DG.rolled && DG.phase !== 'roll') DG.rolled = false;
     const view = X.V.den + (X.V.stall || ''); if (GR.view !== view) { GR.view = view; const p = body.querySelectorAll('.uz-pane')[3]; if (p && X.V.tab === 3) p.scrollTop = 0; }
   }
   function dock(X) {
