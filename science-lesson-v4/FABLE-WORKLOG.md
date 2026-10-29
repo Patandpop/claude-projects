@@ -34,11 +34,25 @@ Plain-English record of the build list in `FABLE-WORKPLAN.md`, newest entry firs
 
 3. **Approve the builder plan for item 1.8 (A-level Drive address).** This touches the lesson builder, so I wait for your yes. The problem: for a Year 12 or 13 lesson the builder writes the wrong Drive address into the two small note files it leaves beside the lesson (it says "Year 13/Physics/Chapter 20 .../Lesson 3 ...", but on Drive there is no Physics level and the chapters sit inside Module folders). The uploader finds the right chapter by itself, so the files land in the right place, but the planner uses the note to attach each lesson's multiple-choice questions for the phone voter, so 12C and 13D lessons silently get none, and the school push uses the same wrong address. The plan, in three steps: (1) when the lesson is Year 12 or 13, the builder asks the uploader's own chapter-by-number lookup for the real folder and writes that into both notes; when Drive is not reachable it works out the module from the same chapter-to-module table the October reorganisation used; (2) check the planner's question collector now finds 12C and 13D lessons by that address; (3) add a 13D test lesson to the main test so this can never slip back. Nothing on Drive is created, moved or renamed. Reply "yes to 1.8" and I build it.
 
+4. **Two quick answers on Ulhu, when you have a moment:** (a) when a boss tap in The Call "does not work", what exactly happens: nothing at all, the row vanishes with no hit, or a "Not saved" line at the top? (b) when the CLAIMED stamp is missing, does it never appear, or appear and vanish at once? I could not make either fail in the simulation (details in the 1U.1 to 1U.4 entry below).
+
 ## Things I noticed but did not touch
 
 - One Ulhu browser check was already failing before I started: "Banish (two taps) removes a boss, Undo brings it back" times out waiting for a click. That is in the boss code the design session owns, so I left it. The check itself still reports 75 of 76 and does not stop the run.
 
 ---
+
+## 29 Oct 2026, items 1U.1 to 1U.4: the four quick fixes from your phone
+
+**What changed:**
+- **1U.1 Bosses in The Call:** I could not make a boss tap fail. In the simulation a boss stage due today sits in The Call, tapping it lands the hit on the server, and so does tapping a stage on the Grimoire card (both by mouse and by touch); the new checks keep it that way. What I did find: from The Call the claw animation plays on the Grimoire card, which is off screen, so the row just vanished with no feedback. The row now glows and shows "hit!" itself. If it still does nothing on your phone, tell me exactly what you see (nothing at all, the row vanishes, or an error line at the top) and I will dig again. The banish check that was flaky has passed every run today; I have not found a cause for the old timeout.
+- **1U.2 Quest spacing:** a quest with no steps is now a compact card (102 pixels tall instead of 120); a quest with steps keeps its room.
+- **1U.3 Night Market:** the rule sentence under the plaza is gone, the label under each keeper's name is gone, and the dice "peek" shows one line of stakes instead of the full rulebook. The keepers' own lines and the table's hints during play carry it.
+- **1U.4 CLAIMED stamp:** I could not make it go missing: in the simulation the stamp shows after the claim, is still there after the server replies, and fades after two and a half seconds, and a check now watches that. If it still skips on your phone, tell me whether it never appears or appears and vanishes at once.
+
+**You need to:** nothing now. It goes into the next complete paste set. Two questions for you are on the Waiting list.
+
+**Save:** 16c96ef8.
 
 ## 29 Oct 2026, items 1.9 to 1.16: Ulhu's data safety (one save for the eight, since they all touch the same server file)
 
