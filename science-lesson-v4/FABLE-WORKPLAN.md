@@ -103,9 +103,9 @@ Anything that needs your eyes (a look to pick, a decision, a paste into Apps Scr
 ### Being built in the design session right now (29 Oct): do NOT build these, and stay out of their code
 - **Two-sided omens**: Pair chip, Pair all, join with existing omens, split, merge duplicates (game-pairs.js). BUILT and merged (47d38c42).
 - **The tab bar** TB5b1-A (game-tabs.js). BUILT.
-- **The Den**: Round Grotto Sanctum, Night Market with keeper characters, dice haggle with every keeper (game-den.js plus the Den code in game-ui.js and haggle rows in Game.gs). Being built; the design session merges it.
-- **The Oracle** in stained glass (game-oracle.js plus the `oracle()` function in game-ui.js). Being built; the design session merges it.
-- While those two are open, keep your edits in game-ui.js and Game.gs small and away from the Den, shop, wardrobe, hoard and Oracle code, so the merges stay clean. Pull or merge `pre-reskin` before each new item, since the design session commits to it.
+- **The Den**: Round Grotto Sanctum, Night Market with keeper characters, dice haggle with every keeper (game-den.js plus the Den code in game-ui.js and haggle rows in Game.gs). BUILT and merged 29 Oct (b5ac8b37). Paste set "(29 Oct, Den Oracle omens)" made.
+- **The Oracle** in stained glass (game-oracle.js plus the `oracle()` function in game-ui.js). BUILT and merged 29 Oct (b5ac8b37). Paste set "(29 Oct, Den Oracle omens)" made.
+- Both are merged now, but keep your edits in game-ui.js and Game.gs small and away from the Den, shop, wardrobe, hoard and Oracle code, so the merges stay clean. Pull or merge `pre-reskin` before each new item, since the design session commits to it.
 - Phase 0 and 1 are yours (a design-session attempt was stopped before it changed anything). The learning loop (Phase 2) is yours too.
 
 ### Phase 0: safety (do first)
