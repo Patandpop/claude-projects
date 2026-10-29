@@ -1,0 +1,494 @@
+[
+  {
+    "meta": {
+      "class": "7MLA",
+      "topic": "Specialised cells",
+      "title": "Specialised Cells",
+      "lessonType": "standard",
+      "theme": "biology",
+      "worksheet": "A",
+      "differentiation": "none",
+      "year": 7,
+      "subject": "Biology",
+      "macrotopic": "B1 Cells",
+      "lessonNumber": 4
+    },
+    "title": {
+      "objectives": [
+        "Identify common specialised cells",
+        "Describe the job of each specialised cell",
+        "Explain how a cell's features help it do its job"
+      ],
+      "keywords": [
+        "specialised cell",
+        "adaptation",
+        "sperm cell",
+        "egg cell",
+        "red blood cell",
+        "nerve cell",
+        "ciliated cell",
+        "root hair cell",
+        "palisade cell"
+      ]
+    },
+    "doNow": {
+      "variant": "A",
+      "questions": [
+        {
+          "q": "What does MRS GREN stand for?",
+          "a": "Movement, Respiration, Sensitivity, Growth, Reproduction, Excretion, Nutrition.",
+          "marks": 1
+        },
+        {
+          "q": "Name three parts of a light microscope.",
+          "a": "Any three: eyepiece lens, objective lens, stage, focus knob, light, arm, base.",
+          "marks": 1,
+          "hint": "e_______ lens, s____, f____ knob"
+        },
+        {
+          "q": "Name four parts found in an animal cell.",
+          "a": "Nucleus, cytoplasm, cell membrane, mitochondria.",
+          "marks": 1,
+          "hint": "n______, c________, c___ m_______, m____________"
+        },
+        {
+          "q": "Name the three extra parts in a plant cell.",
+          "a": "Cell wall, chloroplasts, permanent vacuole.",
+          "marks": 1,
+          "hint": "c___ w___, c__________, v______"
+        },
+        {
+          "q": "What is the job of the nucleus?",
+          "a": "Controls the cell and holds the genetic material.",
+          "marks": 1
+        },
+        {
+          "q": "What happens in the mitochondria?",
+          "a": "Respiration, which releases energy for the cell.",
+          "marks": 1
+        }
+      ]
+    },
+    "engage": {
+      "variant": "mysteryImage",
+      "hook": "You can spot a doctor, a lifeguard or a hairdresser just by looking at them. What gives their job away?",
+      "imagePlaceholder": true,
+      "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Specialised Cells 7MLA/img/d_image7.jpg",
+      "imageConfidence": "search",
+      "imageDescription": "doctor holding a stethoscope towards the camera",
+      "reveal": {
+        "answer": "Their kit fits their job: a stethoscope, a float, a hairdryer. Cells work the same way. A cell's shape and parts give away the job it does."
+      }
+    },
+    "learn": [
+      {
+        "variant": "A",
+        "heading": "What is a specialised cell?",
+        "boxes": [
+          {
+            "header": "Specialised cell",
+            "items": [
+              "A cell with special features, called adaptations, that help it do one job.",
+              "Most still have the parts from last lesson: nucleus, cytoplasm, cell membrane and mitochondria."
+            ]
+          },
+          {
+            "header": "Feature, then job",
+            "items": [
+              "Link every feature to the job: \"It has ___ so that it can ___.\"",
+              "Your body has around 200 kinds of cell, and they all came from one fertilised egg cell."
+            ]
+          }
+        ],
+        "imagePlaceholder": true,
+        "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Specialised Cells 7MLA/img/d_image10.png",
+        "imageConfidence": "search",
+        "imageDescription": "group of specialised cells: nerve, sperm, egg, red blood, ciliated, palisade and root hair cells"
+      },
+      {
+        "variant": "A",
+        "heading": "Cell laminates",
+        "boxes": [
+          {
+            "header": "Your task",
+            "items": [
+              "Visit each cell laminate around the room.",
+              "For each cell, write where it is found, its job and its special features in the table on your worksheet."
+            ]
+          },
+          {
+            "header": "The seven cells",
+            "items": [
+              "Sperm, egg, red blood cell, nerve cell, ciliated cell, root hair cell, palisade cell."
+            ]
+          }
+        ],
+        "imagePlaceholder": true,
+        "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Specialised Cells 7MLA/img/d_image13.png",
+        "imageConfidence": "search",
+        "imageDescription": "blank specialised cells table with columns for where found, job and special features"
+      },
+      {
+        "variant": "E",
+        "heading": "Specialised animal cells",
+        "comparison": {
+          "aTitle": "Cell and its job",
+          "bTitle": "Special features and how they help",
+          "rows": [
+            {
+              "a": "Sperm cell: carries the father's genes",
+              "b": "Tail to swim. Lots of mitochondria for energy. Enzymes in the head to get into the egg."
+            },
+            {
+              "a": "Egg cell: carries the mother's genes",
+              "b": "Large, with a food store for the new cell. Jelly coat lets only one sperm in."
+            },
+            {
+              "a": "Red blood cell: carries oxygen",
+              "b": "No nucleus, so more room for haemoglobin to carry oxygen. Flexible, to fit through capillaries."
+            },
+            {
+              "a": "Nerve cell: carries electrical signals",
+              "b": "Long, to carry signals a long way. Branches connect to other cells."
+            },
+            {
+              "a": "Ciliated cell: keeps the airways clean",
+              "b": "Cilia sweep mucus, dust and bacteria up and out of the lungs."
+            }
+          ]
+        },
+        "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Specialised Cells 7MLA/img/d_image11.png",
+        "imageConfidence": "search",
+        "imageDescription": "red blood cell diagram showing its dimpled disc shape"
+      },
+      {
+        "variant": "A",
+        "heading": "Specialised plant cells",
+        "boxes": [
+          {
+            "header": "Root hair cell (in the roots)",
+            "items": [
+              "Job: absorb water and minerals from the soil.",
+              "Long, thin hair gives a large surface area, so more water is absorbed.",
+              "No chloroplasts: there is no light underground."
+            ]
+          },
+          {
+            "header": "Palisade cell (top of the leaf)",
+            "items": [
+              "Job: photosynthesis, making food for the plant.",
+              "Packed with chloroplasts to absorb lots of light.",
+              "Tall and thin, so many fit at the top of the leaf where the light is."
+            ]
+          }
+        ],
+        "imagePlaceholder": true,
+        "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Specialised Cells 7MLA/img/d_image6.png",
+        "imageConfidence": "search",
+        "imageDescription": "root hair cell diagram with long thin hair, vacuole and thin cell wall"
+      }
+    ],
+    "build": [
+      {
+        "type": "mcq",
+        "q": "Which cell has a tail so it can swim to another cell?",
+        "options": [
+          "Egg cell",
+          "Sperm cell",
+          "Nerve cell",
+          "Ciliated cell"
+        ],
+        "answer": "B",
+        "explanation": "The sperm cell swims to the egg using its tail."
+      },
+      {
+        "type": "mcq",
+        "q": "Why does a red blood cell have no nucleus?",
+        "options": [
+          "So it can swim faster",
+          "So it can absorb more water",
+          "So it can carry electrical signals",
+          "So it has more room to carry oxygen"
+        ],
+        "answer": "D",
+        "explanation": "With no nucleus there is more room for haemoglobin, which carries oxygen."
+      },
+      {
+        "type": "mcq",
+        "q": "Which cell is packed with chloroplasts?",
+        "options": [
+          "Palisade cell",
+          "Root hair cell",
+          "Red blood cell",
+          "Egg cell"
+        ],
+        "answer": "A",
+        "explanation": "Palisade cells sit at the top of the leaf and absorb light for photosynthesis."
+      },
+      {
+        "type": "mcq",
+        "q": "How do ciliated cells protect the lungs?",
+        "options": [
+          "Their cilia make oxygen for the lungs",
+          "Their cilia soak dust into the cell",
+          "Their cilia sweep mucus out of the lungs",
+          "Their cilia sweep mucus into the lungs"
+        ],
+        "answer": "C",
+        "explanation": "Cilia sweep mucus, with trapped dust and bacteria, up and out of the lungs."
+      },
+      {
+        "type": "mcq",
+        "q": "Why does a root hair cell have a long, thin hair?",
+        "options": [
+          "To carry signals to the leaves",
+          "To give a large surface area to absorb water",
+          "To help it swim through the soil",
+          "To give a large surface area to absorb light"
+        ],
+        "answer": "B",
+        "explanation": "A large surface area means more water and minerals are absorbed from the soil."
+      },
+      {
+        "type": "mcq",
+        "q": "Why is a nerve cell long?",
+        "options": [
+          "To carry signals a long way",
+          "To store food for a new cell",
+          "To sweep mucus out of the lungs",
+          "To carry oxygen a long way"
+        ],
+        "answer": "A",
+        "explanation": "Nerve cells carry electrical signals from one part of the body to another."
+      },
+      {
+        "type": "trueFalse",
+        "heading": "COMMON MISCONCEPTIONS",
+        "statements": [
+          {
+            "text": "Specialised cells have no organelles at all.",
+            "isTrue": false,
+            "correction": "Most still have a nucleus, cytoplasm, cell membrane and mitochondria. Red blood cells are unusual because they have no nucleus."
+          },
+          {
+            "text": "An egg cell is much bigger than a sperm cell.",
+            "isTrue": true
+          },
+          {
+            "text": "Root hair cells have lots of chloroplasts.",
+            "isTrue": false,
+            "correction": "Root hair cells are underground with no light, so they have no chloroplasts."
+          },
+          {
+            "text": "Mitochondria in a sperm cell release energy for swimming.",
+            "isTrue": true
+          },
+          {
+            "text": "All the cells in your body look the same.",
+            "isTrue": false,
+            "correction": "Cells have different shapes and features to suit their jobs."
+          }
+        ]
+      }
+    ],
+    "apply": {
+      "variant": "A",
+      "developing": [
+        {
+          "q": "Job 1: sends electrical signals and has long branches. Which cell gets the job?",
+          "a": "Nerve cell.",
+          "marks": 1,
+          "qType": "concept"
+        },
+        {
+          "q": "Job 3: likes sunlight and must have chloroplasts. Which cell gets the job?",
+          "a": "Palisade cell.",
+          "marks": 1,
+          "qType": "concept"
+        },
+        {
+          "q": "Job 2 needs a food store for a new cell. Job 5 carries oxygen. Name both cells.",
+          "a": "Job 2: egg cell. Job 5: red blood cell.",
+          "marks": 2,
+          "qType": "concept"
+        }
+      ],
+      "reaching": [
+        {
+          "q": "Explain how a sperm cell's tail and mitochondria help it do its job.",
+          "a": "The tail lets it swim to the egg. Mitochondria release energy for swimming.",
+          "marks": 2,
+          "qType": "concept",
+          "starters": [
+            "The tail helps because...",
+            "The mitochondria..."
+          ]
+        },
+        {
+          "q": "A red blood cell has no nucleus. Explain why this helps it do its job.",
+          "a": "There is more room for haemoglobin, so it can carry more oxygen.",
+          "marks": 2,
+          "qType": "concept",
+          "starters": [
+            "Without a nucleus there is more room for..."
+          ]
+        },
+        {
+          "q": "Reply to Job 4 (absorb water underground) as a root hair cell. Give two features and how each helps.",
+          "a": "Long, thin hair gives a large surface area to absorb water and minerals. Thin cell wall lets water pass in easily.",
+          "marks": 4,
+          "qType": "extended_writing",
+          "starters": [
+            "I have a ... so that I can ...",
+            "I also have ..."
+          ]
+        }
+      ],
+      "mastering": [
+        {
+          "q": "Write a CV for a ciliated cell: its job, where it works and how its features help.",
+          "a": "Lines the airways. Cilia sweep mucus with dust and bacteria up and out of the lungs, keeping them clean.",
+          "marks": 4,
+          "qType": "extended_writing",
+          "starters": [
+            "I work in the ...",
+            "My cilia help me ..."
+          ]
+        },
+        {
+          "q": "Cells lining the gut have tiny folds. Suggest their job and how the folds help.",
+          "a": "They absorb digested food into the blood. The folds give a large surface area, so food is absorbed faster.",
+          "marks": 3,
+          "qType": "extended_writing"
+        },
+        {
+          "q": "Smoking stops cilia working. Explain why smokers cough more and get more infections.",
+          "a": "Mucus with dust and bacteria is not swept out. It builds up, so they cough to clear it, and the bacteria cause infections.",
+          "marks": 3,
+          "qType": "extended_writing"
+        }
+      ]
+    },
+    "worksheetExtras": {
+      "wordBank": [
+        "specialised",
+        "adaptation",
+        "tail",
+        "nucleus",
+        "surface area",
+        "chloroplasts",
+        "cilia",
+        "signals"
+      ],
+      "cloze": [
+        "A _____ cell has features that help it do one job.",
+        "A sperm cell has a _____ so it can swim to the egg.",
+        "A red blood cell has no _____, so it has more room to carry oxygen.",
+        "A root hair cell has a large surface _____ to absorb water.",
+        "Palisade cells are packed with _____ to absorb light.",
+        "Ciliated cells have tiny hairs called _____ that sweep mucus out of the lungs.",
+        "A nerve cell is long so it can carry electrical _____ around the body."
+      ],
+      "clozeWordBank": [
+        "area",
+        "chloroplasts",
+        "cilia",
+        "mitochondria",
+        "nucleus",
+        "signals",
+        "specialised",
+        "tail"
+      ],
+      "collectionTable": {
+        "title": "SPECIALISED CELLS TABLE",
+        "instruction": "Use the cell laminates around the room to complete the table.",
+        "headers": [
+          "Type of cell",
+          "Where found",
+          "Job",
+          "Special features"
+        ],
+        "rows": [
+          [
+            "Sperm",
+            "",
+            "",
+            ""
+          ],
+          [
+            "Egg",
+            "",
+            "",
+            ""
+          ],
+          [
+            "Palisade cell",
+            "",
+            "",
+            ""
+          ],
+          [
+            "Ciliated cell",
+            "",
+            "",
+            ""
+          ],
+          [
+            "Root hair cell",
+            "",
+            "",
+            ""
+          ],
+          [
+            "Nerve cell",
+            "",
+            "",
+            ""
+          ],
+          [
+            "Red blood cell",
+            "",
+            "",
+            ""
+          ]
+        ]
+      }
+    },
+    "image_dump": {
+      "images": [
+        {
+          "path": "C:/Users/magda/claude-projects/science-lesson-v4/Specialised Cells 7MLA/img/d_image14.jpg",
+          "label": "Cell vacancies (Apply)"
+        },
+        {
+          "path": "C:/Users/magda/claude-projects/science-lesson-v4/Specialised Cells 7MLA/img/d_image4.jpg",
+          "label": "Engage: lifeguard"
+        },
+        {
+          "path": "C:/Users/magda/claude-projects/science-lesson-v4/Specialised Cells 7MLA/img/d_image5.jpg",
+          "label": "Engage: hairdresser"
+        },
+        {
+          "path": "C:/Users/magda/claude-projects/science-lesson-v4/Specialised Cells 7MLA/img/d_image8.jpg",
+          "label": "Sperm cell"
+        },
+        {
+          "path": "C:/Users/magda/claude-projects/science-lesson-v4/Specialised Cells 7MLA/img/d_image16.png",
+          "label": "Egg cell"
+        },
+        {
+          "path": "C:/Users/magda/claude-projects/science-lesson-v4/Specialised Cells 7MLA/img/d_image15.png",
+          "label": "Nerve cell"
+        },
+        {
+          "path": "C:/Users/magda/claude-projects/science-lesson-v4/Specialised Cells 7MLA/img/d_image18.png",
+          "label": "Ciliated cell"
+        },
+        {
+          "path": "C:/Users/magda/claude-projects/science-lesson-v4/Specialised Cells 7MLA/img/d_image12.png",
+          "label": "Palisade cell"
+        }
+      ]
+    }
+  }
+]

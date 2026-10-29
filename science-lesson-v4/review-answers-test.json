@@ -8,11 +8,26 @@
     "subject": "Chemistry",
     "objective": "Answer exam questions on rates of reaction and mark them accurately"
   },
-  "title": { "keywords": ["rate", "collision", "catalyst", "concentration"] },
+  "title": {
+    "keywords": [
+      "rate",
+      "collision",
+      "catalyst",
+      "concentration"
+    ]
+  },
   "doNow": {
     "questions": [
-      { "q": "State one factor that increases the rate of a reaction.", "a": "Increasing temperature (or concentration / surface area / a catalyst).", "marks": 1 },
-      { "q": "Name the unit for rate of reaction when a gas is collected.", "a": "cm^3/s (cm^3 per second).", "marks": 1 }
+      {
+        "q": "State one factor that increases the rate of a reaction.",
+        "a": "Increasing temperature (or concentration / surface area / a catalyst).",
+        "marks": 1
+      },
+      {
+        "q": "Name the unit for rate of reaction when a gas is collected.",
+        "a": "cm^3/s (cm^3 per second).",
+        "marks": 1
+      }
     ]
   },
   "learn": [
@@ -20,8 +35,14 @@
       "variant": "C",
       "heading": "Where to find the answers",
       "corePaper": [
-        { "q": "Q1 Collision theory", "pages": "pp. 142-143" },
-        { "q": "Q2 Rate calculations", "pages": "pp. 146-147" }
+        {
+          "q": "Q1 Collision theory",
+          "pages": "pp. 142-143"
+        },
+        {
+          "q": "Q2 Rate calculations",
+          "pages": "pp. 146-147"
+        }
       ]
     }
   ],
@@ -33,15 +54,43 @@
       "question": "Explain how increasing the concentration of a reactant affects the rate of reaction. Refer to collision theory.",
       "instruction": "Mark each answer against the mark scheme. Give it a level and a mark out of 6.",
       "levelDescriptors": [
-        { "level": "Level 3", "range": "5-6", "desc": "Detailed, coherent explanation linking concentration to collision frequency and to the rate." },
-        { "level": "Level 2", "range": "3-4", "desc": "Some linked points, but the explanation is incomplete." },
-        { "level": "Level 1", "range": "1-2", "desc": "Simple statements with no clear links." }
+        {
+          "level": "Level 3",
+          "range": "5-6",
+          "desc": "Detailed, coherent explanation linking concentration to collision frequency and to the rate."
+        },
+        {
+          "level": "Level 2",
+          "range": "3-4",
+          "desc": "Some linked points, but the explanation is incomplete."
+        },
+        {
+          "level": "Level 1",
+          "range": "1-2",
+          "desc": "Simple statements with no clear links."
+        }
       ],
       "indicativeContent": [
-        { "text": "Increasing concentration means more particles in the same volume.", "group": "collision theory" },
-        { "text": "Collisions between particles happen more often.", "group": "collision theory" },
-        { "text": "So there are more successful collisions per second.", "group": "effect on rate" },
-        { "text": "Therefore the rate of reaction increases.", "group": "effect on rate" }
+        {
+          "text": "Increasing concentration means more particles in the same volume.",
+          "group": "collision theory",
+          "mark": 1
+        },
+        {
+          "text": "Collisions between particles happen more often.",
+          "group": "collision theory",
+          "mark": 2
+        },
+        {
+          "text": "So there are more successful collisions per second.",
+          "group": "effect on rate",
+          "mark": 3
+        },
+        {
+          "text": "Therefore the rate of reaction increases.",
+          "group": "effect on rate",
+          "mark": 4
+        }
       ],
       "doesNotAward": [
         "Particles move faster (that is the effect of temperature, not concentration).",
@@ -50,40 +99,98 @@
       "samples": [
         {
           "label": "Student A",
-          "text": "When you add more concentration the particles move faster so they hit each other more and the reaction speeds up.",
+          "text": "When you add more concentration {x}the particles move faster{/x} so they {2}hit each other more{/2} and {4}the reaction speeds up.{/4}",
           "jitterProfile": 1,
           "awardedLevel": "Level 2",
           "awardedMarks": 3,
-          "hits": ["collisions happen more often", "rate increases"],
-          "misses": ["link to more particles in the same volume"],
+          "hits": [
+            "collisions happen more often",
+            "rate increases"
+          ],
+          "misses": [
+            "link to more particles in the same volume"
+          ],
           "comment": "Muddles concentration with temperature (\"move faster\")."
         },
         {
           "label": "Student B",
-          "text": "More concentration means there are more particles in the same volume, so collisions happen more often. This gives more successful collisions per second, so the rate of reaction increases.",
+          "text": "More concentration means there are {1}more particles in the same volume,{/1} so {2}collisions happen more often.{/2} This gives {3}more successful collisions per second,{/3} so {4}the rate of reaction increases.{/4}",
           "jitterProfile": 3,
           "awardedLevel": "Level 3",
           "awardedMarks": 6,
-          "hits": ["more particles in the same volume", "more successful collisions per second", "rate increases"],
+          "hits": [
+            "more particles in the same volume",
+            "more successful collisions per second",
+            "rate increases"
+          ],
           "misses": [],
           "comment": "Clear, fully linked chain of reasoning."
         },
         {
           "label": "Student C",
-          "text": "The rate goes up because the particles have more energy when you add more of the reactant.",
+          "text": "{4}The rate goes up{/4} because {x}the particles have more energy{/x} when you add more of the reactant.",
           "jitterProfile": 2,
           "awardedLevel": "Level 1",
           "awardedMarks": 1,
-          "hits": ["rate increases"],
-          "misses": ["no reference to collision frequency"],
+          "hits": [
+            "rate increases"
+          ],
+          "misses": [
+            "no reference to collision frequency"
+          ],
           "comment": "States the outcome but the reason is a misconception (energy, not frequency)."
         }
       ]
+    },
+    {
+      "type": "answerList",
+      "heading": "QUICK ANSWERS · ONE-MARK PARTS",
+      "rows": [
+        {
+          "q": "Q1(a) Name the unit of rate",
+          "a": "cm^3/s (or g/s)"
+        },
+        {
+          "q": "Q2(b) Volume of gas collected",
+          "a": "48 (cm^3)"
+        },
+        {
+          "q": "Q1(c) Which tube reacted fastest?",
+          "correct": "C",
+          "a": "the steepest line"
+        }
+      ]
+    },
+    {
+      "type": "modelAnswerReview",
+      "questionNumber": "3(a)(iii)",
+      "marks": 2,
+      "qType": "short",
+      "snippet": "test/snippet-sample.png",
+      "modelAnswer": "{1}Concrete.{/1} The heater was on for the {2}longest time{/2}, so it was supplied with the most energy.",
+      "indicativeContent": [
+        {
+          "text": "concrete",
+          "group": "Answer",
+          "mark": 1
+        },
+        {
+          "text": "(heater on for) longest / longer time",
+          "group": "Reason",
+          "mark": 2,
+          "dependentOn": "concrete"
+        }
+      ],
+      "extend": "3(a)(iii)"
     }
   ],
   "apply": {
     "developing": [
-      { "q": "Describe what happens to the rate of reaction as temperature increases.", "a": "The rate increases: particles move faster, collide more often, and more collisions have enough energy to react.", "marks": 2 }
+      {
+        "q": "Describe what happens to the rate of reaction as temperature increases.",
+        "a": "The rate increases: particles move faster, collide more often, and more collisions have enough energy to react.",
+        "marks": 2
+      }
     ],
     "reaching": [
       {
@@ -105,17 +212,47 @@
         "contentType": "extended_writing",
         "marks": 6,
         "levelDescriptors": [
-          { "level": "Level 3", "range": "5-6", "desc": "Detailed, coherent explanation linking concentration to collision frequency and to the rate." },
-          { "level": "Level 2", "range": "3-4", "desc": "Some linked points, but the explanation is incomplete." },
-          { "level": "Level 1", "range": "1-2", "desc": "Simple statements with no clear links." }
+          {
+            "level": "Level 3",
+            "range": "5-6",
+            "desc": "Detailed, coherent explanation linking concentration to collision frequency and to the rate."
+          },
+          {
+            "level": "Level 2",
+            "range": "3-4",
+            "desc": "Some linked points, but the explanation is incomplete."
+          },
+          {
+            "level": "Level 1",
+            "range": "1-2",
+            "desc": "Simple statements with no clear links."
+          }
         ],
         "indicativeContent": [
-          { "text": "Increasing concentration means more particles in the same volume.", "group": "collision theory" },
-          { "text": "The particles are closer together / more crowded.", "group": "collision theory" },
-          { "text": "Collisions between particles happen more often.", "group": "collision theory" },
-          { "text": "So there are more collisions per second.", "group": "effect on rate" },
-          { "text": "This gives more successful collisions per second.", "group": "effect on rate" },
-          { "text": "Therefore the rate of reaction increases.", "group": "effect on rate" }
+          {
+            "text": "Increasing concentration means more particles in the same volume.",
+            "group": "collision theory"
+          },
+          {
+            "text": "The particles are closer together / more crowded.",
+            "group": "collision theory"
+          },
+          {
+            "text": "Collisions between particles happen more often.",
+            "group": "collision theory"
+          },
+          {
+            "text": "So there are more collisions per second.",
+            "group": "effect on rate"
+          },
+          {
+            "text": "This gives more successful collisions per second.",
+            "group": "effect on rate"
+          },
+          {
+            "text": "Therefore the rate of reaction increases.",
+            "group": "effect on rate"
+          }
         ],
         "doesNotAward": [
           "Particles move faster (that is the effect of temperature, not concentration).",
@@ -126,13 +263,62 @@
   },
   "review": {
     "developing": [
-      { "q": "Describe what happens to the rate of reaction as temperature increases.", "a": "Rate increases — more frequent and more energetic collisions." }
+      {
+        "q": "Describe what happens to the rate of reaction as temperature increases.",
+        "a": "Rate increases — more frequent and more energetic collisions."
+      }
     ],
     "reaching": [
-      { "q": "A reaction produces 48 cm^3 of gas in 60 s. Calculate the mean rate.", "a": "0.8 cm^3/s (rate = 48 / 60)." }
+      {
+        "q": "A reaction produces 48 cm^3 of gas in 60 s. Calculate the mean rate.",
+        "a": "0.8 cm^3/s (rate = 48 / 60)."
+      }
     ],
     "mastering": [
-      { "q": "Explain how concentration affects rate using collision theory.", "a": "More particles per unit volume, so more frequent collisions and more successful collisions per second, so the rate increases." }
+      {
+        "q": "Explain how concentration affects rate using collision theory.",
+        "a": "More particles per unit volume, so more frequent collisions and more successful collisions per second, so the rate increases."
+      }
     ]
-  }
+  },
+  "ebiTask": {
+    "rows": [
+      {
+        "q": "Q1",
+        "task": "Draw a particle diagram before and after heating. Label which has more frequent collisions.",
+        "pages": "C6.2 p.142",
+        "paper": "Core"
+      },
+      {
+        "q": "Q2",
+        "task": "Redo the rate calculation with the units written under each number.",
+        "pages": "C6.1 p.146",
+        "paper": "Extend"
+      }
+    ]
+  },
+  "extension": [
+    {
+      "subtopic": "Collision theory",
+      "pages": "C6.2 p.142",
+      "questions": [
+        {
+          "q": "Explain why powdered marble reacts faster with acid than marble chips.",
+          "a": "Powder has a larger surface area so there are more frequent collisions between acid particles and marble particles.",
+          "marks": 2
+        }
+      ]
+    },
+    {
+      "subtopic": "Rate calculations",
+      "pages": "C6.1 p.146",
+      "questions": [
+        {
+          "q": "A reaction makes 48 cm^3 of gas in 60 s. Calculate the mean rate.",
+          "a": "0.8 cm^3/s",
+          "marks": 2
+        }
+      ]
+    }
+  ]
 }

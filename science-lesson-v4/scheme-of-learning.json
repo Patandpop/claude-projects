@@ -764,7 +764,7 @@
       "examBoard": "OCR Physics A",
       "patrykOwns": "Module 5, plus part of Module 6 (column 'AJS/PTO'); FCA takes the rest of Module 6",
       "driveRoot": "Lessons/Year 13",
-      "resolvedMismatch": "The existing Year 13 folders (Chapter 17 Oscillations, 21 Capacitance, 22 Electric Fields, 23 Magnetic Fields) are FCA's chapters for 2026-27, left over from a previous split. DECIDED 2026-07-22: the pacing document wins. Build the six chapters below. Leave the old folders in place untouched - do not delete them.",
+      "resolvedMismatch": "The existing Year 13 folders (Chapter 17 Oscillations, 21 Capacitance, 22 Electric Fields, 23 Magnetic Fields) are FCA's chapters for 2026-27, left over from a previous split. DECIDED 2026-07-22: the pacing document wins. Build the six chapters below. Leave the old folders in place - do not delete them. 2026-10-10 (Patryk approved): all A-level chapter folders now sit in OCR Module folders, Year 13/Module 5 - Newtonian World and Astrophysics (Ch 17, 19, 20) and Year 13/Module 6 - Particles and Medical Physics (Ch 21-27); Ch 20, 24, 25, 26 folders created.",
       "teachingSequence": [
         {
           "order": 1,

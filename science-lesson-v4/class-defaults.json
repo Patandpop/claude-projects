@@ -61,9 +61,9 @@
         }
       ],
       "lessonsPerFortnight": 2,
-      "wordBank": null,
-      "wordBankReason": "NOT STATED — Patryk has not said whether 8AG is lower prior attainment. ASK.",
-      "support": null,
+      "wordBank": true,
+      "wordBankReason": "Patryk 2026-10-09: '8AG should have word bank'.",
+      "support": true,
       "homework": null,
       "homeworkNote": "Not yet decided.",
       "notes": "32 students. Only 2 lessons/fortnight — Patryk sees them least."
@@ -232,7 +232,7 @@
     }
   },
   "_openQuestions": [
-    "8AG, 9AS, 9XS: is this class lower prior attainment (word bank) or not? Not stated.",
+    "9AS, 9XS: is this class lower prior attainment (word bank) or not? Not stated.",
     "8XP, 10S2, 11S2: word-bank setting carried forward from 2025/26 — confirm still right.",
     "Homework schedule/timing for KS3 and KS4 — Patryk said he will figure this out.",
     "10C2: which subjects do Ms Cox and Ms Bala actually take? Unknown, so we cannot yet tell which topics Patryk must build.",

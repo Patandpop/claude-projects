@@ -1,0 +1,1579 @@
+[
+  {
+    "meta": {
+      "class": "8AG",
+      "topic": "Starch in leaves",
+      "title": "Starch in Leaves",
+      "lessonType": "practical",
+      "theme": "biology",
+      "worksheet": "A",
+      "differentiation": "none",
+      "year": 8,
+      "subject": "Biology",
+      "macrotopic": "B1 Respiration and Photosythesis",
+      "lessonNumber": 7,
+      "outputDir": "C:/Users/magda/claude-projects/science-lesson-v4/Starch in Leaves 8AG"
+    },
+    "title": {
+      "objectives": [
+        "State that plants store glucose as starch",
+        "Test a leaf for starch using iodine solution",
+        "Explain why each step of the starch test is needed"
+      ],
+      "keywords": [
+        "starch",
+        "glucose",
+        "iodine",
+        "chlorophyll",
+        "ethanol",
+        "variegated"
+      ]
+    },
+    "doNow": {
+      "variant": "A",
+      "questions": [
+        {
+          "q": "Write the word equation for photosynthesis.",
+          "a": "carbon dioxide + water → glucose + oxygen",
+          "marks": 2,
+          "hint": "c_______ d_______ + w_______ → g_______ + o_______"
+        },
+        {
+          "q": "Which part of a plant cell does photosynthesis happen in?",
+          "a": "The chloroplasts.",
+          "marks": 1,
+          "hint": "c_______"
+        },
+        {
+          "q": "Write the word equation for aerobic respiration.",
+          "a": "glucose + oxygen → carbon dioxide + water",
+          "marks": 2
+        },
+        {
+          "q": "Name the product of anaerobic respiration in human muscles.",
+          "a": "Lactic acid.",
+          "marks": 1,
+          "hint": "l_______ a_______"
+        },
+        {
+          "q": "Name the two products of fermentation in yeast.",
+          "a": "Ethanol and carbon dioxide.",
+          "marks": 2,
+          "hint": "e_______ and c_______ d_______"
+        },
+        {
+          "q": "Give two factors that affect the rate of photosynthesis.",
+          "a": "Any two from: light intensity, carbon dioxide concentration, temperature.",
+          "marks": 2
+        }
+      ]
+    },
+    "engage": {
+      "variant": "mysteryImage",
+      "hook": "Potatoes, rice, wheat and a full kitchen cupboard. What do they have in common?",
+      "imagePlaceholder": true,
+      "imageDescription": "kitchen cupboard full of stored food",
+      "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Starch in Leaves 8AG/source-images/del_s3_image4.png",
+      "imageConfidence": "search",
+      "reveal": {
+        "answer": "They are all food stores. Plants store food too: the glucose they do not use straight away is kept as starch."
+      }
+    },
+    "learn": [
+      {
+        "variant": "A",
+        "heading": "Plants store glucose as starch",
+        "boxes": [
+          {
+            "header": "Making the store",
+            "items": [
+              "Photosynthesis makes glucose in the leaves.",
+              "Glucose the plant does not need straight away is turned into starch.",
+              "Starch is insoluble, so it stays in the cells and can be stored."
+            ]
+          },
+          {
+            "header": "Using the store",
+            "items": [
+              "At night there is no photosynthesis.",
+              "The plant turns starch back into glucose for respiration.",
+              "Potatoes, rice and wheat are all starch stores."
+            ]
+          }
+        ],
+        "imageDescription": "potato, rice and wheat as plant starch stores"
+      },
+      {
+        "variant": "A",
+        "heading": "Variegated leaves",
+        "boxes": [
+          {
+            "header": "Green parts",
+            "items": [
+              "Contain chlorophyll in chloroplasts.",
+              "Photosynthesis happens here.",
+              "Glucose is made and stored as starch."
+            ]
+          },
+          {
+            "header": "White parts",
+            "items": [
+              "No chlorophyll.",
+              "No photosynthesis.",
+              "No starch is made here."
+            ]
+          }
+        ],
+        "imageDescription": "variegated hosta leaf with green centre and white edges",
+        "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Starch in Leaves 8AG/source-images/del_s5_image10.png",
+        "imageConfidence": "search"
+      }
+    ],
+    "build": [
+      {
+        "type": "mcq",
+        "q": "What do plants turn spare glucose into so it can be stored?",
+        "options": [
+          "Starch",
+          "Oxygen",
+          "Chlorophyll",
+          "Carbon dioxide"
+        ],
+        "answer": "A",
+        "explanation": "Spare glucose is stored as starch, mainly in leaves, roots and seeds."
+      },
+      {
+        "type": "mcq",
+        "q": "Why is starch a good way to store glucose?",
+        "options": [
+          "It is green",
+          "It dissolves easily",
+          "It is insoluble, so it stays in the cells",
+          "It releases oxygen"
+        ],
+        "answer": "C",
+        "explanation": "Starch does not dissolve, so it stays put until the plant needs it."
+      },
+      {
+        "type": "mcq",
+        "q": "Which part of a variegated leaf makes starch?",
+        "options": [
+          "The white part",
+          "The green part",
+          "Both parts equally",
+          "Neither part"
+        ],
+        "answer": "B",
+        "explanation": "Only the green part has chlorophyll, so only it photosynthesises and makes starch."
+      },
+      {
+        "type": "mcq",
+        "about": "practical",
+        "q": "Why is the leaf put in boiling water first?",
+        "options": [
+          "To make it green",
+          "To kill it and stop its chemical reactions",
+          "To add starch",
+          "To dry it out"
+        ],
+        "answer": "B",
+        "explanation": "Boiling kills the leaf, so its reactions stop and it cannot use up its starch."
+      },
+      {
+        "type": "mcq",
+        "about": "practical",
+        "q": "Why is the leaf then put in hot ethanol?",
+        "options": [
+          "To remove the chlorophyll",
+          "To test for starch",
+          "To soften it",
+          "To make it photosynthesise"
+        ],
+        "answer": "A",
+        "explanation": "Ethanol removes the green chlorophyll, so the iodine colour change is easy to see."
+      },
+      {
+        "type": "mcq",
+        "about": "practical",
+        "q": "Why must the Bunsen be off when the ethanol goes into the hot water?",
+        "options": [
+          "Ethanol is flammable",
+          "Ethanol is toxic",
+          "The leaf will burn",
+          "Iodine will boil"
+        ],
+        "answer": "A",
+        "explanation": "Ethanol catches fire easily, so it is only ever heated in a hot water bath with the flame off."
+      },
+      {
+        "type": "practical",
+        "title": "Testing a leaf for starch",
+        "intro": "Kill the leaf, remove the chlorophyll, then add iodine to see which parts contain starch.",
+        "worksheetIntro": true,
+        "equipment": [
+          "variegated leaf",
+          "beaker of water",
+          "Bunsen burner, tripod, gauze and heat-proof mat",
+          "boiling tube of ethanol",
+          "forceps",
+          "white tile",
+          "iodine solution and dropping pipette",
+          "eye protection"
+        ],
+        "steps": [
+          "Boil the water in the beaker.",
+          "Put the leaf in the boiling water for 30 seconds.",
+          "Bunsen OFF. Stand the leaf in a tube of ethanol in the hot water for 5 minutes.",
+          "Dip the leaf in warm water to soften it.",
+          "Spread the leaf flat on the white tile.",
+          "Add iodine. Record which parts turn blue-black."
+        ],
+        "warning": "Eye protection on. Ethanol is flammable: Bunsen off. Use forceps. Iodine stains skin.",
+        "imagePlaceholder": true,
+        "imageDescription": "four stages of testing a leaf for starch: boiling water, ethanol in water bath, rinsing, iodine on white tile",
+        "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Starch in Leaves 8AG/source-images/del_s6_image11.jpg",
+        "imageConfidence": "search",
+        "questions": [
+          {
+            "q": "Which parts of your leaf turned blue-black? Explain why.",
+            "a": "The green parts. They have chlorophyll, so they photosynthesised and stored glucose as starch."
+          },
+          {
+            "q": "Why do you soften the leaf in warm water before adding iodine?",
+            "a": "Ethanol makes the leaf brittle. Softening lets it lie flat without breaking."
+          }
+        ]
+      }
+    ],
+    "apply": {
+      "developing": [
+        {
+          "q": "Describe the test for starch, including the colour change.",
+          "a": "Add iodine solution. It turns from orange-brown to blue-black if starch is present.",
+          "marks": 2,
+          "qType": "concept",
+          "contentType": "routine_recall"
+        },
+        {
+          "q": "Why do plants store glucose as starch?",
+          "a": "Starch is insoluble so it stays in the cells. It can be turned back into glucose when the plant needs it.",
+          "marks": 2,
+          "qType": "concept",
+          "contentType": "routine_recall"
+        },
+        {
+          "q": "Name three pieces of equipment for the starch test and what each is for.",
+          "a": "Any three: boiling water kills the leaf; ethanol removes chlorophyll; white tile shows the colour; iodine tests for starch; forceps hold the hot leaf.",
+          "marks": 3,
+          "qType": "concept",
+          "contentType": "routine_recall"
+        }
+      ],
+      "reaching": [
+        {
+          "q": "Why is the leaf put in ethanol before adding iodine?",
+          "a": "Ethanol removes the green chlorophyll, so the blue-black colour is easy to see.",
+          "marks": 2,
+          "qType": "concept",
+          "contentType": "known_procedure"
+        },
+        {
+          "q": "Why is the ethanol heated in a water bath, not over a flame?",
+          "a": "Ethanol is flammable. A water bath with the Bunsen off heats it without a flame nearby.",
+          "marks": 2,
+          "qType": "concept",
+          "contentType": "known_procedure"
+        },
+        {
+          "q": "Predict which part of a variegated leaf turns blue-black. Explain why.",
+          "a": "The green part. It has chlorophyll, so it photosynthesises and stores glucose as starch. The white part stays orange-brown.",
+          "marks": 3,
+          "qType": "concept",
+          "contentType": "known_procedure"
+        }
+      ],
+      "mastering": [
+        {
+          "q": "Describe how a leaf makes starch and what a positive starch test looks like.",
+          "a": "Chlorophyll absorbs light. Carbon dioxide and water make glucose. Spare glucose is stored as insoluble starch. Iodine turns blue-black.",
+          "marks": 4,
+          "qType": "extended_writing",
+          "contentType": "extended_writing"
+        },
+        {
+          "q": "A plant is kept in the dark for two days. Its leaf stays orange-brown with iodine. Explain why.",
+          "a": "No light, so no photosynthesis. The plant turned its stored starch back into glucose for respiration, so none is left.",
+          "marks": 3,
+          "qType": "concept",
+          "contentType": "unfamiliar_context"
+        },
+        {
+          "q": "Describe the four steps of the starch test. Give one risk and how to control it.",
+          "a": "Boil leaf; hot ethanol in water bath; soften in warm water; iodine on white tile. Risk: ethanol is flammable, so Bunsen off.",
+          "marks": 6,
+          "qType": "extended_writing",
+          "contentType": "extended_writing",
+          "indicativeContent": [
+            "Boil the leaf in water to kill it and stop its reactions",
+            "Turn the Bunsen off, then put the leaf in ethanol in the hot water bath",
+            "Ethanol removes the chlorophyll",
+            "Soften the leaf in warm water and spread it on a white tile",
+            "Add iodine: blue-black shows starch",
+            "Risk: ethanol is flammable, so no flame nearby; or hot water burns, so use forceps"
+          ]
+        }
+      ]
+    },
+    "worksheetExtras": {
+      "wordBank": [
+        "starch",
+        "glucose",
+        "iodine",
+        "chlorophyll",
+        "ethanol",
+        "insoluble",
+        "photosynthesis"
+      ],
+      "cloze": [
+        "Plants make _____ by photosynthesis.",
+        "Spare glucose is stored in the leaf as _____.",
+        "Starch is _____, so it does not dissolve and stays in the cells.",
+        "Hot _____ removes the green chlorophyll from the leaf.",
+        "_____ solution turns blue-black when starch is present."
+      ],
+      "clozeWordBank": [
+        "glucose",
+        "starch",
+        "insoluble",
+        "ethanol",
+        "iodine",
+        "chlorophyll"
+      ],
+      "results": {
+        "headers": [
+          "Part of leaf",
+          "Colour after iodine",
+          "Starch present?"
+        ],
+        "rows": [
+          [
+            "Green part",
+            "",
+            ""
+          ],
+          [
+            "White part",
+            "",
+            ""
+          ]
+        ]
+      }
+    }
+  },
+  {
+    "meta": {
+      "class": "13D",
+      "topic": "Hubble's law",
+      "title": "Hubble's Law",
+      "lessonType": "standard",
+      "theme": "physics",
+      "worksheet": "A",
+      "differentiation": "none",
+      "year": 13,
+      "subject": "Physics",
+      "macrotopic": "Chapter 20 - Cosmology",
+      "lessonNumber": 3,
+      "outputDir": "C:/Users/magda/claude-projects/science-lesson-v4/Hubbles Law 13D"
+    },
+    "title": {
+      "objectives": [
+        "State Hubble's law and the cosmological principle",
+        "Use v = H_0 d to find the speed and distance of a galaxy",
+        "Estimate the age of the universe from 1/H_0"
+      ],
+      "keywords": [
+        "Hubble's law",
+        "Hubble constant",
+        "red shift",
+        "recession velocity",
+        "cosmological principle",
+        "expanding universe"
+      ]
+    },
+    "doNow": {
+      "variant": "A",
+      "questions": [
+        {
+          "q": "Write the Doppler equation for light from a moving source.",
+          "a": "\\Delta\\lambda / \\lambda \\approx v / c",
+          "marks": 1
+        },
+        {
+          "q": "Light from a distant galaxy is red-shifted. What does this tell you about the galaxy?",
+          "a": "It is moving away from us (receding).",
+          "marks": 1
+        },
+        {
+          "q": "Define one parsec.",
+          "a": "The distance at which a radius of 1 AU subtends an angle of 1 arcsecond. About 3.1 × 10^16 m.",
+          "marks": 2
+        },
+        {
+          "q": "Define a light-year and give its value in metres.",
+          "a": "The distance light travels in one year. About 9.5 × 10^15 m.",
+          "marks": 2
+        },
+        {
+          "q": "State Wien's displacement law.",
+          "a": "peak wavelength × T = constant (2.9 × 10^-3 m K)",
+          "marks": 1
+        },
+        {
+          "q": "Write Stefan's law and say what L stands for.",
+          "a": "L = 4\\pi r^2 \\sigma T^4. L is the luminosity of the star (total power emitted).",
+          "marks": 2
+        }
+      ],
+      "specPoints": [
+        "OCR A 5.5.3 (a) Doppler effect",
+        "OCR A 5.5.2 Wien's and Stefan's laws",
+        "OCR A 5.5.1 astronomical distances"
+      ]
+    },
+    "engage": {
+      "variant": "news",
+      "hook": "In 1929 Edwin Hubble found that almost every galaxy is moving away from us. Does that put us at the centre of the universe?",
+      "imagePlaceholder": true,
+      "imageDescription": "Hubble 1929 velocity-distance graph of nearby galaxies",
+      "reveal": {
+        "answer": "No. An observer in any other galaxy would see the same thing. Space itself is expanding, so every galaxy moves away from every other."
+      }
+    },
+    "learn": [
+      {
+        "variant": "A",
+        "heading": "What Hubble measured",
+        "boxes": [
+          {
+            "header": "Two measurements per galaxy",
+            "items": [
+              "Distance: from standard candles such as Cepheid variable stars.",
+              "Recession velocity: from the red shift of its spectral lines, v = c\\Delta\\lambda/\\lambda."
+            ]
+          },
+          {
+            "header": "What he found",
+            "items": [
+              "Almost all galaxies are red-shifted, so they are receding.",
+              "The further away a galaxy is, the faster it recedes.",
+              "The universe is expanding."
+            ]
+          }
+        ],
+        "imageDescription": "absorption spectrum of a galaxy compared with lab spectrum showing red shift"
+      },
+      {
+        "variant": "F",
+        "heading": "Hubble's law",
+        "equation": "v = H_0 d",
+        "components": [
+          {
+            "symbol": "v",
+            "name": "Recession velocity of the galaxy",
+            "unit": "km s^-1 or m s^-1"
+          },
+          {
+            "symbol": "H_0",
+            "name": "Hubble constant",
+            "unit": "km s^-1 Mpc^-1 or s^-1"
+          },
+          {
+            "symbol": "d",
+            "name": "Distance to the galaxy",
+            "unit": "Mpc or m"
+          }
+        ],
+        "rearrangements": [
+          "d = v ÷ H_0",
+          "H_0 = v ÷ d"
+        ],
+        "example": "H_0 = 70 km s^-1 Mpc^-1. A galaxy 200 Mpc away recedes at v = 70 × 200 = 14 000 km s^-1.",
+        "imageDescription": "graph of galaxy recession velocity against distance with straight best-fit line through the origin"
+      },
+      {
+        "variant": "J",
+        "heading": "The Hubble graph",
+        "axes": {
+          "x": "distance d (Mpc)",
+          "y": "recession velocity v (km s^-1)"
+        },
+        "features": [
+          {
+            "label": "Straight line through the origin",
+            "description": "v is directly proportional to d"
+          },
+          {
+            "label": "Gradient",
+            "description": "Equal to the Hubble constant H_0"
+          },
+          {
+            "label": "Scatter about the line",
+            "description": "Galaxies also have their own local motion"
+          }
+        ],
+        "instruction": "Sketch the graph and label these features.",
+        "imageDescription": "Hubble diagram scatter plot of galaxy velocity against distance with best-fit line"
+      },
+      {
+        "variant": "A",
+        "heading": "The cosmological principle and the age of the universe",
+        "boxes": [
+          {
+            "header": "Cosmological principle",
+            "items": [
+              "On a large scale the universe is homogeneous (the same everywhere) and isotropic (the same in every direction).",
+              "The laws of physics are the same everywhere."
+            ]
+          },
+          {
+            "header": "Age of the universe",
+            "items": [
+              "If the expansion rate has been constant, t \\approx 1/H_0.",
+              "H_0 must be in s^-1: 70 × 10^3 ÷ 3.1 × 10^22 = 2.3 × 10^-18 s^-1.",
+              "t \\approx 4.4 × 10^17 s \\approx 14 billion years."
+            ]
+          }
+        ],
+        "imagePlaceholder": false
+      }
+    ],
+    "build": [
+      {
+        "type": "mcq",
+        "q": "Which statement is Hubble's law?",
+        "options": [
+          "Recession velocity is directly proportional to distance",
+          "Luminosity is proportional to temperature to the power four",
+          "Wavelength of peak emission is inversely proportional to temperature",
+          "All galaxies are the same distance from us"
+        ],
+        "answer": "A",
+        "explanation": "v = H_0 d: double the distance, double the recession velocity."
+      },
+      {
+        "type": "mcq",
+        "q": "What is the SI unit of the Hubble constant?",
+        "options": [
+          "s^-1",
+          "m s^-1",
+          "m s^-2",
+          "s"
+        ],
+        "answer": "A",
+        "explanation": "H_0 = v/d, so (m s^-1)/m = s^-1."
+      },
+      {
+        "type": "mcq",
+        "q": "H_0 = 70 km s^-1 Mpc^-1. What is the recession velocity of a galaxy 100 Mpc away?",
+        "options": [
+          "0.7 km s^-1",
+          "70 km s^-1",
+          "7000 km s^-1",
+          "7 × 10^5 km s^-1"
+        ],
+        "answer": "C",
+        "explanation": "v = 70 × 100 = 7000 km s^-1."
+      },
+      {
+        "type": "mcq",
+        "q": "Which observation shows that the universe is expanding?",
+        "options": [
+          "Andromeda is blue-shifted",
+          "Red shift increases with distance for almost all galaxies",
+          "Cepheid variables change in brightness",
+          "Stars are hotter than planets"
+        ],
+        "answer": "B",
+        "explanation": "More distant galaxies recede faster, which is what an expanding universe predicts."
+      },
+      {
+        "type": "mcq",
+        "q": "How is the age of the universe estimated from the Hubble constant?",
+        "options": [
+          "t \\approx H_0",
+          "t \\approx 1/H_0",
+          "t \\approx H_0^2",
+          "t \\approx c H_0"
+        ],
+        "answer": "B",
+        "explanation": "t = d/v = 1/H_0, assuming the expansion rate has been constant."
+      },
+      {
+        "type": "mcq",
+        "q": "The cosmological principle says that on a large scale the universe is:",
+        "options": [
+          "Centred on the Milky Way",
+          "Static and unchanging",
+          "Homogeneous and isotropic",
+          "Denser at the edges"
+        ],
+        "answer": "C",
+        "explanation": "Same everywhere and the same in every direction, so there is no centre."
+      },
+      {
+        "type": "guessExample",
+        "topic": "distance to a galaxy",
+        "given": "lab \\lambda = 656.3 nm, observed \\lambda = 669.4 nm, H_0 = 70 km s^-1 Mpc^-1",
+        "unknown": "distance d (Mpc)",
+        "equation": "v = c\\Delta\\lambda ÷ \\lambda, then d = v ÷ H_0",
+        "substitute": "v = 3.0 × 10^8 × 13.1 ÷ 656.3 = 6.0 × 10^6 m s^-1 = 6000 km s^-1; d = 6000 ÷ 70",
+        "solve": "d \\approx 86 Mpc"
+      },
+      {
+        "type": "practiceTriangle",
+        "topic": "Hubble's law",
+        "equation": "v = H_0 d",
+        "equationSymbols": {
+          "top": "v",
+          "bottom": [
+            "H_0",
+            "d"
+          ]
+        },
+        "questions": [
+          {
+            "q": "A galaxy is 350 Mpc away. H_0 = 70 km s^-1 Mpc^-1. Calculate its recession velocity.",
+            "a": "v = 70 × 350 = 2.5 × 10^4 km s^-1",
+            "marks": 2
+          },
+          {
+            "q": "A galaxy recedes at 1.4 × 10^4 km s^-1. H_0 = 70 km s^-1 Mpc^-1. Calculate its distance.",
+            "a": "d = 1.4 × 10^4 ÷ 70 = 200 Mpc",
+            "marks": 2
+          },
+          {
+            "q": "H_0 = 2.3 × 10^-18 s^-1. Estimate the age of the universe in years.",
+            "a": "t = 1 ÷ 2.3 × 10^-18 = 4.3 × 10^17 s \\approx 1.4 × 10^10 years",
+            "marks": 3
+          }
+        ]
+      },
+      {
+        "type": "errorAnalysis",
+        "wrongWorking": [
+          "H_0 = 70 km s^-1 Mpc^-1",
+          "t \\approx 1/H_0",
+          "t = 1 ÷ 70 = 0.014",
+          "The universe is 0.014 years old"
+        ],
+        "errorLine": 3,
+        "fix": "Convert H_0 to s^-1 first: 70 × 10^3 ÷ 3.1 × 10^22 = 2.3 × 10^-18 s^-1, so t = 4.4 × 10^17 s \\approx 1.4 × 10^10 years.",
+        "errorType": "unit conversion"
+      }
+    ],
+    "apply": {
+      "developing": [
+        {
+          "q": "State Hubble's law.",
+          "a": "The recession velocity of a galaxy is directly proportional to its distance from us.",
+          "marks": 1,
+          "qType": "concept",
+          "contentType": "routine_recall"
+        },
+        {
+          "q": "State the cosmological principle.",
+          "a": "On a large scale the universe is homogeneous and isotropic, and the laws of physics are the same everywhere.",
+          "marks": 2,
+          "qType": "concept",
+          "contentType": "routine_recall"
+        },
+        {
+          "q": "A galaxy is 50 Mpc away. H_0 = 70 km s^-1 Mpc^-1. Calculate its recession velocity.",
+          "a": "v = 70 × 50 = 3500 km s^-1",
+          "marks": 2,
+          "qType": "calculation",
+          "contentType": "known_procedure",
+          "equation": "v = H_0 d",
+          "units": "km s^-1"
+        }
+      ],
+      "reaching": [
+        {
+          "q": "A galaxy recedes at 2.1 × 10^4 km s^-1. H_0 = 70 km s^-1 Mpc^-1. Calculate its distance in Mpc.",
+          "a": "d = 2.1 × 10^4 ÷ 70 = 300 Mpc",
+          "marks": 2,
+          "qType": "calculation",
+          "contentType": "known_procedure",
+          "equation": "d = v ÷ H_0",
+          "units": "Mpc"
+        },
+        {
+          "q": "Convert H_0 = 70 km s^-1 Mpc^-1 into s^-1. (1 Mpc = 3.1 × 10^22 m)",
+          "a": "70 × 10^3 ÷ 3.1 × 10^22 = 2.3 × 10^-18 s^-1",
+          "marks": 2,
+          "qType": "calculation",
+          "contentType": "known_procedure"
+        },
+        {
+          "q": "Explain how the red shift of galaxies is evidence that the universe is expanding.",
+          "a": "Almost all galaxies are red-shifted, so receding. Red shift increases with distance, so v \\propto d: space is expanding.",
+          "marks": 3,
+          "qType": "concept",
+          "contentType": "known_procedure"
+        }
+      ],
+      "mastering": [
+        {
+          "q": "A 486 nm line is seen at 510 nm. H_0 = 2.2 × 10^-18 s^-1. Calculate the galaxy's distance in m.",
+          "a": "v = 3.0 × 10^8 × 24 ÷ 486 = 1.5 × 10^7 m s^-1; d = 1.5 × 10^7 ÷ 2.2 × 10^-18 = 6.7 × 10^24 m",
+          "marks": 4,
+          "qType": "calculation",
+          "contentType": "known_procedure",
+          "guess": true,
+          "given": "\\lambda = 486 nm, observed 510 nm, H_0 = 2.2 × 10^-18 s^-1",
+          "unknown": "d (m)",
+          "equation": "v = c\\Delta\\lambda ÷ \\lambda, d = v ÷ H_0",
+          "substitute": "v = 3.0 × 10^8 × 24 ÷ 486; d = 1.48 × 10^7 ÷ 2.2 × 10^-18",
+          "solve": "6.7 × 10^24 m",
+          "units": "m"
+        },
+        {
+          "q": "Estimate the age of the universe in years (H_0 = 2.2 × 10^-18 s^-1). State one assumption.",
+          "a": "t = 1 ÷ 2.2 × 10^-18 = 4.5 × 10^17 s \\approx 1.4 × 10^10 years. Assumes the expansion rate has been constant.",
+          "marks": 3,
+          "qType": "calculation",
+          "contentType": "known_procedure"
+        },
+        {
+          "q": "Distant supernovae are further away than their red shift predicts. Suggest what this shows.",
+          "a": "The expansion of the universe is accelerating, so galaxies were receding more slowly in the past (linked to dark energy).",
+          "marks": 2,
+          "qType": "concept",
+          "contentType": "unfamiliar_context"
+        }
+      ]
+    },
+    "worksheetExtras": {
+      "wordBank": []
+    }
+  },
+  {
+    "meta": {
+      "class": "10C2",
+      "topic": "Renewable energy resources",
+      "title": "Renewable Energy Resources and Environmental Factors",
+      "lessonType": "standard",
+      "theme": "physics",
+      "worksheet": "A",
+      "differentiation": "none",
+      "year": 10,
+      "subject": "Physics",
+      "macrotopic": "P1 Energy",
+      "lessonNumber": 12,
+      "outputDir": "C:/Users/magda/claude-projects/science-lesson-v4/Renewable Energy 10C2",
+      "examRef": "Physics-Energy-National-and-Global-Energy-Resources-2#Q40"
+    },
+    "title": {
+      "objectives": [
+        "Name the main renewable energy resources",
+        "Compare how reliable each resource is and its effect on the environment",
+        "Describe and explain trends in how the UK generates electricity"
+      ],
+      "keywords": [
+        "renewable",
+        "reliable",
+        "biofuel",
+        "hydroelectric",
+        "geothermal",
+        "tidal",
+        "carbon neutral"
+      ]
+    },
+    "doNow": {
+      "variant": "A",
+      "questions": [
+        {
+          "q": "Name two non-renewable energy resources.",
+          "a": "Any two from: coal, oil, natural gas, nuclear fuel.",
+          "marks": 2
+        },
+        {
+          "q": "What does non-renewable mean?",
+          "a": "It will run out. It cannot be replaced as fast as we use it.",
+          "marks": 1
+        },
+        {
+          "q": "Name two gases released when coal is burned.",
+          "a": "Carbon dioxide and sulfur dioxide.",
+          "marks": 2,
+          "hint": "c_______ d_______ and s_______ d_______"
+        },
+        {
+          "q": "Which environmental problem does sulfur dioxide cause?",
+          "a": "Acid rain.",
+          "marks": 1
+        },
+        {
+          "q": "Write the equation for efficiency.",
+          "a": "efficiency = useful output energy transfer ÷ total input energy transfer",
+          "marks": 1
+        },
+        {
+          "q": "A kettle has a total input of 2000 J and a useful output of 1600 J. Calculate its efficiency.",
+          "a": "1600 ÷ 2000 = 0.8 (80%)",
+          "marks": 2,
+          "hint": "efficiency = useful output ÷ total input"
+        }
+      ],
+      "specPoints": [
+        "AQA 4.1.3 National and global energy resources",
+        "AQA 4.1.2.2 Efficiency"
+      ]
+    },
+    "engage": {
+      "variant": "news",
+      "hook": "The UK's last coal power station, Ratcliffe-on-Soar, closed in September 2024. What is making our electricity instead?",
+      "imagePlaceholder": true,
+      "imageDescription": "cutaway of a wind turbine showing gearbox and generator",
+      "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Renewable Energy 10C2/source-images/lam_s2_image3.jpg",
+      "imageConfidence": "search",
+      "reveal": {
+        "answer": "Mostly gas, nuclear and a fast-growing share of renewables: wind, solar and biofuel. Today we compare the renewables."
+      }
+    },
+    "learn": [
+      {
+        "variant": "B",
+        "heading": "Key words",
+        "definitions": [
+          {
+            "term": "Renewable resource",
+            "definition": "An energy resource that is being (or can be) replenished as it is used."
+          },
+          {
+            "term": "Reliable",
+            "definition": "Available whenever we need it, whatever the weather or time of day."
+          },
+          {
+            "term": "Carbon neutral",
+            "definition": "The carbon dioxide released when it is burned was taken in from the air while the plants grew."
+          }
+        ],
+        "below": "none",
+        "imageDescription": "large solar panel array in sunlight",
+        "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Renewable Energy 10C2/source-images/rba_s7_image10.jpg",
+        "imageConfidence": "search"
+      },
+      {
+        "variant": "A",
+        "heading": "The renewable energy resources",
+        "boxes": [
+          {
+            "header": "Moving water, wind and Sun",
+            "items": [
+              "Hydroelectric: water falls through a dam and turns turbines.",
+              "Tidal and wave: moving sea water turns turbines.",
+              "Wind: turbines turn generators.",
+              "Solar: cells turn light into electricity; panels heat water."
+            ]
+          },
+          {
+            "header": "Hot rocks and living things",
+            "items": [
+              "Geothermal: hot rocks underground heat water to make steam.",
+              "Biofuel: plants or animal waste burned for heat, electricity or transport."
+            ]
+          }
+        ],
+        "imageDescription": "geothermal power station with cold water pumped down and steam returning",
+        "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Renewable Energy 10C2/source-images/rba_s12_image13.gif",
+        "imageConfidence": "search"
+      },
+      {
+        "variant": "E",
+        "heading": "Reliable or not?",
+        "comparison": {
+          "aTitle": "Reliable",
+          "bTitle": "Not reliable",
+          "rows": [
+            {
+              "a": "Tidal: the tides come in and out twice a day, every day.",
+              "b": "Wind: no wind, no electricity."
+            },
+            {
+              "a": "Hydroelectric: water is stored behind the dam until needed.",
+              "b": "Solar: nothing at night, less on cloudy days."
+            },
+            {
+              "a": "Geothermal: the rocks are always hot.",
+              "b": "Wave: a calm sea makes little electricity."
+            },
+            {
+              "a": "Biofuel: can be stored and burned when demand rises.",
+              "b": "Unreliable resources need a backup, often gas power stations."
+            }
+          ]
+        },
+        "imageDescription": "tidal barrage across a river estuary"
+      },
+      {
+        "variant": "A",
+        "heading": "Research task: renewable resources table",
+        "boxes": [
+          {
+            "header": "Complete your table",
+            "items": [
+              "Use the laminates and the textbook, pages 50 to 57.",
+              "Fill in one row for each resource."
+            ]
+          },
+          {
+            "header": "For each resource write",
+            "items": [
+              "Renewable or non-renewable.",
+              "Advantages.",
+              "Disadvantages.",
+              "How suitable it is for the UK."
+            ]
+          }
+        ],
+        "imagePlaceholder": false
+      }
+    ],
+    "build": [
+      {
+        "type": "mcq",
+        "q": "Which of these is a renewable energy resource?",
+        "options": [
+          "Coal",
+          "Nuclear fuel",
+          "Geothermal",
+          "Natural gas"
+        ],
+        "answer": "C",
+        "explanation": "Heat from hot rocks is replenished; the others will run out."
+      },
+      {
+        "type": "mcq",
+        "q": "Which renewable resource is the most reliable?",
+        "options": [
+          "Wind",
+          "Solar",
+          "Tidal",
+          "Wave"
+        ],
+        "answer": "C",
+        "explanation": "The tides come in and out twice a day, so the output is predictable."
+      },
+      {
+        "type": "mcq",
+        "q": "Which renewable resource releases carbon dioxide when it is used?",
+        "options": [
+          "Biofuel",
+          "Tidal",
+          "Hydroelectric",
+          "Wind"
+        ],
+        "answer": "A",
+        "explanation": "Biofuels are burned, which releases carbon dioxide."
+      },
+      {
+        "type": "mcq",
+        "q": "Why are biofuels described as carbon neutral?",
+        "options": [
+          "They release no carbon dioxide",
+          "The carbon dioxide they release was absorbed while the plants grew",
+          "They are stored underground",
+          "They are only burned at night"
+        ],
+        "answer": "B",
+        "explanation": "Plants take in carbon dioxide for photosynthesis, which balances what burning releases."
+      },
+      {
+        "type": "mcq",
+        "q": "Which energy resource can be used for transport as well as electricity?",
+        "options": [
+          "Tidal",
+          "Hydroelectric",
+          "Geothermal",
+          "Biofuel"
+        ],
+        "answer": "D",
+        "explanation": "Biofuels such as bioethanol can fuel cars; the others only make electricity or heat."
+      },
+      {
+        "type": "mcq",
+        "q": "What is the main environmental problem with hydroelectric power?",
+        "options": [
+          "Acid rain",
+          "Flooding valleys and destroying habitats",
+          "Radioactive waste",
+          "Carbon dioxide emissions"
+        ],
+        "answer": "B",
+        "explanation": "The dam floods a valley behind it, destroying habitats and farmland."
+      },
+      {
+        "type": "sort",
+        "instruction": "Sort each energy resource into renewable or non-renewable.",
+        "items": [
+          "coal",
+          "wind",
+          "nuclear fuel",
+          "biofuel",
+          "natural gas",
+          "tidal",
+          "oil",
+          "geothermal"
+        ],
+        "categories": {
+          "A": "Renewable",
+          "B": "Non-renewable"
+        },
+        "sorted": {
+          "A": [
+            "wind",
+            "biofuel",
+            "tidal",
+            "geothermal"
+          ],
+          "B": [
+            "coal",
+            "nuclear fuel",
+            "natural gas",
+            "oil"
+          ]
+        }
+      },
+      {
+        "type": "graphInterpret",
+        "graphLabel": "UK electricity generation 2012 to 2017",
+        "axes": {
+          "x": "year",
+          "y": "electricity generated (GWh)"
+        },
+        "imagePlaceholder": true,
+        "imageDescription": "BBC line graph of UK electricity generation by coal, oil, gas, nuclear and renewables 2012 to 2017",
+        "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Renewable Energy 10C2/source-images/rba_s15_image14.png",
+        "imageConfidence": "search",
+        "questions": [
+          {
+            "q": "Describe the trend in the use of coal from 2012 to 2017.",
+            "a": "It fell sharply, from about 143 000 GWh to about 22 000 GWh.",
+            "marks": 2
+          },
+          {
+            "q": "Suggest why this trend happened.",
+            "a": "Burning coal releases carbon dioxide and sulfur dioxide. Coal power stations closed to cut emissions.",
+            "marks": 2
+          },
+          {
+            "q": "Predict what will happen to the renewables line in the future. Explain why.",
+            "a": "Keep rising: fossil fuels will run out and the UK wants to cut carbon dioxide emissions.",
+            "marks": 2
+          }
+        ]
+      }
+    ],
+    "apply": {
+      "developing": [
+        {
+          "q": "Name three renewable energy resources.",
+          "a": "Any three from: wind, solar, tidal, wave, hydroelectric, geothermal, biofuel.",
+          "marks": 3,
+          "qType": "concept",
+          "contentType": "routine_recall"
+        },
+        {
+          "q": "What does renewable mean?",
+          "a": "Being (or can be) replenished as it is used.",
+          "marks": 1,
+          "qType": "concept",
+          "contentType": "routine_recall"
+        },
+        {
+          "q": "Give one reason why wind is not a reliable energy resource.",
+          "a": "The wind does not always blow, so the output changes.",
+          "marks": 1,
+          "qType": "concept",
+          "contentType": "routine_recall"
+        }
+      ],
+      "reaching": [
+        {
+          "q": "Explain why biofuels are described as carbon neutral.",
+          "a": "The carbon dioxide released when they burn was taken in by the plants for photosynthesis as they grew.",
+          "marks": 2,
+          "qType": "concept",
+          "contentType": "known_procedure"
+        },
+        {
+          "q": "Give one advantage and one disadvantage of hydroelectric power.",
+          "a": "Advantage: reliable, no polluting gases. Disadvantage: floods valleys and destroys habitats; expensive to build.",
+          "marks": 2,
+          "qType": "concept",
+          "contentType": "known_procedure"
+        },
+        {
+          "q": "Explain why solar cells are less useful in the UK than in Spain.",
+          "a": "The UK gets less sunlight and more cloud, so solar cells produce less electricity.",
+          "marks": 2,
+          "qType": "concept",
+          "contentType": "known_procedure"
+        }
+      ],
+      "mastering": [
+        {
+          "q": "Compare tidal and wind power for generating the UK's electricity.",
+          "a": "Both renewable, no polluting gases. Tidal is reliable; wind is not. Tidal barrages harm estuary habitats; turbines are a visual eyesore.",
+          "marks": 6,
+          "qType": "extended_writing",
+          "contentType": "extended_writing",
+          "indicativeContent": [
+            "Both are renewable",
+            "Neither releases carbon dioxide or polluting gases when running",
+            "Tidal is reliable: tides happen twice a day and are predictable",
+            "Wind is unreliable: output depends on the weather",
+            "Tidal barrages are expensive and damage estuary habitats",
+            "Wind turbines cause visual pollution and noise",
+            "The UK is windy and has a long coastline, so both suit the UK"
+          ]
+        },
+        {
+          "q": "Iceland uses geothermal power. Explain why southern England cannot easily do the same.",
+          "a": "Geothermal needs hot rocks near the surface, near volcanic activity. Southern England has none, so drilling deep enough is too expensive.",
+          "marks": 2,
+          "qType": "concept",
+          "contentType": "unfamiliar_context"
+        },
+        {
+          "q": "A turbine gives 0.6 MW. How many replace a 1200 MW coal station? Why is a backup still needed?",
+          "a": "1200 ÷ 0.6 = 2000 turbines. Wind is unreliable, so a backup such as gas is needed on still days.",
+          "marks": 3,
+          "qType": "calculation",
+          "contentType": "unfamiliar_context"
+        }
+      ]
+    },
+    "worksheetExtras": {
+      "wordBank": [
+        "renewable",
+        "reliable",
+        "replenished",
+        "carbon neutral",
+        "biofuel",
+        "hydroelectric",
+        "geothermal",
+        "tidal"
+      ],
+      "cloze": [
+        "A renewable resource is one that is being _____ as it is used.",
+        "Tidal power is _____ because the tides come in and out twice a day.",
+        "Solar cells do not work at _____.",
+        "Hydroelectric dams _____ valleys and destroy habitats.",
+        "Biofuels are carbon _____ because plants take in carbon dioxide as they grow."
+      ],
+      "clozeWordBank": [
+        "replenished",
+        "reliable",
+        "night",
+        "flood",
+        "neutral",
+        "unreliable"
+      ]
+    }
+  },
+  {
+    "meta": {
+      "class": "8XP",
+      "topic": "Pressure on a surface",
+      "title": "Pressure on a Surface",
+      "lessonType": "practical",
+      "theme": "physics",
+      "worksheet": "A",
+      "differentiation": "none",
+      "year": 8,
+      "subject": "Physics",
+      "macrotopic": "P1 Motion and Pressure",
+      "lessonNumber": 2,
+      "outputDir": "C:/Users/magda/claude-projects/science-lesson-v4/Pressure on a Surface 8XP"
+    },
+    "title": {
+      "objectives": [
+        "Estimate the area of a surface by counting squares",
+        "Calculate the pressure a force makes on a surface",
+        "Describe how changing the force or the area changes the pressure"
+      ],
+      "keywords": [
+        "pressure",
+        "force",
+        "area",
+        "weight",
+        "pascal"
+      ]
+    },
+    "doNow": {
+      "variant": "A",
+      "questions": [
+        {
+          "q": "What is the unit of pressure?",
+          "a": "Pascal (Pa), which is the same as N/m^2.",
+          "marks": 1
+        },
+        {
+          "q": "What is the unit of force?",
+          "a": "Newton (N).",
+          "marks": 1
+        },
+        {
+          "q": "What is the unit of area?",
+          "a": "Square metres (m^2) or square centimetres (cm^2).",
+          "marks": 1
+        },
+        {
+          "q": "Write the equation that links pressure, force and area.",
+          "a": "pressure = force ÷ area",
+          "marks": 1
+        },
+        {
+          "q": "Write the word equation for photosynthesis.",
+          "a": "carbon dioxide + water → glucose + oxygen",
+          "marks": 2,
+          "hint": "c_______ d_______ + w_______ → g_______ + o_______"
+        },
+        {
+          "q": "Name the product of anaerobic respiration in human muscles.",
+          "a": "Lactic acid.",
+          "marks": 1,
+          "hint": "l_______ a_______"
+        }
+      ]
+    },
+    "engage": {
+      "variant": "mysteryImage",
+      "hook": "A camel weighs about 5000 N, yet it walks across soft sand without sinking. How?",
+      "imagePlaceholder": true,
+      "imageDescription": "close-up of a camel's wide flat foot on sand",
+      "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Pressure on a Surface 8XP/source-images/del_s3_image6.png",
+      "imageConfidence": "search",
+      "reveal": {
+        "answer": "Its wide, flat feet spread the weight over a big area. A big area means a small pressure, so it does not sink."
+      }
+    },
+    "learn": [
+      {
+        "variant": "F",
+        "heading": "Calculating pressure",
+        "equation": "pressure = force ÷ area",
+        "components": [
+          {
+            "symbol": "pressure",
+            "name": "How spread out the force is",
+            "unit": "N/cm^2 or N/m^2 (Pa)"
+          },
+          {
+            "symbol": "force",
+            "name": "The push on the surface, often the weight",
+            "unit": "newtons (N)"
+          },
+          {
+            "symbol": "area",
+            "name": "The surface the force acts on",
+            "unit": "cm^2 or m^2"
+          }
+        ],
+        "rearrangements": [
+          "weight = mass × gravitational field strength (g = 10 N/kg on Earth)"
+        ],
+        "example": "A camel has a mass of 500 kg. Weight = 500 × 10 = 5000 N. Its four feet cover 1000 cm^2. Pressure = 5000 ÷ 1000 = 5 N/cm^2.",
+        "imageDescription": "camel walking on soft desert sand"
+      },
+      {
+        "variant": "A",
+        "heading": "Estimating area by counting squares",
+        "boxes": [
+          {
+            "header": "Counting squares",
+            "items": [
+              "Draw around the shape on 1 cm squared paper.",
+              "Count every full square.",
+              "Count a square as one if more than half of it is inside the line.",
+              "Ignore squares less than half inside."
+            ]
+          },
+          {
+            "header": "The answer",
+            "items": [
+              "Total number of squares = area in cm^2."
+            ]
+          }
+        ],
+        "imageDescription": "fingerprint outline drawn on centimetre squared paper",
+        "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Pressure on a Surface 8XP/source-images/del_s8_image13.png",
+        "imageConfidence": "search"
+      },
+      {
+        "variant": "E",
+        "heading": "Big pressure or small pressure?",
+        "comparison": {
+          "aTitle": "Bigger pressure",
+          "bTitle": "Smaller pressure",
+          "rows": [
+            {
+              "a": "Bigger force on the same area",
+              "b": "Smaller force on the same area"
+            },
+            {
+              "a": "Same force on a smaller area",
+              "b": "Same force on a bigger area"
+            },
+            {
+              "a": "Drawing pin point, sharp knife, stiletto heel",
+              "b": "Snowshoes, camel feet, tractor tyres"
+            }
+          ]
+        },
+        "imageDescription": "snowshoes on deep snow next to a drawing pin"
+      }
+    ],
+    "build": [
+      {
+        "type": "mcq",
+        "q": "A force in newtons acts on an area in cm^2. What is the unit of the pressure?",
+        "options": [
+          "N/cm^2",
+          "N × cm^2",
+          "cm^2/N",
+          "kg"
+        ],
+        "answer": "A",
+        "explanation": "Pressure = force ÷ area, so the unit is N ÷ cm^2 = N/cm^2."
+      },
+      {
+        "type": "mcq",
+        "q": "A force of 600 N acts on an area of 2 m^2. What is the pressure?",
+        "options": [
+          "1200 Pa",
+          "602 Pa",
+          "300 Pa",
+          "0.003 Pa"
+        ],
+        "answer": "C",
+        "explanation": "600 ÷ 2 = 300 Pa. Multiplying (1200) is the common mistake."
+      },
+      {
+        "type": "mcq",
+        "q": "Why do camels have wide feet?",
+        "options": [
+          "To make their weight bigger",
+          "To spread their weight over a bigger area and lower the pressure",
+          "To increase the pressure on the sand",
+          "To walk faster"
+        ],
+        "answer": "B",
+        "explanation": "Same force, bigger area, smaller pressure, so they do not sink."
+      },
+      {
+        "type": "mcq",
+        "q": "The same force pushes on each of these. Which makes the biggest pressure?",
+        "options": [
+          "A snowshoe",
+          "A flat hand",
+          "The point of a drawing pin",
+          "A tractor tyre"
+        ],
+        "answer": "C",
+        "explanation": "The pin point has the smallest area, so the pressure is biggest."
+      },
+      {
+        "type": "mcq",
+        "about": "practical",
+        "q": "When you count squares, what do you do with a square that is more than half inside your outline?",
+        "options": [
+          "Ignore it",
+          "Count it as one square",
+          "Count it as half a square",
+          "Count it as two squares"
+        ],
+        "answer": "B",
+        "explanation": "More than half in counts as one; less than half in is ignored."
+      },
+      {
+        "type": "mcq",
+        "about": "practical",
+        "q": "In the handprint experiment, what does the newton scale measure?",
+        "options": [
+          "The area of your hand",
+          "The force you push with",
+          "The pressure",
+          "Your mass"
+        ],
+        "answer": "B",
+        "explanation": "The scale reads force in newtons. You find the area from the squared paper."
+      },
+      {
+        "type": "practical",
+        "title": "Handprint pressure",
+        "intro": "Measure the force you push with and the area of your hand, then calculate your hand pressure.",
+        "worksheetIntro": true,
+        "equipment": [
+          "newton scale (bathroom scale reading in N)",
+          "1 cm squared paper",
+          "pencil",
+          "calculator"
+        ],
+        "steps": [
+          "Push down on the newton scale with one hand as hard as you can. Record the force in N.",
+          "Draw around the same hand on the squared paper.",
+          "Count the squares inside your outline. Count more-than-half squares as one.",
+          "The number of squares is the area of your hand in cm^2.",
+          "Calculate your hand pressure: pressure = force ÷ area.",
+          "Compare your pressure with the rest of the class."
+        ],
+        "warning": "Push down steadily. Do not stand or jump on the scale.",
+        "imagePlaceholder": true,
+        "imageDescription": "hand outline drawn on centimetre squared paper next to a newton scale",
+        "questions": [
+          {
+            "q": "Who in your class had the biggest pressure? Was it because of a bigger force or a smaller hand?",
+            "a": "Either: a bigger force or a smaller area both give a bigger pressure."
+          },
+          {
+            "q": "Why is counting squares only an estimate of the area?",
+            "a": "Part squares are rounded to one or zero, so the count is not exact."
+          }
+        ]
+      },
+      {
+        "type": "workedExample",
+        "worked": {
+          "prompt": "A camel has a mass of 500 kg. Each of its 4 feet has an area of 250 cm^2. Calculate the pressure on the sand. (g = 10 N/kg)",
+          "steps": [
+            "Weight = mass × g = 500 × 10 = 5000 N",
+            "Total area = 4 × 250 = 1000 cm^2",
+            "Pressure = force ÷ area = 5000 ÷ 1000 = 5 N/cm^2"
+          ]
+        },
+        "yourTurn": {
+          "prompt": "A student has a mass of 60 kg. Each of their 2 feet has an area of 150 cm^2. Calculate the pressure on the floor. (g = 10 N/kg)",
+          "answer": "Weight = 60 × 10 = 600 N. Area = 2 × 150 = 300 cm^2. Pressure = 600 ÷ 300 = 2 N/cm^2."
+        }
+      }
+    ],
+    "apply": {
+      "developing": [
+        {
+          "q": "Write the equation that links pressure, force and area.",
+          "a": "pressure = force ÷ area",
+          "marks": 1,
+          "qType": "concept",
+          "contentType": "routine_recall"
+        },
+        {
+          "q": "Mr Tick the alien has a mass of 14 kg. On his planet g = 14.5 N/kg. Calculate his weight.",
+          "a": "Weight = 14 × 14.5 = 203 N",
+          "marks": 2,
+          "qType": "calculation",
+          "contentType": "known_procedure",
+          "equation": "weight = mass × g",
+          "units": "N"
+        },
+        {
+          "q": "Explain why snowshoes stop you sinking into snow.",
+          "a": "They spread your weight over a bigger area, so the pressure on the snow is smaller.",
+          "marks": 2,
+          "qType": "concept",
+          "contentType": "known_procedure"
+        }
+      ],
+      "reaching": [
+        {
+          "q": "Mr Tick has 5 feet. Each foot has an area of 131 cm^2. Calculate the total area of his feet.",
+          "a": "5 × 131 = 655 cm^2",
+          "marks": 1,
+          "qType": "calculation",
+          "contentType": "known_procedure"
+        },
+        {
+          "q": "Mr Tick weighs 203 N and his feet cover 655 cm^2. Calculate the pressure he puts on the floor.",
+          "a": "203 ÷ 655 = 0.31 N/cm^2",
+          "marks": 2,
+          "qType": "calculation",
+          "contentType": "known_procedure",
+          "equation": "pressure = force ÷ area",
+          "units": "N/cm^2"
+        },
+        {
+          "q": "A footprint covers 40 full squares and 12 squares that are more than half full. Estimate its area in cm^2.",
+          "a": "40 + 12 = 52 cm^2",
+          "marks": 1,
+          "qType": "calculation",
+          "contentType": "known_procedure"
+        }
+      ],
+      "mastering": [
+        {
+          "q": "Prescottsius: mass 440 kg, g = 9 N/kg, 2 feet of 19 cm^2 each. Calculate its pressure on the floor.",
+          "a": "Weight = 440 × 9 = 3960 N. Area = 2 × 19 = 38 cm^2. Pressure = 3960 ÷ 38 = 104 N/cm^2.",
+          "marks": 3,
+          "qType": "calculation",
+          "contentType": "known_procedure"
+        },
+        {
+          "q": "Two aliens weigh the same. A has 2 feet, B has 8 feet of the same size. Which makes more pressure, and how many times more?",
+          "a": "Alien A. Its feet cover a quarter of the area, so its pressure is 4 times bigger.",
+          "marks": 2,
+          "qType": "concept",
+          "contentType": "unfamiliar_context"
+        },
+        {
+          "q": "Wider tyres stop a tractor sinking into mud. Explain why.",
+          "a": "The weight is the same but it is spread over a bigger area, so the pressure on the mud is smaller.",
+          "marks": 3,
+          "qType": "extended_writing",
+          "contentType": "unfamiliar_context"
+        }
+      ]
+    },
+    "worksheetExtras": {
+      "wordBank": [
+        "pressure",
+        "force",
+        "area",
+        "weight",
+        "bigger",
+        "smaller",
+        "newtons"
+      ],
+      "cloze": [
+        "Pressure = force ÷ _____.",
+        "Force is measured in _____.",
+        "A bigger force on the same area gives a _____ pressure.",
+        "Spreading the same force over a bigger area gives a _____ pressure.",
+        "Weight = mass × gravitational _____ strength."
+      ],
+      "clozeWordBank": [
+        "area",
+        "newtons",
+        "bigger",
+        "smaller",
+        "field",
+        "mass"
+      ],
+      "results": {
+        "headers": [
+          "Force (N)",
+          "Number of squares (area in cm^2)",
+          "Pressure (N/cm^2)"
+        ],
+        "rows": [
+          [
+            "",
+            "",
+            ""
+          ]
+        ]
+      }
+    }
+  }
+]

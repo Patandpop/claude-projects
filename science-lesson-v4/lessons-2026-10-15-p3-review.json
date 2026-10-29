@@ -1,0 +1,832 @@
+[
+  {
+    "meta": {
+      "class": "9XS/9AS",
+      "topic": "Particle model test review",
+      "title": "Particles Review",
+      "lessonType": "review",
+      "theme": "physics",
+      "worksheet": "C",
+      "differentiation": "none",
+      "year": 9,
+      "subject": "Physics",
+      "macrotopic": "P3 Particles",
+      "lessonNumber": 16,
+      "objective": "Correct my P3 test using model answers and fix my 3 EBIs",
+      "textbookRef": "none",
+      "examQuestion": false,
+      "outputDir": "C:/Users/magda/claude-projects/science-lesson-v4/Particles Review 9XS 9AS",
+      "snippetDir": {
+        "core": "Particles Review 9XS 9AS/snippets-core",
+        "extend": "Particles Review 9XS 9AS/snippets-extend"
+      }
+    },
+    "title": {
+      "objectives": [
+        "Use the model answers to mark and correct my test in purple pen",
+        "Correct my 3 EBIs using the follow-up tasks and the support pages",
+        "Stretch myself on the Extension questions"
+      ],
+      "keywords": [
+        "density",
+        "specific heat capacity",
+        "specific latent heat",
+        "internal energy",
+        "changes of state",
+        "accuracy"
+      ]
+    },
+    "doNow": {
+      "questions": [
+        {
+          "q": "Write the equation that links density, mass and volume.",
+          "a": "density = mass ÷ volume",
+          "marks": 1
+        },
+        {
+          "q": "Name the change of state from a gas to a liquid.",
+          "a": "Condensing",
+          "marks": 1
+        },
+        {
+          "q": "What happens to the temperature of a substance while it is changing state?",
+          "a": "It stays the same (the energy goes into breaking bonds, not raising the temperature)",
+          "marks": 1
+        },
+        {
+          "q": "What is the unit of specific heat capacity?",
+          "a": "J/kg °C",
+          "marks": 1
+        },
+        {
+          "q": "What is internal energy?",
+          "a": "The total kinetic energy and potential energy of all the particles in a system",
+          "marks": 1
+        },
+        {
+          "q": "Why does a gas exert a pressure on the walls of its container?",
+          "a": "Its particles collide with the walls and exert a force on them",
+          "marks": 1
+        }
+      ]
+    },
+    "learn": [
+      {
+        "variant": "C",
+        "heading": "Where to find help",
+        "imagePlaceholder": false,
+        "extendPaper": [
+          {
+            "q": "Q1 Changes of state, heating curves, specific latent heat",
+            "pages": "P6.2 p.78, P6.3 p.80, P6.5 p.84"
+          },
+          {
+            "q": "Q2 Density of an irregular object, mean and uncertainty",
+            "pages": "P6.1 p.76"
+          },
+          {
+            "q": "Q3 Specific heat capacity practical, bar charts and graphs",
+            "pages": "P2.4 p.30"
+          },
+          {
+            "q": "Q4 Cooling by evaporation, variables, accuracy",
+            "pages": "P6.3 p.80"
+          }
+        ],
+        "corePaper": [
+          {
+            "q": "Q1 Melting, reversible changes, forces (Stefan in the snow)",
+            "pages": "P6.2 p.78"
+          },
+          {
+            "q": "Q2 Names of the changes of state",
+            "pages": "P6.2 p.78"
+          },
+          {
+            "q": "Q3 Solids, liquids and gases as fuels",
+            "pages": "P6.2 p.78"
+          },
+          {
+            "q": "Q4 Heating curves, specific latent heat, specific heat capacity",
+            "pages": "P6.3 p.80, P6.5 p.84, P2.4 p.30"
+          },
+          {
+            "q": "Q5 Density of an irregular object and a mean",
+            "pages": "P6.1 p.76"
+          }
+        ]
+      }
+    ],
+    "build": [
+      {
+        "type": "answerList",
+        "heading": "CORE ONLY · Q1 · QUICK ANSWERS",
+        "rows": [
+          {
+            "core": "1(a)(i)",
+            "q": "Q1(a)(i) The snowflake melts: from a ... to a ...",
+            "a": "from a solid to a liquid (both, in that order)"
+          },
+          {
+            "core": "1(a)(ii)",
+            "q": "Q1(a)(ii) Why does snow on his nose melt quickly?",
+            "a": "His nose is warmer than the ground (body heat melts the snow). Not just \"the temperature is different\"."
+          },
+          {
+            "core": "1(a)(iii)",
+            "q": "Q1(a)(iii) Reversible? ice melting, wood burning, toasting bread",
+            "a": "yes, no, no (all three for the mark)"
+          },
+          {
+            "core": "1(b)(i)",
+            "q": "Q1(b)(i) Arrow for the force of gravity",
+            "a": "An arrow pointing straight down (not at a right angle to the board)"
+          },
+          {
+            "core": "1(b)(ii)",
+            "q": "Q1(b)(ii) Force that slows him down",
+            "correct": "friction",
+            "a": "not air resistance or drag"
+          }
+        ]
+      },
+      {
+        "type": "answerList",
+        "heading": "CORE ONLY · Q2 · QUICK ANSWERS",
+        "rows": [
+          {
+            "core": "2(a)",
+            "q": "Q2(a) Match each change of state to its name (4 marks)",
+            "a": "solid to liquid: melting.  liquid to gas: evaporating.  gas to liquid: condensing.  liquid to solid: freezing.  (1 mark per correct line; two lines from one box score 0)"
+          }
+        ]
+      },
+      {
+        "type": "answerList",
+        "heading": "CORE ONLY · Q3 · QUICK ANSWERS",
+        "rows": [
+          {
+            "core": "3(a)(i)",
+            "q": "Q3(a)(i) Fuel A",
+            "correct": "liquid",
+            "a": "e.g. petrol, oil, diesel, paraffin"
+          },
+          {
+            "core": "3(a)(ii)",
+            "q": "Q3(a)(ii) Fuel B",
+            "correct": "gas",
+            "a": "e.g. butane, propane, natural gas (not hydrogen or methane)"
+          },
+          {
+            "core": "3(a)(iii)",
+            "q": "Q3(a)(iii) Fuel C",
+            "correct": "solid",
+            "a": "e.g. coal, coke, wood, charcoal"
+          }
+        ]
+      },
+      {
+        "type": "modelAnswerReview",
+        "questionNumber": "3(b)",
+        "core": "3(b)",
+        "marks": 2,
+        "qType": "short",
+        "jitterProfile": 3,
+        "modelAnswer": "Two waste products formed from burning fuels are {1}carbon dioxide{/1} and {2}water.{/2}",
+        "indicativeContent": [
+          {
+            "text": "any two from: carbon dioxide",
+            "group": "Waste products",
+            "mark": 1
+          },
+          {
+            "text": "water (accept steam)",
+            "group": "Waste products",
+            "mark": 2
+          },
+          {
+            "text": "smoke (accept soot)",
+            "group": "Waste products"
+          },
+          {
+            "text": "ash",
+            "group": "Waste products"
+          },
+          {
+            "text": "gases (accept fumes), sulphur dioxide (accept nitrogen oxides), carbon monoxide",
+            "group": "Waste products"
+          }
+        ],
+        "doesNotAward": [
+          "heat",
+          "energy",
+          "lead"
+        ]
+      },
+      {
+        "type": "answerList",
+        "heading": "CORE Q4 = CHALLENGE Q1 · QUICK ANSWERS",
+        "rows": [
+          {
+            "q": "Q1(a) Match each particle arrangement to its state",
+            "a": "Solid: particles touching in a regular pattern. Liquid: particles touching in a random arrangement. Gas: particles far apart and random. (3 marks: 1 per correct line)",
+            "core": "4(a)",
+            "extend": "1(a)"
+          },
+          {
+            "q": "Q1(b) When was the ice melting?",
+            "a": "temperature stays at 0 °C while it melts",
+            "correct": "B",
+            "core": "4(b)",
+            "extend": "1(b)"
+          },
+          {
+            "q": "Q1(c) When was the water boiling?",
+            "a": "temperature stays at 100 °C while it boils",
+            "correct": "D",
+            "core": "4(c)",
+            "extend": "1(c)"
+          },
+          {
+            "q": "Q1(d) Which property changes as the temperature rises?",
+            "a": "",
+            "correct": "The kinetic energy of the particles",
+            "core": "4(d)",
+            "extend": "1(d)"
+          }
+        ]
+      },
+      {
+        "type": "modelAnswerReview",
+        "questionNumber": "1(e)",
+        "marks": 2,
+        "qType": "calculation",
+        "jitterProfile": 1,
+        "modelAnswer": [
+          "thermal energy = mass × specific latent heat",
+          "{1}E = 0.250 × 334 000{/1}",
+          "{2}E = 83 500 J{/2}"
+        ],
+        "indicativeContent": [
+          {
+            "text": "E = 0.250 × 334 000",
+            "group": "Substitution",
+            "mark": 1
+          },
+          {
+            "text": "E = 83 500 (J)",
+            "group": "Answer",
+            "mark": 2
+          }
+        ],
+        "core": "4(e)",
+        "extend": "1(e)"
+      },
+      {
+        "type": "modelAnswerReview",
+        "questionNumber": "4(f)",
+        "core": "4(f)",
+        "marks": 2,
+        "qType": "calculation",
+        "jitterProfile": 2,
+        "modelAnswer": [
+          "energy transferred = m × c × Δθ",
+          "{1}E = 2 × 450 × 5{/1}",
+          "{2}E = 4500 J{/2}"
+        ],
+        "indicativeContent": [
+          {
+            "text": "2 × 450 × 5",
+            "group": "Substitution",
+            "mark": 1
+          },
+          {
+            "text": "4500 (J)",
+            "group": "Answer",
+            "mark": 2
+          }
+        ],
+        "ecfNote": "1 mark for the correct substitution if no further step is shown"
+      },
+      {
+        "type": "answerList",
+        "heading": "CORE Q4(g) = CHALLENGE Q1(f) · QUICK ANSWERS",
+        "rows": [
+          {
+            "q": "Q1(f) Solid straight to gas",
+            "a": "",
+            "correct": "sublimates",
+            "core": "4(g)",
+            "extend": "1(f)"
+          }
+        ]
+      },
+      {
+        "type": "modelAnswerReview",
+        "questionNumber": "2(a)",
+        "marks": 6,
+        "qType": "short",
+        "jitterProfile": 2,
+        "modelAnswer": "{1}Use a eureka can{/1}. {2}Fill it with water{/2} {3}up to the spout{/3} and wait until it stops dripping. Put an empty measuring cylinder under the spout. {4}Gently lower the lime into the eureka can{/4} so that it is fully under the water. {5}Collect all of the water that overflows{/5} in the measuring cylinder. {6}Read the volume of water in the measuring cylinder{/6} at eye level. This volume of water is the volume of the lime.",
+        "levelDescriptors": [
+          {
+            "level": "Level 2",
+            "range": "3–6",
+            "desc": "The method would lead to the production of a valid outcome. The key steps are identified and logically sequenced."
+          },
+          {
+            "level": "Level 1",
+            "range": "1–2",
+            "desc": "The method would not necessarily lead to a valid outcome. Some steps are identified, but the method is not fully logically sequenced."
+          }
+        ],
+        "indicativeContent": [
+          {
+            "text": "use a eureka/displacement can",
+            "group": "Eureka can",
+            "mark": 1
+          },
+          {
+            "text": "fill the eureka/displacement can with water",
+            "group": "Eureka can",
+            "mark": 2
+          },
+          {
+            "text": "fill the eureka/displacement can up to the spout",
+            "group": "Eureka can",
+            "mark": 3
+          },
+          {
+            "text": "place lime in eureka/displacement can",
+            "group": "Eureka can",
+            "mark": 4
+          },
+          {
+            "text": "collect water that overflows",
+            "group": "Eureka can",
+            "mark": 5
+          },
+          {
+            "text": "use a measuring cylinder to measure volume of water",
+            "group": "Eureka can",
+            "mark": 6
+          },
+          {
+            "text": "OR use a measuring cylinder",
+            "group": "Measuring cylinder"
+          },
+          {
+            "text": "part fill the measuring cylinder with water",
+            "group": "Measuring cylinder"
+          },
+          {
+            "text": "measure the initial volume of water",
+            "group": "Measuring cylinder"
+          },
+          {
+            "text": "place lime in measuring cylinder",
+            "group": "Measuring cylinder"
+          },
+          {
+            "text": "record new volume of water",
+            "group": "Measuring cylinder"
+          },
+          {
+            "text": "volume of lime = new volume – initial volume",
+            "group": "Measuring cylinder"
+          }
+        ],
+        "core": "5(a)",
+        "extend": "2(a)"
+      },
+      {
+        "type": "modelAnswerReview",
+        "questionNumber": "2(b)",
+        "marks": 2,
+        "qType": "calculation",
+        "jitterProfile": 0,
+        "modelAnswer": [
+          "{1}mean = (2.1 + 2.1 + 2.4) ÷ 3{/1}",
+          "mean = 6.6 ÷ 3",
+          "{2}mean = 2.2 cm^3{/2}"
+        ],
+        "indicativeContent": [
+          {
+            "text": "mean = (2.1 + 2.1 + 2.4) ÷ 3",
+            "group": "Working",
+            "mark": 1
+          },
+          {
+            "text": "mean = 2.2 (cm^3)",
+            "group": "Answer",
+            "mark": 2
+          }
+        ],
+        "core": "5(b)",
+        "extend": "2(b)"
+      },
+      {
+        "type": "modelAnswerReview",
+        "questionNumber": "2(c)",
+        "marks": 2,
+        "qType": "calculation",
+        "jitterProfile": 3,
+        "modelAnswer": [
+          "range = 2.4 − 2.1 = 0.3 cm^3",
+          "{1}uncertainty = 0.3 ÷ 2{/1}",
+          "{2}uncertainty = ±0.15 cm^3{/2}"
+        ],
+        "indicativeContent": [
+          {
+            "text": "uncertainty = 0.3 ÷ 2",
+            "group": "Working",
+            "mark": 1
+          },
+          {
+            "text": "uncertainty = 0.15 (cm^3)",
+            "group": "Answer",
+            "mark": 2
+          }
+        ],
+        "extend": "2(c)"
+      },
+      {
+        "type": "answerList",
+        "heading": "CORE Q5(c) = CHALLENGE Q2(d) · QUICK ANSWERS",
+        "rows": [
+          {
+            "q": "Q2(d) Two advantages of three measurements and a mean (tick two)",
+            "a": "Allows anomalous results to be identified and ignored. Reduces the effect of random errors when using the equipment.",
+            "core": "5(c)",
+            "extend": "2(d)"
+          }
+        ]
+      },
+      {
+        "type": "modelAnswerReview",
+        "questionNumber": "2(e)",
+        "marks": 2,
+        "qType": "calculation",
+        "jitterProfile": 1,
+        "modelAnswer": [
+          "density = mass ÷ volume",
+          "{1}density = 84.0 ÷ 120{/1}",
+          "{2}density = 0.70 g/cm^3{/2}"
+        ],
+        "indicativeContent": [
+          {
+            "text": "density = 84.0 ÷ 120",
+            "group": "Substitution",
+            "mark": 1
+          },
+          {
+            "text": "density = 0.70 (g/cm^3)",
+            "group": "Answer",
+            "mark": 2
+          }
+        ],
+        "core": "5(d)",
+        "extend": "2(e)"
+      },
+      {
+        "type": "modelAnswerReview",
+        "questionNumber": "3(a)(i)",
+        "marks": 2,
+        "qType": "short",
+        "jitterProfile": 2,
+        "modelAnswer": "1. The {1}mass{/1} of each block was the same. 2. The {2}starting temperature{/2} of each block was the same (20 °C).",
+        "indicativeContent": [
+          {
+            "text": "any two from: mass (of block)",
+            "group": "Control variables",
+            "mark": 1
+          },
+          {
+            "text": "starting temperature",
+            "group": "Control variables",
+            "mark": 2
+          },
+          {
+            "text": "final / increase in temperature",
+            "group": "Control variables"
+          },
+          {
+            "text": "voltage / p.d.",
+            "group": "Control variables"
+          },
+          {
+            "text": "power (supplied to each block)",
+            "group": "Control variables"
+          },
+          {
+            "text": "type / thickness of insulation",
+            "group": "Control variables"
+          }
+        ],
+        "doesNotAward": [
+          "temperature (on its own)",
+          "same power supply",
+          "same insulation"
+        ],
+        "extend": "3(a)(i)"
+      },
+      {
+        "type": "answerList",
+        "heading": "CHALLENGE ONLY · Q3(a)(ii) · QUICK ANSWERS",
+        "rows": [
+          {
+            "q": "Q3(a)(ii) Why a bar chart, not a line graph?",
+            "a": "The type of material is a categoric variable (the data is in categories, not numbers).",
+            "extend": "3(a)(ii)"
+          }
+        ]
+      },
+      {
+        "type": "modelAnswerReview",
+        "questionNumber": "3(a)(iii)",
+        "marks": 2,
+        "qType": "short",
+        "jitterProfile": 0,
+        "modelAnswer": "{1}Concrete.{/1} The heater was switched on for the {2}longest time{/2} to raise its temperature by 5 °C, so it was supplied with the most energy.",
+        "indicativeContent": [
+          {
+            "text": "concrete",
+            "group": "Answer",
+            "mark": 1
+          },
+          {
+            "text": "(heater on for) longest / longer time",
+            "group": "Reason",
+            "dependentOn": "concrete",
+            "mark": 2
+          }
+        ],
+        "doesNotAward": [
+          "a long time, or quoting a time",
+          "it is the highest bar"
+        ],
+        "extend": "3(a)(iii)"
+      },
+      {
+        "type": "modelAnswerReview",
+        "questionNumber": "3(a)(iv)",
+        "marks": 2,
+        "qType": "calculation",
+        "jitterProfile": 4,
+        "modelAnswer": [
+          "E = m × c × Δθ",
+          "{1}E = 2 × 450 × 5{/1}",
+          "{2}E = 4500 J{/2}"
+        ],
+        "indicativeContent": [
+          {
+            "text": "2 × 450 × 5",
+            "group": "Substitution",
+            "mark": 1
+          },
+          {
+            "text": "4500 (J)",
+            "group": "Answer",
+            "mark": 2
+          }
+        ],
+        "extend": "3(a)(iv)"
+      },
+      {
+        "type": "answerList",
+        "heading": "CHALLENGE ONLY · Q3(b) · QUICK ANSWERS",
+        "rows": [
+          {
+            "q": "Q3(b)(i) Ring the anomalous result",
+            "a": "The point at 10 minutes",
+            "extend": "3(b)(i)"
+          },
+          {
+            "q": "Q3(b)(ii) Line of best fit",
+            "a": "A straight line through all the points except the anomaly, from at least the first point to the last",
+            "extend": "3(b)(ii)"
+          },
+          {
+            "q": "Q3(b)(iii) Temperature of the room",
+            "a": "20 °C (where the line starts, at 0 minutes)",
+            "extend": "3(b)(iii)"
+          },
+          {
+            "q": "Q3(b)(iv) Interval of the time values",
+            "a": "2 minutes",
+            "extend": "3(b)(iv)"
+          }
+        ]
+      },
+      {
+        "type": "answerList",
+        "heading": "CHALLENGE ONLY · Q4(a) · QUICK ANSWERS",
+        "rows": [
+          {
+            "q": "Q4(a) Which type of variable was temperature?",
+            "a": "",
+            "correct": "dependent",
+            "extend": "4(a)"
+          }
+        ]
+      },
+      {
+        "type": "modelAnswerReview",
+        "questionNumber": "4(b)",
+        "marks": 2,
+        "qType": "short",
+        "jitterProfile": 1,
+        "modelAnswer": "{1}Probe C.{/1} Its reading of 103.2 °C has the {2}largest difference from the actual temperature{/2} of 100.0 °C.",
+        "indicativeContent": [
+          {
+            "text": "(probe) C (allow 103.2)",
+            "group": "Answer",
+            "mark": 1
+          },
+          {
+            "text": "largest difference between reading and actual temperature",
+            "group": "Reason",
+            "dependentOn": "C",
+            "mark": 2
+          }
+        ],
+        "doesNotAward": [
+          "it is 3.2 greater (on its own)",
+          "comparing C with only one other probe"
+        ],
+        "extend": "4(b)"
+      },
+      {
+        "type": "answerList",
+        "heading": "CHALLENGE ONLY · Q4(c)(i) · QUICK ANSWERS",
+        "rows": [
+          {
+            "q": "Q4(c)(i) Lowest temperature recorded",
+            "a": "12 °C (accept 12.0 to 12.2)",
+            "extend": "4(c)(i)"
+          }
+        ]
+      },
+      {
+        "type": "modelAnswerReview",
+        "questionNumber": "4(c)(ii)",
+        "marks": 2,
+        "qType": "short",
+        "jitterProfile": 3,
+        "modelAnswer": "{1}140 seconds.{/1} This is when {2}the temperature stops falling and starts to rise again,{/2} so there is no liquid left evaporating.",
+        "indicativeContent": [
+          {
+            "text": "140 (seconds), accept 130 to 150",
+            "group": "Answer",
+            "mark": 1
+          },
+          {
+            "text": "temperature starts to rise",
+            "group": "Reason",
+            "dependentOn": "the time mark",
+            "mark": 2
+          }
+        ],
+        "extend": "4(c)(ii)"
+      }
+    ],
+    "ebiTask": {
+      "rows": [
+        {
+          "paper": "Core",
+          "q": "Q1 + 2",
+          "task": "Draw a particle picture for a solid, liquid and gas. Under the diagrams write the names of the changes of state.",
+          "pages": "P6.2 p.78"
+        },
+        {
+          "paper": "Core",
+          "q": "Q3",
+          "task": "Coal, oil and gas are examples of solids, liquids and gases. Describe in words the arrangement of particles in a solid, liquid and gas.",
+          "pages": "P6.2 p.78"
+        },
+        {
+          "paper": "Core",
+          "q": "Q4",
+          "task": "Sketch a heating curve and label the sections. Use your book to help you if you are struggling. Go back to the calculation questions (e) and (f) and try them again. Make sure you put the numbers under the formula given to avoid mistakes.",
+          "pages": "P6.3 p.80, P2.4 p.30"
+        },
+        {
+          "paper": "Core",
+          "q": "Q5",
+          "task": "Using your book or text book to help, rewrite the method for working out the density of an irregular shape. Make sure you state the equipment you use and what measurements you are taking. Do this in bullet points.",
+          "pages": "P6.1 p.76"
+        },
+        {
+          "q": "Q1",
+          "task": "Draw a heating curve and label up the sections on the graph. What do the flat regions represent? What is happening to the kinetic and potential energy across the graph?",
+          "pages": "P6.3 p.80, P6.4 p.82",
+          "paper": "Extend"
+        },
+        {
+          "q": "Q2",
+          "task": "Write a step by step set of instructions that explains how you measure the density of an irregular object. Make sure you include the equipment you use and the measurements you take.",
+          "pages": "P6.1 p.76",
+          "paper": "Extend"
+        },
+        {
+          "q": "Q3",
+          "task": "Define the specific heat capacity of a material. If the specific heat capacity is large, does it take a short time or long time to heat up? Why? Explain your answer.",
+          "pages": "P2.4 p.30",
+          "paper": "Extend"
+        },
+        {
+          "q": "Q4",
+          "task": "In an experiment there are independent, dependent and control variables. What do each of these mean? Go back to Q4. Can you now identify these from the investigation? What does the word ‘accurate’ mean in an experiment? How is it different from the word ‘precise’. Explain your answer.",
+          "pages": "P6.3 p.80",
+          "paper": "Extend"
+        }
+      ]
+    },
+    "extension": [
+      {
+        "subtopic": "Latent heat",
+        "pages": "P6.5 p.84",
+        "questions": [
+          {
+            "q": "The water in the kettle boiled for a short time before the kettle switched off. During this time 5.0 g of water changed to steam. Specific latent heat of vaporisation of water = 2 260 000 J/kg. Calculate the energy transferred to change the water to steam. Use the Physics Equations Sheet.",
+            "a": "m = 0.005 kg; E = 0.005 × 2 260 000; E = 11 300 J",
+            "marks": 3,
+            "ref": "Physics-Particle-Model-of-Matter-Changes-of-Heat-and-Specific-Latent-Heat#Q6g"
+          },
+          {
+            "q": "Calculate the energy transferred to the surroundings as 0.40 kg of stearic acid changed state from liquid to solid. The specific latent heat of fusion of stearic acid is 199 000 J / kg. Use the correct equation from the Physics Equations Sheet.",
+            "a": "E = 0.40 × 199 000; E = 79 600 J",
+            "marks": 2,
+            "ref": "Physics-Particle-Model-of-Matter-Changes-of-Heat-and-Specific-Latent-Heat#Q11e"
+          },
+          {
+            "q": "What is meant by specific latent heat of fusion?",
+            "a": "The amount of energy needed to change 1 kg (unit mass) of a substance from solid to liquid, with no change in temperature.",
+            "marks": 2,
+            "ref": "Physics-Particle-Model-of-Matter-Changes-of-State-and-the-Particle-Model#Q21b.i"
+          }
+        ]
+      },
+      {
+        "subtopic": "Density",
+        "pages": "P6.1 p.76",
+        "questions": [
+          {
+            "q": "The helium in the balloon has a mass of 0.00254 kg. The balloon has a volume of 0.0141 m^3. Calculate the density of helium. Choose the correct unit: m^3/kg, kg/m^3 or kg m^3.",
+            "a": "density = 0.00254 ÷ 0.0141; density = 0.18 kg/m^3",
+            "marks": 3,
+            "ref": "Physics-Particle-Model-of-Matter-Changes-of-State-and-the-Particle-Model#Q17d"
+          },
+          {
+            "q": "The student only took one set of measurements to determine the density of the rock. Explain why taking the measurements more than once may improve the accuracy of the density value.",
+            "a": "A mean can be calculated, which reduces the effect of random errors.",
+            "marks": 2,
+            "ref": "Physics-Particle-Model-of-Matter-Changes-of-State-and-the-Particle-Model#Q5d"
+          }
+        ]
+      },
+      {
+        "subtopic": "Specific heat capacity",
+        "pages": "P2.4 p.30",
+        "questions": [
+          {
+            "q": "The mass of water in the kettle was 0.50 kg. The temperature of the water increased from 20 °C to 100 °C. Specific heat capacity of water = 4200 J/kg °C. Calculate the energy transferred to the water. Use the Physics Equations Sheet.",
+            "a": "Δθ = 80 °C; E = 0.50 × 4200 × 80; E = 168 000 J",
+            "marks": 3,
+            "ref": "Physics-Energy-Energy-Changes-in-Systems#Q5f"
+          },
+          {
+            "q": "When the car engine is working normally, 2 kg of coolant passes through the radiator each second. The temperature of the coolant falls from 112 °C to 97 °C. Calculate the energy transferred each second from the coolant. Specific heat capacity of the coolant = 3800 J/kg °C.",
+            "a": "Δθ = 15 °C; E = 2 × 3800 × 15; E = 114 000 J",
+            "marks": 3,
+            "ref": "Physics-Particle-Model-of-Matter-Internal-Energy#Q20c"
+          },
+          {
+            "q": "What is meant by specific heat capacity?",
+            "a": "The energy needed to raise the temperature of 1 kg (unit mass) of a substance by 1 °C.",
+            "marks": 2,
+            "ref": "Physics-Energy-Energy-Changes-in-Systems#Q11a"
+          }
+        ]
+      },
+      {
+        "subtopic": "Internal energy",
+        "pages": "P6.4 p.82",
+        "questions": [
+          {
+            "q": "Explain how the internal energy of the water changes as it is heated from 20 °C to 25 °C.",
+            "a": "The (mean) kinetic energy of the particles increases, which increases the internal energy of the water.",
+            "marks": 2,
+            "ref": "Physics-Particle-Model-of-Matter-Changes-of-State-and-the-Particle-Model#Q12a"
+          },
+          {
+            "q": "Explain, in terms of particles, how evaporation causes the cooling of water.",
+            "a": "The fastest particles have enough energy to escape from the surface of the water. So the mean energy of the remaining particles decreases. The lower the mean energy of the particles, the lower the temperature of the water.",
+            "marks": 4,
+            "ref": "Physics-Particle-Model-of-Matter-Changes-of-State-and-the-Particle-Model#Q23b.ii"
+          }
+        ]
+      }
+    ]
+  }
+]

@@ -1,0 +1,690 @@
+[
+  {
+    "meta": {
+      "class": "12C",
+      "topic": "Young's double slits",
+      "title": "Young's Double Slits",
+      "lessonType": "standard",
+      "theme": "physics",
+      "worksheet": "A",
+      "differentiation": "none",
+      "year": 12,
+      "subject": "Physics",
+      "macrotopic": "Chapter 12 - Waves 2",
+      "lessonNumber": 3,
+      "uncapLearn": true,
+      "outputDir": "C:/Users/magda/claude-projects/science-lesson-v4/Youngs Double Slits 12C"
+    },
+    "title": {
+      "objectives": [
+        "Use λ = ax/D for two slits and nλ = d sin θ for a grating",
+        "Prove λ = ax/D using two similar triangles",
+        "Describe how to measure the wavelength of laser light"
+      ],
+      "keywords": [
+        "slit separation",
+        "fringe separation",
+        "path difference",
+        "coherent",
+        "small-angle approximation",
+        "diffraction grating",
+        "order"
+      ]
+    },
+    "doNow": {
+      "variant": "A",
+      "questions": [
+        {
+          "q": "Define coherent.",
+          "a": "Waves with a constant phase difference (so the same frequency).",
+          "marks": 1
+        },
+        {
+          "q": "Two points on a wave of wavelength 4.0 mm are 1.4 mm apart. Find their phase difference in degrees.",
+          "a": "(1.4 ÷ 4.0) × 360° = 126°",
+          "marks": 2,
+          "hint": "phase difference = (distance ÷ λ) × 360°"
+        },
+        {
+          "q": "State the path difference for a maximum and for a minimum in two-source interference.",
+          "a": "Maximum: nλ. Minimum: (n + ½)λ.",
+          "marks": 2
+        },
+        {
+          "q": "Calculate the wavelength of light of frequency 5.0 × 10^14 Hz in a vacuum.",
+          "a": "λ = c ÷ f = 3.00 × 10^8 ÷ 5.0 × 10^14 = 6.0 × 10^-7 m",
+          "marks": 2,
+          "hint": "c = fλ"
+        },
+        {
+          "q": "Define diffraction. When is it most noticeable?",
+          "a": "The spreading of a wave through a gap or round an obstacle. Most when the gap is about the same size as λ.",
+          "marks": 2
+        },
+        {
+          "q": "Write 0.25 mm and 650 nm in metres, in standard form.",
+          "a": "2.5 × 10^-4 m and 6.5 × 10^-7 m",
+          "marks": 2
+        }
+      ]
+    },
+    "engage": {
+      "variant": "prediction",
+      "engageType": 1,
+      "hook": "In 1801 most scientists agreed with Newton: light is a stream of particles. Thomas Young shone light through two slits.",
+      "imagePlaceholder": true,
+      "imageDescription": "torch beam drawn as both a wave and a stream of particles",
+      "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Youngs Double Slits 12C/src/ppt_image11.png",
+      "imageConfidence": "search",
+      "reveal": {
+        "question": "If light were particles, what would the screen show? What did Young see?",
+        "answer": "Particles would give two bright strips. Young saw lots of evenly spaced bright and dark fringes. Only waves interfere like that."
+      }
+    },
+    "learn": [
+      {
+        "variant": "A",
+        "heading": "Young's double-slit experiment",
+        "boxes": [
+          {
+            "header": "The set-up",
+            "items": [
+              "A laser lights two narrow slits, a fraction of a millimetre apart.",
+              "Laser light is monochromatic and coherent.",
+              "The screen is several metres away."
+            ]
+          },
+          {
+            "header": "What you see",
+            "items": [
+              "Light diffracts at each slit. The two beams overlap and interfere.",
+              "Evenly spaced bright and dark fringes.",
+              "Bright: path difference nλ. Dark: path difference (n + ½)λ."
+            ]
+          }
+        ],
+        "imageDescription": "light through a double slit making bright and dark interference fringes on a screen",
+        "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Youngs Double Slits 12C/src/ppt_image2.jpg",
+        "imageConfidence": "search"
+      },
+      {
+        "variant": "F",
+        "heading": "The double-slit equation",
+        "equation": "λ = {ax/D}",
+        "components": [
+          {
+            "symbol": "λ",
+            "name": "wavelength",
+            "unit": "m"
+          },
+          {
+            "symbol": "a",
+            "name": "slit separation (some books write d)",
+            "unit": "m"
+          },
+          {
+            "symbol": "x",
+            "name": "fringe separation, bright to next bright",
+            "unit": "m"
+          },
+          {
+            "symbol": "D",
+            "name": "slits to screen distance",
+            "unit": "m"
+          }
+        ],
+        "rearrangements": [
+          "x = {λD/a}",
+          "a = {λD/x}"
+        ],
+        "example": "Only works when a is much smaller than D. a = 0.50 mm, x = 2.4 mm, D = 2.0 m: λ = (5.0 × 10^-4 × 2.4 × 10^-3) ÷ 2.0 = 6.0 × 10^-7 m",
+        "imageDescription": "lamp, single slit, double slit and screen seen from above, with fringes on the screen",
+        "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Youngs Double Slits 12C/src/ppt_image6.png",
+        "imageConfidence": "search"
+      },
+      {
+        "variant": "F",
+        "heading": "The diffraction grating equation",
+        "equation": "nλ = d sin θ",
+        "components": [
+          {
+            "symbol": "n",
+            "name": "order of the maximum (0, 1, 2 ...)",
+            "unit": "no unit"
+          },
+          {
+            "symbol": "λ",
+            "name": "wavelength",
+            "unit": "m"
+          },
+          {
+            "symbol": "d",
+            "name": "grating spacing = 1 ÷ lines per metre",
+            "unit": "m"
+          },
+          {
+            "symbol": "θ",
+            "name": "angle from the central (zero order) maximum",
+            "unit": "°"
+          }
+        ],
+        "rearrangements": [
+          "λ = {d sin θ/n}",
+          "sin θ = {nλ/d}"
+        ],
+        "example": "500 lines per mm: d = 1 ÷ 500 000 = 2.0 × 10^-6 m. 1st order at 17.5°: λ = 2.0 × 10^-6 × sin 17.5° = 6.0 × 10^-7 m",
+        "imageDescription": "laser beam through a diffraction grating, central and second order maxima on a screen",
+        "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Youngs Double Slits 12C/src/ocr_grating_fig.png",
+        "imageConfidence": "search"
+      },
+      {
+        "variant": "A",
+        "heading": "Diffraction gratings",
+        "boxes": [
+          {
+            "header": "Why use a grating",
+            "items": [
+              "Hundreds of slits per mm, so d is tiny.",
+              "Maxima are much brighter and sharper than with two slits.",
+              "Angles are large, so they are easy to measure."
+            ]
+          },
+          {
+            "header": "Watch out",
+            "items": [
+              "No small-angle approximation: use sin θ exactly.",
+              "sin θ cannot be more than 1, so n ≤ d/λ. Round down."
+            ]
+          }
+        ],
+        "imagePlaceholder": false
+      },
+      {
+        "variant": "A",
+        "heading": "Proof step 1: path difference = a sin θ",
+        "boxes": [
+          {
+            "header": "The small triangle at the slits",
+            "items": [
+              "Rays to a far point P leave both slits almost parallel, at θ to the centre line.",
+              "Draw S_1N at right angles to the rays. The angle at S_1 is also θ."
+            ]
+          },
+          {
+            "header": "Path difference",
+            "items": [
+              "Light from S_2 travels the extra distance S_2N.",
+              "S_2N = a sin θ"
+            ]
+          }
+        ],
+        "imageDescription": "close-up of two slits with the small right-angled triangle and path difference a sin theta",
+        "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Youngs Double Slits 12C/src/proof_step1.png",
+        "imageConfidence": "search"
+      },
+      {
+        "variant": "A",
+        "heading": "Proof step 2: tan θ = x/D",
+        "boxes": [
+          {
+            "header": "The big triangle to the screen",
+            "items": [
+              "From the middle of the slits to P, the first bright fringe.",
+              "P is a distance x from the centre O. The screen is D away.",
+              "tan θ = {x/D}"
+            ]
+          },
+          {
+            "header": "Similar triangles",
+            "items": [
+              "Both triangles are right-angled and both contain θ.",
+              "So the same θ links the slits to the screen."
+            ]
+          }
+        ],
+        "imageDescription": "double slit to screen with the big right-angled triangle, D along the bottom and x up the screen",
+        "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Youngs Double Slits 12C/src/proof_step2.png",
+        "imageConfidence": "search"
+      },
+      {
+        "variant": "A",
+        "heading": "Proof step 3: the small-angle approximation",
+        "boxes": [
+          {
+            "header": "Why θ is tiny",
+            "items": [
+              "D is a few metres. x is a few millimetres.",
+              "So θ is a small fraction of a degree."
+            ]
+          },
+          {
+            "header": "The approximation",
+            "items": [
+              "For small θ in radians: sin θ ≈ tan θ ≈ θ",
+              "So sin θ ≈ {x/D}"
+            ]
+          }
+        ],
+        "imageDescription": "thin right-angled triangle with a small angle and a table of sin, tan and theta in radians",
+        "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Youngs Double Slits 12C/src/proof_step3.png",
+        "imageConfidence": "search"
+      },
+      {
+        "variant": "A",
+        "heading": "Proof step 4: λ = ax/D",
+        "boxes": [
+          {
+            "header": "Bright fringe",
+            "items": [
+              "Constructive when a sin θ = nλ.",
+              "First bright fringe, n = 1: a sin θ = λ"
+            ]
+          },
+          {
+            "header": "Put it together",
+            "items": [
+              "a × {x/D} = λ, so λ = {ax/D}",
+              "The nth bright fringe is nx from the centre, so every gap is x."
+            ]
+          }
+        ],
+        "imageDescription": "double slit fringes with path differences 0, lambda and 2 lambda and both triangles highlighted",
+        "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Youngs Double Slits 12C/src/proof_step4.png",
+        "imageConfidence": "search"
+      }
+    ],
+    "build": [
+      {
+        "type": "mcq",
+        "q": "OCR: double slit, D = 3.5 m, a = 1.5 mm. Central fringe to 6th order fringe = 9 mm. What is the wavelength?",
+        "options": [
+          "6.4 × 10^-7 m",
+          "3.9 × 10^-6 m",
+          "6.4 × 10^-1 m",
+          "2.3 × 10^-5 m"
+        ],
+        "answer": "A",
+        "explanation": "x = 9 mm ÷ 6 = 1.5 mm. λ = 1.5 × 10^-3 × 1.5 × 10^-3 ÷ 3.5 = 6.4 × 10^-7 m. B uses 9 mm as x."
+      },
+      {
+        "type": "mcq",
+        "q": "The proof replaces sin θ with tan θ. Why is that allowed?",
+        "options": [
+          "θ is large",
+          "θ is small",
+          "a is larger than D",
+          "λ is larger than a"
+        ],
+        "answer": "B",
+        "explanation": "θ is tiny because x is millimetres and D is metres, so sin θ ≈ tan θ."
+      },
+      {
+        "type": "mcq",
+        "q": "The screen is moved from 1.5 m to 3.0 m from the slits. What happens to the fringe separation x?",
+        "options": [
+          "It halves",
+          "It stays the same",
+          "It doubles",
+          "It quadruples"
+        ],
+        "answer": "C",
+        "explanation": "x = λD/a, so x is proportional to D."
+      },
+      {
+        "type": "mcq",
+        "q": "OCR: 600 nm light, grating, screen 3.0 m away. The two 1st order maxima are 1.42 m apart. What is the line spacing in m?",
+        "options": [
+          "1.3 × 10^-6",
+          "1.4 × 10^-6",
+          "2.5 × 10^-6",
+          "2.6 × 10^-6"
+        ],
+        "answer": "D",
+        "explanation": "tan θ = 0.71 ÷ 3.0, θ = 13.3°. d = 600 × 10^-9 ÷ sin 13.3° = 2.6 × 10^-6 m."
+      },
+      {
+        "type": "mcq",
+        "q": "What is the path difference at the first order bright fringe?",
+        "options": [
+          "0.5λ",
+          "1.0λ",
+          "1.5λ",
+          "2.0λ"
+        ],
+        "answer": "B",
+        "explanation": "Bright fringes: path difference nλ, and n = 1 here."
+      },
+      {
+        "type": "mcq",
+        "q": "OCR: 640 nm laser light, grating line spacing 3.3 × 10^-6 m. What is the total number of bright spots seen?",
+        "options": [
+          "5",
+          "6",
+          "10",
+          "11"
+        ],
+        "answer": "D",
+        "explanation": "n ≤ d/λ = 5.2, so n = 5 each side. 5 + 5 + the central spot = 11."
+      },
+      {
+        "type": "guessExample",
+        "topic": "Wavelength of a red laser",
+        "given": "a = 0.25 mm = 2.5 × 10^-4 m, D = 3.0 m, 10 fringe gaps = 78 mm so x = 7.8 × 10^-3 m",
+        "unknown": "λ",
+        "equation": "λ = {ax/D}",
+        "substitute": "λ = (2.5 × 10^-4 × 7.8 × 10^-3) ÷ 3.0",
+        "solve": "λ = 6.5 × 10^-7 m (650 nm)"
+      },
+      {
+        "type": "practiceTriangle",
+        "topic": "λ = ax/D",
+        "equation": "λ = {ax/D}",
+        "questions": [
+          {
+            "q": "10 fringe gaps measure 8.3 mm. a = 1.6 mm, D = 2.5 m. Calculate λ.",
+            "a": "x = 0.83 mm. λ = 1.6 × 10^-3 × 8.3 × 10^-4 ÷ 2.5 = 5.3 × 10^-7 m",
+            "marks": 2
+          },
+          {
+            "q": "Same slits and screen (a = 1.6 mm, D = 2.5 m) with 470 nm light. Find x.",
+            "a": "x = λD/a = 470 × 10^-9 × 2.5 ÷ 1.6 × 10^-3 = 7.3 × 10^-4 m",
+            "marks": 2
+          },
+          {
+            "q": "Blue laser, 455 nm. a = 0.90 mm, D = 3.0 m. How far is the 1st bright fringe from the centre?",
+            "a": "x = 455 × 10^-9 × 3.0 ÷ 9.0 × 10^-4 = 1.5 × 10^-3 m",
+            "marks": 2
+          }
+        ]
+      },
+      {
+        "type": "workedExample",
+        "worked": {
+          "prompt": "A grating has 300 lines per mm. A green laser (532 nm) shines on it normally. Find the angle of the 2nd order maximum.",
+          "steps": [
+            "d = 1 ÷ 300 000 = 3.33 × 10^-6 m",
+            "sin θ = nλ ÷ d = (2 × 532 × 10^-9) ÷ 3.33 × 10^-6 = 0.319",
+            "θ = sin^-1(0.319) = 18.6°"
+          ]
+        },
+        "yourTurn": {
+          "prompt": "A grating has 600 lines per mm. The 1st order maximum is at 22.3°. Find the wavelength.",
+          "answer": "d = 1.67 μm, so λ = d sin 22.3° = 633 nm"
+        }
+      },
+      {
+        "type": "errorAnalysis",
+        "wrongWorking": [
+          "a = 0.40 mm, D = 2.5 m. 8 fringe gaps measure 30 mm.",
+          "λ = {ax/D}",
+          "x = 30 mm = 0.030 m",
+          "λ = 4.0 × 10^-4 × 0.030 ÷ 2.5 = 4.8 × 10^-6 m"
+        ],
+        "errorLine": 3,
+        "fix": "x = 30 mm ÷ 8 = 3.75 mm = 3.75 × 10^-3 m, so λ = 4.0 × 10^-4 × 3.75 × 10^-3 ÷ 2.5 = 6.0 × 10^-7 m",
+        "errorType": "used the width of several fringes as x"
+      },
+      {
+        "type": "trueFalse",
+        "heading": "COMMON MISCONCEPTIONS",
+        "statements": [
+          {
+            "text": "Moving the screen further away spreads the fringes out.",
+            "isTrue": true
+          },
+          {
+            "text": "Slits further apart give wider fringes.",
+            "isTrue": false,
+            "correction": "x = λD/a, so a bigger a gives fringes closer together."
+          },
+          {
+            "text": "Blue light gives wider fringes than red light.",
+            "isTrue": false,
+            "correction": "Blue has a shorter λ, so its fringes are closer together."
+          },
+          {
+            "text": "λ = ax/D works for a diffraction grating.",
+            "isTrue": false,
+            "correction": "Grating angles are large. Use nλ = d sin θ with no small-angle approximation."
+          },
+          {
+            "text": "The central fringe is bright because the path difference there is zero.",
+            "isTrue": true
+          }
+        ]
+      },
+      {
+        "type": "practical",
+        "title": "Practical 1: wavelength of laser light with a double slit",
+        "heading": "Practical 1: wavelength of laser light with a double slit",
+        "steps": [
+          "Darken the room. Shine the laser through the double slit onto a screen 2 to 5 m away.",
+          "Measure D, slits to screen, with a tape measure. Make D as big as the room allows.",
+          "Measure across 10 or more fringe gaps. Divide by the number of gaps to get x.",
+          "Measure a with a travelling microscope or vernier calipers, or use the value given.",
+          "Repeat for several values of D. Plot x against D: the gradient is λ/a.",
+          "Work out % uncertainties (a is usually the biggest). Then λ = ax/D."
+        ],
+        "warning": "Class 2 laser. Never look into the beam or point it at anyone. Use a matt screen, no shiny surfaces.",
+        "equipment": [
+          "Class 2 laser (under 1 mW)",
+          "Double slit (a about 0.2 to 0.5 mm)",
+          "Screen or matt wall",
+          "Tape measure",
+          "Vernier calipers",
+          "Clamp stand"
+        ],
+        "imagePlaceholder": true,
+        "imageDescription": "laser shining through a double slit onto a screen showing a row of bright spots",
+        "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Youngs Double Slits 12C/src/ppt_image8.png",
+        "imageConfidence": "search",
+        "questions": [
+          {
+            "q": "Why measure across 10 fringe gaps and divide, instead of measuring one gap?",
+            "a": "The uncertainty is spread over 10 gaps, so the % uncertainty in x is 10 times smaller."
+          },
+          {
+            "q": "Why is the screen put several metres away?",
+            "a": "Bigger D gives bigger x, so the % uncertainties in x and D are smaller."
+          },
+          {
+            "q": "a = 0.50 ± 0.05 mm. What is the % uncertainty in a?",
+            "a": "0.05 ÷ 0.50 × 100 = 10%"
+          }
+        ]
+      },
+      {
+        "type": "practical",
+        "title": "Practical 2: wavelength with a diffraction grating",
+        "heading": "Practical 2: wavelength with a diffraction grating",
+        "steps": [
+          "Laser through a grating of known lines per mm, onto a screen over 1 m away.",
+          "Measure D, grating to screen, with a tape measure.",
+          "Measure between the two 1st order spots. Halve it to get y.",
+          "θ = tan^-1(y/D). Find d = 1 ÷ lines per metre.",
+          "λ = d sin θ ÷ n. Repeat for n = 2 and compare.",
+          "Better: plot d sin θ against n. The gradient is λ."
+        ],
+        "warning": "Class 2 laser. Never look into the beam or point it at anyone. Use a matt screen, no shiny surfaces.",
+        "equipment": [
+          "Class 2 laser (under 1 mW)",
+          "Diffraction grating (e.g. 300 lines per mm)",
+          "Clamp stand for the grating",
+          "Screen or matt wall",
+          "Tape measure"
+        ],
+        "imagePlaceholder": true,
+        "imageDescription": "laser through a diffraction grating, central and second order maxima on a screen",
+        "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Youngs Double Slits 12C/src/ocr_grating_fig.png",
+        "imageConfidence": "search",
+        "results": {
+          "headers": [
+            "Order n",
+            "D / m",
+            "Spot to spot / m",
+            "y / m",
+            "θ / °",
+            "λ / m"
+          ],
+          "rows": 4
+        },
+        "questions": [
+          {
+            "q": "Why measure between the two 1st order spots and halve it?",
+            "a": "The centre of the central spot is hard to find. A bigger distance also has a smaller % uncertainty."
+          },
+          {
+            "q": "Why is there no small-angle approximation here?",
+            "a": "Grating angles are large (often 10° to 40°), so sin θ and tan θ are not equal."
+          },
+          {
+            "q": "A grating has 300 lines per mm. Find d.",
+            "a": "d = 1 ÷ 300 000 = 3.3 × 10^-6 m"
+          }
+        ]
+      }
+    ],
+    "apply": {
+      "developing": [
+        {
+          "q": "Explain why the central fringe in a Young double-slit experiment is bright.",
+          "a": "Both slits are the same distance from the centre. Path difference 0, waves arrive in phase: constructive interference.",
+          "marks": 2,
+          "qType": "concept",
+          "contentType": "routine_recall"
+        },
+        {
+          "q": "A red laser (635 nm) lights slits 0.90 mm apart. The screen is 3.0 m away. Find the fringe separation.",
+          "a": "x = λD/a = (635 × 10^-9 × 3.0) ÷ 9.0 × 10^-4 = 2.1 mm",
+          "marks": 2,
+          "qType": "calculation",
+          "contentType": "known_procedure",
+          "guess": true,
+          "equation": "x = {λD/a}",
+          "units": "m"
+        },
+        {
+          "q": "The screen is moved further from the slits. What happens to the fringe separation? Use λ = ax/D.",
+          "a": "It increases. x = λD/a, so x is proportional to D.",
+          "marks": 2,
+          "qType": "concept",
+          "contentType": "known_procedure"
+        }
+      ],
+      "reaching": [
+        {
+          "q": "A grating has 500 lines per mm. Light of 450 nm hits it normally. Find the angle of the 2nd order maximum.",
+          "a": "d = 2.0 × 10^-6 m. sin θ = 2 × 450 × 10^-9 ÷ 2.0 × 10^-6 = 0.45. θ = 26.7°",
+          "marks": 3,
+          "qType": "calculation",
+          "contentType": "known_procedure",
+          "equation": "nλ = d sin θ",
+          "units": "°"
+        },
+        {
+          "q": "Transmitters 0.20 m apart emit 10 GHz microwaves in phase. D = 4.0 m. Find the distance between a maximum and the next minimum.",
+          "a": "λ = 3.0 × 10^8 ÷ 10 × 10^9 = 0.030 m. x = 0.030 × 4.0 ÷ 0.20 = 0.60 m. Max to min = x ÷ 2 = 0.30 m",
+          "marks": 3,
+          "qType": "calculation",
+          "contentType": "new_procedure",
+          "equation": "x = {λD/a}",
+          "units": "m"
+        },
+        {
+          "q": "590 nm light gives fringes 1.2 mm apart on a screen 1.5 m from the slits. Find the slit separation a.",
+          "a": "a = λD/x = 590 × 10^-9 × 1.5 ÷ 1.2 × 10^-3 = 7.4 × 10^-4 m (0.74 mm)",
+          "marks": 2,
+          "qType": "calculation",
+          "contentType": "known_procedure",
+          "equation": "a = {λD/x}",
+          "units": "m"
+        }
+      ],
+      "mastering": [
+        {
+          "q": "Show that x ≈ λD/a for a double slit. Draw both triangles and state the approximations you make.",
+          "a": "Path difference = a sin θ = λ for the 1st bright fringe. tan θ = x/D. a ≪ D so rays parallel; small θ so sin θ ≈ tan θ. So λ = ax/D.",
+          "marks": 4,
+          "qType": "extended_writing",
+          "contentType": "known_procedure",
+          "diagram": "Draw the two triangles here",
+          "diagramLines": 8
+        },
+        {
+          "q": "OCR: a grating with 800 lines per mm is used with the 486 nm hydrogen-beta line. Calculate the angle of the 2nd order line.",
+          "a": "d = 1.25 × 10^-6 m. sin θ = 0.778, so θ = 51°",
+          "marks": 2,
+          "qType": "calculation",
+          "contentType": "known_procedure",
+          "equation": "nλ = d sin θ",
+          "units": "°"
+        },
+        {
+          "q": "The laser is swapped for a white light source. Describe and explain the pattern on the screen.",
+          "a": "White central fringe: path difference 0 for every colour. Side fringes coloured, blue inside, red outside, as x ∝ λ. Further out the colours overlap.",
+          "marks": 4,
+          "qType": "extended_writing",
+          "contentType": "unfamiliar_context"
+        }
+      ]
+    },
+    "examQuestion": {
+      "examRef": "ALevel-Physics-Waves-Superposition#Q3",
+      "board": "OCR A",
+      "marks": 6,
+      "figure": {
+        "path": "C:/Users/magda/claude-projects/science-lesson-v4/exam-library/figures/5e0d44a3e498ca8a.png",
+        "w": 767,
+        "h": 300
+      },
+      "groups": [
+        {
+          "stem": "In an experiment to measure the wavelength of yellow light from a sodium lamp, a beam of light from a lamp passes through a pair of narrow slits S_1 and S_2. This produces a pattern of regularly spaced bright and dark lines, called fringes, on a screen as shown in Fig. 5.1. A student makes the following measurements: distance S_1S_2 = 0.8 mm, distance AB on screen = 6.0 mm, distance from slits to screen = 1.6 m.",
+          "parts": [
+            {
+              "label": "a",
+              "text": "Calculate the wavelength, in nanometre, of the sodium light.",
+              "marks": 3,
+              "ms": "Select λ = ax / D and x = 6.0 × 10^-3/5 = 1.2 × 10^-3 m (C1). λ = 0.8 × 10^-3 × 1.2 × 10^-3 / 1.6 (C1). λ = 600 (nm) (A1). Allow two marks for 500 nm."
+            },
+            {
+              "label": "c",
+              "text": "To reduce the uncertainty in the calculated value of the wavelength, one student suggests making a different slide with a greater slit separation. Discuss whether you think this change will reduce the uncertainty.",
+              "marks": 3,
+              "ms": "Percentage uncertainty in a decreases (B1). Fringes move closer together / percentage uncertainty in x increases / actually measuring 5x so smaller effect / AW (B1). With both measurements to 0.1 mm, measurement of a gives larger improvement so decrease in uncertainty in λ (B1)."
+            }
+          ]
+        }
+      ]
+    },
+    "worksheetExtras": {
+      "wordBank": [],
+      "results": {
+        "headers": [
+          "D / m",
+          "Number of gaps",
+          "Width across gaps / m",
+          "x / m",
+          "λ / m"
+        ],
+        "rows": 4
+      }
+    },
+    "image_dump": {
+      "images": [
+        {
+          "path": "C:/Users/magda/claude-projects/science-lesson-v4/Youngs Double Slits 12C/src/ppt_image7.png",
+          "label": "unassigned"
+        },
+        {
+          "path": "C:/Users/magda/claude-projects/science-lesson-v4/Youngs Double Slits 12C/src/ppt_image3.jpg",
+          "label": "unassigned"
+        },
+        {
+          "path": "C:/Users/magda/claude-projects/science-lesson-v4/Youngs Double Slits 12C/src/pp_image1.png",
+          "label": "unassigned"
+        }
+      ]
+    }
+  }
+]

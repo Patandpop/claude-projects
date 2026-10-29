@@ -1,0 +1,1485 @@
+[
+  {
+    "meta": {
+      "class": "11S2",
+      "topic": "Reflection and refraction",
+      "title": "Reflection and Refraction",
+      "lessonType": "practical",
+      "theme": "physics",
+      "worksheet": "A",
+      "differentiation": "none",
+      "year": 11,
+      "subject": "Physics",
+      "macrotopic": "P6 Waves",
+      "lessonNumber": 7,
+      "outputDir": "C:/Users/magda/claude-projects/science-lesson-v4/Reflection Refraction 11S2",
+      "examQuestion": false
+    },
+    "title": {
+      "objectives": [
+        "Draw ray diagrams for reflection and refraction",
+        "Explain refraction by a change in wave speed (HT: wavefronts)",
+        "Investigate refraction of light through a glass block"
+      ],
+      "keywords": [
+        "normal",
+        "angle of incidence",
+        "angle of refraction",
+        "refraction",
+        "specular reflection",
+        "diffuse reflection",
+        "wavefront"
+      ]
+    },
+    "doNow": {
+      "variant": "A",
+      "questions": [
+        {
+          "q": "Describe the difference between transverse and longitudinal waves.",
+          "a": "Transverse: oscillations perpendicular to the direction of energy transfer. Longitudinal: oscillations parallel to it.",
+          "marks": 2
+        },
+        {
+          "q": "Write the wave equation. Give the unit of each quantity.",
+          "a": "v = f λ. v in m/s, f in Hz, λ in m.",
+          "marks": 2
+        },
+        {
+          "q": "A wave has a frequency of 50 Hz and a wavelength of 4.0 m. Calculate its speed.",
+          "a": "v = 50 × 4.0 = 200 m/s",
+          "marks": 2
+        },
+        {
+          "q": "Put these in order of increasing wavelength: radio, gamma, visible light.",
+          "a": "Gamma, visible light, radio.",
+          "marks": 1
+        },
+        {
+          "q": "Which EM wave is used to take images of broken bones?",
+          "a": "X-rays.",
+          "marks": 1
+        },
+        {
+          "q": "State the law of reflection.",
+          "a": "The angle of incidence equals the angle of reflection.",
+          "marks": 1
+        }
+      ]
+    },
+    "engage": {
+      "variant": "mysteryImage",
+      "engageType": 1,
+      "hook": "This pencil is perfectly straight. Why does it look broken where it enters the water?",
+      "imagePlaceholder": true,
+      "imageDescription": "pencil in a glass of water looking bent at the water surface",
+      "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Reflection Refraction 11S2/fca/image4.jpg",
+      "imageConfidence": "search",
+      "reveal": {
+        "answer": "Light from the pencil changes speed and direction as it leaves the water. Your brain assumes light travels in straight lines, so the bottom looks shifted."
+      }
+    },
+    "learn": [
+      {
+        "variant": "A",
+        "heading": "Reflection",
+        "boxes": [
+          {
+            "header": "The law of reflection",
+            "items": [
+              "Angle of incidence = angle of reflection.",
+              "Both angles are measured from the normal: a dashed line at 90° to the surface."
+            ]
+          },
+          {
+            "header": "Smooth and rough surfaces",
+            "items": [
+              "Specular reflection: a smooth surface reflects light in one direction, like a mirror.",
+              "Diffuse reflection: a rough surface scatters light in many directions, like paper."
+            ]
+          }
+        ],
+        "imageDescription": "ray diagram of light reflecting from a plane mirror with normal and equal angles",
+        "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Reflection Refraction 11S2/fca/image3.jpg",
+        "imageConfidence": "search"
+      },
+      {
+        "variant": "A",
+        "heading": "Refraction",
+        "boxes": [
+          {
+            "header": "What refraction is",
+            "items": [
+              "A change in direction when a wave crosses a boundary at an angle.",
+              "It happens because the wave changes speed.",
+              "Along the normal the speed changes but the direction does not."
+            ]
+          },
+          {
+            "header": "Into and out of glass",
+            "items": [
+              "Air into glass: light slows down and bends towards the normal.",
+              "Glass into air: light speeds up and bends away from the normal."
+            ]
+          }
+        ],
+        "imageDescription": "ray of light refracting through a rectangular glass block with normals and angles labelled",
+        "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Reflection Refraction 11S2/fca/image13.png",
+        "imageConfidence": "search"
+      },
+      {
+        "variant": "A",
+        "heading": "Why waves bend (HT): wavefronts",
+        "boxes": [
+          {
+            "header": "Wavefronts",
+            "items": [
+              "A wavefront joins points on a wave that are in step, like the crests.",
+              "When a wavefront meets glass at an angle, one end slows down first.",
+              "The other end is still moving fast, so the wavefront turns."
+            ]
+          },
+          {
+            "header": "Deep to shallow water",
+            "items": [
+              "Water waves slow down in shallow water.",
+              "The wavelength gets shorter. The frequency stays the same."
+            ]
+          }
+        ],
+        "imageDescription": "car driving at an angle from smooth road onto mud, one wheel slowing first, as an analogy for refraction",
+        "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Reflection Refraction 11S2/fca/image9.png",
+        "imageConfidence": "search"
+      }
+    ],
+    "build": [
+      {
+        "type": "mcq",
+        "q": "A ray hits a plane mirror at 35° to the normal. What is the angle of reflection?",
+        "options": [
+          "35°",
+          "55°",
+          "70°",
+          "145°"
+        ],
+        "answer": "A",
+        "explanation": "Angle of reflection = angle of incidence, both measured from the normal."
+      },
+      {
+        "type": "mcq",
+        "q": "Light passes from air into glass at an angle. What happens to it?",
+        "options": [
+          "It speeds up and bends away from the normal",
+          "It slows down and bends away from the normal",
+          "It speeds up and bends towards the normal",
+          "It slows down and bends towards the normal"
+        ],
+        "answer": "D",
+        "explanation": "Glass slows light down, so it bends towards the normal."
+      },
+      {
+        "type": "mcq",
+        "q": "Which surface gives diffuse reflection?",
+        "options": [
+          "A plane mirror",
+          "A sheet of paper",
+          "Still water",
+          "Polished metal"
+        ],
+        "answer": "B",
+        "explanation": "Paper is rough on a tiny scale, so it scatters light in many directions."
+      },
+      {
+        "type": "mcq",
+        "about": "practical",
+        "q": "A ray enters the glass block along the normal. What happens to it?",
+        "options": [
+          "It bends towards the normal",
+          "It bends away from the normal",
+          "It goes straight on without bending",
+          "It reflects back along the normal"
+        ],
+        "answer": "C",
+        "explanation": "It slows down, but the whole wavefront slows at once, so the direction does not change."
+      },
+      {
+        "type": "mcq",
+        "about": "practical",
+        "q": "Where do you measure the angle of refraction?",
+        "options": [
+          "Between the refracted ray and the normal",
+          "Between the refracted ray and the block",
+          "Between the incident and refracted rays",
+          "Between the incident ray and the normal"
+        ],
+        "answer": "A",
+        "explanation": "All ray angles are measured from the normal."
+      },
+      {
+        "type": "mcq",
+        "about": "practical",
+        "q": "What is the best way to record the path of a ray?",
+        "options": [
+          "Draw along the ray with a pen",
+          "Mark two crosses far apart, then join them with a ruler",
+          "Trace the ray freehand",
+          "Estimate it after removing the ray box"
+        ],
+        "answer": "B",
+        "explanation": "Crosses far apart give an accurate straight line and a more accurate angle."
+      },
+      {
+        "type": "practical",
+        "title": "Refraction through a glass block",
+        "intro": "Trace rays through a glass block and off a mirror, and measure the angles from the normal.",
+        "worksheetIntro": true,
+        "equipment": [
+          "ray box, slit and power supply",
+          "rectangular glass block",
+          "plane mirror",
+          "protractor",
+          "ruler and sharp pencil",
+          "plain A4 paper"
+        ],
+        "steps": [
+          "Draw around the block. Draw a dashed normal at 90° to one long side.",
+          "Shine a single ray at the normal at an angle. Mark the rays in and out with crosses.",
+          "Remove the block. Join the crosses to draw the ray through the block.",
+          "Measure the angles of incidence and refraction. Repeat for three angles.",
+          "Swap the block for the mirror. Measure the angles of incidence and reflection."
+        ],
+        "warning": "Ray box bulbs get hot. The room is dim: keep bags and stools tucked in.",
+        "imagePlaceholder": true,
+        "imageDescription": "light ray from a ray box passing through a rectangular glass block on paper",
+        "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Reflection Refraction 11S2/fca/image10.jpg",
+        "imageConfidence": "search",
+        "questions": [
+          {
+            "q": "What happened to the ray as it entered the glass?",
+            "a": "It slowed down and bent towards the normal: the angle of refraction was smaller than the angle of incidence."
+          },
+          {
+            "q": "What happened as the ray left the glass?",
+            "a": "It sped up and bent away from the normal. It left parallel to the ray that went in."
+          }
+        ]
+      }
+    ],
+    "apply": {
+      "developing": [
+        {
+          "q": "Draw a ray diagram of light reflecting off a plane mirror. Label the normal and both angles.",
+          "a": "Incident and reflected rays at equal angles to a dashed normal. Angles of incidence and reflection labelled.",
+          "marks": 3,
+          "qType": "concept",
+          "contentType": "known_procedure",
+          "diagram": true,
+          "diagramLines": 8
+        },
+        {
+          "q": "State the law of reflection.",
+          "a": "Angle of incidence = angle of reflection.",
+          "marks": 1,
+          "qType": "concept",
+          "contentType": "routine_recall"
+        },
+        {
+          "q": "What is refraction?",
+          "a": "A change in direction of a wave as it crosses a boundary at an angle, caused by a change in speed.",
+          "marks": 2,
+          "qType": "concept",
+          "contentType": "routine_recall"
+        }
+      ],
+      "reaching": [
+        {
+          "q": "Describe what happens to a ray of light as it enters and leaves a glass block at an angle.",
+          "a": "Entering: slows down, bends towards the normal. Leaving: speeds up, bends away from the normal.",
+          "marks": 3,
+          "qType": "concept",
+          "contentType": "known_procedure"
+        },
+        {
+          "q": "Explain the difference between specular and diffuse reflection.",
+          "a": "Specular: a smooth surface reflects light in one direction. Diffuse: a rough surface scatters light in many directions.",
+          "marks": 2,
+          "qType": "concept",
+          "contentType": "known_procedure"
+        },
+        {
+          "q": "A ray hits glass along the normal. Describe what happens and explain why.",
+          "a": "It goes straight on. It slows down, but the whole wavefront slows at once, so its direction does not change.",
+          "marks": 2,
+          "qType": "concept",
+          "contentType": "known_procedure"
+        }
+      ],
+      "mastering": [
+        {
+          "q": "(HT) Use wavefronts to explain why light bends towards the normal as it enters glass.",
+          "a": "One end of the wavefront enters the glass first and slows down. The rest is still fast, so the wavefront turns towards the normal.",
+          "marks": 3,
+          "qType": "extended_writing",
+          "contentType": "extended_writing"
+        },
+        {
+          "q": "Light of wavelength 600 nm in air (3.0 × 10^8 m/s) travels at 2.0 × 10^8 m/s in glass. Find its wavelength in glass.",
+          "a": "f = 3.0 × 10^8 ÷ 600 × 10^-9 = 5.0 × 10^14 Hz (unchanged). λ = 2.0 × 10^8 ÷ 5.0 × 10^14 = 400 nm",
+          "marks": 3,
+          "qType": "calculation",
+          "contentType": "known_procedure",
+          "guess": true,
+          "given": "λ in air = 600 nm, v in air = 3.0 × 10^8 m/s, v in glass = 2.0 × 10^8 m/s",
+          "unknown": "λ in glass",
+          "equation": "v = f λ (f stays the same)",
+          "substitute": "f = 3.0 × 10^8 ÷ 6.0 × 10^-7; λ = 2.0 × 10^8 ÷ 5.0 × 10^14",
+          "solve": "4.0 × 10^-7 m = 400 nm",
+          "units": "m"
+        },
+        {
+          "q": "A fish looks shallower than it really is to someone on the bank. Explain why.",
+          "a": "Light from the fish speeds up as it leaves the water and bends away from the normal. The eye traces it back in a straight line, to a higher point.",
+          "marks": 3,
+          "qType": "concept",
+          "contentType": "unfamiliar_context"
+        }
+      ]
+    },
+    "worksheetExtras": {
+      "wordBank": [],
+      "results": {
+        "headers": [
+          "Angle of incidence (°)",
+          "Angle of refraction (°)"
+        ],
+        "rows": [
+          [
+            "20",
+            ""
+          ],
+          [
+            "40",
+            ""
+          ],
+          [
+            "60",
+            ""
+          ]
+        ]
+      },
+      "referenceData": {
+        "headers": [
+          "Angle of incidence (°)",
+          "Angle of refraction (°)"
+        ],
+        "rows": [
+          [
+            "20",
+            "13"
+          ],
+          [
+            "40",
+            "25"
+          ],
+          [
+            "60",
+            "35"
+          ],
+          [
+            "80",
+            "41"
+          ]
+        ],
+        "note": "Use these results if your own did not work.",
+        "fit": "curve"
+      }
+    }
+  },
+  {
+    "meta": {
+      "class": "7MLA",
+      "topic": "Animal and plant cells",
+      "title": "Animal Cells and Plant Cells",
+      "lessonType": "practical",
+      "theme": "biology",
+      "worksheet": "A",
+      "differentiation": "none",
+      "year": 7,
+      "subject": "Biology",
+      "macrotopic": "B1 Cells",
+      "lessonNumber": 3,
+      "outputDir": "C:/Users/magda/claude-projects/science-lesson-v4/Animal Plant Cells 7MLA"
+    },
+    "title": {
+      "objectives": [
+        "Name the parts of animal and plant cells and what they do",
+        "Prepare and look at an onion cell slide",
+        "Compare animal and plant cells"
+      ],
+      "keywords": [
+        "nucleus",
+        "cell membrane",
+        "cytoplasm",
+        "mitochondria",
+        "cell wall",
+        "vacuole",
+        "chloroplast"
+      ]
+    },
+    "doNow": {
+      "variant": "A",
+      "questions": [
+        {
+          "q": "Name the part of the microscope you look through.",
+          "a": "The eyepiece (lens).",
+          "marks": 1,
+          "hint": "e_______"
+        },
+        {
+          "q": "Which objective lens should you start with: the lowest or the highest power?",
+          "a": "The lowest power.",
+          "marks": 1
+        },
+        {
+          "q": "What does magnify mean?",
+          "a": "To make something look bigger than it really is.",
+          "marks": 1,
+          "hint": "To make something look b_______."
+        },
+        {
+          "q": "Name two of the seven life processes.",
+          "a": "Any two: movement, respiration, sensitivity, growth, reproduction, excretion, nutrition.",
+          "marks": 2,
+          "hint": "Think of MRS GREN."
+        },
+        {
+          "q": "What is the unit of force?",
+          "a": "The newton (N).",
+          "marks": 1,
+          "hint": "n_______"
+        },
+        {
+          "q": "Name the force that acts when two surfaces rub together.",
+          "a": "Friction.",
+          "marks": 1,
+          "hint": "f_______"
+        }
+      ]
+    },
+    "engage": {
+      "variant": "mysteryImage",
+      "engageType": 5,
+      "hook": "These blue shapes were scraped from the inside of someone's mouth. What are they?",
+      "imagePlaceholder": true,
+      "imageDescription": "human cheek cells stained blue under a light microscope",
+      "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Animal Plant Cells 7MLA/an/image16.jpg",
+      "imageConfidence": "search",
+      "reveal": {
+        "answer": "Cheek cells, stained blue so they show up. Every part of you is made of cells like these. The dark dot in each one is the nucleus."
+      }
+    },
+    "learn": [
+      {
+        "variant": "A",
+        "heading": "Parts of an animal cell",
+        "boxes": [
+          {
+            "header": "Control and protection",
+            "items": [
+              "Nucleus: controls the cell. Contains the genetic material.",
+              "Cell membrane: controls what goes in and out of the cell."
+            ]
+          },
+          {
+            "header": "Where things happen",
+            "items": [
+              "Cytoplasm: a jelly where chemical reactions happen.",
+              "Mitochondria: where respiration releases energy."
+            ]
+          }
+        ],
+        "imageDescription": "simple animal cell diagram with nucleus, cytoplasm and cell membrane",
+        "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Animal Plant Cells 7MLA/an/image20.jpg",
+        "imageConfidence": "search"
+      },
+      {
+        "variant": "A",
+        "heading": "Extra parts in a plant cell",
+        "boxes": [
+          {
+            "header": "Only plant cells have",
+            "items": [
+              "Cell wall: made of cellulose. Strengthens and supports the cell.",
+              "Permanent vacuole: filled with cell sap. Keeps the cell firm.",
+              "Chloroplasts: absorb light for photosynthesis."
+            ]
+          },
+          {
+            "header": "Same as animal cells",
+            "items": [
+              "Nucleus, cell membrane, cytoplasm and mitochondria."
+            ]
+          }
+        ],
+        "imageDescription": "labelled plant cell with cell wall, cell membrane, cytoplasm, nucleus, vacuole and chloroplasts",
+        "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Animal Plant Cells 7MLA/pl/image7.png",
+        "imageConfidence": "search"
+      },
+      {
+        "variant": "E",
+        "heading": "Animal and plant cells compared",
+        "imagePlaceholder": false,
+        "comparison": {
+          "aTitle": "Animal cell",
+          "bTitle": "Plant cell",
+          "rows": [
+            {
+              "a": "Nucleus, cytoplasm and cell membrane",
+              "b": "Nucleus, cytoplasm and cell membrane"
+            },
+            {
+              "a": "Mitochondria",
+              "b": "Mitochondria"
+            },
+            {
+              "a": "No cell wall",
+              "b": "Cell wall made of cellulose"
+            },
+            {
+              "a": "No permanent vacuole",
+              "b": "Large permanent vacuole"
+            },
+            {
+              "a": "No chloroplasts",
+              "b": "Chloroplasts in the green parts"
+            },
+            {
+              "a": "Irregular shape",
+              "b": "Regular, box-like shape"
+            }
+          ]
+        }
+      }
+    ],
+    "build": [
+      {
+        "type": "mcq",
+        "q": "Which part controls what the cell does?",
+        "options": [
+          "Cytoplasm",
+          "Nucleus",
+          "Cell membrane",
+          "Mitochondria"
+        ],
+        "answer": "B",
+        "explanation": "The nucleus holds the genetic material that controls the cell."
+      },
+      {
+        "type": "mcq",
+        "q": "Where in the cell does respiration happen?",
+        "options": [
+          "Nucleus",
+          "Vacuole",
+          "Chloroplasts",
+          "Mitochondria"
+        ],
+        "answer": "D",
+        "explanation": "Mitochondria release energy by respiration. Chloroplasts do photosynthesis."
+      },
+      {
+        "type": "mcq",
+        "q": "Which part is found in plant cells but NOT in animal cells?",
+        "options": [
+          "Cell wall",
+          "Cell membrane",
+          "Nucleus",
+          "Cytoplasm"
+        ],
+        "answer": "A",
+        "explanation": "Only plant cells have a cell wall. Both have a membrane, nucleus and cytoplasm."
+      },
+      {
+        "type": "mcq",
+        "about": "practical",
+        "q": "Why do we add iodine to the onion skin?",
+        "options": [
+          "To kill the cells",
+          "To make the cells bigger",
+          "To stain the cells so parts show up",
+          "To stop the cells drying out"
+        ],
+        "answer": "C",
+        "explanation": "Iodine stains the cells, so the nucleus and cell wall are easier to see."
+      },
+      {
+        "type": "mcq",
+        "about": "practical",
+        "q": "Why do you lower the cover slip at an angle?",
+        "options": [
+          "To stop air bubbles getting trapped",
+          "To spread the iodine out",
+          "To make the cells flatter",
+          "To stop the slide breaking"
+        ],
+        "answer": "A",
+        "explanation": "Lowering it slowly at an angle pushes the air out."
+      },
+      {
+        "type": "mcq",
+        "about": "practical",
+        "q": "Which objective lens do you start with?",
+        "options": [
+          "The highest power",
+          "The lowest power",
+          "The middle one",
+          "It does not matter"
+        ],
+        "answer": "B",
+        "explanation": "The lowest power is easiest to focus and shows the most of the slide."
+      },
+      {
+        "type": "practical",
+        "title": "Looking at onion cells",
+        "intro": "Make a slide of onion skin, stain it and draw what you see.",
+        "worksheetIntro": true,
+        "equipment": [
+          "piece of onion",
+          "tweezers",
+          "microscope slide and cover slip",
+          "iodine solution and pipette",
+          "ceramic tile",
+          "microscope",
+          "slide discard pot"
+        ],
+        "steps": [
+          "Peel a thin layer of skin from the inside of the onion with tweezers.",
+          "Lay it flat on the slide. Add 2 drops of iodine solution.",
+          "Lower the cover slip slowly at an angle to keep out air bubbles.",
+          "Start on the lowest power and focus. Draw a few cells in pencil.",
+          "Put used slides in the discard pot."
+        ],
+        "warning": "Iodine stains skin and clothes. Cover slips are thin glass: tell your teacher if one breaks.",
+        "imagePlaceholder": true,
+        "imageDescription": "steps to make an onion cell slide: onion, peeling skin, adding iodine, lowering cover slip",
+        "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Animal Plant Cells 7MLA/pl/image6.png",
+        "imageConfidence": "search",
+        "questions": [
+          {
+            "q": "Which parts of the cell could you see?",
+            "a": "The cell wall, cytoplasm and nucleus."
+          },
+          {
+            "q": "Why could you not see any chloroplasts?",
+            "a": "Onion bulb cells grow underground with no light, so they have no chloroplasts."
+          }
+        ]
+      }
+    ],
+    "apply": {
+      "developing": [
+        {
+          "q": "Draw an onion cell from your slide. Label the cell wall, cytoplasm and nucleus.",
+          "a": "A box-shaped cell drawn in pencil, with ruled label lines to the cell wall, cytoplasm and nucleus.",
+          "marks": 3,
+          "qType": "concept",
+          "contentType": "known_procedure",
+          "diagram": true,
+          "diagramLines": 10
+        },
+        {
+          "q": "Name the part of the cell that controls what the cell does.",
+          "a": "The nucleus.",
+          "marks": 1,
+          "qType": "concept",
+          "contentType": "routine_recall"
+        },
+        {
+          "q": "Name three parts found in both animal and plant cells.",
+          "a": "Any three: nucleus, cell membrane, cytoplasm, mitochondria.",
+          "marks": 3,
+          "qType": "concept",
+          "contentType": "routine_recall"
+        }
+      ],
+      "reaching": [
+        {
+          "q": "Give the job of the cell membrane and of the mitochondria.",
+          "a": "Cell membrane: controls what goes in and out. Mitochondria: respiration releases energy.",
+          "marks": 2,
+          "qType": "concept",
+          "contentType": "known_procedure",
+          "starters": [
+            "The cell membrane",
+            "The mitochondria"
+          ]
+        },
+        {
+          "q": "Name three parts found only in plant cells. Give the job of each.",
+          "a": "Cell wall: support. Permanent vacuole: holds cell sap and keeps the cell firm. Chloroplasts: photosynthesis.",
+          "marks": 3,
+          "qType": "concept",
+          "contentType": "known_procedure"
+        },
+        {
+          "q": "Why could you not see chloroplasts in your onion cells?",
+          "a": "Onion bulb cells grow underground with no light, so they have no chloroplasts.",
+          "marks": 2,
+          "qType": "concept",
+          "contentType": "known_procedure",
+          "starters": [
+            "Onion cells grow",
+            "so they"
+          ]
+        }
+      ],
+      "mastering": [
+        {
+          "q": "Compare animal and plant cells. Give what is the same and what is different.",
+          "a": "Both have a nucleus, cytoplasm, cell membrane and mitochondria. Only plant cells have a cell wall, a permanent vacuole and chloroplasts.",
+          "marks": 4,
+          "qType": "extended_writing",
+          "contentType": "extended_writing",
+          "starters": [
+            "Both animal and plant cells have",
+            "Only plant cells have",
+            "Animal cells do not have"
+          ]
+        },
+        {
+          "q": "A leaf cell has many chloroplasts. A root cell has none. Suggest why.",
+          "a": "Leaves get light, so they photosynthesise. Roots are underground with no light, so chloroplasts would be no use.",
+          "marks": 2,
+          "qType": "concept",
+          "contentType": "unfamiliar_context"
+        },
+        {
+          "q": "Write the steps to make an onion cell slide. Say how to avoid air bubbles.",
+          "a": "Peel thin onion skin, lay it flat on a slide, add iodine, lower the cover slip at an angle to keep out bubbles, view on lowest power.",
+          "marks": 4,
+          "qType": "extended_writing",
+          "contentType": "extended_writing",
+          "starters": [
+            "First,",
+            "Next,",
+            "To avoid air bubbles,"
+          ]
+        }
+      ]
+    },
+    "worksheetExtras": {
+      "wordBank": [
+        "nucleus",
+        "cell membrane",
+        "cytoplasm",
+        "mitochondria",
+        "cell wall",
+        "vacuole",
+        "chloroplasts"
+      ],
+      "cloze": [
+        "The _____ controls what the cell does.",
+        "Chemical reactions happen in the _____.",
+        "Respiration happens in the _____.",
+        "The _____ controls what goes in and out of the cell.",
+        "Plant cells have a _____ made of cellulose for support.",
+        "Photosynthesis happens in the _____."
+      ],
+      "clozeWordBank": [
+        "nucleus",
+        "cytoplasm",
+        "mitochondria",
+        "cell membrane",
+        "cell wall",
+        "chloroplasts",
+        "vacuole"
+      ]
+    }
+  },
+  {
+    "meta": {
+      "class": "9XS",
+      "topic": "Microscope types and biological drawings",
+      "title": "Microscope Types and Biological Drawings",
+      "lessonType": "practical",
+      "theme": "biology",
+      "worksheet": "A",
+      "differentiation": "none",
+      "year": 9,
+      "subject": "Biology",
+      "macrotopic": "B1 Cells",
+      "lessonNumber": 4,
+      "outputDir": "C:/Users/magda/claude-projects/science-lesson-v4/Microscope Types 9XS",
+      "examRef": "Biology-Cell-Biology-Cell-Strucutre-2#Q40"
+    },
+    "title": {
+      "objectives": [
+        "Compare light and electron microscopes",
+        "Explain how electron microscopes increased our understanding of cells",
+        "Make an accurate biological drawing"
+      ],
+      "keywords": [
+        "light microscope",
+        "electron microscope",
+        "magnification",
+        "resolution",
+        "sub-cellular structure",
+        "biological drawing"
+      ]
+    },
+    "doNow": {
+      "variant": "A",
+      "questions": [
+        {
+          "q": "Write the equation for magnification.",
+          "a": "magnification = size of image ÷ size of real object",
+          "marks": 1,
+          "hint": "m_______ = size of i_______ ÷ size of r_______ o_______"
+        },
+        {
+          "q": "An image is 5 mm long. The real cell is 0.05 mm long. Calculate the magnification.",
+          "a": "5 ÷ 0.05 = ×100",
+          "marks": 2,
+          "hint": "magnification = size of image ÷ size of real object"
+        },
+        {
+          "q": "Which part of a light microscope do you turn to focus the image?",
+          "a": "The focusing knob (coarse, then fine focus).",
+          "marks": 1
+        },
+        {
+          "q": "Why do you start with the lowest power objective lens?",
+          "a": "It has the widest field of view, so the cells are easier to find and focus.",
+          "marks": 1
+        },
+        {
+          "q": "Name two structures found in plant cells but not in animal cells.",
+          "a": "Any two: cell wall, chloroplasts, permanent vacuole.",
+          "marks": 2,
+          "hint": "c_______ w_______, c_______"
+        },
+        {
+          "q": "Why is iodine added to an onion cell slide?",
+          "a": "It stains the cells so structures like the nucleus show up.",
+          "marks": 1
+        }
+      ]
+    },
+    "engage": {
+      "variant": "mysteryImage",
+      "engageType": 5,
+      "hook": "This bacterium is about 2 µm long. Could a school microscope show it in this much detail?",
+      "imagePlaceholder": true,
+      "imageDescription": "electron micrograph of E. coli bacteria dividing",
+      "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Microscope Types 9XS/src/image12.png",
+      "imageConfidence": "search",
+      "reveal": {
+        "answer": "No. This was taken with an electron microscope. A school light microscope shows a bacterium as a tiny blob with no detail inside."
+      }
+    },
+    "learn": [
+      {
+        "variant": "E",
+        "heading": "Light and electron microscopes",
+        "imagePlaceholder": false,
+        "comparison": {
+          "aTitle": "Light microscope",
+          "bTitle": "Electron microscope",
+          "rows": [
+            {
+              "a": "Uses light and glass lenses",
+              "b": "Uses a beam of electrons"
+            },
+            {
+              "a": "Magnification up to about ×2000",
+              "b": "Magnification up to about ×2 000 000"
+            },
+            {
+              "a": "Resolution about 200 nm",
+              "b": "Resolution about 0.2 nm"
+            },
+            {
+              "a": "Can show living cells, in colour",
+              "b": "Specimens are dead; images are black and white"
+            },
+            {
+              "a": "Cheap, small and easy to carry",
+              "b": "Expensive, very large, needs a vacuum"
+            }
+          ]
+        }
+      },
+      {
+        "variant": "A",
+        "heading": "Magnification and resolution",
+        "boxes": [
+          {
+            "header": "Two key words",
+            "items": [
+              "Magnification: how many times bigger the image is than the real object.",
+              "Resolution: the smallest distance between two points that can still be seen as separate."
+            ]
+          },
+          {
+            "header": "Why electron microscopes matter",
+            "items": [
+              "Higher resolution shows much finer detail.",
+              "Scientists could now see ribosomes and the inside of mitochondria and chloroplasts.",
+              "This increased our understanding of sub-cellular structures."
+            ]
+          }
+        ],
+        "imageDescription": "transmission electron microscope in a laboratory",
+        "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Microscope Types 9XS/src/image11.jpg",
+        "imageConfidence": "search"
+      },
+      {
+        "variant": "A",
+        "heading": "Biological drawings",
+        "boxes": [
+          {
+            "header": "Rules",
+            "items": [
+              "Pencil only, with clear single lines. No shading.",
+              "Draw only what you see, large: at least half a page.",
+              "Label lines drawn with a ruler. Label lines never cross."
+            ]
+          },
+          {
+            "header": "Always include",
+            "items": [
+              "A title.",
+              "The magnification used."
+            ]
+          }
+        ],
+        "imageDescription": "example biological drawing of onion epithelial cells with ruled labels, title and magnification",
+        "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Microscope Types 9XS/src/image7.png",
+        "imageConfidence": "search"
+      }
+    ],
+    "build": [
+      {
+        "type": "mcq",
+        "q": "Which of these gives the highest resolution?",
+        "options": [
+          "Light microscope",
+          "Magnifying glass",
+          "Electron microscope",
+          "The human eye"
+        ],
+        "answer": "C",
+        "explanation": "Electrons have a far shorter wavelength than light, so the resolution is much higher."
+      },
+      {
+        "type": "mcq",
+        "q": "What is resolution?",
+        "options": [
+          "How many times bigger the image is",
+          "The smallest distance between two points seen as separate",
+          "How bright the image is",
+          "How wide the field of view is"
+        ],
+        "answer": "B",
+        "explanation": "Magnification is how much bigger. Resolution is how much detail."
+      },
+      {
+        "type": "mcq",
+        "q": "Which structure can only be seen with an electron microscope?",
+        "options": [
+          "Ribosome",
+          "Nucleus",
+          "Cell wall",
+          "Chloroplast"
+        ],
+        "answer": "A",
+        "explanation": "Ribosomes are about 25 nm across, far below the 200 nm resolution of a light microscope."
+      },
+      {
+        "type": "mcq",
+        "about": "practical",
+        "q": "Which is correct for a biological drawing?",
+        "options": [
+          "Shade the nucleus in darkly",
+          "Draw in pen so the lines are clear",
+          "Draw in pencil with clear single lines",
+          "Draw what the textbook shows"
+        ],
+        "answer": "C",
+        "explanation": "Pencil, single clear lines, no shading, and only what you see."
+      },
+      {
+        "type": "mcq",
+        "about": "practical",
+        "q": "How should label lines be drawn?",
+        "options": [
+          "With a ruler, and they must not cross",
+          "With arrowheads pointing at the part",
+          "As freehand curves",
+          "In a different colour for each part"
+        ],
+        "answer": "A",
+        "explanation": "Straight ruled lines that never cross keep the drawing clear."
+      },
+      {
+        "type": "mcq",
+        "about": "practical",
+        "q": "A cell's image is 20 mm long at ×400. What is its real length?",
+        "options": [
+          "0.005 mm",
+          "0.05 mm",
+          "0.5 mm",
+          "8000 mm"
+        ],
+        "answer": "B",
+        "explanation": "real size = image size ÷ magnification = 20 ÷ 400 = 0.05 mm."
+      },
+      {
+        "type": "practical",
+        "title": "Biological drawing from a slide",
+        "intro": "Draw cells from a prepared slide, following the rules for biological drawings.",
+        "worksheetIntro": true,
+        "equipment": [
+          "light microscope",
+          "prepared slides",
+          "sharp pencil, ruler and rubber",
+          "plain paper"
+        ],
+        "steps": [
+          "Put a slide on the stage. Focus on the lowest power objective first.",
+          "Turn to a higher power. Refocus with the fine focus knob.",
+          "Draw 2 or 3 cells large, in pencil, with single clear lines.",
+          "Label with ruled lines. Add a title and the magnification."
+        ],
+        "warning": "Never let the objective lens touch the slide. Carry microscopes with two hands.",
+        "imagePlaceholder": true,
+        "imageDescription": "light microscope with stage, objective lenses and focusing knobs",
+        "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Microscope Types 9XS/src/image6.jpg",
+        "imageConfidence": "search",
+        "questions": [
+          {
+            "q": "What magnification did you use? Show how you worked it out.",
+            "a": "Eyepiece × objective, e.g. ×10 × ×40 = ×400."
+          },
+          {
+            "q": "Name two structures you could not see. Explain why.",
+            "a": "e.g. ribosomes and the inside of mitochondria: smaller than the resolution of a light microscope."
+          }
+        ]
+      }
+    ],
+    "apply": {
+      "developing": [
+        {
+          "q": "Give two differences between light and electron microscopes.",
+          "a": "Electron: higher magnification and higher resolution. Light: can show living cells and is cheaper.",
+          "marks": 2,
+          "qType": "concept",
+          "contentType": "routine_recall"
+        },
+        {
+          "q": "Give three rules for a good biological drawing.",
+          "a": "Any three: pencil; single clear lines; no shading; large; ruled label lines that do not cross; title; magnification.",
+          "marks": 3,
+          "qType": "concept",
+          "contentType": "routine_recall"
+        },
+        {
+          "q": "What is meant by magnification?",
+          "a": "How many times bigger the image is than the real object.",
+          "marks": 1,
+          "qType": "concept",
+          "contentType": "routine_recall"
+        }
+      ],
+      "reaching": [
+        {
+          "q": "A cell's image is 15 mm long. The real cell is 0.03 mm long. Calculate the magnification.",
+          "a": "15 ÷ 0.03 = ×500",
+          "marks": 2,
+          "qType": "calculation",
+          "contentType": "known_procedure",
+          "equation": "magnification = size of image ÷ size of real object"
+        },
+        {
+          "q": "Explain why a light microscope cannot show ribosomes.",
+          "a": "Ribosomes are smaller than the resolution of a light microscope (about 200 nm), so they cannot be seen as separate.",
+          "marks": 2,
+          "qType": "concept",
+          "contentType": "known_procedure"
+        },
+        {
+          "q": "Explain how electron microscopes increased our understanding of cells.",
+          "a": "Much higher resolution and magnification show finer detail, so sub-cellular structures like ribosomes and the inside of mitochondria were seen.",
+          "marks": 3,
+          "qType": "concept",
+          "contentType": "known_procedure"
+        }
+      ],
+      "mastering": [
+        {
+          "q": "A mitochondrion is 2 µm long. In a micrograph it is 40 mm long. Calculate the magnification.",
+          "a": "40 mm = 40 000 µm. 40 000 ÷ 2 = ×20 000",
+          "marks": 3,
+          "qType": "calculation",
+          "contentType": "known_procedure",
+          "equation": "magnification = size of image ÷ size of real object"
+        },
+        {
+          "q": "A bacterium is 0.002 mm long. Give this length in µm, and in mm in standard form.",
+          "a": "2 µm. 2 × 10^-3 mm.",
+          "marks": 2,
+          "qType": "calculation",
+          "contentType": "known_procedure"
+        },
+        {
+          "q": "A scientist wants to watch a living white blood cell engulf bacteria. Which microscope should they use? Explain.",
+          "a": "A light microscope. Electron microscope specimens are dead, in a vacuum. A light microscope can show living cells moving.",
+          "marks": 3,
+          "qType": "concept",
+          "contentType": "unfamiliar_context"
+        }
+      ]
+    }
+  },
+  {
+    "meta": {
+      "class": "12C",
+      "topic": "Superposition",
+      "title": "Superposition",
+      "lessonType": "standard",
+      "theme": "physics",
+      "worksheet": "A",
+      "differentiation": "none",
+      "year": 12,
+      "subject": "Physics",
+      "macrotopic": "Chapter 12 - Waves 2",
+      "lessonNumber": 1,
+      "outputDir": "C:/Users/magda/claude-projects/science-lesson-v4/Superposition 12C"
+    },
+    "title": {
+      "objectives": [
+        "State the principle of superposition",
+        "Draw the resultant of two waves graphically",
+        "Explain constructive and destructive interference using phase difference"
+      ],
+      "keywords": [
+        "superposition",
+        "resultant displacement",
+        "in phase",
+        "antiphase",
+        "constructive interference",
+        "destructive interference"
+      ]
+    },
+    "doNow": {
+      "variant": "A",
+      "questions": [
+        {
+          "q": "Define the amplitude of a wave.",
+          "a": "The maximum displacement from the equilibrium position.",
+          "marks": 1
+        },
+        {
+          "q": "Define phase difference.",
+          "a": "The difference in displacement between particles along a wave, or between two waves, in degrees or radians.",
+          "marks": 1
+        },
+        {
+          "q": "Define the intensity of a wave and give its unit.",
+          "a": "The power per unit area at right angles to the wave. W m^-2.",
+          "marks": 2
+        },
+        {
+          "q": "A wave has intensity 4.0 W m^-2. Its amplitude doubles. What is the new intensity?",
+          "a": "I \\propto A^2, so 4 × 4.0 = 16 W m^-2",
+          "marks": 1
+        },
+        {
+          "q": "What happens to the wavelength of light when it enters glass from air?",
+          "a": "It decreases. The speed falls and the frequency stays the same.",
+          "marks": 1
+        },
+        {
+          "q": "State the speed of all EM waves in a vacuum.",
+          "a": "3.00 × 10^8 m s^-1",
+          "marks": 1
+        }
+      ]
+    },
+    "engage": {
+      "variant": "prediction",
+      "engageType": 2,
+      "hook": "Noise-cancelling headphones make their own sound to make things quieter. How can adding sound reduce noise?",
+      "imagePlaceholder": true,
+      "imageDescription": "passenger wearing noise-cancelling headphones on an aeroplane",
+      "prompt": "Discuss with the person next to you. We come back to this at the end."
+    },
+    "learn": [
+      {
+        "variant": "A",
+        "heading": "The principle of superposition",
+        "boxes": [
+          {
+            "header": "The principle",
+            "items": [
+              "When two waves of the same type meet, they superpose.",
+              "The resultant displacement at a point is the sum of the individual displacements.",
+              "Displacement is a vector: up is positive, down is negative."
+            ]
+          },
+          {
+            "header": "After they meet",
+            "items": [
+              "The waves pass through each other unchanged."
+            ]
+          }
+        ],
+        "imageDescription": "two pulses before, during and after superposing, with the combined pulse A+B",
+        "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Superposition 12C/src/image1.png",
+        "imageConfidence": "search"
+      },
+      {
+        "variant": "A",
+        "heading": "Constructive and destructive interference",
+        "boxes": [
+          {
+            "header": "Constructive",
+            "items": [
+              "Waves in phase: phase difference 0 (or 360°, 2π rad).",
+              "Peak meets peak: resultant amplitude = A_1 + A_2."
+            ]
+          },
+          {
+            "header": "Destructive",
+            "items": [
+              "Waves in antiphase: phase difference 180° (π rad).",
+              "Peak meets trough: resultant amplitude = A_1 − A_2.",
+              "Equal amplitudes cancel completely."
+            ]
+          }
+        ],
+        "imageDescription": "two waves in phase adding to a large resultant, and two waves in antiphase cancelling",
+        "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Superposition 12C/src/image2.png",
+        "imageConfidence": "search"
+      },
+      {
+        "variant": "A",
+        "heading": "Drawing the resultant",
+        "boxes": [
+          {
+            "header": "Method",
+            "items": [
+              "Draw both waves on the same axes.",
+              "At regular points, add the two displacements, keeping their signs.",
+              "Plot the sums and join them with a smooth curve."
+            ]
+          },
+          {
+            "header": "Intensity",
+            "items": [
+              "I \\propto A^2, so doubling the resultant amplitude gives 4 times the intensity."
+            ]
+          }
+        ],
+        "imageDescription": "two waves of different wavelengths and the non-sinusoidal resultant wave below them",
+        "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Superposition 12C/src/image10.jpg",
+        "imageConfidence": "search"
+      }
+    ],
+    "build": [
+      {
+        "type": "mcq",
+        "q": "Two pulses with displacements +3 cm and −1 cm meet. What is the resultant displacement?",
+        "options": [
+          "+1 cm",
+          "+2 cm",
+          "+3 cm",
+          "+4 cm"
+        ],
+        "answer": "B",
+        "explanation": "Add with signs: 3 + (−1) = +2 cm."
+      },
+      {
+        "type": "mcq",
+        "q": "Two waves are in antiphase. What is their phase difference?",
+        "options": [
+          "0°",
+          "90°",
+          "180°",
+          "360°"
+        ],
+        "answer": "C",
+        "explanation": "Antiphase: one is at a peak when the other is at a trough, 180° or π rad."
+      },
+      {
+        "type": "mcq",
+        "q": "Waves of amplitude 3 mm and 5 mm meet in antiphase. What is the resultant amplitude?",
+        "options": [
+          "2 mm",
+          "3 mm",
+          "8 mm",
+          "15 mm"
+        ],
+        "answer": "A",
+        "explanation": "Antiphase: subtract, 5 − 3 = 2 mm."
+      },
+      {
+        "type": "mcq",
+        "q": "What happens to two waves after they have superposed?",
+        "options": [
+          "They carry on unchanged",
+          "They cancel out for good",
+          "They merge into one wave",
+          "They reflect back"
+        ],
+        "answer": "A",
+        "explanation": "Waves pass through each other. Superposition only happens where they overlap."
+      },
+      {
+        "type": "mcq",
+        "q": "The resultant amplitude is double the amplitude of one wave. What happens to the intensity?",
+        "options": [
+          "It halves",
+          "It stays the same",
+          "It doubles",
+          "It becomes 4 times bigger"
+        ],
+        "answer": "D",
+        "explanation": "I \\propto A^2, so 2^2 = 4 times."
+      },
+      {
+        "type": "mcq",
+        "q": "Which two waves cancel completely?",
+        "options": [
+          "Same amplitude, in phase",
+          "Different amplitudes, antiphase",
+          "Same amplitude, antiphase",
+          "Different amplitudes, in phase"
+        ],
+        "answer": "C",
+        "explanation": "Equal amplitudes in antiphase give zero resultant displacement everywhere."
+      },
+      {
+        "type": "workedExample",
+        "worked": {
+          "prompt": "A 2.0 cm wave (intensity 3.0 W m^-2) meets a 1.0 cm wave in phase. Find the resultant intensity.",
+          "steps": [
+            "Resultant amplitude = 2.0 + 1.0 = 3.0 cm",
+            "I \\propto A^2, so I = 3.0 × (3.0 ÷ 2.0)^2",
+            "I = 6.75 \\approx 6.8 W m^-2"
+          ]
+        },
+        "yourTurn": {
+          "prompt": "The same two waves now meet in antiphase. Find the resultant intensity.",
+          "answer": "A = 2.0 − 1.0 = 1.0 cm. I = 3.0 × (1.0 ÷ 2.0)^2 = 0.75 W m^-2"
+        }
+      },
+      {
+        "type": "trueFalse",
+        "heading": "COMMON MISCONCEPTIONS",
+        "statements": [
+          {
+            "text": "When two waves cancel, they are destroyed.",
+            "isTrue": false,
+            "correction": "They pass through each other unchanged. They only cancel where they overlap."
+          },
+          {
+            "text": "Superposition only works for light waves.",
+            "isTrue": false,
+            "correction": "It works for any two waves of the same type: sound, water, light, waves on strings."
+          },
+          {
+            "text": "A resultant displacement can be smaller than either wave's displacement.",
+            "isTrue": true
+          },
+          {
+            "text": "Doubling the amplitude doubles the intensity.",
+            "isTrue": false,
+            "correction": "I \\propto A^2, so doubling the amplitude gives 4 times the intensity."
+          },
+          {
+            "text": "Waves in phase have a phase difference of 0 or 2π rad.",
+            "isTrue": true
+          }
+        ]
+      }
+    ],
+    "apply": {
+      "developing": [
+        {
+          "q": "State the principle of superposition.",
+          "a": "When two waves meet, the resultant displacement at a point is the sum of the individual displacements.",
+          "marks": 2,
+          "qType": "concept",
+          "contentType": "routine_recall"
+        },
+        {
+          "q": "Pulses of +4 cm and −1 cm meet. Find the resultant displacement.",
+          "a": "4 + (−1) = +3 cm",
+          "marks": 1,
+          "qType": "calculation",
+          "contentType": "known_procedure"
+        },
+        {
+          "q": "What is meant by two waves being in antiphase?",
+          "a": "Phase difference of 180° (π rad): one is at a peak when the other is at a trough.",
+          "marks": 1,
+          "qType": "concept",
+          "contentType": "routine_recall"
+        }
+      ],
+      "reaching": [
+        {
+          "q": "Sketch two waves in phase and their resultant. Label the amplitudes.",
+          "a": "Resultant has the same wavelength, in phase with both, amplitude = sum of the two amplitudes.",
+          "marks": 3,
+          "qType": "concept",
+          "contentType": "known_procedure",
+          "diagram": true,
+          "diagramLines": 8
+        },
+        {
+          "q": "Waves of amplitude 4 mm and 6 mm meet. Find the largest and smallest possible resultant amplitudes.",
+          "a": "In phase: 4 + 6 = 10 mm. Antiphase: 6 − 4 = 2 mm.",
+          "marks": 2,
+          "qType": "calculation",
+          "contentType": "known_procedure"
+        },
+        {
+          "q": "Explain how noise-cancelling headphones reduce noise.",
+          "a": "They make sound in antiphase with the noise, at the same amplitude. Superposition gives destructive interference, so the resultant is near zero.",
+          "marks": 3,
+          "qType": "concept",
+          "contentType": "known_procedure"
+        }
+      ],
+      "mastering": [
+        {
+          "q": "A 3.0 mm wave has intensity 9.0 W m^-2. It meets an identical wave in phase. Find the resultant intensity.",
+          "a": "A = 6.0 mm. I = 9.0 × (6.0 ÷ 3.0)^2 = 36 W m^-2",
+          "marks": 3,
+          "qType": "calculation",
+          "contentType": "known_procedure"
+        },
+        {
+          "q": "Two identical waves cancel completely at a point. Explain why energy is not destroyed.",
+          "a": "Energy is redistributed. Where the waves cancel the intensity is zero, but where they reinforce it is 4 times one wave's intensity.",
+          "marks": 2,
+          "qType": "concept",
+          "contentType": "unfamiliar_context"
+        },
+        {
+          "q": "Sketch the resultant of a wave (λ = 4 cm, A = 2 cm) and a wave (λ = 8 cm, A = 3 cm) starting together.",
+          "a": "Add displacements at regular points. The resultant is not a sine wave and repeats every 8 cm.",
+          "marks": 3,
+          "qType": "concept",
+          "contentType": "new_procedure",
+          "diagram": true,
+          "diagramLines": 8
+        }
+      ]
+    },
+    "worksheetExtras": {
+      "wordBank": []
+    }
+  }
+]

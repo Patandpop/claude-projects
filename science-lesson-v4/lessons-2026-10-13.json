@@ -1,0 +1,1898 @@
+[
+  {
+    "meta": {
+      "class": "11S2",
+      "topic": "EM waves communication and dangers",
+      "title": "EM Waves: Communication and Dangers",
+      "lessonType": "standard",
+      "theme": "physics",
+      "worksheet": "A",
+      "differentiation": "none",
+      "year": 11,
+      "subject": "Physics",
+      "macrotopic": "P6 Waves",
+      "lessonNumber": 8,
+      "outputDir": "C:/Users/magda/claude-projects/science-lesson-v4/EM Comms Dangers 11S2"
+    },
+    "title": {
+      "objectives": [
+        "Explain which EM waves are used for communication and why",
+        "Describe how radio waves are produced and detected (HT)",
+        "Explain the dangers of UV, X-rays and gamma rays and use radiation dose"
+      ],
+      "keywords": [
+        "ionosphere",
+        "satellite",
+        "oscillate",
+        "ionising",
+        "mutation",
+        "radiation dose",
+        "sievert"
+      ]
+    },
+    "doNow": {
+      "variant": "A",
+      "questions": [
+        {
+          "q": "Name the EM wave with the highest frequency.",
+          "a": "Gamma rays.",
+          "marks": 1
+        },
+        {
+          "q": "State two properties shared by all EM waves.",
+          "a": "Any two: transverse; travel at 3.0 × 10^8 m/s in a vacuum; transfer energy; travel through a vacuum.",
+          "marks": 2
+        },
+        {
+          "q": "A radio wave has a frequency of 100 MHz. Calculate its wavelength. (c = 3.0 × 10^8 m/s)",
+          "a": "λ = v ÷ f = 3.0 × 10^8 ÷ 1.0 × 10^8 = 3.0 m",
+          "marks": 2
+        },
+        {
+          "q": "What happens to the speed of light when it passes from air into glass?",
+          "a": "It slows down.",
+          "marks": 1
+        },
+        {
+          "q": "Name the EM wave detected by a thermal imaging camera.",
+          "a": "Infrared.",
+          "marks": 1
+        },
+        {
+          "q": "What is an ion?",
+          "a": "An atom that has lost or gained electrons, so it has a charge.",
+          "marks": 1
+        }
+      ]
+    },
+    "engage": {
+      "variant": "news",
+      "engageType": 3,
+      "hook": "Since 2011 it has been illegal for under-18s to use a sunbed in England. Why ban something that just gives you a tan?",
+      "imagePlaceholder": true,
+      "imageDescription": "open tanning sunbed with blue UV tubes glowing",
+      "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/EM Comms Dangers 11S2/rba/image15.jpg",
+      "imageConfidence": "search",
+      "reveal": {
+        "answer": "Sunbeds give out ultraviolet. UV can damage the DNA in skin cells, ageing the skin early and raising the risk of skin cancer. Young skin is most at risk."
+      }
+    },
+    "learn": [
+      {
+        "variant": "A",
+        "heading": "EM waves for communication",
+        "boxes": [
+          {
+            "header": "Radio waves: TV and radio",
+            "items": [
+              "Long-wave radio diffracts around the curved Earth, so it reaches places out of sight of the transmitter.",
+              "Short-wave radio reflects off the ionosphere, a charged layer high in the atmosphere."
+            ]
+          },
+          {
+            "header": "Microwaves, infrared and light",
+            "items": [
+              "Microwaves pass through the ionosphere, so they carry signals to and from satellites.",
+              "Infrared: TV remote controls. Visible light: fibre optic broadband."
+            ]
+          }
+        ],
+        "imagePlaceholder": true,
+        "imageDescription": "diagram of the Earth showing radio waves reflecting off the ionosphere and microwaves passing through to a satellite"
+      },
+      {
+        "variant": "G",
+        "heading": "Making and detecting radio waves (HT)",
+        "steps": [
+          {
+            "label": "AC in the transmitter",
+            "note": "a high-frequency alternating current"
+          },
+          {
+            "label": "Electrons oscillate",
+            "note": "up and down the aerial"
+          },
+          {
+            "label": "Radio wave emitted",
+            "note": "oscillating electric and magnetic fields"
+          },
+          {
+            "label": "Wave reaches receiver",
+            "note": "the fields make its electrons oscillate"
+          },
+          {
+            "label": "AC induced",
+            "note": "same frequency as the radio wave"
+          }
+        ],
+        "imagePlaceholder": false
+      },
+      {
+        "variant": "A",
+        "heading": "Where EM waves come from",
+        "boxes": [
+          {
+            "header": "Changes in atoms",
+            "items": [
+              "An electron that absorbs energy jumps to a higher energy level.",
+              "When it drops back, it emits an EM wave, often visible light or UV."
+            ]
+          },
+          {
+            "header": "Changes in the nucleus",
+            "items": [
+              "Gamma rays come from changes in the nucleus of an atom.",
+              "The nucleus loses energy as the gamma ray is emitted."
+            ]
+          }
+        ],
+        "imageDescription": "Bohr model of a hydrogen atom with an electron moving between energy levels",
+        "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/EM Comms Dangers 11S2/rba/image13.png",
+        "imageConfidence": "search"
+      },
+      {
+        "variant": "A",
+        "heading": "Dangers and radiation dose",
+        "boxes": [
+          {
+            "header": "Harmful EM waves",
+            "items": [
+              "UV: skin ages early and the risk of skin cancer rises.",
+              "X-rays and gamma rays are ionising: they can mutate genes and cause cancer.",
+              "The higher the frequency, the more energy each wave carries."
+            ]
+          },
+          {
+            "header": "Radiation dose",
+            "items": [
+              "Dose (in sieverts, Sv) measures the risk of harm. 1 Sv = 1000 mSv.",
+              "Chest X-ray 0.1 mSv. CT scan 10 mSv. 100 mSv gives a small rise in cancer risk."
+            ]
+          }
+        ],
+        "imageDescription": "flow from ionising radiation to DNA mutation to cancer cells and tumour",
+        "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/EM Comms Dangers 11S2/rba/image16.gif",
+        "imageConfidence": "search"
+      }
+    ],
+    "build": [
+      {
+        "type": "mcq",
+        "q": "Which EM wave is used to send signals to and from satellites?",
+        "options": [
+          "Radio waves",
+          "Microwaves",
+          "Infrared",
+          "Visible light"
+        ],
+        "answer": "B",
+        "explanation": "Microwaves pass through the ionosphere. Many radio waves are reflected by it."
+      },
+      {
+        "type": "mcq",
+        "q": "Why can long-wave radio be picked up far beyond the horizon?",
+        "options": [
+          "It passes through the ionosphere",
+          "It travels faster than microwaves",
+          "It diffracts around the curved Earth",
+          "It reflects off satellites"
+        ],
+        "answer": "C",
+        "explanation": "Long wavelengths diffract around the curve of the Earth."
+      },
+      {
+        "type": "mcq",
+        "q": "A transmitter is supplied with 200 kHz alternating current. What is the frequency of the current induced in the receiver?",
+        "options": [
+          "100 kHz",
+          "200 kHz",
+          "400 kHz",
+          "2000 kHz"
+        ],
+        "answer": "B",
+        "explanation": "The induced current has the same frequency as the radio wave and the original current."
+      },
+      {
+        "type": "mcq",
+        "q": "Which change produces gamma rays?",
+        "options": [
+          "A change in the nucleus of an atom",
+          "An electron dropping to a lower energy level",
+          "Electrons oscillating in an aerial",
+          "An electron rising to a higher energy level"
+        ],
+        "answer": "A",
+        "explanation": "Gamma rays come from the nucleus. Electron changes give visible light and UV."
+      },
+      {
+        "type": "mcq",
+        "q": "Which type of EM radiation can make skin age early?",
+        "options": [
+          "Infrared",
+          "Microwaves",
+          "Visible light",
+          "Ultraviolet"
+        ],
+        "answer": "D",
+        "explanation": "UV damages skin cells: early ageing and a higher risk of skin cancer."
+      },
+      {
+        "type": "mcq",
+        "q": "What does a radiation dose in sieverts measure?",
+        "options": [
+          "The risk of harm from the radiation",
+          "The energy of each wave",
+          "The number of waves each second",
+          "The distance the radiation travels"
+        ],
+        "answer": "A",
+        "explanation": "Dose measures the risk of harm to the body from an exposure."
+      },
+      {
+        "type": "workedExample",
+        "worked": {
+          "prompt": "How many chest X-rays (0.1 mSv each) give the same dose as one CT scan (10 mSv)?",
+          "steps": [
+            "Divide the bigger dose by the smaller dose.",
+            "10 ÷ 0.1",
+            "= 100 chest X-rays"
+          ]
+        },
+        "yourTurn": {
+          "prompt": "Natural sources give 0.012 mSv per day. How many days give the same dose as a 0.18 mSv X-ray?",
+          "answer": "0.18 ÷ 0.012 = 15 days"
+        }
+      },
+      {
+        "type": "trueFalse",
+        "heading": "COMMON MISCONCEPTIONS",
+        "statements": [
+          {
+            "text": "Mobile phone microwaves are ionising, like X-rays.",
+            "isTrue": false,
+            "correction": "Microwaves are low frequency and not ionising. Only high-frequency UV, X-rays and gamma ionise."
+          },
+          {
+            "text": "Radio waves travel more slowly than gamma rays in a vacuum.",
+            "isTrue": false,
+            "correction": "All EM waves travel at the same speed in a vacuum, 3.0 × 10^8 m/s."
+          },
+          {
+            "text": "A bigger dose in sieverts means a bigger risk of harm.",
+            "isTrue": true
+          },
+          {
+            "text": "Gamma rays come from changes in the nucleus.",
+            "isTrue": true
+          },
+          {
+            "text": "A small dose of X-rays carries no risk at all.",
+            "isTrue": false,
+            "correction": "Any dose carries some risk. A small dose means a small risk."
+          }
+        ]
+      }
+    ],
+    "apply": {
+      "developing": [
+        {
+          "q": "Name the EM wave used for: (a) a TV remote, (b) satellite TV, (c) fibre optic broadband.",
+          "a": "(a) infrared (b) microwaves (c) visible light",
+          "marks": 3,
+          "qType": "concept",
+          "contentType": "routine_recall"
+        },
+        {
+          "q": "Give two harmful effects of ultraviolet on skin.",
+          "a": "Skin ages early. Higher risk of skin cancer.",
+          "marks": 2,
+          "qType": "concept",
+          "contentType": "routine_recall"
+        },
+        {
+          "q": "Where do gamma rays come from?",
+          "a": "Changes in the nucleus of an atom.",
+          "marks": 1,
+          "qType": "concept",
+          "contentType": "routine_recall"
+        }
+      ],
+      "reaching": [
+        {
+          "q": "Explain why microwaves, not radio waves, are used to communicate with satellites.",
+          "a": "Microwaves pass through the ionosphere to reach the satellite. Many radio waves are reflected by the ionosphere.",
+          "marks": 2,
+          "qType": "concept",
+          "contentType": "known_procedure"
+        },
+        {
+          "q": "Explain how X-rays can cause cancer.",
+          "a": "X-rays are ionising. They can damage DNA and mutate genes. Mutated cells can divide out of control and form a tumour.",
+          "marks": 3,
+          "qType": "concept",
+          "contentType": "known_procedure"
+        },
+        {
+          "q": "A CT scan gives 10 mSv. A chest X-ray gives 0.1 mSv. How many chest X-rays give the same dose as one CT scan?",
+          "a": "10 ÷ 0.1 = 100 chest X-rays",
+          "marks": 2,
+          "qType": "calculation",
+          "contentType": "known_procedure"
+        }
+      ],
+      "mastering": [
+        {
+          "q": "(HT) Describe how a radio wave is sent from a transmitter and detected by a receiver.",
+          "a": "AC makes electrons oscillate in the transmitter, emitting a radio wave. In the receiver it makes electrons oscillate, inducing AC of the same frequency.",
+          "marks": 4,
+          "qType": "extended_writing",
+          "contentType": "extended_writing"
+        },
+        {
+          "q": "Natural sources give 0.012 mSv per day. How many days give the same dose as a 0.18 mSv X-ray?",
+          "a": "0.18 ÷ 0.012 = 15 days",
+          "marks": 2,
+          "qType": "calculation",
+          "contentType": "known_procedure"
+        },
+        {
+          "q": "A flight attendant gets 1.7 mSv a year from flying. 100 mSv gives a small cancer risk. Should they worry? Explain.",
+          "a": "Not much: 1.7 mSv is about 60 times below 100 mSv. But any dose carries some risk, and it adds up over a career.",
+          "marks": 3,
+          "qType": "concept",
+          "contentType": "unfamiliar_context"
+        }
+      ]
+    },
+    "worksheetExtras": {
+      "wordBank": []
+    }
+  },
+  {
+    "meta": {
+      "class": "12C",
+      "topic": "Interference",
+      "title": "Interference",
+      "lessonType": "standard",
+      "theme": "physics",
+      "worksheet": "A",
+      "differentiation": "none",
+      "year": 12,
+      "subject": "Physics",
+      "macrotopic": "Chapter 12 - Waves 2",
+      "lessonNumber": 2,
+      "outputDir": "C:/Users/magda/claude-projects/science-lesson-v4/Interference 12C"
+    },
+    "title": {
+      "objectives": [
+        "Explain what coherent sources are and why interference needs them",
+        "Link maxima and minima to path difference and phase difference",
+        "Describe two-source interference with sound and microwaves"
+      ],
+      "keywords": [
+        "coherent",
+        "interference",
+        "path difference",
+        "phase difference",
+        "constructive",
+        "destructive"
+      ]
+    },
+    "doNow": {
+      "variant": "A",
+      "questions": [
+        {
+          "q": "State the principle of superposition.",
+          "a": "When waves meet, the resultant displacement is the sum of the individual displacements.",
+          "marks": 1
+        },
+        {
+          "q": "Two waves are 180° out of phase. Give this phase difference in radians.",
+          "a": "π rad",
+          "marks": 1
+        },
+        {
+          "q": "The amplitude of a wave halves. What happens to its intensity?",
+          "a": "It falls to a quarter (I \\propto A^2).",
+          "marks": 1
+        },
+        {
+          "q": "Calculate the wavelength of a 2.0 kHz sound wave in air. (v = 340 m s^-1)",
+          "a": "λ = v ÷ f = 340 ÷ 2000 = 0.17 m",
+          "marks": 2
+        },
+        {
+          "q": "State the two conditions for total internal reflection.",
+          "a": "Light travels towards a lower refractive index; angle of incidence greater than the critical angle.",
+          "marks": 2
+        },
+        {
+          "q": "Name the wave behaviour that only transverse waves show.",
+          "a": "Polarisation.",
+          "marks": 1
+        }
+      ]
+    },
+    "engage": {
+      "variant": "prediction",
+      "engageType": 2,
+      "hook": "Two speakers play the same note. Walk across the field in front of the stage. What do you hear?",
+      "imagePlaceholder": true,
+      "imageDescription": "outdoor festival stage with two large speaker stacks either side",
+      "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Interference 12C/src/image6.png",
+      "imageConfidence": "search",
+      "prompt": "Where is the best place to stand, and why?"
+    },
+    "learn": [
+      {
+        "variant": "A",
+        "heading": "Coherent sources",
+        "boxes": [
+          {
+            "header": "Coherence",
+            "items": [
+              "Coherent waves have a constant phase difference.",
+              "To be coherent they must have the same frequency.",
+              "Only coherent sources give a steady interference pattern."
+            ]
+          },
+          {
+            "header": "Getting coherent sources",
+            "items": [
+              "Two speakers driven by one signal generator.",
+              "One microwave transmitter shining through two slits.",
+              "One laser lighting two slits. Two separate lamps are never coherent."
+            ]
+          }
+        ],
+        "imageDescription": "incoherent waves with changing phase above coherent waves with constant phase difference",
+        "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Interference 12C/src/image4.png",
+        "imageConfidence": "search"
+      },
+      {
+        "variant": "A",
+        "heading": "Path difference and phase difference",
+        "boxes": [
+          {
+            "header": "Constructive: a maximum",
+            "items": [
+              "Path difference = nλ (0, λ, 2λ ...).",
+              "Phase difference = 0, 2π, 4π ... The waves arrive in phase."
+            ]
+          },
+          {
+            "header": "Destructive: a minimum",
+            "items": [
+              "Path difference = (n + ½)λ (½λ, 1½λ ...).",
+              "Phase difference = π, 3π, 5π ... The waves arrive in antiphase."
+            ]
+          }
+        ],
+        "imageDescription": "two sources with waves meeting at points A to F, labelled with path difference 0, half wavelength and 2 wavelengths",
+        "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Interference 12C/src/image18.png",
+        "imageConfidence": "search"
+      },
+      {
+        "variant": "A",
+        "heading": "Two-source interference patterns",
+        "boxes": [
+          {
+            "header": "Sound",
+            "items": [
+              "Two speakers on one signal generator.",
+              "Walking parallel to them you hear loud (maxima) and quiet (minima) regions in turn."
+            ]
+          },
+          {
+            "header": "Microwaves",
+            "items": [
+              "A transmitter, a metal sheet with two slits and a probe receiver.",
+              "Moving the probe gives a pattern of maxima and minima. Central maximum: path difference 0."
+            ]
+          }
+        ],
+        "imageDescription": "two-source interference pattern with lines of maxima and minima labelled with path and phase difference",
+        "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Interference 12C/src/image14.png",
+        "imageConfidence": "search"
+      }
+    ],
+    "build": [
+      {
+        "type": "mcq",
+        "q": "What does it mean for two wave sources to be coherent?",
+        "options": [
+          "They have the same amplitude",
+          "They have a constant phase difference",
+          "They have the same speed",
+          "They have zero phase difference"
+        ],
+        "answer": "B",
+        "explanation": "Coherent: constant phase difference, which needs the same frequency. The phase difference need not be zero."
+      },
+      {
+        "type": "mcq",
+        "q": "The path difference at a point is 2.5λ. What is the phase difference?",
+        "options": [
+          "1.25π rad",
+          "2.5π rad",
+          "5π rad",
+          "10π rad"
+        ],
+        "answer": "C",
+        "explanation": "Phase difference = 2π × path difference ÷ λ = 2π × 2.5 = 5π rad."
+      },
+      {
+        "type": "mcq",
+        "q": "Two coherent waves meet with a phase difference of 3π rad. What is observed?",
+        "options": [
+          "A maximum, waves in phase",
+          "A maximum, waves in antiphase",
+          "A minimum, waves in phase",
+          "A minimum, waves in antiphase"
+        ],
+        "answer": "D",
+        "explanation": "An odd multiple of π means antiphase, so destructive interference: a minimum."
+      },
+      {
+        "type": "mcq",
+        "q": "Why do two separate lamps not give a visible interference pattern?",
+        "options": [
+          "Their phase difference keeps changing",
+          "Light waves do not superpose",
+          "Their wavelengths are too short",
+          "Their amplitudes are too small"
+        ],
+        "answer": "A",
+        "explanation": "Separate lamps are not coherent: the phase difference changes randomly, so the pattern averages out."
+      },
+      {
+        "type": "mcq",
+        "q": "Two speakers emit 680 Hz sound. v = 340 m s^-1. What is the path difference at the first minimum?",
+        "options": [
+          "0.25 m",
+          "0.50 m",
+          "0.75 m",
+          "1.0 m"
+        ],
+        "answer": "A",
+        "explanation": "λ = 340 ÷ 680 = 0.50 m. First minimum: path difference ½λ = 0.25 m."
+      },
+      {
+        "type": "mcq",
+        "q": "A microwave probe moves from the central maximum to the next maximum. How does the path difference change?",
+        "options": [
+          "From 0 to ½λ",
+          "From 0 to λ",
+          "From 0 to 2λ",
+          "From λ to 2λ"
+        ],
+        "answer": "B",
+        "explanation": "Central maximum: 0. First-order maximum: λ."
+      },
+      {
+        "type": "workedExample",
+        "worked": {
+          "prompt": "Two speakers share one signal generator. At the first-order maximum the path difference is 0.28 m. v = 340 m s^-1. Find the frequency.",
+          "steps": [
+            "First-order maximum: path difference = λ, so λ = 0.28 m",
+            "f = v ÷ λ = 340 ÷ 0.28",
+            "f = 1200 Hz (2 s.f.)"
+          ]
+        },
+        "yourTurn": {
+          "prompt": "Coherent sound of frequency 2.0 kHz, v = 340 m s^-1. Find the path difference at the second-order minimum.",
+          "answer": "λ = 340 ÷ 2000 = 0.17 m. Second-order minimum: 1.5λ = 0.26 m"
+        }
+      },
+      {
+        "type": "trueFalse",
+        "heading": "COMMON MISCONCEPTIONS",
+        "statements": [
+          {
+            "text": "Destructive interference destroys the energy of the waves.",
+            "isTrue": false,
+            "correction": "Energy is redistributed: less at the minima, more at the maxima."
+          },
+          {
+            "text": "Coherent waves must have the same amplitude.",
+            "isTrue": false,
+            "correction": "Coherent means same frequency and constant phase difference. Equal amplitudes just give zero at the minima."
+          },
+          {
+            "text": "At the central maximum the path difference is zero.",
+            "isTrue": true
+          },
+          {
+            "text": "A path difference of 2.5λ gives a minimum.",
+            "isTrue": true
+          },
+          {
+            "text": "Microwaves cannot show interference because they are invisible.",
+            "isTrue": false,
+            "correction": "All waves interfere. A probe receiver detects the microwave maxima and minima."
+          }
+        ]
+      }
+    ],
+    "apply": {
+      "developing": [
+        {
+          "q": "State the conditions needed to see a steady two-source interference pattern.",
+          "a": "The sources must be coherent: the same frequency and a constant phase difference.",
+          "marks": 2,
+          "qType": "concept",
+          "contentType": "routine_recall"
+        },
+        {
+          "q": "State the path difference for constructive and for destructive interference.",
+          "a": "Constructive: nλ. Destructive: (n + ½)λ.",
+          "marks": 2,
+          "qType": "concept",
+          "contentType": "routine_recall"
+        },
+        {
+          "q": "Give the phase difference, in radians, at the second-order minimum and at the second-order maximum.",
+          "a": "Second-order minimum: 3π rad. Second-order maximum: 4π rad.",
+          "marks": 2,
+          "qType": "concept",
+          "contentType": "known_procedure"
+        }
+      ],
+      "reaching": [
+        {
+          "q": "Two dippers make coherent water waves. The path difference to the second-order maximum is 9.0 cm. Find the wavelength.",
+          "a": "2λ = 9.0 cm, so λ = 4.5 cm",
+          "marks": 2,
+          "qType": "calculation",
+          "contentType": "known_procedure"
+        },
+        {
+          "q": "Explain why the sound is quieter at some points between two speakers.",
+          "a": "Waves arrive in antiphase, path difference (n + ½)λ. By superposition the displacements cancel: destructive interference, a minimum.",
+          "marks": 3,
+          "qType": "concept",
+          "contentType": "known_procedure"
+        },
+        {
+          "q": "Speakers emit 1.7 kHz sound. v = 340 m s^-1. Find the path difference at the first-order maximum.",
+          "a": "λ = 340 ÷ 1700 = 0.20 m. First-order maximum: path difference = λ = 0.20 m",
+          "marks": 2,
+          "qType": "calculation",
+          "contentType": "known_procedure"
+        }
+      ],
+      "mastering": [
+        {
+          "q": "Sound of 2.0 kHz, v = 340 m s^-1. Find the path difference that gives a phase difference of 5π rad.",
+          "a": "λ = 0.17 m. 5π rad = 2.5λ, so path difference = 2.5 × 0.17 = 0.43 m",
+          "marks": 3,
+          "qType": "calculation",
+          "contentType": "known_procedure"
+        },
+        {
+          "q": "A microphone moves along a line parallel to two speakers. Explain the pattern it detects.",
+          "a": "Alternate maxima and minima. Maxima: path difference nλ, in phase, constructive. Minima: (n + ½)λ, antiphase, destructive.",
+          "marks": 4,
+          "qType": "extended_writing",
+          "contentType": "extended_writing"
+        },
+        {
+          "q": "Noise-cancelling headphones make sound that cancels engine noise. Suggest the phase and amplitude of that sound.",
+          "a": "In antiphase with the noise (phase difference π) and the same amplitude, so superposition gives almost zero displacement.",
+          "marks": 2,
+          "qType": "concept",
+          "contentType": "unfamiliar_context"
+        }
+      ]
+    },
+    "worksheetExtras": {
+      "wordBank": []
+    }
+  },
+  {
+    "meta": {
+      "class": "8XP",
+      "topic": "Pressure in fluids",
+      "title": "Pressure in Fluids",
+      "lessonType": "standard",
+      "theme": "physics",
+      "worksheet": "A",
+      "differentiation": "none",
+      "year": 8,
+      "subject": "Physics",
+      "macrotopic": "P1 Motion and Pressure",
+      "lessonNumber": 4,
+      "outputDir": "C:/Users/magda/claude-projects/science-lesson-v4/Pressure in Fluids 8XP"
+    },
+    "title": {
+      "objectives": [
+        "Describe how pressure in a liquid changes with depth",
+        "Explain why pressure increases with depth",
+        "Plot and use a graph of pressure against depth"
+      ],
+      "keywords": [
+        "fluid",
+        "liquid",
+        "pressure",
+        "depth",
+        "particles",
+        "weight"
+      ]
+    },
+    "doNow": {
+      "variant": "A",
+      "questions": [
+        {
+          "q": "Write the equation for pressure.",
+          "a": "pressure = force ÷ area",
+          "marks": 1,
+          "hint": "p_______ = f_______ ÷ a_______"
+        },
+        {
+          "q": "A box pushes down with 600 N on an area of 2 m^2. Calculate the pressure.",
+          "a": "600 ÷ 2 = 300 Pa (N/m^2)",
+          "marks": 2,
+          "hint": "pressure = force ÷ area"
+        },
+        {
+          "q": "Why does a sharp knife cut more easily than a blunt one?",
+          "a": "The sharp edge has a small area, so the same force gives a bigger pressure.",
+          "marks": 2,
+          "hint": "Key words: area, force, pressure"
+        },
+        {
+          "q": "Why is air pressure lower at the top of a mountain?",
+          "a": "There is less air above you, so less weight of air pushes down.",
+          "marks": 1,
+          "hint": "Key words: air, above, weight"
+        },
+        {
+          "q": "Describe how the particles are arranged in a liquid.",
+          "a": "Close together, in a random arrangement, and able to move past each other.",
+          "marks": 2,
+          "hint": "Key words: close, random, move"
+        },
+        {
+          "q": "Write the word equation for photosynthesis.",
+          "a": "carbon dioxide + water → glucose + oxygen",
+          "marks": 2,
+          "hint": "c_______ d_______ + w_______ → g_______ + o_______"
+        }
+      ]
+    },
+    "engage": {
+      "variant": "mysteryImage",
+      "engageType": 5,
+      "hook": "Divers who go hundreds of metres down wear a hard metal suit like this. What is it protecting them from?",
+      "imagePlaceholder": true,
+      "imageDescription": "atmospheric diving suit being lowered into the sea",
+      "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Pressure in Fluids 8XP/src/image4.png",
+      "imageConfidence": "search",
+      "reveal": {
+        "answer": "The pressure of the water above them. Every 10 m of sea water adds about as much pressure as the whole atmosphere pressing on you."
+      }
+    },
+    "learn": [
+      {
+        "variant": "A",
+        "heading": "Pressure in liquids",
+        "boxes": [
+          {
+            "header": "Why liquids push",
+            "items": [
+              "Liquid particles hit every surface they touch.",
+              "Each collision pushes on the surface.",
+              "Liquid pressure acts in all directions."
+            ]
+          },
+          {
+            "header": "Deeper means more pressure",
+            "items": [
+              "Deeper down, there is more liquid above you.",
+              "The weight of that liquid pushes down on the liquid below.",
+              "So the pressure increases with depth."
+            ]
+          }
+        ],
+        "imagePlaceholder": true,
+        "imageDescription": "beach ball being pushed deeper under water and getting squashed from all sides",
+        "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Pressure in Fluids 8XP/src/image1.png",
+        "imageConfidence": "search"
+      },
+      {
+        "variant": "A",
+        "heading": "Living and building with water pressure",
+        "boxes": [
+          {
+            "header": "What affects liquid pressure",
+            "items": [
+              "Depth: deeper water gives more pressure.",
+              "Density: a denser liquid gives more pressure at the same depth.",
+              "The shape of the container does not matter."
+            ]
+          },
+          {
+            "header": "Real examples",
+            "items": [
+              "Dams are built thickest at the bottom.",
+              "Divers' ears hurt more the deeper they go.",
+              "Deep-sea animals are adapted to huge pressures."
+            ]
+          }
+        ],
+        "imagePlaceholder": true,
+        "imageDescription": "cross-section of a dam wall that is much thicker at the bottom than the top"
+      }
+    ],
+    "build": [
+      {
+        "type": "mcq",
+        "q": "What happens to the pressure in water as you go deeper?",
+        "options": [
+          "It decreases",
+          "It stays the same",
+          "It increases",
+          "It drops to zero"
+        ],
+        "answer": "C",
+        "explanation": "There is more water above you, so the pressure increases."
+      },
+      {
+        "type": "mcq",
+        "q": "Why does water pressure increase with depth?",
+        "options": [
+          "The water is warmer deeper down",
+          "More water is above, pushing down",
+          "The particles are bigger deeper down",
+          "There is less air above the water"
+        ],
+        "answer": "B",
+        "explanation": "The weight of the water above pushes down on the water below."
+      },
+      {
+        "type": "mcq",
+        "q": "A beach ball is pushed deeper under water. What happens to it?",
+        "options": [
+          "It is squashed from all sides",
+          "It is squashed from the top only",
+          "It gets bigger",
+          "Nothing changes"
+        ],
+        "answer": "A",
+        "explanation": "Water pressure acts in all directions and gets bigger with depth."
+      },
+      {
+        "type": "mcq",
+        "q": "In which direction does water pressure push on a submarine?",
+        "options": [
+          "Downwards only",
+          "Upwards only",
+          "Sideways only",
+          "In all directions"
+        ],
+        "answer": "D",
+        "explanation": "Particles hit the hull from every side, so the pressure acts in all directions."
+      },
+      {
+        "type": "mcq",
+        "q": "The sea pressure is 100 atmospheres at 1000 m deep. What is it at 3000 m?",
+        "options": [
+          "30 atmospheres",
+          "100 atmospheres",
+          "300 atmospheres",
+          "3000 atmospheres"
+        ],
+        "answer": "C",
+        "explanation": "Three times as deep gives three times the pressure from the water."
+      },
+      {
+        "type": "mcq",
+        "q": "Which dam design is best?",
+        "options": [
+          "Thickest at the bottom",
+          "Thickest at the top",
+          "Thickest in the middle",
+          "The same thickness all the way"
+        ],
+        "answer": "A",
+        "explanation": "Water pressure is biggest at the bottom, so the wall must be strongest there."
+      },
+      {
+        "type": "predictThenCheck",
+        "setup": "A tall can has three holes, one above the other. It is filled with water.",
+        "prediction": "Which hole squirts water the furthest?",
+        "reveal": "The bottom hole. Its jet goes furthest.",
+        "explanation": "The bottom hole has the most water above it, so the pressure there is biggest and the water is pushed out fastest.",
+        "commonError": "Thinking all three jets are the same because it is the same water."
+      },
+      {
+        "type": "graphInterpret",
+        "graphLabel": "Pressure in a deep lake",
+        "axes": {
+          "x": "Depth below the surface (m)",
+          "y": "Pressure (kPa)"
+        },
+        "imagePlaceholder": true,
+        "imageDescription": "straight-line graph of pressure against depth in a lake, 100 kPa at the surface rising to 600 kPa at 50 m",
+        "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Pressure in Fluids 8XP/lake-graph.png",
+        "imageConfidence": "search",
+        "questions": [
+          {
+            "q": "What is the pressure at 20 m deep?",
+            "a": "300 kPa",
+            "marks": 1
+          },
+          {
+            "q": "At what depth is the pressure 450 kPa?",
+            "a": "35 m",
+            "marks": 1
+          },
+          {
+            "q": "The pressure at the surface is not zero. Why?",
+            "a": "The air above the lake presses on the water: air pressure is about 100 kPa.",
+            "marks": 1
+          }
+        ]
+      }
+    ],
+    "apply": {
+      "developing": [
+        {
+          "q": "Plot a line graph of pressure (y-axis) against depth (x-axis) using the data table.",
+          "a": "A straight line from (0, 0) up to (10 000 m, 1000 atm).",
+          "marks": 4,
+          "qType": "concept",
+          "contentType": "known_procedure",
+          "diagram": "Graph: pressure against depth",
+          "diagramLines": 16
+        },
+        {
+          "q": "What happens to the pressure in water as you go deeper?",
+          "a": "It increases.",
+          "marks": 1,
+          "qType": "concept",
+          "contentType": "routine_recall"
+        },
+        {
+          "q": "In which directions does water push on a diver?",
+          "a": "In all directions.",
+          "marks": 1,
+          "qType": "concept",
+          "contentType": "routine_recall"
+        }
+      ],
+      "reaching": [
+        {
+          "q": "Mark these on your graph: spider crab 300 m, blobfish 1200 m, vampire squid 3000 m, fangtooth 5000 m.",
+          "a": "Four points on the line at 300, 1200, 3000 and 5000 m.",
+          "marks": 2,
+          "qType": "concept",
+          "contentType": "known_procedure"
+        },
+        {
+          "q": "Explain why water pressure increases with depth.",
+          "a": "Deeper down there is more water above. Its weight pushes down on the water below.",
+          "marks": 2,
+          "qType": "concept",
+          "contentType": "known_procedure",
+          "starters": [
+            "Deeper down there is more water"
+          ]
+        },
+        {
+          "q": "Why is a dam built thicker at the bottom than at the top?",
+          "a": "Water pressure is biggest at the bottom, so the wall must be strongest there.",
+          "marks": 2,
+          "qType": "concept",
+          "contentType": "known_procedure"
+        }
+      ],
+      "mastering": [
+        {
+          "q": "Use your graph to find the pressure where each of the four animals lives. Which one withstands the most?",
+          "a": "Spider crab 30, blobfish 120, vampire squid 300, fangtooth 500 atm. The fangtooth withstands the most.",
+          "marks": 3,
+          "qType": "concept",
+          "contentType": "known_procedure"
+        },
+        {
+          "q": "A diver's ears hurt more at 10 m deep than at 2 m. Explain why.",
+          "a": "At 10 m there is more water above, so the pressure pushing on the eardrum is bigger.",
+          "marks": 2,
+          "qType": "concept",
+          "contentType": "unfamiliar_context"
+        },
+        {
+          "q": "Submarines have thick, rounded hulls. Use ideas about pressure to explain why.",
+          "a": "Deep water pressure is huge and pushes in all directions, so the hull must be strong all the way round or it would be crushed.",
+          "marks": 3,
+          "qType": "extended_writing",
+          "contentType": "extended_writing",
+          "starters": [
+            "Deep down, the water pressure is",
+            "The pressure pushes in"
+          ]
+        }
+      ]
+    },
+    "worksheetExtras": {
+      "wordBank": [
+        "pressure",
+        "depth",
+        "weight",
+        "above",
+        "particles",
+        "directions",
+        "fluid"
+      ],
+      "cloze": [
+        "Pressure in a liquid increases with _____.",
+        "Deeper down there is more water _____ you.",
+        "The _____ of the water above pushes down on the water below.",
+        "Pressure in a liquid acts in all _____.",
+        "A dam is built thickest at the _____."
+      ],
+      "clozeWordBank": [
+        "depth",
+        "above",
+        "weight",
+        "directions",
+        "bottom",
+        "area"
+      ],
+      "collectionTable": {
+        "title": "PRESSURE AND DEPTH IN THE SEA",
+        "instruction": "Use this data for your graph. Pressure is the extra pressure from the water.",
+        "headers": [
+          "Depth below the surface (m)",
+          "Pressure from the water (atmospheres)"
+        ],
+        "rows": [
+          [
+            "0",
+            "0"
+          ],
+          [
+            "1000",
+            "100"
+          ],
+          [
+            "2000",
+            "200"
+          ],
+          [
+            "3000",
+            "300"
+          ],
+          [
+            "4000",
+            "400"
+          ],
+          [
+            "5000",
+            "500"
+          ],
+          [
+            "6000",
+            "600"
+          ],
+          [
+            "7000",
+            "700"
+          ],
+          [
+            "8000",
+            "800"
+          ],
+          [
+            "9000",
+            "900"
+          ],
+          [
+            "10 000",
+            "1000"
+          ]
+        ]
+      }
+    }
+  },
+  {
+    "meta": {
+      "class": "13D",
+      "topic": "The Big Bang theory",
+      "title": "The Big Bang Theory",
+      "lessonType": "standard",
+      "theme": "physics",
+      "worksheet": "A",
+      "differentiation": "none",
+      "year": 13,
+      "subject": "Physics",
+      "macrotopic": "Chapter 20 - Cosmology",
+      "lessonNumber": 4,
+      "outputDir": "C:/Users/magda/claude-projects/science-lesson-v4/Big Bang 13D"
+    },
+    "title": {
+      "objectives": [
+        "Describe the Big Bang theory and the evidence for it",
+        "Explain the origin and features of the cosmic microwave background",
+        "Use Wien's law to link the CMB to the early universe"
+      ],
+      "keywords": [
+        "Big Bang",
+        "cosmic microwave background",
+        "black body",
+        "isotropic",
+        "steady-state model",
+        "expansion"
+      ]
+    },
+    "doNow": {
+      "variant": "A",
+      "questions": [
+        {
+          "q": "State Hubble's law.",
+          "a": "The recession velocity of a galaxy is directly proportional to its distance from us.",
+          "marks": 1
+        },
+        {
+          "q": "H_0 = 2.3 × 10^-18 s^-1. Estimate the age of the universe in years.",
+          "a": "t = 1 ÷ H_0 = 4.3 × 10^17 s \\approx 1.4 × 10^10 years",
+          "marks": 2
+        },
+        {
+          "q": "Define one parsec.",
+          "a": "The distance at which a radius of 1 AU subtends an angle of 1 arcsecond.",
+          "marks": 1
+        },
+        {
+          "q": "A star's spectrum peaks at 500 nm. Calculate its surface temperature.",
+          "a": "T = 2.9 × 10^-3 ÷ 500 × 10^-9 = 5800 K",
+          "marks": 2
+        },
+        {
+          "q": "State the cosmological principle.",
+          "a": "On a large scale the universe is homogeneous and isotropic, and the laws of physics are universal.",
+          "marks": 2
+        },
+        {
+          "q": "Write the equation linking the energy of a photon to its wavelength.",
+          "a": "E = hc ÷ λ",
+          "marks": 1
+        }
+      ]
+    },
+    "engage": {
+      "variant": "mysteryImage",
+      "engageType": 5,
+      "hook": "In 1965 a radio antenna picked up a faint microwave hiss from every direction in the sky. Pigeon droppings were blamed first.",
+      "imagePlaceholder": true,
+      "imageDescription": "Holmdel horn antenna used by Penzias and Wilson in 1965",
+      "reveal": {
+        "question": "What was the hiss really?",
+        "answer": "Radiation left over from the hot early universe, stretched into microwaves by expansion. It won Penzias and Wilson the 1978 Nobel Prize."
+      }
+    },
+    "learn": [
+      {
+        "variant": "A",
+        "heading": "The Big Bang theory",
+        "boxes": [
+          {
+            "header": "The idea",
+            "items": [
+              "About 13.7 billion years ago the universe began from an extremely hot, dense state.",
+              "Space itself has been expanding ever since.",
+              "As it expanded, the universe cooled."
+            ]
+          },
+          {
+            "header": "What it is not",
+            "items": [
+              "Not an explosion into empty space: space itself stretches.",
+              "There is no centre. Every galaxy sees the others moving away."
+            ]
+          }
+        ],
+        "imagePlaceholder": true,
+        "imageDescription": "balloon with dots drawn on it being inflated, model of expanding space"
+      },
+      {
+        "variant": "E",
+        "heading": "Big Bang or steady state?",
+        "comparison": {
+          "aTitle": "Big Bang model",
+          "bTitle": "Steady-state model",
+          "rows": [
+            {
+              "a": "The universe had a beginning",
+              "b": "No beginning and no end"
+            },
+            {
+              "a": "Expanding, so it was hotter and denser in the past",
+              "b": "Expanding, but new matter forms so density stays the same"
+            },
+            {
+              "a": "Predicts a cooled background radiation from the hot past",
+              "b": "Predicts no background radiation"
+            },
+            {
+              "a": "Distant (older) galaxies should look different",
+              "b": "Distant galaxies should look the same as near ones"
+            },
+            {
+              "a": "Supported by the CMB, found in 1965",
+              "b": "Abandoned after the CMB was found"
+            }
+          ]
+        },
+        "imagePlaceholder": false
+      },
+      {
+        "variant": "A",
+        "heading": "The cosmic microwave background (CMB)",
+        "boxes": [
+          {
+            "header": "What we observe",
+            "items": [
+              "Microwave radiation from every direction in the sky.",
+              "A black-body spectrum peaking at about 1 mm, matching 2.7 K.",
+              "Almost isotropic: it varies by only about 1 part in 100 000."
+            ]
+          },
+          {
+            "header": "Where it came from",
+            "items": [
+              "About 380 000 years after the Big Bang, at about 3000 K, atoms formed.",
+              "Photons could then travel freely through space.",
+              "Expansion has since stretched their wavelength about 1100 times."
+            ]
+          }
+        ],
+        "imageDescription": "black-body spectrum of the cosmic microwave background peaking at about 1.1 mm",
+        "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Big Bang 13D/cmb-spectrum.png",
+        "imageConfidence": "search"
+      }
+    ],
+    "build": [
+      {
+        "type": "mcq",
+        "q": "Which observation is evidence that the universe is expanding?",
+        "options": [
+          "Galaxies are red-shifted more the further away they are",
+          "Stars emit black-body radiation",
+          "Galaxies are blue-shifted more the further away they are",
+          "All stars have the same luminosity"
+        ],
+        "answer": "A",
+        "explanation": "Red shift increasing with distance means recession velocity is proportional to distance: expansion."
+      },
+      {
+        "type": "mcq",
+        "q": "Why is the CMB evidence for the Big Bang?",
+        "options": [
+          "It comes from nearby stars",
+          "It is radiation left from a hot, dense early universe",
+          "It is emitted by the Milky Way",
+          "It proves the universe is not expanding"
+        ],
+        "answer": "B",
+        "explanation": "A uniform black-body background is the cooled radiation the Big Bang model predicts."
+      },
+      {
+        "type": "mcq",
+        "q": "The CMB is a black body at 2.7 K. What is its peak wavelength? (Wien constant = 2.9 × 10^-3 m K)",
+        "options": [
+          "1.1 × 10^-6 m",
+          "1.1 × 10^-5 m",
+          "1.1 × 10^-3 m",
+          "7.8 × 10^-3 m"
+        ],
+        "answer": "C",
+        "explanation": "λ_max = 2.9 × 10^-3 ÷ 2.7 = 1.1 × 10^-3 m, about 1 mm: microwaves."
+      },
+      {
+        "type": "mcq",
+        "q": "Which part of the EM spectrum is the CMB in today?",
+        "options": [
+          "Infrared",
+          "Visible light",
+          "Ultraviolet",
+          "Microwaves"
+        ],
+        "answer": "D",
+        "explanation": "Its peak is near 1 mm, in the microwave region."
+      },
+      {
+        "type": "mcq",
+        "q": "Why does the CMB arrive from every direction?",
+        "options": [
+          "Earth is at the centre of the universe",
+          "It is reflected by the Milky Way",
+          "It was released everywhere in space at once",
+          "It is emitted by every star"
+        ],
+        "answer": "C",
+        "explanation": "It filled all of space when atoms formed, so it reaches us from everywhere."
+      },
+      {
+        "type": "mcq",
+        "q": "Which observation could the steady-state model NOT explain?",
+        "options": [
+          "The CMB and its black-body spectrum",
+          "The speed of light",
+          "The red shift of galaxies",
+          "The colours of stars"
+        ],
+        "answer": "A",
+        "explanation": "Steady state has no hot dense past, so it predicts no CMB."
+      },
+      {
+        "type": "workedExample",
+        "worked": {
+          "prompt": "The CMB was released at about 3000 K. Calculate its peak wavelength then. (Wien constant = 2.9 × 10^-3 m K)",
+          "steps": [
+            "λ_max = 2.9 × 10^-3 ÷ T",
+            "= 2.9 × 10^-3 ÷ 3000",
+            "= 9.7 × 10^-7 m (near infrared)"
+          ]
+        },
+        "yourTurn": {
+          "prompt": "Today the CMB peaks at 1.07 × 10^-3 m. By what factor have its wavelengths been stretched?",
+          "answer": "1.07 × 10^-3 ÷ 9.7 × 10^-7 \\approx 1100"
+        }
+      },
+      {
+        "type": "trueFalse",
+        "heading": "COMMON MISCONCEPTIONS",
+        "statements": [
+          {
+            "text": "The Big Bang was an explosion at one point in space.",
+            "isTrue": false,
+            "correction": "Space itself expanded everywhere at once. There is no centre."
+          },
+          {
+            "text": "More distant galaxies recede faster.",
+            "isTrue": true
+          },
+          {
+            "text": "The CMB is radiation from distant stars.",
+            "isTrue": false,
+            "correction": "It was released about 380 000 years after the Big Bang, before any stars formed."
+          },
+          {
+            "text": "The universe has cooled as it expanded.",
+            "isTrue": true
+          },
+          {
+            "text": "The CMB is exactly the same in every direction.",
+            "isTrue": false,
+            "correction": "It varies by about 1 part in 100 000. These ripples seeded galaxies."
+          }
+        ]
+      }
+    ],
+    "apply": {
+      "developing": [
+        {
+          "q": "Describe the Big Bang theory.",
+          "a": "The universe began about 13.7 billion years ago from a very hot, dense state. Space has expanded and cooled ever since.",
+          "marks": 2,
+          "qType": "concept",
+          "contentType": "routine_recall"
+        },
+        {
+          "q": "State two pieces of evidence for the Big Bang theory.",
+          "a": "Red shift of galaxies increasing with distance (expansion). The cosmic microwave background radiation.",
+          "marks": 2,
+          "qType": "concept",
+          "contentType": "routine_recall"
+        },
+        {
+          "q": "State two properties of the CMB.",
+          "a": "Black-body spectrum at 2.7 K with a peak near 1 mm (microwave). Almost the same in every direction (isotropic).",
+          "marks": 2,
+          "qType": "concept",
+          "contentType": "routine_recall"
+        }
+      ],
+      "reaching": [
+        {
+          "q": "The CMB temperature is 2.7 K. Calculate its peak wavelength. (Wien constant = 2.9 × 10^-3 m K)",
+          "a": "λ_max = 2.9 × 10^-3 ÷ 2.7 = 1.1 × 10^-3 m",
+          "marks": 2,
+          "qType": "calculation",
+          "contentType": "known_procedure",
+          "equation": "λ_max T = 2.9 × 10^-3 m K",
+          "units": "m"
+        },
+        {
+          "q": "Explain how the CMB was produced and why it is now microwave radiation.",
+          "a": "Released at about 3000 K when atoms formed. Expansion of space has since stretched its wavelength about 1100 times into microwaves.",
+          "marks": 3,
+          "qType": "concept",
+          "contentType": "known_procedure"
+        },
+        {
+          "q": "Explain why the CMB is evidence against the steady-state model.",
+          "a": "Steady state has no hot, dense past, so it predicts no black-body background. The CMB exists, as the Big Bang predicts.",
+          "marks": 2,
+          "qType": "concept",
+          "contentType": "known_procedure"
+        }
+      ],
+      "mastering": [
+        {
+          "q": "The CMB peaks at 1.07 mm today. It was released at 3000 K. By what factor have its wavelengths stretched?",
+          "a": "λ then = 2.9 × 10^-3 ÷ 3000 = 9.7 × 10^-7 m. 1.07 × 10^-3 ÷ 9.7 × 10^-7 \\approx 1100",
+          "marks": 3,
+          "qType": "calculation",
+          "contentType": "known_procedure",
+          "equation": "λ_max T = 2.9 × 10^-3 m K"
+        },
+        {
+          "q": "The CMB temperature varies by about 1 part in 100 000. Suggest why these tiny variations matter.",
+          "a": "They show slightly denser regions in the early universe. Gravity pulled these together to form galaxies.",
+          "marks": 2,
+          "qType": "concept",
+          "contentType": "unfamiliar_context"
+        },
+        {
+          "q": "Evaluate the evidence that the universe began in a Big Bang.",
+          "a": "Red shift rises with distance: expansion, so a denser past. CMB: a uniform 2.7 K black body, the cooled afterglow. Age from 1/H_0 fits the oldest stars.",
+          "marks": 4,
+          "qType": "extended_writing",
+          "contentType": "extended_writing"
+        }
+      ]
+    },
+    "worksheetExtras": {
+      "wordBank": []
+    }
+  },
+  {
+    "meta": {
+      "class": "7MLA",
+      "topic": "Unicellular and multicellular organisms",
+      "title": "Unicellular and Multicellular Organisms",
+      "lessonType": "practical",
+      "theme": "biology",
+      "worksheet": "A",
+      "differentiation": "none",
+      "year": 7,
+      "subject": "Biology",
+      "macrotopic": "B1 Cells",
+      "lessonNumber": 6,
+      "outputDir": "C:/Users/magda/claude-projects/science-lesson-v4/Unicellular 7MLA"
+    },
+    "title": {
+      "objectives": [
+        "Describe the difference between unicellular and multicellular organisms",
+        "Give examples of each",
+        "Explain why large organisms need organs to absorb substances"
+      ],
+      "keywords": [
+        "unicellular",
+        "multicellular",
+        "organism",
+        "amoeba",
+        "pseudopodia",
+        "organ"
+      ]
+    },
+    "doNow": {
+      "variant": "A",
+      "questions": [
+        {
+          "q": "What does MRS GREN stand for?",
+          "a": "Movement, Respiration, Sensitivity, Growth, Reproduction, Excretion, Nutrition.",
+          "marks": 2,
+          "hint": "M_______, R_______, S_______, G_______, R_______, E_______, N_______"
+        },
+        {
+          "q": "Name the part of a cell that controls what the cell does.",
+          "a": "The nucleus.",
+          "marks": 1,
+          "hint": "n_______"
+        },
+        {
+          "q": "Name two parts found in plant cells but not in animal cells.",
+          "a": "Any two: cell wall, chloroplasts, permanent vacuole.",
+          "marks": 2,
+          "hint": "c_______ w_______, c_______"
+        },
+        {
+          "q": "What is a tissue?",
+          "a": "A group of similar cells working together to do a job.",
+          "marks": 1,
+          "hint": "A group of s_______ cells working t_______ to do a j_______."
+        },
+        {
+          "q": "Name one specialised cell and say how it is adapted to its job.",
+          "a": "e.g. red blood cell: no nucleus, so more room to carry oxygen. Root hair cell: long hair, big surface to absorb water.",
+          "marks": 2
+        },
+        {
+          "q": "Name the force that slows down a falling parachutist.",
+          "a": "Air resistance (drag).",
+          "marks": 1,
+          "hint": "a_______ r_______"
+        }
+      ]
+    },
+    "engage": {
+      "variant": "mysteryImage",
+      "engageType": 3,
+      "hook": "A hungry alien can only eat living things made of ONE cell. Which of these could it eat?",
+      "content": "humans, cows, oak trees, ants, head lice, slugs, grass, mushrooms, tadpoles, moss, bacteria, amoeba",
+      "imagePlaceholder": true,
+      "imageDescription": "cartoon pink alien with big eyes",
+      "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Unicellular 7MLA/src/image2.png",
+      "imageConfidence": "search",
+      "reveal": {
+        "answer": "Only the bacteria and the amoeba. Everything else on the list is made of many cells, even the moss and the mushrooms."
+      }
+    },
+    "learn": [
+      {
+        "variant": "E",
+        "heading": "Unicellular and multicellular",
+        "comparison": {
+          "aTitle": "Unicellular",
+          "bTitle": "Multicellular",
+          "rows": [
+            {
+              "a": "Made of one cell",
+              "b": "Made of many cells"
+            },
+            {
+              "a": "The one cell carries out all seven life processes",
+              "b": "Cells are specialised to do different jobs"
+            },
+            {
+              "a": "No tissues or organs",
+              "b": "Cells form tissues, organs and organ systems"
+            },
+            {
+              "a": "Usually too small to see without a microscope",
+              "b": "Usually big enough to see"
+            },
+            {
+              "a": "Examples: bacteria, amoeba, yeast",
+              "b": "Examples: humans, trees, mushrooms"
+            }
+          ]
+        },
+        "imagePlaceholder": false
+      },
+      {
+        "variant": "A",
+        "heading": "The amoeba: one cell that does everything",
+        "boxes": [
+          {
+            "header": "Moving and feeding",
+            "items": [
+              "It pushes out pseudopodia (\"false feet\") to move.",
+              "Pseudopodia surround food and take it into the cell."
+            ]
+          },
+          {
+            "header": "Staying alive",
+            "items": [
+              "A contractile vacuole collects extra water and squeezes it out.",
+              "Oxygen passes straight in through the cell membrane."
+            ]
+          }
+        ],
+        "imagePlaceholder": true,
+        "imageDescription": "amoeba under a microscope with pseudopodia, nucleus and contractile vacuole labelled"
+      },
+      {
+        "variant": "A",
+        "heading": "Why big organisms need organs",
+        "boxes": [
+          {
+            "header": "Small organisms",
+            "items": [
+              "Substances only travel a short way to reach the middle of the cell.",
+              "The cell membrane can take in enough oxygen and food."
+            ]
+          },
+          {
+            "header": "Large organisms",
+            "items": [
+              "Cells deep inside are far from the surface.",
+              "Organs like lungs and intestines take in oxygen and food.",
+              "The blood carries them to every cell."
+            ]
+          }
+        ],
+        "imageDescription": "particles outside a cell before and after moving into it through the membrane",
+        "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Unicellular 7MLA/src/image1.png",
+        "imageConfidence": "search"
+      }
+    ],
+    "build": [
+      {
+        "type": "mcq",
+        "q": "What is a unicellular organism?",
+        "options": [
+          "An organism made of many cells",
+          "An organism made of one cell",
+          "A cell with one nucleus",
+          "An organism with one organ"
+        ],
+        "answer": "B",
+        "explanation": "Uni means one: a unicellular organism is a single cell."
+      },
+      {
+        "type": "mcq",
+        "q": "Which of these is multicellular?",
+        "options": [
+          "Amoeba",
+          "Bacterium",
+          "Mushroom",
+          "Yeast"
+        ],
+        "answer": "C",
+        "explanation": "A mushroom is made of many cells. The others are single cells."
+      },
+      {
+        "type": "mcq",
+        "q": "How does an amoeba move?",
+        "options": [
+          "It pushes out pseudopodia",
+          "It uses its contractile vacuole",
+          "It swims with a tail",
+          "It uses muscles"
+        ],
+        "answer": "A",
+        "explanation": "Pseudopodia are \"false feet\" that let the cell creep along."
+      },
+      {
+        "type": "mcq",
+        "about": "practical",
+        "q": "What do the agar cubes model?",
+        "options": [
+          "Cells of different colours",
+          "Different amounts of acid",
+          "Different temperatures",
+          "Organisms of different sizes"
+        ],
+        "answer": "D",
+        "explanation": "Small cubes model small organisms. Big cubes model big organisms."
+      },
+      {
+        "type": "mcq",
+        "about": "practical",
+        "q": "Which cube will turn colourless first?",
+        "options": [
+          "The smallest cube",
+          "The middle-sized cube",
+          "The largest cube",
+          "They all change at the same time"
+        ],
+        "answer": "A",
+        "explanation": "The acid has the shortest distance to travel to reach the middle."
+      },
+      {
+        "type": "mcq",
+        "q": "Why does a large organism need lungs and intestines?",
+        "options": [
+          "Its cells are too small",
+          "Its middle is too far from the surface",
+          "It has no cell membranes",
+          "It needs to make more cells"
+        ],
+        "answer": "B",
+        "explanation": "Inner cells are too far from the surface, so organs take in what they need."
+      },
+      {
+        "type": "practical",
+        "title": "Modelling organisms with agar cubes",
+        "intro": "Pink agar cubes model organisms of different sizes. Acid soaking in turns them colourless.",
+        "worksheetIntro": true,
+        "equipment": [
+          "pink agar cubes: 1 cm and 1.5 cm",
+          "0.1 M hydrochloric acid",
+          "beakers",
+          "forceps",
+          "stopwatch",
+          "eye protection"
+        ],
+        "steps": [
+          "Use forceps to put each cube in its own beaker.",
+          "Pour acid over the cubes until they are covered. Start the stopwatch.",
+          "Record the time each cube takes to turn completely colourless.",
+          "Compare the times for the small and the large cubes."
+        ],
+        "warning": "Eye protection on. Acid is an irritant: wash skin if splashed. Never eat the cubes.",
+        "imagePlaceholder": true,
+        "imageDescription": "beakers of acid with pink agar cubes of different sizes losing their colour",
+        "embeddedImagePath": "C:/Users/magda/claude-projects/science-lesson-v4/Unicellular 7MLA/src/image8.jpg",
+        "imageConfidence": "search",
+        "questions": [
+          {
+            "q": "Which cube turned colourless first? Why?",
+            "a": "The smallest. The acid had a shorter distance to travel to reach its middle."
+          },
+          {
+            "q": "What does the large cube model?",
+            "a": "A large multicellular organism, whose middle is far from its surface."
+          }
+        ]
+      }
+    ],
+    "apply": {
+      "developing": [
+        {
+          "q": "Sort into unicellular and multicellular: human, amoeba, oak tree, bacterium, ant, moss.",
+          "a": "Unicellular: amoeba, bacterium. Multicellular: human, oak tree, ant, moss.",
+          "marks": 3,
+          "qType": "concept",
+          "contentType": "routine_recall"
+        },
+        {
+          "q": "What does the word unicellular mean?",
+          "a": "Made of one cell.",
+          "marks": 1,
+          "qType": "concept",
+          "contentType": "routine_recall"
+        },
+        {
+          "q": "Name two life processes that an amoeba carries out in its one cell.",
+          "a": "Any two: movement, nutrition, respiration, excretion, growth, reproduction, sensitivity.",
+          "marks": 2,
+          "qType": "concept",
+          "contentType": "routine_recall"
+        }
+      ],
+      "reaching": [
+        {
+          "q": "Describe two differences between unicellular and multicellular organisms.",
+          "a": "Unicellular: one cell, no organs. Multicellular: many specialised cells forming tissues and organs.",
+          "marks": 2,
+          "qType": "concept",
+          "contentType": "known_procedure",
+          "starters": [
+            "Unicellular organisms are",
+            "but multicellular organisms"
+          ]
+        },
+        {
+          "q": "Explain how an amoeba is adapted to catch food.",
+          "a": "It pushes out pseudopodia that surround the food and take it into the cell.",
+          "marks": 2,
+          "qType": "concept",
+          "contentType": "known_procedure"
+        },
+        {
+          "q": "In your experiment, which cube changed colour fastest? Explain why.",
+          "a": "The smallest. The acid only had a short distance to travel to reach its middle.",
+          "marks": 2,
+          "qType": "concept",
+          "contentType": "known_procedure",
+          "starters": [
+            "The cube that changed fastest was",
+            "because"
+          ]
+        }
+      ],
+      "mastering": [
+        {
+          "q": "Use your results to explain why large organisms need organs like lungs to take in oxygen.",
+          "a": "In a big organism, inner cells are far from the surface, so oxygen would take too long to reach them. Lungs take it in and blood carries it.",
+          "marks": 3,
+          "qType": "extended_writing",
+          "contentType": "extended_writing",
+          "starters": [
+            "In the large cube, the acid",
+            "A large organism is like this because",
+            "So it needs lungs to"
+          ]
+        },
+        {
+          "q": "A blue whale is made of trillions of cells. Why can it not take in oxygen through its skin like an amoeba?",
+          "a": "Its inner cells are too far from the skin. Oxygen would take far too long to reach them, so it needs lungs and blood.",
+          "marks": 3,
+          "qType": "concept",
+          "contentType": "unfamiliar_context"
+        },
+        {
+          "q": "Give one advantage of being multicellular.",
+          "a": "Cells can specialise, so the organism can grow larger and do more complex jobs. Losing one cell is not fatal.",
+          "marks": 2,
+          "qType": "concept",
+          "contentType": "known_procedure"
+        }
+      ]
+    },
+    "worksheetExtras": {
+      "wordBank": [
+        "unicellular",
+        "multicellular",
+        "organism",
+        "amoeba",
+        "pseudopodia",
+        "organ",
+        "surface"
+      ],
+      "cloze": [
+        "An organism made of one cell is _____.",
+        "Humans and trees are _____.",
+        "An amoeba moves using _____, which means false feet.",
+        "Large organisms need _____ like lungs to take in oxygen.",
+        "Acid reaches the middle of a small cube _____ than a large one."
+      ],
+      "clozeWordBank": [
+        "unicellular",
+        "multicellular",
+        "pseudopodia",
+        "organs",
+        "faster",
+        "tissue"
+      ],
+      "results": {
+        "headers": [
+          "Cube size (cm)",
+          "Time to turn colourless (s)"
+        ],
+        "rows": [
+          [
+            "1",
+            ""
+          ],
+          [
+            "1.5",
+            ""
+          ]
+        ]
+      },
+      "referenceData": {
+        "headers": [
+          "Cube size (cm)",
+          "Time to turn colourless (s)"
+        ],
+        "rows": [
+          [
+            "0.5",
+            "120"
+          ],
+          [
+            "1.0",
+            "420"
+          ],
+          [
+            "1.5",
+            "900"
+          ],
+          [
+            "2.0",
+            "1600"
+          ]
+        ],
+        "note": "Use these results if your own did not work.",
+        "fit": "curve"
+      }
+    }
+  }
+]
