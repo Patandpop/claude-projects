@@ -32,11 +32,29 @@ Plain-English record of the build list in `FABLE-WORKPLAN.md`, newest entry firs
 1. **SUPERSEDED (design session, 29 Oct 01:5x): paste the twelve files named "(29 Oct, ONE COMPLETE SET)" in Admin\Planner Sync instead; they include these three, the Den, Oracle and omens, and a fix for a broken character in the omen code.** Old text: **Paste three files into Apps Script and deploy a new version.** They are on the Desktop in "Planner paste files", dated 2026-10-29: Code.gs (the homework id fix), Planner.html and Phone.html (the build date in the corner). They already include everything from the 27 and 28 Oct paste files of the same names. If you never pasted the 28 Oct Game.gs and GameUI.html or the 27 Oct GameArt.html, those still need pasting too.
 2. **Run the one-off homework id repair once, after pasting Code.gs.** In the Apps Script editor pick the function `fixHomeworkIds` at the top and press Run. It renumbers any homework rows that share an id (the first keeps its id) and writes each change to the Log tab. Running it twice is harmless.
 
+3. **Approve the builder plan for item 1.8 (A-level Drive address).** This touches the lesson builder, so I wait for your yes. The problem: for a Year 12 or 13 lesson the builder writes the wrong Drive address into the two small note files it leaves beside the lesson (it says "Year 13/Physics/Chapter 20 .../Lesson 3 ...", but on Drive there is no Physics level and the chapters sit inside Module folders). The uploader finds the right chapter by itself, so the files land in the right place, but the planner uses the note to attach each lesson's multiple-choice questions for the phone voter, so 12C and 13D lessons silently get none, and the school push uses the same wrong address. The plan, in three steps: (1) when the lesson is Year 12 or 13, the builder asks the uploader's own chapter-by-number lookup for the real folder and writes that into both notes; when Drive is not reachable it works out the module from the same chapter-to-module table the October reorganisation used; (2) check the planner's question collector now finds 12C and 13D lessons by that address; (3) add a 13D test lesson to the main test so this can never slip back. Nothing on Drive is created, moved or renamed. Reply "yes to 1.8" and I build it.
+
 ## Things I noticed but did not touch
 
 - One Ulhu browser check was already failing before I started: "Banish (two taps) removes a boss, Undo brings it back" times out waiting for a click. That is in the boss code the design session owns, so I left it. The check itself still reports 75 of 76 and does not stop the run.
 
 ---
+
+## 29 Oct 2026, item 1.7: the push home no longer slows every save
+
+**What changed:** every save in the planner used to send the whole planner state to your home link straight away, and that call is slow, so a run of quick changes made a run of slow pushes. Now a push goes at most once every three minutes. If a save falls inside that gap the server answers "later", and the page asks for the push on its own about two and a half minutes after your last save, so the last change of a session still reaches home. The daily results run and "Send to Claude" always push straight away, since home acts on those at once.
+
+**You need to:** nothing now. It goes into the next complete paste set.
+
+**Save:** edc54274.
+
+## 29 Oct 2026, item 1.6: term dates and Week A/B in one place
+
+**What changed:** the behaviour app used to carry its own copy of the term dates and the first Week A, plus an old table of last year's classes as a fallback for "today's classes". It now reads the term dates, the first Week A and the INSET days from the planner's data (the same planner-data.json made at home from school-classes.js), so the two apps can never disagree about the week letter, and the old table is gone: with no planner data there are simply no classes listed, and the phone says plainly that the planner needs its data imported. A test checks that the behaviour app and the planner give the same letter for all 47 weeks of 2026-27, that w/c 19 Oct is A and w/c 2 Nov is B, and that both roll over together to a new Week A when next September's data file is imported.
+
+**You need to:** nothing now. It goes into the next complete paste set. From now on the term dates live only in school-classes.js at home.
+
+**Save:** d639075f.
 
 ## 29 Oct 2026, item 1.5: an old planner tab can no longer wipe newer ticks
 
