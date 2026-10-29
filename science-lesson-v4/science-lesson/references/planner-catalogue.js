@@ -683,7 +683,7 @@ function planWeek(monday, ctx) {
   return { monday, letter, timetableFrom: tt.name, slots, state };
 }
 
-module.exports = { planWeek, loadAll, classSequence, progress, nextLesson, report, stripICT, sim, toks, same, sheetSlots, plannerSheets, equipmentFor, isTeachingDay, ROUTES };
+module.exports = { planWeek, loadAll, classSequence, progress, nextLesson, report, stripICT, sim, toks, same, sheetSlots, plannerSheets, equipmentFor, isTeachingDay, ROUTES, lessonMcqs };
 
 /* ------------------------------------------------------------------------ CLI */
 if (require.main === module) {

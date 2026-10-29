@@ -935,6 +935,14 @@ async function main() {
   const paperDocx = await paperMod.runDocx();
   hardFails += paperDocx.fails;
 
+  // The test review lesson generator: marks per section, no em dashes (2026-10-29, built in memory, never Drive).
+  console.log('');
+  hardFails += (await require(path.join(__dirname, 'test-review-lesson.test.js')).run()).fails;
+
+  // Smoke tests for extension-pick, homework-booklet, paper-snippets and lessonMcqs (2.13, 2026-10-29; temp folder only).
+  console.log('');
+  { const st = await require(path.join(__dirname, 'smoke-tools.test.js')).run(); hardFails += st.fails; warnings += st.warns; }
+
   // The planner, the behaviour app and Ulhu's server: Apps Script code run against fakes (work plan 0.2, 2026-10-29).
   // Each is its own script that exits 1 on a failed check; its failing lines are shown here.
   console.log('');
