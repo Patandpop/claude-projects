@@ -511,6 +511,9 @@ function render() {
       const hr = s.kind === 'lesson' ? P.lastResults(S.results, s.cls, P.iso(P.addDays(mon, d))) : null;   // learning loop M8
       if (hr) flags.push('<span class="flag f-hw" title="' + esc('Last homework: ' + hr.title + ' (due ' + hr.dueOn + '), ' + hr.done + (hr.size ? ' of ' + hr.size : '') + ' done, average ' + hr.avg + '%. Weakest: ' +
         hr.weak.map((q) => 'Q' + q.key + ' ' + q.pct + '%' + (q.wrong && q.wrong[0] ? ' (most picked: ' + q.wrong[0].answer + ')' : '') + (q.missed && q.missed[0] ? ' (missed: ' + q.missed[0].title + ')' : '')).join('; ')) + '">HW ' + hr.avg + '%</span>');
+      const hwc = s.kind === 'lesson' ? P.hwForLesson(S.hw, s.cls, P.iso(P.addDays(mon, d))) : null;   // workplan 2.4
+      if (hwc && hwc.due.length) flags.push('<span class="flag f-carry" title="' + esc('Due today: ' + hwc.due.map((h) => h.title).join('; ') + '. Collect it at the start.') + '">HW due</span>');
+      if (hwc && hwc.toMark.length) flags.push('<span class="flag f-built" title="' + esc('Key homework due ' + hwc.toMark.map((h) => h.title + ' (' + h.dueOn + ')').join('; ') + ' and not marked yet. Tick it marked on the Homework tab.') + '">KEY HW to mark</span>');
       const vr = s.kind === 'lesson' ? P.lastVotes(S.votes, s.cls, P.iso(P.addDays(mon, d))) : null;   // workplan 2.2: last lesson's ABCD cards
       if (vr) flags.push('<span class="flag f-hw" title="' + esc('ABCD cards in ' + vr.title + ' (' + vr.when + '): ' + vr.n + ' question' + (vr.n === 1 ? '' : 's') + ', average ' + vr.avg + '% right.' +
         (vr.weak.length ? ' Weakest: ' + vr.weak.map((x) => 'Q' + x.q + ' ' + x.pct + '%' + (x.wrong ? ' (most picked ' + x.wrong + ')' : '')).join('; ') : '') + ' Click the lesson to put one on its Do Now.') + '">ABCD ' + vr.avg + '%' +
@@ -1556,7 +1559,8 @@ function addPanel(day, period) {
 function checkDefaults(s) {
   const idx = S.week.slots.indexOf(s);
   const lastOfWeek = !S.week.slots.some((x, k) => k > idx && x.cls === s.cls && ['lesson', 'revision', 'test'].includes(x.kind) && !x.double);
-  return { review: (s.carry || []).length > 0, collectHw: false, setHw: s.kind === 'lesson' && lastOfWeek, plc: false, kit: !!s.sets && s.sets !== 'demo' };
+  const due = s.kind === 'lesson' && P.hwForLesson(S.hw, s.cls, P.iso(P.addDays(P.parse(S.week.monday), s.day))).due.length > 0;   // workplan 2.4
+  return { review: (s.carry || []).length > 0, collectHw: due, setHw: s.kind === 'lesson' && lastOfWeek, plc: false, kit: !!s.sets && s.sets !== 'demo' };
 }
 function checklistCard(s) {
   const ch = s.checks || checkDefaults(s);
@@ -1939,7 +1943,7 @@ document.addEventListener('keydown', (e) => {
 window.addEventListener('beforeunload', (e) => { if (S.dirty || S.saving) { e.preventDefault(); e.returnValue = ''; } });   // unsaved, or a save still travelling
 
 function onLoad(r, saved) {
-  S.data = r.data; S.results = r.results || []; S.votes = r.votes || []; S.weeks = r.weeks || {}; S.weekStamps = r.weekStamps || {}; S.recStamp = r.lessonsStamp || 0; S.learned = r.learned || {}; S.classSettings = r.classSettings || {}; S.added = r.added || []; S.behaviourUrl = r.behaviourUrl || ""; S.gradeBands = r.gradeBands || {};
+  S.data = r.data; S.results = r.results || []; S.votes = r.votes || []; S.hw = r.homework || []; S.weeks = r.weeks || {}; S.weekStamps = r.weekStamps || {}; S.recStamp = r.lessonsStamp || 0; S.learned = r.learned || {}; S.classSettings = r.classSettings || {}; S.added = r.added || []; S.behaviourUrl = r.behaviourUrl || ""; S.gradeBands = r.gradeBands || {};
   if (S.data && S.data.classes) {
     P.applyAdded(S.data, S.added);                                          // lessons he added in the planner
     Object.values(S.weeks).forEach((w) => P.remapWeek(S.data, w));          // same lessons after a data refresh

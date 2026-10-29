@@ -135,6 +135,7 @@ ok('merge is noted in the planner Log tab, not the behaviour log', m.sheets.Log 
   api.saveVote(k, { cls: '7MLA', key: lm.key, title: lm.title, q: 0, question: mcq[0].q, right: 'B', split: { A: 40, B: 60 }, why: mcq[0].why });
   m.sheets.Equipment = m.sheets.Equipment || m.makeSheet('Equipment', [['key', 'eq', 'sets']]);
   const pv = (api.loadAll_(true).votes || []).filter((x) => x.cls === '7MLA');
+  ok('2.4: the planner gets the homework list for its lesson cards (an array, no Classroom call)', Array.isArray(api.loadAll_(true).homework));
   ok('ABCD: the planner gets each vote with its lesson, date, % right, main wrong answer and misconception (no names)', pv.length === 1 && pv[0].key === lm.key && pv[0].pct === 60 && pv[0].wrong === 'A' && pv[0].q === 1 && /^\d{4}-\d\d-\d\d$/.test(pv[0].when) && pv[0].why === 'thinks the egg swims');
 }
 

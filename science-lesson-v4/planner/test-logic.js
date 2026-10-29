@@ -319,6 +319,14 @@ if (fs.existsSync(DRIVE)) {
   const lr = P.lastResults(resRows, '9XS', '2026-10-21');
   ok(lr && lr.dueOn === '2026-10-19' && lr.weak.map((q) => q.key).join(',') === '2,3,1', 'lesson card: newest homework due before the lesson, its 3 weakest questions first');
   ok(P.lastResults(resRows, '9XS', '2026-11-20') === null && P.lastResults(resRows, '10C2', '2026-10-21') === null, 'lesson card: nothing older than 14 days, nothing for another class');
+  // workplan 2.4 (2026-10-29): homework due on the lesson card; key homework to mark after 5 days
+  const hwl = [{ cls: '9XS', kind: 'quiz', title: 'Cells quiz', dueOn: '2026-10-21', status: 'live' }, { cls: '9XS', kind: 'seneca', title: 'Draft only', dueOn: '2026-10-21', status: 'drafted' },
+    { cls: '9XS', kind: 'key', title: 'Key HW 1', dueOn: '2026-10-15', status: 'due' }, { cls: '9XS', kind: 'key', title: 'Key HW 0', dueOn: '2026-10-01', status: 'marked' },
+    { cls: '9XS', kind: 'key', title: 'Key HW 2', dueOn: '2026-10-19', status: 'due' }, { cls: '9AS', kind: 'quiz', title: 'Other class', dueOn: '2026-10-21', status: 'live' }];
+  const hf = P.hwForLesson(hwl, '9XS', '2026-10-21');
+  ok(hf.due.map((h) => h.title).join() === 'Cells quiz', 'lesson card: homework due that day (a draft never posted is not due)');
+  ok(hf.toMark.map((h) => h.title).join() === 'Key HW 1', 'lesson card: key homework due 5+ days ago and not marked shows as to mark');
+  ok(P.CHECKS.some(([k]) => k === 'followUp') && P.CHECKS.some(([k]) => k === 'keyBack') && /Key homework returned/.test(P.buildPrompt(data, { kind: 'lesson', cls: '9XS', i: 0, checks: { keyBack: true } })), 'checklist: follow-up task and key homework returned ticks go into the build request');
   // workplan 2.3 (2026-10-29): most-missed questions across classes, lowest first, nothing nobody did
   const mm = P.mostMissed(resRows.concat([{ cls: '9AS', id: 'h9', title: 'Waves', dueOn: '2026-10-20', done: 9, questions: [{ key: '1', pct: 10 }, { key: '2', pct: 100 }] }]), { since: '2026-10-10' });
   ok(mm.map((q) => q.cls + q.key).join(',') === '9AS1,9XS2,9XS3,9XS1,9XS4', 'most missed: every class, lowest % first, full marks and old or undone homework left out');

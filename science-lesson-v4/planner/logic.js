@@ -604,6 +604,8 @@
     ['collectHw', 'Collect homework at the start'],
     ['setHw', 'Set homework at the end'],
     ['plc', 'Test next week: hand out / remind them of the PLC'],
+    ['followUp', 'Follow-up task straight after the Do Now (a book task, or an extension exam question)'],
+    ['keyBack', 'Key homework returned: hand it back and give time to act on the feedback'],
     ['kit', 'Practical: check the kit before the lesson'],
   ];
   // Lesson extras (Patryk 2026-10-15, approved 2026-10-19): the parts that fall by the wayside. Ticks go
@@ -657,6 +659,16 @@
     const r = rows[0];
     const weak = (r.questions || []).filter((q) => q.pct != null).slice().sort((a, b) => a.pct - b.pct).slice(0, 3);
     return Object.assign({}, r, { weak });
+  }
+  /* Workplan 2.4 (2026-10-29): homework for a lesson card. hw = Homework tab rows ({ cls, kind, title, dueOn, status }).
+     due = homework due on that day (collect it); toMark = key homework due 5 or more days before and not marked yet. */
+  const KEY_MARK_DAYS = 5;
+  function hwForLesson(hw, cls, dateIso) {
+    const mine = (hw || []).filter((h) => h && h.cls === cls && h.dueOn);
+    const due = mine.filter((h) => h.dueOn === dateIso && h.status !== 'drafted' && h.status !== 'form only');
+    const by = iso(addDays(parse(dateIso), -KEY_MARK_DAYS));
+    const toMark = mine.filter((h) => h.kind === 'key' && h.status !== 'marked' && h.status !== 'drafted' && h.dueOn <= by);
+    return { due, toMark };
   }
   /* Workplan 2.3 (2026-10-29): the most-missed homework questions across classes, for the Assessment
      tab, from the Results tab rows (class counts only). o = { cls (optional), since 'YYYY-MM-DD', n }.
@@ -831,6 +843,6 @@
   }
 
   const api = { dueFor, nextLessonDay, lessonsOn, lessonEnd, recs, findRecord, setRecord, recordChanges, remapRecords, migrateMarks, cascade, revisionSlot, unitBefore, applyAdded, addedNum, remapWeek, lessonId, applyMarks, classReport, topicList, wouldSkip, setSlot, markLesson, refillClass, planFrom, periodTime, calendarEvents, DAYS, iso, parse, addDays, mondayOf, isTeachingDay, nextSchoolDay, weekLetter, progressBefore, next, autofill, moveSlot, refillAfter,
-    EXTRAS, extrasSuggested, gradeFor, hwCoverage, hwStatus, lastResults, lastVotes, doNowFromVote, mostMissed, lessonSlot, testSlot, notHappened, slotDone, slotDay, fromFilled, reflowWeek, CHECKS, sheetCells, sheetModel, setsCount, printList, buildPrompt, carryForward, equipCell, lessonCell, setsLabel };
+    EXTRAS, extrasSuggested, gradeFor, hwCoverage, hwStatus, lastResults, lastVotes, doNowFromVote, mostMissed, hwForLesson, lessonSlot, testSlot, notHappened, slotDone, slotDay, fromFilled, reflowWeek, CHECKS, sheetCells, sheetModel, setsCount, printList, buildPrompt, carryForward, equipCell, lessonCell, setsLabel };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.PlannerLogic = api;
 })(typeof window !== 'undefined' ? window : this);

@@ -42,6 +42,18 @@ with sync_playwright() as p:
     page.click('.eDnv[data-q="1"]')
     r = page.evaluate("(i) => ({ dn: S.week.slots[i].dnVotes || [], prompt: P.buildPrompt(S.data, S.week.slots[i], null, S.week) })", idx)
     check('pressing it again takes it off', len(r['dn']) == 0 and 'Put on the Do Now' not in r['prompt'])
+    # work plan 2.4: homework due on the card, the collect tick on by itself, key homework to mark after 5 days, the two new ticks
+    r = page.evaluate("""(i) => {
+      const s = S.week.slots[i], date = P.iso(P.addDays(P.parse(S.week.monday), s.day));
+      S.hw = [{ cls: s.cls, kind: 'quiz', title: 'Made up quiz', dueOn: date, status: 'live' }, { cls: s.cls, kind: 'key', title: 'Made up key', dueOn: P.iso(P.addDays(P.parse(date), -6)), status: 'due' }];
+      delete S.week.slots[i].checks; S.sel = -1; render(); S.sel = i; editor();
+      const chip = [...document.querySelectorAll('.ev[data-i="' + i + '"] .flag')].map((f) => f.textContent).join(' | ');
+      const box = (k) => { const el = document.querySelector('.eChk[data-k="' + k + '"]'); return el ? el.checked : null; };
+      return { chip, collect: box('collectHw'), follow: box('followUp'), key: box('keyBack') };
+    }""", idx)
+    check('the card shows "HW due" and "KEY HW to mark": ' + r['chip'], 'HW due' in r['chip'] and 'KEY HW to mark' in r['chip'])
+    check('"Collect homework" is ticked by itself when homework is due; the follow-up and key-homework-returned ticks are there, unticked',
+          r['collect'] is True and r['follow'] is False and r['key'] is False)
     # work plan 2.3: most-missed homework questions across classes on the Assessment tab
     r = page.evaluate("""() => {
       const cls = Object.keys(S.data.classes), day = P.iso(P.addDays(todayMidnight(), -3)), old = P.iso(P.addDays(todayMidnight(), -80));
