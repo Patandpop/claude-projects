@@ -5,10 +5,13 @@ const fs = require('fs'), path = require('path');
 // the mock Students tab needs the Support column
 m.sheets.Students._data[0].push('Support');
 m.sheets.Students._data.forEach((r, i) => { if (i) r.push(i === 1 ? 'prompt' : ''); });
+// the planner's calendar (1.6): the behaviour app reads term dates and the first Week A from the planner's Data tab
+const CAL = { weekAStart: '2026-09-07', terms: [['2026-09-07', '2026-10-21'], ['2026-11-02', '2026-12-18'], ['2027-01-05', '2027-02-12'], ['2027-02-22', '2027-03-25'], ['2027-04-12', '2027-05-28'], ['2027-06-07', '2027-07-28']], inset: ['2026-10-22', '2026-10-23', '2026-11-25', '2027-01-04'] };
+m.sheets.Data = m.makeSheet('Data', [['chunk'], [JSON.stringify(Object.assign({ classes: {}, timetable: { A: [], B: [] } }, CAL))]]);
 // one project since 2026-10-12: the planner's Code.gs and Behaviour.gs load together (a clash would break this)
 const SRC = process.env.PLANNER_SRC || path.join(__dirname, '..');   // PLANNER_SRC: the bundle test points this at the comment-stripped copies
 eval(fs.readFileSync(path.join(SRC, 'Code.gs'), 'utf8') + '\n' + fs.readFileSync(path.join(SRC, 'Behaviour.gs'), 'utf8') +
-  '\nglobal.api={init,openClass,logEvent,logMany,removeMany,getBoard,setMode,endMode,getMode,setTimer,adjustTimer,stopTimer,submitResult,getSilence,getFriday,positivesOver,setSupport,setPause,mergeBehaviourData,behaviourWeek,sameClass_,lessonMcqs,saveVote,removeVote,setLost,loadAll_,saveWeek,saveWeeks,saveLessons,saveLessonChanges};');
+  '\nglobal.api={init,openClass,logEvent,logMany,removeMany,getBoard,setMode,endMode,getMode,setTimer,adjustTimer,stopTimer,submitResult,getSilence,getFriday,positivesOver,setSupport,setPause,mergeBehaviourData,behaviourWeek,sameClass_,lessonMcqs,saveVote,removeVote,setLost,loadAll_,saveWeek,saveWeeks,saveLessons,saveLessonChanges,weekLetter_,plannerCal_};');
 const k = 'k', out = []; let failed = 0;
 const ok = (n, c) => { out.push((c ? 'PASS ' : 'FAIL ') + n); if (!c) failed++; };
 
@@ -90,7 +93,7 @@ ok('setSupport writes the Support column', api.setSupport(k, '7BYA', 'Test Pupil
 // one app (2026-10-12)
 ok('class names match across the apps (7MLA = 7ML), but not 7MLA = 7XP', api.sameClass_('7MLA', '7ML') && !api.sameClass_('7MLA', '7XP') && !api.sameClass_('7', '7ML'));
 const wdNow = Number(Utilities.formatDate(new Date(), 'Europe/London', 'u'));
-m.sheets.Data = m.makeSheet('Data', [['chunk'], [JSON.stringify({ timetable: { A: [{ day: wdNow - 1, period: 3, cls: '7BYA' }], B: [{ day: wdNow - 1, period: 3, cls: '7BYA' }] } })]]);
+m.sheets.Data = m.makeSheet('Data', [['chunk'], [JSON.stringify(Object.assign({ timetable: { A: [{ day: wdNow - 1, period: 3, cls: '7BYA' }], B: [{ day: wdNow - 1, period: 3, cls: '7BYA' }] } }, CAL))]]);
 delete m.cache.ptt;
 ok("today's classes come from the planner's timetable", wdNow > 5 || JSON.stringify(api.init(k).today) === '["7BYA"]');
 const wk = api.behaviourWeek(k, Utilities.formatDate(new Date(Date.now() - (wdNow - 1) * 864e5), 'Europe/London', 'yyyy-MM-dd'));
@@ -114,7 +117,7 @@ ok('merge is noted in the planner Log tab, not the behaviour log', m.sheets.Log 
   const day = (Number(Utilities.formatDate(new Date(), 'Europe/London', 'u')) + 6) % 7;
   const mon = Utilities.formatDate(new Date(Date.now() - day * 864e5), 'Europe/London', 'yyyy-MM-dd');
   const mcq = [{ q: 'Which cell has a tail?', o: ['Egg', 'Sperm', 'Nerve', 'Ciliated'], a: 'B', why: { A: 'thinks the egg swims' } }];
-  m.sheets.Data = m.makeSheet('Data', [['json'], [JSON.stringify({ classes: { '7MLA': { seq: [{ unit: 'B1', title: 'Cells', rel: 'Y7/B1/L3' }, { unit: 'B1', title: 'Specialised Cells', rel: 'Y7/B1/L4', mcq }] } }, timetable: {} })]]);
+  m.sheets.Data = m.makeSheet('Data', [['json'], [JSON.stringify(Object.assign({ classes: { '7MLA': { seq: [{ unit: 'B1', title: 'Cells', rel: 'Y7/B1/L3' }, { unit: 'B1', title: 'Specialised Cells', rel: 'Y7/B1/L4', mcq }] } }, timetable: {} }, CAL))]]); delete m.cache.ptt;
   ok('ABCD: no saved week gives a plain message', /not saved/.test(api.lessonMcqs(k, '7MLA').none || ''));
   m.sheets.Weeks = m.makeSheet('Weeks', [['monday', 'json'], [mon, JSON.stringify({ monday: mon, slots: [{ cls: '7MLA', day, period: 2, kind: 'lesson', key: 'Y7/B1/L4' }] })]]);
   const lm = api.lessonMcqs(k, '7ML');
@@ -190,6 +193,32 @@ ok('merge is noted in the planner Log tab, not the behaviour log', m.sheets.Log 
   ok('a batch with fresh stamps lands and returns a stamp per week', sm.saved === 2 && sm.stamps[mon] > 0 && sm.stamps['2027-01-04'] > 0 && m.sheets.Weeks._data.length === 3);
   ok('an older page saving weeks with no stamps is not checked', api.saveWeek(k, wkA).saved === mon);
   ok('saves take the document lock (the one taps use), never the script lock', m.lockLog.slice(-12).every((x) => x === 'document'));
+}
+
+// 1.6 (2026-10-29): term dates and Week A/B live in the planner's data only; the behaviour app's answer agrees with
+// the planner's for every week of 2026-27, and both roll over together when next year's data file is imported.
+{
+  const P = require('../logic.js');
+  const cal = CAL;
+  const setData = (obj) => { m.sheets.Data = m.makeSheet('Data', [['chunk'], [JSON.stringify(obj)]]); delete m.cache.ptt; };
+  setData(Object.assign({ classes: {}, timetable: { A: [], B: [] } }, cal));
+  const got = api.plannerCal_();
+  ok('the behaviour app reads terms, first Week A and INSET days from the planner data', got.weekAStart === '2026-09-07' && got.terms.length === 6 && got.inset.length === 4);
+  const mons = []; for (let d = new Date(2026, 8, 7); d < new Date(2027, 7, 1); d = P.addDays(d, 7)) mons.push(d);
+  const disagree = mons.filter((d) => api.weekLetter_(new Date(d.getFullYear(), d.getMonth(), d.getDate(), 10)) !== P.weekLetter(cal, d)).map((d) => P.iso(d));
+  ok('Week A/B: the behaviour app and the planner agree for every week of 2026-27 (' + mons.length + ' weeks)' + (disagree.length ? ': differ on ' + disagree.join(', ') : ''), mons.length >= 47 && disagree.length === 0);
+  ok('w/c 19 Oct is A and the first week back, w/c 2 Nov, is B (holiday weeks do not count)', api.weekLetter_(new Date(2026, 9, 19, 10)) === 'A' && api.weekLetter_(new Date(2026, 10, 2, 10)) === 'B');
+  ok('the old table of classes is gone: with no timetable slots today there are no classes today', JSON.stringify(api.init(k).today) === '[]');
+  // September 2027: next year's data file brings a new first Week A and new terms; both apps follow it
+  const next = { weekAStart: '2027-09-06', terms: [['2027-09-06', '2027-10-22'], ['2027-11-01', '2027-12-17']], inset: [] };
+  setData(Object.assign({ classes: {}, timetable: { A: [], B: [] } }, next));
+  const sept = []; for (let d = new Date(2027, 8, 6); d < new Date(2027, 11, 20); d = P.addDays(d, 7)) sept.push(d);
+  const off = sept.filter((d) => api.weekLetter_(new Date(d.getFullYear(), d.getMonth(), d.getDate(), 10)) !== P.weekLetter(next, d)).map((d) => P.iso(d));
+  ok('September 2027 rollover: w/c 6 Sep 2027 is A again and every week to December agrees' + (off.length ? ' (differ: ' + off.join(', ') + ')' : ''), api.weekLetter_(new Date(2027, 8, 6, 10)) === 'A' && off.length === 0);
+  setData({ classes: {}, timetable: { A: [], B: [] } });
+  let why = ''; try { api.weekLetter_(new Date()); } catch (e) { why = e.message; }
+  ok('with no term dates in the planner yet, the behaviour app says so plainly instead of guessing', /no term dates yet/.test(why));
+  setData(Object.assign({ classes: {}, timetable: { A: [], B: [] } }, cal));
 }
 
 console.log(out.join('\n')); console.log(failed ? `\n${failed} FAILED` : '\nAll passed'); process.exit(failed ? 1 : 0);

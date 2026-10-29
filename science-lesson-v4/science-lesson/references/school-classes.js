@@ -13,7 +13,8 @@ const CLASSES_JSON = path.join(__dirname, '../../classes-2026-27.json');
 
 // Week letter: the A/B sequence CONTINUES across holidays (Patryk 2026-10-03: w/c 19 Oct is A,
 // so the first week back, w/c 2 Nov, is B). Only weeks with at least one term day count.
-// Same rule and dates as the behaviour app (Code.gs) — change both together.
+// The planner and the behaviour app read these dates from planner-data.json (made by planner-catalogue.js
+// from here), so this is the ONE place to change them (work plan 1.6, 2026-10-29).
 const WEEK_A_START = '2026-09-07';
 const TERMS_2026_27 = [                              // first and last day of each term
   ['2026-09-07', '2026-10-21'], ['2026-11-02', '2026-12-18'], ['2027-01-05', '2027-02-12'],

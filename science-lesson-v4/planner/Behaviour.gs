@@ -11,23 +11,10 @@
 const B_VERSION = 23;   // shown on the phone and board so you can check the new code is live
 // TZ ('Europe/London') comes from the planner's Code.gs (one project since 2026-10-12)
 const RULES = { 2: 'Work ethic', 3: 'Quality', 4: 'Attention', 5: 'Voice', 6: 'Lab safety', 7: 'Fixed stations', 8: 'Silent entry' };
-const WEEK_A_START = '2026-09-07';           // Monday of the first Week A
-const FORTNIGHTLY = ['8AG', 'PSHE-9AB'];      // reviewed per fortnight, not per week
-// Days each class meets: 1 = Mon ... 5 = Fri
-const TIMETABLE = {
-  '7BYA':     { A: [1, 2, 3, 4, 5], B: [1, 2, 3, 4, 5] },
-  '7ML':      { A: [1, 2, 4],       B: [1, 2, 3] },
-  '8AG':      { A: [5],             B: [5] },
-  '8XP':      { A: [2, 5],          B: [2, 5] },
-  '9AS':      { A: [3, 4],          B: [3, 4] },
-  '9XS':      { A: [1, 3, 4],       B: [1, 3, 4] },
-  'PSHE-9AB': { A: [3],             B: [] },
-  '10C2':     { A: [3, 4, 5],       B: [3, 4] },
-  '10S2':     { A: [3],             B: [3, 5] },
-  '11S2':     { A: [1],             B: [1, 2] },
-  '12C':      { A: [2],             B: [1, 2] },
-  '13D':      { A: [2, 5],          B: [2, 5] }
-};
+// Term dates, the first Week A and the timetable all come from the planner's data (plannerCal_ in Code.gs),
+// so the two apps can never disagree about the week letter (work plan 1.6, 2026-10-29). The old table of
+// last year's classes and the second copy of the term dates are gone.
+const FORTNIGHTLY = ['8AG'];                  // reviewed per fortnight, not per week
 // Meter modes. max = seconds before the mode switches itself back to Teaching.
 const MODES = {
   countdown: { label: 'Countdown',    max: 900 },   // ends itself after 2.8 s of quiet (board ACCEPT), or when you end it
@@ -128,11 +115,10 @@ function init(k) {
   const now = new Date();
   const wl = weekLetter_(now), wd = weekday_(now);
   const classes = classOrder_();
-  // today's classes from the planner's real timetable, in period order (2026-10-12); the old table if there is none
+  // today's classes from the planner's real timetable, in period order (2026-10-12); none until the planner has data
   const tt = plannerTimetable_();
   const slots = ((tt && tt[wl]) || []).filter(s => s.day === wd - 1).sort((a, b) => a.period - b.period);
-  const today = slots.length ? slots.map(s => classes.find(c => sameClass_(c, s.cls))).filter((c, i, a) => c && a.indexOf(c) === i)
-    : classes.filter(c => TIMETABLE[c] && (TIMETABLE[c][wl] || []).indexOf(wd) !== -1);
+  const today = slots.map(s => classes.find(c => sameClass_(c, s.cls))).filter((c, i, a) => c && a.indexOf(c) === i);
   return {
     classes: classes, today: today, week: wl,
     active: PropertiesService.getScriptProperties().getProperty('BOARD_CLASS') || '',
@@ -686,12 +672,17 @@ function periodKey_(cls, d) {
 function dayStr_(d) { return Utilities.formatDate(d, TZ, 'yyyy-MM-dd'); }
 function dayNum_(s) { const p = s.split('-').map(Number); return Math.floor(Date.UTC(p[0], p[1] - 1, p[2]) / 86400000); }
 // Teaching weeks since the first Week A. Holiday weeks don't count, so the A/B sequence
-// carries on after a break (w/c 19 Oct = A, w/c 2 Nov = B). Same rule as school-classes.js.
-const TERMS = [['2026-09-07', '2026-10-21'], ['2026-11-02', '2026-12-18'], ['2027-01-05', '2027-02-12'],
-               ['2027-02-22', '2027-03-25'], ['2027-04-12', '2027-05-28'], ['2027-06-07', '2027-07-28']];
-function teachingWeek_(mon) { return TERMS.some(t => mon + 4 >= dayNum_(t[0]) && mon <= dayNum_(t[1])); }
+// carries on after a break (w/c 19 Oct = A, w/c 2 Nov = B). Same rule as the planner's logic.js weekLetter,
+// and the same dates: both read terms and weekAStart from planner-data.json (1.6). When the data file for the
+// next school year is imported (new weekAStart, new terms), both apps roll over together.
+function cal_() {
+  const cal = plannerCal_();
+  if (!cal || !cal.weekAStart || !cal.terms.length) throw new Error('The planner has no term dates yet: open the planner and import planner-data.json, then try again.');
+  return cal;
+}
+function teachingWeek_(mon) { return cal_().terms.some(t => mon + 4 >= dayNum_(t[0]) && mon <= dayNum_(t[1])); }
 function weekIndex_(d) {
-  const start = dayNum_(WEEK_A_START), day = dayNum_(dayStr_(d));
+  const start = dayNum_(cal_().weekAStart), day = dayNum_(dayStr_(d));
   const mon = day - (weekday_(d) - 1);
   let n = 0;
   if (mon >= start) { for (let w = start; w < mon; w += 7) if (teachingWeek_(w)) n++; }

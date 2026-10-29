@@ -70,17 +70,20 @@ function withIcon_(out) { const u = iconUrl_(); if (!u) return out; try { return
    2026-10-12, and its tabs live in this spreadsheet (Students, Behaviour Log, Sessions, Emails,
    Behaviour Settings). */
 
-// The planner's timetable for the behaviour app ("today's classes"), cached for 6 hours.
-function plannerTimetable_() {
+// The planner's timetable and calendar for the behaviour app ("today's classes", Week A/B, term dates), cached
+// for 6 hours. One source for the whole app (work plan 1.6, 2026-10-29): the term dates, the first Week A and
+// the INSET days come from planner-data.json (made at home from school-classes.js), never from a second copy.
+function plannerCal_() {
   const c = CacheService.getScriptCache(), hit = c.get('ptt');
   if (hit) return JSON.parse(hit);
   const d = sheet_('Data');
   if (!d || d.getLastRow() < 2) return null;
   const data = JSON.parse(d.getRange(2, 1, d.getLastRow() - 1, 1).getValues().map((r) => r[0]).join(''));
-  const tt = data.timetable || null;
-  if (tt) c.put('ptt', JSON.stringify(tt), 21600);
-  return tt;
+  const cal = { timetable: data.timetable || null, terms: data.terms || [], weekAStart: data.weekAStart || '', inset: data.inset || [] };
+  if (cal.timetable || cal.terms.length) c.put('ptt', JSON.stringify(cal), 21600);
+  return cal;
 }
+function plannerTimetable_() { const cal = plannerCal_(); return cal ? cal.timetable : null; }
 
 // Run ONCE from the editor (and again just before switching phones over, to catch up): copies the
 // old behaviour sheet's tabs into this spreadsheet. Script property OLD_BEHAVIOUR_SHEET_ID = the old
