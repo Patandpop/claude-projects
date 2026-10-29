@@ -698,7 +698,7 @@
   }
   function settle(X, won) {
     const g = DG; g.phase = 'saving'; X.paint();
-    X.call('gameHaggle', g.k, won ? 'win' : 'lose').then((s) => { X.setShop(s); g.phase = 'done'; g.won = won; ksay(pick(KB[g.k].L[won ? 'win' : 'lose']), won ? 'sulk' : 'gloat'); X.paint(); })
+    X.call('gameHaggle', g.k, won ? 'win' : 'lose', null, g.you).then((s) => { X.setShop(s); g.phase = 'done'; g.won = won; ksay(pick(KB[g.k].L[won ? 'win' : 'lose']), won ? 'sulk' : 'gloat'); X.paint(); })
       .catch((e) => { g.phase = 'done'; g.won = won; g.err = String((e && e.message) || e).replace(/^Error:\s*/, ''); X.paint(); });
   }
   function diceHtml(X) {
@@ -711,7 +711,9 @@
     if (g.phase === 'reveal' || g.phase === 'over' || g.phase === 'saving' || g.phase === 'done') {
       const R = g.rev, row = (l, a) => '<div class="dn-rrow"><small>' + l + '</small><span>' + a.map((f) => die(f, f === R.claim.f || f === 0 ? ' hit' : ' dim')).join('') + '</span></div>';
       if (g.phase === 'done') {
-        h += '<div class="dn-res ' + (g.won ? 'ok' : 'bad') + '"><h3>' + (g.won ? 'You win the haggle' : K.name + ' wins the haggle') + '</h3><p>' + (g.won ? '20% off everything at this stall for the rest of today.' : 'Everything at this stall costs 10% more for the rest of today.') + '</p>' +
+        const it = itemsOf(X, g.k).find((i) => i.id === g.item);   // one big olden word, then the item at its new price (1U.9)
+        h += '<div class="dn-res ' + (g.won ? 'ok' : 'bad') + '"><h3 class="dn-word" aria-label="' + (g.won ? 'You win the haggle' : K.name + ' wins the haggle') + '">' + (g.won ? 'VANQUISHT' : 'ENGULFT') + '</h3>' +
+          (it ? '<p class="dn-newp"><span>' + X.esc(it.name) + '</span> ' + priceHtml(X, it, it.id) + '</p>' : '') +
           (g.err ? '<p class="dn-err">Not saved: ' + X.esc(g.err) + '</p>' : '') + '<button class="dn-big" data-a="dn-leave">Back to the stall</button></div>';
       } else if (!R) h += '<div class="dn-hint">Settling the price...</div>';
       else {
@@ -735,11 +737,15 @@
   /* ---------------- the views ---------------- */
   const SLOTN = { floor: 'Floor', wall: 'Walls', rug: 'Rug', window: 'Window', light: 'Light', corner: 'Corner', furn: 'Seat or table', hang3: 'Left wall', hang4: 'Right wall', prop: 'Ornament' };
   const SLOTK = { floor: 'weaver', rug: 'weaver', wall: 'painter', window: 'glass', light: 'glass', furn: 'carpenter', corner: 'curio', prop: 'curio', hang3: 'gullet', hang4: 'gullet' };
-  const hgPrice = (p, res) => { const f = { win: 0.8, lose: 1.1, playing: 1.1 }[res]; return f && p ? Math.round(p * f) : p; };
+  // the price after today's game (1U.9, Patryk 2026-10-29, permanent): only the item played for moves; a win takes off
+  // 25% (5 or 4 dice left), 20% (3), 15% (2) or 10% (1); a loss or a walk-out adds 10%. Mirrors gHagglePrice_ in Game.gs.
+  const WINF = { 5: 0.75, 4: 0.75, 3: 0.8, 2: 0.85, 1: 0.9 };
+  const hgPrice = (p, res, hi, id) => { if (!res || !p) return p; if (hi && hi.item && hi.item !== id) return p;
+    const f = res === 'win' ? (hi && hi.item ? WINF[Math.max(1, Math.min(5, hi.left || 1))] : 0.8) : { lose: 1.1, playing: 1.1 }[res]; return f ? Math.round(p * f) : p; };
   const pct = (x, y) => 'left:' + (100 * x / W).toFixed(2) + '%;top:' + (100 * y / H).toFixed(2) + '%';
   let LINE = {};   // what each keeper last said in the stall
-  function wears(X) { const out = [], hg = (X.SHOP.haggle || {}).tailor, W2 = X.D.wear || { on: {}, owned: [] };
-    X.WCATS.forEach(([c]) => X.WNAMES[c].forEach((_, i) => { const w = X.witem(c + '-' + i); if (!w) return; out.push(Object.assign({}, w, { base: w.price, price: hgPrice(w.price, hg), own: W2.owned.indexOf(w.id) >= 0, on: W2.on[w.cat] === w.id, tier: i >= 10 ? 'Eldritch' : i >= 7 ? 'Fancy' : i >= 3 ? 'Nice' : 'Basic' })); }));
+  function wears(X) { const out = [], hg = (X.SHOP.haggle || {}).tailor, hi = (X.SHOP.haggleItem || {}).tailor, W2 = X.D.wear || { on: {}, owned: [] };
+    X.WCATS.forEach(([c]) => X.WNAMES[c].forEach((_, i) => { const w = X.witem(c + '-' + i); if (!w) return; out.push(Object.assign({}, w, { base: w.price, price: hgPrice(w.price, hg, hi, w.id), own: W2.owned.indexOf(w.id) >= 0, on: W2.on[w.cat] === w.id, tier: i >= 10 ? 'Eldritch' : i >= 7 ? 'Fancy' : i >= 3 ? 'Nice' : 'Basic' })); }));
     return out; }
   function itemsOf(X, k) { if (k === 'tailor') return wears(X); return (X.SHOP ? X.SHOP.items : []).filter((i) => KB[k].cats.indexOf(i.category) >= 0).sort((a, b) => a.base - b.base); }
   function artOf(X, it, z) {
@@ -805,7 +811,7 @@
     const say = LINE[k] || (LINE[k] = pick(K.L.arrive));
     let h = stallScene(X, k, LINE.f || 'idle', say);
     h += '<div class="dn-kh"><span><b>' + K.name + '</b></span>' +   // 1U.3: no label under the name (the aria-label keeps what and trade for a screen reader)
-      (res === 'win' ? '<span class="dn-badge ok">20% off today</span>' : res === 'lose' ? '<span class="dn-badge bad">10% more today</span>' : res === 'playing' ? (DG && DG.k === k ? '<button class="dn-hag" data-a="dn-resume">Back to the dice</button>' : '<span class="dn-badge bad">Walked out: 10% more</span>') : '<button class="dn-hag" data-a="dn-peek">Haggle</button>') + '</div>';
+      (res === 'win' ? '<span class="dn-badge ok">Vanquisht</span>' : res === 'lose' ? '<span class="dn-badge bad">Engulft</span>' : res === 'playing' ? (DG && DG.k === k ? '<button class="dn-hag" data-a="dn-resume">Back to the dice</button>' : '<span class="dn-badge bad">Engulft</span>') : '<button class="dn-hag" data-a="dn-peek">Haggle</button>') + '</div>';
     h += '<div class="dn-wares">' + its.map((i) => {
       const key = i.id, lk = i.cat ? i.lock > X.D.player.level && !i.own : i.locked && !i.own; let a = i.cat ? (i.own ? 'wear' : 'dn-wear') : 'shop', st, cls = '';
       if (i.cat) st = i.on ? 'Wearing' : i.own ? 'Wear' : lk ? 'Level ' + i.lock : priceHtml(X, i, key);
@@ -816,10 +822,14 @@
   }
   function peekHtml(X) {
     const k = X.V.stall, K = KB[k], its = itemsOf(X, k), s = DICE.smarts(X.D.player.level, bestTier(k));
-    const want = its.filter((i) => !i.own && i.base).sort((a, b) => ((a.cat ? a.lock > X.D.player.level : a.locked) - (b.cat ? b.lock > X.D.player.level : b.locked)) || b.base - a.base).slice(0, 3);
+    const want = its.filter((i) => !i.own && i.base).sort((a, b) => ((a.cat ? a.lock > X.D.player.level : a.locked) - (b.cat ? b.lock > X.D.player.level : b.locked)) || b.base - a.base).slice(0, 5);
+    // you play for ONE item (1U.9): the one tapped here (the spotlight item once the stalls have their spotlight); the best by default
+    if (!want.some((i) => i.id === X.V.hagItem)) X.V.hagItem = want[0] ? want[0].id : '';
     let h = stallScene(X, k, 'talk', LINE.peek || (LINE.peek = pick(K.L.haggle)));
-    h += '<div class="dn-peek"><h3>What you play for</h3>' + want.map((i) => '<div class="dn-pk"><span class="dn-art">' + artOf(X, i, 40) + '</span><span class="dn-nm">' + X.esc(i.name) + tag(X, i.tier) + '</span><span class="dn-pp"><span>' + i.base + X.coin(12, i.base, i.id) + '</span><span class="ok">win ' + hgPrice(i.base, 'win') + '</span><span class="bad">lose ' + hgPrice(i.base, 'lose') + '</span></span></div>').join('') +
-      '<p class="dn-how">Win: 20% off here today. Lose: 10% more. One game a day; walking out is a loss. ' + K.name + ' plays <b>' + DICE.label(s) + '</b>.</p>' +   // 1U.3: one line of stakes, no rulebook (the table's own hints guide each move)
+    h += '<div class="dn-peek"><h3>What you play for</h3>' + want.map((i) => { const on = i.id === X.V.hagItem;
+      return '<button class="dn-pk' + (on ? ' on' : '') + '" data-a="dn-pick" data-id="' + X.esc(i.id) + '" aria-pressed="' + on + '"><span class="dn-art">' + artOf(X, i, 40) + '</span><span class="dn-nm">' + X.esc(i.name) + '</span><span class="dn-pp"><span>' + i.base + X.coin(12, i.base, i.id) + '</span>' +
+        (on ? '<span class="ok">' + hgPrice(i.base, 'win', { item: i.id, left: 5 }, i.id) + '</span><span class="bad">' + hgPrice(i.base, 'lose') + '</span>' : '') + '</span></button>'; }).join('') +
+      '<p class="dn-how">' + K.name + ' plays <b>' + DICE.label(s) + '</b>.</p>' +
       (DG && DG.err0 ? '<p class="dn-err">' + X.esc(DG.err0) + '</p>' : '') +
       '<div class="dn-two"><button class="dn-big" data-a="dn-sit">Sit down and play</button><button class="dn-go" data-a="dn-stall">Not now</button></div></div>';
     return h;
@@ -899,9 +909,10 @@
     }
     if (a === 'dn-peek') { V.den = 'peek'; LINE.peek = null; if (DG && DG.err0) DG.err0 = ''; X.paint(); return true; }
     if (a === 'dn-resume') { V.den = 'dice'; X.paint(); return true; }
+    if (a === 'dn-pick') { V.hagItem = id; X.paint(); return true; }
     if (a === 'dn-sit') {
-      const k = V.stall; if (b) b.disabled = true;
-      X.call('gameHaggle', k, 'start').then((s) => { X.setShop(s); newGame(X, k); V.den = 'dice'; X.paint(); })
+      const k = V.stall, item = V.hagItem; if (!item) return true; if (b) b.disabled = true;
+      X.call('gameHaggle', k, 'start', item).then((s) => { X.setShop(s); newGame(X, k); DG.item = item; V.den = 'dice'; X.paint(); })
         .catch((e) => { DG = { k: null, err0: String((e && e.message) || e).replace(/^Error:\s*/, '') }; X.paint(); });
       return true;
     }
@@ -960,6 +971,9 @@
 .dn-wares{display:grid;grid-template-columns:repeat(auto-fill,minmax(98px,1fr));gap:6px;margin-top:8px}.dn-ware{width:auto;background:linear-gradient(180deg,#1a1510,#100c08);border-color:#3a2c1c}
 .dn-ware.lk{opacity:.55}.dn-ware.lk .dn-st{color:#9a9ab0;font-weight:400}.dn-ware.poor .dn-st{color:#8a7a5a}.dn-ware.own .dn-st{color:#9fd8b8}.dn-tier{font:700 13px var(--a)}
 .dn-peek{padding:10px;background:#15110c;border:1px solid #3a2c1c;border-top:none;border-radius:0 0 8px 8px;font:14px/1.45 var(--a);color:#e0d4bc}
+.dn-word{font:700 34px/1 var(--g);letter-spacing:.12em;margin:4px 0 6px}.dn-res.ok .dn-word{color:#ffd56a;text-shadow:0 0 14px rgba(255,213,106,.6)}.dn-res.bad .dn-word{color:#ff7a66;text-shadow:0 0 14px rgba(255,90,74,.6)}
+.dn-newp{display:flex;justify-content:center;align-items:center;gap:8px;font:700 17px var(--a);color:#ffe9b0;text-shadow:0 0 8px rgba(255,213,106,.7)}.dn-newp s{opacity:.55;margin-right:4px}
+button.dn-pk{width:100%;min-height:52px;border:1px solid transparent;border-radius:6px;background:none;color:inherit;font:inherit;text-align:left;cursor:pointer}button.dn-pk.on{border-color:#ffd56a;background:rgba(255,213,106,.08)}
 .dn-peek h3{margin:0 0 6px;font:500 20px var(--g);color:#ffd56a}.dn-pk{display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid #2a2016}.dn-pk .dn-art{width:48px;height:44px;flex:none}
 .dn-pk .dn-nm{flex:1;min-width:0;display:flex;flex-direction:column;text-align:left}.dn-pp{display:flex;flex-direction:column;align-items:flex-end;font:700 13px var(--a)}.dn-pp>span:first-child{display:flex;align-items:center;gap:3px;color:#ffd56a}
 .dn-how{color:#a8987a;font-size:13px}.dn-err{color:#ff8a70;font:700 14px var(--a)}.dn-two{display:grid;grid-template-columns:1.4fr 1fr;gap:8px;align-items:end}
