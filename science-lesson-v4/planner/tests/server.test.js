@@ -17,18 +17,18 @@ ok('Support column is read', oc.students[0].support === 'prompt');
 ok('no silence data yet', oc.silence === null);
 ok('init has a numeric server version', typeof api.init(k).version === 'number');
 
-let ev = api.logEvent(k, '7BYA', 'Thomas Boxall', '+', 0);
+let ev = api.logEvent(k, '7BYA', 'Test Pupil One', '+', 0);
 ok('positive saved', ev.some(e => e.type === '+'));
 ok('Log stores the word, not a symbol (Sheets turns +/- into #ERROR!)', m.sheets['Behaviour Log']._data[1][3] === 'Positive');
-ev = api.logEvent(k, '7BYA', 'Tom Browning', 'R', 4); ok('report to me keeps its rule', ev.some(e => e.type === 'R' && e.rule === 4));
-ev = api.logMany(k, '7BYA', ['Thomas Boxall', 'Tom Browning'], '-', 0); ok('logMany saves a group', ev.filter(e => e.type === '-').length === 2);
+ev = api.logEvent(k, '7BYA', 'Test Pupil Two', 'R', 4); ok('report to me keeps its rule', ev.some(e => e.type === 'R' && e.rule === 4));
+ev = api.logMany(k, '7BYA', ['Test Pupil One', 'Test Pupil Two'], '-', 0); ok('logMany saves a group', ev.filter(e => e.type === '-').length === 2);
 const ids = ev.filter(e => e.type === '-').map(e => e.id);
 ev = api.removeMany(k, '7BYA', ids); ok('undo removes them', ev.filter(e => e.type === '-').length === 0);
-api.logEvent(k, '7BYA', 'Thomas Boxall', '-', 0); ev = api.logEvent(k, '7BYA', 'Thomas Boxall', '-', 4);
+api.logEvent(k, '7BYA', 'Test Pupil One', '-', 0); ev = api.logEvent(k, '7BYA', 'Test Pupil One', '-', 4);
 ok('detention reason saved on a negative', ev[ev.length - 1].rule === 4);
 const past = Date.now() - 120000;   // 2 minutes ago (an hour ago is yesterday just after midnight)
-ev = api.logEvent(k, '7BYA', 'Tom Browning', '+', 0, past);
-ok('offline tap keeps the time it was tapped', ev.some(e => e.name === 'Tom Browning' && e.type === '+' && Math.abs(e.id - past) < 5));
+ev = api.logEvent(k, '7BYA', 'Test Pupil Two', '+', 0, past);
+ok('offline tap keeps the time it was tapped', ev.some(e => e.name === 'Test Pupil Two' && e.type === '+' && Math.abs(e.id - past) < 5));
 ok('board shows today\'s positives', api.getBoard(k, 6).names.length >= 1);
 ok('board check-in is recorded for the phone dot', Date.now() - api.getMode(k).board < 2000);
 
@@ -86,7 +86,7 @@ ok('more than 3 minutes lost in the week misses the goal', api.getFriday(k).find
 m.props.LOST = JSON.stringify({ cls: '7BYA', start: Date.now() - 2000000 });
 ok('a count left running over 30 minutes is dropped', !api.getMode(k).lost);
 ok('positivesOver counts', api.positivesOver(k, '7BYA', 5).length >= 1);
-ok('setSupport writes the Support column', api.setSupport(k, '7BYA', 'Tom Browning', 'extend') === 'extend' && m.sheets.Students._data[2][6] === 'extend');
+ok('setSupport writes the Support column', api.setSupport(k, '7BYA', 'Test Pupil Two', 'extend') === 'extend' && m.sheets.Students._data[2][6] === 'extend');
 // one app (2026-10-12)
 ok('class names match across the apps (7MLA = 7ML), but not 7MLA = 7XP', api.sameClass_('7MLA', '7ML') && !api.sameClass_('7MLA', '7XP') && !api.sameClass_('7', '7ML'));
 const wdNow = Number(Utilities.formatDate(new Date(), 'Europe/London', 'u'));
@@ -128,6 +128,24 @@ ok('merge is noted in the planner Log tab, not the behaviour log', m.sheets.Log 
   ok('ABCD: undo removes the vote', api.removeVote(k, v.id) === true && m.sheets['MCQ Votes']._data.length === n - 1);
   let bad = ''; try { api.saveVote(k, { cls: '7MLA', split: {} }); } catch (e) { bad = e.message; }
   ok('ABCD: an empty vote is refused', /No letters/.test(bad));
+}
+
+// 1.3 (2026-10-29): a tap sent twice (the phone retries after a lost reply) is written once, and taps take the document lock
+{
+  const log = m.sheets['Behaviour Log']._data, n0 = log.length, t = Date.now() - 5000;
+  m.lockLog.length = 0;
+  api.logEvent(k, '7BYA', 'Test Pupil One', '+', 0, t, 'tap-1');
+  api.logEvent(k, '7BYA', 'Test Pupil One', '+', 0, t, 'tap-1');
+  ok('a tap sent twice with the same id is written once', log.length === n0 + 1);
+  delete m.cache['tap:tap-1'];
+  api.logEvent(k, '7BYA', 'Test Pupil One', '+', 0, t);
+  ok('...and the same moment, class, pupil and type from an older phone (no id) is still written once', log.length === n0 + 1);
+  api.logEvent(k, '7BYA', 'Test Pupil One', '+', 0, t + 1, 'tap-2');
+  ok('a real second tap a moment later is written', log.length === n0 + 2);
+  api.logMany(k, '7BYA', ['Test Pupil One', 'Test Pupil Two'], '-', 2, t + 100, 'tap-3');
+  api.logMany(k, '7BYA', ['Test Pupil One', 'Test Pupil Two'], '-', 2, t + 100, 'tap-3');
+  ok('a multi-select tap sent twice is written once (two rows, not four)', log.length === n0 + 4);
+  ok('taps take the document lock, never the script lock the homework Form build holds', m.lockLog.length >= 5 && m.lockLog.every((x) => x === 'document'));
 }
 
 console.log(out.join('\n')); console.log(failed ? `\n${failed} FAILED` : '\nAll passed'); process.exit(failed ? 1 : 0);

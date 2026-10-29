@@ -166,13 +166,16 @@ function rule_(type, rule) {
   if (type === 'R' && !RULES[r]) throw new Error('Pick a rule');
   return (type === 'R' || type === '-') && RULES[r] ? r : '';
 }
-function logEvent(k, cls, name, type, rule, tapTime) {
+function logEvent(k, cls, name, type, rule, tapTime, tapId) {
   check_(k);
   if (['+', '-', 'R'].indexOf(type) === -1) throw new Error('Unknown type');
   rule = rule_(type, rule);
+  const now = when_(tapTime);
   withLock_(() => {
-    bSheet_('Log').appendRow([when_(tapTime), cls, name, TYPE_WORD[type], rule, rule ? RULES[rule] : '']);
+    if (seenTap_(tapId, now, cls, [name], type)) return;   // the same tap again: already written
+    bSheet_('Log').appendRow([now, cls, name, TYPE_WORD[type], rule, rule ? RULES[rule] : '']);
     SpreadsheetApp.flush();
+    rememberTap_(tapId);
   });
   const events = today_(cls);
   refreshBoard_(cls, events);
@@ -180,16 +183,18 @@ function logEvent(k, cls, name, type, rule, tapTime) {
 }
 
 /** Same as logEvent for several students at once (multi-select). */
-function logMany(k, cls, names, type, rule, tapTime) {
+function logMany(k, cls, names, type, rule, tapTime, tapId) {
   check_(k);
   if (['+', '-', 'R'].indexOf(type) === -1) throw new Error('Unknown type');
   rule = rule_(type, rule);
   const now = when_(tapTime);
   withLock_(() => {
+    if (seenTap_(tapId, now, cls, names, type)) return;   // the same tap again: already written
     const sh = bSheet_('Log');
     const rows = names.map((n, i) => [new Date(now.getTime() + i), cls, n, TYPE_WORD[type], rule, rule ? RULES[rule] : '']);
     sh.getRange(sh.getLastRow() + 1, 1, rows.length, 6).setValues(rows);
     SpreadsheetApp.flush();
+    rememberTap_(tapId);
   });
   const events = today_(cls);
   refreshBoard_(cls, events);
@@ -700,11 +705,23 @@ function weekday_(d) { return Number(Utilities.formatDate(d, TZ, 'u')); }
 // Log and Settings tabs are called "Behaviour Log" and "Behaviour Settings" there.
 const B_TAB = { Log: 'Behaviour Log', Settings: 'Behaviour Settings' };
 function bSheet_(name) { return SpreadsheetApp.getActiveSpreadsheet().getSheetByName(B_TAB[name] || name); }
+// The behaviour app's own lock (1.3, 2026-10-29): the homework Form build in Code.gs holds the SCRIPT lock for up to a
+// minute, so taps take the DOCUMENT lock (this spreadsheet) instead and never queue behind a Form build.
 function withLock_(fn) {
-  const lock = LockService.getScriptLock();
+  const lock = LockService.getDocumentLock();
   lock.waitLock(10000);
-  try { fn(); } finally { lock.releaseLock(); }
+  try { return fn(); } finally { lock.releaseLock(); }
 }
+// A tap sent twice (the phone retries when a reply is lost) is written once (1.3, 2026-10-29): the tap's id is
+// remembered for six hours, and the latest rows are checked for the same moment, class, pupil and type.
+function seenTap_(tapId, when, cls, names, type) {
+  if (tapId && CacheService.getScriptCache().get('tap:' + tapId)) return true;
+  const sh = bSheet_('Log'), last = sh.getLastRow();
+  if (last < 2) return false;
+  const n = Math.min(last - 1, 300), t = when.getTime(), word = TYPE_WORD[type];
+  return sh.getRange(last - n + 1, 1, n, 4).getValues().some(r => r[0] instanceof Date && r[0].getTime() >= t && r[0].getTime() < t + names.length && r[1] === cls && names.indexOf(r[2]) !== -1 && r[3] === word);
+}
+function rememberTap_(tapId) { if (tapId) CacheService.getScriptCache().put('tap:' + tapId, '1', 21600); }
 function json_(o) { return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON); }
 /** Board.html loads these endpoints via a <script> tag (JSONP), not fetch, so a browser's cross-origin
  * rules never come into it. callback must be a plain identifier; anything else falls back to plain JSON. */

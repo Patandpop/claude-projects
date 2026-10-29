@@ -31,7 +31,7 @@ function makeSheet(name, rows) {
   };
 }
 sheets.Students = makeSheet('Students', [['Class','Name','Short','X','Y','Ratio'],
-  ['7BYA','Thomas Boxall','Thomas B.',4,68,2.7],['7BYA','Tom Browning','Tom B.',26,68,2.7]]);
+  ['7BYA','Test Pupil One','Test P.',4,68,2.7],['7BYA','Test Pupil Two','Test P2.',26,68,2.7]]);
 sheets['Behaviour Log'] = makeSheet('Behaviour Log', [['Timestamp','Class','Name','Type','Rule','Rule name']]);
 sheets.Sessions = makeSheet('Sessions', [['Start','Class','Mode','Monitored (s)','Red (s)','Settle (s)']]);
 sheets.Emails = makeSheet('Emails', [['Date','Class','Name']]);
@@ -43,7 +43,9 @@ const cache = {};
 global.PropertiesService = { getScriptProperties: () => ({ getProperty: k => props[k] ?? null, setProperty: (k, v) => { props[k] = String(v); }, deleteProperty: k => { delete props[k]; } }) };
 global.CacheService = { getScriptCache: () => ({ get: k => cache[k] ?? null, put: (k, v) => { cache[k] = v; }, remove: k => { delete cache[k]; } }) };
 global.SpreadsheetApp = { getActiveSpreadsheet: () => book(sheets), openById: () => book(old), flush: () => {} };
-global.LockService = { getScriptLock: () => ({ waitLock: () => {}, releaseLock: () => {} }) };
+const lockLog = [];   // which lock each caller took (the behaviour app must use the document lock, 1.3)
+const mkLock = (kind) => ({ waitLock: () => { lockLog.push(kind); }, tryLock: () => { lockLog.push(kind); return true; }, releaseLock: () => {} });
+global.LockService = { getScriptLock: () => mkLock('script'), getDocumentLock: () => mkLock('document'), getUserLock: () => mkLock('user') };
 global.Utilities = { formatDate: (d, tz, f) => {
   const p = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/London', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', weekday: 'short', hour12: false }).formatToParts(d);
   const g = t => p.find(x => x.type === t).value;
@@ -57,4 +59,4 @@ global.Utilities = { formatDate: (d, tz, f) => {
 global.ContentService = { createTextOutput: t => ({ setMimeType: () => t }), MimeType: {} };
 global.HtmlService = {}; global.ScriptApp = { getService: () => ({ getUrl: () => 'u' }) };
 global.Logger = { log: console.log };
-module.exports = { sheets, props, cache, old, makeSheet, asSheets };
+module.exports = { sheets, props, cache, old, makeSheet, asSheets, lockLog };

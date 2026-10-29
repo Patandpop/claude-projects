@@ -624,6 +624,8 @@ function classSheet() {
 $('sheet').addEventListener('click', e => {
   const b = e.target.closest('button'); if (!b) return;
   if (b.dataset.flush) { closeSheet(); flushQueue(); return; }
+  if (b.dataset.retryStuck) { setQueue(getQueue().concat(getStuck().map(t => Object.assign({}, t, { tries: 0 })))); setStuck([]); closeSheet(); flushQueue(); return; }
+  if (b.dataset.forgetStuck) { setStuck([]); closeSheet(); snack('Those taps were forgotten'); return; }
   if (b.dataset.sup !== undefined) {
     const n = b.dataset.name, v = b.dataset.sup, st = S.students.find(s => s.name === n);
     if (st) st.support = v; closeSheet(); render();
@@ -652,18 +654,20 @@ async function log(names, type, rule) {
   render();
   const who = names.length > 1 ? `${names.length} students` : shortOf(names[0]);
   const second = names.filter(n => type !== '+' && ((t0[n] || {}).neg || 0) + 1 === 2);
+  // every tap carries the moment it happened and its own id (1.3, 2026-10-29): a retry after a lost reply is the
+  // same tap to the server, never a second positive or negative
+  const ts = Date.now(), tapId = ts + '-' + Math.random().toString(36).slice(2, 8);
   try {
-    const ts = Date.now();
-    const ev = names.length > 1 ? await call('logMany', S.cls, names, type, rule || 0, ts) : await call('logEvent', S.cls, names[0], type, rule || 0, ts);
+    const ev = names.length > 1 ? await call('logMany', S.cls, names, type, rule || 0, ts, tapId) : await call('logEvent', S.cls, names[0], type, rule || 0, ts, tapId);
     S.events = ev.concat(queued(S.cls));
     LS.set(cacheKey(S.cls), JSON.stringify(Object.assign(JSON.parse(LS.get(cacheKey(S.cls)) || '{}'), { events: ev })));
     const ids = S.events.filter(e => !before.has(e.id)).map(e => e.id);
     render();
     snack(second.length ? `Detention: ${second.map(shortOf).join(', ')}` : type === '+' ? `Positive for ${who}` : type === 'R' ? `Report to me: ${who}` : `Negative for ${who}`, ids);
   } catch (e) {
-    // no signal: keep the tap on the phone and send it later with the time it happened
+    // no signal: keep the tap on the phone and send it later with the time it happened (the same ts and id)
     temps.forEach(x => { x.queued = true; });
-    setQueue(getQueue().concat([{ cls: S.cls, names, type, rule: rule || 0, ts: Date.now() }]));
+    setQueue(getQueue().concat([{ cls: S.cls, names, type, rule: rule || 0, ts, id: tapId, tries: 0 }]));
     render(); snack('No signal: saved on your phone, it will send when you reconnect');
   }
 }
@@ -944,6 +948,10 @@ async function loadClass(cls) {
 }
 function getQueue() { try { return JSON.parse(LS.get('queue') || '[]'); } catch (e) { return []; } }
 function setQueue(q) { LS.set('queue', JSON.stringify(q)); }
+// Taps the server refused three times while the connection looked fine are set aside here (1.3, 2026-10-29), shown on the
+// connection screen with "Try again" and "Forget", so one bad tap can never block the ones behind it.
+function getStuck() { try { return JSON.parse(LS.get('stuck') || '[]'); } catch (e) { return []; } }
+function setStuck(q) { LS.set('stuck', JSON.stringify(q)); updateDot(); }
 let flushing = false;
 async function flushQueue() {
   if (flushing) return; const q = getQueue(); if (!q.length) return;
@@ -951,11 +959,18 @@ async function flushQueue() {
   let sent = 0;
   while (getQueue().length) {
     const item = getQueue()[0];
+    const looksUp = !NET.down && navigator.onLine;
     try {
-      const ev = item.names.length > 1 ? await call('logMany', item.cls, item.names, item.type, item.rule || 0, item.ts) : await call('logEvent', item.cls, item.names[0], item.type, item.rule || 0, item.ts);
+      const ev = item.names.length > 1 ? await call('logMany', item.cls, item.names, item.type, item.rule || 0, item.ts, item.id) : await call('logEvent', item.cls, item.names[0], item.type, item.rule || 0, item.ts, item.id);
       setQueue(getQueue().slice(1)); sent++;
       if (item.cls === S.cls) { S.events = ev.concat(queued(S.cls)); render(); }
-    } catch (e) { break; }
+    } catch (e) {
+      if (!looksUp || !navigator.onLine) break;   // no signal (before or during the send): everything waits, nothing counts against the tap
+      item.tries = (item.tries || 0) + 1; item.why = String((e && e.message) || e).slice(0, 120);
+      const rest = getQueue().slice(1);
+      if (item.tries >= 3) { setStuck(getStuck().concat([item])); setQueue(rest); if (item.cls === S.cls) render(); continue; }
+      setQueue([item].concat(rest)); break;
+    }
   }
   flushing = false;
   if (sent) snack(`${sent} saved tap${sent > 1 ? 's' : ''} sent`);
@@ -996,15 +1011,19 @@ async function keepAwake() {
   } catch (e) { note.textContent = "Your phone didn't allow this inside Google's page. If the screen still dims, set Screen timeout to 10 minutes in your phone's Display settings."; }
 }
 // connection dot: green all fine, amber the board isn't open or taps are waiting, red no signal
-function dotState() { if (NET.down) return 'red'; if (getQueue().length || S.boardAge === null || S.boardAge === undefined || S.boardAge > 20) return 'amber'; return 'green'; }
+function dotState() { if (NET.down) return 'red'; if (getQueue().length || getStuck().length || S.boardAge === null || S.boardAge === undefined || S.boardAge > 20) return 'amber'; return 'green'; }
 function updateDot() { const d = $('dot'); if (d) d.className = 'dot ' + dotState(); }
 function ago(s) { return s < 90 ? `${Math.round(s)} s` : s < 5400 ? `${Math.round(s / 60)} min` : `${Math.round(s / 3600)} h`; }
+const TAP_WORD = { '+': 'positive', '-': 'negative', 'R': 'report to me' };
+function stuckLine(t) { const d = new Date(t.ts); return `${t.cls} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')} ${TAP_WORD[t.type] || t.type} for ${t.names.length > 1 ? t.names.length + ' students' : shortOf(t.names[0])}`; }
 $('dotBtn').addEventListener('click', () => {
-  const q = getQueue().length, ba = S.boardAge, live = ba !== null && ba !== undefined && ba <= 20;
+  const q = getQueue().length, st = getStuck(), ba = S.boardAge, live = ba !== null && ba !== undefined && ba <= 20;
   openSheet(`<p class="who">Connection</p><div class="conn">
     <div><i class="dot ${NET.down ? 'red' : 'green'}"></i><b>Phone</b><span>${NET.down ? 'No signal right now' : 'Connected'}</span></div>
     <div><i class="dot ${live ? 'green' : 'amber'}"></i><b>Board</b><span>${ba === null || ba === undefined ? 'Not open yet' : live ? 'Live' : 'Last seen ' + ago(ba) + ' ago'}</span></div>
-    <div><i class="dot ${q ? 'amber' : 'green'}"></i><b>Saved taps</b><span>${q ? q + ' waiting to send' : 'None waiting'}</span></div></div>
+    <div><i class="dot ${q ? 'amber' : 'green'}"></i><b>Saved taps</b><span>${q ? q + ' waiting to send' : 'None waiting'}</span></div>
+    ${st.length ? `<div><i class="dot amber"></i><b>Not sent</b><span>${st.length} tap${st.length > 1 ? 's' : ''} the server refused three times</span></div>` : ''}</div>
+    ${st.length ? '<p class="note">' + st.map(stuckLine).map(esc).join('<br>') + (st[0].why ? '<br>Server said: ' + esc(st[0].why) : '') + '</p><div class="row"><button class="cta" data-retry-stuck="1">Try again</button><button data-forget-stuck="1">Forget them</button></div>' : ''}
     ${q ? '<button class="cta" data-flush="1">Send saved taps now</button>' : ''}`);
 });
 applyTheme(); updateHint(); renderSettings(); keepAwake();
