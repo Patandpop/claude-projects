@@ -21,7 +21,7 @@ const H={init:()=>({classes:['10C2','9AS'],today:['10C2'],week:'B',active:'10C2'
 window.google={script:{run:{withSuccessHandler(ok){return {withFailureHandler(fail){return new Proxy({},{get(_,fn){return function(k,...a){
   window.__calls.push(fn); const m = window.__mode || 'ok';
   if (m === 'dead') { setTimeout(()=>fail(new Error('no connection')), 50); return; }
-  setTimeout(()=>{ try{ ok(H[fn] ? H[fn](...a) : null); }catch(e){fail(e);} }, m === 'slow' ? 2500 : 60);
+  setTimeout(()=>{ try{ ok(H[fn] ? H[fn](...a) : null); }catch(e){fail(e);} }, m === 'slow' ? 6000 : 60);
 }}})}}}}}};
 </script>''' % json.dumps(STU)
 html = open(os.path.join(ROOT, 'Phone.html'), encoding='utf-8').read().replace('<?= key ?>', 'k').replace('<?= manifestUrl ?>', '')
@@ -41,7 +41,7 @@ WRAP = """(mode) => { let g; window.__calls = [];
     g = { script: { run: { withSuccessHandler(ok) { return { withFailureHandler(bad) { return new Proxy({}, { get(_, fn) { return (...a) => {
       window.__calls.push(fn);
       if (mode === 'dead') { setTimeout(() => bad(new Error('no connection')), 50); return; }
-      setTimeout(() => real.withSuccessHandler(ok).withFailureHandler(bad)[fn](...a), mode === 'slow' && fn === 'loadAll' ? 2500 : 0);
+      setTimeout(() => real.withSuccessHandler(ok).withFailureHandler(bad)[fn](...a), mode === 'slow' && fn === 'loadAll' ? 6000 : 0);
     }; } }); } }; } } } };
   } }); }"""
 
@@ -61,18 +61,18 @@ with sync_playwright() as p:
     pg = ctx.new_page(); pg.on('pageerror', lambda e: errs.append(str(e)))
     pg.route('**/*fonts*', lambda r: r.abort())
     pg.add_init_script("window.__mode = 'slow'")
-    pg.goto(url); pg.wait_for_timeout(300)
+    pg.goto(url); pg.wait_for_function("document.querySelectorAll('.tile').length > 0", timeout=5000)
     r = pg.evaluate("({ n: document.querySelectorAll('.tile').length, cls: S.cls, calls: window.__calls.slice(), when: $('when').textContent })")
     check('phone, slow server: the saved class shows at once (%s tiles, %s)' % (r['n'], r['cls']), r['n'] == 3 and r['cls'] == '10C2' and 'Week' in r['when'])
     check('...and no class is opened on the server before Google answers (the board does not move)', 'openClass' not in r['calls'])
-    pg.wait_for_timeout(5600)
+    pg.wait_for_function("window.__calls.includes('openClass')", timeout=15000); pg.wait_for_timeout(6500)
     check('...then the fresh answer opens the class for real', pg.evaluate("window.__calls.includes('openClass') && S.students.length === 3"))
     pg.close()
 
     pg = ctx.new_page(); pg.on('pageerror', lambda e: errs.append(str(e)))
     pg.route('**/*fonts*', lambda r: r.abort())
     pg.add_init_script("window.__mode = 'dead'")
-    pg.goto(url); pg.wait_for_timeout(600)
+    pg.goto(url); pg.wait_for_function("window.__calls.includes('init')"); pg.wait_for_timeout(600)
     r = pg.evaluate("({ n: document.querySelectorAll('.tile').length, studs: $('studs').textContent, bar: !!document.getElementById('errbar') })")
     check('phone, no signal: the saved copy stays, no "Could not connect" and no red bar', r['n'] == 3 and 'Could not connect' not in r['studs'] and not r['bar'])
     pg.close(); ctx.close()
@@ -90,12 +90,12 @@ with sync_playwright() as p:
 
         pg = ctx.new_page(); pg.on('pageerror', lambda e: errs.append(str(e)))
         pg.add_init_script('(' + WRAP + ")('slow')")
-        pg.goto(purl); pg.wait_for_timeout(400)
+        pg.goto(purl); pg.wait_for_function("typeof showingSaved !== 'undefined' && !!S.week", timeout=5000)
         r = pg.evaluate("({ week: !!S.week, saved: showingSaved, status: $('status').textContent, cells: document.querySelectorAll('#grid .ev').length })")
         check('planner, slow server: the saved week is drawn at once (%s lessons): %s' % (r['cells'], r['status']), r['week'] and r['saved'] and r['cells'] > 0 and r['status'].startswith('Saved copy from'))
         pg.evaluate("document.querySelector('#grid .ev').click()")
         check('...a click on a lesson is held back while it is the saved copy', pg.evaluate("S.sel === -1"))
-        pg.wait_for_timeout(3000)
+        pg.wait_for_function("!showingSaved", timeout=15000); pg.wait_for_timeout(300)
         r = pg.evaluate("({ saved: showingSaved, calls: window.__calls.slice(), status: $('status').textContent })")
         check('...then the fresh copy replaces it and clicks work again: ' + r['status'], not r['saved'] and not r['status'].startswith('Saved copy'))
         check('...and nothing was saved from the saved copy', not any(c.startswith('save') for c in r['calls']))

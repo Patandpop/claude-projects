@@ -14,6 +14,11 @@
 
 ## Entries (newest first)
 
+### 29 Oct 2026, Lane C part 2, item 2 (installed app step 5, first half): talking to the server, and the outbox
+- What changed: `app/src/api.js` is the one file every app screen will use to reach the planner's server (so moving off Google one day changes one file), and `app/src/outbox.js` holds taps made without signal and sends them in order when signal returns, the same way the phone page's queue works now, never counting a tap twice and setting aside one the server keeps refusing. 22 new checks in `app/tests/api.test.js`. Nothing you can see yet.
+- You need to: nothing.
+- Save: see git log "Installed app: server file and outbox".
+
 ### 29 Oct 2026, Lane C part 2, item 2 (installed app step 4, done early): the bridge
 - What changed: a new server file `planner/Day.gs` lets the installed app talk to the planner's server from outside Google's page. It only answers with the planner key, and only for the calls the pages already use (behaviour, planner, Ulhu); everything else is refused. Code.gs is untouched. New check: `planner/tests/bridge.test.js` (17 checks), run with the rest of Lane C's checks by `node app/tests/run.js`.
 - Steps 2 (moving the planner to your personal account) and 3 (the small school helper for Forms and Classroom) wait for the school test, so I built this one first because nothing waits on it.
