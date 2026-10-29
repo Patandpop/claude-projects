@@ -66,7 +66,7 @@
     else if (/ing$/.test(w) && w.length > 5) w = w.slice(0, -3);
     else if (/ed$/.test(w) && w.length > 4) w = w.slice(0, -2);
     else if (/[^s]s$/.test(w) && w.length > 3) w = w.slice(0, -1);
-    if (/([b-df-hj-km-np-rtv-z])$/.test(w) && w.length > 3) w = w.slice(0, -1);   // hitt -> hit (not ss or ll)
+    if (/([b-df-hj-km-np-rtv-z])\1$/.test(w) && w.length > 3) w = w.slice(0, -1);   // hitt -> hit (not ss or ll)
     if (/e$/.test(w) && w.length > 3) w = w.slice(0, -1);
     return SAME[w] || w;
   }
