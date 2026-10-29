@@ -7,7 +7,7 @@ const dir = process.env.PLANNER_SRC || path.join(__dirname, '..');
 m.props.PLANNER_KEY = 'k';
 const src = ['Code.gs', 'Behaviour.gs', 'game-art.js', 'Game.gs', 'Companion.gs'].map((f) => fs.readFileSync(path.join(dir, f), 'utf8')).join('\n');
 global.SHOP = require('../game-shop.json');
-eval(src + '\nglobal.G={gameLoad,gameTick,gameUntick,gameSaveGoal,gameMoon,gameFreeze,gameVespers,gameVespersUndo,gameDayTag,gameDayTagList,gameFindTake,cIllDay_,cStory_,cFindFor_,C_FINDS};');
+eval(src + '\nglobal.G={gameLoad,gameTick,gameUntick,gameSaveGoal,gameMoon,gameFreeze,gameVespers,gameVespersUndo,gameDayTag,gameDayTagList,gameFindTake,gameCompanionTerm,gameNudge,gameNudgeOff,cIllDay_,cStory_,cFindFor_,C_FINDS};');
 
 const k = 'k'; let failed = 0;
 const ok = (n, c) => { console.log((c ? '  PASS ' : '  FAIL ') + n); if (!c) failed++; };
@@ -119,6 +119,79 @@ ok('taking them puts all three on the shelf, none repeated', s.comp.adventure.sh
 at('2026-11-15T20:30:00Z'); G.gameVespers(k, { clean: true, tags: [] });
 s = G.gameVespersUndo(k);
 ok('Vespers undone means he never dived', s.comp.adventure.state === 'home');
+
+console.log('\n-- "who I\'m becoming": the term page');
+at('2027-01-05T06:30:00Z');   // the first day of the third half term
+s = G.gameLoad(k);
+let tp = G.gameCompanionTerm(k);
+ok('a new half term starts empty: act 3, The Frozen Choir, no votes, no better days', tp.from === '2027-01-05' && tp.act === 'The Frozen Choir' && tp.who.every((w) => w.votes === 0) && tp.betterDays === 0 && !tp.cameFirst.length);
+const water = G.gameSaveGoal(k, { name: 'Drink water', kind: 'habit', polarity: 'plus', minutes: 5, who: 'Nourished' }).saved;
+const study = G.gameSaveGoal(k, { name: 'Study physics', kind: 'daily', days: '1234567', minutes: 30, track: 'life', who: 'Scholar' }).saved;
+at('2027-01-05T07:00:00Z'); G.gameTick(k, water, 1);
+at('2027-01-05T18:00:00Z'); G.gameTick(k, study, 1);
+at('2027-01-06T08:00:00Z'); G.gameTick(k, curse.id, -1); G.gameTick(k, curse.id, -1); G.gameTick(k, curse.id, -1); G.gameTick(k, water, 1);
+G.gameDayTag(k, '2027-01-06', 'Marking', true);
+at('2027-01-07T08:00:00Z'); G.gameTick(k, study, 1);
+G.gameDayTag(k, '2027-01-07', 'Ill', true);
+tp = G.gameCompanionTerm(k);
+const v = (w) => (tp.who.find((x) => x.who === w) || {}).votes;
+ok('each tick of a habit or ritual with an identity is one vote (Nourished 2, Scholar 2)', v('Nourished') === 2 && v('Scholar') === 2);
+ok('a figure lights up a little with each vote (2 of 30)', Math.abs(tp.who.find((x) => x.who === 'Scholar').lit - 2 / 30) < 1e-9 && tp.panes === 30);
+ok('curses never vote', tp.who.every((w) => w.votes <= 2));
+ok('better days: the two good days, not the cursed one', tp.betterDays === 2 && tp.activeDays === 3);
+ok('"these came first" counts the first good ticks of better days (Study physics on 2, Drink water on 1)', tp.cameFirst[0].name === 'Study physics' && tp.cameFirst[0].days === 2 && tp.cameFirst[1].name === 'Drink water' && tp.cameFirst[1].days === 1);
+ok('heavy days show with their tags and how the day went, and Ill days too', tp.heavy.length === 2 && tp.heavy[0].tags[0] === 'Marking' && tp.heavy[0].curse === 3 && tp.heavy[1].tags[0] === 'Ill');
+ok('chapters: one per school week of the act, this week the open one, with its colours counted', tp.chapters.length === 1 && tp.chapters[0].now && tp.chapters[0].blessings === 2 && tp.chapters[0].curses === 3 && tp.chapters[0].rituals === 2 && !tp.chapters[0].closed);
+ok('the tag count says how many days each tag had', tp.tagCount.some((x) => x.tag === 'Marking' && x.days === 1));
+at('2027-08-12T10:00:00Z');
+tp = G.gameCompanionTerm(k);
+ok('in the summer the term page covers the summer so far', tp.from === '2027-07-29' && tp.actNo === 7);
+
+console.log('\n-- nudges: one a day at most, a real fact, never after 7 pm, each switchable off');
+// Study physics ticked at about 08:00 on three mornings: its usual time is 08:00, and it has a streak
+['2027-01-11', '2027-01-12', '2027-01-13'].forEach((d) => { at(d + 'T08:00:00Z'); G.gameTick(k, study, 1); });
+at('2027-01-14T07:30:00Z'); G.gameLoad(k);
+ok('before the usual time there is nothing to say', G.gameNudge(k) === null);
+at('2027-01-14T08:30:00Z');
+let nu = G.gameNudge(k);
+ok('after the usual time, a ritual not yet done is named with its streak ("Study physics: 3 days")', nu && nu.kind === 'streak' && nu.text === 'Study physics: 3 days');
+ok('the words are never sad and never pressure', !/(miss|lose|lost|fail|hurry|must|don't|sad|break)/i.test(nu.text));
+ok('asking does not use up the day; only sending does', G.gameNudge(k) !== null);
+G.gameNudge(k, true);
+ok('once one is sent, nothing more that day', G.gameNudge(k) === null);
+at('2027-01-15T08:30:00Z');
+ok('the next day it can come again', G.gameNudge(k) !== null);
+G.gameTick(k, study, 1);
+ok('a ritual already done today is never nudged', G.gameNudge(k) === null);
+at('2027-01-16T19:05:00Z');
+ok('after 7 pm nothing reaches out', G.gameNudge(k) === null);
+at('2027-01-16T08:30:00Z');
+s = G.gameNudgeOff(k, ['streak']);
+ok('a kind switched off stays quiet, and the screen knows', G.gameNudge(k) === null && s.comp.nudgeOff.join() === 'streak');
+at('2027-01-16T20:30:00Z'); G.gameVespers(k, { clean: true, tags: [] });
+at('2027-01-17T07:15:00Z');
+nu = G.gameNudge(k);
+ok('in the morning, Ulhu back with a find is a nudge of its own', nu && nu.kind === 'find');
+G.gameNudgeOff(k, ['all']);
+ok('"all" switches every nudge off', G.gameNudge(k) === null);
+G.gameNudgeOff(k, []);
+
+console.log('\n-- sound: big moments only (game-companion.js)');
+const C = require(path.join(dir, 'game-companion.js'));
+const scr = (o) => Object.assign({ today: '2027-01-08', player: { level: 3, deaths: 0 }, goals: [{ kind: 'daily', doneToday: false }, { kind: 'habit', polarity: 'plus', count: 0 }, { kind: 'habit', polarity: 'minus', count: 0 }], vespers: { done: false }, comp: { adventure: { state: 'home' } } }, o);
+const base = scr({});
+ok('a ritual ticked makes the tick sound', C.moment(base, scr({ goals: [{ kind: 'daily', doneToday: true }, base.goals[1], base.goals[2]] })) === 'tick');
+ok('a blessing makes the tick sound', C.moment(base, scr({ goals: [base.goals[0], { kind: 'habit', polarity: 'plus', count: 1 }, base.goals[2]] })) === 'tick');
+ok('a curse makes no sound', C.moment(base, scr({ goals: [base.goals[0], base.goals[1], { kind: 'habit', polarity: 'minus', count: 1 }] })) === '');
+ok('an undo makes no sound', C.moment(scr({ goals: [{ kind: 'daily', doneToday: true }, base.goals[1], base.goals[2]] }), base) === '');
+ok('the same screen again (the server catching up) makes no sound', C.moment(base, scr({})) === '');
+ok('a level-up wins over the tick that caused it', C.moment(base, scr({ player: { level: 4, deaths: 0 }, goals: [{ kind: 'daily', doneToday: true }, base.goals[1], base.goals[2]] })) === 'level');
+ok('fainting has its own sound', C.moment(base, scr({ player: { level: 2, deaths: 1 } })) === 'faint');
+ok('Vespers done has its own sound', C.moment(base, scr({ vespers: { done: true } })) === 'vespers');
+ok('Ulhu back from the deep (his find taken) has its own sound', C.moment(scr({ comp: { adventure: { state: 'back' } } }), base) === 'return');
+ok('a new day loading is not a moment', C.moment(base, scr({ today: '2027-01-09', goals: [{ kind: 'daily', doneToday: true }, base.goals[1], base.goals[2]] })) === '');
+ok('only the five big-moment sounds exist (no music)', C.SOUNDS.join() === 'tick,vespers,level,faint,return');
+ok('with no speaker (node) playing does nothing', C.play('tick') === false);
 
 console.log(failed ? `\n${failed} FAILED` : '\nAll companion checks passed');
 process.exit(failed ? 1 : 0);

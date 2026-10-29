@@ -165,10 +165,114 @@ function gameFindTake(k) {
   return gSnapshot_(gWorld_(), { found: got });
 }
 
+/* ---- "Who I'm becoming": the term page. The term is the act he is in (its half term, from its first day to today;
+   in a break, the half term just gone; in the summer, the summer so far). Simple counting only:
+   - each identity (who) gets one vote per tick of a habit or ritual that carries it (the same rule as High Vespers);
+   - heavy days are just his own tags, listed with how the day went; they change nothing;
+   - better days: days with at least one good tick whose score (good ticks minus twice the curses) is in the top half
+     of the term's active days; "these came first" = the first two good ticks of each better day, counted. ---- */
+const C_PANES = 30;   // a figure is fully lit at 30 votes (about one a school day across a half term)
+function cTermRange_(today, world) {
+  const terms = ((world && world.data && world.data.terms) || []).slice().sort((a, b) => (a[0] < b[0] ? -1 : 1));
+  const past = terms.filter((t) => t[0] <= today);
+  if (!past.length) return { from: gAdd_(today, -42), to: today };
+  const t = past[past.length - 1];
+  if (today > t[1] && past.length === terms.length) return { from: gAdd_(t[1], 1), to: today };   // the summer so far
+  return { from: t[0], to: today < t[1] ? today : t[1] };
+}
+function cTerm_(today, world, frozen) {
+  const r = cTermRange_(today, world), story = cStory_(r.from, world), goals = gGoals_(), ticks = gRows_('ticks');
+  const byId = {}; goals.forEach((g) => { byId[g.id] = g; });
+  const undone = gUndone_(ticks), isC = (t) => gNote_(t).side === 'c';
+  const tt = ticks.filter((t) => String(t.day) >= r.from && String(t.day) <= r.to && !undone[t.id] && !gNote_(t).untick && Number(t.delta) > 0 && byId[t.goalId]);
+  const votes = {}; tt.filter((t) => !isC(t) && byId[t.goalId].who).forEach((t) => { const w = byId[t.goalId].who; votes[w] = (votes[w] || 0) + 1; });
+  const mine = {}; goals.forEach((g) => { if (g.who) mine[g.who] = true; });
+  const who = G_WHO.filter((w) => mine[w] || votes[w]).map((w) => ({ who: w, votes: votes[w] || 0, lit: Math.min(1, (votes[w] || 0) / C_PANES) })).sort((a, b) => b.votes - a.votes);
+  const nm = (t) => { const g = byId[t.goalId]; return g.polarity === 'both' ? (String(g.name).split(' / ')[1] || g.name) : g.name; };
+  const days = {};
+  tt.forEach((t) => { const d = String(t.day), x = days[d] || (days[d] = { day: d, good: 0, curse: 0, first: [] }); if (isC(t)) x.curse++; else { x.good++; x.first.push(t); } });
+  const active = Object.keys(days).map((d) => days[d]);
+  active.forEach((x) => { x.score = x.good - 2 * x.curse; x.first = x.first.sort((a, b) => (String(a.at) < String(b.at) ? -1 : 1)).slice(0, 2).map(nm); });
+  const sc = active.filter((x) => x.good > 0).map((x) => x.score).sort((a, b) => b - a), cut = sc.length ? sc[Math.floor((sc.length - 1) / 2)] : Infinity;
+  const better = active.filter((x) => x.good > 0 && x.score >= cut), firsts = {};
+  better.forEach((x) => x.first.forEach((n) => { firsts[n] = (firsts[n] || 0) + 1; }));
+  const cameFirst = Object.keys(firsts).map((n) => ({ name: n, days: firsts[n] })).sort((a, b) => b.days - a.days || (a.name < b.name ? -1 : 1)).slice(0, 3);
+  const tagBy = cTagsByDay_(), heavy = [];
+  Object.keys(tagBy).filter((d) => d >= r.from && d <= r.to).sort().forEach((d) => {
+    const tg = tagBy[d].filter((x) => x !== C_ILL), x = days[d] || { good: 0, curse: 0 };
+    if (tg.length || tagBy[d].indexOf(C_ILL) >= 0) heavy.push({ day: d, tags: tagBy[d], good: x.good, curse: x.curse });
+  });
+  const tagCount = {}; heavy.forEach((h) => h.tags.forEach((t) => { tagCount[t] = (tagCount[t] || 0) + 1; }));
+  // the act's chapters, one per school week: its stained-glass pane is that week's colours (blue blessings, red curses,
+  // gold rituals); a chapter is closed when High Vespers for that week was saved
+  const reviewed = {}; gRows_('reviews').forEach((x) => { reviewed[String(x.week)] = true; });
+  const chapters = [];
+  for (let mon = gMonday_(r.from), n = 1; mon <= r.to; mon = gAdd_(mon, 7), n++) {
+    const sun = gAdd_(mon, 6), wk = tt.filter((t) => String(t.day) >= mon && String(t.day) <= sun);
+    chapters.push({ chapter: n, from: mon, blessings: wk.filter((t) => !isC(t) && byId[t.goalId].kind === 'habit').length, curses: wk.filter(isC).length,
+      rituals: wk.filter((t) => !isC(t) && byId[t.goalId].kind !== 'habit').length, closed: !!reviewed[mon], now: today >= mon && today <= sun });
+  }
+  return { from: r.from, to: r.to, act: story.name, chapters, actNo: story.act, panes: C_PANES, who, betterDays: better.length, activeDays: active.length, cameFirst,
+    heavy, tagCount: Object.keys(tagCount).map((t) => ({ tag: t, days: tagCount[t] })).sort((a, b) => b.days - a.days) };
+}
+// the term page, asked for when it is opened (it reads the whole term, so it is not in every snapshot)
+function gameCompanionTerm(k) {
+  check_(k); gFresh_(); cReg_();
+  const world = gWorld_(), today = gDay_(gNow_());
+  return gOut_(cTerm_(today, world, gFrozenDays_()));
+}
+
+/* ---- nudges: at most one a day, never after 7 pm, never sad, each kind switchable off. They name something real.
+   The installed app's notifications (Lane C, lanes/design-installed-app.md 6.2) will ask gameNudge every so often and
+   send whatever comes back; nothing here sends anything by itself. Kinds:
+   - streak: a ritual not yet done today whose usual time (the middle of its last 14 tick times) has passed, the
+     longest streak first: "Read: 24 days";
+   - find: Ulhu is back from the deep with something (from 7 am). ---- */
+const C_NUDGE_END = 19;              // 7 pm: nothing reaches out after this
+const C_NUDGE_KINDS = ['streak', 'find'];
+function cHm_(t) { return Utilities.formatDate(new Date(t.at), TZ, 'HH:mm'); }
+function cUsual_(goalId, ticks, today) {
+  const from = gAdd_(today, -14), und = gUndone_(ticks);
+  const hm = ticks.filter((t) => t.goalId === goalId && String(t.day) >= from && String(t.day) < today && Number(t.delta) > 0 && !und[t.id] && !gNote_(t).untick).map(cHm_).sort();
+  return hm.length >= 3 ? hm[Math.floor(hm.length / 2)] : '';   // three ticks or more before there is a "usual"
+}
+function cNudge_(now, world) {
+  const today = gDay_(now), hour = Number(Utilities.formatDate(now, TZ, 'H')), hm = Utilities.formatDate(now, TZ, 'HH:mm'), p = gPlayer_();
+  if (hour >= C_NUDGE_END || String(p.nudgeLast || '') === today) return null;
+  const off = String(p.nudgeOff || '').split('|');
+  if (off.indexOf('all') >= 0) return null;
+  if (off.indexOf('find') < 0 && hour >= 7) { const a = cAdventure_(today, world); if (a.state === 'back') return { kind: 'find', text: 'Ulhu is back from the deep. He found something.' }; }
+  if (off.indexOf('streak') < 0) {
+    const ticks = gRows_('ticks'), frozen = gFrozenDays_();
+    const due = gGoals_().filter((g) => g.kind === 'daily' && g.streak >= 2 && gIsDue_(g, today) && !gIsFrozen_(today, world, frozen, g) && gNet_(ticks, g.id, today) <= 0)
+      .map((g) => ({ g, at: cUsual_(g.id, ticks, today) })).filter((x) => x.at && x.at <= hm && x.at < String(C_NUDGE_END) + ':00')
+      .sort((a, b) => b.g.streak - a.g.streak);
+    if (due.length) return { kind: 'streak', text: due[0].g.name + ': ' + due[0].g.streak + ' days', goalId: due[0].g.id };
+  }
+  return null;
+}
+// what a nudge would say right now, or null. send = true marks today as used (the app calls it that way when it really sends).
+function gameNudge(k, send) {
+  check_(k); gFresh_();
+  let out = null;
+  withLock_(function () { gFresh_(true); cReg_();
+    out = cNudge_(gNow_(), gWorld_());
+    if (out && send) { const p = gPlayer_(); p.nudgeLast = gDay_(gNow_()); gSavePlayer_(p); }
+  });
+  return out;
+}
+// which kinds are switched off ('streak', 'find', or 'all')
+function gameNudgeOff(k, kinds) {
+  check_(k); gFresh_();
+  withLock_(function () { gFresh_(true);
+    const p = gPlayer_(); p.nudgeOff = (kinds || []).filter((x) => C_NUDGE_KINDS.indexOf(x) >= 0 || x === 'all').join('|'); gSavePlayer_(p); });
+  return gSnapshot_(gWorld_());
+}
+
 /* ---- what the page gets with every snapshot (Game.gs gSnapshot_ adds it as "comp") ---- */
 function cSnap_(today, world, frozen, p) {
   cReg_();
   const by = cTagsByDay_(), days = {};
   for (let i = -7; i <= 14; i++) { const d = gAdd_(today, i); if (by[d]) days[d] = by[d]; }
-  return { tags: cTagList_(p), days, ill: cIllDay_(today, frozen), story: cStory_(today, world), adventure: cAdventure_(today, world) };
+  return { tags: cTagList_(p), days, ill: cIllDay_(today, frozen), story: cStory_(today, world), adventure: cAdventure_(today, world), nudgeOff: String((p || gPlayer_()).nudgeOff || '').split('|').filter(Boolean) };
 }

@@ -47,10 +47,12 @@ files['GameArt.html'] = pack(['game-temple.js', 'game-stone.js', 'game-blood.js'
 files['GameHV.html'] = pack(['game-highvespers.js', 'game-lair.js', 'game-brew.js']);   // the Lair banner rides here (1U.5)
 // 2026-10-28: the Den (Round Grotto, Night Market, dice with every keeper) is its own include too; it loads before GameUI's code runs
 files['GameDen.html'] = pack(['game-den.js']);
+// 2026-10-29 Lane D: Ulhu as a life companion, the page side (sound now; day tags, his adventure and the term page next)
+files['GameComp.html'] = pack(['game-companion.js']);
 // 2026-10-27: the game code is its own file, GameUI.html, pulled in by include() (Planner.html at 406 KB would no longer save in the editor)
 ['Planner.html', 'Phone.html'].forEach((f) => {
   if (!files[f].includes('<!--GAME_UI-->')) throw new Error(f + ' has no <!--GAME_UI--> marker');
-  files[f] = files[f].replace('<!--GAME_UI-->', () => "<?!= include('GameUI') ?>\n<?!= include('GameArt') ?>\n<?!= include('GameHV') ?>\n<?!= include('GameDen') ?>");
+  files[f] = files[f].replace('<!--GAME_UI-->', () => "<?!= include('GameUI') ?>\n<?!= include('GameArt') ?>\n<?!= include('GameHV') ?>\n<?!= include('GameDen') ?>\n<?!= include('GameComp') ?>");
   if (!files[f].includes('{{BUILD_STAMP}}')) throw new Error(f + ' has no {{BUILD_STAMP}} marker (the build date shown in the corner)');
 });
 
