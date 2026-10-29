@@ -290,6 +290,6 @@ Patryk's answers, in grill order. Mock-ups follow each area.
 - Later: ritual colour should match the polished stone ritual tablets; then a desktop version of Ulhu.
 
 ### 29 Oct, later (phone)
-- Haggle prize: win on ONE item, discount by dice left (5 or 4 = 25%, 3 = 20%, 2 = 15%, 1 = 10%); lose = +10% on that item today. Replaces the flat 20% stall discount.
+- Haggle prize (PERMANENT): win on ONE item, discount by dice left (5 or 4 = 25%, 3 = 20%, 2 = 15%, 1 = 10%); lose = +10% on that item today. Replaces the flat 20% stall discount.
 - Grimoire BG1 Candlelit desk and the book: amazing, approved. But the opened book must show the stained-glass day overview (Oracle glass style).
-- Big Moments (LU/FA/DP): liked. Wall / Golems / Inscriptions: rejected, "didn't make sense, not understandable".
+- Big Moments (LU/FA/DP): liked. Wall / Golems / Inscriptions: wanted, but the mock-ups were not understandable; refine them after grilling Patryk when the time comes.
