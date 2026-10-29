@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Day screen: pick a layout</title>
+<!-- Lane C mock-up, 29 Oct 2026. Three layouts for the day screen (A, B, C) and the evening timer picker.
+     Made-up data, no pupil names. Nothing here is wired to anything. -->
+<style>
+  :root { --paper:#EDF2F8; --plate:#fff; --ink:#12345C; --soft:#557192; --line:#C9D6E5; --sodium:#F2AE12; --sodium-wash:#FFF3D1; --sodium-text:#7A4E00;
+    --ok:#1E7A4F; --ok-wash:#DDF1E6; --warn:#E07B24; --warn-wash:#FDEBDC; --warn-text:#8A3F00; --deep:#0D2442;
+    --text:"Atkinson Hyperlegible Next","Atkinson Hyperlegible",Roboto,system-ui,sans-serif; --display:"Arial Narrow",system-ui,sans-serif; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:#c9d3e0; font:15px/1.35 var(--text); color:var(--ink); }
+  header.top { padding:18px 20px 6px; max-width:1300px; margin:0 auto; }
+  header.top h1 { margin:0 0 4px; font-size:22px; }
+  header.top p { margin:0; color:#33475f; }
+  .row { display:flex; flex-wrap:wrap; gap:26px; justify-content:center; padding:18px; }
+  .opt { display:flex; flex-direction:column; align-items:center; gap:8px; }
+  .opt h2 { margin:0; font-size:18px; }
+  .opt .why { max-width:360px; font-size:13px; color:#33475f; text-align:center; margin:0; }
+  .phone { width:360px; height:740px; background:var(--paper); border-radius:28px; border:10px solid #10151f; overflow:hidden; position:relative; display:flex; flex-direction:column; }
+  .bar { background:var(--deep); color:#fff; padding:10px 14px; display:flex; align-items:center; gap:8px; font-weight:700; }
+  .bar .d { flex:1; } .bar small { font-weight:400; opacity:.8; }
+  .scroll { flex:1; overflow:auto; padding:10px 12px 70px; }
+  .tabs { position:absolute; left:0; right:0; bottom:0; height:56px; background:var(--deep); display:flex; }
+  .tabs span { flex:1; color:#9fb4cc; font-size:11px; display:flex; align-items:center; justify-content:center; }
+  .tabs span.on { color:#fff; font-weight:700; border-top:3px solid var(--sodium); }
+  .cap { display:flex; gap:6px; margin-bottom:10px; }
+  .cap input { flex:1; border:1px solid var(--line); border-radius:10px; padding:9px 10px; font:inherit; background:#fff; }
+  .cap button { border:0; border-radius:10px; background:var(--ink); color:#fff; font-weight:700; padding:0 12px; }
+  .strip { display:flex; gap:5px; margin-bottom:6px; }
+  .strip .p { flex:1; border-radius:8px; padding:5px 4px; color:#fff; font-size:11px; line-height:1.2; min-height:52px; position:relative; }
+  .strip .p b { display:block; font-size:12px; }
+  .strip .p i { position:absolute; right:4px; top:3px; font-style:normal; font-weight:800; }
+  .strip .p.free { background:#fff; color:var(--soft); border:1px dashed var(--line); }
+  .work { border-radius:8px; padding:6px 10px; font-weight:700; font-size:13px; margin-bottom:10px; }
+  .work.over { background:var(--warn-wash); color:var(--warn-text); } .work.fits { background:var(--ok-wash); color:var(--ok); }
+  h3 { font-size:12px; letter-spacing:.06em; text-transform:uppercase; color:var(--soft); margin:12px 0 6px; }
+  .todo { background:#fff; border:1px solid var(--line); border-radius:10px; padding:8px 10px; display:flex; align-items:center; gap:8px; margin-bottom:6px; font-size:14px; }
+  .todo .tick { width:20px; height:20px; border-radius:6px; border:2px solid var(--line); flex:none; }
+  .todo .t { flex:1; }
+  .todo .m { font-size:11px; color:var(--soft); }
+  .tag { font-size:10px; font-weight:700; background:var(--sodium-wash); color:var(--sodium-text); border-radius:5px; padding:1px 5px; margin-left:4px; }
+  .act { font-size:11px; color:var(--soft); border:1px solid var(--line); border-radius:6px; padding:2px 6px; }
+  .more { font-size:13px; color:var(--soft); padding:4px 2px; }
+  .ghost { border:2px dashed #9fb4cc; border-radius:10px; padding:8px 10px; color:var(--soft); display:flex; align-items:center; gap:8px; margin-bottom:6px; background:rgba(255,255,255,.5); font-size:14px; }
+  .ghost .t { flex:1; } .ghost .ok { color:var(--ok); font-weight:800; } .ghost .x { font-weight:800; }
+  .chip { display:flex; align-items:center; gap:8px; background:var(--deep); color:#fff; border-radius:12px; padding:9px 12px; margin:10px 0; font-weight:700; }
+  .chip .dot { width:10px; height:10px; border-radius:50%; background:#5ED39B; }
+  .chip .t { flex:1; } .chip button { border:0; border-radius:8px; padding:5px 10px; font-weight:800; background:#fff; color:var(--deep); }
+  .chips { display:flex; gap:6px; flex-wrap:wrap; margin:6px 0 10px; }
+  .chips span { border:1px solid var(--line); background:#fff; border-radius:999px; padding:6px 10px; font-size:13px; font-weight:600; }
+  .chips span.start { background:var(--deep); color:#fff; border-color:var(--deep); }
+  .rit { display:flex; gap:6px; flex-wrap:wrap; }
+  .rit span { background:#fff; border:1px solid var(--line); border-radius:10px; padding:6px 9px; font-size:13px; }
+  .ulhu { position:absolute; right:12px; bottom:66px; width:54px; height:54px; border-radius:50%; background:radial-gradient(circle at 40% 35%, #6fb8a8, #1d5a63); box-shadow:0 2px 8px rgba(0,0,0,.25); display:flex; align-items:center; justify-content:center; color:#fff; font-size:11px; font-weight:800; }
+  .ulhu.stir { animation:stir 1.2s ease-in-out infinite; }
+  @keyframes stir { 0%,100% { transform:rotate(-6deg); } 50% { transform:rotate(6deg) translateY(-3px); } }
+  /* B: timeline */
+  .tl { position:relative; padding-left:54px; }
+  .tl .slot { position:relative; margin-bottom:6px; }
+  .tl .slot .when { position:absolute; left:-54px; top:6px; width:48px; font-size:11px; color:var(--soft); text-align:right; }
+  .tl .les { border-radius:10px; color:#fff; padding:7px 10px; font-size:13px; }
+  .tl .les b { font-size:14px; } .tl .les i { float:right; font-style:normal; font-weight:800; }
+  /* C: sticky summary */
+  .sum { background:#fff; border-bottom:1px solid var(--line); padding:8px 12px; }
+  .sum .line { display:flex; gap:6px; align-items:center; font-size:13px; }
+  .big { background:#fff; border:1px solid var(--line); border-radius:14px; padding:12px; margin-bottom:8px; display:flex; gap:10px; align-items:center; }
+  .big .tick { width:28px; height:28px; border-radius:8px; border:2px solid var(--line); flex:none; }
+  .big .t { flex:1; font-size:15px; font-weight:600; } .big .m { display:block; font-size:12px; color:var(--soft); font-weight:400; }
+  .inbox { background:var(--sodium-wash); border-radius:10px; padding:8px 10px; font-size:13px; margin-bottom:6px; }
+  .inbox b { color:var(--sodium-text); }
+  /* timer picker */
+  .pick h4 { margin:8px 0 4px; font-size:14px; }
+  .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .grid2 span { background:#fff; border:1px solid var(--line); border-radius:12px; padding:16px 10px; text-align:center; font-weight:700; }
+  .grid2 span.sel { background:var(--deep); color:#fff; }
+  .pop { position:absolute; right:74px; bottom:76px; background:#fff; border:1px solid var(--line); border-radius:12px; padding:8px 10px; font-size:12px; box-shadow:0 3px 10px rgba(0,0,0,.15); width:200px; }
+  .pop button { margin-top:4px; border:1px solid var(--line); background:#fff; border-radius:6px; font-size:11px; padding:2px 8px; }
+</style>
+</head>
+<body>
+<header class="top">
+  <h1>Day screen: which layout? (A, B or C)</h1>
+  <p>All three hold the same things from your grill: capture box, today's lessons, workload line, up to 7 to-dos, suggested blocks, the timer, rituals, Ulhu in the corner. They differ in what leads. Below them: the evening timer picker (one design, from your two-tap answer).</p>
+</header>
+
+<div class="row">
+  <!-- A -->
+  <div class="opt"><h2>A. The list</h2><p class="why">Exactly your grill order, top to bottom. The suggested blocks sit as one faded group above the to-dos.</p>
+  <div class="phone">
+    <div class="bar"><span class="d">Thursday 30 Oct <small>Week B</small></span></div>
+    <div class="scroll">
+      <div class="cap"><input placeholder="Capture anything..."><button>Save</button></div>
+      <div class="strip">
+        <div class="p" style="background:#C62828"><b>P1 9AS</b>Latent heat<i>✓</i></div>
+        <div class="p free"><b>P2</b>free</div>
+        <div class="p" style="background:#00838F"><b>P3 10C2</b>Efficiency<i>✓</i></div>
+        <div class="p" style="background:#AD1457"><b>P4 10S2</b>?<i>?</i></div>
+        <div class="p" style="background:#283593"><b>P5 12C</b>Superposition<i>✓</i></div>
+      </div>
+      <div class="work over">Over by 35 min</div>
+      <h3>Suggested</h3>
+      <div class="ghost"><span class="t">P2: Mark 9AS books (60 min)</span><span class="ok">✓</span><span class="x">✕</span></div>
+      <div class="ghost"><span class="t">After school: Build 10S2 L5 (40 min)</span><span class="ok">✓</span><span class="x">✕</span></div>
+      <h3>To do</h3>
+      <div class="todo"><span class="tick"></span><span class="t">Build 10S2 P4 lesson <span class="m">today</span></span><span class="act">Move</span></div>
+      <div class="todo"><span class="tick"></span><span class="t">Mark 9AS key homework<span class="tag">yesterday</span></span><span class="act">Move</span></div>
+      <div class="todo"><span class="tick"></span><span class="t">Chase 4 pupils, 10C2 homework</span><span class="act">Move</span></div>
+      <div class="todo"><span class="tick"></span><span class="t">8XP test needs a review lesson</span><span class="act">Move</span></div>
+      <div class="todo"><span class="tick"></span><span class="t">Order 30 beakers for Tuesday</span><span class="act">Move</span></div>
+      <div class="more">+ 3 more</div>
+      <div class="chip"><span class="dot"></span><span class="t">Marking 9AS · 12 min</span><button>Stop</button></div>
+      <h3>Rituals</h3>
+      <div class="rit"><span>Inbox zero</span><span>Walk</span><span>Done for today</span></div>
+    </div>
+    <div class="ulhu stir">Ulhu</div>
+    <div class="tabs"><span class="on">Today</span><span>Lesson</span><span>Ulhu</span><span>Planner</span><span>More</span></div>
+  </div></div>
+
+  <!-- B -->
+  <div class="opt"><h2>B. The timeline</h2><p class="why">Your day as a timeline, P1 to the end of after-school. Suggested blocks sit inside the free period they are for. To-dos below.</p>
+  <div class="phone">
+    <div class="bar"><span class="d">Thursday 30 Oct <small>Week B</small></span></div>
+    <div class="scroll">
+      <div class="cap"><input placeholder="Capture anything..."><button>Save</button></div>
+      <div class="work over">Over by 35 min</div>
+      <div class="tl">
+        <div class="slot"><span class="when">9:00</span><div class="les" style="background:#C62828"><i>✓</i><b>9AS</b> Latent heat</div></div>
+        <div class="slot"><span class="when">10:00</span><div class="ghost"><span class="t">Mark 9AS books (60)</span><span class="ok">✓</span><span class="x">✕</span></div></div>
+        <div class="slot"><span class="when">11:30</span><div class="les" style="background:#00838F"><i>✓</i><b>10C2</b> Efficiency</div></div>
+        <div class="slot"><span class="when">12:30</span><div class="les" style="background:#AD1457"><i>?</i><b>10S2</b> not planned</div></div>
+        <div class="slot"><span class="when">14:15</span><div class="les" style="background:#283593"><i>✓</i><b>12C</b> Superposition</div></div>
+        <div class="slot"><span class="when">15:15</span><div class="ghost"><span class="t">Build 10S2 L5 (40)</span><span class="ok">✓</span><span class="x">✕</span></div></div>
+        <div class="slot"><span class="when">17:00</span><div class="todo" style="background:var(--sodium-wash)"><span class="t">Shut down: "Done for today"</span></div></div>
+      </div>
+      <div class="chip"><span class="dot"></span><span class="t">Marking 9AS · 12 min</span><button>Stop</button></div>
+      <h3>To do</h3>
+      <div class="todo"><span class="tick"></span><span class="t">Mark 9AS key homework<span class="tag">yesterday</span></span><span class="act">Move</span></div>
+      <div class="todo"><span class="tick"></span><span class="t">Chase 4 pupils, 10C2 homework</span><span class="act">Move</span></div>
+      <div class="todo"><span class="tick"></span><span class="t">8XP test needs a review lesson</span><span class="act">Move</span></div>
+      <div class="more">+ 4 more</div>
+      <h3>Rituals</h3>
+      <div class="rit"><span>Inbox zero</span><span>Walk</span></div>
+    </div>
+    <div class="ulhu stir">Ulhu</div>
+    <div class="tabs"><span class="on">Today</span><span>Lesson</span><span>Ulhu</span><span>Planner</span><span>More</span></div>
+  </div></div>
+
+  <!-- C -->
+  <div class="opt"><h2>C. Summary bar + big to-dos</h2><p class="why">A slim bar always on top (lessons, workload, timer). Below it, big easy-to-tap to-dos with this morning's captures to sort first.</p>
+  <div class="phone">
+    <div class="bar"><span class="d">Thursday 30 Oct <small>Week B</small></span></div>
+    <div class="sum">
+      <div class="strip" style="margin-bottom:4px">
+        <div class="p" style="background:#C62828;min-height:34px"><b>9AS</b><i>✓</i></div>
+        <div class="p free" style="min-height:34px"><b>free</b></div>
+        <div class="p" style="background:#00838F;min-height:34px"><b>10C2</b><i>✓</i></div>
+        <div class="p" style="background:#AD1457;min-height:34px"><b>10S2</b><i>?</i></div>
+        <div class="p" style="background:#283593;min-height:34px"><b>12C</b><i>✓</i></div>
+      </div>
+      <div class="line"><span class="work over" style="margin:0;flex:1">Over by 35 min</span><span class="chips" style="margin:0"><span class="start">▶ Marking 9AS</span></span></div>
+    </div>
+    <div class="scroll">
+      <div class="cap"><input placeholder="Capture anything..."><button>Save</button></div>
+      <h3>Sort last night's captures</h3>
+      <div class="inbox">"order 30 beakers tues" → <b>Order sheet</b> ✓ <span class="act">Other</span></div>
+      <div class="inbox">"book idea: Dune reread" → <b>Obsidian</b> ✓ <span class="act">Other</span></div>
+      <h3>To do</h3>
+      <div class="big"><span class="tick"></span><span class="t">Build 10S2 P4 lesson<span class="m">today · 40 min</span></span></div>
+      <div class="big"><span class="tick"></span><span class="t">Mark 9AS key homework<span class="tag">yesterday</span><span class="m">60 min</span></span></div>
+      <div class="ghost"><span class="t">P2: Mark 9AS books (60 min)</span><span class="ok">✓</span><span class="x">✕</span></div>
+      <div class="big"><span class="tick"></span><span class="t">Chase 4 pupils, 10C2<span class="m">20 min</span></span></div>
+      <div class="more">+ 4 more</div>
+      <h3>Rituals</h3>
+      <div class="rit"><span>Inbox zero</span><span>Walk</span></div>
+    </div>
+    <div class="ulhu stir">Ulhu</div>
+    <div class="tabs"><span class="on">Today</span><span>Lesson</span><span>Ulhu</span><span>Planner</span><span>More</span></div>
+  </div></div>
+</div>
+
+<header class="top"><h1>The evening timer (one design)</h1><p>Left: the phone picker (tap "Start" or the home-screen shortcut). Your 3 likeliest jobs first, then the two-tap picker. Right: the home PC, where Little Ulhu says what it is tracking, with one "not that" button.</p></header>
+<div class="row">
+  <div class="opt"><h2>Phone picker</h2>
+  <div class="phone">
+    <div class="bar"><span class="d">Start the timer</span></div>
+    <div class="scroll pick">
+      <h4>Likeliest now</h4>
+      <div class="chips"><span class="start">Marking 9AS</span><span class="start">Building 10S2</span><span class="start">Setting homework 12C</span></div>
+      <h4>1. What job?</h4>
+      <div class="grid2"><span class="sel">Marking</span><span>Building lessons</span><span>Setting homework</span><span>Admin</span><span>Emails</span><span>Personal</span></div>
+      <h4>2. Which class?</h4>
+      <div class="chips"><span>7MLA</span><span>8XP</span><span>8AG</span><span class="start">9AS</span><span>9XS</span><span>10C2</span><span>10S2</span><span>11S2</span><span>12C</span><span>13D</span></div>
+      <div class="chip"><span class="dot"></span><span class="t">Marking 9AS · 0 min</span><button>Stop</button></div>
+    </div>
+    <div class="tabs"><span class="on">Today</span><span>Lesson</span><span>Ulhu</span><span>Planner</span><span>More</span></div>
+  </div></div>
+  <div class="opt"><h2>Home PC pop-up</h2>
+  <div class="phone" style="width:520px;height:340px;border-radius:12px">
+    <div class="bar"><span class="d">Planner app (home PC)</span></div>
+    <div class="scroll"><p style="color:var(--soft)">...your normal planner...</p></div>
+    <div class="pop">Tracking: <b>Emails</b> (since 18:02)<br><button>Not that</button></div>
+    <div class="ulhu" style="bottom:20px">Ulhu</div>
+  </div></div>
+</div>
+</body>
+</html>
