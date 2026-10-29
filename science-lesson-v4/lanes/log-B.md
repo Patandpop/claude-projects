@@ -26,13 +26,21 @@ Plain-English record of Lane B's work, newest entry first. Each entry says what 
 8. **Memory map: pick how the Memory tab looks.** Three layouts in one mock-up page: A, a grid (one row per topic, one coloured square per section); B, bars (each section a bar showing its %); C, a due list (reddest first, as cards). The "Suggested Do Now" box for lesson cards is the same in all three. The page is lanes/mockups/memory-tab.html in the project (I could not send it to your phone from this chat; open it on the PC, or ask the design chat to publish it). Reply A, B, C or a mix.
 
 ---
+## 30 Oct 2026, big goal 1, step 6: the phone shows what is due back
+
+**What changed:** on the phone, opening a class now shows one extra line under the seating plan: "Due back: Latent heat 48%, Particle model and pressure 58%, Transition metals ?", the class's three reddest taught spots from the memory map ("?" = taught but not checked yet). Nothing else changes, and the line is empty when nothing is due or the map has no data yet. It is kept with the class's saved copy, so it also shows with no signal.
+
+**You need to:** nothing now. It goes into the next complete paste set (Phone.html, Behaviour.gs).
+
+**Save:** see the history line "Phone: the memory map's three reddest spots".
+
 ## 29 Oct 2026, big goal 1, step 5 (home part): the Do Now uses the memory map
 
 **What changed:** when a lesson is built, the Do Now picker now prefers questions from the parts of the specification the memory map says the class most needs back: either the ones you tick in the lesson's "Suggested Do Now" (once that box exists), or, with none ticked, the map's own reddest spots for that class. It still keeps the spacing pattern (one from last lesson, some from 2 to 4 and 5+ lessons ago, one from last year) and the question mix; it just picks within each slot from the red spots first. In a trial with two sections asked for, 4 of the 6 questions came from them. The builder side of this step (passing the ticked sections through to the slides' notes) waits with the builder plan.
 
 **You need to:** nothing.
 
-**Save:** see the history line "Do Now picker prefers the memory map's red spots".
+**Save:** 94ffa3bd.
 
 ## 29 Oct 2026, big goal 1, step 3: the memory map fills itself each morning
 

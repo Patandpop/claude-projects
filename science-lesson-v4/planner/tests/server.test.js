@@ -267,6 +267,8 @@ ok('merge is noted in the planner Log tab, not the behaviour log', m.sheets.Log 
   ok('memory: running the update again adds no evidence and keeps one square', b.evidence === 0 && m.sheets['Memory Evidence']._data.length === 3 && m.sheets['Memory Scores']._data.length === 2);
   const snap = api.readMemory_();
   ok('memory: the snapshot for home holds the class square with its recall and state', snap['9AS'] && snap['9AS'][0].spec === 'Physics: Internal Energy' && typeof snap['9AS'][0].recall === 'number');
+  const top = api.openClass(k, '9AS').memory;
+  ok('memory: opening a class on the phone brings its reddest spots (title, % or ?)', Array.isArray(top) && top.length <= 3 && top.every((x) => x.title && !/:/.test(x.title)));
   const names = m.sheets.Students._data.slice(1).map((r) => String(r[1])).filter(Boolean);
   const memTabs = ['Memory Evidence', 'Memory Scores', 'Memory Settings'].map((t) => JSON.stringify((m.sheets[t] || { _data: [] })._data)).join(' ');
   ok('memory: no pupil name in any memory tab', names.every((nm) => !memTabs.includes(nm)));

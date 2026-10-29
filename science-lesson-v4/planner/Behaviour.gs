@@ -136,8 +136,19 @@ function openClass(k, cls) {
     students: list.map(s => ({ name: s.name, short: s.short, x: s.x, y: s.y, support: s.support })),
     silence: silenceToday_(cls),
     ratio: (list.find(s => s.ratio) || {}).ratio || 2.6,
-    events: events
+    events: events,
+    memory: memoryTop_(cls)
   };
+}
+// The memory map's 3 reddest taught spots for a class today (big goal 1, design 5.3): [{ title, recall, state }]
+function memoryTop_(cls) {
+  try {
+    if (typeof PlannerMemory === 'undefined' || typeof memScores_ !== 'function') return [];
+    const rows = memScores_().filter(x => sameClass_(x.cls, cls));
+    const today = Utilities.formatDate(new Date(), TZ, 'yyyy-MM-dd');
+    return PlannerMemory.suggest(rows.map(x => Object.assign({}, x, { cls: 'C' })), 'C', today, { n: 3, tick: 3 })
+      .map(x => ({ title: x.spec.replace(/^[^:]+:\s*/, ''), recall: x.recall, state: x.state }));
+  } catch (e) { return []; }
 }
 
 /** type: '+' positive, '-' negative, 'R' report to me (needs rule 2-8) */

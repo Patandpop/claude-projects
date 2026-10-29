@@ -284,6 +284,7 @@
       <input id="search" type="search" placeholder="Find" autocomplete="off" class="hidden">
     </div>
     <p class="hint" id="hint">Tap to award. Hold to pick several.</p>
+    <p class="hint" id="memLine"></p>
     <div id="vote" class="hidden"></div>
     <div id="studs"></div>
     <div id="lesson"></div>
@@ -957,19 +958,25 @@ async function loadClass(cls, savedOnly) {
   const cached = (() => { try { return JSON.parse(LS.get(cacheKey(cls)) || 'null'); } catch (e) { return null; } })();
   // show this class straight away (saved copy, or empty), never the previous class's lists
   S.students = cached ? cached.students : []; S.ratio = cached ? cached.ratio : 2.6; S.silence = cached ? cached.silence : null;
-  S.events = (cached ? cached.events : []).concat(queued(cls));
+  S.events = (cached ? cached.events : []).concat(queued(cls)); memLine(cached && cached.memory);
   if (cached) render(); else { $('studs').innerHTML = '<p class="note">Loading</p>'; $('lesson').innerHTML = ''; }
   if (savedOnly) return;   // instant open: the saved copy only, no server call (opening a class also moves the board)
   try {
     const d = await call('openClass', cls);
     if (S.cls !== cls) return;
     S.students = d.students; S.ratio = d.ratio; S.silence = d.silence || null; S.events = d.events.concat(queued(cls));
-    LS.set(cacheKey(cls), JSON.stringify({ students: d.students, ratio: d.ratio, events: d.events, silence: d.silence || null }));
+    memLine(d.memory);
+    LS.set(cacheKey(cls), JSON.stringify({ students: d.students, ratio: d.ratio, events: d.events, silence: d.silence || null, memory: d.memory || [] }));
     render();
   } catch (e) {
     if (cached) snack('No signal: showing the saved copy of this class');
     else $('studs').innerHTML = '<p class="note">No signal and nothing saved for this class yet.</p>';
   }
+}
+// The memory map's 3 reddest spots for this class (big goal 1): one line, nothing else.
+function memLine(m) {
+  const el = $('memLine'); if (!el) return;
+  el.textContent = (m || []).length ? 'Due back: ' + m.map(x => x.title + ' ' + (x.state === 'unknown' ? '?' : x.recall + '%')).join(', ') : '';
 }
 function getQueue() { try { return JSON.parse(LS.get('queue') || '[]'); } catch (e) { return []; } }
 function setQueue(q) { LS.set('queue', JSON.stringify(q)); }
