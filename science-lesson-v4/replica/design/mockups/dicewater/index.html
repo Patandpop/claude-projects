@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ulhu: the dice game water (1U.6)</title>
+<style>
+:root{--a:'Atkinson Hyperlegible',system-ui,sans-serif;--g:Georgia,serif}
+body{margin:0;background:#07080c;color:#e8e1cf;font:15px/1.45 var(--a)}
+main{max-width:420px;margin:0 auto;padding:14px 12px 40px}
+h1{font:500 24px var(--g);color:#e0c8ff;margin:4px 0 6px}
+.lede{color:#b8a8cc;font-size:14px;margin:0 0 10px}
+h2{font:500 21px var(--g);color:#ffd56a;margin:26px 0 4px}
+.why{font-size:14px;color:#b8a8cc;margin:0 0 8px}
+canvas{display:block;width:100%;image-rendering:pixelated;border-radius:6px;border:1px solid #2a2440;background:#000}
+.row{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+button{min-height:44px;flex:1;border-radius:6px;border:1.5px solid #3a2a4e;background:#16101f;color:#e0c8ff;font:700 14px var(--a)}
+.words{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.words div{padding:14px 6px;text-align:center;border:1px solid #3a2a4e;border-radius:6px;background:#0d0a14;font:700 26px var(--g);letter-spacing:.12em;color:#ff7a66;text-shadow:0 0 12px rgba(255,90,74,.6)}
+.words div small{display:block;font:13px var(--a);letter-spacing:0;color:#a991c8;text-shadow:none;margin-top:4px}
+.words .win{color:#ffd56a;text-shadow:0 0 12px rgba(255,213,106,.6);grid-column:1/-1}
+</style></head><body><main>
+<h1>The dice game: the water</h1>
+<p class="lede">Item 1U.6. Seen from above, over the table, the keeper across from you. Flat pixel water, not 3D. Each panel loops: a die is lost and taken, then the game ends and the water takes the loser. Tap <b>Win</b> or <b>Lose</b> to see either ending. Pick a letter (or mix), and pick the losing word at the bottom.</p>
+
+<h2>W1 The tide sweep</h2>
+<p class="why">A band of water rolls across the table from the side, like the tide coming in. A lost die is lifted off the table and carried out with it. At the end the tide rolls back in, higher, and carries the loser off the edge.</p>
+<canvas id="w1" width="160" height="200"></canvas><div class="row"><button data-c="w1" data-e="win">Win</button><button data-c="w1" data-e="lose">Lose</button></div>
+
+<h2>W2 The tentacle in the pool</h2>
+<p class="why">Water seeps up through the cracks of the table and pools round the lost die; a tentacle rises out of the pool, wraps it and pulls it under with a swirl. At the end the pool floods the whole table and the tentacle drags the loser down.</p>
+<canvas id="w2" width="160" height="200"></canvas><div class="row"><button data-c="w2" data-e="win">Win</button><button data-c="w2" data-e="lose">Lose</button></div>
+
+<h2>W3 The breaking wave</h2>
+<p class="why">A wave breaks over the far edge of the table (from behind the keeper when you lose a die, from your side when the keeper does) and a pale hand reaches out of the foam for the die. At the end a big wave breaks over the loser: over the keeper, or straight at you, filling the screen.</p>
+<canvas id="w3" width="160" height="200"></canvas><div class="row"><button data-c="w3" data-e="win">Win</button><button data-c="w3" data-e="lose">Lose</button></div>
+
+<h2>The end words</h2>
+<p class="why">Shown big, then the item's new price in glowing runes. The win word is fixed. Pick the losing word (ENGULFT stays if you do not pick).</p>
+<div class="words"><div class="win">VANQUISHT<small>win (fixed)</small></div><div>ENGULFT<small>default</small></div><div>FORFEIT</div><div>BEREFT</div><div>DROWNED</div><div>FORSAKEN</div></div>
+</main>
+<script>
+'use strict';
+const W = 160, H = 200, RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const C = { table: '#3a2616', tableHi: '#5a3a20', tableLo: '#24160c', felt: '#1e3a2c', feltHi: '#2a4e3a', die: '#e8dcc0', dieLo: '#a8987a', pip: '#2a1a12', eye: '#c4323a',
+  w1: '#1e5a6a', w2: '#2e8a9a', w3: '#7ad0d8', foam: '#e0f8f8', ink: '#0a0a14', ten: '#5a3a7a', tenHi: '#8a5aaa', hand: '#c8d8d0', keeper: '#3a5a4a', keeperHi: '#6a9a7a', ulhu: '#5aa080' };
+function R(x, y, w, h, c) { this.fillStyle = c; this.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h)); }
+// the table and the keeper: drawn the same in all three
+function scene(x, t, k, gone) {
+  const r = R.bind(x);
+  r(0, 0, W, H, '#0b0a12');
+  // keeper across the table (a hunched eel-like figure with a lantern glow)
+  const kb = Math.sin(t / 500) * 1;
+  if (k.keeper !== false) { r(56, 18 + kb, 48, 36, C.keeper); r(60, 16 + kb, 40, 4, C.keeperHi); r(66, 26 + kb, 6, 5, '#f0e0a0'); r(88, 26 + kb, 6, 5, '#f0e0a0'); r(68, 28 + kb, 2, 2, C.ink); r(90, 28 + kb, 2, 2, C.ink); r(72, 40 + kb, 16, 3, C.ink); }
+  // the table
+  r(14, 58, 132, 112, C.tableLo); r(16, 60, 128, 108, C.table); r(16, 60, 128, 2, C.tableHi); r(24, 68, 112, 92, C.felt); r(24, 68, 112, 1, C.feltHi);
+  for (let i = 0; i < 6; i++) r(30 + i * 19, 165, 8, 1, C.tableLo);
+  // dice: his row at the top of the felt, yours at the bottom
+  const die = (dx, dy, f) => { r(dx, dy, 11, 11, C.dieLo); r(dx, dy, 10, 10, C.die); if (f === 0) { r(dx + 3, dy + 3, 4, 4, C.eye); r(dx + 4, dy + 4, 2, 2, C.ink); } else for (let i = 0; i < f; i++) r(dx + 2 + (i % 2) * 4, dy + 2 + Math.floor(i / 2) * 4, 2, 2, C.pip); };
+  for (let i = 0; i < 5; i++) { if (!gone.him[i]) die(36 + i * 18, 76, (i * 3 + 1) % 4); if (!gone.you[i]) die(36 + i * 18, 144, (i * 2 + 2) % 4); }
+  // your hands (Ulhu's tentacle tips) at the bottom edge
+  if (k.you !== false) { r(40, 186, 14, 14, C.ulhu); r(106, 186, 14, 14, C.ulhu); r(42, 186, 10, 2, '#8ad0a8'); r(108, 186, 10, 2, '#8ad0a8'); }
+}
+const DIE = (who, i) => [36 + i * 18, who === 'him' ? 76 : 144];
+// a band of pixel water between yTop and yBot (or xL..xR), with a crest of foam
+function waterRect(r, x0, y0, w, h, t) {
+  for (let y = y0; y < y0 + h; y += 2) for (let x = x0; x < x0 + w; x += 2) { const n = Math.sin(x / 7 + t / 200) + Math.cos(y / 5 - t / 260); r(x, y, 2, 2, n > 1.1 ? C.w3 : n > 0 ? C.w2 : C.w1); } }
+const banner = (x, word, good) => { x.fillStyle = 'rgba(4,4,10,.72)'; x.fillRect(0, 84, W, 34); x.font = '700 17px Georgia'; x.textAlign = 'center'; x.fillStyle = good ? '#ffd56a' : '#ff7a66'; x.fillText(word, W / 2, 106);
+  x.font = '700 10px sans-serif'; x.fillStyle = '#ffe9b0'; x.fillText(good ? 'Woven rug  135' : 'Woven rug  198', W / 2, 116); };
+
+// each variation: a timeline. phase 1 (0..2.4s): you lose your 3rd die; phase 2 (2.4..5.4s): the end (ending 'win' or 'lose')
+const PLAY = { w1: 'win', w2: 'win', w3: 'win' };
+function draw(id, x, ms) {
+  const r = R.bind(x), T = ms % 6400, end = PLAY[id], gone = { him: [0, 1, 0, 0, 0], you: [1, 0, 0, 0, 0] }, k = {};
+  const p1 = Math.min(1, T / 2200), p2 = Math.max(0, Math.min(1, (T - 2600) / 2600));
+  const lost = T > 1400; if (lost) gone.you[2] = 1;
+  if (p2 > .55) { if (end === 'win') k.keeper = false; }
+  scene(x, ms, k, gone);
+  const [dx, dy] = DIE('you', 2);
+  if (id === 'w1') {
+    if (T < 2400) { const bx = -60 + p1 * 260; waterRect(r, bx, 128, 60, 34, ms); for (let y = 128; y < 162; y += 2) r(bx + 58, y, 2, 2, C.foam);
+      if (T > 900 && T < 2200) { const q = (T - 900) / 1300; r(dx + q * 120, dy - Math.sin(q * 3.14) * 10, 10, 10, C.die); } }
+    if (T >= 2600) { const lose = end === 'lose', y0 = lose ? 200 - p2 * 220 : -40 + p2 * 120, hh = 90; const bx = -170 + p2 * 330;
+      waterRect(r, bx, lose ? 110 : 0, 170, lose ? 90 : 70, ms); for (let y = lose ? 110 : 0; y < (lose ? 200 : 70); y += 2) r(bx + 168, y, 2, 2, C.foam);
+      if (lose && p2 > .6) { x.fillStyle = 'rgba(30,90,106,' + ((p2 - .6) * 2.2) + ')'; x.fillRect(0, 0, W, H); }
+      if (p2 > .75) banner(x, end === 'win' ? 'VANQUISHT' : 'ENGULFT', end === 'win'); }
+  }
+  if (id === 'w2') {
+    if (T < 2400) { const pr = Math.min(1, T / 900) * 9; for (let a = 0; a < 6.28; a += .25) { const rr = pr + Math.sin(a * 3 + ms / 150); r(dx + 5 + Math.cos(a) * rr, dy + 5 + Math.sin(a) * rr * .7, 2, 2, (a * 10 | 0) % 3 ? C.w2 : C.w1); }
+      if (T > 800 && T < 2300) { const q = (T - 800) / 1500, h = Math.sin(q * 3.14) * 22; for (let j = 0; j < h; j += 2) r(dx + 4 + Math.sin(j / 4 + ms / 120) * 3, dy + 8 - j, 4, 2, j % 4 ? C.ten : C.tenHi);
+        if (q < .55) r(dx, dy - (q * 8), 10, 10, C.die); } }
+    if (T >= 2600) { const lose = end === 'lose', cx = lose ? 80 : 80, cy = lose ? 150 : 40, rr = p2 * 120;
+      for (let y = 0; y < H; y += 2) for (let xx = 0; xx < W; xx += 2) { const d = Math.hypot(xx - cx, (y - cy) * 1.2); if (d < rr) { const n = Math.sin(d / 5 - ms / 120 + Math.atan2(y - cy, xx - cx) * 2); r(xx, y, 2, 2, n > .6 ? C.w3 : n > -.2 ? C.w2 : C.w1); } }
+      if (p2 > .3 && p2 < .9) { const q = (p2 - .3) / .6; for (let a = 0; a < 3; a++) { const bx = cx - 30 + a * 30; for (let j = 0; j < 30 * Math.sin(q * 3.14); j += 2) r(bx + Math.sin(j / 4 + ms / 100 + a) * 4, cy + (lose ? 40 : 20) - j, 4, 2, j % 4 ? C.ten : C.tenHi); } }
+      if (p2 > .75) banner(x, end === 'win' ? 'VANQUISHT' : 'ENGULFT', end === 'win'); }
+  }
+  if (id === 'w3') {
+    if (T < 2400) { const q = p1, top = 58 - 10 + Math.sin(q * 3.14) * 70; waterRect(r, 16, 58, 128, Math.max(0, top - 58), ms); for (let xx = 16; xx < 144; xx += 2) r(xx, top + Math.sin(xx / 6 + ms / 90) * 2, 2, 2, C.foam);
+      if (T > 700 && T < 2200) { const h = (T - 700) / 1500, hy = top + 2, ty = dy - (1 - Math.min(1, h * 2)) * 0; const reach = Math.min(1, h * 2); for (let j = hy; j < hy + (dy - hy) * reach; j += 2) r(dx + 3, j, 4, 2, C.hand); r(dx - 1, hy + (dy - hy) * reach - 2, 12, 4, C.hand);
+        if (h > .5) r(dx, dy - (h - .5) * 160, 10, 10, C.die); } }
+    if (T >= 2600) { const lose = end === 'lose';
+      if (!lose) { const top = Math.min(130, p2 * 170); waterRect(r, 0, 0, W, top, ms); for (let xx = 0; xx < W; xx += 2) r(xx, top + Math.sin(xx / 6 + ms / 90) * 3, 2, 2, C.foam); }
+      else { const top = H - p2 * 230; waterRect(r, 0, Math.max(0, top), W, H, ms); for (let xx = 0; xx < W; xx += 2) r(xx, top + Math.sin(xx / 6 + ms / 90) * 3, 2, 3, C.foam); }
+      if (p2 > .75) banner(x, end === 'win' ? 'VANQUISHT' : 'ENGULFT', end === 'win'); }
+  }
+}
+const cvs = ['w1', 'w2', 'w3'].map((id) => [id, document.getElementById(id).getContext('2d')]);
+document.querySelectorAll('button[data-c]').forEach((b) => b.onclick = () => { PLAY[b.dataset.c] = b.dataset.e; T0[b.dataset.c] = performance.now(); });
+const T0 = { w1: 0, w2: 1200, w3: 2400 };
+function loop(now) { cvs.forEach(([id, x]) => draw(id, x, RM ? 6000 : now - T0[id])); if (!RM) requestAnimationFrame(loop); }
+requestAnimationFrame(loop);
+</script>
+</body></html>
