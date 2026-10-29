@@ -55,9 +55,10 @@ vm.runInContext(fs.readFileSync(path.join(__dirname, 'Mailbox.gs'), 'utf8'), mb)
 
 /* ---- the school planner (only its mailbox functions are exercised) ---- */
 const schoolProps = props({ MAILBOX_URL: 'https://mailbox', MAILBOX_KEY: 'k1', PLANNER_KEY: 'pk' });
-const imported = [];
+const imported = [], schoolCache = {};
 const school = vm.createContext(Object.assign({}, common, {
   PropertiesService: { getScriptProperties: () => schoolProps },
+  CacheService: { getScriptCache: () => ({ get: (k) => (k in schoolCache ? schoolCache[k] : null), put: (k, v) => { schoolCache[k] = v; }, remove: (k) => { delete schoolCache[k]; } }) },
   UrlFetchApp: { fetch(url, opt) {
     const res = opt && opt.method === 'post'
       ? mb.doPost({ postData: { contents: opt.payload } })
@@ -85,6 +86,18 @@ r = school.pullData_();
 check(!r.pulled && imported.length === 1, 'the same file is not imported twice');
 
 check(school.pushState_() === true, 'saving at school sends planner-state.json home');
+// 1.7 (2026-10-29): the push is throttled, the page's nudge sends the last one, results and requests always push
+{
+  const writes = () => sync.files.filter((f) => f.name === 'planner-state.json').length;
+  const before = writes();
+  check(school.pushState_() === 'later' && schoolCache.pushDue === '1', 'a second save a moment later does not push again (the server says "later")');
+  check(school.pushHome('pk') === true && !schoolCache.pushDue, 'the page\'s nudge after a quiet spell sends the push that was skipped');
+  check(school.pushHome('pk') === 'nothing new', 'a nudge with nothing skipped sends nothing');
+  check(school.pushState_(true) === true, 'the daily results and "Send to Claude" always push (force)');
+  delete schoolCache.pushAt;
+  check(school.pushState_() === true, 'once the gap has passed, a save pushes again');
+  check(writes() >= before, 'planner-state.json is still written on each real push');
+}
 const st = JSON.parse(sync.files.find((f) => f.name === 'planner-state.json').text);
 check(st.weeks['2026-10-12'] && st.learned.a === 1, 'planner-state.json holds the saved weeks and equipment edits');
 

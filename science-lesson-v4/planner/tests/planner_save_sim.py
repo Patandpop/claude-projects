@@ -71,6 +71,17 @@ with sync_playwright() as p:
     check('only the changed tick travels, with the stamp the page loaded; the returned stamp is kept; an untick travels as removed: ' + r['status'],
           r['n'] == 2 and len(r['first']) == 1 and r['first'][0]['cls'] == r['cls'] and r['first'][0]['done'] is True and r['stamp1'] == 1234 and r['after1'] > 1234
           and len(r['second']) == 1 and r['second'][0].get('removed') is True and r['status'] == 'All changes saved')
+    # the push home is throttled (1.7): saves that come back "later" lead to ONE pushHome call after a quiet spell
+    r = page.evaluate("""async () => { const real = google.script.run; window.__calls = []; PUSH_NUDGE_MS = 60;
+      google.script.run = { withSuccessHandler(ok) { return { withFailureHandler(bad) { return new Proxy({}, { get(_, fn) { return (...a) => {
+        if (fn === 'saveWeek') { window.__calls.push(fn); setTimeout(() => ok({ saved: a[1].monday, home: 'later', stamp: Date.now() }), 5); return; }
+        if (fn === 'pushHome') { window.__calls.push(fn); setTimeout(() => ok('nothing new'), 0); return; }
+        return real.withSuccessHandler(ok).withFailureHandler(bad)[fn](...a); }; } }); } }; } };
+      S.dirty = true; await save(); S.dirty = true; await save(); S.dirty = true; await save();
+      await new Promise((res) => setTimeout(res, 250)); google.script.run = real;
+      return { calls: window.__calls }; }""")
+    check('three quick saves answered "later" lead to one pushHome after the pause: ' + ','.join(r['calls']),
+          r['calls'].count('saveWeek') == 3 and r['calls'].count('pushHome') == 1 and r['calls'][-1] == 'pushHome')
     check('no page errors', not errors)
     b.close()
 try: os.remove(path)

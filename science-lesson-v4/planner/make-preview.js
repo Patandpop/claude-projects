@@ -47,6 +47,7 @@ window.google = { script: { run: (function make(ok, bad) {
     saveWeeks() { setTimeout(() => ok({ saved: true }), 0); },
     saveLessons() { setTimeout(() => ok({ saved: true }), 0); },
     saveLessonChanges(k, changes) { setTimeout(() => ok({ saved: changes.length, stamp: Date.now() }), 0); },
+    pushHome() { setTimeout(() => ok('nothing new'), 0); },
     // behaviour, built in (2026-10-12): a made-up class, no real names
     init() { setTimeout(() => ok({ classes: ['7ML', '8XP'], today: ['8XP'], rules: { 2: 'Work ethic', 4: 'Attention' }, version: 22 }), 0); },
     openClass(k, cls) { setTimeout(() => ok({ students: ['Ada Lovelace', 'Alan Turing', 'Marie Curie'].map((n, i) => ({ name: n, short: n.split(' ')[0] + ' ' + n.split(' ')[1][0] + '.', x: 20 + i * 30, y: 50, support: '' })), ratio: 2.6, events: (window.__EV = window.__EV || []) }), 0); },

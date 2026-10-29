@@ -179,14 +179,24 @@ function pullData_() {
   } catch (e) { return { on: true, error: String(e.message || e) }; }
 }
 // Saved weeks, his equipment edits and added lessons, as one file for home to read.
-function pushState_() {
+// Throttled (work plan 1.7, 2026-10-29): the planner saves after every change and each push is a slow call to the
+// mailbox, so a push goes at most once every PUSH_GAP_S seconds. A skipped push is remembered ("later"), and the page
+// asks for it (pushHome) a couple of minutes after its last save, so the last change of a session reaches home too.
+// The daily results and "Send to Claude" always push (force), since home acts on them straight away.
+const PUSH_GAP_S = 180;
+function pushState_(force) {
   if (!mailboxOn_()) return null;
+  const c = CacheService.getScriptCache();
+  if (!force && c.get('pushAt')) { c.put('pushDue', '1', 21600); return 'later'; }
   try {
     const a = loadAll_(false);
     mailPost_({ op: 'write', name: 'planner-state.json', text: JSON.stringify({ saved: new Date().toISOString(), weeks: a.weeks, records: a.records, learned: a.learned, added: a.added, classSettings: a.classSettings, results: readResults_() }) });   // results: class counts only (learning loop M1)
+    c.put('pushAt', '1', PUSH_GAP_S); c.remove('pushDue');
     return true;
   } catch (e) { return String(e.message || e); }
 }
+// The page's nudge after a quiet spell: push only if a push was skipped since the last one.
+function pushHome(k) { check_(k); return CacheService.getScriptCache().get('pushDue') ? pushState_(true) : 'nothing new'; }
 // "Send to Claude": a message or a list of lessons to build, for Claude Code at home.
 /* ------------------------------------------------------------ homework quizzes
    Patryk 2026-10-08: homework from real exam questions that marks itself. At home Claude chooses the
@@ -577,14 +587,14 @@ function readResults_() {
   } catch (e) { return []; }   // no Results tab yet: nothing to send
 }
 // The daily time trigger (public so a trigger can call it; it only reads Forms and writes class counts).
-function dailyResults() { refreshResults_(); pushState_(); }
+function dailyResults() { refreshResults_(); pushState_(true); }
 // "Turn on daily results": one trigger, 6-7am, never two. Also runs it once now.
 function turnOnDailyResults(k) {
   check_(k);
   if (!ScriptApp.getProjectTriggers().some((t) => t.getHandlerFunction() === 'dailyResults'))
     ScriptApp.newTrigger('dailyResults').timeBased().everyDays(1).atHour(6).create();
   const res = refreshResults_();
-  pushState_();
+  pushState_(true);
   return { on: true, homeworks: res.length };
 }
 // His grade boundaries (% for each grade), one list per key stage: { ks3: [...], ks4: [...], ks5: [...] }.
@@ -860,6 +870,7 @@ function classroomDraft_(hw, form, opt) {
 function sendRequest(k, req) {
   check_(k);
   if (!mailboxOn_()) throw new Error('The mailbox is not set up yet (see the setup guide: MAILBOX_URL and MAILBOX_KEY).');
+  pushState_(true);   // home reads the request against the latest saved weeks (1.7: always, never throttled)
   const o = mailPost_({ op: 'request', kind: req.kind, text: req.text, lessons: req.lessons || [] });
   return { id: o.id };
 }

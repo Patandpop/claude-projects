@@ -394,6 +394,10 @@ const tryTwice = (fn, ...a) => run(fn, ...a).catch((e) => isStale(e) ? Promise.r
 // school can never wipe ticks made at home. Ticks travel as the changed records only, merged by lesson, and the
 // server sends back every record as it now stands, so ticks made elsewhere appear here without a reload.
 const weekStamp = (mon) => (S.weekStamps[mon] === undefined ? null : S.weekStamps[mon]);
+// The push home is throttled on the server (1.7); when a save says "later", ask for the push after a quiet spell,
+// so the last change of a session still reaches home. Reset on every save, so one push follows the burst.
+let PUSH_NUDGE_MS = 150000, pushTimer = null;
+function nudgeHome(r) { if (!r || r.home !== 'later') return; clearTimeout(pushTimer); pushTimer = setTimeout(() => run('pushHome').catch(() => {}), PUSH_NUDGE_MS); }
 function takeRecords(r, sentJson) {
   S.recStamp = r.stamp || S.recStamp;
   if (!r.records) { S.recSaved = sentJson; return; }
@@ -415,7 +419,7 @@ function save() {
   const failed = []; let stale = false;
   const part = (what, fn, ...a) => tryTwice(fn, ...a).then((r) => r || true, (e) => { if (isStale(e)) stale = true; failed.push(what + ' (' + e.message + ')'); return false; });
   S.saving++;
-  const week = part('this week', 'saveWeek', wk, weekStamp(wk.monday)).then((r) => { if (r) { S.weeks[wk.monday] = wk; if (r.stamp) S.weekStamps[wk.monday] = r.stamp; } return !!r; });
+  const week = part('this week', 'saveWeek', wk, weekStamp(wk.monday)).then((r) => { if (r) { S.weeks[wk.monday] = wk; if (r.stamp) S.weekStamps[wk.monday] = r.stamp; nudgeHome(r); } return !!r; });
   const changes = recs === S.recSaved ? [] : P.recordChanges(JSON.parse(S.recSaved || '[]'), JSON.parse(recs));
   const ticks = !changes.length ? Promise.resolve(true) : part('lesson ticks', 'saveLessonChanges', changes, S.recStamp).then((r) => { if (r) takeRecords(r, recs); return !!r; });
   // slide-over (2026-10-12): later saved weeks re-plan now, not only when opened
@@ -424,7 +428,7 @@ function save() {
     const moved = P.cascade(S.data, S.weeks, wk.monday, todayMidnight(), S.learned);
     if (!moved.length) return true;
     return part('later weeks', 'saveWeeks', moved, moved.map((x) => weekStamp(x.monday))).then((r) => {
-      if (r) { Object.assign(S.weekStamps, r.stamps || {}); toast('Later weeks moved along: w/c ' + moved.map((x) => fmtDate(x.monday)).join(', ')); }
+      if (r) { Object.assign(S.weekStamps, r.stamps || {}); nudgeHome(r); toast('Later weeks moved along: w/c ' + moved.map((x) => fmtDate(x.monday)).join(', ')); }
       return !!r;
     });
   });
