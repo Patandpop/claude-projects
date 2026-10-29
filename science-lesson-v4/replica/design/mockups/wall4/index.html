@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Moon Day Blocks</title>
+<style>
+:root{color-scheme:dark;--bg:#0a0d14;--card:#10141d;--ink:#e8ebf2;--mute:#9ca3b4;--line:#222838;--lightg:#f3e3b8;--focus:#9fd7ff}
+html,body{background:var(--bg);margin:0}
+body{color:var(--ink);font:15px/1.45 system-ui,'Segoe UI',sans-serif;background:radial-gradient(ellipse at 50% -10%,#1a2033,var(--bg) 60%) fixed;overflow-x:hidden}
+main{max-width:412px;margin:0 auto;padding:16px;box-sizing:border-box}
+h1{font:700 28px/1.05 Georgia,serif;margin:0 0 6px;color:var(--lightg);text-shadow:0 0 18px rgba(240,210,150,.3)}
+p{margin:4px 0}
+.mute{color:var(--mute);font-size:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px;margin-top:16px}
+.card h3{font:700 17px/1.15 Georgia,serif;margin:0;color:var(--ink)}
+.code{display:inline-block;font:700 11px system-ui,sans-serif;letter-spacing:.06em;color:#0b0d12;background:var(--lightg);border-radius:3px;padding:1px 6px;margin-right:6px;vertical-align:2px}
+.cap{font-size:13px;color:var(--mute);margin:3px 0 0}
+.chooser{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.chooser button{min-height:32px;padding:0 11px;border-radius:16px;border:1.5px solid #333b52;background:#151a26;font:700 12.5px system-ui,sans-serif;color:#d0d5e0;cursor:pointer}
+.chooser button[aria-pressed="true"]{border-color:#c9a24a;background:#2a2410;color:var(--lightg)}
+button:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+svg.wall{display:block;width:100%;max-width:360px;height:auto;margin:10px auto 0;touch-action:manipulation}
+svg.wall .pc{cursor:pointer}
+.info{min-height:20px;margin-top:8px;padding:6px 9px;border-radius:7px;background:#0b0e15;border:1px solid #1f2535;font-size:13px;color:#d6dbe6}
+.info b{color:var(--lightg)}
+.key{display:grid;grid-template-columns:1fr 1fr;gap:5px 10px;margin-top:8px;font-size:12.5px;color:#c4cad6}
+.key span{display:flex;align-items:center;gap:6px}
+.key svg{flex:none}
+</style>
+</head>
+<body>
+<main>
+<h1>Moon day blocks</h1>
+<p class="mute">Two made-up weeks. Each square is one day: the round moon is five wedges, one per period. Inner piece = the lesson, outer rim piece = its homework. Tap any piece.</p>
+<div id="cards"></div>
+</main>
+
+<script>
+/* ---------- made-up two weeks (periods 1 to 5) ---------- */
+const DAYS=['Mon 2 Nov','Tue 3 Nov','Wed 4 Nov','Thu 5 Nov','Fri 6 Nov','Mon 9 Nov','Tue 10 Nov','Wed 11 Nov','Thu 12 Nov','Fri 13 Nov'];
+const DL=['M','T','W','T','F'];
+const SCHED=[
+ [[1,'9AS'],[2,'10S2'],[3,'12C'],[5,'7MLA']],
+ [[1,'11S2'],[3,'12C'],[5,'8XP']],
+ [[1,'13D'],[4,'9XS']],
+ [[1,'10C2'],[2,'8AG'],[3,'11S2'],[4,'9AS'],[5,'13D']],
+ [[1,'12C'],[4,'7MLA'],[5,'10S2']],
+ [[2,'9XS'],[3,'10S2'],[5,'8XP']],
+ [[1,'11S2'],[2,'13D'],[4,'12C'],[5,'7MLA']],
+ [[2,'12C'],[5,'9AS']],
+ [[1,'10C2'],[2,'8AG'],[3,'11S2'],[4,'9XS'],[5,'13D']],
+ [[2,'13D'],[4,'10S2'],[5,'9AS']]
+];
+// Homework needed? A level every lesson, KS4 most, KS3 only some (made up).
+const NOHW=new Set(['0-5','1-5','4-4','5-5','6-5','8-2']);
+const LESSONS=[];
+SCHED.forEach((d,di)=>d.forEach(([p,c])=>LESSONS.push({day:di,per:p,cls:c,needHw:!NOHW.has(di+'-'+p),i:LESSONS.length})));
+const N=LESSONS.length;
+const CLASSCOL={'7MLA':'#ff7a5c','8XP':'#f2a541','8AG':'#f5d142','9AS':'#7fd36b','9XS':'#3fcf8a','10C2':'#3fd6c6','10S2':'#3fb4e8','11S2':'#6a8cff','12C':'#b98bff','13D':'#e870d8'};
+const STATES={behind:'Behind',track:'On track',ahead:'Well ahead'};
+// built: lesson made; hwSet: homework given out
+function statusFor(s){return LESSONS.map(l=>{
+  let b,h;
+  if(s==='ahead'){b=true;h=true;}
+  else if(s==='track'){if(l.day<5){b=true;h=true}else{const k=l.i-LESSONS.findIndex(x=>x.day>=5);b=k<9;h=k<5}}
+  else{b=l.i<7;h=l.i<4}
+  return {built:b,hw:l.needHw?(h&&b?'set':'needed'):'none'}})}
+
+/* ---------- geometry ---------- */
+const S=64,GAP=10,TOP=14,ROWGAP=10;
+const CX=S/2,CY=S/2,R=24.5,RIM=3.2,RI=R*.74; // moon radius, gold rim band width, lesson/homework split
+const P=(r,a)=>[CX+r*Math.cos(a),CY+r*Math.sin(a)];
+const f=n=>n.toFixed(2);
+const ANG=k=>-Math.PI/2+k*2*Math.PI/5;
+// where a ray from the centre at angle a hits the square edge (inset 0)
+function edge(a){const c=Math.cos(a),s=Math.sin(a),h=S/2;const t=Math.min(Math.abs(c)>1e-9?h/Math.abs(c):1e9,Math.abs(s)>1e-9?h/Math.abs(s):1e9);return[CX+c*t,CY+s*t]}
+// square corners in angle order between a1 and a2
+function cornersBetween(a1,a2){const out=[];[[S,S,Math.PI/4],[0,S,3*Math.PI/4],[0,0,5*Math.PI/4],[S,0,7*Math.PI/4]].forEach(([x,y,a])=>{
+  let aa=a;while(aa<a1)aa+=2*Math.PI;if(aa<a2)out.push([aa,x,y])});return out.sort((p,q)=>p[0]-q[0]).map(p=>[p[1],p[2]])}
+// piece between radius r0 circle and the square, from angle a1 to a2 (a2>a1)
+function outerSector(r0,a1,a2){const p1=P(r0,a1),e1=edge(a1),e2=edge(a2),p2=P(r0,a2);
+  let d='M'+f(p1[0])+' '+f(p1[1])+'L'+f(e1[0])+' '+f(e1[1]);
+  cornersBetween(a1,a2).forEach(c=>d+='L'+c[0]+' '+c[1]);
+  d+='L'+f(e2[0])+' '+f(e2[1])+'L'+f(p2[0])+' '+f(p2[1])+'A'+r0+' '+r0+' 0 0 0 '+f(p1[0])+' '+f(p1[1])+'Z';return d}
+// annulus piece between radii, angle a1..a2
+function ring(r0,r1,a1,a2){const a=P(r1,a1),b=P(r1,a2),c=P(r0,a2),d=P(r0,a1),lg=(a2-a1)>Math.PI?1:0;
+  return 'M'+f(a[0])+' '+f(a[1])+'A'+r1+' '+r1+' 0 '+lg+' 1 '+f(b[0])+' '+f(b[1])+'L'+f(c[0])+' '+f(c[1])+'A'+r0+' '+r0+' 0 '+lg+' 0 '+f(d[0])+' '+f(d[1])+'Z'}
+// moon wedge pieces: inner triangle (lesson) and outer trapezoid with arc (homework)
+function wedge(k){const a1=ANG(k),a2=ANG(k+1),i1=P(RI,a1),i2=P(RI,a2),o1=P(R,a1),o2=P(R,a2);
+  return{lesson:'M'+CX+' '+CY+'L'+f(i1[0])+' '+f(i1[1])+'L'+f(i2[0])+' '+f(i2[1])+'Z',
+    hw:'M'+f(i1[0])+' '+f(i1[1])+'L'+f(o1[0])+' '+f(o1[1])+'A'+R+' '+R+' 0 0 1 '+f(o2[0])+' '+f(o2[1])+'L'+f(i2[0])+' '+f(i2[1])+'Z',
+    mid:(a1+a2)/2}}
+const WEDGES=[0,1,2,3,4].map(wedge);
+
+/* ---------- the three variations (palette + filler-corner pattern only) ---------- */
+const VARS=[
+ {id:'MD-1',title:'Deep blue night, gold rim',cap:'Night-blue corner glass cut into fans, a gold ring holding each moon.',
+  corners:['#1a2752','#22336b','#16224a','#2b3d7c','#1e2c60'],rim:['#e2b44c','#c9932f'],
+  free:'#6f8fa3',noHw:'#7a72a8',hwSet:'#f4f1e2',unlit:'#161a24',
+  pattern:{rays:[0,1,2,3,4,5,6,7].map(k=>k*Math.PI/4+Math.PI/8)}},
+ {id:'MD-2',title:'Sea-green and amber',cap:'Sea-green corners in a tighter fan, with an amber ring.',
+  corners:['#14423f','#1b5550','#123733','#22645a','#184a44'],rim:['#f0a945','#c97d22'],
+  free:'#7aa3a0',noHw:'#93a87a',hwSet:'#fbefd2',unlit:'#141b1b',
+  pattern:{rays:Array.from({length:12},(_,k)=>k*Math.PI/6+Math.PI/12)}},
+ {id:'MD-3',title:'Violet and silver',cap:'Violet corners split twice: a fan, then a second leaded band around the silver ring.',
+  corners:['#2c1d4d','#3a2763','#241844','#46307a','#33225a'],rim:['#d9dee8','#9aa3b6'],
+  free:'#8b8fb0',noHw:'#a77f9c',hwSet:'#f3eefc',unlit:'#17141f',
+  pattern:{rays:[0,1,2,3,4,5,6,7].map(k=>k*Math.PI/4),band:R+RIM+6}}
+];
+
+function mixHex(a,b,t){const A=[1,3,5].map(i=>parseInt(a.substr(i,2),16)),B=[1,3,5].map(i=>parseInt(b.substr(i,2),16));
+  return '#'+A.map((v,i)=>Math.round(v+(B[i]-v)*t).toString(16).padStart(2,'0')).join('')}
+
+function buildSVG(v,st,uid){
+  const defs=[],grads={};
+  // lit glass: light through glass, bright core, deeper edge
+  function lit(col){if(grads[col])return grads[col];const id=uid+'g'+Object.keys(grads).length;grads[col]='url(#'+id+')';
+    defs.push('<radialGradient id="'+id+'" cx="45%" cy="40%" r="75%"><stop offset="0" stop-color="'+mixHex(col,'#ffffff',.55)+'"/><stop offset=".55" stop-color="'+col+'"/><stop offset="1" stop-color="'+mixHex(col,'#000000',.32)+'"/></radialGradient>');return grads[col]}
+  // muted filler glass: gentle gradient, no glow
+  function muted(col){const key='m'+col;if(grads[key])return grads[key];const id=uid+'m'+Object.keys(grads).length;grads[key]='url(#'+id+')';
+    defs.push('<linearGradient id="'+id+'" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="'+mixHex(col,'#ffffff',.12)+'"/><stop offset="1" stop-color="'+mixHex(col,'#000000',.25)+'"/></linearGradient>');return grads[key]}
+  defs.push('<filter id="'+uid+'tex" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="1.1" numOctaves="2" seed="4" result="n"/><feColorMatrix in="n" type="matrix" values="0 0 0 0 .55  0 0 0 0 .58  0 0 0 0 .66  0 0 0 .22 0" result="c"/><feComposite in="c" in2="SourceGraphic" operator="in" result="t"/><feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="t"/></feMerge></filter>');
+  defs.push('<filter id="'+uid+'bloom" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="1.8"/></filter>');
+  const unlitFill=muted(v.unlit);
+  let glassLayer='',bloomLayer='',leadLayer='';
+  const W=5*S+4*GAP,H=TOP+2*S+ROWGAP;
+  let labels='';for(let c=0;c<5;c++)labels+='<text x="'+(c*(S+GAP)+S/2)+'" y="10" text-anchor="middle" font-size="9" font-weight="700" fill="#aab2c4" font-family="system-ui,sans-serif">'+DL[c]+'</text>';
+  const LEAD='stroke="#0a090c" stroke-width="1.7" stroke-linejoin="round"';
+  for(let d=0;d<10;d++){
+    const ox=(d%5)*(S+GAP),oy=TOP+(d>=5?S+ROWGAP:0),T='transform="translate('+ox+' '+oy+')"';
+    let g='';
+    // filler corners: pieces between the rim ring and the square edge, cut along rays
+    const rays=v.pattern.rays,r0=R+RIM;
+    for(let k=0;k<rays.length;k++){const a1=rays[k],a2=rays[(k+1)%rays.length]+(k===rays.length-1?2*Math.PI:0);
+      const col=v.corners[(k*3+d)%v.corners.length];
+      if(v.pattern.band){ // MD-3: inner leaded band, then outer corner piece
+        g+='<path d="'+ring(r0,v.pattern.band,a1,a2)+'" fill="'+muted(v.corners[(k+1+d)%v.corners.length])+'" '+LEAD+'/>';
+        g+='<path d="'+outerSector(v.pattern.band,a1,a2)+'" fill="'+muted(col)+'" '+LEAD+'/>';
+      } else g+='<path d="'+outerSector(r0,a1,a2)+'" fill="'+muted(col)+'" '+LEAD+'/>';
+    }
+    // gold/amber/silver rim ring, cut in 10 pieces in line with the wedges
+    for(let k=0;k<10;k++){const a1=-Math.PI/2+k*Math.PI/5,a2=a1+Math.PI/5;
+      g+='<path d="'+ring(R,r0,a1,a2)+'" fill="'+lit(k%2?v.rim[1]:v.rim[0])+'" '+LEAD+'/>'}
+    // moon: 5 wedges, each split lesson / homework
+    for(let p=1;p<=5;p++){const w=WEDGES[p-1],l=LESSONS.find(x=>x.day===d&&x.per===p);
+      let lf,hf,lOn=false,hOn=false;
+      if(!l){lf=lit(v.free);hf=lit(v.noHw);lOn=hOn='calm'}
+      else{const s=st[l.i];
+        if(s.built){lf=lit(CLASSCOL[l.cls]);lOn=true}else lf=unlitFill;
+        if(s.hw==='set'){hf=lit(v.hwSet);hOn=true}else if(s.hw==='none'){hf=lit(v.noHw);hOn='calm'}else hf=unlitFill}
+      const tag=(part)=>'class="pc" data-d="'+d+'" data-p="'+p+'" data-part="'+part+'"';
+      const one=(path,fill,on,part)=>{
+        const filt=on?'':' filter="url(#'+uid+'tex)"';
+        const op=on==='calm'?' fill-opacity=".78"':'';
+        g+='<path '+tag(part)+' d="'+path+'" fill="'+fill+'"'+op+filt+' '+LEAD+'/>';
+        if(on===true)bloomLayer+='<path d="'+path+'" fill="'+fill+'" '+T+'/>';
+        leadLayer+='<path d="'+path+'" fill="none" stroke="#0a090c" stroke-width="1.5" stroke-linejoin="round" '+T+'/>'};
+      one(w.lesson,lf,lOn,'lesson');one(w.hw,hf,hOn,'hw');
+    }
+    // outer frame of the block (heavier lead came)
+    g+='<rect x=".9" y=".9" width="'+(S-1.8)+'" height="'+(S-1.8)+'" fill="none" stroke="#0a090c" stroke-width="2.4" rx="1.5"/>';
+    glassLayer+='<g '+T+'>'+g+'</g>';
+  }
+  return '<svg class="wall" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+v.title+'"><defs>'+defs.join('')+'</defs>'+labels+glassLayer+
+    '<g filter="url(#'+uid+'bloom)" opacity=".4" style="mix-blend-mode:screen" pointer-events="none">'+bloomLayer+'</g><g pointer-events="none">'+leadLayer+'</g><g class="sel" pointer-events="none"></g></svg>';
+}
+
+function swatch(fill,texture){return '<svg width="18" height="14" viewBox="0 0 18 14"><rect x="1" y="1" width="16" height="12" rx="1" fill="'+fill+'" stroke="#0a090c" stroke-width="1.7"/>'+(texture?'<path d="M3 4h3M9 9h4M11 4h2" stroke="#2a2f3c" stroke-width="1"/>':'')+'</svg>'}
+
+function describe(d,p,part,st){const l=LESSONS.find(x=>x.day===d&&x.per===p);
+  const base='<b>'+DAYS[d]+', P'+p;
+  if(!l)return base+'</b>: free period ('+(part==='lesson'?'lesson piece':'homework piece')+').';
+  const s=st[l.i];
+  if(part==='lesson')return base+', '+l.cls+', lesson</b>: '+(s.built?'built.':'not built yet.');
+  return base+', '+l.cls+', homework</b>: '+(s.hw==='set'?'homework set.':s.hw==='none'?'no homework needed.':'homework needed, not set yet.')}
+
+const cards=document.getElementById('cards');
+VARS.forEach((v,vi)=>{
+  const card=document.createElement('section');card.className='card';
+  card.innerHTML='<h3><span class="code">'+v.id+'</span>'+v.title+'</h3><p class="cap">'+v.cap+'</p><div class="chooser"></div><div class="wallbox"></div><div class="info">Tap a piece.</div>'+
+   '<div class="key">'+
+   '<span>'+swatch('#3fb4e8')+'Built (class colour)</span>'+
+   '<span>'+swatch(v.unlit,1)+'Not built</span>'+
+   '<span>'+swatch(v.free)+'Free period</span>'+
+   '<span>'+swatch(v.hwSet)+'Homework set</span>'+
+   '<span>'+swatch(v.unlit,1)+'Homework needed</span>'+
+   '<span>'+swatch(v.noHw)+'No homework needed</span></div>';
+  cards.appendChild(card);
+  const ch=card.querySelector('.chooser'),box=card.querySelector('.wallbox'),info=card.querySelector('.info');
+  let state='track',st;
+  function render(){st=statusFor(state);box.innerHTML=buildSVG(v,st,'v'+vi);
+    ch.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.s===state));
+    const b=st.filter(s=>s.built).length,need=st.filter(s=>s.hw!=='none').length,h=st.filter(s=>s.hw==='set').length;
+    info.innerHTML='Built <b>'+b+'</b> of '+N+' lessons, homework set <b>'+h+'</b> of '+need+'. Tap a piece.'}
+  Object.entries(STATES).forEach(([k,t])=>{const b=document.createElement('button');b.textContent=t;b.dataset.s=k;b.onclick=()=>{state=k;render()};ch.appendChild(b)});
+  box.addEventListener('click',e=>{const pc=e.target.closest('.pc');if(!pc)return;
+    const d=+pc.dataset.d,p=+pc.dataset.p,part=pc.dataset.part;info.innerHTML=describe(d,p,part,st);
+    const sel=box.querySelector('.sel');sel.innerHTML='<path d="'+pc.getAttribute('d')+'" transform="'+pc.parentNode.getAttribute('transform')+'" fill="none" stroke="#ffffff" stroke-width="1.6"/>'});
+  render();
+});
+</script>
+</body>
+</html>
