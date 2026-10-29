@@ -43,6 +43,8 @@ scientist-league.html
 classroom-jeopardy.html
 Students*.csv
 exam-usage.json
+exam-usage-backups/
+exam-usage.json.tmp-*
 exam-lesson-picks.json
 homework-out/
 planner/planner-data.json

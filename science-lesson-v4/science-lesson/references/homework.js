@@ -126,7 +126,7 @@ async function main() {
   await hb.writeDocx(hb.bookletChildren(chosen, meta, FIGS, false), booklet);
   await hb.writeDocx(hb.answerChildren(chosen, meta), answers);
   usage[cls + ':homework'] = [...used, ...chosen.map((q) => q.id)];
-  fs.writeFileSync(ep.USAGE, JSON.stringify(usage, null, 1), 'utf8');
+  ep.saveUsage(usage);
   console.log(`\n  booklet     -> ${booklet}\n  mark scheme -> ${answers}\n`);
 }
 

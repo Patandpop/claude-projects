@@ -59,6 +59,7 @@ const ROOT = path.join(__dirname, '..', '..');
 const LIB = path.join(ROOT, 'exam-library');
 const FIGS = path.join(LIB, 'figures');
 const USAGE = path.join(ROOT, 'exam-usage.json');
+const { loadUsage, saveUsage } = require('./exam-usage.js');   // 2026-10-29: safe read and write of the record
 const FONT = 'Arial';                       // exam papers are Arial, not the lesson house font
 const SZ = 24;                              // 12pt (2026-10-15: 11pt read cramped)
 const readJson = (f, d) => { try { return JSON.parse(fs.readFileSync(f, 'utf8')); } catch (_) { return d; } };
@@ -318,7 +319,7 @@ function choose(o) {
     }
     return [...new Set(words.concat((o.exclude || []).map((w) => w.toLowerCase())))];
   })();
-  const usage = readJson(USAGE, {});
+  const usage = loadUsage();
   const used = new Set([...(usage[o.cls] || []), ...(usage[o.cls + ':homework'] || []), ...(usage[o.cls + ':test'] || [])]);
   const papers = [];
   if (ks === 'ks5' && o.same) {
@@ -1078,10 +1079,10 @@ async function build(o) {
     }
   }
   if (!o.noRecord) {
-    const u = readJson(USAGE, {});
+    const u = loadUsage();
     const ids = pick.papers.flatMap((p) => [...(p.sectionA || []), ...p.questions].map((q) => q.id));
     u[o.cls + ':homework'] = [...new Set([...(u[o.cls + ':homework'] || []), ...ids])];
-    fs.writeFileSync(USAGE, JSON.stringify(u, null, 1), 'utf8');
+    saveUsage(u);
   }
   console.log(`\nwritten to ${outDir}:\n  ` + files.join('\n  '));
   if (formFiles.length) console.log(`Forms quizzes (planner Homework tab): ${formFiles.join(', ')}`);

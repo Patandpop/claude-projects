@@ -24,6 +24,7 @@ const path = require('path');
 const ROOT = path.join(__dirname, '..', '..');
 const DOCS = path.join(ROOT, 'exam-library', 'docs');
 const USAGE = path.join(ROOT, 'exam-usage.json');
+const { loadUsage, saveUsage } = require('./exam-usage.js');   // 2026-10-29: safe read and write of the record
 const readJson = (f, d) => { try { return JSON.parse(fs.readFileSync(f, 'utf8')); } catch (_) { return d; } };
 const norm = (s) => String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
 
@@ -49,7 +50,7 @@ function standsAlone(p) {
 function pick(spec, classes, opts) {
   const o = opts || {};
   const per = o.per || 3;
-  const usage = readJson(USAGE, {});
+  const usage = loadUsage();
   const used = new Set(classes.flatMap((c) => [...(usage[c] || []), ...(usage[c + ':homework'] || []), ...(usage[c + ':test'] || [])]));
   const docs = fs.readdirSync(DOCS).map((f) => ({ f, d: readJson(path.join(DOCS, f), null) })).filter((x) => x.d && x.d.subject === 'Physics');
   const taken = new Set(), stems = new Set();
@@ -84,10 +85,10 @@ function pick(spec, classes, opts) {
 }
 
 function record(ext, classes) {
-  const u = readJson(USAGE, {});
+  const u = loadUsage();
   const refs = ext.flatMap((c) => c.questions.map((q) => q.ref));
   classes.forEach((c) => { u[c] = [...new Set([...(u[c] || []), ...refs])]; });
-  fs.writeFileSync(USAGE, JSON.stringify(u, null, 1));
+  saveUsage(u);
 }
 
 module.exports = { pick, record, standsAlone, answerOf };

@@ -28,6 +28,7 @@ const { applyToCatalogue } = require('./exam-categories-apply.js');
 const ROOT = path.join(__dirname, '..', '..');
 const LIB = path.join(ROOT, 'exam-library');
 const USAGE = path.join(ROOT, 'exam-usage.json');
+const XU = require('./exam-usage.js');
 const PICKS = path.join(ROOT, 'exam-lesson-picks.json');
 
 // Drive topic code (start of meta.macrotopic) -> library topic. Library = AQA GCSE spec names.
@@ -106,9 +107,9 @@ function score(q, lw) {
   return s;
 }
 
-function loadUsage() {
-  try { return JSON.parse(fs.readFileSync(USAGE, 'utf8')); } catch { return {}; }
-}
+// exam-usage.js owns the file (2026-10-29): a damaged record stops the pick instead of looking empty
+function loadUsage() { return XU.loadUsage(); }
+function saveUsage(u) { return XU.saveUsage(u); }
 // One lesson = class + topic + lesson number (title when there is no number).
 function lessonKey(m) {
   const n = m.lessonNumber != null && m.lessonNumber !== '' ? 'L' + m.lessonNumber : String(m.title || m.topic || '').trim().toLowerCase();
@@ -279,7 +280,7 @@ function recordUse(cls, ids) {
   if (!cls || !ids.length || process.env.NO_UPLOAD) return;
   const u = loadUsage();
   u[cls] = [...new Set([...(u[cls] || []), ...ids])];
-  fs.writeFileSync(USAGE, JSON.stringify(u, null, 1), 'utf8');
+  saveUsage(u);
   // and which lesson got them, so a rebuild of that lesson shows the same question
   const mine = ids.map((id) => [id, pending.get(id)]).filter(([, p]) => p && p.key.split('|')[0] === cls);
   if (!mine.length) return;
@@ -288,7 +289,7 @@ function recordUse(cls, ids) {
   fs.writeFileSync(PICKS, JSON.stringify(picks, null, 1), 'utf8');
 }
 
-module.exports = { pickForLesson, recordUse, loadUsage, loadPicks, lessonKey, PICKS, variants, subtopicTopics, candidates, damaged, paperOnly, noData, AQA_TOPIC, USAGE };
+module.exports = { pickForLesson, recordUse, loadUsage, saveUsage, loadPicks, lessonKey, PICKS, variants, subtopicTopics, candidates, damaged, paperOnly, noData, AQA_TOPIC, USAGE };
 
 if (require.main === module) {
   const f = process.argv[2];

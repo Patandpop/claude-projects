@@ -612,7 +612,7 @@ async function main() {
   await hb.writeDocx(answersDocx(h), path.join(outDir, `${cls} ${p.topicFolder} Answers.docx`));
   if (!a.includes('--no-record')) {
     p.usage[cls + ':homework'] = [...new Set([...(p.usage[cls + ':homework'] || []), ...p.chosen.map((q) => q.id)])];
-    fs.writeFileSync(ep.USAGE, JSON.stringify(p.usage, null, 1), 'utf8');
+    ep.saveUsage(p.usage);
   }
   console.log(`\n  -> ${outDir}`);
 }

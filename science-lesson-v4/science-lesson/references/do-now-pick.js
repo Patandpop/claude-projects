@@ -42,7 +42,7 @@ const norm = (s) => String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').tr
 // so the match is on the first words of the question.
 const HW_KEY = (s) => norm(String(s || '').replace(/\[(FIG|TABLE):\d+\]/g, ' ')).slice(0, 60);
 function homeworkKeys(cls, usage) {
-  const u = usage || readJson(path.join(ROOT, 'exam-usage.json'), {});
+  const u = usage || require('./exam-usage.js').loadUsage();   // 2026-10-29: a damaged record stops the pick instead of looking empty
   const refs = [...(u[cls + ':homework'] || []), ...(u[cls + ':test'] || [])];
   const keys = new Set(), docs = new Map();
   for (const r of refs) {

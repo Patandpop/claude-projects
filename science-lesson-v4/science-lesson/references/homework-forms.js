@@ -36,6 +36,7 @@ const { msPlain, markPoints, numberAnswer } = require('./ms-friendly.js');
 const ROOT = path.join(__dirname, '..', '..');
 const LIB = path.join(ROOT, 'exam-library');
 const USAGE = path.join(ROOT, 'exam-usage.json');
+const { loadUsage, saveUsage } = require('./exam-usage.js');   // 2026-10-29: safe read and write of the record
 const SYNC = 'G:\\My Drive\\Beechen Cliff Science\\Admin\\Planner Sync';
 const readJson = (f, d) => { try { return JSON.parse(fs.readFileSync(f, 'utf8')); } catch (_) { return d; } };
 
@@ -91,7 +92,7 @@ function choose(cls, opts) {
   if (!c) throw new Error(`${cls}: not in planner-data.json`);
   const year = c.year;
   const today = o.today || new Date().toISOString().slice(0, 10);
-  const usage = readJson(USAGE, {});
+  const usage = loadUsage();
   const used = new Set([...(usage[cls + ':homework'] || []), ...(usage[cls + ':test'] || [])]);   // never a question on their test
   const pool = poolFor(cls, year).filter((x) => !used.has(x.id));
 
@@ -275,9 +276,9 @@ function write(hw, dryRun) {
   delete hw.file;
   fs.writeFileSync(file, JSON.stringify(hw, null, 1));
   fs.appendFileSync(path.join(dir, 'sync-log.txt'), new Date().toISOString().slice(0, 16).replace('T', ' ') + `  wrote ${path.basename(file)}\n`);
-  const usage = readJson(USAGE, {});
+  const usage = loadUsage();
   usage[hw.cls + ':homework'] = [...new Set([...(usage[hw.cls + ':homework'] || []), ...hw.questions.map((q) => q.ref)])];
-  fs.writeFileSync(USAGE, JSON.stringify(usage, null, 1));
+  saveUsage(usage);
   return file;
 }
 
