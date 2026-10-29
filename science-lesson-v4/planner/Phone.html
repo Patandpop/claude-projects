@@ -928,13 +928,14 @@ function render() { if (S.tab === 'log') renderStudents(); if (S.tab === 'day') 
 // Each class's last loaded data is kept on the phone, so it still shows with no signal.
 function cacheKey(c) { return 'class:' + c; }
 function queued(c) { return getQueue().filter(q => q.cls === c).flatMap(q => q.names.map(n => ({ id: 'q' + q.ts, t: '', name: n, type: q.type, rule: q.rule || 0, queued: true }))); }
-async function loadClass(cls) {
-  S.cls = cls; if (S.vote && S.vote.on) loadVote(); $('clsTitle').textContent = cls; $('clsTitle').classList.toggle('clsTitleLong', cls.length > 6); renderChips();
+async function loadClass(cls, savedOnly) {
+  S.cls = cls; if (!savedOnly && S.vote && S.vote.on) loadVote(); $('clsTitle').textContent = cls; $('clsTitle').classList.toggle('clsTitleLong', cls.length > 6); renderChips();
   const cached = (() => { try { return JSON.parse(LS.get(cacheKey(cls)) || 'null'); } catch (e) { return null; } })();
   // show this class straight away (saved copy, or empty), never the previous class's lists
   S.students = cached ? cached.students : []; S.ratio = cached ? cached.ratio : 2.6; S.silence = cached ? cached.silence : null;
   S.events = (cached ? cached.events : []).concat(queued(cls));
   if (cached) render(); else { $('studs').innerHTML = '<p class="note">Loading</p>'; $('lesson').innerHTML = ''; }
+  if (savedOnly) return;   // instant open: the saved copy only, no server call (opening a class also moves the board)
   try {
     const d = await call('openClass', cls);
     if (S.cls !== cls) return;
@@ -1028,14 +1029,32 @@ $('dotBtn').addEventListener('click', () => {
 });
 applyTheme(); updateHint(); renderSettings(); keepAwake();
 
-call('init').then(d => {
+function applyInit(d) {
   RULES = d.rules; CLASSES = d.classes; TODAY = d.today; if (d.limit) LIMIT = d.limit;
   $('when').textContent = `Week ${d.week}, ${new Date().toLocaleDateString('en-GB', { weekday:'long' })}  (app 20, server ${d.version || 'old'})`;
+}
+const firstClass = d => CLASSES.includes(d.active) ? d.active : (TODAY[0] || CLASSES[0]);
+// Instant open (Lane C quick win, 29 Oct 2026): the last answer to init is kept on the phone and drawn straight away with
+// that class's saved copy, before Google answers. Silence and timers wait for the fresh answer; yesterday's timetable is dropped.
+let shownSaved = '', initFresh = false;
+(() => {
+  let c = null; try { c = JSON.parse(LS.get('initCopy') || 'null'); } catch (e) { c = null; }
+  if (!c || !c.d || !c.d.classes || !c.d.classes.length) return;
+  const d = Object.assign({}, c.d); if (c.day !== new Date().toDateString()) { d.today = []; d.week = d.week + ' (saved)'; }
+  applyInit(d); shownSaved = firstClass(d); loadClass(shownSaved, true);
+})();
+call('init').then(d => {
+  initFresh = true; applyInit(d);
+  LS.set('initCopy', JSON.stringify({ day: new Date().toDateString(), d: d }));
   if (!CLASSES.length) { $('studs').innerHTML = '<p class="note">No classes yet. Import Students.csv into the Students tab.</p>'; return; }
-  loadClass(CLASSES.includes(d.active) ? d.active : (TODAY[0] || CLASSES[0]));
+  if (!shownSaved || S.cls === shownSaved) loadClass(firstClass(d));   // he may already have tapped another class while it loaded
   applyMode(d.mode);
-}).catch((e) => { $('studs').innerHTML = '<p class="note">Could not connect. Reopen the link.</p>'; showErr('Server: ' + ((e && e.message) || e)); });
-setTimeout(() => { if (!$('when').textContent.trim()) showErr('Still waiting for Google after 20 seconds. Tap refresh.'); }, 20000);
+}).catch((e) => {
+  if (shownSaved) { snack('No signal: showing the saved copy'); return; }
+  $('studs').innerHTML = '<p class="note">Could not connect. Reopen the link.</p>';
+  showErr('Server: ' + ((e && e.message) || e));
+});
+setTimeout(() => { if (!initFresh) showErr('Still waiting for Google after 20 seconds. Tap refresh.'); }, 20000);
 </script>
 <span class="build-stamp" title="when this copy of the phone page was built">{{BUILD_STAMP}}</span>
 </body>
