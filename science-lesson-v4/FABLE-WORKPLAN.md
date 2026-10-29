@@ -318,6 +318,16 @@ Each look goes in its own include file. Size plan: GameGlass.html and GameVesper
 
 ---
 
+### Big goals (Patryk 29 Oct): NOT for Fable to start. Each needs a grilling with Patryk first; research is in `replica/design/big-goals-research.md`.
+In priority order:
+1. **A memory map for every class.** Every MCQ vote, Form and homework shows which parts of the spec each class remembers; the Do Now suggests itself from the weak spots (he still chooses). This is the project's north star (pupils remember the spec). Builds on Phase 2's learning loop.
+2. **One app that runs your day.** Each morning one screen shows what matters (lessons not built, marking due, pupils to chase, rituals) instead of hunting through tabs. Serves "not working evenings".
+3. **Ulhu as a life companion.** Knows his workload as well as his habits; a year-long story; a page showing who he is becoming over a term; sound; gentle evening nudges (never after 7pm); what he opens instead of scrolling.
+4. **Ulhu for a friend (not a teacher).** A general version with the teaching parts removed or made general, possibly a social layer (Habitica-style bosses beaten together, or better). Undecided.
+5. **Colleagues using the planner.** Lowest; keep it personal for now.
+- **Enabler: move the phone and desktop side to a proper installed app** (free hosting, Sheets/Drive stay, Apps Script becomes the data layer): no URL bar, opens instantly, no paste size limit, sound and notifications possible. Grill before 3 and 4.
+- **Quick wins now (can go in Phase 2):** Native Alpha on his phone for no URL bar (his job, no code); faster opening: show the last saved screen instantly then refresh, phone view stops loading the desktop planner, Ulhu's heavy art loads only when his tabs open.
+
 ## Part C: the message to paste into the Fable session
 
 > You are working through my build list unattended. Read `CLAUDE.md`, then `FABLE-WORKPLAN.md` (Part B is for you), then `FABLE-WORKLOG.md` if it exists, to see where you got to. Work the items in order, one at a time, following every rule in Part B: checks green before each commit, commit by explicit file paths, one plain-English log line per item, anything needing my pick or decision goes on the Waiting list and you move on, Plan Mode jobs wait for my approval, nothing deleted, moved or renamed on Drive, no paid services, no pupil names anywhere. Start with Phase 0. I approve the save point in 0.1. Talk to me in plain English with no em dashes. Keep going until the list is finished or everything left is waiting on me, then summarise what you built and what you need from me.
