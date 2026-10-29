@@ -40,6 +40,24 @@ Plain-English record of the build list in `FABLE-WORKPLAN.md`, newest entry firs
 
 ---
 
+## 29 Oct 2026, items 1.9 to 1.16: Ulhu's data safety (one save for the eight, since they all touch the same server file)
+
+**What changed, item by item:**
+- **1.9 Shop locks:** the code already read both lock shapes in the shop file (nothing to build); a new check proves every item with a lock above Ulhu's level or deeds shows as locked and is refused at buy time (17 items at the test's level).
+- **1.10 Day rollover before any tick:** the server now closes yesterday before it takes the first tick of a new day, so a tap on a page left open overnight can no longer break a streak or land on the old day. The phone also reloads itself when it comes back into view on a later day.
+- **1.11 Exact Undo after fainting:** when a curse makes Ulhu faint, the tick now remembers what the faint took (the level, the XP, the runes, the health before the hit, the Rise quest) and Undo of that curse gives it all back. Undoing a curse or blessing also puts its colour back exactly (that was skipped before).
+- **1.12 Formula guard:** a ritual, quest, step, reward or chip named like "+20 press-ups", "-Netflix" or "10" is written to the sheet as text (with the apostrophe marker Sheets itself uses, which never shows), so it can no longer turn into a formula error, a number or a date.
+- **1.13 Reduced motion keeps the sigils:** with the phone's "reduce motion" setting on, a curse still raises the four sigils (Flesh, Domain, Scene, Coven), just without the flying blood, so High Vespers still learns where the slips came from.
+- **1.14 Life bonus:** a slip or a blessing earlier in the day no longer eats the first-life-ritual bonus; only life rituals count.
+- **1.15 Every-few-days rituals can miss:** "Do something for Martha" (every 7) and "Call a friend" (every 3) now miss when their due day passes with no tick: the first miss is forgiven, the second in a row breaks the streak, and the 14-day strip shows the miss.
+- **1.16 Offline taps:** every tick and untick carries the moment it was made and its own id. A tap saved with no signal lands on the day it was made (up to 36 hours back), a resend after a lost reply is the same tap (never paid twice), and the same Undo sent twice undoes one, not two.
+
+Sixteen new server checks and four new phone checks cover these; the Ulhu phone simulation passes 80 of 80 (the boss banish check that used to be flaky passed every time today, but I have not yet found its real cause: that is item 1U.1).
+
+**You need to:** nothing now. It all goes into the next complete paste set.
+
+**Save:** b823a462.
+
 ## 29 Oct 2026, item 1.7: the push home no longer slows every save
 
 **What changed:** every save in the planner used to send the whole planner state to your home link straight away, and that call is slow, so a run of quick changes made a run of slow pushes. Now a push goes at most once every three minutes. If a save falls inside that gap the server answers "later", and the page asks for the push on its own about two and a half minutes after your last save, so the last change of a session still reaches home. The daily results run and "Send to Claude" always push straight away, since home acts on those at once.
