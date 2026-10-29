@@ -327,7 +327,7 @@ Each look goes in its own include file. Size plan: GameGlass.html and GameVesper
 
 ### Big goals (Patryk 29 Oct): NOT for Fable to start. Each needs a grilling with Patryk first; research is in `replica/design/big-goals-research.md`.
 In priority order:
-1. **A memory map for every class.** Every MCQ vote, Form and homework shows which parts of the spec each class remembers; the Do Now suggests itself from the weak spots (he still chooses). This is the project's north star (pupils remember the spec). Builds on Phase 2's learning loop.
+1. **A memory map for every class.** Every MCQ vote, Form and homework shows which parts of the spec each class remembers; the Do Now suggests itself from the weak spots (he still chooses). This is the project's north star (pupils remember the spec). Builds on Phase 2's learning loop. Grilled (29 Oct 2026): see replica/design/grills/memory-map.md, ready to build.
 2. **One app that runs your day.** Each morning one screen shows what matters (lessons not built, marking due, pupils to chase, rituals) instead of hunting through tabs. Serves "not working evenings".
 3. **Ulhu as a life companion.** Knows his workload as well as his habits; a year-long story; a page showing who he is becoming over a term; sound; gentle evening nudges (never after 7pm); what he opens instead of scrolling.
 4. **Ulhu for a friend (not a teacher).** A general version with the teaching parts removed or made general, possibly a social layer (Habitica-style bosses beaten together, or better). Undecided.
