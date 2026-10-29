@@ -64,9 +64,17 @@ function has(n, toks, w) {
   if (w.length < 4) return toks.some((t) => t === w || t === w + 's');
   return toks.some((t) => t.startsWith(w));
 }
+// Answering instructions are not what a question is about ("drawing a ring around" is not a
+// Biological Drawings question, 2026-10-29).
+const INSTRUCTIONS = / (by )?draw(ing)? a (ring|circle) around( the correct (answer|word|line)s?)?(?= )| tick (one|two|three) box(es)?(?= )| complete the (sentence|table|diagram)s?(?= )/g;
 function hitsIn(text, words) {
-  const n = norm(text), toks = tokens(n);
+  const n = norm(text).replace(INSTRUCTIONS, ' '), toks = tokens(n);
   return words.filter((w) => has(n, toks, w));
+}
+// How many DIFFERENT lesson words: "atmosphere" and "atmospher" in one map are one hit, not two
+// (2026-10-29). Counting only; the need-word check still sees every hit.
+function distinct(hits) {
+  return hits.filter((w) => w.includes(' ') || !hits.some((x) => x !== w && !x.includes(' ') && x.startsWith(w))).length;
 }
 
 // -------------------------------------------------------------- lesson lookup
@@ -129,10 +137,10 @@ function scoreOne(q, e) {
   const both = [...new Set([...th, ...mh])];
   if (subOk && both.length >= Math.max(2, e.min) && needOk(both)) return { ok: true, tier: 2, score: both.length / 2, hits: both };
   // the same topic, a neighbouring subtopic (a GPE question filed under Efficiency), with the lesson's own words
-  if (!subOk && e.topicSubs && subsHas(e.topicSubs, q.subtopic) && th.length >= e.min && needOk(th) && (e.need.length || th.length >= 2 || e.words.length <= 2)) return { ok: true, tier: 3, score: th.length / 2, hits: th };
+  if (!subOk && e.topicSubs && subsHas(e.topicSubs, q.subtopic) && th.length >= e.min && needOk(th) && (e.need.length || distinct(th) >= 2 || e.words.length <= 2)) return { ok: true, tier: 3, score: th.length / 2, hits: th };
   // filed under another subtopic: needs to be clearly about this lesson
   const strong = e.need.length ? th.filter((w) => e.need.includes(w)) : th;
-  if (!subOk && th.length >= Math.max(2, e.min + 1) && strong.length >= 1 && (!q.subject || !e.subject || q.subject === e.subject)) return { ok: true, tier: 4, score: th.length / 3, hits: th };
+  if (!subOk && distinct(th) >= Math.max(2, e.min + 1) && strong.length >= 1 && (!q.subject || !e.subject || q.subject === e.subject)) return { ok: true, tier: 4, score: th.length / 3, hits: th };
   return { ok: false, tier: 0, score: 0, hits: th, why: subOk ? (th.length ? 'not the words this lesson needs' : 'none of the lesson words') : 'another area of the course' };
 }
 function match(q, spec) {
@@ -163,4 +171,4 @@ function standalone(text, hasFigure) {
   return '';
 }
 
-module.exports = { specFor, match, rank, standalone, hitsIn, findTopic, DATA };
+module.exports = { specFor, match, rank, standalone, hitsIn, distinct, findTopic, DATA };

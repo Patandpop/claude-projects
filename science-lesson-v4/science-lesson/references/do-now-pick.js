@@ -17,6 +17,10 @@
      1 from LAST YEAR's content (Year 8 for Year 9 and so on; never Year 11 for Year 12; Year 7
      and Year 12 get a sixth older question instead).
    Questions used as a Do Now for that class in its last 8 lessons (lesson-log.json) are skipped.
+   2026-10-29 (workplan 2.1): an exam question is matched to a lesson by lesson-match.js (the lesson's
+   exam subtopics AND its words); a taught lesson the bank has nothing for draws on the whole exam
+   library (question-pool.js); and the six aim for 4 short recall, one 2-mark explain and one
+   calculation (a soft rule: a thin pool still gets six).
 
    Usage: node references/do-now-pick.js 9XS [--date 2026-10-12] [--json]
    ============================================================================ */
@@ -80,11 +84,22 @@ function taughtLessons(data, cls, date, weeks) {
 
 // A lesson's subject (from its Drive folder or topic code) and, for Years 9-11, its AQA exam topic.
 const { AQA_TOPIC } = require('./exam-pick.js');
+const lm = require('./lesson-match.js');
 function lessonInfo(L, year) {
   const code = (String(L.topic).match(/^([BCP])(\d+)\b/) || []);
   const subject = (L.rel || '').split('/')[1] || { B: 'Biology', C: 'Chemistry', P: 'Physics' }[code[1]] || (year >= 12 ? 'Physics' : null);
   const aqa = year >= 9 && year <= 11 && code[0] ? AQA_TOPIC[code[0]] : null;
-  return { title: L.title, topic: L.topic, subject: /^(Biology|Chemistry|Physics)$/.test(subject) ? subject : null, aqa, words: words(L.title + ' ' + (L.lo || '')) };
+  return { title: L.title, topic: L.topic, subject: /^(Biology|Chemistry|Physics)$/.test(subject) ? subject : null, aqa, words: words(L.title + ' ' + (L.lo || '')),
+    spec: lm.specFor({ topic: L.topic, title: L.title }) };
+}
+// What kind of Do Now question it is, for the mix (2026-10-29): 4 short recall, one 2-mark explain,
+// one calculation. A soft rule: a thin pool still gets six questions.
+const MIX = { short: 4, explain: 1, calc: 1 };
+function kindOf(q) {
+  const t = String(q.text || '');
+  if (q.type === 'calculate' || (q.source === 'own' && /\bcalculate\b/i.test(t))) return 'calc';
+  if ((q.marks || 1) >= 2 && /\b(explain|describe|suggest|why|compare|evaluate|justify)\b/i.test(t)) return 'explain';
+  return 'short';
 }
 // Best matching lesson for a question (2026-10-08, tightened after "ethanol" matched Latent Heat):
 // same subject; for an AQA question and a Year 9-11 lesson, the same exam topic; then shared words,
@@ -105,6 +120,15 @@ function bestLesson(q, lessons) {
     if (q.subject && L.subject && q.subject !== L.subject) continue;
     if (q.unit && L.aqa && q.board !== 'OCR A' && q.unit !== L.aqa) continue;
     if (own && q.askedAt && L.date && L.date >= q.askedAt) continue;   // must be taught before it was asked
+    // An exam question is matched by lesson-match.js (2026-10-29): the lesson's exam subtopics AND its
+    // words, so a satellite question no longer lands on "Energy Levels in Atoms". An assessment
+    // lesson has no questions; a lesson missing from the map falls back to shared words below.
+    if (!own && L.spec) {
+      if (L.spec.none) continue;
+      const r = lm.match({ text: q.text, ms: q.answer, subtopic: q.topic, subject: q.subject }, L.spec);
+      if (r.ok && 1000 + lm.rank(r) > bs) { bs = 1000 + lm.rank(r); best = L; }
+      continue;
+    }
     const th = hits(L.words, tw, tp), xh = hits(L.words, xw, xp);
     const sc = 2 * th + xh;
     // Years 7-8 lessons (no exam-topic check) need the question's topic name to match too
@@ -141,11 +165,29 @@ function pick(cls, opts) {
   const recent = new Set(log.flatMap((r) => (r.doNow || []).map((q) => norm(q.q))));
 
   // A Do Now is read off the board: no figures or tables pupils can't see, and a complete answer.
-  const usable = (q) => q.source === 'own' || (!/\b(figure|fig\.|table|graph|diagram|shown|box below)\b|\[FIG|\[TABLE/i.test(q.text) && String(q.answer || '').trim().length > 1 && !/[(\[]\s*$|^\d+\.$|\[FIG/.test(String(q.answer).trim()));
+  // It must also make sense on its own (lesson-match.standalone: no "in part (a)", no lost opening).
+  const usable = (q) => q.source === 'own' || (!/\b(figure|fig\.|table|graph|diagram|shown|box below)\b|\[FIG|\[TABLE/i.test(q.text) && String(q.answer || '').trim().length > 1 && !/[(\[]\s*$|^\d+\.$|\[FIG/.test(String(q.answer).trim())
+    && !lm.standalone(q.text, false) && !/\bpart \(?[a-h]\)?/i.test(q.answer));
   const hw = o.homeworkKeys || homeworkKeys(cls);
   const notHomework = (q) => q.source === 'own' || !hw.has(HW_KEY(q.text));
-  const pool = [...own, ...bank].filter((q) => !recent.has(norm(q.text)) && String(q.text).length < 400 && usable(q) && notHomework(q))
+  const fresh = (q) => !recent.has(norm(q.text)) && String(q.text).length < 400 && usable(q) && notHomework(q);
+  const pool = [...own, ...bank].filter(fresh)
     .map((q) => { const L = bestLesson(q, lessons); return L ? { q, L, age: ageOf.get(L.k) } : null; }).filter(Boolean);
+  // A taught lesson the class bank has nothing for: single parts from the whole exam library that
+  // stand on their own (question-pool.js), still verbatim with their real mark schemes (2026-10-29).
+  // Also used when the class bank lacks a calculation or a 2-mark explain for the mix (below).
+  const seen = new Set(pool.map((x) => norm(x.q.text)));
+  let wideAll = null;
+  const addWide = (target, kind) => {
+    if (o.wide === false || !target.length) return;
+    if (!wideAll) wideAll = require('./question-pool.js').widePool({ year: c.year, subjects: ((readJson(path.join(ROOT, 'class-defaults.json'), {}).classes || {})[cls] || {}).patrykTeaches });
+    for (const q of wideAll) {
+      if (seen.has(norm(q.text)) || (kind && kindOf(q) !== kind) || !fresh(q)) continue;
+      const L = bestLesson(q, target);
+      if (L) { pool.push({ q, L, age: ageOf.get(L.k) }); seen.add(norm(q.text)); }
+    }
+  };
+  addWide(lessons.filter((L) => L.spec && !L.spec.none && !pool.some((x) => x.L.k === L.k)));
   const seed = [...(cls + date)].reduce((h, ch) => (h * 31 + ch.charCodeAt(0)) >>> 0, 7);
   let r = seed;
   const rand = () => ((r = (r * 1103515245 + 12345) >>> 0) / 4294967296);
@@ -153,8 +195,11 @@ function pick(cls, opts) {
   const take = (list, n, why) => {
     const sorted = list.filter((x) => !used.has(x.q.id)).map((x) => [rand() + (x.q.source === 'own' ? 0.3 : 0), x]).sort((a, b) => b[0] - a[0]).map((x) => x[1]);
     const lessonsUsed = new Set(out.map((x) => x.L && x.L.k));
+    const room = (x) => out.filter((y) => kindOf(y.q) === kindOf(x.q)).length < MIX[kindOf(x.q)];
+    sorted.sort((a, b) => room(b) - room(a));                   // the mix: a kind still wanted comes first
     for (const x of sorted) {                                   // one question per lesson where possible
       if (n <= 0) break;
+      if (!room(x) && sorted.some((y) => !used.has(y.q.id) && room(y))) continue;
       const stem = norm(x.q.text).slice(0, 60);                   // two parts of the same exam question: only one
       if (out.some((y) => norm(y.q.text).slice(0, 60) === stem)) continue;
       if (x.L && lessonsUsed.has(x.L.k) && sorted.some((y) => !used.has(y.q.id) && !lessonsUsed.has(y.L && y.L.k))) continue;
@@ -172,6 +217,24 @@ function pick(cls, opts) {
   }
   // top up (thin bank, or Year 7 / 12): older first
   if (out.length < 6) take(pool.filter((x) => !used.has(x.q.id)).sort((a, b) => b.age - a.age), 6 - out.length, 'top-up');
+  // Still no calculation or no 2-mark explain, and the pool has one: it replaces a spare short
+  // question, from the same spacing band where possible.
+  const band = (age) => (age === 1 ? 'last lesson' : age <= 4 ? '2-4 lessons ago' : '5+ lessons ago');
+  for (const k of ['calc', 'explain']) {
+    if (out.filter((y) => kindOf(y.q) === k).length >= MIX[k]) continue;
+    const stems = new Set(out.map((y) => norm(y.q.text).slice(0, 60)));
+    if (!pool.some((x) => !used.has(x.q.id) && kindOf(x.q) === k)) addWide(lessons, k);
+    const cands = pool.filter((x) => !used.has(x.q.id) && kindOf(x.q) === k && !stems.has(norm(x.q.text).slice(0, 60)))
+      .map((x) => [rand(), x]).sort((a, b) => a[0] - b[0]).map((x) => x[1]);
+    if (!cands.length) continue;
+    if (out.length < 6) { used.add(cands[0].q.id); out.push({ ...cands[0], why: band(cands[0].age) }); continue; }
+    // a spare = a question of a kind already over its share (never the last-year one)
+    const spares = out.map((y, i) => i).filter((i) => out[i].why !== 'last year' && out.filter((y) => kindOf(y.q) === kindOf(out[i].q)).length > MIX[kindOf(out[i].q)]);
+    if (!spares.length) continue;
+    let pickI = spares[spares.length - 1], x = cands[0];
+    for (const i of spares) { const same = cands.find((cd) => band(cd.age) === out[i].why); if (same) { pickI = i; x = same; break; } }
+    used.add(x.q.id); out[pickI] = { ...x, why: band(x.age) };
+  }
   // still short of real questions: practice questions Claude wrote to mcq-rules.md (mcq-written.js),
   // labelled as not from a real exam (Patryk 2026-10-10: optional extras only)
   if (out.length < 6 && o.written !== false) {
@@ -203,7 +266,9 @@ function shown(q) {
   const lines = text.split('\n').map((l) => l.trim()).filter(Boolean);
   if (letter && (q.type === 'mcq' || lines.filter((l) => /^[A-D]\s+\S/.test(l)).length >= 4 || lines.length >= 5)) {
     a = letter;
+    // the options are the LAST lines starting A-D: a stem that opens "A cylinder of..." is not option A
     let opts = lines.filter((l) => /^[A-D]\s+\S/.test(l));
+    if (opts.length > 4) opts = opts.slice(-4);
     if (opts.length < 4 && lines.length >= 5) {
       opts = lines.slice(-4).map((l, i) => 'ABCD'[i] + ' ' + l);
       text = [...lines.slice(0, -4), ...opts].join('\n');

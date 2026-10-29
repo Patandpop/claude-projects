@@ -908,6 +908,12 @@ async function main() {
   hardFails += dnhTest.fails;
   warnings  += dnhTest.warns;
 
+  // The Do Now picker: lesson-match.js matching, the wide pool, the 4/1/1 mix (2026-10-29).
+  console.log('');
+  const dnpTest = require(path.join(__dirname, 'do-now-pick.test.js')).run();
+  hardFails += dnpTest.fails;
+  warnings  += dnpTest.warns;
+
   // Practice questions Claude writes, checked against mcq-rules.md (mcq-written.js).
   console.log('');
   const mwTest = require(path.join(__dirname, 'mcq-written.test.js')).run();
