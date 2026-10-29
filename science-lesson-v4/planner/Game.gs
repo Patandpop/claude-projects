@@ -728,11 +728,11 @@ function gLock_(lock, p, ticks, goals) {
 }
 function gameShop(k) {
   check_(k); gFresh_();
-  const p = gPlayer_(), owned = gOwned_(), ticks = gRows_('ticks'), goals = gGoals_(), have = {};
+  const p = gPlayer_(), owned = gOwned_(), ticks = gRows_('ticks'), goals = gGoals_(), have = {}, hg = gHaggles_(gDay_(gNow_()));
   owned.forEach((r) => { have[r.itemId] = r; });
-  return gOut_({ coins: p.coins, level: p.level, outside: gOutsideTicks_(ticks, goals), items: gShop_().items.map((i) => {
-    const lk = gLock_(i.lock, p, ticks, goals), r = have[i.id];
-    return { id: i.id, name: i.name, category: i.category, slots: i.slots, tier: i.tier, price: i.price, own: !!r, slot: r ? r.slot : '', locked: !lk.ok, why: lk.why, w: (i.layers[i.slots[0]] || {}).w, h: (i.layers[i.slots[0]] || {}).h };
+  return gOut_({ coins: p.coins, level: p.level, outside: gOutsideTicks_(ticks, goals), haggle: hg, items: gShop_().items.map((i) => {
+    const lk = gLock_(i.lock, p, ticks, goals), r = have[i.id], kp = gKeeperOf_(i.category);
+    return { id: i.id, name: i.name, category: i.category, keeper: kp, slots: i.slots, tier: i.tier, price: gHagglePrice_(i.price, hg[kp]), base: i.price, own: !!r, slot: r ? r.slot : '', locked: !lk.ok, why: lk.why, w: (i.layers[i.slots[0]] || {}).w, h: (i.layers[i.slots[0]] || {}).h };
   }) });
 }
 // the pictures, fetched once by the page (about 160 KB): { id: { slot: {art, ox, oy, w, h} } } plus the room geometry
@@ -751,13 +751,14 @@ function gameBuy(k, id) {
     if (owned.some((r) => r.itemId === id)) { bad = 'Ulhu already has that.'; return; }
     const lk = gLock_(it.lock, p, gRows_('ticks'), gGoals_());
     if (!lk.ok) { bad = 'Locked: ' + lk.why; return; }
-    if (p.coins < it.price) { bad = 'Not enough runes (' + it.price + ' needed).'; return; }
+    const price = gHagglePrice_(it.price, gHaggles_(gDay_(gNow_()))[gKeeperOf_(it.category)]);   // the day's dice result at that stall
+    if (p.coins < price) { bad = 'Not enough runes (' + price + ' needed).'; return; }
     const taken = {}; owned.forEach((r) => { if (r.slot) taken[r.slot] = true; });
     const slot = it.slots.filter((x) => !taken[x])[0] || '';       // it goes straight into an empty slot, else the drawer
-    p.coins -= it.price; gSavePlayer_(p);
+    p.coins -= price; gSavePlayer_(p);
     const now = gNow_();
-    gAppend_('owned', { itemId: id, boughtOn: gDay_(now), price: it.price, slot });
-    gAppend_('ticks', { id: Utilities.getUuid().slice(0, 8), at: now.toISOString(), day: gDay_(now), goalId: 'buy|' + id, delta: 0, coins: -it.price, xp: 0, hp: 0, auto: '', ref: '', note: JSON.stringify({ name: it.name }) });
+    gAppend_('owned', { itemId: id, boughtOn: gDay_(now), price, slot });
+    gAppend_('ticks', { id: Utilities.getUuid().slice(0, 8), at: now.toISOString(), day: gDay_(now), goalId: 'buy|' + id, delta: 0, coins: -price, xp: 0, hp: 0, auto: '', ref: '', note: JSON.stringify({ name: it.name }) });
   });
   if (bad) throw new Error(bad);
   return gSnapshot_(gWorld_());
@@ -777,6 +778,35 @@ function gamePlace(k, id, slot) {
   return gSnapshot_(gWorld_());
 }
 
+
+/* ---------------------------------------------------------------- the Night Market keepers and their dice (Patryk 2026-10-28)
+   Each stall's keeper plays one game of Swindlestones a day. Win: 20% off at that stall for the rest of the day.
+   Lose: 10% more there today. Walking away from a game you started counts as losing. Rows: Game Haggle {day, keeper, result}. */
+G_HEAD.haggle = ['day', 'keeper', 'result', 'savedOn']; G_TAB.haggle = 'Game Haggle';
+const G_KEEPERS = { weaver: ['floors', 'rugs'], painter: ['wallpapers'], glass: ['windows', 'lights'], carpenter: ['seats', 'tables'], curio: ['corner', 'props'], gullet: ['wall'], tailor: ['wear'] };
+const G_HAGGLE = { win: 0.8, lose: 1.1, playing: 1.1 };
+function gKeeperOf_(cat) { return Object.keys(G_KEEPERS).filter((k) => G_KEEPERS[k].indexOf(cat) >= 0)[0] || ''; }
+function gHaggles_(day) { const o = {}; gRows_('haggle').forEach((r) => { if (String(r.day) === day) o[r.keeper] = String(r.result); }); return o; }
+function gHagglePrice_(price, result) { const f = G_HAGGLE[result]; return f && price ? Math.round(price * f) : price; }
+// result: 'start' sits down at the table (once a day per keeper), then 'win' or 'lose' settles it. Returns the shop.
+function gameHaggle(k, keeper, result) {
+  check_(k); gFresh_();
+  let bad = '';
+  withLock_(function () { gFresh_(true);
+    if (!G_KEEPERS[keeper]) { bad = 'There is no such keeper in the market.'; return; }
+    const day = gDay_(gNow_()), row = gRows_('haggle').filter((r) => String(r.day) === day && r.keeper === keeper)[0];
+    if (result === 'start') {
+      if (row) { bad = 'You have already played this keeper today. Come back tomorrow.'; return; }
+      gAppend_('haggle', { day, keeper, result: 'playing', savedOn: day });
+    } else if (result === 'win' || result === 'lose') {
+      if (!row) { bad = 'Sit down at the table first.'; return; }
+      if (String(row.result) !== 'playing') { bad = 'That game is already settled.'; return; }
+      gSet_('haggle', row.row, 'result', result);
+    } else bad = 'Unknown dice result.';
+  });
+  if (bad) throw new Error(bad);
+  return gameShop(k);
+}
 
 /* ---------------------------------------------------------------- boss fights (slice 7)
    A big job split into stages with deadlines (test marking: half marked, the rest, totals added, entered on the system).
@@ -1113,10 +1143,11 @@ function gameWear(k, id, on) {
     const p = gPlayer_(), rows = gRows_('owned'), st = gWearState_(p, rows.filter((r) => String(r.itemId).indexOf('w:') === 0));
     if (on && st.owned.indexOf(id) < 0) {
       if (w.lock > p.level) { bad = 'Locked: Level ' + w.lock; return; }
-      if (p.coins < w.price) { bad = 'Not enough runes (' + w.price + ' needed).'; return; }
-      p.coins -= w.price; const now = gNow_();
-      gAppend_('owned', { itemId: 'w:' + id, boughtOn: gDay_(now), price: w.price, slot: '' });
-      gAppend_('ticks', { id: Utilities.getUuid().slice(0, 8), at: now.toISOString(), day: gDay_(now), goalId: 'buy|w:' + id, delta: 0, coins: -w.price, xp: 0, hp: 0, auto: '', ref: '', note: JSON.stringify({ name: id }) });
+      const price = gHagglePrice_(w.price, gHaggles_(gDay_(gNow_())).tailor);   // the tailor's dice result today
+      if (p.coins < price) { bad = 'Not enough runes (' + price + ' needed).'; return; }
+      p.coins -= price; const now = gNow_();
+      gAppend_('owned', { itemId: 'w:' + id, boughtOn: gDay_(now), price, slot: '' });
+      gAppend_('ticks', { id: Utilities.getUuid().slice(0, 8), at: now.toISOString(), day: gDay_(now), goalId: 'buy|w:' + id, delta: 0, coins: -price, xp: 0, hp: 0, auto: '', ref: '', note: JSON.stringify({ name: id }) });
     }
     const wear = st.on; wear[w.cat] = on ? id : (w.cat === 'skin' ? 'skin-0' : '');
     p.wear = JSON.stringify(wear); gSavePlayer_(p);
