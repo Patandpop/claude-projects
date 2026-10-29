@@ -295,6 +295,7 @@
   <button id="vHomework">Homework<small>set, check</small></button>
   <button id="vTests">Assessment<small>tests, builder, results</small></button>
   <button id="vBehaviour">Behaviour<small>points and board</small></button>
+  <button id="vRituals">Ulhu's Rituals<small>jobs, Ulhu, doubloons</small></button>
 </nav>
 <main id="main">
   <section class="cal" id="calWrap"><div class="grid" id="grid"></div></section>
@@ -304,6 +305,7 @@
 <div id="toast"><span id="toastMsg"></span><button id="toastUndo">Undo</button></div>
 
 <?!= include('Logic') ?>
+<!--GAME_UI-->
 <script>
 const KEY = <?!= JSON.stringify(key) ?>;   // the key is letters and numbers only, so unescaped output is safe
 const APP_URL = <?!= JSON.stringify(appUrl) ?>;   // this web app: phone page = ?key=..&view=phone, board = &view=board
@@ -404,13 +406,14 @@ function timeLabel(p) {
   return 'P' + p + '<br>' + (a === b ? a : a + '<br>' + b);
 }
 function setViewButtons() {
-  ['Week', 'Day', 'Classes', 'Homework', 'Tests', 'Behaviour'].forEach((v) => $('v' + v).classList.toggle('on', S.view === v.toLowerCase()));
+  ['Week', 'Day', 'Classes', 'Homework', 'Tests', 'Behaviour', 'Rituals'].forEach((v) => $('v' + v).classList.toggle('on', S.view === v.toLowerCase()));
   const wide = !['week', 'day'].includes(S.view);
   $('main').classList.toggle('full', wide);
   $('ed').style.display = wide ? 'none' : '';
   document.documentElement.style.setProperty('--hh', document.querySelector('header').offsetHeight + 'px');
 }
 function render() {
+  if (S.view !== 'rituals') { const gg = $('grid'); if (gg) gg.dataset.ul = ''; }
   setViewButtons();
   const mon = S.monday, today = P.iso(todayMidnight());
   $('wkLabel').textContent = (S.view === 'day' ? P.DAYS[S.day] + ' ' : 'w/c ') + P.addDays(mon, S.view === 'day' ? S.day : 0).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
@@ -420,6 +423,7 @@ function render() {
   if (S.view === 'homework') return renderHomework();
   if (S.view === 'tests') return renderTests();
   if (S.view === 'behaviour') return renderBehaviour();
+  if (S.view === 'rituals') return renderRituals();
   const days = S.view === 'day' ? [S.day] : [0, 1, 2, 3, 4];
   const g = $('grid');
   g.className = 'grid';
@@ -1039,6 +1043,13 @@ function lessonNowCls() {
   return (on || today.find((s) => minsOf(win(s)[0] || '0:0') > now) || {}).cls || '';
 }
 const behLink = (view) => APP_URL + '?key=' + encodeURIComponent(KEY) + '&view=' + view;
+// Ulhu's Rituals (2026-10-23): the job list, Ulhu and the doubloons. The screen itself is game-ui.js, shared with the phone.
+function renderRituals() {
+  const g = $('grid'); g.className = 'tab rituals'; g.style.gridTemplateColumns = ''; g.style.maxWidth = 'none';
+  if (g.dataset.ul === '1' && g.firstChild) return;
+  g.innerHTML = ''; g.dataset.ul = '1';
+  GameUI.mount(g, (fn, ...a) => run(fn, ...a), { wide: true });
+}
 function renderBehaviour() {
   const g = $('grid'); g.className = 'tab behaviour'; g.style.gridTemplateColumns = ''; g.style.maxWidth = 'none';
   S.beh = S.beh || { mode: '+' };
@@ -1799,6 +1810,7 @@ $('vHomework').onclick = () => showTab('homework');
 $('vTests').onclick = () => showTab('tests');
 // Behaviour opens on the selected lesson's class, else the lesson on now
 function openBehaviourFor(cls) { S.beh = Object.assign(S.beh || { mode: '+' }, { cls: '', want: cls || '', cl: null }); showTab('behaviour'); }
+$('vRituals').onclick = () => showTab('rituals');
 $('vBehaviour').onclick = () => { const s = S.sel >= 0 && S.week && S.week.slots[S.sel]; openBehaviourFor(s ? s.cls : ''); };
 $('undo').onclick = undo;
 $('file').onchange = () => {
