@@ -270,6 +270,7 @@ s = G.gameHoardClaim(k, hid, true);
 ok('Undo a claim gives the doubloons back', s.player.coins === 100 && s.hoard.find((h) => h.id === hid).claims === 0);
 const ch = G.gameChronicle(k);
 ok('the Oracle has 7 weeks, 35 days with all/most/some/none/off/future and the trophies', ch.weeks.length === 7 && ch.days.length === 35 && ch.days.every((d) => ['all', 'most', 'some', 'none', 'off', 'future'].includes(d.level)) && ch.days.some((d) => d.today && d.due > 0) && ch.beaten.length >= 2);
+ok('the Oracle day sheet: every day carries its curses, blessings and Vespers', ch.days.every((d) => typeof d.curses === 'number' && typeof d.blessings === 'number' && typeof d.vespers === 'string') && ch.days.some((d) => d.curses + d.blessings > 0));
 ok('each daily ritual carries its last 14 days', s.goals.filter((g) => g.kind === 'daily').every((g) => /^[ox\-f]{14}$/.test(g.strip)));
 ok('spending and refunds never count as doubloons earned', ch.weeks[6].coins === s.weekCoins);
 // 2026-10-26: a day that freezes itself (INSET here) can be switched back on, and off again; a ritual can be renamed

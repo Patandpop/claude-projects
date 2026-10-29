@@ -3,7 +3,7 @@ Run: python tests/ulhu_sim.py  (add --shots DIR to save screenshots). Synthetic 
 import os, sys, subprocess, time
 from playwright.sync_api import sync_playwright
 P = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '/'; SP = sys.argv[1] if len(sys.argv) > 1 and not sys.argv[1].startswith('--') else __import__('tempfile').mkdtemp()
-js = ''.join(open(P + f, encoding='utf-8').read() + '\n' for f in ['game-ulhu.js', 'game-pixel.js', 'game-runes.js', 'game-temple.js', 'game-stone.js', 'game-omens.js', 'game-tabs.js', 'game-blood.js', 'game-scroll.js', 'game-glass.js', 'game-highvespers.js', 'game-pairs.js', 'game-ui.js'])
+js = ''.join(open(P + f, encoding='utf-8').read() + '\n' for f in ['game-ulhu.js', 'game-pixel.js', 'game-runes.js', 'game-temple.js', 'game-stone.js', 'game-omens.js', 'game-tabs.js', 'game-blood.js', 'game-scroll.js', 'game-glass.js', 'game-oracle.js', 'game-highvespers.js', 'game-pairs.js', 'game-ui.js'])
 page = '''<!doctype html><meta charset="utf-8"><meta name=viewport content="width=device-width,initial-scale=1"><body style="margin:0;background:#0d1b3a">
 <div style="height:60px;background:#0a1020;color:#fff">8AG header</div><div id=u></div><nav style="position:fixed;bottom:0;left:0;right:0;height:62px;background:#0a1020"></nav>
 <script>window.CALLS=[];function call(fn,...args){CALLS.push(fn);return fetch('/c',{method:'POST',body:JSON.stringify({fn,args})}).then(r=>r.json()).then(x=>{if(x.err)throw new Error(x.err);return x.ok;});}</script>
@@ -95,7 +95,13 @@ try:
         c4 = int(pg.inner_text('.uz-coins b')); pg.locator('[data-a=claim]').nth(1).click(); pg.wait_for_timeout(900)
         check('claiming a Hoard reward costs its price and stamps CLAIMED', int(pg.inner_text('.uz-coins b')) == c4 - 80)
         pg.wait_for_timeout(100)
-        check('the Oracle: this week as seven sigils and the five-week star chart', pg.locator('.uz-wk > div').count() == 7 and pg.locator('.uz-sky').count() == 1)
+        pg.wait_for_timeout(1500)
+        check('the Oracle: a stained-glass rose window (canvas) with 35 day panes, the days so far tappable', pg.locator('.orx-win canvas').count() == 1 and pg.locator('.orx-win .rs-over g.jw, .orx-win .rs-over g.rs-fut').count() == 35 and pg.locator('.orx-win [data-od]').count() >= 1)
+        pg.locator('.orx-win [data-od]').last.dispatch_event('click'); pg.wait_for_timeout(300)
+        check('tapping a day opens its sheet (date, rituals kept, curses and blessings, Vespers) and Close shuts it', pg.locator('.orx-sh').count() == 1 and 'rituals' in pg.inner_text('.orx-sh') and 'blessing' in pg.inner_text('.orx-sh') and 'Vespers' in pg.inner_text('.orx-sh'))
+        if shots: pg.screenshot(path=os.path.join(SP, 's7b.png'))
+        pg.click('.orx-sh .x'); pg.wait_for_timeout(200)
+        check('the day sheet closes', pg.locator('.orx-sh').count() == 0)
         if shots: pg.screenshot(path=os.path.join(SP, 's7.png'))
         # 2026-10-26: edit after setting, a date picker for quests, sizes not minutes, instant open, no-signal saving
         pg.click('.uz-tabs [data-v="1"]'); pg.wait_for_timeout(400)

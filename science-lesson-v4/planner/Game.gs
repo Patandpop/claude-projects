@@ -1175,11 +1175,16 @@ function gameChronicle(k) {
   const weeks = []; for (let i = 6; i >= 0; i--) { const m = gAdd_(mon, -7 * i), e = gAdd_(m, 6); weeks.push({ mon: m, coins: ticks.filter((t) => String(t.day) >= m && String(t.day) <= e && earn(t)).reduce((a, t) => a + Number(t.coins), 0) }); }
   const days = [], start = gAdd_(mon, -28), goals = gGoals_(), dailies = goals.filter((g) => g.kind === 'daily' && !g.everyN), net = {};
   ticks.forEach((t) => { const key = t.goalId + '|' + t.day; net[key] = (net[key] || 0) + Number(t.delta); });
+  // the Oracle's day sheet (Patryk 2026-10-29): curses and blessings logged each day, and whether Vespers was kept
+  const undone = gUndone_(ticks), om = {}, vesp = {};
+  ticks.forEach((t) => { const n = gNote_(t); if (String(t.day) < start || undone[t.id] || n.untick || Number(t.delta) <= 0 || (n.side !== 'c' && n.side !== 'b')) return;
+    const o = om[String(t.day)] || (om[String(t.day)] = { c: 0, b: 0 }); o[n.side]++; });
+  gRows_('vespers').forEach((r) => { if (String(r.clean) !== 'undone') vesp[String(r.day)] = String(r.clean); });
   for (let i = 0; i < 35; i++) {
     const d = gAdd_(start, i), fz = gIsFrozen_(d, world, frozen), due = dailies.filter((g) => String(g.created || '') <= d && gIsDue_(Object.assign({}, g, { lastDone: '' }), d));
     const got = due.filter((g) => (net[g.id + '|' + d] || 0) > 0).length, share = due.length ? got / due.length : 0;
     const later = d > today ? due.length + goals.filter((g) => g.kind === 'todo' && !g.lastDone && g.due === d).length : 0;
-    days.push({ day: d, n: got, due: due.length, share, level: fz ? 'off' : d > today ? 'future' : !due.length ? 'none' : share >= 1 ? 'all' : share >= 0.75 ? 'most' : share > 0 ? 'some' : 'none', later, frozen: fz, future: d > today, today: d === today });
+    days.push({ day: d, n: got, due: due.length, share, level: fz ? 'off' : d > today ? 'future' : !due.length ? 'none' : share >= 1 ? 'all' : share >= 0.75 ? 'most' : share > 0 ? 'some' : 'none', later, frozen: fz, future: d > today, today: d === today, curses: (om[d] || {}).c || 0, blessings: (om[d] || {}).b || 0, vespers: vesp[d] || '' });
   }
   return gOut_({ weeks, days, beaten: gBeaten_() });
 }
