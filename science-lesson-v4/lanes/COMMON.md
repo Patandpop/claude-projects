@@ -6,6 +6,8 @@ Three chats build the plan at the same time, in the SAME folder on Patryk's PC, 
 - **Lane A, Ulhu game:** planner/Game.gs, planner/game-*.js, planner/game-shop.json, planner/tests/game.test.js, planner/tests/ulhu_sim.py, and the Ulhu parts of Phone.html. Lane A ALSO owns making the paste files (always one complete set).
 - **Lane B, learning:** planner/Code.gs, planner/Planner.html, planner/Mailbox.gs, planner/Behaviour.gs, the lesson builder (science-lesson/**), test/, and the lesson and homework tools.
 - **Lane C, your day:** a new folder app/ (the installed app), plus the evening timer and day screen. Lane C needs small additions in Code.gs or Planner.html: keep each one small, re-read the file just before editing, commit straight away, and say so in your log.
+- **Lane D, Ulhu life companion (added 29 Oct, late):** new files planner/game-companion.js, planner/Companion.gs, planner/tests/companion.test.js, replica/design/mockups/companion/. Tiny hook edits in Lane A's game-ui.js or Game.gs only, committed at once.
+- Lane C's server code goes in its own new file planner/Day.gs (see lanes/design-installed-app.md).
 - Anything else shared (bundle.js, README files): small targeted edits, commit at once.
 
 ## Working beside two other chats

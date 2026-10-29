@@ -1,0 +1,10 @@
+LANE D: Ulhu as a life companion (builder, Opus)
+
+Repo C:\Users\magda\claude-projects\science-lesson-v4, branch pre-reskin. Read CLAUDE.md, lanes/COMMON.md, the FABLE-WORKPLAN.md Part B rules, replica/design/grills/ulhu-companion.md (its Decisions are law), and lanes/log-D.md if it exists (to resume). Skim planner/game-ui.js and planner/Game.gs only to learn how Ulhu's screens and data work; Lane A owns those files and is busy in them.
+
+Build Big goal 3, Ulhu as a life companion, in the order the grilling file gives (if it gives none: the data first, then the year-long story and daily adventure, then the "who I am becoming" page, then rest days, holidays and illness, then streak protection, then sound, then nudges). Rules for this lane:
+- Put your code in NEW files you own: planner/game-companion.js (screens) and planner/Companion.gs (server), plus planner/tests/companion.test.js. Add them to bundle.js (one small edit, commit at once).
+- Where Ulhu's existing screens must call your code (a button, a tab, a hook on a tick), make the smallest possible edit in game-ui.js or Game.gs: pull first, re-read the file, edit, run the checks, commit and push straight away, and note it in your log. Never restyle or move Lane A's code.
+- Visual pieces need a mock-up first: write it as a self-contained HTML page in replica/design/mockups/companion/, commit it, and put "mock-up ready: <path>" in your Waiting list (the design session publishes it for Patryk); carry on with non-visual work while you wait.
+- Never after 7pm for nudges and sound; no paid services; the tool suggests, never decides.
+You don't make paste files; Lane A does. Put "next paste set" in your Waiting list when your changes need pasting. Start now.
