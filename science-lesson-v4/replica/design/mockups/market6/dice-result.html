@@ -1,0 +1,94 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dice result: three options</title>
+<style>
+body{margin:0;background:#07100e;color:#cfe8d8;font-family:Georgia,serif;padding:12px}
+h1{font-size:18px;margin:4px 0 2px;color:#9fe0b8}
+p.n{font-size:13px;margin:0 0 12px;color:#8aa}
+.card{max-width:380px;margin:0 auto 22px}
+.card h2{font-size:15px;margin:0 0 4px;color:#e6c27a}
+.card .d{font-size:12px;color:#8aa;margin:0 0 6px}
+.stage{position:relative;height:300px;border-radius:10px;overflow:hidden;background:radial-gradient(ellipse at 50% 70%,#1d2a1c 0,#0a0f0c 65%,#040605 100%);box-shadow:inset 0 0 40px #000}
+.btns{display:flex;gap:8px;margin-top:6px}
+.btns button{flex:1;padding:9px;border:1px solid #3c5a48;background:#0f1d17;color:#cfe8d8;border-radius:6px;font-size:14px}
+/* pixel figures */
+.fig{position:absolute;bottom:92px;width:64px;height:80px;image-rendering:pixelated;transition:all .6s}
+.ulhu{left:34px}.keeper{right:34px}
+.fig svg{width:100%;height:100%}
+.table{position:absolute;left:20px;right:20px;bottom:40px;height:54px;background:linear-gradient(#3a2414,#1d1109);border-radius:50%/30%;box-shadow:0 6px 20px #000}
+.candle{position:absolute;left:50%;bottom:86px;width:8px;height:22px;margin-left:-4px;background:#d9cfae}
+.candle:after{content:"";position:absolute;left:-3px;top:-14px;width:14px;height:16px;border-radius:50% 50% 40% 40%;background:radial-gradient(#fff6c0,#f0a030 60%,transparent 70%);animation:fl .3s infinite alternate}
+@keyframes fl{to{transform:scaleY(1.15) translateY(-1px)}}
+.dice{position:absolute;bottom:58px;display:flex;gap:3px}
+.dice.l{left:44px}.dice.r{right:44px}
+.die{width:14px;height:14px;background:#e8dfc8;border-radius:3px;box-shadow:0 1px 0 #6a5a40;transition:all .5s}
+.die.gone{opacity:0;transform:translateY(20px) scale(.4)}
+.word{position:absolute;left:0;right:0;top:34px;text-align:center;font-size:40px;letter-spacing:6px;opacity:0;transform:scale(.6);transition:all .5s;font-weight:bold}
+.price{position:absolute;left:0;right:0;top:86px;text-align:center;font-size:20px;opacity:0;transition:opacity .5s .4s}
+.price s{color:#7a8a80;margin-right:8px}
+.win .word{color:#7dffb0;text-shadow:0 0 18px #2bd47a,0 0 4px #fff}
+.lose .word{color:#ff6a5a;text-shadow:0 0 18px #b0201a}
+.win .price b{color:#7dffb0;text-shadow:0 0 10px #2bd47a}
+.lose .price b{color:#ff8a70;text-shadow:0 0 10px #b0201a}
+.show .word{opacity:1;transform:scale(1)}.show .price{opacity:1}
+/* DR1 face-off spotlight */
+.spot{position:absolute;top:0;width:150px;height:300px;opacity:0;transition:opacity .6s;background:linear-gradient(rgba(180,255,210,.28),transparent 85%);clip-path:polygon(40% 0,60% 0,100% 100%,0 100%)}
+.spot.l{left:0}.spot.r{right:0}
+.dim{filter:brightness(.25) saturate(.3);transform:translateY(8px)}
+.lift{transform:translateY(-10px) scale(1.12);filter:drop-shadow(0 0 10px #7dffb0)}
+.liftbad{transform:translateY(-10px) scale(1.12);filter:drop-shadow(0 0 10px #ff6a5a)}
+/* DR2 circle */
+.circle{position:absolute;left:50%;bottom:44px;width:150px;height:44px;margin-left:-75px;border:2px solid #2bd47a;border-radius:50%;opacity:.25;box-shadow:0 0 12px #2bd47a;transition:all .6s}
+.beam{position:absolute;bottom:66px;height:4px;width:0;background:#7dffb0;box-shadow:0 0 12px #2bd47a;transition:width .6s .2s}
+.beam.toL{right:50%}.beam.toR{left:50%}
+.lose .beam{background:#ff6a5a;box-shadow:0 0 12px #b0201a}
+.circle.flare{opacity:1;transform:scale(1.25)}
+.lose .circle.flare{border-color:#ff6a5a;box-shadow:0 0 16px #b0201a}
+/* DR3 tide */
+.tide{position:absolute;left:0;right:0;bottom:0;height:0;background:linear-gradient(rgba(20,90,80,.75),rgba(5,30,30,.95));transition:all 1s}
+.tide.half{height:62%}
+.tide.L{clip-path:polygon(0 0,50% 0,50% 100%,0 100%)}
+.tide.R{clip-path:polygon(50% 0,100% 0,100% 100%,50% 100%)}
+.bub{position:absolute;width:6px;height:6px;border:1px solid #9fe;border-radius:50%;opacity:0}
+.tide.half~.bub{animation:up 1.4s ease-out forwards}
+@keyframes up{0%{opacity:.8}100%{opacity:0;transform:translateY(-120px)}}
+</style></head><body>
+<h1>The dice result: who won</h1>
+<p class="n">Three ways to show the end of a haggle. Tap Win or Lose under each one to play it. The words are only ideas: DR1 IA! / FHTAGN, DR2 YIELDED / CLAIMED, DR3 Y'HAH / N'GHA. You can swap them.</p>
+
+<div class="card" id="c1"><h2>DR1 Face-off</h2><p class="d">A light shaft drops on the winner, who rises up and glows. The loser sinks into the dark. The loser's dice fall off the table.</p><div class="stage"></div><div class="btns"><button data-r="win">Win</button><button data-r="lose">Lose</button></div></div>
+<div class="card" id="c2"><h2>DR2 The circle chooses</h2><p class="d">The green summoning circle on the table flares up and fires a beam at the winner. On a loss it burns red and the beam goes to the keeper.</p><div class="stage"></div><div class="btns"><button data-r="win">Win</button><button data-r="lose">Lose</button></div></div>
+<div class="card" id="c3"><h2>DR3 The tide takes the loser</h2><p class="d">Sea water floods the loser's side of the table, with bubbles (the same look as the Low tide way in). The winner stays dry.</p><div class="stage"></div><div class="btns"><button data-r="win">Win</button><button data-r="lose">Lose</button></div></div>
+
+<script>
+const ULHU=`<svg viewBox="0 0 16 20" shape-rendering="crispEdges"><rect x="4" y="2" width="8" height="8" fill="#3f8f6a"/><rect x="5" y="4" width="2" height="2" fill="#ffe680"/><rect x="9" y="4" width="2" height="2" fill="#ffe680"/><rect x="4" y="10" width="2" height="5" fill="#2f6f52"/><rect x="7" y="10" width="2" height="6" fill="#2f6f52"/><rect x="10" y="10" width="2" height="5" fill="#2f6f52"/><rect x="2" y="11" width="12" height="5" fill="#1d3a2e" opacity=".7"/><rect x="2" y="0" width="2" height="4" fill="#2f6f52"/><rect x="12" y="0" width="2" height="4" fill="#2f6f52"/></svg>`;
+const KEEP=`<svg viewBox="0 0 16 20" shape-rendering="crispEdges"><rect x="3" y="3" width="10" height="9" fill="#7a6a9a"/><rect x="4" y="5" width="3" height="3" fill="#fff"/><rect x="5" y="6" width="1" height="1" fill="#000"/><rect x="9" y="5" width="3" height="3" fill="#fff"/><rect x="10" y="6" width="1" height="1" fill="#000"/><rect x="5" y="10" width="6" height="1" fill="#3a2a4a"/><rect x="2" y="12" width="12" height="7" fill="#4a3a5a"/><rect x="7" y="0" width="1" height="3" fill="#aaa"/><rect x="6" y="0" width="3" height="1" fill="#ffd060"/></svg>`;
+const WORDS={c1:["IA!","FHTAGN"],c2:["YIELDED","CLAIMED"],c3:["Y'HAH","N'GHA"]};
+function base(){return `<div class="table"></div><div class="candle"></div>
+<div class="fig ulhu">${ULHU}</div><div class="fig keeper">${KEEP}</div>
+<div class="dice l">${'<div class="die"></div>'.repeat(5)}</div><div class="dice r">${'<div class="die"></div>'.repeat(5)}</div>
+<div class="word"></div><div class="price"></div>`}
+function play(card,r){
+  const st=card.querySelector('.stage'),id=card.id,win=r==='win';
+  st.className='stage '+r;
+  let extra='';
+  if(id==='c1')extra='<div class="spot l"></div><div class="spot r"></div>';
+  if(id==='c2')extra='<div class="circle"></div><div class="beam '+(win?'toL':'toR')+'"></div>';
+  if(id==='c3')extra='<div class="tide '+(win?'R':'L')+'"></div>'+Array.from({length:8},(_,i)=>`<div class="bub" style="left:${(win?55:8)+i*5}%;bottom:${20+(i%3)*30}px;animation-delay:${i*.12}s"></div>`).join('');
+  st.innerHTML=base()+extra;
+  st.querySelector('.word').textContent=WORDS[id][win?0:1];
+  st.querySelector('.price').innerHTML=win?'<s>40 ᚱ</s><b>30 ᚱ</b>':'<s>40 ᚱ</s><b>44 ᚱ</b>';
+  const u=st.querySelector('.ulhu'),k=st.querySelector('.keeper');
+  const loserDice=st.querySelectorAll(win?'.dice.r .die':'.dice.l .die');
+  const winnerDice=st.querySelectorAll(win?'.dice.l .die':'.dice.r .die');
+  setTimeout(()=>{
+    loserDice.forEach((d,i)=>setTimeout(()=>d.classList.add('gone'),i*90));
+    winnerDice.forEach((d,i)=>{if(i>=4)d.classList.add('gone')}); // winner kept 4
+    if(id==='c1'){st.querySelector(win?'.spot.l':'.spot.r').style.opacity=1;(win?u:k).classList.add(win?'lift':'liftbad');(win?k:u).classList.add('dim')}
+    if(id==='c2'){st.querySelector('.circle').classList.add('flare');st.querySelector('.beam').style.width='110px';setTimeout(()=>(win?u:k).classList.add(win?'lift':'liftbad'),500)}
+    if(id==='c3'){st.querySelector('.tide').classList.add('half');setTimeout(()=>(win?k:u).classList.add('dim'),500)}
+  },300);
+  setTimeout(()=>st.classList.add('show'),1100);
+}
+document.querySelectorAll('.card').forEach(c=>{c.querySelectorAll('button').forEach(b=>b.onclick=()=>play(c,b.dataset.r));play(c,'win')});
+</script></body></html>
