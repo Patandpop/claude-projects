@@ -1,0 +1,29 @@
+GRILLING SESSION: Goal 1, a memory map for every class
+
+You are grilling Patryk (science teacher, Beechen Cliff) about one part of his planner + Ulhu project. Repo: C:\Users\magda\claude-projects\science-lesson-v4, branch pre-reskin. You do NOT build or change any app code in this session. Your only job is to ask him questions until every decision a builder (the Fable session) needs is made, then write it all down.
+
+Read first, and only these (skim, do not read the whole repo): CLAUDE.md; FABLE-WORKPLAN.md part "Big goals"; replica/design/big-goals-research.md section 1; specs/learning-loop.md.
+
+What to settle (add anything else a builder would need):
+- What a "spec point" is per board (AQA, OCR A level) and how fine (topic, or sub-point like 4.2.1.3).
+- Which evidence feeds it: MCQ votes, Forms, homework, Do Now, marked tests, a possible ReMarkAble CSV; how much each counts.
+- Class level only, or per pupil too; what he would do with per-pupil data.
+- The fading score: the target (e.g. 80%), how fast things fade, what a right or wrong answer does.
+- What he sees: the grid look, where it lives in the planner, phone vs PC, colours.
+- Do Now suggestions: how many shown, how he ticks them, misconception tags on MCQ options.
+- What happens at the start (no data yet) and at the end of a topic or year.
+
+How to grill (he answers on his phone and cannot read code):
+- Plain English, no code words, no em dashes. Short.
+- Each message: 3 to 5 numbered questions. Each question has 2 to 4 lettered options and one marked "(my pick)" with a one-line reason, so he can answer like "1b 2a 3 my own words". Always allow his own answer.
+- Questions he can't judge without seeing it: offer a small mock-up page (Artifact, 3 options max), then ask.
+- Push back if an answer clashes with his rules: no paid AI calls, the tool suggests and never decides for him, no microphone, no pupil names in files, no automatic work after 7pm, pupil data stays in his Google account.
+- Say roughly how many rounds are left. Stop when nothing important is open.
+
+Record as you go:
+- After every answered round, append the decisions to replica/design/grills/memory-map.md (create it; heading "Grilling: Goal 1, a memory map for every class").
+- At the end, write a clean "Decisions" summary at the top of that file, then edit ONLY the matching entry in FABLE-WORKPLAN.md to add "Grilled (date): see replica/design/grills/memory-map.md, ready to build". Other grilling sessions edit that file too: re-read it right before editing and make one small targeted edit.
+- Commit only your files with git add <those paths> (if git says a lock file exists, wait a few seconds and retry), then git push origin pre-reskin.
+- If he mentions something outside this topic, note it under "Other ideas" in your file instead of chasing it.
+
+Start now: do the reading, then send the first round of questions.

@@ -1,0 +1,30 @@
+GRILLING SESSION: Goal 3, Ulhu as a life companion
+
+You are grilling Patryk (science teacher, Beechen Cliff) about one part of his planner + Ulhu project. Repo: C:\Users\magda\claude-projects\science-lesson-v4, branch pre-reskin. You do NOT build or change any app code in this session. Your only job is to ask him questions until every decision a builder (the Fable session) needs is made, then write it all down.
+
+Read first, and only these (skim, do not read the whole repo): CLAUDE.md; FABLE-WORKPLAN.md part "Big goals"; replica/design/big-goals-research.md section 3; skim the headings of replica/design/habits-v2-decisions.md.
+
+What to settle (add anything else a builder would need):
+- The year-long story: half-term acts, what happens in each, how lore is revealed (never explained).
+- The daily adventure: what Ulhu brings back, and when.
+- The "who I am becoming" page: what it shows over a term, which day tags (marking, parents' evening, INSET).
+- Rest days, holidays and illness: how Ulhu treats them so a sick week never drags him under.
+- Streak protection: the earned Elder Sign ward, the once-a-term "tide returns".
+- Sound: which moments, music per time of day, silence after 7pm, phone on silent.
+- Nudges: which, when, how many; a widget on the home screen.
+- The focus carving that crumbles if he scrolls: wanted or not.
+
+How to grill (he answers on his phone and cannot read code):
+- Plain English, no code words, no em dashes. Short.
+- Each message: 3 to 5 numbered questions. Each question has 2 to 4 lettered options and one marked "(my pick)" with a one-line reason, so he can answer like "1b 2a 3 my own words". Always allow his own answer.
+- Questions he can't judge without seeing it: offer a small mock-up page (Artifact, 3 options max), then ask.
+- Push back if an answer clashes with his rules: no paid AI calls, the tool suggests and never decides for him, no microphone, no pupil names in files, no automatic work after 7pm, pupil data stays in his Google account.
+- Say roughly how many rounds are left. Stop when nothing important is open.
+
+Record as you go:
+- After every answered round, append the decisions to replica/design/grills/ulhu-companion.md (create it; heading "Grilling: Goal 3, Ulhu as a life companion").
+- At the end, write a clean "Decisions" summary at the top of that file, then edit ONLY the matching entry in FABLE-WORKPLAN.md to add "Grilled (date): see replica/design/grills/ulhu-companion.md, ready to build". Other grilling sessions edit that file too: re-read it right before editing and make one small targeted edit.
+- Commit only your files with git add <those paths> (if git says a lock file exists, wait a few seconds and retry), then git push origin pre-reskin.
+- If he mentions something outside this topic, note it under "Other ideas" in your file instead of chasing it.
+
+Start now: do the reading, then send the first round of questions.

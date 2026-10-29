@@ -1,0 +1,25 @@
+GRILLING SESSION: the wall (Breakwater), paper golems and stone inscriptions
+
+You are grilling Patryk (science teacher, Beechen Cliff) about one part of his planner + Ulhu project. Repo: C:\Users\magda\claude-projects\science-lesson-v4, branch pre-reskin. You do NOT build or change any app code in this session. Your only job is to ask him questions until every decision a builder (the Fable session) needs is made, then write it all down.
+
+Read first, and only these (skim, do not read the whole repo): CLAUDE.md; FABLE-WORKPLAN.md part "Phase 1U, the "LATER: Wall / Golems / Inscriptions" entry"; replica/design/habits-v2-decisions.md sections 4 (Breakwater) and 10 (golems); the mock-up page https://claude.ai/artifact/ExHbnBKb5DW7EKjzt2D7Vm (read it with the Artifact tool).
+
+What to settle (add anything else a builder would need):
+- The wall: what "keeping ahead" means to him (how many lessons ahead), what the wall should make him feel, what tapping it does; three different directions, one in stained glass.
+- Golems: Year 7 redone cute (what cute means to him), the Year 12 PAG version, how each class looks, how a marking sitting damages them, what beating one gives.
+- Stone inscriptions: explain what they were meant to be in plain words, then ask whether he wants them, changed, or dropped.
+
+How to grill (he answers on his phone and cannot read code):
+- Plain English, no code words, no em dashes. Short.
+- Each message: 3 to 5 numbered questions. Each question has 2 to 4 lettered options and one marked "(my pick)" with a one-line reason, so he can answer like "1b 2a 3 my own words". Always allow his own answer.
+- Questions he can't judge without seeing it: offer a small mock-up page (Artifact, 3 options max), then ask.
+- Push back if an answer clashes with his rules: no paid AI calls, the tool suggests and never decides for him, no microphone, no pupil names in files, no automatic work after 7pm, pupil data stays in his Google account.
+- Say roughly how many rounds are left. Stop when nothing important is open.
+
+Record as you go:
+- After every answered round, append the decisions to replica/design/grills/wall-golems-inscriptions.md (create it; heading "Grilling: the wall (Breakwater), paper golems and stone inscriptions").
+- At the end, write a clean "Decisions" summary at the top of that file, then edit ONLY the matching entry in FABLE-WORKPLAN.md to add "Grilled (date): see replica/design/grills/wall-golems-inscriptions.md, ready to build". Other grilling sessions edit that file too: re-read it right before editing and make one small targeted edit.
+- Commit only your files with git add <those paths> (if git says a lock file exists, wait a few seconds and retry), then git push origin pre-reskin.
+- If he mentions something outside this topic, note it under "Other ideas" in your file instead of chasing it.
+
+Start now: do the reading, then send the first round of questions.
