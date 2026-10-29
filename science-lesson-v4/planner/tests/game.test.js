@@ -133,6 +133,13 @@ threw = false; try { G.gameBuy(k, cheap.id); } catch (e) { threw = /Not enough/.
 ok('buying without enough doubloons is refused', threw);
 const lockedItem = sh.items.find((i) => i.locked);
 setCoins(5000);
+// 1.9 (2026-10-29): both lock shapes in the shop file ({type,min} / {type,count} and {level} / {outside_work}) are read, and
+// every item whose lock is above the player is refused at buy time, not only shown as locked
+{ const p = G.gameLoad(k).player, lockOf = (i) => { const l = i.lock || {}; return { lv: Math.max(Number(l.level) || 0, l.type === 'level' ? Number(l.min) || 0 : 0), ow: Number(l.outside_work) || (l.type === 'outside_work' ? Number(l.count) || 0 : 0) }; };
+  const shouldLock = SHOP.items.filter((i) => { const L = lockOf(i); return L.lv > p.level || L.ow > sh.outside; }).map((i) => i.id);
+  ok('1.9 every item with a lock above the player (either shape) shows as locked (' + shouldLock.length + ' items)', shouldLock.length > 5 && shouldLock.every((id) => sh.items.find((i) => i.id === id).locked));
+  const refused = sh.items.filter((i) => i.locked).every((i) => { try { G.gameBuy(k, i.id); return false; } catch (e) { return /Locked/.test(e.message); } });
+  ok('...and every locked item is refused at buy time even with the doubloons', refused); }
 threw = false; try { G.gameBuy(k, lockedItem.id); } catch (e) { threw = /Locked/.test(e.message); }
 ok('a locked item is refused even with the doubloons', threw);
 const before = G.gameLoad(k).room[cheap.slots[0]];
@@ -427,6 +434,56 @@ ok('spending and refunds never count as doubloons earned', ch.weeks[6].coins ===
   const sh = G.gameShop(k), el = sh.items.find((i) => i.tier === 'Eldritch'), ba = sh.items.find((i) => i.tier === 'Basic' && !i.locked);
   ok('Eldritch needs level 20', el.locked && /level 20/.test(el.why));
   ok('Basic is open from level 1', !!ba); }
+console.log('\n-- 29 Oct 2026: rollover before a tick, offline taps, exact Undo after fainting, formula guard, life bonus, every-few-days');
+{ const gid = (re, kind) => (G.gameLoad(k).goals.find((g) => re.test(g.name) && g.kind === kind) || {}).id;
+  // 1.10: a page left open past midnight: the first tick of the new day closes yesterday first
+  at('2027-02-01T09:00:00Z'); let s = G.gameLoad(k); const rd = gid(/^Read/, 'daily'), tr = gid(/^(Train|Workout)/, 'daily'), nf = gid(/Netflix/, 'habit');
+  G.gameTick(k, rd, 1); G.gameTick(k, tr, 1);
+  at('2027-02-03T09:00:00Z'); s = G.gameTick(k, rd, 1);   // two days on, no reload in between
+  let t = s.goals.find((g) => g.id === tr), r = s.goals.find((g) => g.id === rd);
+  ok('1.10 a tick on a page left open past midnight runs the day rollover first (Train shows its forgiven miss, Read counts for today)', t.miss === true && !t.doneToday && r.doneToday && r.streak === 2);
+  // 1.16: a tap saved with no signal lands on the day it was made, and the same tap id never pays twice
+  at('2027-02-04T08:00:00Z'); const late = Date.parse('2027-02-03T23:10:00Z'), c0 = G.gameLoad(k).player.coins;
+  s = G.gameTick(k, tr, 1, '', { at: late, aid: 'tap-A' }); t = s.goals.find((g) => g.id === tr);
+  ok('1.16 an 11 pm tick sent the next morning counts for yesterday, not today', t.strip[12] === 'o' && !t.doneToday && s.player.coins > c0);
+  const c1 = s.player.coins; s = G.gameTick(k, tr, 1, '', { at: late, aid: 'tap-A' });
+  ok('...the same tap sent twice pays once', s.player.coins === c1);
+  s = G.gameUntick(k, tr, { at: late, aid: 'un-A' }); t = s.goals.find((g) => g.id === tr);
+  ok('...Undo of that tap reaches yesterday\'s tick', s.player.coins === c0 && t.strip[12] !== 'o');
+  const h0 = s.player.hp; s = G.gameTick(k, nf, -1, '', { at: late, aid: 'c-1' }); s = G.gameTick(k, nf, -1, '', { at: late + 1000, aid: 'c-2' });
+  const h2 = s.player.hp; s = G.gameUntick(k, nf, { at: late, aid: 'un-c' }); const h3 = s.player.hp; s = G.gameUntick(k, nf, { at: late, aid: 'un-c' });
+  ok('...the same Undo sent twice undoes one curse, not two', h2 < h0 && h3 > h2 && s.player.hp === h3);
+  s = G.gameTick(k, rd, 1, '', { at: Date.parse('2027-01-20T10:00:00Z'), aid: 'tap-old' });
+  ok('...a tap older than 36 hours counts for today', s.goals.find((g) => g.id === rd).doneToday);
+  // 1.11: Undo after fainting gives back the level, the XP, the runes and the health
+  at('2027-02-05T10:00:00Z'); s = G.gameLoad(k); s = G.gameTick(k, rd, 1);
+  let guard = 0, was = null; while (!s.last || !s.last.died) { was = { lv: s.player.level, xp: s.player.xp, co: s.player.coins, hp: s.player.hp }; s = G.gameTick(k, nf, -1); if (++guard > 25) break; }
+  ok('a curse at low health faints Ulhu (runes or a level go, the Rise quest opens)', s.last && s.last.died && s.player.rise && (s.player.coins < was.co || s.player.level < was.lv));
+  s = G.gameUntick(k, nf);
+  ok('1.11 Undo of that curse gives back the level, the XP, the runes and the health he had, and closes the Rise quest', s.player.level === was.lv && s.player.xp === was.xp && s.player.coins === was.co && s.player.hp === was.hp && !s.player.rise);
+  const fresh = G.gameSaveGoal(k, { name: 'Test slip (fresh)', kind: 'habit', polarity: 'minus', minutes: 15, track: 'life' }).saved;
+  const v0 = G.gameLoad(k).goals.find((g) => g.id === fresh).value; s = G.gameTick(k, fresh, -1); const v1 = s.goals.find((g) => g.id === fresh).value; s = G.gameUntick(k, fresh);
+  ok('...and undoing a curse puts its colour back exactly (' + v0 + ' -> ' + v1 + ' -> ' + s.goals.find((g) => g.id === fresh).value + ')', v1 === v0 - 1 && s.goals.find((g) => g.id === fresh).value === v0);
+  G.gameArchive(k, fresh);
+  // 1.12: names that look like formulas or numbers stay text
+  const id1 = G.gameSaveGoal(k, { name: '+20 press-ups', kind: 'daily', days: '1234567', minutes: 15, track: 'life' }).saved;
+  const id2 = G.gameSaveGoal(k, { name: '10', kind: 'daily', days: '1234567', minutes: 15, track: 'life' }).saved;
+  s = G.gameLoad(k);
+  ok('1.12 a ritual named "+20 press-ups" is kept as text, not turned into a formula', s.goals.some((g) => g.id === id1 && g.name === '+20 press-ups'));
+  ok('...and one named "10" stays "10"', s.goals.some((g) => g.id === id2 && g.name === '10'));
+  // 1.14: the life bonus counts life rituals only, never a slip or a blessing
+  at('2027-02-08T10:00:00Z'); s = G.gameLoad(k); const pay0 = s.goals.find((g) => g.id === rd).pay;
+  s = G.gameTick(k, nf, -1); const pay1 = s.goals.find((g) => g.id === rd).pay, cA = s.player.coins; s = G.gameTick(k, rd, 1);
+  ok('1.14 a slip earlier in the day does not eat the first-life-ritual bonus (Read still pays ' + pay0 + ')', pay1 === pay0 && s.player.coins - cA >= pay0);
+  // 1.15: every-few-days rituals can miss, never-miss-twice applies
+  at('2027-02-10T10:00:00Z'); const ev = G.gameSaveGoal(k, { name: 'Call a friend (test)', kind: 'daily', days: '', everyN: 3, minutes: 30, track: 'life' }).saved;
+  s = G.gameTick(k, ev, 1); const st1 = s.goals.find((g) => g.id === ev).streak;
+  at('2027-02-14T10:00:00Z'); s = G.gameLoad(k); let g = s.goals.find((x) => x.id === ev);   // due on the 13th, missed
+  ok('1.15 an every-3-days ritual not done by its due day records a forgiven miss (streak kept, the strip shows it)', g.miss === true && g.streak === st1 && st1 >= 1 && g.strip[12] === 'x');
+  at('2027-02-17T10:00:00Z'); s = G.gameLoad(k); g = s.goals.find((x) => x.id === ev);   // due again on the 16th, missed again
+  ok('...missing it twice in a row breaks the streak', g.streak === 0 && g.miss === false);
+  G.gameArchive(k, ev); G.gameArchive(k, id1); G.gameArchive(k, id2); }
+
 console.log('\n-- two-sided omens: pairing, joining, duplicates (2026-10-28 night)');
 { at('2027-01-12T10:00:00Z'); let s = G.gameLoad(k);
   const n0 = s.goals.length;

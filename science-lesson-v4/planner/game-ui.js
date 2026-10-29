@@ -385,7 +385,16 @@
     }
     // one at a time, in tap order (2026-10-28): fast taps queue behind each other instead of fighting over the lock
     let line = Promise.resolve();
+    // a tick or untick carries when it was made and its own id (1.16, 2026-10-29): one saved with no signal lands on the day
+    // it was made, and a resend after a lost reply is the same tap to the server, never a second one
+    const tapMeta = () => ({ at: Date.now(), aid: Date.now().toString(36) + Math.random().toString(36).slice(2, 8) });
+    function withMeta(fn, args) {
+      if (!/^game(Tick|Untick)$/.test(fn) || (args.length && args[args.length - 1] && args[args.length - 1].aid)) return args;
+      args = args.slice(); if (fn === 'gameTick') while (args.length < 3) args.push('');
+      args.push(tapMeta()); return args;
+    }
     function send(fn, args, after) {
+      args = withMeta(fn, args);
       const my = ++seq, p = line.then(() => call(fn, ...args)); line = p.catch(() => null);
       return p.then((d) => {
         if (!d) throw new Error('The planner sent nothing back. Reload, and if it keeps happening paste Game.gs again and deploy a new version.');
@@ -1044,7 +1053,8 @@
         if (V.curseT && V.curseT.id === id) { clearTimeout(V.curseT.t); V.curseT = null; return logCurse(id, r, k, ''); }
         if (V.curseT) clearTimeout(V.curseT.t);
         V.curseT = { id, t: setTimeout(() => { V.curseT = null; const host = b.closest('.uz-pane');
-          if (window.BLOOD && host && !matchMedia('(prefers-reduced-motion: reduce)').matches) BLOOD.open(host, b, (sig) => logCurse(id, b.getBoundingClientRect(), k, sig || '')); else logCurse(id, r, k, ''); }, 260) };
+          // reduced motion (1.13, 2026-10-29): the blood module plays still, but the four sigils still rise and are asked
+          if (window.BLOOD && host) BLOOD.open(host, b, (sig) => logCurse(id, b.getBoundingClientRect(), k, sig || '')); else logCurse(id, r, k, ''); }, 260) };
         return;
       }
       if (a === 'bless') {
@@ -1131,6 +1141,13 @@
     D = LS('ulhuD');   // last time's screen, shown at once; the server's copy replaces it a moment later
     fit(); paint();
     window.addEventListener('online', () => flush().then(() => send('gameLoad', [])));
+    // a page left open past midnight (1.10, 2026-10-29): when it comes back into view on a later day, reload it, so
+    // yesterday's lit ticks are not shown as today's and the first tap of the day never lands on the old day
+    const localDay = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+    let waking = false;
+    function wake() { if (!D || !D.today || D.today === localDay() || waking) return; waking = true; flush().then(() => send('gameLoad', [])).catch(() => null).then(() => { waking = false; }); }
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') wake(); });
+    window.addEventListener('focus', wake); window.addEventListener('pageshow', wake);
     flush().then(() => send('gameLoad', [], (d) => { setTimeout(fit, 50); if (d.auto && d.auto.length) { V.last = { verb: 'Ticked for you:', name: d.auto.map((x) => x.name).join(', '), delta: '+' + d.auto.reduce((n, x) => n + x.coins, 0), unit: 'coin' }; paint(); } }));
     return { refit: fit };
   }

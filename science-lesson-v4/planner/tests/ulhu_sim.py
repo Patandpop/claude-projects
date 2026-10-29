@@ -6,7 +6,7 @@ P = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '/'; SP = sys.
 js = ''.join(open(P + f, encoding='utf-8').read() + '\n' for f in ['game-ulhu.js', 'game-pixel.js', 'game-runes.js', 'game-temple.js', 'game-stone.js', 'game-omens.js', 'game-tabs.js', 'game-blood.js', 'game-scroll.js', 'game-glass.js', 'game-highvespers.js', 'game-den.js', 'game-ui.js', 'game-oracle.js', 'game-pairs.js'])
 page = '''<!doctype html><meta charset="utf-8"><meta name=viewport content="width=device-width,initial-scale=1"><body style="margin:0;background:#0d1b3a">
 <div style="height:60px;background:#0a1020;color:#fff">8AG header</div><div id=u></div><nav style="position:fixed;bottom:0;left:0;right:0;height:62px;background:#0a1020"></nav>
-<script>window.CALLS=[];function call(fn,...args){CALLS.push(fn);return fetch('/c',{method:'POST',body:JSON.stringify({fn,args})}).then(r=>r.json()).then(x=>{if(x.err)throw new Error(x.err);return x.ok;});}</script>
+<script>window.CALLS=[];function call(fn,...args){CALLS.push(fn);window.ARGS=window.ARGS||[];ARGS.push(args);return fetch('/c',{method:'POST',body:JSON.stringify({fn,args})}).then(r=>r.json()).then(x=>{if(x.err)throw new Error(x.err);return x.ok;});}</script>
 <script>''' + js + '''</script><script>GameUI.mount(document.getElementById('u'),call,{wide:false});</script>'''
 f = os.path.join(SP, 'ul2.html'); open(f, 'w', encoding='utf-8').write(page)
 srv = subprocess.Popen(['node', os.path.join(os.path.dirname(os.path.abspath(__file__)), 'ulhu_server.js'), '8765', f], stdout=subprocess.PIPE, text=True)
@@ -37,6 +37,9 @@ try:
         check('a tick pays at once, before the server answers', c1 > c0 and ('Ticked:' in pg.inner_text('.uz-undo') or 'Marked:' in pg.inner_text('.uz-undo')))
         pg.wait_for_timeout(900)
         check('the server agrees', int(pg.inner_text('.uz-coins b')) == c1)
+        check('1.16 every tick carries the moment it was made and its own id', pg.evaluate("(() => { const a = ARGS[CALLS.lastIndexOf('gameTick')]; const m = a && a[a.length - 1]; return !!(m && m.at && m.aid); })()"))
+        n_loads = pg.evaluate("CALLS.filter(c => c === 'gameLoad').length"); pg.evaluate("window.dispatchEvent(new Event('focus'))"); pg.wait_for_timeout(700)
+        check('1.10 coming back to a page whose day has passed reloads it from the server', pg.evaluate("CALLS.filter(c => c === 'gameLoad').length") == n_loads + 1)
         pg.click('[data-a=undo]'); pg.wait_for_timeout(900)
         check('Undo puts it back (screen and server)', int(pg.inner_text('.uz-coins b')) == c0 and 'Undone' in pg.inner_text('.uz-undo'))
         # swipe to Quests
@@ -185,6 +188,11 @@ try:
         check('tapping its left half logs the curse', pg.inner_text('.hpt') != hpb and 'ABSOLUTION I' in pg.inner_text('.uz-two'))
         pg.click('.uz-twr'); pg.wait_for_timeout(1200)
         check('tapping its right half is Absolution I', 'Absolution I' in pg.inner_text('.uz-undo') and 'ABSOLUTION II' in pg.inner_text('.uz-two'))
+        pg.emulate_media(reduced_motion='reduce'); pg.click('.uz-twl'); pg.wait_for_timeout(900)
+        check('1.13 with reduced motion on, a curse still offers the four sigils (still, no flying blood)', pg.locator('[data-sig]').count() == 4)
+        pg.click('[data-sig=Domain]'); pg.wait_for_timeout(1300)
+        check('...and the sigil picked is logged with the curse', 'Domain' in pg.inner_text('.uz-undo'))
+        pg.emulate_media(reduced_motion='no-preference')
         pg.click('.uz-tabs [data-v="3"]'); pg.wait_for_timeout(600)
         check('nothing in the Den scrolls sideways at phone width', pg.evaluate("document.querySelectorAll('.uz-pane')[3].scrollWidth <= document.querySelectorAll('.uz-pane')[3].clientWidth + 1"))
         # 2026-10-28 night: one-sided omens get their other side (game-pairs.js)
