@@ -309,3 +309,9 @@ Patryk's answers, in grill order. Mock-ups follow each area.
 - **Level up:** LU2 round two was weak. The health refill spoiled the good animation. Next round: 3 wildly different level-ups, where the healing must not ruin the moment.
 - **DP3-b** is amazing, but the doors should slide in from the sides, as in the original DP3. Next round: variations of DP3-b with side doors.
 - **FA2-a** is amazing, but take the pentagram out of the middle of the stars. Next round: variations of FA2-a with no pentagram.
+- **Wall, Patryk's exact design (29 Oct, late):** one square stained-glass block per day, with 2 rows (weeks) by 5 columns (days). The corners outside the circle are pleasant filler glass. Inside each block is a round stained-glass moon in 5 wedges, one per lesson slot. Each wedge is split in two: the inner triangle is the lesson and the outer trapezoid is its homework, so 10 pieces per moon.
+  - Lit means done; unlit means not done.
+  - A free period, and "no homework needed", each have their own pleasant colour.
+  - Homework given out has its own colour.
+  - Everything is real stained glass with lead lines between the pieces. Never shapes laid on top of a picture; he has had to repeat this several times.
+  - Mock-ups: replica/design/mockups/wall4/ (MD-1/2/3).
