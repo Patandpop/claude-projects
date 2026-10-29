@@ -315,3 +315,5 @@ Patryk's answers, in grill order. Mock-ups follow each area.
   - Homework given out has its own colour.
   - Everything is real stained glass with lead lines between the pieces. Never shapes laid on top of a picture; he has had to repeat this several times.
   - Mock-ups: replica/design/mockups/wall4/ (MD-1/2/3).
+- **DP3 FINAL: DP3-b2** (kraken-eye doors slide in from the sides, a gold blade cuts the pupil, then a warm gold flood with bubbles). Source: replica/design/mockups/moments3/. Fix the small flaw where the crack in the plaque crosses the number.
+- **FA2-a:** the stars are just the stained-glass star lighting up piece by piece, with nothing in the middle. The story: Ulhu stays alive and gets all his health back. The runes he lost come home by floating down inside see-through bubbles (no squares, no swooshes), and he gains energy as each one arrives. Three ways the bubbles float down are in replica/design/mockups/faint4/ (FA-R1/2/3).
