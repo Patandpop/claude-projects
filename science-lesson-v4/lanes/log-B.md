@@ -6,16 +6,37 @@ Plain-English record of Lane B's work, newest entry first. Each entry says what 
 
 1. **Approve the builder plan for item 1.8 (A-level Drive address).** It touches the lesson builder, so it waits for your yes. The problem: for a Year 12 or 13 lesson the builder writes the wrong Drive address into the two small note files beside the lesson (it says "Year 13/Physics/Chapter 20 ...", but on Drive there is no Physics level and the chapters sit inside Module folders). The files still land in the right place, but the planner uses that note to attach each lesson's multiple-choice questions for the phone voter, so 12C and 13D lessons get none, and the school push uses the same wrong address. The plan: (1) for Year 12 or 13 the builder asks the uploader's own chapter lookup for the real folder and writes that into both notes (when Drive is not reachable it works out the module from the chapter-to-module table the October reorganisation used); (2) check the planner finds 12C and 13D lessons by that address; (3) add a 13D test lesson so it cannot slip back. Nothing on Drive is created, moved or renamed. Reply "yes to 1.8".
 2. **OK to write the Do Now mix rule into SKILL.md?** The picker now aims for 4 short recall questions, one 2-mark explain and one calculation (item 2.1). The plan says the rule only goes into the skill notes with your OK. Reply "yes to the mix rule".
-3. **Next paste set (Lane A makes it):** my planner changes from items 2.2, 2.3 and 2.4 (Planner.html, Code.gs) need to go into the next complete set.
+3. **Next paste set (Lane A makes it):** my planner changes from items 2.2, 2.3, 2.4 and 2.7 (Planner.html, Code.gs) need to go into the next complete set.
+
+4. **Approve the builder plan for items 2.5 and 2.6 (lesson builder fixes).** They touch the lesson builder, so they wait for your yes. I checked the code itself, since the two audits disagree. What I would change, one at a time, with a test for each:
+   - **Sentence starters:** the standard sheet still shows them on its easiest tier (and on any 4+ mark question). Move them to the support sheet only, except where a lesson asks for them on purpose.
+   - **No calculation working given away:** on a lesson that teaches a new method, the standard sheet's GUESS box comes half filled in (Given, Unknown, Equation). Make that pre-filled box appear on the support sheet only; the standard sheet gets the empty GUESS box.
+   - **Word bank from each class's setting:** the builder still has its own "no word bank" list naming last year's 8AB and 9AB. Read class-defaults.json instead, so 10S2, 11S2 and the A-level classes get none without anyone remembering. 9AS and 9XS are still undecided there, so they keep today's behaviour (a word bank) until you say.
+   - **Whiteboard round answers:** the answer text is a fixed small size in a big box; size it to fill the box.
+   - **Graph slide title:** it reads "READ THE GRAPH: ANSWERS" before the answers show. It becomes "READ THE GRAPH", with the answers still on click.
+   - **False picture warning:** the build check asks for a picture description on comparison slides, which have no picture. Skip them.
+   - **Long exam questions:** a long question (like the 7-mark one on 11S2) shrinks to the smallest text and still runs off. When it does not fit, the later parts move to a second slide, and the same for its mark scheme panel (which also overflows on long schemes, so that counts as not fixed). Also make sure no "[FIG]" marker can show in a board mark scheme.
+   - **Mark totals:** "3 to 4 mark questions shown as 6" has no example yet. I would look for one in the October lessons first; if I can't find one, I'll ask you for the lesson where you saw it.
+   - **2.6, a delayed multiple choice:** one question from a lesson 3 to 4 weeks ago joins the multiple-choice block (as its last question, labelled "from [lesson]"), taken from that earlier lesson's own checked questions, so the class meets it again at a spaced gap. It travels with the lesson's questions to the phone, so its ABCD vote is saved like the others.
+   Nothing on Drive changes. Reply "yes to the builder plan" (or pick which bullets).
+5. **Technicians' email addresses (item 2.7):** for the order sheet email draft. Send them to me, or add them as the TECH_EMAILS script property in Apps Script (commas between).
 
 ---
+## 29 Oct 2026, item 2.7: the order sheet as an email draft
+
+**What changed:** the planner menu has a new "Order sheet email" button beside "Technicians' Excel". It makes the same one-page order sheet and puts it in a Gmail draft (subject: the sheet's title, a two-line note, the spreadsheet attached). It never sends: you open Gmail, check it and press Send. Each draft is written in the planner's Log tab, and it counts for Ulhu's order sheet ritual like a download does.
+
+**You need to:** (1) when you paste it, Google will ask once for permission to make Gmail drafts; say yes. (2) give me the technicians' email addresses, or add them yourself in Apps Script (Project Settings, Script properties, name TECH_EMAILS, the addresses with commas between them). Until then the draft has no "To" and the planner tells you so.
+
+**Save:** see the history line "Order sheet email draft".
+
 ## 29 Oct 2026, item 2.4: homework on the lesson card
 
 **What changed:** a lesson card now shows "HW due" when a class's homework is due that lesson (hover for which one), and the lesson's checklist ticks "Collect homework at the start" by itself on those days. A red "KEY HW to mark" shows on a class's lessons once a key homework is 5 days past its due date and still not ticked as marked on the Homework tab. Two new checklist ticks go to Claude with the build: "Follow-up task straight after the Do Now (a book task, or an extension exam question)" and "Key homework returned: hand it back and give time to act on the feedback". The homework list comes from the planner's own Homework tab, so the page does not wait for Classroom.
 
 **You need to:** nothing now. It goes into the next complete paste set (Planner.html, Code.gs).
 
-**Save:** see the history line "Homework on the lesson card".
+**Save:** fbcca8fd.
 
 ## 29 Oct 2026, items 2.2 and 2.3: ABCD card results on the next lesson, and the most-missed homework questions (one save, they share files)
 

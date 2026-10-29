@@ -1202,6 +1202,10 @@ const tint_ = (cls) => (CLASS_COL[cls] || ['#F2F2F2', '#BFBFBF'])[0];
 
 function exportXlsx(k, model, title) {
   check_(k);
+  return { name: title + '.xlsx', b64: Utilities.base64Encode(orderXlsx_(model, title).getBytes()) };
+}
+// The order sheet as an .xlsx blob (shared by the download and the email draft).
+function orderXlsx_(model, title) {
   const ss = SpreadsheetApp.create(title);
   const file = DriveApp.getFileById(ss.getId());
   try {
@@ -1212,10 +1216,21 @@ function exportXlsx(k, model, title) {
     const url = 'https://docs.google.com/spreadsheets/d/' + ss.getId() + '/export?format=xlsx';
     const blob = UrlFetchApp.fetch(url, { headers: { Authorization: 'Bearer ' + ScriptApp.getOAuthToken() } }).getBlob();
     try { tab_('Log', ['when', 'what', 'where']).appendRow([new Date(), 'order sheet downloaded', title]); } catch (e) { /* the log is optional */ }   // Ulhu's order sheet ritual reads this
-    return { name: title + '.xlsx', b64: Utilities.base64Encode(onePage_(blob, title).getBytes()) };
+    return onePage_(blob, title).setName(title + '.xlsx');
   } finally {
     file.setTrashed(true);   // the temporary sheet this function just made, nothing else
   }
+}
+/* Workplan 2.7 (2026-10-29): the order sheet as a Gmail DRAFT to the technicians, the .xlsx attached.
+   Never sent: he opens Gmail, checks it and presses Send. The addresses are the TECH_EMAILS script
+   property (commas between them); with none set the draft has no "To" and the page says so. Logged. */
+function orderSheetDraft(k, model, title) {
+  check_(k);
+  const to = String(PropertiesService.getScriptProperties().getProperty('TECH_EMAILS') || '').split(/[,;\s]+/).filter((x) => /@/.test(x)).join(',');
+  const body = 'Hello,\n\nHere is the order sheet for ' + title.replace(/^Order Sheet /, '') + ' (attached).\n\nThank you';
+  const d = GmailApp.createDraft(to, title, body, { attachments: [orderXlsx_(model, title)] });
+  try { tab_('Log', ['when', 'what', 'where']).appendRow([new Date(), 'order sheet email drafted', title + (to ? ' to ' + to.split(',').length + ' address(es)' : ' (no address set)')]); } catch (e) { /* optional */ }
+  return { to: to, noAddress: !to, subject: title, id: d.getId() };
 }
 
 // Excel widths (characters) and heights (points) from his file, converted to pixels for Sheets.

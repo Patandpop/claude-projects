@@ -11,7 +11,7 @@ m.sheets.Data = m.makeSheet('Data', [['chunk'], [JSON.stringify(Object.assign({ 
 // one project since 2026-10-12: the planner's Code.gs and Behaviour.gs load together (a clash would break this)
 const SRC = process.env.PLANNER_SRC || path.join(__dirname, '..');   // PLANNER_SRC: the bundle test points this at the comment-stripped copies
 eval(fs.readFileSync(path.join(SRC, 'Code.gs'), 'utf8') + '\n' + fs.readFileSync(path.join(SRC, 'Behaviour.gs'), 'utf8') +
-  '\nglobal.api={init,openClass,logEvent,logMany,removeMany,getBoard,setMode,endMode,getMode,setTimer,adjustTimer,stopTimer,submitResult,getSilence,getFriday,positivesOver,setSupport,setPause,mergeBehaviourData,behaviourWeek,sameClass_,lessonMcqs,saveVote,removeVote,setLost,loadAll_,saveWeek,saveWeeks,saveLessons,saveLessonChanges,weekLetter_,plannerCal_};');
+  '\nglobal.api={init,openClass,logEvent,logMany,removeMany,getBoard,setMode,endMode,getMode,setTimer,adjustTimer,stopTimer,submitResult,getSilence,getFriday,positivesOver,setSupport,setPause,mergeBehaviourData,behaviourWeek,sameClass_,lessonMcqs,orderSheetDraft,saveVote,removeVote,setLost,loadAll_,saveWeek,saveWeeks,saveLessons,saveLessonChanges,weekLetter_,plannerCal_};');
 const k = 'k', out = []; let failed = 0;
 const ok = (n, c) => { out.push((c ? 'PASS ' : 'FAIL ') + n); if (!c) failed++; };
 
@@ -225,6 +225,22 @@ ok('merge is noted in the planner Log tab, not the behaviour log', m.sheets.Log 
   let why = ''; try { api.weekLetter_(new Date()); } catch (e) { why = e.message; }
   ok('with no term dates in the planner yet, the behaviour app says so plainly instead of guessing', /no term dates yet/.test(why));
   setData(Object.assign({ classes: {}, timetable: { A: [], B: [] } }, cal));
+}
+
+// 2.7 (2026-10-29): the order sheet as a Gmail DRAFT to the technicians (never sent), the .xlsx attached, logged
+{
+  const drafts = [];
+  global.GmailApp = { createDraft: (to, subj, body, o) => { drafts.push({ to, subj, body, o }); return { getId: () => 'd1' }; },
+    sendEmail: () => { throw new Error('must never send'); } };
+  orderXlsx_ = (model, title) => ({ name: title + '.xlsx' });   // the Sheets export itself is not in the mock
+  delete m.props.TECH_EMAILS;
+  const a = api.orderSheetDraft(k, {}, 'Order Sheet Week A - Nov 9');
+  ok('order sheet draft with no TECH_EMAILS: a draft with no "To", and the page is told', a.noAddress === true && drafts[0].to === '' && drafts[0].o.attachments[0].name === 'Order Sheet Week A - Nov 9.xlsx');
+  m.props.TECH_EMAILS = 'tech.one@example.org; tech.two@example.org';
+  const b = api.orderSheetDraft(k, {}, 'Order Sheet Week B - Nov 16');
+  const logs = m.sheets.Log._data.filter((r) => r[1] === 'order sheet email drafted');
+  ok('order sheet draft: to every address in TECH_EMAILS, subject is the sheet title, logged in the Log tab', !b.noAddress && drafts[1].to === 'tech.one@example.org,tech.two@example.org' && drafts[1].subj === 'Order Sheet Week B - Nov 16' && logs.length === 2);
+  delete m.props.TECH_EMAILS;
 }
 
 console.log(out.join('\n')); console.log(failed ? `\n${failed} FAILED` : '\nAll passed'); process.exit(failed ? 1 : 0);

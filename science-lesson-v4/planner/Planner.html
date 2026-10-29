@@ -274,6 +274,7 @@
       <hr>
       <button id="mPrint">Print list<small>everything to photocopy, with quantities</small></button>
       <button id="mXlsx">Technicians' Excel<small>the order sheet to email</small></button>
+      <button id="mXmail">Order sheet email<small>a Gmail draft with it attached (you send it)</small></button>
       <hr>
       <button id="mClaude">Send to Claude<small>build lessons or ask for changes, done at home</small></button>
       <button id="mHw">Homework quizzes<small>set them: Forms + Classroom drafts</small></button>
@@ -1818,6 +1819,15 @@ item('mXlsx', () => {
     a.href = URL.createObjectURL(new Blob([bytes], { type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }));
     a.download = r.name; a.click(); status('Downloaded ' + r.name);
   }).catch((e) => status('Excel failed: ' + e.message));
+});
+// Workplan 2.7 (2026-10-29): the same sheet as a Gmail draft to the technicians. Never sent from here.
+item('mXmail', () => {
+  const title = 'Order Sheet Week ' + S.week.letter + ' - ' + S.monday.toLocaleDateString('en-GB', { month:'short' }) + ' ' + S.monday.getDate();
+  status('Making the email draft...');
+  run('orderSheetDraft', P.sheetModel(S.data, S.week, S.classSettings), title).then((r) => {
+    status('Draft in Gmail: ' + r.subject);
+    toast(r.noAddress ? 'Draft made in Gmail with the sheet attached, but with no "To": add the technicians\' addresses as the TECH_EMAILS script property, or type them in Gmail. It is not sent.' : 'Draft made in Gmail to the technicians, sheet attached. Open Gmail, check it and press Send.');
+  }).catch((e) => status('Email draft failed: ' + e.message));
 });
 item('mAuto', () => { if (S.readOnly) { toast('This week is already taught'); return; } if (confirm('Re-plan the whole week from where each class is up to? Your changes to this week are replaced (Undo brings them back).')) { change(P.autofill(S.data, S.weeks, S.monday, S.learned), 'Week re-planned'); markGaps(); render(); } });
 item('mImp', () => $('file').click());
