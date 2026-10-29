@@ -142,6 +142,7 @@
   .f-beh { color:var(--green); } .f-none { color:var(--muted); } .f-hw { color:#1565C0; }
   .flag.f-own { color:var(--green); } .flag.f-reuse { color:var(--blue); }
   #status.dirty::before { content:"\25CF  "; color:var(--gold); }
+  #status.failed { color:#e5484d; font-weight:700; }
   .menuwrap { position:relative; }
   #menu { display:none; position:absolute; right:0; top:34px; background:var(--panel); border:1px solid var(--line); border-radius:8px; min-width:250px; padding:6px; box-shadow:0 10px 30px rgba(0,0,0,.35); z-index:10; }
   #menu.on { display:block; }
@@ -312,10 +313,10 @@ const KEY = <?!= JSON.stringify(key) ?>;   // the key is letters and numbers onl
 const APP_URL = <?!= JSON.stringify(appUrl) ?>;   // this web app: phone page = ?key=..&view=phone, board = &view=board
 const P = window.PlannerLogic;
 const COLS = ['B', 'F', 'J', 'N', 'R'];
-let S = { data:null, weeks:{}, learned:{}, hasTemplate:false, monday:null, week:null, undo:[], sel:-1, dirty:false, view:'week', day:0, mine:null, showMine:false, readOnly:false, chooser:{} };
+let S = { data:null, weeks:{}, learned:{}, hasTemplate:false, monday:null, week:null, undo:[], sel:-1, dirty:false, saving:0, view:'week', day:0, mine:null, showMine:false, readOnly:false, chooser:{} };
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c]));
-const status = (t) => { $('status').textContent = t; $('status').classList.toggle('dirty', S.dirty); };
+const status = (t) => { $('status').textContent = t; $('status').classList.toggle('dirty', S.dirty); $('status').classList.toggle('failed', /^NOT saved/.test(t)); };
 const run = (fn, ...args) => new Promise((ok, bad) => google.script.run.withSuccessHandler(ok).withFailureHandler(bad)[fn](KEY, ...args));
 const todayMidnight = () => { const t = new Date(); return new Date(t.getFullYear(), t.getMonth(), t.getDate()); };
 const store = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} } };
@@ -384,21 +385,36 @@ function undo() {
   const u = JSON.parse(S.undo.pop()); S.week = u.w; S.data.records = JSON.parse(u.r || '[]'); S.recSnap = u.r; S.dirty = true; markGaps(); render(); editor();
   status('Saving...'); clearTimeout(saveTimer); saveTimer = setTimeout(save, 1200);
 }
+// One retry: a blip in the connection is the usual cause of a failed save (work plan 1.2, 2026-10-29).
+const tryTwice = (fn, ...a) => run(fn, ...a).catch(() => run(fn, ...a));
 function save() {
   clearTimeout(saveTimer);
   if (S.readOnly || !S.dirty) return Promise.resolve();
   const wk = JSON.parse(JSON.stringify(S.week));          // this week, even if he moves on before it lands
   S.dirty = false; status('Saving...');
   const recs = JSON.stringify(S.data.records || []);
-  return run('saveWeek', wk).then(() => {
-    S.weeks[wk.monday] = wk; if (S.week.monday === wk.monday) status(S.dirty ? 'Saving...' : 'All changes saved');
-    if (recs !== S.recSaved) run('saveLessons', JSON.parse(recs)).then(() => { S.recSaved = recs; });
-    // slide-over (2026-10-12): later saved weeks re-plan now, not only when opened
+  // Three parts travel: this week, the lesson ticks, and later weeks that slid along. "All changes saved" only
+  // once every part has landed; a red "NOT saved" if any part failed twice (the ticks used to fail silently);
+  // and the leave-page warning stays on while any part is still travelling (S.saving).
+  const failed = [];
+  const part = (what, fn, ...a) => tryTwice(fn, ...a).then(() => true, (e) => { failed.push(what + ' (' + e.message + ')'); return false; });
+  S.saving++;
+  const week = part('this week', 'saveWeek', wk).then((ok) => { if (ok) S.weeks[wk.monday] = wk; return ok; });
+  const ticks = recs === S.recSaved ? Promise.resolve(true) : part('lesson ticks', 'saveLessons', JSON.parse(recs)).then((ok) => { if (ok) S.recSaved = recs; return ok; });
+  // slide-over (2026-10-12): later saved weeks re-plan now, not only when opened
+  const later = week.then((ok) => {
+    if (!ok) return false;
     const moved = P.cascade(S.data, S.weeks, wk.monday, todayMidnight(), S.learned);
-    if (moved.length) run('saveWeeks', moved).then(() => toast('Later weeks moved along: w/c ' + moved.map((x) => fmtDate(x.monday)).join(', ')))
-      .catch((e) => status('Later weeks NOT saved: ' + e.message));
-  })
-    .catch((e) => { if (S.week.monday === wk.monday) S.dirty = true; status('NOT saved: ' + e.message + ' (Ctrl+S to try again)'); });
+    if (!moved.length) return true;
+    return part('later weeks', 'saveWeeks', moved).then((ok2) => { if (ok2) toast('Later weeks moved along: w/c ' + moved.map((x) => fmtDate(x.monday)).join(', ')); return ok2; });
+  });
+  return Promise.all([week, ticks, later]).then(() => {
+    S.saving = Math.max(0, S.saving - 1);
+    if (failed.length) {
+      S.dirty = true;   // so Ctrl+S, or the next change, sends everything again
+      status('NOT saved: ' + failed.join('; ') + '. Ctrl+S to try again');
+    } else if (S.week.monday === wk.monday) status(S.dirty ? 'Saving...' : 'All changes saved');
+  });
 }
 
 /* ------------------------------------------------------------------ render */
@@ -1838,7 +1854,7 @@ document.addEventListener('keydown', (e) => {
   else if (e.key === '/' && $('q')) { e.preventDefault(); $('q').focus(); }
   else if (e.key === 'Delete' && S.sel >= 0) $('kFree').click();
 });
-window.addEventListener('beforeunload', (e) => { if (S.dirty) { e.preventDefault(); e.returnValue = ''; } });
+window.addEventListener('beforeunload', (e) => { if (S.dirty || S.saving) { e.preventDefault(); e.returnValue = ''; } });   // unsaved, or a save still travelling
 
 function onLoad(r) {
   S.data = r.data; S.results = r.results || []; S.weeks = r.weeks || {}; S.learned = r.learned || {}; S.classSettings = r.classSettings || {}; S.added = r.added || []; S.behaviourUrl = r.behaviourUrl || ""; S.gradeBands = r.gradeBands || {};
