@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Wall and Golems</title>
+<style>
+:root{color-scheme:dark;--sea:#0a1210;--card:#0f1a17;--ink:#e6efe9;--mute:#9aada3;--line:#1f2e28;--gold:#e6c26a;--lightg:#f6e2b0;--mint:#5ef2a0;
+  --g:'Grenze Gotisch','UnifrakturMaguntia',Georgia,serif;--a:system-ui,'Segoe UI',sans-serif}
+html,body{background:var(--sea);margin:0}
+body{background:radial-gradient(ellipse at 50% -10%,#16302a,var(--sea) 60%) fixed;color:var(--ink);font:15px/1.45 var(--a)}
+.wrap{max-width:412px;margin:0 auto;padding:22px 16px 70px}
+h1{font:700 34px/1.05 Georgia,serif;margin:0 0 6px;color:var(--lightg);text-shadow:0 0 18px rgba(240,210,150,.35)}
+h2{font:700 26px/1.1 Georgia,serif;margin:40px 0 4px;color:var(--lightg)}
+p{margin:0 0 8px}
+.mute{color:var(--mute)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;margin-top:16px}
+.card h3{font:700 19px/1.15 Georgia,serif;margin:0 0 4px;color:var(--ink)}
+.code{display:inline-block;font:700 11px var(--a);letter-spacing:.08em;color:#08100d;background:var(--lightg);border-radius:3px;padding:1px 6px;margin-right:6px;vertical-align:2px}
+canvas{display:block;width:100%;height:auto;image-rendering:pixelated;image-rendering:crisp-edges;border-radius:8px;cursor:pointer;touch-action:manipulation}
+.chooser{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+.chooser button{min-height:34px;padding:0 12px;border-radius:17px;border:1.5px solid #2f443b;background:#131d19;font:700 13px var(--a);color:#cfd8d3;cursor:pointer}
+.chooser button[aria-pressed="true"]{border-color:#c9a24a;background:#2a2410;color:var(--lightg)}
+button:focus-visible{outline:2px solid var(--mint);outline-offset:2px}
+.info{min-height:40px;margin-top:8px;padding:8px 10px;border-radius:8px;background:#0b1311;border:1px solid #1d2b26;font-size:14px;color:#cfe0d6}
+.info b{color:var(--lightg)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.chips button{min-height:32px;padding:0 10px;border-radius:6px;border:1px solid #4a3a22;background:#1c150c;color:#f0d9a8;font:700 12px var(--a);cursor:pointer}
+.chips .none{color:var(--mute);font-size:13px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.gcard{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px}
+.gcard h4{margin:0;font:700 15px/1.2 Georgia,serif;color:var(--ink)}
+.gcard .cap{font-size:12.5px;color:var(--mute);margin:2px 0 6px;min-height:34px}
+.gcard canvas{cursor:default;background:#0c1513}
+.hp{display:flex;gap:4px;margin:6px 0 4px}
+.hp i{flex:1;height:9px;border-radius:2px;background:#c4323a;box-shadow:inset 0 -2px 0 #7a1a20}
+.hp i.gone{background:#2a1f1f;box-shadow:inset 0 0 0 1px #4a2a2a}
+.gcard .chooser{margin:4px 0 0;gap:4px}
+.gcard .chooser button{min-height:30px;padding:0 8px;font-size:11.5px;border-radius:15px}
+.state{font-size:12px;color:#d8c79a;min-height:32px}
+.themes{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.themes button{width:40px;height:40px;border-radius:50%;border:2px solid #2f443b;cursor:pointer;font:700 9px var(--a);color:#fff;text-shadow:0 1px 2px #000}
+.themes button[aria-pressed="true"]{border-color:var(--lightg);box-shadow:0 0 0 2px #2a2410}
+.key{font-size:12.5px;color:var(--mute);margin-top:6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>The Wall and the Paper Golems</h1>
+<p class="mute">Round 2 mock-ups, 29 Oct. Section 1 is three ways to show how far ahead the lessons are built. Section 2 is the marking golems. Tap the pieces.</p>
+
+<h2>1. Keeping ahead</h2>
+<p class="mute">One piece per lesson in the next 2 weeks (2 to 13 Nov). A piece is complete when the lesson is built AND homework is set. The whole next week done is "keeping ahead"; both weeks done pays the lesson-ahead bonus once. Tap a gap to see which lesson it is (in the planner it jumps there).</p>
+
+<div class="card" id="cardA">
+<h3><span class="code">W-A</span>The Moon Window</h3>
+<p class="mute">Stained glass: each lesson is a moon in two halves, the class colour lights when built, the silver half when homework is set.</p>
+<div class="chooser" data-for="A"></div>
+<canvas id="cvA"></canvas>
+<div class="info" id="infoA">Tap a moon.</div>
+</div>
+
+<div class="card" id="cardB">
+<h3><span class="code">W-B</span>The Sea Wall</h3>
+<p class="mute">One stone per lesson, days along the top, class names written in the gaps; homework is the mortar.</p>
+<div class="chooser" data-for="B"></div>
+<canvas id="cvB"></canvas>
+<div class="info" id="infoB">Tap a stone or a gap.</div>
+</div>
+
+<div class="card" id="cardC">
+<h3><span class="code">W-C</span>The Tide Gauge</h3>
+<p class="mute">The water mark shows how many school days ahead are fully done, with carved marks at 1 and 2 weeks.</p>
+<div class="chooser" data-for="C"></div>
+<canvas id="cvC"></canvas>
+<div class="info" id="infoC">Tap a day stone, or a gap below.</div>
+<div class="chips" id="chipsC"></div>
+</div>
+
+<h2>2. Paper golems</h2>
+<p class="mute">Summoned through the boss circle when the planner suggests it. Each marking sitting tears off a chunk of paper, red ticks spread and one health block breaks. Beating one gives runes and a small trophy for the Sanctum.</p>
+<div class="card">
+<h3>Class theme</h3>
+<p class="mute">He picks one of 8 themes per class. Tap to try a theme on every golem; tap again to go back to each card's own.</p>
+<div class="themes" id="themes"></div>
+</div>
+<div class="grid" id="golems"></div>
+<p class="key">Health: 2 sittings per class per term by default (changeable per class). PAG golems: finish-by is one week after the practical.</p>
+</div>
+
+<script>
+"use strict";
+/* ---------- tiny pixel helper ---------- */
+function mk(cv,w,h,s){cv.width=w*s;cv.height=h*s;const c=cv.getContext('2d');c.imageSmoothingEnabled=false;
+  const g={c,s,w,h,
+    r(x,y,ww,hh,col){c.fillStyle=col;c.fillRect(Math.round(x)*s,Math.round(y)*s,Math.round(ww)*s,Math.round(hh)*s)},
+    p(x,y,col){this.r(x,y,1,1,col)},
+    disc(cx,cy,rad,col,half){for(let y=-rad;y<=rad;y++)for(let x=-rad;x<=rad;x++){if(x*x+y*y>rad*rad+rad*0.6)continue;if(half==='L'&&x>=0)continue;if(half==='R'&&x<0)continue;this.p(cx+x,cy+y,col)}},
+    txt(t,x,y,col,size,align){c.fillStyle=col;c.font='700 '+(size*1.2)+'px system-ui,Segoe UI,sans-serif';c.textAlign=align||'left';c.textBaseline='middle';c.fillText(t,x*s,y*s)}
+  };return g}
+function rnd(seed){let x=seed*9301+49297;return()=>{x=(x*9301+49297)%233280;return x/233280}}
+
+/* ---------- lesson data ---------- */
+const DAYS=['Mon 2 Nov','Tue 3 Nov','Wed 4 Nov','Thu 5 Nov','Fri 6 Nov','Mon 9 Nov','Tue 10 Nov','Wed 11 Nov','Thu 12 Nov','Fri 13 Nov'];
+const DSHORT=['M','T','W','T','F','M','T','W','T','F'];
+const SCHED=[
+ [[1,'9AS'],[3,'10S2'],[5,'7MLA']],
+ [[2,'11S2'],[3,'12C'],[6,'8XP']],
+ [[1,'13D'],[4,'9XS']],
+ [[2,'10C2'],[3,'8AG'],[5,'11S2'],[6,'9AS']],
+ [[1,'12C'],[4,'7MLA']],
+ [[2,'9XS'],[3,'10S2'],[5,'8XP']],
+ [[1,'11S2'],[4,'13D'],[6,'7MLA']],
+ [[2,'12C'],[5,'9AS']],
+ [[1,'10C2'],[3,'8AG'],[4,'11S2'],[6,'9XS']],
+ [[2,'13D'],[5,'10S2']]
+];
+const LESSONS=[];SCHED.forEach((d,di)=>d.forEach(([p,c])=>LESSONS.push({day:di,per:p,cls:c,i:LESSONS.length})));
+const W1=LESSONS.filter(l=>l.day<5).length;
+const CLASSCOL={'7MLA':'#ff8a6b','8XP':'#f2a541','8AG':'#f2a541','9AS':'#7fd36b','9XS':'#7fd36b','10C2':'#3fd0c0','10S2':'#3fd0c0','11S2':'#5a9cff','12C':'#b98bff','13D':'#e070d8'};
+const STATES={behind:'Behind',track:'On track',ahead:'Well ahead'};
+function statusFor(state){ // 0 none, 1 built (no homework), 2 complete
+  return LESSONS.map(l=>{
+    if(state==='ahead')return 2;
+    if(state==='track'){if(l.i<W1)return 2;if(l.i<W1+3)return 2;if(l.i<W1+5)return 1;return 0}
+    if(l.i<4)return 2;if(l.i<6)return 1;if(l.i===8)return 1;return 0;
+  })}
+function weekDone(st,w){return LESSONS.filter(l=>(w===0?l.day<5:l.day>=5)).every(l=>st[l.i]===2)}
+function daysAhead(st){let n=0;for(let d=0;d<10;d++){if(LESSONS.filter(l=>l.day===d).every(l=>st[l.i]===2))n++;else break}return n}
+function describe(l,st){const s=st[l.i];const base='<b>'+DAYS[l.day]+', P'+l.per+', '+l.cls+'</b>: ';
+  if(s===2)return base+'built and homework set. Complete.';
+  if(s===1)return base+'built, homework not set yet. Setting it completes the piece.';
+  return base+'not built yet. In the planner, tapping jumps to this lesson.'}
+const cur={A:'track',B:'track',C:'track'};
+const hits={A:[],B:[],C:[]};
+let T=0;
+
+/* ---------- W-A: the moon window ---------- */
+function drawA(){
+  const st=statusFor(cur.A),w1=weekDone(st,0),w2=weekDone(st,1);
+  const g=mk(document.getElementById('cvA'),124,176,3);hits.A=[];
+  g.r(0,0,124,176,'#0a0f12');
+  // stone frame + arch
+  for(let y=0;y<176;y++)for(let x=0;x<124;x++){
+    const inArch=(y>=40&&x>=6&&x<118&&y<166)||((x-62)*(x-62)+(y-40)*(y-40)<=56*56&&y<40);
+    const inFrame=(y>=36&&x>=2&&x<122&&y<170)||((x-62)*(x-62)+(y-40)*(y-40)<=60*60&&y<40);
+    if(inFrame&&!inArch)g.p(x,y,((x*7+y*3)%11<2)?'#3a3a44':'#4a4a56');
+  }
+  // rose: two big moon halves = week 1 (left) and week 2 (right)
+  const rx=62,ry=26,rr=16;
+  g.disc(rx,ry,rr+2,'#0b0d10');
+  g.disc(rx,ry,rr,w1?'#f6e2b0':'#1c2433','L');
+  g.disc(rx,ry,rr,w2?'#c4e0ff':'#18202c','R');
+  if(w1){for(let a=0;a<12;a++){const an=a/12*Math.PI*2;const k=0.5+0.5*Math.sin(T*2+a);if(k>0.6)g.p(rx+Math.round(Math.cos(an)*(rr+5)),ry+Math.round(Math.sin(an)*(rr+5)),'#f6e2b0')}}
+  g.r(rx,ry-rr,1,rr*2+1,'#0b0d10');
+  for(let a=0;a<8;a++){const an=a/8*Math.PI*2;for(let k=4;k<rr;k++)g.p(rx+Math.round(Math.cos(an)*k),ry+Math.round(Math.sin(an)*k),'#0b0d10')}
+  g.disc(rx,ry,3,w1&&w2?'#ffffff':'#3a4050');
+  // lancets
+  const lan=[[8,52],[64,52]];const top=48,rowH=23;
+  lan.forEach(([lx,lw],wk)=>{
+    const done=wk===0?w1:w2;
+    for(let y=top;y<top+rowH*5;y++)for(let x=lx;x<lx+lw;x++){
+      const q=((x+y)>>2)%2;const base=done?(q?'#1e3a6a':'#24467a'):(q?'#121a28':'#162030');g.p(x,y,base)}
+    for(let y=top;y<top+rowH*5;y+=4)for(let x=lx;x<lx+lw;x++)if((x+y)%8===0)g.p(x,y,'#0b0d10');
+    g.r(lx-1,top-1,lw+2,1,'#0b0d10');g.r(lx-1,top+rowH*5,lw+2,1,'#0b0d10');g.r(lx-1,top,1,rowH*5,'#0b0d10');g.r(lx+lw,top,1,rowH*5,'#0b0d10');
+    for(let d=0;d<5;d++){
+      const day=wk*5+d,ls=LESSONS.filter(l=>l.day===day);const y0=top+d*rowH;
+      g.r(lx,y0+rowH-1,lw,1,'#0b0d10');
+      const cw=lw/ls.length;
+      ls.forEach((l,k)=>{
+        const cx=Math.round(lx+cw*k+cw/2),cy=y0+11,R=ls.length>3?5:6,s=st[l.i];
+        g.disc(cx,cy,R+1,'#0b0d10');
+        g.disc(cx,cy,R,s>=1?CLASSCOL[l.cls]:'#26303c','L');
+        g.disc(cx,cy,R,s===2?'#dfe8f4':(s===1?'#4a4a4a':'#232b36'),'R');
+        if(s===1){for(let yy=-R;yy<=R;yy+=2)g.p(cx+2,cy+yy,'#2c2c2c')}
+        if(s>=1)g.p(cx-R+2,cy-R+3,'#ffffff');
+        g.r(cx,cy-R,1,R*2+1,'#0b0d10');
+        if(s===0)g.p(cx-2,cy+1,'#3a4656');
+        hits.A.push({x:cx-cw/2,y:y0,w:cw,h:rowH,l});
+      });
+    }
+    if(done){for(let i=0;i<10;i++){const xx=lx+((i*17+Math.floor(T*6))%lw),yy=top+((i*29)%(rowH*5));g.p(xx,yy,'rgba(255,240,200,.7)')}}
+  });
+  for(let d=0;d<5;d++)g.txt(DSHORT[d],62,top+d*rowH+11,'#9aada3',9,'center');
+  g.txt('2 Nov',34,top+rowH*5+5,'#9aada3',9,'center');g.txt('9 Nov',90,top+rowH*5+5,'#9aada3',9,'center');
+  const msg=w1&&w2?'Both weeks done: the window blazes, bonus paid once.':w1?'Next week done: the left moon is lit. You are keeping ahead.':'The left moon lights when next week is complete.';
+  g.txt(msg,62,174,w1?'#f6e2b0':'#9aada3',8.5,'center');
+}
+
+/* ---------- W-B: the sea wall ---------- */
+function drawB(){
+  const st=statusFor(cur.B),w1=weekDone(st,0),w2=weekDone(st,1),calm=w1;
+  const g=mk(document.getElementById('cvB'),124,120,3);hits.B=[];
+  // sky
+  g.r(0,0,124,120,'#0b1420');
+  for(let i=0;i<18;i++)g.p((i*37)%124,(i*13)%26,'#3a4a66');
+  g.disc(108,9,5,calm?'#f6e2b0':'#8a8f9a');
+  // sea behind (top band) and front sea
+  const seaY=74;
+  for(let x=0;x<124;x++){
+    const amp=calm?0.6:(w1?1.5:3.2);
+    const h=Math.round(Math.sin(x/5+T*2)*amp+Math.sin(x/11-T*1.3)*amp);
+    for(let y=seaY+h;y<120;y++)g.p(x,y,y<seaY+h+2?(calm?'#3a6a8a':'#9ac4d8'):((x+y)%7===0?'#16304a':'#102438'));
+  }
+  if(calm){for(let i=0;i<6;i++)g.r(104-i%3,seaY+4+i*5,4+(i%2)*2,1,'#e6d29a')}
+  // wall: day columns
+  const x0=6,cw=11,slotH=11,slots=4,wallTop=24;
+  for(let d=0;d<10;d++){
+    const cx=x0+d*cw+(d>=5?2:0);const ls=LESSONS.filter(l=>l.day===d);
+    g.txt(DSHORT[d]+(d<5?2+d:4+d),cx+cw/2,wallTop-4,'#9aada3',8,'center');
+    for(let k=0;k<slots;k++){
+      const y=wallTop+(slots-1-k)*slotH;const l=ls[k];
+      if(!l){ // old grey stone, not a lesson
+        g.r(cx,y,cw,slotH,'#3a3a44');g.r(cx+1,y+1,cw-2,slotH-2,'#4c4c58');g.r(cx+1,y+5,cw-2,1,'#3a3a44');g.p(cx+3,y+2,'#5a5a66');g.p(cx+7,y+8,'#5a5a66');continue}
+      const s=st[l.i];
+      if(s===0){ // gap: sea shows through, spray if rough
+        g.r(cx,y,cw,slotH,'#0d1a26');
+        if(!calm){for(let i=0;i<5;i++){const yy=y+slotH-1-((i*3+Math.floor(T*8))%slotH);g.p(cx+2+(i*3)%7,yy,'#cfe8f4')}}
+        g.txt(l.cls,cx+cw/2,y+slotH/2,'#f0d9a8',7.5,'center');
+      }else{
+        const col=s===2?'#8a8378':'#6a655c';
+        g.r(cx,y,cw,slotH,s===2?(calm?'#e6d29a':'#c8bfa8'):'#1a1a1a'); // mortar
+        g.r(cx+1,y+1,cw-2,slotH-2,col);
+        g.r(cx+1,y+1,cw-2,1,s===2?'#a49c8e':'#7a756c');
+        g.p(cx+1+(l.i%5),y+5,'#5a554e');
+        if(s===1){g.p(cx+6,y+3,'#2a2a2a');g.p(cx+7,y+4,'#2a2a2a');g.p(cx+7,y+5,'#2a2a2a')}
+        g.r(cx+2,y+slotH-3,3,1,CLASSCOL[l.cls]);
+      }
+      hits.B.push({x:cx,y,w:cw,h:slotH,l});
+    }
+  }
+  // pillar between weeks + foundation
+  g.r(x0+5*cw,wallTop-2,2,slots*slotH+2,'#4a4a56');
+  g.r(4,wallTop+slots*slotH,116,6,'#3a3a44');for(let x=4;x<120;x+=6)g.p(x,wallTop+slots*slotH+2,'#2a2a30');
+  const msg=w1&&w2?'Whole wall sealed: the sea lies flat, bonus paid once.':w1?'Next week sealed: the sea calms.':'Waves break through the gaps.';
+  g.txt(msg,62,114,calm?'#f6e2b0':'#cfe0d6',8.5,'center');
+}
+
+/* ---------- W-C: tide gauge ---------- */
+function drawC(){
+  const st=statusFor(cur.C),n=daysAhead(st),w1=weekDone(st,0);
+  const g=mk(document.getElementById('cvC'),124,150,3);hits.C=[];
+  g.r(0,0,124,150,'#0a1218');
+  const bot=138,per=11.5,gx=18,gw=24;
+  const lvl=bot-n*per;
+  // water
+  for(let x=0;x<124;x++){const h=Math.round(Math.sin(x/6+T*1.5)*(w1?0.5:1.2));for(let y=Math.round(lvl)+h;y<150;y++)g.p(x,y,y<lvl+h+1?(w1?'#9ff0e0':'#6aa8c8'):((x*3+y)%9===0?'#123048':'#0e263a'))}
+  // pillar
+  for(let y=6;y<146;y++)for(let x=gx;x<gx+gw;x++){const under=y>lvl;g.p(x,y,((x+y*2)%13===0)?(under?'#1e3a48':'#3a3a44'):(under?'#2a5060':'#55555f'))}
+  g.r(gx-2,4,gw+4,4,'#6a6a74');g.r(gx-3,144,gw+6,4,'#3a3a44');
+  for(let d=0;d<=10;d++){const y=Math.round(bot-d*per);const big=d===5||d===10;g.r(gx+2,y,big?gw-4:8,1,big?'#e6c26a':'#20202a');
+    if(d>0&&!big)g.txt(String(d),gx+14,y-0.5,'#c8c8d0',7,'center')}
+  g.txt('1 week',gx+gw/2,bot-5*per-4,'#e6c26a',8,'center');g.txt('2 weeks',gx+gw/2,bot-10*per-4,'#e6c26a',8,'center');
+  // water mark arrow
+  g.r(gx-6,Math.round(lvl),5,1,'#f6e2b0');g.p(gx-2,Math.round(lvl)-1,'#f6e2b0');g.p(gx-2,Math.round(lvl)+1,'#f6e2b0');
+  // day stones on the right, aligned to their height
+  for(let d=0;d<10;d++){
+    const yc=Math.round(bot-(d+0.5)*per);const ls=LESSONS.filter(l=>l.day===d);
+    const sx=52;g.r(sx,yc-4,66,9,'#2a2a32');g.r(sx+1,yc-3,64,7,'#3a3a44');
+    g.txt(DAYS[d].replace(' Nov',''),sx+3,yc+0.5,'#c8c8d0',7,'left');
+    ls.forEach((l,k)=>{const px=sx+30+k*9,s=st[l.i];
+      g.disc(px,yc,3,'#14141a');
+      if(s>=1)g.disc(px,yc,2,CLASSCOL[l.cls],'L');else g.disc(px,yc,2,'#24242c','L');
+      g.disc(px,yc,2,s===2?'#dfe8f4':'#24242c','R');
+      hits.C.push({x:px-4,y:yc-4,w:9,h:9,l})});
+  }
+  g.txt(n+' school day'+(n===1?'':'s')+' ahead',86,8,w1?'#9ff0e0':'#cfe0d6',9,'center');
+  // gap chips
+  const gaps=LESSONS.filter(l=>st[l.i]<2).slice(0,6);
+  const box=document.getElementById('chipsC');if(box.dataset.k===cur.C)return;box.dataset.k=cur.C;box.innerHTML='';
+  if(!gaps.length){box.innerHTML='<span class="none">No gaps. Both weeks done, bonus paid once.</span>'}
+  gaps.forEach(l=>{const b=document.createElement('button');b.type='button';b.textContent=DAYS[l.day].slice(0,3)+' P'+l.per+' '+l.cls+(st[l.i]===1?' (homework)':'');
+    b.onclick=()=>{document.getElementById('infoC').innerHTML=describe(l,statusFor(cur.C))};box.appendChild(b)});
+}
+
+const DRAW={A:drawA,B:drawB,C:drawC};
+document.querySelectorAll('.chooser[data-for]').forEach(ch=>{const k=ch.dataset.for;
+  Object.entries(STATES).forEach(([key,lab])=>{const b=document.createElement('button');b.type='button';b.textContent=lab;b.setAttribute('aria-pressed',key===cur[k]);
+    b.onclick=()=>{cur[k]=key;ch.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));document.getElementById('info'+k).textContent='Tap a piece.';DRAW[k]()};ch.appendChild(b)})});
+['A','B','C'].forEach(k=>{const cv=document.getElementById('cv'+k);cv.addEventListener('click',e=>{
+  const r=cv.getBoundingClientRect(),sx=(e.clientX-r.left)/r.width*(cv.width/3),sy=(e.clientY-r.top)/r.height*(cv.height/3);
+  const h=hits[k].find(h=>sx>=h.x&&sx<h.x+h.w&&sy>=h.y&&sy<h.y+h.h);
+  if(h)document.getElementById('info'+k).innerHTML=describe(h.l,statusFor(cur[k]))})});
+
+/* ---------- golems ---------- */
+const THEMES={coral:['#ff7a6b','#b8443c','#ffc2b0'],ember:['#ff9a3c','#a8481a','#ffd28a'],frost:['#8fd8ff','#3a7aa8','#e0f6ff'],moss:['#7fc85a','#3e7a2a','#cdf0a8'],
+  ink:['#5a6ad8','#2a2f78','#b8c0ff'],storm:['#8a96a8','#4a5262','#d4dce8'],ash:['#b0a89c','#5e5850','#e8e2d8'],gold:['#e6c26a','#9a7424','#fff0b8']};
+const PAPER='#efe6cf',PSH='#cbbf9f',PLN='#b4c4dc',INK='#1b1410',RED='#d8323a',BG='#0c1513';
+function eye(g,x,y,w,h){g.r(x,y,w,h,'#1a1622');g.r(x+1,y-1,w-2,1,'#1a1622');g.r(x+1,y+h,w-2,1,'#1a1622');g.r(x+1,y+1,2,2,'#ffffff');g.p(x+w-2,y+h-2,'#ffffff');g.p(x+w-2,y+h-1,'#6a6a9a')}
+function ruled(g,x,y,w,h,test){for(let yy=y+2;yy<y+h;yy+=3)for(let xx=x;xx<x+w;xx++)if(!test||test(xx,yy))g.p(xx,yy,PLN)}
+
+const GOLEMS=[
+ {id:'y7a',name:'Year 7: Puff',cls:'7MLA',theme:'coral',cap:'A soft round bundle of paper with big shiny eyes and stubby legs.',bbox:[11,13,26,26],
+  draw(g,th,b){const cx=24,cy=27+b;
+   g.r(17,38+b,4,4,th[1]);g.r(27,38+b,4,4,th[1]);
+   g.disc(cx,cy,13,PSH);g.disc(cx-1,cy-1,12,PAPER);ruled(g,12,15+b,24,24,(x,y)=>(x-cx+1)**2+(y-cy+1)**2<120);
+   g.r(18,13+b,12,3,th[0]);g.r(20,11+b,8,2,th[0]);g.r(22,10+b,4,1,th[2]);g.r(29,15+b,2,6,th[1]);
+   eye(g,16,22+b,6,7);eye(g,26,22+b,6,7);g.r(15,31+b,3,1,'#f2a0a0');g.r(30,31+b,3,1,'#f2a0a0');
+   g.p(22,32+b,INK);g.p(23,33+b,INK);g.p(24,32+b,INK);g.p(25,33+b,INK);g.p(26,32+b,INK);
+   g.r(9,28+b,3,2,PSH);g.r(36,28+b,3,2,PSH)}},
+ {id:'y7b',name:'Year 7: Notebook',cls:'7MLA',theme:'frost',cap:'A tiny round notebook creature, face on the cover, spiral rings on its head.',bbox:[12,14,24,24],
+  draw(g,th,b){g.r(16,38+b,5,4,th[1]);g.r(27,38+b,5,4,th[1]);
+   g.r(13,15+b,23,24,th[1]);g.r(12,17+b,25,20,th[1]);g.r(14,16+b,21,22,th[0]);g.r(33,17+b,3,20,PAPER);g.r(34,17+b,1,20,PSH);
+   for(let x=15;x<34;x+=4){g.r(x,12+b,2,4,'#c8c8d0');g.p(x,12+b,'#ffffff')}
+   g.r(15,17+b,18,2,th[2]);
+   eye(g,16,22+b,6,7);eye(g,25,22+b,6,7);g.r(15,31+b,2,1,'#ffb0b0');g.r(30,31+b,2,1,'#ffb0b0');
+   g.r(21,32+b,5,1,INK);g.p(20,31+b,INK);g.p(26,31+b,INK);
+   g.r(10,27+b,3,3,th[0]);g.r(36,27+b,3,3,th[0])}},
+ {id:'y7c',name:'Year 7: Crumple',cls:'7MLA',theme:'gold',cap:'A crumpled paper sprite that hops, hugging a little pencil.',bbox:[11,14,26,24],
+  draw(g,th,b){const R=rnd(7),cx=24,cy=27+b;
+   for(let y=-13;y<=13;y++)for(let x=-13;x<=13;x++){const d=Math.sqrt(x*x+y*y);if(d<11.5+R()*1.8)g.p(cx+x,cy+y,(x+y)%5===0||(x-y)%7===0?PSH:PAPER)}
+   g.r(16,38+b,3,3,th[1]);g.r(29,38+b,3,3,th[1]);
+   eye(g,16,21+b,7,8);eye(g,25,21+b,7,8);g.r(15,31+b,3,1,'#f2a0a0');g.r(31,31+b,3,1,'#f2a0a0');
+   g.r(22,32+b,4,2,'#7a2a2a');g.r(23,33+b,2,1,'#ff9a9a');
+   for(let k=0;k<12;k++){g.p(8+k,40+b-Math.floor(k/1.4),th[0])}g.p(19,32+b,'#ffd0a0');g.p(7,41+b,INK);
+   g.r(23,12+b,2,3,th[0]);g.r(25,11+b,1,2,th[2])}},
+ {id:'y89',name:'Years 8-9: Bookstack',cls:'9AS',theme:'moss',cap:'Older: a walking stack of exercise books with a folded paper head.',bbox:[13,8,22,34],
+  draw(g,th,b){g.r(16,40,5,6,th[1]);g.r(27,40,5,6,th[1]);
+   [[14,30,20,th[0]],[13,24,22,th[1]],[15,18,18,th[0]]].forEach(([x,y,w,c])=>{g.r(x,y+b,w,6,c);g.r(x+w-3,y+1+b,3,4,PAPER);g.r(x,y+5+b,w,1,'#00000055')});
+   g.r(16,7+b,16,11,PAPER);g.r(16,7+b,16,1,PSH);g.p(16,7+b,BG);g.p(31,7+b,BG);g.r(23,7+b,1,11,PSH);
+   g.r(18,11+b,4,3,'#1a1622');g.r(26,11+b,4,3,'#1a1622');g.p(18,11+b,'#fff');g.p(26,11+b,'#fff');g.r(21,15+b,6,1,INK);
+   g.r(9,20+b,4,12,PAPER);g.r(9,20+b,1,12,PSH);g.r(35,20+b,4,12,PAPER);g.r(38,20+b,1,12,PSH);g.r(9,31+b,4,3,th[2]);g.r(35,31+b,4,3,th[2])}},
+ {id:'y1011',name:'Years 10-11: Red-pen Brute',cls:'11S2',theme:'ember',cap:'Bigger, less cute: textbook shoulders, old red-pen scars, glowing slit eyes.',bbox:[10,8,28,32],
+  draw(g,th,b){g.r(14,40,7,6,PSH);g.r(27,40,7,6,PSH);
+   g.r(12,14+b,24,27,PSH);g.r(13,13+b,22,27,PAPER);ruled(g,13,15+b,22,24);
+   g.r(4,12+b,11,8,th[1]);g.r(5,13+b,9,6,th[0]);g.r(33,12+b,11,8,th[1]);g.r(34,13+b,9,6,th[0]);
+   g.r(3,20+b,7,14,PAPER);g.r(3,33+b,7,5,PSH);g.r(38,20+b,7,14,PAPER);g.r(38,33+b,7,5,PSH);
+   g.r(17,6+b,14,9,PSH);g.r(18,7+b,12,7,PAPER);g.r(19,10+b,4,1,th[2]);g.r(25,10+b,4,1,th[2]);g.r(19,9+b,4,1,th[0]);g.r(25,9+b,4,1,th[0]);
+   for(let k=0;k<6;k++){g.p(15+k,18+k+b,'#a82a2a');g.p(29-k,28+k+b,'#a82a2a')}for(let k=0;k<4;k++)g.p(38+k,24+k+b,'#a82a2a')}},
+ {id:'y1213',name:'Years 12-13: Elder Scholar',cls:'13D',theme:'ink',cap:'A robed paper scholar with a mortarboard, strip beard and quill staff.',bbox:[12,10,24,34],
+  draw(g,th,b){for(let y=0;y<26;y++){const w=14+Math.floor(y/2.2);g.r(24-w/2,20+y,w,1,y%3===2?PLN:PAPER)}
+   g.r(14,20,2,26,PSH);g.r(22,20,4,26,th[0]);g.r(23,20,2,26,th[1]);
+   g.r(18,9+b,12,11,PAPER);g.r(15,6+b,18,2,'#1a1a22');g.r(18,8+b,12,2,'#2a2a36');g.r(31,7+b,1,5,th[0]);g.r(30,12+b,3,2,th[2]);
+   g.r(20,12+b,3,2,th[2]);g.r(25,12+b,3,2,th[2]);
+   for(let k=0;k<5;k++)g.r(19+k*2,16+b,1,6+(k%2)*3,PSH);
+   g.r(39,10,2,36,'#6a4a2a');g.r(37,6,5,5,PAPER);g.p(41,5,PAPER);g.p(36,7,PSH);g.r(34,24,6,3,PAPER)}},
+ {id:'pag',name:'Year 12: PAG Scholar',cls:'12C',theme:'storm',pag:true,cap:'The same elder scholar for practicals: goggles, a bubbling flask and a PAG write-up.',bbox:[12,10,24,34],
+  draw(g,th,b){GOLEMS[5].draw(g,th,b);
+   g.r(18,10+b,12,2,'#3a3a44');g.r(19,10+b,3,2,'#8fd8ff');g.r(26,10+b,3,2,'#8fd8ff');
+   g.r(37,4,6,8,'#2a2a2a');g.r(38,5,4,6,BG);
+   g.r(4,30,2,4,'#c8e8f0');g.r(2,34,6,2,'#c8e8f0');g.r(1,36,8,6,'#c8e8f0');g.r(2,37,6,4,th[0]);g.p(3+Math.floor(T*3)%4,36-(Math.floor(T*4)%3),'#ffffff');g.r(8,32,6,2,PAPER);
+   g.r(18,26,12,9,'#fff8e6');g.txt('PAG',24,30.5,INK,9,'center')}}
+];
+const TEARS=[ // per sitting: corner to tear, tick spots relative to bbox (fractions)
+ {corner:'tr',ticks:[[.2,.72],[.72,.66],[.45,.9]]},
+ {corner:'bl',ticks:[[.62,.8],[.18,.62],[.85,.86]]}];
+function tear(g,bb,corner,seed,b){const [x,y,w,h]=bb;const R=rnd(seed),sz=Math.round(Math.min(w,h)*0.38);
+  for(let i=0;i<sz;i++){const len=sz-i+Math.floor(R()*3)-1;for(let j=0;j<len;j++){
+    let px,py;if(corner==='tr'){px=x+w-1-j;py=y+b+i}else{px=x+j;py=y+h-1-i+b}g.p(px,py,BG)}
+    let ex,ey;if(corner==='tr'){ex=x+w-1-len;ey=y+b+i}else{ex=x+len;ey=y+h-1-i+b}g.p(ex,ey,'#fff8e6')}}
+function tick(g,x,y){[[0,1],[1,2],[2,1],[3,0],[4,-1],[5,-2]].forEach(([dx,dy])=>{g.p(x+dx,y+dy,RED)})}
+function scrap(g,corner,b){const x=corner==='tr'?40:3,y=corner==='tr'?40:4;g.r(x,y,5,3,PAPER);g.r(x+1,y+3,3,1,PAPER);g.p(x+4,y,BG);tick(g,x,y+1)}
+let themeOverride=null;
+const gstate={};
+function drawGolem(G){const st=gstate[G.id];const cv=document.getElementById('g_'+G.id);const g=mk(cv,48,48,4);
+  g.r(0,0,48,48,BG);for(let x=0;x<48;x+=2)g.p(x,46,'#1a2a26');
+  const th=THEMES[themeOverride||st.theme];const beaten=st.dmg>=2;
+  const b=beaten?0:Math.round(Math.sin(T*(G.id==='y7c'?5:2.5))*(G.id.startsWith('y7')?1:0.6));
+  if(beaten)g.c.globalAlpha=0.35;
+  G.draw(g,th,b);
+  for(let k=0;k<Math.min(st.dmg,2);k++){tear(g,G.bbox,TEARS[k].corner,k+3,b);}
+  for(let k=0;k<Math.min(st.dmg,2);k++){const [x,y,w,h]=G.bbox;TEARS[k].ticks.forEach(([fx,fy])=>tick(g,Math.round(x+fx*w)-2,Math.round(y+fy*h)+b));if(!beaten)scrap(g,TEARS[k].corner,0)}
+  g.c.globalAlpha=1;
+  if(beaten){const runes='ᚱᚢᚾᛖᛋ';for(let i=0;i<5;i++){const yy=(40-((T*10+i*9)%36));g.txt(runes[i],8+i*8,yy,'#e6c26a',11,'center')}
+    g.r(19,38,10,7,'#2a2410');g.r(20,39,8,5,'#e6c26a');g.r(23,44,2,2,'#9a7424')}
+  const hp=document.getElementById('hp_'+G.id);hp.querySelectorAll('i').forEach((el,i)=>el.classList.toggle('gone',i<st.dmg));
+  document.getElementById('st_'+G.id).textContent=st.dmg===0?'Fresh: summoned, '+(G.pag?'finish by 1 week after the practical.':'books due this Friday.'):st.dmg===1?'After sitting 1: a chunk torn off, red ticks spread, one block gone.':'Beaten: runes paid and a small trophy kept in the Sanctum.';
+}
+const grid=document.getElementById('golems');
+GOLEMS.forEach(G=>{gstate[G.id]={dmg:0,theme:G.theme};
+  const d=document.createElement('div');d.className='gcard';
+  d.innerHTML='<h4>'+G.name+'</h4><div class="cap">'+G.cap+' ('+G.cls+', '+G.theme+')</div><canvas id="g_'+G.id+'" aria-label="'+G.name+'"></canvas><div class="hp" id="hp_'+G.id+'"><i></i><i></i></div><div class="state" id="st_'+G.id+'"></div><div class="chooser"></div>';
+  const ch=d.querySelector('.chooser');['Fresh','Sitting 1','Beaten'].forEach((lab,i)=>{const b=document.createElement('button');b.type='button';b.textContent=lab;b.setAttribute('aria-pressed',i===0);
+    b.onclick=()=>{gstate[G.id].dmg=i;ch.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));drawGolem(G)};ch.appendChild(b)});
+  grid.appendChild(d)});
+const tbox=document.getElementById('themes');
+Object.entries(THEMES).forEach(([k,c])=>{const b=document.createElement('button');b.type='button';b.textContent=k;b.style.background=c[0];b.setAttribute('aria-pressed','false');b.setAttribute('aria-label','Theme '+k);
+  b.onclick=()=>{themeOverride=themeOverride===k?null:k;tbox.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x.textContent===themeOverride))};tbox.appendChild(b)});
+
+/* ---------- animation loop ---------- */
+let last=0;
+function frame(ts){T=ts/1000;if(ts-last>90){last=ts;drawA();drawB();drawC();GOLEMS.forEach(drawGolem)}requestAnimationFrame(frame)}
+drawA();drawB();drawC();GOLEMS.forEach(drawGolem);
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

@@ -1,0 +1,412 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ulhu Big Moments II</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Grenze+Gotisch:wght@500;700&family=IM+Fell+English:ital@0;1&display=swap">
+<style>
+/* One dark look by design (the drowned temple). Every theme hook repeats the same dark tokens. */
+:root{color-scheme:dark;--bg:#0a100e;--panel:#101a17;--line:#24443a;--fg:#e8e1cf;--muted:#8fa298;--sea:#5ef2a0;--honey:#ffd56a;--wax:#b8322a;
+--gx:'Grenze Gotisch',Georgia,serif;--ax:'Atkinson Hyperlegible',system-ui,sans-serif;--fx:'IM Fell English',Georgia,serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#0a100e;--panel:#101a17;--line:#24443a;--fg:#e8e1cf;--muted:#8fa298}}
+:root[data-theme="dark"],:root[data-theme="light"]{color-scheme:dark;--bg:#0a100e;--panel:#101a17;--line:#24443a;--fg:#e8e1cf;--muted:#8fa298}
+*{box-sizing:border-box}
+html,body{margin:0;background:#0a100e;color:#e8e1cf;font:15px/1.45 var(--ax)}
+main{max-width:412px;margin:0 auto;padding:16px}
+h1{font:700 30px/1.1 var(--gx);color:#ffd56a;margin:4px 0 6px}
+h2{font:700 24px/1.1 var(--gx);color:#5ef2a0;margin:28px 0 4px}
+.intro,.gi{color:#8fa298;margin:0 0 10px}
+.card{background:#101a17;border:1px solid #24443a;border-radius:10px;padding:10px;margin:14px 0}
+.card h3{margin:0 0 2px;font:700 18px var(--ax);color:#e8e1cf}.card h3 b{color:#ffd56a;margin-right:6px}
+.cap{margin:0 0 8px;color:#b9c4bc;font-size:14px}
+.btns{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+button{font:700 14px var(--ax);color:#0a100e;background:#5ef2a0;border:0;border-radius:6px;padding:8px 14px;min-height:40px;cursor:pointer}
+button.alt{background:#2a3d36;color:#e8e1cf}
+.px{image-rendering:pixelated;image-rendering:crisp-edges}
+/* stage */
+.stage{position:relative;height:290px;border-radius:8px;overflow:hidden;background:#02070a;border:1px solid #0d1f19}
+.cam{position:absolute;inset:0;transform-origin:50% 50%}
+.cam>canvas.bg{position:absolute;inset:0;width:100%;height:100%}
+.ulhu{position:absolute;left:calc(50% - 48px);bottom:22px;width:96px;height:96px;transform-origin:50% 85%}
+.ulhu img{width:96px;height:96px;display:block}
+.vial{position:absolute;left:14px;top:14px;width:30px;height:52px;border:3px solid #cfe9df;border-top-width:5px;border-radius:3px 3px 8px 8px;background:#06110d;overflow:hidden}
+.vial i{position:absolute;left:0;right:0;bottom:0;height:100%;background:repeating-linear-gradient(0deg,#3fd38a 0 3px,#5ef2a0 3px 6px);box-shadow:0 0 10px #5ef2a0}
+.vial.cr{border-color:#7d8f88}
+.hpl{position:absolute;left:8px;top:70px;width:44px;text-align:center;font:700 11px var(--ax);color:#cfe9df;text-shadow:0 1px 0 #000}
+.plq{position:absolute;right:12px;top:12px;width:132px;padding:6px 6px 7px;text-align:center;background:linear-gradient(#2b3a34,#18231f);border:2px solid #0a120f;box-shadow:inset 0 0 0 2px #3d5249,0 3px 0 #050a08}
+.plq .num{font:700 30px/1 var(--gx);color:#ffd56a;text-shadow:0 2px 0 #000;position:relative;display:inline-block;min-width:40px}
+.plq .ttl{font:italic 13px var(--fx);color:#e8e1cf}
+.plq .crk{position:absolute;inset:0;opacity:0;background:linear-gradient(115deg,transparent 46%,#050a08 47% 49%,transparent 50%),linear-gradient(60deg,transparent 60%,#050a08 61% 62%,transparent 63%)}
+.fx{position:absolute;inset:0;pointer-events:none}
+.say{position:absolute;left:10px;right:10px;bottom:8px;padding:6px 10px;background:#e9dbb4;color:#2a1a12;font:italic 14px/1.3 var(--fx);border-radius:3px;opacity:0;box-shadow:0 2px 0 #000}
+.lab{position:absolute;left:0;right:0;top:44%;text-align:center;font:italic 17px var(--fx);color:#e8e1cf;opacity:0;text-shadow:0 2px 6px #000}
+.big{position:absolute;left:0;right:0;top:36%;text-align:center;font:700 34px var(--gx);color:#ffd56a;opacity:0;text-shadow:0 0 18px rgba(255,213,106,.8),0 2px 0 #000}
+/* level up */
+.fall{position:absolute;top:0;height:100%;transform-origin:50% 0;transform:scaleY(0);background:repeating-linear-gradient(180deg,rgba(190,255,230,.55) 0 5px,rgba(94,242,160,.32) 5px 14px,rgba(40,160,120,.12) 14px 22px);background-size:100% 44px;animation:flow .5s linear infinite;mix-blend-mode:screen}
+@keyframes flow{to{background-position:0 44px}}
+.pool{position:absolute;left:0;right:0;bottom:0;height:40px;background:linear-gradient(transparent,rgba(94,242,160,.55));opacity:0}
+.ember{position:absolute;width:7px;height:7px;background:#fff6c8;box-shadow:0 0 6px 3px #ff9a3a,0 0 14px 6px rgba(255,120,40,.6);opacity:0}
+.burn{position:absolute;inset:0;color:#fff2b0;text-shadow:0 0 8px #ff8a2a,0 0 16px #ff5a1a;clip-path:inset(0 100% 0 0)}
+.ring{position:absolute;width:20px;height:20px;margin:-10px 0 0 -10px;border:2px solid #5ef2a0;border-radius:50%;opacity:0}
+.mote{position:absolute;width:4px;height:4px;background:#5ef2a0;box-shadow:0 0 6px #5ef2a0}
+/* faint */
+.shard{position:absolute;width:5px;height:5px;background:rgba(220,245,235,.9)}
+.ink{position:absolute;width:40px;height:40px;margin:-20px 0 0 -20px;border-radius:50%;background:radial-gradient(circle,#03110b 0 40%,rgba(10,40,26,.95) 60%,rgba(40,120,80,0) 72%);transform:scale(0)}
+.rbub{position:absolute;width:30px;height:30px;border-radius:50%;border:1px solid rgba(200,255,230,.55);background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.35),rgba(120,200,170,.08) 60%);display:grid;place-items:center}
+.rbub canvas{width:16px;height:16px}
+.beam{position:absolute;top:-20px;width:70px;height:340px;left:calc(50% - 35px);background:linear-gradient(180deg,rgba(255,250,215,.55),rgba(255,250,215,0));clip-path:polygon(35% 0,65% 0,100% 100%,0 100%);opacity:0;mix-blend-mode:screen}
+/* The Call panel with the three stars */
+.call{margin-top:8px;padding:10px;background:#0c1512;border:1px solid #24443a;border-radius:8px}
+.call .hd{font:700 15px var(--gx);color:#8fa298;letter-spacing:.08em;text-align:center;margin-bottom:6px}
+.stars{display:flex;justify-content:space-around;align-items:center}
+.stars canvas{width:96px;height:96px;transition:filter .6s}
+.stars canvas.on{filter:drop-shadow(0 0 8px rgba(255,215,140,.75))}
+.rits{margin-top:8px;display:grid;gap:5px}
+.rit{display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:#142420;border:1px solid #24443a;border-radius:5px;font-size:14px}
+.rit .sk{width:16px;height:16px;border:2px solid #5d7a70;border-radius:3px}
+.rit.on{background:#1b3a2e;border-color:#5ef2a0}.rit.on .sk{background:#5ef2a0;border-color:#5ef2a0}
+.back{margin-top:6px;text-align:center;font:italic 14px var(--fx);color:#ffd56a;min-height:20px}
+.states{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:8px}
+.states div{text-align:center;font-size:12px;color:#8fa298}
+.states .row{display:flex;justify-content:center;gap:1px}
+.states canvas{width:28px;height:28px}
+.states canvas.on{filter:drop-shadow(0 0 3px rgba(255,215,140,.8))}
+/* gate */
+.gate{position:absolute;inset:0;pointer-events:none}
+.door{position:absolute;top:0;bottom:0;width:50%;background-size:cover}
+.door.l{left:0;border-right:2px solid #000}.door.r{right:0;border-left:2px solid #000}
+.door canvas{width:100%;height:100%}
+.arch{position:absolute;left:14px;right:14px;top:84px;text-align:center;padding:10px 6px;background:rgba(0,0,0,.6);border:1px solid rgba(110,200,255,.6);box-shadow:0 0 24px rgba(110,200,255,.45);opacity:0}
+.arch .dn{font:700 12px var(--ax);letter-spacing:.3em;color:#9ed8ff}
+.arch .dt{font:700 32px/1 var(--gx);color:#fff;text-shadow:0 0 14px rgba(110,200,255,.9),0 2px 0 #000;margin-top:4px;min-height:32px}
+.arch .dt span{opacity:0;display:inline-block}
+.arch .dm{font:italic 13px var(--fx);color:rgba(255,255,255,.85);margin-top:4px;opacity:0}
+.seam{position:absolute;top:0;bottom:0;left:calc(50% - 2px);width:4px;background:#d8f2ff;box-shadow:0 0 12px 6px rgba(140,210,255,.8);opacity:0}
+.flood{position:absolute;inset:0;background:radial-gradient(circle at 50% 60%,rgba(170,225,255,.9),rgba(40,110,160,.3) 60%,transparent);opacity:0}
+.spark{position:absolute;width:3px;height:3px;background:#fff3c0;box-shadow:0 0 4px #ffcf5a}
+@media (prefers-reduced-motion:reduce){.fall{animation:none}}
+</style>
+</head>
+<body>
+<main id="main">
+<h1>Ulhu's Big Moments, round two</h1>
+<p class="intro">Three refinements of each pick: LU2 The Falls, FA2 Ink in the Water, DP3 The Gate. Press Replay on any card. The faint cards also replay the slow recovery and show the three Rise again stars at 0, 1, 2 and 3 lit.</p>
+</main>
+<script>
+(function () {
+'use strict';
+const ULHU = /*__ULHU__*/;
+const STOP = { stop: true };
+const RM = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+function el(tag, cls, html) { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
+function spawn(p, cls, css, html) { const e = el('div', cls, html); if (css) e.style.cssText = css; p.appendChild(e); return e; }
+function rng(seed) { return function () { seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function pen(ctx) { return (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(Math.round(x), Math.round(y), Math.max(1, Math.round(w)), Math.max(1, Math.round(h))); }; }
+
+/* ---------- timeline: every animation and wait belongs to one run, Replay kills it ---------- */
+function TL() { this.anims = []; this.timers = []; this.dead = false; }
+TL.prototype.a = function (e, kf, d, o) { if (this.dead) throw STOP; o = o || {}; const an = e.animate(kf, { duration: RM ? 1 : d, delay: RM ? 0 : (o.delay || 0), easing: o.ease || 'ease', fill: 'forwards', iterations: o.it || 1 }); this.anims.push(an); return an; };
+TL.prototype.wait = function (ms) { return new Promise((res, rej) => { if (this.dead) return rej(STOP); this.timers.push(setTimeout(() => this.dead ? rej(STOP) : res(), RM ? 1 : ms)); }); };
+TL.prototype.kill = function () { this.dead = true; this.anims.forEach((a) => a.cancel()); this.timers.forEach(clearTimeout); };
+
+/* ---------- the drowned-temple backdrop, drawn in pixels ---------- */
+const PAL = {
+  shallows: { top: '#1f7a5a', bot: '#07211a', far: '#174d3e', mid: '#1b3a31', hi: '#30604f', lo: '#0f221c', ledge: '#28392f', lhi: '#43604f', moss: '#3fae6a', shaft: 'rgba(150,255,205,.10)' },
+  twilight: { top: '#1f6f8a', bot: '#061a2a', far: '#12405a', mid: '#173246', hi: '#2b5a76', lo: '#0b1a26', ledge: '#243440', lhi: '#3d5a6e', moss: '#3a8f9a', shaft: 'rgba(150,220,255,.10)' },
+  grey: { top: '#26302d', bot: '#070a09', far: '#1c2422', mid: '#161d1b', hi: '#2a3431', lo: '#0c100f', ledge: '#232a28', lhi: '#38423f', moss: '#3b4a44', shaft: 'rgba(200,210,205,.05)' }
+};
+function drawBg(cv, pal, seed) {
+  const W = 128, H = 97; cv.width = W; cv.height = H; const ctx = cv.getContext('2d'), R = pen(ctx), r = rng(seed || 7);
+  for (let y = 0; y < H; y++) { const k = y / H; ctx.fillStyle = mix(pal.top, pal.bot, k); ctx.fillRect(0, y, W, 1); if (y % 2 === 0) for (let x = (y / 2) % 2; x < W; x += 4) if (r() < .25) R(x, y, 1, 1, mix(pal.top, pal.bot, Math.min(1, k + .06))); }
+  for (let i = 0; i < 4; i++) { ctx.fillStyle = pal.shaft; ctx.beginPath(); const x = 10 + i * 30 + r() * 10; ctx.moveTo(x, 0); ctx.lineTo(x + 8, 0); ctx.lineTo(x + 26, H); ctx.lineTo(x + 12, H); ctx.fill(); }
+  for (let i = 0; i < 9; i++) { const x = r() * W, w = 5 + Math.floor(r() * 7), h = 18 + Math.floor(r() * 30); R(x, 78 - h, w, h, pal.far); R(x, 78 - h, 1, h, pal.hi); if (r() < .5) R(x - 2, 78 - h, w + 4, 2, pal.hi); }
+  for (const x of [14, 104]) { R(x, 30, 9, 50, pal.mid); R(x, 30, 2, 50, pal.hi); R(x + 7, 30, 2, 50, pal.lo); R(x - 2, 27, 13, 4, pal.hi); for (let y = 36; y < 78; y += 7) R(x + 2, y, 5, 1, pal.lo); }
+  R(0, 80, W, 17, pal.ledge); R(0, 80, W, 2, pal.lhi); for (let x = 0; x < W; x += 6 + Math.floor(r() * 6)) R(x, 83 + Math.floor(r() * 10), 3, 1, pal.lo);
+  for (const kx of [6, 30, 92, 120]) for (let j = 0; j < 16; j++) { const xx = kx + Math.round(Math.sin(j / 3 + kx) * 1.3); R(xx, 80 - j, 1, 1, pal.moss); if (j % 4 === 2) R(xx + 1, 80 - j, 1, 1, pal.moss); }
+}
+function hex(c) { return [1, 3, 5].map((i) => parseInt(c.slice(i, i + 2), 16)); }
+function mix(a, b, k) { const A = hex(a), B = hex(b); return 'rgb(' + A.map((v, i) => Math.round(v + (B[i] - v) * k)).join(',') + ')'; }
+
+/* a tiny rune glyph for the bubbles */
+function runeCanvas(seed) { const c = document.createElement('canvas'); c.width = 8; c.height = 8; c.className = 'px'; const R = pen(c.getContext('2d')), r = rng(seed);
+  R(1, 1, 6, 6, '#c9a64a'); R(2, 2, 4, 4, '#ffd56a'); R(3 + Math.floor(r() * 2), 2, 1, 4, '#5a3d10'); R(2, 3 + Math.floor(r() * 2), 4, 1, '#5a3d10'); return c; }
+
+/* ---------- stained-glass star, Voronoi pieces with lead lines, pentagram sigil ---------- */
+const GLASS = {
+  rose:  { starLit: ['#ffd56a', '#ffb347', '#f2803a', '#ffe9a0', '#e8a23a'], ringLit: ['#2d4fb8', '#5a2d9a', '#1f7ab0', '#7a2a6a', '#3b3fc0'], seeds: 34, ring: true, sigil: 'gold', rays: 5, inner: .42 },
+  sigil: { starLit: ['#5ef2a0', '#3fd38a', '#9af7c6', '#2fae84', '#c8ffe0'], ringLit: ['#14506a', '#1f3f7a', '#0e6a5e', '#2b2a6e', '#155a8a'], seeds: 30, ring: true, sigil: 'heavy', rays: 5, inner: .5, circle: true },
+  shard: { starLit: ['#e0405a', '#b8322a', '#ff7a6a', '#8a2a8a', '#ffb0a0', '#ffd56a'], ringLit: [], seeds: 26, ring: false, sigil: 'small', rays: 8, inner: .36 }
+};
+function starPoly(cx, cy, R1, R2, n, rot) { const p = []; for (let i = 0; i < n * 2; i++) { const a = rot + i * Math.PI / n, rr = i % 2 ? R2 : R1; p.push([cx + Math.cos(a) * rr, cy + Math.sin(a) * rr]); } return p; }
+function inPoly(x, y, p) { let c = false; for (let i = 0, j = p.length - 1; i < p.length; j = i++) { const [xi, yi] = p[i], [xj, yj] = p[j]; if ((yi > y) !== (yj > y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) c = !c; } return c; }
+function darken(c, k) { const A = hex(c); return 'rgb(' + A.map((v) => Math.round(v * k + 8)).join(',') + ')'; }
+function makeGlass(style, seed) {
+  const g = GLASS[style], S = 48, r = rng(seed), cx = S / 2, cy = S / 2 + 1;
+  const star = starPoly(cx, cy, 22, 22 * g.inner, g.rays, -Math.PI / 2);
+  const seeds = []; while (seeds.length < g.seeds) { const x = 1 + r() * (S - 2), y = 1 + r() * (S - 2); const ins = inPoly(x, y, star); const d = Math.hypot(x - cx, y - cy); if (ins || (g.ring && d < 23)) seeds.push({ x, y, ins }); }
+  const id = new Int16Array(S * S).fill(-1), zone = new Int8Array(S * S);
+  for (let y = 0; y < S; y++) for (let x = 0; x < S; x++) { const px = x + .5, py = y + .5, ins = inPoly(px, py, star), d = Math.hypot(px - cx, py - cy);
+    if (!ins && !(g.ring && d < 23.5)) continue; zone[y * S + x] = ins ? 1 : 2; let best = 1e9, bi = -1;
+    seeds.forEach((s, i) => { if (s.ins !== ins) return; const dd = (s.x - px) ** 2 + (s.y - py) ** 2; if (dd < best) { best = dd; bi = i; } }); id[y * S + x] = bi; }
+  const cols = seeds.map((s) => { const pal = s.ins ? g.starLit : g.ringLit; return pal[Math.floor(r() * pal.length)]; });
+  // lighting order: star pieces from the centre outward, then the surround
+  const order = seeds.map((s, i) => i).sort((a, b) => (seeds[a].ins === seeds[b].ins ? Math.hypot(seeds[a].x - cx, seeds[a].y - cy) - Math.hypot(seeds[b].x - cx, seeds[b].y - cy) : seeds[a].ins ? -1 : 1));
+  const rank = new Int16Array(seeds.length); order.forEach((i, k) => { rank[i] = k; });
+  const sig = []; if (g.sigil) { const pts = starPoly(cx, cy, g.sigil === 'small' ? 7 : 11, 0, 5, -Math.PI / 2).filter((_, i) => i % 2 === 0); for (let i = 0; i < 5; i++) line(pts[i], pts[(i + 2) % 5], sig); if (g.circle) for (let a = 0; a < 64; a++) sig.push([Math.round(cx + Math.cos(a / 64 * 6.283) * 12), Math.round(cy + Math.sin(a / 64 * 6.283) * 12)]); }
+  return { S, id, zone, cols, rank, n: seeds.length, sig, style };
+}
+function line(a, b, out) { let [x0, y0] = a.map(Math.round), [x1, y1] = b.map(Math.round); const dx = Math.abs(x1 - x0), dy = -Math.abs(y1 - y0), sx = x0 < x1 ? 1 : -1, sy = y0 < y1 ? 1 : -1; let e = dx + dy; for (;;) { out.push([x0, y0]); if (x0 === x1 && y0 === y1) break; const e2 = 2 * e; if (e2 >= dy) { e += dy; x0 += sx; } if (e2 <= dx) { e += dx; y0 += sy; } } }
+// lit = how many pieces glow (0..n); flash = a piece rank shown white-hot
+function paintGlass(cv, G, lit, flash) {
+  const S = G.S; cv.width = S; cv.height = S; const ctx = cv.getContext('2d'), img = ctx.createImageData(S, S), d = img.data;
+  const rgbCache = {};
+  const rgb = (c) => rgbCache[c] || (rgbCache[c] = c[0] === '#' ? hex(c) : c.match(/\d+/g).map(Number));
+  for (let y = 0; y < S; y++) for (let x = 0; x < S; x++) { const k = y * S + x, i = G.id[k]; if (i < 0) continue; const o = k * 4;
+    const lead = x === 0 || y === 0 || x === S - 1 || y === S - 1 || G.id[k - 1] !== i || G.id[k + 1] !== i || G.id[k - S] !== i || G.id[k + S] !== i;
+    let c;
+    if (lead) c = [18, 16, 14];
+    else { const on = G.rank[i] < lit; c = rgb(G.cols[i]); if (G.rank[i] === flash) c = [255, 250, 225]; else if (!on) c = c.map((v) => Math.round(v * .22 + 10)); else { const sh = ((x + y) % 7 === 0) ? 1.18 : 1; c = c.map((v) => Math.min(255, Math.round(v * sh))); } }
+    d[o] = c[0]; d[o + 1] = c[1]; d[o + 2] = c[2]; d[o + 3] = 255; }
+  ctx.putImageData(img, 0, 0);
+  const full = lit >= G.n;
+  G.sig.forEach(([x, y]) => { if (G.id[y * S + x] < 0) return; ctx.fillStyle = full ? '#fff1b8' : lit > 0 ? '#9b7a2a' : '#3a3120'; ctx.fillRect(x, y, 1, 1); if (G.style === 'sigil') { ctx.fillStyle = full ? '#ffd56a' : '#2a2418'; ctx.fillRect(x + 1, y, 1, 1); } });
+}
+
+/* ---------- a stage: backdrop, Ulhu, vial, plaque ---------- */
+function makeStage(host, o) {
+  host.innerHTML = '';
+  const st = { host };
+  st.cam = spawn(host, 'cam');
+  st.bg = el('canvas', 'bg px'); st.cam.appendChild(st.bg); drawBg(st.bg, PAL[o.pal || 'shallows'], o.seed);
+  st.back = spawn(st.cam, 'fx');
+  st.ulhu = spawn(st.cam, 'ulhu', '', '<img class="px" alt="Ulhu">'); st.img = st.ulhu.querySelector('img'); st.mood = (m) => { st.img.src = ULHU[m]; }; st.mood(o.mood || 'idle');
+  st.vial = spawn(st.cam, 'vial', '', '<i></i>'); st.fill = st.vial.firstChild; st.hpl = spawn(st.cam, 'hpl');
+  st.setHp = (hp) => { st.fill.style.height = (hp / 60 * 100) + '%'; st.hpl.textContent = hp + '/60'; };
+  st.setHp(o.hp == null ? 60 : o.hp);
+  st.plq = spawn(st.cam, 'plq', '', '<span class="num"></span><div class="ttl"></div><i class="crk"></i>'); st.num = st.plq.querySelector('.num'); st.ttl = st.plq.querySelector('.ttl');
+  st.num.textContent = o.num || 'VII'; st.ttl.textContent = o.ttl || 'Tide Caller';
+  st.fx = spawn(host, 'fx');
+  st.sayEl = spawn(host, 'say');
+  st.say = (t, tl) => { st.sayEl.textContent = t; tl.a(st.sayEl, [{ opacity: 0, transform: 'translateY(10px)' }, { opacity: 1, transform: 'none' }], 500); };
+  st.center = (e) => { const h = host.getBoundingClientRect(), r = e.getBoundingClientRect(); return [r.left - h.left + r.width / 2, r.top - h.top + r.height / 2]; };
+  return st;
+}
+function shake(st, t, a) { t.a(st.cam, [{ transform: 'none' }, { transform: 'translate(' + (-a) + 'px,' + a / 2 + 'px)' }, { transform: 'translate(' + a + 'px,' + (-a / 2) + 'px)' }, { transform: 'translate(' + (-a / 2) + 'px,0)' }, { transform: 'none' }], 240, { ease: 'linear' }); }
+function sparks(st, t, x, y, n, col) { for (let i = 0; i < n; i++) { const s = spawn(st.fx, 'spark', 'left:' + x + 'px;top:' + y + 'px' + (col ? ';background:' + col : '')); const a = i / n * 6.283 + .3, d = 14 + (i * 7) % 18; t.a(s, [{ transform: 'translate(0,0)', opacity: 1 }, { transform: 'translate(' + Math.cos(a) * d + 'px,' + (Math.sin(a) * d + 10) + 'px)', opacity: 0 }], 500 + (i % 3) * 120, { ease: 'ease-out' }); } }
+
+/* ---------- LU2 The Falls: three refinements ---------- */
+async function falls(st, t, tint) {
+  const xs = [8, 20, 33, 47, 61, 74, 88], w = [10, 7, 12, 8, 11, 7, 9];
+  xs.forEach((x, i) => { const f = spawn(st.back, 'fall', 'left:' + x + '%;width:' + w[i] + '%' + (tint ? ';filter:' + tint : '')); t.a(f, [{ transform: 'scaleY(0)' }, { transform: 'scaleY(1)' }], 500 + ((i * 337) % 900), { ease: 'cubic-bezier(.5,0,.9,.6)', delay: (i * 211) % 500 }); });
+  const pool = spawn(st.back, 'pool'); t.a(pool, [{ opacity: 0 }, { opacity: 1 }], 600, { delay: 1100 });
+  await t.wait(1500); shake(st, t, 3); return pool;
+}
+function zoomTo(st, e, k) { const h = st.host.getBoundingClientRect(), r = e.getBoundingClientRect(); const x = r.left - h.left + r.width / 2, y = r.top - h.top + r.height / 2; st.cam.style.transformOrigin = x + 'px ' + y + 'px'; return 'scale(' + k + ')'; }
+async function burnNumeral(st, t, newNum, ms) {
+  st.num.textContent = newNum; st.num.style.color = '#3b2a12';
+  const b = spawn(st.num, 'burn', '', newNum); const em = spawn(st.num, 'ember', 'top:40%');
+  t.a(b, [{ clipPath: 'inset(0 100% 0 0)' }, { clipPath: 'inset(0 0 0 0)' }], ms, { ease: 'linear' });
+  t.a(em, [{ left: '0%', opacity: 1, transform: 'translateY(-6px)' }, { transform: 'translateY(6px)', offset: .25 }, { transform: 'translateY(-6px)', offset: .5 }, { transform: 'translateY(6px)', offset: .75 }, { left: '100%', opacity: 1, transform: 'translateY(0)' }], ms, { ease: 'linear' });
+  await t.wait(ms); t.a(em, [{ opacity: 1 }, { opacity: 0 }], 200);
+  t.a(b, [{ color: '#fff2b0', textShadow: '0 0 8px #ff8a2a,0 0 16px #ff5a1a' }, { color: '#ffd56a', textShadow: '0 2px 0 #000' }], 1200);
+}
+async function heal(st, t, from, style) {
+  st.back.querySelectorAll('.fall,.pool').forEach((f) => t.a(f, [{ opacity: 1 }, { opacity: 0 }], 1600, { ease: 'ease-out' }));
+  const [vx, vy] = st.center(st.vial);
+  if (style === 'motes') { for (let i = 0; i < 14; i++) { const m = spawn(st.fx, 'mote', 'left:' + (60 + (i * 47) % 280) + 'px;top:' + (180 + (i * 31) % 80) + 'px'); const h = st.host.getBoundingClientRect(); t.a(m, [{ transform: 'translate(0,0)', opacity: 0 }, { opacity: 1, offset: .2 }, { transform: 'translate(' + (vx - parseFloat(m.style.left)) + 'px,' + (vy - parseFloat(m.style.top)) + 'px)', opacity: .9 }], 1100, { delay: i * 70, ease: 'ease-in' }); } await t.wait(1000); }
+  if (style === 'ring') { for (let i = 0; i < 3; i++) { const r = spawn(st.fx, 'ring', 'left:' + vx + 'px;top:' + vy + 'px'); t.a(r, [{ transform: 'scale(.5)', opacity: 1 }, { transform: 'scale(6)', opacity: 0 }], 1000, { delay: i * 250, ease: 'ease-out' }); } }
+  t.a(st.fill, [{ height: (from / 60 * 100) + '%' }, { height: '100%' }], 1200, { ease: 'ease-out' });
+  t.a(st.vial, [{ boxShadow: '0 0 0 rgba(94,242,160,0)' }, { boxShadow: '0 0 18px rgba(94,242,160,.9)' }, { boxShadow: '0 0 0 rgba(94,242,160,0)' }], 1400);
+  let hp = from; const step = async () => { while (hp < 60) { hp = Math.min(60, hp + 4); st.hpl.textContent = hp + '/60'; await t.wait(70); } }; await step();
+}
+async function LU2a(st, t) { // classic, slower push with the ember, then heal
+  await t.wait(300); await falls(st, t);
+  st.mood('proud'); t.a(st.cam, [{ transform: 'none' }, { transform: zoomTo(st, st.plq, 2.3) }], 1100, { ease: 'ease-in-out' }); await t.wait(1100);
+  await burnNumeral(st, t, 'VIII', 1500); st.ttl.textContent = 'Shell Breaker'; await t.wait(700);
+  t.a(st.cam, [{ transform: 'scale(2.3)' }, { transform: 'none' }], 1000, { ease: 'ease-in-out' }); await t.wait(1000);
+  st.mood('happy'); await heal(st, t, 22, 'ring'); st.say('Level VIII. The falls wash the cracks out of me. Full again.', t);
+}
+async function LU2b(st, t) { // follow one ember down the falls into the plaque
+  await t.wait(300); await falls(st, t, 'hue-rotate(-70deg) saturate(1.6)');
+  const em = spawn(st.fx, 'ember', 'left:30%;top:0;opacity:1;width:9px;height:9px');
+  const [px, py] = st.center(st.plq);
+  t.a(st.cam, [{ transform: 'none' }, { transform: zoomTo(st, st.plq, 1.5) }], 1400, { ease: 'ease-in' });
+  t.a(em, [{ left: '30%', top: '0px' }, { left: '45%', top: '120px', offset: .5 }, { left: (px - 4) + 'px', top: (py - 4) + 'px' }], 1400, { ease: 'ease-in' }); await t.wait(1400);
+  em.remove(); sparks(st, t, px, py, 12, '#ffb347'); t.a(st.cam, [{ transform: 'scale(1.5)' }, { transform: 'scale(2.6)' }], 400, { ease: 'ease-out' }); await t.wait(400);
+  st.mood('proud'); await burnNumeral(st, t, 'VIII', 1200); st.ttl.textContent = 'Shell Breaker'; await t.wait(600);
+  t.a(st.cam, [{ transform: 'scale(2.6)' }, { transform: 'none' }], 900, { ease: 'ease-in-out' }); await t.wait(900);
+  st.mood('happy'); await heal(st, t, 22, 'motes'); st.say('The falls ran gold for me. Level VIII, and every scrape healed.', t);
+}
+async function LU2c(st, t) { // tilted push in, then the pull back reveals the healing glow around Ulhu
+  await t.wait(300); await falls(st, t);
+  st.mood('proud'); const z = zoomTo(st, st.plq, 2.1);
+  t.a(st.cam, [{ transform: 'none' }, { transform: z + ' rotate(-4deg)' }], 1200, { ease: 'cubic-bezier(.6,0,.3,1)' }); await t.wait(1200);
+  await burnNumeral(st, t, 'VIII', 1300); st.ttl.textContent = 'Shell Breaker';
+  const big = spawn(st.fx, 'big', '', 'Level VIII'); t.a(big, [{ opacity: 0, transform: 'scale(.6)' }, { opacity: 1, transform: 'scale(1)', offset: .3 }, { opacity: 1, offset: .8 }, { opacity: 0 }], 1600); await t.wait(500);
+  t.a(st.cam, [{ transform: 'scale(2.1) rotate(-4deg)' }, { transform: 'scale(.92)', offset: .7 }, { transform: 'none' }], 1300, { ease: 'ease-out' }); await t.wait(1300);
+  const [ux, uy] = st.center(st.ulhu); for (let i = 0; i < 3; i++) { const r = spawn(st.fx, 'ring', 'left:' + ux + 'px;top:' + (uy + 30) + 'px;border-color:#ffd56a'); t.a(r, [{ transform: 'scale(1,.3)', opacity: 1 }, { transform: 'scale(9,2.6)', opacity: 0 }], 1200, { delay: i * 300 }); }
+  t.a(st.ulhu, [{ transform: 'translateY(0)' }, { transform: 'translateY(-10px)' }, { transform: 'translateY(0)' }], 700, { ease: 'ease-out' });
+  st.mood('happy'); await heal(st, t, 22, 'ring'); st.say('Zoom out, look at me: new level, full vial. Again.', t);
+}
+
+/* ---------- FA2 Ink in the Water: the faint, then a separate slow recovery ---------- */
+async function faint(st, t, ctx) {
+  if (ctx && ctx.call) ctx.call.reset();
+  await t.wait(400); st.mood('sad');
+  t.a(st.vial, [{ transform: 'none' }, { transform: 'scale(1.1,.92)' }, { transform: 'none' }], 300); await t.wait(300);
+  const [x, y] = st.center(st.vial); st.fill.style.height = '0%'; st.hpl.textContent = '0/60'; st.vial.classList.add('cr');
+  for (let i = 0; i < 14; i++) { const s = spawn(st.fx, 'shard', 'left:' + x + 'px;top:' + y + 'px;' + (i % 3 ? '' : 'background:#2fae6a')); const a = i / 14 * 6.283, d = 26 + (i * 13) % 30; t.a(s, [{ transform: 'translate(0,0)', opacity: 1 }, { transform: 'translate(' + Math.cos(a) * d + 'px,' + (Math.sin(a) * d + 40) + 'px) rotate(' + i * 80 + 'deg)', opacity: 0 }], 900, { ease: 'ease-out' }); }
+  const ink = spawn(st.fx, 'ink', 'left:' + x + 'px;top:' + y + 'px');
+  t.a(ink, [{ transform: 'scale(0)' }, { transform: 'scale(8)', offset: .35 }, { transform: 'scale(30)' }], 2600, { ease: 'ease-in' });
+  t.a(st.cam, [{ filter: 'none' }, { filter: 'brightness(.3) blur(1px)' }], 2400, { ease: 'ease-in' });
+  const [ux, uy] = st.center(st.ulhu);
+  for (let i = 0; i < 6; i++) { const b = spawn(st.fx, 'rbub', 'left:' + (ux - 50 + i * 18) + 'px;top:' + (uy + 10) + 'px'); b.appendChild(runeCanvas(i + 3));
+    t.a(b, [{ transform: 'translate(0,0) scale(.4)', opacity: 0 }, { transform: 'translate(0,-20px) scale(1)', opacity: 1, offset: .15 }, { transform: 'translate(' + (i % 2 ? 14 : -14) + 'px,-110px)', opacity: .9, offset: .55 }, { transform: 'translate(' + (i % 2 ? -10 : 10) + 'px,-240px)', opacity: 0 }], 3200, { delay: 900 + i * 220, ease: 'ease-in-out' }); }
+  const lab = spawn(st.fx, 'lab', '', '310 runes drift out of reach'); await t.wait(2000); t.a(lab, [{ opacity: 0 }, { opacity: 1 }], 700);
+  await t.wait(2300); t.a(lab, [{ opacity: 1 }, { opacity: 0 }], 500);
+  // found lying on the ledge, grey and still (no seaweed)
+  st.num.textContent = 'VI'; st.ttl.textContent = 'Reef Creeper'; st.plq.querySelector('.crk').style.opacity = .8;
+  t.a(ink, [{ opacity: 1 }, { opacity: 0 }], 1400); t.a(st.cam, [{ filter: 'brightness(.3) blur(1px)' }, { filter: 'brightness(.8) saturate(.6)' }], 1400);
+  t.a(st.ulhu, [{ transform: 'translate(10px,26px) rotate(-90deg)', filter: 'grayscale(1) brightness(.7)' }, { transform: 'translate(10px,26px) rotate(-90deg)', filter: 'grayscale(1) brightness(.7)' }], 1400);
+  await t.wait(1500); st.say('Down to level VI. Light the three stars and I will come back, bit by bit.', t);
+}
+function lyingState(st) { st.mood('sad'); st.setHp(0); st.vial.classList.add('cr'); st.num.textContent = 'VI'; st.ttl.textContent = 'Reef Creeper'; st.plq.querySelector('.crk').style.opacity = .8; st.cam.style.filter = 'brightness(.8) saturate(.6)'; }
+// recovery steps 0..3, one per ritual / star
+const LIE = 'translate(10px,26px) rotate(-90deg)';
+const POSE = { a: [LIE, 'translate(6px,16px) rotate(-55deg)', 'translate(2px,6px) rotate(-18deg)', 'none'], b: [LIE, 'translate(8px,20px) rotate(-70deg)', 'translate(0,8px) rotate(-10deg) scaleY(.92)', 'none'], c: [LIE, 'translate(10px,22px) rotate(-75deg)', 'translate(4px,10px) rotate(-30deg)', 'none'] };
+const FIL = ['grayscale(1) brightness(.7)', 'grayscale(.65) brightness(.8)', 'grayscale(.3) brightness(.92)', 'none'];
+async function recoverStep(st, t, v, k) {
+  const from = POSE[v][k - 1], to = POSE[v][k], [ux, uy] = st.center(st.ulhu);
+  if (v === 'a') { // colour seeps back from the feet up, a slow warm breath
+    t.a(st.ulhu, [{ transform: from, filter: FIL[k - 1] }, { transform: from, filter: FIL[k - 1], offset: .3 }, { transform: to, filter: FIL[k] }], 2200, { ease: 'ease-in-out' });
+    for (let i = 0; i < 6; i++) { const m = spawn(st.fx, 'mote', 'left:' + (ux - 30 + i * 12) + 'px;top:' + (uy + 40) + 'px;background:#ffd56a;box-shadow:0 0 6px #ffd56a'); t.a(m, [{ transform: 'translateY(0)', opacity: 0 }, { opacity: 1, offset: .3 }, { transform: 'translateY(-50px)', opacity: 0 }], 1600, { delay: i * 120 }); }
+  } else if (v === 'b') { // green ichor motes drift home into him and the vial
+    const [vx, vy] = st.center(st.vial);
+    for (let i = 0; i < 10; i++) { const sx = 20 + (i * 67) % 360, sy = 30 + (i * 41) % 200, tx = i % 2 ? ux : vx, ty = i % 2 ? uy : vy; const m = spawn(st.fx, 'mote', 'left:' + sx + 'px;top:' + sy + 'px'); t.a(m, [{ transform: 'translate(0,0)', opacity: 0 }, { opacity: 1, offset: .25 }, { transform: 'translate(' + (tx - sx) + 'px,' + (ty - sy) + 'px)', opacity: .2 }], 1500, { delay: i * 90, ease: 'ease-in' }); }
+    await t.wait(1100);
+    t.a(st.ulhu, [{ transform: from, filter: FIL[k - 1] }, { transform: to, filter: FIL[k] }], 1600, { ease: 'cubic-bezier(.3,0,.2,1)' });
+  } else { // a moonbeam finds him, he breathes three times, then rises
+    const beam = st.host.querySelector('.beam') || spawn(st.back, 'beam'); t.a(beam, [{ opacity: (k - 1) * .25 }, { opacity: k * .25 + .1 }], 900);
+    const kf = [{ transform: from, filter: FIL[k - 1] }]; for (let i = 1; i <= 3; i++) kf.push({ transform: from + ' scale(' + (1 + .05) + ',' + (1 - .03) + ')', offset: i * .2 - .1 }, { transform: from, offset: i * .2 }); kf.push({ transform: to, filter: FIL[k] });
+    t.a(st.ulhu, kf, 2800, { ease: 'ease-in-out' });
+  }
+  const hp = [0, 4, 9, 15][k]; t.a(st.fill, [{ height: ([0, 4, 9, 15][k - 1] / 60 * 100) + '%' }, { height: (hp / 60 * 100) + '%' }], 1400); st.hpl.textContent = hp + '/60';
+  t.a(st.cam, [{ filter: 'brightness(' + (.8 + (k - 1) * .07) + ') saturate(' + (.6 + (k - 1) * .13) + ')' }, { filter: 'brightness(' + (.8 + k * .07) + ') saturate(' + (.6 + k * .13) + ')' }], 1800);
+}
+async function lightStar(cv, G, t, mode) {
+  const n = G.n, per = mode === 'shard' ? 30 : mode === 'sigil' ? 45 : 38;
+  for (let k = 0; k <= n; k++) { paintGlass(cv, G, k, k); await t.wait(per); }
+  paintGlass(cv, G, n, -1); cv.classList.add('on');
+  t.a(cv, [{ transform: 'scale(1)' }, { transform: 'scale(1.12)' }, { transform: 'scale(1)' }], 500, { ease: 'ease-out' });
+}
+async function recover(st, t, v, call) {
+  lyingState(st); st.ulhu.style.transform = LIE; st.ulhu.style.filter = FIL[0];
+  call.reset(); await t.wait(700);
+  for (let k = 1; k <= 3; k++) {
+    call.rits[k - 1].classList.add('on'); await t.wait(250);
+    const lit = lightStar(call.cvs[k - 1], call.G[k - 1], t, call.style);
+    await recoverStep(st, t, v, k); await lit;
+    call.back.textContent = k < 3 ? (k + ' of 3 stars lit. Keep going.') : 'Atoned for today: 78 runes back (one quarter). Tomorrow, three more.';
+    await t.wait(1400);
+  }
+  st.mood('idle'); st.ulhu.style.transform = 'none'; st.ulhu.style.filter = 'none';
+  st.say(['Warm again. Not whole yet. Same again tomorrow.', 'The ichor came home. I can stand. Tomorrow I finish the job.', 'The moon forgave me. Tomorrow I earn the rest.'][' abc'.indexOf(v) - 1], t);
+}
+function buildCall(host, style, seedBase) {
+  host.innerHTML = '<div class="hd">RISE AGAIN</div><div class="stars"></div><div class="rits"></div><div class="back"></div>';
+  const call = { style, cvs: [], G: [], rits: [] };
+  for (let i = 0; i < 3; i++) { const G = makeGlass(style, seedBase + i * 17); const c = el('canvas', 'px'); host.querySelector('.stars').appendChild(c); call.cvs.push(c); call.G.push(G); }
+  ['Morning sweep', 'Mark one set', 'Plan tomorrow'].forEach((n) => { const r = el('div', 'rit', '<span>' + n + '</span><span class="sk"></span>'); host.querySelector('.rits').appendChild(r); call.rits.push(r); });
+  call.back = host.querySelector('.back');
+  call.reset = () => { call.cvs.forEach((c, i) => { paintGlass(c, call.G[i], 0, -1); c.classList.remove('on'); }); call.rits.forEach((r) => r.classList.remove('on')); call.back.textContent = 'Three rituals light the three stars.'; };
+  call.reset(); return call;
+}
+function buildStates(host, style, seedBase) {
+  host.className = 'states'; host.innerHTML = '';
+  const G = [0, 1, 2].map((i) => makeGlass(style, seedBase + i * 17));
+  for (let s = 0; s <= 3; s++) { const d = el('div', '', '<div class="row"></div>' + s + ' lit'); for (let i = 0; i < 3; i++) { const c = el('canvas', 'px' + (i < s ? ' on' : '')); paintGlass(c, G[i], i < s ? G[i].n : 0, -1); d.firstChild.appendChild(c); } host.appendChild(d); }
+}
+
+/* ---------- DP3 The Gate: three refinements ---------- */
+function stoneCanvas(side, seed, glow) { const c = el('canvas', 'px'); c.width = 64; c.height = 97; const R = pen(c.getContext('2d')), r = rng(seed);
+  R(0, 0, 64, 97, '#2a2f33'); for (let y = 0; y < 97; y += 12) { R(0, y, 64, 1, '#121518'); const off = (y / 12) % 2 ? 0 : 10; for (let x = off; x < 64; x += 20) R(x, y, 1, 12, '#121518'); }
+  for (let i = 0; i < 160; i++) R(r() * 64, r() * 97, 1, 1, r() < .5 ? '#363c41' : '#1d2125');
+  const gx = side === 'l' ? 40 : 10; R(gx, 30, 14, 36, '#1a1d20'); R(gx + 1, 31, 12, 34, '#24292d');
+  const gc = glow || '#6fbfe0'; for (let j = 0; j < 30; j++) R(gx + 6 + Math.round(Math.sin(j / 3) * 4), 33 + j, 1, 1, gc);
+  R(side === 'l' ? 58 : 2, 44, 4, 12, '#c7a54a'); R(side === 'l' ? 58 : 2, 54, 4, 2, '#6b5420'); return c; }
+function buildGate(st, glow) {
+  const g = spawn(st.host, 'gate'); g.style.zIndex = 3; const l = spawn(g, 'door l'), r = spawn(g, 'door r'); l.appendChild(stoneCanvas('l', 3, glow)); r.appendChild(stoneCanvas('r', 9, glow));
+  const seam = spawn(g, 'seam'); const arch = spawn(g, 'arch', '', '<div class="dn">DEPTH II</div><div class="dt">' + 'The Twilight'.split('').map((ch) => '<span>' + (ch === ' ' ? '&nbsp;' : ch) + '</span>').join('') + '</div><div class="dm">200 to 1,000 metres down. The last light.</div>');
+  return { g, l, r, seam, arch, letters: [...arch.querySelectorAll('.dt span')], dm: arch.querySelector('.dm') };
+}
+async function strike(st, t, num) { for (let i = 0; i < 3; i++) { t.a(st.plq, [{ transform: 'scale(1)' }, { transform: 'scale(1.12) rotate(' + (i % 2 ? 2 : -2) + 'deg)' }, { transform: 'scale(1)' }], 220); const [px, py] = st.center(st.plq); sparks(st, t, px, py + 10, 8); shake(st, t, 3); if (i === 2) { st.num.textContent = num; st.ttl.textContent = 'Lantern Fish'; } await t.wait(380); } }
+async function gateRise(st, t, gt) { t.a(gt.l, [{ transform: 'translateY(100%)' }, { transform: 'none' }], 1300, { ease: 'cubic-bezier(.2,.8,.3,1)' }); t.a(gt.r, [{ transform: 'translateY(100%)' }, { transform: 'none' }], 1300, { ease: 'cubic-bezier(.2,.8,.3,1)', delay: 150 }); await t.wait(1450); shake(st, t, 5); await t.wait(300); }
+async function DP3a(st, t) { // each letter chiselled with a spark
+  await t.wait(300); const gt = buildGate(st); await gateRise(st, t, gt);
+  t.a(gt.arch, [{ opacity: 0 }, { opacity: 1 }], 500); await t.wait(500);
+  for (const s of gt.letters) { t.a(s, [{ opacity: 0, transform: 'scale(1.6)', color: '#ffd56a' }, { opacity: 1, transform: 'scale(1)', color: '#fff' }], 260); const [x, y] = st.center(s); sparks(st, t, x, y, 5); await t.wait(150); }
+  t.a(gt.dm, [{ opacity: 0 }, { opacity: 1 }], 600); await t.wait(1600);
+  t.a(gt.arch, [{ opacity: 1 }, { opacity: 0 }], 400);
+  drawBg(st.bg, PAL.twilight, 4); t.a(gt.l, [{ transform: 'none' }, { transform: 'translateX(-102%)' }], 2000, { ease: 'cubic-bezier(.6,0,.4,1)' }); t.a(gt.r, [{ transform: 'none' }, { transform: 'translateX(102%)' }], 2000, { ease: 'cubic-bezier(.6,0,.4,1)' });
+  for (let i = 0; i < 6; i++) shake(st, t, 2); await t.wait(2100);
+  st.mood('proud'); await strike(st, t, 'XI'); st.say('The Twilight. Darker water, older stone. I like it here.', t);
+}
+async function DP3b(st, t) { // light pours through the seam, the doors part on a flood of new water
+  await t.wait(300); const gt = buildGate(st, '#9ed8ff'); await gateRise(st, t, gt);
+  t.a(gt.arch, [{ opacity: 0, transform: 'translateY(-10px)' }, { opacity: 1, transform: 'none' }], 900); gt.letters.forEach((s) => { s.style.opacity = 1; }); t.a(gt.dm, [{ opacity: 0 }, { opacity: 1 }], 900, { delay: 500 }); await t.wait(1800);
+  t.a(gt.arch, [{ opacity: 1 }, { opacity: 0 }], 400);
+  t.a(gt.seam, [{ opacity: 0, transform: 'scaleY(.2)' }, { opacity: 1, transform: 'scaleY(1)' }], 800); await t.wait(900);
+  drawBg(st.bg, PAL.twilight, 4); const fl = spawn(gt.g, 'flood');
+  t.a(gt.l, [{ transform: 'none' }, { transform: 'translateX(-102%)' }], 1500, { ease: 'cubic-bezier(.5,0,.3,1)' }); t.a(gt.r, [{ transform: 'none' }, { transform: 'translateX(102%)' }], 1500, { ease: 'cubic-bezier(.5,0,.3,1)' });
+  t.a(fl, [{ opacity: 0 }, { opacity: 1, offset: .3 }, { opacity: 0 }], 2200); t.a(gt.seam, [{ opacity: 1 }, { opacity: 0 }], 600);
+  t.a(st.ulhu, [{ transform: 'none' }, { transform: 'translateX(-6px) rotate(-4deg)', offset: .3 }, { transform: 'none' }], 1400); await t.wait(1800);
+  st.mood('proud'); await strike(st, t, 'XI'); st.say('The light got in first. Then me. Depth II.', t);
+}
+async function DP3c(st, t) { // Ulhu walks up, the camera pushes through the open gate into the new depth
+  await t.wait(300); const gt = buildGate(st); await gateRise(st, t, gt);
+  t.a(gt.arch, [{ opacity: 0 }, { opacity: 1 }], 600); gt.letters.forEach((s) => { s.style.opacity = 1; }); t.a(gt.dm, [{ opacity: 0 }, { opacity: 1 }], 600); await t.wait(1600); t.a(gt.arch, [{ opacity: 1 }, { opacity: 0 }], 400);
+  t.a(gt.l, [{ transform: 'none' }, { transform: 'translateX(-70%)' }], 1600, { ease: 'ease-in-out' }); t.a(gt.r, [{ transform: 'none' }, { transform: 'translateX(70%)' }], 1600, { ease: 'ease-in-out' }); await t.wait(1600);
+  gt.g.style.transformOrigin = '50% 55%'; t.a(gt.g, [{ transform: 'scale(1)', opacity: 1 }, { transform: 'scale(3.2)', opacity: 0 }], 1400, { ease: 'ease-in' });
+  t.a(st.cam, [{ transform: 'scale(1)', filter: 'brightness(1)' }, { transform: 'scale(1.4)', filter: 'brightness(.2)', offset: .5 }, { transform: 'scale(1)', filter: 'brightness(1)' }], 2000, { ease: 'ease-in-out' });
+  await t.wait(1000); drawBg(st.bg, PAL.twilight, 4); await t.wait(1000);
+  t.a(st.ulhu, [{ transform: 'translateY(-40px)', opacity: 0 }, { transform: 'none', opacity: 1 }], 900, { ease: 'ease-out' }); await t.wait(900);
+  st.mood('proud'); await strike(st, t, 'XI'); st.say('Through the gate and down. Depth II, The Twilight.', t);
+}
+
+/* ---------- cards ---------- */
+const main = document.getElementById('main');
+function section(title, intro) { main.appendChild(el('h2', '', title)); main.appendChild(el('p', 'gi', intro)); }
+function card(id, name, cap, stageOpts, buttons, extra) {
+  const c = el('section', 'card'); c.innerHTML = '<h3><b>' + id + '</b>' + name + '</h3><p class="cap">' + cap + '</p>';
+  const stage = spawn(c, 'stage'); const ex = extra ? spawn(c, '') : null; const bt = spawn(c, 'btns'); main.appendChild(c);
+  let tl = null; const ctx = { ex };
+  const run = (play) => { if (tl) tl.kill(); stage.innerHTML = ''; const st = makeStage(stage, stageOpts); tl = new TL(); const t = tl; play(st, t, ctx).catch((e) => { if (e !== STOP) console.error(e); }); };
+  buttons.forEach(([label, play], i) => { const b = el('button', i ? 'alt' : '', label); b.type = 'button'; b.onclick = () => run(play); bt.appendChild(b); });
+  if (extra) extra(ctx); ctx.first = () => run(buttons[0][1]); cards.push(ctx); return ctx;
+}
+const cards = [];
+section('Level up: LU2 The Falls', 'Seven falls crash in, the camera pushes in on the plaque while the numeral is burned, then pulls back. Every version ends by refilling the vial, because levelling up heals.');
+card('LU2-a', 'The Falls, steady', 'The original, with a slower closer push and a glowing ember that writes the numeral; the pull back ends with the vial refilling in green rings.', { hp: 22 }, [['Replay', LU2a]]);
+card('LU2-b', 'The Falls, golden ember', 'The falls run gold and the camera follows one ember down the water into the plaque; green motes then fly up into the vial to heal him.', { hp: 22 }, [['Replay', LU2b]]);
+card('LU2-c', 'The Falls, tilt and reveal', 'A tilted push in, a big Level VIII title, then the camera pulls back past Ulhu so gold rings spread from him as he heals.', { hp: 22 }, [['Replay', LU2c]]);
+section('Faint: FA2 Ink in the Water', 'The ichor turns the water black and the runes float away. He is found lying grey on the ledge, no seaweed. The recovery is its own replay: each ritual lights one stained-glass star at the top of The Call and he comes back one step.');
+const FAV = [['a', 'rose', 'Gold dawn, rose window', 'Recovery: warm colour seeps back into him with each star while he sits up a little more. Stars: gold star pieces inside a blue and violet rose window, gold pentagram once fully lit.', 101],
+  ['b', 'sigil', 'Ichor comes home, sigil glass', 'Recovery: green ichor drifts back through the water into him and the vial before each step up. Stars: sea-green glass in a round leaded window with a heavy pentagram sigil like the rituals.', 202],
+  ['c', 'shard', 'Moonbeam, blood shards', 'Recovery: a moonbeam grows brighter with each star while he takes three slow breaths and then rises a notch. Stars: eight jagged rays of crimson and violet shards with a small sigil.', 303]];
+FAV.forEach(([v, style, name, cap, seed]) => {
+  card('FA2-' + v, name, cap, { hp: 60 }, [['Replay faint', faint], ['Replay recovery', (st, t, ctx) => recover(st, t, v, ctx.call)]], (ctx) => {
+    const callHost = spawn(ctx.ex, 'call'); ctx.call = buildCall(callHost, style, seed);
+    const s = spawn(ctx.ex, ''); buildStates(s, style, seed);
+  });
+});
+section('Depth passed: DP3 The Gate', 'Stone doors rise and close in front of Ulhu, the depth name is carved over them, they grind open onto the new water, then the plaque is struck in.');
+card('DP3-a', 'The Gate, chiselled', 'The depth name is chiselled letter by letter with a spark on each, then the doors grind apart with a long rumble.', { pal: 'shallows', num: 'X', ttl: 'Abyss Apprentice' }, [['Replay', DP3a]]);
+card('DP3-b', 'The Gate, light through the seam', 'A blade of light opens down the middle first, then the doors part on a flood of pale blue water that nudges Ulhu back.', { pal: 'shallows', num: 'X', ttl: 'Abyss Apprentice' }, [['Replay', DP3b]]);
+card('DP3-c', 'The Gate, pass through', 'The doors open part way and the camera pushes right through the gap; Ulhu drops into the new deeper water on the other side.', { pal: 'shallows', num: 'X', ttl: 'Abyss Apprentice' }, [['Replay', DP3c]]);
+window.addEventListener('load', () => cards.forEach((c) => c.first()));
+})();
+</script>
+</body>
+</html>
