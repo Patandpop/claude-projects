@@ -51,3 +51,9 @@ planner/dist/
 
 # school pictures pulled from lesson decks (image-library.js): school files, never committed
 image-library/
+
+# Python bytecode caches
+__pycache__/
+
+# Jeopardy handover note names pupils (tutor group). Never commit.
+tools/JEOPARDY_HANDOVER.md
