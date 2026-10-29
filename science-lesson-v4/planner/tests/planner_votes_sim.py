@@ -54,6 +54,18 @@ with sync_playwright() as p:
     check('the card shows "HW due" and "KEY HW to mark": ' + r['chip'], 'HW due' in r['chip'] and 'KEY HW to mark' in r['chip'])
     check('"Collect homework" is ticked by itself when homework is due; the follow-up and key-homework-returned ticks are there, unticked',
           r['collect'] is True and r['follow'] is False and r['key'] is False)
+    # work plan 2.12: a note for next time, kept on the lesson record and shown to another class planning the same lesson
+    r = page.evaluate("""(i) => {
+      S.sel = i; editor();
+      const ta = document.querySelector('#eNext'); if (!ta) return { none: true };
+      ta.value = 'Start with the demo next time'; ta.dispatchEvent(new Event('change'));
+      const s = S.week.slots[i], rec = P.findRecord(S.data, s.cls, s.i) || {};
+      const L = S.data.classes[s.cls].seq[s.i];
+      const other = Object.keys(S.data.classes).find((c) => c !== s.cls && S.data.classes[c].seq.some((x) => (x.rel || '') === (L.rel || '-')));
+      return { rec: rec.nextYear || '', prompt: P.buildPrompt(S.data, s, null, S.week), dirty: S.dirty, other };
+    }""", idx)
+    check('a note for next time is kept on the lesson record, saved, and goes to Claude in the build request',
+          r.get('rec') == 'Start with the demo next time' and r.get('dirty') and 'Start with the demo next time' in r.get('prompt', ''))
     # work plan 2.3: most-missed homework questions across classes on the Assessment tab
     r = page.evaluate("""() => {
       const cls = Object.keys(S.data.classes), day = P.iso(P.addDays(todayMidnight(), -3)), old = P.iso(P.addDays(todayMidnight(), -80));

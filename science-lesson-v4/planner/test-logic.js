@@ -319,6 +319,18 @@ if (fs.existsSync(DRIVE)) {
   const lr = P.lastResults(resRows, '9XS', '2026-10-21');
   ok(lr && lr.dueOn === '2026-10-19' && lr.weak.map((q) => q.key).join(',') === '2,3,1', 'lesson card: newest homework due before the lesson, its 3 weakest questions first');
   ok(P.lastResults(resRows, '9XS', '2026-11-20') === null && P.lastResults(resRows, '10C2', '2026-10-21') === null, 'lesson card: nothing older than 14 days, nothing for another class');
+  // workplan 2.12 (2026-10-29): a note for next time on a lesson shows for any class planning that lesson, and goes to Claude
+  {
+    const d2 = JSON.parse(JSON.stringify(data)), cls = Object.keys(d2.classes)[0], L0 = d2.classes[cls].seq[0];
+    d2.records = []; P.setRecord(d2, cls, 0, { nextYear: 'Needs the long ruler, start with the demo' });
+    const notes = P.lessonNotes(d2, L0);
+    ok(notes.length === 1 && notes[0].cls === cls && /long ruler/.test(notes[0].text), 'lesson note for next time is kept on the lesson record');
+    d2.records.push({ cls: 'OLDCLASS', i: null, key: L0.rel || L0.origKey || (L0.unit + '|' + L0.title), nextYear: 'Last year: too long' });
+    ok(P.lessonNotes(d2, L0).length === 2, 'a note from a class of last year (no longer in the data) still shows for the same lesson');
+    ok(/Patryk's note from teaching this lesson to OLDCLASS: Last year: too long/.test(P.buildPrompt(d2, { kind: 'lesson', cls, i: 0 })), 'the notes go to Claude in the build request');
+    P.setRecord(d2, cls, 0, { nextYear: null });
+    ok(P.lessonNotes(d2, L0).length === 1, 'clearing the note removes it');
+  }
   // workplan 2.4 (2026-10-29): homework due on the lesson card; key homework to mark after 5 days
   const hwl = [{ cls: '9XS', kind: 'quiz', title: 'Cells quiz', dueOn: '2026-10-21', status: 'live' }, { cls: '9XS', kind: 'seneca', title: 'Draft only', dueOn: '2026-10-21', status: 'drafted' },
     { cls: '9XS', kind: 'key', title: 'Key HW 1', dueOn: '2026-10-15', status: 'due' }, { cls: '9XS', kind: 'key', title: 'Key HW 0', dueOn: '2026-10-01', status: 'marked' },

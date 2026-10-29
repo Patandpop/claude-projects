@@ -67,6 +67,12 @@
   // in every week, earlier and later. Old weeks may still carry marks of their own: both count.
   const recs = (data, w) => (data.records || []).concat((w && w.marks) || []);
   function findRecord(data, cls, i) { return (data.records || []).find((r) => r.cls === cls && r.i === i) || null; }
+  // Workplan 2.12 (2026-10-29): his notes for next time on a lesson (record field nextYear), from every class
+  // that has taught it (this year's other classes, or last year's), shown when the lesson is planned again.
+  function lessonNotes(data, L) {
+    const id = lessonId(L);
+    return id ? (data.records || []).filter((r) => r.key === id && r.nextYear).map((r) => ({ cls: r.cls, text: r.nextYear, date: r.date || '' })) : [];
+  }
   // Merge fields into a lesson's record (null removes a field); an empty record is dropped.
   function setRecord(data, cls, i, fields) {
     data.records = data.records || [];
@@ -748,6 +754,7 @@
     CHECKS.forEach(([k, t]) => { if ((s.checks || {})[k]) lines.push(t + '.'); });
     EXTRAS.forEach(([k, , t]) => { if ((s.adds || {})[k]) lines.push(t + '.'); });
     if (s.book && s.bookOn) lines.push(`Textbooks out: ${s.book}.`);
+    if (L) lessonNotes(data, L).forEach((x) => lines.push(`Patryk's note from teaching this lesson to ${x.cls}: ${x.text}`));   // 2.12
     const about = (profile && profile.notes) || c.profile;
     if (about) lines.push(`About ${s.cls}: ${about}`);
     return lines.filter(Boolean).join('\n');
@@ -842,7 +849,7 @@
     return out;
   }
 
-  const api = { dueFor, nextLessonDay, lessonsOn, lessonEnd, recs, findRecord, setRecord, recordChanges, remapRecords, migrateMarks, cascade, revisionSlot, unitBefore, applyAdded, addedNum, remapWeek, lessonId, applyMarks, classReport, topicList, wouldSkip, setSlot, markLesson, refillClass, planFrom, periodTime, calendarEvents, DAYS, iso, parse, addDays, mondayOf, isTeachingDay, nextSchoolDay, weekLetter, progressBefore, next, autofill, moveSlot, refillAfter,
+  const api = { dueFor, nextLessonDay, lessonsOn, lessonEnd, recs, findRecord, setRecord, lessonNotes, recordChanges, remapRecords, migrateMarks, cascade, revisionSlot, unitBefore, applyAdded, addedNum, remapWeek, lessonId, applyMarks, classReport, topicList, wouldSkip, setSlot, markLesson, refillClass, planFrom, periodTime, calendarEvents, DAYS, iso, parse, addDays, mondayOf, isTeachingDay, nextSchoolDay, weekLetter, progressBefore, next, autofill, moveSlot, refillAfter,
     EXTRAS, extrasSuggested, gradeFor, hwCoverage, hwStatus, lastResults, lastVotes, doNowFromVote, mostMissed, hwForLesson, lessonSlot, testSlot, notHappened, slotDone, slotDay, fromFilled, reflowWeek, CHECKS, sheetCells, sheetModel, setsCount, printList, buildPrompt, carryForward, equipCell, lessonCell, setsLabel };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.PlannerLogic = api;
 })(typeof window !== 'undefined' ? window : this);

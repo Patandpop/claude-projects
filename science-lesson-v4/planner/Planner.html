@@ -1591,6 +1591,17 @@ function votesCard(s) {
         '<button class="eDnv" data-q="' + x.q + '">' + (has ? 'Take off the Do Now' : 'Put on this lesson\'s Do Now') + '</button></div>';
     }).join('') : '<p class="muted">Every question 100% right.</p>') + '</div>';
 }
+// Workplan 2.12 (2026-10-29): a note for next time on this lesson (kept on the lesson's record). Notes other
+// classes' copies of the same lesson carry (this year or last) show above it.
+function noteCard(s) {
+  const L = (S.data.classes[s.cls] || {}).seq ? S.data.classes[s.cls].seq[s.i] : null;
+  if (!L) return '';
+  const mine = (P.findRecord(S.data, s.cls, s.i) || {}).nextYear || '';
+  const others = P.lessonNotes(S.data, L).filter((x) => x.cls !== s.cls);
+  return '<div class="card"><h4>Note for next time <span class="src">shown when this lesson is planned again, and sent to Claude with the build</span></h4>' +
+    others.map((x) => '<div class="muted">From ' + esc(x.cls) + ': ' + esc(x.text) + '</div>').join('') +
+    '<textarea id="eNext" placeholder="What to change next time: kit, timing, what worked" style="min-height:38px;margin-top:4px">' + esc(mine) + '</textarea></div>';
+}
 function lessonKey(s) { const L = S.data.classes[s.cls].seq[s.i]; return L.rel || (s.cls + '|' + L.topic + '|' + L.title); }
 
 function editor() {
@@ -1623,7 +1634,7 @@ function editor() {
         '<input type="text" id="eBook" placeholder="Textbook pages" value="' + esc(s.book || (curL && curL.book) || '') + '" style="flex:1"></div>' +
       (s.kind === 'lesson' ? '<label class="inline"><input type="checkbox" id="eRemember"' + (s.eqSrc === 'remembered' ? ' checked' : '') + '> use this every time this lesson is taught</label>' : '') +
     '</div>' +
-    (isLesson ? checklistCard(s) : '') + (s.kind === 'lesson' ? extrasCard(s) + votesCard(s) : '') +
+    (isLesson ? checklistCard(s) : '') + (s.kind === 'lesson' ? extrasCard(s) + votesCard(s) + noteCard(s) : '') +
     (['lesson', 'revision'].includes(s.kind) ? '<div class="card"><h4>Who makes it</h4>' +
       '<label class="inline" style="display:block"><input type="checkbox" id="eOwn"' + (s.own ? ' checked' : '') + '> I have made this myself (never sent to Claude)</label>' +
       (() => { const others = S.week.slots.map((x, n) => ({ x, n })).filter(({ x, n }) => n !== S.sel && x.cls !== s.cls && !x.double && ['lesson', 'revision'].includes(x.kind));
@@ -1724,6 +1735,10 @@ function editor() {
     w.slots[S.sel].dnVotes = at >= 0 ? cur.filter((d, i) => i !== at) : cur.concat(P.doNowFromVote(x, L.mcq));
     change(w, at >= 0 ? 'Taken off the Do Now' : 'On the Do Now: it goes to Claude with the build request');
   });
+  if ($('eNext')) $('eNext').onchange = () => {   // workplan 2.12
+    P.setRecord(S.data, s.cls, s.i, { nextYear: $('eNext').value.trim() || null });
+    change(JSON.parse(JSON.stringify(S.week)), $('eNext').value.trim() ? 'Note kept for next time' : 'Note removed', true);
+  };
   if ($('eNotes')) $('eNotes').onchange = () => { const w = JSON.parse(JSON.stringify(S.week)); w.slots[S.sel].notes = $('eNotes').value.split('\n').map((x) => x.trim()).filter(Boolean); change(w, null, true); };
   $('eRefill').onclick = () => { const w = JSON.parse(JSON.stringify(S.week)); P.refillAfter(S.data, S.weeks, w, S.sel, S.learned); change(w, 'Re-planned ' + s.cls + reflowNote(S.week, w, s.cls, S.sel)); };
   const carry = (what) => {
