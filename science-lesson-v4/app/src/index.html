@@ -84,12 +84,22 @@
       <div class="row"><button class="plain" id="change">Change</button><button class="plain" id="forgetKey">Forget the key on this device</button></div>
       <p class="msg" id="homeMsg" role="status"></p>
     </div>
+    <h2>This PC's evening timer</h2>
+    <div class="card" id="pcCard">
+      <p class="note" style="margin-top:0">For the home PC only. With ActivityWatch running on this PC, the app counts what you work on (Emails, Building lessons 9AS, ...) and sends only minutes per job and class. Window names never leave this PC. Little Ulhu says what he is counting; after 7pm he only counts.</p>
+      <div class="seg" id="pcOn"><button data-v="off">Off</button><button data-v="on">On</button></div>
+      <p class="msg" id="pcMsg" role="status"></p>
+    </div>
     <p class="note"><a class="btn plain" href="test/">Open the school test</a></p>
   </section>
   <p class="stamp">build {{BUILD_STAMP}}</p>
 </main>
 <script src="api.js"></script>
 <script src="outbox.js"></script>
+<script src="shared/day-logic.js"></script>
+<script src="shared/game-ulhu.js"></script>
+<script src="shared/day-popup.js"></script>
+<script src="pc-timer.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

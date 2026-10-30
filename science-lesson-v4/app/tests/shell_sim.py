@@ -53,7 +53,7 @@ with sync_playwright() as p:
     check('first open asks to set up this device, with no Cancel', pg.is_visible('#setup') and pg.is_hidden('#home') and pg.is_hidden('#cancel'))
     pg.fill('#url', 'https://example.com/x'); pg.fill('#key', 'good-key-123'); pg.click('#save')
     check('a wrong-looking address is refused in plain words', 'should look like' in pg.inner_text('#setupMsg') and pg.evaluate("localStorage.getItem('app.key')") is None)
-    pg.fill('#url', GOOD); pg.fill('#key', 'wrong-key-99'); pg.click('#save'); pg.wait_for_timeout(400)
+    pg.fill('#url', GOOD); pg.fill('#key', 'wrong-key-99'); pg.click('#save'); pg.wait_for_function("!document.getElementById('save').disabled")
     check('a key the planner refuses says so, and nothing is kept', 'did not accept' in pg.inner_text('#setupMsg') and pg.evaluate("localStorage.getItem('app.key')") is None and pg.is_visible('#setup'))
     pg.fill('#url', BAD); pg.fill('#key', 'good-key-123'); pg.click('#save'); pg.wait_for_timeout(1800)
     check('an address with no planner behind it says "Could not reach"', 'Could not reach' in pg.inner_text('#setupMsg') and pg.evaluate("localStorage.getItem('app.serverUrl')") is None)
@@ -83,6 +83,26 @@ with sync_playwright() as p:
     check('a tap the planner keeps refusing is listed with its reason, with Try again and Forget', 'An ABCD vote (That lesson has gone)' in pg.inner_text('#outbox') and pg.is_visible('#retry'))
     pg.click('#forget'); pg.wait_for_timeout(100)
     check('Forget clears it and the box goes', pg.is_hidden('#outbox'))
+
+    # ---- this PC's evening timer, against a fake ActivityWatch on this PC
+    import datetime
+    t0 = datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(minutes=12)
+    AW = {'aw-watcher-window_PC': {}, 'aw-watcher-afk_PC': {}}
+    WIN = [{'timestamp': t0.isoformat(), 'duration': 600, 'data': {'app': 'POWERPNT.EXE', 'title': 'Latent Heat 9AS.pptx - PowerPoint'}}]
+    awseen = []
+    def aw(route, req):
+        awseen.append(req.url); h = {'Access-Control-Allow-Origin': '*'}
+        body = AW if req.url.endswith('/buckets/') else (WIN if 'window' in req.url else [])
+        route.fulfill(status=200, headers=h, content_type='application/json', body=json.dumps(body))
+    ctx.route('http://localhost:5600/**', aw)
+    check('the PC timer is off until switched on, and asks nothing of ActivityWatch', pg.evaluate("document.querySelector('#pcOn [data-v=off]').getAttribute('aria-pressed')") == 'true' and not awseen)
+    n = len(seen); pg.click('#pcOn [data-v=on]'); pg.wait_for_timeout(1200)
+    logs = [json.loads(x['body']) for x in seen[n:] if x['body'] and json.loads(x['body']).get('fn') == 'timerLog']
+    check('switched on: it reads ActivityWatch on this PC and says what it is counting (%s)' % pg.inner_text('#pcMsg'), awseen and 'Counting' in pg.inner_text('#pcMsg') and 'Building lessons 9AS' in pg.inner_text('#pcMsg'))
+    check('it sends 10 minutes of Building lessons 9AS, and no window name', logs and logs[0]['args'][0][0]['job'] == 'Building lessons' and logs[0]['args'][0][0]['cls'] == '9AS' and logs[0]['args'][0][0]['minutes'] == 10 and 'Latent' not in json.dumps(logs))
+    check('Little Ulhu pops up to say what he is counting', pg.locator('.dp').count() == 1 and 'Building lessons 9AS' in pg.inner_text('.dp'))
+    pg.click('.dp [data-dp=not]'); pg.click('#pcOn [data-v=off]'); pg.wait_for_timeout(100)
+    check('"Not that" closes it; Off stops the counting', pg.locator('.dp').count() == 0 and 'Off' in pg.inner_text('#pcMsg'))
 
     # ---- forget the key
     pg.once('dialog', lambda d: d.accept()); pg.click('#forgetKey')

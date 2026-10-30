@@ -360,7 +360,7 @@ function timerLog(k, rows) {
       const id = /^[\w:.-]{1,60}$/.test(String(x.id || '')) ? String(x.id) : '';
       if (!id || have[id] || DAY_JOBS.indexOf(x.job) < 0 || !(Number(x.minutes) > 0) || !/^\d{4}-\d{2}-\d{2}$/.test(String(x.day))) return;
       dAppend_('Timer', { id: id, day: x.day, job: x.job, cls: DAY_CLASS_JOBS.indexOf(x.job) >= 0 ? dClean_(x.cls, 8) : '', minutes: Math.round(Number(x.minutes)), source: 'pc',
-        startedAt: Number(x.startedAt) || '', endedAt: Number(x.endedAt) || Number(x.startedAt) || 1, maybe: false });
+        startedAt: Number(x.startedAt) || '', endedAt: Number(x.endedAt) || Number(x.startedAt) || 1, maybe: x.maybe === true });   // maybe: he pressed "Not that"
       have[id] = 1; n++;
     });
     return { saved: n };

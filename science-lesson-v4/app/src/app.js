@@ -78,6 +78,33 @@
   function net() { var on = navigator.onLine; $('net').textContent = on ? 'Online' : 'No signal'; $('net').classList.toggle('off', !on); }
   window.addEventListener('online', net); window.addEventListener('offline', net); net();
 
+  // ---- this PC's evening timer (pc-timer.js): off unless switched on here; a sync every 5 minutes while the app is open
+  var PC = window.makePcTimer && window.DayLogic ? makePcTimer({ fetch: window.fetch.bind(window), storage: localStorage, api: API, logic: DayLogic }) : null;
+  var pcLoop = null, rulesAsked = false;
+  function pcDraw(text, good) {
+    var on = !!(PC && PC.state().on);
+    Array.prototype.forEach.call($('pcOn').children, function (b) { b.setAttribute('aria-pressed', String((b.dataset.v === 'on') === on)); });
+    if (text !== undefined) say($('pcMsg'), text, good);
+  }
+  function pcTick() {
+    if (!PC || !PC.state().on) return;
+    if (!rulesAsked && API.ready()) { rulesAsked = true; API.call('timerRules').then(function (r) { PC.setRules(r); }, function () { rulesAsked = false; }); }
+    PC.sync().then(function (r) {
+      var c = PC.current();
+      pcDraw('Counting. Last sent ' + new Date().toTimeString().slice(0, 5) + (c ? '; now: ' + c.job + (c.cls ? ' ' + c.cls : '') : '') + '.', true);
+      var p = PC.popupDue();
+      if (p && window.DayPopup) DayPopup.show(document.body, { job: p.job, cls: p.cls, since: p.since, ledger: p.ledger, onNotThat: function () { PC.notThat(); } });
+    }, function (e) { pcDraw(e.message, false); });
+  }
+  function pcStart() { if (pcLoop) clearInterval(pcLoop); pcLoop = PC && PC.state().on ? setInterval(pcTick, 5 * 60 * 1000) : null; pcTick(); }
+  if (PC) {
+    $('pcOn').addEventListener('click', function (e) {
+      var b = e.target.closest('button'); if (!b) return;
+      PC.setOn(b.dataset.v === 'on'); pcDraw(b.dataset.v === 'on' ? 'Looking for ActivityWatch...' : 'Off. Nothing is counted on this PC.', b.dataset.v !== 'on'); pcStart();
+    });
+    pcDraw(); pcStart();
+  } else $('pcCard').classList.add('hidden');
+
   // ---- install and updates
   if ('serviceWorker' in navigator && location.protocol !== 'file:') {
     navigator.serviceWorker.register('sw.js').then(function (reg) {

@@ -22,6 +22,24 @@
 
 ## Entries (newest first)
 
+### 30 Oct 2026, Lane C part 2, item 3 (installed app step 10, the home PC half): the evening timer counts by itself
+- What changed: the app now has a "This PC's evening timer" switch in Settings. It is off by default and only for the home PC.
+- When it is on and the app is open, every 5 minutes it reads ActivityWatch (a free program that records which window is in front; it stays on your PC):
+  - it turns each window into a job and class (a "Latent Heat 9AS" PowerPoint is Building lessons 9AS, Gmail is Emails, anything it does not know is Personal);
+  - it takes away the time you were away from the keyboard;
+  - it sends only minutes per job and class to your planner. Window names never leave the PC.
+- If the app was closed, it fills the gap next time (up to two days back). With no signal nothing is lost or counted twice.
+- Little Ulhu's pop-up: when a new job has been in front for 2 minutes, he says what he is counting (the bubble you approved). "Not that" marks those minutes "maybe" for your report. After 7pm he shows the N3 night pop-up once, with tonight's tally, and then only counts.
+- The planner's server now keeps that "maybe" mark from the PC (one line in Day.gs; it is in the next paste set anyway).
+- Checks: 18 in `app/tests/pc-timer.test.js` and 5 more in `app/tests/shell_sim.py`.
+- Nothing to do yet. Once the app is on the planner's personal account, setting it up on the home PC will be:
+  1. install ActivityWatch from activitywatch.net (free);
+  2. let it start with Windows;
+  3. tell ActivityWatch to let your app's address read it: I'll give you the exact line to add to its settings once the `.pages.dev` address exists, checked against ActivityWatch's own instructions then;
+  4. open the app on the home PC and switch "This PC's evening timer" On.
+- Risk to check then: Chrome may ask an extra question before a website reads a program on the same PC. If it blocks ActivityWatch, the fallback is a tiny script on the PC that sends the same totals (no change to what is counted).
+- Save: see git log "Installed app step 10: the home PC timer".
+
 ### 30 Oct 2026, Lane C: the design chat's list (try everything that does not need you)
 - **Obsidian inbox:** set to option (a), `G:\My Drive\Obsidian\Inbox from planner.md`, with writing OFF. A capture you send to Obsidian is now kept in the planner's Inbox tab as "held" (the capture box says "Kept for Obsidian. Nothing is written there until you switch it on"). When writing is switched on, everything held is written, oldest first, once each, and every write is logged. Anything about a class or a pupil still never goes to Obsidian. 7 new server checks, 1 new phone check. Day.gs changed (Lane A: it is in the next paste set anyway).
 - **Build ahead, the dry run** (`planner/tools/build-ahead.ps1 -DryRun`, nothing installed, nothing built): today it says "not a school day" (half term). I also asked its rules about a school afternoon, Tuesday 3 Nov:

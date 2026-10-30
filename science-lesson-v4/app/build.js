@@ -33,4 +33,9 @@ let n = 0;
     n++;
   }
 })(src, out);
+// files shared with the planner pages, copied as they are into dist/shared/ so both use one copy of the rules:
+// the day and timer rules, Ulhu's pop-up and his sprites
+const SHARED = ['day-logic.js', 'day-popup.js', 'game-ulhu.js'];
+fs.mkdirSync(path.join(out, 'shared'), { recursive: true });
+SHARED.forEach((f) => { fs.copyFileSync(path.join(__dirname, '..', 'planner', f), path.join(out, 'shared', f)); n++; });
 console.log(`app built: ${n} files in ${path.relative(process.cwd(), out) || '.'} (build ${stamp})`);
