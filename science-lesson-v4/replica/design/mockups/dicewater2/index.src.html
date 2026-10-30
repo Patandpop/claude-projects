@@ -117,11 +117,18 @@ function grotto(g, C) {
   g.globalAlpha = .06; for (let k = 0; k < 10; k++) { const rr = 50 - k * 4; g.fillStyle = '#e0f0ff'; g.beginPath(); g.ellipse(W - 34, 62, rr, rr / 2, 0, 0, 7); g.fill(); } g.globalAlpha = 1;
   rc(g, W - 36, 56, 4, 8, '#ffe8a0'); rc(g, W - 37, 55, 6, 1, '#3a2a16');
 }
+// ---------- D3, through Ulhu's eyes: Squall across the table, Ulhu's own tentacles resting on the near edge ----------
+function across(g, C, frame) {
+  const K = img(UZDEN.portrait('curio', frame).src), w = 78, h = 67; if (K.complete) g.drawImage(K, W / 2 - w / 2, C.yF - h + 6, w, h);
+}
+function hands(g, C, t) {
+  arm(g, 18, H + 4, 46, 1.6, t, 0, 0); arm(g, W - 18, H + 4, 46, -1.6, t, 2, 0);
+}
 // ---------- the three ways ----------
 const SCN = {
   D1: { name: 'Tide sweep', cap: 'Your W1, rebuilt: the sea rolls in from the far side over the whole table toward you, then drains back, dragging the loser\'s dice off the far edge in the backwash.', cam: { yN: 168, yF: 70, wN: 74, wF: 46 }, crest: 9 },
   D2: { name: 'The deep takes them', cap: 'The same flood, but when the whole table is under, tentacles rise through the water, each wraps one of the loser\'s dice and pulls it down. Then the water drains.', cam: { yN: 168, yF: 70, wN: 74, wF: 46 }, crest: 7, arms: true },
-  D3: { name: 'Low and close', cap: 'A new angle: low, from Ulhu\'s side, almost at table height. The table runs away from you, the wave towers over the far edge and crashes down onto it, then slides back with the loser\'s dice.', cam: { yN: 196, yF: 132, wN: 96, wF: 70, k: 1.3, dN: 24, dF: 15 }, crest: 34 }
+  D3: { name: 'Low and close', cap: 'Through your own eyes, low at the table: Squall sits across from you behind the far edge, and your tentacles rest on the near edge. The wave towers over Squall\'s side and crashes down onto the table, then slides back with the loser\'s dice.', cam: { yN: 196, yF: 132, wN: 96, wF: 70, k: 1.3, dN: 24, dF: 15 }, crest: 34, pov: true }
 };
 // both hands on the final reveal: Squall's far, Ulhu's near
 const THEIRS = [[-.45, .78, 5], [-.1, .84, 3], [.25, .8, 5], [.55, .76, 2]], YOURS = [[-.5, .22, 5], [-.15, .16, 1], [.2, .24, 6]];
@@ -130,7 +137,7 @@ function render(g, id, t, lose) {
   // timeline (s): .8 reveal, 1.0 to 2.2 the flood comes over, 2.2 to 3.1 under (the grab), 3.1 to 4.4 it drains, then the word
   const inP = eio(seg(t, 1, 2.2)), outP = eio(seg(t, 3.1, 4.4)), under = t >= 2.2 && t < 3.1, gone = t >= 4.4;
   const frame = t < 1 ? 'talk' : t < 4.4 ? 'idle' : (lose ? 'gloat' : 'sulk');
-  rc(g, 0, 0, W, H, '#050c0a'); grotto(g, C); strip(g, frame); table(g, C);
+  rc(g, 0, 0, W, H, '#050c0a'); grotto(g, C); if (S.pov) across(g, C, frame); else strip(g, frame); table(g, C);
   const loser = lose ? YOURS : THEIRS, winner = lose ? THEIRS : YOURS;
   const front = t < 3.1 ? 1 - inP : outP;   // where the water's edge is: v from far (1) to near (0) and back
   const flooded = t >= 1 && t < 4.4;
@@ -150,6 +157,7 @@ function render(g, id, t, lose) {
     if (S.arms && t >= 2.2 && t < 3.1) loser.forEach((d, i) => { const [x, y] = C.p(d[0], d[1]); const p = seg(t, 2.2, 2.55), q = seg(t, 2.6, 3.0); arm(g, x + 4, y + 4 + q * 20, 6 + p * 18 * (1 - q), 2.2, t, i, 1); });
   }
   if (t >= 4.4 && t < 6) { g.globalAlpha = .25 * (1 - seg(t, 4.4, 6)); for (let y = Math.round(C.yF); y <= C.yN; y += 2) { const v = C.v(y), [x0] = C.p(-1, v), [x1] = C.p(1, v); rc(g, x0, y, x1 - x0, 1, '#6ad0e0'); } g.globalAlpha = 1; }
+  if (S.pov) hands(g, C, t);
   return { word: t >= 4.6, frame };
 }
 // ---------- cards ----------
@@ -160,6 +168,7 @@ Object.keys(SCN).forEach((id) => {
     '<div class="btns"><button type="button" data-l="1">Lose</button><button type="button" class="alt" data-l="0">Win</button></div>';
   host.appendChild(c);
   const cv = c.querySelector('canvas'), g = cv.getContext('2d'), wd = c.querySelector('.word'), call = c.querySelector('.call');
+  if (S.pov) call.style.top = '20%';
   const R = { lose: true, t0: performance.now() };
   c.querySelectorAll('button[data-l]').forEach((b) => b.onclick = () => { R.lose = b.dataset.l === '1'; R.t0 = performance.now(); });
   const Q = new URLSearchParams(location.search); if (Q.has('lose')) R.lose = Q.get('lose') === '1';   // ?t=3&lose=1 freezes a moment, for checking
