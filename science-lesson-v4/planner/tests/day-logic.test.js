@@ -101,5 +101,21 @@ const rep = L.report(rows);
 ok('report: biggest drain first, Personal never the suggestion, maybe rows listed', rep.jobs[0].name === 'Personal' && /Marking/.test(rep.suggestion) && rep.maybe.length === 1 && rep.classes[0].name === '9AS' && rep.classes[0].hours === 2);
 ok('one task over several sittings adds up (last time it took 120 min)', L.lastTimeTook(rows, 'Marking', '9AS') === 120 && L.lastTimeTook(rows, 'Marking', '8XP') === null);
 
+// ---- the day screen's model (layout B, the timeline)
+const LOAD = { day: T, periodTimes: PT, settings: { shutdownTime: '17:00', afterSchoolEnd: '17:00' }, doneForToday: false,
+  lessons: [{ period: 1, cls: '9AS', title: 'L3 Latent heat', kind: 'lesson', built: true, planned: true }, { period: 3, cls: '10C2', title: 'L2 Efficiency', kind: 'lesson', built: true, planned: true },
+    { period: 4, cls: '10S2', title: '', kind: 'lesson', built: null, planned: false }, { period: 5, cls: '12C', title: 'L7 Superposition', kind: 'lesson', built: true, planned: true }],
+  items: items.filter((x) => x.id !== 'a'), recent: [], inbox: [], timer: null };
+const dm = L.dayModel(LOAD, L.mins('08:00'));
+ok('model: rows in time order: four lessons, the free P2, after school, shutdown', dm.rows.map((r) => r.type).join() === 'lesson,free,lesson,lesson,lesson,after,shutdown');
+ok('model: the free holds the marking block, after school the build', dm.rows[1].ghosts.some((g) => g.todoId === 'c') && dm.rows[5].ghosts.some((g) => g.todoId === 'b') && dm.rows[5].at === '15:15');
+ok('model: lessons carry class, title and built flag; an unplanned one shows as not planned', dm.rows[0].cls === '9AS' && dm.rows[0].built === true && dm.rows[3].planned === false);
+ok('model: workload, Ulhu\'s mood and the likeliest timer jobs come with it', dm.workload.fits === false && dm.mood === 'stir' && dm.likely[0].job === 'Marking' && dm.likely[0].cls === '9AS');
+ok('model: a dismissed suggestion does not come back today', !L.dayModel(LOAD, L.mins('08:00'), ['c']).rows[1].ghosts.length);
+ok('model: the shutdown card shows from his set time, not after 19:00, not once done',
+  !L.dayModel(LOAD, L.mins('16:59')).shutdownDue && L.dayModel(LOAD, L.mins('17:01')).shutdownDue && !L.dayModel(LOAD, L.mins('19:05')).shutdownDue && !L.dayModel(Object.assign({}, LOAD, { doneForToday: true }), L.mins('17:30')).shutdownDue);
+ok('model: a shutdown time set after 19:00 is held at 19:00', L.dayModel(Object.assign({}, LOAD, { settings: { shutdownTime: '21:00' } }), L.mins('08:00')).rows.pop().at === '19:00');
+ok('model: no data yet gives an empty day, not an error', L.dayModel({ day: T }, 600).rows.map((r) => r.type).join() === 'shutdown');
+
 console.log(failed ? `\n${failed} FAILED` : '\nAll day-logic checks passed');
 process.exit(failed ? 1 : 0);

@@ -201,7 +201,35 @@
     return hit.reduce(function (s, r) { return s + (r.minutes || 0); }, 0);
   }
 
-  var api = { CLASSES: CLASSES, JOBS: JOBS, CLASS_JOBS: CLASS_JOBS, MINUTES: MINUTES, DEFAULT_RULES: DEFAULT_RULES,
+  // ------------------------------------------------------------------ the day screen's model (layout B, the timeline)
+  // load: what dayLoad answers; nowMin: minutes since midnight; dropped: ghost ids he dismissed today.
+  // Rows in time order: each lesson, each free period with its suggested blocks, the after-school window with its
+  // blocks, then the shutdown at his set time (never after 19:00). Plus the to-dos, the workload line and Ulhu's mood.
+  function dayModel(load, nowMin, dismissed) {
+    var d = load || {}, st = d.settings || {};
+    var per = d.periodTimes ? periodsToday((d.lessons || []).map(function (l) { return { period: l.period, cls: l.cls }; }), d.periodTimes) : [];
+    var byP = {}; (d.lessons || []).forEach(function (l) { byP[l.period] = l; });
+    var av = timeAvailable(per, nowMin, st.afterSchoolEnd || '17:00');
+    var todos = buildTodos(d.items || [], d.day, [], st.minutes);
+    var gone = {}; (dismissed || []).forEach(function (id) { gone[id] = 1; });
+    var ghosts = ghostBlocks(todos.all, av).filter(function (g) { return !gone[g.todoId]; });
+    var rows = per.map(function (p) {
+      var L = byP[p.period];
+      if (p.cls && L) return { type: 'lesson', at: hhmm(p.start), period: p.period, cls: L.cls, title: L.title || '', kind: L.kind, built: L.built, planned: L.planned };
+      return { type: 'free', at: hhmm(p.start), period: p.period, ghosts: ghosts.filter(function (g) { return g.where === 'P' + p.period; }) };
+    });
+    var lastEnd = per.reduce(function (m, p) { return Math.max(m, p.end || 0); }, 0);
+    var after = ghosts.filter(function (g) { return g.where === 'after'; });
+    if (lastEnd) rows.push({ type: 'after', at: hhmm(lastEnd), ghosts: after });
+    var shut = Math.min(mins(st.shutdownTime || '17:00') || 17 * 60, LATEST);
+    rows.push({ type: 'shutdown', at: hhmm(shut), done: !!d.doneForToday });
+    var load2 = workload(todos.all, av.total);
+    return { rows: rows, todos: todos, workload: load2, mood: ulhuMood(load2), timer: d.timer || null,
+      likely: likelyJobs((d.lessons || []).map(function (l) { return l.cls; }).filter(function (c, i, a) { return c && a.indexOf(c) === i; }), d.recent || []),
+      shutdownDue: nowMin >= shut && nowMin < LATEST && !d.doneForToday, inbox: d.inbox || [] };
+  }
+
+  var api = { CLASSES: CLASSES, dayModel: dayModel, JOBS: JOBS, CLASS_JOBS: CLASS_JOBS, MINUTES: MINUTES, DEFAULT_RULES: DEFAULT_RULES,
     findClass: findClass, sortCapture: sortCapture, isSchoolDay: isSchoolDay, morningMessageDue: morningMessageDue, afterSeven: afterSeven,
     periodsToday: periodsToday, timeAvailable: timeAvailable, buildTodos: buildTodos, addDay: addDay, workload: workload,
     ghostBlocks: ghostBlocks, ulhuMood: ulhuMood, mapWindow: mapWindow, totals: totals, capRunning: capRunning,
