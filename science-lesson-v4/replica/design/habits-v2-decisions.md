@@ -336,3 +336,4 @@ Patryk's answers, in grill order. Mock-ups follow each area.
 - **Level up FINAL: LU-X2 The Sky Answers** (replica/design/mockups/levelup4/).
 - **Day screen B3 confirmed** ("B1 with small Ulhu was best"). **19:20 night pop-up FINAL: N3 One eye open**, plus the small tally from N2 (time per job tonight) under his words, but none of N2's wording.
 - **Wall:** loves the glass in WD-1 (moon) and WD-2 (star) but they are hard to read at a glance. The outside glass should be lit, not dark. No key should be needed: Roman numerals I to V in the outside glass. Blocks a bit bigger with smaller gaps. Next round: replica/design/mockups/wall6/ (WD-1a/1b, WD-2a/2b).
+- **Wall: WD-1b is "awesome"** (replica/design/mockups/wall6/): the moon, five owned slices from gold (I) to ruby (V), dark-glass Roman numerals, lit outer glass. Structure fixed. Refined variations in replica/design/mockups/wall7/.
