@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Timer report: pick a layout</title>
+<!-- Lane C mock-up, 30 Oct 2026 (installed-app design 3.10). The fortnightly timer report, three layouts. Made-up
+     minutes, no pupil names. Option A is the test default the planner builds first. -->
+<style>
+  :root { --paper:#EDF2F8; --plate:#fff; --ink:#12345C; --soft:#557192; --line:#C9D6E5; --gold:#F2AE12; --gold-wash:#FFF3D1; --gold-text:#7A4E00;
+    --warn-wash:#FDEBDC; --warn-text:#8A3F00; --deep:#0D2442; --bg:#c9d3e0; --lead:#33475f;
+    --j-mark:#C62828; --j-build:#1565C0; --j-mail:#EF6C00; --j-admin:#6A1B9A; --j-hw:#00838F; --j-pers:#90A4AE;
+    --text:"Atkinson Hyperlegible Next","Atkinson Hyperlegible",Roboto,system-ui,sans-serif; }
+  html.dark { --paper:#0E1424; --plate:#161E33; --ink:#E6EAF5; --soft:#98A2BC; --line:#2A3555; --gold-wash:rgba(242,174,18,.16); --gold-text:#FABB2E;
+    --warn-wash:rgba(255,167,38,.14); --warn-text:#FFB95C; --bg:#05080f; --lead:#98A2BC; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); font:15px/1.35 var(--text); color:var(--ink); }
+  header.top { padding:18px 20px 6px; max-width:1200px; margin:0 auto; color:var(--lead); }
+  header.top h1 { margin:0 0 4px; font-size:22px; color:var(--ink); }
+  header.top p { margin:0 0 6px; }
+  header.top button { font:inherit; font-weight:700; border:1px solid var(--line); border-radius:8px; background:var(--plate); color:var(--ink); padding:6px 12px; }
+  .row { display:flex; flex-wrap:wrap; gap:26px; justify-content:center; padding:18px; }
+  .opt { display:flex; flex-direction:column; align-items:center; gap:8px; }
+  .opt h2 { margin:0; font-size:18px; color:var(--ink); }
+  .opt .why { max-width:340px; font-size:13px; color:var(--lead); text-align:center; margin:0; }
+  .phone { width:360px; height:740px; background:var(--paper); border-radius:28px; border:10px solid #10151f; overflow:hidden; display:flex; flex-direction:column; }
+  .bar { background:var(--deep); color:#fff; padding:10px 14px; font-weight:700; display:flex; justify-content:space-between; border-bottom:3px solid var(--gold); }
+  .bar small { font-weight:400; opacity:.8; }
+  .scroll { flex:1; overflow:auto; padding:12px; }
+  h3 { font-size:12px; letter-spacing:.06em; text-transform:uppercase; color:var(--soft); margin:14px 0 6px; }
+  .card { background:var(--plate); border:1px solid var(--line); border-radius:12px; padding:10px 12px; margin-bottom:8px; }
+  .say { display:flex; gap:10px; align-items:center; background:var(--gold-wash); color:var(--gold-text); border-radius:12px; padding:10px 12px; font-weight:700; font-size:14px; }
+  .say .u { width:34px; height:34px; border-radius:50%; background:var(--deep); flex:none; display:grid; place-items:center; color:var(--gold); font-size:18px; }
+  .hb { display:grid; grid-template-columns:118px 1fr 44px; gap:8px; align-items:center; font-size:13px; margin:5px 0; }
+  .hb .t { height:14px; border-radius:7px; background:var(--line); overflow:hidden; } .hb .t i { display:block; height:100%; border-radius:7px; }
+  .hb b { text-align:right; }
+  .chip { display:inline-block; border-radius:999px; color:#fff; font-size:11px; font-weight:800; padding:1px 8px; margin:0 3px 3px 0; }
+  .maybe { display:flex; align-items:center; gap:6px; font-size:13px; padding:7px 0; border-top:1px solid var(--line); }
+  .maybe:first-child { border-top:0; }
+  .maybe span { flex:1; }
+  .maybe button, .btn { font:inherit; font-size:12px; font-weight:800; border:1px solid var(--line); border-radius:8px; padding:5px 9px; background:var(--plate); color:var(--ink); }
+  .maybe button.y { background:var(--gold); border-color:var(--gold); color:#0D2442; }
+  .note { font-size:12px; color:var(--soft); }
+  /* B */
+  .tide { display:flex; gap:5px; align-items:flex-end; height:170px; padding:6px 2px 0; }
+  .tide .d { flex:1; display:flex; flex-direction:column-reverse; height:100%; position:relative; }
+  .tide .d i { display:block; width:100%; }
+  .tide .d i:last-child { border-radius:5px 5px 0 0; }
+  .tide .d.late::after { content:''; position:absolute; left:-2px; right:-2px; bottom:calc(var(--h7) * 1%); border-top:2px dashed var(--gold); }
+  .days { display:flex; gap:5px; font-size:10px; color:var(--soft); text-align:center; } .days span { flex:1; }
+  .legend { display:flex; flex-wrap:wrap; gap:4px 10px; font-size:11px; margin-top:8px; } .legend span::before { content:''; display:inline-block; width:9px; height:9px; border-radius:2px; background:var(--c); margin-right:4px; }
+  /* C */
+  .big { text-align:center; padding:8px 0 2px; } .big b { font-size:54px; line-height:1; display:block; } .big span { color:var(--soft); font-size:13px; }
+  .drain { border-left:6px solid var(--c); }
+  .drain .h { display:flex; justify-content:space-between; font-weight:800; font-size:16px; }
+  .drain .s { font-size:12px; color:var(--soft); margin:2px 0 6px; }
+</style>
+</head>
+<body>
+<header class="top">
+  <h1>Timer report: pick a layout</h1>
+  <p>Your fortnightly report (opened from the card on the Day screen every other Friday): where the evening and free-period hours went, the biggest drain to automate next, and the "maybe" rows to fix. Made-up minutes. Option A is the test default, built first.</p>
+  <button id="mode">Dark</button>
+</header>
+<div class="row">
+
+  <div class="opt"><h2>A. The ledger</h2><p class="why">Ulhu's one line on top, then a bar per job and a bar per class, biggest first, then the maybe rows. Simplest to read.</p>
+    <div class="phone"><div class="bar"><span>Timer report</span><small>19 to 30 Oct</small></div><div class="scroll">
+      <div class="say"><div class="u">ᛟ</div><div>Biggest drain: Marking (9.5 h). That is the one to automate next.</div></div>
+      <h3>Hours per job</h3><div class="card" id="aJobs"></div>
+      <h3>Hours per class</h3><div class="card" id="aCls"></div>
+      <h3>3 to check (marked "maybe")</h3><div class="card" id="aMaybe"></div>
+      <p class="note">Setter hint: when you set "Book marking 9AS" again, the task shows "last time this took about 95 min".</p>
+    </div></div></div>
+
+  <div class="opt"><h2>B. The tide chart</h2><p class="why">One column per school day, coloured by job, a gold dashed line where 7 pm fell. Shows which evenings ran late.</p>
+    <div class="phone"><div class="bar"><span>Timer report</span><small>19 to 30 Oct</small></div><div class="scroll">
+      <div class="say"><div class="u">ᛟ</div><div>Two evenings ran past 7 pm. Marking took the most.</div></div>
+      <div class="card"><div class="tide" id="bTide"></div><div class="days" id="bDays"></div><div class="legend" id="bLeg"></div></div>
+      <h3>Totals</h3><div class="card" id="bJobs"></div>
+      <h3>3 to check</h3><div class="card" id="bMaybe"></div>
+    </div></div></div>
+
+  <div class="opt"><h2>C. One glance</h2><p class="why">One big number (work hours, Personal left out), the top three drains as cards with their classes, the maybe rows folded away.</p>
+    <div class="phone"><div class="bar"><span>Timer report</span><small>19 to 30 Oct</small></div><div class="scroll">
+      <div class="big"><b>24.7 h</b><span>work outside lessons in two weeks · 2.5 h a school day</span></div>
+      <div class="say" style="margin-top:10px"><div class="u">ᛟ</div><div>Marking is the one to automate next.</div></div>
+      <div id="cDrains" style="margin-top:10px"></div>
+      <div class="card"><b>3 rows marked "maybe"</b> <button class="btn" style="float:right">Check them</button><div class="note">From the PC timer's "Not that" and timers stopped after 2 hours.</div></div>
+      <div class="card"><span class="note">Also: Admin 2.3 h · Setting homework 1.6 h · Personal 3.0 h</span></div>
+    </div></div></div>
+
+</div>
+<script>
+(function () {
+  var JOBS = [['Marking', 570, '--j-mark'], ['Building lessons', 432, '--j-build'], ['Emails', 246, '--j-mail'], ['Admin', 138, '--j-admin'], ['Setting homework', 96, '--j-hw'], ['Personal', 180, '--j-pers']];
+  var CLS = [['11S2', 210, '#4E342E'], ['9AS', 192, '#C62828'], ['10S2', 168, '#AD1457'], ['12C', 150, '#283593'], ['10C2', 120, '#00838F'], ['7MLA', 84, '#1565C0']];
+  var MAYBE = [['Tue 20', 'Emails', '', 40, 'PC: you said "Not that"'], ['Wed 21', 'Marking', '9AS', 120, 'phone timer ran 2 hours'], ['Mon 26', 'Building lessons', '10S2', 35, 'PC: you said "Not that"']];
+  var h = function (m) { return (Math.round(m / 6) / 10) + ' h'; };
+  var bars = function (rows) { var max = rows[0][1]; return rows.map(function (r) { var c = r[2].indexOf('--') === 0 ? 'var(' + r[2] + ')' : r[2];
+    return '<div class="hb"><span>' + r[0] + '</span><span class="t"><i style="width:' + Math.round(r[1] / max * 100) + '%;background:' + c + '"></i></span><b>' + h(r[1]) + '</b></div>'; }).join(''); };
+  var maybes = MAYBE.map(function (r) { return '<div class="maybe"><span><b>' + r[0] + '</b> ' + r[1] + (r[2] ? ' ' + r[2] : '') + ', ' + r[3] + ' min<br><span class="note">' + r[4] + '</span></span><button class="y">Right</button><button>Change</button></div>'; }).join('');
+  document.getElementById('aJobs').innerHTML = bars(JOBS); document.getElementById('aCls').innerHTML = bars(CLS); document.getElementById('aMaybe').innerHTML = maybes;
+  document.getElementById('bJobs').innerHTML = bars(JOBS); document.getElementById('bMaybe').innerHTML = maybes;
+  // B: ten school days, minutes per job; days 3 and 7 ran past 7 pm
+  var DAYS = ['M', 'T', 'W', 'T', 'F', 'M', 'T', 'W', 'T', 'F'], PER = [
+    [60, 50, 20, 10, 0, 20], [70, 30, 30, 10, 20, 15], [90, 60, 25, 20, 10, 10], [40, 40, 20, 15, 0, 25], [30, 20, 15, 10, 15, 40],
+    [55, 45, 30, 20, 10, 15], [80, 70, 30, 15, 15, 10], [50, 40, 25, 13, 10, 20], [60, 47, 31, 15, 16, 10], [35, 30, 20, 10, 0, 15]];
+  var top = 220, late = { 2: 190, 6: 200 };
+  document.getElementById('bTide').innerHTML = PER.map(function (d, i) { return '<div class="d' + (late[i] ? ' late' : '') + '" style="--h7:' + (late[i] ? Math.round(late[i] / top * 100) - 18 : 0) + '">' +
+    d.map(function (m, j) { return m ? '<i style="height:' + (m / top * 100) + '%;background:var(' + JOBS[j][2] + ')"></i>' : ''; }).join('') + '</div>'; }).join('');
+  document.getElementById('bDays').innerHTML = DAYS.map(function (d) { return '<span>' + d + '</span>'; }).join('');
+  document.getElementById('bLeg').innerHTML = JOBS.map(function (j) { return '<span style="--c:var(' + j[2] + ')">' + j[0] + '</span>'; }).join('') + '<span style="--c:var(--gold)">7 pm</span>';
+  var SPLIT = { Marking: [['11S2', 210, '#4E342E'], ['9AS', 192, '#C62828'], ['10S2', 168, '#AD1457']], 'Building lessons': [['12C', 150, '#283593'], ['10C2', 120, '#00838F'], ['7MLA', 84, '#1565C0'], ['others', 78, '#557192']], Emails: [] };
+  document.getElementById('cDrains').innerHTML = JOBS.slice(0, 3).map(function (j) { return '<div class="card drain" style="--c:var(' + j[2] + ')"><div class="h"><span>' + j[0] + '</span><span>' + h(j[1]) + '</span></div>' +
+    '<div class="s">' + Math.round(j[1] / 10) + ' min a school day</div>' + (SPLIT[j[0]] || []).map(function (c) { return '<span class="chip" style="background:' + c[2] + '">' + c[0] + ' ' + h(c[1]) + '</span>'; }).join('') + '</div>'; }).join('');
+  var b = document.getElementById('mode'); b.onclick = function () { var d = document.documentElement.classList.toggle('dark'); b.textContent = d ? 'Light' : 'Dark'; };
+})();
+</script>
+</body>
+</html>

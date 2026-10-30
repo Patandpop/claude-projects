@@ -366,18 +366,22 @@ function timerLog(k, rows) {
     return { saved: n };
   });
 }
+// id: one row id, or a list (the report fixes a day's "maybe" rows from the PC, one per sync, in one tap). Any edit he
+// makes, or maybe: false ("Right" in the report), clears the "maybe" mark.
 function timerEdit(k, id, fields) {
   check_(k);
+  const ids = Array.isArray(id) ? id.map(String) : [String(id)];
   return dLock_(() => {
-    const r = dRows_('Timer').find((x) => x.id === id);
-    if (!r) throw new Error('That timer row is not in the Timer tab');
+    const all = dRows_('Timer'), rows = ids.map((x) => all.find((r) => r.id === x));
+    if (!ids.length || rows.some((r) => !r)) throw new Error('That timer row is not in the Timer tab');
     const f = fields || {}, ch = {};
-    if (f.job !== undefined) { if (DAY_JOBS.indexOf(f.job) < 0) throw new Error('Unknown job'); ch.job = f.job; }
-    if (f.cls !== undefined) ch.cls = dClean_(f.cls, 8);
+    if (f.job !== undefined) { if (DAY_JOBS.indexOf(f.job) < 0) throw new Error('Unknown job'); ch.job = f.job; ch.maybe = false; }
+    if (f.cls !== undefined) { ch.cls = dClean_(f.cls, 8); ch.maybe = false; }
     if (f.minutes !== undefined) { if (!(Number(f.minutes) >= 0)) throw new Error('Minutes must be a number'); ch.minutes = Math.round(Number(f.minutes)); ch.maybe = false; }
     if (f.note !== undefined) ch.note = dClean_(f.note, 200);
-    dUpdate_('Timer', r, ch);
-    return { id: id };
+    if (f.maybe === false) ch.maybe = false;
+    rows.forEach((r) => dUpdate_('Timer', r, ch));
+    return Array.isArray(id) ? { ids: ids } : { id: id };
   });
 }
 function timerReport(k, from, to) {

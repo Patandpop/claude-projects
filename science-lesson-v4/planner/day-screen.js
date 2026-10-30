@@ -11,7 +11,7 @@
 // is put back with a message if the server says no. Nothing here runs by itself after 19:00.
 (function (root) {
   'use strict';
-  var COPY = 'dayCopy', TICKS = 'dayTicks', GONE = 'dayDismissed';
+  var COPY = 'dayCopy', TICKS = 'dayTicks', GONE = 'dayDismissed', SEEN = 'dayReportSeen';
   var CLASS_COLOURS = { '7MLA': '#1565C0', '8XP': '#2E7D32', '8AG': '#6A1B9A', '9AS': '#C62828', '9XS': '#EF6C00', '10C2': '#00838F',
     '10S2': '#AD1457', '11S2': '#4E342E', '12C': '#283593', '13D': '#558B2F' };
   var RUNES = 'ᚠᚢᚦᚨᚱᚲᚷᚹᚺᚾᛁᛃᛇᛈᛉᛊᛏᛒᛖᛗᛚᛜᛞᛟ';
@@ -117,7 +117,7 @@
     if (copy && copy.day === today() && copy.d) { S.load = copy.d; S.saved = true; }
 
     el.innerHTML = '<div class="ds ds-main"><div data-ds="cap"></div><div data-ds="top"></div>' +
-      '<div class="picker" data-ds="picker" hidden></div><div data-ds="list"></div></div>';
+      '<div class="picker" data-ds="picker" hidden></div><div data-ds="list"></div><div data-ds="rpt" hidden></div></div>';
     var bar = o.bar;
     if (!bar) { bar = document.createElement('div'); document.body.appendChild(bar); }
     bar.classList.add('ds', 'ds-bar'); bar.hidden = true;
@@ -183,8 +183,25 @@
       }).join('');
       if (!open.length && !ticks.length) h += '<p class="empty">Nothing to do yet.</p>';
       if (open.length > shown.length) h += '<button class="more" data-ds="all">+ ' + (open.length - shown.length) + ' more</button>';
+      // the fortnightly timer report (3.10): a card on a Friday when it has not been opened for 13 days, a quiet link otherwise
+      var seen = get(SEEN, ''), friday = new Date(now()).getDay() === 5;
+      var due = friday && (!seen || (new Date(today() + 'T12:00:00') - new Date(seen + 'T12:00:00')) / 864e5 >= 13);
+      var rep = due ? '<div class="shut due" data-ds="repcard"><span class="s">Your fortnight: where the hours went</span><button class="btn start" data-ds="report">Open</button></div>'
+        : '<button class="more" data-ds="report">Timer report</button>';
       if (rituals.length) h += '<h3>Rituals</h3><div class="rit">' + rituals.map(function (t) { return '<button data-ds="tick" data-todo="' + esc(t.id) + '">' + esc(t.text) + '</button>'; }).join('') + '</div>';
-      q('list').innerHTML = h;
+      q('list').innerHTML = h + '<div style="margin-top:12px">' + rep + '</div>';
+    }
+    // the report replaces the day's parts until "← Day"
+    var rpt = null;
+    function showReport(on) {
+      ['cap', 'top', 'list'].forEach(function (k) { q(k).hidden = on; });
+      if (on) { S.picker = false; q('picker').hidden = true; }
+      q('rpt').hidden = !on;
+      if (!on) return draw();
+      put(SEEN, today());
+      if (!root.DayReport) { q('rpt').innerHTML = '<p class="msg">The timer report is not in this copy yet. <button class="btn move" data-ds="unreport">← Day</button></p>'; return; }
+      if (!rpt) rpt = root.DayReport.mount(q('rpt'), call, { now: now, storage: store, sprites: o.sprites, onBack: function () { showReport(false); } });
+      else rpt.reload();
     }
     function draw() {
       var m = model();
@@ -255,6 +272,8 @@
       else if (k === 'all') { S.showAll = true; draw(); }
       else if (k === 'pick') { S.picker = !S.picker; draw(); }
       else if (k === 'retry') reload();
+      else if (k === 'report') showReport(true);
+      else if (k === 'unreport') showReport(false);
       else if (k === 'go') { var x = (q('top')._likely || [])[+b.getAttribute('data-i')]; if (x) dt.start(x.job, x.cls); }
     });
     var every = setInterval(function () { if (!el.isConnected) return clearInterval(every); draw(); }, 60000);   // the timeline and Ulhu follow the clock
@@ -262,7 +281,7 @@
     draw();
     reload();
     return { reload: reload, draw: draw, state: function () { return S; }, model: model, timer: dt, capture: dc, bar: bar,
-      tick: tick, move: move, accept: accept, dismiss: dismiss, doneForToday: doneForToday };
+      tick: tick, move: move, accept: accept, dismiss: dismiss, doneForToday: doneForToday, report: showReport };
   }
 
   var api = { mount: mount, CLASS_COLOURS: CLASS_COLOURS, SAY: SAY };

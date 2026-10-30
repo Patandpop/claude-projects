@@ -21,6 +21,25 @@
 
 ## Entries (newest first)
 
+### 30 Oct 2026, Lane C: the timer report (installed app 3.10), built in layout A
+- What changed: the fortnightly report on where your hours outside lessons go is on the Day tab.
+  - On a Friday, when you have not looked for two weeks, a card says "Your fortnight: where the hours went". At any other time a small "Timer report" link sits under your to-dos.
+  - It shows the last 14 days: Ulhu's one line naming the biggest drain that is not Personal ("the one to automate next"), hours per job, and hours per class in class colours.
+  - Then the rows marked "maybe" (the PC timer's "Not that", or a phone timer that stopped itself after 2 hours). A day of PC counting is one line, not dozens. **Right** keeps it; **Change** gives another job (and class, for marking, building and homework). With no signal the tap is put back with a message.
+  - It opens at once from the copy saved last time, then gets the latest.
+- Mock-up with three layouts: `lanes/mockups/timer-report.html` (also on the site's /mockups/): A the ledger, B a tide chart per day with the 7 pm line, C one big number with the top three drains. **A is built as the test default**; say B or C if you prefer.
+- Not yet: the "last time this took about N min" hint when you set a task again (it belongs on the planner's task rows, Lane B's page; the sum is ready in day-logic.js).
+- Also fixed: one app check failed after 7 pm only (it expected the daytime pop-up; after 7 pm Ulhu dozes, as designed). It now checks whichever one the clock calls for.
+- For Lane A: `day-report.js` joins DayUI.html and Day.gs changed (one call can now fix several timer rows); both go in the next complete set, no new Apps Script file.
+- Checks: 16 new browser checks in `planner/tests/day_screen_sim.py`, 3 new server checks in `day.test.js`.
+- Save: see git log "Timer report".
+
+### 30 Oct 2026, Lane C: "no term dates yet" fixes itself
+- What changed: the error you hit ("The planner has no term dates yet") came from a Data tab imported before the term dates joined planner-data.json. Now, when the planner finds no term dates, it fetches planner-data.json from home by itself, stores it exactly as Import data does, and carries on. If home does not answer, you get the same plain message, and it tries home again after 10 minutes (not on every tap, so the phone never slows down). This is a small addition to Code.gs, made at the design chat's request.
+- For Lane A: Code.gs changed, so it goes in the next complete set. For Lane B: one function in your Code.gs (`plannerCal_`) now reads the Data tab through a new helper (`calFromData_`) and asks home once if the dates are missing; your server checks all pass. 7 new checks in `planner/tests/cal-recover.test.js`, which fail on the old code.
+- You need to: nothing once the next set is pasted. Until then, Import data with planner-data.json fixes it, as the design chat said.
+- Save: see git log "No term dates: fetch from home".
+
 ### 30 Oct 2026, Lane C: the site address is in, and a fault it showed up
 - Your site is https://ulhu-planner.pages.dev (the app), https://ulhu-planner.pages.dev/test/ (the school test) and https://ulhu-planner.pages.dev/mockups/ (every mock-up and the decisions page). Waiting item 3 is cleared. You can delete the old "ylhu-planner" project in Cloudflare whenever you like.
 - **A fault the real site showed up, fixed before it mattered:** Cloudflare tidies addresses, so `/index.html` becomes `/`. The app kept its home page under the long name for opening with no signal, and a browser refuses to open a kept page that was a redirect, so the installed app would have shown an error offline. Also, opening a mock-up page replaced the app's kept home page. Now the app keeps its home page under `/` only, and mock-up pages are left to the browser. The app's test server now answers like Cloudflare does, and a new check opens a mock-up, goes offline and opens the app (it fails on the old code, passes on the new).

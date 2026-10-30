@@ -38,7 +38,7 @@ const w = [];
 const kept = S.stripFile('x.gs', broken);
 ok(kept.text === broken || !kept.warnings.length, 'code that does not parse is left as it was');
 // the real sources: every .gs and every script block must still parse after stripping
-for (const f of ['Code.gs', 'Behaviour.gs', 'Game.gs', 'Companion.gs', 'Mailbox.gs', 'logic.js', 'game-ui.js', 'game-den.js', 'game-oracle.js', 'game-companion.js', 'companion-term.js', 'companion-focus.js', 'Planner.html', 'Phone.html', 'BoardPage.html', 'Day.gs', 'day-logic.js', 'day-screen.js']) {
+for (const f of ['Code.gs', 'Behaviour.gs', 'Game.gs', 'Companion.gs', 'Mailbox.gs', 'logic.js', 'game-ui.js', 'game-den.js', 'game-oracle.js', 'game-companion.js', 'companion-term.js', 'companion-focus.js', 'Planner.html', 'Phone.html', 'BoardPage.html', 'Day.gs', 'day-logic.js', 'day-screen.js', 'day-report.js']) {
   const p = path.join(__dirname, '..', f);
   if (!fs.existsSync(p)) continue;
   const r = S.stripFile(f, fs.readFileSync(p, 'utf8'));

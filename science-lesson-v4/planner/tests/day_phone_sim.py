@@ -29,7 +29,7 @@ html = read('Phone.html').replace('<?= key ?>', 'k').replace('<?= manifestUrl ?>
 html = html.replace('<script>\nconst KEY', MOCK + '\n<script>\nconst KEY', 1)
 tmp = tempfile.mkdtemp()
 with_day = os.path.join(tmp, 'phone.html')
-open(with_day, 'w', encoding='utf-8').write(html.replace('<!--DAY_UI-->', ''.join('<script>' + read(f) + '</script>' for f in ['day-logic.js', 'day-timer.js', 'day-capture.js', 'day-screen.js'])))
+open(with_day, 'w', encoding='utf-8').write(html.replace('<!--DAY_UI-->', ''.join('<script>' + read(f) + '</script>' for f in ['day-logic.js', 'day-timer.js', 'day-capture.js', 'day-screen.js', 'day-report.js'])))
 without = os.path.join(tmp, 'phone-old.html')
 open(without, 'w', encoding='utf-8').write(html)
 

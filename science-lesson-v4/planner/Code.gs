@@ -76,12 +76,25 @@ function withIcon_(out) { const u = iconUrl_(); if (!u) return out; try { return
 function plannerCal_() {
   const c = CacheService.getScriptCache(), hit = c.get('ptt');
   if (hit) return JSON.parse(hit);
+  let cal = calFromData_();
+  // Lane C, 30 Oct: a Data tab imported before the term dates joined planner-data.json has none, and the behaviour
+  // app stopped with "no term dates yet". Fetch the file from home and store it (as Import data does) instead, at
+  // most once every 10 minutes; if that fails the plain message still shows.
+  if ((!cal || !cal.terms.length || !cal.weekAStart) && mailboxOn_() && !c.get('calRetry')) {
+    c.put('calRetry', '1', 600);
+    try {
+      const o = mailGet_({ op: 'read', name: 'planner-data.json' });
+      if (o.found) { importData_(o.text); PropertiesService.getScriptProperties().setProperty('DATA_MODIFIED', o.modified); cal = calFromData_(); }
+    } catch (e) { /* no signal from home: the caller's message stands */ }
+  }
+  if (cal && (cal.timetable || cal.terms.length)) c.put('ptt', JSON.stringify(cal), 21600);
+  return cal;
+}
+function calFromData_() {
   const d = sheet_('Data');
   if (!d || d.getLastRow() < 2) return null;
   const data = JSON.parse(d.getRange(2, 1, d.getLastRow() - 1, 1).getValues().map((r) => r[0]).join(''));
-  const cal = { timetable: data.timetable || null, terms: data.terms || [], weekAStart: data.weekAStart || '', inset: data.inset || [] };
-  if (cal.timetable || cal.terms.length) c.put('ptt', JSON.stringify(cal), 21600);
-  return cal;
+  return { timetable: data.timetable || null, terms: data.terms || [], weekAStart: data.weekAStart || '', inset: data.inset || [] };
 }
 function plannerTimetable_() { const cal = plannerCal_(); return cal ? cal.timetable : null; }
 

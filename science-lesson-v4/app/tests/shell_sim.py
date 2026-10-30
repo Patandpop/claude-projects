@@ -111,8 +111,13 @@ with sync_playwright() as p:
     check('switched on: it reads ActivityWatch on this PC and says what it is counting (%s)' % pg.inner_text('#pcMsg'), awseen and 'Counting' in pg.inner_text('#pcMsg') and 'Building lessons 9AS' in pg.inner_text('#pcMsg'))
     check('it sends 10 minutes of Building lessons 9AS, and no window name', logs and logs[0]['args'][0][0]['job'] == 'Building lessons' and logs[0]['args'][0][0]['cls'] == '9AS' and logs[0]['args'][0][0]['minutes'] == 10 and 'Latent' not in json.dumps(logs))
     check('Little Ulhu pops up to say what he is counting', pg.locator('.dp').count() == 1 and 'Building lessons 9AS' in pg.inner_text('.dp'))
-    pg.click('.dp [data-dp=not]'); pg.click('#pcOn [data-v=off]'); pg.wait_for_timeout(100)
-    check('"Not that" closes it; Off stops the counting', pg.locator('.dp').count() == 0 and 'Off' in pg.inner_text('#pcMsg'))
+    if datetime.datetime.now().hour < 19:
+        pg.click('.dp [data-dp=not]'); pg.click('#pcOn [data-v=off]'); pg.wait_for_timeout(100)
+        check('"Not that" closes it; Off stops the counting', pg.locator('.dp').count() == 0 and 'Off' in pg.inner_text('#pcMsg'))
+    else:   # after 7pm: the night pop-up (N3), dozing, with only a close cross
+        check('after 7pm it is the night pop-up, with no "Not that" button', pg.get_attribute('.dp', 'data-variant') == 'night' and pg.locator('.dp [data-dp=not]').count() == 0)
+        pg.click('#pcOn [data-v=off]'); pg.wait_for_timeout(100)
+        check('Off stops the counting', 'Off' in pg.inner_text('#pcMsg'))
 
     # ---- forget the key
     pg.once('dialog', lambda d: d.accept()); pg.click('#forgetKey')

@@ -133,6 +133,15 @@ ok('no window title is ever stored', !JSON.stringify(m.sheets.Timer._data).inclu
 const maybeRow = timerReport(k, '', '9999').find((x) => x.maybe);
 timerEdit(k, maybeRow.id, { minutes: 75 });
 ok('editing a "maybe" row fixes its minutes and clears the flag', timerReport(k, '', '9999').find((x) => x.id === maybeRow.id).minutes === 75 && !timerReport(k, '', '9999').find((x) => x.id === maybeRow.id).maybe);
+// the report: "Right" on a group of PC rows, "Change" to another job and class
+timerLog(k, [{ id: 'pc-m1', day: TODAY, job: 'Emails', minutes: 5, maybe: true }, { id: 'pc-m2', day: TODAY, job: 'Emails', minutes: 4, maybe: true }, { id: 'pc-m3', day: TODAY, job: 'Personal', minutes: 9, maybe: true }]);
+const one = (id) => timerReport(k, '', '9999').find((x) => x.id === id);
+r = timerEdit(k, ['pc-m1', 'pc-m2'], { maybe: false });
+ok('"Right" clears the maybe mark on a whole group in one call, and changes nothing else', r.ids.length === 2 && !one('pc-m1').maybe && !one('pc-m2').maybe && one('pc-m1').job === 'Emails' && one('pc-m2').minutes === 4 && one('pc-m3').maybe);
+timerEdit(k, ['pc-m3'], { job: 'Marking', cls: '9AS' });
+ok('"Change" to another job and class clears the mark too', one('pc-m3').job === 'Marking' && one('pc-m3').cls === '9AS' && !one('pc-m3').maybe && one('pc-m3').minutes === 9);
+threw = ''; try { timerEdit(k, ['pc-m1', 'nope'], { maybe: false }); } catch (e) { threw = e.message; }
+ok('a list with a row that is not there changes nothing', /not in the Timer tab/.test(threw));
 // counted by each row's own day: a timer started "3 hours ago" falls on yesterday when the tests run before 3am
 const allRows = timerReport(k, '', '9999'), todays = allRows.filter((x) => x.day === TODAY).length;
 ok('the report covers a date range', timerReport(k, addDay(TODAY, 1), '9999').length === 0 && todays > 0 && timerReport(k, TODAY, TODAY).length === todays &&

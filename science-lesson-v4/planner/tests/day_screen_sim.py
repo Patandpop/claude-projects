@@ -31,16 +31,25 @@ LOAD = {'day': T, 'periodTimes': PT, 'settings': {'shutdownTime': '17:00', 'afte
             {'id': 'g4', 'kind': 'own', 'text': 'Book the computer room', 'since': T},
             {'id': 'r1', 'kind': 'ritual', 'text': 'Walk', 'since': T}]}
 
+# the last two weeks of the Timer tab, for the report (Friday 6 Nov): Marking is the biggest drain, Personal left out of it
+REPORT = [{'id': 'a1', 'day': '2026-10-26', 'job': 'Marking', 'cls': '9AS', 'minutes': 95, 'maybe': False, 'source': 'phone'},
+          {'id': 'a2', 'day': '2026-10-27', 'job': 'Building lessons', 'cls': '10S2', 'minutes': 60, 'maybe': False, 'source': 'pc'},
+          {'id': 'a3', 'day': '2026-10-28', 'job': 'Emails', 'cls': '', 'minutes': 40, 'maybe': False, 'source': 'pc'},
+          {'id': 'x1', 'day': '2026-11-01', 'job': 'Personal', 'cls': '', 'minutes': 200, 'maybe': False, 'source': 'pc'},
+          {'id': 'p1', 'day': '2026-11-02', 'job': 'Emails', 'cls': '', 'minutes': 5, 'maybe': True, 'source': 'pc'},
+          {'id': 'p2', 'day': '2026-11-02', 'job': 'Emails', 'cls': '', 'minutes': 4, 'maybe': True, 'source': 'pc'},
+          {'id': 'm1', 'day': '2026-11-03', 'job': 'Marking', 'cls': '11S2', 'minutes': 120, 'maybe': True, 'source': 'phone'}]
+
 page = '''<!doctype html><html data-theme="light"><meta charset="utf-8"><meta name=viewport content="width=device-width,initial-scale=1">
 <style>body{margin:0;padding:12px;font:15px system-ui;background:#ccd}</style><body><div id="d"></div>
 <script>''' + read('game-ulhu.js') + '''</script>
 <script>''' + read('day-logic.js') + '''</script><script>''' + read('day-timer.js') + '''</script><script>''' + read('day-capture.js') + '''</script>
-<script>''' + read('day-screen.js') + '''</script><script>''' + read('day-popup.js') + '''</script>
+<script>''' + read('day-screen.js') + '''</script><script>''' + read('day-popup.js') + '''</script><script>''' + read('day-report.js') + '''</script>
 <script>
 const LOAD = ''' + json.dumps(LOAD) + ''';
 window.NOW = Date.parse('2026-11-03T08:00:00');
 window.CALLS = []; window.DOWN = false; window.DELAY = +(new URLSearchParams(location.search).get('delay') || 80);
-const SERVER = { gone: {}, done: false, timer: null };
+const SERVER = { gone: {}, done: false, timer: null, report: ''' + json.dumps(REPORT) + ''' };
 function call(fn, ...a) {
   CALLS.push([fn].concat(a));
   return new Promise((ok, bad) => setTimeout(() => {
@@ -51,6 +60,8 @@ function call(fn, ...a) {
     if (fn === 'doneForToday') { SERVER.done = true; return ok({ day: '2026-11-03', stopped: null, beforeSeven: true }); }
     if (fn === 'timerStart') { SERVER.timer = { job: a[0], cls: a[1], startedAt: a[2] }; return ok({ id: 'tm1' }); }
     if (fn === 'timerStop') { SERVER.timer = null; return ok({}); }
+    if (fn === 'timerReport') return ok(JSON.parse(JSON.stringify(SERVER.report)));
+    if (fn === 'timerEdit') { SERVER.report.forEach(r => { if (a[0].indexOf(r.id) >= 0) { r.maybe = false; if (a[1].job) { r.job = a[1].job; r.cls = a[1].cls; } } }); return ok({ ids: a[0] }); }
     ok({});
   }, DELAY));
 }
@@ -179,6 +190,46 @@ with sync_playwright() as p:
     check("none of N2's wording", 'scribble' not in n[1] and 'ledger' not in n[1].lower() and 'knock' not in n[1])
     ev = pop('18:10', "{ job: '<img src=x onerror=alert(1)>' }")
     check('a job name is shown as text, never as markup', pg.locator('.dp img[src=x]').count() == 0 and '<img' in ev[1])
+
+    # ---- the fortnightly timer report (3.10, layout A)
+    pg.evaluate("document.querySelectorAll('.dp').forEach(x => x.remove()); DELAY = 80; NOW = Date.parse('2026-11-06T16:00:00'); D.draw()")
+    check('on a Friday, a "Your fortnight" card on the Day screen', pg.locator('[data-ds=repcard]').count() == 1 and 'where the hours went' in pg.inner_text('[data-ds=repcard]'))
+    pg.click('[data-ds=repcard] [data-ds=report]'); pg.wait_for_selector('[data-dr-jobs]')
+    check('Open shows the report in place of the day, for the last 14 days', pg.is_hidden('[data-ds=top]') and pg.is_hidden('[data-ds=list]') and pg.is_visible('[data-ds=rpt]') and
+          [c for c in calls() if c[0] == 'timerReport'][-1][1:] == ['2026-10-24', '2026-11-06'])
+    check("Ulhu's line: the biggest drain that is not Personal (%s)" % pg.inner_text('[data-dr-say]'), 'Biggest drain: Marking (3.6 h). That is the one to automate next.' in pg.inner_text('[data-dr-say]'))
+    jobs = pg.eval_on_selector_all('[data-dr-jobs] .hb', 'b => b.map(x => [x.children[0].textContent, x.querySelector("b").textContent, x.querySelector("i").style.width])')
+    check('hours per job, biggest first, in hours: %s' % jobs, [j[0] for j in jobs] == ['Marking', 'Personal', 'Building lessons', 'Emails'] and jobs[0][1:] == ['3.6 h', '100%'] and jobs[2][1] == '1 h')
+    cls = pg.eval_on_selector_all('[data-dr-cls] .hb', 'b => b.map(x => [x.children[0].textContent, getComputedStyle(x.querySelector("i")).backgroundColor])')
+    check('hours per class in class colours: %s' % cls, [c[0] for c in cls] == ['11S2', '9AS', '10S2'] and cls[0][1] == 'rgb(78, 52, 46)' and cls[1][1] == 'rgb(198, 40, 40)')
+    mb = pg.eval_on_selector_all('[data-dr-maybe] .mb', 'b => b.map(x => x.querySelector(".s").textContent)')
+    check('the maybe rows: a day of PC syncs is one line, each says why: %s' % mb, len(mb) == 2 and 'Emails, 9 min' in mb[0] and 'PC: you said "Not that"' in mb[0] and 'Marking 11S2, 120 min' in mb[1] and '2 hours' in mb[1])
+    if os.environ.get('SHOTS'): pg.screenshot(path=os.path.join(os.environ['SHOTS'], 'report-dark.png'), full_page=True)
+    pg.evaluate('DOWN = true'); pg.click('[data-dr-maybe] .mb >> nth=0 >> [data-dr=right]'); pg.wait_for_timeout(250)
+    check('no signal: "Right" is put back with a message', pg.locator('[data-dr-maybe] .mb').count() == 2 and 'Not saved' in pg.inner_text('[data-dr-msg]'))
+    pg.evaluate('DOWN = false'); pg.click('[data-dr-maybe] .mb >> nth=0 >> [data-dr=right]')
+    check('"Right" keeps the whole group in one call and the line goes at once', pg.locator('[data-dr-maybe] .mb').count() == 1 and last() == ['timerEdit', ['p1', 'p2'], {'maybe': False}] and '1 to check' in pg.inner_text('[data-ds=rpt]').lower())
+    pg.wait_for_timeout(150)
+    pg.click('[data-dr-maybe] [data-dr=change]')
+    check('"Change": the jobs, and for a class job the classes, with its own picked', pg.locator('.mb .alt [data-dr=job]').count() == 6 and pg.get_attribute('.mb .alt [data-v="11S2"]', 'aria-pressed') == 'true')
+    pg.click('.mb .alt [data-v="Admin"]')
+    check('a job with no class hides the classes', pg.locator('.mb .alt [data-dr=cls]').count() == 0)
+    pg.click('.mb .alt [data-v="Building lessons"]')
+    check('back to a class job: Save waits for a class', pg.is_disabled('.mb [data-dr=save]'))
+    pg.click('.mb .alt [data-v="12C"]'); pg.click('.mb [data-dr=save]'); pg.wait_for_timeout(250)
+    check('Save sends the new job and class, and the totals follow', last() == ['timerEdit', ['m1'], {'job': 'Building lessons', 'cls': '12C'}] and pg.locator('[data-dr-maybe]').count() == 0 and
+          pg.eval_on_selector_all('[data-dr-cls] .hb span:first-child', 'b => b.map(x => x.textContent)')[0] == '12C')
+    pg.click('[data-dr=back]')
+    check('"← Day" brings the day back; the card has gone (seen), a quiet link stays', pg.is_visible('[data-ds=top]') and pg.is_hidden('[data-ds=rpt]') and pg.locator('[data-ds=repcard]').count() == 0 and pg.locator('button.more[data-ds=report]').count() == 1)
+    n = len([c for c in calls() if c[0] == 'timerReport']); pg.evaluate('DELAY = 1500'); pg.click('button.more[data-ds=report]')
+    check('opening it again shows the last copy at once and fetches the latest', pg.locator('[data-dr-cls] .hb').count() == 3 and len([c for c in calls() if c[0] == 'timerReport']) == n + 1)
+    pg.wait_for_timeout(1700)
+    fresh = pg.evaluate("(() => { const d = document.createElement('div'); d.className = 'ds'; document.body.appendChild(d); DayReport.mount(d, call, { now: () => NOW }); const t = d.textContent; d.remove(); return t; })()")
+    check('a fresh open (the phone page reopened) draws the saved copy at once and says so', 'Saved copy' in fresh and '12C' in fresh)
+    pg.evaluate('DELAY = 80')
+    pg.evaluate("NOW = Date.parse('2026-11-13T16:00:00'); D.report(false)")
+    check('the next Friday (7 days on) no card; two weeks on it comes back', pg.locator('[data-ds=repcard]').count() == 0 and
+          pg.evaluate("NOW = Date.parse('2026-11-20T16:00:00'); D.draw(); !!document.querySelector('[data-ds=repcard]')"))
 
     check('no page errors', not errs)
     if errs: print(errs)

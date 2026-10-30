@@ -48,16 +48,16 @@ files['GameShop.gs'] = '// Ulhu shop: 120 items with their room sprites, made by
 const pack = (list) => '<script>\n' + list.map(read).join('\n') + '\n</script>';
 files['GameUI.html'] = pack(['game-ulhu.js', 'game-pixel.js', 'game-runes.js', 'game-omens.js', 'game-tabs.js', 'game-pairs.js', 'game-ui.js']);
 // 2026-10-27: the looks Patryk picked (stone tablets, temple bosses, blood and sigils) are their own file, GameArt.html, so each paste stays small enough to save
-files['GameArt.html'] = pack(['game-temple.js', 'game-stone.js', 'game-blood.js', 'game-scroll.js', 'game-glass.js', 'game-oracle.js']);
+files['GameArt.html'] = pack(['game-temple.js', 'game-stone.js', 'game-bar.js', 'game-blood.js', 'game-scroll.js', 'game-glass.js', 'game-oracle.js']);
 // High Vespers is its own include (Sunday to Tuesday screen), so no paste file passes the limit
-files['GameHV.html'] = pack(['game-highvespers.js', 'game-lair.js', 'game-brew.js', 'game-gate.js', 'game-levelup.js', 'game-faint.js', 'game-wall.js']);   // the Lair banner rides here (1U.5), with the loading screen, Going deeper, the level up, the faint and the wall
+files['GameHV.html'] = pack(['game-highvespers.js', 'game-lair.js', 'game-brew.js', 'game-gate.js', 'game-levelup.js', 'game-faint.js', 'game-wall.js', 'game-grimoire.js']);   // the Lair banner rides here (1U.5), with the loading screen, Going deeper, the level up, the faint and the wall
 // 2026-10-28: the Den (Round Grotto, Night Market, dice with every keeper) is its own include too; it loads before GameUI's code runs
-files['GameDen.html'] = pack(['game-den.js']);
+files['GameDen.html'] = pack(['game-den.js', 'game-dicewater.js']);   // the dice game's end, the sea over the table (1U.6)
 // 2026-10-29 Lane D: Ulhu as a life companion, the page side (sound now; day tags, his adventure and the term page next)
 files['GameComp.html'] = pack(['companion-term.js', 'companion-focus.js', 'game-companion.js']);   // Lane D: the life companion (term page, focus crafts, sound and screens)
 // 2026-10-30 Lane C: the day screen (layout B3) with its timer and quick capture, on the phone's Day tab; Day.gs is its server side
 files['Day.gs'] = read('Day.gs');
-files['DayUI.html'] = pack(['day-logic.js', 'day-timer.js', 'day-capture.js', 'day-screen.js']);
+files['DayUI.html'] = pack(['day-logic.js', 'day-timer.js', 'day-capture.js', 'day-screen.js', 'day-report.js']);
 if (!files['Phone.html'].includes('<!--DAY_UI-->')) throw new Error('Phone.html has no <!--DAY_UI--> marker');
 files['Phone.html'] = files['Phone.html'].replace('<!--DAY_UI-->', () => "<?!= include('DayUI') ?>");
 // eyes-free entry, "Blind" (Lane B, 30 Oct 2026): the letter reader and tap rules, only on the phone page
