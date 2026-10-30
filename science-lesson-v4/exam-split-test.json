@@ -1,0 +1,369 @@
+[
+ {
+  "meta": {
+   "topic": "Exam split test",
+   "title": "Exam split test",
+   "class": "7BYA / 7MLA",
+   "yearLine": "Year 7  ·  Biology  ·  B1 Cells",
+   "theme": "Biology",
+   "type": "standard",
+   "year": 7,
+   "subject": "Biology",
+   "macrotopic": "B1 Cells",
+   "lessonNumber": 1
+  },
+  "title": {
+   "objectives": [
+    "Identify whether things are living, dead, or never been alive",
+    "Describe the seven life processes using MRS GREN",
+    "Explain why something is alive or dead using MRS GREN"
+   ],
+   "keywords": [
+    "life processes",
+    "living",
+    "non-living",
+    "MRS GREN",
+    "excretion",
+    "sensitivity"
+   ]
+  },
+  "doNow": {
+   "variant": "A",
+   "questions": [
+    {
+     "q": "Name ONE thing you saw on the way to school that is definitely alive.",
+     "a": "Any living thing: person, bird, tree, dog, plant, insect etc.",
+     "marks": 1,
+     "hint": "Think about what was moving or growing on your way in — animals, people, plants."
+    },
+    {
+     "q": "Is a tree alive? Write YES or NO and give ONE reason.",
+     "a": "Yes — it grows, takes in water and nutrients, produces seeds (reproduces).",
+     "marks": 2,
+     "hint": "Does a tree grow? Does it need water and sunlight to survive?"
+    },
+    {
+     "q": "Give ONE difference between how a plant and an animal get their food.",
+     "a": "Plants make their own food using sunlight (photosynthesis); animals eat other organisms.",
+     "marks": 1,
+     "hint": "Think about where the energy comes from for each one."
+    },
+    {
+     "q": "Is fire alive? Write YES or NO and give ONE reason.",
+     "a": "No — fire is a chemical reaction. It cannot reproduce, grow biologically, or respond to its environment.",
+     "marks": 2,
+     "hint": "Can fire make copies of itself? Does it grow like a living thing does?"
+    },
+    {
+     "q": "Write down THREE things you think ALL living things must be able to do.",
+     "a": "Any three of: move, release energy from food, respond to the environment, grow, reproduce, remove waste, take in nutrition.",
+     "marks": 3,
+     "hint": "Think about what a dog, a plant, and a human all have in common — what do they all HAVE to do?"
+    }
+   ]
+  },
+  "engage": {
+   "variant": "oddOneOut",
+   "hook": "6 out of 12 objects are alive — can you find them?",
+   "content": "Look at the objects on the board. Some are alive right now, some were once alive but are dead, and some have never been alive. Discuss with your partner which is which — and more importantly, WHY.",
+   "imagePlaceholder": true,
+   "imageDescription": "Collage grid of 12 objects: dog, tree, brick, fire, roast chicken, Venus flytrap, wooden chair, bread, toy doll, car, stick insect, human (alive vs non-living mix).",
+   "prompt": "What makes something alive — and how can you prove it?"
+  },
+  "learn": [
+   {
+    "variant": "A",
+    "heading": "MRS GREN — The 7 Life Processes",
+    "boxes": [
+     {
+      "header": "M · R · S",
+      "items": [
+       "Movement — all living things move. Animals move freely; plants grow towards light.",
+       "Respiration — living things release energy from food. Most use oxygen to do this.",
+       "Sensitivity — living things detect and respond to changes in their environment."
+      ]
+     },
+     {
+      "header": "G · R · E · N",
+      "items": [
+       "Growth — all living things grow and develop over time.",
+       "Reproduction — living things produce offspring to keep the species going.",
+       "Excretion — living things remove waste products made inside their cells.",
+       "Nutrition — living things take in or make their own food for energy."
+      ]
+     }
+    ],
+    "keywords": [
+     "MRS GREN",
+     "respiration",
+     "excretion",
+     "sensitivity",
+     "nutrition"
+    ],
+    "imagePlaceholder": true,
+    "imageDescription": "Split diagram: left = labelled animal (dog or human) with arrows pointing to MRS GREN processes; right = labelled plant with same arrows."
+   }
+  ],
+  "build": [
+   {
+    "type": "mcq",
+    "q": "A Venus flytrap closes its leaves when an insect lands on it. Which life process is this?",
+    "options": [
+     "A. Nutrition",
+     "B. Sensitivity",
+     "C. Excretion",
+     "D. Reproduction"
+    ],
+    "answer": "B",
+    "explanation": "Sensitivity = detecting and responding to the environment. The flytrap responds to the touch stimulus of the insect landing.",
+    "commonError": "Students say Nutrition because the plant is catching food, but the act of detecting and closing is Sensitivity."
+   },
+   {
+    "type": "mcq",
+    "q": "Which of these objects is DEAD (not 'never-been-alive')?",
+    "options": [
+     "A. A brick",
+     "B. A toy doll",
+     "C. A roast chicken",
+     "D. Fire"
+    ],
+    "answer": "C",
+    "explanation": "A roast chicken was once a living animal that carried out all 7 life processes. Bricks, dolls and fire have never been alive.",
+    "commonError": "Students choose fire because it 'grows' and 'moves' — but fire has never been a living organism."
+   },
+   {
+    "type": "mcq",
+    "q": "Which life process removes waste products made inside cells?",
+    "options": [
+     "A. Respiration",
+     "B. Nutrition",
+     "C. Egestion",
+     "D. Excretion"
+    ],
+    "answer": "D",
+    "explanation": "Excretion removes waste from chemical reactions inside cells — e.g. CO₂ from respiration, urea from protein breakdown.",
+    "commonError": "Students confuse Excretion (waste from inside cells) with Egestion (undigested food leaving the gut)."
+   },
+   {
+    "type": "mcq",
+    "q": "A student says 'cars move and use fuel so they must be alive.' What is wrong?",
+    "options": [
+     "A. Cars do not move",
+     "B. Cars do not use fuel",
+     "C. Cars cannot carry out ALL 7 life processes",
+     "D. Movement is not a life process"
+    ],
+    "answer": "C",
+    "explanation": "Being alive requires ALL 7 MRS GREN processes. Cars cannot grow, reproduce, excrete or show sensitivity — they fail most of MRS GREN.",
+    "commonError": "Students think movement and energy use alone are enough to define life."
+   }
+  ],
+  "apply": {
+   "variant": "A",
+   "developing": [
+    {
+     "q": "Name the life process shown by a plant growing its stem towards sunlight.",
+     "a": "Sensitivity — it detects and responds to the direction of light.",
+     "marks": 1,
+     "qType": "concept",
+     "contentType": "routine_recall",
+     "hint": "Which MRS GREN letter is about detecting and responding to surroundings?"
+    },
+    {
+     "q": "State ONE way a dog shows the life process of Excretion.",
+     "a": "Urinating / sweating / breathing out carbon dioxide — each removes waste from inside cells.",
+     "marks": 1,
+     "qType": "concept",
+     "contentType": "routine_recall",
+     "hint": "Excretion = removing waste from inside cells. What waste does a dog's body make?"
+    },
+    {
+     "q": "Give an example of Nutrition for (a) a plant and (b) an animal.",
+     "a": "(a) Plant absorbs water and minerals through roots; makes glucose by photosynthesis. (b) Animal eats food (plants or other animals) to obtain energy.",
+     "marks": 2,
+     "qType": "concept",
+     "contentType": "routine_recall",
+     "hint": "Think about where each one gets its energy or food from.",
+     "starters": [
+      "A plant shows nutrition by…",
+      "An animal shows nutrition by…"
+     ]
+    }
+   ],
+   "reaching": [
+    {
+     "q": "Explain why a wooden chair is 'never-been-alive' and NOT 'dead'.",
+     "a": "Dead means once alive. A wooden chair is made from processed timber but was never an independent living organism — it never reproduced, excreted from cells or showed sensitivity on its own.",
+     "marks": 3,
+     "qType": "concept",
+     "contentType": "extended_writing",
+     "starters": [
+      "Dead means…",
+      "A wooden chair is never-been-alive because…"
+     ]
+    },
+    {
+     "q": "A student says fire is alive because it moves, grows and needs fuel. Argue against this using MRS GREN.",
+     "a": "Fire cannot reproduce (make copies of itself), excrete waste from cells, show sensitivity or grow biologically. MRS GREN requires ALL 7 processes — fire only mimics a few superficially.",
+     "marks": 3,
+     "qType": "concept",
+     "contentType": "extended_writing",
+     "starters": [
+      "Fire appears to show… however…",
+      "MRS GREN requires ALL 7 processes — fire fails because…"
+     ]
+    },
+    {
+     "q": "Explain why scientists need all 7 MRS GREN criteria, not just 1 or 2, to decide if something is alive.",
+     "a": "Using 1–2 criteria lets non-living things pass — fire moves and uses energy; cars use fuel and move. All 7 together exclude non-living things because only true organisms carry out every process.",
+     "marks": 3,
+     "qType": "concept",
+     "contentType": "extended_writing",
+     "starters": [
+      "If we only used one life process…",
+      "All 7 criteria are needed because…"
+     ]
+    }
+   ],
+   "mastering": [
+    {
+     "q": "A roast chicken was once alive but is now cooked. Is it alive, dead, or never-been-alive? Explain using at least THREE life processes it can no longer carry out.",
+     "a": "Dead — it was once a living animal. It can no longer: respire (no energy release), grow (no cell division), show sensitivity (no response to stimuli), reproduce, excrete, move or take in nutrition. All 7 processes have ceased.",
+     "marks": 4,
+     "qType": "extended_writing",
+     "contentType": "extended_writing",
+     "starters": [
+      "The roast chicken is [alive / dead / never-been-alive] because…",
+      "Evidence it was once alive includes…",
+      "Life processes it can no longer carry out are…"
+     ]
+    },
+    {
+     "q": "Compare how a plant and an animal each show Reproduction. Include one similarity and one difference.",
+     "a": "Similarity: both produce offspring to continue the species. Difference: animals usually reproduce sexually (male and female required); plants can reproduce sexually (seeds, pollen) OR asexually (runners, cuttings, bulbs) without a partner.",
+     "marks": 4,
+     "qType": "concept",
+     "contentType": "extended_writing",
+     "starters": [
+      "Both plants and animals show reproduction by…",
+      "A difference is that plants can…"
+     ]
+    },
+    {
+     "q": "A scientist finds a new object on a distant planet. Design a checklist to test if it is alive. Explain why each item is needed.",
+     "a": "Checklist = MRS GREN all 7. Each item needed because non-living things may pass some checks (fire moves, cars use energy) but only a living organism passes ALL 7. Missing any one criteria could let a non-living thing be classified as alive.",
+     "marks": 6,
+     "qType": "extended_writing",
+     "contentType": "extended_writing",
+     "starters": [
+      "My checklist would include…",
+      "Each item is needed because…",
+      "A non-living thing might show… but it cannot show…"
+     ]
+    }
+   ]
+  },
+  "review": {
+   "developing": [
+    {
+     "q": "Name the life process shown by a plant growing towards sunlight.",
+     "a": "Sensitivity — detects light direction and responds by growing towards it.",
+     "commonError": "Do not accept Growth alone — this is specifically about responding to a stimulus."
+    },
+    {
+     "q": "State ONE way a dog shows Excretion.",
+     "a": "Urinating / sweating / breathing out CO₂ — removes waste from inside cells."
+    },
+    {
+     "q": "Give an example of Nutrition for (a) a plant and (b) an animal.",
+     "a": "(a) Makes glucose via photosynthesis / absorbs water and minerals. (b) Eats food (plants or animals) to obtain energy."
+    }
+   ],
+   "reaching": [
+    {
+     "q": "Explain why a wooden chair is 'never-been-alive', not 'dead'.",
+     "a": "Dead = was once alive. Chair was never an independent organism — never reproduced, excreted from cells or showed sensitivity."
+    },
+    {
+     "q": "A student says fire is alive — argue against using MRS GREN.",
+     "a": "Fire cannot reproduce, excrete from cells, show sensitivity or grow biologically — fails most of MRS GREN."
+    },
+    {
+     "q": "Why do scientists need ALL 7 MRS GREN criteria to define life?",
+     "a": "1–2 criteria let non-living things pass (fire moves, cars use fuel). All 7 together exclude all non-living things."
+    }
+   ],
+   "mastering": [
+    {
+     "q": "Is a roast chicken alive, dead or never-been-alive? Explain using 3+ life processes.",
+     "a": "Dead — was a living animal. Now cannot: respire, grow, show sensitivity, reproduce, excrete, move or take in nutrition."
+    },
+    {
+     "q": "Compare plant and animal Reproduction — one similarity, one difference.",
+     "a": "Both produce offspring (similarity). Animals need male + female; plants can reproduce asexually (difference)."
+    },
+    {
+     "q": "Design a checklist to test if an alien object is alive. Explain why each item is needed.",
+     "a": "MRS GREN all 7 — each required because non-living things pass some but not all. Only living organisms pass every check."
+    }
+   ]
+  },
+  "examQuestion": {
+   "examRef": "made-up-split",
+   "board": "AQA",
+   "marks": 20,
+   "passRate": null,
+   "figure": null,
+   "groups": [
+    {
+     "stem": "A student investigated how the temperature of water in a beaker changed when it was heated with an electric immersion heater connected to a joulemeter. The student recorded the energy transferred and the temperature every minute for ten minutes, keeping the mass of water the same in each repeat and stirring the water before each reading.",
+     "parts": [
+      {
+       "label": "01.1",
+       "text": "Describe a method the student could use to find the specific heat capacity of water. Include the measurements the student should take and how the student would use them to calculate the specific heat capacity of the water.",
+       "marks": 6,
+       "ms": "Level 3: a clear method with measurements of mass, temperature change and energy, used correctly in the equation 5-6 Level 2: a method with some measurements 3-4 Level 1: simple statements 1-2 indicative content: measure mass of water on a balance 1 measure start temperature with a thermometer 1 record joulemeter reading 1 [FIG:2] use c = E / m delta theta 1",
+       "passRate": 31,
+       "commonError": "Many answers gave no way to measure the mass of the water."
+      },
+      {
+       "label": "01.2",
+       "text": "Explain why the value the student found was higher than the true value for the specific heat capacity of water. Suggest one change to the method that would reduce this error.",
+       "marks": 3,
+       "ms": "energy is lost to the surroundings 1 so more energy is transferred than is used to heat the water 1 insulate the beaker or add a lid 1",
+       "passRate": 44
+      },
+      {
+       "label": "01.3",
+       "text": "The student repeated the experiment with a larger mass of water and the same energy. Predict how the temperature rise would change and explain your prediction using the equation.",
+       "marks": 3,
+       "ms": "temperature rise would be smaller 1 because the same energy is shared by more mass 1 reference to delta theta = E / m c 1",
+       "passRate": 52
+      },
+      {
+       "label": "01.4",
+       "text": "Calculate the energy needed to raise the temperature of 0.50 kg of water by 20 degrees Celsius. The specific heat capacity of water is 4200 J/kg degrees Celsius.",
+       "marks": 2,
+       "ms": "E = 0.50 x 4200 x 20 1 E = 42000 J 1",
+       "passRate": 70
+      },
+      {
+       "label": "01.5",
+       "text": "The student plotted a graph of temperature against energy transferred. Describe how the student could use the gradient of the graph to find the specific heat capacity, and explain why a line of best fit gives a better value than a single pair of readings.",
+       "marks": 4,
+       "ms": "gradient = 1 / m c 1 so c = 1 / (m x gradient) 1 line of best fit averages many readings 1 so reduces the effect of random error 1",
+       "passRate": 22
+      },
+      {
+       "label": "01.6",
+       "text": "Another student used a metal block instead of water and found a much smaller temperature rise for every joule of energy transferred to the block than the first student found for the same mass of water. Explain what this tells you about the specific heat capacity of the metal compared with water.",
+       "marks": 2,
+       "ms": "the metal has a smaller specific heat capacity 1 less energy is needed to raise 1 kg by 1 degree 1",
+       "passRate": 48
+      }
+     ]
+    }
+   ]
+  }
+ }
+]

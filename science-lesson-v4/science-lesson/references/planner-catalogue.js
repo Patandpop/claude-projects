@@ -807,6 +807,9 @@ function lessonMcqs() {
     let L; try { L = JSON.parse(fs.readFileSync(path.join(dir, 'lesson-content.json'), 'utf8')); } catch (_) { continue; }
     L = Array.isArray(L) ? L[0] : L;
     const items = (L && Array.isArray(L.build) ? L.build : []).filter((b) => ['mcq', 'mcq_image'].includes(b.type || b.variant));
+    // item 2.6: the question back from 3 to 4 weeks ago, which the builder adds at build time (<name>.delayed.json)
+    const dj = files.find((f) => f.endsWith('.delayed.json'));
+    if (dj) { try { items.push(...[].concat(JSON.parse(fs.readFileSync(path.join(dir, dj), 'utf8')))); } catch (_) { /* unreadable: skipped */ } }
     if (!items.length) continue;
     out[m[1].split(path.sep).join('/').split('\\').join('/')] = items.map((b) => {
       const o = Array.isArray(b.options) ? b.options.map(strip) : ['A', 'B', 'C', 'D'].map((k) => strip((b.options || {})[k]));

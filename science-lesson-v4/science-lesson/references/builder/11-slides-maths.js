@@ -360,7 +360,7 @@ function slideGraphInterpret(pptx, L, item) {
   const s = pptx.addSlide();
   s.background = { color: BG };
   navBar(s, 'build');
-  let y = sectionHeader(s, 'BUILD \u00B7 READ THE GRAPH: ANSWERS', STAGE.build, TOP);
+  let y = sectionHeader(s, 'BUILD \u00B7 READ THE GRAPH', STAGE.build, TOP);
   y = purplePenBar(s, y - GAP + 0.02);
   const h = BOT_Y - 0.08 - y;
   const rx = drawFrame(s, y, h);

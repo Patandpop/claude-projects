@@ -605,6 +605,16 @@
           "label": "Symbols: chlorine tile"
         }
       ]
+    },
+    "worksheetExtras": {
+      "wordBank": [
+        "atom",
+        "element",
+        "compound",
+        "mixture",
+        "chemical reaction",
+        "formula"
+      ]
     }
   }
 ]

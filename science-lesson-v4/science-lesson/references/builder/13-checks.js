@@ -63,6 +63,62 @@ function learnChecks(L, lines) {
   });
 }
 
+/* Teaching language (Patryk 2026-10-30, all 20 rules approved; SKILL.md "Teaching language").
+   Warnings only, one ✗ line per rule naming the slides; the build never rewrites. */
+const LANG_HYPE = /\b(explore|exploring|discover|discovering|journey|fascinating|amazing|incredible|unlock|dive into|delve)\b/i;
+const langSentences = (t) => stripMarkTags(stripKeys(String(t || ''))).split(/(?<=[.?!])\s+|\n+/).map((x) => x.trim()).filter(Boolean);
+const langWords = (t) => t.split(/\s+/).filter(Boolean).length;
+function languageChecks(L, lines, type) {
+  const year = parseInt((L.meta || {}).year, 10) || 0;
+  const aLevel = year >= 12;
+  const maxWords = aLevel ? 25 : 20, maxNotes = aLevel ? 5 : 3;
+  const learn = arr(L.learn), e = L.engage;
+  const slideText = (it) => [...arr(it.boxes).flatMap((b) => [b.header, ...arr(b.items)]), it.body, it.content, it.hook, it.prompt].filter(Boolean);
+  // (3) long sentences on slides
+  const long = [];
+  if (e) slideText(e).forEach((t) => langSentences(t).forEach((x) => { if (langWords(x) > maxWords) long.push('Engage'); }));
+  learn.forEach((it, i) => slideText(it).forEach((t) => langSentences(t).forEach((x) => { if (langWords(x) > maxWords) long.push(`Learn ${i + 1}`); })));
+  if (long.length) lines.push(`  ✗ LANGUAGE · sentence over ${maxWords} words on ${[...new Set(long)].join(', ')} (aim for 15 on slides; the rest goes in notes)`);
+  // (4) the explanation lives in the notes, in Patryk's voice
+  const noNotes = learn.map((it, i) => (it.notes ? null : `Learn ${i + 1}`)).filter(Boolean);
+  if (noNotes.length) lines.push(`  ✗ LANGUAGE · no speaker notes on ${noNotes.join(', ')} (the slide has the short version, notes the full explanation)`);
+  // (2) words by the picture: at most 3 notes on a picture slide (5 for Years 12 and 13); Learn L builds one per click
+  const crowded = learn.map((it, i) => {
+    const v = String(it.variant || 'A').toUpperCase();
+    const pic = (v === 'A' && it.imagePlaceholder !== false && !it.annotationZone) || v === 'D' || v === 'J';
+    const n = arr(it.boxes).reduce((t, b) => t + arr(b.items).length, 0) + arr(it.features).length;
+    return pic && n > maxNotes ? `Learn ${i + 1} (${n})` : null;
+  }).filter(Boolean);
+  if (crowded.length) lines.push(`  ✗ LANGUAGE · more than ${maxNotes} notes beside a picture on ${crowded.join(', ')} (one sentence each, next to its part)`);
+  // (6) "you" and "we", never the passive instruction
+  const passive = JSON.stringify([L.learn, L.engage, L.build, L.apply, L.title]).match(/\b(?:is|are) to be \w+(?:ed|en)\b|\bby the (?:student|pupil)s?\b/gi);
+  if (passive) lines.push(`  ✗ LANGUAGE · passive instruction ("${passive[0]}"): say "you" or "we" ("Work out the pressure")`);
+  // (14-17) Engage: always a question, short, plain, and the notes say where the lesson answers it
+  if (type === 'standard' || type === 'practical') {
+    if (!e) lines.push('  ✗ LANGUAGE · no Engage: every lesson has one, always a question (from history, real data, or what you just said)');
+    else {
+      const q = [(e.reveal || {}).question, e.hook, e.prompt].filter(Boolean).map((t) => stripKeys(String(t))).find((t) => /\?\s*$/.test(t));
+      if (!q) lines.push('  ✗ LANGUAGE · Engage asks no question (the hook, prompt or reveal question should end with "?")');
+      else if (langWords(langSentences(q).slice(-1)[0] || q) > 15) lines.push(`  ✗ LANGUAGE · Engage question over 15 words: "${q}"`);
+      const hype = slideText(e).join(' ').match(LANG_HYPE);
+      if (hype) lines.push(`  ✗ LANGUAGE · Engage uses the hype word "${hype[0]}"`);
+      if (!e.notes) lines.push('  ✗ LANGUAGE · Engage has no notes line saying where the lesson answers its question');
+    }
+  }
+  // (20) MCQ options: one line each
+  const wide = arr(L.build).filter((b) => ['mcq', 'mcq_image'].includes(b.type || b.variant)).map((b, i) => {
+    const o = mcqOptions(b.options);
+    return ['A', 'B', 'C', 'D'].some((k) => stripKeys(String(o[k] || '')).length > 70) ? `question ${i + 1}` : null;
+  }).filter(Boolean);
+  if (wide.length) lines.push(`  ✗ LANGUAGE · an MCQ option over 70 characters on ${wide.join(', ')} (one line each, answerable in under a minute)`);
+}
+
+// Em dashes (Patryk's rule, 2026-07-02): anywhere in what pupils or Patryk read, not the file's meta.
+function emDashCheck(L, lines) {
+  const where = Object.keys(L).filter((k) => k !== 'meta' && JSON.stringify(L[k] || '').includes('—'));
+  if (where.length) lines.push(`  ✗ em dash in ${where.join(', ')}: rewrite with a comma, colon or new sentence`);
+}
+
 function contentCheck(L) {
   const meta = L.meta || {};
   const type = (meta.lessonType || meta.type || 'standard').toLowerCase();
@@ -90,7 +146,7 @@ function contentCheck(L) {
   if (arr(L.extension).length > 4) lines.push('  ✗ Extension has more than 4 subtopic columns — only the first 4 are drawn');
 
   if (isTeaching) {
-    const mcq = arr(L.build).filter((b) => ['mcq', 'mcq_image'].includes(b.type || b.variant)).length;
+    const mcq = arr(L.build).filter((b) => ['mcq', 'mcq_image'].includes(b.type || b.variant) && !b.from).length;   // a question back from 3 to 4 weeks ago (2.6) is extra
     check(mcq === 6, 'MCQ count 6/6', `MCQ count ${mcq} — rule is exactly 6 (one block after Learn; experiment MCQs tagged about:"practical" go after the method slide)`);
     // MCQ CHECK (Lesson quality A): every wrong option names its mistake; no give-aways
     const mcqBad = [];
@@ -100,6 +156,7 @@ function contentCheck(L) {
     });
     if (mcq) { if (mcqBad.length) lines.push(...mcqBad); else lines.push('  ✓ MCQ CHECK · every wrong option names its mistake'); }
     learnChecks(L, lines);
+    languageChecks(L, lines, type);
     TIERS.forEach((t) => {
       const a = arr((L.apply || {})[t]).length;
       check(a >= 3, `Apply ${t} ${a}/3+`, `Apply ${t} has ${a} question(s) — minimum 3 per tier`);
@@ -127,9 +184,16 @@ function contentCheck(L) {
 
   // Image discipline: every placeholder slot needs a Google-searchable description,
   // and a lesson with no images at all usually means source extraction was skipped.
+  // Only slides that draw a picture slot (item 2.5, 2026-10-30: no false warning on a comparison
+  // table): Learn A, B with a picture below, D, H and J. K checks its events; C, E, F, G, I and L have none.
+  const drawsPicture = (it) => {
+    const v = String(it.variant || 'A').toUpperCase();
+    if (v === 'B') { const b = String(it.below || 'none'); return b === 'image' || (b !== 'none' && b !== 'two-column' && arr(it.boxes).length > 0); }
+    return ['A', 'D', 'H', 'J'].includes(v);
+  };
   const imgItems = [
     L.engage && { it: L.engage, label: 'Engage' },
-    ...arr(L.learn).map((it, i) => ({ it, label: `Learn ${i + 1} (${it.variant})` })),
+    ...arr(L.learn).map((it, i) => ({ it, label: `Learn ${i + 1} (${it.variant})` })).filter((x) => drawsPicture(x.it)),
   ].filter(Boolean).filter((x) => x.it.imagePlaceholder !== false);
   const noDesc = imgItems.filter((x) => !x.it.embeddedImagePath && !x.it.imageDescription).map((x) => x.label);
   check(noDesc.length === 0, 'image slots all described/embedded',
@@ -180,6 +244,7 @@ function contentCheck(L) {
   if (arr(wx.wordBank).length && arr(wx.wordBank).length < 5)
     lines.push(`  ✗ word bank has ${arr(wx.wordBank).length} words: give at least 5 (add believable extras from the topic)`);
 
+  emDashCheck(L, lines);
   console.log(`── CONTENT CHECK · ${name}`);
   lines.forEach((l) => console.log(l));
 

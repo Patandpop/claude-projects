@@ -45,7 +45,14 @@ const STAGE_LABEL = {
 const TIER_PPTX = { developing: '2E7D32', reaching: 'E65100', mastering: 'B71C1C' };
 const TIER_DOCX = { developing: '1E5C2D', reaching: 'C05A00', mastering: '9B1B1B' };
 const TIERS = ['developing', 'reaching', 'mastering'];
-const NO_WORD_BANK = new Set(['8AB', '9AB']); // M5: B13 classes that suppress keyword-fallback word bank
+// Classes with no automatic word bank (item 2.5, 2026-10-30): read from class-defaults.json
+// (wordBank: false) at home; without it (claude.ai) this year's list.
+const NO_WORD_BANK = (() => {
+  try {
+    const c = JSON.parse(fs.readFileSync(path.join(__dirname, '..', '..', 'class-defaults.json'), 'utf8')).classes || {};
+    return new Set(Object.keys(c).filter((k) => c[k] && c[k].wordBank === false));
+  } catch (_) { return new Set(['9AS', '9XS', '10S2', '11S2', '12C', '13D']); }
+})();
 const MCQ = {
   A: { badge: 'C2185B', bg: 'FCE4EC' },
   B: { badge: '1565C0', bg: 'E3F2FD' },

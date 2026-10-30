@@ -114,7 +114,7 @@ Canonical package list = `$ENTRIES` in `package-skill.ps1`. Keep `package-skill.
 | 12C | 12 | OCR A Physics, half the content | Double lessons, OCR only, homework every lesson |
 | 13D | 13 | OCR A Physics, half the content | OCR only, homework every lesson, exam year |
 
-Sources: `class-defaults.json` (word bank, homework, board: feeds the planner's build requests), `classes-2026-27.json` (timetable, sizes, sharing; read by `school-classes.js`). Who-teaches-what in the memory note on class sharing overrides `classes-2026-27.json`. Same table, in skill form, in SKILL.md "Class Profiles". For a no-word-bank class set `worksheetExtras.wordBank: []` (build.js's own `NO_WORD_BANK` list still names last year's 8AB/9AB). Old classes (7BYA, 8AB, 9AB, 12D, 10C4, 11C3) are gone.
+Sources: `class-defaults.json` (word bank, homework, board: feeds the planner's build requests), `classes-2026-27.json` (timetable, sizes, sharing; read by `school-classes.js`). Who-teaches-what in the memory note on class sharing overrides `classes-2026-27.json`. Same table, in skill form, in SKILL.md "Class Profiles". For a no-word-bank class set `worksheetExtras.wordBank: []` (the builder also reads `wordBank: false` from class-defaults.json, so it is a belt-and-braces step). Old classes (7BYA, 8AB, 9AB, 12D, 10C4, 11C3) are gone.
 
 ---
 

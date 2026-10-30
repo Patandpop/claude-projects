@@ -53,6 +53,55 @@ function lessonRel(meta, title, lookup) {
 }
 
 /* =========================================================================
+   A MULTIPLE-CHOICE QUESTION FROM 3 TO 4 WEEKS AGO (item 2.6, 2026-10-30)
+   ========================================================================= */
+
+// The lesson log the uploader keeps (home). Missing (claude.ai): none, so no question comes back.
+function readLessonLog() {
+  const p = process.env.LESSON_LOG || 'G:\\My Drive\\Beechen Cliff Science\\Admin\\Brief Data\\lesson-log.json';
+  try { const j = JSON.parse(fs.readFileSync(p, 'utf8')); return Array.isArray(j) ? j : []; } catch (_) { return []; }
+}
+
+// A lesson built at home, found by class and title among the project's lesson folders.
+let _builtLessons = null;
+function findBuiltLesson(cls, title) {
+  if (!_builtLessons) {
+    _builtLessons = [];
+    const root = path.join(__dirname, '..', '..');
+    let dirs = [];
+    try { dirs = fs.readdirSync(root, { withFileTypes: true }).filter((d) => d.isDirectory()); } catch (_) { /* none */ }
+    for (const d of dirs) {
+      try { [].concat(JSON.parse(fs.readFileSync(path.join(root, d.name, 'lesson-content.json'), 'utf8'))).forEach((x) => x && x.meta && _builtLessons.push(x)); } catch (_) { /* no lesson here */ }
+    }
+  }
+  const norm = (s) => String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '');
+  return _builtLessons.find((x) => String(x.meta.class || '').split(/[\/,]/).map((c) => c.trim()).includes(cls)
+    && (norm(x.meta.title) === norm(title) || norm(x.meta.topic) === norm(title))) || null;
+}
+
+// The class's lessons built 21 to 35 days before this one (nearest first); the first with checked
+// multiple-choice questions gives one, chosen by this lesson's number so a rebuild gives the same.
+function delayedMcq(L, log, readLesson, today) {
+  const meta = L.meta || {};
+  const type = String(meta.lessonType || 'standard').toLowerCase();
+  const cls = String(meta.class || '').split(/[\/,]/)[0].trim();
+  if (!cls || meta.delayedMcq === false || !['standard', 'practical'].includes(type)) return null;
+  const day = Date.parse((meta.date || today) + 'T12:00:00Z');
+  const mine = String(meta.title || meta.topic || '').toLowerCase();
+  const past = arr(log).filter((r) => r && r.class === cls && r.builtOn && String(r.title || '').toLowerCase() !== mine)
+    .map((r) => ({ r, d: (day - Date.parse(r.builtOn + 'T12:00:00Z')) / 864e5 }))
+    .filter((x) => x.d >= 21 && x.d <= 35).sort((a, b) => a.d - b.d);
+  for (const { r } of past) {
+    const src = readLesson(cls, r.title);
+    const mcqs = arr(src && src.build).filter((b) => (b.type || b.variant) === 'mcq' && b.options && /^[A-D]/i.test(String(b.answer || '')));
+    if (!mcqs.length) continue;
+    const pick = JSON.parse(JSON.stringify(mcqs[(parseInt(meta.lessonNumber, 10) || 0) % mcqs.length]));
+    return Object.assign(pick, { from: r.title });
+  }
+  return null;
+}
+
+/* =========================================================================
    MAIN
    ========================================================================= */
 
@@ -104,10 +153,14 @@ async function main() {
       // questions from what the class has covered (do-now-pick.js: spaced retrieval + one question from
       // last year's content). A Do Now written into the lesson is always used as written.
       const dnPickPath = path.join(__dirname, 'do-now-pick.js');
+      // the memory map's sections show in the Do Now slide's notes, picked or written by hand
+      if (L.doNow && arr(L.doNow.spec).length) L.doNow.specPoints = arr(L.doNow.specPoints).concat('From the memory map (most due first): ' + arr(L.doNow.spec).join(', '));
       if (L.doNow && L.doNow.auto && !arr(L.doNow.questions).length && fs.existsSync(dnPickPath)) {
         try {
           const cls = String((L.meta || {}).class || '').split(/[\/,]/)[0].trim();
-          const r = require(dnPickPath).pick(cls, { date: (L.meta || {}).date, varyNumbers: L.doNow.varyNumbers !== false });
+          // doNow.spec: the sections ticked under "Suggested Do Now" in the planner (memory map, item 2.5)
+          const spec = arr(L.doNow.spec).map(String).filter(Boolean);
+          const r = require(dnPickPath).pick(cls, { date: (L.meta || {}).date, varyNumbers: L.doNow.varyNumbers !== false, spec });
           L.doNow.questions = r.picked.map((p) => ({ q: p.q, a: p.a, marks: p.marks || 1 }));
           // new numbers on a calculation (2026-10-15): say so in the presenter notes, never on the slide
           const varied = r.picked.map((p, i) => (p.varied ? `Q${i + 1}: numbers changed from ${p.varied} (same wording, answer worked out again)` : null)).filter(Boolean);
@@ -136,6 +189,20 @@ async function main() {
         buildWarn('NO EXAM QUESTION on this deck: ' + (process.env.NO_EXAM_PICK ? 'NO_EXAM_PICK is set'
           : !examPicked ? 'the lesson JSON already had an examQuestion key (delete it to auto-pick)'
           : (examPicked.why || 'none picked')));
+      }
+
+      // item 2.6: one MCQ from this class's lesson of 3 to 4 weeks ago joins the block (home only)
+      if (!process.env.NO_DELAYED_MCQ) {
+        try {
+          const back = delayedMcq(L, readLessonLog(), findBuiltLesson, new Date().toISOString().slice(0, 10));
+          const b = arr(L.build), last = b.map((x) => x.type || x.variant).lastIndexOf('mcq');
+          const side = path.join(outDir, base + '.delayed.json');   // the phone voter gets it too (planner-catalogue.js)
+          if (back && last >= 0) {
+            b.splice(last + 1, 0, back); L.build = b;
+            fs.writeFileSync(side, JSON.stringify([back], null, 2), 'utf8');
+            console.log(`  [mcq] one question back from "${back.from}" (3 to 4 weeks ago)`);
+          } else if (fs.existsSync(side)) fs.writeFileSync(side, '[]', 'utf8');   // an earlier build's pick no longer applies
+        } catch (e) { console.log('  [mcq] no question from 3 to 4 weeks ago: ' + e.message); }
       }
 
       const pptxPath = path.join(outDir, base + '.pptx');

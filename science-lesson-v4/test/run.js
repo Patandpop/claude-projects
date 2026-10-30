@@ -37,6 +37,8 @@ const FIXTURES = [
   'lesson-quality-test.json',  // 2026-10-19 Lesson quality A: {k} gold underline, answer yellow, objectives slide, exam wording, misconception, notes, MCQ CHECK
   'dual-coding-test.json',     // 2026-10-23 Part B: Learn L labelled picture (build one part at a time + all-labels slide)
   'alevel-13d-test.json',      // 2026-10-30 item 1.8: 13D lesson, Drive notes name Module/Chapter (no Physics level)
+  'exam-split-test.json',      // 2026-10-30 item 2.5: a long exam question + mark scheme split over slides, no [FIG]
+  'nobank-10s2-test.json',     // 2026-10-30 item 2.13: a 10S2 lesson with no word bank in it: the class setting keeps both sheets bank-free
 ];
 
 // Strings the RENDERER must never emit (terminology + font-glyph regressions).
@@ -124,7 +126,7 @@ async function main() {
     // Build — NO_UPLOAD keeps the Drive uploader out of the test.
     const r = cp.spawnSync(process.execPath, [BUILD_JS, sanitisedPath, outDir], {
       cwd: ROOT, encoding: 'utf8',
-      env: Object.assign({}, process.env, { NO_UPLOAD: '1', NO_PAGECOUNT: '1', NO_EXAM_LOG: '1' }),
+      env: Object.assign({}, process.env, { NO_UPLOAD: '1', NO_PAGECOUNT: '1', NO_EXAM_LOG: '1', NO_DELAYED_MCQ: '1' }),
     });
     const output = (r.stdout || '') + (r.stderr || '');
 
@@ -780,6 +782,32 @@ async function main() {
       else fail('module table wrong for: ' + want.map(([y, m]) => y + ' ' + m + ' gave ' + rel(y, m)).join('; '));
     }
 
+    // Item 2.5 (2026-10-30): a long exam question and its mark scheme move onto a second slide
+    // instead of shrinking and running off; no [FIG] marker reaches the board.
+    if (fixture === 'exam-split-test.json') {
+      const pptx = path.join(outDir, baseName(lessons[0].meta) + '.pptx');
+      const slides = fs.existsSync(pptx) ? new AdmZip(pptx).getEntries().filter((e) => /slides\/slide\d+\.xml$/.test(e.entryName)).map((e) => e.getData().toString('utf8')) : [];
+      const q = slides.filter((x) => /EXAM QUESTION · AQA/.test(x)), ms = slides.filter((x) => x.includes('EXAM QUESTION · MARK SCHEME'));
+      if (q.length === 2 && q[1].includes('(CONTINUED)')) pass('long exam question: split over 2 slides, the second says continued');
+      else fail(`long exam question: ${q.length} question slide(s), expected 2`);
+      if (ms.length >= 2) pass(`long mark scheme: split over ${ms.length} slides`);
+      else fail('long mark scheme: still on one slide');
+      const all = q.concat(ms).join('\n');
+      const lost = ['01.1', '01.2', '01.3', '01.4', '01.5', '01.6'].filter((p) => (all.match(new RegExp(`\\(${p.replace('.', '\\.')}\\)`, 'g')) || []).length < 2);
+      if (!lost.length) pass('every part is on a question slide and a mark scheme slide');
+      else fail('parts missing after the split: ' + lost.join(', '));
+      if (!/\[FIG/.test(all)) pass('no [FIG] marker on the exam slides');
+      else fail('a [FIG] marker reached the exam slides');
+    }
+
+    // Item 2.13 (2026-10-30): 10S2 has no word bank (class-defaults.json), on either sheet.
+    if (fixture === 'nobank-10s2-test.json') {
+      const b = baseName(lessons[0].meta);
+      const banks = ['_worksheet.docx', '_support_worksheet.docx'].filter((x) => { const p = path.join(outDir, b + x); return fs.existsSync(p) && /Word bank/i.test(readArchiveXml(p)); });
+      if (!banks.length) pass('10S2: no word bank on the standard or support sheet');
+      else fail('10S2: a word bank appeared on ' + banks.join(', '));
+    }
+
     if (fixture === 'flow-native-test.json') {
       const pptx = path.join(outDir, baseName(lessons[0].meta) + '.pptx');
       if (!fs.existsSync(pptx)) { fail('flow-native pptx missing'); }
@@ -974,6 +1002,10 @@ async function main() {
   // The morning brief end to end, preview only (2026-10-30).
   console.log('');
   { const bs = require(path.join(__dirname, 'brief-smoke.test.js')).run(); hardFails += bs.fails; warnings += bs.warns; }
+
+  // Builder pieces checked without a build: word bank per class, language warnings, the question from 3 to 4 weeks ago (2026-10-30).
+  console.log('');
+  hardFails += require(path.join(__dirname, 'builder-parts.test.js')).run().fails;
 
   // Flag-only checks on lesson MCQs (4.11, 2026-10-29).
   console.log('');

@@ -26,21 +26,48 @@ function examQuestionRuns(eq, fs) {
   return runs;
 }
 
-function slideExamQuestion(pptx, L) {
+// Item 2.5 (2026-10-30): a long question (or mark scheme) never shrinks below 16 pt and runs off;
+// the parts that do not fit move to the next slide. Same line model as autoFontSize, one paragraph
+// per part, so a part's own line break is counted.
+const EXAM_MIN = 16;
+const EXAM_CPI = 150;   // characters per inch at 1 pt: the board font measured on rendered slides (autoFontSize keeps a safer 120)
+function examParasFit(paras, w, h, fs) {
+  const cpl = Math.max(1, Math.floor((w * EXAM_CPI) / fs));
+  const n = paras.reduce((t, p) => t + Math.max(1, Math.ceil(flattenText(p).length / cpl)), 0);
+  return (n * fs * 1.4 + paras.length * 8) / 72 <= h * 0.95;
+}
+const examStripFig = (t) => String(t || '').replace(/\s*\[FIG(?::\s*\d+)?\]\s*/gi, ' ').trim();
+// The question's parts, one per entry, each with its group's stem on the group's first part.
+function examUnits(eq) {
+  const out = [];
+  eq.groups.forEach((g, gi) => g.parts.forEach((p, k) => out.push({ gi, stem: k === 0 ? g.stem : '', part: p })));
+  return out;
+}
+function examFromUnits(units) {
+  const groups = [];
+  units.forEach((u) => {
+    let g = groups.length && groups[groups.length - 1]._gi === u.gi ? groups[groups.length - 1] : null;
+    if (!g) { g = { _gi: u.gi, stem: u.stem, parts: [] }; groups.push(g); }
+    g.parts.push(u.part);
+  });
+  return groups;
+}
+const examQParas = (units) => units.flatMap((u) => [u.stem, `(${u.part.label}) ${u.part.text} [${u.part.marks} marks]`].filter(Boolean));
+
+// Draws one question slide with as many parts as fit at 16 pt (always at least one); returns the rest.
+function slideExamQuestion(pptx, L, units, page) {
   const eq = L.examQuestion;
-  if (!eq || !arr(eq.groups).length) return;
   const obj = objectiveText(L);
   const s = pptx.addSlide();
   s.background = { color: BG };
   navBar(s, 'apply');
-  let y = sectionHeader(s, `EXAM QUESTION \u00B7 ${eq.board || 'AQA'} \u00B7 ${eq.marks} MARKS`, STAGE.apply, TOP);
-  txt(s, 'Real exam question. Answer it in your book.', { x: MX, y, w: CW, h: 0.35, italic: true, fontSize: 14, color: '333333', valign: 'middle' });
+  let y = sectionHeader(s, `EXAM QUESTION \u00B7 ${eq.board || 'AQA'} \u00B7 ${eq.marks} MARKS${page > 1 ? ' (CONTINUED)' : ''}`, STAGE.apply, TOP);
+  txt(s, page > 1 ? 'The same question, continued. Answer it in your book.' : 'Real exam question. Answer it in your book.', { x: MX, y, w: CW, h: 0.35, italic: true, fontSize: 14, color: '333333', valign: 'middle' });
   y += 0.42;
   const h = BOT_Y - 0.1 - y;
-  const plain = eq.groups.map((g) => [g.stem, ...g.parts.map((p) => `(${p.label}) ${p.text} [${p.marks} marks]`)].filter(Boolean).join(' ')).join(' ');
   let tx = MX, tw = CW;
   if (eq.figure && eq.figure.path && fs.existsSync(eq.figure.path)) {
-    // figure on the left, at most half the width, never stretched
+    // figure on the left, at most half the width, never stretched (on every page: the parts refer to it)
     const maxW = CW * 0.48, maxH = h;
     const r = (eq.figure.w && eq.figure.h) ? eq.figure.w / eq.figure.h : 4 / 3;
     let iw = maxW, ih = iw / r;
@@ -48,56 +75,78 @@ function slideExamQuestion(pptx, L) {
     s.addImage({ path: eq.figure.path, x: MX, y: y + (maxH - ih) / 2, w: iw, h: ih });
     tx = MX + iw + 0.25; tw = CW - iw - 0.25;
   }
-  const fsz = autoFontSize(plain, tw - 0.2, h, { min: 16, max: 26 });
-  goldBox(s, tx, y, tw, h, examQuestionRuns(eq, fsz), { valign: 'top', margin: 10 });
+  let n = 1;
+  while (n < units.length && examParasFit(examQParas(units.slice(0, n + 1)), tw - 0.2, h, EXAM_MIN)) n++;
+  const here = units.slice(0, n);
+  const paras = examQParas(here);
+  let fsz = EXAM_MIN;
+  for (let f = 26; f > EXAM_MIN; f--) if (examParasFit(paras, tw - 0.2, h, f)) { fsz = f; break; }
+  goldBox(s, tx, y, tw, h, examQuestionRuns({ groups: examFromUnits(here) }, fsz), { valign: 'top', margin: 10 });
   bottomBar(s, obj);
+  return units.slice(n);
 }
 
-function slideExamMarkScheme(pptx, L) {
-  const eq = L.examQuestion;
-  if (!eq || !arr(eq.groups).length) return;
+// AQA writes marking points as one run-on line with a bare "1" after each point. Put each point on
+// its own line and show its mark as "(1)". The words themselves are untouched (verbatim rule).
+const MS_UNIT = /^(kg|g|mg|m|cm|mm|km|s|ms|h|min|j|kj|mj|w|kw|mw|n|v|a|ma|hz|khz|k|pa|kpa|mol|dm|l|ml|%)\b/i;
+function msPoints(ms) {
+  const out = []; let cur = '';
+  const toks = examStripFig(ms).split(/\s+/);
+  toks.forEach((t, k) => {
+    const next = toks[k + 1] || '';
+    if (/^[1-3]$/.test(t) && cur && !MS_UNIT.test(next)) { out.push(`${cur.trim()}  (${t})`); cur = ''; }
+    else cur += ' ' + t;
+  });
+  if (cur.trim()) out.push(cur.trim());
+  return out;
+}
+// Height one part's box needs at 16 pt (its label + one paragraph per marking point, plus margins).
+const msNeed = (p, i) => {
+  const lines = msPoints(p.ms);
+  const cpl = Math.max(1, Math.floor(((CW - 0.25) * EXAM_CPI) / EXAM_MIN));
+  const n = lines.reduce((t, ln, k) => t + Math.max(1, Math.ceil(((k ? '' : `(${p.label || i + 1})  `) + ln).length / cpl)), 0) || 1;
+  return (n * EXAM_MIN * 1.4) / 72 / 0.95 + 0.2;
+};
+
+// Draws one mark-scheme slide with as many parts as fit at 16 pt (always at least one); returns the rest.
+function slideExamMarkScheme(pptx, L, parts, first, page) {
   const obj = objectiveText(L);
   const s = pptx.addSlide();
   s.background = { color: BG };
   navBar(s, 'apply');
-  let y = sectionHeader(s, 'EXAM QUESTION \u00B7 MARK SCHEME', STAGE.apply, TOP);
+  let y = sectionHeader(s, 'EXAM QUESTION \u00B7 MARK SCHEME' + (page > 1 ? ' (CONTINUED)' : ''), STAGE.apply, TOP);
   txt(s, 'Mark your answer in purple pen. This is the real examiner mark scheme.', { x: MX, y, w: CW, h: 0.35, italic: true, fontSize: 14, color: '333333', valign: 'middle' });
   y += 0.42;
-  const parts = eq.groups.flatMap((g) => g.parts);
-  const insight = parts.map((p) => {
+  const room = BOT_Y - 0.1 - y;
+  const insightOf = (ps) => ps.map((p) => {
     const bits = [];
     if (p.passRate != null) bits.push(`${p.passRate}% of students got (${p.label || 'this'}) right.`);
     if (p.commonError) bits.push(p.commonError);
     return bits.join(' ');
   }).filter(Boolean).join('  ');
-  const insH = insight ? 1.1 : 0;
-  const h = BOT_Y - 0.1 - y - (insH ? insH + 0.12 : 0);
-  // AQA writes marking points as one run-on line with a bare "1" after each point. Put each point on
-  // its own line and show its mark as "(1)". The words themselves are untouched (verbatim rule).
-  const UNIT = /^(kg|g|mg|m|cm|mm|km|s|ms|h|min|j|kj|mj|w|kw|mw|n|v|a|ma|hz|khz|k|pa|kpa|mol|dm|l|ml|%)\b/i;
-  const points = (ms) => {
-    const out = []; let cur = '';
-    const toks = String(ms || '').split(/\s+/);
-    toks.forEach((t, k) => {
-      const next = toks[k + 1] || '';
-      if (/^[1-3]$/.test(t) && cur && !UNIT.test(next)) { out.push(`${cur.trim()}  (${t})`); cur = ''; }
-      else cur += ' ' + t;
-    });
-    if (cur.trim()) out.push(cur.trim());
-    return out;
+  // how many parts fit, with the examiner box (if any) for the parts on this slide
+  let n = 1;
+  const fitsN = (k) => {
+    const ps = parts.slice(0, k), insH = insightOf(ps) ? 1.1 + 0.12 : 0;
+    return ps.reduce((t, p, i) => t + msNeed(p, first + i), 0) + 0.1 * (k - 1) <= room - insH;
   };
+  while (n < parts.length && fitsN(n + 1)) n++;
+  const here = parts.slice(0, n);
+  const insight = insightOf(here);
+  const insH = insight ? 1.1 : 0;
+  const h = room - (insH ? insH + 0.12 : 0);
   // one navy/gold box per part (each answer appears on its own click), height shared by text length
-  const texts = parts.map((p) => points(p.ms));
+  const texts = here.map((p) => msPoints(p.ms));
   const weight = texts.map((t) => Math.max(60, t.join(' ').length + 40 * t.length));
-  const avail = h - 0.1 * (parts.length - 1);
+  const avail = h - 0.1 * (here.length - 1);
   const tot = weight.reduce((a, b) => a + b, 0);
   let yy = y;
-  parts.forEach((p, i) => {
+  here.forEach((p, i) => {
     const bh = avail * weight[i] / tot;
     const lines = texts[i];
-    const plain = `(${p.label || i + 1})  ` + lines.join(' ');
-    const fsz = autoFontSize(plain, CW - 0.25, bh, { min: 16, max: 24, linesHint: undefined });
-    const runs = [{ text: `(${p.label || i + 1})  `, options: { fontSize: fsz, bold: true } }];
+    const lab = `(${p.label || first + i + 1})  `;
+    const fsz = fitListFont([lab + lines[0], ...lines.slice(1)], CW - 0.25, bh, EXAM_MIN, 24);
+    const runs = [{ text: lab, options: { fontSize: fsz, bold: true } }];
     lines.forEach((ln, k) => runs.push({ text: ln, options: { fontSize: fsz, breakLine: k < lines.length - 1 } }));
     goldBox(s, MX, yy, CW, bh, runs, { fill: NAVY, color: GOLD, valign: 'middle', margin: 10 });
     yy += bh + 0.1;
@@ -110,12 +159,18 @@ function slideExamMarkScheme(pptx, L) {
     });
   }
   bottomBar(s, obj);
+  return parts.slice(n);
 }
 
 // Patryk 2026-10-07: the exam question and its mark scheme come after the Apply answers (Review slides).
 function slideExam(pptx, L) {
-  slideExamQuestion(pptx, L);
-  slideExamMarkScheme(pptx, L);
+  const eq = L.examQuestion;
+  if (!eq || !arr(eq.groups).length) return;
+  let units = examUnits(eq), page = 0;
+  while (units.length) units = slideExamQuestion(pptx, L, units, ++page);
+  let parts = eq.groups.flatMap((g) => g.parts), done = 0;
+  page = 0;
+  while (parts.length) { const rest = slideExamMarkScheme(pptx, L, parts, done, ++page); done += parts.length - rest.length; parts = rest; }
 }
 
 function slideApply(pptx, L) {
@@ -413,7 +468,8 @@ function slideWhiteboardRounds(pptx, L) {
     navBar(s, 'build');
     y = sectionHeader(s, head + ' \u00B7 ANSWER', STAGE.build, TOP);
     goldBox(s, MX, y, CW, 2.0, prettyText(r.q || ''), { fill: BG, bold: true, fontSize: 20, align: 'center', valign: 'middle' });
-    goldBox(s, MX, y + 2.0 + GAP, CW, 1.8, r.a || '', { bold: true, fontSize: 15, color: NAVY, align: 'center', valign: 'middle' });
+    // item 2.5 (2026-10-30): the answer fills its box instead of a fixed 15 pt
+    goldBox(s, MX, y + 2.0 + GAP, CW, 1.8, prettyText(r.a || ''), { bold: true, fontSize: autoFontSize(r.a || '', CW - 0.3, 1.8, { min: 15, max: 32 }), color: NAVY, align: 'center', valign: 'middle' });
     bottomBar(s, obj);
   });
 }

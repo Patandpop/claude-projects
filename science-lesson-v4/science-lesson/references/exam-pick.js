@@ -265,7 +265,7 @@ function shape(q) {
       stem: g.stem,
       parts: g.parts.map((p) => ({
         label: p.part || '', text: hb.stripStem(p.text, g.stem) || hb.clean(p.text), marks: p.marks || 0,
-        ms: (p.ms && p.ms.text) || '',
+        ms: String((p.ms && p.ms.text) || '').replace(/\s*\[FIG(?::\s*\d+)?\]\s*/gi, ' ').trim(),   // no figure marker on the board (2.5)
         commonError: (p.ms && p.ms.examiner && p.ms.examiner.commonError) || '',
         passRate: p.passRate,
       })),

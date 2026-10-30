@@ -10,7 +10,9 @@ function slideMcq(pptx, L, item) {
   const s = pptx.addSlide();
   s.background = { color: BG };
   navBar(s, 'build');
-  let y = sectionHeader(s, 'BUILD \u00B7 CHECK YOUR UNDERSTANDING', STAGE.build, TOP);
+  // item 2.6: a question back from 3 to 4 weeks ago says which lesson it is from
+  const from = item.from ? String(item.from).toUpperCase() : '';
+  let y = sectionHeader(s, 'BUILD \u00B7 CHECK YOUR UNDERSTANDING' + (from ? ' \u00B7 FROM ' + (from.length > 38 ? from.slice(0, 36).trim() + '...' : from) : ''), STAGE.build, TOP);
   goldBox(s, MX, y, CW, 0.9, question, { fill: BG, bold: true, fontSize: autoFontSize(question, CW, 0.9, { min: 12, max: 22 }), valign: 'middle' });
   y += 0.9 + 0.08;
 

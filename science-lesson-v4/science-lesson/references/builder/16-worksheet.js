@@ -195,6 +195,8 @@ function applyTierSection(L, tier, mode, opts) {
         else if (isReaching) scaffoldMode = 'blank';
         else scaffoldMode = null; // Mastering known_procedure: no scaffold table at all
       }
+      // item 2.5 (2026-10-30): the standard sheet never gives the working away; filled boxes are support only
+      if (mode !== 'developing' && (scaffoldMode === 'full' || scaffoldMode === 'backward-fade')) scaffoldMode = 'blank';
       if (scaffoldMode) { out.push(...guessScaffold(scaffoldMode, { given: q.given, unknown: q.unknown, equation: q.equation, substitute: q.substitute })); guessAdded = true; _guessUsedOnSheet = true; }
     }
     if (q.structure) out.push(...structureGuide(q.structure));
@@ -238,9 +240,8 @@ function applyTierSection(L, tier, mode, opts) {
       scaffoldRendered = true;
     }
 
-    // sentence starters: extended_writing questions get tier-appropriate density at every tier, never zero
-    const isExtendedWriting = q.contentType === 'extended_writing' || (q.marks || 0) >= 4;
-    const starterOk = !scaffoldRendered && q.starters && (isExtendedWriting || mode === 'developing' || q.forceStarters);
+    // sentence starters: support sheet only (item 2.5, 2026-10-30), unless the lesson asks for them (forceStarters)
+    const starterOk = !scaffoldRendered && q.starters && (mode === 'developing' || q.forceStarters);
     if (starterOk) out.push(...sentenceStarters(q.starters));
     if (!scaffoldRendered && !guessAdded && o.boxes && q.marks) out.push(...answerBox(q.marks));
   });
