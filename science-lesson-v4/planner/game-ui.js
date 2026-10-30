@@ -433,6 +433,14 @@
     }
     // pay locally like the server: coins, XP, level (the reply then has the exact numbers)
     function earnLocal(d, n, xp) { const p = d.player; p.coins += n; d.weekCoins = (d.weekCoins || 0) + n; p.xp += xp; let up = false; while (p.xp >= p.need) { p.xp -= p.need; p.level++; p.need = need(p.level); p.hp = p.maxHp; p.coins += p.level * (p.gift || 10); up = true; } return up; }
+    // Rise again (1U.11): a ritual not yet lit this round lights the next star, the same sums as the server (gRiseStar_)
+    function riseStar(d, id) {
+      const p = d.player, R = p.rise; if (!R || (R.ids || []).indexOf(id) >= 0 || R.lit >= 3) return null;
+      const q = R.back || 0, n = R.lit + 1, coins = n < 3 ? Math.floor(q / 3) : q - 2 * Math.floor(q / 3), hp0 = p.hp, runes = p.coins, hp = R.stage === 1 ? Math.max(0, Math.min(R.hp || 0, p.maxHp - p.hp)) : 0;
+      p.coins += coins; p.hp += hp; R.lit = n; R.ids = (R.ids || []).concat(id); R.got = (R.got || 0) + coins; if (n === 3) p.rise = null;
+      const line = n < 3 ? (3 - n) + ' more ritual' + (n === 2 ? '' : 's') + ' to light the stars.' : R.stage === 1 ? 'The stars gave back a quarter of my runes. Standing again.' : 'Another quarter home. The stars are quiet again.';
+      return { k: n - 1, stage: R.stage, coins, hp, max: p.maxHp, hp0, runes, lv: p.level, title: TITLES[p.level] || '', line };
+    }
     // Going deeper (1U.11, DP3-b2): a level up into a new depth (11, 21, 31, 41) opens the kraken doors, once per level
     function goDeeper() {
       const lv = D && D.player.level; if (!window.GATE || !(lv > 1) || (lv - 1) % 10 || V.gateLv === lv) return; V.gateLv = lv;
@@ -449,7 +457,9 @@
       const g = goal(id); if (!g) return; const cost = g.hpLoss; let faint = false;
       act({ verb: 'Cursed:', name: (g.polarity === 'both' ? sides(g.name)[0] : g.name) + (sig ? ' · ' + sig : ''), delta: '−' + cost, unit: 'hp' }, ['gameUntick', id], 'gameTick', [id, -1, sig], (d) => { const x = d.goals.find((y) => y.id === id); x.count = (x.count || 0) + 1; if (x.polarity === 'both') x.cCount = (x.cCount || 0) + 1; d.player.hp -= cost;
         // its antidote opens an Absolution straight away, so the glass card rises to the top before the reply (1U.13)
-        const an = x.polarity === 'both' ? x : d.goals.find((y) => y.id === x.anti); if (an && !an.absolve) an.absolve = { slip: 'local', curse: x.id, name: x.name, stage: 0, lost: cost, until: '' }; if (d.player.hp <= 0) { faint = true; d.player.hp = d.player.maxHp; d.player.level = Math.max(1, d.player.level - 1); } });
+        const an = x.polarity === 'both' ? x : d.goals.find((y) => y.id === x.anti); if (an && !an.absolve) an.absolve = { slip: 'local', curse: x.id, name: x.name, stage: 0, lost: cost, until: '' }; if (d.player.hp <= 0) { const rise = d.player.rise; if (rise && rise.stage === 1) { d.player.hp = 1; return; }   // no second faint before the stars are lit (1U.11)
+          faint = true; d.player.hp = d.player.maxHp - 3 * Math.round(d.player.maxHp / 4); d.player.level = Math.max(1, d.player.level - 1); d.player.rise = { stage: 1, lit: 0, ids: [], need: 3, back: 0, lost: 0, got: 0, hp: Math.round(d.player.maxHp / 4) }; } },
+        (res) => { const dd = res && res.last && res.last.died; if (dd && window.FAINT) { const p = res.player; FAINT.faint(box, { max: p.maxHp, hp: Math.min(p.maxHp, cost), runes: p.coins, lost: dd.lost || 0, wake: p.hp, lv: p.level, title: TITLES[p.level] || '' }); } });
       flinch(); floatText(r, '−' + cost + ' HP', '#ff7a66'); glow(k, 'rgba(196,50,58,.9)'); buzz([25, 40, 25]);
       if (faint) { V.last = { verb: 'Fainted:', name: 'lost a level and 7 days of runes' }; paintTop(); setMood('sad', pickSay('faint')); } else setMood('sad', CURSE_SAYS[Math.floor(Math.random() * CURSE_SAYS.length)]);
     }
@@ -581,7 +591,8 @@
     function today() {
       const T = todayItems(); let h = '';
       const rs = D.player.rise;   // the Rise quest after fainting (Patryk 2026-10-28)
-      if (rs && !rs.done) h += '<div class="uz-rise"><b>Rise</b>Do 3 rituals today to win back ' + rs.back + ' of the lost runes. ' + Math.min(rs.got, 3) + ' of 3.</div>';
+      if (rs && window.FAINT) h += FAINT.panel(rs);   // Rise again (1U.11, FA-R3): three stained-glass stars, one per ritual
+      else if (rs) h += '<div class="uz-rise"><b>Rise again</b>' + (3 - rs.lit) + ' more rituals bring back ' + rs.back + ' of the lost runes.</div>';
       // High Vespers (Sunday to Tuesday) replaces the old Sunday card (Patryk 2026-10-28): a tablet that opens the whole screen
       if (window.HIGHV && D.high) {
         if (V.hv) return '<button data-a="hvclose" class="uz-hvback">‹ Back to The Call</button>' + HIGHV.html(D.high, D.review, { attrs: { answer: 'hvans', seal: 'hvseal', pane: 'hvpane', field: 'hv' }, reward: D.high.saved ? 0 : 20 });
@@ -956,6 +967,7 @@
       drawSky();
       if (window.UZDEN) UZDEN.after(X, body);
       if (window.BREW) BREW.run(body);   // any loading scene on the page starts stirring (1U.12)
+      if (window.FAINT) FAINT.paint(body);   // the Rise again stars
       const sb = body.querySelector('.uz-stampbox'); if (sb && V.stampNew) { V.stampNew = false; anim(sb, [{ transform: 'scale(2.4) rotate(-28deg)', opacity: 0 }, { transform: 'scale(.92) rotate(-10deg)', opacity: 1, offset: 0.7 }, { transform: 'scale(1) rotate(-10deg)', opacity: 1 }], { duration: 420, easing: 'cubic-bezier(.2,.8,.3,1.2)' }); }
       if (window.TEMPLE) TEMPLE.paint(body);
       if (window.STONE) STONE.paint(body);
@@ -1077,10 +1089,11 @@
           if (on && window.SCROLL) { V.sayKind = 'quest'; earnFx(r, k, g.pay, upL); return; }
           if (on) { V.sayKind = 'quest'; V.waxNew = id; V.settling[id] = 1; paint(); setTimeout(() => { delete V.settling[id]; paint(); }, 1100); earnFx(r, k, g.pay, upL); } else buzz(6); return;
         }
-        const on = !g.doneToday; let upL = false;
+        const on = !g.doneToday; let upL = false, star = null;
         if (on) { V.settling[id] = 1; setTimeout(() => { delete V.settling[id]; paint(); }, 1100); if ([7, 21, 66].indexOf(g.streak + 1) >= 0) V.sayKind = 'streak'; }
         act({ verb: on ? 'Ticked:' : 'Unticked:', name: g.name, delta: (on ? '+' : '−') + g.pay, unit: 'coin' }, on ? ['gameUntick', id] : ['gameTick', id, 1], on ? 'gameTick' : 'gameUntick', on ? [id, 1] : [id],
-          (d) => { const x = d.goals.find((y) => y.id === id); x.doneToday = on; x.streak = Math.max(0, x.streak + (on ? 1 : -1)); if (on) upL = earnLocal(d, g.pay, g.pay); else { d.player.coins -= g.pay; d.weekCoins -= g.pay; } });
+          (d) => { const x = d.goals.find((y) => y.id === id); x.doneToday = on; x.streak = Math.max(0, x.streak + (on ? 1 : -1)); if (on) { upL = earnLocal(d, g.pay, g.pay); star = riseStar(d, id); } else { d.player.coins -= g.pay; d.weekCoins -= g.pay; } });
+        if (star && window.FAINT) setTimeout(() => FAINT.star(box, star), 600);   // Rise again: this ritual lights a star (1U.11)
         if (on) { earnFx(r, k, g.pay, upL); if (window.STONE) STONE.flare(k); if (g.aim && g.aim.type === 'avg' && USUAL(id)) { const u = USUAL(id); send('gameAim', [id, u, null]); g.aimToday = Object.assign({}, g.aimToday, { minutes: u }); } } else buzz(6); return;
       }
       if (a === 'curse') {

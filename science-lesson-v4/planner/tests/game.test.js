@@ -30,7 +30,7 @@ ok('one missed day drops a step (70 nights, missed once: x1.25)', G.gPay_({ minu
 ok('XP to the next level: 200 at level 1', G.gNeed_(1) === 200);
 const pl = { coins: 500, level: 4, xp: 10, hp: 3, maxHp: 50, deaths: 0 };
 const lost = G.gDie_(pl, '2026-11-04', [{ day: '2026-11-02', coins: 120 }, { day: '2026-10-20', coins: 400 }]);
-ok('at 0 HP: level -1, full health, only the last 7 days of earnings lost', pl.level === 3 && pl.hp === 50 && pl.coins === 380 && lost.lost === 120 && pl.xp === 0);
+ok('at 0 HP: level -1, he wakes on a quarter of his health (1U.11), only the last 7 days of earnings lost', pl.level === 3 && pl.hp === 50 - 3 * Math.round(50 / 4) && pl.coins === 380 && lost.lost === 120 && pl.xp === 0);
 const p1 = { coins: 20, level: 1, xp: 0, hp: 1, maxHp: 50, deaths: 0 };
 G.gDie_(p1, '2026-11-04', [{ day: '2026-11-03', coins: 900 }]);
 ok('death never takes coins below 0 or the level below 1', p1.coins === 0 && p1.level === 1);
@@ -431,11 +431,27 @@ ok('spending and refunds never count as doubloons earned', ch.weeks[6].coins ===
 { at('2027-01-11T09:00:00Z'); let s = G.gameLoad(k); const nf = s.goals.find((g) => /Netflix/.test(g.name)).id;
   const rs = s.goals.filter((g) => g.kind === 'daily' && g.track === 'life').slice(0, 3).map((g) => g.id);
   let guard = 0; while (!s.last || !s.last.died) { s = G.gameTick(k, nf, -1); if (++guard > 10) break; }
-  ok('fainting opens the Rise quest', s.player.rise && !s.player.rise.done && s.player.rise.need === 3);
-  const back = s.player.rise ? s.player.rise.back : 0; s = G.gameTick(k, rs[0], 1); s = G.gameTick(k, rs[1], 1); const before = s.player.coins; s = G.gameTick(k, rs[2], 1);
-  ok('the third ritual wins back half the lost runes', s.player.rise.done && s.player.coins - before >= back && back > 0);
+  const R = s.player.rise, lost = R ? R.lost : 0, q = Math.floor(lost / 4);
+  ok('1U.11 fainting opens Rise again: three stars, a quarter of the lost runes to win back, and he wakes on a quarter of his health', R && R.stage === 1 && R.lit === 0 && R.need === 3 && R.back === q && lost > 0 && s.player.hp === s.player.maxHp - 3 * Math.round(s.player.maxHp / 4));
+  { let t = s; for (let i = 0; i < 4; i++) t = G.gameTick(k, nf, -1);
+    ok('1U.11 no second faint before the first three stars are lit (health stops at 1)', t.player.hp === 1 && !(t.last && t.last.died) && t.player.rise && t.player.rise.stage === 1);
+    for (let i = 0; i < 4; i++) t = G.gameUntick(k, nf); s = t; }
+  const hp0 = s.player.hp, c0 = s.player.coins; s = G.gameTick(k, rs[0], 1); const c1 = s.player.coins;
+  ok('1U.11 the first ritual lights a star: a quarter of his health and a third of the quarter come back', s.player.rise.lit === 1 && s.player.hp >= hp0 + Math.round(s.player.maxHp / 4) && s.last.rise.hp === Math.round(s.player.maxHp / 4) && s.last.rise && s.last.rise.coins === Math.floor(q / 3));
+  s = G.gameTick(k, rs[0], 1);
+  ok('1U.11 the same ritual twice lights no second star', s.player.rise.lit === 1);
+  s = G.gameUntick(k, rs[0]); s = G.gameUntick(k, rs[0]);
+  ok('1U.11 Undo puts the star out and takes its health and runes back', s.player.rise.lit === 0 && s.player.hp === hp0 && s.player.coins === c0);
+  s = G.gameTick(k, rs[0], 1); s = G.gameTick(k, rs[1], 1); const before = s.player.coins; s = G.gameTick(k, rs[2], 1);
+  ok('1U.11 three rituals: full health, the whole quarter home, and the second round waits for tomorrow', s.player.hp === s.player.maxHp && s.player.coins - c0 >= q && !s.player.rise);
   s = G.gameUntick(k, rs[2]);
-  ok('undoing it takes the payout back and reopens the quest', !s.player.rise.done && s.player.coins === before);
+  ok('undoing the third ritual takes its runes back and opens the round again', s.player.rise && s.player.rise.stage === 1 && s.player.rise.lit === 2 && s.player.coins === before);
+  s = G.gameTick(k, rs[2], 1);
+  at('2027-01-12T09:00:00Z'); s = G.gameLoad(k);
+  ok('1U.11 the next day: round two, three stars for the next quarter (no health this time)', s.player.rise && s.player.rise.stage === 2 && s.player.rise.lit === 0 && s.player.rise.hp === 0);
+  const d0 = s.player.coins; rs.forEach((id) => { s = G.gameTick(k, id, 1); });
+  ok('1U.11 three rituals that day bring the second quarter home, and Rise again ends', !s.player.rise && s.last.rise && s.last.rise.stage === 1 && s.player.coins - d0 >= q);
+  at('2027-01-11T09:00:00Z'); s = G.gameLoad(k);
   const sh = G.gameShop(k), el = sh.items.find((i) => i.tier === 'Eldritch'), ba = sh.items.find((i) => i.tier === 'Basic' && !i.locked);
   ok('Eldritch needs level 20', el.locked && /level 20/.test(el.why));
   ok('Basic is open from level 1', !!ba); }

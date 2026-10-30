@@ -3,7 +3,7 @@ Run: python tests/ulhu_sim.py  (add --shots DIR to save screenshots). Synthetic 
 import os, sys, subprocess, time
 from playwright.sync_api import sync_playwright
 P = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '/'; SP = sys.argv[1] if len(sys.argv) > 1 and not sys.argv[1].startswith('--') else __import__('tempfile').mkdtemp()
-js = ''.join(open(P + f, encoding='utf-8').read() + '\n' for f in ['game-ulhu.js', 'game-pixel.js', 'game-runes.js', 'game-temple.js', 'game-stone.js', 'game-omens.js', 'game-tabs.js', 'game-blood.js', 'game-scroll.js', 'game-glass.js', 'game-highvespers.js', 'game-lair.js', 'game-brew.js', 'game-gate.js', 'game-levelup.js', 'game-den.js', 'game-ui.js', 'game-oracle.js', 'game-pairs.js'])
+js = ''.join(open(P + f, encoding='utf-8').read() + '\n' for f in ['game-ulhu.js', 'game-pixel.js', 'game-runes.js', 'game-temple.js', 'game-stone.js', 'game-omens.js', 'game-tabs.js', 'game-blood.js', 'game-scroll.js', 'game-glass.js', 'game-highvespers.js', 'game-lair.js', 'game-brew.js', 'game-gate.js', 'game-levelup.js', 'game-faint.js', 'game-den.js', 'game-ui.js', 'game-oracle.js', 'game-pairs.js'])
 page = '''<!doctype html><meta charset="utf-8"><meta name=viewport content="width=device-width,initial-scale=1"><body style="margin:0;background:#0d1b3a">
 <div style="height:60px;background:#0a1020;color:#fff">8AG header</div><div id=u></div><nav style="position:fixed;bottom:0;left:0;right:0;height:62px;background:#0a1020"></nav>
 <script>window.CALLS=[];function call(fn,...args){CALLS.push(fn);window.ARGS=window.ARGS||[];ARGS.push(args);return fetch('/c',{method:'POST',body:JSON.stringify({fn,args})}).then(r=>r.json()).then(x=>{if(x.err)throw new Error(x.err);return x.ok;});}</script>
@@ -272,6 +272,23 @@ try:
             const b = w.getBoundingClientRect(), h = box.getBoundingClientRect(); w.click();
             Promise.race([p.then(() => 'over'), new Promise((q) => setTimeout(() => q('stuck'), 4000))]).then((end) => r({ lit, cover: b.width >= h.width - 1, end, gone: !box.querySelector('.lu-wrap'), ups: LU_CALLS.slice() })); }, 4200)); })()""")
         check('1U.11 level up: The Sky Answers covers the screen and lights up, and a tap ends it: ' + str(lu), lu.get('lit', 0) > 200 and lu.get('cover') and lu.get('end') == 'over' and lu.get('gone'))
+        # 1U.11 the faint (FA-R3): the vial shatters, the lost runes float away, he wakes on a quarter of his health
+        fz = pg.evaluate("""(() => { const box = document.querySelector('.uz'); const p = FAINT.faint(box, { max: 60, hp: 20, runes: 200, lost: 80, wake: 15, lv: 7, title: 'Tide Caller' });
+          return new Promise((r) => setTimeout(() => { const w = box.querySelector('.fz'), lab = w && w.querySelector('.lab'), b = w && w.getBoundingClientRect(), h = box.getBoundingClientRect();
+            const o = { cover: !!w && b.width >= h.width - 1, lab: lab ? lab.textContent : '', ulhu: !!(w && w.querySelector('.ulhu img')) };
+            setTimeout(() => { o.hp = w.querySelector('.hpl').textContent; w.click(); Promise.race([p.then(() => 'over'), new Promise((q) => setTimeout(() => q('stuck'), 4000))]).then((end) => { o.end = end; o.gone = !box.querySelector('.fz'); r(o); }); }, 5200); }, 3200)); })()""")
+        check('1U.11 faint: it covers the screen, "80 runes drift out of reach", he wakes on 15 of 60, a tap ends it: ' + str(fz), fz.get('cover') and '80 runes drift out of reach' in fz.get('lab', '') and fz.get('ulhu') and fz.get('hp') == '15/60' and fz.get('end') == 'over' and fz.get('gone'))
+        # Rise again: the card at the top of The Call, three stained-glass stars, no tick boxes under them
+        rc = pg.evaluate("""(() => { const d = document.createElement('div'); d.className = 'uz-pane'; d.innerHTML = FAINT.panel({ stage: 1, lit: 1, ids: ['a'], back: 30 }); document.body.appendChild(d); FAINT.paint(d);
+          const cv = [...d.querySelectorAll('canvas[data-fs]')], lum = (c) => { const x = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; let n = 0, s = 0; for (let i = 0; i < x.length; i += 4) if (x[i + 3]) { n++; s += x[i] + x[i + 1] + x[i + 2]; } return [n, Math.round(s / Math.max(1, n))]; };
+          const o = { n: cv.length, lums: cv.map(lum), ticks: d.querySelectorAll('.rit, .sk, input[type=checkbox]').length, text: d.textContent }; d.remove(); return o; })()""")
+        check('1U.11 Rise again card: three glass stars, the lit one brighter, no tick boxes under them: ' + str(rc), rc['n'] == 3 and all(n > 500 for n, _ in rc['lums']) and rc['lums'][0][1] > rc['lums'][1][1] + 60 and rc['ticks'] == 0 and 'RISE AGAIN' in rc['text'])
+        # a ritual lights a star: it rains six bubbles into him and his health and runes climb by the real amounts
+        sr = pg.evaluate("""(() => { const box = document.querySelector('.uz'); const p = FAINT.star(box, { k: 0, stage: 1, coins: 12, hp: 15, max: 60, hp0: 15, runes: 100, lv: 7, title: 'Tide Caller', line: '2 more rituals to light the stars.' });
+          let seen = 0; const look = setInterval(() => { seen = Math.max(seen, box.querySelectorAll('.fz .bb').length); }, 100);
+          return new Promise((r) => setTimeout(() => { clearInterval(look); const w = box.querySelector('.fz'); const o = { bubbles: seen, hp: w.querySelector('.hpl').textContent, runes: w.querySelector('.rc span').textContent, back: w.querySelector('.back').textContent };
+            w.click(); Promise.race([p.then(() => 'over'), new Promise((q) => setTimeout(() => q('stuck'), 4000))]).then((end) => { o.end = end; r(o); }); }, 7500)); })()""")
+        check('1U.11 a star lights: six rune bubbles rain into Ulhu, health 15 to 30, runes 100 to 112: ' + str(sr), sr.get('bubbles') >= 6 and sr.get('hp') == '30/60' and sr.get('runes') == '112 runes' and sr.get('end') == 'over')
         # 1U.11 Going deeper (DP3-b2): the kraken doors, the depth name, three strikes on the plaque, the crack clear of the number
         gt = pg.evaluate("""(() => { const box = document.querySelector('.uz'), lv = box.querySelector('.uz-lv'); window.scrollTo(0, 0);
           const p = GATE.play(box, { depth: 1, name: 'The Twilight', plaque: lv }), seen = {}, hx = box.querySelector('.uz-hex').getBoundingClientRect();

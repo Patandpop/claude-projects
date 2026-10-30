@@ -5,11 +5,26 @@ Plain-English record of Lane A's work (the Ulhu game), newest entry first.
 ## Waiting on you
 
 0. **Paste the complete set (30 Oct, 17 files).** On the PC, in the Desktop folder "Planner paste files", every file ending "(2026-10-30, complete set, Lair banner, haggle, loading screen, Day tab).txt". (Drive wasn't connected, so they went to the Desktop, not Admin\Planner Sync.) In Apps Script, paste each one over the file of the same name: Code, Planner, Logic, Memory, Behaviour, Phone, BoardPage, Game, Companion, GameShop, GameUI, GameArt, GameHV, GameDen, GameComp, Day, DayUI. **Two are new:** make a Script file called **Day** and an HTML file called **DayUI** (also make Companion as a Script and GameComp as HTML if you don't have them yet). Then Deploy, Manage deployments, edit, New version. It holds every lane's saved work: the Lair banner, the one-item haggle, the cauldron loading screen, the omens fixes, the Day tab, the backdating and Ulhu's companion. It replaces every older set.
+4. **Check the faint rules I chose (1U.11).** Your notes left some details open, so I built: he wakes on a quarter of his health; each of the next three rituals gives back a quarter of his health and a third of a quarter of the lost runes; three more the next day bring the second quarter; the first three can be the day he faints or the next day; no second faint before the stars are lit. Say "fine", or what to change (the full list is in the 1U.11 entry below).
 3. **Pick the Grimoire's opened page (1U.10).** Mock-up: `replica/design/mockups/grimoire/opened.html`. **O1** one rose window across both pages, **O2** a round window on the left page and a tall lancet window of the day on the right, **O3** three glass medallions down the gutter with the day's rituals inked either side. The book itself (BG1 desk, T1 tome, T4 chains) is already approved; I build it after your pick.
 2. **Pick the dice-game water (1U.6).** Mock-up: `replica/design/mockups/dicewater/index.html` (open it on the PC; it plays by itself, Win and Lose buttons show each ending). Round two, after your note: you and the keeper in a slim strip at the top with his call between you, the table filling the rest; this layout goes into the build whichever water you pick. **W1** tide sweep, **W2** tentacle in the pool, **W3** breaking wave with a pale hand. Also pick the losing word: ENGULFT (default), FORFEIT, BEREFT, DROWNED or FORSAKEN.
 1. **Pick a 2-week bar for under the rituals (1U.13).** Mock-up file: `replica/design/mockups/ritualbar/index.html` (sent to you in the chat). **B1** two weeks of pebbles with day letters, **B2** a tide line that rises and sinks, **B3** a carved ledge on the bottom of the stone tablet. Reply with a letter, or what to mix.
 
 ---
+
+## 30 Oct 2026, item 1U.11 (last part): the faint and Rise again
+
+**What changed:** fainting now plays your pick FA-R3. The health flask shatters, ink fills the water, Ulhu lies down (still breathing) and the lost runes float away in bubbles ("80 runes drift out of reach"). He then wakes on a quarter of his health. The old Rise tablet is gone. At the top of The Call sits a RISE AGAIN card with three many-coloured stained-glass stars and no tick boxes under them (the stars are the marks). Each ritual you tick lights the next star piece by piece, and six bubbles carrying rune tablets rain from it down into Ulhu. His health and runes climb by the real amounts, and he gets up a little more each time.
+
+**The rules I built** (from your notes of 29 and 30 Oct; change any of them):
+- He wakes on a quarter of his health. Each of the first three rituals gives back another quarter, so he is full after three.
+- Those three rituals also bring back a quarter of the lost runes, a third of it with each star.
+- The day after, three more rituals bring the next quarter (the card shows "RISE AGAIN · II"; no health this time, he is already full).
+- The first three can be done the day he faints (only rituals after the faint count) or the next day, in case he faints late in the evening.
+- No second faint before the first three stars are lit: health stops at 1.
+- Each ritual lights one star per round; the same ritual twice doesn't count twice. Undo puts the star out and takes its health and runes back.
+
+**You need to:** nothing now; it goes into the next complete paste set. If any rule above is wrong, say which (it's on the Waiting list).
 
 ## 30 Oct 2026, item 1U.11 (first part): the level up and Going deeper
 

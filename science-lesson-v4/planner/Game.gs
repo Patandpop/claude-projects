@@ -79,7 +79,7 @@ function gAppend_(t, o) { delete G_C.v[t]; gTab_(t).appendRow(G_HEAD[t].map((h) 
 function gDel_(t, row) { delete G_C.v[t]; gTab_(t).deleteRow(row); }
 function gSet_(t, row, field, v) { delete G_C.v[t]; gTab_(t).getRange(row, G_HEAD[t].indexOf(field) + 1).setValue(gText_(v)); }
 function gPlayer_() {
-  const p = { coins: 0, xp: 0, level: 1, hp: GAME.maxHp, maxHp: GAME.maxHp, lastDay: '', deaths: 0, seeded: '', diedDay: '', levelUpDay: '', frozenOk: '', groups: '', wear: '', markPlan: '', vTime: '20:00', vStreak: 0, vBest: 0, vLast: '', vPrev: '', myChips: '', aimsSeeded: '', riseDay: '', riseLost: 0, riseDone: '' };
+  const p = { coins: 0, xp: 0, level: 1, hp: GAME.maxHp, maxHp: GAME.maxHp, lastDay: '', deaths: 0, seeded: '', diedDay: '', levelUpDay: '', frozenOk: '', groups: '', wear: '', markPlan: '', vTime: '20:00', vStreak: 0, vBest: 0, vLast: '', vPrev: '', myChips: '', aimsSeeded: '', riseDay: '', riseLost: 0, riseDone: '', riseStage: 0, riseLit: '', riseFrom: '', riseUntil: '', riseGot: 0 };
   gRows_('player').forEach((r) => { const v = r.Value; p[r.Setting] = (typeof p[r.Setting] === 'number') ? Number(v) : String(v === undefined ? '' : v); });
   return p;
 }
@@ -187,9 +187,33 @@ function gDie_(p, today, ticks) {
   const since = gAdd_(today, -7);
   const earned = ticks.filter((t) => String(t.day) > since && t.coins > 0 && !/^(buy|hoard)\|/.test(String(t.goalId))).reduce((a, t) => a + Number(t.coins), 0);
   const lost = Math.min(p.coins, earned);
-  p.level = Math.max(1, p.level - 1); p.xp = 0; p.coins -= lost; p.hp = p.maxHp; p.deaths++; p.diedDay = today;
-  p.riseDay = today; p.riseLost = lost; p.riseDone = '';           // the Rise quest: 3 rituals today win back half (2026-10-28)
-  return { lost, level: p.level, rise: Math.floor(lost / 2) };
+  p.level = Math.max(1, p.level - 1); p.xp = 0; p.coins -= lost; p.deaths++; p.diedDay = today;
+  // Rise again (1U.11, Patryk 29-30 Oct): he wakes on a quarter of his health; each of the next three rituals lights a star
+  // and gives back a quarter of his health and a third of a quarter of the lost runes. Three more rituals the day after
+  // bring the next quarter of the runes. The first three can be done the day he faints or the next day.
+  p.hp = p.maxHp - 3 * gRiseHp_(p);
+  p.riseDay = today; p.riseLost = lost; p.riseDone = ''; p.riseStage = 0; p.riseLit = ''; p.riseFrom = today; p.riseUntil = gAdd_(today, 1); p.riseGot = 0;
+  return { lost, level: p.level, rise: Math.floor(lost / 4) };
+}
+const gRiseHp_ = (p) => Math.round(Number(p.maxHp) / 4);
+// the Rise round open today, if any: { stage 0 or 1, lit ids }
+function gRiseView_(p, today) {
+  const r = gRiseOpen_(p, today); if (!r) return null; const q = Math.floor(Number(p.riseLost) / 4);
+  return { stage: r.stage + 1, lit: r.lit.length, ids: r.lit, need: 3, back: q, lost: Number(p.riseLost), got: Number(p.riseGot) || 0, hp: r.stage === 0 ? gRiseHp_(p) : 0, until: String(p.riseUntil), done: false };
+}
+function gRiseOpen_(p, today) {
+  if (!(Number(p.riseLost) > 0) || Number(p.riseStage) >= 2 || !p.riseFrom || today < String(p.riseFrom) || today > String(p.riseUntil)) return null;
+  return { stage: Number(p.riseStage) || 0, lit: String(p.riseLit || '').split(',').filter(Boolean) };
+}
+// a ritual ticked while a Rise round is open lights the next star (each ritual once per round)
+function gRiseStar_(p, g, today, out, note) {
+  const r = gRiseOpen_(p, today); if (!r || r.lit.indexOf(g.id) >= 0 || r.lit.length >= 3) return;
+  const was = { stage: r.stage, lit: p.riseLit, from: p.riseFrom, until: p.riseUntil, got: Number(p.riseGot) || 0, done: p.riseDone };
+  const q = Math.floor(Number(p.riseLost) / 4), n = r.lit.length + 1, coins = n < 3 ? Math.floor(q / 3) : q - 2 * Math.floor(q / 3);
+  const hp = r.stage === 0 ? Math.max(0, Math.min(gRiseHp_(p), p.maxHp - p.hp)) : 0;
+  p.coins += coins; out.coins += coins; p.hp += hp; out.hp += hp; p.riseGot = was.got + coins; p.riseLit = r.lit.concat(g.id).join(',');
+  if (n === 3) { p.riseStage = r.stage + 1; p.riseLit = ''; if (r.stage === 0) { p.riseFrom = gAdd_(today, 1); p.riseUntil = gAdd_(today, 1); } else p.riseDone = today; }
+  out.rise = { star: n, stage: r.stage, coins, hp }; note.rise = Object.assign({ coins, hp }, { was });
 }
 
 /* ---- goals ---- */
@@ -252,8 +276,9 @@ function gTick_(g, delta, auto, ref, note, when) {
   if (delta < 0) {                                                            // a bad habit: health only
     out.bad = true; out.hp = (typeof cIllDay_ === 'function' && cIllDay_(today)) ? 0 : -gHpLoss_(g); p.hp += out.hp;   // an Ill day: curses are logged but cost no health (Companion.gs)
     note.side = 'c'; if (gAntiOf_(g)) note.anti = gAntiOf_(g);
+    const r0 = gRiseOpen_(p, today); if (r0 && r0.stage === 0 && p.hp <= 0) { out.hp += 1 - p.hp; p.hp = 1; }   // no second faint before the first three stars are lit
     if (p.hp <= 0) {   // fainting: keep what it took in the note, so Undo of this curse gives it all back (1.11, 2026-10-29)
-      const was = { hp: p.hp - out.hp, level: p.level, xp: p.xp, deaths: p.deaths, diedDay: p.diedDay, riseDay: p.riseDay, riseLost: p.riseLost, riseDone: p.riseDone };
+      const was = { hp: p.hp - out.hp, level: p.level, xp: p.xp, deaths: p.deaths, diedDay: p.diedDay, riseDay: p.riseDay, riseLost: p.riseLost, riseDone: p.riseDone, riseStage: p.riseStage, riseLit: p.riseLit, riseFrom: p.riseFrom, riseUntil: p.riseUntil, riseGot: p.riseGot };
       out.died = gDie_(p, today, ticks); note.faint = Object.assign(was, { lost: out.died.lost });
     }
     if (g.row) gSet_('goals', g.row, 'value', Math.max(-5, g.value - 1));
@@ -274,11 +299,7 @@ function gTick_(g, delta, auto, ref, note, when) {
       }
       if (!g.lastDone || today >= g.lastDone) gSet_('goals', g.row, 'lastDone', today);   // a late tick for yesterday never moves lastDone back
     }
-    // the Rise quest: the third different ritual ticked on the day he fainted wins back half the lost runes
-    if (g.kind === 'daily' && p.riseDay === today && !p.riseDone && p.riseLost > 0) {
-      const done = {}; goals.filter((x) => x.kind === 'daily' && gNet_(ticks, x.id, today) > 0).forEach((x) => { done[x.id] = 1; }); done[g.id] = 1;
-      if (Object.keys(done).length >= 3) { const back = Math.floor(Number(p.riseLost) / 2); p.coins += back; out.coins += back; out.rise = back; note.rise = back; p.riseDone = today; }
-    }
+    if (g.kind === 'daily') gRiseStar_(p, g, today, out, note);   // Rise again: a ritual lights a star (1U.11)
   }
   gAppend_('ticks', { id: Utilities.getUuid().slice(0, 8), at: now.toISOString(), day: today, goalId: g.id, delta: 1, coins: out.coins, xp: out.xp, hp: out.hp, auto: auto ? 'yes' : '', ref: ref || '', note: JSON.stringify(Object.assign({ prev, name: g.name }, note)) });
   gSavePlayer_(p);
@@ -538,7 +559,7 @@ function gSnapshot_(world, extra) {
   const bosses = gBosses_(today), review = gReviewCard_(today, ticks, goals, bosses), vespers = gVespers_(today, ticks, goals, p, world, frozen), high = gHighShape_(gHighVespers_(today, ticks, goals, world, frozen));
   const hoard = gRows_('hoard').filter((h) => String(h.archived) !== 'true').map((h) => ({ id: h.id, name: h.name, cost: Number(h.cost) || 0, claims: Number(h.claims) || 0 }));
   return gOut_(Object.assign({ bosses: bosses.filter((b) => b.status === 'active'), beaten: gBeaten_(), review, vespers, high, whoList: G_WHO, moon: gPhase_(today, world, frozen), vMult: gVMult_(), room, owned: owned.map((r) => r.itemId), player: { coins: p.coins, xp: p.xp, level, need: gNeed_(level), hp: p.hp, maxHp: p.maxHp, deaths: p.deaths, coinName: GAME.coin, gift: GAME.levelGift,
-      rise: p.riseDay === today && Number(p.riseLost) > 0 ? { done: p.riseDone === today, back: Math.floor(Number(p.riseLost) / 2), got: goals.filter((x) => x.kind === 'daily' && gNet_(ticks, x.id, today) > 0).length, need: 3 } : null }, mood, today, frozen: fz,
+      rise: gRiseView_(p, today) }, mood, today, frozen: fz,
     goals: view, summoned, tide, hw, weekCoins, groups: gGroups_(p), hoard, wear: gWearState_(p, wearRows), freezes: gFreezesAhead_(world, today, frozen), blessCount: gBlessCount_(goals, todayTicks), hour: Number(Utilities.formatDate(gNow_(), TZ, 'H')),
     table: { base: GAME.base, mult: GAME.mult, hpLoss: GAME.hpLoss } }, comp, extra || {}));
 }
@@ -582,7 +603,7 @@ function gameTick(k, id, delta, sig, meta) {
     res = gTick_(g, delta < 0 ? -1 : 1, false, ref, delta < 0 && /^(Flesh|Domain|Scene|Coven)$/.test(String(sig || '')) ? { sig } : null, when) || { already: true };
   });
   if (bad) throw new Error(bad);
-  return gSnapshot_(gWorld_(), { last: res && !res.already ? { coins: res.coins || 0, hp: res.hp || 0, up: !!res.up, died: res.died || null, bad: !!res.bad, abs: res.abs || null } : null });
+  return gSnapshot_(gWorld_(), { last: res && !res.already ? { coins: res.coins || 0, hp: res.hp || 0, up: !!res.up, died: res.died || null, bad: !!res.bad, abs: res.abs || null, rise: res.rise || null } : null });
 }
 // untick: writes an exact reversing row (never deletes), restores streak, colour and sittings
 function gameUntick(k, id, meta) {
@@ -601,10 +622,12 @@ function gameUntick(k, id, meta) {
     if (tn.faint) {   // this curse made Ulhu faint: give back the level, the XP, the lost runes and the health he had (1.11)
       const f = tn.faint;
       p.level = Math.max(1, Number(f.level) || 1); p.xp = Number(f.xp) || 0; p.hp = Math.max(1, Math.min(p.maxHp, Number(f.hp) || 1));
-      p.coins += Number(f.lost) || 0; if (p.riseDone && p.riseDay === today) p.coins = Math.max(0, p.coins - Math.floor((Number(f.lost) || 0) / 2));   // a Rise payout already made is taken back
+      p.coins += (Number(f.lost) || 0) - (Number(p.riseGot) || 0); p.coins = Math.max(0, p.coins);   // Rise runes already given back are taken back
       p.deaths = Math.max(0, Number(f.deaths) || 0); p.diedDay = f.diedDay || ''; p.riseDay = f.riseDay || ''; p.riseLost = Number(f.riseLost) || 0; p.riseDone = f.riseDone || '';
+      p.riseStage = Number(f.riseStage) || 0; p.riseLit = f.riseLit || ''; p.riseFrom = f.riseFrom || ''; p.riseUntil = f.riseUntil || ''; p.riseGot = Number(f.riseGot) || 0;
     } else { p.coins = Math.max(0, p.coins - c); gTakeXp_(p, x); p.hp = Math.max(1, Math.min(p.maxHp, p.hp - h)); }
-    if (tn.rise) p.riseDone = '';                                                   // the Rise payout rode on this tick: its quest opens again
+    if (tn.rise && tn.rise.was) { const w = tn.rise.was; p.riseStage = w.stage; p.riseLit = w.lit || ''; p.riseFrom = w.from || ''; p.riseUntil = w.until || ''; p.riseGot = w.got; p.riseDone = w.done || ''; }   // its star goes dark again
+    else if (tn.rise) p.riseDone = '';
     if (g.kind === 'termly') gSet_('goals', g.row, 'sitDone', Math.max(0, g.sitDone - 1));
     else if (g.kind === 'todo') gSet_('goals', g.row, 'lastDone', '');
     else if (prev.s !== undefined) {   // rituals, curses and blessings alike: streak, colour, last done and the forgiven miss go back (1.11: habits too)
