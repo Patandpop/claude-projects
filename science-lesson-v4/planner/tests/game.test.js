@@ -6,7 +6,7 @@ const dir = process.env.PLANNER_SRC || path.join(__dirname, '..');   // PLANNER_
 m.props.PLANNER_KEY = 'k';
 const src = ['Code.gs', 'Behaviour.gs', 'game-art.js', 'Game.gs'].map((f) => fs.readFileSync(path.join(dir, f), 'utf8')).join('\n');
 global.SHOP = require('../game-shop.json');
-eval(src + '\nglobal.G_PRICE=gHagglePrice_;global.G={gVespersPay_,GAME,gameLoad,gameTick,gameUntick,gameSaveGoal,gameArchive,gameFreeze,gameShop,gameArt,gameBuy,gamePlace,gameBossStart,gameBossStage,gameBossRemove,gameBossSave,gameTag,gameChips,gameVespers,gameVespersUndo,gameVespersTime,gameMoon,gameReview,gameQuestStep,gameGroupSave,gameWear,gameUnbuy,gameHoardSave,gameHoardClaim,gameChronicle,gameAim,gameHaggle,gPay_,gDie_,gNeed_,gAdd_,gDow_,gDiff_,gIsFrozen_,gameMergeGoals,gameUnmerge};');
+eval(src + '\nglobal.G_PRICE=gHagglePrice_;global.G={gVespersPay_,GAME,gWall_,gameLoad,gameTick,gameUntick,gameSaveGoal,gameArchive,gameFreeze,gameShop,gameArt,gameBuy,gamePlace,gameBossStart,gameBossStage,gameBossRemove,gameBossSave,gameTag,gameChips,gameVespers,gameVespersUndo,gameVespersTime,gameMoon,gameReview,gameQuestStep,gameGroupSave,gameWear,gameUnbuy,gameHoardSave,gameHoardClaim,gameChronicle,gameAim,gameHaggle,gPay_,gDie_,gNeed_,gAdd_,gDow_,gDiff_,gIsFrozen_,gameMergeGoals,gameUnmerge};');
 
 const k = 'k'; let failed = 0;
 const ok = (n, c) => { console.log((c ? '  PASS ' : '  FAIL ') + n); if (!c) failed++; };
@@ -562,5 +562,17 @@ console.log('\n-- two-sided omens: pairing, joining, duplicates (2026-10-28 nigh
     ['Sleep 7.5Hrs +|Up past midnight', 'Eating Healthy|Junk or takeaway', 'Proud of Day|Wasted the day', 'Making Bed|Left the bed unmade', 'Showered|Skipped a shower', 'Brush Teeth|Skipped teeth at night', 'Floss|Skipped teeth at night'].every((x) => PAIRS.suggest({ name: x.split('|')[0], polarity: 'plus' })[0] === x.split('|')[1]));
   ok('nothing in the list: a gentle wording', PAIRS.suggest({ name: 'Gardening', polarity: 'plus' })[0] === 'Skipped gardening' && PAIRS.suggest({ name: 'Vaping', polarity: 'minus' })[0] === 'Resisted vaping');
   ok('Floss and Flossing are seen as duplicates, Wordle is not a duplicate of Floss', PAIRS.dupes(gs[6], gs).length === 1 && PAIRS.dupes(gs[8], gs).length === 0); }
+console.log('\n-- 30 Oct 2026: the wall (Breakwater, WD-1b-ii): this week and next, one wedge per period');
+{ const world = { data: { classes: { '9AS': { seq: [{ num: 1, built: true }, { num: 2, built: false }, { num: 3, built: true }] }, '12C': { homework: 'every-lesson', seq: [{ num: 7, built: true }, { num: 8, built: false }] } } },
+    weeks: { '2026-11-02': { slots: [{ kind: 'lesson', cls: '9AS', i: 0, day: 0, period: 1, col: '#7fd36b' }, { kind: 'lesson', cls: '12C', i: 0, day: 1, period: 3, col: '#b98bff' }, { kind: 'lesson', cls: '9AS', i: 1, day: 3, period: 2, col: '#7fd36b' }, { kind: 'free', day: 2, period: 4 }] },
+      '2026-11-09': { slots: [{ kind: 'lesson', cls: '12C', i: 1, day: 4, period: 5, col: '#b98bff' }, { kind: 'lesson', cls: '9AS', i: 2, day: 0, period: 6 }] } } };
+  const w = G.gWall_(world, '2026-11-03', [{ cls: '9AS', setOn: '2026-11-05', status: 'live' }]);
+  const at = (d, p) => w.lessons.find((l) => l.day === d && l.per === p);
+  ok('the wall covers ten school days, this week then next', w.days.length === 10 && w.days[0] === 'Mon 2 Nov' && w.days[5] === 'Mon 9 Nov');
+  ok('each lesson sits on its day and period with its class colour and built state', at(0, 1).cls === '9AS' && at(0, 1).built && at(0, 1).col === '#7fd36b' && !at(3, 2).built && at(9, 5).cls === '12C');
+  ok('homework: set on the day it was set, needed on the class\'s last lesson of the week, none before it', at(3, 2).hw === 'set' && at(0, 1).hw === 'none');
+  ok('an every-lesson class needs homework every lesson', at(1, 3).hw === 'needed' && at(9, 5).hw === 'needed');
+  ok('free periods and period 6 are not on the wall', w.lessons.length === 4); }
+
 console.log('\n' + (failed ? failed + ' FAILED' : 'all game server checks passed'));
 process.exit(failed ? 1 : 0);

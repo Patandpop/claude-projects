@@ -12,6 +12,14 @@ Plain-English record of Lane A's work (the Ulhu game), newest entry first.
 
 ---
 
+## 30 Oct 2026, the wall: built into the game (WD-1b-ii with your fixes)
+
+**What changed:** the Breakwater line at the top of the Teaching area is now your wall, drawn from the wall8 mock-up with your fixes. There are ten square stained-glass blocks, this week on top and next week below. Each block holds a moon of five wedges, one per period: I gold at the top, round to V ruby. The inner piece is the lesson, lit in the class colour once it's built. The outer ring is its homework: white once set, lilac when none is needed, dark when it's still to do. A free period has its own calm colour. The heading counts the lessons built and the homework set. Tap any piece of glass and the line under the wall says its day, period and class.
+
+**How it decides homework:** a lesson needs homework on the class's last lesson of the week (the same rule the planner's checklist uses), or every lesson for a class set to "every-lesson". (12C and 13D are "every-lesson" in the lesson builder's class settings, but the planner's own class data doesn't carry that setting yet, so until it does the wall treats them like the other classes.) Homework counts as set when the Homework tab has a row for that class set on that day.
+
+**You need to:** nothing now; it goes into the next complete paste set. If the homework rule is wrong for a class, say which.
+
 ## 30 Oct 2026, your go: the faint rules, and mock-ups for the 2-week bar and the Grimoire
 
 **What changed:**

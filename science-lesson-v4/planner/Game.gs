@@ -341,6 +341,30 @@ function gLessonsAhead_(world, today) {
   });
   return out.sort((a, b) => (a.date < b.date ? -1 : 1));
 }
+// The wall (Breakwater, Patryk's WD-1b-ii, 30 Oct): this week and next, one block per school day, one wedge per period.
+// Each lesson: built or not; its homework 'set' (a Homework row for that class set on that day), 'needed' (the class's
+// last lesson of the week, as the planner's checklist suggests, or every lesson for an every-lesson class), or 'none'.
+function gWall_(world, today, hwRows) {   // hwRows: the Homework tab rows (read here when left out)
+  const d = world.data; if (!d || !d.classes) return null;
+  let rows = hwRows || []; if (!hwRows) try { rows = typeof hwRows_ === 'function' ? hwRows_() : []; } catch (e) { rows = []; }
+  const setOn = {}; rows.filter((r) => r.setOn && r.status !== 'not made').forEach((r) => { setOn[r.cls + '|' + r.setOn] = 1; });
+  const mon = gMonday_(today), MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'], DN = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+  const days = [], lessons = [];
+  [0, 7].forEach((off, w) => {
+    const wk = gAdd_(mon, off);
+    for (let k = 0; k < 5; k++) { const dt = gAdd_(wk, k), p = dt.split('-').map(Number); days.push(DN[k] + ' ' + p[2] + ' ' + MON[p[1] - 1]); }
+    const slots = ((world.weeks || {})[wk] || {}).slots || [], teach = slots.filter((s) => ['lesson', 'revision', 'test'].indexOf(s.kind) >= 0);
+    slots.forEach((s) => {
+      const per = Number(s.period), day = Number(s.day);
+      if (s.kind !== 'lesson' || s.i === undefined || s.i === null || !(per >= 1 && per <= 5) || !(day >= 0 && day <= 4)) return;
+      const c = d.classes[s.cls] || {}, L = (c.seq || [])[s.i]; if (!L) return;
+      const date = gAdd_(wk, day), last = !teach.some((x) => x !== s && x.cls === s.cls && !x.double && (Number(x.day) > day || (Number(x.day) === day && Number(x.period) > per)));
+      const need = c.homework === 'every-lesson' || (last && !s.double);
+      lessons.push({ day: w * 5 + day, per, cls: s.cls, col: s.col || c.col || '', built: !!L.built, hw: setOn[s.cls + '|' + date] ? 'set' : need ? 'needed' : 'none' });
+    });
+  });
+  return { days, lessons, from: mon };
+}
 // "Order Sheet Week B - Nov 2" -> the Monday it is for (the year that puts it nearest to the download day)
 function gOrderMonday_(title, day) {
   const m = /([A-Z][a-z]{2})\s+(\d{1,2})\s*$/.exec(title); if (!m) return '';
@@ -552,7 +576,7 @@ function gSnapshot_(world, extra) {
   const ahead = gLessonsAhead_(world, today);
   const summoned = ahead.slice(0, 10).map((L) => ({ name: L.name, date: L.date, ahead: L.ahead, built: L.built, pay: gPay_({ minutes: 30, track: L.ahead ? 'ahead' : 'necessary' }, [], {}).coins }));   // pay = what building it pays (gTick_ in the auto-ticks above)
   // Tide Charts: 1 = the next lesson is built, 2 = everything this coming week, 3 = two weeks ahead
-  const tide = gTide_(ahead, today), hw = gHwAhead_(today);
+  const tide = gTide_(ahead, today), hw = gHwAhead_(today), wall = gWall_(world, today);
   const mon = gMonday_(today), weekCoins = ticks.filter((t) => String(t.day) >= mon && Number(t.coins) > 0 && !/^(buy|hoard)\|/.test(String(t.goalId))).reduce((a, t) => a + Number(t.coins), 0);
   const wearRows = gRows_('owned').filter((r) => String(r.itemId).indexOf('w:') === 0);
   const owned = gRows_('owned').filter((r) => String(r.itemId).indexOf('w:') !== 0), room = {}; owned.forEach((r) => { if (r.slot) room[r.slot] = r.itemId; });
@@ -560,7 +584,7 @@ function gSnapshot_(world, extra) {
   const hoard = gRows_('hoard').filter((h) => String(h.archived) !== 'true').map((h) => ({ id: h.id, name: h.name, cost: Number(h.cost) || 0, claims: Number(h.claims) || 0 }));
   return gOut_(Object.assign({ bosses: bosses.filter((b) => b.status === 'active'), beaten: gBeaten_(), review, vespers, high, whoList: G_WHO, moon: gPhase_(today, world, frozen), vMult: gVMult_(), room, owned: owned.map((r) => r.itemId), player: { coins: p.coins, xp: p.xp, level, need: gNeed_(level), hp: p.hp, maxHp: p.maxHp, deaths: p.deaths, coinName: GAME.coin, gift: GAME.levelGift,
       rise: gRiseView_(p, today) }, mood, today, frozen: fz,
-    goals: view, summoned, tide, hw, weekCoins, groups: gGroups_(p), hoard, wear: gWearState_(p, wearRows), freezes: gFreezesAhead_(world, today, frozen), blessCount: gBlessCount_(goals, todayTicks), hour: Number(Utilities.formatDate(gNow_(), TZ, 'H')),
+    goals: view, summoned, tide, hw, wall, weekCoins, groups: gGroups_(p), hoard, wear: gWearState_(p, wearRows), freezes: gFreezesAhead_(world, today, frozen), blessCount: gBlessCount_(goals, todayTicks), hour: Number(Utilities.formatDate(gNow_(), TZ, 'H')),
     table: { base: GAME.base, mult: GAME.mult, hpLoss: GAME.hpLoss } }, comp, extra || {}));
 }
 // what goes back to the page is plain JSON (a Date or NaN inside makes Apps Script send back null)

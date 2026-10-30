@@ -82,6 +82,8 @@
 .uz-strip{display:flex;gap:2px;padding:0 0 2px 62px;margin-top:-3px}.uz-strip i{flex:1;max-width:14px;height:4px;border-radius:1px}
 .uz-sub2{display:flex;align-items:center;justify-content:space-between;padding:6px 2px 0;font:500 17px var(--g);color:#9fb4aa}
 .uz-bw{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;padding:8px 10px;border-radius:6px;background:#0c1620;border:1px solid #1e3444;font:700 13px var(--a);color:#d0e4f4}.uz-bw b{font:500 18px var(--g);color:#bfe0ff;margin-right:2px}.uz-bw span{display:flex;align-items:center;gap:4px}
+.uz-wall{margin:0 0 10px;padding:8px 8px 6px;border-radius:8px;background:#0c1512;border:1px solid #24443a}.uz-wall svg{display:block;width:100%;height:auto}.uz-wall .pc{cursor:pointer}.uz-wall .pc.wl-on{stroke:#fff;stroke-width:.8;filter:brightness(1.35)}
+.uz-wallh{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin:0 2px 4px;font:13px var(--a);color:#a9bcb0}.uz-wallh b{font:500 18px var(--g);color:#cfe8dc}.uz-walli{margin:4px 2px 0;font:13px var(--a);color:#a9bcb0;min-height:18px}.uz-walli b{color:#e8e1cf}
 .uz-bw i{font-style:normal;padding:1px 7px;border-radius:10px;font:700 11px var(--a);border:1.5px solid #2a4a5e;color:#6f8a9a}.uz-bw i.on{border-color:#5aa7ff;background:#173040;color:#bfe0ff}
 .uz-orc{padding:10px;border-radius:8px;background:radial-gradient(ellipse at 50% 0%,#1d1440,#0a0716 70%);border:1px solid #3a2a6a;display:flex;flex-direction:column;gap:8px}
 .uz-orc h4{margin:0;font:500 21px var(--g);color:#d4bfff;display:flex;justify-content:space-between;align-items:baseline}.uz-orc h4 span{font:700 12px var(--a);color:#a99cc8}
@@ -611,6 +613,13 @@
     }
     // Breakwater: how far ahead lessons and homework are (a week ahead and two weeks ahead each pay once a week)
     function breakwater() {
+      // the wall (WD-1b-ii, 30 Oct): this week and next in stained glass; the SVG is made again only when its data changes
+      if (window.WALL && D.wall && D.wall.lessons) {
+        const key = JSON.stringify(D.wall); if (V.wallKey !== key) { V.wallKey = key; V.wallSvg = WALL.html(D.wall); V.wallInfo = ''; }
+        const c = WALL.count(D.wall);
+        return '<div class="uz-wall" data-a="wall"><div class="uz-wallh"><b>Breakwater</b><span>' + c.built + ' of ' + c.lessons + ' lessons built · homework ' + c.hwSet + ' of ' + c.hwNeed + '</span></div>' +
+          V.wallSvg + '<div class="uz-walli">' + (V.wallInfo || 'Tap a piece of glass.') + '</div></div>';
+      }
       const L = D.tide >= 3 ? 2 : D.tide >= 2 ? 1 : 0, H = D.hw ? Math.min(2, D.hw.weeks) : null;
       const pills = (n) => ['1 wk', '2 wks'].map((w, i) => '<i class="' + (i < n ? 'on' : '') + '">' + (i < n ? '✓ ' : '') + w + '</i>').join('');
       return '<div class="uz-bw"><b>Breakwater</b><span>Lessons ' + pills(L) + '</span>' + (H === null ? '' : '<span>Homework ' + pills(H) + '</span>') + '</div>';
@@ -1034,6 +1043,12 @@
     box.addEventListener('click', (e) => {
       const b = e.target.closest('[data-a]'); if (!b || !box.contains(b)) return;
       const a = b.dataset.a, id = b.dataset.id, v = b.dataset.v, r = b.getBoundingClientRect(), k = b.dataset.fx;
+      if (a === 'wall') {   // a piece of the wall says which day, period and class it is (no redraw, the glass stays put)
+        const pc = e.target.closest('.pc'); if (!pc || !window.WALL || !D.wall) return;
+        V.wallInfo = WALL.describe(D.wall, +pc.dataset.d, +pc.dataset.p, pc.dataset.part); const i = b.querySelector('.uz-walli'); if (i) i.innerHTML = V.wallInfo;
+        b.querySelectorAll('.pc.wl-on').forEach((x) => x.classList.remove('wl-on')); b.querySelectorAll('.pc[data-d="' + pc.dataset.d + '"][data-p="' + pc.dataset.p + '"][data-part="' + pc.dataset.part + '"]').forEach((x) => x.classList.add('wl-on'));
+        buzz(6); return;
+      }
       if (window.UZDEN && UZDEN.click(X, a, id, v, b, r)) return;
       if (a === 'undo') return undo();
       if (/^(pair|pairall|pclose|pskip|pall|pwith|psug|pgo|pdup|psplit)$/.test(a) && window.PAIRS) return pairTap(a, id, v);
