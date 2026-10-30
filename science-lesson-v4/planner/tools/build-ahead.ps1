@@ -10,7 +10,7 @@ param([switch]$DryRun, [switch]$Install, [switch]$Remove)
 $ErrorActionPreference = 'Continue'
 $root = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 $log = Join-Path $root 'planner\tools\build-ahead.log'
-$task = 'Science lessons: build ahead'
+$task = 'Science lessons - build ahead'   # no colon: Windows refuses task names with one
 function Say($t) { $line = "$(Get-Date -Format 'yyyy-MM-dd HH:mm')  $t"; Add-Content $log $line; Write-Host $line }
 
 if ($Install) {
@@ -18,7 +18,8 @@ if ($Install) {
   $action = New-ScheduledTaskAction -Execute $ps -Argument "-NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`""
   $trigger = New-ScheduledTaskTrigger -Weekly -DaysOfWeek Monday,Tuesday,Wednesday,Thursday,Friday -At 15:45
   $settings = New-ScheduledTaskSettingsSet -StartWhenAvailable -ExecutionTimeLimit (New-TimeSpan -Hours 4) -MultipleInstances IgnoreNew
-  Register-ScheduledTask -TaskName $task -Action $action -Trigger $trigger -Settings $settings -Force | Out-Null
+  try { Register-ScheduledTask -TaskName $task -Action $action -Trigger $trigger -Settings $settings -Force -ErrorAction Stop | Out-Null }
+  catch { Say "install FAILED: $($_.Exception.Message)"; exit 1 }
   Say "installed the scheduled task '$task' (weekdays 15:45; the rules inside decide whether to build)"
   exit
 }
