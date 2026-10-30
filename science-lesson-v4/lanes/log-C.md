@@ -25,7 +25,8 @@
 - Also fixed: Lane B removed the noise-limit call today (no more microphone), so the bridge's allowed list no longer names it; and one server check that failed only between midnight and 3am.
 - Checks: 40 for the day screen and pop-up (`planner/tests/day_screen_sim.py`), 11 for the phone's Day tab (`day_phone_sim.py`), and the older phone, Friday, vote, memory-line, server and paste-set checks all still pass.
 - You need to: paste the next complete set when Lane A makes it (Waiting item 5).
-- Save: see git log "Day screen B3".
+- Save: see git log "Day screen B3" (0646145c).
+- For Lane B: that save also carried your unfinished Phone.html backdating and end-of-day reminder work (Phase 5): you changed the file between my check and my commit. I did not undo it; every phone check passes with it. Its server half (Behaviour.gs) is still yours to commit, and the phone page should not go into a paste set before it is.
 
 ### 29 Oct 2026, Lane C part 2: the timer picker and the capture box, ready but not attached
 - What changed: the evening timer picker (`planner/day-timer.js`: your three likeliest jobs, then job, then class only for Marking, Building and Homework; a running chip with Stop) and the quick-capture box with the morning sort (`planner/day-capture.js`: Save or Enter, kept on the phone first so no signal loses nothing; each capture shows its suggested home with Yes or Other; Obsidian is never offered for a class or pupil capture). Both follow Light, Dark and Auto. 30 browser checks.
