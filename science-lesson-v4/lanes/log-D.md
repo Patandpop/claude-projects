@@ -3,8 +3,8 @@
 ## Waiting on you
 1. Next paste set (Lane A makes it): Companion.gs and GameComp.html (now holds the term page, focus knitting, sound and the companion screens) plus one line in game-ui.js (already committed). These are the changed Apps Script files.
 2. The overnight adventure round 2: mock-up ready: replica/design/mockups/companion/adventure2.html. The test build uses 1C-i (brass lantern, parchment note), M1 (the scroll) and K1 (wooden cabinets) until you pick.
-3. Term page gallery of all 16 windows, matched to the Rise again stars, the week in glass and the Oracle: being made (term-gallery.html). The screen updates with it.
-4. Knitting, three better scenes (K1, K2, K3) with the yarn-to-row bar: being made (focus-crafts-3.html).
+3. Term page gallery of all 16 windows, matched to the Rise again stars, the week in glass and the Oracle: mock-up ready: replica/design/mockups/companion/term-gallery.html. The term page screen already uses this look. Open question: Leviathan is now a sea serpent; the old whale tail read more clearly at a glance.
+4. Knitting: round 3 seen (focus-crafts-3.html). You liked K1 and K3 but Ulhu was too rounded. Round 4 being made (focus-crafts-4.html): K1 and K3 in his real 16-bit pixel style, room and all, with a better knitted bar and yarn.
 5. Nudges on the phone need Lane C's notifications (installed app, step 8). The rules are built and waiting.
 
 ## Entries (newest first)
