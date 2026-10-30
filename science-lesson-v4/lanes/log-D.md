@@ -1,15 +1,19 @@
 # Lane D log: Ulhu as a life companion
 
 ## Waiting on you
-1. Day tags: where do they live? mock-up ready: replica/design/mockups/companion/day-tags.html (A hold the moon, B a ribbon under the tabs, C week stones).
-2. The overnight adventure: mock-up ready: replica/design/mockups/companion/adventure.html (row 1 while he is away, row 2 the morning find, row 3 where finds live; pick one letter per row).
-3. The term page and chapter windows: mock-up ready: replica/design/mockups/companion/term-page.html (A one scroll, B cathedral wall with a rose window, C two tabs).
-4. Focus crafts: mock-up ready: replica/design/mockups/companion/focus-crafts.html (six crafts; say which to keep and which to drop).
-5. Ocarina chorus: mock-up ready: replica/design/mockups/companion/sounds.html (the gold button, "Level up, chorus version"; play it beside the old level up and say: chorus, old, or keep both for different moments).
-6. Next paste set (Lane A makes it): two new files join the set, Companion.gs (server) and GameComp.html (sound).
-7. Nudges on the phone need Lane C's notifications (installed app, step 8). The rules are built and waiting; nothing reaches your phone until then.
+1. The overnight adventure, round 2: mock-up ready: replica/design/mockups/companion/adventure2.html (row 1 lantern and note: 1C-i, 1C-ii or 1C-iii; row 2 the morning find: M1 scroll, M2 net or M3 drawer; row 3 cabinet style: K1, K2 or K3).
+2. The term page, A redone as real stained glass: being made (term-page-a2.html).
+3. Focus crafts round 2 (stone carving and knitting, task sizes, progress bars): being made (focus-crafts-2.html).
+4. Ocarina chorus: mock-up ready: replica/design/mockups/companion/sounds.html (gold button; chorus, old, or both).
+5. Next paste set (Lane A makes it): two new files join the set, Companion.gs (server) and GameComp.html (sound).
+6. Nudges on the phone need Lane C's notifications (installed app, step 8). The rules are built and waiting; nothing reaches your phone until then.
 
 ## Entries (newest first)
+
+### 30 Oct, your picks, and the adventure round 2
+- Your picks: day tags A (hold the moon: the week's days rise, pick a day, tap its tags); adventure 1C (the note) with a better note and lantern, the card under the banner made far better (grey-night tone kept), and 3B cabinets that open, with finds giving notes you piece together; term page A, redone as real stained glass; focus crafts keep stone carving and knitting, drop the other four.
+- What changed: a new mock-up, adventure2.html. Row 1: three lantern-and-note pairs in pixel art (brass lantern with torn parchment under a pebble; ghost-green lantern with a dripping note on kelp; glass float with a blue flame and a chalk slate), new note each night. Row 2: three morning finds (a scroll that unrolls with a wax seal, a dripping net you tap open, a drawer that slides out of the ledge), each with a grey-night version. Row 3: a hall of seven cabinets; tap one and its doors swing open; tap a find for its torn note, which joins that act's page; eight pieces make the act's page, a short story never quite explained. Three cabinet styles.
+- You need to: pick one letter in each row.
 
 ### 30 Oct, ocarina chorus to try
 - What changed: one new sound on the sounds test page, a small choir of ocarinas playing together in harmony: a short tune of our own that climbs in a haunted minor and lands on a bright major chord, with the same cave echo. It suits the level up best (the biggest happy moment), so it sits right under the old level up to compare. The five sounds you love are untouched, and the game itself does not use the chorus until you pick.
