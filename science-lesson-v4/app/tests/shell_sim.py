@@ -1,6 +1,6 @@
 """The installed app's shell (app/src/index.html, app.js, sw.js, manifest) in headless Chromium, served from a fresh
 build over a local web address (service workers need a real address), against a fake planner server. No real data.
-Checks: the manifest and icons are installable; first open asks to set up; a bad address or key is refused with a plain
+The server answers like Cloudflare Pages (/index.html and /x.html redirect to / and /x). Checks: the manifest and icons are installable; first open asks to set up; a bad address or key is refused with a plain
 message and the old settings kept; a good one connects and the key never appears in a link; it opens again with no
 signal from the device's own copy; the service worker never keeps the planner's server or the school test; theme;
 waiting and stuck taps with Try again and Forget; Forget the key; a newer build offers "Update now".
@@ -17,7 +17,16 @@ class Quiet(http.server.SimpleHTTPRequestHandler):
     extensions_map = dict(http.server.SimpleHTTPRequestHandler.extensions_map, **{'.webmanifest': 'application/manifest+json', '.js': 'text/javascript'})
     def log_message(self, *a): pass
     def end_headers(self): self.send_header('Cache-Control', 'no-cache'); super().end_headers()
+    # like Cloudflare Pages' tidy addresses: /x.html and /index.html answer 308 to /x and /, and /x serves x.html
+    def send_head(self):
+        path = self.path.split('?')[0]
+        if path.endswith('.html'):
+            self.send_response(308); self.send_header('Location', path[:-len('index.html')] if path.endswith('index.html') else path[:-5]); self.end_headers(); return None
+        if not os.path.splitext(path)[1] and not path.endswith('/') and os.path.isfile(os.path.join(dist, path.lstrip('/') + '.html')):
+            self.path = path + '.html'
+        return super().send_head()
 srv = http.server.ThreadingHTTPServer(('127.0.0.1', 0), functools.partial(Quiet, directory=dist))
+srv.handle_error = lambda *a: None   # the browser hanging up early is not a failure
 threading.Thread(target=srv.serve_forever, daemon=True).start()
 BASE = 'http://127.0.0.1:%d/' % srv.server_address[1]
 GOOD = 'https://script.google.com/macros/s/AKfyFAKE_good-1/exec'
@@ -62,8 +71,9 @@ with sync_playwright() as p:
     check('the key is never in a link or on screen, and the key box is emptied', all('good-key-123' not in s['url'] for s in seen) and 'good-key-123' not in pg.inner_text('body') and pg.input_value('#key') == '')
     check('it was tested with one harmless read (getMode), sent as plain text', json.loads(seen[-1]['body'])['fn'] == 'getMode')
 
-    # ---- no signal: opens from the device's own copy
-    ctx.set_offline(True); pg.reload(); pg.wait_for_timeout(500)
+    # ---- no signal: opens from the device's own copy (after a mock-up page was opened, which must not replace it)
+    pg.goto(BASE + 'mockups/')
+    ctx.set_offline(True); pg.goto(BASE); pg.wait_for_timeout(500)
     check('with no signal it still opens, says "No signal", and stays set up', pg.is_visible('#home') and pg.inner_text('#net') == 'No signal')
     ctx.set_offline(False); pg.reload(); pg.wait_for_timeout(300)
     kept = pg.evaluate("caches.keys().then(ks => Promise.all(ks.map(k => caches.open(k).then(c => c.keys()).then(r => r.map(x => x.url))))).then(a => a.flat())")
