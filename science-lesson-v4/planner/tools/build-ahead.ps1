@@ -2,7 +2,7 @@
 # See lanes/design-build-ahead.md. Rules live in build-ahead.js (checked by planner/tests/build-ahead.test.js).
 #
 #   .\planner\tools\build-ahead.ps1            one run now (the rules decide whether anything happens)
-#   .\planner\tools\build-ahead.ps1 -DryRun    show the decision and the instructions, build nothing
+#   .\planner\tools\build-ahead.ps1 -DryRun    show the decision and the instructions, build nothing, mark nothing
 #   .\planner\tools\build-ahead.ps1 -Install   make the Windows scheduled task (weekdays 15:45), once, by Patryk
 #   .\planner\tools\build-ahead.ps1 -Remove    remove that task
 # Off switch: make an empty file planner\tools\.build-ahead-off (holidays, or whenever he wants quiet).
@@ -36,7 +36,8 @@ if ($DryRun) {
   exit
 }
 
-$d = node planner/tools/build-ahead.js check | ConvertFrom-Json
+# "start" is the only step that marks today as run; the dry run above used "check", which writes nothing
+$d = node planner/tools/build-ahead.js start | ConvertFrom-Json
 if (-not $d.run) { Say "no run: $($d.why)"; exit }
 Say "run: $($d.why); requests $($d.requests -join ', '); ends by $($d.hardStop)"
 $prompt = node planner/tools/build-ahead.js prompt | Out-String

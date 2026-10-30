@@ -126,8 +126,29 @@
     fs.mkdirSync(outDir, { recursive: true });
     var tmp = fs.mkdtempSync(path.join(require('os').tmpdir(), 'weekpack-'));
     var pdfs = docs.map(function (d, k) { return path.join(tmp, pad(k) + '.pdf'); });
-    var ps = '$w = New-Object -ComObject Word.Application; $w.Visible = $false; ' + docs.map(function (d, k) { return '$doc = $w.Documents.Open(\'' + d.replace(/'/g, "''") + '\', $false, $true); $doc.ExportAsFixedFormat(\'' + pdfs[k].replace(/'/g, "''") + '\', 17); $doc.Close(0);'; }).join(' ') + ' $w.Quit()';
-    cp.execFileSync('powershell', ['-NoProfile', '-Command', ps], { stdio: 'inherit' });
+    // Word can hang on a damaged file or a hidden dialog, so this step has a time limit. If it runs out, only the Word
+    // this tool started is closed (never one he has open), and the failure is said plainly. The checks stand in for
+    // Word with OPEN_LESSON_FAKE_WORD (a PowerShell line) and a short OPEN_LESSON_WORD_TIMEOUT_MS.
+    var q = function (s) { return "'" + String(s).replace(/'/g, "''") + "'"; };
+    var ps = '$ErrorActionPreference = "Stop"; $w = New-Object -ComObject Word.Application; $w.Visible = $false; $w.DisplayAlerts = 0; try { ' +
+      docs.map(function (d, k) { return '$doc = $w.Documents.Open(' + q(d) + ', $false, $true, $false); $doc.ExportAsFixedFormat(' + q(pdfs[k]) + ', 17); $doc.Close(0);'; }).join(' ') + ' } finally { $w.Quit() }';
+    var limitMs = Number(process.env.OPEN_LESSON_WORD_TIMEOUT_MS) || (30000 + docs.length * 45000);
+    var wordPids = function () { try { return cp.execFileSync('tasklist', ['/FI', 'IMAGENAME eq WINWORD.EXE', '/FO', 'CSV', '/NH'], { encoding: 'utf8', windowsHide: true, stdio: ['ignore', 'pipe', 'ignore'] }).split('\n').map(function (l) { var m = /^"WINWORD\.EXE","(\d+)"/.exec(l.trim()); return m ? Number(m[1]) : null; }).filter(Boolean); } catch (e) { return []; } };
+    var before = wordPids();
+    // an empty input closes stdin at once: PowerShell can otherwise wait on an open pipe and never end
+    var res = cp.spawnSync('powershell', ['-NoProfile', '-NonInteractive', '-Command', process.env.OPEN_LESSON_FAKE_WORD || ps], { encoding: 'utf8', timeout: limitMs, windowsHide: true, input: '' });
+    var timedOut = !!(res.error && res.error.code === 'ETIMEDOUT');
+    if (timedOut || res.status !== 0) {
+      var mine = wordPids().filter(function (p) { return before.indexOf(p) === -1; });
+      mine.forEach(function (pid) { try { cp.execFileSync('taskkill', ['/PID', String(pid), '/F'], { stdio: 'ignore', windowsHide: true }); } catch (e) { /* already gone */ } });
+      console.error(timedOut
+        ? '\nWord did not finish turning the worksheets into PDFs within ' + Math.round(limitMs / 1000) + ' seconds, so the pack was not made.' + (mine.length ? ' The Word this tool started has been closed.' : '') + ' Open the worksheets in Word yourself to see whether one of them asks a question, then try again.'
+        : '\nWord could not turn the worksheets into PDFs, so the pack was not made.' + (res.stderr && String(res.stderr).trim() ? ' Word said: ' + String(res.stderr).trim().split('\n')[0] : ''));
+      fs.rmSync(tmp, { recursive: true, force: true });
+      process.exit(1);
+    }
+    var missing = docs.filter(function (d, k) { return !fs.existsSync(pdfs[k]); });
+    if (missing.length) { console.error('\nWord finished but made no PDF for: ' + missing.join(', ') + '. The pack was not made.'); fs.rmSync(tmp, { recursive: true, force: true }); process.exit(1); }
     fs.writeFileSync(path.join(tmp, 'cover.txt'), cover.join('\n'));
     cp.execFileSync('python', ['-I', path.join(__dirname, 'week-pack.py'), path.join(tmp, 'cover.txt'), out].concat(pdfs), { stdio: 'inherit' });
     fs.rmSync(tmp, { recursive: true, force: true });

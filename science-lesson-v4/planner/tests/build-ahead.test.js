@@ -41,5 +41,25 @@ ok('the prompt carries the stop times and the "leave it for tomorrow" rule', /18
 ok('the prompt says how to mark a request done', /planner-sync\.js done/.test(p));
 ok('no em dashes anywhere in the prompt', p.indexOf('—') === -1);
 
+
+
+// ---- the command line: a dry run (check) never marks the day; only start does
+(function () {
+  const fs = require('fs'), os = require('os'), path = require('path'), cp = require('child_process');
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'buildahead-')), stamp = path.join(tmp, 'stamp');
+  fs.writeFileSync(path.join(tmp, 'requests.json'), JSON.stringify([{ id: 'r1', at: '2026-11-03T12:00:00Z', kind: 'build', text: '', lessons: [{ when: '2026-11-04', cls: '9AS', prompt: 'Build 9AS L4' }] }]));
+  const env = Object.assign({}, process.env, { PLANNER_SYNC: tmp, BUILD_AHEAD_STAMP: stamp, BUILD_AHEAD_NOW: '2026-11-03T16:00:00', BUILD_AHEAD_DRIVE: '1', BUILD_AHEAD_BUSY: '0' });
+  const run = (c) => JSON.parse(cp.execFileSync(process.execPath, [path.join(__dirname, '..', 'tools', 'build-ahead.js'), c], { env, encoding: 'utf8' }));
+  const c1 = run('check');
+  ok('a dry run (check) on a school afternoon says run', c1.run === true && c1.requests.join() === 'r1');
+  ok('a dry run writes no stamp, so it cannot block the real run', !fs.existsSync(stamp));
+  ok('a second dry run still says run', run('check').run === true);
+  const s1 = run('start');
+  ok('start says run and marks today', s1.run === true && fs.existsSync(stamp) && fs.readFileSync(stamp, 'utf8').trim() === '2026-11-03');
+  ok('after start, another start the same day is refused (once a day)', /already ran/.test(run('start').why));
+  ok('a dry run after the real run reports it honestly', /already ran/.test(run('check').why));
+  fs.rmSync(tmp, { recursive: true, force: true });
+})();
+
 console.log(failed ? `\n${failed} FAILED` : '\nAll build-ahead checks passed');
 process.exit(failed ? 1 : 0);

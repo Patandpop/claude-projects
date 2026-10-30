@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 // Build ahead: the rules for the scheduled afternoon run that builds the lessons Patryk asked for in the planner
 // (lanes/design-build-ahead.md). Pure rules, no server calls. The runner (build-ahead.ps1) calls:
-//   node planner/tools/build-ahead.js check     prints a JSON decision: run or not, why, which requests, the stop time
+//   node planner/tools/build-ahead.js check     prints a JSON decision: run or not, why, which requests, the stop time (writes nothing)
+//   node planner/tools/build-ahead.js start     the same, and marks today as run (only the real run calls this)
 //   node planner/tools/build-ahead.js prompt    prints the plain-English instructions handed to the unattended session
 // Nothing here writes to Drive. The lessons themselves are built by the normal lesson build, which uploads as usual.
 (function (root) {
@@ -82,13 +83,16 @@
     var cal = readJson(path.join(ROOT, 'planner', 'planner-data.json'), {});
     var done = {}; readJson(path.join(SYNC, 'requests-done.json'), []).forEach(function (x) { done[x.id] = 1; });
     var open = readJson(path.join(SYNC, 'requests.json'), []).filter(function (r) { return !done[r.id]; });
-    var stamp = path.join(ROOT, 'planner', 'tools', '.build-ahead-last');
-    var today = iso(new Date());
-    var state = { now: new Date(), cal: { terms: cal.terms, inset: cal.inset }, drive: fs.existsSync('G:\\'),
+    var stamp = process.env.BUILD_AHEAD_STAMP || path.join(ROOT, 'planner', 'tools', '.build-ahead-last');
+    var now = process.env.BUILD_AHEAD_NOW ? new Date(process.env.BUILD_AHEAD_NOW) : new Date();   // the checks set a pretend time
+    var today = iso(now);
+    var state = { now: now, cal: { terms: cal.terms, inset: cal.inset }, drive: process.env.BUILD_AHEAD_DRIVE ? process.env.BUILD_AHEAD_DRIVE === '1' : fs.existsSync('G:\\'),
       busy: process.env.BUILD_AHEAD_BUSY === '1', open: open, ranToday: fs.existsSync(stamp) && fs.readFileSync(stamp, 'utf8').trim() === today,
       holiday: fs.existsSync(path.join(ROOT, 'planner', 'tools', '.build-ahead-off')) };
     var cmd = process.argv[2];
-    if (cmd === 'check') { var d = decide(state); if (d.run) fs.writeFileSync(stamp, today); console.log(JSON.stringify(d)); }
+    // check never writes anything (a dry run must not block the day's real run); start writes the stamp just before a real run
+    if (cmd === 'check') { console.log(JSON.stringify(decide(state))); }
+    else if (cmd === 'start') { var d1 = decide(state); if (d1.run) fs.writeFileSync(stamp, today); console.log(JSON.stringify(d1)); }
     else if (cmd === 'prompt') { var d2 = decide(Object.assign({}, state, { ranToday: false })); if (!d2.run) { console.error(d2.why); process.exit(1); } console.log(promptFor(open.filter(function (r) { return d2.requests.indexOf(r.id) >= 0; }), d2)); }
     else { console.log('node planner/tools/build-ahead.js check | prompt'); }
   }

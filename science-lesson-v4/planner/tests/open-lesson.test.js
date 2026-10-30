@@ -43,5 +43,29 @@ ok('a lesson with nothing built is listed as such', /Wed P2  12C  Superposition:
 ok('a support copy count can be given', /support x 6/.test(O.coverLines('2026-11-02', items, 6)[2]));
 ok('nothing on the cover names a pupil (classes and titles only)', cover.every((l) => !/[A-Z][a-z]+ [A-Z]\./.test(l)));
 
+// ---- the pack when Word hangs or fails: a time limit, a plain message, no PDF, exit 1
+(function () {
+  const fs = require('fs'), os = require('os'), path = require('path'), cp = require('child_process');
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'olpack-'));
+  const les = path.join(tmp, 'lessons', 'Year 9', 'Physics', 'P3 Particles', 'Lesson 4 - Changing States');
+  fs.mkdirSync(les, { recursive: true }); fs.mkdirSync(path.join(tmp, 'sync'));
+  fs.writeFileSync(path.join(les, 'Changing-states_worksheet.docx'), 'not a real docx');
+  const data = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'planner-data.json'), 'utf8'));
+  const i = data.classes['9AS'].seq.findIndex((x) => /Changing States/.test(x.title));
+  fs.writeFileSync(path.join(tmp, 'sync', 'planner-state.json'), JSON.stringify({ weeks: { '2026-11-02': { monday: '2026-11-02', slots: [{ day: 0, period: 3, cls: '9AS', kind: 'lesson', i, text: 'x', built: true }] } } }));
+  const out = path.join(tmp, 'out');
+  const run = (fake, ms) => cp.spawnSync(process.execPath, [path.join(__dirname, '..', 'tools', 'open-lesson.js'), 'pack', '2026-11-02', '--out', out],
+    { encoding: 'utf8', env: Object.assign({}, process.env, { PLANNER_SYNC: path.join(tmp, 'sync'), LESSONS_ROOT: path.join(tmp, 'lessons'), OPEN_LESSON_FAKE_WORD: fake, OPEN_LESSON_WORD_TIMEOUT_MS: String(ms) }) });
+  const hang = run('Start-Sleep -Seconds 90', 15000);   // PowerShell itself can take 10 s to start on a busy PC
+  ok('a Word that hangs is cut off at the time limit, the failure is said plainly and the tool exits 1', hang.status === 1 && /Word did not finish/.test(hang.stderr) && /try again/.test(hang.stderr));
+  ok('the hung Word was cut off at the limit, not left to run', hang.status === 1);
+  ok('no half-made pack is left behind after a hang', !fs.existsSync(path.join(out, 'Worksheets week of 2026-11-02.pdf')));
+  const fail = run('Write-Error "cannot open file"; exit 3', 40000);
+  ok('a Word that fails says so with its reason', fail.status === 1 && /could not turn the worksheets/.test(fail.stderr) && /cannot open file/.test(fail.stderr));
+  const silent = run('exit 0', 40000);
+  ok('a Word that finishes but writes no PDF is reported, not passed off as success', silent.status === 1 && /made no PDF for/.test(silent.stderr));
+  fs.rmSync(tmp, { recursive: true, force: true });
+})();
+
 console.log(failed ? `\n${failed} FAILED` : '\nAll open-lesson checks passed');
 process.exit(failed ? 1 : 0);

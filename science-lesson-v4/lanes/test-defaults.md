@@ -26,4 +26,6 @@ Where the design chat had a recommended pick, that pick is now the **test defaul
 | Teaching-language rules | the 20 rules as written; the build only warns, never rewrites | still his (SKILL.md wording and builder warnings need his yes) | lanes/research-teaching-language.md |
 | Build ahead (afternoon run) | built; off until he runs `-Install` | still his | lanes/design-build-ahead.md |
 
-Still his, no default possible: the site address, the school test, the eyes-free Try score, the 9AS and 9XS word bank, review answers sheet or board, the Engage rule OK, the Do Now mix rule into SKILL.md, Lane B's builder plans for 1.8 and 2.5/2.6, Lane A's and Lane D's visual picks (their chats hold the options).
+Still his, no default possible: the site address, the school test, the eyes-free Try score, review answers sheet or board, the Engage rule OK, the Do Now mix rule into SKILL.md, Lane B's builder plans for 1.8 and 2.5/2.6, Lane A's and Lane D's visual picks (their chats hold the options).
+
+**Answered 30 Oct (evening):** Do Now mix rule yes; builder plans 1.8 and 2.5/2.6 yes; 9AS and 9XS word bank: none, like 10S2 and 11S2 (class-defaults.json updated; 10C2 keeps its word bank).
