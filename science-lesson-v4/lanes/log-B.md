@@ -24,9 +24,16 @@ Plain-English record of Lane B's work, newest entry first. Each entry says what 
 7. **Item 2.10, the "last week's homework" slide:** a builder job that needs a mock-up first. I can't publish mock-ups from this chat, so it waits; tell me if you want me to make the mock-up as a file you can open instead.
 8. **Memory map: which Memory tab layout did you pick?** You said you picked it in another chat, but I can't find it saved in the project yet. Tell me the letter (and the details) here, or ask that chat to save it. Three layouts in one mock-up page: A, a grid (one row per topic, one coloured square per section); B, bars (each section a bar showing its %); C, a due list (reddest first, as cards). The "Suggested Do Now" box for lesson cards is the same in all three. The page is lanes/mockups/memory-tab.html in the project (I could not send it to your phone from this chat; open it on the PC, or ask the design chat to publish it). Reply A, B, C or a mix.
 9. **Item 4.13, homework ahead: OK to build this?** What already exists: the Homework tab's "Coming up automatically" list suggests revision homework two weeks before every test, one click to fill it in. My proposal for the rest: (a) on Fridays the planner lists next week's lessons that need homework set (the ones ticked "Set homework") and offers one button, "Ask Claude to prepare these", which sends a single request home; nothing is posted. (b) Two weeks before a test, the 6am job makes the revision homework as a Classroom DRAFT (never posted, you check and post it) and the card says "draft ready"; or, if you would rather, it only reminds you. (c) A 6-mark question done on the board comes back as homework three weeks later, chosen from that lesson's real 6-markers, offered as a tick in the Friday list. Reply with the letters you want, and for (b) "draft" or "reminder".
-10. **Item 4.14, the whole-class feedback sheet: what should it look like?** I need a picture of it before building: one page per class after a marked test or key homework, with "what went well", the 3 most-missed questions with the right answer, the common wrong answer and why, and a short "now do this" task? Or the school's own whole-class feedback template, if there is one (send it and I will build to it).
 
 ---
+## 30 Oct 2026, item 4.14 dropped: you already make the whole-class feedback sheet
+
+**What changed:** nothing built. You told me the marking feedback sheet is a printout you make yourself, so item 4.14 (a feedback sheet builder) is off Lane B's list and no longer waiting on you.
+
+**You need to:** nothing.
+
+**Save:** see the history line "4.14 dropped".
+
 ## 30 Oct 2026, item 2.9: silences judged by you, no microphone, and the weekly goal decides emails home
 
 **What changed:**
@@ -36,7 +43,7 @@ Plain-English record of Lane B's work, newest entry first. Each entry says what 
 
 **You need to:** nothing now. It all goes into the next complete paste set (BoardPage.html, Phone.html, Behaviour.gs, Code.gs). After pasting, reopen the board page once so it loads the new version (the page says "Board version 26").
 
-**Save:** see the history line "Silences judged by the Talking button".
+**Save:** 990165d2.
 
 ## 30 Oct 2026, Phase 5: a smoke test for the morning brief (and no more em dashes in it)
 
