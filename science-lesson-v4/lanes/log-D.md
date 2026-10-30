@@ -5,11 +5,13 @@
 2. The overnight adventure: mock-up ready: replica/design/mockups/companion/adventure.html (row 1 while he is away, row 2 the morning find, row 3 where finds live; pick one letter per row).
 3. The term page and chapter windows: mock-up ready: replica/design/mockups/companion/term-page.html (A one scroll, B cathedral wall with a rose window, C two tabs).
 4. Focus crafts: mock-up ready: replica/design/mockups/companion/focus-crafts.html (six crafts; say which to keep and which to drop).
-5. Listen to the sounds: replica/design/mockups/companion/sounds.html (keep, or say which to change).
-6. Next paste set (Lane A makes it): two new files join the set, Companion.gs (server) and GameComp.html (sound).
-7. Nudges on the phone need Lane C's notifications (installed app, step 8). The rules are built and waiting; nothing reaches your phone until then.
+5. Next paste set (Lane A makes it): two new files join the set, Companion.gs (server) and GameComp.html (sound).
+6. Nudges on the phone need Lane C's notifications (installed app, step 8). The rules are built and waiting; nothing reaches your phone until then.
 
 ## Entries (newest first)
+
+### 30 Oct, sounds kept
+- You said you love the haunted ocarina sounds, so all five stay exactly as they are. Future Ulhu sounds (the focus crafts, if they get any) will be made in the same style.
 
 ### 30 Oct, sounds remade: haunted ocarina
 - What changed: the five sounds (tick, Vespers, level-up, fainting, back from the deep) are now video-game style as you asked: a soft breathy ocarina tone with a slow wobble, a cave echo, a faint ghost note an octave below, and minor-key tunes (all our own, nothing copied). Test page to hear them: replica/design/mockups/companion/sounds.html.
