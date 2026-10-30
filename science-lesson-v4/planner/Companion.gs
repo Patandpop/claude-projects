@@ -276,3 +276,63 @@ function cSnap_(today, world, frozen, p) {
   for (let i = -7; i <= 14; i++) { const d = gAdd_(today, i); if (by[d]) days[d] = by[d]; }
   return { tags: cTagList_(p), days, ill: cIllDay_(today, frozen), story: cStory_(today, world), adventure: cAdventure_(today, world), nudgeOff: String((p || gPlayer_()).nudgeOff || '').split('|').filter(Boolean) };
 }
+
+/* ---- the cabinets (Patryk 2026-10-30, adventure pick 3B with a twist): one cabinet per act. Each object find gives a
+   torn note, one piece of that act's page; the act's eight pieces read in order make one short story, still never
+   explained. Lore lines are scratched inside the cabinet. Grey-night and between-acts finds sit on their own shelf. ---- */
+const C_PIECES = {
+  1: ['They rang the bell once, at the wrong hour,', 'and the number on the last door was 9.', 'The church key turned from the inside.', 'A child wrote one word, again and again, so it would not be lost.', 'On the roof, the cockerel turned to face the water.', 'Someone set the table for one more.', 'Then the rope was cut, from both ends at once.', 'They sang four hundred and twelve, and the tide came in to listen.'],
+  2: ['Before the first lamp, there was a wick nobody dared to light.', 'A keeper caught a flame in glass and let it sink.', 'She followed it down with her long hook,', 'lighting the silt as she passed, kindly, one patch at a time.', 'She hung a tin star where the dark was thickest.', 'From above, it looked very far away.', 'She is still striking matches. She has not run out.', 'Every window she passes remembers being lit.'],
+  3: ['The choir took one breath together,', 'and the cold kept it for them.', 'The youngest singer\'s collar froze first.', 'Their music had only rests left in it.', 'Inside the ice they can see out. They are watching for someone.', 'Nothing down there melts until it is ready.', 'Each morning the frost draws the next note.', 'When the baton is whole again, they will sing the rest.'],
+  4: ['The reef slept through the bell, the lanterns and the long cold.', 'Someone planted something in it anyway.', 'A shell opened, just a little, to see.', 'A crab left its old armour on the step and walked on, larger.', 'The anemones began to wave, slowly, at no one in particular.', 'The new kelp came up greener than it had any right to.', 'Even the stone was not sure it was still stone.', 'Growth comes in small round pieces. More are coming.'],
+  5: ['Every tally ever made is kept in the Archive.', 'Nothing is overdue. Nothing is fined.', 'The pages turn themselves to where you are.', 'There is a list, and only one thing is left on it.', 'The ink writes in a stranger\'s hand, and then in yours.', 'The book of this year is open at the middle.', 'One column for what was carried. One for what was set down.', 'The index ends with your name.'],
+  6: ['Above the deep there is a door with a handle made of sun.', 'A gull came down to look at it.', 'Beside it, a dry stone. Nothing down there is dry.', 'Someone cut a piece of sky to measure the gap.', 'The hinges were oiled by somebody patient.', 'There is a ticket, one way, with the place smudged out.', 'On the step, a little flag says somebody built something here.', 'The key was never lost. It was waiting to be carried up.'],
+  7: ['The year put its last message in a bottle and let go.', 'The compass stopped pointing anywhere in particular.', 'An old sail, patched seven times, caught a slow wind.', 'Something round and strange floated by. He kept it.', 'Somebody up there lost a shoe and did not mind.', 'A card came, unsigned: wish you were here.', 'Even the knight stopped charging and went sideways for a while.', 'A small star fell in to rest, and so did he.']
+};
+// every act's cabinet: its objects in page order (found or not), the lore lines found, and the odd-things shelf
+function cCabinets_(today, world) {
+  cReg_();
+  const got = {}; gRows_('finds').forEach((r) => { got[String(r.fid)] = String(r.day); });
+  const now = cStory_(today, world).act;
+  const acts = C_ACTS.map((name, a) => {
+    const key = String(a + 1), objs = [], lore = []; let n = 0;
+    C_FINDS[key].forEach((x, i) => { const p = x.split('|'), fid = key + ':' + i;
+      if (p[0] === 'o') { objs.push({ fid, name: p[1], line: p[2], piece: (C_PIECES[key] || [])[n] || '', found: got[fid] || '' }); n++; }
+      else if (got[fid]) lore.push({ fid, text: p[1], found: got[fid] }); });
+    return { act: a + 1, name, state: a + 1 < now ? 'past' : a + 1 === now ? 'now' : 'later', objects: objs, lore, pieces: objs.filter((o) => o.found).length };
+  });
+  const odd = []; ['interlude', 'small'].forEach((key) => C_FINDS[key].forEach((x, i) => { const p = x.split('|'), fid = key + ':' + i;
+    if (got[fid]) odd.push({ fid, kind: p[0] === 'o' ? 'object' : 'lore', name: p[0] === 'o' ? p[1] : '', text: p[0] === 'o' ? p[2] : p[1], found: got[fid], grey: key === 'small' }); }));
+  return { now, acts, odd };
+}
+function gameCabinets(k) { check_(k); return cCabinets_(gDay_(gNow_()), gWorld_()); }
+
+/* ==== FOCUS CRAFTS (companion-focus.js, 30 Oct 2026) ========================================================
+   While Patryk focuses on a task, Ulhu knits (Patryk 30 Oct: knitting only for now; the craft column stays so more
+   crafts can come later). The page keeps the running piece itself (it pauses when
+   he leaves the app and is never lost); only a finished piece comes here, to go on the shelf. A bigger task makes a
+   bigger piece. Ulhu never decides: Patryk picks the size and presses Start. ==== */
+const CF_PIECES = { knit: { small: 'sock', medium: 'kelp scarf', large: 'jumper' } };
+function cfReg_() {
+  if (G_HEAD.focus) return;
+  G_HEAD.focus = ['day', 'craft', 'size', 'minutes', 'piece', 'savedOn']; G_TAB.focus = 'Game Focus';
+}
+function cfShelf_() {
+  cfReg_();
+  return gRows_('focus').slice().reverse().slice(0, 40).map((r) => ({ day: String(r.day), craft: String(r.craft), size: String(r.size), minutes: Number(r.minutes) || 0, piece: String(r.piece), savedOn: String(r.savedOn) }));
+}
+// a finished piece goes on the shelf; returns the shelf (newest first)
+function gameFocusDone(k, craft, size, minutes) {
+  check_(k); gFresh_();
+  craft = String(craft || ''); size = String(size || ''); minutes = Number(minutes);
+  if (!CF_PIECES[craft]) throw new Error('Only knitting for now.');
+  if (!CF_PIECES[craft][size]) throw new Error('Pick a small, medium or large task.');
+  if (!isFinite(minutes) || minutes < 1 || minutes > 240) throw new Error('The focus time does not look right.');
+  return withLock_(function () { gFresh_(true); cfReg_();
+    const today = gDay_(gNow_());
+    gAppend_('focus', { day: today, craft, size, minutes: Math.round(minutes), piece: CF_PIECES[craft][size], savedOn: today });
+    return cfShelf_();
+  });
+}
+function gameFocusShelf(k) { check_(k); gFresh_(); return cfShelf_(); }
+/* ==== end FOCUS CRAFTS ==== */

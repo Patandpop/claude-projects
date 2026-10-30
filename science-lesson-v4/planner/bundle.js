@@ -54,7 +54,7 @@ files['GameHV.html'] = pack(['game-highvespers.js', 'game-lair.js', 'game-brew.j
 // 2026-10-28: the Den (Round Grotto, Night Market, dice with every keeper) is its own include too; it loads before GameUI's code runs
 files['GameDen.html'] = pack(['game-den.js']);
 // 2026-10-29 Lane D: Ulhu as a life companion, the page side (sound now; day tags, his adventure and the term page next)
-files['GameComp.html'] = pack(['game-companion.js']);
+files['GameComp.html'] = pack(['companion-term.js', 'companion-focus.js', 'game-companion.js']);   // Lane D: the life companion (term page, focus crafts, sound and screens)
 // 2026-10-30 Lane C: the day screen (layout B3) with its timer and quick capture, on the phone's Day tab; Day.gs is its server side
 files['Day.gs'] = read('Day.gs');
 files['DayUI.html'] = pack(['day-logic.js', 'day-timer.js', 'day-capture.js', 'day-screen.js']);

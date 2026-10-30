@@ -1,14 +1,18 @@
 # Lane D log: Ulhu as a life companion
 
 ## Waiting on you
-1. The overnight adventure, round 2: mock-up ready: replica/design/mockups/companion/adventure2.html (row 1 lantern and note: 1C-i, 1C-ii or 1C-iii; row 2 the morning find: M1 scroll, M2 net or M3 drawer; row 3 cabinet style: K1, K2 or K3).
-2. The term page, A redone as real stained glass: mock-up ready: replica/design/mockups/companion/term-page-a2.html (six identity windows with the emblem cut from the glass, leaded panels, a lancet per week with a red glass seal; say yes or what to change).
-3. Focus crafts round 2: mock-up ready: replica/design/mockups/companion/focus-crafts-2.html (stone carving and knitting, small/medium/large pieces, pause; pick a progress bar for each: P1 rune ledge, P2 rune strip, P3 block wall for stone; P4 yarn to row, P5 stitches on needles, P6 washing line for knitting).
-4. Ocarina chorus: mock-up ready: replica/design/mockups/companion/sounds.html (gold button; chorus, old, or both).
-5. Next paste set (Lane A makes it): two new files join the set, Companion.gs (server) and GameComp.html (sound).
-6. Nudges on the phone need Lane C's notifications (installed app, step 8). The rules are built and waiting; nothing reaches your phone until then.
+1. Next paste set (Lane A makes it): Companion.gs and GameComp.html (now holds the term page, focus knitting, sound and the companion screens) plus one line in game-ui.js (already committed). These are the changed Apps Script files.
+2. The overnight adventure round 2: mock-up ready: replica/design/mockups/companion/adventure2.html. The test build uses 1C-i (brass lantern, parchment note), M1 (the scroll) and K1 (wooden cabinets) until you pick.
+3. Term page gallery of all 16 windows, matched to the Rise again stars, the week in glass and the Oracle: being made (term-gallery.html). The screen updates with it.
+4. Knitting, three better scenes (K1, K2, K3) with the yarn-to-row bar: being made (focus-crafts-3.html).
+5. Nudges on the phone need Lane C's notifications (installed app, step 8). The rules are built and waiting.
 
 ## Entries (newest first)
+
+### 30 Oct, test build of the companion screens
+- What changed: the companion screens are now in the game, as test builds from your picks. Hold the moon: the week's days rise, pick a day, tap its tags (a plain tap still changes the moon). After Vespers the ledge is empty, a brass lantern burns and his note lies beside it (tap to read it big). In the morning a parchment scroll hangs under the banner with his find; the wax seal keeps it ("later" tucks it away). A little cabinet on the banner opens the Cabinets: seven, one per act; tap a find for its torn note, which joins the act's page (eight pieces, a short story per act, all seven written). Tabs beside it: Becoming (the stained-glass term page, all 16 identity windows) and Focus (knitting only, small sock, medium kelp scarf, large jumper; leaving the app pauses it, stopping early keeps the piece on the bench, finished pieces go on the shelf). Sound: the ocarina chorus plays on every 5th level, the old level-up on the others (changeable).
+- New files: planner/companion-term.js, planner/companion-focus.js (both packed into GameComp.html), tests companion_server.js, companion_sim.py, companion_steps.py (the screens tested in the real game page). One line added to game-ui.js (it hands the companion its helpers).
+- You need to: nothing until Lane A's next complete paste set; then try holding the moon, and look at the cabinet after a Vespers.
 
 ### 30 Oct, your picks, and the adventure round 2
 - Your picks: day tags A (hold the moon: the week's days rise, pick a day, tap its tags); adventure 1C (the note) with a better note and lantern, the card under the banner made far better (grey-night tone kept), and 3B cabinets that open, with finds giving notes you piece together; term page A, redone as real stained glass; focus crafts keep stone carving and knitting, drop the other four.

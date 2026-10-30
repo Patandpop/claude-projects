@@ -38,7 +38,7 @@ const w = [];
 const kept = S.stripFile('x.gs', broken);
 ok(kept.text === broken || !kept.warnings.length, 'code that does not parse is left as it was');
 // the real sources: every .gs and every script block must still parse after stripping
-for (const f of ['Code.gs', 'Behaviour.gs', 'Game.gs', 'Companion.gs', 'Mailbox.gs', 'logic.js', 'game-ui.js', 'game-den.js', 'game-oracle.js', 'game-companion.js', 'Planner.html', 'Phone.html', 'BoardPage.html', 'Day.gs', 'day-logic.js', 'day-screen.js']) {
+for (const f of ['Code.gs', 'Behaviour.gs', 'Game.gs', 'Companion.gs', 'Mailbox.gs', 'logic.js', 'game-ui.js', 'game-den.js', 'game-oracle.js', 'game-companion.js', 'companion-term.js', 'companion-focus.js', 'Planner.html', 'Phone.html', 'BoardPage.html', 'Day.gs', 'day-logic.js', 'day-screen.js']) {
   const p = path.join(__dirname, '..', f);
   if (!fs.existsSync(p)) continue;
   const r = S.stripFile(f, fs.readFileSync(p, 'utf8'));
@@ -49,7 +49,7 @@ for (const f of ['Code.gs', 'Behaviour.gs', 'Game.gs', 'Companion.gs', 'Mailbox.
 console.log('── the server tests pass on the stripped copies');
 const tmpSrc = fs.mkdtempSync(path.join(require('os').tmpdir(), 'stripped-'));
 try {
-  for (const f of ['Code.gs', 'Behaviour.gs', 'Game.gs', 'Companion.gs', 'game-companion.js', 'game-art.js']) fs.writeFileSync(path.join(tmpSrc, f), S.stripFile(f, fs.readFileSync(path.join(__dirname, '..', f), 'utf8')).text);
+  for (const f of ['Code.gs', 'Behaviour.gs', 'Game.gs', 'Companion.gs', 'game-companion.js', 'companion-term.js', 'companion-focus.js', 'game-art.js']) fs.writeFileSync(path.join(tmpSrc, f), S.stripFile(f, fs.readFileSync(path.join(__dirname, '..', f), 'utf8')).text);
   for (const t of ['server.test.js', 'game.test.js', 'companion.test.js']) {
     const r = cp.spawnSync(process.execPath, [path.join(__dirname, t)], { encoding: 'utf8', env: Object.assign({}, process.env, { PLANNER_SRC: tmpSrc }) });
     ok(r.status === 0, `${t} on the stripped Code.gs, Behaviour.gs and Game.gs` + (r.status ? '\n' + (r.stdout + r.stderr).split('\n').filter((l) => /FAIL|Error/.test(l)).slice(0, 5).join('\n') : ''));

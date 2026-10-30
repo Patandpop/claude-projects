@@ -7,7 +7,7 @@ const dir = process.env.PLANNER_SRC || path.join(__dirname, '..');
 m.props.PLANNER_KEY = 'k';
 const src = ['Code.gs', 'Behaviour.gs', 'game-art.js', 'Game.gs', 'Companion.gs'].map((f) => fs.readFileSync(path.join(dir, f), 'utf8')).join('\n');
 global.SHOP = require('../game-shop.json');
-eval(src + '\nglobal.G={gameLoad,gameTick,gameUntick,gameSaveGoal,gameMoon,gameFreeze,gameVespers,gameVespersUndo,gameDayTag,gameDayTagList,gameFindTake,gameCompanionTerm,gameNudge,gameNudgeOff,cIllDay_,cStory_,cFindFor_,C_FINDS};');
+eval(src + '\nglobal.G={gameLoad,gameTick,gameUntick,gameSaveGoal,gameMoon,gameFreeze,gameVespers,gameVespersUndo,gameDayTag,gameDayTagList,gameFindTake,gameCompanionTerm,gameNudge,gameNudgeOff,gameCabinets,cIllDay_,cStory_,cFindFor_,C_FINDS,C_PIECES};');
 
 const k = 'k'; let failed = 0;
 const ok = (n, c) => { console.log((c ? '  PASS ' : '  FAIL ') + n); if (!c) failed++; };
@@ -116,6 +116,16 @@ s = G.gameLoad(k);
 ok('three nights waiting: the newest is shown and the count is 3', s.comp.adventure.state === 'back' && s.comp.adventure.find.night === '2026-11-14' && s.comp.adventure.waiting === 3);
 s = G.gameFindTake(k);
 ok('taking them puts all three on the shelf, none repeated', s.comp.adventure.shelf.length === 5 && new Set(s.comp.adventure.shelf.map((x) => x.text)).size === 5 && s.found.length === 3);
+// the cabinets (3B): one per act, each object gives a torn piece of the act's page; lore is scratched inside
+{
+  const cb = G.gameCabinets(k), a2 = cb.acts[1];
+  ok('seven cabinets, act 2 is now, act 1 past, act 3 later', cb.acts.length === 7 && cb.now === 2 && a2.state === 'now' && cb.acts[0].state === 'past' && cb.acts[2].state === 'later');
+  ok('every act has eight objects, each with its own page piece', cb.acts.every((a, i) => a.objects.length === 8 && a.objects.every((o) => o.piece) && G.C_PIECES[i + 1].length === 8));
+  const shelf = s.comp.adventure.shelf, objs = shelf.filter((x) => x.kind === 'object' && x.act === 'The Lantern Below').length, lore = shelf.filter((x) => x.kind === 'lore' && x.act === 'The Lantern Below').length;
+  ok('the act 2 cabinet holds exactly the act 2 objects found, and its pieces count them', a2.pieces === objs && a2.objects.filter((o) => o.found).length === objs);
+  ok('act 2 lore lines found are scratched inside (not the grey night note)', a2.lore.length === lore - shelf.filter((x) => x.kind === 'lore' && !G.C_FINDS[2].some((y) => y.endsWith('|' + x.text))).length && a2.lore.length === 3);
+  ok('the grey night find sits on the odd-things shelf', cb.odd.some((x) => x.grey));
+}
 at('2026-11-15T20:30:00Z'); G.gameVespers(k, { clean: true, tags: [] });
 s = G.gameVespersUndo(k);
 ok('Vespers undone means he never dived', s.comp.adventure.state === 'home');
@@ -190,8 +200,32 @@ ok('fainting has its own sound', C.moment(base, scr({ player: { level: 2, deaths
 ok('Vespers done has its own sound', C.moment(base, scr({ vespers: { done: true } })) === 'vespers');
 ok('Ulhu back from the deep (his find taken) has its own sound', C.moment(scr({ comp: { adventure: { state: 'back' } } }), base) === 'return');
 ok('a new day loading is not a moment', C.moment(base, scr({ today: '2027-01-09', goals: [{ kind: 'daily', doneToday: true }, base.goals[1], base.goals[2]] })) === '');
-ok('only the five big-moment sounds exist (no music)', C.SOUNDS.join() === 'tick,vespers,level,faint,return');
+ok('only the big-moment sounds exist (no music): the five, plus the level-up chorus', C.SOUNDS.join() === 'tick,vespers,level,faint,return,chorus');
+ok('every 5th level plays the ocarina chorus', C.soundFor('level', { player: { level: 10 } }) === 'chorus' && C.soundFor('level', { player: { level: 5 } }) === 'chorus');
+ok('other levels play the plain level-up', C.soundFor('level', { player: { level: 7 } }) === 'level' && C.soundFor('tick', { player: { level: 10 } }) === 'tick');
 ok('with no speaker (node) playing does nothing', C.play('tick') === false);
+
+/* ==== FOCUS CRAFTS tests (companion-focus.js / gameFocusDone, gameFocusShelf) ==== */
+console.log('\n-- focus crafts: a finished piece goes on the shelf');
+at('2027-01-20T10:00:00Z');
+ok('the shelf starts empty', gameFocusShelf(k).length === 0);
+let fsh = gameFocusDone(k, 'knit', 'medium', 30);
+ok('a finished piece saves one row with its name (a kelp scarf)', fsh.length === 1 && fsh[0].piece === 'kelp scarf' && fsh[0].craft === 'knit' && fsh[0].size === 'medium' && fsh[0].minutes === 30 && fsh[0].day === '2027-01-20');
+ok('the row is in the Game Focus tab', m.sheets['Game Focus'] && m.sheets['Game Focus']._data.length === 2);
+at('2027-01-21T10:00:00Z');
+gameFocusDone(k, 'knit', 'small', 15);
+fsh = gameFocusDone(k, 'knit', 'large', 60);
+ok('each size makes its own piece (sock, jumper)', fsh.some((x) => x.piece === 'sock') && fsh[0].piece === 'jumper');
+ok('the shelf is newest first', gameFocusShelf(k).map((x) => x.piece).join('|') === 'jumper|sock|kelp scarf');
+ok('knitting only: stone carving and unknown crafts are refused', throws(() => gameFocusDone(k, 'stone', 'small', 15)) && throws(() => gameFocusDone(k, 'pottery', 'small', 15)));
+ok('a size that does not exist is refused', throws(() => gameFocusDone(k, 'knit', 'huge', 15)));
+ok('a silly focus time is refused', throws(() => gameFocusDone(k, 'knit', 'small', 0)) && throws(() => gameFocusDone(k, 'knit', 'small', 'lots')));
+ok('the wrong key is refused', throws(() => gameFocusShelf('nope')));
+for (let i = 0; i < 45; i++) gameFocusDone(k, 'knit', 'small', 15);
+ok('the shelf shows at most 40 pieces', gameFocusShelf(k).length === 40);
+const FC = require(path.join(dir, 'companion-focus.js'));
+ok('companion-focus.js loads harmlessly in node (no window)', FC !== undefined);
+/* ==== end FOCUS CRAFTS tests ==== */
 
 console.log(failed ? `\n${failed} FAILED` : '\nAll companion checks passed');
 process.exit(failed ? 1 : 0);
