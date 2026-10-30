@@ -1,0 +1,125 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Ulhu: haunted ocarina sounds</title><style>body{margin:0;background:#070d0b;color:#e8e1cf;font:16px system-ui,sans-serif;padding:18px}h1{color:#5ef2a0;font-size:24px;margin:0 0 6px}p{color:#9fb1a8;line-height:1.4;max-width:420px}button{display:block;width:100%;max-width:420px;margin:0 0 12px;padding:14px;border-radius:14px;border:2px solid #5ef2a0;background:#0b1411;color:#e8e1cf;text-align:left;font:inherit;cursor:pointer}button b{display:block;color:#ffd56a;font-size:18px}button:active{background:#13261f}</style></head><body><h1>Ulhu's sounds</h1><p>Haunted ocarina: a soft breathy tone, a cave echo, a ghost note underneath, minor keys. Tap each to hear it. These five are the only sounds Ulhu makes; there is no music.</p><button data-s="tick"><b>A tick</b>Two ocarina notes and a faint chime in the echo.</button><button data-s="vespers"><b>Vespers done</b>A slow evening phrase in D minor that comes to rest.</button><button data-s="level"><b>Level up</b>Rising through a haunted minor scale to a bright note, with a sparkle above.</button><button data-s="faint"><b>Fainting</b>A slow falling line that wavers, then sinks into a breath.</button><button data-s="return"><b>Back from the deep</b>A splash, bubbles rising, then a small tune that opens out.</button><script>/* Ulhu as a life companion, the page side (Lane D, Big goal 3, 29 Oct 2026). Decisions:
+   replica/design/grills/ulhu-companion.md. The server side is Companion.gs; its data rides in every snapshot as D.comp.
+   Part 1, sound (haunted ocarina style since 30 Oct): big moments only (a tick, a level-up, fainting, Vespers, Ulhu back from the deep). No music, nothing
+   by time of day, and a switch to turn it off. Sounds are made on the spot (Web Audio), no sound files, nothing paid.
+   It needs no hook in game-ui.js: the game saves its screen and fires "ulhuchange" after every change; this file
+   compares the screen before and after and plays the moment. Undo and server catch-ups never make a sound twice.
+   On the phone a web page cannot read the silent switch: where the browser supports it the sound is marked
+   "ambient" (it then obeys silent mode), and the in-app switch is the sure way to keep it quiet. */
+(function (root) {
+  'use strict';
+
+  /* ---------- what changed: pure, so it is tested in node (planner/tests/companion.test.js) ---------- */
+  // good things done today: rituals ticked, sittings, quests done today, blessings (curses never count)
+  const one = (g, today) => g.kind === 'daily' ? (g.doneToday ? 1 : 0) : g.kind === 'termly' ? Number(g.sitDone) || 0 : g.kind === 'todo' ? (g.doneOn === today ? 1 : 0)
+    : g.polarity === 'both' ? Number(g.bCount) || 0 : g.polarity === 'minus' ? 0 : Number(g.count) || 0;
+  const sumTicks = (d) => (d && d.goals ? d.goals.reduce((n, g) => n + one(g, d.today), 0) : 0);
+  // the one moment worth a sound between two screens (the biggest wins), or '' for none
+  function moment(a, b) {
+    if (!a || !b || !a.player || !b.player || a.today !== b.today) return '';
+    if ((Number(b.player.deaths) || 0) > (Number(a.player.deaths) || 0)) return 'faint';
+    if ((Number(b.player.level) || 0) > (Number(a.player.level) || 0)) return 'level';
+    const ra = a.comp && a.comp.adventure, rb = b.comp && b.comp.adventure;
+    if (ra && rb && ra.state === 'back' && rb.state === 'home') return 'return';
+    if (b.vespers && b.vespers.done && !(a.vespers && a.vespers.done)) return 'vespers';
+    if (sumTicks(b) > sumTicks(a)) return 'tick';
+    return '';
+  }
+
+  /* ---------- the sounds ---------- */
+  const KEY = 'ulhuSound';
+  const on = () => { try { return localStorage.getItem(KEY) !== 'off'; } catch (e) { return true; } };
+  function setOn(v) { try { localStorage.setItem(KEY, v ? 'on' : 'off'); } catch (e) { /* private mode */ } }
+  let ctx = null;
+  function audio() {
+    if (ctx) return ctx;
+    const AC = root.AudioContext || root.webkitAudioContext; if (!AC) return null;
+    try { if (root.navigator && root.navigator.audioSession) root.navigator.audioSession.type = 'ambient'; } catch (e) { /* not supported */ }
+    ctx = new AC(); return ctx;
+  }
+  // video-game sounds, haunted (Patryk 2026-10-30): "aesthetic but slightly haunted, Ocarina of Time, all those sorts of
+  // things". An ocarina-like voice (a soft pure tone with breath and a slow wobble), a cave echo, a faint ghost note an
+  // octave below, minor keys. Every tune here is our own; nothing is copied from a game.
+  let bus = null;
+  // everything plays into one bus: straight out, and through a dark echo that repeats a few times and fades (the cave)
+  function out(c) {
+    if (bus && bus.c === c) return bus.in;
+    const inp = c.createGain(), dl = c.createDelay(1), fb = c.createGain(), lp = c.createBiquadFilter(), wet = c.createGain();
+    dl.delayTime.value = 0.27; fb.gain.value = 0.38; lp.type = 'lowpass'; lp.frequency.value = 1800; wet.gain.value = 0.32;
+    inp.connect(c.destination); inp.connect(dl); dl.connect(lp); lp.connect(fb); fb.connect(dl); lp.connect(wet); wet.connect(c.destination);
+    bus = { c, in: inp }; return inp;
+  }
+  // one plain note: frequency (or a slide from f to f2), start, length, wave, loudness
+  function note(c, f, t, len, type, vol, f2) {
+    const o = c.createOscillator(), g = c.createGain(), at = c.currentTime + t, v = vol || 0.05;
+    o.type = type || 'triangle'; o.frequency.setValueAtTime(f, at); if (f2) o.frequency.exponentialRampToValueAtTime(f2, at + len);
+    g.gain.setValueAtTime(0.0001, at); g.gain.linearRampToValueAtTime(v, at + 0.01); g.gain.setValueAtTime(v, at + len * 0.6); g.gain.exponentialRampToValueAtTime(0.0001, at + len);
+    o.connect(g); g.connect(out(c)); o.start(at); o.stop(at + len + 0.05);
+  }
+  // a burst of noise (breath, a splash, a thud), low-passed from f down to f2
+  function noise(c, t, len, vol, f, f2) {
+    const n = Math.floor(c.sampleRate * len), buf = c.createBuffer(1, n, c.sampleRate), d = buf.getChannelData(0);
+    for (let i = 0; i < n; i++) d[i] = Math.random() * 2 - 1;
+    const s = c.createBufferSource(), lp = c.createBiquadFilter(), g = c.createGain(), at = c.currentTime + t;
+    s.buffer = buf; lp.type = 'lowpass'; lp.frequency.setValueAtTime(f, at); lp.frequency.exponentialRampToValueAtTime(f2 || f, at + len);
+    g.gain.setValueAtTime(0.0001, at); g.gain.linearRampToValueAtTime(vol, at + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, at + len);
+    s.connect(lp); lp.connect(g); g.connect(out(c)); s.start(at); s.stop(at + len + 0.05);
+  }
+  // the ocarina: a soft pure tone that swells in, a slow wobble that arrives late, a little breath, and a ghost an
+  // octave below, slightly out of tune, very quiet (the haunted part)
+  function oca(c, f, t, len, vol) {
+    const at = c.currentTime + t, v = vol || 0.09, o = c.createOscillator(), o2 = c.createOscillator(), g = c.createGain(), lfo = c.createOscillator(), lg = c.createGain();
+    o.type = 'sine'; o2.type = 'triangle'; o.frequency.setValueAtTime(f, at); o2.frequency.setValueAtTime(f * 2, at);
+    lfo.frequency.value = 5.2; lg.gain.setValueAtTime(0, at); lg.gain.linearRampToValueAtTime(f * 0.012, at + Math.min(0.35, len * 0.6));
+    lfo.connect(lg); lg.connect(o.frequency);
+    const g2 = c.createGain(); g2.gain.value = 0.08; o2.connect(g2); g2.connect(g);
+    g.gain.setValueAtTime(0.0001, at); g.gain.linearRampToValueAtTime(v, at + 0.05); g.gain.setValueAtTime(v * 0.85, at + len * 0.75); g.gain.exponentialRampToValueAtTime(0.0001, at + len);
+    o.connect(g); g.connect(out(c)); [o, o2, lfo].forEach((x) => { x.start(at); x.stop(at + len + 0.05); });
+    noise(c, t, Math.min(0.12, len), v * 0.25, 2600, 1200);                       // the breath at the start
+    note(c, f / 2 * 1.006, t + 0.03, len * 1.1, 'sine', v * 0.18);                 // the ghost below
+  }
+  // note names to frequencies (A4 = 440)
+  const N = { A3: 220, D4: 293.7, E4: 329.6, F4: 349.2, G4: 392, A4: 440, B4: 493.9, C5: 523.3, D5: 587.3, Ds5: 622.3, E5: 659.3, F5: 698.5, Fs5: 740, G5: 784, Gs5: 830.6, A5: 880, B5: 987.8, C6: 1046.5, D6: 1174.7, E6: 1318.5 };
+  const SOUNDS = {
+    // a tick: two ocarina notes a fifth apart, and a faint chime in the echo
+    tick: (c) => { oca(c, N.D5, 0, 0.12, 0.08); oca(c, N.A5, 0.1, 0.32, 0.08); note(c, N.A5 * 2, 0.1, 0.25, 'sine', 0.012); },
+    // Vespers: a slow evening phrase in D minor that comes to rest
+    vespers: (c) => { [[N.D5, 0, 0.3], [N.F5, 0.28, 0.3], [N.A5, 0.56, 0.3], [N.G5, 0.84, 0.9]].forEach(([f, t, l]) => oca(c, f, t, l, 0.07)); note(c, N.D4, 0, 1.6, 'sine', 0.05); },
+    // level up: rising through A harmonic minor to a bright A, with a quiet sparkle above (eerie, then triumphant)
+    level: (c) => { [[N.A4, 0, 0.14], [N.C5, 0.12, 0.14], [N.E5, 0.24, 0.14], [N.Gs5, 0.36, 0.2], [N.A5, 0.54, 0.9]].forEach(([f, t, l]) => oca(c, f, t, l, 0.09));
+      [N.E6, N.A5 * 2, N.C6 * 2].forEach((f, i) => note(c, f, 0.6 + i * 0.08, 0.4, 'sine', 0.014)); note(c, N.A3, 0.54, 1.1, 'triangle', 0.08); },
+    // fainting: a slow falling half-step line that wavers, then sinks into a breath
+    faint: (c) => { [[N.E5, 0], [N.Ds5, 0.3], [N.D5, 0.6]].forEach(([f, t]) => oca(c, f, t, 0.32, 0.07)); oca(c, N.B4, 0.9, 0.9, 0.07); note(c, N.B4, 1.25, 0.8, 'sine', 0.03, N.B4 / 2); noise(c, 1.5, 0.6, 0.05, 700, 150); },
+    // back from the deep: a splash, bubbles rising, then a small E minor arpeggio that opens out
+    return: (c) => { noise(c, 0, 0.4, 0.12, 2400, 250); [0.15, 0.22, 0.29, 0.36].forEach((t, i) => note(c, 300 + i * 120, t, 0.06, 'sine', 0.06, 620 + i * 200));
+      [[N.E5, 0.5, 0.14], [N.G5, 0.62, 0.14], [N.B5, 0.74, 0.14], [N.E6, 0.86, 0.7]].forEach(([f, t, l]) => oca(c, f, t, l, 0.07)); note(c, N.E4, 0.86, 1, 'sine', 0.05); },
+  };
+  function play(name) {
+    if (!on() || !SOUNDS[name]) return false;
+    const c = audio(); if (!c) return false;
+    try { if (c.state === 'suspended') c.resume(); SOUNDS[name](c); return true; } catch (e) { return false; }
+  }
+
+  /* ---------- watching the game's screen (browser only) ---------- */
+  let last = null, quietUntil = 0;
+  function read() { try { return JSON.parse(root.localStorage.getItem('ulhuD') || 'null'); } catch (e) { return null; } }
+  function watch() {
+    if (!root.addEventListener || root.UZCOMP_WATCHING) return;
+    root.UZCOMP_WATCHING = true;
+    last = read();
+    quietUntil = Date.now() + 2500;   // the first load and the server's first reply are not moments
+    root.addEventListener('ulhuchange', () => {
+      const d = read(), m = moment(last, d); last = d;
+      if (m && Date.now() > quietUntil) play(m);
+    });
+    // browsers only allow sound after a tap: wake the sound up on the first one
+    const wake = () => { const c = on() && audio(); if (c && c.state === 'suspended') c.resume(); root.removeEventListener('pointerdown', wake, true); };
+    root.addEventListener('pointerdown', wake, true);
+  }
+
+  const api = { moment, play, soundOn: on, setSound: setOn, SOUNDS: Object.keys(SOUNDS) };
+  root.UZCOMP = Object.assign(root.UZCOMP || {}, api);
+  if (typeof module !== 'undefined' && module.exports) module.exports = api;
+  else if (root.document) { if (root.document.readyState === 'loading') root.document.addEventListener('DOMContentLoaded', watch); else watch(); }
+})(typeof window !== 'undefined' ? window : this);
+</script><script>document.querySelectorAll("button").forEach(function(b){b.onclick=function(){UZCOMP.setSound(true);UZCOMP.play(b.dataset.s);};});</script></body></html>

@@ -16,9 +16,14 @@ ok('eyes-free.js on the site is the same as planner/eyes-free.js', same(path.joi
 const ef = fs.readFileSync(path.join(M, 'eyes-free.html'), 'utf8'), src = fs.readFileSync(path.join(ROOT, 'lanes', 'mockups', 'eyes-free.html'), 'utf8');
 ok('eyes-free.html on the site loads the code from beside it, and is otherwise the lane mock-up', /<script src="eyes-free\.js"><\/script>/.test(ef) && ef.replace('<script src="eyes-free.js"></script>', '<script src="../../planner/eyes-free.js"></script>').replace(/\r\n/g, '\n') === src.replace(/\r\n/g, '\n'));
 ok('the diagram-style page and its pictures are on the site, same as the lane copy', same(path.join(M, 'diagram-style', 'index.html'), path.join(ROOT, 'lanes', 'mockups', 'diagram-style', 'index.html')) && fs.readdirSync(path.join(M, 'diagram-style')).filter((f) => /\.png$/.test(f)).length === 9);
+['ritualbar', 'dicewater', 'grimoire', 'companion'].forEach((d) => {
+  const srcDir = path.join(ROOT, 'replica', 'design', 'mockups', d), dst = path.join(M, 'ulhu', d);
+  ok(`the Ulhu mock-up folder ${d} on the site matches replica/design/mockups/${d}`, fs.existsSync(dst) && fs.readdirSync(srcDir).every((f) => fs.existsSync(path.join(dst, f)) && same(path.join(srcDir, f), path.join(dst, f))));
+});
 const idx = fs.readFileSync(path.join(M, 'index.html'), 'utf8');
 fs.readdirSync(M).filter((f) => /\.html$/.test(f) && f !== 'index.html').forEach((f) => ok(`the index links to ${f}`, idx.includes(`href="${f}"`)));
 ok('the index links to the diagram-style page', idx.includes('href="diagram-style/index.html"'));
+['ulhu/ritualbar/index.html', 'ulhu/dicewater/index.html', 'ulhu/grimoire/opened.html', 'ulhu/companion/day-tags.html', 'ulhu/companion/adventure.html', 'ulhu/companion/term-page.html', 'ulhu/companion/focus-crafts.html', 'ulhu/companion/sounds.html'].forEach((f) => ok(`the index links to ${f}`, idx.includes(`href="${f}"`)));
 ok('no real class list or pupil name is bundled (the pages hold made-up rosters only)', !/Testperson|tomczynski/i.test(idx + ef));
 
 console.log(failed ? `\n${failed} FAILED` : '\nAll mock-up site checks passed');

@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ulhu: day tags, three options</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Grenze+Gotisch:wght@500;700&family=IM+Fell+English:ital@0;1&display=swap">
+<style>
+body{margin:0;background:#020504;color:#e8e1cf;font:14px 'Atkinson Hyperlegible',system-ui,sans-serif;padding:18px}
+h1{font:700 28px 'Grenze Gotisch',serif;color:#5ef2a0;margin:0 0 4px}
+.lead{color:#9fb1a8;max-width:900px;margin:0 0 18px;line-height:1.45}
+.row{display:flex;flex-wrap:wrap;gap:22px}
+.opt{width:360px}
+.opt h2{font:500 22px 'Grenze Gotisch',serif;color:#ffd56a;margin:0 0 4px}
+.opt p{color:#9fb1a8;margin:0 0 10px;line-height:1.4;min-height:58px}
+.ph{position:relative;width:360px;height:640px;border-radius:26px;overflow:hidden;background:#070d0b;border:2px solid #1b2823;box-shadow:0 10px 40px #000}
+.ban{position:relative;height:172px;background:linear-gradient(180deg,#0f3a34 0%,#0b2522 50%,#08110f 100%);overflow:hidden}
+.ban.ill{background:linear-gradient(180deg,#0a0f1c 0%,#0a1424 55%,#0a1210 100%)}
+.rays{position:absolute;inset:0;background:repeating-linear-gradient(104deg,rgba(170,255,225,.055) 0 16px,transparent 16px 52px)}
+.ledge{position:absolute;left:0;right:0;bottom:0;height:22px;background:repeating-linear-gradient(90deg,#26362f 0 30px,#1b2823 30px 32px);border-top:2px solid #3b5047}
+.ulhu{position:absolute;left:22px;bottom:18px;width:74px;height:74px;border-radius:46% 46% 38% 38%;background:radial-gradient(circle at 35% 35%,#8ff0c4,#3c9e7a 60%,#1f5a45);box-shadow:inset -6px -8px 0 rgba(0,0,0,.18)}
+.ulhu:before,.ulhu:after{content:"";position:absolute;top:26px;width:10px;height:12px;border-radius:50%;background:#08110f}
+.ulhu:before{left:20px}.ulhu:after{right:20px}
+.ulhu i{position:absolute;bottom:-12px;width:9px;height:20px;border-radius:0 0 6px 6px;background:#3c9e7a}
+.ulhu i:nth-child(1){left:12px}.ulhu i:nth-child(2){left:27px}.ulhu i:nth-child(3){left:41px}.ulhu i:nth-child(4){left:55px}
+.ill .ulhu{filter:saturate(.5) brightness(.85)}
+.blanket{position:absolute;left:12px;bottom:14px;width:96px;height:34px;border-radius:14px 14px 6px 6px;background:repeating-linear-gradient(90deg,#6b4a9a 0 10px,#55397d 10px 20px);border-top:2px solid #a48aff}
+.coins{position:absolute;left:12px;top:9px;font:700 22px 'Atkinson Hyperlegible';color:#ffd56a}
+.lv{position:absolute;right:12px;top:9px;font:500 16px 'Grenze Gotisch';text-align:right}.lv small{display:block;font:700 11px 'Atkinson Hyperlegible';letter-spacing:.12em;color:#c9a560}
+.moon{position:absolute;left:50%;top:6px;transform:translateX(-50%);width:36px;height:36px;border-radius:50%;background:#e9eef2;box-shadow:0 0 14px #cfe0ec}
+.moon.dark{background:#141c24;box-shadow:0 0 0 2px #3a4a5a,0 0 14px #2a3a4a}
+.say{position:absolute;left:118px;right:12px;bottom:34px;background:#0d1714;border:1px solid #2f443b;border-radius:10px;padding:7px 9px;font:13px 'IM Fell English',serif;color:#cfd8d3}
+.tabs{display:flex;height:42px;border-bottom:1px solid #1b2823}
+.tabs span{flex:1;display:flex;align-items:center;justify-content:center;font:500 16px 'Grenze Gotisch';color:#7f9389}.tabs span.on{color:#5ef2a0}
+.list{padding:10px}
+.it{display:flex;align-items:center;gap:10px;padding:10px;border:1px solid #1b2823;border-radius:10px;margin-bottom:8px;background:#0b1411}
+.it b{flex:1;font-weight:400}.it em{font-style:normal;color:#ffd56a;font-weight:700}
+.sig{width:22px;height:22px;border-radius:50%;border:2px solid #6b4a9a}
+.dim{opacity:.35}
+/* chips */
+.chip{display:inline-flex;align-items:center;gap:6px;padding:7px 11px;border-radius:999px;border:1px solid #2f443b;background:#0d1714;color:#cfd8d3;font:700 13px 'Atkinson Hyperlegible';margin:0 6px 8px 0}
+.chip.on{border-color:#c9a560;background:#2a2010;color:#ffd56a}
+.chip.ill{border-color:#5aa7ff;color:#bfe0ff}.chip.ill.on{background:#0f1a24;box-shadow:0 0 10px #5aa7ff66}
+.chip .dot{width:9px;height:9px;border-radius:50%;background:#c9a560}.chip.ill .dot{background:#141c24;border:1px solid #5aa7ff}
+.chip.add{border-style:dashed;color:#7f9389}
+/* option A: sheet from the moon */
+.sheet{position:absolute;left:0;right:0;top:120px;bottom:0;background:#0b1411;border-top:2px solid #c9a560;border-radius:18px 18px 0 0;padding:16px 14px;box-shadow:0 -20px 40px #000c}
+.sheet h3{margin:0 0 2px;font:500 22px 'Grenze Gotisch';color:#e8e1cf}
+.sheet .sub{color:#7f9389;font-size:12px;margin-bottom:12px}
+.week{display:flex;gap:5px;margin-bottom:14px}
+.week div{flex:1;text-align:center;padding:6px 0;border-radius:8px;border:1px solid #1b2823;font-size:11px;color:#7f9389}
+.week div.on{border-color:#5ef2a0;color:#5ef2a0}
+.week div i{display:block;height:6px;margin:4px auto 0;width:6px;border-radius:50%}
+.note{margin-top:10px;padding:9px 10px;border-radius:8px;background:#0f1a24;border:1px solid #23405e;color:#bfe0ff;font-size:12px;line-height:1.4}
+.grab{width:40px;height:4px;border-radius:2px;background:#2f443b;margin:-6px auto 10px}
+/* option B: ribbon under the tabs */
+.ribbon{display:flex;align-items:center;gap:6px;padding:8px 10px;border-bottom:1px solid #1b2823;background:#0a110f;overflow:hidden;white-space:nowrap}
+.ribbon .lbl{font:700 11px 'Atkinson Hyperlegible';letter-spacing:.12em;color:#c9a560;margin-right:2px}
+.ribbon .chip{margin:0}
+/* option C: carved week stones */
+.stones{display:flex;gap:6px;padding:10px;border-bottom:1px solid #1b2823;background:#0a110f}
+.stone{flex:1;height:64px;border-radius:10px 10px 4px 4px;background:linear-gradient(180deg,#33433c,#1d2924);border:1px solid #415a4f;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:5px 0;font:700 11px 'Atkinson Hyperlegible';color:#9fb1a8}
+.stone.today{border-color:#5ef2a0;box-shadow:0 0 8px #5ef2a055}
+.stone .glyph{width:18px;height:18px;border-radius:4px;display:flex;align-items:center;justify-content:center;font:700 11px 'Atkinson Hyperlegible';color:#08100d}
+.g-m{background:#c9a560}.g-p{background:#ff9f6a}.g-r{background:#a48aff}.g-i{background:#141c24;border:1px solid #5aa7ff;color:#bfe0ff!important}
+.pop{position:absolute;left:10px;right:10px;top:290px;background:#0b1411;border:1px solid #c9a560;border-radius:12px;padding:12px;box-shadow:0 10px 30px #000}
+.pop h4{margin:0 0 8px;font:500 18px 'Grenze Gotisch'}
+.cap{font-size:12px;color:#7f9389;margin:4px 0 0}
+</style></head><body>
+<h1>Day tags: where do they live?</h1>
+<p class="lead">You tag your own heavy days (Marking, Parents' evening, INSET, Report writing, Trip, Cover) and Ill days. Heavy tags change no rules; they only show on the term page. Ill turns the moon dark and curses cost no health. Ulhu never suggests a tag. Three places they could live. Pick a letter (or mix).</p>
+<div class="row">
+
+<div class="opt"><h2>A. Hold the moon</h2>
+<p>Tap the moon still changes its phase. Hold it and a sheet rises: this week's days on top, tap a day, then tap its tags. Nothing new on the main screen.</p>
+<div class="ph">
+  <div class="ban"><div class="rays"></div><div class="coins">412</div><div class="lv"><small>LEVEL 6</small>Deep Dreamer</div><div class="moon"></div><div class="ulhu"><i></i><i></i><i></i><i></i></div><div class="ledge"></div></div>
+  <div class="sheet"><div class="grab"></div>
+    <h3>Thursday 5 November</h3><div class="sub">Your tags for this day. They change nothing; they show on the term page.</div>
+    <div class="week"><div>Mon<i></i></div><div>Tue<i></i></div><div>Wed<i style="background:#c9a560"></i></div><div class="on">Thu<i style="background:#ff9f6a"></i></div><div>Fri<i></i></div><div>Sat<i></i></div><div>Sun<i></i></div></div>
+    <span class="chip"><span class="dot"></span>Marking</span><span class="chip on"><span class="dot"></span>Parents' evening</span><span class="chip"><span class="dot"></span>INSET</span><span class="chip"><span class="dot"></span>Report writing</span><span class="chip"><span class="dot"></span>Trip</span><span class="chip"><span class="dot"></span>Cover</span><span class="chip ill"><span class="dot"></span>Ill</span><span class="chip add">+ your own</span>
+    <div class="note">Ill: the moon goes dark for that day and curses are still logged but cost no health.</div>
+  </div>
+</div></div>
+
+<div class="opt"><h2>B. A ribbon under the tabs</h2>
+<p>A thin strip of today's tags always sits under the tabs. Tap it to add or remove one. Always visible, one tap away, costs one line of space.</p>
+<div class="ph">
+  <div class="ban"><div class="rays"></div><div class="coins">412</div><div class="lv"><small>LEVEL 6</small>Deep Dreamer</div><div class="moon"></div><div class="ulhu"><i></i><i></i><i></i><i></i></div><div class="say">Parents' evening tonight. I'll keep the lantern lit.</div><div class="ledge"></div></div>
+  <div class="tabs"><span class="on">The Call</span><span>Grimoire</span><span>Omens</span><span>Den</span></div>
+  <div class="ribbon"><span class="lbl">TODAY</span><span class="chip on"><span class="dot"></span>Parents' evening</span><span class="chip on"><span class="dot"></span>Marking</span><span class="chip add">+ tag</span></div>
+  <div class="list">
+    <div class="it"><span class="sig"></span><b>Plan tomorrow's 9AS lesson</b><em>+10</em></div>
+    <div class="it"><span class="sig"></span><b>Log behaviour</b><em>+6</em></div>
+    <div class="it"><span class="sig"></span><b>Read</b><em>+25</em></div>
+    <div class="it"><span class="sig"></span><b>Train</b><em>+20</em></div>
+  </div>
+</div></div>
+
+<div class="opt"><h2>C. Week stones</h2>
+<p>Seven carved stones under the banner, one per day, each with a small glyph per tag. Tap a stone to tag it. You see the shape of your week at a glance, ill days as dark stones.</p>
+<div class="ph">
+  <div class="ban ill"><div class="rays"></div><div class="coins">412</div><div class="lv"><small>LEVEL 6</small>Deep Dreamer</div><div class="moon dark"></div><div class="ulhu"><i></i><i></i><i></i><i></i></div><div class="blanket"></div><div class="say">Rest. Curses cost nothing today.</div><div class="ledge"></div></div>
+  <div class="stones">
+    <div class="stone">Mon<span></span></div>
+    <div class="stone today" style="background:linear-gradient(180deg,#141c24,#0a1018);border-color:#5aa7ff">Tue<span class="glyph g-i">I</span></div>
+    <div class="stone">Wed<span class="glyph g-m">M</span></div>
+    <div class="stone">Thu<span class="glyph g-p">P</span></div>
+    <div class="stone">Fri<span class="glyph g-r">R</span></div>
+    <div class="stone">Sat<span></span></div>
+    <div class="stone">Sun<span></span></div>
+  </div>
+  <div class="pop"><h4>Wednesday 4 November</h4>
+    <span class="chip on"><span class="dot"></span>Marking</span><span class="chip"><span class="dot"></span>Parents' evening</span><span class="chip"><span class="dot"></span>INSET</span><span class="chip"><span class="dot"></span>Report writing</span><span class="chip"><span class="dot"></span>Trip</span><span class="chip"><span class="dot"></span>Cover</span><span class="chip ill"><span class="dot"></span>Ill</span>
+    <p class="cap">Tuesday is dark: tagged Ill. Ulhu is under a blanket.</p></div>
+</div></div>
+
+</div>
+<p class="lead" style="margin-top:18px">In every option: on an Ill day Ulhu rests (C shows him under a blanket), the moon is dark, and the curse buttons show no health cost. Tags you add yourself ("+ your own") join the list; Ill can never be removed.</p>
+</body></html>

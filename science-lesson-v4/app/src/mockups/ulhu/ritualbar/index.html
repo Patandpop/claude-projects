@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ulhu: the 2-week bar under the rituals (1U.13)</title>
+<style>
+:root{--a:'Atkinson Hyperlegible',system-ui,sans-serif;--g:Georgia,serif}
+body{margin:0;background:#0b0816;color:#e8e1cf;font:15px/1.45 var(--a)}
+main{max-width:420px;margin:0 auto;padding:14px 12px 40px}
+h1{font:500 24px var(--g);color:#e0c8ff;margin:4px 0 6px}
+.lede{color:#b8a8cc;font-size:14px;margin:0 0 14px}
+h2{font:500 21px var(--g);color:#ffd56a;margin:26px 0 4px}
+.why{font-size:14px;color:#b8a8cc;margin:0 0 10px}
+.key{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:13px;color:#a99cc8;margin:8px 0 0}
+.key span{display:inline-flex;align-items:center;gap:5px}
+/* a plain stand-in for the stone tablet, so the bar is seen in place */
+.tab{position:relative;display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;background:linear-gradient(160deg,#5a5560,#3a3640 55%,#2c2932);box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 2px 0 #000;margin-top:10px}
+.tab .tk{width:34px;height:34px;border-radius:50%;background:#1d1b22;box-shadow:inset 0 0 0 2px #8a8292}
+.tab.done .tk{background:radial-gradient(circle,#7af0b0,#1e6a48 70%);box-shadow:inset 0 0 0 2px #bdf6d6}
+.tab b{display:block;font:700 16px var(--a);color:#f3eee6}
+.tab small{font-size:12.5px;color:#d4ccd8}
+.tab .pay{margin-left:auto;font:700 15px var(--a);color:#f0c45a}
+
+/* B1 Two weeks of pebbles */
+.b1{display:grid;grid-template-columns:repeat(7,1fr) 10px repeat(7,1fr);gap:4px;padding:6px 4px 0}
+.b1 i{height:14px;border-radius:50% 50% 45% 45%;background:#1e1a26;box-shadow:inset 0 -2px 0 rgba(0,0,0,.5)}
+.b1 i.o{background:radial-gradient(circle at 40% 35%,#d8fff0,#5ef2a0 45%,#1e6a48);box-shadow:0 0 6px rgba(94,242,160,.6)}
+.b1 i.x{background:#3a1418;box-shadow:inset 0 0 0 1.5px #c4323a}
+.b1 i.e{background:radial-gradient(circle,#ffb35a,#7a3a10 70%);box-shadow:0 0 5px rgba(255,150,60,.5)}
+.b1 i.f{background:linear-gradient(160deg,#cfe6ff,#3a6a9a);}
+.b1 i.n{background:transparent;box-shadow:inset 0 0 0 1px #3a3450;height:6px;margin-top:4px}
+.b1 i.t{outline:2px solid #efe6ff;outline-offset:1px}
+.b1 .gap{display:block}
+.b1l{display:grid;grid-template-columns:repeat(7,1fr) 10px repeat(7,1fr);gap:4px;padding:2px 4px 0;font:700 11px var(--a);color:#8a7ea8;text-align:center}
+.b1h{display:flex;justify-content:space-between;padding:2px 4px 0;font:700 12px var(--a);color:#a99cc8}
+
+/* B2 The tide line */
+.b2{position:relative;height:30px;margin:6px 4px 0}
+.b2 svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.b2t{display:flex;justify-content:space-between;font:700 12px var(--a);color:#8fd8b0;padding:0 4px}
+
+/* B3 Carved ledge */
+.b3{display:flex;gap:3px;align-items:flex-end;padding:7px 8px 6px;margin-top:6px;border-radius:0 0 8px 8px;background:linear-gradient(180deg,#2c2932,#1c1a20);box-shadow:inset 0 2px 3px rgba(0,0,0,.6)}
+.b3 i{flex:1;height:10px;border-radius:2px;background:#141217;box-shadow:inset 0 1px 2px #000,0 1px 0 rgba(255,255,255,.06)}
+.b3 i.o{height:16px;background:linear-gradient(180deg,#9ae8c4,#3a9a70 60%,#20573f);box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 0 5px rgba(94,242,160,.45)}
+.b3 i.x{background:#141217;box-shadow:inset 0 0 0 1.5px #a02a32}
+.b3 i.e{height:12px;background:linear-gradient(180deg,#ffc27a,#8a4a18)}
+.b3 i.f{height:12px;background:linear-gradient(180deg,#e0f0ff,#5a8ab8)}
+.b3 i.n{opacity:.35}
+.b3 i.t{box-shadow:0 0 0 2px #efe6ff}
+.b3 em{flex:none;width:6px}
+.b3f{display:flex;justify-content:space-between;font:700 12px var(--a);color:#a99cc8;padding:3px 8px 0}
+
+.now{font:13px var(--a);color:#a99cc8;margin:6px 0 0;padding:8px 10px;border:1px dashed #3a2a4e;border-radius:6px}
+.old{display:flex;gap:2px;padding:4px 0 0 56px}.old i{flex:1;max-width:14px;height:4px;border-radius:1px}
+</style></head><body><main>
+<h1>The 2-week bar under each ritual</h1>
+<p class="lede">Item 1U.13. Three ways to show the last 14 days under a ritual tablet. Same pretend data in each: <b>Read</b> (school days), <b>Floss</b> (every day) and <b>Call a friend</b> (every 3 days). Pick a letter, or say what to mix.</p>
+
+<div class="now"><b>Today:</b> a 4-pixel line of 14 dashes, hard to read and no days shown.
+<div class="old" id="old"></div></div>
+
+<h2>B1 Two weeks of pebbles</h2>
+<p class="why">14 round pebbles, last week and this week with a gap between them, a day letter under each. Glowing green = done, red ring = missed, amber = a forgiven miss, ice = day off, a small dash = not due that day. Today has a white ring.</p>
+<div id="b1"></div>
+
+<h2>B2 The tide line</h2>
+<p class="why">One wavy line across 14 days that rises on done days and sinks on misses, like a tide. Higher = a better run. Small dots mark each day; the numbers say this week against last week.</p>
+<div id="b2"></div>
+
+<h2>B3 Carved ledge</h2>
+<p class="why">The bottom edge of the stone tablet becomes a carved ledge with 14 sockets. A done day holds a small polished green stone that stands up out of the ledge; misses are an empty socket rimmed red. Feels part of the tablet rather than a chart.</p>
+<div id="b3"></div>
+
+<div class="key"><span><i style="width:10px;height:10px;border-radius:50%;background:#5ef2a0"></i>done</span><span><i style="width:10px;height:10px;border-radius:50%;box-shadow:inset 0 0 0 1.5px #c4323a"></i>missed</span><span><i style="width:10px;height:10px;border-radius:50%;background:#ffb35a"></i>forgiven miss</span><span><i style="width:10px;height:10px;border-radius:50%;background:#9fc4ee"></i>day off</span><span><i style="width:10px;height:3px;background:#3a3450"></i>not due</span></div>
+</main>
+<script>
+// 14 days, oldest first, ending today (a Thursday). o done, x missed, e forgiven miss, f day off, n not due
+const R = [
+  { name: 'Read', sub: 'School days', pay: 12, done: true, s: 'onnoxooonnoeoo' },
+  { name: 'Floss', sub: 'Every day', pay: 6, done: false, s: 'oooxooofoooooe' },
+  { name: 'Call a friend', sub: 'Every 3 days · due by Sat', pay: 15, done: false, s: 'nnonnonnenonnn' }
+];
+const DAYS = 'FSSMTWTFSSMTWT'.split('');
+const tab = (r) => '<div class="tab' + (r.done ? ' done' : '') + '"><span class="tk"></span><span><b>' + r.name + '</b><small>' + r.sub + '</small></span><span class="pay">+' + r.pay + '</span></div>';
+const cnt = (s) => [s.slice(0, 7), s.slice(7)].map((w) => w.split('').filter((c) => c === 'o').length);
+document.getElementById('old').innerHTML = R[1].s.split('').map((c) => '<i style="background:' + (c === 'o' ? '#5ef2a0' : c === 'f' ? '#3a6a9a' : c === 'x' ? '#3a1418' : '#1a1430') + '"></i>').join('');
+// B1
+document.getElementById('b1').innerHTML = R.map((r) => { const c = cnt(r.s);
+  return tab(r) + '<div class="b1">' + r.s.split('').map((d, i) => (i === 7 ? '<span class="gap"></span>' : '') + '<i class="' + d + (i === 13 ? ' t' : '') + '"></i>').join('') + '</div>' +
+    '<div class="b1l">' + DAYS.map((d, i) => (i === 7 ? '<span></span>' : '') + '<span>' + d + '</span>').join('') + '</div>' +
+    '<div class="b1h"><span>last week ' + c[0] + '</span><span>this week ' + c[1] + '</span></div>'; }).join('');
+// B2
+document.getElementById('b2').innerHTML = R.map((r) => { const c = cnt(r.s); let h = 0; const pts = r.s.split('').map((d, i) => { h += d === 'o' ? 1 : d === 'x' ? -1.6 : d === 'e' ? -0.6 : 0; h = Math.max(-2, Math.min(5, h)); return [i / 13 * 100, 26 - (h + 2) * 3.4, d]; });
+  const path = pts.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' ');
+  return tab(r) + '<div class="b2"><svg viewBox="0 0 100 30" preserveAspectRatio="none"><defs><linearGradient id="tg" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#5ef2a0" stop-opacity=".45"/><stop offset="1" stop-color="#5ef2a0" stop-opacity="0"/></linearGradient></defs>' +
+    '<path d="' + path + ' L100 30 L0 30 Z" fill="url(#tg)"/><path d="' + path + '" fill="none" stroke="#8ff5c0" stroke-width="1.2" vector-effect="non-scaling-stroke"/>' +
+    pts.map((p) => '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="1.3" fill="' + ({ o: '#d8fff0', x: '#ff5a4e', e: '#ffb35a', f: '#9fc4ee', n: '#4a4466' })[p[2]] + '" vector-effect="non-scaling-stroke"/>').join('') + '</svg></div>' +
+    '<div class="b2t"><span>last week ' + c[0] + '</span><span>this week ' + c[1] + (c[1] >= c[0] ? ' ↑' : ' ↓') + '</span></div>'; }).join('');
+// B3
+document.getElementById('b3').innerHTML = R.map((r) => { const c = cnt(r.s);
+  return tab(r).replace('class="tab', 'style="border-radius:8px 8px 0 0" class="tab') + '<div class="b3">' + r.s.split('').map((d, i) => (i === 7 ? '<em></em>' : '') + '<i class="' + d + (i === 13 ? ' t' : '') + '"></i>').join('') + '</div>' +
+    '<div class="b3f"><span>' + c[0] + ' last week</span><span>' + c[1] + ' this week</span></div>'; }).join('');
+</script>
+</body></html>

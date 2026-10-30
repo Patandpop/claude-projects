@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ulhu: the overnight adventure, three options</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Grenze+Gotisch:wght@500;700&family=IM+Fell+English:ital@0;1&display=swap">
+<style>
+body{margin:0;background:#020504;color:#e8e1cf;font:14px 'Atkinson Hyperlegible',system-ui,sans-serif;padding:18px}
+h1{font:700 28px 'Grenze Gotisch',serif;color:#5ef2a0;margin:0 0 4px}
+.lead{color:#9fb1a8;max-width:960px;margin:0 0 18px;line-height:1.45}
+h2.sec{font:500 24px 'Grenze Gotisch';color:#c9a560;margin:26px 0 8px}
+.row{display:flex;flex-wrap:wrap;gap:22px}
+.opt{width:360px}.opt h3{font:500 21px 'Grenze Gotisch';color:#ffd56a;margin:0 0 4px}.opt p{color:#9fb1a8;margin:0 0 10px;line-height:1.4;min-height:58px}
+.ban{position:relative;width:360px;height:172px;border-radius:16px;overflow:hidden;background:linear-gradient(180deg,#050a18 0%,#0a1424 55%,#0a1210 100%);border:2px solid #1b2823}
+.ban.day{background:linear-gradient(180deg,#0f3a34 0%,#0b2522 50%,#08110f 100%)}
+.rays{position:absolute;inset:0;background:repeating-linear-gradient(104deg,rgba(170,255,225,.04) 0 16px,transparent 16px 52px)}
+.ledge{position:absolute;left:0;right:0;bottom:0;height:22px;background:repeating-linear-gradient(90deg,#26362f 0 30px,#1b2823 30px 32px);border-top:2px solid #3b5047}
+.moon{position:absolute;left:50%;top:8px;transform:translateX(-50%);width:30px;height:30px;border-radius:50%;background:#e9eef2;box-shadow:0 0 14px #cfe0ec}
+.coins{position:absolute;left:12px;top:9px;font:700 20px 'Atkinson Hyperlegible';color:#ffd56a}
+.say{position:absolute;left:120px;right:10px;bottom:32px;background:#0d1714;border:1px solid #2f443b;border-radius:10px;padding:6px 9px;font:13px 'IM Fell English',serif;color:#cfd8d3}
+/* Ulhu */
+.ulhu{position:absolute;left:22px;bottom:18px;width:74px;height:74px;border-radius:46% 46% 38% 38%;background:radial-gradient(circle at 35% 35%,#8ff0c4,#3c9e7a 60%,#1f5a45)}
+.ulhu:before,.ulhu:after{content:"";position:absolute;top:26px;width:10px;height:12px;border-radius:50%;background:#08110f}.ulhu:before{left:20px}.ulhu:after{right:20px}
+.ulhu i{position:absolute;bottom:-12px;width:9px;height:20px;border-radius:0 0 6px 6px;background:#3c9e7a}.ulhu i:nth-child(1){left:12px}.ulhu i:nth-child(2){left:27px}.ulhu i:nth-child(3){left:41px}.ulhu i:nth-child(4){left:55px}
+.ulhu.wet{animation:drip 2.6s ease-in-out infinite}
+@keyframes drip{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+/* away: ripples + lantern */
+.rip{position:absolute;left:58px;bottom:21px;width:30px;height:8px;border:2px solid #6ab8ff;border-radius:50%;opacity:0;animation:rip 3s ease-out infinite}
+.rip.b{animation-delay:1s}.rip.c{animation-delay:2s}
+@keyframes rip{0%{transform:scale(.3);opacity:.9}100%{transform:scale(3.2);opacity:0}}
+.lant{position:absolute;left:130px;bottom:22px;width:16px;height:22px;border-radius:4px 4px 3px 3px;background:#2a1c08;border:2px solid #8a6a2a}
+.lant:before{content:"";position:absolute;left:3px;top:4px;width:6px;height:10px;border-radius:50%;background:#ffd56a;box-shadow:0 0 14px 6px #ffb84088;animation:flick 1.8s infinite}
+.lant:after{content:"";position:absolute;left:4px;top:-8px;width:4px;height:6px;border:2px solid #8a6a2a;border-bottom:none;border-radius:4px 4px 0 0}
+@keyframes flick{0%,100%{opacity:1}45%{opacity:.75}55%{opacity:.95}}
+.bub{position:absolute;width:6px;height:6px;border-radius:50%;border:1px solid #9fd0ff;opacity:0;animation:bub 4s linear infinite}
+@keyframes bub{0%{transform:translateY(0);opacity:0}10%{opacity:.8}100%{transform:translateY(-120px);opacity:0}}
+.rope{position:absolute;left:73px;bottom:22px;width:2px;height:150px;background:repeating-linear-gradient(180deg,#8a6a2a 0 4px,#5a4418 4px 8px)}
+.tag{position:absolute;left:62px;bottom:20px;width:24px;height:6px;border-radius:2px;background:#26362f;border:1px solid #415a4f}
+.note{position:absolute;left:110px;bottom:30px;width:110px;padding:5px 7px;background:#e8dcb8;color:#3a2c14;border-radius:2px;transform:rotate(-3deg);font:12px 'IM Fell English',serif;box-shadow:2px 3px 0 #0006}
+/* find card */
+.card{width:360px;margin-top:10px;border:1px solid #c9a560;border-radius:12px;background:#0b1411;padding:12px;display:flex;gap:12px;align-items:flex-start}
+.card .obj{flex:none;width:58px;height:58px;border-radius:10px;background:radial-gradient(circle,#2a3a34,#0d1714);display:flex;align-items:center;justify-content:center;border:1px solid #415a4f}
+.card h4{margin:0;font:500 20px 'Grenze Gotisch';color:#ffd56a}.card .t{font:15px 'IM Fell English',serif;color:#e8e1cf;margin:3px 0 6px;font-style:italic}
+.card .m{font-size:11px;color:#7f9389;letter-spacing:.08em}
+.btn{display:inline-block;margin-top:8px;padding:8px 14px;border-radius:999px;border:1px solid #5ef2a0;color:#08100d;background:#5ef2a0;font-weight:700}
+.btn.ghost{background:none;color:#5ef2a0}
+/* shelf */
+.shelf{width:360px;border-radius:12px;background:#0b1411;border:1px solid #2f443b;padding:10px}
+.plank{height:10px;border-radius:2px;background:linear-gradient(180deg,#6a4a24,#3a2810);margin:0 0 14px;box-shadow:0 4px 0 #0008}
+.items{display:flex;gap:10px;align-items:flex-end;padding:0 6px;height:46px}
+.it{width:36px;height:36px;border-radius:8px;background:#162420;border:1px solid #2f443b;display:flex;align-items:center;justify-content:center}
+.it.new{border-color:#ffd56a;box-shadow:0 0 10px #ffd56a66}
+.jr{font:14px 'IM Fell English',serif;font-style:italic;color:#cfd8d3;border-left:2px solid #6b4a9a;padding:4px 10px;margin:6px 0}
+.jr small{display:block;font:11px 'Atkinson Hyperlegible';font-style:normal;color:#7f9389;letter-spacing:.06em}
+.lbl{font:700 11px 'Atkinson Hyperlegible';letter-spacing:.12em;color:#c9a560;margin:4px 0 6px}
+</style></head><body>
+<h1>Ulhu's overnight adventure</h1>
+<p class="lead">After Vespers he sinks into the deep. The app works exactly as normal while he is away (ticks, new habits, Vespers). From 6 am he is back with one find: mostly an odd object for the Sanctum shelf or a lore line, now and then a few runes. After a bad day he still goes and brings back something small or strange; it never costs anything. Three ways to show each part. Pick a letter per row (for example "1B, 2A, 3C").</p>
+
+<h2 class="sec">1. While he is away (evening, after Vespers)</h2>
+<div class="row">
+<div class="opt"><h3>1A. Ripples and a lantern</h3><p>The exact words of the decision: an empty ledge, rings spreading where he dived, a small lantern glowing until he is back. A bubble now and then.</p>
+<div class="ban"><div class="rays"></div><div class="coins">412</div><div class="moon"></div><div class="rip"></div><div class="rip b"></div><div class="rip c"></div><div class="lant"></div><span class="bub" style="left:66px;bottom:30px"></span><span class="bub" style="left:76px;bottom:30px;animation-delay:2s"></span><div class="ledge"></div></div></div>
+<div class="opt"><h3>1B. The rope goes down</h3><p>A rope tied to a ledge peg drops off the bottom of the banner, gently swaying. The lantern hangs on the peg. You can see he is "on the line" down there.</p>
+<div class="ban"><div class="rays"></div><div class="coins">412</div><div class="moon"></div><div class="rope"></div><div class="tag"></div><div class="lant" style="left:94px"></div><div class="rip"></div><div class="ledge"></div></div></div>
+<div class="opt"><h3>1C. He left a note</h3><p>Ripples and lantern as in A, plus a little paper note on the ledge in his hand: a different line each night ("Gone down. Back by breakfast.").</p>
+<div class="ban"><div class="rays"></div><div class="coins">412</div><div class="moon"></div><div class="rip"></div><div class="rip b"></div><div class="lant" style="left:236px"></div><div class="note">Gone down. Back by breakfast. Do not eat my kelp.</div><div class="ledge"></div></div></div>
+</div>
+
+<h2 class="sec">2. The morning: he is back</h2>
+<div class="row">
+<div class="opt"><h3>2A. A card under the banner</h3><p>He is back on the ledge, a little wet. A card slides in under the banner with the find. One tap: "Put it on the shelf".</p>
+<div class="ban day"><div class="rays"></div><div class="coins">412</div><div class="ulhu wet"><i></i><i></i><i></i><i></i></div><div class="say">I went down. Look what I found.</div><div class="ledge"></div></div>
+<div class="card"><div class="obj"><svg width="34" height="34" viewBox="0 0 34 34"><path d="M17 4c5 0 8 4 8 9v7l3 4H6l3-4v-7c0-5 3-9 8-9z" fill="#6a8a5a" stroke="#3a5a3a" stroke-width="2"/><circle cx="17" cy="28" r="3" fill="#4a6a4a"/></svg></div>
+<div><h4>A bell clapper</h4><div class="t">Green with age. It still swings when no one is looking.</div><div class="m">ACT I · THE DROWNED BELL · TUESDAY NIGHT</div><span class="btn">Put it on the shelf</span></div></div></div>
+
+<div class="opt"><h3>2B. He holds it up</h3><p>No card. He holds the find above his head on the ledge (a small sprite), and his speech bubble says what it is. Tap him to take it. Lore lines come as a bottle he holds instead.</p>
+<div class="ban day"><div class="rays"></div><div class="coins">412</div><div class="ulhu wet"><i></i><i></i><i></i><i></i></div>
+<div style="position:absolute;left:44px;bottom:100px;width:30px;height:30px"><svg width="30" height="30" viewBox="0 0 30 30"><rect x="9" y="3" width="12" height="22" rx="4" fill="#9fd0ff55" stroke="#9fd0ff" stroke-width="2"/><rect x="11" y="9" width="8" height="10" fill="#e8dcb8"/><rect x="11" y="0" width="8" height="5" fill="#8a6a2a"/></svg></div>
+<div class="say">"The bell rang once in the night. Nobody above heard it." Tap me.</div><div class="ledge"></div></div></div>
+
+<div class="opt"><h3>2C. A small bad-day find</h3><p>The same card as A, after a bad day: smaller, odder, with no runes and no cost. Shown so you can see the tone of a grey night.</p>
+<div class="ban day"><div class="rays"></div><div class="coins">412</div><div class="ulhu wet"><i></i><i></i><i></i><i></i></div><div class="say">It was a grey night down there too. I came back anyway.</div><div class="ledge"></div></div>
+<div class="card" style="border-color:#415a4f"><div class="obj" style="width:40px;height:40px"><svg width="16" height="16"><circle cx="8" cy="8" r="6" fill="#7f8a84"/></svg></div>
+<div><h4 style="font-size:17px">A very small stone</h4><div class="t">It is round. That is all. He is pleased with it.</div><span class="btn ghost">Keep it</span></div></div></div>
+</div>
+
+<h2 class="sec">3. Where the finds live</h2>
+<div class="row">
+<div class="opt"><h3>3A. A shelf in the Sanctum</h3><p>Objects sit on a plank shelf in the Den's Sanctum, newest glowing. Tap one to read its line again. Lore lines are kept in a little journal under it.</p>
+<div class="shelf"><div class="lbl">THE SHELF · ACT II</div><div class="items"><div class="it new"><svg width="20" height="24"><rect x="4" y="2" width="12" height="20" rx="3" fill="#ffd56a55" stroke="#ffd56a"/></svg></div><div class="it"><svg width="22" height="22"><path d="M11 2l2.6 6 6.4.6-4.8 4.2 1.5 6.2L11 15.8 5.3 19l1.5-6.2L2 8.6 8.4 8z" fill="#c9a560"/></svg></div><div class="it"><svg width="20" height="20"><circle cx="10" cy="10" r="7" fill="#9fd0ff44" stroke="#9fd0ff"/></svg></div><div class="it"><svg width="22" height="12"><rect y="4" width="22" height="4" fill="#8a6a2a"/></svg></div><div class="it"><svg width="16" height="16"><circle cx="8" cy="8" r="5" fill="#7f8a84"/></svg></div></div><div class="plank"></div>
+<div class="jr">Lanterns go down in winter, never up.<small>TUESDAY · ACT II</small></div><div class="jr">There is a keeper who lights them one by one. She is a long way behind.<small>SUNDAY · ACT II</small></div></div></div>
+
+<div class="opt"><h3>3B. A cabinet per act</h3><p>A glass cabinet for each act: seven over the year. Empty outlines show how many objects the act still has to give. Past acts close their doors.</p>
+<div class="shelf"><div class="lbl">ACT II · THE LANTERN BELOW · 5 OF 14</div>
+<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px;padding:8px;border:2px solid #415a4f;border-radius:6px;background:linear-gradient(135deg,#9fd0ff11,transparent 40%)">
+<div class="it new"></div><div class="it"></div><div class="it"></div><div class="it"></div><div class="it"></div><div class="it" style="opacity:.25;border-style:dashed"></div><div class="it" style="opacity:.25;border-style:dashed"></div><div class="it" style="opacity:.25;border-style:dashed"></div><div class="it" style="opacity:.25;border-style:dashed"></div><div class="it" style="opacity:.25;border-style:dashed"></div><div class="it" style="opacity:.25;border-style:dashed"></div><div class="it" style="opacity:.25;border-style:dashed"></div><div class="it" style="opacity:.25;border-style:dashed"></div><div class="it" style="opacity:.25;border-style:dashed"></div></div>
+<p style="color:#7f9389;font-size:12px;margin:8px 0 0">Act I cabinet: closed, 14 of 14.</p></div></div>
+
+<div class="opt"><h3>3C. A tide line</h3><p>Finds wash up along a sandy strip in the order they came, one per night, like a timeline of the act. Swipe sideways to go back through the year.</p>
+<div class="shelf" style="background:linear-gradient(180deg,#0b1411 60%,#2a2414)"><div class="lbl">THE TIDE LINE · NOVEMBER</div>
+<div style="display:flex;gap:8px;overflow:hidden;padding:10px 0 18px;border-bottom:3px wavy #6ab8ff55">
+<div style="text-align:center;font-size:10px;color:#7f9389"><div class="it"></div>Mon</div><div style="text-align:center;font-size:10px;color:#7f9389"><div class="it"></div>Tue</div><div style="text-align:center;font-size:10px;color:#7f9389"><div class="it" style="opacity:.3"></div>Wed</div><div style="text-align:center;font-size:10px;color:#7f9389"><div class="it"></div>Thu</div><div style="text-align:center;font-size:10px;color:#7f9389"><div class="it new"></div>Fri</div><div style="text-align:center;font-size:10px;color:#7f9389"><div class="it" style="border-style:dashed;opacity:.3"></div>Sat</div></div>
+<p style="color:#7f9389;font-size:12px;margin:8px 0 0">A faint shell = a night with no Vespers: nothing washed up, nothing lost.</p></div></div>
+</div>
+</body></html>
