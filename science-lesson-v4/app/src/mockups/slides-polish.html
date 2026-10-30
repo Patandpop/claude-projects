@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Slide polish mock-ups: answer-box contrast, true or false reveal, GUESS example, exam questions with pictures</title>
+<style>
+  :root { --navy:#0D1B5E; --navy2:#152347; --gold:#FABB2E; --yellow:#FFD60A; --bg:#EDF2FA; --build:#E65100; --green:#1B5E20; --red:#B71C1C; --grey:#5d6a7f; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:#1b2233; color:#e8edf5; font:15px/1.4 "Trebuchet MS",Trebuchet,system-ui,sans-serif; }
+  header { padding:12px 14px; display:flex; flex-wrap:wrap; gap:8px; align-items:center; background:#0f1420; position:sticky; top:0; z-index:3; }
+  header b { font-size:17px; margin-right:6px; }
+  button { font:inherit; padding:8px 12px; border-radius:9px; border:1px solid #3a4661; background:#182134; color:#e8edf5; }
+  button[aria-pressed="true"] { background:var(--gold); color:#111; border-color:var(--gold); font-weight:700; }
+  .note { padding:10px 14px; color:#b8c2d6; max-width:1100px; } .note b { color:#fff; }
+  .tools { padding:0 14px 8px; display:flex; gap:8px; flex-wrap:wrap; }
+  #stage { padding:10px; display:flex; justify-content:center; }
+  .frame { position:relative; transform-origin:top left; }
+  .slide { width:1333px; height:750px; background:var(--bg); position:relative; overflow:hidden; color:#111; font-family:"Trebuchet MS",Trebuchet,sans-serif; }
+  .nav { display:flex; height:55px; } .nav div { flex:1; display:flex; align-items:center; justify-content:center; color:#fff; font-size:14px; background:var(--navy2); letter-spacing:.04em; }
+  .nav div.on { background:var(--build); font-weight:700; font-size:15px; }
+  .acc { height:4px; background:var(--gold); }
+  .bar { margin-top:12px; height:38px; background:var(--build); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:20px; }
+  .foot { position:absolute; left:0; right:0; bottom:0; height:35px; background:var(--navy); color:#fff; display:flex; align-items:center; padding:0 14px; font-size:15px; } .foot b { margin-right:8px; } .foot i { color:#dfe6f5; }
+  .body { position:absolute; left:45px; right:45px; top:121px; bottom:47px; }
+  .gbox { border:2px solid var(--gold); background:#fff; border-radius:3px; padding:12px 16px; }
+  .lights { position:absolute; inset:0; background:rgba(255,255,255,.42); pointer-events:none; display:none; }
+  .slide.washed .lights { display:block; }
+  /* answer boxes */
+  .abox { border-radius:3px; padding:14px 18px; font-size:24px; font-weight:700; min-height:92px; display:flex; flex-direction:column; justify-content:center; }
+  .abox small { font-size:13px; font-weight:400; letter-spacing:.08em; opacity:.85; margin-bottom:6px; }
+  /* true or false */
+  .tf { display:flex; gap:16px; height:100%; }
+  .tf .rows { flex:1; display:flex; flex-direction:column; gap:12px; }
+  .tfrow { display:flex; gap:12px; align-items:stretch; min-height:92px; }
+  .tfrow .st { flex:1; display:flex; align-items:center; font-size:21px; gap:14px; position:relative; }
+  .tfrow .st b { color:var(--build); font-size:22px; }
+  .tfrow .tfb { width:120px; background:var(--navy); color:#fff; border:2px solid var(--gold); border-radius:3px; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:19px; position:relative; overflow:hidden; }
+  .stamp { position:absolute; right:14px; top:50%; transform:translateY(-50%) rotate(-8deg) scale(2.2); opacity:0; font-weight:900; font-size:28px; padding:2px 10px; border:4px solid; border-radius:6px; letter-spacing:.06em; transition:transform .25s ease-out, opacity .2s; }
+  .stamp.t { color:var(--green); border-color:var(--green); } .stamp.f { color:var(--red); border-color:var(--red); }
+  .tfrow.show .stamp { opacity:1; transform:translateY(-50%) rotate(-8deg) scale(1); }
+  .corr { position:absolute; left:0; right:0; bottom:-2px; font-size:15px; font-style:italic; color:#333; opacity:0; transform:translateY(6px); transition:all .3s .25s; padding:0 16px 6px 46px; }
+  .tfrow.show .corr { opacity:1; transform:none; }
+  .tfrow.show .st.tinted { background:#FFEBEE; } .tfrow.show .st.tinted.ok { background:#E8F5E9; }
+  .flip { perspective:900px; } .flip .in { position:relative; width:100%; height:100%; transition:transform .5s; transform-style:preserve-3d; }
+  .flip.show .in { transform:rotateX(180deg); }
+  .face { position:absolute; inset:0; backface-visibility:hidden; display:flex; align-items:center; justify-content:center; padding:0 14px; text-align:center; font-weight:700; }
+  .face.back { transform:rotateX(180deg); background:#fff; font-weight:400; }
+  .flip .tfb { position:absolute; left:auto; right:0; width:120px; }
+  .corners { width:360px; position:relative; }
+  .corners .c { position:absolute; width:150px; height:110px; background:var(--navy); color:var(--yellow); border:2px solid var(--gold); border-radius:3px; display:flex; flex-direction:column; align-items:center; justify-content:center; font-weight:800; font-size:30px; }
+  .corners .c small { font-size:14px; color:#fff; font-weight:400; }
+  .big { position:absolute; right:40px; top:50%; transform:translate(0,-50%) scale(.2); opacity:0; font-size:150px; font-weight:900; transition:all .3s cubic-bezier(.2,1.4,.4,1); }
+  .big.show { opacity:1; transform:translate(0,-50%) scale(1); }
+  .big.t { color:var(--green); } .big.f { color:var(--red); }
+  .point { font-size:17px; color:#333; margin-top:8px; }
+  /* GUESS */
+  .guess { display:flex; flex-direction:column; height:100%; gap:12px; }
+  .qtop { font-size:22px; padding:12px 16px; }
+  .qtop b { color:var(--build); }
+  .grows { flex:1; display:flex; gap:14px; }
+  .glabels { width:38%; display:flex; flex-direction:column; }
+  .glabels div { flex:1; display:flex; align-items:center; gap:12px; font-size:17px; color:var(--navy); }
+  .badge { width:46px; height:46px; border-radius:6px; background:var(--gold); color:var(--navy); font-weight:800; font-size:24px; display:flex; align-items:center; justify-content:center; flex:none; }
+  .gpanel { flex:1; background:var(--navy); border:2px solid var(--gold); border-radius:3px; display:flex; flex-direction:column; }
+  .gpanel div { flex:1; display:flex; align-items:center; padding:0 18px; color:var(--yellow); font-size:21px; border-top:1px solid var(--gold); opacity:0; transform:translateX(-10px); transition:all .3s; }
+  .gpanel div:first-child { border-top:0; } .gpanel div.on { opacity:1; transform:none; } .gpanel div.solve { font-weight:800; font-size:24px; }
+  .cards { flex:none; height:300px; display:flex; gap:12px; }
+  .yourturn { border:2px solid var(--gold); background:#fff; border-radius:3px; padding:14px 18px; font-size:21px; } .yourturn b { color:var(--build); }
+  .card { flex:1; border:2px solid var(--gold); background:#fff; border-radius:3px; padding:12px; display:flex; flex-direction:column; gap:8px; opacity:.18; transition:opacity .3s; }
+  .card.on { opacity:1; } .card .badge { align-self:flex-start; } .card .lab { color:var(--navy); font-size:15px; } .card .val { background:var(--navy); color:var(--yellow); padding:10px; border-radius:3px; font-size:20px; font-weight:700; margin-top:auto; }
+  .steps { flex:none; display:flex; flex-direction:column; gap:8px; }
+  .step { display:flex; gap:12px; align-items:center; opacity:.18; transition:opacity .3s; }
+  .step.on { opacity:1; } .step .lab { width:260px; color:var(--navy); font-size:17px; } .step .val { flex:1; background:var(--navy); color:var(--yellow); padding:10px 16px; border-radius:3px; font-size:21px; font-weight:700; border:2px solid var(--gold); }
+  .step.solve .val { font-size:25px; }
+  /* worksheet */
+  .ws { width:840px; height:600px; background:#fff; color:#111; padding:34px 44px; position:relative; font-size:14px; font-family:"Trebuchet MS",Trebuchet,sans-serif; }
+  .ws h3 { margin:0 0 8px; font-size:15px; color:var(--navy); border-bottom:2px solid var(--navy); padding-bottom:4px; }
+  .ws .qn { font-weight:700; }
+  .fig { background:repeating-linear-gradient(135deg,#eef2f8 0 8px,#e2e8f2 8px 16px); border:1px solid #b9c3d6; display:flex; align-items:center; justify-content:center; color:#5d6a7f; font-size:13px; text-align:center; }
+  .marks { text-align:right; color:#333; }
+  .two { display:flex; gap:14px; } .two > div { flex:1; }
+  .pagecut { border-top:2px dashed #c33; color:#c33; font-size:12px; text-align:right; margin:10px 0; }
+</style>
+</head>
+<body>
+<header>
+  <b>1 Answer boxes</b><button data-v="box" aria-pressed="true">contrast options</button>
+  <b style="margin-left:14px">2 True or false</b><button data-v="tfA">A stamp</button><button data-v="tfB">B flip</button><button data-v="tfC">C corners</button>
+  <b style="margin-left:14px">3 GUESS</b><button data-v="gA">A rows</button><button data-v="gB">B cards</button><button data-v="gC">C steps</button>
+  <b style="margin-left:14px">4 Exam question with picture</b><button data-v="wA">A two-up</button><button data-v="wB">B picture first</button><button data-v="wC">C picture beside</button>
+</header>
+<div class="note" id="note"></div>
+<div class="tools" id="tools"></div>
+<div id="stage"><div class="frame" id="frame"></div></div>
+
+<script>
+(function () {
+  'use strict';
+  var chrome = function (body, barText, extra) {
+    return '<div class="slide' + (extra || '') + '"><div class="nav"><div>DO NOW</div><div>ENGAGE</div><div>LEARN</div><div class="on">BUILD</div><div>APPLY</div><div>REVIEW</div></div><div class="acc"></div>' +
+      '<div class="bar">' + barText + '</div><div class="body">' + body + '</div><div class="foot"><b>Learning objective:</b><i>Calculate the pressure a solid exerts on a surface</i></div><div class="lights"></div></div>';
+  };
+  var STATEMENTS = [
+    { t: 'Pressure is measured in newtons.', ok: false, c: 'Pressure is measured in pascals (N/m²). Force is in newtons.' },
+    { t: 'A sharp knife cuts better because the force acts on a smaller area.', ok: true },
+    { t: 'Doubling the area doubles the pressure.', ok: false, c: 'Doubling the area halves the pressure. Pressure = force ÷ area.' },
+    { t: 'Snowshoes stop you sinking because they spread your weight over a bigger area.', ok: true }
+  ];
+  var GUESS = { q: 'A box weighs 600 N and stands on a base of 0.5 m². Calculate the pressure on the floor.', g: 'Force = 600 N, area = 0.5 m²', u: 'Pressure, p (in Pa)', e: 'p = F ÷ A', s1: 'p = 600 ÷ 0.5', s2: 'p = 1200 Pa' };
+  var step = 0;
+
+  var V = {
+    box: {
+      note: '<b>1. Answer boxes on the classroom board</b> (plan item 4.12). You love gold on navy but with the lights on it washes out. Since 19 Oct answer text is already the brighter Y5 yellow; the gold stays for titles. Four ways to go further, side by side on one slide, and a <b>Lights on</b> button that fades the whole slide the way the projector does. Pick the one you can still read washed out.',
+      tools: '<button id="wash">Lights on / off</button>',
+      html: function () {
+        var q = '<div class="gbox" style="font-size:21px">A box weighs 600 N and stands on 0.5 m². Calculate the pressure.</div>';
+        var opts = [
+          ['A as now', 'background:var(--navy);color:var(--yellow);border:2px solid var(--gold)', 'Y5 yellow text on navy, gold border (built 19 Oct)'],
+          ['B bigger and bolder', 'background:var(--navy);color:var(--yellow);border:3px solid var(--yellow);font-size:30px', 'same colours, yellow border, text up two sizes'],
+          ['C white text, yellow label', 'background:var(--navy);color:#fff;border:2px solid var(--gold)', 'white answer text, the ANSWER label and numbers in yellow'],
+          ['D cream box', 'background:#FFF3C4;color:var(--navy);border:3px solid var(--gold)', 'pale gold box, navy text: the highest contrast, still gold and navy']
+        ];
+        return chrome(q + '<div style="display:flex;gap:16px;margin-top:16px">' + opts.map(function (o) {
+          return '<div style="flex:1"><div style="font-size:15px;color:#555;margin-bottom:6px"><b>' + o[0] + '</b><br>' + o[2] + '</div><div class="abox" style="' + o[1] + '"><small style="' + (o[0][0] === 'C' ? 'color:var(--yellow);opacity:1' : '') + '">ANSWER</small>p = F ÷ A = 600 ÷ 0.5 = <span style="' + (o[0][0] === 'C' ? 'color:var(--yellow)' : '') + '">1200 Pa</span></div></div>';
+        }).join('') + '</div><p style="font-size:17px;color:#333;margin-top:22px">The same four, as a one-line answer in a review row:</p><div style="display:flex;gap:16px">' + opts.map(function (o) {
+          return '<div class="abox" style="min-height:0;padding:8px 14px;font-size:20px;flex:1;' + o[1] + '">' + (o[0][0] === 'C' ? '<span style="color:var(--yellow)">2.</span> 1200 Pa' : '2. 1200 Pa') + '</div>';
+        }).join('') + '</div>', 'BUILD · ANSWER BOX CONTRAST · four options');
+      }
+    },
+    tfA: {
+      note: '<b>2A, the stamp.</b> One slide, no second answers slide. Each click stamps TRUE or FALSE across the statement (green or red, drops in), the row tints, and the correct statement slides in underneath a false one. Pupils answer first (point A for true, D for false), then the stamp. Keeps the look of today\'s rows.',
+      tools: '<button id="next">Next click</button><button id="reset">Start again</button>',
+      html: function () {
+        return chrome('<div class="tf"><div class="rows">' + STATEMENTS.map(function (s, i) {
+          return '<div class="tfrow" data-i="' + i + '"><div class="st gbox tinted' + (s.ok ? ' ok' : '') + '" style="' + (i % 2 ? 'background:#FFF8E1' : '') + '"><b>' + (i + 1) + '</b> ' + s.t + '<div class="stamp ' + (s.ok ? 't' : 'f') + '">' + (s.ok ? 'TRUE' : 'FALSE') + '</div>' + (s.c ? '<div class="corr">' + s.c + '</div>' : '') + '</div><div class="tfb">T / F</div></div>';
+        }).join('') + '<div style="background:var(--navy);color:#fff;text-align:center;padding:8px;font-weight:700;border-radius:3px">Point: A = true, D = false. Be ready to justify on 3-2-1</div></div></div>', 'BUILD · TRUE OR FALSE');
+      }
+    },
+    tfB: {
+      note: '<b>2B, the flip.</b> Each click flips the statement card over like a playing card: the back is green (true) or red (false) and, for a false one, shows the corrected statement in place of the wrong one. The T / F box on the right turns into the verdict. Slightly more theatre.',
+      tools: '<button id="next">Next click</button><button id="reset">Start again</button>',
+      html: function () {
+        return chrome('<div class="tf"><div class="rows">' + STATEMENTS.map(function (s, i) {
+          return '<div class="tfrow flip" data-i="' + i + '"><div class="in" style="flex:1;display:flex;gap:12px"><div class="face gbox" style="justify-content:flex-start;font-weight:400;font-size:21px;gap:14px;right:132px"><b style="color:var(--build)">' + (i + 1) + '</b> ' + s.t + '</div>' +
+            '<div class="face back gbox" style="right:132px;border-color:' + (s.ok ? 'var(--green)' : 'var(--red)') + ';background:' + (s.ok ? '#E8F5E9' : '#FFEBEE') + ';font-size:21px;justify-content:flex-start;gap:14px;text-align:left"><b style="color:' + (s.ok ? 'var(--green)' : 'var(--red)') + '">' + (i + 1) + ' ' + (s.ok ? '✓' : '✗') + '</b> ' + (s.ok ? s.t : s.c) + '</div>' +
+            '<div class="face tfb" style="left:auto;width:120px">T / F</div><div class="face back tfb" style="left:auto;width:120px;background:' + (s.ok ? 'var(--green)' : 'var(--red)') + ';color:#fff">' + (s.ok ? 'TRUE' : 'FALSE') + '</div></div></div>';
+        }).join('') + '<div style="background:var(--navy);color:#fff;text-align:center;padding:8px;font-weight:700;border-radius:3px">Point: A = true, D = false</div></div></div>', 'BUILD · TRUE OR FALSE');
+      }
+    },
+    tfC: {
+      note: '<b>2C, one at a time with the corners.</b> One statement per slide, big, with the two voting corners on the right (A true, D false, like the ABCD cards). The click brings a huge tick or cross in the middle and the correction under the statement. Slowest, but one statement fills the board and the vote is explicit.',
+      tools: '<button id="next">Next click</button><button id="reset">Start again</button>',
+      html: function () {
+        var s = STATEMENTS[2];
+        return chrome('<div class="tf" style="align-items:stretch"><div class="gbox" style="flex:1;display:flex;flex-direction:column;justify-content:center;position:relative;font-size:34px;line-height:1.3;padding:30px"><div style="font-size:16px;color:#555;margin-bottom:12px">Statement 3 of 4</div>' + s.t +
+          '<div class="tfrow" data-i="0" style="position:static;min-height:0"><div class="corr" style="position:static;font-size:22px;padding:18px 0 0;color:var(--red)"><b>False.</b> ' + s.c + '</div></div><div class="big f">✗</div></div>' +
+          '<div class="corners"><div class="c" style="left:0;top:0">A<small>TRUE</small></div><div class="c" style="right:0;top:0;opacity:.25">B</div><div class="c" style="left:0;bottom:0;opacity:.25">C</div><div class="c" style="right:0;bottom:0">D<small>FALSE</small></div><div style="position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);text-align:center;color:#333;font-size:16px">point to your corner</div></div></div>', 'BUILD · TRUE OR FALSE · 3 of 4');
+      }
+    },
+    gA: {
+      note: '<b>3A, rows.</b> Today\'s GUESS slide with the example question added across the top, and each row appearing on click (G, then U, E, S, S) instead of all at once. Smallest change to what you have.',
+      tools: '<button id="next">Next click</button><button id="reset">Start again</button>',
+      html: function () {
+        return chrome('<div class="guess"><div class="qtop gbox"><b>Example</b> ' + GUESS.q + '</div><div class="grows"><div class="glabels"><div><span class="badge">G</span>What are you given?</div><div><span class="badge">U</span>What is unknown?</div><div><span class="badge">E</span>What is the equation?</div><div><span class="badge">S</span>Substitute the numbers</div><div><span class="badge">S</span><b>Solve (add units)</b></div></div>' +
+          '<div class="gpanel"><div data-i="0">' + GUESS.g + '</div><div data-i="1">' + GUESS.u + '</div><div data-i="2" style="font-size:26px">' + GUESS.e + '</div><div data-i="3">' + GUESS.s1 + '</div><div data-i="4" class="solve">' + GUESS.s2 + '</div></div></div></div>', 'BUILD · WORKED EXAMPLE · PRESSURE');
+      }
+    },
+    gB: {
+      note: '<b>3B, cards left to right.</b> The question on top, then five cards in a row that light up one per click, left to right, each with its letter, its question and the working in a navy box. Reads like a timeline; good for the first time a class meets GUESS.',
+      tools: '<button id="next">Next click</button><button id="reset">Start again</button>',
+      html: function () {
+        var c = [['G', 'What are you given?', GUESS.g], ['U', 'What is unknown?', GUESS.u], ['E', 'What is the equation?', GUESS.e], ['S', 'Substitute', GUESS.s1], ['S', 'Solve, add units', GUESS.s2]];
+        return chrome('<div class="guess"><div class="qtop gbox"><b>Example</b> ' + GUESS.q + '</div><div class="cards">' + c.map(function (x, i) { return '<div class="card" data-i="' + i + '"><span class="badge">' + x[0] + '</span><div class="lab">' + x[1] + '</div><div class="val">' + x[2] + '</div></div>'; }).join('') + '</div><div class="yourturn"><b>Your turn</b> A 900 N crate stands on a base of 0.3 m². Use G U E S S in your book. <span style="color:#555;font-size:16px">(answer on the next click: 3000 Pa)</span></div></div>', 'BUILD · WORKED EXAMPLE · PRESSURE');
+      }
+    },
+    gC: {
+      note: '<b>3C, steps down the page.</b> The question on top, then the five steps as full-width lines that appear one per click, the way you would write it on the board: label on the left, working on the right, the last line biggest. Closest to what pupils will write in their books.',
+      tools: '<button id="next">Next click</button><button id="reset">Start again</button>',
+      html: function () {
+        var c = [['G', 'Given', GUESS.g], ['U', 'Unknown', GUESS.u], ['E', 'Equation', GUESS.e], ['S', 'Substitute', GUESS.s1], ['S', 'Solve, with units', GUESS.s2]];
+        return chrome('<div class="guess"><div class="qtop gbox"><b>Example</b> ' + GUESS.q + '</div><div class="steps">' + c.map(function (x, i) { return '<div class="step' + (i === 4 ? ' solve' : '') + '" data-i="' + i + '"><span class="badge">' + x[0] + '</span><div class="lab">' + x[1] + '</div><div class="val">' + x[2] + '</div></div>'; }).join('') + '</div><div class="yourturn"><b>Your turn</b> A 900 N crate stands on a base of 0.3 m². Use G U E S S in your book. <span style="color:#555;font-size:16px">(answer on the next click: 3000 Pa)</span></div></div>', 'BUILD · WORKED EXAMPLE · PRESSURE');
+      }
+    },
+    wA: {
+      note: '<b>4A, two-up.</b> On the worksheet an exam question with a picture is laid out as two columns: the question text and the answer space on the left, the picture on the right, scaled to the column. Nothing is left out for having a diagram. The dashed red line shows where a page would break: the whole question moves to the next page together rather than splitting.',
+      tools: '',
+      html: function () {
+        return '<div class="ws"><h3>Exam question</h3><div class="two"><div><p><span class="qn">1.</span> The diagram shows a brick lying on its side on a table. The brick weighs 20 N. Its side measures 0.2 m by 0.1 m.</p><p><span class="qn">1 (a)</span> Calculate the pressure the brick exerts on the table.</p><p class="marks">[3 marks]</p><p><span class="qn">1 (b)</span> The brick is stood on its end (0.1 m by 0.05 m). Explain what happens to the pressure.</p><p class="marks">[2 marks]</p></div><div class="fig" style="height:200px">Figure 1<br>(the real figure from the paper)</div></div><div class="pagecut">page 2 ends here: the whole of question 2 moves to page 3</div><div class="two"><div><p><span class="qn">2.</span> Figure 2 shows a pin being pushed into a board...</p></div><div class="fig" style="height:120px">Figure 2</div></div></div>';
+      }
+    },
+    wB: {
+      note: '<b>4B, picture first.</b> The picture sits above the question at 60% width, centred, then the question text runs full width below. Simpler to build, uses more height, but the picture is bigger and nearer the question stem it belongs to.',
+      tools: '',
+      html: function () {
+        return '<div class="ws"><h3>Exam question</h3><div class="fig" style="height:170px;width:60%;margin:0 auto 10px">Figure 1<br>(the real figure from the paper)</div><p><span class="qn">1.</span> The diagram shows a brick lying on its side on a table. The brick weighs 20 N. Its side measures 0.2 m by 0.1 m.</p><p><span class="qn">1 (a)</span> Calculate the pressure the brick exerts on the table.</p><p class="marks">[3 marks]</p><p><span class="qn">1 (b)</span> The brick is stood on its end (0.1 m by 0.05 m). Explain what happens to the pressure.</p><p class="marks">[2 marks]</p><div class="pagecut">page 2 ends here</div></div>';
+      }
+    },
+    wC: {
+      note: '<b>4C, picture beside the stem only.</b> The picture floats to the right of the question stem; the parts (a) and (b) then run full width underneath. The most compact of the three; the picture is smallest.',
+      tools: '',
+      html: function () {
+        return '<div class="ws"><h3>Exam question</h3><div style="overflow:hidden"><div class="fig" style="float:right;width:260px;height:150px;margin:0 0 8px 14px">Figure 1</div><p><span class="qn">1.</span> The diagram shows a brick lying on its side on a table. The brick weighs 20 N. Its side measures 0.2 m by 0.1 m.</p><p><span class="qn">1 (a)</span> Calculate the pressure the brick exerts on the table.</p><p class="marks">[3 marks]</p></div><p><span class="qn">1 (b)</span> The brick is stood on its end (0.1 m by 0.05 m). Explain what happens to the pressure.</p><p class="marks">[2 marks]</p><div class="pagecut">page 2 ends here</div></div>';
+      }
+    }
+  };
+  var frame = document.getElementById('frame'), note = document.getElementById('note'), tools = document.getElementById('tools'), cur = 'box';
+  function fit() {
+    var el = frame.firstChild, w = el ? el.offsetWidth : 1333, h = el ? el.offsetHeight : 750, s = Math.min((window.innerWidth - 20) / w, 1);
+    frame.style.transform = 'scale(' + s + ')'; frame.style.width = w + 'px'; frame.style.height = h + 'px';
+    document.getElementById('stage').style.height = (h * s + 20) + 'px';
+  }
+  function next() {
+    if (cur === 'tfC') { var b = frame.querySelector('.big'), r = frame.querySelector('.tfrow'); b.classList.add('show'); r.classList.add('show'); return; }
+    var items = frame.querySelectorAll('[data-i]');
+    if (step < items.length) { items[step].classList.add(cur.charAt(0) === 'g' ? 'on' : 'show'); step++; }
+  }
+  function show(k) {
+    cur = k; step = 0; frame.innerHTML = V[k].html(); note.innerHTML = V[k].note; tools.innerHTML = V[k].tools;
+    document.querySelectorAll('header button').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.v === k)); });
+    var n = document.getElementById('next'), r = document.getElementById('reset'), w = document.getElementById('wash');
+    if (n) n.onclick = next; if (r) r.onclick = function () { show(k); };
+    if (w) w.onclick = function () { frame.firstChild.classList.toggle('washed'); };
+    fit();
+  }
+  document.querySelector('header').addEventListener('click', function (e) { var b = e.target.closest('button'); if (b) show(b.dataset.v); });
+  frame.addEventListener('click', function () { if (document.getElementById('next')) next(); });
+  window.addEventListener('resize', fit);
+  show('box');
+})();
+</script>
+</body>
+</html>

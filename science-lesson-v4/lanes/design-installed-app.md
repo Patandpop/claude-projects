@@ -257,3 +257,11 @@ Each step ends with its tests green, a commit by explicit paths, a push, and one
 | Long jobs hit Apps Script's time limit | Jobs run on their own trigger with up to six minutes; the order sheet and drafts finish well inside it; a failed job shows its note and can be retried. |
 | Files that are Lane A's or Lane B's | Lane C edits none of them. Shim and Day.gs are Lane C's; one-line hooks elsewhere are committed at once and named in the log. |
 | Working after 19:00 | The app never starts automatic work after 19:00; the 06:50 trigger and the 06:00 agent run are the only scheduled jobs. |
+
+## 12. Later additions (design chat, 30 Oct 2026)
+
+Built elsewhere, waiting for the day screen to pick them up when the builder gets there. None of these change the data model.
+- **Open and Print on the home PC:** `node planner/tools/open-lesson.js today` opens a lesson's files in order; `pack` makes the week's print pack (lanes/design-lesson-launcher.md). On the desktop copy of the app, each lesson block gets an "Open" button and the Today card a "Print this week" button that run those commands (the browser cannot run them itself: the desktop app needs a tiny local helper, or the buttons copy the command to the clipboard until there is one).
+- **"Built ahead" line:** `planner/tools/build-ahead.log` (lanes/design-build-ahead.md) holds one line per afternoon run. The Today card shows the latest line when it is from today ("9AS L4 built at 16:40"), under the lessons strip.
+- **Blind mode in the Lesson tab:** eyes-free behaviour entry (lanes/design-eyes-free.md) is Lane B's to wire into Phone.html; the app's Lesson tab inherits it with the page.
+- **Mock-ups on the site:** `app/src/mockups/` holds copies of the lane mock-ups (index at `/mockups/`), so Patryk can pick on his phone. `app/tests/mockups.test.js` keeps the copies equal to their sources. They carry made-up classes only.

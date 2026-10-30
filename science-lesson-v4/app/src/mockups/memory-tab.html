@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Memory tab: three layouts (mock-up)</title>
+<style>
+  :root { --ink:#1a1a2e; --muted:#667; --line:#dde2ec; --bg:#f5f7fb; --navy:#0d1b5e; --green:#2e7d32; --amber:#e6a100; --red:#c62828; --grey:#c9ced8; }
+  body { font:15px/1.4 "Segoe UI", system-ui, sans-serif; color:var(--ink); background:var(--bg); margin:0; padding:16px; }
+  h1 { font-size:20px; margin:0 0 4px; } h2 { font-size:17px; margin:28px 0 6px; color:var(--navy); }
+  .lead { color:var(--muted); margin:0 0 12px; max-width:900px; }
+  .opt { background:#fff; border:1px solid var(--line); border-radius:10px; padding:14px; margin-bottom:18px; max-width:1100px; }
+  .classes { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px; }
+  .classes span { padding:4px 10px; border:1px solid var(--line); border-radius:14px; font-size:13px; }
+  .classes span.on { background:var(--navy); color:#fff; border-color:var(--navy); }
+  .head { font-size:13px; color:var(--muted); margin-bottom:10px; }
+  .g { background:var(--green); } .a { background:var(--amber); } .r { background:var(--red); } .u { background:var(--amber); opacity:.55; } .x { background:var(--grey); }
+  /* A: grid */
+  .row { display:grid; grid-template-columns:230px 1fr; gap:8px; align-items:center; margin:5px 0; }
+  .row b { font-size:13px; }
+  .sq { display:flex; gap:5px; flex-wrap:wrap; }
+  .sq i { width:96px; height:44px; border-radius:6px; color:#fff; font-style:normal; font-size:11px; padding:4px; box-sizing:border-box; overflow:hidden; position:relative; }
+  .sq i small { position:absolute; right:4px; bottom:2px; font-weight:700; }
+  .sq i.x { color:#556; }
+  /* B: bars */
+  .bars div.l { display:grid; grid-template-columns:330px 1fr 50px; gap:8px; align-items:center; margin:3px 0; font-size:13px; }
+  .bars .t { height:14px; background:#eef1f6; border-radius:7px; overflow:hidden; } .bars .t i { display:block; height:100%; }
+  .bars h4 { margin:10px 0 2px; font-size:13px; color:var(--navy); }
+  /* C: due list */
+  .due { display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:8px; }
+  .due div { border-left:6px solid; border-radius:6px; background:#fafbfd; padding:6px 8px; font-size:13px; }
+  .due div.r { border-color:var(--red); background:#fdf1f1; } .due div.a { border-color:var(--amber); background:#fdf8ec; } .due div.u { border-color:var(--amber); background:#fdf8ec; opacity:1; }
+  .due div.g { border-color:var(--green); background:#f1f8f1; }
+  .due b { display:block; } .due small { color:var(--muted); }
+  .panel { margin-top:10px; border:1px dashed var(--line); border-radius:8px; padding:8px 10px; font-size:13px; background:#fcfcfe; }
+  .card { max-width:420px; border:1px solid var(--line); border-radius:8px; padding:8px 10px; background:#fff; font-size:13px; }
+  .card label { display:block; margin:2px 0; }
+  .key span { display:inline-block; width:12px; height:12px; border-radius:3px; vertical-align:middle; margin:0 4px 0 10px; }
+</style></head><body>
+<h1>Memory tab: three ways to show it</h1>
+<p class="lead">Mock-up only, made-up colours on 9AS's real topics (no pupil data). Each square is one part of the specification; its colour is how well the class is predicted to remember it today. Pick A, B or C (or mix: "A, with C's due list on top"). The "Suggested Do Now" box at the bottom is the same for all three.</p>
+<div class="key">Key:<span class="g"></span>remembered (85%+)<span class="a"></span>fading (75 to 84%)<span class="r"></span>due (under 75%)<span class="u"></span>taught, not checked yet (?)<span class="x"></span>not taught yet</div>
+
+<h2>A. Grid: one row per topic, one square per section</h2>
+<div class="opt">
+  <div class="classes"><span>7MLA</span><span>8XP</span><span class="on">9AS</span><span>9XS</span><span>10C2</span><span>10S2</span><span>11S2</span><span>12C</span><span>13D</span></div>
+  <div class="head">14 taught: 4 red, 5 amber, 5 green. Updated 06:10. Tap a square for the questions behind it.</div>
+  <div class="row"><b>Particle Model of Matter</b><div class="sq"><i class="g">Changes of state<small>91%</small></i><i class="a">Internal energy<small>79%</small></i><i class="r">Particle model and pressure<small>58%</small></i><i class="g">Specific heat capacity<small>88%</small></i><i class="r">Latent heat<small>48%</small></i></div></div>
+  <div class="row"><b>Atomic Structure (Chemistry)</b><div class="sq"><i class="a">The periodic table<small>80%</small></i><i class="u">Transition metals<small>?</small></i></div></div>
+  <div class="row"><b>Atomic Structure (Physics)</b><div class="sq"><i class="g">Atoms and isotopes<small>90%</small></i><i class="a">Nuclear radiation<small>77%</small></i><i class="x">Hazards and uses</i></div></div>
+  <div class="row"><b>Chemical Changes</b><div class="sq"><i class="x">Reactivity of metals</i></div></div>
+  <div class="row"><b>Bonding and Structure</b><div class="sq"><i class="r">Bonding and properties<small>62%</small></i><i class="a">Carbon<small>81%</small></i><i class="x">Nanoparticles</i></div></div>
+  <div class="row"><b>Quantitative Chemistry</b><div class="sq"><i class="r">Amount of substance<small>55%</small></i></div></div>
+  <div class="panel"><b>Latent heat: 48%, re-teach</b>. Taught 13 Oct. ABCD cards 15 Oct: 40% right (most picked C: "the temperature rises while it melts"). Homework 22 Oct Q3: 52% of marks. <u>Put on next lesson's Do Now</u> · <u>Fix section</u></div>
+</div>
+
+<h2>B. Bars: every section as a bar, grouped by topic</h2>
+<div class="opt bars">
+  <div class="classes"><span>8XP</span><span class="on">9AS</span><span>9XS</span><span>10C2</span></div>
+  <h4>Particle Model of Matter</h4>
+  <div class="l"><span>Changes of state and the particle model</span><span class="t"><i class="g" style="width:91%"></i></span><span>91%</span></div>
+  <div class="l"><span>Internal energy</span><span class="t"><i class="a" style="width:79%"></i></span><span>79%</span></div>
+  <div class="l"><span>Particle model and pressure</span><span class="t"><i class="r" style="width:58%"></i></span><span>58%</span></div>
+  <div class="l"><span>Specific heat capacity</span><span class="t"><i class="g" style="width:88%"></i></span><span>88%</span></div>
+  <div class="l"><span>Latent heat (re-teach)</span><span class="t"><i class="r" style="width:48%"></i></span><span>48%</span></div>
+  <h4>Bonding and Structure</h4>
+  <div class="l"><span>Bonding and properties</span><span class="t"><i class="r" style="width:62%"></i></span><span>62%</span></div>
+  <div class="l"><span>Structure and bonding of carbon</span><span class="t"><i class="a" style="width:81%"></i></span><span>81%</span></div>
+  <div class="l"><span>Nanoparticles</span><span class="t"></span><span>not yet</span></div>
+</div>
+
+<h2>C. Due list: what needs retrieving first, reddest at the top</h2>
+<div class="opt">
+  <div class="classes"><span class="on">9AS</span><span>9XS</span><span>10C2</span></div>
+  <div class="head">Due now (4) · Fading (5) · Remembered (5). Not taught yet: 3, hidden.</div>
+  <div class="due">
+    <div class="r"><b>Latent heat 48%</b><small>Particle Model · re-teach · last checked 22 Oct</small></div>
+    <div class="r"><b>Amount of substance 55%</b><small>Quantitative · last checked 9 Oct</small></div>
+    <div class="r"><b>Particle model and pressure 58%</b><small>Particle Model · never re-checked since 2 Oct</small></div>
+    <div class="r"><b>Bonding and properties 62%</b><small>Bonding · ABCD 21 Oct</small></div>
+    <div class="u"><b>Transition metals ?</b><small>Atomic Structure · taught 27 Oct, not checked yet</small></div>
+    <div class="a"><b>Nuclear radiation 77%</b><small>Atomic Structure</small></div>
+    <div class="a"><b>Internal energy 79%</b><small>Particle Model</small></div>
+    <div class="g"><b>Changes of state 91%</b><small>Particle Model</small></div>
+  </div>
+</div>
+
+<h2>Same in all three: the lesson card's "Suggested Do Now"</h2>
+<div class="card"><b>Suggested Do Now</b> <span style="color:#667">(from the memory map; goes to Claude with the build)</span>
+  <label><input type="checkbox" checked> Latent heat 48% (re-teach)</label>
+  <label><input type="checkbox" checked> Amount of substance 55%</label>
+  <label><input type="checkbox" checked> Particle model and pressure 58%</label>
+  <label><input type="checkbox" checked> Bonding and properties 62%</label>
+  <label><input type="checkbox" checked> Transition metals ?</label>
+  <label><input type="checkbox" checked> Nuclear radiation 77%</label>
+  <label><input type="checkbox"> Internal energy 79%</label>
+</div>
+</body></html>
