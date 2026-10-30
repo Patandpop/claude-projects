@@ -22,6 +22,11 @@
 
 ## Entries (newest first)
 
+### 30 Oct 2026, design chat: the site builds its mock-ups from their source folders
+- What changed: the app site no longer keeps copies of the mock-up pages (they went stale every time a lane edited one, and the copy check then failed everyone's test run). `app/build.js` now copies the pages, code and pictures straight from `lanes/mockups`, `planner/eyes-free.js` and the Ulhu mock-up folders when the site is built, so /mockups/ is always current; `app/src/mockups` holds only the index. The check now builds the site into a temporary folder and confirms every index link lands on a built page.
+- You need to: nothing.
+- Save: see git log "Site mock-ups built from source".
+
 ### 30 Oct 2026, design chat: homework ahead made warmer, decisions down to three
 - What changed: you picked layout B for homework ahead but said it felt soulless, so `lanes/mockups/homework-ahead-b2.html` is the same idea in the planner's own look: the three weeks as a lantern-lit path with a progress ring each, one crafted card per lesson with its class colour ribbon and chip, "to prepare" and "already made" sections, and the gold button with a line saying what happens next. Lane B builds it. Your other answers (Engage always a question, keep the review answers sheet, Vespers only, yes to all 20 language rules, install build ahead) are recorded in `lanes/test-defaults.md`, and the decisions page is down to the three facts only you have.
 - You need to: the eyes-free Try score, the site address when it exists, the school test.
