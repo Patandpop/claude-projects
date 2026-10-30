@@ -22,6 +22,12 @@ const t = fs.readFileSync(path.join(dist, 'test/index.html'), 'utf8');
 check(/personal Google sign-in/.test(t) && /talk to your personal Apps Script/.test(t) && /Direct updates to the school script/.test(t), 'the test page has its three checks');
 check(!/localStorage\.setItem\('testMailboxKey'|LS\.set\('testMailboxKey'/.test(t), 'the test page never remembers the key');
 
+// the app shell: every file the service worker keeps for no-signal use is in the build, and the icons are real images
+const sw = fs.readFileSync(path.join(dist, 'sw.js'), 'utf8'), shell = JSON.parse(/var SHELL = (\[[^\]]*\])/.exec(sw)[1].replace(/'/g, '"'));
+check(shell.every((f) => f === './' || rel.includes(f)) && /planner-app \d/.test(sw), 'every file the app keeps for no-signal use is in the build, and its store is named by the build');
+const man = JSON.parse(fs.readFileSync(path.join(dist, 'manifest.webmanifest'), 'utf8'));
+check(man.icons.every((i) => rel.includes(i.src) && fs.readFileSync(path.join(dist, i.src)).slice(1, 4).toString() === 'PNG'), 'the icons in the manifest are in the build and are PNG images');
+
 // the build folder guard: it will not empty a folder it did not make
 const other = fs.mkdtempSync(path.join(os.tmpdir(), 'notapp-')); fs.writeFileSync(path.join(other, 'keep.txt'), 'x');
 let refused = false; try { execFileSync(process.execPath, [path.join(APP, 'build.js'), other], { stdio: 'pipe' }); } catch (e) { refused = true; }
@@ -42,7 +48,7 @@ fs.rmSync(out, { recursive: true, force: true }); fs.rmSync(other, { recursive: 
 // Lane C's other checks: the server bridge (Day.gs), then the browser checks (python, playwright)
 const PLANNER_TESTS = path.join(APP, '..', 'planner', 'tests');
 const py = process.platform === 'win32' ? 'python' : 'python3';
-for (const [cmd, file] of [[process.execPath, path.join(__dirname, 'api.test.js')], [process.execPath, path.join(PLANNER_TESTS, 'bridge.test.js')], [process.execPath, path.join(PLANNER_TESTS, 'day-logic.test.js')], [process.execPath, path.join(PLANNER_TESTS, 'day.test.js')], [py, path.join(__dirname, 'test_page_sim.py')], [py, path.join(PLANNER_TESTS, 'instant_sim.py')], [py, path.join(PLANNER_TESTS, 'day_timer_sim.py')], [py, path.join(PLANNER_TESTS, 'day_capture_sim.py')], [py, path.join(PLANNER_TESTS, 'day_screen_sim.py')], [py, path.join(PLANNER_TESTS, 'day_phone_sim.py')], [process.execPath, path.join(PLANNER_TESTS, 'bundle.test.js')]]) {
+for (const [cmd, file] of [[process.execPath, path.join(__dirname, 'api.test.js')], [process.execPath, path.join(PLANNER_TESTS, 'bridge.test.js')], [process.execPath, path.join(PLANNER_TESTS, 'day-logic.test.js')], [process.execPath, path.join(PLANNER_TESTS, 'day.test.js')], [py, path.join(__dirname, 'test_page_sim.py')], [py, path.join(PLANNER_TESTS, 'instant_sim.py')], [py, path.join(PLANNER_TESTS, 'day_timer_sim.py')], [py, path.join(PLANNER_TESTS, 'day_capture_sim.py')], [py, path.join(PLANNER_TESTS, 'day_screen_sim.py')], [py, path.join(PLANNER_TESTS, 'day_phone_sim.py')], [process.execPath, path.join(PLANNER_TESTS, 'bundle.test.js')], [py, path.join(__dirname, 'shell_sim.py')]]) {
   try { console.log(execFileSync(cmd, [file], { encoding: 'utf8' }).trim()); }
   catch (e) { console.log(String(e.stdout || '') + String(e.stderr || '')); check(false, path.basename(file)); }
 }

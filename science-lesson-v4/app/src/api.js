@@ -9,7 +9,7 @@
 (function (root) {
   'use strict';
   var NAMES = ['init', 'openClass', 'logEvent', 'logMany', 'removeEvent', 'removeMany', 'positivesOver', 'getMode', 'setMode',
-    'setLive', 'setLost', 'setSupport', 'getSilence', 'setLimit', 'showRecap', 'stopRecap', 'setTimer', 'adjustTimer',
+    'setLive', 'setLost', 'setSupport', 'getSilence', 'showRecap', 'stopRecap', 'setTimer', 'adjustTimer',
     'stopTimer', 'setPause', 'endMode', 'getFriday', 'markEmailed', 'lessonMcqs', 'saveVote', 'removeVote',
     'loadAll', 'saveWeek', 'saveWeeks', 'saveLessonChanges', 'saveLessons', 'saveClassSetting', 'learnEquipment',
     'createLesson', 'renameAdded', 'sendRequest', 'pushHome', 'behaviourWeek', 'syncWeek', 'myEvents', 'homeworkList',

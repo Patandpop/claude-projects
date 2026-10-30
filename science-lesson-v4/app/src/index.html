@@ -1,23 +1,95 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="auto">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Planner app</title>
-<!-- The installed app (lanes/design-installed-app.md). Being built step by step; for now only the school test page is live. -->
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Planner</title>
+<!-- The installed app's shell (lanes/design-installed-app.md 3.1, build step 5): installable on the phone and the PC,
+     opens with no signal, asks once per device for the server address and planner key, settings (theme, key, updates)
+     and the outbox's waiting taps. The screens arrive one by one (step 6); until then the old links work as always.
+     The code is in app.js; api.js and outbox.js are the server and the waiting-taps queue. -->
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<meta name="theme-color" content="#0D1B5E">
 <style>
-  body { margin:0; font:16px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; color:#16213a; background:#f6f7fb; }
-  main { max-width:560px; margin:0 auto; padding:32px 16px; }
-  a { color:#16213a; font-weight:700; }
-  .stamp { position:fixed; right:6px; bottom:4px; font-size:11px; color:#99a; }
+  :root { --navy:#0D1B5E; --gold:#FABB2E; --bg:#EDF2FA; --panel:#FFFFFF; --ink:#1A1A2E; --muted:#6B6B7B; --line:#D5DDEC; --head:#0D1B5E;
+    --good:#1B5E20; --good-wash:#E3F3E4; --bad:#8A3F00; --bad-wash:#FFF0DC; }
+  html[data-theme="dark"] { --bg:#0E1424; --panel:#161E33; --ink:#E6EAF5; --muted:#98A2BC; --line:#2A3555; --head:#FABB2E;
+    --good:#8BD68E; --good-wash:rgba(102,187,106,.16); --bad:#FFB95C; --bad-wash:rgba(255,167,38,.14); }
+  @media (prefers-color-scheme: dark) { html[data-theme="auto"] { --bg:#0E1424; --panel:#161E33; --ink:#E6EAF5; --muted:#98A2BC; --line:#2A3555; --head:#FABB2E;
+    --good:#8BD68E; --good-wash:rgba(102,187,106,.16); --bad:#FFB95C; --bad-wash:rgba(255,167,38,.14); } }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:16px/1.45 "Century Gothic","Segoe UI",system-ui,sans-serif; }
+  header { background:var(--navy); color:#fff; display:flex; align-items:center; gap:10px; padding:10px 16px; padding-top:calc(10px + env(safe-area-inset-top,0px)); border-bottom:3px solid var(--gold); }
+  header img { width:32px; height:32px; image-rendering:pixelated; border-radius:6px; }
+  header h1 { margin:0; font-size:20px; flex:1; }
+  .pill { font-size:12px; font-weight:800; border-radius:999px; padding:2px 10px; background:rgba(255,255,255,.16); }
+  .pill.off { background:var(--gold); color:var(--navy); }
+  main { max-width:560px; margin:0 auto; padding:16px; }
+  h2 { font-size:13px; letter-spacing:.06em; text-transform:uppercase; color:var(--head); margin:22px 0 8px; }
+  .card { background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:14px; margin-bottom:10px; }
+  label { display:block; font-weight:700; font-size:14px; margin:10px 0 4px; }
+  input { width:100%; font:inherit; padding:10px; border:1px solid var(--line); border-radius:8px; background:var(--bg); color:var(--ink); }
+  button, .btn { font:inherit; font-weight:800; border:0; border-radius:8px; padding:10px 14px; cursor:pointer; background:var(--gold); color:var(--navy); text-decoration:none; display:inline-block; }
+  button.plain, .btn.plain { background:transparent; color:var(--ink); border:1px solid var(--line); font-weight:700; }
+  button:disabled { opacity:.5; cursor:default; }
+  .row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-top:12px; }
+  .msg { margin:10px 0 0; padding:8px 10px; border-radius:8px; font-size:14px; }
+  .msg:empty { display:none; }
+  .msg.good { background:var(--good-wash); color:var(--good); } .msg.bad { background:var(--bad-wash); color:var(--bad); }
+  .note { color:var(--muted); font-size:14px; }
+  .seg { display:inline-flex; border:1px solid var(--line); border-radius:8px; overflow:hidden; }
+  .seg button { border-radius:0; background:var(--panel); color:var(--ink); font-weight:700; padding:8px 14px; }
+  .seg button[aria-pressed="true"] { background:var(--gold); color:var(--navy); }
+  .stuck li { margin-bottom:6px; }
+  .hidden { display:none !important; }
+  .stamp { text-align:center; color:var(--muted); font-size:12px; margin-top:28px; }
 </style>
 </head>
 <body>
+<header><img src="icons/icon-192.png" alt=""><h1>Planner</h1><span class="pill" id="net">Online</span></header>
 <main>
-  <h1>Planner app</h1>
-  <p>Coming step by step. Your planner and phone links work as they always have.</p>
-  <p><a href="test/">Open the school test</a></p>
+  <div id="update" class="card hidden"><b>A newer version is ready.</b><div class="row"><button id="updateNow">Update now</button></div></div>
+
+  <section id="setup" class="hidden">
+    <h2>Set up this device</h2>
+    <div class="card">
+      <p class="note" id="setupWhy">Type these once on each device. They stay on this device only and are never put in a link.</p>
+      <label for="url">Server address</label>
+      <input id="url" type="url" inputmode="url" autocomplete="off" spellcheck="false" placeholder="https://script.google.com/macros/s/.../exec">
+      <label for="key">Planner key</label>
+      <input id="key" type="password" autocomplete="off" spellcheck="false">
+      <div class="row"><button id="save">Save and test</button><button class="plain hidden" id="cancel">Cancel</button></div>
+      <p class="msg" id="setupMsg" role="status"></p>
+    </div>
+  </section>
+
+  <section id="home" class="hidden">
+    <h2>Today</h2>
+    <div class="card">
+      <p style="margin:0">The app's screens arrive one by one. Until then your planner and phone links work as they always have.</p>
+    </div>
+    <div class="card hidden" id="outbox">
+      <b id="waiting"></b>
+      <ul class="stuck" id="stuckList"></ul>
+      <div class="row" id="stuckBtns"><button id="retry">Try again</button><button class="plain" id="forget">Forget these</button></div>
+    </div>
+    <h2>Settings</h2>
+    <div class="card">
+      <label>Theme</label>
+      <div class="seg" id="theme"><button data-t="auto">Auto</button><button data-t="light">Light</button><button data-t="dark">Dark</button></div>
+      <label>Server and key</label>
+      <p class="note" id="server" style="margin:0"></p>
+      <div class="row"><button class="plain" id="change">Change</button><button class="plain" id="forgetKey">Forget the key on this device</button></div>
+      <p class="msg" id="homeMsg" role="status"></p>
+    </div>
+    <p class="note"><a class="btn plain" href="test/">Open the school test</a></p>
+  </section>
+  <p class="stamp">build {{BUILD_STAMP}}</p>
 </main>
-<span class="stamp">build {{BUILD_STAMP}}</span>
+<script src="api.js"></script>
+<script src="outbox.js"></script>
+<script src="app.js"></script>
 </body>
 </html>

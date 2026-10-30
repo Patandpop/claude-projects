@@ -11,6 +11,18 @@
 
 ## Entries (newest first)
 
+### 30 Oct 2026, Lane C part 2, item 2 (installed app step 5): the app shell
+- What changed: the Cloudflare site is now a real app you can install, though there are no screens in it yet:
+  - **Installing:** a manifest and icons (Ulhu's own pixel sprite on navy, made by `app/tools/make-icons.py`), so "Install" or "Add to home screen" puts a Planner icon on the phone or PC.
+  - **No signal:** it keeps its own files on the device (never your data, never the planner's server, never the school test page), so it opens with no signal and says "No signal".
+  - **Setting up:** the first time on each device it asks for the server address and planner key once, then tests them with one harmless read. A wrong address or key is refused in plain words and nothing is kept. The key never goes in a link.
+  - **Settings:** Auto, Light or Dark; Change; Forget the key on this device; taps waiting to send, and any the planner refused, with Try again or Forget.
+  - **Updates:** "A newer version is ready, Update now" when Cloudflare has a newer build.
+- The look is plain navy and gold for now; the real screens come next (step 6, most-used first) and each gets a mock-up first.
+- Checks: 20 in `app/tests/shell_sim.py`, plus two in `app/tests/run.js`.
+- You need to: nothing new. It is useful once the planner moves to your personal account (step 2, after the school test).
+- Save: see git log "Installed app step 5".
+
 ### 30 Oct 2026, design chat: mock-ups for the homework slide and the whole-class feedback sheet
 - What changed: Lane B had two items stuck for want of a picture. One page now shows three lettered options for each: the slide that follows the Do Now answers with last week's three most-missed homework questions (class counts only: the right answer, the answer most gave, and why it is wrong), and the printed one-page whole-class feedback sheet. All the numbers come from what the planner already keeps (the Results tab and the ABCD votes), so no new data is needed; option C of the sheet also uses the memory map's colours. Made-up class and numbers; no names.
 - You need to: Waiting item 8 (two letters).
