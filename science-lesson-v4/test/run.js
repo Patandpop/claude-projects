@@ -943,6 +943,10 @@ async function main() {
   console.log('');
   { const si = require(path.join(__dirname, 'spec-index.test.js')).run(); hardFails += si.fails; warnings += si.warns; }
 
+  // Flag-only checks on lesson MCQs (4.11, 2026-10-29).
+  console.log('');
+  hardFails += require(path.join(__dirname, 'mcq-lint.test.js')).run().fails;
+
   // Smoke tests for extension-pick, homework-booklet, paper-snippets and lessonMcqs (2.13, 2026-10-29; temp folder only).
   console.log('');
   { const st = await require(path.join(__dirname, 'smoke-tools.test.js')).run(); hardFails += st.fails; warnings += st.warns; }

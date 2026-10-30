@@ -27,13 +27,21 @@ Plain-English record of Lane B's work, newest entry first. Each entry says what 
 8. **Memory map: pick how the Memory tab looks.** Three layouts in one mock-up page: A, a grid (one row per topic, one coloured square per section); B, bars (each section a bar showing its %); C, a due list (reddest first, as cards). The "Suggested Do Now" box for lesson cards is the same in all three. The page is lanes/mockups/memory-tab.html in the project (I could not send it to your phone from this chat; open it on the PC, or ask the design chat to publish it). Reply A, B, C or a mix.
 
 ---
+## 30 Oct 2026, item 4.11: checks on multiple-choice wrong answers (flag only)
+
+**What changed:** a new report reads every built lesson's multiple-choice questions and flags the weak ones against the rules taken from real exam papers: the right answer clearly the longest (a give-away), very uneven options, two options the same, "all/none of the above", number options not smallest to largest, a NOT stem not in capitals, a wrong option without its "why" (the mistake it catches), and, across a lesson's six, a letter never used or used more than twice. It only reports; it never changes a lesson. Run today, 9 built lessons have something to look at, mostly lessons built before the 19 Oct "every wrong option names its mistake" rule. I will use it on lessons I build from now on.
+
+**You need to:** nothing.
+
+**Save:** see the history line "MCQ checks on built lessons".
+
 ## 30 Oct 2026, item 4.7: the behaviour log stays fast
 
 **What changed:** opening a class on the phone used to read the last 8,000 rows of the behaviour log just to show today's taps. Now it reads upwards from the bottom, a few hundred rows at a time, and stops as soon as it reaches yesterday, so it reads only today's rows however long the log grows. The Friday tab and the weekly views already read a fixed slice, so they stay as they are. I did not build the per-term archive tab: with reads bounded like this the log no longer slows down as it grows, and moving old rows out would hide past weeks' behaviour from the planner's lesson cards. If the spreadsheet itself ever gets sluggish, an archive you run yourself once a term is easy to add.
 
 **You need to:** nothing now. It goes into the next complete paste set (Behaviour.gs).
 
-**Save:** see the history line "Behaviour log: today read from the bottom".
+**Save:** bb6878f4.
 
 ## 30 Oct 2026, item 4.6: a faster Homework tab
 
