@@ -343,3 +343,7 @@ Patryk's answers, in grill order. Mock-ups follow each area.
 - Memory tab colour, final: ORANGE (blue remembered, orange fading, red due). Lane B building it; Lane A makes the next complete paste set after.
 
 - Lane D picks (30 Oct): day tags A (hold the moon); overnight 1C with a better note and lantern; morning find as the card under the banner, far improved; finds in 3B act cabinets, clicking a find gives a note, notes piece together into a story. Improved mock-up round asked for.
+
+### 30 Oct 2026: identity windows APPROVED
+- term-gallery.html (Lane D, f4dbe7c5): all 16 "who you are becoming" windows and the term page glass, matched to the Rise again stars, the week in glass and the Oracle. Patryk: "these are perfect". Final; build as shown.
+- Leviathan: the serpent stays (he called the set perfect as shown); the whale tail only if he asks.
