@@ -407,7 +407,7 @@
     alive.forEach((q, k) => { q.fam = k >= nLit ? 'dim' : k < nBlue ? 'blue' : 'red'; });
     if (seal) seal.fam = c.closed ? 'blood' : 'chaloD';
     const glowOf = (fam) => (fam === 'blue' ? '#4a7aff' : fam === 'red' ? '#c02a30' : fam === 'blood' ? '#ff4a3a' : null);
-    const colOf = (fam) => { if (fam !== 'dim') return G.fam(fam); const k = G.fam('field'); return [k[0], k[1] - 8, k[2] - 9]; };
+    const colOf = (fam) => { if (fam !== 'dim') return G.fam(fam); const k = G.fam('field'); return [k[0], k[1] - 24, k[2] - 11]; };
     pcs.forEach((q) => { G.piece(q.p, colOf(q.fam), glowOf(q.fam)); });
     const fieldLead = G.lead; G.lead = '';
     // the honey band: rituals, rising from the bottom
@@ -433,37 +433,45 @@
 
   /* ---------- the page ---------- */
   const CSS = `
-.uzct{max-width:380px;margin:0 auto;padding:16px 12px 30px;box-sizing:border-box;color:#e8e1cf;font:14px/1.45 'Atkinson Hyperlegible',system-ui,sans-serif;background:radial-gradient(ellipse at 50% -5%,#0e1d18,rgba(2,5,4,0) 55%)}
+.uzct{max-width:380px;margin:0 auto;padding:16px 12px 30px;box-sizing:border-box;overflow-x:clip;color:#e8e1cf;font:14px/1.45 'Atkinson Hyperlegible',system-ui,sans-serif;background:radial-gradient(ellipse at 50% -5%,#0e1d18,rgba(2,5,4,0) 55%)}
 .uzct-h1{font:700 27px/1.1 'Grenze Gotisch',serif;color:#ffd56a;margin:0;text-shadow:0 0 16px rgba(255,213,106,.25)}
 .uzct-sub{font-size:12px;color:#7f9389;margin:2px 0 4px;letter-spacing:.08em;text-transform:uppercase}
 .uzct-lbl{font:700 11px 'Atkinson Hyperlegible',sans-serif;letter-spacing:.14em;color:#c9a560;margin:22px 0 8px;text-transform:uppercase}
-.uzct-figs{display:grid;grid-template-columns:repeat(3,1fr);gap:4px 6px}
-.uzct-fig{text-align:center}
+.uzct-figs{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 6px}
+.uzct-fig{text-align:center;width:calc((100% - 12px) / 3);min-width:0}
 .uzct-fig svg{display:block;width:100%;height:auto;overflow:visible}
 .uzct-fig b{display:block;font:500 17px/1.1 'Grenze Gotisch',serif;color:#e8e1cf;margin-top:2px}
 .uzct-fig span{font-size:12px;color:#9fb1a8}
 .uzct-panel{position:relative}
 .uzct-panel svg.uzct-glass{position:absolute;left:0;top:0;overflow:visible;z-index:0;filter:drop-shadow(0 0 6px rgba(232,180,80,.22))}
 .uzct-in{position:relative;z-index:1;padding:12px 15px}
-.uzct-row{height:44px;display:flex;align-items:center;gap:10px;color:#1b1a22}
+.uzct-row{min-height:44px;box-sizing:border-box;padding:4px 0;display:flex;align-items:center;gap:10px;color:#1b1a22}
 .uzct-row .uzct-n{font:700 22px/1 'Grenze Gotisch',serif;color:#6b4a12;width:14px;text-align:center}
-.uzct-row b{flex:1;font:700 15px 'Atkinson Hyperlegible',sans-serif;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.uzct-row b{flex:1;min-width:0;font:700 15px/1.2 'Atkinson Hyperlegible',sans-serif;overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow-wrap:anywhere}
 .uzct-row i{font-style:normal;font-size:12.5px;color:#3a3442;white-space:nowrap}
 .uzct-heavy{display:grid;grid-template-columns:1fr 1fr;row-gap:2px;column-gap:24px;color:#1b1a22}
-.uzct-heavy div{height:26px;display:flex;align-items:center;justify-content:space-between;gap:6px;font-size:13.5px}
-.uzct-heavy div b{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.uzct-heavy div{min-width:0;min-height:26px;display:flex;align-items:center;justify-content:space-between;gap:6px;font-size:13.5px}
+.uzct-heavy div b{min-width:0;font-weight:700;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.uzct-heavy.uzct-one{grid-template-columns:1fr}
 .uzct-heavy div i{font-style:normal;color:#5a4214;font-weight:700;white-space:nowrap}
 .uzct-quote{font:italic 15px/1.35 'IM Fell English',serif;color:#cfd8d3;margin:9px 2px 0}
 .uzct-small{font-size:12px;color:#9fb1a8;margin:7px 2px 0}
 .uzct-empty{font:italic 15px/1.4 'IM Fell English',serif;color:#9fb1a8;margin:2px 2px 0}
-.uzct-wait{font:italic 16px 'IM Fell English',serif;color:#9fb1a8;text-align:center;padding:40px 16px}
+.uzct-wait{font:italic 16px/1.4 'IM Fell English',serif;color:#9fb1a8;text-align:center;padding:40px 16px;margin:0}
+.uzct-wait.uzct-pulse{animation:uzctPulse 1.6s ease-in-out infinite alternate}
+@keyframes uzctPulse{from{opacity:.45}to{opacity:1}}
+@media (prefers-reduced-motion:reduce){.uzct-wait.uzct-pulse{animation:none}}
+.uzct-retry{display:block;margin:0 auto;padding:9px 20px;border-radius:10px;border:1px solid #5a4a20;background:#1b2823;color:#ffd56a;font:500 18px 'Grenze Gotisch',serif;cursor:pointer}
 .uzct-tracery{padding:10px 8px 8px;border-radius:4px;background:linear-gradient(180deg,#1b1824,#100e15);border:1px solid #33293f;box-shadow:inset 0 2px 10px #000}
-.uzct-panes{display:grid;gap:5px;align-items:end}
+.uzct-panes{display:grid;gap:5px;align-items:end;justify-content:center}
 .uzct-pane{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0;color:#a39cb2;font:700 11.5px 'Atkinson Hyperlegible',sans-serif}
 .uzct-pane svg.uzct-lancet{display:block;width:100%;height:auto;filter:drop-shadow(0 0 5px rgba(150,170,240,.22))}
 .uzct-pane.uzct-now{color:#fff}
 .uzct-pane.uzct-now svg.uzct-lancet{transform:translateY(-3px);filter:drop-shadow(0 0 8px rgba(232,196,110,.55))}
-.uzct-pane em{font:700 10.5px 'Atkinson Hyperlegible',sans-serif;font-style:normal;color:#8a8298;font-variant-numeric:tabular-nums}
+.uzct-pane>span{line-height:1.1}
+.uzct-pane em{font:700 10.5px/1.1 'Atkinson Hyperlegible',sans-serif;font-style:normal;color:#6f6880;font-variant-numeric:tabular-nums;white-space:nowrap}
+.uzct-pane em .b{color:#8fb0ff}
+.uzct-pane em .c{color:#ff8a86}
 .uzct-key{display:flex;flex-wrap:wrap;gap:5px 14px;font-size:12px;color:#a39cb2;margin-top:9px;padding-top:8px;border-top:1px solid #2a2338}
 .uzct-key span{display:inline-flex;align-items:center;gap:6px}
 .uzct-key svg{flex:none}
@@ -478,8 +486,9 @@
 
   function pageHTML(rid, T) {
     const panes = Number(T.panes) || 30, chapters = T.chapters || [], now = chapters.findIndex((c) => c.now);
-    let h = '<h1 class="uzct-h1">Act ' + roman(Number(T.actNo)) + (T.act ? ': ' + esc(T.act) : '') + '</h1>';
-    h += '<p class="uzct-sub">' + esc(nice(T.from)) + ' to ' + (now >= 0 ? 'today' : esc(nice(T.to))) + (now >= 0 ? ' · week ' + (now + 1) : '') + '</p>';
+    const actN = roman(Number(T.actNo)), actT = actN ? 'Act ' + actN + (T.act ? ': ' + esc(T.act) : '') : (T.act ? esc(T.act) : 'This term');
+    let h = '<h1 class="uzct-h1">' + actT + '</h1>';
+    h += '<p class="uzct-sub">' + esc(nice(T.from)) + (now >= 0 ? ' to today · week ' + esc(chapters[now].chapter || now + 1) : T.to && T.to !== T.from ? ' to ' + esc(nice(T.to)) : '') + '</p>';
 
     h += '<div class="uzct-lbl">Who you are becoming</div>';
     const who = T.who || [];
@@ -496,18 +505,20 @@
     h += '<div class="uzct-lbl">Your heavy days</div>';
     const tags = T.tagCount || [], heavy = T.heavy || [];
     if (tags.length) {
-      h += '<div class="uzct-panel" data-uzct="heavy"><div class="uzct-in"><div class="uzct-heavy">' + tags.map((t) => '<div><b>' + esc(t.tag) + '</b><i>' + plural(Number(t.days) || 0, 'day', 'days') + '</i></div>').join('') + '</div></div></div>';
+      h += '<div class="uzct-panel" data-uzct="heavy"><div class="uzct-in"><div class="uzct-heavy' + (tags.length < 2 || tags.some((t) => String(t.tag).length > 13) ? ' uzct-one' : '') + '">' + tags.map((t) => '<div><b>' + esc(t.tag) + '</b><i>' + plural(Number(t.days) || 0, 'day', 'days') + '</i></div>').join('') + '</div></div></div>';
       const kept = heavy.filter((x) => Number(x.good) > 0).length;
       h += '<p class="uzct-quote">' + (heavy.length && kept * 2 >= heavy.length ? 'Heavy days change nothing. The glass kept filling.' : 'Heavy days are allowed to be heavy. Rest is part of it too.') + '</p>';
     } else h += '<p class="uzct-empty">No heavy days marked this term. Long may it last.</p>';
 
     h += '<div class="uzct-lbl">The chapters</div>';
     if (chapters.length) {
-      const toN = dayNo(T.to), maxRit = Math.max(1, ...chapters.map((c) => Number(c.rituals) || 0)), per = Math.min(8, Math.max(7, chapters.length));
-      h += '<div class="uzct-tracery"><div class="uzct-panes" style="grid-template-columns:repeat(' + per + ',1fr)">' + chapters.map((c, i) => {
+      const toN = dayNo(T.to), maxRit = Math.max(1, ...chapters.map((c) => Number(c.rituals) || 0));
+      // a bay of 7 lights (a half term); longer stretches narrow the lights to fit up to 10 in a row; a short one sits in the middle
+      const per = clamp(chapters.length, 7, 10), colW = 'calc((100% - ' + (per - 1) * 5 + 'px) / ' + per + ')';
+      h += '<div class="uzct-tracery"><div class="uzct-panes" style="grid-template-columns:repeat(' + Math.min(per, chapters.length) + ',' + colW + ')">' + chapters.map((c, i) => {
         const bl = Number(c.blessings) || 0, cu = Number(c.curses) || 0;
         return '<div class="uzct-pane' + (c.now ? ' uzct-now' : '') + '" role="img" aria-label="Week ' + esc(c.chapter) + ': ' + plural(bl, 'blessing', 'blessings') + ', ' + plural(cu, 'curse', 'curses') + ', ' + plural(Number(c.rituals) || 0, 'ritual', 'rituals') + (c.closed ? ', sealed' : '') + '">' +
-          chapterSVG(rid, c, i, maxRit, toN) + '<span>' + (c.now ? 'now' : 'W' + esc(c.chapter)) + '</span><em>' + bl + '·' + cu + '</em></div>'; }).join('') + '</div>' +
+          chapterSVG(rid, c, i, maxRit, toN) + '<span>' + (c.now ? 'now' : 'W' + esc(c.chapter)) + '</span><em aria-hidden="true"><span class="b">' + bl + '</span> · <span class="c">' + cu + '</span></em></div>'; }).join('') + '</div>' +
         '<div class="uzct-key"><span>' + swatch(rid, 0, 'blue') + 'blessings</span><span>' + swatch(rid, 1, 'red') + 'curses</span><span>' + swatch(rid, 2, 'honey') + 'rituals</span>' +
         '<span>' + swatch(rid, 3, 'blood', 1) + 'sealed by High Vespers</span><span>' + swatch(rid, 4, 'night') + 'not lived yet</span></div></div>';
     } else h += '<p class="uzct-empty">The first chapter starts on Monday.</p>';
@@ -519,21 +530,26 @@
     const doc = el.ownerDocument || document;
     injectCss(doc);
     const rid = 'uzct' + (++RID) + '-';
-    el.innerHTML = '<div class="uzct"><p class="uzct-wait">Lighting the windows...</p></div>';
+    el.innerHTML = '<div class="uzct" aria-busy="true"><p class="uzct-wait uzct-pulse" role="status">Lighting the windows...</p></div>';
     const box = el.firstChild;
     let p;
     try { p = Promise.resolve(X.call('gameCompanionTerm')); } catch (e) { p = Promise.reject(e); }
     return p.then((T) => {
       if (!T || typeof T !== 'object') throw new Error('no term');
       if (T.error) throw new Error(String(T.error));
-      box.innerHTML = pageHTML(rid, T);
+      box.innerHTML = pageHTML(rid, T); box.removeAttribute('aria-busy');
       // the word panels are measured once laid out, then leaded to fit; redrawn if their size changes
       const draw = () => {
         const fp = box.querySelector('[data-uzct="first"]');
         if (fp) drawPanel(fp, rid + 'pf-', (panel, W) => { const rows = panel.querySelectorAll('.uzct-row'), top = panel.querySelector('.uzct-in').offsetTop, out = [];
           for (let i = 1; i < rows.length && i < 3; i++) out.push([W / 2, rows[i].offsetTop + top, i === 1 ? 1.2 : -1.2]); return out; });
         const hp = box.querySelector('[data-uzct="heavy"]');
-        if (hp) drawPanel(hp, rid + 'ph-', (panel, W, H) => (panel.querySelectorAll('.uzct-heavy div').length > 1 ? [[W / 2, H / 2, 90]] : []));
+        // one lead break: down the gap between the two columns, or across between the first rows when there is one column
+        if (hp) drawPanel(hp, rid + 'ph-', (panel, W, H) => { const it = panel.querySelectorAll('.uzct-heavy div'), top = panel.querySelector('.uzct-in').offsetTop;
+          if (it.length < 2) return [];
+          if (it[1].offsetTop === it[0].offsetTop) { const x = (it[0].offsetLeft + it[0].offsetWidth + it[1].offsetLeft) / 2 + panel.querySelector('.uzct-in').offsetLeft; return [[x, H / 2, 90]]; }
+          const m = Math.floor(it.length / 2), u = it[m - 1], d = it[m];
+          return [[W / 2, top + (u.offsetTop + u.offsetHeight + d.offsetTop) / 2, 1]]; });
       };
       draw();
       if (root.requestAnimationFrame) root.requestAnimationFrame(draw);
@@ -544,7 +560,9 @@
         ro.observe(box);
       }
     }).catch(() => {
-      box.innerHTML = '<p class="uzct-wait">The windows could not be lit just now. Close this page and try again in a moment.</p>';
+      box.removeAttribute('aria-busy');
+      box.innerHTML = '<p class="uzct-wait" role="alert" style="padding-bottom:16px">The windows could not be lit just now. The term is safe; only this page did not load.</p><button type="button" class="uzct-retry">Try again</button>';
+      const b = box.querySelector('.uzct-retry'); if (b) b.addEventListener('click', (e) => { e.stopPropagation(); render(el, X); });
     });
   }
 

@@ -9,6 +9,13 @@
 
 ## Entries (newest first)
 
+### 30 Oct, finishing pass on everything picked
+- Term page: fits a phone exactly, clearer chapter numbers (blessings blue, curses red), greyer glass for empty days, long names wrap, a Try again button on errors. The approved glass is unchanged.
+- Knitting (K1): the arms come from his sides and hold the needles at chest height, so his belly is clear. The lap knitting shows two cast-on rows from the start and stays visible when he dozes.
+- Night note, morning scroll, cabinets and day tags: richer textures, bigger tap targets (40 px or more), loading, error and empty messages everywhere.
+- Chorus on every 5th level was already built.
+- All checks green (companion, bundle, game, server, bridge, phone screen run, npm test).
+
 ### 30 Oct, test build of the companion screens
 - What changed: the companion screens are now in the game, as test builds from your picks. Hold the moon: the week's days rise, pick a day, tap its tags (a plain tap still changes the moon). After Vespers the ledge is empty, a brass lantern burns and his note lies beside it (tap to read it big). In the morning a parchment scroll hangs under the banner with his find; the wax seal keeps it ("later" tucks it away). A little cabinet on the banner opens the Cabinets: seven, one per act; tap a find for its torn note, which joins the act's page (eight pieces, a short story per act, all seven written). Tabs beside it: Becoming (the stained-glass term page, all 16 identity windows) and Focus (knitting only, small sock, medium kelp scarf, large jumper; leaving the app pauses it, stopping early keeps the piece on the bench, finished pieces go on the shelf). Sound: the ocarina chorus plays on every 5th level, the old level-up on the others (changeable).
 - New files: planner/companion-term.js, planner/companion-focus.js (both packed into GameComp.html), tests companion_server.js, companion_sim.py, companion_steps.py (the screens tested in the real game page). One line added to game-ui.js (it hands the companion its helpers).

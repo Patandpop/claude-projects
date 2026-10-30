@@ -158,13 +158,16 @@
     b.outline(OUTL); return b;
   }
   const MINI = { small: miniBuf('small'), medium: miniBuf('medium'), large: miniBuf('large') };
-  // the part already knitted, hanging from the needles: newest row at the top
+  // the part already knitted, hanging from the needles: newest row at the top.
+  // From the very start there are two cast-on rows and a line of live loops on the needle, so you can see what he is making.
+  const CAST = 2;
   function lapPiece(c, sz, f, cx, top, maxRows) {
     const g = GRIDS[sz], R = g.length, W = g[0].length;
-    const done = clamp(f, 0, 1) * R, full = Math.floor(done), part = done - full;
-    const b = new Buf(W + 2, maxRows + 3);
+    const done = CAST + clamp(f, 0, 1) * (R - CAST), full = Math.floor(done), part = done - full;
+    const b = new Buf(W + 2, maxRows + 4);
+    top += 1;   // room above for the loops on the needle
     const curRow = R - full - 1; let rows = [];
-    if (curRow >= 0) rows.push(curRow);
+    if (curRow >= 0) { const row = g[curRow], n = row.length - row.replace(/^\.+|\.+$/g, '').length; if (Math.floor(part * (row.length - n)) > 0) rows.push(curRow); }   // a row only shows once its first stitch is made
     for (let r = R - full; r < R; r++) rows.push(r);
     rows = rows.slice(0, maxRows);
     rows.forEach((gr, i) => {
@@ -174,7 +177,16 @@
       for (let col = from; col <= to; col++) if (row[col] !== '.') b.p(col + 1, i + 1, knitCol(PAL[sz][row[col]], col, gr));
     });
     b.outline(OUTL);
-    b.draw(c, Math.round(cx - (W + 2) / 2), top - 1);
+    const x0 = Math.round(cx - (W + 2) / 2);
+    b.draw(c, x0, top - 1);
+    // the live stitches sitting on the needle above the newest row: a bumpy line of loops in that row's yarn
+    const nr = g[Math.max(0, R - full)] || g[R - 1];
+    for (let col = 0; col < W; col++) {
+      if (nr[col] === '.') continue;
+      const yc = PAL[sz][nr[col]];
+      if (col % 2 === 0) F(c, x0 + col + 1, top - 2, 1, 1, sh(yc, 0.3));
+      F(c, x0 + col + 1, top - 1, 1, 1, sh(yc, col % 2 ? -0.12 : 0.15));
+    }
   }
   
   /* ---------- Ulhu: his real 64 by 64 game sprite (ULHU_ART.b16 from game-ulhu.js: idle, sleepy and happy) ---------- */
@@ -214,9 +226,9 @@
     if (st === 'paused') { rim(8, 6); rim(17, 7); F(c, ox + 15, oy + 9, 2, 1, G); }
     else { rim(8, 6); rim(17, 6); F(c, ox + 15, oy + 8, 2, 1, G); F(c, ox + 6, oy + 8, 2, 1, g2); F(c, ox + 24, oy + 8, 2, 1, g2); }
   }
-  // two of his face tentacles become arms; needles in his "hands"
+  // two tentacle arms from his sides; needles in his "hands"
   function armsAndNeedles(c, st, t, hop) {
-    const ox = UX, oy = UY + hop, k = st === 'work' ? Math.floor(t / 180) % 4 : 0, drop = st === 'paused' ? 2 : 0;
+    const ox = UX, oy = UY + hop, k = st === 'work' ? Math.floor(t / 180) % 4 : 0;
     const rh = [[0, 0], [-1, 0], [-1, -1], [0, 0]][k], lh = [[0, 0], [0, 0], [0, 1], [0, 0]][k];
     const arm = (pts) => { // 2-pixel-thick tentacle with outline and an underside shade
       const cells = new Map();
@@ -226,13 +238,23 @@
       out.forEach((key) => { const [x, y] = key.split(',').map(Number); F(c, ox + x, oy + y, 1, 1, SKOUT); });
       cells.forEach((v, key) => { const [x, y] = key.split(',').map(Number); F(c, ox + x, oy + y, 1, 1, v === 2 ? SKIN2 : SKIN); });
     };
-    const L = [12 + lh[0], 27 + lh[1] + drop], R = [20 + rh[0], 27 + rh[1] + drop];
-    const needle = (x0, y0, x1, y1, knob) => { const n = Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0)); for (let s = 0; s <= n; s++) { const x = Math.round(x0 + (x1 - x0) * s / n), y = Math.round(y0 + (y1 - y0) * s / n); F(c, ox + x, oy + y + 1, 1, 1, '#3a1e0a'); F(c, ox + x, oy + y, 1, 1, s % 3 ? '#c9853a' : '#f0b060'); } F(c, ox + x0, oy + y0, 1, 1, knob); F(c, ox + x0 + (x1 > x0 ? -1 : 1), oy + y0, 1, 1, knob); F(c, ox + x0, oy + y0 + 1, 1, 1, '#a04a5a'); };
-    if (st === 'paused') { needle(L[0] - 3, L[1] + 1, L[0] + 9, L[1] + 3, '#f28ca0'); needle(R[0] + 3, R[1] + 1, R[0] - 9, R[1] + 3, '#f28ca0'); }
-    else { needle(L[0] - 4, L[1] + 2, L[0] + 9, L[1] - 6, '#f28ca0'); needle(R[0] + 4, R[1] + 2, R[0] - 9, R[1] - 6, '#f28ca0'); }
-    arm([[10, 21], [8, 24], [L[0] - 2, L[1]], L]);
-    arm([[21, 21], [23, 24], [R[0] + 1, R[1]], [R[0] - 1, R[1]]]);
-    if (k === 2) { const x = ox + 16, y = oy + 21; F(c, x, y - 1, 1, 1, '#fff6c8'); F(c, x - 1, y, 3, 1, '#fff6c8'); F(c, x, y + 1, 1, 1, '#fff6c8'); }
+    const needle = (x0, y0, x1, y1, knob) => { const n = Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0)); for (let s = 0; s <= n; s++) { const x = Math.round(x0 + (x1 - x0) * s / n), y = Math.round(y0 + (y1 - y0) * s / n); F(c, ox + x, oy + y + 1, 1, 1, '#7a4618'); F(c, ox + x, oy + y, 1, 1, s % 3 ? '#e0a050' : '#ffd088'); } F(c, ox + x0, oy + y0, 1, 1, knob); F(c, ox + x0 + (x1 > x0 ? -1 : 1), oy + y0, 1, 1, knob); F(c, ox + x0, oy + y0 + 1, 1, 1, '#a04a5a'); };
+    // the arms come out of his sides below the belly line, elbows out over the chair, and curl up so the hands hold the
+    // needles at chest height, well clear of his belly; the needles slope in and down so their tips cross just above the work.
+    // Dozing: the hands drop to his lap and the needles lie across the knitting.
+    let L, R;
+    if (st === 'paused') {
+      L = [6, 28]; R = [24, 28];
+      needle(2, 27, 17, 29, '#f28ca0'); needle(29, 27, 14, 29, '#f28ca0');
+      arm([[8, 25], [5, 27], L]);
+      arm([[22, 25], [25, 27], R]);
+    } else {
+      L = [3 + lh[0], 20 + lh[1]]; R = [27 + rh[0], 20 + rh[1]];
+      needle(L[0] - 1, L[1] - 1, L[0] + 16, L[1] + 7, '#f28ca0'); needle(R[0] + 2, R[1] - 1, R[0] - 14, R[1] + 7, '#f28ca0');
+      arm([[8, 25], [5, 26], [L[0], 24], L]);
+      arm([[22, 25], [25, 26], [R[0], 24], R]);
+    }
+    if (k === 2) { const x = ox + 16, y = oy + 24; F(c, x, y - 1, 1, 1, '#fff6c8'); F(c, x - 1, y, 3, 1, '#fff6c8'); F(c, x, y + 1, 1, 1, '#fff6c8'); }
     return [ox + R[0], oy + R[1], ox + L[0], oy + L[1]];
   }
   function zzz(c, t) {
@@ -640,4 +662,4 @@
   }
   api.render = render;
   root.UZCOMP_FOCUS = api;
-})(typeof window !== 'undefined' ? window : null);
+})(typeof window !== 'undefined' ? window : null);
