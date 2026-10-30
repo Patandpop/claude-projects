@@ -19,7 +19,7 @@ const GAME = {
   lifeFirst: 5, lifeThree: 15,                               // life bonus: first life goal of the day, then three or more
   afterWork: 1.5, afterHour: 16,                             // life done after work on a school day pays x1.5 (not holidays or days off)
   streakSteps: [[66, 1.5], [30, 1.25], [7, 1.1]],             // ritual streak multiplier (Patryk 2026-10-27)
-  vespersSteps: [[66, 1.25], [30, 1.2], [7, 1.1]],           // Vespers streak multiplier, on everything earned
+  vespersSteps: [[66, 1.25], [30, 1.2], [7, 1.1]],           // Vespers streak multiplier, on the Vespers reward only (Patryk 30 Oct: not rituals, blessings, bosses or the review)
 };
 const G_HEAD = {
   player: ['Setting', 'Value'],
@@ -138,12 +138,14 @@ function gVMult_() {
     G_VM = gStepMult_(GAME.vespersSteps, gStep_(GAME.vespersSteps, st, missed === 1)); } catch (e) { G_VM = 1; }
   return G_VM;
 }
+// the Vespers reward, grown by its own streak (x1.1 at 7 nights, x1.2 at 30, x1.25 at 66)
+function gVespersPay_(streak) { return Math.round(GAME.base[5] * gStepMult_(GAME.vespersSteps, gStep_(GAME.vespersSteps, Number(streak) || 0, false))); }
 function gRitualMult_(goal) { return gStepMult_(GAME.streakSteps, gStep_(GAME.streakSteps, Number(goal.streak) || 0, !!goal.miss)); }
 function gPay_(goal, todayTicks, goalsById) {
   const m = Number(goal.minutes) || 15, track = goal.track || 'necessary';
   const base = GAME.base[m] || GAME.base[15], mult = GAME.mult[track] || 1;
   const val = Number(goal.value) || 0, red = val < 0 ? 1 + (-val) * 0.1 : 1;
-  const sm = gRitualMult_(goal) * gVMult_();
+  const sm = gRitualMult_(goal);   // the Vespers bonus is for Vespers only (Patryk 30 Oct)
   const core = Math.round(base * mult * red * sm * (track === 'life' && gAfterWork_() ? GAME.afterWork : 1));
   let bonus = 0;
   if (track === 'life') {
@@ -188,18 +190,17 @@ function gDie_(p, today, ticks) {
   const earned = ticks.filter((t) => String(t.day) > since && t.coins > 0 && !/^(buy|hoard)\|/.test(String(t.goalId))).reduce((a, t) => a + Number(t.coins), 0);
   const lost = Math.min(p.coins, earned);
   p.level = Math.max(1, p.level - 1); p.xp = 0; p.coins -= lost; p.deaths++; p.diedDay = today;
-  // Rise again (1U.11, Patryk 29-30 Oct): he wakes on a quarter of his health; each of the next three rituals lights a star
-  // and gives back a quarter of his health and a third of a quarter of the lost runes. Three more rituals the day after
-  // bring the next quarter of the runes. The first three can be done the day he faints or the next day.
-  p.hp = p.maxHp - 3 * gRiseHp_(p);
+  // Rise again (1U.11, Patryk 30 Oct): he wakes with all his health. Each ritual lights a star; the whole set of three
+  // gives back a quarter of the lost runes, and three more the day after another quarter (half at most). The first
+  // three can be done the day he faints or the next day.
+  p.hp = p.maxHp;
   p.riseDay = today; p.riseLost = lost; p.riseDone = ''; p.riseStage = 0; p.riseLit = ''; p.riseFrom = today; p.riseUntil = gAdd_(today, 1); p.riseGot = 0;
   return { lost, level: p.level, rise: Math.floor(lost / 4) };
 }
-const gRiseHp_ = (p) => Math.round(Number(p.maxHp) / 4);
 // the Rise round open today, if any: { stage 0 or 1, lit ids }
 function gRiseView_(p, today) {
   const r = gRiseOpen_(p, today); if (!r) return null; const q = Math.floor(Number(p.riseLost) / 4);
-  return { stage: r.stage + 1, lit: r.lit.length, ids: r.lit, need: 3, back: q, lost: Number(p.riseLost), got: Number(p.riseGot) || 0, hp: r.stage === 0 ? gRiseHp_(p) : 0, until: String(p.riseUntil), done: false };
+  return { stage: r.stage + 1, lit: r.lit.length, ids: r.lit, need: 3, back: q, lost: Number(p.riseLost), got: Number(p.riseGot) || 0, until: String(p.riseUntil), done: false };
 }
 function gRiseOpen_(p, today) {
   if (!(Number(p.riseLost) > 0) || Number(p.riseStage) >= 2 || !p.riseFrom || today < String(p.riseFrom) || today > String(p.riseUntil)) return null;
@@ -209,11 +210,10 @@ function gRiseOpen_(p, today) {
 function gRiseStar_(p, g, today, out, note) {
   const r = gRiseOpen_(p, today); if (!r || r.lit.indexOf(g.id) >= 0 || r.lit.length >= 3) return;
   const was = { stage: r.stage, lit: p.riseLit, from: p.riseFrom, until: p.riseUntil, got: Number(p.riseGot) || 0, done: p.riseDone };
-  const q = Math.floor(Number(p.riseLost) / 4), n = r.lit.length + 1, coins = n < 3 ? Math.floor(q / 3) : q - 2 * Math.floor(q / 3);
-  const hp = r.stage === 0 ? Math.max(0, Math.min(gRiseHp_(p), p.maxHp - p.hp)) : 0;
-  p.coins += coins; out.coins += coins; p.hp += hp; out.hp += hp; p.riseGot = was.got + coins; p.riseLit = r.lit.concat(g.id).join(',');
+  const n = r.lit.length + 1, coins = n === 3 ? Math.floor(Number(p.riseLost) / 4) : 0;   // the quarter comes with the whole set
+  p.coins += coins; out.coins += coins; p.riseGot = was.got + coins; p.riseLit = r.lit.concat(g.id).join(',');
   if (n === 3) { p.riseStage = r.stage + 1; p.riseLit = ''; if (r.stage === 0) { p.riseFrom = gAdd_(today, 1); p.riseUntil = gAdd_(today, 1); } else p.riseDone = today; }
-  out.rise = { star: n, stage: r.stage, coins, hp }; note.rise = Object.assign({ coins, hp }, { was });
+  out.rise = { star: n, stage: r.stage, coins }; note.rise = { coins, was };
 }
 
 /* ---- goals ---- */
@@ -1026,7 +1026,7 @@ function gameVespers(k, rv) {
     const prev = { s: Number(p.vStreak) || 0, b: Number(p.vBest) || 0, l: String(p.vLast || '') };
     const st = gVespersStreak_(p, today, world, frozen) + 1;
     p.vStreak = st; p.vBest = Math.max(prev.b, st); p.vPrev = JSON.stringify(prev); p.vLast = today;
-    const pay = GAME.base[5]; p.coins += pay; const up = gAddXp_(p, pay, today); gSavePlayer_(p);
+    const pay = gVespersPay_(st); p.coins += pay; const up = gAddXp_(p, pay, today); gSavePlayer_(p);
     gAppend_('vespers', { day: today, clean: rv && rv.clean ? 'clean' : 'logged', savedOn: today, note: '' });
     gAppend_('ticks', { id: Utilities.getUuid().slice(0, 8), at: now.toISOString(), day: today, goalId: 'vespers', delta: 0, coins: pay, xp: pay, hp: 0, auto: '', ref: 'vespers|' + today, note: JSON.stringify({ name: 'Vespers' }) });
     res = { coins: pay, streak: st, up };

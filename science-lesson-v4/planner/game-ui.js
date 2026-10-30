@@ -433,13 +433,15 @@
     }
     // pay locally like the server: coins, XP, level (the reply then has the exact numbers)
     function earnLocal(d, n, xp) { const p = d.player; p.coins += n; d.weekCoins = (d.weekCoins || 0) + n; p.xp += xp; let up = false; while (p.xp >= p.need) { p.xp -= p.need; p.level++; p.need = need(p.level); p.hp = p.maxHp; p.coins += p.level * (p.gift || 10); up = true; } return up; }
-    // Rise again (1U.11): a ritual not yet lit this round lights the next star, the same sums as the server (gRiseStar_)
+    // Rise again (1U.11, rules of 30 Oct): a ritual not yet lit this round lights the next star; the whole set of three brings
+    // a quarter of the lost runes home (the same sums as the server, gRiseStar_)
     function riseStar(d, id) {
       const p = d.player, R = p.rise; if (!R || (R.ids || []).indexOf(id) >= 0 || R.lit >= 3) return null;
-      const q = R.back || 0, n = R.lit + 1, coins = n < 3 ? Math.floor(q / 3) : q - 2 * Math.floor(q / 3), hp0 = p.hp, runes = p.coins, hp = R.stage === 1 ? Math.max(0, Math.min(R.hp || 0, p.maxHp - p.hp)) : 0;
-      p.coins += coins; p.hp += hp; R.lit = n; R.ids = (R.ids || []).concat(id); R.got = (R.got || 0) + coins; if (n === 3) p.rise = null;
-      const line = n < 3 ? (3 - n) + ' more ritual' + (n === 2 ? '' : 's') + ' to light the stars.' : R.stage === 1 ? 'The stars gave back a quarter of my runes. Standing again.' : 'Another quarter home. The stars are quiet again.';
-      return { k: n - 1, stage: R.stage, coins, hp, max: p.maxHp, hp0, runes, lv: p.level, title: TITLES[p.level] || '', line };
+      const n = R.lit + 1, coins = n === 3 ? (R.back || 0) : 0, runes = p.coins;
+      p.coins += coins; R.lit = n; R.ids = (R.ids || []).concat(id); R.got = (R.got || 0) + coins; R.fresh = n - 1; if (n === 3) p.rise = null;
+      if (n < 3) return null;   // stars one and two light on the card itself (FAINT.paint), the third rains the runes home
+      const line = R.stage === 1 ? 'A quarter of my runes came home. Three more rituals tomorrow bring the next.' : 'Another quarter home. The stars are quiet again.';
+      return { k: 2, stage: R.stage, coins, max: p.maxHp, hp0: p.hp, runes, lv: p.level, title: TITLES[p.level] || '', line };
     }
     // Going deeper (1U.11, DP3-b2): a level up into a new depth (11, 21, 31, 41) opens the kraken doors, once per level
     function goDeeper() {
@@ -458,8 +460,8 @@
       act({ verb: 'Cursed:', name: (g.polarity === 'both' ? sides(g.name)[0] : g.name) + (sig ? ' · ' + sig : ''), delta: '−' + cost, unit: 'hp' }, ['gameUntick', id], 'gameTick', [id, -1, sig], (d) => { const x = d.goals.find((y) => y.id === id); x.count = (x.count || 0) + 1; if (x.polarity === 'both') x.cCount = (x.cCount || 0) + 1; d.player.hp -= cost;
         // its antidote opens an Absolution straight away, so the glass card rises to the top before the reply (1U.13)
         const an = x.polarity === 'both' ? x : d.goals.find((y) => y.id === x.anti); if (an && !an.absolve) an.absolve = { slip: 'local', curse: x.id, name: x.name, stage: 0, lost: cost, until: '' }; if (d.player.hp <= 0) { const rise = d.player.rise; if (rise && rise.stage === 1) { d.player.hp = 1; return; }   // no second faint before the stars are lit (1U.11)
-          faint = true; d.player.hp = d.player.maxHp - 3 * Math.round(d.player.maxHp / 4); d.player.level = Math.max(1, d.player.level - 1); d.player.rise = { stage: 1, lit: 0, ids: [], need: 3, back: 0, lost: 0, got: 0, hp: Math.round(d.player.maxHp / 4) }; } },
-        (res) => { const dd = res && res.last && res.last.died; if (dd && window.FAINT) { const p = res.player; FAINT.faint(box, { max: p.maxHp, hp: Math.min(p.maxHp, cost), runes: p.coins, lost: dd.lost || 0, wake: p.hp, lv: p.level, title: TITLES[p.level] || '' }); } });
+          faint = true; d.player.hp = d.player.maxHp; d.player.level = Math.max(1, d.player.level - 1); d.player.rise = { stage: 1, lit: 0, ids: [], need: 3, back: 0, lost: 0, got: 0 }; } },
+        (res) => { const dd = res && res.last && res.last.died; if (dd && window.FAINT) { const p = res.player; FAINT.faint(box, { max: p.maxHp, hp: Math.min(p.maxHp, cost), runes: p.coins, lost: dd.lost || 0, wake: p.maxHp, lv: p.level, title: TITLES[p.level] || '' }); } });
       flinch(); floatText(r, '−' + cost + ' HP', '#ff7a66'); glow(k, 'rgba(196,50,58,.9)'); buzz([25, 40, 25]);
       if (faint) { V.last = { verb: 'Fainted:', name: 'lost a level and 7 days of runes' }; paintTop(); setMood('sad', pickSay('faint')); } else setMood('sad', CURSE_SAYS[Math.floor(Math.random() * CURSE_SAYS.length)]);
     }

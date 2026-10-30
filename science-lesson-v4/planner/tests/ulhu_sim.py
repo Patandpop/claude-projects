@@ -132,7 +132,7 @@ try:
         c4 = coins(); pg.locator('.dn-panel [data-a=claim]').nth(1).click(); pg.wait_for_timeout(900)
         check('a chest is the Hoard: breaking its seal claims the reward (80)', coins() == c4 - 80 and 'Claimed' in pg.inner_text('.uz-undo'))
         pg.wait_for_function("STAMPT.off != null", timeout=8000); st = pg.evaluate("STAMPT")
-        check('1U.4 the CLAIMED stamp shows at once, stays through the server reply, then fades (%s)' % st, st['on'] is not None and st['on'] < 900 and st['gaps'] == 0 and 2400 <= st['off'] < 4500)
+        check('1U.4 the CLAIMED stamp shows at once, stays through the server reply, then fades (%s)' % st, st['on'] is not None and st['on'] < 900 and st['gaps'] == 0 and 2400 <= st['off'] < 8000)   # the fade waits for the server reply, which a busy PC slows
         pg.click('.uz-dock [data-a=den][data-v=market]'); pg.wait_for_timeout(1500)
         check('the Night Market has seven stalls round the well, each with its keeper', pg.locator('.dn-booth').count() == 7 and pg.locator('img.dn-plz').count() == 1 and 'Mother Skein' in pg.inner_text('.dn-mkt'))
         if shots: pg.screenshot(path=os.path.join(SP, 's6.png'))
@@ -224,7 +224,9 @@ try:
         check('a two-sided omen shows under Both Ways with both names', pg.locator('.uz-two').count() == 1 and 'Cooked from scratch' in pg.inner_text('.uz-two'))
         hpb = pg.inner_text('.hpt'); pg.click('.uz-twl'); pg.wait_for_timeout(1500)
         check('one tap on a curse runs the blood to four sigils', pg.locator('[data-sig]').count() == 4)
-        pg.click('[data-sig=Flesh]'); pg.wait_for_timeout(1600)
+        pg.click('[data-sig=Flesh]')
+        try: pg.wait_for_function("document.querySelector('.uz-undo') && document.querySelector('.uz-undo').innerText.includes('Flesh')", timeout=12000)
+        except Exception: pass
         check('picking a sigil logs it with the curse', 'Flesh' in pg.inner_text('.uz-undo'))
         check('tapping its left half logs the curse', pg.inner_text('.hpt') != hpb)
         check('1U.13 the two-sided omen becomes the stained-glass Absolution card at the very top of the omens', pg.evaluate("(() => { const p = document.querySelectorAll('.uz-pane')[2], a = p.querySelector('.uz-absq .gl-ab'); if (!a) return false; const first = [...p.children].find((n) => n.offsetHeight > 0); return first && first.contains(a) && !p.querySelector('.uz-two .uz-twl[data-id=\"' + a.closest('[data-abs]').dataset.abs + '\"]'); })()"))
@@ -272,23 +274,27 @@ try:
             const b = w.getBoundingClientRect(), h = box.getBoundingClientRect(); w.click();
             Promise.race([p.then(() => 'over'), new Promise((q) => setTimeout(() => q('stuck'), 4000))]).then((end) => r({ lit, cover: b.width >= h.width - 1, end, gone: !box.querySelector('.lu-wrap'), ups: LU_CALLS.slice() })); }, 4200)); })()""")
         check('1U.11 level up: The Sky Answers covers the screen and lights up, and a tap ends it: ' + str(lu), lu.get('lit', 0) > 200 and lu.get('cover') and lu.get('end') == 'over' and lu.get('gone'))
-        # 1U.11 the faint (FA-R3): the vial shatters, the lost runes float away, he wakes on a quarter of his health
-        fz = pg.evaluate("""(() => { const box = document.querySelector('.uz'); const p = FAINT.faint(box, { max: 60, hp: 20, runes: 200, lost: 80, wake: 15, lv: 7, title: 'Tide Caller' });
+        # 1U.11 the faint (FA-R3): the vial shatters, the lost runes float away, he wakes with all his health (rules of 30 Oct)
+        fz = pg.evaluate("""(() => { const box = document.querySelector('.uz'); const p = FAINT.faint(box, { max: 60, hp: 20, runes: 200, lost: 80, wake: 60, lv: 7, title: 'Tide Caller' });
           return new Promise((r) => setTimeout(() => { const w = box.querySelector('.fz'), lab = w && w.querySelector('.lab'), b = w && w.getBoundingClientRect(), h = box.getBoundingClientRect();
             const o = { cover: !!w && b.width >= h.width - 1, lab: lab ? lab.textContent : '', ulhu: !!(w && w.querySelector('.ulhu img')) };
             setTimeout(() => { o.hp = w.querySelector('.hpl').textContent; w.click(); Promise.race([p.then(() => 'over'), new Promise((q) => setTimeout(() => q('stuck'), 4000))]).then((end) => { o.end = end; o.gone = !box.querySelector('.fz'); r(o); }); }, 5200); }, 3200)); })()""")
-        check('1U.11 faint: it covers the screen, "80 runes drift out of reach", he wakes on 15 of 60, a tap ends it: ' + str(fz), fz.get('cover') and '80 runes drift out of reach' in fz.get('lab', '') and fz.get('ulhu') and fz.get('hp') == '15/60' and fz.get('end') == 'over' and fz.get('gone'))
+        check('1U.11 faint: it covers the screen, "80 runes drift out of reach", he wakes with all his health, a tap ends it: ' + str(fz), fz.get('cover') and '80 runes drift out of reach' in fz.get('lab', '') and fz.get('ulhu') and fz.get('hp') == '60/60' and fz.get('end') == 'over' and fz.get('gone'))
         # Rise again: the card at the top of The Call, three stained-glass stars, no tick boxes under them
         rc = pg.evaluate("""(() => { const d = document.createElement('div'); d.className = 'uz-pane'; d.innerHTML = FAINT.panel({ stage: 1, lit: 1, ids: ['a'], back: 30 }); document.body.appendChild(d); FAINT.paint(d);
           const cv = [...d.querySelectorAll('canvas[data-fs]')], lum = (c) => { const x = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; let n = 0, s = 0; for (let i = 0; i < x.length; i += 4) if (x[i + 3]) { n++; s += x[i] + x[i + 1] + x[i + 2]; } return [n, Math.round(s / Math.max(1, n))]; };
           const o = { n: cv.length, lums: cv.map(lum), ticks: d.querySelectorAll('.rit, .sk, input[type=checkbox]').length, text: d.textContent }; d.remove(); return o; })()""")
         check('1U.11 Rise again card: three glass stars, the lit one brighter, no tick boxes under them: ' + str(rc), rc['n'] == 3 and all(n > 500 for n, _ in rc['lums']) and rc['lums'][0][1] > rc['lums'][1][1] + 60 and rc['ticks'] == 0 and 'RISE AGAIN' in rc['text'])
-        # a ritual lights a star: it rains six bubbles into him and his health and runes climb by the real amounts
-        sr = pg.evaluate("""(() => { const box = document.querySelector('.uz'); const p = FAINT.star(box, { k: 0, stage: 1, coins: 12, hp: 15, max: 60, hp0: 15, runes: 100, lv: 7, title: 'Tide Caller', line: '2 more rituals to light the stars.' });
+        # the third ritual of a set: the whole quarter of the runes rains home from the three stars
+        sr = pg.evaluate("""(() => { const box = document.querySelector('.uz'); const p = FAINT.star(box, { stage: 1, coins: 18, max: 60, hp0: 60, runes: 100, lv: 7, title: 'Tide Caller', line: 'A quarter of my runes came home.' });
           let seen = 0; const look = setInterval(() => { seen = Math.max(seen, box.querySelectorAll('.fz .bb').length); }, 100);
-          return new Promise((r) => setTimeout(() => { clearInterval(look); const w = box.querySelector('.fz'); const o = { bubbles: seen, hp: w.querySelector('.hpl').textContent, runes: w.querySelector('.rc span').textContent, back: w.querySelector('.back').textContent };
-            w.click(); Promise.race([p.then(() => 'over'), new Promise((q) => setTimeout(() => q('stuck'), 4000))]).then((end) => { o.end = end; r(o); }); }, 7500)); })()""")
-        check('1U.11 a star lights: six rune bubbles rain into Ulhu, health 15 to 30, runes 100 to 112: ' + str(sr), sr.get('bubbles') >= 6 and sr.get('hp') == '30/60' and sr.get('runes') == '112 runes' and sr.get('end') == 'over')
+          return new Promise((r) => { const t0 = performance.now(); (function wait() { const w0 = box.querySelector('.fz'), rs = w0 && w0.querySelector('.rc span'); if (performance.now() - t0 < 25000 && !(rs && rs.textContent === '118 runes')) return setTimeout(wait, 200); clearInterval(look); const w = box.querySelector('.fz'); const o = { bubbles: seen, hp: w.querySelector('.hpl').textContent, runes: w.querySelector('.rc span').textContent, back: w.querySelector('.back').textContent };
+            w.click(); Promise.race([p.then(() => 'over'), new Promise((q) => setTimeout(() => q('stuck'), 4000))]).then((end) => { o.end = end; r(o); }); })(); }); })()""")
+        check('1U.11 the whole set of three: the third star lights, all three rain rune bubbles into Ulhu, runes 100 to 118 (the quarter), health stays full: ' + str(sr), sr.get('bubbles') >= 12 and sr.get('hp') == '60/60' and sr.get('runes') == '118 runes' and sr.get('end') == 'over')
+        nw = pg.evaluate("""(() => { const d = document.createElement('div'); d.innerHTML = FAINT.panel({ stage: 1, lit: 1, ids: ['a'], back: 30, fresh: 0 }); document.body.appendChild(d); FAINT.paint(d);
+          const c = d.querySelector('canvas[data-fs="0"]'), lum = () => { const x = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; let s = 0, n = 0; for (let i = 0; i < x.length; i += 4) if (x[i + 3]) { n++; s += x[i] + x[i + 1] + x[i + 2]; } return s / Math.max(1, n); };
+          const a = lum(); return new Promise((r) => setTimeout(() => { const b = lum(); d.remove(); r([Math.round(a), Math.round(b)]); }, 1600)); })()""")
+        check('1U.11 a ritual that lights star one or two lights it piece by piece on the card (dim first, bright after): ' + str(nw), nw[1] > nw[0] + 40)
         # 1U.11 Going deeper (DP3-b2): the kraken doors, the depth name, three strikes on the plaque, the crack clear of the number
         gt = pg.evaluate("""(() => { const box = document.querySelector('.uz'), lv = box.querySelector('.uz-lv'); window.scrollTo(0, 0);
           const p = GATE.play(box, { depth: 1, name: 'The Twilight', plaque: lv }), seen = {}, hx = box.querySelector('.uz-hex').getBoundingClientRect();

@@ -1,12 +1,14 @@
 /* The faint and Rise again (1U.11, Patryk's pick 30 Oct: FA-R3 "Rain"; no ticks under the stars, the stars are the marks).
    MADE BY planner/tools/make-faint.js from replica/design/mockups/faint5/index.src.html; change those, not this file.
    FAINT.faint(host, n) -> Promise: the health vial shatters, ink fills the water, Ulhu lies down (still breathing) and
-     n.lost runes float away in bubbles; he wakes on n.wake health. n = { max, hp, runes, lost, wake, lv, title }.
-   FAINT.panel(rise) -> the RISE AGAIN card for the top of The Call: three many-coloured stained-glass stars, rise.lit lit.
+     n.lost runes float away in bubbles; he wakes with all his health (n.wake). n = { max, hp, runes, lost, wake, lv, title }.
+   FAINT.panel(rise) -> the RISE AGAIN card for the top of The Call: three many-coloured stained-glass stars, rise.lit lit;
+     the star rise.fresh (just lit by a ritual) lights piece by piece when painted.
    FAINT.paint(root) draws every card's stars inside root.
-   FAINT.star(host, n) -> Promise: the card and the stage together; star n.k lights piece by piece and rains six bubbles
-     carrying rune tablets down into Ulhu, his health and runes climbing by the real amounts. n = { k, stage, coins, hp,
-     max, hp0, runes, lv, title, line }. A tap ends either one early. Reduced motion: every step is instant. */
+   FAINT.star(host, n) -> Promise: the whole set of three (rules of 30 Oct): the card and the stage together; the third
+     star lights piece by piece, then all three rain six bubbles each, carrying rune tablets down into Ulhu, and his runes
+     climb by the quarter of what he lost (n.coins). n = { stage, coins, max, hp0, runes, lv, title, line }.
+   A tap ends either one early. Reduced motion: every step is instant. */
 (function () {
 'use strict';
 if (typeof window === 'undefined' || window.FAINT) return;
@@ -255,16 +257,22 @@ const esc = (s) => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</
 function line(rise) {
   if (!rise) return '';
   const left = 3 - rise.lit;
-  return rise.stage === 1 ? (left === 3 ? 'Three rituals light the three stars. Each one brings back health and runes.' : left + ' more ritual' + (left === 1 ? '' : 's') + ' to light the stars.')
+  return rise.stage === 1 ? (left === 3 ? 'Three rituals light the three stars and bring a quarter of the lost runes home.' : left + ' more ritual' + (left === 1 ? '' : 's') + ' to light the stars.')
     : (left === 3 ? 'Three rituals today bring the next quarter of the runes home.' : left + ' more ritual' + (left === 1 ? '' : 's') + ' for the second quarter.');
 }
 function panel(rise) {
   css(); if (!rise) return '';
   let h = '<div class="fz-call call" data-fz="' + rise.lit + '"><div class="hd">RISE AGAIN' + (rise.stage === 2 ? ' · II' : '') + '</div><div class="stars">';
-  for (let i = 0; i < 3; i++) h += '<canvas class="px' + (i < rise.lit ? ' on' : '') + '" data-fs="' + i + '" data-lit="' + (i < rise.lit ? 1 : 0) + '" aria-label="star ' + (i + 1) + (i < rise.lit ? ', lit' : '') + '"></canvas>';
+  for (let i = 0; i < 3; i++) h += '<canvas class="px' + (i < rise.lit ? ' on' : '') + '" data-fs="' + i + '" data-lit="' + (i < rise.lit ? 1 : 0) + '"' + (i === rise.fresh ? ' data-new="1"' : '') + ' aria-label="star ' + (i + 1) + (i < rise.lit ? ', lit' : '') + '"></canvas>';
   return h + '</div><div class="back">' + esc(line(rise)) + '</div></div>';
 }
-function paint(root) { (root || document).querySelectorAll('canvas[data-fs]:not([data-on])').forEach((c) => { const i = +c.dataset.fs, G = glass(i); kit().paintGlass(c, G, c.dataset.lit === '1' ? G.n : 0, -1); c.setAttribute('data-on', '1'); }); }
+function paint(root) {
+  (root || document).querySelectorAll('canvas[data-fs]:not([data-on])').forEach((c) => { const i = +c.dataset.fs, G = glass(i), k = kit(); c.setAttribute('data-on', '1');
+    if (c.dataset.new !== '1' || RM) return k.paintGlass(c, G, c.dataset.lit === '1' ? G.n : 0, -1);
+    // a star a ritual has just lit: piece by piece from the middle, as in the mock-up's lightStar
+    let p = 0; (function step() { if (!c.isConnected) return; if (p <= G.n) { k.paintGlass(c, G, p, p); p++; return setTimeout(step, 40); }
+      k.paintGlass(c, G, G.n, -1); c.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.12)' }, { transform: 'scale(1)' }], { duration: 500, easing: 'ease-out' }); })(); });
+}
 let busy = null;
 function overlay(host, withCall, rise) {
   css(); const k = kit(), g = document.createElement('div'); g.className = 'fz'; g.setAttribute('role', 'status');
@@ -291,23 +299,19 @@ function faint(host, n) {
   });
 }
 function star(host, n) {
-  n = n || {}; const k0 = Math.max(0, Math.min(2, n.k | 0)), first = n.stage !== 2;
-  setNum({ max: n.max, hp: n.hp0, runes: n.runes, lv: n.lv, title: n.title });
-  const per = [], hpAt = [], coins = n.coins || 0, dh = n.hp || 0;
-  for (let i = 0; i < 6; i++) per[k0 * 6 + i] = Math.floor(coins / 6) + (i < coins % 6 ? 1 : 0);
-  for (let i = 0; i <= 6; i++) hpAt[k0 * 6 + i] = Math.min(NUM.max, NUM.hp + Math.round(dh * i / 6));
-  const S = { n: k0 * 6, runes: NUM.runes, per, hpAt: (i) => hpAt[i] != null ? hpAt[i] : NUM.hp, pose: (i) => first ? Math.min(1, i / 18) : 1 };
-  const rise = { stage: first ? 1 : 2, lit: k0 };
-  return run(host, true, rise, async (st, t, O) => {
-    const k = kit(); st.mood(first ? 'sleepy' : 'idle');
-    if (first) { const r = S.pose(S.n); st.ulhu.style.transform = k.pose(r); st.ulhu.style.filter = k.fil(r, 7 * r); st.cam.style.filter = 'brightness(' + (.8 + .2 * r).toFixed(2) + ') saturate(' + (.6 + .4 * r).toFixed(2) + ')'; }
+  n = n || {}; setNum({ max: n.max, hp: n.hp0, runes: n.runes, lv: n.lv, title: n.title });
+  const per = [], coins = n.coins || 0;   // the quarter, shared out over the eighteen bubbles
+  for (let i = 0; i < 18; i++) per[i] = Math.floor(coins / 18) + (i < coins % 18 ? 1 : 0);
+  const S = { n: 0, runes: NUM.runes, per, hpAt: () => NUM.hp, pose: () => 1 };
+  return run(host, true, { stage: n.stage === 2 ? 2 : 1, lit: 2 }, async (st, t, O) => {
+    const k = kit(), cvs = O.call.querySelectorAll('canvas[data-fs]'), back = O.call.querySelector('.back');
     await t.wait(500);
-    const cv = O.call.querySelectorAll('canvas[data-fs]')[k0], G = glass(k0), back = O.call.querySelector('.back');
-    await k.lightStar(cv, G, t);
-    back.textContent = 'Star ' + (k0 + 1) + ' of 3 lit: six rune bubbles are on their way.';
-    await k.flowRain(st, t, { call: { cvs: O.call.querySelectorAll('canvas[data-fs]') }, over: O.over }, k0, S);
+    await k.lightStar(cvs[2], glass(2), t);
+    back.textContent = 'The three stars are lit: the runes are on their way.';
+    const ctx = { call: { cvs }, over: O.over };
+    await Promise.all([0, 1, 2].map((s) => t.wait(s * 500).then(() => k.flowRain(st, t, ctx, s, S))));
     back.textContent = n.line || '';
-    if (k0 === 2) { st.mood('happy'); t.a(st.ulhu, [{ transform: 'none', filter: k.fil(1, 7) }, { transform: 'translateY(-16px)', filter: k.fil(1, 18), offset: .4 }, { transform: 'none', filter: k.fil(1, 6) }], 900, { ease: 'ease-out' }); }
+    st.mood('happy'); t.a(st.ulhu, [{ transform: 'none', filter: k.fil(1, 7) }, { transform: 'translateY(-16px)', filter: k.fil(1, 18), offset: .4 }, { transform: 'none', filter: k.fil(1, 6) }], 900, { ease: 'ease-out' });
   });
 }
 window.FAINT = { faint, star, panel, paint };

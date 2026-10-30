@@ -6,7 +6,7 @@ const dir = process.env.PLANNER_SRC || path.join(__dirname, '..');   // PLANNER_
 m.props.PLANNER_KEY = 'k';
 const src = ['Code.gs', 'Behaviour.gs', 'game-art.js', 'Game.gs'].map((f) => fs.readFileSync(path.join(dir, f), 'utf8')).join('\n');
 global.SHOP = require('../game-shop.json');
-eval(src + '\nglobal.G_PRICE=gHagglePrice_;global.G={gameLoad,gameTick,gameUntick,gameSaveGoal,gameArchive,gameFreeze,gameShop,gameArt,gameBuy,gamePlace,gameBossStart,gameBossStage,gameBossRemove,gameBossSave,gameTag,gameChips,gameVespers,gameVespersUndo,gameVespersTime,gameMoon,gameReview,gameQuestStep,gameGroupSave,gameWear,gameUnbuy,gameHoardSave,gameHoardClaim,gameChronicle,gameAim,gameHaggle,gPay_,gDie_,gNeed_,gAdd_,gDow_,gDiff_,gIsFrozen_,gameMergeGoals,gameUnmerge};');
+eval(src + '\nglobal.G_PRICE=gHagglePrice_;global.G={gVespersPay_,GAME,gameLoad,gameTick,gameUntick,gameSaveGoal,gameArchive,gameFreeze,gameShop,gameArt,gameBuy,gamePlace,gameBossStart,gameBossStage,gameBossRemove,gameBossSave,gameTag,gameChips,gameVespers,gameVespersUndo,gameVespersTime,gameMoon,gameReview,gameQuestStep,gameGroupSave,gameWear,gameUnbuy,gameHoardSave,gameHoardClaim,gameChronicle,gameAim,gameHaggle,gPay_,gDie_,gNeed_,gAdd_,gDow_,gDiff_,gIsFrozen_,gameMergeGoals,gameUnmerge};');
 
 const k = 'k'; let failed = 0;
 const ok = (n, c) => { console.log((c ? '  PASS ' : '  FAIL ') + n); if (!c) failed++; };
@@ -30,7 +30,7 @@ ok('one missed day drops a step (70 nights, missed once: x1.25)', G.gPay_({ minu
 ok('XP to the next level: 200 at level 1', G.gNeed_(1) === 200);
 const pl = { coins: 500, level: 4, xp: 10, hp: 3, maxHp: 50, deaths: 0 };
 const lost = G.gDie_(pl, '2026-11-04', [{ day: '2026-11-02', coins: 120 }, { day: '2026-10-20', coins: 400 }]);
-ok('at 0 HP: level -1, he wakes on a quarter of his health (1U.11), only the last 7 days of earnings lost', pl.level === 3 && pl.hp === 50 - 3 * Math.round(50 / 4) && pl.coins === 380 && lost.lost === 120 && pl.xp === 0);
+ok('at 0 HP: level -1, full health, only the last 7 days of earnings lost', pl.level === 3 && pl.hp === 50 && pl.coins === 380 && lost.lost === 120 && pl.xp === 0);
 const p1 = { coins: 20, level: 1, xp: 0, hp: 1, maxHp: 50, deaths: 0 };
 G.gDie_(p1, '2026-11-04', [{ day: '2026-11-03', coins: 900 }]);
 ok('death never takes coins below 0 or the level below 1', p1.coins === 0 && p1.level === 1);
@@ -410,6 +410,8 @@ ok('spending and refunds never count as doubloons earned', ch.weeks[6].coins ===
   m = G.gameMoon(k, '2026-12-21', 'full'); ok('and to full (working in the holiday)', m.moon === 'full');
   m = G.gameMoon(k, '2026-12-21', 'half'); ok('and back to half', m.moon === 'half');
   ok('the Vespers multiplier is in the snapshot', typeof m.vMult === 'number' && m.vMult >= 1);
+  ok('the Vespers bonus is on the Vespers reward only (30 Oct): it grows with the Vespers streak', G.gVespersPay_(0) === G.GAME.base[5] && G.gVespersPay_(7) === Math.round(G.GAME.base[5] * 1.1) && G.gVespersPay_(66) === Math.round(G.GAME.base[5] * 1.25));
+  ok('...and never on the pay for a ritual', !/gVMult_/.test(G.gPay_.toString()));
   const sh = G.gameShop(k); ok('shop prices are 20% higher, rounded to 5', sh.items.every((i) => i.price % 5 === 0) && sh.items.some((i) => i.price > 0)); }
 // 2026-10-28: health 60, aims with bottom lines, curse ceilings, the Rise quest, tier locks
 { at('2027-01-04T09:00:00Z');   // a Monday (after the test terms, so a half-moon day: life still counts)
@@ -432,25 +434,25 @@ ok('spending and refunds never count as doubloons earned', ch.weeks[6].coins ===
   const rs = s.goals.filter((g) => g.kind === 'daily' && g.track === 'life').slice(0, 3).map((g) => g.id);
   let guard = 0; while (!s.last || !s.last.died) { s = G.gameTick(k, nf, -1); if (++guard > 10) break; }
   const R = s.player.rise, lost = R ? R.lost : 0, q = Math.floor(lost / 4);
-  ok('1U.11 fainting opens Rise again: three stars, a quarter of the lost runes to win back, and he wakes on a quarter of his health', R && R.stage === 1 && R.lit === 0 && R.need === 3 && R.back === q && lost > 0 && s.player.hp === s.player.maxHp - 3 * Math.round(s.player.maxHp / 4));
-  { let t = s; for (let i = 0; i < 4; i++) t = G.gameTick(k, nf, -1);
+  ok('1U.11 fainting opens Rise again: three stars, a quarter of the lost runes to win back, and he wakes with all his health', R && R.stage === 1 && R.lit === 0 && R.need === 3 && R.back === q && lost > 0 && s.player.hp === s.player.maxHp);
+  { let t = s, g = 0; while (t.player.hp > 8 && ++g < 30) t = G.gameTick(k, nf, -1); const n = g; for (let i = 0; i < 4; i++) t = G.gameTick(k, nf, -1);
     ok('1U.11 no second faint before the first three stars are lit (health stops at 1)', t.player.hp === 1 && !(t.last && t.last.died) && t.player.rise && t.player.rise.stage === 1);
-    for (let i = 0; i < 4; i++) t = G.gameUntick(k, nf); s = t; }
-  const hp0 = s.player.hp, c0 = s.player.coins; s = G.gameTick(k, rs[0], 1); const c1 = s.player.coins;
-  ok('1U.11 the first ritual lights a star: a quarter of his health and a third of the quarter come back', s.player.rise.lit === 1 && s.player.hp >= hp0 + Math.round(s.player.maxHp / 4) && s.last.rise.hp === Math.round(s.player.maxHp / 4) && s.last.rise && s.last.rise.coins === Math.floor(q / 3));
+    for (let i = 0; i < n + 4; i++) t = G.gameUntick(k, nf); s = t; }
+  const c0 = s.player.coins; s = G.gameTick(k, rs[0], 1);
+  ok('1U.11 the first ritual lights a star, but no runes come back for one ritual alone', s.player.rise.lit === 1 && s.last.rise && s.last.rise.star === 1 && s.last.rise.coins === 0);
   s = G.gameTick(k, rs[0], 1);
   ok('1U.11 the same ritual twice lights no second star', s.player.rise.lit === 1);
   s = G.gameUntick(k, rs[0]); s = G.gameUntick(k, rs[0]);
-  ok('1U.11 Undo puts the star out and takes its health and runes back', s.player.rise.lit === 0 && s.player.hp === hp0 && s.player.coins === c0);
+  ok('1U.11 Undo puts the star out', s.player.rise.lit === 0 && s.player.coins === c0);
   s = G.gameTick(k, rs[0], 1); s = G.gameTick(k, rs[1], 1); const before = s.player.coins; s = G.gameTick(k, rs[2], 1);
-  ok('1U.11 three rituals: full health, the whole quarter home, and the second round waits for tomorrow', s.player.hp === s.player.maxHp && s.player.coins - c0 >= q && !s.player.rise);
+  ok('1U.11 the whole set of three brings a quarter of the lost runes home, and the second round waits for tomorrow', s.last.rise && s.last.rise.coins === q && s.player.coins - before >= q && !s.player.rise);
   s = G.gameUntick(k, rs[2]);
-  ok('undoing the third ritual takes its runes back and opens the round again', s.player.rise && s.player.rise.stage === 1 && s.player.rise.lit === 2 && s.player.coins === before);
+  ok('undoing the third ritual takes the quarter back and opens the round again', s.player.rise && s.player.rise.stage === 1 && s.player.rise.lit === 2 && s.player.coins === before);
   s = G.gameTick(k, rs[2], 1);
   at('2027-01-12T09:00:00Z'); s = G.gameLoad(k);
-  ok('1U.11 the next day: round two, three stars for the next quarter (no health this time)', s.player.rise && s.player.rise.stage === 2 && s.player.rise.lit === 0 && s.player.rise.hp === 0);
+  ok('1U.11 the next day: round two, three stars for the next quarter', s.player.rise && s.player.rise.stage === 2 && s.player.rise.lit === 0);
   const d0 = s.player.coins; rs.forEach((id) => { s = G.gameTick(k, id, 1); });
-  ok('1U.11 three rituals that day bring the second quarter home, and Rise again ends', !s.player.rise && s.last.rise && s.last.rise.stage === 1 && s.player.coins - d0 >= q);
+  ok('1U.11 three rituals that day bring the second quarter home (half in all), and Rise again ends', !s.player.rise && s.last.rise && s.last.rise.stage === 1 && s.last.rise.coins === q && s.player.coins - d0 >= q);
   at('2027-01-11T09:00:00Z'); s = G.gameLoad(k);
   const sh = G.gameShop(k), el = sh.items.find((i) => i.tier === 'Eldritch'), ba = sh.items.find((i) => i.tier === 'Basic' && !i.locked);
   ok('Eldritch needs level 20', el.locked && /level 20/.test(el.why));
