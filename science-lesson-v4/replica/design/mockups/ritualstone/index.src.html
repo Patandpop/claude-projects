@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ulhu: ritual stone colour (1U.7)</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Grenze+Gotisch:wght@500;700&display=swap">
+<style>
+/* One dark look by design (the drowned temple). */
+:root{color-scheme:dark;--a:'Atkinson Hyperlegible',system-ui,sans-serif;--g:'Grenze Gotisch',Georgia,serif}
+*{box-sizing:border-box}
+html,body{margin:0;background:#070d0b;color:#e8e1cf;font:15px/1.45 var(--a)}
+main{max-width:412px;margin:0 auto;padding:16px}
+h1{font:700 30px/1.1 var(--g);color:#ffd56a;margin:4px 0 6px}
+.intro{color:#8fa298;margin:0 0 12px}
+.card{background:#0c1512;border:1px solid #24443a;border-radius:10px;padding:10px 6px;margin:14px 0}
+.card h3{margin:0 6px 2px;font:700 18px var(--a)}.card h3 b{color:#ffd56a;margin-right:6px}
+.cap{margin:0 6px 8px;color:#b9c4bc;font-size:14px}
+.runes{display:flex;justify-content:space-around;align-items:center;padding:6px 0 10px;margin:0 6px 8px;border-bottom:1px solid #1c2924}
+.runes img{width:40px;height:40px;image-rendering:pixelated}
+.runes span{display:block;text-align:center;font-size:11px;color:#8fa298}
+.rows>div{margin:0 0 2px}
+.pay{color:#f4dd9a}
+</style>
+</head>
+<body>
+<main>
+<h1>Ritual stone colour</h1>
+<p class="intro">Your note: the ritual tablets' colour feels wrong; they should match the polished stone rune tablets you use like coins. Each card is the real ritual tablet with only its stone changed, under the five real rune tablets. Pick a letter, or mix.</p>
+<div id="cards"></div>
+</main>
+<script>/*__RUNES__*/</script>
+<script>/*__STONES__*/</script>
+<script>
+(function () {
+'use strict';
+const RITS = [
+  { name: 'Read', s: 12, done: true, sub: 'appeased · 15 min', pay: 18 },
+  { name: 'Train', s: 3, done: false, sub: 'awaits · 1 session', pay: 24 },
+  { name: 'Write', s: 0, done: false, sub: 'awaits · one line', pay: 12 },
+  { name: 'Plan tomorrow', s: 40, done: true, sub: 'appeased · 5 min', pay: 15 },
+  { name: 'Mark one set', s: 70, done: false, sub: 'embers · 30 min', pay: 30 }
+];
+const CARDS = [
+  ['NOW', 'As it is now', 'Violet obsidian: the stone that feels wrong, kept here to compare.', ['now']],
+  ['C1', 'Sage river stone', 'The grey-green of the single rune pebble, the coin you see most. Calm, and it sits with the green of the sea.', ['sage']],
+  ['C2', 'Slate', 'The blue-grey of the rune shard. Cooler and darker, so the gold pay numbers stand out most.', ['slate']],
+  ['C3', 'Each ritual its own stone', 'Like a handful of rune tablets: each ritual keeps one of the five stones (pebble, shard, tile, sandstone oval, coral), picked by its name, so a ritual is known by its colour.', ['sage', 'slate', 'obsid', 'sand', 'coral']]
+];
+const host = document.getElementById('cards');
+const ONES = (window.RUNES && RUNES.ones) || [], NAMES = ['pebble', 'shard', 'tile', 'oval', 'coral'];
+CARDS.forEach(([id, name, cap, stones]) => {
+  const c = document.createElement('section'); c.className = 'card'; c.id = id;
+  c.innerHTML = '<h3><b>' + id + '</b>' + name + '</h3><p class="cap">' + cap + '</p><div class="runes">' + ONES.slice(0, 5).map((r, i) => '<div><img src="' + r.src + '" alt=""><span>' + NAMES[i] + '</span></div>').join('') + '</div><div class="rows"></div>';
+  host.appendChild(c);
+  const rows = c.querySelector('.rows');
+  RITS.forEach((r, i) => { const k = stones[i % stones.length], S = window['STONE_' + k]; const d = document.createElement('div');
+    d.innerHTML = S.row({ id: id + i, name: r.name, streak: r.s, done: r.done, subHtml: r.sub + (r.s ? ' · ' + r.s + ' nights' : ''), payHtml: '<span class="pay">+' + r.pay + '</span>' }); rows.appendChild(d); });
+  new Set(stones).forEach((k) => window['STONE_' + k].paint(rows));
+});
+})();
+</script>
+</body>
+</html>

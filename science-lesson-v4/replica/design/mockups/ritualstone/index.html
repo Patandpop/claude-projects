@@ -1,0 +1,2295 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ulhu: ritual stone colour (1U.7)</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Grenze+Gotisch:wght@500;700&display=swap">
+<style>
+/* One dark look by design (the drowned temple). */
+:root{color-scheme:dark;--a:'Atkinson Hyperlegible',system-ui,sans-serif;--g:'Grenze Gotisch',Georgia,serif}
+*{box-sizing:border-box}
+html,body{margin:0;background:#070d0b;color:#e8e1cf;font:15px/1.45 var(--a)}
+main{max-width:412px;margin:0 auto;padding:16px}
+h1{font:700 30px/1.1 var(--g);color:#ffd56a;margin:4px 0 6px}
+.intro{color:#8fa298;margin:0 0 12px}
+.card{background:#0c1512;border:1px solid #24443a;border-radius:10px;padding:10px 6px;margin:14px 0}
+.card h3{margin:0 6px 2px;font:700 18px var(--a)}.card h3 b{color:#ffd56a;margin-right:6px}
+.cap{margin:0 6px 8px;color:#b9c4bc;font-size:14px}
+.runes{display:flex;justify-content:space-around;align-items:center;padding:6px 0 10px;margin:0 6px 8px;border-bottom:1px solid #1c2924}
+.runes img{width:40px;height:40px;image-rendering:pixelated}
+.runes span{display:block;text-align:center;font-size:11px;color:#8fa298}
+.rows>div{margin:0 0 2px}
+.pay{color:#f4dd9a}
+</style>
+</head>
+<body>
+<main>
+<h1>Ritual stone colour</h1>
+<p class="intro">Your note: the ritual tablets' colour feels wrong; they should match the polished stone rune tablets you use like coins. Each card is the real ritual tablet with only its stone changed, under the five real rune tablets. Pick a letter, or mix.</p>
+<div id="cards"></div>
+</main>
+<script>/* Ulhu's currency: runes (chosen by Patryk 2026-10-25 over pearls, dream orbs and doubloons; mock-up rounds in
+   https://claude.ai/artifact/GsrdW9MrKHRnP47yEwRA2V). Drawn on the page in the app's pixel style, nothing fetched.
+   window.RUNES.pick(amount, key): the picture for a reward of that size. Under 30 = one of his five runes (most rewards, about 70%) (a river
+   stone, a slate shard, a cracked obsidian tile, a sandstone oval, a cracked coral stone); 30+ = the tall cairn;
+   boss treasure = the portal held open by the five runes (Patryk 2026-10-25). key keeps the same rune on the same row between repaints. */
+(function (root) {
+  if (typeof document === 'undefined') return;
+  const TAU = Math.PI * 2;
+  function make(w, h, pal, draw) {
+    const g = []; for (let y = 0; y < h; y++) g.push(new Array(w).fill(null));
+    const set = (x, y, c) => { x = Math.floor(x); y = Math.floor(y); if (x >= 0 && y >= 0 && x < w && y < h) g[y][x] = c; };
+    const A = { set,
+      ell(cx, cy, rx, ry, c) { for (let y = Math.floor(cy - ry - 1); y <= cy + ry + 1; y++) for (let x = Math.floor(cx - rx - 1); x <= cx + rx + 1; x++) { const dx = (x + .5 - cx) / rx, dy = (y + .5 - cy) / ry; if (dx * dx + dy * dy <= 1) set(x, y, c); } },
+      rect(x, y, ww, hh, c) { for (let j = 0; j < hh; j++) for (let i = 0; i < ww; i++) set(x + i, y + j, c); },
+      line(x0, y0, x1, y1, c) { const n = Math.ceil(Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0))) * 2 || 1; for (let i = 0; i <= n; i++) set(x0 + (x1 - x0) * i / n, y0 + (y1 - y0) * i / n, c); },
+      tri(ax, ay, bx, by, cx, cy, c) { const s = (px, py, qx, qy, rx, ry) => (px - rx) * (qy - ry) - (qx - rx) * (py - ry);
+        for (let y = Math.floor(Math.min(ay, by, cy)); y <= Math.max(ay, by, cy); y++) for (let x = Math.floor(Math.min(ax, bx, cx)); x <= Math.max(ax, bx, cx); x++) { const px = x + .5, py = y + .5, d1 = s(px, py, ax, ay, bx, by), d2 = s(px, py, bx, by, cx, cy), d3 = s(px, py, cx, cy, ax, ay); if (!((d1 < 0 || d2 < 0 || d3 < 0) && (d1 > 0 || d2 > 0 || d3 > 0))) set(x, y, c); } } };
+    draw(A);
+    const empty = (x, y) => !(x >= 0 && y >= 0 && x < w && y < h) || g[y][x] === null;
+    const c = document.createElement('canvas'); c.width = w; c.height = h; const x2 = c.getContext('2d');
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+      const k = g[y][x]; let v = null;
+      if (k) { const p = pal[k]; v = Array.isArray(p) ? ((empty(x, y - 1) || empty(x - 1, y)) ? p[1] : (empty(x, y + 1) || empty(x + 1, y)) ? p[2] : ((empty(x, y + 2) || empty(x + 2, y)) && (x + y) % 2 === 0) ? p[2] : p[0]) : p; }
+      else if ([[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dy]) => !empty(x + dx, y + dy))) v = '#120b14';
+      if (v) { x2.fillStyle = v; x2.fillRect(x, y, 1, 1); }
+    }
+    return { src: c.toDataURL(), w, h };
+  }
+  const GLOWS = { g: ['#1d8a52', '#c8ffe0'], t: ['#1a6a8a', '#bff4ff'], v: ['#5a2a9a', '#f0d0ff'], y: ['#9a6a10', '#fff0b0'], p: ['#8a2a6a', '#ffd4f4'] };
+  const GLYPHS = [[[0, -1, 0, 1], [-.7, -.3, 0, -1], [.7, -.3, 0, -1], [-.7, .5, .7, .5]], [[-.7, -1, .7, 1], [.7, -1, -.7, 1], [0, -1, 0, 1]], [[0, -1, 0, 1], [0, -.2, .7, -.8], [0, .3, -.7, -.3], [0, .3, .7, .9]],
+    [[-.7, -.9, .7, -.9], [0, -.9, 0, 1], [-.6, .2, .6, .2], [-.6, .2, -.2, .9]], [], [], [], [[-.6, -1, .6, -1], [.6, -1, -.6, 1], [-.6, 1, .6, 1]]];
+  const glyph = (A, cx, cy, s, k, col) => { const G = GLYPHS[k];
+    G.forEach(([a, b, c, d]) => [[-1, 0], [1, 0], [0, -1], [0, 1]].forEach(([ox, oy]) => A.line(cx + a * s + ox, cy + b * s + oy, cx + c * s + ox, cy + d * s + oy, 'h' + col)));
+    G.forEach(([a, b, c, d]) => A.line(cx + a * s, cy + b * s, cx + c * s, cy + d * s, 'r' + col)); };
+  const spark = (A, x, y, c) => { A.set(x, y, 'r' + c); A.set(x - 1, y, 'h' + c); A.set(x + 1, y, 'h' + c); A.set(x, y - 1, 'h' + c); A.set(x, y + 1, 'h' + c); };
+  const crack = (A, pts) => { for (let i = 1; i < pts.length; i++) A.line(pts[i - 1][0], pts[i - 1][1], pts[i][0], pts[i][1], 'k'); };
+  const PAL = { a: ['#566a60', '#8fa398', '#2e3a34'], b: ['#4a5a6e', '#8a9cb2', '#262e3c'], o: ['#2c2a36', '#5e5a72', '#141218'], d: ['#8f7a56', '#cbb68a', '#4e402a'], q: ['#a04a5a', '#e88a9a', '#5a1a2a'],
+    m: ['#4a7a3a', '#7ab05a', '#2a4a1a'], c: '#1e2622', k: '#0a080e', pv: ['#2a1a5a', '#8a6ae0', '#100830'], sw: '#e8f0ff' };
+  Object.keys(GLOWS).forEach((c) => { PAL['h' + c] = GLOWS[c][0]; PAL['r' + c] = GLOWS[c][1]; });
+  const RS = {
+    pebble: (A, x, y, s, k, c) => { A.ell(x, y, 7 * s, 6 * s, 'a'); glyph(A, x, y, 3 * s, k, c); },
+    shard: (A, x, y, s, k, c) => { A.tri(x - 5 * s, y + 6 * s, x + 5 * s, y + 6 * s, x + 1 * s, y - 9 * s, 'b'); A.rect(x - 5 * s, y + 3 * s, 10 * s, 4 * s, 'b'); glyph(A, x, y + 1 * s, 2.6 * s, k, c); },
+    tile: (A, x, y, s, k, c) => { A.rect(x - 6 * s, y - 6 * s, 12 * s, 12 * s, 'o'); glyph(A, x, y, 3.2 * s, k, c); },
+    oval: (A, x, y, s, k, c) => { A.ell(x, y, 8 * s, 5 * s, 'd'); glyph(A, x, y, 2.6 * s, k, c); },
+    coral: (A, x, y, s, k, c) => { A.ell(x, y, 7.5 * s, 6.5 * s, 'q'); [[-6, -3], [5, -5], [6, 4], [-4, 6]].forEach(([dx, dy]) => A.ell(x + dx * s, y + dy * s, 1.6 * s, 1.6 * s, 'q')); glyph(A, x, y, 2.8 * s, k, c); } };
+  const MINE = [['pebble', 0, 'g'], ['shard', 2, 't'], ['tile', 1, 'v'], ['oval', 3, 'y'], ['coral', 7, 'p']];
+  const R1 = (i, A, x, y, s) => { const [f, k, c] = MINE[i % 5]; RS[f](A, x, y, s, k, c); };
+  const one = (i, extra, s) => make(24, 24, PAL, (A) => { R1(i, A, 12, 12.5, s); if (extra) extra(A); });
+  const ONES = [
+    one(0, (A) => { A.ell(6, 7, 2.6, 1.6, 'm'); A.line(17, 6, 19, 11, 'c'); }, 1.35),
+    make(24, 24, PAL, (A) => { RS.shard(A, 12, 11.5, 1.32, 2, 't'); A.line(9, 7, 11, 12, 'c'); }),
+    one(2, (A) => { crack(A, [[4, 6], [7, 8], [6, 11]]); crack(A, [[20, 15], [17, 17], [18, 20], [16, 21]]); crack(A, [[14, 4], [15, 6]]); }, 1.4),
+    one(3, (A) => A.line(5, 13, 8, 11, 'c'), 1.3),
+    one(4, (A) => { crack(A, [[6, 10], [8, 12], [7, 15]]); crack(A, [[16, 16], [18, 17], [18, 19]]); }, 1.12)];
+  const HAND = make(32, 34, PAL, (A) => { R1(3, A, 16, 30, 1.25); R1(0, A, 16, 23, .9); R1(4, A, 15, 16.5, .62); R1(2, A, 16, 11, .5); R1(1, A, 16, 6, .38); spark(A, 16, 1.5, 'g'); A.set(16, 0, 'hg'); spark(A, 5, 9, 'v'); });
+  const HOARD = make(40, 40, PAL, (A) => { const P = []; for (let i = 0; i < 5; i++) { const a = i / 5 * TAU - Math.PI / 2; P.push([20 + Math.cos(a) * 15, 20 + Math.sin(a) * 15]); }
+    A.ell(20, 20, 9, 9, 'pv'); for (let i = 0; i < 26; i++) { const a = i * .6; A.set(20 + Math.cos(a) * i * .3, 20 + Math.sin(a) * i * .3, 'sw'); }
+    P.forEach(([x, y], i) => { const [x2, y2] = P[(i + 2) % 5]; A.line(x, y, x2, y2, 'r' + MINE[i][2]); }); P.forEach(([x, y], i) => R1(i, A, x, y, .55)); });
+  const hash = (s) => { let h = 7; s = String(s); for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0; return h; };
+  root.RUNES = {
+    ones: ONES, hand: HAND, hoard: HOARD,
+    // the picture for a reward of n (kind 'boss' = the hoard); the same key always gets the same single rune
+    pick(n, key, kind) { n = Math.abs(Number(n) || 0); if (kind === 'boss') return HOARD; if (n >= 30) return HAND; return ONES[hash(key == null ? n : key) % ONES.length]; },
+    any() { return ONES[Math.floor(Math.random() * ONES.length)]; }
+  };
+})(typeof window !== 'undefined' ? window : this);
+</script>
+<script>/* Ritual tablets (Patryk 2026-10-27, final picks from the "Obsidian and Parchment" mock-up):
+   stone ST-final "Polished deep slab" (ST3c fine grain and satin shine on ST3e's thick slab with a deep rounded bevel),
+   the plain pixel pentagram tick (no studs, no multiplier marks) waiting in a carved well and lighting from the middle
+   in chunky pixel steps, and real-looking cracks round the border (dark fissure, lit lip, chip at the rim), seeded by
+   the ritual's name, more of them the longer the streak (2 at the start, 11 by 70 nights), glowing faintly in the
+   streak colour with a slight shimmer and flaring when ticked.
+   STONE.row(opts) -> HTML for one tablet; STONE.paint(root) paints every tablet inside root (cached, cheap to repeat);
+   STONE.flare(key) plays the tick flare on the tablet whose tick has data-fx=key.
+   Each tablet face is drawn once into a cached canvas; only the flare and a stepped shimmer animate.
+   All CSS classes start with now-. */
+(function () {
+'use strict';
+if (window.STONE_now) return;
+
+const RM = () => !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+const DPRf = () => Math.min(2, window.devicePixelRatio || 1);
+
+/* ---------- the app's streak colour (copied from game-ui.js sCol): ember orange at night 1, eldritch green at 66 ---------- */
+const hx = (c) => [1, 3, 5].map((i) => parseInt(c.slice(i, i + 2), 16));
+const mixc = (a, b, t) => { const x = hx(a), y = hx(b); return '#' + x.map((v, i) => Math.round(v + (y[i] - v) * t).toString(16).padStart(2, '0')).join(''); };
+const STOPS = [[1, '#ff6a2a'], [7, '#ffc040'], [21, '#6ab8ff'], [45, '#5adcd0'], [66, '#5ef2a0']];
+const sCol = (n) => { n = Math.max(1, n || 1); if (n >= 66) return '#5ef2a0'; for (let i = 1; i < STOPS.length; i++) if (n <= STOPS[i][0]) return mixc(STOPS[i - 1][1], STOPS[i][1], (n - STOPS[i - 1][0]) / (STOPS[i][0] - STOPS[i - 1][0])); return '#5ef2a0'; };
+const rgba = (c, a) => { const v = hx(c); return 'rgba(' + v[0] + ',' + v[1] + ',' + v[2] + ',' + a + ')'; };
+const esc = (s) => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
+const norm3 = (v) => { const l = Math.hypot(v[0], v[1], v[2]); return [v[0] / l, v[1] / l, v[2] / l]; };
+
+/* ---------- seeded randomness and value noise ---------- */
+function hashStr(s) { let h = 2166136261 >>> 0; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+function mulberry(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function noiseTile(size, cells, oct, seed) {
+  const out = new Float32Array(size * size), r = mulberry(seed); let amp = 1, tot = 0;
+  for (let o = 0; o < oct; o++) {
+    const c = cells << o, g = new Float32Array(c * c); for (let i = 0; i < g.length; i++) g[i] = r();
+    const step = size / c;
+    for (let y = 0; y < size; y++) { const fy = y / step, iy = Math.floor(fy), ty = fy - iy, sy = ty * ty * (3 - 2 * ty), y0 = (iy % c) * c, y1 = ((iy + 1) % c) * c;
+      for (let x = 0; x < size; x++) { const fx = x / step, ix = Math.floor(fx), tx = fx - ix, sx = tx * tx * (3 - 2 * tx), x0 = ix % c, x1 = (ix + 1) % c;
+        const a = g[y0 + x0], b = g[y0 + x1], cc = g[y1 + x0], d = g[y1 + x1], top = a + (b - a) * sx, bot = cc + (d - cc) * sx;
+        out[y * size + x] += amp * (top + (bot - top) * sy); } }
+    tot += amp; amp *= 0.5;
+  }
+  for (let i = 0; i < out.length; i++) out[i] /= tot;
+  return out;
+}
+let N1 = null, N2 = null, N3 = null; // made on the first tablet, not at load
+const noise = () => { if (!N1) { N1 = noiseTile(512, 4, 5, 11); N2 = noiseTile(256, 8, 4, 23); N3 = noiseTile(256, 32, 3, 37); } };
+const s1 = (x, y) => N1[((y | 0) & 511) * 512 + ((x | 0) & 511)];
+const s2 = (x, y) => N2[((y | 0) & 255) * 256 + ((x | 0) & 255)];
+const s3 = (x, y) => N3[((y | 0) & 255) * 256 + ((x | 0) & 255)];
+function boxBlur(src, w, h, r) {
+  const tmp = new Float32Array(w * h), out = new Float32Array(w * h), d = 2 * r + 1;
+  for (let y = 0; y < h; y++) { const o = y * w; let acc = 0; for (let x = -r; x <= r; x++) acc += src[o + Math.min(w - 1, Math.max(0, x))];
+    for (let x = 0; x < w; x++) { tmp[o + x] = acc / d; acc += src[o + Math.min(w - 1, x + r + 1)] - src[o + Math.max(0, x - r)]; } }
+  for (let x = 0; x < w; x++) { let acc = 0; for (let y = -r; y <= r; y++) acc += tmp[Math.min(h - 1, Math.max(0, y)) * w + x];
+    for (let y = 0; y < h; y++) { out[y * w + x] = acc / d; acc += tmp[Math.min(h - 1, y + r + 1) * w + x] - tmp[Math.max(0, y - r) * w + x]; } }
+  return out;
+}
+const blur2 = (a, w, h, r) => boxBlur(boxBlur(a, w, h, r), w, h, r);
+
+/* ---------- ST-final: the stone recipe ---------- */
+const V = { code: 'ST-final', base: [22, 18, 30], c1: .45, b2: .15, b3: .1, pits: 3, pitR: [.6, 1.6], spec: 1.4, sx: 44, sheen: 1,
+  bev: 5.2, bevR: 4, side: 7, cham: 3, rough: .6, chips: .08 };
+const ROW_H = 64; // css px, including the slab's thickness and its shadow
+// where the face sits inside the row (css px): the thickness and the drop shadow take the bottom
+const M = { l: 3, t: 2, r: 3, b: V.side + 5 };
+
+function slabPath(W, H, m, rng, v, DPR) {
+  const pts = [], x0 = m.l, y0 = m.t, x1 = W - m.r, y1 = H - m.b;
+  const cs = [0, 1, 2, 3].map(() => (1.5 + rng() * v.cham) * DPR), C = [[x0, y0], [x1, y0], [x1, y1], [x0, y1]];
+  for (let i = 0; i < 4; i++) {
+    const a = C[i], b = C[(i + 1) % 4], dx = Math.sign(b[0] - a[0]), dy = Math.sign(b[1] - a[1]), nx = -dy, ny = dx;
+    const len = Math.abs(b[0] - a[0]) + Math.abs(b[1] - a[1]), sA = cs[i], sB = cs[(i + 1) % 4];
+    const P = (t, o) => [a[0] + dx * t + nx * o, a[1] + dy * t + ny * o, nx, ny];
+    let t = sA; pts.push(P(t, rng() * v.rough * DPR));
+    while (t < len - sB) {
+      t = Math.min(len - sB, t + (3 + rng() * 5) * DPR);
+      if (rng() < v.chips && t > sA + 6 * DPR && t < len - sB - 12 * DPR) {
+        const cw = (3 + rng() * 7) * DPR, dep = (0.8 + rng() * 2.4) * DPR;
+        pts.push(P(t, .3 * DPR), P(t + cw * .25, dep * .8), P(t + cw * .55, dep), P(t + cw * .8, dep * .5), P(t + cw, .2 * DPR)); t += cw;
+      } else pts.push(P(t, rng() * v.rough * DPR));
+    }
+  }
+  return pts;
+}
+
+// renders one tablet face; forb = rectangles (device px) the cracks keep out of (tick, words, pay)
+function renderStone(name, streak, Wc, Hc, forb, DPR) {
+  noise();
+  const v = V, W = Math.round(Wc * DPR), H = Math.round(Hc * DPR);
+  const rng = mulberry(hashStr(name + '|' + v.code)), side = v.side * DPR;
+  const m = { l: M.l * DPR, t: M.t * DPR, r: M.r * DPR, b: M.b * DPR };
+  const pts = slabPath(W, H, m, rng, v, DPR);
+  const oc = document.createElement('canvas'); oc.width = W; oc.height = H; const ox = oc.getContext('2d', { willReadFrequently: true });
+  const poly = (dy) => { ox.beginPath(); pts.forEach((p, i) => (i ? ox.lineTo(p[0], p[1] + dy) : ox.moveTo(p[0], p[1] + dy))); ox.closePath(); ox.fill(); };
+  ox.fillStyle = '#fff'; poly(0); const fd = ox.getImageData(0, 0, W, H).data; ox.clearRect(0, 0, W, H);
+  for (let k = 1; k <= side; k++) poly(k); const sd = ox.getImageData(0, 0, W, H).data; ox.clearRect(0, 0, W, H);
+  const A = new Float32Array(W * H), AS = new Float32Array(W * H);
+  for (let i = 0; i < A.length; i++) { A[i] = fd[i * 4 + 3] / 255; AS[i] = sd[i * 4 + 3] / 255; }
+  const Hh = blur2(A, W, H, Math.max(1, Math.round(v.bevR * DPR)));
+  // cracks stay within this many px of the face's edge (the slab is near enough a rectangle to measure it straight)
+  const band = 12 * DPR, fx0 = m.l, fy0 = m.t, fx1 = W - m.r, fy1 = H - m.b;
+  // surface height: bevel plus two scales of fine grain
+  const o1x = rng() * 512, o1y = rng() * 512, o2x = rng() * 256, o2y = rng() * 256, o3x = rng() * 256, o3y = rng() * 256;
+  const Hn = new Float32Array(W * H), C1 = new Float32Array(W * H);
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    const i = y * W + x; if (A[i] <= 0 && AS[i] <= 0) continue;
+    const X = x / DPR, Y = y / DPR, n1 = s1(X * .6 + o1x, Y * .6 + o1y), n2 = s2(X * 1.2 + o2x, Y * 1.2 + o2y), n3 = s3(X * 2.4 + o3x, Y * 2.4 + o3y);
+    Hn[i] = Hh[i] * v.bev + (n2 - .5) * v.b2 + (n3 - .5) * v.b3; C1[i] = n1;
+  }
+  // a few tiny pits
+  const dig = (cx, cy, r, depth) => { const R = r * DPR; for (let y = Math.max(0, cy - R | 0); y <= Math.min(H - 1, cy + R + 1 | 0); y++) for (let x = Math.max(0, cx - R | 0); x <= Math.min(W - 1, cx + R + 1 | 0); x++) {
+    const d = Math.hypot(x - cx, y - cy) / R; if (d < 1) Hn[y * W + x] -= depth * (1 - d * d); } };
+  for (let k = 0; k < v.pits; k++) { const x = rng() * W, y = rng() * H; if (A[(y | 0) * W + (x | 0)] > .9) dig(x, y, v.pitR[0] + rng() * (v.pitR[1] - v.pitR[0]), .9 + rng() * .8); }
+  const Hb = blur2(Hn, W, H, Math.max(1, Math.round(2 * DPR)));
+  // light it from the top left, satin highlight and a soft violet sheen
+  const L = norm3([-.45, -.68, .58]), Hv = norm3([L[0], L[1], L[2] + 1]);
+  const img = ox.createImageData(W, H), D = img.data;
+  for (let y = 1; y < H - 1; y++) for (let x = 1; x < W - 1; x++) {
+    const i = y * W + x, a = A[i], as = AS[i]; if (a <= .004 && as <= .004) continue;
+    const j = i * 4, n1 = C1[i], tone = 1 + (n1 - .5) * v.c1 * 2;
+    const R = v.base[0] * tone, G = v.base[1] * tone, B = v.base[2] * tone;
+    let fR = 0, fG = 0, fB = 0;
+    if (a > .004) {
+      const gx = (Hn[i + 1] - Hn[i - 1]) * DPR / 2, gy = (Hn[i + W] - Hn[i - W]) * DPR / 2, nl = Math.hypot(gx, gy, 1), nx = -gx / nl, ny = -gy / nl, nz = 1 / nl;
+      const dif = Math.max(0, nx * L[0] + ny * L[1] + nz * L[2]), sp = Math.pow(Math.max(0, nx * Hv[0] + ny * Hv[1] + nz * Hv[2]), v.sx) * v.spec;
+      const ao = clamp((Hb[i] - Hn[i]) * 1.1, 0, .75), lit = (.3 + .95 * dif) * (1 - ao);
+      fR = R * lit + sp * 150; fG = G * lit + sp * 146; fB = B * lit + sp * 165;
+      const bd = Math.exp(-Math.pow((x / W + y / H * .5 - .42 + (n1 - .5) * .2) / .16, 2)) * (.6 + dif * .6); fR += bd * 16 * v.sheen; fG += bd * 14 * v.sheen; fB += bd * 26 * v.sheen;
+    }
+    const k = .5 + (n1 - .5) * .3, sR = R * .42 * k, sG = G * .42 * k, sB = B * .42 * k; // the thickness below the face
+    D[j] = sR + (fR - sR) * a; D[j + 1] = sG + (fG - sG) * a; D[j + 2] = sB + (fB - sB) * a; D[j + 3] = Math.max(a, as) * 255;
+  }
+  ox.putImageData(img, 0, 0);
+  // the dark seam where face meets thickness
+  ox.save(); ox.globalCompositeOperation = 'source-atop'; ox.strokeStyle = 'rgba(0,0,0,.55)'; ox.lineWidth = DPR;
+  ox.beginPath(); pts.forEach((p, i) => (i ? ox.lineTo(p[0], p[1] + DPR * .6) : ox.moveTo(p[0], p[1] + DPR * .6))); ox.closePath(); ox.stroke(); ox.restore();
+
+  /* ---- cracks: only near the border, spread round it, more with a longer streak ---- */
+  const valid = (x, y, loose) => { if (x < 1 || y < 1 || x >= W - 1 || y >= H - 1) return false; const i = (y | 0) * W + (x | 0);
+    if (A[i] < (loose ? .5 : .97) || Math.min(x - fx0, fx1 - x, y - fy0, fy1 - y) > band) return false;
+    for (let k = 0; k < forb.length; k++) { const f = forb[k]; if (x > f[0] && x < f[2] && y > f[1] && y < f[3]) return false; } return true; };
+  const cracks = [], count = clamp(2 + Math.floor(streak / 7), 2, 11);
+  function grow(x, y, a, w, len, depth, list) {
+    const P = [[x, y, w]]; let L2 = 0; const drift = (rng() - .5) * .12;
+    while (L2 < len && w > .22 * DPR) {
+      a += drift + (rng() - .5) * .95; const st = (2.4 + rng() * 3.6) * DPR; let ok = false, nx = 0, ny = 0;
+      for (let k = 0; k < 5; k++) { const aa = a + (k === 0 ? 0 : (k % 2 ? 1 : -1) * .45 * Math.ceil(k / 2)); nx = x + Math.cos(aa) * st; ny = y + Math.sin(aa) * st; if (valid(nx, ny, L2 < 3 * DPR)) { a = aa; ok = true; break; } }
+      if (!ok) break; x = nx; y = ny; L2 += st; w *= .9; P.push([x, y, w]);
+      if (depth < 2 && rng() < .16 && L2 > 4 * DPR) grow(x, y, a + (rng() < .5 ? -1 : 1) * (.6 + rng() * .7), w * .6, (len - L2) * (.35 + rng() * .4), depth + 1, list);
+      if (rng() < .12) list.push([[x, y, w * .45], [x + Math.cos(a + 1.6) * 2.2 * DPR, y + Math.sin(a + 1.6) * 2.2 * DPR, w * .2]]); // splinter
+    }
+    if (P.length > 2) list.push(P);
+    return P.length > 2;
+  }
+  const off = rng(), n = pts.length;
+  for (let k = 0; k < count; k++) {
+    let made = false;
+    for (let t = 0; t < 14 && !made; t++) {
+      const idx = Math.floor((((k + off + (rng() - .5) * .6) / count) % 1 + 1) % 1 * n), p = pts[idx];
+      const sx = p[0] + p[2] * 1.2 * DPR, sy = p[1] + p[3] * 1.2 * DPR; if (!valid(sx, sy, true)) continue;
+      const inA = Math.atan2(p[3], p[2]), a = inA + (rng() < .5 ? -1 : 1) * (.55 + rng() * .5);
+      const list = [], w0 = (1.5 + rng() * 1.1) * DPR;
+      if (grow(sx, sy, a, w0, (14 + rng() * 22 + Math.min(streak, 70) * .22) * DPR, 0, list)) { cracks.push({ list, mouth: [sx, sy, p[2], p[3], w0] }); made = true; }
+    }
+  }
+  ox.save(); ox.globalCompositeOperation = 'source-atop'; ox.lineCap = 'round'; ox.lineJoin = 'round';
+  cracks.forEach((c) => {
+    // a chip knocked out where the crack meets the edge
+    const [mx, my, nx, ny, w0] = c.mouth, tx = -ny, ty = nx, cw = w0 * (1.8 + rng()), dp = w0 * (2 + rng() * 1.5);
+    ox.fillStyle = 'rgba(8,6,10,.85)'; ox.beginPath(); ox.moveTo(mx - nx * 1.5 * DPR + tx * cw, my - ny * 1.5 * DPR + ty * cw); ox.lineTo(mx + nx * dp, my + ny * dp); ox.lineTo(mx - nx * 1.5 * DPR - tx * cw * .8, my - ny * 1.5 * DPR - ty * cw * .8); ox.fill();
+    ox.strokeStyle = 'rgba(205,195,220,.4)'; ox.lineWidth = .7 * DPR; ox.beginPath(); ox.moveTo(mx - nx * DPR + tx * cw, my - ny * DPR + ty * cw); ox.lineTo(mx + nx * dp, my + ny * dp); ox.stroke();
+    c.list.forEach((P) => {
+      const Lp = [], Rp = []; let lx = 0, ly = 0;
+      for (let k = 0; k < P.length; k++) { const a = P[Math.max(0, k - 1)], b = P[Math.min(P.length - 1, k + 1)], dx = b[0] - a[0], dy = b[1] - a[1], l = Math.hypot(dx, dy) || 1, nx = -dy / l, ny = dx / l;
+        const w = (k === P.length - 1 ? 0 : P[k][2]) / 2 * (k % 2 ? .8 : 1.1); Lp.push([P[k][0] + nx * w, P[k][1] + ny * w]); Rp.push([P[k][0] - nx * w, P[k][1] - ny * w]); lx += nx; ly += ny; }
+      const lightL = (lx * -.45 + ly * -.68) > 0, path = (arr, dx, dy) => { ox.beginPath(); arr.forEach((p, k) => (k ? ox.lineTo(p[0] + dx, p[1] + dy) : ox.moveTo(p[0] + dx, p[1] + dy))); };
+      // a soft shadow beside the gap, the black gap itself, a thin lit lip on the side facing the light
+      ox.fillStyle = 'rgba(0,0,0,.35)'; path(Lp.concat(Rp.slice().reverse()), .5 * DPR, .7 * DPR); ox.closePath(); ox.fill();
+      ox.fillStyle = 'rgba(2,1,4,.97)'; path(Lp.concat(Rp.slice().reverse()), 0, 0); ox.closePath(); ox.fill();
+      ox.lineWidth = .55 * DPR; ox.strokeStyle = 'rgba(215,205,232,.42)'; path(lightL ? Lp : Rp, 0, -.45 * DPR); ox.stroke();
+      ox.strokeStyle = 'rgba(0,0,0,.5)'; ox.lineWidth = .8 * DPR; path(lightL ? Rp : Lp, .3 * DPR, .5 * DPR); ox.stroke();
+    });
+  });
+  ox.restore();
+  // final face with its drop shadow
+  const fc = document.createElement('canvas'); fc.width = W; fc.height = H; const fx = fc.getContext('2d');
+  fx.shadowColor = 'rgba(0,0,0,.85)'; fx.shadowBlur = 5 * DPR; fx.shadowOffsetY = 2.5 * DPR; fx.drawImage(oc, 0, 0);
+  return { face: fc, cracks, W, H, DPR, glows: {} };
+}
+
+// embers deep inside the cracks, in the streak colour
+function renderGlow(S, col) {
+  if (S.glows[col]) return S.glows[col];
+  const DPR = S.DPR, gc = document.createElement('canvas'); gc.width = S.W; gc.height = S.H; const g = gc.getContext('2d');
+  g.globalCompositeOperation = 'lighter';
+  // each pass strokes every crack onto a scratch layer with no shadow, then lays that layer down with one blurred shadow
+  // (a shadow on every little stroke cost 0.3-0.9 s per tablet)
+  const tc = document.createElement('canvas'); tc.width = S.W; tc.height = S.H; const t = tc.getContext('2d'); t.lineCap = 'round'; t.lineJoin = 'round';
+  const pass = (mul, blur, style, min) => { t.clearRect(0, 0, S.W, S.H); t.strokeStyle = style;
+    S.cracks.forEach((c) => c.list.forEach((P) => { for (let k = 1; k < P.length; k++) { t.lineWidth = Math.max(min, P[k][2] * mul); t.beginPath(); t.moveTo(P[k - 1][0], P[k - 1][1]); t.lineTo(P[k][0], P[k][1]); t.stroke(); } }));
+    g.shadowBlur = blur; g.shadowColor = col; g.drawImage(tc, 0, 0); g.shadowBlur = 0; };
+  pass(1.4, 6 * DPR, rgba(col, .22), .5);
+  pass(.42, 2 * DPR, col, .35);
+  pass(.16, 0, mixc(col, '#fff6e0', .5), .25);
+  S.cracks.forEach((c) => { const [mx, my, nx, ny, w0] = c.mouth, cx = mx + nx * w0, cy = my + ny * w0, gr = g.createRadialGradient(cx, cy, 0, cx, cy, w0 * 3);
+    gr.addColorStop(0, rgba(col, .35)); gr.addColorStop(1, rgba(col, 0)); g.shadowBlur = 0; g.fillStyle = gr; g.beginPath(); g.arc(cx, cy, w0 * 3, 0, 7); g.fill(); });
+  const keys = Object.keys(S.glows); if (keys.length > 3) delete S.glows[keys[0]];
+  S.glows[col] = gc;
+  return gc;
+}
+
+/* ---------- the pixel pentagram tick: carved well and dashed ring when waiting, a disc of light with a dark star when lit ---------- */
+const TG = 22; // pixel grid; shown at 2x (44 css px)
+const TICKS = {};
+function drawTick(col, lit) {
+  const key = col + (lit ? '1' : '0'); if (TICKS[key]) return TICKS[key];
+  const cv = document.createElement('canvas'); cv.width = TG; cv.height = TG; const g = cv.getContext('2d');
+  const cx = TG / 2, cy = TG / 2, R = 8.6;
+  const px = (x, y, c) => { g.fillStyle = c; g.fillRect(Math.floor(x), Math.floor(y), 1, 1); };
+  const dim = mixc('#2a2038', col, .5), white = '#fffbea';
+  for (let y = 0; y < TG; y++) for (let x = 0; x < TG; x++) {
+    const dx = x + .5 - cx, dy = y + .5 - cy, d = Math.hypot(dx, dy);
+    if (d < R + .5) {
+      if (!lit) px(x, y, (x + y) % 3 ? '#0b0910' : '#120f18');
+      else { const q = d / R; px(x, y, q < .22 ? white : q < .5 ? mixc(white, col, (q - .22) / .28) : q < .82 ? col : ((x + y) % 2 ? col : mixc(col, '#000000', .35))); }
+    } else if (d < R + 1.6) px(x, y, dx + dy > 1 ? 'rgba(210,200,230,.28)' : 'rgba(0,0,0,.7)'); // the well's carved rim
+  }
+  for (let a = 0; a < 6.283; a += .02) { const idx = Math.floor(a / 6.283 * 44); if (!lit && idx % 4 === 3) continue; px(cx + Math.cos(a) * R - .5, cy + Math.sin(a) * R - .5, lit ? mixc(col, '#ffffff', .3) : dim); }
+  const P = []; for (let k = 0; k < 5; k++) { const a = -Math.PI / 2 + k * 2 * Math.PI / 5; P.push([cx + Math.cos(a) * (R - 1.8), cy + Math.sin(a) * (R - 1.8)]); }
+  const sc = lit ? mixc(col, '#000000', .72) : dim;
+  [0, 2, 4, 1, 3, 0].forEach((k, i, arr) => { if (!i) return; const a = P[arr[i - 1]], b = P[k]; for (let t = 0; t <= 1; t += .04) px(a[0] + (b[0] - a[0]) * t - .5, a[1] + (b[1] - a[1]) * t - .5, sc); });
+  TICKS[key] = cv;
+  return cv;
+}
+
+/* ---------- CSS, injected once ---------- */
+const CSS = '' +
+'.now-tab{position:relative;box-sizing:border-box;width:100%;height:' + ROW_H + 'px;display:flex;align-items:center;gap:8px;padding:' + M.t + 'px ' + (M.r + 10) + 'px ' + M.b + 'px ' + (M.l + 3) + 'px;isolation:isolate;color:#efeaf4;text-align:left;-webkit-tap-highlight-color:transparent}' +
+'.now-tab::before{content:"";position:absolute;left:' + M.l + 'px;right:' + M.r + 'px;top:' + M.t + 'px;bottom:' + (M.b - V.side) + 'px;border-radius:3px;background:linear-gradient(170deg,#2a2630,#18161c);box-shadow:0 ' + V.side + 'px 0 #0f0e12;z-index:-3}' +
+'.now-tab.now-ready::before{display:none}' +
+'.now-tab>canvas{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none}' +
+'.now-stone{z-index:-2}' +
+'.now-glow{z-index:-1;mix-blend-mode:screen;opacity:.55;animation:now-shim 2.6s steps(1,end) infinite}' +
+'.now-tab.now-on .now-glow{opacity:1;animation:now-shimon 3.1s ease-in-out infinite}' +
+'.now-lum{position:absolute;left:' + M.l + 'px;right:' + M.r + 'px;top:' + M.t + 'px;bottom:' + M.b + 'px;pointer-events:none;opacity:0;transition:opacity .6s;mix-blend-mode:screen;z-index:-1}' +
+'.now-tab.now-on .now-lum{opacity:1}' +
+'@keyframes now-shim{0%{opacity:.5}13%{opacity:.62}21%{opacity:.52}37%{opacity:.7}44%{opacity:.54}63%{opacity:.64}71%{opacity:.48}86%{opacity:.6}}' +
+'@keyframes now-shimon{0%,100%{opacity:1}30%{opacity:.86}55%{opacity:.97}80%{opacity:.9}}' +
+'.now-tick{position:relative;flex:none;width:44px;height:44px;margin:0;padding:0;border:0;background:none;cursor:pointer;transition:filter .4s;-webkit-tap-highlight-color:transparent}' +
+'.now-tick canvas{position:absolute;left:0;top:0;width:44px;height:44px;image-rendering:pixelated;pointer-events:none}' +
+'.now-tick .now-t1{clip-path:circle(0% at 50% 50%);transition:clip-path .4s steps(6,end)}' +
+'.now-tab.now-on .now-tick .now-t1{clip-path:circle(75% at 50% 50%)}' +
+'.now-tick:focus-visible{outline:2px solid #e8c46a;outline-offset:2px;border-radius:50%}' +
+'.now-body{position:relative;flex:1;min-width:0;cursor:pointer}' +
+'.now-nm{font:700 15px/1.2 var(--a,\'Atkinson Hyperlegible\',sans-serif);color:#efeaf4;text-shadow:0 -1px 0 rgba(0,0,0,.95),0 1px 0 rgba(200,190,220,.16);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}' +
+'.now-sub{font:12.5px/1.3 var(--a,\'Atkinson Hyperlegible\',sans-serif);color:#aaa3b8;margin-top:2px;text-shadow:0 1px 1px #000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}' +
+'.now-pay{position:relative;flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:2px;font:700 15px/1 var(--a,\'Atkinson Hyperlegible\',sans-serif);color:#f4dd9a;text-shadow:0 1px 1px #000;font-variant-numeric:tabular-nums}' +
+'@media (prefers-reduced-motion: reduce){.now-glow,.now-tab.now-on .now-glow{animation:none}.now-tick,.now-tick .now-t1,.now-lum{transition:none}}';
+function css() { if (document.getElementById('stone-css-now')) return; const s = document.createElement('style'); s.id = 'stone-css-now'; s.textContent = CSS; (document.head || document.documentElement).appendChild(s); }
+
+/* ---------- the API ---------- */
+function row(o) {
+  css();
+  o = o || {};
+  const s = Math.max(0, +o.streak || 0), on = !!o.done;
+  return '<div class="now-tab' + (on ? ' now-on' : '') + '" data-now-id="' + esc(o.id) + '" data-now-name="' + esc(o.name) + '" data-now-s="' + s + '" data-now-d="' + (on ? 1 : 0) + '">' +
+    '<canvas class="now-stone"></canvas><canvas class="now-glow"></canvas><div class="now-lum"></div>' +
+    '<button type="button" class="now-tick" ' + (o.tickAttrs || '') + ' aria-pressed="' + on + '" aria-label="' + esc(o.name) + (on ? ', done today' : ', not done yet') + ', ' + s + ' night' + (s === 1 ? '' : 's') + '">' +
+    '<canvas class="now-t0" width="' + TG + '" height="' + TG + '"></canvas><canvas class="now-t1" width="' + TG + '" height="' + TG + '"></canvas></button>' +
+    '<div class="now-body" ' + (o.bodyAttrs || '') + '><div class="now-nm">' + esc(o.name) + '</div><div class="now-sub">' + (o.subHtml || '') + '</div></div>' +
+    '<div class="now-pay">' + (o.payHtml || '') + '</div></div>';
+}
+
+const CACHE = new Map(), CACHE_MAX = 24; // a stone is about W*H*4 bytes (400 KB at 390 px on a 2x phone)
+const QUEUE = []; let busy = false;
+const textRect = (node) => { const rg = document.createRange(); rg.selectNodeContents(node); return rg.getBoundingClientRect(); };
+// what the cracks must avoid, in device px relative to the tablet; rounded so the cache key stays steady
+function measure(el, br, DPR) {
+  const f = [], pad = 4, R = (b) => { if (!b || !b.width) return; f.push([Math.round((b.left - br.left - pad) * DPR), Math.round((b.top - br.top - pad) * DPR), Math.round((b.right - br.left + pad) * DPR), Math.round((b.bottom - br.top + pad) * DPR)]); };
+  R(el.querySelector('.now-tick').getBoundingClientRect());
+  const nm = el.querySelector('.now-nm'), sub = el.querySelector('.now-sub'), pay = el.querySelector('.now-pay');
+  if (nm && nm.firstChild) R(textRect(nm)); if (sub && sub.firstChild) R(textRect(sub)); if (pay && pay.firstChild) R(pay.getBoundingClientRect());
+  return f;
+}
+function apply(el, S) {
+  const col = el._stCol, on = el._stOn;
+  const sc = el.querySelector('.now-stone'), gc = el.querySelector('.now-glow');
+  if (sc.width !== S.W || sc.height !== S.H) { sc.width = S.W; sc.height = S.H; } else sc.getContext('2d').clearRect(0, 0, S.W, S.H);
+  sc.getContext('2d').drawImage(S.face, 0, 0);
+  if (gc.width !== S.W || gc.height !== S.H) { gc.width = S.W; gc.height = S.H; } else gc.getContext('2d').clearRect(0, 0, S.W, S.H);
+  gc.getContext('2d').drawImage(renderGlow(S, col), 0, 0);
+  el._stKey = S.key; el.classList.add('now-ready');
+  if (el._stFlare) { el._stFlare = false; play(el, on); }
+}
+function paintTick(el) {
+  const col = el._stCol;
+  const t0 = el.querySelector('.now-t0'), t1 = el.querySelector('.now-t1');
+  t0.getContext('2d').clearRect(0, 0, TG, TG); t0.getContext('2d').drawImage(drawTick(col, false), 0, 0);
+  t1.getContext('2d').clearRect(0, 0, TG, TG); t1.getContext('2d').drawImage(drawTick(col, true), 0, 0);
+  el.querySelector('.now-tick').style.filter = el._stOn ? 'drop-shadow(0 0 5px ' + rgba(col, .75) + ')' : 'none';
+  el.querySelector('.now-lum').style.background = 'radial-gradient(ellipse 110px 46px at 28px 50%,' + rgba(col, .2) + ',transparent 75%)';
+}
+function build(job) {
+  const S = renderStone(job.name, job.s, job.Wc, job.Hc, job.forb, job.DPR); S.key = job.key; S.near = job.near;
+  CACHE.set(job.key, S); while (CACHE.size > CACHE_MAX) CACHE.delete(CACHE.keys().next().value);
+  return S;
+}
+function pump() {
+  if (busy) return; busy = true;
+  // the first stone waits a moment so a tick's flare gets its opening frames before the main thread is busy
+  setTimeout(function next() {
+    const job = QUEUE.shift(); if (!job) { busy = false; return; }
+    const els = job.els.filter((el) => el.isConnected && el._stWant === job.key);
+    if (els.length) try { const S = CACHE.get(job.key) || build(job); els.forEach((el) => apply(el, S)); } catch (e) { console.error(e); }
+    setTimeout(next, 0);
+  }, 90);
+}
+function paint(root) {
+  css();
+  root = root || document;
+  const els = Array.prototype.slice.call(root.querySelectorAll('.now-tab')), DPR = DPRf(); let queued = false;
+  els.forEach((el) => {
+    const name = el.getAttribute('data-now-name') || '', s = +el.getAttribute('data-now-s') || 0, on = el.getAttribute('data-now-d') === '1';
+    el._stOn = on; el._stCol = sCol(Math.max(1, on ? s : s + 1));
+    paintTick(el);
+    const br = el.getBoundingClientRect(); if (br.width < 40) return; // hidden: try again on the next paint
+    const Wc = Math.round(br.width), Hc = Math.round(br.height), forb = measure(el, br, DPR);
+    const near = name + '|' + Wc + 'x' + Hc + '@' + DPR, key = near + '|' + s + '|' + forb.map((f) => f.join(',')).join(';');
+    el._stWant = key;
+    if (el._stKey === key && el.classList.contains('now-ready')) { const gc = el.querySelector('.now-glow'), S = CACHE.get(key); if (S) { gc.getContext('2d').clearRect(0, 0, S.W, S.H); gc.getContext('2d').drawImage(renderGlow(S, el._stCol), 0, 0); } return; }
+    const S = CACHE.get(key); if (S) { apply(el, S); return; }
+    // not drawn yet (a tick moved the streak, the words changed): show the same ritual's last stone at this size straight
+    // away, so the tick and its flare are instant, and swap in the new cracks when they are drawn a moment later
+    let old = null; CACHE.forEach((c) => { if (c.near === near) old = c; });
+    if (old) apply(el, old);
+    const job = QUEUE.find((j) => j.key === key);
+    if (job) job.els.push(el); else QUEUE.push({ key, near, name, s, Wc, Hc, forb, DPR, els: [el] });
+    queued = true;
+  });
+  if (queued) pump();
+}
+function play(el, on) {
+  if (RM()) return;
+  const an = (n, kf, o) => { if (n && n.animate) n.animate(kf, o); };
+  an(el.querySelector('.now-glow'), [{ opacity: .4, filter: 'brightness(1)' }, { opacity: 1, filter: 'brightness(3) saturate(1.4)', offset: .15 }, { opacity: 1, filter: 'brightness(1.7)', offset: .4 }, { opacity: .95, filter: 'brightness(1)' }], { duration: 1200, easing: 'ease-out' });
+  an(el.querySelector('.now-tick'), [{ transform: 'scale(1)', filter: 'brightness(1)' }, { transform: 'scale(1.12)', filter: 'brightness(1.8)', offset: .3 }, { transform: 'scale(1)', filter: 'brightness(1)' }], { duration: 450, easing: 'steps(5,end)' });
+  if (on) {
+    an(el.querySelector('.now-t1'), [{ clipPath: 'circle(0% at 50% 50%)' }, { clipPath: 'circle(75% at 50% 50%)' }], { duration: 420, easing: 'steps(6,end)' });
+    an(el.querySelector('.now-lum'), [{ opacity: 0 }, { opacity: 1, offset: .2 }, { opacity: .8 }, { opacity: 1 }], { duration: 1200 });
+  }
+}
+function flare(key) {
+  const sel = '[data-fx="' + String(key).replace(/["\\]/g, '\\$&') + '"]', btn = document.querySelector('.now-tab ' + sel) || document.querySelector(sel);
+  const el = btn && btn.closest('.now-tab'); if (!el) return;
+  const on = el.getAttribute('data-now-d') === '1';
+  if (el.classList.contains('now-ready')) play(el, on); else el._stFlare = true; // the stone is still being drawn: flare when it lands
+}
+
+window.STONE_now = { row, paint, flare, sCol };
+})();
+
+/* Ritual tablets (Patryk 2026-10-27, final picks from the "Obsidian and Parchment" mock-up):
+   stone ST-final "Polished deep slab" (ST3c fine grain and satin shine on ST3e's thick slab with a deep rounded bevel),
+   the plain pixel pentagram tick (no studs, no multiplier marks) waiting in a carved well and lighting from the middle
+   in chunky pixel steps, and real-looking cracks round the border (dark fissure, lit lip, chip at the rim), seeded by
+   the ritual's name, more of them the longer the streak (2 at the start, 11 by 70 nights), glowing faintly in the
+   streak colour with a slight shimmer and flaring when ticked.
+   STONE.row(opts) -> HTML for one tablet; STONE.paint(root) paints every tablet inside root (cached, cheap to repeat);
+   STONE.flare(key) plays the tick flare on the tablet whose tick has data-fx=key.
+   Each tablet face is drawn once into a cached canvas; only the flare and a stepped shimmer animate.
+   All CSS classes start with sage-. */
+(function () {
+'use strict';
+if (window.STONE_sage) return;
+
+const RM = () => !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+const DPRf = () => Math.min(2, window.devicePixelRatio || 1);
+
+/* ---------- the app's streak colour (copied from game-ui.js sCol): ember orange at night 1, eldritch green at 66 ---------- */
+const hx = (c) => [1, 3, 5].map((i) => parseInt(c.slice(i, i + 2), 16));
+const mixc = (a, b, t) => { const x = hx(a), y = hx(b); return '#' + x.map((v, i) => Math.round(v + (y[i] - v) * t).toString(16).padStart(2, '0')).join(''); };
+const STOPS = [[1, '#ff6a2a'], [7, '#ffc040'], [21, '#6ab8ff'], [45, '#5adcd0'], [66, '#5ef2a0']];
+const sCol = (n) => { n = Math.max(1, n || 1); if (n >= 66) return '#5ef2a0'; for (let i = 1; i < STOPS.length; i++) if (n <= STOPS[i][0]) return mixc(STOPS[i - 1][1], STOPS[i][1], (n - STOPS[i - 1][0]) / (STOPS[i][0] - STOPS[i - 1][0])); return '#5ef2a0'; };
+const rgba = (c, a) => { const v = hx(c); return 'rgba(' + v[0] + ',' + v[1] + ',' + v[2] + ',' + a + ')'; };
+const esc = (s) => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
+const norm3 = (v) => { const l = Math.hypot(v[0], v[1], v[2]); return [v[0] / l, v[1] / l, v[2] / l]; };
+
+/* ---------- seeded randomness and value noise ---------- */
+function hashStr(s) { let h = 2166136261 >>> 0; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+function mulberry(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function noiseTile(size, cells, oct, seed) {
+  const out = new Float32Array(size * size), r = mulberry(seed); let amp = 1, tot = 0;
+  for (let o = 0; o < oct; o++) {
+    const c = cells << o, g = new Float32Array(c * c); for (let i = 0; i < g.length; i++) g[i] = r();
+    const step = size / c;
+    for (let y = 0; y < size; y++) { const fy = y / step, iy = Math.floor(fy), ty = fy - iy, sy = ty * ty * (3 - 2 * ty), y0 = (iy % c) * c, y1 = ((iy + 1) % c) * c;
+      for (let x = 0; x < size; x++) { const fx = x / step, ix = Math.floor(fx), tx = fx - ix, sx = tx * tx * (3 - 2 * tx), x0 = ix % c, x1 = (ix + 1) % c;
+        const a = g[y0 + x0], b = g[y0 + x1], cc = g[y1 + x0], d = g[y1 + x1], top = a + (b - a) * sx, bot = cc + (d - cc) * sx;
+        out[y * size + x] += amp * (top + (bot - top) * sy); } }
+    tot += amp; amp *= 0.5;
+  }
+  for (let i = 0; i < out.length; i++) out[i] /= tot;
+  return out;
+}
+let N1 = null, N2 = null, N3 = null; // made on the first tablet, not at load
+const noise = () => { if (!N1) { N1 = noiseTile(512, 4, 5, 11); N2 = noiseTile(256, 8, 4, 23); N3 = noiseTile(256, 32, 3, 37); } };
+const s1 = (x, y) => N1[((y | 0) & 511) * 512 + ((x | 0) & 511)];
+const s2 = (x, y) => N2[((y | 0) & 255) * 256 + ((x | 0) & 255)];
+const s3 = (x, y) => N3[((y | 0) & 255) * 256 + ((x | 0) & 255)];
+function boxBlur(src, w, h, r) {
+  const tmp = new Float32Array(w * h), out = new Float32Array(w * h), d = 2 * r + 1;
+  for (let y = 0; y < h; y++) { const o = y * w; let acc = 0; for (let x = -r; x <= r; x++) acc += src[o + Math.min(w - 1, Math.max(0, x))];
+    for (let x = 0; x < w; x++) { tmp[o + x] = acc / d; acc += src[o + Math.min(w - 1, x + r + 1)] - src[o + Math.max(0, x - r)]; } }
+  for (let x = 0; x < w; x++) { let acc = 0; for (let y = -r; y <= r; y++) acc += tmp[Math.min(h - 1, Math.max(0, y)) * w + x];
+    for (let y = 0; y < h; y++) { out[y * w + x] = acc / d; acc += tmp[Math.min(h - 1, y + r + 1) * w + x] - tmp[Math.max(0, y - r) * w + x]; } }
+  return out;
+}
+const blur2 = (a, w, h, r) => boxBlur(boxBlur(a, w, h, r), w, h, r);
+
+/* ---------- ST-final: the stone recipe ---------- */
+const V = { code: 'ST-final', base: [44, 58, 50], c1: .45, b2: .15, b3: .1, pits: 3, pitR: [.6, 1.6], spec: 1.4, sx: 44, sheen: 1,
+  bev: 5.2, bevR: 4, side: 7, cham: 3, rough: .6, chips: .08 };
+const ROW_H = 64; // css px, including the slab's thickness and its shadow
+// where the face sits inside the row (css px): the thickness and the drop shadow take the bottom
+const M = { l: 3, t: 2, r: 3, b: V.side + 5 };
+
+function slabPath(W, H, m, rng, v, DPR) {
+  const pts = [], x0 = m.l, y0 = m.t, x1 = W - m.r, y1 = H - m.b;
+  const cs = [0, 1, 2, 3].map(() => (1.5 + rng() * v.cham) * DPR), C = [[x0, y0], [x1, y0], [x1, y1], [x0, y1]];
+  for (let i = 0; i < 4; i++) {
+    const a = C[i], b = C[(i + 1) % 4], dx = Math.sign(b[0] - a[0]), dy = Math.sign(b[1] - a[1]), nx = -dy, ny = dx;
+    const len = Math.abs(b[0] - a[0]) + Math.abs(b[1] - a[1]), sA = cs[i], sB = cs[(i + 1) % 4];
+    const P = (t, o) => [a[0] + dx * t + nx * o, a[1] + dy * t + ny * o, nx, ny];
+    let t = sA; pts.push(P(t, rng() * v.rough * DPR));
+    while (t < len - sB) {
+      t = Math.min(len - sB, t + (3 + rng() * 5) * DPR);
+      if (rng() < v.chips && t > sA + 6 * DPR && t < len - sB - 12 * DPR) {
+        const cw = (3 + rng() * 7) * DPR, dep = (0.8 + rng() * 2.4) * DPR;
+        pts.push(P(t, .3 * DPR), P(t + cw * .25, dep * .8), P(t + cw * .55, dep), P(t + cw * .8, dep * .5), P(t + cw, .2 * DPR)); t += cw;
+      } else pts.push(P(t, rng() * v.rough * DPR));
+    }
+  }
+  return pts;
+}
+
+// renders one tablet face; forb = rectangles (device px) the cracks keep out of (tick, words, pay)
+function renderStone(name, streak, Wc, Hc, forb, DPR) {
+  noise();
+  const v = V, W = Math.round(Wc * DPR), H = Math.round(Hc * DPR);
+  const rng = mulberry(hashStr(name + '|' + v.code)), side = v.side * DPR;
+  const m = { l: M.l * DPR, t: M.t * DPR, r: M.r * DPR, b: M.b * DPR };
+  const pts = slabPath(W, H, m, rng, v, DPR);
+  const oc = document.createElement('canvas'); oc.width = W; oc.height = H; const ox = oc.getContext('2d', { willReadFrequently: true });
+  const poly = (dy) => { ox.beginPath(); pts.forEach((p, i) => (i ? ox.lineTo(p[0], p[1] + dy) : ox.moveTo(p[0], p[1] + dy))); ox.closePath(); ox.fill(); };
+  ox.fillStyle = '#fff'; poly(0); const fd = ox.getImageData(0, 0, W, H).data; ox.clearRect(0, 0, W, H);
+  for (let k = 1; k <= side; k++) poly(k); const sd = ox.getImageData(0, 0, W, H).data; ox.clearRect(0, 0, W, H);
+  const A = new Float32Array(W * H), AS = new Float32Array(W * H);
+  for (let i = 0; i < A.length; i++) { A[i] = fd[i * 4 + 3] / 255; AS[i] = sd[i * 4 + 3] / 255; }
+  const Hh = blur2(A, W, H, Math.max(1, Math.round(v.bevR * DPR)));
+  // cracks stay within this many px of the face's edge (the slab is near enough a rectangle to measure it straight)
+  const band = 12 * DPR, fx0 = m.l, fy0 = m.t, fx1 = W - m.r, fy1 = H - m.b;
+  // surface height: bevel plus two scales of fine grain
+  const o1x = rng() * 512, o1y = rng() * 512, o2x = rng() * 256, o2y = rng() * 256, o3x = rng() * 256, o3y = rng() * 256;
+  const Hn = new Float32Array(W * H), C1 = new Float32Array(W * H);
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    const i = y * W + x; if (A[i] <= 0 && AS[i] <= 0) continue;
+    const X = x / DPR, Y = y / DPR, n1 = s1(X * .6 + o1x, Y * .6 + o1y), n2 = s2(X * 1.2 + o2x, Y * 1.2 + o2y), n3 = s3(X * 2.4 + o3x, Y * 2.4 + o3y);
+    Hn[i] = Hh[i] * v.bev + (n2 - .5) * v.b2 + (n3 - .5) * v.b3; C1[i] = n1;
+  }
+  // a few tiny pits
+  const dig = (cx, cy, r, depth) => { const R = r * DPR; for (let y = Math.max(0, cy - R | 0); y <= Math.min(H - 1, cy + R + 1 | 0); y++) for (let x = Math.max(0, cx - R | 0); x <= Math.min(W - 1, cx + R + 1 | 0); x++) {
+    const d = Math.hypot(x - cx, y - cy) / R; if (d < 1) Hn[y * W + x] -= depth * (1 - d * d); } };
+  for (let k = 0; k < v.pits; k++) { const x = rng() * W, y = rng() * H; if (A[(y | 0) * W + (x | 0)] > .9) dig(x, y, v.pitR[0] + rng() * (v.pitR[1] - v.pitR[0]), .9 + rng() * .8); }
+  const Hb = blur2(Hn, W, H, Math.max(1, Math.round(2 * DPR)));
+  // light it from the top left, satin highlight and a soft violet sheen
+  const L = norm3([-.45, -.68, .58]), Hv = norm3([L[0], L[1], L[2] + 1]);
+  const img = ox.createImageData(W, H), D = img.data;
+  for (let y = 1; y < H - 1; y++) for (let x = 1; x < W - 1; x++) {
+    const i = y * W + x, a = A[i], as = AS[i]; if (a <= .004 && as <= .004) continue;
+    const j = i * 4, n1 = C1[i], tone = 1 + (n1 - .5) * v.c1 * 2;
+    const R = v.base[0] * tone, G = v.base[1] * tone, B = v.base[2] * tone;
+    let fR = 0, fG = 0, fB = 0;
+    if (a > .004) {
+      const gx = (Hn[i + 1] - Hn[i - 1]) * DPR / 2, gy = (Hn[i + W] - Hn[i - W]) * DPR / 2, nl = Math.hypot(gx, gy, 1), nx = -gx / nl, ny = -gy / nl, nz = 1 / nl;
+      const dif = Math.max(0, nx * L[0] + ny * L[1] + nz * L[2]), sp = Math.pow(Math.max(0, nx * Hv[0] + ny * Hv[1] + nz * Hv[2]), v.sx) * v.spec;
+      const ao = clamp((Hb[i] - Hn[i]) * 1.1, 0, .75), lit = (.3 + .95 * dif) * (1 - ao);
+      fR = R * lit + sp * 150; fG = G * lit + sp * 146; fB = B * lit + sp * 165;
+      const bd = Math.exp(-Math.pow((x / W + y / H * .5 - .42 + (n1 - .5) * .2) / .16, 2)) * (.6 + dif * .6); fR += bd * 14 * v.sheen; fG += bd * 22 * v.sheen; fB += bd * 16 * v.sheen;
+    }
+    const k = .5 + (n1 - .5) * .3, sR = R * .42 * k, sG = G * .42 * k, sB = B * .42 * k; // the thickness below the face
+    D[j] = sR + (fR - sR) * a; D[j + 1] = sG + (fG - sG) * a; D[j + 2] = sB + (fB - sB) * a; D[j + 3] = Math.max(a, as) * 255;
+  }
+  ox.putImageData(img, 0, 0);
+  // the dark seam where face meets thickness
+  ox.save(); ox.globalCompositeOperation = 'source-atop'; ox.strokeStyle = 'rgba(0,0,0,.55)'; ox.lineWidth = DPR;
+  ox.beginPath(); pts.forEach((p, i) => (i ? ox.lineTo(p[0], p[1] + DPR * .6) : ox.moveTo(p[0], p[1] + DPR * .6))); ox.closePath(); ox.stroke(); ox.restore();
+
+  /* ---- cracks: only near the border, spread round it, more with a longer streak ---- */
+  const valid = (x, y, loose) => { if (x < 1 || y < 1 || x >= W - 1 || y >= H - 1) return false; const i = (y | 0) * W + (x | 0);
+    if (A[i] < (loose ? .5 : .97) || Math.min(x - fx0, fx1 - x, y - fy0, fy1 - y) > band) return false;
+    for (let k = 0; k < forb.length; k++) { const f = forb[k]; if (x > f[0] && x < f[2] && y > f[1] && y < f[3]) return false; } return true; };
+  const cracks = [], count = clamp(2 + Math.floor(streak / 7), 2, 11);
+  function grow(x, y, a, w, len, depth, list) {
+    const P = [[x, y, w]]; let L2 = 0; const drift = (rng() - .5) * .12;
+    while (L2 < len && w > .22 * DPR) {
+      a += drift + (rng() - .5) * .95; const st = (2.4 + rng() * 3.6) * DPR; let ok = false, nx = 0, ny = 0;
+      for (let k = 0; k < 5; k++) { const aa = a + (k === 0 ? 0 : (k % 2 ? 1 : -1) * .45 * Math.ceil(k / 2)); nx = x + Math.cos(aa) * st; ny = y + Math.sin(aa) * st; if (valid(nx, ny, L2 < 3 * DPR)) { a = aa; ok = true; break; } }
+      if (!ok) break; x = nx; y = ny; L2 += st; w *= .9; P.push([x, y, w]);
+      if (depth < 2 && rng() < .16 && L2 > 4 * DPR) grow(x, y, a + (rng() < .5 ? -1 : 1) * (.6 + rng() * .7), w * .6, (len - L2) * (.35 + rng() * .4), depth + 1, list);
+      if (rng() < .12) list.push([[x, y, w * .45], [x + Math.cos(a + 1.6) * 2.2 * DPR, y + Math.sin(a + 1.6) * 2.2 * DPR, w * .2]]); // splinter
+    }
+    if (P.length > 2) list.push(P);
+    return P.length > 2;
+  }
+  const off = rng(), n = pts.length;
+  for (let k = 0; k < count; k++) {
+    let made = false;
+    for (let t = 0; t < 14 && !made; t++) {
+      const idx = Math.floor((((k + off + (rng() - .5) * .6) / count) % 1 + 1) % 1 * n), p = pts[idx];
+      const sx = p[0] + p[2] * 1.2 * DPR, sy = p[1] + p[3] * 1.2 * DPR; if (!valid(sx, sy, true)) continue;
+      const inA = Math.atan2(p[3], p[2]), a = inA + (rng() < .5 ? -1 : 1) * (.55 + rng() * .5);
+      const list = [], w0 = (1.5 + rng() * 1.1) * DPR;
+      if (grow(sx, sy, a, w0, (14 + rng() * 22 + Math.min(streak, 70) * .22) * DPR, 0, list)) { cracks.push({ list, mouth: [sx, sy, p[2], p[3], w0] }); made = true; }
+    }
+  }
+  ox.save(); ox.globalCompositeOperation = 'source-atop'; ox.lineCap = 'round'; ox.lineJoin = 'round';
+  cracks.forEach((c) => {
+    // a chip knocked out where the crack meets the edge
+    const [mx, my, nx, ny, w0] = c.mouth, tx = -ny, ty = nx, cw = w0 * (1.8 + rng()), dp = w0 * (2 + rng() * 1.5);
+    ox.fillStyle = 'rgba(8,6,10,.85)'; ox.beginPath(); ox.moveTo(mx - nx * 1.5 * DPR + tx * cw, my - ny * 1.5 * DPR + ty * cw); ox.lineTo(mx + nx * dp, my + ny * dp); ox.lineTo(mx - nx * 1.5 * DPR - tx * cw * .8, my - ny * 1.5 * DPR - ty * cw * .8); ox.fill();
+    ox.strokeStyle = 'rgba(205,195,220,.4)'; ox.lineWidth = .7 * DPR; ox.beginPath(); ox.moveTo(mx - nx * DPR + tx * cw, my - ny * DPR + ty * cw); ox.lineTo(mx + nx * dp, my + ny * dp); ox.stroke();
+    c.list.forEach((P) => {
+      const Lp = [], Rp = []; let lx = 0, ly = 0;
+      for (let k = 0; k < P.length; k++) { const a = P[Math.max(0, k - 1)], b = P[Math.min(P.length - 1, k + 1)], dx = b[0] - a[0], dy = b[1] - a[1], l = Math.hypot(dx, dy) || 1, nx = -dy / l, ny = dx / l;
+        const w = (k === P.length - 1 ? 0 : P[k][2]) / 2 * (k % 2 ? .8 : 1.1); Lp.push([P[k][0] + nx * w, P[k][1] + ny * w]); Rp.push([P[k][0] - nx * w, P[k][1] - ny * w]); lx += nx; ly += ny; }
+      const lightL = (lx * -.45 + ly * -.68) > 0, path = (arr, dx, dy) => { ox.beginPath(); arr.forEach((p, k) => (k ? ox.lineTo(p[0] + dx, p[1] + dy) : ox.moveTo(p[0] + dx, p[1] + dy))); };
+      // a soft shadow beside the gap, the black gap itself, a thin lit lip on the side facing the light
+      ox.fillStyle = 'rgba(0,0,0,.35)'; path(Lp.concat(Rp.slice().reverse()), .5 * DPR, .7 * DPR); ox.closePath(); ox.fill();
+      ox.fillStyle = 'rgba(2,1,4,.97)'; path(Lp.concat(Rp.slice().reverse()), 0, 0); ox.closePath(); ox.fill();
+      ox.lineWidth = .55 * DPR; ox.strokeStyle = 'rgba(215,205,232,.42)'; path(lightL ? Lp : Rp, 0, -.45 * DPR); ox.stroke();
+      ox.strokeStyle = 'rgba(0,0,0,.5)'; ox.lineWidth = .8 * DPR; path(lightL ? Rp : Lp, .3 * DPR, .5 * DPR); ox.stroke();
+    });
+  });
+  ox.restore();
+  // final face with its drop shadow
+  const fc = document.createElement('canvas'); fc.width = W; fc.height = H; const fx = fc.getContext('2d');
+  fx.shadowColor = 'rgba(0,0,0,.85)'; fx.shadowBlur = 5 * DPR; fx.shadowOffsetY = 2.5 * DPR; fx.drawImage(oc, 0, 0);
+  return { face: fc, cracks, W, H, DPR, glows: {} };
+}
+
+// embers deep inside the cracks, in the streak colour
+function renderGlow(S, col) {
+  if (S.glows[col]) return S.glows[col];
+  const DPR = S.DPR, gc = document.createElement('canvas'); gc.width = S.W; gc.height = S.H; const g = gc.getContext('2d');
+  g.globalCompositeOperation = 'lighter';
+  // each pass strokes every crack onto a scratch layer with no shadow, then lays that layer down with one blurred shadow
+  // (a shadow on every little stroke cost 0.3-0.9 s per tablet)
+  const tc = document.createElement('canvas'); tc.width = S.W; tc.height = S.H; const t = tc.getContext('2d'); t.lineCap = 'round'; t.lineJoin = 'round';
+  const pass = (mul, blur, style, min) => { t.clearRect(0, 0, S.W, S.H); t.strokeStyle = style;
+    S.cracks.forEach((c) => c.list.forEach((P) => { for (let k = 1; k < P.length; k++) { t.lineWidth = Math.max(min, P[k][2] * mul); t.beginPath(); t.moveTo(P[k - 1][0], P[k - 1][1]); t.lineTo(P[k][0], P[k][1]); t.stroke(); } }));
+    g.shadowBlur = blur; g.shadowColor = col; g.drawImage(tc, 0, 0); g.shadowBlur = 0; };
+  pass(1.4, 6 * DPR, rgba(col, .22), .5);
+  pass(.42, 2 * DPR, col, .35);
+  pass(.16, 0, mixc(col, '#fff6e0', .5), .25);
+  S.cracks.forEach((c) => { const [mx, my, nx, ny, w0] = c.mouth, cx = mx + nx * w0, cy = my + ny * w0, gr = g.createRadialGradient(cx, cy, 0, cx, cy, w0 * 3);
+    gr.addColorStop(0, rgba(col, .35)); gr.addColorStop(1, rgba(col, 0)); g.shadowBlur = 0; g.fillStyle = gr; g.beginPath(); g.arc(cx, cy, w0 * 3, 0, 7); g.fill(); });
+  const keys = Object.keys(S.glows); if (keys.length > 3) delete S.glows[keys[0]];
+  S.glows[col] = gc;
+  return gc;
+}
+
+/* ---------- the pixel pentagram tick: carved well and dashed ring when waiting, a disc of light with a dark star when lit ---------- */
+const TG = 22; // pixel grid; shown at 2x (44 css px)
+const TICKS = {};
+function drawTick(col, lit) {
+  const key = col + (lit ? '1' : '0'); if (TICKS[key]) return TICKS[key];
+  const cv = document.createElement('canvas'); cv.width = TG; cv.height = TG; const g = cv.getContext('2d');
+  const cx = TG / 2, cy = TG / 2, R = 8.6;
+  const px = (x, y, c) => { g.fillStyle = c; g.fillRect(Math.floor(x), Math.floor(y), 1, 1); };
+  const dim = mixc('#2a2038', col, .5), white = '#fffbea';
+  for (let y = 0; y < TG; y++) for (let x = 0; x < TG; x++) {
+    const dx = x + .5 - cx, dy = y + .5 - cy, d = Math.hypot(dx, dy);
+    if (d < R + .5) {
+      if (!lit) px(x, y, (x + y) % 3 ? '#0b0910' : '#120f18');
+      else { const q = d / R; px(x, y, q < .22 ? white : q < .5 ? mixc(white, col, (q - .22) / .28) : q < .82 ? col : ((x + y) % 2 ? col : mixc(col, '#000000', .35))); }
+    } else if (d < R + 1.6) px(x, y, dx + dy > 1 ? 'rgba(210,200,230,.28)' : 'rgba(0,0,0,.7)'); // the well's carved rim
+  }
+  for (let a = 0; a < 6.283; a += .02) { const idx = Math.floor(a / 6.283 * 44); if (!lit && idx % 4 === 3) continue; px(cx + Math.cos(a) * R - .5, cy + Math.sin(a) * R - .5, lit ? mixc(col, '#ffffff', .3) : dim); }
+  const P = []; for (let k = 0; k < 5; k++) { const a = -Math.PI / 2 + k * 2 * Math.PI / 5; P.push([cx + Math.cos(a) * (R - 1.8), cy + Math.sin(a) * (R - 1.8)]); }
+  const sc = lit ? mixc(col, '#000000', .72) : dim;
+  [0, 2, 4, 1, 3, 0].forEach((k, i, arr) => { if (!i) return; const a = P[arr[i - 1]], b = P[k]; for (let t = 0; t <= 1; t += .04) px(a[0] + (b[0] - a[0]) * t - .5, a[1] + (b[1] - a[1]) * t - .5, sc); });
+  TICKS[key] = cv;
+  return cv;
+}
+
+/* ---------- CSS, injected once ---------- */
+const CSS = '' +
+'.sage-tab{position:relative;box-sizing:border-box;width:100%;height:' + ROW_H + 'px;display:flex;align-items:center;gap:8px;padding:' + M.t + 'px ' + (M.r + 10) + 'px ' + M.b + 'px ' + (M.l + 3) + 'px;isolation:isolate;color:#eef4ee;text-align:left;-webkit-tap-highlight-color:transparent}' +
+'.sage-tab::before{content:"";position:absolute;left:' + M.l + 'px;right:' + M.r + 'px;top:' + M.t + 'px;bottom:' + (M.b - V.side) + 'px;border-radius:3px;background:linear-gradient(170deg,#3a4a42,#1e2822);box-shadow:0 ' + V.side + 'px 0 #0f0e12;z-index:-3}' +
+'.sage-tab.sage-ready::before{display:none}' +
+'.sage-tab>canvas{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none}' +
+'.sage-stone{z-index:-2}' +
+'.sage-glow{z-index:-1;mix-blend-mode:screen;opacity:.55;animation:sage-shim 2.6s steps(1,end) infinite}' +
+'.sage-tab.sage-on .sage-glow{opacity:1;animation:sage-shimon 3.1s ease-in-out infinite}' +
+'.sage-lum{position:absolute;left:' + M.l + 'px;right:' + M.r + 'px;top:' + M.t + 'px;bottom:' + M.b + 'px;pointer-events:none;opacity:0;transition:opacity .6s;mix-blend-mode:screen;z-index:-1}' +
+'.sage-tab.sage-on .sage-lum{opacity:1}' +
+'@keyframes sage-shim{0%{opacity:.5}13%{opacity:.62}21%{opacity:.52}37%{opacity:.7}44%{opacity:.54}63%{opacity:.64}71%{opacity:.48}86%{opacity:.6}}' +
+'@keyframes sage-shimon{0%,100%{opacity:1}30%{opacity:.86}55%{opacity:.97}80%{opacity:.9}}' +
+'.sage-tick{position:relative;flex:none;width:44px;height:44px;margin:0;padding:0;border:0;background:none;cursor:pointer;transition:filter .4s;-webkit-tap-highlight-color:transparent}' +
+'.sage-tick canvas{position:absolute;left:0;top:0;width:44px;height:44px;image-rendering:pixelated;pointer-events:none}' +
+'.sage-tick .sage-t1{clip-path:circle(0% at 50% 50%);transition:clip-path .4s steps(6,end)}' +
+'.sage-tab.sage-on .sage-tick .sage-t1{clip-path:circle(75% at 50% 50%)}' +
+'.sage-tick:focus-visible{outline:2px solid #e8c46a;outline-offset:2px;border-radius:50%}' +
+'.sage-body{position:relative;flex:1;min-width:0;cursor:pointer}' +
+'.sage-nm{font:700 15px/1.2 var(--a,\'Atkinson Hyperlegible\',sans-serif);color:#eef4ee;text-shadow:0 -1px 0 rgba(0,0,0,.95),0 1px 0 rgba(200,190,220,.16);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}' +
+'.sage-sub{font:12.5px/1.3 var(--a,\'Atkinson Hyperlegible\',sans-serif);color:#a9bcb0;margin-top:2px;text-shadow:0 1px 1px #000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}' +
+'.sage-pay{position:relative;flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:2px;font:700 15px/1 var(--a,\'Atkinson Hyperlegible\',sans-serif);color:#f4dd9a;text-shadow:0 1px 1px #000;font-variant-numeric:tabular-nums}' +
+'@media (prefers-reduced-motion: reduce){.sage-glow,.sage-tab.sage-on .sage-glow{animation:none}.sage-tick,.sage-tick .sage-t1,.sage-lum{transition:none}}';
+function css() { if (document.getElementById('stone-css-sage')) return; const s = document.createElement('style'); s.id = 'stone-css-sage'; s.textContent = CSS; (document.head || document.documentElement).appendChild(s); }
+
+/* ---------- the API ---------- */
+function row(o) {
+  css();
+  o = o || {};
+  const s = Math.max(0, +o.streak || 0), on = !!o.done;
+  return '<div class="sage-tab' + (on ? ' sage-on' : '') + '" data-sage-id="' + esc(o.id) + '" data-sage-name="' + esc(o.name) + '" data-sage-s="' + s + '" data-sage-d="' + (on ? 1 : 0) + '">' +
+    '<canvas class="sage-stone"></canvas><canvas class="sage-glow"></canvas><div class="sage-lum"></div>' +
+    '<button type="button" class="sage-tick" ' + (o.tickAttrs || '') + ' aria-pressed="' + on + '" aria-label="' + esc(o.name) + (on ? ', done today' : ', not done yet') + ', ' + s + ' night' + (s === 1 ? '' : 's') + '">' +
+    '<canvas class="sage-t0" width="' + TG + '" height="' + TG + '"></canvas><canvas class="sage-t1" width="' + TG + '" height="' + TG + '"></canvas></button>' +
+    '<div class="sage-body" ' + (o.bodyAttrs || '') + '><div class="sage-nm">' + esc(o.name) + '</div><div class="sage-sub">' + (o.subHtml || '') + '</div></div>' +
+    '<div class="sage-pay">' + (o.payHtml || '') + '</div></div>';
+}
+
+const CACHE = new Map(), CACHE_MAX = 24; // a stone is about W*H*4 bytes (400 KB at 390 px on a 2x phone)
+const QUEUE = []; let busy = false;
+const textRect = (node) => { const rg = document.createRange(); rg.selectNodeContents(node); return rg.getBoundingClientRect(); };
+// what the cracks must avoid, in device px relative to the tablet; rounded so the cache key stays steady
+function measure(el, br, DPR) {
+  const f = [], pad = 4, R = (b) => { if (!b || !b.width) return; f.push([Math.round((b.left - br.left - pad) * DPR), Math.round((b.top - br.top - pad) * DPR), Math.round((b.right - br.left + pad) * DPR), Math.round((b.bottom - br.top + pad) * DPR)]); };
+  R(el.querySelector('.sage-tick').getBoundingClientRect());
+  const nm = el.querySelector('.sage-nm'), sub = el.querySelector('.sage-sub'), pay = el.querySelector('.sage-pay');
+  if (nm && nm.firstChild) R(textRect(nm)); if (sub && sub.firstChild) R(textRect(sub)); if (pay && pay.firstChild) R(pay.getBoundingClientRect());
+  return f;
+}
+function apply(el, S) {
+  const col = el._stCol, on = el._stOn;
+  const sc = el.querySelector('.sage-stone'), gc = el.querySelector('.sage-glow');
+  if (sc.width !== S.W || sc.height !== S.H) { sc.width = S.W; sc.height = S.H; } else sc.getContext('2d').clearRect(0, 0, S.W, S.H);
+  sc.getContext('2d').drawImage(S.face, 0, 0);
+  if (gc.width !== S.W || gc.height !== S.H) { gc.width = S.W; gc.height = S.H; } else gc.getContext('2d').clearRect(0, 0, S.W, S.H);
+  gc.getContext('2d').drawImage(renderGlow(S, col), 0, 0);
+  el._stKey = S.key; el.classList.add('sage-ready');
+  if (el._stFlare) { el._stFlare = false; play(el, on); }
+}
+function paintTick(el) {
+  const col = el._stCol;
+  const t0 = el.querySelector('.sage-t0'), t1 = el.querySelector('.sage-t1');
+  t0.getContext('2d').clearRect(0, 0, TG, TG); t0.getContext('2d').drawImage(drawTick(col, false), 0, 0);
+  t1.getContext('2d').clearRect(0, 0, TG, TG); t1.getContext('2d').drawImage(drawTick(col, true), 0, 0);
+  el.querySelector('.sage-tick').style.filter = el._stOn ? 'drop-shadow(0 0 5px ' + rgba(col, .75) + ')' : 'none';
+  el.querySelector('.sage-lum').style.background = 'radial-gradient(ellipse 110px 46px at 28px 50%,' + rgba(col, .2) + ',transparent 75%)';
+}
+function build(job) {
+  const S = renderStone(job.name, job.s, job.Wc, job.Hc, job.forb, job.DPR); S.key = job.key; S.near = job.near;
+  CACHE.set(job.key, S); while (CACHE.size > CACHE_MAX) CACHE.delete(CACHE.keys().next().value);
+  return S;
+}
+function pump() {
+  if (busy) return; busy = true;
+  // the first stone waits a moment so a tick's flare gets its opening frames before the main thread is busy
+  setTimeout(function next() {
+    const job = QUEUE.shift(); if (!job) { busy = false; return; }
+    const els = job.els.filter((el) => el.isConnected && el._stWant === job.key);
+    if (els.length) try { const S = CACHE.get(job.key) || build(job); els.forEach((el) => apply(el, S)); } catch (e) { console.error(e); }
+    setTimeout(next, 0);
+  }, 90);
+}
+function paint(root) {
+  css();
+  root = root || document;
+  const els = Array.prototype.slice.call(root.querySelectorAll('.sage-tab')), DPR = DPRf(); let queued = false;
+  els.forEach((el) => {
+    const name = el.getAttribute('data-sage-name') || '', s = +el.getAttribute('data-sage-s') || 0, on = el.getAttribute('data-sage-d') === '1';
+    el._stOn = on; el._stCol = sCol(Math.max(1, on ? s : s + 1));
+    paintTick(el);
+    const br = el.getBoundingClientRect(); if (br.width < 40) return; // hidden: try again on the next paint
+    const Wc = Math.round(br.width), Hc = Math.round(br.height), forb = measure(el, br, DPR);
+    const near = name + '|' + Wc + 'x' + Hc + '@' + DPR, key = near + '|' + s + '|' + forb.map((f) => f.join(',')).join(';');
+    el._stWant = key;
+    if (el._stKey === key && el.classList.contains('sage-ready')) { const gc = el.querySelector('.sage-glow'), S = CACHE.get(key); if (S) { gc.getContext('2d').clearRect(0, 0, S.W, S.H); gc.getContext('2d').drawImage(renderGlow(S, el._stCol), 0, 0); } return; }
+    const S = CACHE.get(key); if (S) { apply(el, S); return; }
+    // not drawn yet (a tick moved the streak, the words changed): show the same ritual's last stone at this size straight
+    // away, so the tick and its flare are instant, and swap in the new cracks when they are drawn a moment later
+    let old = null; CACHE.forEach((c) => { if (c.near === near) old = c; });
+    if (old) apply(el, old);
+    const job = QUEUE.find((j) => j.key === key);
+    if (job) job.els.push(el); else QUEUE.push({ key, near, name, s, Wc, Hc, forb, DPR, els: [el] });
+    queued = true;
+  });
+  if (queued) pump();
+}
+function play(el, on) {
+  if (RM()) return;
+  const an = (n, kf, o) => { if (n && n.animate) n.animate(kf, o); };
+  an(el.querySelector('.sage-glow'), [{ opacity: .4, filter: 'brightness(1)' }, { opacity: 1, filter: 'brightness(3) saturate(1.4)', offset: .15 }, { opacity: 1, filter: 'brightness(1.7)', offset: .4 }, { opacity: .95, filter: 'brightness(1)' }], { duration: 1200, easing: 'ease-out' });
+  an(el.querySelector('.sage-tick'), [{ transform: 'scale(1)', filter: 'brightness(1)' }, { transform: 'scale(1.12)', filter: 'brightness(1.8)', offset: .3 }, { transform: 'scale(1)', filter: 'brightness(1)' }], { duration: 450, easing: 'steps(5,end)' });
+  if (on) {
+    an(el.querySelector('.sage-t1'), [{ clipPath: 'circle(0% at 50% 50%)' }, { clipPath: 'circle(75% at 50% 50%)' }], { duration: 420, easing: 'steps(6,end)' });
+    an(el.querySelector('.sage-lum'), [{ opacity: 0 }, { opacity: 1, offset: .2 }, { opacity: .8 }, { opacity: 1 }], { duration: 1200 });
+  }
+}
+function flare(key) {
+  const sel = '[data-fx="' + String(key).replace(/["\\]/g, '\\$&') + '"]', btn = document.querySelector('.sage-tab ' + sel) || document.querySelector(sel);
+  const el = btn && btn.closest('.sage-tab'); if (!el) return;
+  const on = el.getAttribute('data-sage-d') === '1';
+  if (el.classList.contains('sage-ready')) play(el, on); else el._stFlare = true; // the stone is still being drawn: flare when it lands
+}
+
+window.STONE_sage = { row, paint, flare, sCol };
+})();
+
+/* Ritual tablets (Patryk 2026-10-27, final picks from the "Obsidian and Parchment" mock-up):
+   stone ST-final "Polished deep slab" (ST3c fine grain and satin shine on ST3e's thick slab with a deep rounded bevel),
+   the plain pixel pentagram tick (no studs, no multiplier marks) waiting in a carved well and lighting from the middle
+   in chunky pixel steps, and real-looking cracks round the border (dark fissure, lit lip, chip at the rim), seeded by
+   the ritual's name, more of them the longer the streak (2 at the start, 11 by 70 nights), glowing faintly in the
+   streak colour with a slight shimmer and flaring when ticked.
+   STONE.row(opts) -> HTML for one tablet; STONE.paint(root) paints every tablet inside root (cached, cheap to repeat);
+   STONE.flare(key) plays the tick flare on the tablet whose tick has data-fx=key.
+   Each tablet face is drawn once into a cached canvas; only the flare and a stepped shimmer animate.
+   All CSS classes start with slate-. */
+(function () {
+'use strict';
+if (window.STONE_slate) return;
+
+const RM = () => !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+const DPRf = () => Math.min(2, window.devicePixelRatio || 1);
+
+/* ---------- the app's streak colour (copied from game-ui.js sCol): ember orange at night 1, eldritch green at 66 ---------- */
+const hx = (c) => [1, 3, 5].map((i) => parseInt(c.slice(i, i + 2), 16));
+const mixc = (a, b, t) => { const x = hx(a), y = hx(b); return '#' + x.map((v, i) => Math.round(v + (y[i] - v) * t).toString(16).padStart(2, '0')).join(''); };
+const STOPS = [[1, '#ff6a2a'], [7, '#ffc040'], [21, '#6ab8ff'], [45, '#5adcd0'], [66, '#5ef2a0']];
+const sCol = (n) => { n = Math.max(1, n || 1); if (n >= 66) return '#5ef2a0'; for (let i = 1; i < STOPS.length; i++) if (n <= STOPS[i][0]) return mixc(STOPS[i - 1][1], STOPS[i][1], (n - STOPS[i - 1][0]) / (STOPS[i][0] - STOPS[i - 1][0])); return '#5ef2a0'; };
+const rgba = (c, a) => { const v = hx(c); return 'rgba(' + v[0] + ',' + v[1] + ',' + v[2] + ',' + a + ')'; };
+const esc = (s) => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
+const norm3 = (v) => { const l = Math.hypot(v[0], v[1], v[2]); return [v[0] / l, v[1] / l, v[2] / l]; };
+
+/* ---------- seeded randomness and value noise ---------- */
+function hashStr(s) { let h = 2166136261 >>> 0; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+function mulberry(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function noiseTile(size, cells, oct, seed) {
+  const out = new Float32Array(size * size), r = mulberry(seed); let amp = 1, tot = 0;
+  for (let o = 0; o < oct; o++) {
+    const c = cells << o, g = new Float32Array(c * c); for (let i = 0; i < g.length; i++) g[i] = r();
+    const step = size / c;
+    for (let y = 0; y < size; y++) { const fy = y / step, iy = Math.floor(fy), ty = fy - iy, sy = ty * ty * (3 - 2 * ty), y0 = (iy % c) * c, y1 = ((iy + 1) % c) * c;
+      for (let x = 0; x < size; x++) { const fx = x / step, ix = Math.floor(fx), tx = fx - ix, sx = tx * tx * (3 - 2 * tx), x0 = ix % c, x1 = (ix + 1) % c;
+        const a = g[y0 + x0], b = g[y0 + x1], cc = g[y1 + x0], d = g[y1 + x1], top = a + (b - a) * sx, bot = cc + (d - cc) * sx;
+        out[y * size + x] += amp * (top + (bot - top) * sy); } }
+    tot += amp; amp *= 0.5;
+  }
+  for (let i = 0; i < out.length; i++) out[i] /= tot;
+  return out;
+}
+let N1 = null, N2 = null, N3 = null; // made on the first tablet, not at load
+const noise = () => { if (!N1) { N1 = noiseTile(512, 4, 5, 11); N2 = noiseTile(256, 8, 4, 23); N3 = noiseTile(256, 32, 3, 37); } };
+const s1 = (x, y) => N1[((y | 0) & 511) * 512 + ((x | 0) & 511)];
+const s2 = (x, y) => N2[((y | 0) & 255) * 256 + ((x | 0) & 255)];
+const s3 = (x, y) => N3[((y | 0) & 255) * 256 + ((x | 0) & 255)];
+function boxBlur(src, w, h, r) {
+  const tmp = new Float32Array(w * h), out = new Float32Array(w * h), d = 2 * r + 1;
+  for (let y = 0; y < h; y++) { const o = y * w; let acc = 0; for (let x = -r; x <= r; x++) acc += src[o + Math.min(w - 1, Math.max(0, x))];
+    for (let x = 0; x < w; x++) { tmp[o + x] = acc / d; acc += src[o + Math.min(w - 1, x + r + 1)] - src[o + Math.max(0, x - r)]; } }
+  for (let x = 0; x < w; x++) { let acc = 0; for (let y = -r; y <= r; y++) acc += tmp[Math.min(h - 1, Math.max(0, y)) * w + x];
+    for (let y = 0; y < h; y++) { out[y * w + x] = acc / d; acc += tmp[Math.min(h - 1, y + r + 1) * w + x] - tmp[Math.max(0, y - r) * w + x]; } }
+  return out;
+}
+const blur2 = (a, w, h, r) => boxBlur(boxBlur(a, w, h, r), w, h, r);
+
+/* ---------- ST-final: the stone recipe ---------- */
+const V = { code: 'ST-final', base: [38, 46, 60], c1: .45, b2: .15, b3: .1, pits: 3, pitR: [.6, 1.6], spec: 1.4, sx: 44, sheen: 1,
+  bev: 5.2, bevR: 4, side: 7, cham: 3, rough: .6, chips: .08 };
+const ROW_H = 64; // css px, including the slab's thickness and its shadow
+// where the face sits inside the row (css px): the thickness and the drop shadow take the bottom
+const M = { l: 3, t: 2, r: 3, b: V.side + 5 };
+
+function slabPath(W, H, m, rng, v, DPR) {
+  const pts = [], x0 = m.l, y0 = m.t, x1 = W - m.r, y1 = H - m.b;
+  const cs = [0, 1, 2, 3].map(() => (1.5 + rng() * v.cham) * DPR), C = [[x0, y0], [x1, y0], [x1, y1], [x0, y1]];
+  for (let i = 0; i < 4; i++) {
+    const a = C[i], b = C[(i + 1) % 4], dx = Math.sign(b[0] - a[0]), dy = Math.sign(b[1] - a[1]), nx = -dy, ny = dx;
+    const len = Math.abs(b[0] - a[0]) + Math.abs(b[1] - a[1]), sA = cs[i], sB = cs[(i + 1) % 4];
+    const P = (t, o) => [a[0] + dx * t + nx * o, a[1] + dy * t + ny * o, nx, ny];
+    let t = sA; pts.push(P(t, rng() * v.rough * DPR));
+    while (t < len - sB) {
+      t = Math.min(len - sB, t + (3 + rng() * 5) * DPR);
+      if (rng() < v.chips && t > sA + 6 * DPR && t < len - sB - 12 * DPR) {
+        const cw = (3 + rng() * 7) * DPR, dep = (0.8 + rng() * 2.4) * DPR;
+        pts.push(P(t, .3 * DPR), P(t + cw * .25, dep * .8), P(t + cw * .55, dep), P(t + cw * .8, dep * .5), P(t + cw, .2 * DPR)); t += cw;
+      } else pts.push(P(t, rng() * v.rough * DPR));
+    }
+  }
+  return pts;
+}
+
+// renders one tablet face; forb = rectangles (device px) the cracks keep out of (tick, words, pay)
+function renderStone(name, streak, Wc, Hc, forb, DPR) {
+  noise();
+  const v = V, W = Math.round(Wc * DPR), H = Math.round(Hc * DPR);
+  const rng = mulberry(hashStr(name + '|' + v.code)), side = v.side * DPR;
+  const m = { l: M.l * DPR, t: M.t * DPR, r: M.r * DPR, b: M.b * DPR };
+  const pts = slabPath(W, H, m, rng, v, DPR);
+  const oc = document.createElement('canvas'); oc.width = W; oc.height = H; const ox = oc.getContext('2d', { willReadFrequently: true });
+  const poly = (dy) => { ox.beginPath(); pts.forEach((p, i) => (i ? ox.lineTo(p[0], p[1] + dy) : ox.moveTo(p[0], p[1] + dy))); ox.closePath(); ox.fill(); };
+  ox.fillStyle = '#fff'; poly(0); const fd = ox.getImageData(0, 0, W, H).data; ox.clearRect(0, 0, W, H);
+  for (let k = 1; k <= side; k++) poly(k); const sd = ox.getImageData(0, 0, W, H).data; ox.clearRect(0, 0, W, H);
+  const A = new Float32Array(W * H), AS = new Float32Array(W * H);
+  for (let i = 0; i < A.length; i++) { A[i] = fd[i * 4 + 3] / 255; AS[i] = sd[i * 4 + 3] / 255; }
+  const Hh = blur2(A, W, H, Math.max(1, Math.round(v.bevR * DPR)));
+  // cracks stay within this many px of the face's edge (the slab is near enough a rectangle to measure it straight)
+  const band = 12 * DPR, fx0 = m.l, fy0 = m.t, fx1 = W - m.r, fy1 = H - m.b;
+  // surface height: bevel plus two scales of fine grain
+  const o1x = rng() * 512, o1y = rng() * 512, o2x = rng() * 256, o2y = rng() * 256, o3x = rng() * 256, o3y = rng() * 256;
+  const Hn = new Float32Array(W * H), C1 = new Float32Array(W * H);
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    const i = y * W + x; if (A[i] <= 0 && AS[i] <= 0) continue;
+    const X = x / DPR, Y = y / DPR, n1 = s1(X * .6 + o1x, Y * .6 + o1y), n2 = s2(X * 1.2 + o2x, Y * 1.2 + o2y), n3 = s3(X * 2.4 + o3x, Y * 2.4 + o3y);
+    Hn[i] = Hh[i] * v.bev + (n2 - .5) * v.b2 + (n3 - .5) * v.b3; C1[i] = n1;
+  }
+  // a few tiny pits
+  const dig = (cx, cy, r, depth) => { const R = r * DPR; for (let y = Math.max(0, cy - R | 0); y <= Math.min(H - 1, cy + R + 1 | 0); y++) for (let x = Math.max(0, cx - R | 0); x <= Math.min(W - 1, cx + R + 1 | 0); x++) {
+    const d = Math.hypot(x - cx, y - cy) / R; if (d < 1) Hn[y * W + x] -= depth * (1 - d * d); } };
+  for (let k = 0; k < v.pits; k++) { const x = rng() * W, y = rng() * H; if (A[(y | 0) * W + (x | 0)] > .9) dig(x, y, v.pitR[0] + rng() * (v.pitR[1] - v.pitR[0]), .9 + rng() * .8); }
+  const Hb = blur2(Hn, W, H, Math.max(1, Math.round(2 * DPR)));
+  // light it from the top left, satin highlight and a soft violet sheen
+  const L = norm3([-.45, -.68, .58]), Hv = norm3([L[0], L[1], L[2] + 1]);
+  const img = ox.createImageData(W, H), D = img.data;
+  for (let y = 1; y < H - 1; y++) for (let x = 1; x < W - 1; x++) {
+    const i = y * W + x, a = A[i], as = AS[i]; if (a <= .004 && as <= .004) continue;
+    const j = i * 4, n1 = C1[i], tone = 1 + (n1 - .5) * v.c1 * 2;
+    const R = v.base[0] * tone, G = v.base[1] * tone, B = v.base[2] * tone;
+    let fR = 0, fG = 0, fB = 0;
+    if (a > .004) {
+      const gx = (Hn[i + 1] - Hn[i - 1]) * DPR / 2, gy = (Hn[i + W] - Hn[i - W]) * DPR / 2, nl = Math.hypot(gx, gy, 1), nx = -gx / nl, ny = -gy / nl, nz = 1 / nl;
+      const dif = Math.max(0, nx * L[0] + ny * L[1] + nz * L[2]), sp = Math.pow(Math.max(0, nx * Hv[0] + ny * Hv[1] + nz * Hv[2]), v.sx) * v.spec;
+      const ao = clamp((Hb[i] - Hn[i]) * 1.1, 0, .75), lit = (.3 + .95 * dif) * (1 - ao);
+      fR = R * lit + sp * 150; fG = G * lit + sp * 146; fB = B * lit + sp * 165;
+      const bd = Math.exp(-Math.pow((x / W + y / H * .5 - .42 + (n1 - .5) * .2) / .16, 2)) * (.6 + dif * .6); fR += bd * 14 * v.sheen; fG += bd * 18 * v.sheen; fB += bd * 28 * v.sheen;
+    }
+    const k = .5 + (n1 - .5) * .3, sR = R * .42 * k, sG = G * .42 * k, sB = B * .42 * k; // the thickness below the face
+    D[j] = sR + (fR - sR) * a; D[j + 1] = sG + (fG - sG) * a; D[j + 2] = sB + (fB - sB) * a; D[j + 3] = Math.max(a, as) * 255;
+  }
+  ox.putImageData(img, 0, 0);
+  // the dark seam where face meets thickness
+  ox.save(); ox.globalCompositeOperation = 'source-atop'; ox.strokeStyle = 'rgba(0,0,0,.55)'; ox.lineWidth = DPR;
+  ox.beginPath(); pts.forEach((p, i) => (i ? ox.lineTo(p[0], p[1] + DPR * .6) : ox.moveTo(p[0], p[1] + DPR * .6))); ox.closePath(); ox.stroke(); ox.restore();
+
+  /* ---- cracks: only near the border, spread round it, more with a longer streak ---- */
+  const valid = (x, y, loose) => { if (x < 1 || y < 1 || x >= W - 1 || y >= H - 1) return false; const i = (y | 0) * W + (x | 0);
+    if (A[i] < (loose ? .5 : .97) || Math.min(x - fx0, fx1 - x, y - fy0, fy1 - y) > band) return false;
+    for (let k = 0; k < forb.length; k++) { const f = forb[k]; if (x > f[0] && x < f[2] && y > f[1] && y < f[3]) return false; } return true; };
+  const cracks = [], count = clamp(2 + Math.floor(streak / 7), 2, 11);
+  function grow(x, y, a, w, len, depth, list) {
+    const P = [[x, y, w]]; let L2 = 0; const drift = (rng() - .5) * .12;
+    while (L2 < len && w > .22 * DPR) {
+      a += drift + (rng() - .5) * .95; const st = (2.4 + rng() * 3.6) * DPR; let ok = false, nx = 0, ny = 0;
+      for (let k = 0; k < 5; k++) { const aa = a + (k === 0 ? 0 : (k % 2 ? 1 : -1) * .45 * Math.ceil(k / 2)); nx = x + Math.cos(aa) * st; ny = y + Math.sin(aa) * st; if (valid(nx, ny, L2 < 3 * DPR)) { a = aa; ok = true; break; } }
+      if (!ok) break; x = nx; y = ny; L2 += st; w *= .9; P.push([x, y, w]);
+      if (depth < 2 && rng() < .16 && L2 > 4 * DPR) grow(x, y, a + (rng() < .5 ? -1 : 1) * (.6 + rng() * .7), w * .6, (len - L2) * (.35 + rng() * .4), depth + 1, list);
+      if (rng() < .12) list.push([[x, y, w * .45], [x + Math.cos(a + 1.6) * 2.2 * DPR, y + Math.sin(a + 1.6) * 2.2 * DPR, w * .2]]); // splinter
+    }
+    if (P.length > 2) list.push(P);
+    return P.length > 2;
+  }
+  const off = rng(), n = pts.length;
+  for (let k = 0; k < count; k++) {
+    let made = false;
+    for (let t = 0; t < 14 && !made; t++) {
+      const idx = Math.floor((((k + off + (rng() - .5) * .6) / count) % 1 + 1) % 1 * n), p = pts[idx];
+      const sx = p[0] + p[2] * 1.2 * DPR, sy = p[1] + p[3] * 1.2 * DPR; if (!valid(sx, sy, true)) continue;
+      const inA = Math.atan2(p[3], p[2]), a = inA + (rng() < .5 ? -1 : 1) * (.55 + rng() * .5);
+      const list = [], w0 = (1.5 + rng() * 1.1) * DPR;
+      if (grow(sx, sy, a, w0, (14 + rng() * 22 + Math.min(streak, 70) * .22) * DPR, 0, list)) { cracks.push({ list, mouth: [sx, sy, p[2], p[3], w0] }); made = true; }
+    }
+  }
+  ox.save(); ox.globalCompositeOperation = 'source-atop'; ox.lineCap = 'round'; ox.lineJoin = 'round';
+  cracks.forEach((c) => {
+    // a chip knocked out where the crack meets the edge
+    const [mx, my, nx, ny, w0] = c.mouth, tx = -ny, ty = nx, cw = w0 * (1.8 + rng()), dp = w0 * (2 + rng() * 1.5);
+    ox.fillStyle = 'rgba(8,6,10,.85)'; ox.beginPath(); ox.moveTo(mx - nx * 1.5 * DPR + tx * cw, my - ny * 1.5 * DPR + ty * cw); ox.lineTo(mx + nx * dp, my + ny * dp); ox.lineTo(mx - nx * 1.5 * DPR - tx * cw * .8, my - ny * 1.5 * DPR - ty * cw * .8); ox.fill();
+    ox.strokeStyle = 'rgba(205,195,220,.4)'; ox.lineWidth = .7 * DPR; ox.beginPath(); ox.moveTo(mx - nx * DPR + tx * cw, my - ny * DPR + ty * cw); ox.lineTo(mx + nx * dp, my + ny * dp); ox.stroke();
+    c.list.forEach((P) => {
+      const Lp = [], Rp = []; let lx = 0, ly = 0;
+      for (let k = 0; k < P.length; k++) { const a = P[Math.max(0, k - 1)], b = P[Math.min(P.length - 1, k + 1)], dx = b[0] - a[0], dy = b[1] - a[1], l = Math.hypot(dx, dy) || 1, nx = -dy / l, ny = dx / l;
+        const w = (k === P.length - 1 ? 0 : P[k][2]) / 2 * (k % 2 ? .8 : 1.1); Lp.push([P[k][0] + nx * w, P[k][1] + ny * w]); Rp.push([P[k][0] - nx * w, P[k][1] - ny * w]); lx += nx; ly += ny; }
+      const lightL = (lx * -.45 + ly * -.68) > 0, path = (arr, dx, dy) => { ox.beginPath(); arr.forEach((p, k) => (k ? ox.lineTo(p[0] + dx, p[1] + dy) : ox.moveTo(p[0] + dx, p[1] + dy))); };
+      // a soft shadow beside the gap, the black gap itself, a thin lit lip on the side facing the light
+      ox.fillStyle = 'rgba(0,0,0,.35)'; path(Lp.concat(Rp.slice().reverse()), .5 * DPR, .7 * DPR); ox.closePath(); ox.fill();
+      ox.fillStyle = 'rgba(2,1,4,.97)'; path(Lp.concat(Rp.slice().reverse()), 0, 0); ox.closePath(); ox.fill();
+      ox.lineWidth = .55 * DPR; ox.strokeStyle = 'rgba(215,205,232,.42)'; path(lightL ? Lp : Rp, 0, -.45 * DPR); ox.stroke();
+      ox.strokeStyle = 'rgba(0,0,0,.5)'; ox.lineWidth = .8 * DPR; path(lightL ? Rp : Lp, .3 * DPR, .5 * DPR); ox.stroke();
+    });
+  });
+  ox.restore();
+  // final face with its drop shadow
+  const fc = document.createElement('canvas'); fc.width = W; fc.height = H; const fx = fc.getContext('2d');
+  fx.shadowColor = 'rgba(0,0,0,.85)'; fx.shadowBlur = 5 * DPR; fx.shadowOffsetY = 2.5 * DPR; fx.drawImage(oc, 0, 0);
+  return { face: fc, cracks, W, H, DPR, glows: {} };
+}
+
+// embers deep inside the cracks, in the streak colour
+function renderGlow(S, col) {
+  if (S.glows[col]) return S.glows[col];
+  const DPR = S.DPR, gc = document.createElement('canvas'); gc.width = S.W; gc.height = S.H; const g = gc.getContext('2d');
+  g.globalCompositeOperation = 'lighter';
+  // each pass strokes every crack onto a scratch layer with no shadow, then lays that layer down with one blurred shadow
+  // (a shadow on every little stroke cost 0.3-0.9 s per tablet)
+  const tc = document.createElement('canvas'); tc.width = S.W; tc.height = S.H; const t = tc.getContext('2d'); t.lineCap = 'round'; t.lineJoin = 'round';
+  const pass = (mul, blur, style, min) => { t.clearRect(0, 0, S.W, S.H); t.strokeStyle = style;
+    S.cracks.forEach((c) => c.list.forEach((P) => { for (let k = 1; k < P.length; k++) { t.lineWidth = Math.max(min, P[k][2] * mul); t.beginPath(); t.moveTo(P[k - 1][0], P[k - 1][1]); t.lineTo(P[k][0], P[k][1]); t.stroke(); } }));
+    g.shadowBlur = blur; g.shadowColor = col; g.drawImage(tc, 0, 0); g.shadowBlur = 0; };
+  pass(1.4, 6 * DPR, rgba(col, .22), .5);
+  pass(.42, 2 * DPR, col, .35);
+  pass(.16, 0, mixc(col, '#fff6e0', .5), .25);
+  S.cracks.forEach((c) => { const [mx, my, nx, ny, w0] = c.mouth, cx = mx + nx * w0, cy = my + ny * w0, gr = g.createRadialGradient(cx, cy, 0, cx, cy, w0 * 3);
+    gr.addColorStop(0, rgba(col, .35)); gr.addColorStop(1, rgba(col, 0)); g.shadowBlur = 0; g.fillStyle = gr; g.beginPath(); g.arc(cx, cy, w0 * 3, 0, 7); g.fill(); });
+  const keys = Object.keys(S.glows); if (keys.length > 3) delete S.glows[keys[0]];
+  S.glows[col] = gc;
+  return gc;
+}
+
+/* ---------- the pixel pentagram tick: carved well and dashed ring when waiting, a disc of light with a dark star when lit ---------- */
+const TG = 22; // pixel grid; shown at 2x (44 css px)
+const TICKS = {};
+function drawTick(col, lit) {
+  const key = col + (lit ? '1' : '0'); if (TICKS[key]) return TICKS[key];
+  const cv = document.createElement('canvas'); cv.width = TG; cv.height = TG; const g = cv.getContext('2d');
+  const cx = TG / 2, cy = TG / 2, R = 8.6;
+  const px = (x, y, c) => { g.fillStyle = c; g.fillRect(Math.floor(x), Math.floor(y), 1, 1); };
+  const dim = mixc('#2a2038', col, .5), white = '#fffbea';
+  for (let y = 0; y < TG; y++) for (let x = 0; x < TG; x++) {
+    const dx = x + .5 - cx, dy = y + .5 - cy, d = Math.hypot(dx, dy);
+    if (d < R + .5) {
+      if (!lit) px(x, y, (x + y) % 3 ? '#0b0910' : '#120f18');
+      else { const q = d / R; px(x, y, q < .22 ? white : q < .5 ? mixc(white, col, (q - .22) / .28) : q < .82 ? col : ((x + y) % 2 ? col : mixc(col, '#000000', .35))); }
+    } else if (d < R + 1.6) px(x, y, dx + dy > 1 ? 'rgba(210,200,230,.28)' : 'rgba(0,0,0,.7)'); // the well's carved rim
+  }
+  for (let a = 0; a < 6.283; a += .02) { const idx = Math.floor(a / 6.283 * 44); if (!lit && idx % 4 === 3) continue; px(cx + Math.cos(a) * R - .5, cy + Math.sin(a) * R - .5, lit ? mixc(col, '#ffffff', .3) : dim); }
+  const P = []; for (let k = 0; k < 5; k++) { const a = -Math.PI / 2 + k * 2 * Math.PI / 5; P.push([cx + Math.cos(a) * (R - 1.8), cy + Math.sin(a) * (R - 1.8)]); }
+  const sc = lit ? mixc(col, '#000000', .72) : dim;
+  [0, 2, 4, 1, 3, 0].forEach((k, i, arr) => { if (!i) return; const a = P[arr[i - 1]], b = P[k]; for (let t = 0; t <= 1; t += .04) px(a[0] + (b[0] - a[0]) * t - .5, a[1] + (b[1] - a[1]) * t - .5, sc); });
+  TICKS[key] = cv;
+  return cv;
+}
+
+/* ---------- CSS, injected once ---------- */
+const CSS = '' +
+'.slate-tab{position:relative;box-sizing:border-box;width:100%;height:' + ROW_H + 'px;display:flex;align-items:center;gap:8px;padding:' + M.t + 'px ' + (M.r + 10) + 'px ' + M.b + 'px ' + (M.l + 3) + 'px;isolation:isolate;color:#eef2f8;text-align:left;-webkit-tap-highlight-color:transparent}' +
+'.slate-tab::before{content:"";position:absolute;left:' + M.l + 'px;right:' + M.r + 'px;top:' + M.t + 'px;bottom:' + (M.b - V.side) + 'px;border-radius:3px;background:linear-gradient(170deg,#34404e,#1a2028);box-shadow:0 ' + V.side + 'px 0 #0f0e12;z-index:-3}' +
+'.slate-tab.slate-ready::before{display:none}' +
+'.slate-tab>canvas{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none}' +
+'.slate-stone{z-index:-2}' +
+'.slate-glow{z-index:-1;mix-blend-mode:screen;opacity:.55;animation:slate-shim 2.6s steps(1,end) infinite}' +
+'.slate-tab.slate-on .slate-glow{opacity:1;animation:slate-shimon 3.1s ease-in-out infinite}' +
+'.slate-lum{position:absolute;left:' + M.l + 'px;right:' + M.r + 'px;top:' + M.t + 'px;bottom:' + M.b + 'px;pointer-events:none;opacity:0;transition:opacity .6s;mix-blend-mode:screen;z-index:-1}' +
+'.slate-tab.slate-on .slate-lum{opacity:1}' +
+'@keyframes slate-shim{0%{opacity:.5}13%{opacity:.62}21%{opacity:.52}37%{opacity:.7}44%{opacity:.54}63%{opacity:.64}71%{opacity:.48}86%{opacity:.6}}' +
+'@keyframes slate-shimon{0%,100%{opacity:1}30%{opacity:.86}55%{opacity:.97}80%{opacity:.9}}' +
+'.slate-tick{position:relative;flex:none;width:44px;height:44px;margin:0;padding:0;border:0;background:none;cursor:pointer;transition:filter .4s;-webkit-tap-highlight-color:transparent}' +
+'.slate-tick canvas{position:absolute;left:0;top:0;width:44px;height:44px;image-rendering:pixelated;pointer-events:none}' +
+'.slate-tick .slate-t1{clip-path:circle(0% at 50% 50%);transition:clip-path .4s steps(6,end)}' +
+'.slate-tab.slate-on .slate-tick .slate-t1{clip-path:circle(75% at 50% 50%)}' +
+'.slate-tick:focus-visible{outline:2px solid #e8c46a;outline-offset:2px;border-radius:50%}' +
+'.slate-body{position:relative;flex:1;min-width:0;cursor:pointer}' +
+'.slate-nm{font:700 15px/1.2 var(--a,\'Atkinson Hyperlegible\',sans-serif);color:#eef2f8;text-shadow:0 -1px 0 rgba(0,0,0,.95),0 1px 0 rgba(200,190,220,.16);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}' +
+'.slate-sub{font:12.5px/1.3 var(--a,\'Atkinson Hyperlegible\',sans-serif);color:#a6b2c4;margin-top:2px;text-shadow:0 1px 1px #000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}' +
+'.slate-pay{position:relative;flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:2px;font:700 15px/1 var(--a,\'Atkinson Hyperlegible\',sans-serif);color:#f4dd9a;text-shadow:0 1px 1px #000;font-variant-numeric:tabular-nums}' +
+'@media (prefers-reduced-motion: reduce){.slate-glow,.slate-tab.slate-on .slate-glow{animation:none}.slate-tick,.slate-tick .slate-t1,.slate-lum{transition:none}}';
+function css() { if (document.getElementById('stone-css-slate')) return; const s = document.createElement('style'); s.id = 'stone-css-slate'; s.textContent = CSS; (document.head || document.documentElement).appendChild(s); }
+
+/* ---------- the API ---------- */
+function row(o) {
+  css();
+  o = o || {};
+  const s = Math.max(0, +o.streak || 0), on = !!o.done;
+  return '<div class="slate-tab' + (on ? ' slate-on' : '') + '" data-slate-id="' + esc(o.id) + '" data-slate-name="' + esc(o.name) + '" data-slate-s="' + s + '" data-slate-d="' + (on ? 1 : 0) + '">' +
+    '<canvas class="slate-stone"></canvas><canvas class="slate-glow"></canvas><div class="slate-lum"></div>' +
+    '<button type="button" class="slate-tick" ' + (o.tickAttrs || '') + ' aria-pressed="' + on + '" aria-label="' + esc(o.name) + (on ? ', done today' : ', not done yet') + ', ' + s + ' night' + (s === 1 ? '' : 's') + '">' +
+    '<canvas class="slate-t0" width="' + TG + '" height="' + TG + '"></canvas><canvas class="slate-t1" width="' + TG + '" height="' + TG + '"></canvas></button>' +
+    '<div class="slate-body" ' + (o.bodyAttrs || '') + '><div class="slate-nm">' + esc(o.name) + '</div><div class="slate-sub">' + (o.subHtml || '') + '</div></div>' +
+    '<div class="slate-pay">' + (o.payHtml || '') + '</div></div>';
+}
+
+const CACHE = new Map(), CACHE_MAX = 24; // a stone is about W*H*4 bytes (400 KB at 390 px on a 2x phone)
+const QUEUE = []; let busy = false;
+const textRect = (node) => { const rg = document.createRange(); rg.selectNodeContents(node); return rg.getBoundingClientRect(); };
+// what the cracks must avoid, in device px relative to the tablet; rounded so the cache key stays steady
+function measure(el, br, DPR) {
+  const f = [], pad = 4, R = (b) => { if (!b || !b.width) return; f.push([Math.round((b.left - br.left - pad) * DPR), Math.round((b.top - br.top - pad) * DPR), Math.round((b.right - br.left + pad) * DPR), Math.round((b.bottom - br.top + pad) * DPR)]); };
+  R(el.querySelector('.slate-tick').getBoundingClientRect());
+  const nm = el.querySelector('.slate-nm'), sub = el.querySelector('.slate-sub'), pay = el.querySelector('.slate-pay');
+  if (nm && nm.firstChild) R(textRect(nm)); if (sub && sub.firstChild) R(textRect(sub)); if (pay && pay.firstChild) R(pay.getBoundingClientRect());
+  return f;
+}
+function apply(el, S) {
+  const col = el._stCol, on = el._stOn;
+  const sc = el.querySelector('.slate-stone'), gc = el.querySelector('.slate-glow');
+  if (sc.width !== S.W || sc.height !== S.H) { sc.width = S.W; sc.height = S.H; } else sc.getContext('2d').clearRect(0, 0, S.W, S.H);
+  sc.getContext('2d').drawImage(S.face, 0, 0);
+  if (gc.width !== S.W || gc.height !== S.H) { gc.width = S.W; gc.height = S.H; } else gc.getContext('2d').clearRect(0, 0, S.W, S.H);
+  gc.getContext('2d').drawImage(renderGlow(S, col), 0, 0);
+  el._stKey = S.key; el.classList.add('slate-ready');
+  if (el._stFlare) { el._stFlare = false; play(el, on); }
+}
+function paintTick(el) {
+  const col = el._stCol;
+  const t0 = el.querySelector('.slate-t0'), t1 = el.querySelector('.slate-t1');
+  t0.getContext('2d').clearRect(0, 0, TG, TG); t0.getContext('2d').drawImage(drawTick(col, false), 0, 0);
+  t1.getContext('2d').clearRect(0, 0, TG, TG); t1.getContext('2d').drawImage(drawTick(col, true), 0, 0);
+  el.querySelector('.slate-tick').style.filter = el._stOn ? 'drop-shadow(0 0 5px ' + rgba(col, .75) + ')' : 'none';
+  el.querySelector('.slate-lum').style.background = 'radial-gradient(ellipse 110px 46px at 28px 50%,' + rgba(col, .2) + ',transparent 75%)';
+}
+function build(job) {
+  const S = renderStone(job.name, job.s, job.Wc, job.Hc, job.forb, job.DPR); S.key = job.key; S.near = job.near;
+  CACHE.set(job.key, S); while (CACHE.size > CACHE_MAX) CACHE.delete(CACHE.keys().next().value);
+  return S;
+}
+function pump() {
+  if (busy) return; busy = true;
+  // the first stone waits a moment so a tick's flare gets its opening frames before the main thread is busy
+  setTimeout(function next() {
+    const job = QUEUE.shift(); if (!job) { busy = false; return; }
+    const els = job.els.filter((el) => el.isConnected && el._stWant === job.key);
+    if (els.length) try { const S = CACHE.get(job.key) || build(job); els.forEach((el) => apply(el, S)); } catch (e) { console.error(e); }
+    setTimeout(next, 0);
+  }, 90);
+}
+function paint(root) {
+  css();
+  root = root || document;
+  const els = Array.prototype.slice.call(root.querySelectorAll('.slate-tab')), DPR = DPRf(); let queued = false;
+  els.forEach((el) => {
+    const name = el.getAttribute('data-slate-name') || '', s = +el.getAttribute('data-slate-s') || 0, on = el.getAttribute('data-slate-d') === '1';
+    el._stOn = on; el._stCol = sCol(Math.max(1, on ? s : s + 1));
+    paintTick(el);
+    const br = el.getBoundingClientRect(); if (br.width < 40) return; // hidden: try again on the next paint
+    const Wc = Math.round(br.width), Hc = Math.round(br.height), forb = measure(el, br, DPR);
+    const near = name + '|' + Wc + 'x' + Hc + '@' + DPR, key = near + '|' + s + '|' + forb.map((f) => f.join(',')).join(';');
+    el._stWant = key;
+    if (el._stKey === key && el.classList.contains('slate-ready')) { const gc = el.querySelector('.slate-glow'), S = CACHE.get(key); if (S) { gc.getContext('2d').clearRect(0, 0, S.W, S.H); gc.getContext('2d').drawImage(renderGlow(S, el._stCol), 0, 0); } return; }
+    const S = CACHE.get(key); if (S) { apply(el, S); return; }
+    // not drawn yet (a tick moved the streak, the words changed): show the same ritual's last stone at this size straight
+    // away, so the tick and its flare are instant, and swap in the new cracks when they are drawn a moment later
+    let old = null; CACHE.forEach((c) => { if (c.near === near) old = c; });
+    if (old) apply(el, old);
+    const job = QUEUE.find((j) => j.key === key);
+    if (job) job.els.push(el); else QUEUE.push({ key, near, name, s, Wc, Hc, forb, DPR, els: [el] });
+    queued = true;
+  });
+  if (queued) pump();
+}
+function play(el, on) {
+  if (RM()) return;
+  const an = (n, kf, o) => { if (n && n.animate) n.animate(kf, o); };
+  an(el.querySelector('.slate-glow'), [{ opacity: .4, filter: 'brightness(1)' }, { opacity: 1, filter: 'brightness(3) saturate(1.4)', offset: .15 }, { opacity: 1, filter: 'brightness(1.7)', offset: .4 }, { opacity: .95, filter: 'brightness(1)' }], { duration: 1200, easing: 'ease-out' });
+  an(el.querySelector('.slate-tick'), [{ transform: 'scale(1)', filter: 'brightness(1)' }, { transform: 'scale(1.12)', filter: 'brightness(1.8)', offset: .3 }, { transform: 'scale(1)', filter: 'brightness(1)' }], { duration: 450, easing: 'steps(5,end)' });
+  if (on) {
+    an(el.querySelector('.slate-t1'), [{ clipPath: 'circle(0% at 50% 50%)' }, { clipPath: 'circle(75% at 50% 50%)' }], { duration: 420, easing: 'steps(6,end)' });
+    an(el.querySelector('.slate-lum'), [{ opacity: 0 }, { opacity: 1, offset: .2 }, { opacity: .8 }, { opacity: 1 }], { duration: 1200 });
+  }
+}
+function flare(key) {
+  const sel = '[data-fx="' + String(key).replace(/["\\]/g, '\\$&') + '"]', btn = document.querySelector('.slate-tab ' + sel) || document.querySelector(sel);
+  const el = btn && btn.closest('.slate-tab'); if (!el) return;
+  const on = el.getAttribute('data-slate-d') === '1';
+  if (el.classList.contains('slate-ready')) play(el, on); else el._stFlare = true; // the stone is still being drawn: flare when it lands
+}
+
+window.STONE_slate = { row, paint, flare, sCol };
+})();
+
+/* Ritual tablets (Patryk 2026-10-27, final picks from the "Obsidian and Parchment" mock-up):
+   stone ST-final "Polished deep slab" (ST3c fine grain and satin shine on ST3e's thick slab with a deep rounded bevel),
+   the plain pixel pentagram tick (no studs, no multiplier marks) waiting in a carved well and lighting from the middle
+   in chunky pixel steps, and real-looking cracks round the border (dark fissure, lit lip, chip at the rim), seeded by
+   the ritual's name, more of them the longer the streak (2 at the start, 11 by 70 nights), glowing faintly in the
+   streak colour with a slight shimmer and flaring when ticked.
+   STONE.row(opts) -> HTML for one tablet; STONE.paint(root) paints every tablet inside root (cached, cheap to repeat);
+   STONE.flare(key) plays the tick flare on the tablet whose tick has data-fx=key.
+   Each tablet face is drawn once into a cached canvas; only the flare and a stepped shimmer animate.
+   All CSS classes start with obsid-. */
+(function () {
+'use strict';
+if (window.STONE_obsid) return;
+
+const RM = () => !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+const DPRf = () => Math.min(2, window.devicePixelRatio || 1);
+
+/* ---------- the app's streak colour (copied from game-ui.js sCol): ember orange at night 1, eldritch green at 66 ---------- */
+const hx = (c) => [1, 3, 5].map((i) => parseInt(c.slice(i, i + 2), 16));
+const mixc = (a, b, t) => { const x = hx(a), y = hx(b); return '#' + x.map((v, i) => Math.round(v + (y[i] - v) * t).toString(16).padStart(2, '0')).join(''); };
+const STOPS = [[1, '#ff6a2a'], [7, '#ffc040'], [21, '#6ab8ff'], [45, '#5adcd0'], [66, '#5ef2a0']];
+const sCol = (n) => { n = Math.max(1, n || 1); if (n >= 66) return '#5ef2a0'; for (let i = 1; i < STOPS.length; i++) if (n <= STOPS[i][0]) return mixc(STOPS[i - 1][1], STOPS[i][1], (n - STOPS[i - 1][0]) / (STOPS[i][0] - STOPS[i - 1][0])); return '#5ef2a0'; };
+const rgba = (c, a) => { const v = hx(c); return 'rgba(' + v[0] + ',' + v[1] + ',' + v[2] + ',' + a + ')'; };
+const esc = (s) => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
+const norm3 = (v) => { const l = Math.hypot(v[0], v[1], v[2]); return [v[0] / l, v[1] / l, v[2] / l]; };
+
+/* ---------- seeded randomness and value noise ---------- */
+function hashStr(s) { let h = 2166136261 >>> 0; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+function mulberry(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function noiseTile(size, cells, oct, seed) {
+  const out = new Float32Array(size * size), r = mulberry(seed); let amp = 1, tot = 0;
+  for (let o = 0; o < oct; o++) {
+    const c = cells << o, g = new Float32Array(c * c); for (let i = 0; i < g.length; i++) g[i] = r();
+    const step = size / c;
+    for (let y = 0; y < size; y++) { const fy = y / step, iy = Math.floor(fy), ty = fy - iy, sy = ty * ty * (3 - 2 * ty), y0 = (iy % c) * c, y1 = ((iy + 1) % c) * c;
+      for (let x = 0; x < size; x++) { const fx = x / step, ix = Math.floor(fx), tx = fx - ix, sx = tx * tx * (3 - 2 * tx), x0 = ix % c, x1 = (ix + 1) % c;
+        const a = g[y0 + x0], b = g[y0 + x1], cc = g[y1 + x0], d = g[y1 + x1], top = a + (b - a) * sx, bot = cc + (d - cc) * sx;
+        out[y * size + x] += amp * (top + (bot - top) * sy); } }
+    tot += amp; amp *= 0.5;
+  }
+  for (let i = 0; i < out.length; i++) out[i] /= tot;
+  return out;
+}
+let N1 = null, N2 = null, N3 = null; // made on the first tablet, not at load
+const noise = () => { if (!N1) { N1 = noiseTile(512, 4, 5, 11); N2 = noiseTile(256, 8, 4, 23); N3 = noiseTile(256, 32, 3, 37); } };
+const s1 = (x, y) => N1[((y | 0) & 511) * 512 + ((x | 0) & 511)];
+const s2 = (x, y) => N2[((y | 0) & 255) * 256 + ((x | 0) & 255)];
+const s3 = (x, y) => N3[((y | 0) & 255) * 256 + ((x | 0) & 255)];
+function boxBlur(src, w, h, r) {
+  const tmp = new Float32Array(w * h), out = new Float32Array(w * h), d = 2 * r + 1;
+  for (let y = 0; y < h; y++) { const o = y * w; let acc = 0; for (let x = -r; x <= r; x++) acc += src[o + Math.min(w - 1, Math.max(0, x))];
+    for (let x = 0; x < w; x++) { tmp[o + x] = acc / d; acc += src[o + Math.min(w - 1, x + r + 1)] - src[o + Math.max(0, x - r)]; } }
+  for (let x = 0; x < w; x++) { let acc = 0; for (let y = -r; y <= r; y++) acc += tmp[Math.min(h - 1, Math.max(0, y)) * w + x];
+    for (let y = 0; y < h; y++) { out[y * w + x] = acc / d; acc += tmp[Math.min(h - 1, y + r + 1) * w + x] - tmp[Math.max(0, y - r) * w + x]; } }
+  return out;
+}
+const blur2 = (a, w, h, r) => boxBlur(boxBlur(a, w, h, r), w, h, r);
+
+/* ---------- ST-final: the stone recipe ---------- */
+const V = { code: 'ST-final', base: [30, 28, 38], c1: .45, b2: .15, b3: .1, pits: 3, pitR: [.6, 1.6], spec: 1.4, sx: 44, sheen: 1,
+  bev: 5.2, bevR: 4, side: 7, cham: 3, rough: .6, chips: .08 };
+const ROW_H = 64; // css px, including the slab's thickness and its shadow
+// where the face sits inside the row (css px): the thickness and the drop shadow take the bottom
+const M = { l: 3, t: 2, r: 3, b: V.side + 5 };
+
+function slabPath(W, H, m, rng, v, DPR) {
+  const pts = [], x0 = m.l, y0 = m.t, x1 = W - m.r, y1 = H - m.b;
+  const cs = [0, 1, 2, 3].map(() => (1.5 + rng() * v.cham) * DPR), C = [[x0, y0], [x1, y0], [x1, y1], [x0, y1]];
+  for (let i = 0; i < 4; i++) {
+    const a = C[i], b = C[(i + 1) % 4], dx = Math.sign(b[0] - a[0]), dy = Math.sign(b[1] - a[1]), nx = -dy, ny = dx;
+    const len = Math.abs(b[0] - a[0]) + Math.abs(b[1] - a[1]), sA = cs[i], sB = cs[(i + 1) % 4];
+    const P = (t, o) => [a[0] + dx * t + nx * o, a[1] + dy * t + ny * o, nx, ny];
+    let t = sA; pts.push(P(t, rng() * v.rough * DPR));
+    while (t < len - sB) {
+      t = Math.min(len - sB, t + (3 + rng() * 5) * DPR);
+      if (rng() < v.chips && t > sA + 6 * DPR && t < len - sB - 12 * DPR) {
+        const cw = (3 + rng() * 7) * DPR, dep = (0.8 + rng() * 2.4) * DPR;
+        pts.push(P(t, .3 * DPR), P(t + cw * .25, dep * .8), P(t + cw * .55, dep), P(t + cw * .8, dep * .5), P(t + cw, .2 * DPR)); t += cw;
+      } else pts.push(P(t, rng() * v.rough * DPR));
+    }
+  }
+  return pts;
+}
+
+// renders one tablet face; forb = rectangles (device px) the cracks keep out of (tick, words, pay)
+function renderStone(name, streak, Wc, Hc, forb, DPR) {
+  noise();
+  const v = V, W = Math.round(Wc * DPR), H = Math.round(Hc * DPR);
+  const rng = mulberry(hashStr(name + '|' + v.code)), side = v.side * DPR;
+  const m = { l: M.l * DPR, t: M.t * DPR, r: M.r * DPR, b: M.b * DPR };
+  const pts = slabPath(W, H, m, rng, v, DPR);
+  const oc = document.createElement('canvas'); oc.width = W; oc.height = H; const ox = oc.getContext('2d', { willReadFrequently: true });
+  const poly = (dy) => { ox.beginPath(); pts.forEach((p, i) => (i ? ox.lineTo(p[0], p[1] + dy) : ox.moveTo(p[0], p[1] + dy))); ox.closePath(); ox.fill(); };
+  ox.fillStyle = '#fff'; poly(0); const fd = ox.getImageData(0, 0, W, H).data; ox.clearRect(0, 0, W, H);
+  for (let k = 1; k <= side; k++) poly(k); const sd = ox.getImageData(0, 0, W, H).data; ox.clearRect(0, 0, W, H);
+  const A = new Float32Array(W * H), AS = new Float32Array(W * H);
+  for (let i = 0; i < A.length; i++) { A[i] = fd[i * 4 + 3] / 255; AS[i] = sd[i * 4 + 3] / 255; }
+  const Hh = blur2(A, W, H, Math.max(1, Math.round(v.bevR * DPR)));
+  // cracks stay within this many px of the face's edge (the slab is near enough a rectangle to measure it straight)
+  const band = 12 * DPR, fx0 = m.l, fy0 = m.t, fx1 = W - m.r, fy1 = H - m.b;
+  // surface height: bevel plus two scales of fine grain
+  const o1x = rng() * 512, o1y = rng() * 512, o2x = rng() * 256, o2y = rng() * 256, o3x = rng() * 256, o3y = rng() * 256;
+  const Hn = new Float32Array(W * H), C1 = new Float32Array(W * H);
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    const i = y * W + x; if (A[i] <= 0 && AS[i] <= 0) continue;
+    const X = x / DPR, Y = y / DPR, n1 = s1(X * .6 + o1x, Y * .6 + o1y), n2 = s2(X * 1.2 + o2x, Y * 1.2 + o2y), n3 = s3(X * 2.4 + o3x, Y * 2.4 + o3y);
+    Hn[i] = Hh[i] * v.bev + (n2 - .5) * v.b2 + (n3 - .5) * v.b3; C1[i] = n1;
+  }
+  // a few tiny pits
+  const dig = (cx, cy, r, depth) => { const R = r * DPR; for (let y = Math.max(0, cy - R | 0); y <= Math.min(H - 1, cy + R + 1 | 0); y++) for (let x = Math.max(0, cx - R | 0); x <= Math.min(W - 1, cx + R + 1 | 0); x++) {
+    const d = Math.hypot(x - cx, y - cy) / R; if (d < 1) Hn[y * W + x] -= depth * (1 - d * d); } };
+  for (let k = 0; k < v.pits; k++) { const x = rng() * W, y = rng() * H; if (A[(y | 0) * W + (x | 0)] > .9) dig(x, y, v.pitR[0] + rng() * (v.pitR[1] - v.pitR[0]), .9 + rng() * .8); }
+  const Hb = blur2(Hn, W, H, Math.max(1, Math.round(2 * DPR)));
+  // light it from the top left, satin highlight and a soft violet sheen
+  const L = norm3([-.45, -.68, .58]), Hv = norm3([L[0], L[1], L[2] + 1]);
+  const img = ox.createImageData(W, H), D = img.data;
+  for (let y = 1; y < H - 1; y++) for (let x = 1; x < W - 1; x++) {
+    const i = y * W + x, a = A[i], as = AS[i]; if (a <= .004 && as <= .004) continue;
+    const j = i * 4, n1 = C1[i], tone = 1 + (n1 - .5) * v.c1 * 2;
+    const R = v.base[0] * tone, G = v.base[1] * tone, B = v.base[2] * tone;
+    let fR = 0, fG = 0, fB = 0;
+    if (a > .004) {
+      const gx = (Hn[i + 1] - Hn[i - 1]) * DPR / 2, gy = (Hn[i + W] - Hn[i - W]) * DPR / 2, nl = Math.hypot(gx, gy, 1), nx = -gx / nl, ny = -gy / nl, nz = 1 / nl;
+      const dif = Math.max(0, nx * L[0] + ny * L[1] + nz * L[2]), sp = Math.pow(Math.max(0, nx * Hv[0] + ny * Hv[1] + nz * Hv[2]), v.sx) * v.spec;
+      const ao = clamp((Hb[i] - Hn[i]) * 1.1, 0, .75), lit = (.3 + .95 * dif) * (1 - ao);
+      fR = R * lit + sp * 150; fG = G * lit + sp * 146; fB = B * lit + sp * 165;
+      const bd = Math.exp(-Math.pow((x / W + y / H * .5 - .42 + (n1 - .5) * .2) / .16, 2)) * (.6 + dif * .6); fR += bd * 14 * v.sheen; fG += bd * 14 * v.sheen; fB += bd * 22 * v.sheen;
+    }
+    const k = .5 + (n1 - .5) * .3, sR = R * .42 * k, sG = G * .42 * k, sB = B * .42 * k; // the thickness below the face
+    D[j] = sR + (fR - sR) * a; D[j + 1] = sG + (fG - sG) * a; D[j + 2] = sB + (fB - sB) * a; D[j + 3] = Math.max(a, as) * 255;
+  }
+  ox.putImageData(img, 0, 0);
+  // the dark seam where face meets thickness
+  ox.save(); ox.globalCompositeOperation = 'source-atop'; ox.strokeStyle = 'rgba(0,0,0,.55)'; ox.lineWidth = DPR;
+  ox.beginPath(); pts.forEach((p, i) => (i ? ox.lineTo(p[0], p[1] + DPR * .6) : ox.moveTo(p[0], p[1] + DPR * .6))); ox.closePath(); ox.stroke(); ox.restore();
+
+  /* ---- cracks: only near the border, spread round it, more with a longer streak ---- */
+  const valid = (x, y, loose) => { if (x < 1 || y < 1 || x >= W - 1 || y >= H - 1) return false; const i = (y | 0) * W + (x | 0);
+    if (A[i] < (loose ? .5 : .97) || Math.min(x - fx0, fx1 - x, y - fy0, fy1 - y) > band) return false;
+    for (let k = 0; k < forb.length; k++) { const f = forb[k]; if (x > f[0] && x < f[2] && y > f[1] && y < f[3]) return false; } return true; };
+  const cracks = [], count = clamp(2 + Math.floor(streak / 7), 2, 11);
+  function grow(x, y, a, w, len, depth, list) {
+    const P = [[x, y, w]]; let L2 = 0; const drift = (rng() - .5) * .12;
+    while (L2 < len && w > .22 * DPR) {
+      a += drift + (rng() - .5) * .95; const st = (2.4 + rng() * 3.6) * DPR; let ok = false, nx = 0, ny = 0;
+      for (let k = 0; k < 5; k++) { const aa = a + (k === 0 ? 0 : (k % 2 ? 1 : -1) * .45 * Math.ceil(k / 2)); nx = x + Math.cos(aa) * st; ny = y + Math.sin(aa) * st; if (valid(nx, ny, L2 < 3 * DPR)) { a = aa; ok = true; break; } }
+      if (!ok) break; x = nx; y = ny; L2 += st; w *= .9; P.push([x, y, w]);
+      if (depth < 2 && rng() < .16 && L2 > 4 * DPR) grow(x, y, a + (rng() < .5 ? -1 : 1) * (.6 + rng() * .7), w * .6, (len - L2) * (.35 + rng() * .4), depth + 1, list);
+      if (rng() < .12) list.push([[x, y, w * .45], [x + Math.cos(a + 1.6) * 2.2 * DPR, y + Math.sin(a + 1.6) * 2.2 * DPR, w * .2]]); // splinter
+    }
+    if (P.length > 2) list.push(P);
+    return P.length > 2;
+  }
+  const off = rng(), n = pts.length;
+  for (let k = 0; k < count; k++) {
+    let made = false;
+    for (let t = 0; t < 14 && !made; t++) {
+      const idx = Math.floor((((k + off + (rng() - .5) * .6) / count) % 1 + 1) % 1 * n), p = pts[idx];
+      const sx = p[0] + p[2] * 1.2 * DPR, sy = p[1] + p[3] * 1.2 * DPR; if (!valid(sx, sy, true)) continue;
+      const inA = Math.atan2(p[3], p[2]), a = inA + (rng() < .5 ? -1 : 1) * (.55 + rng() * .5);
+      const list = [], w0 = (1.5 + rng() * 1.1) * DPR;
+      if (grow(sx, sy, a, w0, (14 + rng() * 22 + Math.min(streak, 70) * .22) * DPR, 0, list)) { cracks.push({ list, mouth: [sx, sy, p[2], p[3], w0] }); made = true; }
+    }
+  }
+  ox.save(); ox.globalCompositeOperation = 'source-atop'; ox.lineCap = 'round'; ox.lineJoin = 'round';
+  cracks.forEach((c) => {
+    // a chip knocked out where the crack meets the edge
+    const [mx, my, nx, ny, w0] = c.mouth, tx = -ny, ty = nx, cw = w0 * (1.8 + rng()), dp = w0 * (2 + rng() * 1.5);
+    ox.fillStyle = 'rgba(8,6,10,.85)'; ox.beginPath(); ox.moveTo(mx - nx * 1.5 * DPR + tx * cw, my - ny * 1.5 * DPR + ty * cw); ox.lineTo(mx + nx * dp, my + ny * dp); ox.lineTo(mx - nx * 1.5 * DPR - tx * cw * .8, my - ny * 1.5 * DPR - ty * cw * .8); ox.fill();
+    ox.strokeStyle = 'rgba(205,195,220,.4)'; ox.lineWidth = .7 * DPR; ox.beginPath(); ox.moveTo(mx - nx * DPR + tx * cw, my - ny * DPR + ty * cw); ox.lineTo(mx + nx * dp, my + ny * dp); ox.stroke();
+    c.list.forEach((P) => {
+      const Lp = [], Rp = []; let lx = 0, ly = 0;
+      for (let k = 0; k < P.length; k++) { const a = P[Math.max(0, k - 1)], b = P[Math.min(P.length - 1, k + 1)], dx = b[0] - a[0], dy = b[1] - a[1], l = Math.hypot(dx, dy) || 1, nx = -dy / l, ny = dx / l;
+        const w = (k === P.length - 1 ? 0 : P[k][2]) / 2 * (k % 2 ? .8 : 1.1); Lp.push([P[k][0] + nx * w, P[k][1] + ny * w]); Rp.push([P[k][0] - nx * w, P[k][1] - ny * w]); lx += nx; ly += ny; }
+      const lightL = (lx * -.45 + ly * -.68) > 0, path = (arr, dx, dy) => { ox.beginPath(); arr.forEach((p, k) => (k ? ox.lineTo(p[0] + dx, p[1] + dy) : ox.moveTo(p[0] + dx, p[1] + dy))); };
+      // a soft shadow beside the gap, the black gap itself, a thin lit lip on the side facing the light
+      ox.fillStyle = 'rgba(0,0,0,.35)'; path(Lp.concat(Rp.slice().reverse()), .5 * DPR, .7 * DPR); ox.closePath(); ox.fill();
+      ox.fillStyle = 'rgba(2,1,4,.97)'; path(Lp.concat(Rp.slice().reverse()), 0, 0); ox.closePath(); ox.fill();
+      ox.lineWidth = .55 * DPR; ox.strokeStyle = 'rgba(215,205,232,.42)'; path(lightL ? Lp : Rp, 0, -.45 * DPR); ox.stroke();
+      ox.strokeStyle = 'rgba(0,0,0,.5)'; ox.lineWidth = .8 * DPR; path(lightL ? Rp : Lp, .3 * DPR, .5 * DPR); ox.stroke();
+    });
+  });
+  ox.restore();
+  // final face with its drop shadow
+  const fc = document.createElement('canvas'); fc.width = W; fc.height = H; const fx = fc.getContext('2d');
+  fx.shadowColor = 'rgba(0,0,0,.85)'; fx.shadowBlur = 5 * DPR; fx.shadowOffsetY = 2.5 * DPR; fx.drawImage(oc, 0, 0);
+  return { face: fc, cracks, W, H, DPR, glows: {} };
+}
+
+// embers deep inside the cracks, in the streak colour
+function renderGlow(S, col) {
+  if (S.glows[col]) return S.glows[col];
+  const DPR = S.DPR, gc = document.createElement('canvas'); gc.width = S.W; gc.height = S.H; const g = gc.getContext('2d');
+  g.globalCompositeOperation = 'lighter';
+  // each pass strokes every crack onto a scratch layer with no shadow, then lays that layer down with one blurred shadow
+  // (a shadow on every little stroke cost 0.3-0.9 s per tablet)
+  const tc = document.createElement('canvas'); tc.width = S.W; tc.height = S.H; const t = tc.getContext('2d'); t.lineCap = 'round'; t.lineJoin = 'round';
+  const pass = (mul, blur, style, min) => { t.clearRect(0, 0, S.W, S.H); t.strokeStyle = style;
+    S.cracks.forEach((c) => c.list.forEach((P) => { for (let k = 1; k < P.length; k++) { t.lineWidth = Math.max(min, P[k][2] * mul); t.beginPath(); t.moveTo(P[k - 1][0], P[k - 1][1]); t.lineTo(P[k][0], P[k][1]); t.stroke(); } }));
+    g.shadowBlur = blur; g.shadowColor = col; g.drawImage(tc, 0, 0); g.shadowBlur = 0; };
+  pass(1.4, 6 * DPR, rgba(col, .22), .5);
+  pass(.42, 2 * DPR, col, .35);
+  pass(.16, 0, mixc(col, '#fff6e0', .5), .25);
+  S.cracks.forEach((c) => { const [mx, my, nx, ny, w0] = c.mouth, cx = mx + nx * w0, cy = my + ny * w0, gr = g.createRadialGradient(cx, cy, 0, cx, cy, w0 * 3);
+    gr.addColorStop(0, rgba(col, .35)); gr.addColorStop(1, rgba(col, 0)); g.shadowBlur = 0; g.fillStyle = gr; g.beginPath(); g.arc(cx, cy, w0 * 3, 0, 7); g.fill(); });
+  const keys = Object.keys(S.glows); if (keys.length > 3) delete S.glows[keys[0]];
+  S.glows[col] = gc;
+  return gc;
+}
+
+/* ---------- the pixel pentagram tick: carved well and dashed ring when waiting, a disc of light with a dark star when lit ---------- */
+const TG = 22; // pixel grid; shown at 2x (44 css px)
+const TICKS = {};
+function drawTick(col, lit) {
+  const key = col + (lit ? '1' : '0'); if (TICKS[key]) return TICKS[key];
+  const cv = document.createElement('canvas'); cv.width = TG; cv.height = TG; const g = cv.getContext('2d');
+  const cx = TG / 2, cy = TG / 2, R = 8.6;
+  const px = (x, y, c) => { g.fillStyle = c; g.fillRect(Math.floor(x), Math.floor(y), 1, 1); };
+  const dim = mixc('#2a2038', col, .5), white = '#fffbea';
+  for (let y = 0; y < TG; y++) for (let x = 0; x < TG; x++) {
+    const dx = x + .5 - cx, dy = y + .5 - cy, d = Math.hypot(dx, dy);
+    if (d < R + .5) {
+      if (!lit) px(x, y, (x + y) % 3 ? '#0b0910' : '#120f18');
+      else { const q = d / R; px(x, y, q < .22 ? white : q < .5 ? mixc(white, col, (q - .22) / .28) : q < .82 ? col : ((x + y) % 2 ? col : mixc(col, '#000000', .35))); }
+    } else if (d < R + 1.6) px(x, y, dx + dy > 1 ? 'rgba(210,200,230,.28)' : 'rgba(0,0,0,.7)'); // the well's carved rim
+  }
+  for (let a = 0; a < 6.283; a += .02) { const idx = Math.floor(a / 6.283 * 44); if (!lit && idx % 4 === 3) continue; px(cx + Math.cos(a) * R - .5, cy + Math.sin(a) * R - .5, lit ? mixc(col, '#ffffff', .3) : dim); }
+  const P = []; for (let k = 0; k < 5; k++) { const a = -Math.PI / 2 + k * 2 * Math.PI / 5; P.push([cx + Math.cos(a) * (R - 1.8), cy + Math.sin(a) * (R - 1.8)]); }
+  const sc = lit ? mixc(col, '#000000', .72) : dim;
+  [0, 2, 4, 1, 3, 0].forEach((k, i, arr) => { if (!i) return; const a = P[arr[i - 1]], b = P[k]; for (let t = 0; t <= 1; t += .04) px(a[0] + (b[0] - a[0]) * t - .5, a[1] + (b[1] - a[1]) * t - .5, sc); });
+  TICKS[key] = cv;
+  return cv;
+}
+
+/* ---------- CSS, injected once ---------- */
+const CSS = '' +
+'.obsid-tab{position:relative;box-sizing:border-box;width:100%;height:' + ROW_H + 'px;display:flex;align-items:center;gap:8px;padding:' + M.t + 'px ' + (M.r + 10) + 'px ' + M.b + 'px ' + (M.l + 3) + 'px;isolation:isolate;color:#efeef4;text-align:left;-webkit-tap-highlight-color:transparent}' +
+'.obsid-tab::before{content:"";position:absolute;left:' + M.l + 'px;right:' + M.r + 'px;top:' + M.t + 'px;bottom:' + (M.b - V.side) + 'px;border-radius:3px;background:linear-gradient(170deg,#2c2a36,#141218);box-shadow:0 ' + V.side + 'px 0 #0f0e12;z-index:-3}' +
+'.obsid-tab.obsid-ready::before{display:none}' +
+'.obsid-tab>canvas{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none}' +
+'.obsid-stone{z-index:-2}' +
+'.obsid-glow{z-index:-1;mix-blend-mode:screen;opacity:.55;animation:obsid-shim 2.6s steps(1,end) infinite}' +
+'.obsid-tab.obsid-on .obsid-glow{opacity:1;animation:obsid-shimon 3.1s ease-in-out infinite}' +
+'.obsid-lum{position:absolute;left:' + M.l + 'px;right:' + M.r + 'px;top:' + M.t + 'px;bottom:' + M.b + 'px;pointer-events:none;opacity:0;transition:opacity .6s;mix-blend-mode:screen;z-index:-1}' +
+'.obsid-tab.obsid-on .obsid-lum{opacity:1}' +
+'@keyframes obsid-shim{0%{opacity:.5}13%{opacity:.62}21%{opacity:.52}37%{opacity:.7}44%{opacity:.54}63%{opacity:.64}71%{opacity:.48}86%{opacity:.6}}' +
+'@keyframes obsid-shimon{0%,100%{opacity:1}30%{opacity:.86}55%{opacity:.97}80%{opacity:.9}}' +
+'.obsid-tick{position:relative;flex:none;width:44px;height:44px;margin:0;padding:0;border:0;background:none;cursor:pointer;transition:filter .4s;-webkit-tap-highlight-color:transparent}' +
+'.obsid-tick canvas{position:absolute;left:0;top:0;width:44px;height:44px;image-rendering:pixelated;pointer-events:none}' +
+'.obsid-tick .obsid-t1{clip-path:circle(0% at 50% 50%);transition:clip-path .4s steps(6,end)}' +
+'.obsid-tab.obsid-on .obsid-tick .obsid-t1{clip-path:circle(75% at 50% 50%)}' +
+'.obsid-tick:focus-visible{outline:2px solid #e8c46a;outline-offset:2px;border-radius:50%}' +
+'.obsid-body{position:relative;flex:1;min-width:0;cursor:pointer}' +
+'.obsid-nm{font:700 15px/1.2 var(--a,\'Atkinson Hyperlegible\',sans-serif);color:#efeef4;text-shadow:0 -1px 0 rgba(0,0,0,.95),0 1px 0 rgba(200,190,220,.16);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}' +
+'.obsid-sub{font:12.5px/1.3 var(--a,\'Atkinson Hyperlegible\',sans-serif);color:#a8a6b8;margin-top:2px;text-shadow:0 1px 1px #000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}' +
+'.obsid-pay{position:relative;flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:2px;font:700 15px/1 var(--a,\'Atkinson Hyperlegible\',sans-serif);color:#f4dd9a;text-shadow:0 1px 1px #000;font-variant-numeric:tabular-nums}' +
+'@media (prefers-reduced-motion: reduce){.obsid-glow,.obsid-tab.obsid-on .obsid-glow{animation:none}.obsid-tick,.obsid-tick .obsid-t1,.obsid-lum{transition:none}}';
+function css() { if (document.getElementById('stone-css-obsid')) return; const s = document.createElement('style'); s.id = 'stone-css-obsid'; s.textContent = CSS; (document.head || document.documentElement).appendChild(s); }
+
+/* ---------- the API ---------- */
+function row(o) {
+  css();
+  o = o || {};
+  const s = Math.max(0, +o.streak || 0), on = !!o.done;
+  return '<div class="obsid-tab' + (on ? ' obsid-on' : '') + '" data-obsid-id="' + esc(o.id) + '" data-obsid-name="' + esc(o.name) + '" data-obsid-s="' + s + '" data-obsid-d="' + (on ? 1 : 0) + '">' +
+    '<canvas class="obsid-stone"></canvas><canvas class="obsid-glow"></canvas><div class="obsid-lum"></div>' +
+    '<button type="button" class="obsid-tick" ' + (o.tickAttrs || '') + ' aria-pressed="' + on + '" aria-label="' + esc(o.name) + (on ? ', done today' : ', not done yet') + ', ' + s + ' night' + (s === 1 ? '' : 's') + '">' +
+    '<canvas class="obsid-t0" width="' + TG + '" height="' + TG + '"></canvas><canvas class="obsid-t1" width="' + TG + '" height="' + TG + '"></canvas></button>' +
+    '<div class="obsid-body" ' + (o.bodyAttrs || '') + '><div class="obsid-nm">' + esc(o.name) + '</div><div class="obsid-sub">' + (o.subHtml || '') + '</div></div>' +
+    '<div class="obsid-pay">' + (o.payHtml || '') + '</div></div>';
+}
+
+const CACHE = new Map(), CACHE_MAX = 24; // a stone is about W*H*4 bytes (400 KB at 390 px on a 2x phone)
+const QUEUE = []; let busy = false;
+const textRect = (node) => { const rg = document.createRange(); rg.selectNodeContents(node); return rg.getBoundingClientRect(); };
+// what the cracks must avoid, in device px relative to the tablet; rounded so the cache key stays steady
+function measure(el, br, DPR) {
+  const f = [], pad = 4, R = (b) => { if (!b || !b.width) return; f.push([Math.round((b.left - br.left - pad) * DPR), Math.round((b.top - br.top - pad) * DPR), Math.round((b.right - br.left + pad) * DPR), Math.round((b.bottom - br.top + pad) * DPR)]); };
+  R(el.querySelector('.obsid-tick').getBoundingClientRect());
+  const nm = el.querySelector('.obsid-nm'), sub = el.querySelector('.obsid-sub'), pay = el.querySelector('.obsid-pay');
+  if (nm && nm.firstChild) R(textRect(nm)); if (sub && sub.firstChild) R(textRect(sub)); if (pay && pay.firstChild) R(pay.getBoundingClientRect());
+  return f;
+}
+function apply(el, S) {
+  const col = el._stCol, on = el._stOn;
+  const sc = el.querySelector('.obsid-stone'), gc = el.querySelector('.obsid-glow');
+  if (sc.width !== S.W || sc.height !== S.H) { sc.width = S.W; sc.height = S.H; } else sc.getContext('2d').clearRect(0, 0, S.W, S.H);
+  sc.getContext('2d').drawImage(S.face, 0, 0);
+  if (gc.width !== S.W || gc.height !== S.H) { gc.width = S.W; gc.height = S.H; } else gc.getContext('2d').clearRect(0, 0, S.W, S.H);
+  gc.getContext('2d').drawImage(renderGlow(S, col), 0, 0);
+  el._stKey = S.key; el.classList.add('obsid-ready');
+  if (el._stFlare) { el._stFlare = false; play(el, on); }
+}
+function paintTick(el) {
+  const col = el._stCol;
+  const t0 = el.querySelector('.obsid-t0'), t1 = el.querySelector('.obsid-t1');
+  t0.getContext('2d').clearRect(0, 0, TG, TG); t0.getContext('2d').drawImage(drawTick(col, false), 0, 0);
+  t1.getContext('2d').clearRect(0, 0, TG, TG); t1.getContext('2d').drawImage(drawTick(col, true), 0, 0);
+  el.querySelector('.obsid-tick').style.filter = el._stOn ? 'drop-shadow(0 0 5px ' + rgba(col, .75) + ')' : 'none';
+  el.querySelector('.obsid-lum').style.background = 'radial-gradient(ellipse 110px 46px at 28px 50%,' + rgba(col, .2) + ',transparent 75%)';
+}
+function build(job) {
+  const S = renderStone(job.name, job.s, job.Wc, job.Hc, job.forb, job.DPR); S.key = job.key; S.near = job.near;
+  CACHE.set(job.key, S); while (CACHE.size > CACHE_MAX) CACHE.delete(CACHE.keys().next().value);
+  return S;
+}
+function pump() {
+  if (busy) return; busy = true;
+  // the first stone waits a moment so a tick's flare gets its opening frames before the main thread is busy
+  setTimeout(function next() {
+    const job = QUEUE.shift(); if (!job) { busy = false; return; }
+    const els = job.els.filter((el) => el.isConnected && el._stWant === job.key);
+    if (els.length) try { const S = CACHE.get(job.key) || build(job); els.forEach((el) => apply(el, S)); } catch (e) { console.error(e); }
+    setTimeout(next, 0);
+  }, 90);
+}
+function paint(root) {
+  css();
+  root = root || document;
+  const els = Array.prototype.slice.call(root.querySelectorAll('.obsid-tab')), DPR = DPRf(); let queued = false;
+  els.forEach((el) => {
+    const name = el.getAttribute('data-obsid-name') || '', s = +el.getAttribute('data-obsid-s') || 0, on = el.getAttribute('data-obsid-d') === '1';
+    el._stOn = on; el._stCol = sCol(Math.max(1, on ? s : s + 1));
+    paintTick(el);
+    const br = el.getBoundingClientRect(); if (br.width < 40) return; // hidden: try again on the next paint
+    const Wc = Math.round(br.width), Hc = Math.round(br.height), forb = measure(el, br, DPR);
+    const near = name + '|' + Wc + 'x' + Hc + '@' + DPR, key = near + '|' + s + '|' + forb.map((f) => f.join(',')).join(';');
+    el._stWant = key;
+    if (el._stKey === key && el.classList.contains('obsid-ready')) { const gc = el.querySelector('.obsid-glow'), S = CACHE.get(key); if (S) { gc.getContext('2d').clearRect(0, 0, S.W, S.H); gc.getContext('2d').drawImage(renderGlow(S, el._stCol), 0, 0); } return; }
+    const S = CACHE.get(key); if (S) { apply(el, S); return; }
+    // not drawn yet (a tick moved the streak, the words changed): show the same ritual's last stone at this size straight
+    // away, so the tick and its flare are instant, and swap in the new cracks when they are drawn a moment later
+    let old = null; CACHE.forEach((c) => { if (c.near === near) old = c; });
+    if (old) apply(el, old);
+    const job = QUEUE.find((j) => j.key === key);
+    if (job) job.els.push(el); else QUEUE.push({ key, near, name, s, Wc, Hc, forb, DPR, els: [el] });
+    queued = true;
+  });
+  if (queued) pump();
+}
+function play(el, on) {
+  if (RM()) return;
+  const an = (n, kf, o) => { if (n && n.animate) n.animate(kf, o); };
+  an(el.querySelector('.obsid-glow'), [{ opacity: .4, filter: 'brightness(1)' }, { opacity: 1, filter: 'brightness(3) saturate(1.4)', offset: .15 }, { opacity: 1, filter: 'brightness(1.7)', offset: .4 }, { opacity: .95, filter: 'brightness(1)' }], { duration: 1200, easing: 'ease-out' });
+  an(el.querySelector('.obsid-tick'), [{ transform: 'scale(1)', filter: 'brightness(1)' }, { transform: 'scale(1.12)', filter: 'brightness(1.8)', offset: .3 }, { transform: 'scale(1)', filter: 'brightness(1)' }], { duration: 450, easing: 'steps(5,end)' });
+  if (on) {
+    an(el.querySelector('.obsid-t1'), [{ clipPath: 'circle(0% at 50% 50%)' }, { clipPath: 'circle(75% at 50% 50%)' }], { duration: 420, easing: 'steps(6,end)' });
+    an(el.querySelector('.obsid-lum'), [{ opacity: 0 }, { opacity: 1, offset: .2 }, { opacity: .8 }, { opacity: 1 }], { duration: 1200 });
+  }
+}
+function flare(key) {
+  const sel = '[data-fx="' + String(key).replace(/["\\]/g, '\\$&') + '"]', btn = document.querySelector('.obsid-tab ' + sel) || document.querySelector(sel);
+  const el = btn && btn.closest('.obsid-tab'); if (!el) return;
+  const on = el.getAttribute('data-obsid-d') === '1';
+  if (el.classList.contains('obsid-ready')) play(el, on); else el._stFlare = true; // the stone is still being drawn: flare when it lands
+}
+
+window.STONE_obsid = { row, paint, flare, sCol };
+})();
+
+/* Ritual tablets (Patryk 2026-10-27, final picks from the "Obsidian and Parchment" mock-up):
+   stone ST-final "Polished deep slab" (ST3c fine grain and satin shine on ST3e's thick slab with a deep rounded bevel),
+   the plain pixel pentagram tick (no studs, no multiplier marks) waiting in a carved well and lighting from the middle
+   in chunky pixel steps, and real-looking cracks round the border (dark fissure, lit lip, chip at the rim), seeded by
+   the ritual's name, more of them the longer the streak (2 at the start, 11 by 70 nights), glowing faintly in the
+   streak colour with a slight shimmer and flaring when ticked.
+   STONE.row(opts) -> HTML for one tablet; STONE.paint(root) paints every tablet inside root (cached, cheap to repeat);
+   STONE.flare(key) plays the tick flare on the tablet whose tick has data-fx=key.
+   Each tablet face is drawn once into a cached canvas; only the flare and a stepped shimmer animate.
+   All CSS classes start with sand-. */
+(function () {
+'use strict';
+if (window.STONE_sand) return;
+
+const RM = () => !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+const DPRf = () => Math.min(2, window.devicePixelRatio || 1);
+
+/* ---------- the app's streak colour (copied from game-ui.js sCol): ember orange at night 1, eldritch green at 66 ---------- */
+const hx = (c) => [1, 3, 5].map((i) => parseInt(c.slice(i, i + 2), 16));
+const mixc = (a, b, t) => { const x = hx(a), y = hx(b); return '#' + x.map((v, i) => Math.round(v + (y[i] - v) * t).toString(16).padStart(2, '0')).join(''); };
+const STOPS = [[1, '#ff6a2a'], [7, '#ffc040'], [21, '#6ab8ff'], [45, '#5adcd0'], [66, '#5ef2a0']];
+const sCol = (n) => { n = Math.max(1, n || 1); if (n >= 66) return '#5ef2a0'; for (let i = 1; i < STOPS.length; i++) if (n <= STOPS[i][0]) return mixc(STOPS[i - 1][1], STOPS[i][1], (n - STOPS[i - 1][0]) / (STOPS[i][0] - STOPS[i - 1][0])); return '#5ef2a0'; };
+const rgba = (c, a) => { const v = hx(c); return 'rgba(' + v[0] + ',' + v[1] + ',' + v[2] + ',' + a + ')'; };
+const esc = (s) => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
+const norm3 = (v) => { const l = Math.hypot(v[0], v[1], v[2]); return [v[0] / l, v[1] / l, v[2] / l]; };
+
+/* ---------- seeded randomness and value noise ---------- */
+function hashStr(s) { let h = 2166136261 >>> 0; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+function mulberry(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function noiseTile(size, cells, oct, seed) {
+  const out = new Float32Array(size * size), r = mulberry(seed); let amp = 1, tot = 0;
+  for (let o = 0; o < oct; o++) {
+    const c = cells << o, g = new Float32Array(c * c); for (let i = 0; i < g.length; i++) g[i] = r();
+    const step = size / c;
+    for (let y = 0; y < size; y++) { const fy = y / step, iy = Math.floor(fy), ty = fy - iy, sy = ty * ty * (3 - 2 * ty), y0 = (iy % c) * c, y1 = ((iy + 1) % c) * c;
+      for (let x = 0; x < size; x++) { const fx = x / step, ix = Math.floor(fx), tx = fx - ix, sx = tx * tx * (3 - 2 * tx), x0 = ix % c, x1 = (ix + 1) % c;
+        const a = g[y0 + x0], b = g[y0 + x1], cc = g[y1 + x0], d = g[y1 + x1], top = a + (b - a) * sx, bot = cc + (d - cc) * sx;
+        out[y * size + x] += amp * (top + (bot - top) * sy); } }
+    tot += amp; amp *= 0.5;
+  }
+  for (let i = 0; i < out.length; i++) out[i] /= tot;
+  return out;
+}
+let N1 = null, N2 = null, N3 = null; // made on the first tablet, not at load
+const noise = () => { if (!N1) { N1 = noiseTile(512, 4, 5, 11); N2 = noiseTile(256, 8, 4, 23); N3 = noiseTile(256, 32, 3, 37); } };
+const s1 = (x, y) => N1[((y | 0) & 511) * 512 + ((x | 0) & 511)];
+const s2 = (x, y) => N2[((y | 0) & 255) * 256 + ((x | 0) & 255)];
+const s3 = (x, y) => N3[((y | 0) & 255) * 256 + ((x | 0) & 255)];
+function boxBlur(src, w, h, r) {
+  const tmp = new Float32Array(w * h), out = new Float32Array(w * h), d = 2 * r + 1;
+  for (let y = 0; y < h; y++) { const o = y * w; let acc = 0; for (let x = -r; x <= r; x++) acc += src[o + Math.min(w - 1, Math.max(0, x))];
+    for (let x = 0; x < w; x++) { tmp[o + x] = acc / d; acc += src[o + Math.min(w - 1, x + r + 1)] - src[o + Math.max(0, x - r)]; } }
+  for (let x = 0; x < w; x++) { let acc = 0; for (let y = -r; y <= r; y++) acc += tmp[Math.min(h - 1, Math.max(0, y)) * w + x];
+    for (let y = 0; y < h; y++) { out[y * w + x] = acc / d; acc += tmp[Math.min(h - 1, y + r + 1) * w + x] - tmp[Math.max(0, y - r) * w + x]; } }
+  return out;
+}
+const blur2 = (a, w, h, r) => boxBlur(boxBlur(a, w, h, r), w, h, r);
+
+/* ---------- ST-final: the stone recipe ---------- */
+const V = { code: 'ST-final', base: [86, 70, 46], c1: .45, b2: .15, b3: .1, pits: 3, pitR: [.6, 1.6], spec: 1.4, sx: 44, sheen: 1,
+  bev: 5.2, bevR: 4, side: 7, cham: 3, rough: .6, chips: .08 };
+const ROW_H = 64; // css px, including the slab's thickness and its shadow
+// where the face sits inside the row (css px): the thickness and the drop shadow take the bottom
+const M = { l: 3, t: 2, r: 3, b: V.side + 5 };
+
+function slabPath(W, H, m, rng, v, DPR) {
+  const pts = [], x0 = m.l, y0 = m.t, x1 = W - m.r, y1 = H - m.b;
+  const cs = [0, 1, 2, 3].map(() => (1.5 + rng() * v.cham) * DPR), C = [[x0, y0], [x1, y0], [x1, y1], [x0, y1]];
+  for (let i = 0; i < 4; i++) {
+    const a = C[i], b = C[(i + 1) % 4], dx = Math.sign(b[0] - a[0]), dy = Math.sign(b[1] - a[1]), nx = -dy, ny = dx;
+    const len = Math.abs(b[0] - a[0]) + Math.abs(b[1] - a[1]), sA = cs[i], sB = cs[(i + 1) % 4];
+    const P = (t, o) => [a[0] + dx * t + nx * o, a[1] + dy * t + ny * o, nx, ny];
+    let t = sA; pts.push(P(t, rng() * v.rough * DPR));
+    while (t < len - sB) {
+      t = Math.min(len - sB, t + (3 + rng() * 5) * DPR);
+      if (rng() < v.chips && t > sA + 6 * DPR && t < len - sB - 12 * DPR) {
+        const cw = (3 + rng() * 7) * DPR, dep = (0.8 + rng() * 2.4) * DPR;
+        pts.push(P(t, .3 * DPR), P(t + cw * .25, dep * .8), P(t + cw * .55, dep), P(t + cw * .8, dep * .5), P(t + cw, .2 * DPR)); t += cw;
+      } else pts.push(P(t, rng() * v.rough * DPR));
+    }
+  }
+  return pts;
+}
+
+// renders one tablet face; forb = rectangles (device px) the cracks keep out of (tick, words, pay)
+function renderStone(name, streak, Wc, Hc, forb, DPR) {
+  noise();
+  const v = V, W = Math.round(Wc * DPR), H = Math.round(Hc * DPR);
+  const rng = mulberry(hashStr(name + '|' + v.code)), side = v.side * DPR;
+  const m = { l: M.l * DPR, t: M.t * DPR, r: M.r * DPR, b: M.b * DPR };
+  const pts = slabPath(W, H, m, rng, v, DPR);
+  const oc = document.createElement('canvas'); oc.width = W; oc.height = H; const ox = oc.getContext('2d', { willReadFrequently: true });
+  const poly = (dy) => { ox.beginPath(); pts.forEach((p, i) => (i ? ox.lineTo(p[0], p[1] + dy) : ox.moveTo(p[0], p[1] + dy))); ox.closePath(); ox.fill(); };
+  ox.fillStyle = '#fff'; poly(0); const fd = ox.getImageData(0, 0, W, H).data; ox.clearRect(0, 0, W, H);
+  for (let k = 1; k <= side; k++) poly(k); const sd = ox.getImageData(0, 0, W, H).data; ox.clearRect(0, 0, W, H);
+  const A = new Float32Array(W * H), AS = new Float32Array(W * H);
+  for (let i = 0; i < A.length; i++) { A[i] = fd[i * 4 + 3] / 255; AS[i] = sd[i * 4 + 3] / 255; }
+  const Hh = blur2(A, W, H, Math.max(1, Math.round(v.bevR * DPR)));
+  // cracks stay within this many px of the face's edge (the slab is near enough a rectangle to measure it straight)
+  const band = 12 * DPR, fx0 = m.l, fy0 = m.t, fx1 = W - m.r, fy1 = H - m.b;
+  // surface height: bevel plus two scales of fine grain
+  const o1x = rng() * 512, o1y = rng() * 512, o2x = rng() * 256, o2y = rng() * 256, o3x = rng() * 256, o3y = rng() * 256;
+  const Hn = new Float32Array(W * H), C1 = new Float32Array(W * H);
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    const i = y * W + x; if (A[i] <= 0 && AS[i] <= 0) continue;
+    const X = x / DPR, Y = y / DPR, n1 = s1(X * .6 + o1x, Y * .6 + o1y), n2 = s2(X * 1.2 + o2x, Y * 1.2 + o2y), n3 = s3(X * 2.4 + o3x, Y * 2.4 + o3y);
+    Hn[i] = Hh[i] * v.bev + (n2 - .5) * v.b2 + (n3 - .5) * v.b3; C1[i] = n1;
+  }
+  // a few tiny pits
+  const dig = (cx, cy, r, depth) => { const R = r * DPR; for (let y = Math.max(0, cy - R | 0); y <= Math.min(H - 1, cy + R + 1 | 0); y++) for (let x = Math.max(0, cx - R | 0); x <= Math.min(W - 1, cx + R + 1 | 0); x++) {
+    const d = Math.hypot(x - cx, y - cy) / R; if (d < 1) Hn[y * W + x] -= depth * (1 - d * d); } };
+  for (let k = 0; k < v.pits; k++) { const x = rng() * W, y = rng() * H; if (A[(y | 0) * W + (x | 0)] > .9) dig(x, y, v.pitR[0] + rng() * (v.pitR[1] - v.pitR[0]), .9 + rng() * .8); }
+  const Hb = blur2(Hn, W, H, Math.max(1, Math.round(2 * DPR)));
+  // light it from the top left, satin highlight and a soft violet sheen
+  const L = norm3([-.45, -.68, .58]), Hv = norm3([L[0], L[1], L[2] + 1]);
+  const img = ox.createImageData(W, H), D = img.data;
+  for (let y = 1; y < H - 1; y++) for (let x = 1; x < W - 1; x++) {
+    const i = y * W + x, a = A[i], as = AS[i]; if (a <= .004 && as <= .004) continue;
+    const j = i * 4, n1 = C1[i], tone = 1 + (n1 - .5) * v.c1 * 2;
+    const R = v.base[0] * tone, G = v.base[1] * tone, B = v.base[2] * tone;
+    let fR = 0, fG = 0, fB = 0;
+    if (a > .004) {
+      const gx = (Hn[i + 1] - Hn[i - 1]) * DPR / 2, gy = (Hn[i + W] - Hn[i - W]) * DPR / 2, nl = Math.hypot(gx, gy, 1), nx = -gx / nl, ny = -gy / nl, nz = 1 / nl;
+      const dif = Math.max(0, nx * L[0] + ny * L[1] + nz * L[2]), sp = Math.pow(Math.max(0, nx * Hv[0] + ny * Hv[1] + nz * Hv[2]), v.sx) * v.spec;
+      const ao = clamp((Hb[i] - Hn[i]) * 1.1, 0, .75), lit = (.3 + .95 * dif) * (1 - ao);
+      fR = R * lit + sp * 150; fG = G * lit + sp * 146; fB = B * lit + sp * 165;
+      const bd = Math.exp(-Math.pow((x / W + y / H * .5 - .42 + (n1 - .5) * .2) / .16, 2)) * (.6 + dif * .6); fR += bd * 22 * v.sheen; fG += bd * 18 * v.sheen; fB += bd * 10 * v.sheen;
+    }
+    const k = .5 + (n1 - .5) * .3, sR = R * .42 * k, sG = G * .42 * k, sB = B * .42 * k; // the thickness below the face
+    D[j] = sR + (fR - sR) * a; D[j + 1] = sG + (fG - sG) * a; D[j + 2] = sB + (fB - sB) * a; D[j + 3] = Math.max(a, as) * 255;
+  }
+  ox.putImageData(img, 0, 0);
+  // the dark seam where face meets thickness
+  ox.save(); ox.globalCompositeOperation = 'source-atop'; ox.strokeStyle = 'rgba(0,0,0,.55)'; ox.lineWidth = DPR;
+  ox.beginPath(); pts.forEach((p, i) => (i ? ox.lineTo(p[0], p[1] + DPR * .6) : ox.moveTo(p[0], p[1] + DPR * .6))); ox.closePath(); ox.stroke(); ox.restore();
+
+  /* ---- cracks: only near the border, spread round it, more with a longer streak ---- */
+  const valid = (x, y, loose) => { if (x < 1 || y < 1 || x >= W - 1 || y >= H - 1) return false; const i = (y | 0) * W + (x | 0);
+    if (A[i] < (loose ? .5 : .97) || Math.min(x - fx0, fx1 - x, y - fy0, fy1 - y) > band) return false;
+    for (let k = 0; k < forb.length; k++) { const f = forb[k]; if (x > f[0] && x < f[2] && y > f[1] && y < f[3]) return false; } return true; };
+  const cracks = [], count = clamp(2 + Math.floor(streak / 7), 2, 11);
+  function grow(x, y, a, w, len, depth, list) {
+    const P = [[x, y, w]]; let L2 = 0; const drift = (rng() - .5) * .12;
+    while (L2 < len && w > .22 * DPR) {
+      a += drift + (rng() - .5) * .95; const st = (2.4 + rng() * 3.6) * DPR; let ok = false, nx = 0, ny = 0;
+      for (let k = 0; k < 5; k++) { const aa = a + (k === 0 ? 0 : (k % 2 ? 1 : -1) * .45 * Math.ceil(k / 2)); nx = x + Math.cos(aa) * st; ny = y + Math.sin(aa) * st; if (valid(nx, ny, L2 < 3 * DPR)) { a = aa; ok = true; break; } }
+      if (!ok) break; x = nx; y = ny; L2 += st; w *= .9; P.push([x, y, w]);
+      if (depth < 2 && rng() < .16 && L2 > 4 * DPR) grow(x, y, a + (rng() < .5 ? -1 : 1) * (.6 + rng() * .7), w * .6, (len - L2) * (.35 + rng() * .4), depth + 1, list);
+      if (rng() < .12) list.push([[x, y, w * .45], [x + Math.cos(a + 1.6) * 2.2 * DPR, y + Math.sin(a + 1.6) * 2.2 * DPR, w * .2]]); // splinter
+    }
+    if (P.length > 2) list.push(P);
+    return P.length > 2;
+  }
+  const off = rng(), n = pts.length;
+  for (let k = 0; k < count; k++) {
+    let made = false;
+    for (let t = 0; t < 14 && !made; t++) {
+      const idx = Math.floor((((k + off + (rng() - .5) * .6) / count) % 1 + 1) % 1 * n), p = pts[idx];
+      const sx = p[0] + p[2] * 1.2 * DPR, sy = p[1] + p[3] * 1.2 * DPR; if (!valid(sx, sy, true)) continue;
+      const inA = Math.atan2(p[3], p[2]), a = inA + (rng() < .5 ? -1 : 1) * (.55 + rng() * .5);
+      const list = [], w0 = (1.5 + rng() * 1.1) * DPR;
+      if (grow(sx, sy, a, w0, (14 + rng() * 22 + Math.min(streak, 70) * .22) * DPR, 0, list)) { cracks.push({ list, mouth: [sx, sy, p[2], p[3], w0] }); made = true; }
+    }
+  }
+  ox.save(); ox.globalCompositeOperation = 'source-atop'; ox.lineCap = 'round'; ox.lineJoin = 'round';
+  cracks.forEach((c) => {
+    // a chip knocked out where the crack meets the edge
+    const [mx, my, nx, ny, w0] = c.mouth, tx = -ny, ty = nx, cw = w0 * (1.8 + rng()), dp = w0 * (2 + rng() * 1.5);
+    ox.fillStyle = 'rgba(8,6,10,.85)'; ox.beginPath(); ox.moveTo(mx - nx * 1.5 * DPR + tx * cw, my - ny * 1.5 * DPR + ty * cw); ox.lineTo(mx + nx * dp, my + ny * dp); ox.lineTo(mx - nx * 1.5 * DPR - tx * cw * .8, my - ny * 1.5 * DPR - ty * cw * .8); ox.fill();
+    ox.strokeStyle = 'rgba(205,195,220,.4)'; ox.lineWidth = .7 * DPR; ox.beginPath(); ox.moveTo(mx - nx * DPR + tx * cw, my - ny * DPR + ty * cw); ox.lineTo(mx + nx * dp, my + ny * dp); ox.stroke();
+    c.list.forEach((P) => {
+      const Lp = [], Rp = []; let lx = 0, ly = 0;
+      for (let k = 0; k < P.length; k++) { const a = P[Math.max(0, k - 1)], b = P[Math.min(P.length - 1, k + 1)], dx = b[0] - a[0], dy = b[1] - a[1], l = Math.hypot(dx, dy) || 1, nx = -dy / l, ny = dx / l;
+        const w = (k === P.length - 1 ? 0 : P[k][2]) / 2 * (k % 2 ? .8 : 1.1); Lp.push([P[k][0] + nx * w, P[k][1] + ny * w]); Rp.push([P[k][0] - nx * w, P[k][1] - ny * w]); lx += nx; ly += ny; }
+      const lightL = (lx * -.45 + ly * -.68) > 0, path = (arr, dx, dy) => { ox.beginPath(); arr.forEach((p, k) => (k ? ox.lineTo(p[0] + dx, p[1] + dy) : ox.moveTo(p[0] + dx, p[1] + dy))); };
+      // a soft shadow beside the gap, the black gap itself, a thin lit lip on the side facing the light
+      ox.fillStyle = 'rgba(0,0,0,.35)'; path(Lp.concat(Rp.slice().reverse()), .5 * DPR, .7 * DPR); ox.closePath(); ox.fill();
+      ox.fillStyle = 'rgba(2,1,4,.97)'; path(Lp.concat(Rp.slice().reverse()), 0, 0); ox.closePath(); ox.fill();
+      ox.lineWidth = .55 * DPR; ox.strokeStyle = 'rgba(215,205,232,.42)'; path(lightL ? Lp : Rp, 0, -.45 * DPR); ox.stroke();
+      ox.strokeStyle = 'rgba(0,0,0,.5)'; ox.lineWidth = .8 * DPR; path(lightL ? Rp : Lp, .3 * DPR, .5 * DPR); ox.stroke();
+    });
+  });
+  ox.restore();
+  // final face with its drop shadow
+  const fc = document.createElement('canvas'); fc.width = W; fc.height = H; const fx = fc.getContext('2d');
+  fx.shadowColor = 'rgba(0,0,0,.85)'; fx.shadowBlur = 5 * DPR; fx.shadowOffsetY = 2.5 * DPR; fx.drawImage(oc, 0, 0);
+  return { face: fc, cracks, W, H, DPR, glows: {} };
+}
+
+// embers deep inside the cracks, in the streak colour
+function renderGlow(S, col) {
+  if (S.glows[col]) return S.glows[col];
+  const DPR = S.DPR, gc = document.createElement('canvas'); gc.width = S.W; gc.height = S.H; const g = gc.getContext('2d');
+  g.globalCompositeOperation = 'lighter';
+  // each pass strokes every crack onto a scratch layer with no shadow, then lays that layer down with one blurred shadow
+  // (a shadow on every little stroke cost 0.3-0.9 s per tablet)
+  const tc = document.createElement('canvas'); tc.width = S.W; tc.height = S.H; const t = tc.getContext('2d'); t.lineCap = 'round'; t.lineJoin = 'round';
+  const pass = (mul, blur, style, min) => { t.clearRect(0, 0, S.W, S.H); t.strokeStyle = style;
+    S.cracks.forEach((c) => c.list.forEach((P) => { for (let k = 1; k < P.length; k++) { t.lineWidth = Math.max(min, P[k][2] * mul); t.beginPath(); t.moveTo(P[k - 1][0], P[k - 1][1]); t.lineTo(P[k][0], P[k][1]); t.stroke(); } }));
+    g.shadowBlur = blur; g.shadowColor = col; g.drawImage(tc, 0, 0); g.shadowBlur = 0; };
+  pass(1.4, 6 * DPR, rgba(col, .22), .5);
+  pass(.42, 2 * DPR, col, .35);
+  pass(.16, 0, mixc(col, '#fff6e0', .5), .25);
+  S.cracks.forEach((c) => { const [mx, my, nx, ny, w0] = c.mouth, cx = mx + nx * w0, cy = my + ny * w0, gr = g.createRadialGradient(cx, cy, 0, cx, cy, w0 * 3);
+    gr.addColorStop(0, rgba(col, .35)); gr.addColorStop(1, rgba(col, 0)); g.shadowBlur = 0; g.fillStyle = gr; g.beginPath(); g.arc(cx, cy, w0 * 3, 0, 7); g.fill(); });
+  const keys = Object.keys(S.glows); if (keys.length > 3) delete S.glows[keys[0]];
+  S.glows[col] = gc;
+  return gc;
+}
+
+/* ---------- the pixel pentagram tick: carved well and dashed ring when waiting, a disc of light with a dark star when lit ---------- */
+const TG = 22; // pixel grid; shown at 2x (44 css px)
+const TICKS = {};
+function drawTick(col, lit) {
+  const key = col + (lit ? '1' : '0'); if (TICKS[key]) return TICKS[key];
+  const cv = document.createElement('canvas'); cv.width = TG; cv.height = TG; const g = cv.getContext('2d');
+  const cx = TG / 2, cy = TG / 2, R = 8.6;
+  const px = (x, y, c) => { g.fillStyle = c; g.fillRect(Math.floor(x), Math.floor(y), 1, 1); };
+  const dim = mixc('#2a2038', col, .5), white = '#fffbea';
+  for (let y = 0; y < TG; y++) for (let x = 0; x < TG; x++) {
+    const dx = x + .5 - cx, dy = y + .5 - cy, d = Math.hypot(dx, dy);
+    if (d < R + .5) {
+      if (!lit) px(x, y, (x + y) % 3 ? '#0b0910' : '#120f18');
+      else { const q = d / R; px(x, y, q < .22 ? white : q < .5 ? mixc(white, col, (q - .22) / .28) : q < .82 ? col : ((x + y) % 2 ? col : mixc(col, '#000000', .35))); }
+    } else if (d < R + 1.6) px(x, y, dx + dy > 1 ? 'rgba(210,200,230,.28)' : 'rgba(0,0,0,.7)'); // the well's carved rim
+  }
+  for (let a = 0; a < 6.283; a += .02) { const idx = Math.floor(a / 6.283 * 44); if (!lit && idx % 4 === 3) continue; px(cx + Math.cos(a) * R - .5, cy + Math.sin(a) * R - .5, lit ? mixc(col, '#ffffff', .3) : dim); }
+  const P = []; for (let k = 0; k < 5; k++) { const a = -Math.PI / 2 + k * 2 * Math.PI / 5; P.push([cx + Math.cos(a) * (R - 1.8), cy + Math.sin(a) * (R - 1.8)]); }
+  const sc = lit ? mixc(col, '#000000', .72) : dim;
+  [0, 2, 4, 1, 3, 0].forEach((k, i, arr) => { if (!i) return; const a = P[arr[i - 1]], b = P[k]; for (let t = 0; t <= 1; t += .04) px(a[0] + (b[0] - a[0]) * t - .5, a[1] + (b[1] - a[1]) * t - .5, sc); });
+  TICKS[key] = cv;
+  return cv;
+}
+
+/* ---------- CSS, injected once ---------- */
+const CSS = '' +
+'.sand-tab{position:relative;box-sizing:border-box;width:100%;height:' + ROW_H + 'px;display:flex;align-items:center;gap:8px;padding:' + M.t + 'px ' + (M.r + 10) + 'px ' + M.b + 'px ' + (M.l + 3) + 'px;isolation:isolate;color:#fff6e6;text-align:left;-webkit-tap-highlight-color:transparent}' +
+'.sand-tab::before{content:"";position:absolute;left:' + M.l + 'px;right:' + M.r + 'px;top:' + M.t + 'px;bottom:' + (M.b - V.side) + 'px;border-radius:3px;background:linear-gradient(170deg,#6e5c40,#3a3020);box-shadow:0 ' + V.side + 'px 0 #0f0e12;z-index:-3}' +
+'.sand-tab.sand-ready::before{display:none}' +
+'.sand-tab>canvas{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none}' +
+'.sand-stone{z-index:-2}' +
+'.sand-glow{z-index:-1;mix-blend-mode:screen;opacity:.55;animation:sand-shim 2.6s steps(1,end) infinite}' +
+'.sand-tab.sand-on .sand-glow{opacity:1;animation:sand-shimon 3.1s ease-in-out infinite}' +
+'.sand-lum{position:absolute;left:' + M.l + 'px;right:' + M.r + 'px;top:' + M.t + 'px;bottom:' + M.b + 'px;pointer-events:none;opacity:0;transition:opacity .6s;mix-blend-mode:screen;z-index:-1}' +
+'.sand-tab.sand-on .sand-lum{opacity:1}' +
+'@keyframes sand-shim{0%{opacity:.5}13%{opacity:.62}21%{opacity:.52}37%{opacity:.7}44%{opacity:.54}63%{opacity:.64}71%{opacity:.48}86%{opacity:.6}}' +
+'@keyframes sand-shimon{0%,100%{opacity:1}30%{opacity:.86}55%{opacity:.97}80%{opacity:.9}}' +
+'.sand-tick{position:relative;flex:none;width:44px;height:44px;margin:0;padding:0;border:0;background:none;cursor:pointer;transition:filter .4s;-webkit-tap-highlight-color:transparent}' +
+'.sand-tick canvas{position:absolute;left:0;top:0;width:44px;height:44px;image-rendering:pixelated;pointer-events:none}' +
+'.sand-tick .sand-t1{clip-path:circle(0% at 50% 50%);transition:clip-path .4s steps(6,end)}' +
+'.sand-tab.sand-on .sand-tick .sand-t1{clip-path:circle(75% at 50% 50%)}' +
+'.sand-tick:focus-visible{outline:2px solid #e8c46a;outline-offset:2px;border-radius:50%}' +
+'.sand-body{position:relative;flex:1;min-width:0;cursor:pointer}' +
+'.sand-nm{font:700 15px/1.2 var(--a,\'Atkinson Hyperlegible\',sans-serif);color:#fff6e6;text-shadow:0 -1px 0 rgba(0,0,0,.95),0 1px 0 rgba(200,190,220,.16);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}' +
+'.sand-sub{font:12.5px/1.3 var(--a,\'Atkinson Hyperlegible\',sans-serif);color:#e6d6b6;margin-top:2px;text-shadow:0 1px 1px #000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}' +
+'.sand-pay{position:relative;flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:2px;font:700 15px/1 var(--a,\'Atkinson Hyperlegible\',sans-serif);color:#f4dd9a;text-shadow:0 1px 1px #000;font-variant-numeric:tabular-nums}' +
+'@media (prefers-reduced-motion: reduce){.sand-glow,.sand-tab.sand-on .sand-glow{animation:none}.sand-tick,.sand-tick .sand-t1,.sand-lum{transition:none}}';
+function css() { if (document.getElementById('stone-css-sand')) return; const s = document.createElement('style'); s.id = 'stone-css-sand'; s.textContent = CSS; (document.head || document.documentElement).appendChild(s); }
+
+/* ---------- the API ---------- */
+function row(o) {
+  css();
+  o = o || {};
+  const s = Math.max(0, +o.streak || 0), on = !!o.done;
+  return '<div class="sand-tab' + (on ? ' sand-on' : '') + '" data-sand-id="' + esc(o.id) + '" data-sand-name="' + esc(o.name) + '" data-sand-s="' + s + '" data-sand-d="' + (on ? 1 : 0) + '">' +
+    '<canvas class="sand-stone"></canvas><canvas class="sand-glow"></canvas><div class="sand-lum"></div>' +
+    '<button type="button" class="sand-tick" ' + (o.tickAttrs || '') + ' aria-pressed="' + on + '" aria-label="' + esc(o.name) + (on ? ', done today' : ', not done yet') + ', ' + s + ' night' + (s === 1 ? '' : 's') + '">' +
+    '<canvas class="sand-t0" width="' + TG + '" height="' + TG + '"></canvas><canvas class="sand-t1" width="' + TG + '" height="' + TG + '"></canvas></button>' +
+    '<div class="sand-body" ' + (o.bodyAttrs || '') + '><div class="sand-nm">' + esc(o.name) + '</div><div class="sand-sub">' + (o.subHtml || '') + '</div></div>' +
+    '<div class="sand-pay">' + (o.payHtml || '') + '</div></div>';
+}
+
+const CACHE = new Map(), CACHE_MAX = 24; // a stone is about W*H*4 bytes (400 KB at 390 px on a 2x phone)
+const QUEUE = []; let busy = false;
+const textRect = (node) => { const rg = document.createRange(); rg.selectNodeContents(node); return rg.getBoundingClientRect(); };
+// what the cracks must avoid, in device px relative to the tablet; rounded so the cache key stays steady
+function measure(el, br, DPR) {
+  const f = [], pad = 4, R = (b) => { if (!b || !b.width) return; f.push([Math.round((b.left - br.left - pad) * DPR), Math.round((b.top - br.top - pad) * DPR), Math.round((b.right - br.left + pad) * DPR), Math.round((b.bottom - br.top + pad) * DPR)]); };
+  R(el.querySelector('.sand-tick').getBoundingClientRect());
+  const nm = el.querySelector('.sand-nm'), sub = el.querySelector('.sand-sub'), pay = el.querySelector('.sand-pay');
+  if (nm && nm.firstChild) R(textRect(nm)); if (sub && sub.firstChild) R(textRect(sub)); if (pay && pay.firstChild) R(pay.getBoundingClientRect());
+  return f;
+}
+function apply(el, S) {
+  const col = el._stCol, on = el._stOn;
+  const sc = el.querySelector('.sand-stone'), gc = el.querySelector('.sand-glow');
+  if (sc.width !== S.W || sc.height !== S.H) { sc.width = S.W; sc.height = S.H; } else sc.getContext('2d').clearRect(0, 0, S.W, S.H);
+  sc.getContext('2d').drawImage(S.face, 0, 0);
+  if (gc.width !== S.W || gc.height !== S.H) { gc.width = S.W; gc.height = S.H; } else gc.getContext('2d').clearRect(0, 0, S.W, S.H);
+  gc.getContext('2d').drawImage(renderGlow(S, col), 0, 0);
+  el._stKey = S.key; el.classList.add('sand-ready');
+  if (el._stFlare) { el._stFlare = false; play(el, on); }
+}
+function paintTick(el) {
+  const col = el._stCol;
+  const t0 = el.querySelector('.sand-t0'), t1 = el.querySelector('.sand-t1');
+  t0.getContext('2d').clearRect(0, 0, TG, TG); t0.getContext('2d').drawImage(drawTick(col, false), 0, 0);
+  t1.getContext('2d').clearRect(0, 0, TG, TG); t1.getContext('2d').drawImage(drawTick(col, true), 0, 0);
+  el.querySelector('.sand-tick').style.filter = el._stOn ? 'drop-shadow(0 0 5px ' + rgba(col, .75) + ')' : 'none';
+  el.querySelector('.sand-lum').style.background = 'radial-gradient(ellipse 110px 46px at 28px 50%,' + rgba(col, .2) + ',transparent 75%)';
+}
+function build(job) {
+  const S = renderStone(job.name, job.s, job.Wc, job.Hc, job.forb, job.DPR); S.key = job.key; S.near = job.near;
+  CACHE.set(job.key, S); while (CACHE.size > CACHE_MAX) CACHE.delete(CACHE.keys().next().value);
+  return S;
+}
+function pump() {
+  if (busy) return; busy = true;
+  // the first stone waits a moment so a tick's flare gets its opening frames before the main thread is busy
+  setTimeout(function next() {
+    const job = QUEUE.shift(); if (!job) { busy = false; return; }
+    const els = job.els.filter((el) => el.isConnected && el._stWant === job.key);
+    if (els.length) try { const S = CACHE.get(job.key) || build(job); els.forEach((el) => apply(el, S)); } catch (e) { console.error(e); }
+    setTimeout(next, 0);
+  }, 90);
+}
+function paint(root) {
+  css();
+  root = root || document;
+  const els = Array.prototype.slice.call(root.querySelectorAll('.sand-tab')), DPR = DPRf(); let queued = false;
+  els.forEach((el) => {
+    const name = el.getAttribute('data-sand-name') || '', s = +el.getAttribute('data-sand-s') || 0, on = el.getAttribute('data-sand-d') === '1';
+    el._stOn = on; el._stCol = sCol(Math.max(1, on ? s : s + 1));
+    paintTick(el);
+    const br = el.getBoundingClientRect(); if (br.width < 40) return; // hidden: try again on the next paint
+    const Wc = Math.round(br.width), Hc = Math.round(br.height), forb = measure(el, br, DPR);
+    const near = name + '|' + Wc + 'x' + Hc + '@' + DPR, key = near + '|' + s + '|' + forb.map((f) => f.join(',')).join(';');
+    el._stWant = key;
+    if (el._stKey === key && el.classList.contains('sand-ready')) { const gc = el.querySelector('.sand-glow'), S = CACHE.get(key); if (S) { gc.getContext('2d').clearRect(0, 0, S.W, S.H); gc.getContext('2d').drawImage(renderGlow(S, el._stCol), 0, 0); } return; }
+    const S = CACHE.get(key); if (S) { apply(el, S); return; }
+    // not drawn yet (a tick moved the streak, the words changed): show the same ritual's last stone at this size straight
+    // away, so the tick and its flare are instant, and swap in the new cracks when they are drawn a moment later
+    let old = null; CACHE.forEach((c) => { if (c.near === near) old = c; });
+    if (old) apply(el, old);
+    const job = QUEUE.find((j) => j.key === key);
+    if (job) job.els.push(el); else QUEUE.push({ key, near, name, s, Wc, Hc, forb, DPR, els: [el] });
+    queued = true;
+  });
+  if (queued) pump();
+}
+function play(el, on) {
+  if (RM()) return;
+  const an = (n, kf, o) => { if (n && n.animate) n.animate(kf, o); };
+  an(el.querySelector('.sand-glow'), [{ opacity: .4, filter: 'brightness(1)' }, { opacity: 1, filter: 'brightness(3) saturate(1.4)', offset: .15 }, { opacity: 1, filter: 'brightness(1.7)', offset: .4 }, { opacity: .95, filter: 'brightness(1)' }], { duration: 1200, easing: 'ease-out' });
+  an(el.querySelector('.sand-tick'), [{ transform: 'scale(1)', filter: 'brightness(1)' }, { transform: 'scale(1.12)', filter: 'brightness(1.8)', offset: .3 }, { transform: 'scale(1)', filter: 'brightness(1)' }], { duration: 450, easing: 'steps(5,end)' });
+  if (on) {
+    an(el.querySelector('.sand-t1'), [{ clipPath: 'circle(0% at 50% 50%)' }, { clipPath: 'circle(75% at 50% 50%)' }], { duration: 420, easing: 'steps(6,end)' });
+    an(el.querySelector('.sand-lum'), [{ opacity: 0 }, { opacity: 1, offset: .2 }, { opacity: .8 }, { opacity: 1 }], { duration: 1200 });
+  }
+}
+function flare(key) {
+  const sel = '[data-fx="' + String(key).replace(/["\\]/g, '\\$&') + '"]', btn = document.querySelector('.sand-tab ' + sel) || document.querySelector(sel);
+  const el = btn && btn.closest('.sand-tab'); if (!el) return;
+  const on = el.getAttribute('data-sand-d') === '1';
+  if (el.classList.contains('sand-ready')) play(el, on); else el._stFlare = true; // the stone is still being drawn: flare when it lands
+}
+
+window.STONE_sand = { row, paint, flare, sCol };
+})();
+
+/* Ritual tablets (Patryk 2026-10-27, final picks from the "Obsidian and Parchment" mock-up):
+   stone ST-final "Polished deep slab" (ST3c fine grain and satin shine on ST3e's thick slab with a deep rounded bevel),
+   the plain pixel pentagram tick (no studs, no multiplier marks) waiting in a carved well and lighting from the middle
+   in chunky pixel steps, and real-looking cracks round the border (dark fissure, lit lip, chip at the rim), seeded by
+   the ritual's name, more of them the longer the streak (2 at the start, 11 by 70 nights), glowing faintly in the
+   streak colour with a slight shimmer and flaring when ticked.
+   STONE.row(opts) -> HTML for one tablet; STONE.paint(root) paints every tablet inside root (cached, cheap to repeat);
+   STONE.flare(key) plays the tick flare on the tablet whose tick has data-fx=key.
+   Each tablet face is drawn once into a cached canvas; only the flare and a stepped shimmer animate.
+   All CSS classes start with coral-. */
+(function () {
+'use strict';
+if (window.STONE_coral) return;
+
+const RM = () => !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+const DPRf = () => Math.min(2, window.devicePixelRatio || 1);
+
+/* ---------- the app's streak colour (copied from game-ui.js sCol): ember orange at night 1, eldritch green at 66 ---------- */
+const hx = (c) => [1, 3, 5].map((i) => parseInt(c.slice(i, i + 2), 16));
+const mixc = (a, b, t) => { const x = hx(a), y = hx(b); return '#' + x.map((v, i) => Math.round(v + (y[i] - v) * t).toString(16).padStart(2, '0')).join(''); };
+const STOPS = [[1, '#ff6a2a'], [7, '#ffc040'], [21, '#6ab8ff'], [45, '#5adcd0'], [66, '#5ef2a0']];
+const sCol = (n) => { n = Math.max(1, n || 1); if (n >= 66) return '#5ef2a0'; for (let i = 1; i < STOPS.length; i++) if (n <= STOPS[i][0]) return mixc(STOPS[i - 1][1], STOPS[i][1], (n - STOPS[i - 1][0]) / (STOPS[i][0] - STOPS[i - 1][0])); return '#5ef2a0'; };
+const rgba = (c, a) => { const v = hx(c); return 'rgba(' + v[0] + ',' + v[1] + ',' + v[2] + ',' + a + ')'; };
+const esc = (s) => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
+const norm3 = (v) => { const l = Math.hypot(v[0], v[1], v[2]); return [v[0] / l, v[1] / l, v[2] / l]; };
+
+/* ---------- seeded randomness and value noise ---------- */
+function hashStr(s) { let h = 2166136261 >>> 0; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+function mulberry(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function noiseTile(size, cells, oct, seed) {
+  const out = new Float32Array(size * size), r = mulberry(seed); let amp = 1, tot = 0;
+  for (let o = 0; o < oct; o++) {
+    const c = cells << o, g = new Float32Array(c * c); for (let i = 0; i < g.length; i++) g[i] = r();
+    const step = size / c;
+    for (let y = 0; y < size; y++) { const fy = y / step, iy = Math.floor(fy), ty = fy - iy, sy = ty * ty * (3 - 2 * ty), y0 = (iy % c) * c, y1 = ((iy + 1) % c) * c;
+      for (let x = 0; x < size; x++) { const fx = x / step, ix = Math.floor(fx), tx = fx - ix, sx = tx * tx * (3 - 2 * tx), x0 = ix % c, x1 = (ix + 1) % c;
+        const a = g[y0 + x0], b = g[y0 + x1], cc = g[y1 + x0], d = g[y1 + x1], top = a + (b - a) * sx, bot = cc + (d - cc) * sx;
+        out[y * size + x] += amp * (top + (bot - top) * sy); } }
+    tot += amp; amp *= 0.5;
+  }
+  for (let i = 0; i < out.length; i++) out[i] /= tot;
+  return out;
+}
+let N1 = null, N2 = null, N3 = null; // made on the first tablet, not at load
+const noise = () => { if (!N1) { N1 = noiseTile(512, 4, 5, 11); N2 = noiseTile(256, 8, 4, 23); N3 = noiseTile(256, 32, 3, 37); } };
+const s1 = (x, y) => N1[((y | 0) & 511) * 512 + ((x | 0) & 511)];
+const s2 = (x, y) => N2[((y | 0) & 255) * 256 + ((x | 0) & 255)];
+const s3 = (x, y) => N3[((y | 0) & 255) * 256 + ((x | 0) & 255)];
+function boxBlur(src, w, h, r) {
+  const tmp = new Float32Array(w * h), out = new Float32Array(w * h), d = 2 * r + 1;
+  for (let y = 0; y < h; y++) { const o = y * w; let acc = 0; for (let x = -r; x <= r; x++) acc += src[o + Math.min(w - 1, Math.max(0, x))];
+    for (let x = 0; x < w; x++) { tmp[o + x] = acc / d; acc += src[o + Math.min(w - 1, x + r + 1)] - src[o + Math.max(0, x - r)]; } }
+  for (let x = 0; x < w; x++) { let acc = 0; for (let y = -r; y <= r; y++) acc += tmp[Math.min(h - 1, Math.max(0, y)) * w + x];
+    for (let y = 0; y < h; y++) { out[y * w + x] = acc / d; acc += tmp[Math.min(h - 1, y + r + 1) * w + x] - tmp[Math.max(0, y - r) * w + x]; } }
+  return out;
+}
+const blur2 = (a, w, h, r) => boxBlur(boxBlur(a, w, h, r), w, h, r);
+
+/* ---------- ST-final: the stone recipe ---------- */
+const V = { code: 'ST-final', base: [82, 36, 46], c1: .45, b2: .15, b3: .1, pits: 3, pitR: [.6, 1.6], spec: 1.4, sx: 44, sheen: 1,
+  bev: 5.2, bevR: 4, side: 7, cham: 3, rough: .6, chips: .08 };
+const ROW_H = 64; // css px, including the slab's thickness and its shadow
+// where the face sits inside the row (css px): the thickness and the drop shadow take the bottom
+const M = { l: 3, t: 2, r: 3, b: V.side + 5 };
+
+function slabPath(W, H, m, rng, v, DPR) {
+  const pts = [], x0 = m.l, y0 = m.t, x1 = W - m.r, y1 = H - m.b;
+  const cs = [0, 1, 2, 3].map(() => (1.5 + rng() * v.cham) * DPR), C = [[x0, y0], [x1, y0], [x1, y1], [x0, y1]];
+  for (let i = 0; i < 4; i++) {
+    const a = C[i], b = C[(i + 1) % 4], dx = Math.sign(b[0] - a[0]), dy = Math.sign(b[1] - a[1]), nx = -dy, ny = dx;
+    const len = Math.abs(b[0] - a[0]) + Math.abs(b[1] - a[1]), sA = cs[i], sB = cs[(i + 1) % 4];
+    const P = (t, o) => [a[0] + dx * t + nx * o, a[1] + dy * t + ny * o, nx, ny];
+    let t = sA; pts.push(P(t, rng() * v.rough * DPR));
+    while (t < len - sB) {
+      t = Math.min(len - sB, t + (3 + rng() * 5) * DPR);
+      if (rng() < v.chips && t > sA + 6 * DPR && t < len - sB - 12 * DPR) {
+        const cw = (3 + rng() * 7) * DPR, dep = (0.8 + rng() * 2.4) * DPR;
+        pts.push(P(t, .3 * DPR), P(t + cw * .25, dep * .8), P(t + cw * .55, dep), P(t + cw * .8, dep * .5), P(t + cw, .2 * DPR)); t += cw;
+      } else pts.push(P(t, rng() * v.rough * DPR));
+    }
+  }
+  return pts;
+}
+
+// renders one tablet face; forb = rectangles (device px) the cracks keep out of (tick, words, pay)
+function renderStone(name, streak, Wc, Hc, forb, DPR) {
+  noise();
+  const v = V, W = Math.round(Wc * DPR), H = Math.round(Hc * DPR);
+  const rng = mulberry(hashStr(name + '|' + v.code)), side = v.side * DPR;
+  const m = { l: M.l * DPR, t: M.t * DPR, r: M.r * DPR, b: M.b * DPR };
+  const pts = slabPath(W, H, m, rng, v, DPR);
+  const oc = document.createElement('canvas'); oc.width = W; oc.height = H; const ox = oc.getContext('2d', { willReadFrequently: true });
+  const poly = (dy) => { ox.beginPath(); pts.forEach((p, i) => (i ? ox.lineTo(p[0], p[1] + dy) : ox.moveTo(p[0], p[1] + dy))); ox.closePath(); ox.fill(); };
+  ox.fillStyle = '#fff'; poly(0); const fd = ox.getImageData(0, 0, W, H).data; ox.clearRect(0, 0, W, H);
+  for (let k = 1; k <= side; k++) poly(k); const sd = ox.getImageData(0, 0, W, H).data; ox.clearRect(0, 0, W, H);
+  const A = new Float32Array(W * H), AS = new Float32Array(W * H);
+  for (let i = 0; i < A.length; i++) { A[i] = fd[i * 4 + 3] / 255; AS[i] = sd[i * 4 + 3] / 255; }
+  const Hh = blur2(A, W, H, Math.max(1, Math.round(v.bevR * DPR)));
+  // cracks stay within this many px of the face's edge (the slab is near enough a rectangle to measure it straight)
+  const band = 12 * DPR, fx0 = m.l, fy0 = m.t, fx1 = W - m.r, fy1 = H - m.b;
+  // surface height: bevel plus two scales of fine grain
+  const o1x = rng() * 512, o1y = rng() * 512, o2x = rng() * 256, o2y = rng() * 256, o3x = rng() * 256, o3y = rng() * 256;
+  const Hn = new Float32Array(W * H), C1 = new Float32Array(W * H);
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    const i = y * W + x; if (A[i] <= 0 && AS[i] <= 0) continue;
+    const X = x / DPR, Y = y / DPR, n1 = s1(X * .6 + o1x, Y * .6 + o1y), n2 = s2(X * 1.2 + o2x, Y * 1.2 + o2y), n3 = s3(X * 2.4 + o3x, Y * 2.4 + o3y);
+    Hn[i] = Hh[i] * v.bev + (n2 - .5) * v.b2 + (n3 - .5) * v.b3; C1[i] = n1;
+  }
+  // a few tiny pits
+  const dig = (cx, cy, r, depth) => { const R = r * DPR; for (let y = Math.max(0, cy - R | 0); y <= Math.min(H - 1, cy + R + 1 | 0); y++) for (let x = Math.max(0, cx - R | 0); x <= Math.min(W - 1, cx + R + 1 | 0); x++) {
+    const d = Math.hypot(x - cx, y - cy) / R; if (d < 1) Hn[y * W + x] -= depth * (1 - d * d); } };
+  for (let k = 0; k < v.pits; k++) { const x = rng() * W, y = rng() * H; if (A[(y | 0) * W + (x | 0)] > .9) dig(x, y, v.pitR[0] + rng() * (v.pitR[1] - v.pitR[0]), .9 + rng() * .8); }
+  const Hb = blur2(Hn, W, H, Math.max(1, Math.round(2 * DPR)));
+  // light it from the top left, satin highlight and a soft violet sheen
+  const L = norm3([-.45, -.68, .58]), Hv = norm3([L[0], L[1], L[2] + 1]);
+  const img = ox.createImageData(W, H), D = img.data;
+  for (let y = 1; y < H - 1; y++) for (let x = 1; x < W - 1; x++) {
+    const i = y * W + x, a = A[i], as = AS[i]; if (a <= .004 && as <= .004) continue;
+    const j = i * 4, n1 = C1[i], tone = 1 + (n1 - .5) * v.c1 * 2;
+    const R = v.base[0] * tone, G = v.base[1] * tone, B = v.base[2] * tone;
+    let fR = 0, fG = 0, fB = 0;
+    if (a > .004) {
+      const gx = (Hn[i + 1] - Hn[i - 1]) * DPR / 2, gy = (Hn[i + W] - Hn[i - W]) * DPR / 2, nl = Math.hypot(gx, gy, 1), nx = -gx / nl, ny = -gy / nl, nz = 1 / nl;
+      const dif = Math.max(0, nx * L[0] + ny * L[1] + nz * L[2]), sp = Math.pow(Math.max(0, nx * Hv[0] + ny * Hv[1] + nz * Hv[2]), v.sx) * v.spec;
+      const ao = clamp((Hb[i] - Hn[i]) * 1.1, 0, .75), lit = (.3 + .95 * dif) * (1 - ao);
+      fR = R * lit + sp * 150; fG = G * lit + sp * 146; fB = B * lit + sp * 165;
+      const bd = Math.exp(-Math.pow((x / W + y / H * .5 - .42 + (n1 - .5) * .2) / .16, 2)) * (.6 + dif * .6); fR += bd * 24 * v.sheen; fG += bd * 12 * v.sheen; fB += bd * 14 * v.sheen;
+    }
+    const k = .5 + (n1 - .5) * .3, sR = R * .42 * k, sG = G * .42 * k, sB = B * .42 * k; // the thickness below the face
+    D[j] = sR + (fR - sR) * a; D[j + 1] = sG + (fG - sG) * a; D[j + 2] = sB + (fB - sB) * a; D[j + 3] = Math.max(a, as) * 255;
+  }
+  ox.putImageData(img, 0, 0);
+  // the dark seam where face meets thickness
+  ox.save(); ox.globalCompositeOperation = 'source-atop'; ox.strokeStyle = 'rgba(0,0,0,.55)'; ox.lineWidth = DPR;
+  ox.beginPath(); pts.forEach((p, i) => (i ? ox.lineTo(p[0], p[1] + DPR * .6) : ox.moveTo(p[0], p[1] + DPR * .6))); ox.closePath(); ox.stroke(); ox.restore();
+
+  /* ---- cracks: only near the border, spread round it, more with a longer streak ---- */
+  const valid = (x, y, loose) => { if (x < 1 || y < 1 || x >= W - 1 || y >= H - 1) return false; const i = (y | 0) * W + (x | 0);
+    if (A[i] < (loose ? .5 : .97) || Math.min(x - fx0, fx1 - x, y - fy0, fy1 - y) > band) return false;
+    for (let k = 0; k < forb.length; k++) { const f = forb[k]; if (x > f[0] && x < f[2] && y > f[1] && y < f[3]) return false; } return true; };
+  const cracks = [], count = clamp(2 + Math.floor(streak / 7), 2, 11);
+  function grow(x, y, a, w, len, depth, list) {
+    const P = [[x, y, w]]; let L2 = 0; const drift = (rng() - .5) * .12;
+    while (L2 < len && w > .22 * DPR) {
+      a += drift + (rng() - .5) * .95; const st = (2.4 + rng() * 3.6) * DPR; let ok = false, nx = 0, ny = 0;
+      for (let k = 0; k < 5; k++) { const aa = a + (k === 0 ? 0 : (k % 2 ? 1 : -1) * .45 * Math.ceil(k / 2)); nx = x + Math.cos(aa) * st; ny = y + Math.sin(aa) * st; if (valid(nx, ny, L2 < 3 * DPR)) { a = aa; ok = true; break; } }
+      if (!ok) break; x = nx; y = ny; L2 += st; w *= .9; P.push([x, y, w]);
+      if (depth < 2 && rng() < .16 && L2 > 4 * DPR) grow(x, y, a + (rng() < .5 ? -1 : 1) * (.6 + rng() * .7), w * .6, (len - L2) * (.35 + rng() * .4), depth + 1, list);
+      if (rng() < .12) list.push([[x, y, w * .45], [x + Math.cos(a + 1.6) * 2.2 * DPR, y + Math.sin(a + 1.6) * 2.2 * DPR, w * .2]]); // splinter
+    }
+    if (P.length > 2) list.push(P);
+    return P.length > 2;
+  }
+  const off = rng(), n = pts.length;
+  for (let k = 0; k < count; k++) {
+    let made = false;
+    for (let t = 0; t < 14 && !made; t++) {
+      const idx = Math.floor((((k + off + (rng() - .5) * .6) / count) % 1 + 1) % 1 * n), p = pts[idx];
+      const sx = p[0] + p[2] * 1.2 * DPR, sy = p[1] + p[3] * 1.2 * DPR; if (!valid(sx, sy, true)) continue;
+      const inA = Math.atan2(p[3], p[2]), a = inA + (rng() < .5 ? -1 : 1) * (.55 + rng() * .5);
+      const list = [], w0 = (1.5 + rng() * 1.1) * DPR;
+      if (grow(sx, sy, a, w0, (14 + rng() * 22 + Math.min(streak, 70) * .22) * DPR, 0, list)) { cracks.push({ list, mouth: [sx, sy, p[2], p[3], w0] }); made = true; }
+    }
+  }
+  ox.save(); ox.globalCompositeOperation = 'source-atop'; ox.lineCap = 'round'; ox.lineJoin = 'round';
+  cracks.forEach((c) => {
+    // a chip knocked out where the crack meets the edge
+    const [mx, my, nx, ny, w0] = c.mouth, tx = -ny, ty = nx, cw = w0 * (1.8 + rng()), dp = w0 * (2 + rng() * 1.5);
+    ox.fillStyle = 'rgba(8,6,10,.85)'; ox.beginPath(); ox.moveTo(mx - nx * 1.5 * DPR + tx * cw, my - ny * 1.5 * DPR + ty * cw); ox.lineTo(mx + nx * dp, my + ny * dp); ox.lineTo(mx - nx * 1.5 * DPR - tx * cw * .8, my - ny * 1.5 * DPR - ty * cw * .8); ox.fill();
+    ox.strokeStyle = 'rgba(205,195,220,.4)'; ox.lineWidth = .7 * DPR; ox.beginPath(); ox.moveTo(mx - nx * DPR + tx * cw, my - ny * DPR + ty * cw); ox.lineTo(mx + nx * dp, my + ny * dp); ox.stroke();
+    c.list.forEach((P) => {
+      const Lp = [], Rp = []; let lx = 0, ly = 0;
+      for (let k = 0; k < P.length; k++) { const a = P[Math.max(0, k - 1)], b = P[Math.min(P.length - 1, k + 1)], dx = b[0] - a[0], dy = b[1] - a[1], l = Math.hypot(dx, dy) || 1, nx = -dy / l, ny = dx / l;
+        const w = (k === P.length - 1 ? 0 : P[k][2]) / 2 * (k % 2 ? .8 : 1.1); Lp.push([P[k][0] + nx * w, P[k][1] + ny * w]); Rp.push([P[k][0] - nx * w, P[k][1] - ny * w]); lx += nx; ly += ny; }
+      const lightL = (lx * -.45 + ly * -.68) > 0, path = (arr, dx, dy) => { ox.beginPath(); arr.forEach((p, k) => (k ? ox.lineTo(p[0] + dx, p[1] + dy) : ox.moveTo(p[0] + dx, p[1] + dy))); };
+      // a soft shadow beside the gap, the black gap itself, a thin lit lip on the side facing the light
+      ox.fillStyle = 'rgba(0,0,0,.35)'; path(Lp.concat(Rp.slice().reverse()), .5 * DPR, .7 * DPR); ox.closePath(); ox.fill();
+      ox.fillStyle = 'rgba(2,1,4,.97)'; path(Lp.concat(Rp.slice().reverse()), 0, 0); ox.closePath(); ox.fill();
+      ox.lineWidth = .55 * DPR; ox.strokeStyle = 'rgba(215,205,232,.42)'; path(lightL ? Lp : Rp, 0, -.45 * DPR); ox.stroke();
+      ox.strokeStyle = 'rgba(0,0,0,.5)'; ox.lineWidth = .8 * DPR; path(lightL ? Rp : Lp, .3 * DPR, .5 * DPR); ox.stroke();
+    });
+  });
+  ox.restore();
+  // final face with its drop shadow
+  const fc = document.createElement('canvas'); fc.width = W; fc.height = H; const fx = fc.getContext('2d');
+  fx.shadowColor = 'rgba(0,0,0,.85)'; fx.shadowBlur = 5 * DPR; fx.shadowOffsetY = 2.5 * DPR; fx.drawImage(oc, 0, 0);
+  return { face: fc, cracks, W, H, DPR, glows: {} };
+}
+
+// embers deep inside the cracks, in the streak colour
+function renderGlow(S, col) {
+  if (S.glows[col]) return S.glows[col];
+  const DPR = S.DPR, gc = document.createElement('canvas'); gc.width = S.W; gc.height = S.H; const g = gc.getContext('2d');
+  g.globalCompositeOperation = 'lighter';
+  // each pass strokes every crack onto a scratch layer with no shadow, then lays that layer down with one blurred shadow
+  // (a shadow on every little stroke cost 0.3-0.9 s per tablet)
+  const tc = document.createElement('canvas'); tc.width = S.W; tc.height = S.H; const t = tc.getContext('2d'); t.lineCap = 'round'; t.lineJoin = 'round';
+  const pass = (mul, blur, style, min) => { t.clearRect(0, 0, S.W, S.H); t.strokeStyle = style;
+    S.cracks.forEach((c) => c.list.forEach((P) => { for (let k = 1; k < P.length; k++) { t.lineWidth = Math.max(min, P[k][2] * mul); t.beginPath(); t.moveTo(P[k - 1][0], P[k - 1][1]); t.lineTo(P[k][0], P[k][1]); t.stroke(); } }));
+    g.shadowBlur = blur; g.shadowColor = col; g.drawImage(tc, 0, 0); g.shadowBlur = 0; };
+  pass(1.4, 6 * DPR, rgba(col, .22), .5);
+  pass(.42, 2 * DPR, col, .35);
+  pass(.16, 0, mixc(col, '#fff6e0', .5), .25);
+  S.cracks.forEach((c) => { const [mx, my, nx, ny, w0] = c.mouth, cx = mx + nx * w0, cy = my + ny * w0, gr = g.createRadialGradient(cx, cy, 0, cx, cy, w0 * 3);
+    gr.addColorStop(0, rgba(col, .35)); gr.addColorStop(1, rgba(col, 0)); g.shadowBlur = 0; g.fillStyle = gr; g.beginPath(); g.arc(cx, cy, w0 * 3, 0, 7); g.fill(); });
+  const keys = Object.keys(S.glows); if (keys.length > 3) delete S.glows[keys[0]];
+  S.glows[col] = gc;
+  return gc;
+}
+
+/* ---------- the pixel pentagram tick: carved well and dashed ring when waiting, a disc of light with a dark star when lit ---------- */
+const TG = 22; // pixel grid; shown at 2x (44 css px)
+const TICKS = {};
+function drawTick(col, lit) {
+  const key = col + (lit ? '1' : '0'); if (TICKS[key]) return TICKS[key];
+  const cv = document.createElement('canvas'); cv.width = TG; cv.height = TG; const g = cv.getContext('2d');
+  const cx = TG / 2, cy = TG / 2, R = 8.6;
+  const px = (x, y, c) => { g.fillStyle = c; g.fillRect(Math.floor(x), Math.floor(y), 1, 1); };
+  const dim = mixc('#2a2038', col, .5), white = '#fffbea';
+  for (let y = 0; y < TG; y++) for (let x = 0; x < TG; x++) {
+    const dx = x + .5 - cx, dy = y + .5 - cy, d = Math.hypot(dx, dy);
+    if (d < R + .5) {
+      if (!lit) px(x, y, (x + y) % 3 ? '#0b0910' : '#120f18');
+      else { const q = d / R; px(x, y, q < .22 ? white : q < .5 ? mixc(white, col, (q - .22) / .28) : q < .82 ? col : ((x + y) % 2 ? col : mixc(col, '#000000', .35))); }
+    } else if (d < R + 1.6) px(x, y, dx + dy > 1 ? 'rgba(210,200,230,.28)' : 'rgba(0,0,0,.7)'); // the well's carved rim
+  }
+  for (let a = 0; a < 6.283; a += .02) { const idx = Math.floor(a / 6.283 * 44); if (!lit && idx % 4 === 3) continue; px(cx + Math.cos(a) * R - .5, cy + Math.sin(a) * R - .5, lit ? mixc(col, '#ffffff', .3) : dim); }
+  const P = []; for (let k = 0; k < 5; k++) { const a = -Math.PI / 2 + k * 2 * Math.PI / 5; P.push([cx + Math.cos(a) * (R - 1.8), cy + Math.sin(a) * (R - 1.8)]); }
+  const sc = lit ? mixc(col, '#000000', .72) : dim;
+  [0, 2, 4, 1, 3, 0].forEach((k, i, arr) => { if (!i) return; const a = P[arr[i - 1]], b = P[k]; for (let t = 0; t <= 1; t += .04) px(a[0] + (b[0] - a[0]) * t - .5, a[1] + (b[1] - a[1]) * t - .5, sc); });
+  TICKS[key] = cv;
+  return cv;
+}
+
+/* ---------- CSS, injected once ---------- */
+const CSS = '' +
+'.coral-tab{position:relative;box-sizing:border-box;width:100%;height:' + ROW_H + 'px;display:flex;align-items:center;gap:8px;padding:' + M.t + 'px ' + (M.r + 10) + 'px ' + M.b + 'px ' + (M.l + 3) + 'px;isolation:isolate;color:#fff0f2;text-align:left;-webkit-tap-highlight-color:transparent}' +
+'.coral-tab::before{content:"";position:absolute;left:' + M.l + 'px;right:' + M.r + 'px;top:' + M.t + 'px;bottom:' + (M.b - V.side) + 'px;border-radius:3px;background:linear-gradient(170deg,#6a3440,#3a1820);box-shadow:0 ' + V.side + 'px 0 #0f0e12;z-index:-3}' +
+'.coral-tab.coral-ready::before{display:none}' +
+'.coral-tab>canvas{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none}' +
+'.coral-stone{z-index:-2}' +
+'.coral-glow{z-index:-1;mix-blend-mode:screen;opacity:.55;animation:coral-shim 2.6s steps(1,end) infinite}' +
+'.coral-tab.coral-on .coral-glow{opacity:1;animation:coral-shimon 3.1s ease-in-out infinite}' +
+'.coral-lum{position:absolute;left:' + M.l + 'px;right:' + M.r + 'px;top:' + M.t + 'px;bottom:' + M.b + 'px;pointer-events:none;opacity:0;transition:opacity .6s;mix-blend-mode:screen;z-index:-1}' +
+'.coral-tab.coral-on .coral-lum{opacity:1}' +
+'@keyframes coral-shim{0%{opacity:.5}13%{opacity:.62}21%{opacity:.52}37%{opacity:.7}44%{opacity:.54}63%{opacity:.64}71%{opacity:.48}86%{opacity:.6}}' +
+'@keyframes coral-shimon{0%,100%{opacity:1}30%{opacity:.86}55%{opacity:.97}80%{opacity:.9}}' +
+'.coral-tick{position:relative;flex:none;width:44px;height:44px;margin:0;padding:0;border:0;background:none;cursor:pointer;transition:filter .4s;-webkit-tap-highlight-color:transparent}' +
+'.coral-tick canvas{position:absolute;left:0;top:0;width:44px;height:44px;image-rendering:pixelated;pointer-events:none}' +
+'.coral-tick .coral-t1{clip-path:circle(0% at 50% 50%);transition:clip-path .4s steps(6,end)}' +
+'.coral-tab.coral-on .coral-tick .coral-t1{clip-path:circle(75% at 50% 50%)}' +
+'.coral-tick:focus-visible{outline:2px solid #e8c46a;outline-offset:2px;border-radius:50%}' +
+'.coral-body{position:relative;flex:1;min-width:0;cursor:pointer}' +
+'.coral-nm{font:700 15px/1.2 var(--a,\'Atkinson Hyperlegible\',sans-serif);color:#fff0f2;text-shadow:0 -1px 0 rgba(0,0,0,.95),0 1px 0 rgba(200,190,220,.16);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}' +
+'.coral-sub{font:12.5px/1.3 var(--a,\'Atkinson Hyperlegible\',sans-serif);color:#ecc0c8;margin-top:2px;text-shadow:0 1px 1px #000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}' +
+'.coral-pay{position:relative;flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:2px;font:700 15px/1 var(--a,\'Atkinson Hyperlegible\',sans-serif);color:#f4dd9a;text-shadow:0 1px 1px #000;font-variant-numeric:tabular-nums}' +
+'@media (prefers-reduced-motion: reduce){.coral-glow,.coral-tab.coral-on .coral-glow{animation:none}.coral-tick,.coral-tick .coral-t1,.coral-lum{transition:none}}';
+function css() { if (document.getElementById('stone-css-coral')) return; const s = document.createElement('style'); s.id = 'stone-css-coral'; s.textContent = CSS; (document.head || document.documentElement).appendChild(s); }
+
+/* ---------- the API ---------- */
+function row(o) {
+  css();
+  o = o || {};
+  const s = Math.max(0, +o.streak || 0), on = !!o.done;
+  return '<div class="coral-tab' + (on ? ' coral-on' : '') + '" data-coral-id="' + esc(o.id) + '" data-coral-name="' + esc(o.name) + '" data-coral-s="' + s + '" data-coral-d="' + (on ? 1 : 0) + '">' +
+    '<canvas class="coral-stone"></canvas><canvas class="coral-glow"></canvas><div class="coral-lum"></div>' +
+    '<button type="button" class="coral-tick" ' + (o.tickAttrs || '') + ' aria-pressed="' + on + '" aria-label="' + esc(o.name) + (on ? ', done today' : ', not done yet') + ', ' + s + ' night' + (s === 1 ? '' : 's') + '">' +
+    '<canvas class="coral-t0" width="' + TG + '" height="' + TG + '"></canvas><canvas class="coral-t1" width="' + TG + '" height="' + TG + '"></canvas></button>' +
+    '<div class="coral-body" ' + (o.bodyAttrs || '') + '><div class="coral-nm">' + esc(o.name) + '</div><div class="coral-sub">' + (o.subHtml || '') + '</div></div>' +
+    '<div class="coral-pay">' + (o.payHtml || '') + '</div></div>';
+}
+
+const CACHE = new Map(), CACHE_MAX = 24; // a stone is about W*H*4 bytes (400 KB at 390 px on a 2x phone)
+const QUEUE = []; let busy = false;
+const textRect = (node) => { const rg = document.createRange(); rg.selectNodeContents(node); return rg.getBoundingClientRect(); };
+// what the cracks must avoid, in device px relative to the tablet; rounded so the cache key stays steady
+function measure(el, br, DPR) {
+  const f = [], pad = 4, R = (b) => { if (!b || !b.width) return; f.push([Math.round((b.left - br.left - pad) * DPR), Math.round((b.top - br.top - pad) * DPR), Math.round((b.right - br.left + pad) * DPR), Math.round((b.bottom - br.top + pad) * DPR)]); };
+  R(el.querySelector('.coral-tick').getBoundingClientRect());
+  const nm = el.querySelector('.coral-nm'), sub = el.querySelector('.coral-sub'), pay = el.querySelector('.coral-pay');
+  if (nm && nm.firstChild) R(textRect(nm)); if (sub && sub.firstChild) R(textRect(sub)); if (pay && pay.firstChild) R(pay.getBoundingClientRect());
+  return f;
+}
+function apply(el, S) {
+  const col = el._stCol, on = el._stOn;
+  const sc = el.querySelector('.coral-stone'), gc = el.querySelector('.coral-glow');
+  if (sc.width !== S.W || sc.height !== S.H) { sc.width = S.W; sc.height = S.H; } else sc.getContext('2d').clearRect(0, 0, S.W, S.H);
+  sc.getContext('2d').drawImage(S.face, 0, 0);
+  if (gc.width !== S.W || gc.height !== S.H) { gc.width = S.W; gc.height = S.H; } else gc.getContext('2d').clearRect(0, 0, S.W, S.H);
+  gc.getContext('2d').drawImage(renderGlow(S, col), 0, 0);
+  el._stKey = S.key; el.classList.add('coral-ready');
+  if (el._stFlare) { el._stFlare = false; play(el, on); }
+}
+function paintTick(el) {
+  const col = el._stCol;
+  const t0 = el.querySelector('.coral-t0'), t1 = el.querySelector('.coral-t1');
+  t0.getContext('2d').clearRect(0, 0, TG, TG); t0.getContext('2d').drawImage(drawTick(col, false), 0, 0);
+  t1.getContext('2d').clearRect(0, 0, TG, TG); t1.getContext('2d').drawImage(drawTick(col, true), 0, 0);
+  el.querySelector('.coral-tick').style.filter = el._stOn ? 'drop-shadow(0 0 5px ' + rgba(col, .75) + ')' : 'none';
+  el.querySelector('.coral-lum').style.background = 'radial-gradient(ellipse 110px 46px at 28px 50%,' + rgba(col, .2) + ',transparent 75%)';
+}
+function build(job) {
+  const S = renderStone(job.name, job.s, job.Wc, job.Hc, job.forb, job.DPR); S.key = job.key; S.near = job.near;
+  CACHE.set(job.key, S); while (CACHE.size > CACHE_MAX) CACHE.delete(CACHE.keys().next().value);
+  return S;
+}
+function pump() {
+  if (busy) return; busy = true;
+  // the first stone waits a moment so a tick's flare gets its opening frames before the main thread is busy
+  setTimeout(function next() {
+    const job = QUEUE.shift(); if (!job) { busy = false; return; }
+    const els = job.els.filter((el) => el.isConnected && el._stWant === job.key);
+    if (els.length) try { const S = CACHE.get(job.key) || build(job); els.forEach((el) => apply(el, S)); } catch (e) { console.error(e); }
+    setTimeout(next, 0);
+  }, 90);
+}
+function paint(root) {
+  css();
+  root = root || document;
+  const els = Array.prototype.slice.call(root.querySelectorAll('.coral-tab')), DPR = DPRf(); let queued = false;
+  els.forEach((el) => {
+    const name = el.getAttribute('data-coral-name') || '', s = +el.getAttribute('data-coral-s') || 0, on = el.getAttribute('data-coral-d') === '1';
+    el._stOn = on; el._stCol = sCol(Math.max(1, on ? s : s + 1));
+    paintTick(el);
+    const br = el.getBoundingClientRect(); if (br.width < 40) return; // hidden: try again on the next paint
+    const Wc = Math.round(br.width), Hc = Math.round(br.height), forb = measure(el, br, DPR);
+    const near = name + '|' + Wc + 'x' + Hc + '@' + DPR, key = near + '|' + s + '|' + forb.map((f) => f.join(',')).join(';');
+    el._stWant = key;
+    if (el._stKey === key && el.classList.contains('coral-ready')) { const gc = el.querySelector('.coral-glow'), S = CACHE.get(key); if (S) { gc.getContext('2d').clearRect(0, 0, S.W, S.H); gc.getContext('2d').drawImage(renderGlow(S, el._stCol), 0, 0); } return; }
+    const S = CACHE.get(key); if (S) { apply(el, S); return; }
+    // not drawn yet (a tick moved the streak, the words changed): show the same ritual's last stone at this size straight
+    // away, so the tick and its flare are instant, and swap in the new cracks when they are drawn a moment later
+    let old = null; CACHE.forEach((c) => { if (c.near === near) old = c; });
+    if (old) apply(el, old);
+    const job = QUEUE.find((j) => j.key === key);
+    if (job) job.els.push(el); else QUEUE.push({ key, near, name, s, Wc, Hc, forb, DPR, els: [el] });
+    queued = true;
+  });
+  if (queued) pump();
+}
+function play(el, on) {
+  if (RM()) return;
+  const an = (n, kf, o) => { if (n && n.animate) n.animate(kf, o); };
+  an(el.querySelector('.coral-glow'), [{ opacity: .4, filter: 'brightness(1)' }, { opacity: 1, filter: 'brightness(3) saturate(1.4)', offset: .15 }, { opacity: 1, filter: 'brightness(1.7)', offset: .4 }, { opacity: .95, filter: 'brightness(1)' }], { duration: 1200, easing: 'ease-out' });
+  an(el.querySelector('.coral-tick'), [{ transform: 'scale(1)', filter: 'brightness(1)' }, { transform: 'scale(1.12)', filter: 'brightness(1.8)', offset: .3 }, { transform: 'scale(1)', filter: 'brightness(1)' }], { duration: 450, easing: 'steps(5,end)' });
+  if (on) {
+    an(el.querySelector('.coral-t1'), [{ clipPath: 'circle(0% at 50% 50%)' }, { clipPath: 'circle(75% at 50% 50%)' }], { duration: 420, easing: 'steps(6,end)' });
+    an(el.querySelector('.coral-lum'), [{ opacity: 0 }, { opacity: 1, offset: .2 }, { opacity: .8 }, { opacity: 1 }], { duration: 1200 });
+  }
+}
+function flare(key) {
+  const sel = '[data-fx="' + String(key).replace(/["\\]/g, '\\$&') + '"]', btn = document.querySelector('.coral-tab ' + sel) || document.querySelector(sel);
+  const el = btn && btn.closest('.coral-tab'); if (!el) return;
+  const on = el.getAttribute('data-coral-d') === '1';
+  if (el.classList.contains('coral-ready')) play(el, on); else el._stFlare = true; // the stone is still being drawn: flare when it lands
+}
+
+window.STONE_coral = { row, paint, flare, sCol };
+})();
+</script>
+<script>
+(function () {
+'use strict';
+const RITS = [
+  { name: 'Read', s: 12, done: true, sub: 'appeased · 15 min', pay: 18 },
+  { name: 'Train', s: 3, done: false, sub: 'awaits · 1 session', pay: 24 },
+  { name: 'Write', s: 0, done: false, sub: 'awaits · one line', pay: 12 },
+  { name: 'Plan tomorrow', s: 40, done: true, sub: 'appeased · 5 min', pay: 15 },
+  { name: 'Mark one set', s: 70, done: false, sub: 'embers · 30 min', pay: 30 }
+];
+const CARDS = [
+  ['NOW', 'As it is now', 'Violet obsidian: the stone that feels wrong, kept here to compare.', ['now']],
+  ['C1', 'Sage river stone', 'The grey-green of the single rune pebble, the coin you see most. Calm, and it sits with the green of the sea.', ['sage']],
+  ['C2', 'Slate', 'The blue-grey of the rune shard. Cooler and darker, so the gold pay numbers stand out most.', ['slate']],
+  ['C3', 'Each ritual its own stone', 'Like a handful of rune tablets: each ritual keeps one of the five stones (pebble, shard, tile, sandstone oval, coral), picked by its name, so a ritual is known by its colour.', ['sage', 'slate', 'obsid', 'sand', 'coral']]
+];
+const host = document.getElementById('cards');
+const ONES = (window.RUNES && RUNES.ones) || [], NAMES = ['pebble', 'shard', 'tile', 'oval', 'coral'];
+CARDS.forEach(([id, name, cap, stones]) => {
+  const c = document.createElement('section'); c.className = 'card'; c.id = id;
+  c.innerHTML = '<h3><b>' + id + '</b>' + name + '</h3><p class="cap">' + cap + '</p><div class="runes">' + ONES.slice(0, 5).map((r, i) => '<div><img src="' + r.src + '" alt=""><span>' + NAMES[i] + '</span></div>').join('') + '</div><div class="rows"></div>';
+  host.appendChild(c);
+  const rows = c.querySelector('.rows');
+  RITS.forEach((r, i) => { const k = stones[i % stones.length], S = window['STONE_' + k]; const d = document.createElement('div');
+    d.innerHTML = S.row({ id: id + i, name: r.name, streak: r.s, done: r.done, subHtml: r.sub + (r.s ? ' · ' + r.s + ' nights' : ''), payHtml: '<span class="pay">+' + r.pay + '</span>' }); rows.appendChild(d); });
+  new Set(stones).forEach((k) => window['STONE_' + k].paint(rows));
+});
+})();
+</script>
+</body>
+</html>
