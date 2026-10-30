@@ -1,8 +1,8 @@
 /* ============================================================================
    companion-focus.js: focus crafts (Lane D, 30 Oct 2026). While Patryk focuses on a task, Ulhu makes something.
-   From the approved mock-up replica/design/mockups/companion/focus-crafts-2.html. Patryk 30 Oct: KNITTING ONLY for now,
-   with the "yarn to row" progress bar (P4). The craft is still stored with each piece so more crafts can come later.
-   The knitting scene is the mock-up's; a new scene may replace knitStage() once he picks one.
+   Patryk 30 Oct: KNITTING ONLY for now. The scene is K1, the firelit cottage nook he picked from
+   replica/design/mockups/companion/focus-crafts-4.html, with Ulhu as his real pixel sprite and the knitted-strip bar.
+   The craft is still stored with each piece so more crafts can come later.
    Law: leaving the app PAUSES the piece (it never crumbles and is never lost) and coming back resumes it. A bigger task
    makes a bigger piece. The tool suggests, never decides: Patryk picks the size and presses Start. He can
    stop early: the piece waits on the bench, half made, and can be picked up again later.
@@ -81,34 +81,365 @@
       .catch(function () { SHELF_ERR = 'The shelf would not open just now.'; paint(true); });
   }
 
-  /* ---------------- drawing helpers (from the mock-up) ---------------- */
+  /* ---------------- the scene: K1, the firelit cottage nook ----------------
+     Patryk picked K1 on 30 Oct from replica/design/mockups/companion/focus-crafts-4.html; the drawing below is the mock-up's.
+     Everything is drawn on a grid of "art pixels", each 2 by 2 canvas pixels, the pixel size of his game sprite.
+     The room is drawn once onto the back canvas; only the moving parts (fire, fish, Ulhu, yarn, the bar) are redrawn. */
   const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
   let uid = 0;
-
-  // Ulhu, drawn to match the game sprite: mint head, big dark eyes, blush, face tentacles, dark green wings, cream belly, sprout
-  function ulhuBody(o) {
-    o = o || {};
-    const wing = '<path d="M0,2 C-10,-12 -22,-20 -28,-16 L-24,-9 L-29,-2 L-23,2 L-25,10 C-16,10 -6,8 0,6 Z" fill="#3f8a57" stroke="#1d4a33" stroke-width="1.5" stroke-linejoin="round"/><path d="M0,4 L-24,-9 M0,5 L-23,2" stroke="#1d4a33" stroke-width="1" fill="none"/>';
-    let s = `<g transform="translate(-11,-27)"><g class="uzcf-wing">${wing}</g></g><g transform="translate(11,-27) scale(-1,1)"><g class="uzcf-wing">${wing}</g></g>`;
-    s += '<ellipse cx="-8" cy="-3.5" rx="6.5" ry="4.5" fill="#6cc79f" stroke="#2f6b55" stroke-width="1.4"/><ellipse cx="8" cy="-3.5" rx="6.5" ry="4.5" fill="#6cc79f" stroke="#2f6b55" stroke-width="1.4"/>';
-    s += '<ellipse cx="0" cy="-17" rx="15.5" ry="15" fill="#8fdcb9" stroke="#2f6b55" stroke-width="1.6"/><ellipse cx="0" cy="-12" rx="9.5" ry="8" fill="#f3ecd2"/>';
-    s += '<circle cx="0" cy="-42" r="22" fill="url(#uzcf-hg)" stroke="#2f6b55" stroke-width="1.8"/><ellipse cx="-9" cy="-55" rx="6" ry="3.2" fill="#fff" opacity=".45" transform="rotate(-20 -9 -55)"/>';
-    s += '<path d="M0,-63 q-1.5,-5 1,-9" stroke="#3f8a57" stroke-width="2" fill="none"/><ellipse cx="-4" cy="-71" rx="4.6" ry="2.4" transform="rotate(-25 -4 -71)" fill="#7fe07a" stroke="#3f8a57" stroke-width=".8"/><ellipse cx="6" cy="-73" rx="4.6" ry="2.4" transform="rotate(25 6 -73)" fill="#7fe07a" stroke="#3f8a57" stroke-width=".8"/>';
-    const eo = (x) => `<g transform="translate(${x},-45)"><g class="uzcf-blink"><ellipse rx="5.3" ry="6.5" fill="#16203a"/><circle cx="-1.8" cy="-2.5" r="2" fill="#fff"/><circle cx="1.7" cy="2.1" r=".95" fill="#fff"/></g></g>`;
-    s += `<g class="uzcf-eo">${eo(-8)}${eo(8)}</g>`;
-    s += '<g class="uzcf-ec"><path d="M-13,-44 q5,3.5 10,0 M3,-44 q5,3.5 10,0" stroke="#16203a" stroke-width="2" fill="none" stroke-linecap="round"/></g>';
-    s += '<g class="uzcf-eh"><path d="M-13,-43 q5,-6 10,0 M3,-43 q5,-6 10,0" stroke="#16203a" stroke-width="2.2" fill="none" stroke-linecap="round"/></g>';
-    s += '<ellipse cx="-15.5" cy="-36" rx="4.2" ry="2.4" fill="#ff9fb4" opacity=".85"/><ellipse cx="15.5" cy="-36" rx="4.2" ry="2.4" fill="#ff9fb4" opacity=".85"/>';
-    [-9, -3, 3, 9].forEach((x) => { const d = x < 0 ? -1 : 1; s += `<path d="M${x},-33 q${2.5 * d},5 0,9 q${-2.5 * d},4 ${d},7.5" stroke="#2f6b55" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M${x},-33 q${2.5 * d},5 0,9 q${-2.5 * d},4 ${d},7.5" stroke="#5fb894" stroke-width="3.2" fill="none" stroke-linecap="round"/>`; });
-    if (o.glasses) {
-      s += '<g class="uzcf-glasses"><path d="M-15,-46 Q-22,-40 -20,-26 Q-17,-14 -10,-10" stroke="#e0b85c" stroke-width=".8" fill="none" stroke-dasharray="1.4 1.2" opacity=".85"/><circle cx="-8" cy="-45" r="7.3" fill="#fff" fill-opacity=".14" stroke="#e0b85c" stroke-width="1.5"/><circle cx="8" cy="-45" r="7.3" fill="#fff" fill-opacity=".14" stroke="#e0b85c" stroke-width="1.5"/><path d="M-1.2,-46 q1.2,-2 2.4,0" stroke="#e0b85c" stroke-width="1.3" fill="none"/><path d="M-15.2,-46 L-21,-48 M15.2,-46 L21,-48" stroke="#e0b85c" stroke-width="1.2"/><ellipse cx="-10.5" cy="-48" rx="2.2" ry="1.1" fill="#fff" opacity=".55" transform="rotate(-30 -10.5 -48)"/><ellipse cx="5.5" cy="-48" rx="2.2" ry="1.1" fill="#fff" opacity=".55" transform="rotate(-30 5.5 -48)"/></g>';
+  const AW = 96, AH = 92, U = 2;
+  function rng(seed) { let s = seed; return () => { s = (s * 16807) % 2147483647; return (s - 1) / 2147483646; }; }
+  const hx = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+  function mix(a, b, t) { const A = hx(a), B = hx(b); return '#' + A.map((v, i) => clamp(Math.round(v + (B[i] - v) * t), 0, 255).toString(16).padStart(2, '0')).join(''); }
+  const sh = (h, t) => (t >= 0 ? mix(h, '#ffffff', t) : mix(h, '#000000', -t));
+  const hash = (a, b) => { const x = Math.sin(a * 127.1 + b * 311.7) * 43758.5453; return x - Math.floor(x); };
+  const BAY = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
+  const bay = (x, y) => BAY[(y & 3) * 4 + (x & 3)] / 16;
+  
+  /* ---------- art-pixel buffer for the static backgrounds ---------- */
+  class Buf {
+    constructor(w = AW, h = AH) { this.w = w; this.h = h; this.c = new Array(w * h).fill(null); }
+    p(x, y, col) { x = Math.floor(x); y = Math.floor(y); if (x >= 0 && y >= 0 && x < this.w && y < this.h && col) this.c[y * this.w + x] = col; }
+    g(x, y) { return x < 0 || y < 0 || x >= this.w || y >= this.h ? null : this.c[y * this.w + x]; }
+    r(x, y, w, h, col) { for (let j = 0; j < h; j++) for (let i = 0; i < w; i++) this.p(x + i, y + j, typeof col === 'function' ? col(x + i, y + j, i, j) : col); }
+    circ(cx, cy, r, col) { for (let y = Math.floor(cy - r - 1); y <= cy + r + 1; y++) for (let x = Math.floor(cx - r - 1); x <= cx + r + 1; x++) { const dx = x + 0.5 - cx, dy = y + 0.5 - cy; if (dx * dx + dy * dy <= r * r) this.p(x, y, typeof col === 'function' ? col(x, y, dx, dy) : col); } }
+    outline(col) { const o = this.c.slice(); for (let y = 0; y < this.h; y++) for (let x = 0; x < this.w; x++) { if (this.c[y * this.w + x]) continue; if (this.g(x - 1, y) || this.g(x + 1, y) || this.g(x, y - 1) || this.g(x, y + 1)) o[y * this.w + x] = col; } this.c = o; }
+    draw(ctx, ox = 0, oy = 0) { for (let y = 0; y < this.h; y++) { let x = 0; while (x < this.w) { const k = this.c[y * this.w + x]; if (!k) { x++; continue; } let x2 = x; while (x2 < this.w && this.c[y * this.w + x2] === k) x2++; ctx.fillStyle = k; ctx.fillRect((ox + x) * U, (oy + y) * U, (x2 - x) * U, U); x = x2; } } }
+    // dithered light: each source brightens towards its colour in 3 steps, plus a dithered darkness away from all lights
+    light(srcs, dark, skip) {
+      for (let y = 0; y < this.h; y++) for (let x = 0; x < this.w; x++) {
+        const i = y * this.w + x; let col = this.c[i]; if (!col || (skip && skip(x, y))) continue;
+        let tot = 0;
+        for (const s of srcs) { const d = Math.hypot(x - s.x, y - s.y) / s.r, L = Math.max(0, 1 - d); tot += L * (s.dk == null ? 1 : s.dk); const lv = Math.floor(clamp(L * 3 + bay(x, y) - 0.3, 0, 3)) / 3; if (lv > 0) col = mix(col, s.col, lv * s.k); }
+        const dv = Math.floor(clamp((1 - Math.min(1, tot)) * dark * 3 + bay(x + 1, y + 2) - 0.5, 0, 3)) / 3;
+        if (dv > 0) col = mix(col, '#04050a', dv * 0.42);
+        this.c[i] = col;
+      }
     }
-    s += '<g class="uzcf-zz"><text class="uzcf-z" x="16" y="-64">z</text><text class="uzcf-z uzcf-z2" x="22" y="-74">z</text><text class="uzcf-z uzcf-z3" x="28" y="-84">Z</text></g>';
-    return s;
   }
-  function tentArm(d) { return `<path d="${d}" stroke="#2f6b55" stroke-width="7" fill="none" stroke-linecap="round"/><path d="${d}" stroke="#8fdcb9" stroke-width="4.6" fill="none" stroke-linecap="round"/>`; }
+  const F = (c, x, y, w, h, col) => { c.fillStyle = col; c.fillRect(Math.round(x) * U, Math.round(y) * U, w * U, h * U); };
+  // a curved strand of yarn as a pixel line (quadratic curve), with a darker pixel under it so it reads as a strand
+  function strand(c, x0, y0, qx, qy, x1, y1, col, lo) {
+    const seen = new Set(), pts = [];
+    const n = Math.ceil((Math.abs(x1 - x0) + Math.abs(y1 - y0) + Math.abs(qy - y0)) * 3) + 4;
+    for (let i = 0; i <= n; i++) { const t = i / n, a = (1 - t) * (1 - t), b = 2 * (1 - t) * t, d = t * t; const x = Math.round(a * x0 + b * qx + d * x1), y = Math.round(a * y0 + b * qy + d * y1); const k = x + ',' + y; if (!seen.has(k)) { seen.add(k); pts.push([x, y]); } }
+    pts.forEach(([x, y]) => { if (!seen.has(x + ',' + (y + 1))) F(c, x, y + 1, 1, 1, lo); });
+    pts.forEach(([x, y], i) => F(c, x, y, 1, 1, i % 4 === 1 ? sh(col, 0.3) : col));
+  }
+  
+  /* ---------- the knitted pieces (row 0 = top of the finished piece, knitting starts at the bottom row) ---------- */
+  const SOCK = ['aaaaaaa......', 'bbbbbbb......', 'aaaaaaa......', 'ccccccc......', 'ccccccc......', 'ddddddd......', 'ccccccc......', 'ccccccc......',
+    'ddddddd......', 'ccccccc......', 'cccccccc.....', 'ccccccccccc..', 'eccccccccccee', 'eeccccccccdee', '.eeccccccceee', '..eeeeeeeee..'];
+  function scarf() { const R = 22, W = 8, g = []; for (let r = 0; r < R; r++) { let row = ''; const sx = Math.round(3.5 + 1.7 * Math.sin(r * 0.62)); for (let c = 0; c < W; c++) { let k = 'a'; if (r < 2 || r >= R - 2) k = r % 2 ? 'd' : 'b'; else if (c === sx) k = 'c'; else if (r % 3 === 0 && ((r / 3) % 2 ? c === sx - 1 || c === sx - 2 : c === sx + 1 || c === sx + 2)) k = 'e'; row += k; } g.push(row); } return g; }
+  function jumper() {
+    const R = 18, W = 19, g = [];
+    for (let r = 0; r < R; r++) { let row = ''; for (let c = 0; c < W; c++) { const body = c >= 4 && c <= 14, sleeve = c <= 3 || c >= 15; let k = '.';
+      if (r === 0) { if ((c >= 3 && c <= 6) || (c >= 12 && c <= 15)) k = c === 6 || c === 12 ? 'b' : 'a'; } else if (r === 1) { if (c >= 1 && c <= 17) k = c >= 7 && c <= 11 ? 'b' : 'a'; }
+      else if (r <= 10) { if (body || sleeve) k = 'a'; if (sleeve && r === 5) k = 'c'; if (sleeve && r >= 9) k = 'b'; } else if (body) k = r >= 16 ? 'b' : 'a';
+      if (body && r >= 2 && r <= 14) { const dx = (c - 9) * 6, dy = (r - 8) * 4.4; if (dx * dx + dy * dy <= 22 * 22) k = 'f'; }
+      if ((c === 7 || c === 11) && (r === 7 || r === 8)) k = 'e'; if ((c === 6 || c === 12) && r === 10) k = 'p'; if ((c === 8 || c === 10) && r >= 11 && r <= 13) k = 'g'; if (c === 9 && r === 12) k = 'g'; if (c === 9 && r === 2) k = 'k';
+      row += k; } g.push(row); }
+    return g;
+  }
+  const GRIDS = { small: SOCK, medium: scarf(), large: jumper() };
+  const PAL = {
+    small: { a: '#faf5d7', b: '#f28ca0', c: '#78be96', d: '#3c643c', e: '#e0b860' },
+    medium: { a: '#3c643c', b: '#e0b860', c: '#8fd06a', d: '#c98a2a', e: '#aae2be' },
+    large: { a: '#9a3048', b: '#6e1f34', c: '#e0b860', f: '#aae2be', e: '#1b1b2f', p: '#f28ca0', g: '#5a9c78', k: '#8fd06a' },
+  };
+  const OUTL = '#141c18';
+  // knit texture at one art pixel per stitch: alternate columns lighter and darker so it reads as ribs of V stitches
+  const knitCol = (col, c, r) => sh(col, c % 2 ? -0.16 : (r % 2 ? 0.04 : 0.12));
+  // small version for the shelf: every other stitch
+  function miniBuf(sz) {
+    const g = GRIDS[sz], R = g.length, W = g[0].length, mw = Math.ceil(W / 2), mh = Math.ceil(R / 2);
+    const b = new Buf(mw + 2, mh + 2);
+    for (let r = 0; r < mh; r++) for (let c = 0; c < mw; c++) { const k = g[Math.min(R - 1, r * 2)][Math.min(W - 1, c * 2)]; if (k !== '.') b.p(c + 1, r + 1, knitCol(PAL[sz][k], c, r)); }
+    b.outline(OUTL); return b;
+  }
+  const MINI = { small: miniBuf('small'), medium: miniBuf('medium'), large: miniBuf('large') };
+  // the part already knitted, hanging from the needles: newest row at the top
+  function lapPiece(c, sz, f, cx, top, maxRows) {
+    const g = GRIDS[sz], R = g.length, W = g[0].length;
+    const done = clamp(f, 0, 1) * R, full = Math.floor(done), part = done - full;
+    const b = new Buf(W + 2, maxRows + 3);
+    const curRow = R - full - 1; let rows = [];
+    if (curRow >= 0) rows.push(curRow);
+    for (let r = R - full; r < R; r++) rows.push(r);
+    rows = rows.slice(0, maxRows);
+    rows.forEach((gr, i) => {
+      const row = g[gr]; const c0 = row.search(/[^.]/); let c1 = row.length - 1; while (row[c1] === '.') c1--;
+      let from = c0, to = c1;
+      if (gr === curRow) { const n = c1 - c0 + 1, s = Math.floor(part * n), ltr = full % 2 === 0; if (s === 0) return; if (ltr) to = c0 + s - 1; else from = c1 - s + 1; }
+      for (let col = from; col <= to; col++) if (row[col] !== '.') b.p(col + 1, i + 1, knitCol(PAL[sz][row[col]], col, gr));
+    });
+    b.outline(OUTL);
+    b.draw(c, Math.round(cx - (W + 2) / 2), top - 1);
+  }
+  
+  /* ---------- Ulhu: his real 64 by 64 game sprite (ULHU_ART.b16 from game-ulhu.js: idle, sleepy and happy) ---------- */
+  const IMG = {};
+  let IMG_P = null;
+  function loadImgs() {
+    if (IMG_P) return IMG_P;
+    const src = root.ULHU_ART && root.ULHU_ART.b16;
+    IMG_P = Promise.all(['idle', 'sleepy', 'happy'].map((k) => new Promise((res) => {
+      if (!src || !src[k]) { res(); return; }
+      const i = new root.Image(); i.onload = () => { IMG[k] = i; res(); }; i.onerror = () => res(); i.src = src[k];
+    })));
+    return IMG_P;
+  }
+  function tinted(img, col, a) { const cv = document.createElement('canvas'); cv.width = 64; cv.height = 64; const x = cv.getContext('2d'); x.drawImage(img, 0, 0); if (a > 0) { x.globalCompositeOperation = 'source-atop'; x.fillStyle = col; x.globalAlpha = a; x.fillRect(0, 0, 64, 64); } return cv; }
+  const UX = 37, UY = 26; // his top-left, in art pixels (same place in both scenes)
+  const SKIN = '#aae2be', SKIN2 = '#78be96', SKOUT = '#284632';
+  function drawUlhu(c, S, st, t) {
+    const mood = st === 'paused' ? 'sleepy' : st === 'fin' ? 'happy' : 'idle', im = S.tint[mood];
+    const step = Math.floor(t / 140);
+    const hop = st === 'fin' ? [0, -1, -3, -4, -3, -1, 0, 0][step % 8] : 0;
+    const X = UX * U, Y = (UY + hop) * U;
+    const wdy = st === 'paused' ? 0 : st === 'fin' ? (step % 2 ? -2 : 0) : (Math.floor(t / 520) % 2 ? -2 : 0);
+    const hdy = st === 'paused' ? (Math.floor(t / 1700) % 2 ? 2 : 0) : 0;
+    c.drawImage(im, 0, 0, 12, 64, X, Y + wdy, 12, 64);
+    if (mood === 'sleepy') c.drawImage(im, 52, 14, 12, 50, X + 52, Y + 14 + wdy, 12, 50); else c.drawImage(im, 52, 0, 12, 64, X + 52, Y + wdy, 12, 64);
+    c.drawImage(im, 12, 30, 40, 34, X + 12, Y + 30, 40, 34);
+    if (mood === 'sleepy') c.drawImage(im, 12, 0, 36, 30, X + 12, Y + hdy, 36, 30), c.drawImage(im, 48, 14, 4, 16, X + 48, Y + 14 + hdy, 4, 16);
+    else c.drawImage(im, 12, 0, 40, 30, X + 12, Y + hdy, 40, 30);
+    if (mood === 'idle' && t % 4300 < 150) c.drawImage(S.tint.sleepy, 14, 13, 36, 15, X + 14, Y + 13, 36, 15);
+    return { hop };
+  }
+  // glasses on the same 2-pixel grid, sitting over his eyes; when he dozes they slide down his nose
+  function glasses(c, st, hop) {
+    const ox = UX, oy = UY + hop + (st === 'paused' ? 3 : 0), G = '#e0b860', g2 = '#8a6a2a', gl = '#fff6d0';
+    const rim = (x0, y0) => { F(c, ox + x0 + 1, oy + y0, 5, 1, G); F(c, ox + x0, oy + y0 + 1, 1, 6, G); F(c, ox + x0 + 6, oy + y0 + 1, 1, 6, g2); F(c, ox + x0 + 1, oy + y0 + 7, 5, 1, g2); F(c, ox + x0 + 4, oy + y0 + 1, 1, 1, gl); };
+    if (st === 'paused') { rim(8, 6); rim(17, 7); F(c, ox + 15, oy + 9, 2, 1, G); }
+    else { rim(8, 6); rim(17, 6); F(c, ox + 15, oy + 8, 2, 1, G); F(c, ox + 6, oy + 8, 2, 1, g2); F(c, ox + 24, oy + 8, 2, 1, g2); }
+  }
+  // two of his face tentacles become arms; needles in his "hands"
+  function armsAndNeedles(c, st, t, hop) {
+    const ox = UX, oy = UY + hop, k = st === 'work' ? Math.floor(t / 180) % 4 : 0, drop = st === 'paused' ? 2 : 0;
+    const rh = [[0, 0], [-1, 0], [-1, -1], [0, 0]][k], lh = [[0, 0], [0, 0], [0, 1], [0, 0]][k];
+    const arm = (pts) => { // 2-pixel-thick tentacle with outline and an underside shade
+      const cells = new Map();
+      for (let i = 0; i < pts.length - 1; i++) { const [a, b] = pts[i], [c2, d] = pts[i + 1], n = Math.max(Math.abs(c2 - a), Math.abs(d - b)) * 2 + 1; for (let s = 0; s <= n; s++) { const x = Math.round(a + (c2 - a) * s / n), y = Math.round(b + (d - b) * s / n); if (cells.get(x + ',' + y) !== 1) cells.set(x + ',' + y, 1); cells.set(x + 1 + ',' + y, 1); if (!cells.has(x + ',' + (y + 1))) cells.set(x + ',' + (y + 1), 2); } }
+      const out = new Set();
+      cells.forEach((v, key) => { const [x, y] = key.split(',').map(Number); [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(([dx, dy]) => { const q = x + dx + ',' + (y + dy); if (!cells.has(q)) out.add(q); }); });
+      out.forEach((key) => { const [x, y] = key.split(',').map(Number); F(c, ox + x, oy + y, 1, 1, SKOUT); });
+      cells.forEach((v, key) => { const [x, y] = key.split(',').map(Number); F(c, ox + x, oy + y, 1, 1, v === 2 ? SKIN2 : SKIN); });
+    };
+    const L = [12 + lh[0], 27 + lh[1] + drop], R = [20 + rh[0], 27 + rh[1] + drop];
+    const needle = (x0, y0, x1, y1, knob) => { const n = Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0)); for (let s = 0; s <= n; s++) { const x = Math.round(x0 + (x1 - x0) * s / n), y = Math.round(y0 + (y1 - y0) * s / n); F(c, ox + x, oy + y + 1, 1, 1, '#3a1e0a'); F(c, ox + x, oy + y, 1, 1, s % 3 ? '#c9853a' : '#f0b060'); } F(c, ox + x0, oy + y0, 1, 1, knob); F(c, ox + x0 + (x1 > x0 ? -1 : 1), oy + y0, 1, 1, knob); F(c, ox + x0, oy + y0 + 1, 1, 1, '#a04a5a'); };
+    if (st === 'paused') { needle(L[0] - 3, L[1] + 1, L[0] + 9, L[1] + 3, '#f28ca0'); needle(R[0] + 3, R[1] + 1, R[0] - 9, R[1] + 3, '#f28ca0'); }
+    else { needle(L[0] - 4, L[1] + 2, L[0] + 9, L[1] - 6, '#f28ca0'); needle(R[0] + 4, R[1] + 2, R[0] - 9, R[1] - 6, '#f28ca0'); }
+    arm([[10, 21], [8, 24], [L[0] - 2, L[1]], L]);
+    arm([[21, 21], [23, 24], [R[0] + 1, R[1]], [R[0] - 1, R[1]]]);
+    if (k === 2) { const x = ox + 16, y = oy + 21; F(c, x, y - 1, 1, 1, '#fff6c8'); F(c, x - 1, y, 3, 1, '#fff6c8'); F(c, x, y + 1, 1, 1, '#fff6c8'); }
+    return [ox + R[0], oy + R[1], ox + L[0], oy + L[1]];
+  }
+  function zzz(c, t) {
+    const Z = [[0, 0], [1, 0], [2, 0], [2, 1], [1, 2], [0, 3], [0, 4], [1, 4], [2, 4]];
+    for (let i = 0; i < 3; i++) { const ph = ((t / 900 + i) % 3) / 3, s = Math.floor(ph * 8); if (ph > 0.92) continue; const x = UX + 26 + s, y = UY + 1 - s * 2; Z.forEach(([dx, dy]) => F(c, x + dx, y + dy, 1, 1, ph > 0.7 ? '#9fb8cc' : '#e9f4ff')); }
+  }
+  function sparkle(c, x, y, ph) { const a = ph > 0.5 ? '#fff6c8' : '#ffd56a'; F(c, x, y, 1, 1, '#ffffff'); if (ph > 0.25) { F(c, x - 1, y, 1, 1, a); F(c, x + 1, y, 1, 1, a); F(c, x, y - 1, 1, 1, a); F(c, x, y + 1, 1, 1, a); } if (ph > 0.6) { F(c, x - 2, y, 1, 1, '#c98a2a'); F(c, x + 2, y, 1, 1, '#c98a2a'); F(c, x, y - 2, 1, 1, '#c98a2a'); F(c, x, y + 2, 1, 1, '#c98a2a'); } }
+  
+  /* ---------- yarn ball: a pixel circle with wrapped strands that spin and shrink ---------- */
+  const YARN = '#8fd0a8';
+  function ball(c, cx, floorY, r, spin, jig) {
+    const cy = floorY - r, b = new Buf(20, 20), o = 10;
+    for (let y = 0; y < 20; y++) for (let x = 0; x < 20; x++) {
+      const dx = x + 0.5 - o, dy = y + 0.5 - o, d = Math.hypot(dx, dy); if (d > r) continue;
+      let col = YARN;
+      const u = dx * 0.8 + dy * 0.6 + spin, v = dx * -0.55 + dy * 0.85 - spin * 0.6;
+      if (((Math.floor(u * 0.9) % 3) + 3) % 3 === 0 && dy < r * 0.3) col = '#5a9c78';
+      else if (((Math.floor(v) % 3) + 3) % 3 === 0 && dy >= -r * 0.2) col = '#3c7a5a';
+      const lit = -(dx + dy) / r;
+      if (lit > 0.75) col = sh(col, 0.35); else if (lit > 0.3) col = sh(col, 0.12); else if (lit < -0.75) col = sh(col, -0.35); else if (lit < -0.3) col = sh(col, -0.15);
+      b.p(x, y, col);
+    }
+    b.outline('#16301f');
+    b.draw(c, Math.round(cx - o + jig), Math.round(cy - o));
+    return [Math.round(cx + jig), Math.round(cy - r)];
+  }
+  
+  /* ---------- the bar: a knitted strip that grows stitch by stitch ---------- */
+  const BAR = { x: 4, y: 74, cols: 17, rows: 2, sw: 5, sh: 4 };
+  const NST = BAR.cols * BAR.rows;
+  const STRIPE = ['#aae2be', '#aae2be', '#aae2be', '#faf5d7', '#5a8c5a', '#faf5d7', '#aae2be', '#aae2be', '#78be96', '#3c643c'];
+  function stitchCol(cI, r) { const k = cI % 10; if (k === 4 && r === 0) return '#f28ca0'; return STRIPE[k]; }
+  function stitch(c, x, y, col) { // a V: two arms meeting at the bottom middle
+    const D = sh(col, -0.5), A = sh(col, 0.25), B = sh(col, -0.06), M = sh(col, -0.2);
+    const g = ['ADDDB', 'AADBB', 'DAMBD', 'DDMDD'], m = { A, B, D, M };
+    for (let j = 0; j < 4; j++) for (let i = 0; i < 5; i++) F(c, x + i, y + j, 1, 1, m[g[j][i]]);
+  }
+  function drawBar(c, S, f, st, t) {
+    const n = Math.floor(clamp(f, 0, 1) * NST + 1e-6), { x: X, y: Y, sw, sh: H } = BAR;
+    const wcols = Math.ceil(n / BAR.rows);
+    if (wcols) { c.globalAlpha = 0.35; F(c, X + 1, Y + BAR.rows * H, wcols * sw, 1, '#000000'); c.globalAlpha = 1; }
+    for (let i = 0; i < n; i++) { const ci = Math.floor(i / BAR.rows), r = i % BAR.rows; stitch(c, X + ci * sw, Y + r * H, stitchCol(ci, r)); }
+    // cast-on knot on the left
+    F(c, X - 1, Y + 2, 1, 5, '#3c643c'); F(c, X - 2, Y + 3, 1, 3, '#5a8c5a');
+    S.pins(c, wcols);
+    if (st === 'fin') return;
+    // loose yarn ahead: lies in a soft wave along the board, shorter as the strip grows
+    const ex = X + wcols * sw, endX = X + BAR.cols * sw + 2;
+    for (let x = ex + 1; x < endX; x++) { const y = Y + 3 + [0, 0, 1, 1, 1, 0, 0, -1, -1, -1][(x + 3) % 10]; c.globalAlpha = 0.4; F(c, x, y + 1, 1, 1, '#000000'); c.globalAlpha = 1; F(c, x, y, 1, 1, x % 5 === 0 ? '#c4ecd2' : YARN); }
+    F(c, endX, Y + 2, 2, 3, '#5a9c78'); F(c, endX + 1, Y + 1, 1, 1, '#3c643c');
+    // two little needles at the growing edge, and the stitch being made blinks
+    const cx = X + Math.floor(n / BAR.rows) * sw, cy = Y + (n % BAR.rows) * H;
+    const k = st === 'work' ? Math.floor(t / 180) % 4 : 0, dip = k === 1 || k === 2 ? 1 : 0;
+    const nd = (x0, y0, dx) => { for (let s = 0; s < 8; s++) { F(c, x0 + Math.round(s * dx), y0 - s + 1, 1, 1, '#5a3a1c'); F(c, x0 + Math.round(s * dx), y0 - s, 1, 1, s % 3 ? '#c9853a' : '#f0b060'); } F(c, x0 + Math.round(7 * dx), y0 - 7, 1, 1, '#f28ca0'); };
+    if (n < NST) {
+      if (st === 'work' && Math.floor(t / 330) % 2) { F(c, cx, cy - 1, 5, 1, '#fff6c8'); F(c, cx, cy + 4, 5, 1, '#fff6c8'); F(c, cx - 1, cy, 1, 4, '#fff6c8'); F(c, cx + 5, cy, 1, 4, '#fff6c8'); }
+      else if (st === 'paused') { F(c, cx, cy - 1, 5, 1, '#9fb8cc'); F(c, cx, cy + 4, 5, 1, '#9fb8cc'); }
+      nd(cx + 1, cy + 4 + dip, -0.45); nd(cx + 3, cy + 4, 0.5);
+    }
+  }
+  
+  /* ---------- chair (shared shape, own colours) ---------- */
+  function chairBack(B, P, wings, rad) {
+    const x0 = 38, x1 = 68, y0 = 16, y1 = 56;
+    const inside = (x, y) => { if (x < x0 || x > x1 || y < y0 || y > y1) return false; const cx = x < x0 + rad ? x0 + rad : x > x1 - rad ? x1 - rad : x, cy = y < y0 + rad ? y0 + rad : y; return Math.hypot(x - cx, y - cy) <= rad; };
+    const T = new Buf();
+    for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) if (inside(x, y)) { const u = (x - x0) / (x1 - x0); let col = u < 0.18 ? P.hi : u > 0.82 ? P.lo : P.mid; if (y < y0 + 3) col = sh(col, 0.1); T.p(x, y, col); }
+    if (wings) for (const s of [-1, 1]) for (let y = 22; y <= 48; y++) for (let x = 0; x < 6; x++) { const xx = s < 0 ? 33 + x : 68 + x; const top = y < 27 ? (s < 0 ? x >= 27 - y : x <= 5 - (27 - y)) : true; if (top) T.p(xx, y, s < 0 ? (x < 2 ? P.hi : P.mid) : (x > 3 ? P.lo : P.mid)); }
+    for (const by of [24, 33, 42]) for (const bx of [45, 53, 61]) { const X = bx + (by === 33 ? -4 : 0); if (X < x0 + 2) continue; T.p(X, by, P.btn); T.p(X - 1, by - 1, P.hi); T.p(X + 1, by + 1, sh(P.mid, -0.18)); T.p(X + 2, by + 2, sh(P.mid, -0.1)); T.p(X - 2, by + 2, sh(P.mid, -0.1)); }
+    T.outline(P.out);
+    T.c.forEach((v, i) => { if (v) B.c[i] = v; });
+  }
+  function chairFront(P, rad) {
+    const T = new Buf();
+    for (const ax of [33, 67]) for (let y = 50; y <= 59; y++) for (let x = ax; x < ax + 7; x++) { if (y === 50 && (x === ax || x === ax + 6)) continue; if (rad > 4 && y === 51 && (x === ax || x === ax + 6)) continue; const top = y < 53; const col = top ? (y === 50 || (rad > 4 && y === 51) ? sh(P.hi, 0.12) : P.hi) : (x === ax ? P.hi : x === ax + 6 ? P.lo : P.mid); T.p(x, y, col); }
+    T.r(40, 55, 27, 1, sh(P.hi, 0.05)); T.r(40, 56, 27, 3, P.mid); T.r(40, 59, 27, 1, P.lo);
+    for (const lx of [35, 70]) T.r(lx, 60, 2, 3, P.leg);
+    T.outline(P.out);
+    return T;
+  }
+  
+  /* ---------- K1: firelit cottage nook ---------- */
+  function buildK1() {
+    const B = new Buf(), R = rng(11);
+    // stone wall
+    for (let row = 0; row * 5 + 4 < 62; row++) { const y0 = 4 + row * 5; let x = -(row % 2) * 5; while (x < AW) { const w = 7 + Math.floor(R() * 6), base = ['#4e3f38', '#55443b', '#4a3b35', '#5a4840', '#463832'][Math.floor(R() * 5)]; for (let j = 0; j < 5; j++) for (let i = 0; i < w; i++) { let col = base; if (i === w - 1 || j === 4) col = '#2b211d'; else if (j === 0) col = sh(base, 0.12); else if (j === 3) col = sh(base, -0.14); else if (hash(x + i, y0 + j) > 0.9) col = sh(base, -0.1); B.p(x + i, y0 + j, col); } x += w; } }
+    // beam and hanging herbs
+    B.r(0, 0, AW, 4, (x, y) => (y === 0 ? '#2a180c' : y === 3 ? '#1e1008' : hash(x, 3) > 0.8 ? '#2e1c0e' : y === 1 ? '#4e3220' : '#3a2414'));
+    for (const hx0 of [30, 54]) { B.r(hx0, 4, 1, 3, '#c9a050'); for (let j = 0; j < 5; j++) for (let i = -2; i <= 2; i++) if (Math.abs(i) <= 2 - (j > 2 ? 1 : 0)) B.p(hx0 + i, 7 + j, (i + j) % 2 ? '#3e6a2a' : '#5a8a3a'); B.p(hx0, 6, '#e0b860'); }
+    // fireplace
+    for (let y = 27; y < 60; y++) for (let x = 2; x < 35; x++) { const sx = x + (Math.floor((y - 27) / 4) % 2) * 3, bx = Math.floor(sx / 6), by = Math.floor((y - 27) / 4); const base = ['#7a6a5e', '#857466', '#6e5f54'][(bx + by * 2) % 3]; let col = base; if (sx % 6 === 5 || (y - 27) % 4 === 3) col = '#3e332c'; else if ((y - 27) % 4 === 0) col = sh(base, 0.12); B.p(x, y, col); }
+    const opening = (x, y) => { if (y < 34 || y > 58) return false; const hw = y === 34 ? 7 : y === 35 ? 9 : y === 36 ? 10 : 11; return x >= 18 - hw && x <= 18 + hw; };
+    for (let y = 34; y <= 58; y++) for (let x = 6; x <= 30; x++) if (opening(x, y)) { let col = '#140a07'; if (y < 50 && (x + Math.floor(y / 3)) % 5 !== 0 && y % 3 !== 0) col = y < 42 ? '#2a120c' : '#3a1a10'; B.p(x, y, col); }
+    B.r(0, 24, 37, 1, '#b07a42'); B.r(0, 25, 37, 2, (x) => (hash(x, 25) > 0.75 ? '#6a3e1e' : '#7a4a24')); B.r(0, 27, 37, 1, '#3e2410');
+    B.r(2, 28, 3, 2, '#5a3418'); B.r(32, 28, 3, 2, '#5a3418');
+    B.r(0, 58, 37, 4, (x, y) => (y === 58 ? '#8a7a6a' : y === 61 ? '#3e332c' : '#6a5a50'));
+    // logs and the ember bed
+    B.r(9, 53, 19, 3, (x, y) => (y === 53 ? '#7a4a24' : '#5a3418')); B.r(11, 50, 15, 3, (x, y) => (y === 50 ? '#8a5a2e' : '#62391a'));
+    for (const [ex, ey] of [[9, 54], [27, 54], [11, 51], [25, 51]]) B.p(ex, ey, '#c9925a');
+    B.r(10, 56, 18, 2, (x) => (x % 3 ? '#ff6a2a' : '#ffb43a'));
+    // window onto the sea
+    const glass = (x, y) => { if (y < 12 || y > 38) return false; const hw = y === 12 ? 2 : y === 13 ? 4 : y === 14 ? 5 : y === 15 ? 6 : 7; return x >= 83 - hw && x <= 82 + hw; };
+    for (let y = 9; y <= 40; y++) for (let x = 73; x <= 92; x++) { let near = false; for (let dy = -2; dy <= 2; dy++) for (let dx = -2; dx <= 2; dx++) if (glass(x + dx, y + dy)) near = true; if (near && !glass(x, y)) B.p(x, y, (x + y) % 7 === 0 ? '#6e6052' : y < 13 || x < 76 ? '#a09080' : '#8a7a6a'); }
+    const win = new Set();
+    for (let y = 12; y <= 38; y++) for (let x = 76; x <= 89; x++) if (glass(x, y)) {
+      const v = (y - 12) / 26 + (bay(x, y) - 0.5) * 0.18, cols = ['#14365a', '#0e2c4c', '#0a2238', '#071a2c', '#05121f'];
+      let col = cols[clamp(Math.floor(v * 5), 0, 4)];
+      const dm = Math.hypot(x + 0.5 - 86, y + 0.5 - 17);
+      if (dm < 2.7) col = dm < 1.6 ? '#f2f6e0' : '#d0d8b8'; else if (Math.abs(x - 85.5) < 1.5 + (y - 19) * 0.12 && y > 20 && bay(x, y) > 0.55) col = '#2a5a80';
+      if (y > 34 && y > 38 - hash(x, 5) * 6) col = '#0c2a1c';
+      if (x === 83 || y === 25) col = '#1a1410'; else win.add(x + ',' + y);
+      B.p(x, y, col);
+    }
+    B.r(72, 40, 22, 1, '#a8743e'); B.r(72, 41, 22, 2, '#6a3e1e');
+    // floor planks and the rug
+    for (let y = 60; y < 70; y++) { const row = Math.floor((y - 60) / 3); for (let x = 0; x < AW; x++) { const seam = (x + row * 13) % 21 === 0, base = ['#5a3820', '#62402a', '#4e301c', '#583822'][row % 4]; let col = (y - 60) % 3 === 2 || seam ? '#2a1a0e' : (y - 60) % 3 === 0 ? sh(base, 0.12) : base; if (!seam && hash(x, y) > 0.92) col = sh(base, -0.12); B.p(x, y, col); } }
+    for (let y = 60; y < 70; y++) for (let x = 26; x < 82; x++) { const dx = (x + 0.5 - 54) / 27, dy = (y + 0.5 - 65) / 4.6, d = dx * dx + dy * dy; if (d > 1) continue; let col = '#8a2a2a'; if (d > 0.72) col = '#c9a050'; else if (d > 0.6) col = '#5a1a1a'; else if ((Math.abs(x - 54) + Math.abs(y - 65) * 3) % 6 === 0) col = '#e6c88a'; else if ((x + y) % 2 && d < 0.2) col = '#9a3a32'; B.p(x, y, col); }
+    // basket of spare yarn by the window
+    B.circ(88, 55.5, 2.6, (x, y, dx, dy) => (dx + dy < -1.5 ? '#ffb8c6' : dx + dy > 1.6 ? '#c06a7e' : (x + y) % 3 === 0 ? '#d8788c' : '#f28ca0'));
+    B.circ(92, 56, 2.3, (x, y, dx, dy) => (dx + dy < -1.2 ? '#ffffff' : dx + dy > 1.4 ? '#c8c0a0' : (x - y) % 3 === 0 ? '#e0d8b4' : '#faf5d7'));
+    B.r(84, 57, 11, 6, (x, y) => (y === 57 ? '#c09a50' : (x + Math.floor(y / 2)) % 2 ? '#a07a3a' : '#7a5a28'));
+    B.r(84, 63, 11, 1, '#3a2410');
+    chairBack(B, K1.chair, true, 4);
+    B.light([{ x: 18, y: 50, r: 62, col: '#ff9a48', k: 0.42 }, { x: 18, y: 50, r: 26, col: '#ffd08a', k: 0.25, dk: 0.5 }, { x: 84, y: 24, r: 22, col: '#7ab0d8', k: 0.18, dk: 0.6 }], 0.85, (x, y) => win.has(x + ',' + y) || (y >= 34 && y <= 58 && x >= 7 && x <= 29) || y >= 70);
+    // bar area: skirting, the board the strip is pinned to, and the plaque
+    B.r(0, 70, AW, 1, '#6a4224'); B.r(0, 71, AW, 2, '#3a2414');
+    B.r(0, 73, AW, 11, (x, y) => (y === 83 ? '#3a2616' : hash(x >> 2, y) > 0.85 ? '#5e4228' : x % 31 === 0 ? '#4a321e' : '#6a4a2c'));
+    B.r(0, 84, AW, 8, '#1e1208'); B.r(1, 84, AW - 2, 1, '#c9a050'); B.r(1, 91, AW - 2, 1, '#6a4a1a'); B.r(1, 85, 1, 6, '#c9a050'); B.r(AW - 2, 85, 1, 6, '#6a4a1a');
+    K1.win = win;
+    return B;
+  }
+  const K1 = {
+    id: 'k1', chair: { hi: '#c84a44', mid: '#9a2a30', lo: '#5e161c', btn: '#4a0e14', out: '#240608', leg: '#3a2010' },
+    shelfY: 23, slots: [7, 18, 29], dash: '#e6c88a', ballX: 81, floorY: 67, tintCol: '#ff9a48', tintA: 0.07,
+    pins(c, w) { for (let i = 0; i < w; i += 3) { const x = BAR.x + i * BAR.sw + 2; F(c, x, BAR.y - 1, 2, 1, '#f0d080'); F(c, x + 1, BAR.y - 1, 1, 1, '#a07a2a'); } },
+    mid(c, t, st) {
+      // fire: columns of flame that change every frame, hot core, orange body, red tips
+      const fr = Math.floor(t / 110), base = 53;
+      for (let x = 10; x <= 27; x++) { const cen = 1 - Math.abs(x - 18.5) / 9.5, h = Math.round(3 + 11 * cen + hash(x, fr) * 4 - (st === 'paused' ? 2 : 0)); for (let j = 0; j < h; j++) { const y = base - j, rel = j / h; if (rel > 0.75 && hash(x * 3 + j, fr) > 0.6) continue; const col = rel < 0.35 && cen > 0.55 ? '#fff2a8' : rel < 0.55 ? '#ffc040' : rel < 0.8 ? '#f07a22' : '#c03a1a'; F(c, x, y, 1, 1, col); } }
+      for (let i = 0; i < 3; i++) { const q = t / 1300 + i * 0.33, ph = q % 1, x = 13 + Math.floor(hash(i, Math.floor(q)) * 12), y = 46 - Math.floor(ph * 12); if (y > 35) F(c, x + (Math.floor(ph * 6) % 2), y, 1, 1, ph > 0.6 ? '#c03a1a' : '#ffb43a'); }
+      c.drawImage(Math.floor(t / 240) % 3 === 0 ? this.glowB : this.glowA, 0, 0);
+      // fish and bubbles in the window
+      const W = this.win, put = (x, y, col) => { if (W.has(x + ',' + y)) F(c, x, y, 1, 1, col); };
+      const fx = 70 + Math.floor((t / 260) % 34), fy = 29;
+      [[1, 0], [2, 0], [3, 0], [5, 0], [0, 1], [1, 1], [3, 1], [4, 1], [1, 2], [2, 2], [3, 2], [5, 2]].forEach(([dx, dy]) => put(fx - dx, fy + dy, dy === 0 ? '#ffb070' : '#f08a3a'));
+      put(fx - 1, fy + 1, '#1a0a04');
+      const f2 = 96 - Math.floor((t / 420) % 30); [[0, 0], [1, 0], [2, 0], [-1, 0], [0, -1], [1, 1]].forEach(([dx, dy]) => put(f2 + dx, 20 + dy, '#8ab8d8'));
+      for (let i = 0; i < 3; i++) { const ph = (t / 3400 + i * 0.37) % 1, x = 79 + i * 3 + (Math.floor(ph * 9) % 2), y = 37 - Math.floor(ph * 24); put(x, y, '#9fd0ff'); }
+      if (Math.floor(t / 500) % 2) put(86, 22, '#4a7aa0');
+    },
+  };
+  
+  /* ---------- glow over the room from the fire (dithered, made once) ---------- */
+  function glow(cx, cy, r, col, a, seed) { const cv = document.createElement('canvas'); cv.width = AW * U; cv.height = AH * U; const x = cv.getContext('2d'); x.fillStyle = col; for (let y = 0; y < 70; y++) for (let i = 0; i < AW; i++) { const L = 1 - Math.hypot(i - cx, y - cy) / r; if (L <= 0) continue; const lv = Math.floor(clamp(L * 3 + bay(i + seed, y) - 0.4, 0, 3)); if (lv) { x.globalAlpha = a * lv; x.fillRect(i * U, y * U, U, U); } } return cv; }
+  /* ---------- the mantelpiece: the two newest real shelf pieces, plus the slot for the piece being made ---------- */
+  function drawMantel(c, S, st, size, t) {
+    const put = (sz, x, dy) => { const m = MINI[sz]; m.draw(c, Math.round(x - m.w / 2), S.shelfY - m.h + 1 + (dy || 0)); };
+    const list = (SHELF || []).filter((x) => x && MINI[x.size]);
+    const skip = st === 'fin' && !ST.owed.length && list.length ? 1 : 0;   // once saved, the finished piece is the newest in the list
+    list.slice(skip, skip + 2).forEach((x, i) => put(x.size, S.slots[1 - i]));
+    const x = S.slots[2], m = MINI[size];
+    if (st === 'fin') {
+      const e = t - (S.finT == null ? t : S.finT), dy = e < 120 ? 7 : e < 240 ? 3 : e < 360 ? -2 : e < 480 ? -1 : 0;
+      put(size, x, dy);
+      [[-6, -m.h - 2], [5, -m.h + 1], [-1, -m.h - 5], [6, -3]].forEach(([dx, dy2], i) => { const ph = ((t / 700 + i * 0.27) % 1); if (ph < 0.85) sparkle(c, x + dx, S.shelfY + dy2, ph); });
+    } else {
+      const x0 = Math.round(x - m.w / 2) + 1, y0 = S.shelfY - m.h + 2, w = m.w - 2, h = m.h - 2;
+      for (let i = 0; i < w; i += 2) { F(c, x0 + i, y0, 1, 1, S.dash); F(c, x0 + i, y0 + h - 1, 1, 1, S.dash); }
+      for (let j = 0; j < h; j += 2) { F(c, x0, y0 + j, 1, 1, S.dash); F(c, x0 + w - 1, y0 + j, 1, 1, S.dash); }
+    }
+  }
+  /* ---------- putting the scene together: the static parts are made once per page ---------- */
+  function scene() {
+    const S = K1;
+    if (!S.bg) {
+      const bg = doc.createElement('canvas'); bg.width = AW * U; bg.height = AH * U;
+      const g = bg.getContext('2d'); g.fillStyle = '#000'; g.fillRect(0, 0, AW * U, AH * U); buildK1().draw(g); S.bg = bg;
+      const fr = doc.createElement('canvas'); fr.width = AW * U; fr.height = AH * U; chairFront(S.chair, 4).draw(fr.getContext('2d')); S.front = fr;
+      S.glowA = glow(18, 48, 40, '#ff8a30', 0.05, 0); S.glowB = glow(18, 48, 44, '#ff8a30', 0.05, 2);
+    }
+    if (!S.tint && IMG.idle && IMG.sleepy && IMG.happy) S.tint = { idle: tinted(IMG.idle, S.tintCol, S.tintA), sleepy: tinted(IMG.sleepy, S.tintCol, S.tintA), happy: tinted(IMG.happy, S.tintCol, S.tintA) };
+    return S;
+  }
+  // st: idle (ready, nothing started), work, paused (away or resting on the bench: he dozes), fin (finished)
+  function drawScene(c, t, st, f, size) {
+    const S = scene(), fin = st === 'fin';
+    if (fin && !S.wasFin) S.finT = t; S.wasFin = fin;
+    c.clearRect(0, 0, AW * U, AH * U);
+    S.mid(c, t, st);
+    drawMantel(c, S, st, size, t);
+    const u = S.tint ? drawUlhu(c, S, st, t) : { hop: 0 };
+    c.drawImage(S.front, 0, 0);
+    const r = fin ? 3 : 3 + 3.4 * (1 - f), live = st === 'work';
+    const spin = live ? t / 260 : (S.spin || 0); if (live) S.spin = spin;
+    const jig = live && Math.floor(t / 180) % 4 === 1 ? 1 : 0;
+    if (!fin) lapPiece(c, size, f, UX + 16, UY + u.hop + 27 + (st === 'paused' ? 2 : 0), size === 'medium' ? 13 : 11);
+    const hands = fin ? null : armsAndNeedles(c, st, t, u.hop);
+    glasses(c, st, u.hop);
+    if (fin) for (let s = 0; s < 9; s++) { F(c, 66 + s, 50 - Math.floor(s / 3), 1, 1, s % 3 ? '#c9853a' : '#f0b060'); F(c, 65 + s, 51 - Math.floor(s / 4), 1, 1, s % 3 ? '#c9853a' : '#f0b060'); }
+    const top = ball(c, S.ballX, S.floorY, r, spin, jig);
+    if (hands) { const sag = 6 + (live ? [0, 1, 1, 0][Math.floor(t / 300) % 4] : 0); strand(c, top[0], top[1], (top[0] + hands[0]) / 2, Math.max(top[1], hands[1]) + sag, hands[0], hands[1] + 1, YARN, '#2a5a3e'); }
+    if (st === 'paused') zzz(c, t);
+    if (fin) for (let i = 0; i < 3; i++) { const ph = (t / 900 + i / 3) % 1; if (ph < 0.8) { const x = UX + 6 + i * 10, y = UY - 2 - Math.floor(ph * 8); F(c, x, y, 1, 1, '#f28ca0'); F(c, x + 2, y, 1, 1, '#f28ca0'); F(c, x - 1, y + 1, 5, 1, '#f28ca0'); F(c, x, y + 2, 3, 1, '#d86a84'); F(c, x + 1, y + 3, 1, 1, '#d86a84'); } }
+    drawBar(c, S, f, st, t);
+  }
 
-  /* ---------------- KNIT: Ulhu in his armchair, the piece growing row by row ---------------- */
+  /* ---------------- the vector piece, kept for the shelf list and the bench icons ---------------- */
   const KNITS = { small: { H: 60 }, medium: { H: 92 }, large: { H: 76 } };
   function knitPiece(key, f, id) { // f = 0..1; the piece hanging from the needles (top centre = 0,0)
     const K = KNITS[key], rowH = 4, vp = 'url(#uzcf-v)';
@@ -132,78 +463,6 @@
     if (frac > 0 && rows < tot) rev += `<rect x="-80" y="${rows * rowH}" width="${(160 * frac).toFixed(1)}" height="${rowH + 0.3}" fill="#fff"/>`;
     return `<clipPath id="${id}c"><path d="${shape}"/></clipPath><mask id="${id}m" maskUnits="userSpaceOnUse" x="-80" y="-10" width="160" height="100">${rev}</mask>
      <g mask="url(#${id}m)"><g clip-path="url(#${id}c)">${fills}<rect x="-60" y="0" width="120" height="80" fill="${vp}"/></g><path d="${shape}" fill="none" stroke="#2c1a10" stroke-width="1.4"/></g>`;
-  }
-  function knitStage() {
-    const sc = 1.35;
-    return `<defs>
-     <linearGradient id="uzcf-kbg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a1a35"/><stop offset="1" stop-color="#140c1b"/></linearGradient>
-     <linearGradient id="uzcf-vel" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#a0466a"/><stop offset="1" stop-color="#5a1f3c"/></linearGradient>
-     <radialGradient id="uzcf-lamp" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ffd56a" stop-opacity=".45"/><stop offset="1" stop-color="#ffd56a" stop-opacity="0"/></radialGradient>
-     <radialGradient id="uzcf-sea" cx=".4" cy=".35" r=".7"><stop offset="0" stop-color="#1d5a7a"/><stop offset="1" stop-color="#0a1f33"/></radialGradient>
-     <pattern id="uzcf-wall" width="26" height="26" patternUnits="userSpaceOnUse"><path d="M13,4 l3,5 l-3,5 l-3,-5 Z" fill="#ffffff08"/></pattern>
-     <clipPath id="uzcf-port"><circle cx="318" cy="118" r="31"/></clipPath>
-    </defs>
-    <rect width="380" height="330" fill="url(#uzcf-kbg)"/><rect width="380" height="262" fill="url(#uzcf-wall)"/>
-    <circle cx="318" cy="118" r="31" fill="url(#uzcf-sea)"/>
-    <g clip-path="url(#uzcf-port)"><g transform="translate(318,120)"><g class="uzcf-fish"><path d="M0,0 q8,-6 16,0 q-8,6 -16,0 Z M0,0 l-6,-4 v8 Z" fill="#5aa7ff" opacity=".7"/></g></g>
-     ${[[305, 148, 0], [325, 152, -2], [335, 146, -4]].map(([x, y, d]) => `<circle class="uzcf-bub" style="animation-delay:${d}s;animation-duration:5s" cx="${x}" cy="${y}" r="2" fill="none" stroke="#bfe0ff" stroke-width=".8"/>`).join('')}</g>
-    <circle cx="318" cy="118" r="31" fill="none" stroke="#c9a560" stroke-width="6"/><circle cx="318" cy="118" r="34.5" fill="none" stroke="#7a5a26" stroke-width="1.5"/>
-    ${[0, 60, 120, 180, 240, 300].map((a) => `<circle cx="${(318 + 31 * Math.cos(a * Math.PI / 180)).toFixed(1)}" cy="${(118 + 31 * Math.sin(a * Math.PI / 180)).toFixed(1)}" r="1.6" fill="#7a5a26"/>`).join('')}
-    <circle cx="44" cy="176" r="60" fill="url(#uzcf-lamp)" class="uzcf-jelly"/>
-    <rect x="0" y="262" width="380" height="68" fill="#2b1a12"/>${[0, 1, 2, 3, 4, 5, 6].map((i) => `<path d="M0,${270 + i * 9} H380" stroke="#1c110b" stroke-width="1"/>`).join('')}
-    <ellipse cx="168" cy="268" rx="150" ry="10" fill="#5a1f3c"/><ellipse cx="168" cy="268" rx="140" ry="7" fill="none" stroke="#ffd56a55" stroke-width="1.4" stroke-dasharray="4 4"/>
-    <g><path d="M44,264 V210" stroke="#5a3a1e" stroke-width="5"/><path d="M30,264 l14,-8 l14,8" stroke="#5a3a1e" stroke-width="4" fill="none"/><ellipse cx="44" cy="208" rx="24" ry="5" fill="#7a5230"/>
-     <path d="M30,206 q0,-20 8,-26 h12 q8,6 8,26 Z" fill="#bfe0ff22" stroke="#bfe0ff77" stroke-width="1.2"/><g class="uzcf-jelly"><path d="M36,190 q8,-12 16,0 Z" fill="#ff9fd8"/><path d="M38,190 q-1,6 1,10 M42,190 q1,7 -1,12 M46,190 q-1,6 1,10 M50,190 q1,5 -1,9" stroke="#ff9fd8" stroke-width="1.2" fill="none"/></g>
-     <path d="M60,203 h12 v-1 q0,-7 -6,-7 q-6,0 -6,7 Z" fill="#f3ecd2"/><path d="M72,198 q4,0 3,3 q-1,2 -3,1" stroke="#f3ecd2" stroke-width="1.4" fill="none"/><path class="uzcf-steam" d="M64,193 q-3,-4 0,-8 q3,-4 0,-8" stroke="#ffffff88" stroke-width="1.2" fill="none"/><path class="uzcf-steam" style="animation-delay:1.3s" d="M68,193 q-3,-4 0,-8 q3,-4 0,-8" stroke="#ffffff88" stroke-width="1.2" fill="none"/></g>
-    <path class="uzcf-strand" d="" stroke="#5ef2a0" stroke-width="1.6" fill="none" stroke-linecap="round"/>
-    <g transform="translate(305,266)"><g class="uzcf-ball"></g></g>
-    <g transform="translate(160,268)"><g class="uzcf-rock">
-     <path d="M-78,-4 Q0,14 78,-4" stroke="#7a5230" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M-50,-14 V2 M50,-14 V2" stroke="#7a5230" stroke-width="5"/>
-     <path d="M-58,-58 L-58,-150 Q-58,-178 -30,-181 Q0,-190 30,-181 Q58,-178 58,-150 L58,-58 Z" fill="url(#uzcf-vel)" stroke="#3a1226" stroke-width="2"/>
-     ${[[-30, -150], [0, -158], [30, -150], [-30, -110], [0, -116], [30, -110]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="2.2" fill="#3a1226"/>`).join('')}
-     <rect x="-60" y="-50" width="120" height="38" rx="6" fill="#6e2848" stroke="#3a1226" stroke-width="2"/><path d="M-58,-20 H58" stroke="#ffd56a66" stroke-width="1.2" stroke-dasharray="3 3"/>
-     <rect x="-56" y="-66" width="112" height="20" rx="9" fill="#b45a80" stroke="#3a1226" stroke-width="2"/>
-     <g transform="translate(0,-60) scale(${sc})"><g class="uzcf-tilt"><g class="uzcf-breath">${ulhuBody({ glasses: true })}</g></g></g>
-     <path d="M-74,-50 V-92 Q-74,-106 -60,-106 Q-46,-106 -46,-92 V-50 Z" fill="url(#uzcf-vel)" stroke="#3a1226" stroke-width="2"/><circle cx="-60" cy="-94" r="6" fill="none" stroke="#3a1226" stroke-width="1.5"/>
-     <path d="M74,-50 V-92 Q74,-106 60,-106 Q46,-106 46,-92 V-50 Z" fill="url(#uzcf-vel)" stroke="#3a1226" stroke-width="2"/><circle cx="60" cy="-94" r="6" fill="none" stroke="#3a1226" stroke-width="1.5"/>
-     <g transform="translate(0,${(-60 - 18 * sc).toFixed(1)})" class="uzcf-piece"></g>
-     <g transform="translate(0,-60) scale(${sc})"><g class="uzcf-tilt">
-      ${tentArm('M-13,-24 q-6,5 -3,10')}${tentArm('M13,-24 q6,5 3,10')}
-      <g transform="translate(-16,-14)"><g class="uzcf-nl"><path d="M-11,5 L29,-13" stroke="#e0b85c" stroke-width="2.3" stroke-linecap="round"/><circle cx="-11" cy="5" r="2.6" fill="#ff7a8a"/></g></g>
-      <g transform="translate(16,-14)"><g class="uzcf-nr"><path d="M11,5 L-29,-13" stroke="#e0b85c" stroke-width="2.3" stroke-linecap="round"/><circle cx="11" cy="5" r="2.6" fill="#ff7a8a"/></g></g>
-      <circle cx="-16" cy="-14" r="3.6" fill="#8fdcb9" stroke="#2f6b55" stroke-width="1.2"/><circle cx="16" cy="-14" r="3.6" fill="#8fdcb9" stroke="#2f6b55" stroke-width="1.2"/>
-      <text class="uzcf-clk" x="-46" y="-16">click</text><text class="uzcf-clk uzcf-clk2" x="26" y="-16">clack</text>
-      <g class="uzcf-heart">${[[-24, -60, 0], [22, -66, 0.7], [0, -80, 1.4]].map(([x, y, d]) => `<g transform="translate(${x},${y})"><path class="uzcf-hrt" style="animation-delay:${d}s" d="M0,3 C-6,-2 -4,-7 0,-4 C4,-7 6,-2 0,3 Z" fill="#ff7a8a"/></g>`).join('')}</g>
-     </g></g>
-    </g></g>
-    <g class="uzcf-bar"></g>`;
-  }
-  // the progress bar he picked (P4, yarn to row): a loose strand along the floor turns into a knitted band; the ball shrinks
-  function knitBar(p, live) {
-    const f = p / 100, x0 = 18, x1 = 350, xp = x0 + (x1 - x0) * f, y = 300;
-    let s = `<rect x="${x0}" y="${y - 8}" width="${(xp - x0).toFixed(1)}" height="16" fill="#2e8a64"/><rect x="${x0}" y="${y - 8}" width="${(xp - x0).toFixed(1)}" height="16" fill="url(#uzcf-v)"/>`;
-    for (let x = x0; x < xp; x += 30) s += `<rect x="${x + 18}" y="${y - 8}" width="${Math.max(0, Math.min(6, xp - x - 18)).toFixed(1)}" height="16" fill="#ffd56a"/><rect x="${x + 18}" y="${y - 8}" width="${Math.max(0, Math.min(6, xp - x - 18)).toFixed(1)}" height="16" fill="url(#uzcf-v)"/>`;
-    s += `<rect x="${x0}" y="${y - 8}" width="${(xp - x0).toFixed(1)}" height="16" fill="none" stroke="#14301f" stroke-width="1"/>`;
-    if (p < 100) {
-      let d = `M${xp.toFixed(1)},${y}`; for (let x = xp; x < x1; x += 8) d += ' q2,-5 4,0 q2,5 4,0';
-      s += `<path d="${d}" stroke="#5ef2a0" stroke-width="1.6" fill="none"/><circle cx="${x1 + 9}" cy="${y}" r="${(3 + 7 * (1 - f)).toFixed(1)}" fill="#3fc283" stroke="#1d5a3c"/>`;
-      s += `<g transform="translate(${xp.toFixed(1)},${y})"><g class="${live ? 'uzcf-sway' : ''}"><path d="M-6,-14 L6,8 M6,-14 L-6,8" stroke="#c9a560" stroke-width="1.8" stroke-linecap="round"/></g></g>`;
-    }
-    return s;
-  }
-  function knitUpdate(svg, size, p, live) {
-    svg.querySelector('.uzcf-piece').innerHTML = knitPiece(size, p / 100, 'uzcf-kp');
-    svg.querySelector('.uzcf-bar').innerHTML = knitBar(p, live);
-  }
-  // the yarn ball wobbles and the strand sways (still when he is resting or done)
-  function ballFrame(svg, p, live, t) {
-    const ball = svg.querySelector('.uzcf-ball'), strand = svg.querySelector('.uzcf-strand'); if (!ball || !strand) return;
-    const bs = 1 - 0.62 * p / 100, a = live ? 9 * Math.sin(t / 1000 * 2 * Math.PI / 1.1) : 0, r = 22 * bs;
-    ball.setAttribute('transform', `rotate(${a.toFixed(2)}) translate(${(a * 0.25).toFixed(2)},0)`);
-    ball.innerHTML = `<circle cx="0" cy="${-r}" r="${r}" fill="#3fc283" stroke="#1d5a3c" stroke-width="1.5"/><g transform="translate(0,${-r}) scale(${bs})"><path d="M-18,-8 Q0,-22 18,-8 M-21,2 Q0,-14 21,2 M-17,12 Q0,-2 17,12 M-8,-20 Q6,0 -2,21" stroke="#1d5a3c" stroke-width="1.4" fill="none"/></g>`;
-    const rad = a * Math.PI / 180, bx = 305 + Math.sin(rad) * 2 * r * 0.9 + a * 0.25, by = 266 - Math.cos(rad) * 2 * r * 0.9;
-    const nx = 172, ny = 180, sag = 34 + (live ? 5 * Math.sin(t / 1000 * 2 * Math.PI / 1.4) : 0);
-    strand.setAttribute('d', `M${nx},${ny} Q${((nx + bx) / 2).toFixed(1)},${(Math.max(ny, by) + sag).toFixed(1)} ${bx.toFixed(1)},${by.toFixed(1)}`);
   }
 
   /* ---------------- small pictures of a finished piece (shelf and picker) ---------------- */
@@ -234,16 +493,13 @@
   const CSS = `
 .uzcf{color:#e8e1cf;font:14px 'Atkinson Hyperlegible Next','Atkinson Hyperlegible',system-ui,sans-serif;padding:0 0 18px;max-width:420px;margin:0 auto}
 .uzcf-defs{position:absolute;width:0;height:0;overflow:hidden}
-.uzcf-sw{position:relative;border:1px solid #1b2823;border-radius:16px;overflow:hidden;margin:4px 10px 0;background:#07100d}
-.uzcf-stage{display:block;width:100%;height:auto}
-.uzcf-time{position:absolute;left:8px;top:8px;background:#020504c0;border:1px solid #2f443b;border-radius:14px;padding:5px 12px 6px;line-height:1}
-.uzcf-time b{font:700 30px 'Atkinson Hyperlegible Next','Atkinson Hyperlegible',sans-serif;color:#fff}
-.uzcf-time i{font:700 15px 'Atkinson Hyperlegible Next','Atkinson Hyperlegible',sans-serif;color:#fff;font-style:normal;margin-left:4px}
-.uzcf-time span{display:block;font:700 12px 'Atkinson Hyperlegible Next','Atkinson Hyperlegible',sans-serif;color:#c9a560;margin-top:3px}
-.uzcf-pz{display:none;position:absolute;right:8px;top:10px;font:700 11px 'Atkinson Hyperlegible Next','Atkinson Hyperlegible',sans-serif;letter-spacing:.06em;color:#bfe0ff;background:#0f1a24e0;border:1px solid #5aa7ff;border-radius:999px;padding:4px 9px;text-align:center;line-height:1.3}
+.uzcf-sw{position:relative;border:1px solid #1b2823;border-radius:12px;overflow:hidden;margin:4px 10px 0;background:#000;aspect-ratio:192/184}
+.uzcf-sw canvas{position:absolute;left:0;top:0;width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-edges}
+.uzcf-plq{position:absolute;left:5%;right:5%;top:91.6%;height:7.6%;display:flex;align-items:center;justify-content:space-between;gap:8px;font:500 12.5px 'Pixelify Sans',monospace;white-space:nowrap;pointer-events:none;color:#ffe2a0}
+.uzcf-plq span{overflow:hidden;text-overflow:ellipsis}
+.uzcf-plq .uzcf-tl{font-weight:700;flex:none;color:#fff3c8}
+.uzcf-pz{display:none;position:absolute;right:8px;top:8px;font:700 11px 'Pixelify Sans',monospace;letter-spacing:.05em;color:#bfe0ff;background:#0f1a24e8;border:2px solid #5aa7ff;padding:4px 8px;text-align:center;line-height:1.3}
 .uzcf-paused .uzcf-pz{display:block}
-.uzcf-fintag{display:none;position:absolute;left:50%;bottom:4.5%;transform:translateX(-50%);white-space:nowrap;text-align:center;font:700 20px 'Grenze Gotisch',serif;color:#ffd56a;text-shadow:0 2px 0 #000;background:#020504d9;border:1px solid #c9a560;border-radius:999px;padding:3px 16px 5px}
-.uzcf-fin .uzcf-fintag{display:block}
 .uzcf-panel{margin:10px 10px 0}
 .uzcf-lab{font:700 12px 'Atkinson Hyperlegible Next','Atkinson Hyperlegible',sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#c9a560;margin:12px 2px 6px}
 .uzcf-row{display:flex;gap:8px}
@@ -266,64 +522,23 @@
 .uzcf-shh small{font:400 12.5px 'Atkinson Hyperlegible Next','Atkinson Hyperlegible',sans-serif;color:#9fb1a8}
 .uzcf-shelf{margin:0 10px}
 .uzcf-plank{display:block;width:100%;height:auto;margin:0 0 6px}
-/* Ulhu bits */
-.uzcf-blink{animation:uzcf-blink 4.2s infinite;transform-box:fill-box;transform-origin:center}
-@keyframes uzcf-blink{0%,93%,100%{transform:scaleY(1)}95%{transform:scaleY(.1)}}
-.uzcf-eo{display:inline}.uzcf-ec,.uzcf-eh{display:none}
-.uzcf-paused .uzcf-eo,.uzcf-fin .uzcf-eo{display:none}.uzcf-paused .uzcf-ec{display:inline}.uzcf-fin .uzcf-eh{display:inline}
-.uzcf-zz{display:none}.uzcf-paused .uzcf-zz{display:inline}
-.uzcf-z{font:700 13px 'Grenze Gotisch',serif;fill:#bfe0ff;animation:uzcf-zz 2.6s ease-in-out infinite;opacity:0}
-.uzcf-z2{animation-delay:.85s}.uzcf-z3{animation-delay:1.7s}
-@keyframes uzcf-zz{0%{transform:translate(0,0);opacity:0}25%{opacity:1}100%{transform:translate(10px,-18px);opacity:0}}
-.uzcf-wing{animation:uzcf-flap .7s ease-in-out infinite alternate}
-@keyframes uzcf-flap{from{transform:rotate(-7deg)}to{transform:rotate(6deg)}}
-.uzcf-paused .uzcf-wing,.uzcf-idle .uzcf-wing{animation-duration:2.4s}
-.uzcf-paused .uzcf-breath,.uzcf-idle .uzcf-breath{animation:uzcf-breath 3.2s ease-in-out infinite}
-@keyframes uzcf-breath{0%,100%{transform:scale(1,1)}50%{transform:scale(1.03,.97)}}
 @keyframes uzcf-sp{0%,100%{opacity:0;transform:scale(.3)}50%{opacity:1;transform:scale(1)}}
-.uzcf-bub{animation:uzcf-bub 7s linear infinite}
-@keyframes uzcf-bub{0%{transform:translate(0,0);opacity:0}10%{opacity:.7}100%{transform:translate(6px,-260px);opacity:0}}
-/* knit */
-.uzcf-work .uzcf-rock{animation:uzcf-rock 3.2s ease-in-out infinite}
-@keyframes uzcf-rock{0%,100%{transform:rotate(-1.6deg)}50%{transform:rotate(1.6deg)}}
-.uzcf-work .uzcf-nl{animation:uzcf-nl .45s ease-in-out infinite alternate}
-.uzcf-work .uzcf-nr{animation:uzcf-nl .45s ease-in-out infinite alternate-reverse}
-@keyframes uzcf-nl{from{transform:rotate(-7deg)}to{transform:rotate(5deg)}}
-.uzcf-clk{opacity:0;font:700 8px 'Atkinson Hyperlegible Next','Atkinson Hyperlegible',sans-serif;fill:#ffe2a0}
-.uzcf-work .uzcf-clk{animation:uzcf-clk .9s ease-out infinite}
-.uzcf-work .uzcf-clk2{animation-delay:.45s}
-@keyframes uzcf-clk{0%{opacity:0;transform:translate(0,2px)}12%{opacity:1;transform:translate(0,0)}45%{opacity:0;transform:translate(0,-5px)}100%{opacity:0}}
-.uzcf-glasses{transition:transform .7s ease}
-.uzcf-paused .uzcf-glasses{transform:translateY(7px) rotate(-6deg)}
-.uzcf-tilt{transition:transform .7s ease}
-.uzcf-paused .uzcf-tilt{transform:rotate(-7deg)}
-.uzcf-heart{display:none}.uzcf-fin .uzcf-heart{display:inline}
-.uzcf-hrt{animation:uzcf-hrt 2.2s ease-out infinite;opacity:0}
-@keyframes uzcf-hrt{0%{opacity:0;transform:translate(0,0) scale(.5)}20%{opacity:1}100%{opacity:0;transform:translate(4px,-30px) scale(1.1)}}
-.uzcf-steam{animation:uzcf-steam 2.6s ease-in-out infinite;opacity:0}
-@keyframes uzcf-steam{0%{opacity:0;transform:translate(0,0)}30%{opacity:.6}100%{opacity:0;transform:translate(3px,-16px)}}
-.uzcf-jelly{animation:uzcf-jelly 3s ease-in-out infinite alternate}
-@keyframes uzcf-jelly{from{opacity:.55}to{opacity:1}}
-.uzcf-fish{animation:uzcf-fish 9s linear infinite}
-@keyframes uzcf-fish{from{transform:translateX(-50px)}to{transform:translateX(50px)}}
-.uzcf-sway{animation:uzcf-sway 2.4s ease-in-out infinite alternate}
-@keyframes uzcf-sway{from{transform:rotate(-6deg)}to{transform:rotate(6deg)}}
-/* shelf */
 .uzcf-pop{animation:uzcf-pop .9s cubic-bezier(.3,1.6,.5,1) both;transform-box:fill-box;transform-origin:50% 100%}
 @keyframes uzcf-pop{from{transform:translateY(-40px) scale(.2);opacity:0}to{transform:translateY(0) scale(1);opacity:1}}
 .uzcf-glint{animation:uzcf-sp 1.6s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
-@media (prefers-reduced-motion:reduce){.uzcf-work .uzcf-nl,.uzcf-work .uzcf-nr{animation-duration:1.4s}.uzcf-work .uzcf-rock{animation:none}}
 `;
+  const PIXFONT = 'https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@500;700&display=swap';
   function css() {
     if (doc.getElementById('uzcf-css')) return;
     const st = doc.createElement('style'); st.id = 'uzcf-css'; st.textContent = CSS; doc.head.appendChild(st);
+    // the pixel font for the plaque (free Google font); monospace stands in if it cannot load
+    if (!doc.querySelector('link[href*="Pixelify+Sans"]')) { const l = doc.createElement('link'); l.rel = 'stylesheet'; l.href = PIXFONT; doc.head.appendChild(l); }
   }
   const DEFS = '<svg class="uzcf-defs" aria-hidden="true" focusable="false"><defs>' +
-    '<radialGradient id="uzcf-hg" cx=".36" cy=".3" r=".75"><stop offset="0" stop-color="#d4fae8"/><stop offset=".55" stop-color="#93dfbd"/><stop offset="1" stop-color="#5cb893"/></radialGradient>' +
     '<pattern id="uzcf-v" width="6" height="4" patternUnits="userSpaceOnUse"><path d="M.6,.3 L3,3.6 L5.4,.3" fill="none" stroke="#00000055" stroke-width="1"/><path d="M1.1,.4 L3,2.7" stroke="#ffffff38" stroke-width=".8"/></pattern>' +
     '</defs></svg>';
 
-  let V = null;   // the open screen: { el, key, state, p, panel, shelfKey, raf }
+  let V = null;   // the open screen: { el, state, p, size, panelHtml, shelfKey, raf, lastF, fg, ... }
   function state() {
     const c = ST.cur;
     if (!c) return 'idle';
@@ -350,43 +565,45 @@
     }
     return `<button class="uzcf-go" data-f="again">Make another</button><p class="uzcf-hint">${ST.owed.length ? 'Putting it on the shelf...' : 'It is on the shelf below.'}</p>` + note;
   }
-  function timeHtml(st, c, craft, size) {
-    if (st === 'fin') return `<b>Done</b><span>${MIN[size]} min focus. On the shelf now</span>`;
-    if (st === 'idle') return `<b>${MIN[size]}</b><i>min</i><span>ready to make ${esc(an(PIECE[craft][size]))}</span>`;
-    return `<b>${minsLeft(c)}</b><i>min left</i><span>${st === 'paused' && !c.run ? 'on the bench: ' : 'making '}${esc(an(PIECE[craft][size]))}</span>`;
+  // the little wooden plaque on the skirting board: the piece on the left, the time on the right
+  function plaqueText(st, c, craft, size) {
+    const name = an(PIECE[craft][size]);
+    if (st === 'fin') return [MIN[size] + ' min of focus. On the shelf.', 'Done!'];
+    if (st === 'idle') return ['Ready to knit ' + name, MIN[size] + ' min'];
+    const left = minsLeft(c) + ' min left';
+    if (st === 'paused') return [c.run ? 'Paused while you are away. Nothing lost.' : 'Resting on the bench. Nothing lost.', left];
+    return ['Knitting ' + name, left];
   }
   function paint(full) {
     if (!V || !V.el.isConnected) return;
     const st = state(), c = ST.cur, craft = c ? c.craft : ST.pick.craft, size = c ? c.size : ST.pick.size;
-    const p = c ? clamp((Number(c.el) || 0) / total(c) * 100, 0, 100) : 0;
-    const key = craft + '|' + size;
-    if (key !== V.key) {
-      V.svg.innerHTML = knitStage();
-      V.key = key; V.p = -1; V.state = '';
-    }
-    if (st !== V.state || Math.abs(p - V.p) >= 0.05) {
-      knitUpdate(V.svg, size, p, st === 'work');
-      V.p = p;
-    }
-    if (st !== V.state) { V.wrap.className = 'uzcf-sw uzcf-' + st; V.state = st; }
-    V.time.innerHTML = timeHtml(st, c, craft, size);
-    V.pz.innerHTML = c && c.run ? 'PAUSED<br>back when you are' : 'RESTING<br>carry on when you like';
-    V.fintag.textContent = st === 'fin' ? 'Finished: ' + an(PIECE[craft][size]) : '';
+    V.p = c ? clamp((Number(c.el) || 0) / total(c) * 100, 0, 100) : 0;
+    if (st !== V.state || size !== V.size) { V.wrap.className = 'uzcf-sw uzcf-' + st; V.state = st; V.size = size; V.lastF = -1e9; }
+    const pq = plaqueText(st, c, craft, size);
+    if (V.tx.textContent !== pq[0]) V.tx.textContent = pq[0];
+    if (V.tl.textContent !== pq[1]) V.tl.textContent = pq[1];
+    V.pz.innerHTML = c && c.run ? 'PAUSED<br>nothing lost' : 'RESTING<br>nothing lost';
     const ph = panelHtml(st);
     if (ph !== V.panelHtml) { V.panel.innerHTML = ph; V.panelHtml = ph; }
     const sk = JSON.stringify([SHELF, SHELF_ERR, ST.owed.length]);
     if (full || sk !== V.shelfKey) {
-      V.shelfKey = sk;
+      V.shelfKey = sk; V.lastF = -1e9;
       const n = SHELF ? SHELF.length : 0;
       V.shh.innerHTML = 'The shelf' + (SHELF ? `<small>${n ? n + (n === 1 ? ' piece' : ' pieces') + (n >= 40 ? ', the newest 40' : '') : 'empty so far'}</small>` : '');
       V.shelf.innerHTML = SHELF_ERR ? `<p class="uzcf-hint">${esc(SHELF_ERR)}</p>` : SHELF ? shelfSvg(SHELF, NEWEST) : '<p class="uzcf-hint">Opening the shelf...</p>';
     }
+    wake();
   }
+  // the moving parts are redrawn about 14 times a second, only while the Focus tab is on screen
+  function shown() { return !!(V && V.el.isConnected && !doc.hidden && V.el.getClientRects().length); }
   function frame(t) {
-    if (!V || !V.el.isConnected) { if (V) V.raf = 0; return; }
-    if (V.key.indexOf('knit') === 0) ballFrame(V.svg, V.p < 0 ? 0 : V.p, V.state === 'work', t);
+    if (!V) return;
+    V.raf = 0;
+    if (!shown()) return;   // the tab is shut or hidden: stop; paint() starts it again when it is back
+    if (t - V.lastF > 70) { V.lastF = t; drawScene(V.fg, t, V.state, V.p / 100, V.size); }
     V.raf = root.requestAnimationFrame(frame);
   }
+  function wake() { if (V && !V.raf && shown()) V.raf = root.requestAnimationFrame(frame); }
   function act(f, v) {
     const c = ST.cur;
     if (f === 'size' && MIN[v]) ST.pick.size = v;
@@ -405,19 +622,22 @@
   function render(el, X) {
     XX = X || XX; css();
     el.innerHTML = '<div class="uzcf">' + DEFS +
-      '<div class="uzcf-sw"><svg class="uzcf-stage" viewBox="0 0 380 330" role="img" aria-label="Ulhu at his craft"></svg><div class="uzcf-time"></div><div class="uzcf-pz"></div><div class="uzcf-fintag"></div></div>' +
+      '<div class="uzcf-sw" role="img" aria-label="Ulhu knitting by the fire"><canvas class="uzcf-bg" width="' + AW * U + '" height="' + AH * U + '"></canvas><canvas class="uzcf-fg" width="' + AW * U + '" height="' + AH * U + '"></canvas>' +
+      '<div class="uzcf-plq"><span class="uzcf-tx"></span><span class="uzcf-tl"></span></div><div class="uzcf-pz"></div></div>' +
       '<div class="uzcf-panel"></div><div class="uzcf-shh">The shelf</div><div class="uzcf-shelf"></div></div>';
     if (V && V.raf) root.cancelAnimationFrame(V.raf);
-    V = { el, key: '', state: '', p: -1, panelHtml: '', shelfKey: '', raf: 0,
-      svg: el.querySelector('.uzcf-stage'), wrap: el.querySelector('.uzcf-sw'), time: el.querySelector('.uzcf-time'), pz: el.querySelector('.uzcf-pz'),
-      fintag: el.querySelector('.uzcf-fintag'), panel: el.querySelector('.uzcf-panel'), shh: el.querySelector('.uzcf-shh'), shelf: el.querySelector('.uzcf-shelf') };
+    const fg = el.querySelector('.uzcf-fg').getContext('2d'); fg.imageSmoothingEnabled = false;
+    V = { el, state: '', size: '', p: 0, panelHtml: '', shelfKey: '', raf: 0, lastF: -1e9, fg,
+      wrap: el.querySelector('.uzcf-sw'), tx: el.querySelector('.uzcf-tx'), tl: el.querySelector('.uzcf-tl'), pz: el.querySelector('.uzcf-pz'),
+      panel: el.querySelector('.uzcf-panel'), shh: el.querySelector('.uzcf-shh'), shelf: el.querySelector('.uzcf-shelf') };
+    el.querySelector('.uzcf-bg').getContext('2d').drawImage(scene().bg, 0, 0);   // the room, drawn once
     el.querySelector('.uzcf').addEventListener('click', function (e) {
       const b = e.target.closest && e.target.closest('button[data-f]'); if (!b) return;
       act(b.getAttribute('data-f'), b.getAttribute('data-v'));
     });
     paint(true); loadShelf(); saveOwed();
-    V.raf = root.requestAnimationFrame(frame);
+    loadImgs().then(function () { if (V) V.lastF = -1e9; });   // Ulhu appears as soon as his sprite has loaded
   }
   api.render = render;
   root.UZCOMP_FOCUS = api;
-})(typeof window !== 'undefined' ? window : null);
+})(typeof window !== 'undefined' ? window : null);

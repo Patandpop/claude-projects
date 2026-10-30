@@ -4,7 +4,7 @@
 1. Next paste set (Lane A makes it): Companion.gs and GameComp.html (now holds the term page, focus knitting, sound and the companion screens) plus one line in game-ui.js (already committed). These are the changed Apps Script files.
 2. The overnight adventure round 2: mock-up ready: replica/design/mockups/companion/adventure2.html. The test build uses 1C-i (brass lantern, parchment note), M1 (the scroll) and K1 (wooden cabinets) until you pick.
 3. Term page glass and all 16 identity windows: APPROVED as final ("perfect", 30 Oct). Leviathan stays a sea serpent. Already in the game screen (term-gallery.html shows it).
-4. Knitting round 4: mock-up ready: replica/design/mockups/companion/focus-crafts-4.html. K1 (firelit nook) and K3 (diving-bell room with Bloop), both in his real 16-bit sprite, room included, with a knitted strip bar and a pixel yarn ball. Pick one; it then replaces the scene in the Focus tab.
+4. Knitting: K1 (firelit cottage nook) picked 30 Oct and built into the Focus tab (companion-focus.js, packed in GameComp.html).
 5. Nudges on the phone need Lane C's notifications (installed app, step 8). The rules are built and waiting.
 
 ## Entries (newest first)
