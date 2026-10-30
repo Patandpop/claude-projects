@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Homework ahead, layout B made warmer (mock-up)</title>
+<style>
+  :root { --navy:#0D1B5E; --gold:#FABB2E; --gold2:#FFD97A; --red:#EF5350; --green:#66BB6A; --orange:#FFA726; --blue:#64B5F6;
+    --bg:#0E1424; --panel:#161E33; --panel2:#1C2540; --ink:#E6EAF5; --muted:#98A2BC; --line:#2A3555; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:"Century Gothic","Segoe UI",sans-serif; background:var(--bg); color:var(--ink); padding:18px; }
+  body::before { content:""; position:fixed; inset:0; pointer-events:none; opacity:.35;
+    background: radial-gradient(1200px 500px at 20% -10%, rgba(250,187,46,.14), transparent 60%), radial-gradient(900px 400px at 110% 110%, rgba(100,181,246,.10), transparent 60%); }
+  .wrap { position:relative; max-width:760px; margin:0 auto; }
+  h2 { margin:4px 0 2px; font-size:22px; color:var(--gold); letter-spacing:.01em; }
+  .sub { color:var(--muted); font-size:13px; margin-bottom:14px; }
+  .sub b { color:var(--ink); font-weight:600; }
+  /* the three weeks as a lantern-lit path */
+  .path { position:relative; display:flex; gap:12px; margin:8px 0 18px; padding:0 4px; }
+  .path::before { content:""; position:absolute; left:40px; right:40px; top:22px; height:2px; background:linear-gradient(90deg, rgba(250,187,46,.15), rgba(250,187,46,.7), rgba(250,187,46,.15)); }
+  .wk { flex:1; position:relative; background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:30px 12px 12px; box-shadow:0 10px 24px rgba(0,0,0,.28); }
+  .wk .lamp { position:absolute; top:12px; left:50%; transform:translateX(-50%); width:20px; height:20px; border-radius:50%; background:var(--panel2); border:2px solid var(--line); }
+  .wk.now { border-color:rgba(250,187,46,.7); background:linear-gradient(180deg, rgba(250,187,46,.12), transparent 55%), var(--panel); }
+  .wk.now .lamp { background:var(--gold); border-color:var(--gold2); box-shadow:0 0 0 6px rgba(250,187,46,.18), 0 0 18px rgba(250,187,46,.55); }
+  .wk.done .lamp { background:var(--green); border-color:var(--green); box-shadow:0 0 10px rgba(102,187,106,.5); }
+  .wk b { display:block; font-size:14px; } .wk span { display:block; color:var(--muted); font-size:12px; margin-top:2px; }
+  .wk .ring { position:absolute; right:10px; top:8px; width:34px; height:34px; border-radius:50%; display:grid; place-items:center; font-size:11px; font-weight:700;
+    background:conic-gradient(var(--gold) calc(var(--p) * 1%), var(--line) 0); }
+  .wk .ring i { width:26px; height:26px; border-radius:50%; background:var(--panel); display:grid; place-items:center; font-style:normal; }
+  /* the list of homework to prepare, one crafted card per lesson */
+  .card { position:relative; display:flex; align-items:center; gap:12px; background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:12px 14px 12px 18px; margin:10px 0; box-shadow:0 6px 18px rgba(0,0,0,.25); overflow:hidden; }
+  .card::before { content:""; position:absolute; left:0; top:0; bottom:0; width:6px; background:var(--c); }
+  .card::after { content:""; position:absolute; inset:0; pointer-events:none; background:linear-gradient(135deg, rgba(255,255,255,.04), transparent 40%); }
+  .tick { width:26px; height:26px; border-radius:8px; border:2px solid var(--line); flex:none; display:grid; place-items:center; color:#0D1B5E; font-weight:900; background:var(--panel2); }
+  .tick.on { background:var(--gold); border-color:var(--gold2); }
+  .chip { border:2px solid var(--c); border-radius:16px; padding:3px 11px; font-weight:700; font-size:13px; color:var(--ink); flex:none; background:var(--panel2); }
+  .t { flex:1; min-width:0; } .t b { display:block; font-weight:600; font-size:15px; } .t small { display:block; color:var(--muted); font-size:12px; margin-top:2px; }
+  .kind { font-size:12px; color:var(--muted); border:1px solid var(--line); border-radius:8px; padding:3px 8px; flex:none; background:var(--panel2); }
+  .kind.gold { color:var(--gold); border-color:rgba(250,187,46,.6); } .kind.warm { color:var(--orange); border-color:rgba(255,167,38,.6); } .kind.ok { color:var(--green); border-color:rgba(102,187,106,.6); }
+  .card.ready { opacity:.78; } .card.ready .tick { background:var(--green); border-color:var(--green); }
+  .sec { display:flex; align-items:center; gap:10px; margin:18px 0 6px; color:var(--gold); font-size:13px; letter-spacing:.06em; text-transform:uppercase; }
+  .sec::after { content:""; flex:1; height:1px; background:linear-gradient(90deg, rgba(250,187,46,.5), transparent); }
+  .cta { display:flex; align-items:center; gap:12px; margin-top:18px; background:linear-gradient(180deg, var(--panel2), var(--panel)); border:1px solid var(--line); border-radius:14px; padding:12px 14px; }
+  .cta .note { flex:1; color:var(--muted); font-size:13px; } .cta .note b { color:var(--ink); font-weight:600; }
+  .cta button { font-family:inherit; font-size:14px; font-weight:700; background:var(--gold); color:#0D1B5E; border:1px solid var(--gold); border-radius:10px; padding:10px 16px; box-shadow:0 6px 16px rgba(250,187,46,.25); }
+  .foot { color:var(--muted); font-size:12px; margin-top:12px; font-style:italic; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h2>Homework ahead</h2>
+  <div class="sub">Friday 13 November &middot; <b>4 to prepare</b> for next week, 2 already made &middot; nothing is posted until you say</div>
+
+  <div class="path">
+    <div class="wk done"><div class="lamp"></div><div class="ring" style="--p:100"><i>5/5</i></div><b>This week</b><span>all set, 3 marked</span></div>
+    <div class="wk now"><div class="lamp"></div><div class="ring" style="--p:33"><i>2/6</i></div><b>Next week</b><span>4 to prepare by tonight</span></div>
+    <div class="wk"><div class="lamp"></div><div class="ring" style="--p:0"><i>0/5</i></div><b>Week after</b><span>P1 test, 10C2 &middot; revision reminder</span></div>
+  </div>
+
+  <div class="sec">To prepare</div>
+  <div class="card" style="--c:#1565C0"><div class="tick on">&#10003;</div><span class="chip" style="--c:#1565C0">7MLA</span><div class="t"><b>Cells: specialised cells</b><small>Seneca &middot; due Fri 20 Nov &middot; Mon P2</small></div><span class="kind">Seneca</span></div>
+  <div class="card" style="--c:#00838F"><div class="tick on">&#10003;</div><span class="chip" style="--c:#00838F">10C2</span><div class="t"><b>Energy: efficiency</b><small>self-marked mini test &middot; Core and Challenge &middot; due Fri 20 Nov</small></div><span class="kind">mini test</span></div>
+  <div class="card" style="--c:#00838F"><div class="tick on">&#10003;</div><span class="chip" style="--c:#00838F">10C2</span><div class="t"><b>Revision for the P1 test on 27 Nov</b><small>two weeks before the test &middot; a reminder, you check and post</small></div><span class="kind warm">reminder</span></div>
+  <div class="card" style="--c:#4E342E"><div class="tick on">&#10003;</div><span class="chip" style="--c:#4E342E">11S2</span><div class="t"><b>The resistance of a wire, 6-marker</b><small>done on the board 3 weeks ago &middot; comes back without the small questions</small></div><span class="kind gold">6-mark</span></div>
+
+  <div class="sec">Already made</div>
+  <div class="card ready" style="--c:#AD1457"><div class="tick">&#10003;</div><span class="chip" style="--c:#AD1457">10S2</span><div class="t"><b>Energy stores mini test</b><small>prepared Tuesday &middot; due Fri 20 Nov</small></div><span class="kind ok">ready</span></div>
+  <div class="card ready" style="--c:#283593"><div class="tick">&#10003;</div><span class="chip" style="--c:#283593">12C</span><div class="t"><b>Superposition, OCR questions</b><small>prepared Wednesday &middot; homework every lesson</small></div><span class="kind ok">ready</span></div>
+
+  <div class="cta"><div class="note"><b>Four ticked.</b> Claude prepares them at home tonight; they appear here as "ready" and you post them from Classroom.</div><button>Ask Claude to prepare these (4)</button></div>
+  <div class="foot">8XP and 8AG skip this week: the shared teacher set theirs.</div>
+</div>
+</body>
+</html>

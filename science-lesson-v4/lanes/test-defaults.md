@@ -29,3 +29,5 @@ Where the design chat had a recommended pick, that pick is now the **test defaul
 Still his, no default possible: the site address, the school test, the eyes-free Try score, review answers sheet or board, the Engage rule OK, the Do Now mix rule into SKILL.md, Lane B's builder plans for 1.8 and 2.5/2.6, Lane A's and Lane D's visual picks (their chats hold the options).
 
 **Answered 30 Oct (evening):** Do Now mix rule yes; builder plans 1.8 and 2.5/2.6 yes; 9AS and 9XS word bank: none, like 10S2 and 11S2 (class-defaults.json updated; 10C2 keeps its word bank).
+
+**Answered 30 Oct (late, via the design chat):** Engage: always an attempt, always a question, from history, data or what was just said (Lane B writes it). Review lessons: keep the answers sheet. Vespers bonus: Vespers only. The 20 language rules: yes to all (Lane B puts them in SKILL.md with build warnings, Plan Mode). Build ahead: install (Lane C build does it). Homework ahead: B, made warmer as lanes/mockups/homework-ahead-b2.html (Lane B builds that one). Overnight adventure: 1C-ii, M1 with better texture, K1 (Lane D). Site address: not made yet.
