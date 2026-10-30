@@ -61,3 +61,10 @@ __pycache__/
 tools/JEOPARDY_HANDOVER.md
 # private settings for the paste files (staff email addresses): home PC only
 planner/private-settings.json
+
+# build ahead: local stamp, off switch and logs (planner/tools/build-ahead.ps1)
+planner/tools/.build-ahead-last
+planner/tools/.build-ahead-off
+planner/tools/build-ahead.log
+planner/tools/build-ahead-run.log
+build-ahead-notes.txt
