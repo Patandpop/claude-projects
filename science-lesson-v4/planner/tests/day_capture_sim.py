@@ -19,7 +19,7 @@ html[data-theme="dark"]{--plate:#13294A;--ink:#EAF2FA;--line:#27456B;--deep:#1C3
 <script>
 window.CALLS=[]; window.DOWN=false; window.SAVED={};
 function call(fn,...a){ CALLS.push([fn].concat(a)); return new Promise((ok,bad)=>setTimeout(()=>{ if(DOWN) return bad(new Error('no connection'));
-  if(fn==='captureSave'){ SAVED[a[2]]=(SAVED[a[2]]||0)+1; } ok({}); },60)); }
+  if(fn==='captureSave'){ SAVED[a[2]]=(SAVED[a[2]]||0)+1; } ok(fn==='captureFile' && a[1].home==='obsidian' ? {held:true} : {}); },60)); }
 window.C = DayCapture.mount(document.getElementById('c'), call, { names: () => ['Zorbo Testperson'], inbox: ''' + json.dumps(INBOX) + ''' });
 </script></body></html>'''
 d = tempfile.mkdtemp(); path = os.path.join(d, 'cap.html'); open(path, 'w', encoding='utf-8').write(page)
@@ -62,6 +62,9 @@ with sync_playwright() as p:
     pg.click(".it[data-id=i2] [data-dc=file]:has-text('To-do')"); pg.wait_for_timeout(150)
     c = pg.evaluate('CALLS[CALLS.length-1]')
     check('Other lets him pick another home (To-do)', c[0] == 'captureFile' and c[1] == 'i2' and c[2]['home'] == 'todo')
+    pg.evaluate("C.setInbox(C.state().inbox.concat([{id:'i5',text:'film idea',suggestedHome:'obsidian',cls:'',lesson:''}]))")
+    pg.click('.it[data-id=i5] [data-dc=file].ok'); pg.wait_for_timeout(150)
+    check('Obsidian while writing is off: it leaves the list and says it is kept until switched on', pg.locator('.it[data-id=i5]').count() == 0 and 'Kept for Obsidian' in pg.inner_text('[data-dc=note]'))
     pg.evaluate('DOWN=true'); pg.click('.it[data-id=i3] [data-dc=file].ok'); pg.wait_for_timeout(150)
     check('no signal when filing: it stays on the list and says so', pg.locator('.it[data-id=i3]').count() == 1 and 'Not filed' in pg.inner_text('[data-dc=note]'))
     pg.evaluate("document.documentElement.dataset.theme='dark'"); pg.wait_for_timeout(50)

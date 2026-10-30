@@ -1,7 +1,7 @@
 # Lane C log (your day)
 
 ## Waiting on you
-1. **Obsidian inbox folder** for the quick-capture box: (a) `G:\My Drive\Obsidian\Inbox from planner.md` with the vault syncing that folder (my pick), (b) a folder you name, (c) inside `Beechen Cliff Science\Admin\`. Nothing is written to Obsidian until you answer.
+1. **Obsidian inbox: confirm the folder.** It is set to (a) `G:\My Drive\Obsidian\Inbox from planner.md`, with writing switched OFF. Captures you send to Obsidian are kept safe in the planner until you say yes; then they are written, oldest first. Say "yes, (a)", or name another folder.
 2. **Per-pupil homework results**: the design moves them into your personal Planner Sheet along with everything else (your decision in the installed-app grill). Say "keep them at school" if that has changed.
 3. **Cloudflare: connected to GitHub (30 Oct).** Check the project's build settings match: Production branch `pre-reskin`; Framework preset None; Build command `node app/build.js`; Build output directory `app/dist`; Root directory `science-lesson-v4`. Then paste the site's address (it ends in `.pages.dev`) into the chat. The school test page is that address with `/test/` on the end.
 4. **The school test** (two minutes at school) once the test page is live: open the page on a school PC, paste your mailbox address and key (the same two values in the school planner's Script properties, MAILBOX_URL and MAILBOX_KEY), press "Run the test", and read the three results back to the chat (the "Copy the results" button copies them). The page never remembers the key.
@@ -21,6 +21,23 @@
 5. **Next paste set** (for Lane A to make): the phone page and the planner open instantly from their saved copy, and the phone has the new Day tab. Planner.html and Phone.html changed, and the set has **two new files** to make once in the Apps Script editor: a script file called `Day` (from Day.gs) and an HTML file called `DayUI` (from DayUI.html). Name them exactly that, or the phone's Day tab says "not in this copy yet".
 
 ## Entries (newest first)
+
+### 30 Oct 2026, Lane C: the design chat's list (try everything that does not need you)
+- **Obsidian inbox:** set to option (a), `G:\My Drive\Obsidian\Inbox from planner.md`, with writing OFF. A capture you send to Obsidian is now kept in the planner's Inbox tab as "held" (the capture box says "Kept for Obsidian. Nothing is written there until you switch it on"). When writing is switched on, everything held is written, oldest first, once each, and every write is logged. Anything about a class or a pupil still never goes to Obsidian. 7 new server checks, 1 new phone check. Day.gs changed (Lane A: it is in the next paste set anyway).
+- **Build ahead, the dry run** (`planner/tools/build-ahead.ps1 -DryRun`, nothing installed, nothing built): today it says "not a school day" (half term). I also asked its rules about a school afternoon, Tuesday 3 Nov:
+  - at 15:45 with Drive off: no run ("Google Drive (G:) is not mounted");
+  - with Drive on and no requests: no run;
+  - with three made-up requests (two build requests covering three lessons, and one exam practice): it would build three lessons, soonest first, start nothing new after 18:30 and stop at 18:50, leaving the exam practice for the next day;
+  - at 18:40: no run ("after 17:45: too late");
+  - with another Claude session busy, if it had already run that day, or with your off switch on: no run.
+  - The instructions it would hand the session read correctly (no questions back, no paid services, no pupil names, no git).
+  - **One fault for its owner:** on a school afternoon, `-DryRun` marks the day as "already ran", so the real 15:45 run would then do nothing that day. The dry run should not leave that mark.
+- **Open-lesson tool:** Google Drive is not connected on this PC this morning, so I tried it on a copy shaped like Drive (a real 9AS latent heat lesson from this PC).
+  - "list today" and "open today --dry-run" work: the lesson, then slides, worksheet and support sheet in the right order, and a lesson with nothing built is listed as such.
+  - The pack's dry run works and shows the right cover page.
+  - **The real pack failed:** Word hung, and no PDF was made. Also, 7 copies of Word are left running hidden on this PC from tool and test runs since 27 Oct, one of them mine. I was not allowed to close them; you can end them in Task Manager (each is "Microsoft Word" with no window).
+  - **For the tool's owner:** the pack should give Word a time limit, close it if it hangs, and say so instead of finishing quietly.
+- Save: see git log "Obsidian inbox held until confirmed".
 
 ### 30 Oct 2026, design chat: test defaults, a shorter decisions page, the homework-ahead mock-up
 - What changed: following your "everything unfinished made, or artifacted, or tried out, or test built", every pick where I had a recommendation is now a test default handed to the building lane in `lanes/test-defaults.md`; the one item with no picture yet (homework ahead, 4.13) has a mock-up with three panels; and the decisions page is cut from 41 items to the 21 that only you can answer, shortest first, with the defaults listed under it. All on the site.

@@ -81,8 +81,10 @@
     function file(id, home) {
       var x = S.inbox.find(function (y) { return y.id === id; }); if (!x) return;
       var h = { home: home, cls: home === 'obsidian' ? '' : (x.cls || L.findClass(x.text)), lesson: x.lesson };
-      return call('captureFile', id, h).then(function () {
-        S.inbox = S.inbox.filter(function (y) { return y.id !== id; }); S.other = ''; S.note = 'Filed: ' + homeLabel(h) + '.'; S.bad = false; draw();
+      return call('captureFile', id, h).then(function (r) {
+        S.inbox = S.inbox.filter(function (y) { return y.id !== id; }); S.other = ''; S.bad = false;
+        S.note = r && r.held ? 'Kept for Obsidian. Nothing is written there until you switch it on in Settings.' : 'Filed: ' + homeLabel(h) + '.';
+        draw();
         if (o.onFiled) o.onFiled(id, h);
       }, function (e) { S.note = 'Not filed: ' + ((e && e.message) || 'no signal'); S.bad = true; draw(); });
     }

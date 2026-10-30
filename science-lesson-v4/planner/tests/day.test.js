@@ -88,9 +88,15 @@ ok('filing it: off the inbox, on the list as "Order: ..."', !d.inbox.some((x) =>
 captureSave(k, '9AS ran out of time', Date.now(), 'cap2', { home: 'class', cls: '9AS' });
 threw = ''; try { captureFile(k, 'cap2', { home: 'obsidian' }); } catch (e) { threw = e.message; }
 ok('anything with a class is refused for Obsidian', /stays in the planner/.test(threw));
-captureSave(k, 'book idea', Date.now(), 'cap3', { home: 'obsidian' });
-threw = ''; try { captureFile(k, 'cap3', { home: 'obsidian' }); } catch (e) { threw = e.message; }
-ok('Obsidian is never written until the folder is set', /Pick the Obsidian folder/.test(threw) && dayLoad(k).inbox.some((x) => x.id === 'cap3'));
+ok('Obsidian: the folder is option (a), and writing is OFF until he confirms it', daySettings(k).obsidianFolder === 'G:\\My Drive\\Obsidian' && daySettings(k).obsidianWrite === false);
+captureSave(k, 'book idea', Date.now() - 60000, 'cap3', { home: 'obsidian' });
+global.DriveApp = { getRootFolder: () => { throw new Error('Drive touched'); } };
+r = captureFile(k, 'cap3', { home: 'obsidian' });
+d = dayLoad(k);
+ok('with writing off, a capture for Obsidian is held, not written, and leaves the morning sort', r.held === true && !d.inbox.some((x) => x.id === 'cap3') && d.obsidianHeld === 1);
+ok('...and nothing is written or logged', !(m.sheets.Log && m.sheets.Log._data.some((x) => x[1] === 'capture appended to Obsidian inbox')));
+ok('flushing while off writes nothing', obsidianFlush(k).off === true);
+captureSave(k, 'later idea', Date.now(), 'cap5', { home: 'obsidian' }); captureFile(k, 'cap5', { home: 'obsidian' });
 // a fake Drive: G:\My Drive\Obsidian
 const files = {};
 const folder = (name, kids) => ({ getFoldersByName: (n) => { const f = (kids || {})[n]; let done = !f; return { hasNext: () => !done, next: () => { done = true; return f; } }; },
@@ -98,12 +104,13 @@ const folder = (name, kids) => ({ getFoldersByName: (n) => { const f = (kids || 
   createFile: (n, t) => { files[n] = t; } });
 global.DriveApp = { getRootFolder: () => folder('root', { Obsidian: folder('Obsidian') }) };
 const realFmt = Utilities.formatDate; Utilities.formatDate = (dt, tz, f) => (f === 'yyyy-MM-dd HH:mm' ? '2026-11-03 07:10' : realFmt(dt, tz, f));
-daySettingsSave(k, { obsidianFolder: 'G:\\My Drive\\Obsidian' });
-captureFile(k, 'cap3', { home: 'obsidian' });
-ok('with the folder set, it is appended as a dated bullet to "Inbox from planner.md"', files['Inbox from planner.md'] === '# Inbox from planner\n\n- 2026-11-03 07:10 book idea\n');
+daySettingsSave(k, { obsidianWrite: true });
+ok('switching writing on writes what was held, oldest first, as dated bullets in "Inbox from planner.md"',
+  files['Inbox from planner.md'] === '# Inbox from planner\n\n- 2026-11-03 07:10 book idea\n- 2026-11-03 07:10 later idea\n' && dayLoad(k).obsidianHeld === 0);
+ok('held ones are written once only', obsidianFlush(k).written === 0);
 captureSave(k, 'second idea', Date.now(), 'cap4', { home: 'obsidian' }); captureFile(k, 'cap4', { home: 'obsidian' });
-ok('the next one is added to the end, nothing replaced', files['Inbox from planner.md'].split('\n').filter((l) => l.startsWith('- ')).length === 2);
-ok('every Obsidian write is logged', m.sheets.Log._data.filter((x) => x[1] === 'capture appended to Obsidian inbox').length === 2);
+ok('once on, the next one is added straight to the end, nothing replaced', files['Inbox from planner.md'].split('\n').filter((l) => l.startsWith('- ')).length === 3);
+ok('every Obsidian write is logged', m.sheets.Log._data.filter((x) => x[1] === 'capture appended to Obsidian inbox').length === 3);
 Utilities.formatDate = realFmt;
 
 // ---- timer

@@ -22,7 +22,7 @@ const BRIDGE_CALLS = [
   'turnOnDailyResults', 'setBehaviourUrl', 'exportXlsx',
   // the day screen, capture box and evening timer (this file)
   'dayLoad', 'daySettings', 'daySettingsSave', 'todoSave', 'todoSet', 'blockAccept', 'doneForToday', 'captureSave', 'captureFile',
-  'timerStart', 'timerStop', 'timerLog', 'timerEdit', 'timerReport', 'timerRules', 'timerRulesSave'
+  'obsidianFlush', 'timerStart', 'timerStop', 'timerLog', 'timerEdit', 'timerReport', 'timerRules', 'timerRulesSave'
 ];
 // Ulhu: every public game call (gameLoad, gameTick, ...). Names ending in _ are private and never reachable.
 const BRIDGE_GAME = /^game[A-Z][A-Za-z0-9]*$/;
@@ -63,7 +63,10 @@ const DAY_TABS = {
   'Day Log': ['day', 'what', 'at']
 };
 const DAY_DEFAULTS = { shutdownTime: '17:00', afterSchoolEnd: '17:00', minutes: { mark: 60, chase: 5, build: 40, ritualBooks: 120 },
-  soundPhone: false, soundPc: true, obsidianFolder: '' };
+  soundPhone: false, soundPc: true,
+  // Obsidian inbox (30 Oct 2026): option (a) is the folder; writing stays OFF until Patryk confirms it. Until then a capture
+  // he sends to Obsidian is kept in the Inbox tab as "held" and written, oldest first, the moment writing is switched on.
+  obsidianFolder: 'G:\\My Drive\\Obsidian', obsidianWrite: false };
 const DAY_JOBS = ['Marking', 'Building lessons', 'Setting homework', 'Admin', 'Emails', 'Personal'];
 const DAY_CLASS_JOBS = ['Marking', 'Building lessons', 'Setting homework'];
 const DAY_TZ = 'Europe/London';
@@ -107,14 +110,15 @@ function daySettings(k) {
 }
 function daySettingsSave(k, obj) {
   check_(k);
-  return dLock_(() => {
+  dLock_(() => {
     const rows = dRows_('Day Settings');
     Object.keys(obj || {}).filter((key) => key in DAY_DEFAULTS).forEach((key) => {
       const v = JSON.stringify(obj[key]), hit = rows.find((r) => r.key === key);
       if (hit) dUpdate_('Day Settings', hit, { value: v }); else dAppend_('Day Settings', { key: key, value: v });
     });
-    return daySettings(k);
   });
+  if (obj && obj.obsidianWrite === true) obsidianFlush(k);   // switching it on writes what was held, oldest first
+  return daySettings(k);
 }
 
 /* ---- what the planner knows about a day */
@@ -183,6 +187,7 @@ function dayLoad(k, day) {
     items: own.concat(planner),
     timer: run ? { id: run.id, job: run.job, cls: run.cls, startedAt: run.startedAt, source: run.source, taskRef: run.taskRef } : null,
     recent: timerRows.slice(-40).map((r) => ({ job: r.job, cls: r.cls, startedAt: r.startedAt })),
+    obsidianHeld: dRows_('Inbox').filter((r) => r.status === 'held').length,
     inbox: dRows_('Inbox').filter((r) => r.status === 'new').map((r) => ({ id: r.id, at: r.at, text: r.text, suggestedHome: r.suggestedHome, cls: r.cls, lesson: r.lesson })),
     settings: daySettings(k), rules: timerRules(k),
     doneForToday: dRows_('Day Log').some((r) => r.day === today && r.what === 'done for today')
@@ -269,7 +274,8 @@ function captureSave(k, text, at, id, suggested) {
 // file a capture where he confirmed: home = { home: todo|orderSheet|class|lesson|obsidian, cls, lesson }.
 // For now the order sheet, class and lesson homes become a to-do labelled with the class and the destination, so nothing
 // is lost; writing straight into the planner's lesson notes waits for the planner side. Obsidian: appended as a dated
-// bullet to "Inbox from planner.md" in the folder set in Settings, and only then; anything with a class is refused.
+// bullet to "Inbox from planner.md" in the folder set in Settings, only once writing is switched on (until then it is
+// held, see obsidianFlush); anything with a class is refused.
 function captureFile(k, id, home) {
   check_(k);
   const h = home || {}, where = String(h.home || '');
@@ -281,6 +287,10 @@ function captureFile(k, id, home) {
     const cls = dClean_(h.cls !== undefined ? h.cls : row.cls, 8), lesson = Number(h.lesson || row.lesson) || '';
     if (where === 'obsidian') {
       if (cls) throw new Error('Anything about a class stays in the planner, not Obsidian');
+      if (daySettingsRaw_().obsidianWrite !== true) {   // writing is off: kept safe here until he switches it on
+        dUpdate_('Inbox', row, { confirmedHome: 'obsidian', cls: '', status: 'held' });
+        return { id: id, home: 'obsidian', held: true };
+      }
       dObsidianAppend_(row.text, row.at);
     } else {
       const label = where === 'orderSheet' ? 'Order' + (cls ? ' ' + cls : '') + ': ' : where === 'lesson' && cls ? cls + ' L' + lesson + ': ' : where === 'class' && cls ? cls + ': ' : '';
@@ -290,8 +300,19 @@ function captureFile(k, id, home) {
     return { id: id, home: where };
   });
 }
+// writes the captures held for Obsidian (oldest first) once writing is on; each one is marked filed as it is written
+function obsidianFlush(k) {
+  check_(k);
+  if (daySettingsRaw_().obsidianWrite !== true) return { written: 0, off: true };
+  return dLock_(() => {
+    const held = dRows_('Inbox').filter((r) => r.status === 'held').sort((a, b) => Number(a.at) - Number(b.at));
+    held.forEach((r) => { dObsidianAppend_(r.text, r.at); dUpdate_('Inbox', r, { status: 'filed', filedAt: Date.now() }); });
+    return { written: held.length };
+  });
+}
 function dObsidianAppend_(text, at) {
-  const folderPath = String(daySettingsRaw_().obsidianFolder || '').trim();
+  const set = Object.assign({}, DAY_DEFAULTS, daySettingsRaw_()), folderPath = String(set.obsidianFolder || '').trim();
+  if (set.obsidianWrite !== true) throw new Error('Writing to Obsidian is off until you confirm the folder in Settings');
   if (!folderPath) throw new Error('Pick the Obsidian folder in Settings first (nothing is written until you do)');
   let dir = DriveApp.getRootFolder();
   folderPath.replace(/^[A-Z]:[\\/]/i, '').replace(/^My Drive[\\/]/i, '').split(/[\\/]/).filter(Boolean).forEach((name) => {
