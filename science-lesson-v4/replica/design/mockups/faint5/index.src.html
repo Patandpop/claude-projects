@@ -1,0 +1,368 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ulhu Rune Tablets</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Grenze+Gotisch:wght@500;700&family=IM+Fell+English:ital@0;1&display=swap">
+<style>
+/* One dark look by design (the drowned temple). Every theme hook repeats the same dark tokens. */
+:root{color-scheme:dark;--bg:#0a100e;--panel:#101a17;--line:#24443a;--fg:#e8e1cf;--muted:#8fa298;--sea:#5ef2a0;--honey:#ffd56a;
+--gx:'Grenze Gotisch',Georgia,serif;--ax:'Atkinson Hyperlegible',system-ui,sans-serif;--fx:'IM Fell English',Georgia,serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#0a100e;--panel:#101a17;--line:#24443a;--fg:#e8e1cf;--muted:#8fa298}}
+:root[data-theme="dark"],:root[data-theme="light"]{color-scheme:dark;--bg:#0a100e;--panel:#101a17;--line:#24443a;--fg:#e8e1cf;--muted:#8fa298}
+*{box-sizing:border-box}
+html,body{margin:0;background:#0a100e;color:#e8e1cf;font:15px/1.45 var(--ax)}
+main{max-width:412px;margin:0 auto;padding:16px}
+h1{font:700 30px/1.1 var(--gx);color:#ffd56a;margin:4px 0 6px}
+.intro{color:#8fa298;margin:0 0 10px}
+.card{position:relative;background:#101a17;border:1px solid #24443a;border-radius:10px;padding:10px;margin:14px 0}
+.card h3{margin:0 0 2px;font:700 18px var(--ax);color:#e8e1cf}.card h3 b{color:#ffd56a;margin-right:6px}
+.cap{margin:0 0 8px;color:#b9c4bc;font-size:14px}
+.over{position:absolute;inset:0;pointer-events:none;z-index:6}
+.btns{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+button{font:700 14px var(--ax);color:#0a100e;background:#5ef2a0;border:0;border-radius:6px;padding:8px 14px;min-height:40px;cursor:pointer}
+button.alt{background:#2a3d36;color:#e8e1cf}
+.px{image-rendering:pixelated;image-rendering:crisp-edges}
+/* stage */
+.stage{position:relative;height:290px;border-radius:8px;overflow:hidden;background:#02070a;border:1px solid #0d1f19;margin-top:8px}
+.cam{position:absolute;inset:0;transform-origin:50% 50%}
+.cam>canvas.bg{position:absolute;inset:0;width:100%;height:100%}
+.ulhu{position:absolute;left:calc(50% - 48px);bottom:22px;width:96px;height:96px;transform-origin:50% 85%}
+.ulhu img{width:96px;height:96px;display:block;transform-origin:50% 90%}
+.vial{position:absolute;left:14px;top:14px;width:30px;height:52px;border:3px solid #cfe9df;border-top-width:5px;border-radius:3px 3px 8px 8px;background:#06110d;overflow:hidden}
+.vial i{position:absolute;left:0;right:0;bottom:0;height:100%;background:repeating-linear-gradient(0deg,#3fd38a 0 3px,#5ef2a0 3px 6px);box-shadow:0 0 10px #5ef2a0}
+.vial.cr{border-color:#7d8f88}
+.hpl{position:absolute;left:8px;top:70px;width:44px;text-align:center;font:700 11px var(--ax);color:#cfe9df;text-shadow:0 1px 0 #000}
+.rc{position:absolute;left:56px;top:16px;display:flex;align-items:center;gap:5px;padding:3px 8px 3px 5px;background:rgba(5,12,10,.72);border:1px solid #5a4a20;border-radius:4px;font:700 13px var(--ax);color:#ffd56a;text-shadow:0 1px 0 #000}
+.rc img{width:20px;height:20px}
+.plq{position:absolute;right:12px;top:12px;width:132px;padding:6px 6px 7px;text-align:center;background:linear-gradient(#2b3a34,#18231f);border:2px solid #0a120f;box-shadow:inset 0 0 0 2px #3d5249,0 3px 0 #050a08}
+.plq .num{font:700 30px/1 var(--gx);color:#ffd56a;text-shadow:0 2px 0 #000;display:inline-block;min-width:40px}
+.plq .ttl{font:italic 13px var(--fx);color:#e8e1cf}
+.fx{position:absolute;inset:0;pointer-events:none}
+.say{position:absolute;left:10px;right:10px;bottom:8px;padding:6px 10px;background:#e9dbb4;color:#2a1a12;font:italic 14px/1.3 var(--fx);border-radius:3px;opacity:0;box-shadow:0 2px 0 #000;z-index:5}
+.lab{position:absolute;left:0;right:0;top:44%;text-align:center;font:italic 17px var(--fx);color:#e8e1cf;opacity:0;text-shadow:0 2px 6px #000}
+.shard{position:absolute;width:5px;height:5px;background:rgba(220,245,235,.9)}
+.ink{position:absolute;width:40px;height:40px;margin:-20px 0 0 -20px;border-radius:50%;background:radial-gradient(circle,#03110b 0 40%,rgba(10,40,26,.95) 60%,rgba(40,120,80,0) 72%);transform:scale(0)}
+.dawn{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 100%,rgba(255,200,110,.55),rgba(255,170,80,.18) 45%,transparent 70%);opacity:0;mix-blend-mode:screen}
+/* the rune bubble: a 16 px pixel canvas shown at 2x */
+.bb{position:absolute;left:0;top:0;width:42px;height:42px;opacity:0}
+.bb canvas{width:42px;height:42px;display:block}
+.drop{position:absolute;left:0;top:0;width:3px;height:3px;background:#d8f6ff}
+.gsp{position:absolute;left:0;top:0;width:3px;height:3px;background:#ffd56a;box-shadow:0 0 4px #ffb347}
+.plus{position:absolute;left:0;top:0;font:700 13px var(--ax);color:#ffd56a;text-shadow:0 1px 0 #000,0 0 6px #b86a10;white-space:nowrap}
+.halo{position:absolute;left:0;top:0;width:60px;height:60px;margin:-30px 0 0 -30px;border-radius:50%;border:2px solid rgba(255,214,120,.9);box-shadow:0 0 12px rgba(255,190,90,.8),inset 0 0 10px rgba(255,190,90,.5)}
+/* Rise Again panel: three stained-glass stars, above the water so the runes come DOWN */
+.call{padding:10px;background:#0c1512;border:1px solid #24443a;border-radius:8px}
+.call .hd{font:700 15px var(--gx);color:#8fa298;letter-spacing:.08em;text-align:center;margin-bottom:4px}
+.stars{display:flex;justify-content:space-around;align-items:center}
+.stars canvas{width:96px;height:96px;transition:filter .6s}
+.stars canvas.on{filter:drop-shadow(0 0 7px rgba(255,236,210,.6))}
+.rits{margin-top:6px;display:flex;gap:5px}
+.rit{flex:1;display:flex;justify-content:space-between;align-items:center;gap:4px;padding:5px 7px;background:#142420;border:1px solid #24443a;border-radius:5px;font-size:12px;line-height:1.15}
+.rit .sk{flex:none;width:14px;height:14px;border:2px solid #5d7a70;border-radius:3px}
+.rit.on{background:#1b3a2e;border-color:#5ef2a0}.rit.on .sk{background:#5ef2a0;border-color:#5ef2a0}
+.back{margin-top:6px;text-align:center;font:italic 14px var(--fx);color:#ffd56a;min-height:20px}
+.states{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:8px}
+.states div{text-align:center;font-size:12px;color:#8fa298}
+.states .row{display:flex;justify-content:center;gap:1px}
+.states canvas{width:28px;height:28px}
+.states canvas.on{filter:drop-shadow(0 0 3px rgba(255,236,210,.6))}
+.spark{position:absolute;width:3px;height:3px;background:#fff3c0;box-shadow:0 0 4px #ffcf5a}
+</style>
+</head>
+<body>
+<main id="main">
+<h1>Ulhu's runes come home</h1>
+<p class="intro">FA2-a gold dawn, three ways for the lost runes to come back. Ulhu faints but stays alive; each ritual lights one many-coloured stained-glass star, piece by piece, and his rune tablets (the same ones he spends in the app) float down to him in bubbles. Every bubble that reaches him gives back health and colour, lifts him a little and makes him glow, until he is standing with full health. A faint still costs: today's three rituals bring back one quarter of the lost runes (78 of 310), and the next quarter comes with tomorrow's three.</p>
+</main>
+<script>/*__RUNES__*/</script>
+<script>
+(function () {
+'use strict';
+const ULHU = /*__ULHU__*/;
+const STOP = { stop: true };
+const RM = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+function el(tag, cls, html) { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
+function spawn(p, cls, css, html) { const e = el('div', cls, html); if (css) e.style.cssText = css; p.appendChild(e); return e; }
+function rng(seed) { return function () { seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function pen(ctx) { return (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(Math.round(x), Math.round(y), Math.max(1, Math.round(w)), Math.max(1, Math.round(h))); }; }
+function hex(c) { return [1, 3, 5].map((i) => parseInt(c.slice(i, i + 2), 16)); }
+function mix(a, b, k) { const A = hex(a), B = hex(b); return 'rgb(' + A.map((v, i) => Math.round(v + (B[i] - v) * k)).join(',') + ')'; }
+
+/* ---------- timeline: every animation and wait belongs to one run, Replay kills it ---------- */
+function TL() { this.anims = []; this.timers = []; this.dead = false; }
+TL.prototype.a = function (e, kf, d, o) { if (this.dead) throw STOP; o = o || {}; const an = e.animate(kf, { duration: RM ? 1 : d, delay: RM ? 0 : (o.delay || 0), easing: o.ease || 'ease', fill: 'forwards', iterations: o.it || 1 }); this.anims.push(an); return an; };
+TL.prototype.wait = function (ms) { return new Promise((res, rej) => { if (this.dead) return rej(STOP); this.timers.push(setTimeout(() => this.dead ? rej(STOP) : res(), RM ? 1 : ms)); }); };
+TL.prototype.kill = function () { this.dead = true; this.anims.forEach((a) => a.cancel()); this.timers.forEach(clearTimeout); };
+
+/* ---------- drowned-temple backdrop in pixels ---------- */
+const PAL = { top: '#1f7a5a', bot: '#07211a', far: '#174d3e', mid: '#1b3a31', hi: '#30604f', lo: '#0f221c', ledge: '#28392f', lhi: '#43604f', moss: '#3fae6a', shaft: 'rgba(150,255,205,.10)' };
+function drawBg(cv, pal, seed) {
+  const W = 128, H = 97; cv.width = W; cv.height = H; const ctx = cv.getContext('2d'), R = pen(ctx), r = rng(seed || 7);
+  for (let y = 0; y < H; y++) { const k = y / H; ctx.fillStyle = mix(pal.top, pal.bot, k); ctx.fillRect(0, y, W, 1); if (y % 2 === 0) for (let x = (y / 2) % 2; x < W; x += 4) if (r() < .25) R(x, y, 1, 1, mix(pal.top, pal.bot, Math.min(1, k + .06))); }
+  for (let i = 0; i < 4; i++) { ctx.fillStyle = pal.shaft; ctx.beginPath(); const x = 10 + i * 30 + r() * 10; ctx.moveTo(x, 0); ctx.lineTo(x + 8, 0); ctx.lineTo(x + 26, H); ctx.lineTo(x + 12, H); ctx.fill(); }
+  for (let i = 0; i < 9; i++) { const x = r() * W, w = 5 + Math.floor(r() * 7), h = 18 + Math.floor(r() * 30); R(x, 78 - h, w, h, pal.far); R(x, 78 - h, 1, h, pal.hi); if (r() < .5) R(x - 2, 78 - h, w + 4, 2, pal.hi); }
+  for (const x of [14, 104]) { R(x, 30, 9, 50, pal.mid); R(x, 30, 2, 50, pal.hi); R(x + 7, 30, 2, 50, pal.lo); R(x - 2, 27, 13, 4, pal.hi); for (let y = 36; y < 78; y += 7) R(x + 2, y, 5, 1, pal.lo); }
+  R(0, 80, W, 17, pal.ledge); R(0, 80, W, 2, pal.lhi); for (let x = 0; x < W; x += 6 + Math.floor(r() * 6)) R(x, 83 + Math.floor(r() * 10), 3, 1, pal.lo);
+  for (const kx of [6, 30, 92, 120]) for (let j = 0; j < 16; j++) { const xx = kx + Math.round(Math.sin(j / 3 + kx) * 1.3); R(xx, 80 - j, 1, 1, pal.moss); if (j % 4 === 2) R(xx + 1, 80 - j, 1, 1, pal.moss); }
+}
+
+/* ---------- runes: six 5 x 7 pixel glyphs ---------- */
+const GLYPHS = [
+  ['..#..', '.###.', '#.#.#', '..#..', '..#..', '..#..', '..#..'], // tiwaz, the arrow
+  ['#.#.#', '#.#.#', '.###.', '..#..', '..#..', '..#..', '..#..'], // algiz
+  ['..#..', '.#.#.', '#...#', '#...#', '#...#', '.#.#.', '..#..'], // ingwaz
+  ['#...#', '##.##', '#.#.#', '#.#.#', '#.#.#', '##.##', '#...#'], // dagaz
+  ['...#.', '..#..', '.#...', '..#..', '...#.', '..#..', '.#...'], // sowilo
+  ['#....', '#.#..', '##.#.', '#.#..', '##...', '#....', '#....']  // fehu
+];
+function glyphOn(g, x, y) { return y >= 0 && y < 7 && x >= 0 && x < 5 && GLYPHS[g][y][x] === '#'; }
+// the small gold rune tile used on the counter
+function runeIcon() { const i = el('img', 'px'); i.src = window.RUNES.ones[0].src; i.alt = ''; return i; }
+// the app's own rune tablets (planner/game-runes.js, 24 x 24 sprites), loaded once
+const TABS = window.RUNES.ones.map((r) => { const im = new Image(); im.src = r.src; return im; });
+// a see-through pixel bubble (28 px canvas shown at 1.5x): the rune tablet floats inside at its real
+// pixel size, a faint tint, then the rim (lit top left, darker bottom right) and highlight drawn over it
+function bubbleCanvas(g) {
+  const c = el('canvas', 'px'); c.width = 28; c.height = 28; const ctx = c.getContext('2d');
+  const P = (x, y, col) => { ctx.fillStyle = col; ctx.fillRect(x, y, 1, 1); };
+  const inside = () => { for (let y = 0; y < 28; y++) for (let x = 0; x < 28; x++) { const d = Math.hypot(x + .5 - 14, y + .5 - 14); if (d <= 12.4) P(x, y, 'rgba(160,225,255,.12)'); } };
+  const rim = () => {
+    for (let y = 0; y < 28; y++) for (let x = 0; x < 28; x++) { const d = Math.hypot(x + .5 - 14, y + .5 - 14); if (d > 13.6) continue;
+      if (d > 12.4) P(x, y, x + y < 24 ? '#e6fbff' : x + y < 32 ? '#a6e4f4' : '#5fa9c4');
+      else if (d > 11.2 && x + y > 31) P(x, y, 'rgba(110,190,225,.34)'); }
+    P(7, 5, '#ffffff'); P(8, 5, '#ffffff'); P(9, 5, 'rgba(255,255,255,.6)'); P(6, 6, '#ffffff'); P(5, 7, '#ffffff'); P(5, 8, 'rgba(255,255,255,.7)'); P(20, 21, '#c8f2ff'); P(21, 20, '#c8f2ff'); };
+  const im = TABS[g % TABS.length];
+  const paint = () => { ctx.clearRect(0, 0, 28, 28); inside(); ctx.globalAlpha = .96; ctx.drawImage(im, 2, 1.5 | 0); ctx.globalAlpha = 1; rim(); };
+  if (im.complete) paint(); else { inside(); rim(); im.addEventListener('load', paint, { once: true }); }
+  return c;
+}
+
+/* ---------- the stained-glass star: leaded pieces only, nothing on top ---------- */
+// many-coloured cathedral glass (ruby, cobalt, emerald, amber, violet, teal, gold, rose, sky)
+const STAR_COLS = ['#e0405a', '#3b6fe0', '#2fbf6a', '#ffb347', '#9a4ad8', '#22b8c0', '#ffd56a', '#ff7aa8', '#7ec8ff'];
+function starPoly(cx, cy, R1, R2, n, rot) { const p = []; for (let i = 0; i < n * 2; i++) { const a = rot + i * Math.PI / n, rr = i % 2 ? R2 : R1; p.push([cx + Math.cos(a) * rr, cy + Math.sin(a) * rr]); } return p; }
+function inPoly(x, y, p) { let c = false; for (let i = 0, j = p.length - 1; i < p.length; j = i++) { const [xi, yi] = p[i], [xj, yj] = p[j]; if ((yi > y) !== (yj > y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) c = !c; } return c; }
+function makeGlass(seed) {
+  const S = 48, r = rng(seed), cx = 24, cy = 25.5;
+  const star = starPoly(cx, cy, 23, 23 * .47, 5, -Math.PI / 2);
+  const seeds = [{ x: cx, y: cy }];
+  for (let i = 0; i < 5; i++) { const a = -Math.PI / 2 + i * 2 * Math.PI / 5; seeds.push({ x: cx + Math.cos(a) * 17, y: cy + Math.sin(a) * 17 }); seeds.push({ x: cx + Math.cos(a + .55) * 9, y: cy + Math.sin(a + .55) * 9 }); }
+  let guard = 0; while (seeds.length < 22 && guard++ < 4000) { const x = 1 + r() * 46, y = 1 + r() * 46; if (!inPoly(x, y, star)) continue; if (seeds.some((s) => Math.hypot(s.x - x, s.y - y) < 5.2)) continue; seeds.push({ x, y }); }
+  const id = new Int16Array(S * S).fill(-1);
+  for (let y = 0; y < S; y++) for (let x = 0; x < S; x++) { const px = x + .5, py = y + .5; if (!inPoly(px, py, star)) continue;
+    let best = 1e9, bi = -1; seeds.forEach((s, i) => { const dd = (s.x - px) ** 2 + (s.y - py) ** 2; if (dd < best) { best = dd; bi = i; } }); id[y * S + x] = bi; }
+  const nb = seeds.map(() => new Set());
+  for (let y = 0; y < S; y++) for (let x = 0; x < S; x++) { const i = id[y * S + x]; if (i < 0) continue;
+    for (const [dx, dy] of [[1, 0], [0, 1], [2, 0], [0, 2], [1, 1], [1, -1]]) { const X = x + dx, Y = y + dy; if (X >= S || Y < 0 || Y >= S) continue; const j = id[Y * S + X]; if (j >= 0 && j !== i) { nb[i].add(j); nb[j].add(i); } } }
+  const cols = [];
+  seeds.forEach((s, i) => { const used = new Set([...nb[i]].map((j) => cols[j]).filter(Boolean)); const free = STAR_COLS.filter((c) => !used.has(c)); const pool = free.length ? free : STAR_COLS; cols[i] = pool[Math.floor(r() * pool.length)]; });
+  const order = seeds.map((s, i) => i).sort((a, b) => Math.hypot(seeds[a].x - cx, seeds[a].y - cy) - Math.hypot(seeds[b].x - cx, seeds[b].y - cy));
+  const rank = new Int16Array(seeds.length); order.forEach((i, k) => { rank[i] = k; });
+  return { S, id, cols, rank, n: seeds.length };
+}
+function paintGlass(cv, G, lit, flash) {
+  const S = G.S; cv.width = S; cv.height = S; const ctx = cv.getContext('2d'), img = ctx.createImageData(S, S), d = img.data;
+  const cache = {}; const rgb = (c) => cache[c] || (cache[c] = hex(c));
+  for (let y = 0; y < S; y++) for (let x = 0; x < S; x++) { const k = y * S + x, i = G.id[k]; if (i < 0) continue; const o = k * 4;
+    // one-pixel lead: round the outside, and between two pieces only on one side of the join
+    const edge = x === 0 || y === 0 || x === S - 1 || y === S - 1 || G.id[k - 1] < 0 || G.id[k + 1] < 0 || G.id[k - S] < 0 || G.id[k + S] < 0;
+    const lead = edge || G.id[k + 1] !== i || G.id[k + S] !== i;
+    let c;
+    if (lead) c = [20, 17, 14];
+    else { const on = G.rank[i] < lit; c = rgb(G.cols[i]);
+      if (G.rank[i] === flash) c = [255, 250, 225];
+      else if (!on) c = c.map((v) => Math.round(v * .2 + 12));
+      else { const ul = G.id[k - S - 1] !== i || G.id[k - 2 * S] !== i; const sh = ul ? 1.22 : ((x * 3 + y) % 9 === 0) ? 1.12 : 1; c = c.map((v) => Math.min(255, Math.round(v * sh + (ul ? 18 : 0)))); } }
+    d[o] = c[0]; d[o + 1] = c[1]; d[o + 2] = c[2]; d[o + 3] = 255; }
+  ctx.putImageData(img, 0, 0);
+}
+
+/* ---------- a stage: backdrop, Ulhu, health vial, rune counter, plaque ---------- */
+function makeStage(host) {
+  host.innerHTML = '';
+  const st = { host };
+  st.cam = spawn(host, 'cam');
+  st.bg = el('canvas', 'bg px'); st.cam.appendChild(st.bg); drawBg(st.bg, PAL, 7);
+  st.back = spawn(st.cam, 'fx');
+  st.ulhu = spawn(st.cam, 'ulhu', '', '<img class="px" alt="Ulhu">'); st.img = st.ulhu.querySelector('img'); st.mood = (m) => { st.img.src = ULHU[m]; }; st.mood('idle');
+  st.fx = spawn(host, 'fx'); st.hud = spawn(host, 'fx'); st.vial = spawn(st.hud, 'vial', '', '<i></i>'); st.fill = st.vial.firstChild; st.hpl = spawn(st.hud, 'hpl');
+  st.setHp = (hp) => { st.fill.style.height = (hp / 60 * 100) + '%'; st.hpl.textContent = hp + '/60'; };
+  st.setHp(60);
+  st.rc = spawn(st.hud, 'rc'); st.rc.appendChild(runeIcon()); st.rcn = el('span'); st.rc.appendChild(st.rcn);
+  st.setRunes = (n) => { st.rcn.textContent = n + ' runes'; }; st.setRunes(310);
+  st.plq = spawn(st.hud, 'plq', '', '<span class="num">VII</span><div class="ttl">Tide Caller</div>');
+  // the HUD sits above the bubble layer, so bubbles pass BEHIND the vial, counter and plaque
+  st.sayEl = spawn(host, 'say');
+  st.say = (t, tl) => { st.sayEl.textContent = t; tl.a(st.sayEl, [{ opacity: 0, transform: 'translateY(10px)' }, { opacity: 1, transform: 'none' }], 500); };
+  return st;
+}
+function rel(L, e) { const a = L.getBoundingClientRect(), b = e.getBoundingClientRect(); return [b.left - a.left + b.width / 2, b.top - a.top + b.height / 2]; }
+function at(x, y, s) { return 'translate(' + (x - 21).toFixed(1) + 'px,' + (y - 21).toFixed(1) + 'px) scale(' + (s == null ? 1 : s).toFixed(2) + ')'; }
+function bubble(L, g) { const b = spawn(L, 'bb'); b.appendChild(bubbleCanvas(g % 6)); return b; }
+
+/* ---------- the faint: health empties, Ulhu falls asleep but keeps breathing, the runes float away in bubbles ---------- */
+async function faint(st, t, ctx) {
+  ctx.call.reset(); ctx.over.innerHTML = '';
+  await t.wait(400); st.mood('sad');
+  t.a(st.vial, [{ transform: 'none' }, { transform: 'scale(1.1,.92)' }, { transform: 'none' }], 300); await t.wait(300);
+  const [x, y] = rel(st.host, st.vial); st.fill.style.height = '0%'; st.hpl.textContent = '0/60'; st.vial.classList.add('cr');
+  for (let i = 0; i < 14; i++) { const s = spawn(st.fx, 'shard', 'left:' + x + 'px;top:' + y + 'px;' + (i % 3 ? '' : 'background:#2fae6a')); const a = i / 14 * 6.283, d = 26 + (i * 13) % 30; t.a(s, [{ transform: 'translate(0,0)', opacity: 1 }, { transform: 'translate(' + Math.cos(a) * d + 'px,' + (Math.sin(a) * d + 40) + 'px) rotate(' + i * 80 + 'deg)', opacity: 0 }], 900, { ease: 'ease-out' }); }
+  const ink = spawn(st.fx, 'ink', 'left:' + x + 'px;top:' + y + 'px');
+  t.a(ink, [{ transform: 'scale(0)' }, { transform: 'scale(8)', offset: .35 }, { transform: 'scale(30)' }], 2600, { ease: 'ease-in' });
+  t.a(st.cam, [{ filter: 'none' }, { filter: 'brightness(.35) blur(1px)' }], 2400, { ease: 'ease-in' });
+  t.a(st.ulhu, [{ transform: 'none', filter: fil(1, 0) }, { transform: LIE, filter: fil(0, 0) }], 1600, { delay: 600, ease: 'ease-in' });
+  const [ux, uy] = rel(st.fx, st.ulhu);
+  for (let i = 0; i < 6; i++) { const b = bubble(st.fx, i), x0 = ux - 45 + i * 18;
+    t.a(b, [{ transform: at(x0, uy + 10, .4), opacity: 0 }, { transform: at(x0, uy - 10, 1), opacity: 1, offset: .15 }, { transform: at(x0 + (i % 2 ? 14 : -14), uy - 110, 1), opacity: .95, offset: .55 }, { transform: at(x0 + (i % 2 ? -10 : 10), uy - 250, 1), opacity: 0 }], 3200, { delay: 900 + i * 220, ease: 'ease-in-out' }); }
+  for (let n = 0; n <= 10; n++) { setTimeout(() => { if (!t.dead) st.setRunes(Math.round(310 * (1 - n / 10))); }, 900 + n * 200); }
+  const lab = spawn(st.fx, 'lab', '', '310 runes drift out of reach'); await t.wait(2000); t.a(lab, [{ opacity: 0 }, { opacity: 1 }], 700);
+  await t.wait(2300); t.a(lab, [{ opacity: 1 }, { opacity: 0 }], 500);
+  st.mood('sleepy'); breathe(st, t);
+  t.a(ink, [{ opacity: 1 }, { opacity: 0 }], 1400); t.a(st.cam, [{ filter: 'brightness(.35) blur(1px)' }, { filter: 'brightness(.8) saturate(.6)' }], 1400);
+  await t.wait(1500); st.say('I fainted, but I am still here. Light the stars and my runes will find me.', t);
+}
+const LIE = 'translate(8px,10px) rotate(-90deg)';
+function pose(r, lift) { const e = 1 - r; return 'translate(' + (8 * e).toFixed(1) + 'px,' + (10 * e - (lift || 0)).toFixed(1) + 'px) rotate(' + (-90 * e).toFixed(1) + 'deg)'; }
+function fil(r, g) { return 'grayscale(' + (1 - r).toFixed(2) + ') brightness(' + (.68 + .32 * r).toFixed(2) + ') drop-shadow(0 0 ' + g.toFixed(1) + 'px rgba(255,214,120,' + Math.min(1, .2 + g / 12).toFixed(2) + '))'; }
+function breathe(st, t) { st.breath = t.a(st.img, [{ transform: 'scale(1,1)' }, { transform: 'scale(1.04,1.03)' }, { transform: 'scale(1,1)' }], 1900, { it: Infinity, ease: 'ease-in-out' }); }
+function lyingState(st, t) { st.mood('sleepy'); st.setHp(0); st.setRunes(0); st.vial.classList.add('cr'); st.cam.style.filter = 'brightness(.8) saturate(.6)'; st.ulhu.style.transform = LIE; st.ulhu.style.filter = fil(0, 0); breathe(st, t); }
+
+/* ---------- each bubble that reaches him: pop, then he revives a step ---------- */
+const N_BUB = 18, PER = [5, 5, 5, 5, 5, 5, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4]; // 78 runes (one quarter of 310) in 18 bubbles; health still refills fully
+function pop(L, t, x, y, b) {
+  t.a(b, [{ transform: at(x, y, 1), opacity: 1 }, { transform: at(x, y, 1.45), opacity: 0 }], 180, { ease: 'ease-out' });
+  for (let i = 0; i < 8; i++) { const d = spawn(L, 'drop'), a = i / 8 * 6.283 + .4, r = 16 + (i % 3) * 4; t.a(d, [{ transform: 'translate(' + x + 'px,' + y + 'px)', opacity: 1 }, { transform: 'translate(' + (x + Math.cos(a) * r) + 'px,' + (y + Math.sin(a) * r) + 'px)', opacity: 0 }], 360, { ease: 'ease-out' }); }
+}
+function revive(st, t, S) {
+  const r0 = S.n / N_BUB, amt = PER[S.n]; S.n++; const r = S.n / N_BUB;
+  // a glow pulse, a little lift, colour returns, then he settles one step higher than before
+  t.a(st.ulhu, [{ transform: pose(r0), filter: fil(r0, 7 * r0) }, { transform: pose(r0 + (r - r0) * .6, 7), filter: fil(r, 16), offset: .3 }, { transform: pose(r), filter: fil(r, 7 * r) }], 900, { ease: 'ease-out' });
+  if (S.n === 1) st.mood('sad'); if (S.n === 7) st.mood('idle');
+  const [ux, uy] = rel(st.fx, st.ulhu);
+  const h = spawn(st.fx, 'halo'); t.a(h, [{ transform: 'translate(' + ux + 'px,' + uy + 'px) scale(.3)', opacity: 1 }, { transform: 'translate(' + ux + 'px,' + uy + 'px) scale(1.7)', opacity: 0 }], 700, { ease: 'ease-out' });
+  for (let i = 0; i < 5; i++) { const s = spawn(st.fx, 'gsp'), a = i / 5 * 6.283; t.a(s, [{ transform: 'translate(' + (ux + Math.cos(a) * 22) + 'px,' + (uy + Math.sin(a) * 22) + 'px)', opacity: 1 }, { transform: 'translate(' + ux + 'px,' + uy + 'px)', opacity: 0 }], 420, { ease: 'ease-in' }); }
+  const pl = spawn(st.fx, 'plus', '', '+' + amt); t.a(pl, [{ transform: 'translate(' + (ux + 18) + 'px,' + (uy - 24) + 'px)', opacity: 0 }, { opacity: 1, offset: .2 }, { transform: 'translate(' + (ux + 24) + 'px,' + (uy - 54) + 'px)', opacity: 0 }], 1100, { ease: 'ease-out' });
+  const hp0 = Math.round(60 * r0), hp = Math.round(60 * r); t.a(st.fill, [{ height: (hp0 / 60 * 100) + '%' }, { height: (hp / 60 * 100) + '%' }], 500); st.hpl.textContent = hp + '/60'; if (hp > 0) st.vial.classList.remove('cr');
+  S.runes += amt; st.setRunes(S.runes); t.a(st.rc, [{ transform: 'scale(1)' }, { transform: 'scale(1.15)' }, { transform: 'scale(1)' }], 300);
+  const dawn = st.back.querySelector('.dawn') || spawn(st.back, 'dawn'); t.a(dawn, [{ opacity: r0 * .9 }, { opacity: r * .9 }], 700);
+  t.a(st.cam, [{ filter: 'brightness(' + (.8 + .2 * r0).toFixed(2) + ') saturate(' + (.6 + .4 * r0).toFixed(2) + ')' }, { filter: 'brightness(' + (.8 + .2 * r).toFixed(2) + ') saturate(' + (.6 + .4 * r).toFixed(2) + ')' }], 700);
+}
+async function arriveAt(st, t, L, b, x, y, S) { pop(L, t, x, y, b); revive(st, t, S); }
+
+/* ---------- FA-R1: a gentle stream, one bubble at a time, swaying down through the dawn water ---------- */
+async function flowStream(st, t, ctx, k, S) {
+  const L = st.fx, W = L.clientWidth, jobs = [];
+  for (let i = 0; i < 6; i++) jobs.push((async () => {
+    await t.wait(i * 620); const g = k * 6 + i, b = bubble(L, g);
+    const [tx, ty] = rel(L, st.ulhu), x0 = 46 + ((g * 61) % (W - 92)), y0 = -18, dur = 3300, kf = [];
+    for (let j = 0; j <= 16; j++) { const p = j / 16, ex = p * p * (3 - 2 * p), sway = Math.sin(p * Math.PI * 2.4 + i) * 16 * (1 - p);
+      kf.push({ transform: at(x0 + (tx - x0) * ex + sway, y0 + (ty - 6 - y0) * p, 1 + Math.sin(p * 20 + i) * .04), opacity: p < .08 ? p / .08 : 1 }); }
+    t.a(b, kf, dur, { ease: 'linear' }); await t.wait(dur);
+    await arriveAt(st, t, L, b, tx, ty - 6, S);
+  })());
+  await Promise.all(jobs);
+}
+
+/* ---------- FA-R2: they gather into a slow ring above him, turn once, then spiral in together ---------- */
+async function flowRing(st, t, ctx, k, S) {
+  const L = st.fx; let [tx, ty] = rel(L, st.ulhu); const cx = tx, cy = 92, rx = 66, ry = 22;
+  const bs = [], ang = [];
+  for (let i = 0; i < 6; i++) { const a = i / 6 * 2 * Math.PI + k * .4; ang.push(a); const b = bubble(L, k * 6 + i); bs.push(b);
+    const sx = cx + rx * Math.cos(a), sy = cy + ry * Math.sin(a), x0 = sx + (i % 2 ? -26 : 26);
+    t.a(b, [{ transform: at(x0, -20, .9), opacity: 0 }, { opacity: 1, offset: .12 }, { transform: at(x0 * .4 + sx * .6, sy * .5, .95), offset: .55 }, { transform: at(sx, sy, .86 + .14 * Math.sin(a)), opacity: 1 }], 1700, { delay: i * 160, ease: 'ease-out' }); }
+  await t.wait(1700 + 5 * 160 + 80);
+  const turn = 1.5 * Math.PI, ODUR = 2300;
+  bs.forEach((b, i) => { const kf = []; for (let j = 0; j <= 24; j++) { const a = ang[i] + j / 24 * turn; kf.push({ transform: at(cx + rx * Math.cos(a), cy + ry * Math.sin(a), .86 + .14 * Math.sin(a)), opacity: 1 }); } t.a(b, kf, ODUR, { ease: 'linear' }); });
+  await t.wait(ODUR);
+  [tx, ty] = rel(L, st.ulhu); ty -= 6;
+  const jobs = bs.map((b, i) => (async () => {
+    const kf = []; for (let j = 0; j <= 14; j++) { const p = j / 14, a = ang[i] + turn + p * Math.PI * 1.2, q = 1 - p, mx = cx + (tx - cx) * p, my = cy + (ty - cy) * p;
+      kf.push({ transform: at(mx + rx * q * Math.cos(a), my + ry * q * Math.sin(a), (.86 + .14 * Math.sin(a)) * (1 - .15 * p)), opacity: 1 }); }
+    const d = i * 190; t.a(b, kf, 1200, { delay: d, ease: 'ease-in' }); await t.wait(1200 + d);
+    await arriveAt(st, t, L, b, tx, ty, S);
+  })());
+  await Promise.all(jobs);
+}
+
+/* ---------- FA-R3: slow rain from the lit star itself, each star releasing its share ---------- */
+async function flowRain(st, t, ctx, k, S) {
+  const L = ctx.over, cv = ctx.call.cvs[k], jobs = [];
+  for (let i = 0; i < 6; i++) jobs.push((async () => {
+    await t.wait(i * 430);
+    t.a(cv, [{ transform: 'scale(1)' }, { transform: 'scale(1.07)' }, { transform: 'scale(1)' }], 300);
+    const [sx, sy] = rel(L, cv), [tx, ty0] = rel(L, st.ulhu), ty = ty0 - 6, b = bubble(L, k * 6 + i);
+    const x0 = sx + (i - 2.5) * 7, y0 = sy + 6 + (i % 2) * 4, dur = 2700, kf = [];
+    for (let j = 0; j <= 16; j++) { const p = j / 16, ex = Math.pow(p, 1.6);
+      kf.push({ transform: at(x0 + (tx - x0) * ex + Math.sin(p * Math.PI * 3 + i) * 5 * (1 - p), y0 + (ty - y0) * p, p < .15 ? .3 + p / .15 * .7 : 1), opacity: p < .1 ? p / .1 : 1 }); }
+    t.a(b, kf, dur, { ease: 'ease-in-out' }); await t.wait(dur);
+    await arriveAt(st, t, L, b, tx, ty, S);
+  })());
+  await Promise.all(jobs);
+}
+
+/* ---------- the recovery: three rituals, three stars, eighteen bubbles ---------- */
+async function lightStar(cv, G, t) {
+  for (let k = 0; k <= G.n; k++) { paintGlass(cv, G, k, k); await t.wait(40); }
+  paintGlass(cv, G, G.n, -1); cv.classList.add('on');
+  t.a(cv, [{ transform: 'scale(1)' }, { transform: 'scale(1.12)' }, { transform: 'scale(1)' }], 500, { ease: 'ease-out' });
+}
+async function recover(st, t, ctx, flow, line) {
+  const call = ctx.call; ctx.over.innerHTML = '';
+  lyingState(st, t); call.reset(); const S = { n: 0, runes: 0 };
+  await t.wait(800);
+  for (let k = 0; k < 3; k++) {
+    call.rits[k].classList.add('on'); await t.wait(250);
+    await lightStar(call.cvs[k], call.G[k], t);
+    call.back.textContent = 'Star ' + (k + 1) + ' of 3 lit: six rune bubbles are on their way.';
+    await flow(st, t, ctx, k, S);
+    call.back.textContent = k < 2 ? (S.runes + ' of 78 runes home. Next ritual, next star.') : '78 runes home. Three more rituals tomorrow bring the next quarter.';
+    await t.wait(700);
+  }
+  if (st.breath) st.breath.cancel();
+  st.mood('happy');
+  const [ux, uy] = rel(st.fx, st.ulhu);
+  t.a(st.ulhu, [{ transform: 'none', filter: fil(1, 7) }, { transform: 'translateY(-16px)', filter: fil(1, 18), offset: .4 }, { transform: 'none', filter: fil(1, 6) }], 900, { ease: 'ease-out' });
+  for (let i = 0; i < 14; i++) { const s = spawn(st.fx, 'spark', 'left:' + ux + 'px;top:' + uy + 'px'); const a = i / 14 * 6.283, d = 30 + (i * 7) % 20; t.a(s, [{ transform: 'translate(0,0)', opacity: 1 }, { transform: 'translate(' + Math.cos(a) * d + 'px,' + Math.sin(a) * d + 'px)', opacity: 0 }], 800, { ease: 'ease-out' }); }
+  await t.wait(900); st.say(line, t);
+}
+function buildCall(host, seedBase) {
+  host.innerHTML = '<div class="hd">RISE AGAIN</div><div class="stars"></div><div class="rits"></div><div class="back"></div>';
+  const call = { cvs: [], G: [], rits: [] };
+  for (let i = 0; i < 3; i++) { const G = makeGlass(seedBase + i * 17); const c = el('canvas', 'px'); host.querySelector('.stars').appendChild(c); call.cvs.push(c); call.G.push(G); }
+  ['Morning sweep', 'Mark one set', 'Plan tomorrow'].forEach((n) => { const r = el('div', 'rit', '<span>' + n + '</span><span class="sk"></span>'); host.querySelector('.rits').appendChild(r); call.rits.push(r); });
+  call.back = host.querySelector('.back');
+  call.reset = () => { call.cvs.forEach((c, i) => { paintGlass(c, call.G[i], 0, -1); c.classList.remove('on'); }); call.rits.forEach((r) => r.classList.remove('on')); call.back.textContent = 'Three rituals light the three stars.'; };
+  call.reset(); return call;
+}
+function buildStates(host, seedBase) {
+  host.className = 'states'; host.innerHTML = '';
+  const G = [0, 1, 2].map((i) => makeGlass(seedBase + i * 17));
+  for (let s = 0; s <= 3; s++) { const d = el('div', '', '<div class="row"></div>' + s + ' lit'); for (let i = 0; i < 3; i++) { const c = el('canvas', 'px' + (i < s ? ' on' : '')); paintGlass(c, G[i], i < s ? G[i].n : 0, -1); d.firstChild.appendChild(c); } host.appendChild(d); }
+}
+
+/* ---------- cards ---------- */
+const main = document.getElementById('main');
+function card(id, name, cap, seed, flow, line) {
+  const c = el('section', 'card'); c.id = id; c.innerHTML = '<h3><b>' + id + '</b>' + name + '</h3><p class="cap">' + cap + '</p>';
+  const ctx = {}; ctx.call = buildCall(spawn(c, 'call'), seed);
+  const stage = spawn(c, 'stage'); const bt = spawn(c, 'btns'); buildStates(spawn(c, ''), seed);
+  ctx.over = spawn(c, 'over'); main.appendChild(c);
+  let tl = null;
+  const run = (play) => { if (tl) tl.kill(); ctx.over.innerHTML = ''; const st = makeStage(stage); tl = new TL(); const t = tl; play(st, t, ctx).catch((e) => { if (e !== STOP) console.error(e); }); };
+  [['Replay faint', faint], ['Replay recovery', (st, t) => recover(st, t, ctx, flow, line)]].forEach(([label, play], i) => { const b = el('button', i ? 'alt' : '', label); b.type = 'button'; b.dataset.act = i ? 'recover' : 'faint'; b.onclick = () => run(play); bt.appendChild(b); });
+  ctx.first = () => run((st, t) => recover(st, t, ctx, flow, line));
+  return ctx;
+}
+const cards = [
+  card('FA-R1', 'Stream', 'After each star lights, six rune bubbles drift down through the dawn water one at a time, swaying, and pop into Ulhu.', 101, flowStream, 'Full strength again. A quarter of my runes came home.'),
+  card('FA-R2', 'Ring', 'Each lit star calls six bubbles into a slow ring above Ulhu; the ring turns, then they spiral in together and he rises with each one.', 202, flowRing, 'They circled, then came home. A quarter back, the rest tomorrow.'),
+  card('FA-R3', 'Rain', 'Each star rains its own six bubbles as it lights: they leave the glass and fall slowly through the water into Ulhu.', 303, flowRain, 'The stars gave back a quarter of my runes. Standing again.')
+];
+window.addEventListener('load', () => cards.forEach((c) => c.first()));
+})();
+</script>
+</body>
+</html>
