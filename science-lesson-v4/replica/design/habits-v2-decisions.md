@@ -317,3 +317,14 @@ Patryk's answers, in grill order. Mock-ups follow each area.
   - Mock-ups: replica/design/mockups/wall4/ (MD-1/2/3).
 - **DP3 FINAL: DP3-b2** (kraken-eye doors slide in from the sides, a gold blade cuts the pupil, then a warm gold flood with bubbles). Source: replica/design/mockups/moments3/. Fix the small flaw where the crack in the plaque crosses the number.
 - **FA2-a:** the stars are just the stained-glass star lighting up piece by piece, with nothing in the middle. The story: Ulhu stays alive and gets all his health back. The runes he lost come home by floating down inside see-through bubbles (no squares, no swooshes), and he gains energy as each one arrives. Three ways the bubbles float down are in replica/design/mockups/faint4/ (FA-R1/2/3).
+
+## 30 Oct: picks
+- **Faint:** the bubbles must carry the rune TABLETS used as coins in the app. The stars should be the multi-coloured stained-glass stars from earlier builds, with nothing odd in the middle. Next round: replica/design/mockups/faint5/.
+- **Level up: LU-X The Breach is loved.** Make it a bit more triumphant: 3 variations in replica/design/mockups/levelup4/.
+- **Wall (moon day block):** it doesn't feel like a moon. He likes the fragmenting and the lit colour scheme. He wants more fragments, a clear way to tell which period is which, and perhaps different shapes such as stars. Next round of 3: replica/design/mockups/wall5/.
+- **Golems FINAL:** Crumple for Year 7; the round-two ("before") versions for every other year.
+- **Day screen: B (timeline) is best but feels soulless.** Rework it in his own planner's design language:
+  - colour on the buttons, and each class in its own colour;
+  - the running timer ("Marking 9AS") as a top bar that stays while it runs, with its start button staying where it is;
+  - the home PC timer pop-up drawn in Ulhu's style.
+  - He wonders about to-dos in Ulhu's style but likes the current look; that's open.
