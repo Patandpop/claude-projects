@@ -1,6 +1,7 @@
 # Lane C log (your day)
 
 ## Waiting on you
+0. **Build before 7pm: one command for you to run.** You said yes (through the design chat). The dry run is clean and no longer marks the day, but I was not allowed to create the scheduled task myself, because that needs your own say-so. On the home PC, open PowerShell in the project folder and run: `.\planner	oolsuild-ahead.ps1 -Install`. It makes the task "Science lessons: build ahead" (weekdays 15:45).
 1. **Obsidian inbox: confirm the folder.** It is set to (a) `G:\My Drive\Obsidian\Inbox from planner.md`, with writing switched OFF. Captures you send to Obsidian are kept safe in the planner until you say yes; then they are written, oldest first. Say "yes, (a)", or name another folder.
 2. **Per-pupil homework results**: the design moves them into your personal Planner Sheet along with everything else (your decision in the installed-app grill). Say "keep them at school" if that has changed.
 3. **Cloudflare: connected to GitHub (30 Oct).** Check the project's build settings match: Production branch `pre-reskin`; Framework preset None; Build command `node app/build.js`; Build output directory `app/dist`; Root directory `science-lesson-v4`. Then paste the site's address (it ends in `.pages.dev`) into the chat. The school test page is that address with `/test/` on the end.
@@ -21,6 +22,14 @@
 5. **Next paste set** (for Lane A to make): the phone page and the planner open instantly from their saved copy, and the phone has the new Day tab. Planner.html and Phone.html changed, and the set has **two new files** to make once in the Apps Script editor: a script file called `Day` (from Day.gs) and an HTML file called `DayUI` (from DayUI.html). Name them exactly that, or the phone's Day tab says "not in this copy yet".
 
 ## Entries (newest first)
+
+### 30 Oct 2026, Lane C: build before 7pm, approved
+- You said yes (through the design chat). I pulled Lane C design's fix (a dry run now writes nothing), ran `-DryRun` again ("not a school day", nothing marked), and the tool's own checks all pass.
+- The scheduled task is NOT made yet: the safety check on this PC would not let me make a task that starts by itself unless the yes comes from you directly. To make it, run `.\planner	oolsuild-ahead.ps1 -Install` in PowerShell in the project folder (Waiting item 0).
+- Once it is made:
+  - **It runs** weekdays at 15:45, and only builds when it is a school day, Drive is connected, requests are waiting and no other Claude session is busy. It starts nothing new after 18:30 and stops at 18:50.
+  - **Off switch:** make an empty file called `.build-ahead-off` in `planner	ools\` (holidays, or any time you want quiet); delete it to switch back on. To remove the task completely: `.\planner	oolsuild-ahead.ps1 -Remove`.
+  - **The log:** `planner	oolsuild-ahead.log` (one line per afternoon: ran or why not), and the last session's own output in `planner	oolsuild-ahead-run.log`. Anything it skipped is explained in `build-ahead-notes.txt` in the project folder.
 
 ### 30 Oct 2026, design chat: two faults fixed, and the Year 9 word bank
 - What changed: (1) the afternoon run's dry run no longer marks the day as run (it used to, which would have blocked that day's real run); only the real run marks it, and six new checks prove it. (2) The print pack's Word step now has a time limit, closes only the Word it started if it hangs, and says plainly what went wrong (hung, failed with Word's reason, or finished without making a PDF); four new checks fake Word each way. (3) Your answer on the Year 9 word bank is in class-defaults.json: none for 9AS and 9XS, like 10S2 and 11S2 (10C2 keeps its word bank); the builder reads that file once Lane B's plan 2.5 lands. Taken off the decisions page.
