@@ -341,3 +341,5 @@ Patryk's answers, in grill order. Mock-ups follow each area.
 - **Memory tab (Lane B): layout A is best**, mock-up "amazing". Wants dark mode, and blue as the "where we want it" colour, with orange or purple in the middle instead of amber. Passed to Lane B.
 
 - Memory tab colour, final: ORANGE (blue remembered, orange fading, red due). Lane B building it; Lane A makes the next complete paste set after.
+
+- Lane D picks (30 Oct): day tags A (hold the moon); overnight 1C with a better note and lantern; morning find as the card under the banner, far improved; finds in 3B act cabinets, clicking a find gives a note, notes piece together into a story. Improved mock-up round asked for.
