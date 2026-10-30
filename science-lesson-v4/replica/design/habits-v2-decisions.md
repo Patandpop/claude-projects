@@ -328,3 +328,8 @@ Patryk's answers, in grill order. Mock-ups follow each area.
   - the running timer ("Marking 9AS") as a top bar that stays while it runs, with its start button staying where it is;
   - the home PC timer pop-up drawn in Ulhu's style.
   - He wonders about to-dos in Ulhu's style but likes the current look; that's open.
+
+## 30 Oct, later: picks
+- **Faint FINAL: FA-R3** (replica/design/mockups/faint5/). Remove the little ticks under the stars: the stars themselves are the marks. The rituals should feel realistic: over the three rituals he climbs back to full health and gets back the runes he lost.
+- **Day screen FINAL: B3** (B1 navy and gold plus the small Ulhu touch on the to-dos), lanes/mockups/day-screen-b2.html. He loves the daytime home PC pop-up. The 19:20 after-seven pop-up must be more Ulhu-like: three night versions added to the same page (N1 whisper, N2 night ledger, N3 one eye open), pick pending.
+- New pages waiting for picks: level up replica/design/mockups/levelup4/ (LU-X1/X2/X3), wall replica/design/mockups/wall5/ (WD-1 moon, WD-2 star, WD-3 lancet).
