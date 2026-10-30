@@ -5,10 +5,15 @@
 2. The overnight adventure: mock-up ready: replica/design/mockups/companion/adventure.html (row 1 while he is away, row 2 the morning find, row 3 where finds live; pick one letter per row).
 3. The term page and chapter windows: mock-up ready: replica/design/mockups/companion/term-page.html (A one scroll, B cathedral wall with a rose window, C two tabs).
 4. Focus crafts: mock-up ready: replica/design/mockups/companion/focus-crafts.html (six crafts; say which to keep and which to drop).
-5. Next paste set (Lane A makes it): two new files join the set, Companion.gs (server) and GameComp.html (sound).
-6. Nudges on the phone need Lane C's notifications (installed app, step 8). The rules are built and waiting; nothing reaches your phone until then.
+5. Ocarina chorus: mock-up ready: replica/design/mockups/companion/sounds.html (the gold button, "Level up, chorus version"; play it beside the old level up and say: chorus, old, or keep both for different moments).
+6. Next paste set (Lane A makes it): two new files join the set, Companion.gs (server) and GameComp.html (sound).
+7. Nudges on the phone need Lane C's notifications (installed app, step 8). The rules are built and waiting; nothing reaches your phone until then.
 
 ## Entries (newest first)
+
+### 30 Oct, ocarina chorus to try
+- What changed: one new sound on the sounds test page, a small choir of ocarinas playing together in harmony: a short tune of our own that climbs in a haunted minor and lands on a bright major chord, with the same cave echo. It suits the level up best (the biggest happy moment), so it sits right under the old level up to compare. The five sounds you love are untouched, and the game itself does not use the chorus until you pick.
+- You need to: play both level ups and say chorus, old, or both.
 
 ### 30 Oct, sounds kept
 - You said you love the haunted ocarina sounds, so all five stay exactly as they are. Future Ulhu sounds (the focus crafts, if they get any) will be made in the same style.
