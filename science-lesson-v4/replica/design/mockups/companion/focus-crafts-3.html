@@ -1,0 +1,801 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ulhu: knitting, round 3 (K1, K2, K3)</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Grenze+Gotisch:wght@500;700&family=Pixelify+Sans:wght@500;700&family=Cormorant+Garamond:ital,wght@1,600;1,700&family=Fredoka:wght@500;700&family=VT323&display=swap">
+<style>
+body{margin:0;background:#020504;color:#e8e1cf;font:14px 'Atkinson Hyperlegible',system-ui,sans-serif;padding:16px}
+h1{font:700 28px 'Grenze Gotisch',serif;color:#5ef2a0;margin:0 0 4px}
+.lead{color:#9fb1a8;max-width:860px;margin:0 0 12px;line-height:1.45}
+.ctl{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;margin:0 0 16px;padding:10px 12px;border:1px solid #1b2823;border-radius:12px;background:#0b1411;max-width:820px;position:sticky;top:0;z-index:5}
+.ctl label{font-weight:700;color:#c9a560}
+.ctl input[type=range]{width:220px;accent-color:#5ef2a0}
+.ctl .pv{min-width:42px;font-weight:700}
+button{padding:8px 14px;border-radius:999px;border:1px solid #5aa7ff;background:#0f1a24;color:#bfe0ff;font:700 13px 'Atkinson Hyperlegible';cursor:pointer}
+button.on{background:#5aa7ff;color:#08101a}
+.seg{display:flex;gap:4px;flex-wrap:wrap}
+.seg button{border-color:#c9a560;color:#ffe2a0;background:#1a140a}
+.seg button.on{background:#c9a560;color:#1a140a}
+.grid{display:flex;flex-wrap:wrap;gap:22px;align-items:flex-start}
+.card{width:380px;max-width:100%;background:#07100d;border:1px solid #1b2823;border-radius:18px;overflow:hidden}
+.card h2{font:500 26px 'Grenze Gotisch';color:#ffd56a;margin:10px 12px 0}
+.card h2 small{font:700 13px 'Atkinson Hyperlegible';color:#9fb1a8;margin-left:6px}
+.card .d{color:#9fb1a8;margin:2px 12px 8px;line-height:1.38;font-size:13px}
+.sw{position:relative}
+.stage{display:block;width:100%;height:auto;aspect-ratio:380/420}
+.stage{will-change:transform}
+.stage.fg{position:absolute;left:0;top:0}
+.pz{display:none;position:absolute;right:10px;top:10px;font:700 11px 'Atkinson Hyperlegible';letter-spacing:.05em;color:#bfe0ff;background:#0f1a24e8;border:1px solid #5aa7ff;border-radius:12px;padding:5px 10px;text-align:center;line-height:1.3}
+.paused .pz{display:block}
+.notes{color:#9fb1a8;font-size:12.5px;margin:8px 12px 12px;line-height:1.4}
+.notes b{color:#e8e1cf}
+
+/* ===== shared state switches ===== */
+.eo,.bw{display:inline}.ec,.eh,.bz,.bh{display:none}
+.paused .eo,.fin .eo,.paused .bw,.fin .bw{display:none}
+.paused .ec,.paused .bz{display:inline}
+.fin .eh,.fin .bh{display:inline}
+.zz{display:none}.paused .zz{display:inline}
+.hearts,.spark{display:none}.fin .hearts,.fin .spark{display:inline}
+.fin .lap{display:none}
+.blink{animation:blink 4.2s infinite}
+@keyframes blink{0%,93%,100%{transform:scaleY(1)}95.5%{transform:scaleY(.08)}}
+.wing{animation:flap 1.7s ease-in-out infinite alternate}
+@keyframes flap{from{transform:rotate(-6deg)}to{transform:rotate(7deg)}}
+.paused .wing{animation:none;transform:rotate(10deg)}
+.fin .wing{animation-duration:.35s}
+.sprout{animation:sprout 2.8s ease-in-out infinite alternate}
+@keyframes sprout{from{transform:rotate(-7deg)}to{transform:rotate(7deg)}}
+.tw{animation:tw 1.4s ease-in-out infinite alternate}
+@keyframes tw{from{transform:rotate(-5deg)}to{transform:rotate(5deg)}}
+.paused .tw{animation-duration:4s}
+.head{transition:transform .9s ease}
+.paused .head{transform:rotate(-8deg) translateY(3px)}
+.gl{transition:transform 1.1s cubic-bezier(.5,0,.4,1.4)}
+.paused .gl{transform:translate(-1px,11px) rotate(-6deg)}
+.breath{transform-origin:0 50px}
+.paused .breath{animation:breath 3.4s ease-in-out infinite}
+@keyframes breath{0%,100%{transform:scale(1,1)}50%{transform:scale(1.035,.97)}}
+.z{animation:zz 3s ease-in-out infinite;opacity:0}
+.z2{animation-delay:1s}.z3{animation-delay:2s}
+@keyframes zz{0%{transform:translate(0,0) scale(.7);opacity:0}25%{opacity:1}100%{transform:translate(14px,-26px) scale(1.15);opacity:0}}
+.fin .hop{animation:hop .9s cubic-bezier(.3,0,.5,1) infinite}
+@keyframes hop{0%,100%{transform:translateY(0)}40%{transform:translateY(-13px)}55%{transform:translateY(-13px)}}
+.hrt{animation:hrt 2.2s ease-out infinite;opacity:0}
+@keyframes hrt{0%{opacity:0;transform:translate(0,0) scale(.5)}20%{opacity:1}100%{opacity:0;transform:translate(5px,-34px) scale(1.15)}}
+/* needles: tip of the right needle dives into the stitch, clicks, then lifts the new loop off */
+.work .nl{animation:nlk .72s ease-in-out infinite}
+.work .nr{animation:nrk .72s ease-in-out infinite}
+@keyframes nrk{0%{transform:rotate(0)}24%{transform:translate(-3px,-1px) rotate(-10deg)}36%{transform:translate(-3px,-1px) rotate(-10deg)}62%{transform:translate(1px,-3px) rotate(7deg)}100%{transform:rotate(0)}}
+@keyframes nlk{0%,100%{transform:rotate(0)}24%,36%{transform:rotate(4deg)}62%{transform:rotate(-3deg)}}
+.paused .nl{transform:rotate(16deg)}.paused .nr{transform:rotate(-16deg)}
+.nl,.nr{transition:transform .8s ease}
+.ck{opacity:0}
+.work .ck{animation:ck .72s infinite}
+@keyframes ck{0%,20%{opacity:0;transform:scale(.3)}27%{opacity:1;transform:scale(1.15)}46%,100%{opacity:0;transform:scale(1.5)}}
+.cur{animation:cur .7s ease-in-out infinite alternate}
+@keyframes cur{from{opacity:.25}to{opacity:1}}
+.paused .cur{animation:none;opacity:.5}
+.pop{animation:pop 1s cubic-bezier(.3,1.7,.5,1) both}
+@keyframes pop{0%{transform:translateY(60px) scale(.15);opacity:0}60%{opacity:1}100%{transform:translateY(0) scale(1);opacity:1}}
+.sp{animation:sp 1.4s ease-in-out infinite}
+@keyframes sp{0%,100%{opacity:0;transform:scale(.3)}50%{opacity:1;transform:scale(1)}}
+.bub{animation:bub 8s linear infinite}
+@keyframes bub{0%{transform:translate(0,0);opacity:0}10%{opacity:.85}90%{opacity:.6}100%{transform:translate(8px,-300px);opacity:0}}
+.spin{animation:spin 2.4s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.paused .spin,.fin .spin{animation-play-state:paused}
+.mini{animation:mini .36s ease-in-out infinite alternate}
+@keyframes mini{from{transform:rotate(-9deg)}to{transform:rotate(9deg)}}
+.paused .mini{animation:none}
+
+/* ===== K1 pixel cottage ===== */
+.k1 .stage{shape-rendering:crispEdges}
+.k1 .px{shape-rendering:crispEdges}
+.fl{opacity:0;animation:fl .48s steps(1) infinite}
+@keyframes fl{0%{opacity:1}33.4%,100%{opacity:0}}
+.fglow{animation:fglow 2.3s steps(6) infinite}
+@keyframes fglow{0%{opacity:.75}17%{opacity:.95}33%{opacity:.8}50%{opacity:1}67%{opacity:.78}83%{opacity:.92}100%{opacity:.75}}
+.pfish{animation:pfish 11s steps(44) infinite}
+@keyframes pfish{from{transform:translateX(-30px)}to{transform:translateX(90px)}}
+.pbub{animation:pbub 4s steps(16) infinite}
+@keyframes pbub{0%{transform:translateY(0);opacity:0}10%{opacity:1}100%{transform:translateY(-80px);opacity:0}}
+.k1 .z{font:700 15px 'Pixelify Sans';fill:#e9f4ff}
+.k1 .hop{animation-timing-function:steps(4)}
+.candle{animation:fl2 .6s steps(2) infinite}
+@keyframes fl2{0%{transform:scaleY(1)}50%{transform:scaleY(.75)}}
+
+/* ===== K2 painterly library ===== */
+.shaft{animation:shaft 7s ease-in-out infinite alternate}
+@keyframes shaft{from{opacity:.55}to{opacity:1}}
+.mote{animation:mote 9s ease-in-out infinite alternate}
+@keyframes mote{from{transform:translate(0,0)}to{transform:translate(14px,-22px)}}
+.jel{animation:jel 3.2s ease-in-out infinite alternate}
+@keyframes jel{from{opacity:.65;transform:translateY(1px)}to{opacity:1;transform:translateY(-2px)}}
+.k2 .z{font:italic 700 18px 'Cormorant Garamond';fill:#e6ecff}
+
+/* ===== K3 diving bell ===== */
+.kelp{animation:kelp 3.6s ease-in-out infinite alternate}
+@keyframes kelp{from{transform:rotate(-7deg)}to{transform:rotate(7deg)}}
+.dfish{animation:dfish 9s linear infinite}
+@keyframes dfish{from{transform:translateX(-80px)}to{transform:translateX(80px)}}
+.bulb{animation:bulb 4s ease-in-out infinite alternate}
+@keyframes bulb{from{transform:rotate(-3deg)}to{transform:rotate(3deg)}}
+.gauge{animation:gauge 2.6s ease-in-out infinite alternate}
+@keyframes gauge{from{transform:rotate(-20deg)}to{transform:rotate(25deg)}}
+.lure{animation:lure 1.6s ease-in-out infinite alternate}
+@keyframes lure{from{transform:rotate(-8deg)}to{transform:rotate(10deg)}}
+.lglow{animation:lglow 1.6s ease-in-out infinite alternate}
+@keyframes lglow{from{opacity:.55}to{opacity:1}}
+.paused .lglow{animation:none;opacity:.2}
+.work .swat{animation:swat 1.5s ease-in-out infinite}
+@keyframes swat{0%,55%,100%{transform:rotate(0)}68%{transform:rotate(-55deg)}78%{transform:rotate(-10deg)}86%{transform:rotate(-50deg)}}
+.catb{transform-origin:0 0}
+.paused .catb{animation:breath 3.4s ease-in-out infinite}
+.fin .catb{animation:hop .9s cubic-bezier(.3,0,.5,1) infinite;animation-delay:.2s}
+.k3 .z{font:700 16px 'Fredoka';fill:#dff6ff}
+</style></head><body>
+<h1>Knitting, round 3: three new looks</h1>
+<p class="lead">You picked knitting and the yarn strand bar (P4). Here are three fresh versions of the whole scene, each in a different mood, all doing the same job. Drag the progress slider or press Play (about 20 seconds from start to finished). Press "Leave the app" to see him doze: glasses slide down his nose, needles still in his hands, nothing lost. Switch the task size to see the sock, the kelp scarf or the jumper with his face on it. Tell me K1, K2 or K3 (or bits of each).</p>
+<div class="ctl">
+ <label for="pr">Progress</label><input id="pr" type="range" min="0" max="100" value="40"><span class="pv" id="pv">40%</span>
+ <button id="play">Play</button>
+ <button id="pa">Leave the app (pause)</button>
+ <span class="seg" id="sz"><button data-s="small">Small, 15 min (sock)</button><button data-s="medium" class="on">Medium, 30 min (kelp scarf)</button><button data-s="large">Large, 60 min (jumper)</button></span>
+</div>
+<div class="grid">
+ <div class="card k1 work" id="c1">
+  <h2>K1 <small>Firelit cottage nook, pixel art</small></h2>
+  <p class="d">Drawn in the same chunky 16-bit pixels as his game sprite. A crackling fire on the left, a stone cottage wall, a pointed window onto the dark sea, and his red wingback chair.</p>
+  <div class="sw"><svg class="stage" id="s1" viewBox="0 0 380 420"></svg><svg class="stage fg" id="f1" viewBox="0 0 380 420"></svg><div class="pz">PAUSED<br>nothing lost</div></div>
+  <p class="notes"><b>Bar:</b> a pixel strand of yarn along the floorboards turns into a knitted band two stitches tall, one stitch at a time. <b>Shelf:</b> the wall shelf, top right.</p>
+ </div>
+ <div class="card k2 work" id="c2">
+  <h2>K2 <small>Moonlit sunken library, painterly</small></h2>
+  <p class="d">Soft painted shading. A tall gothic window with the moon seen through deep water, light falling across his plum velvet chair, books all round and bubbles drifting up.</p>
+  <div class="sw"><svg class="stage" id="s2" viewBox="0 0 380 420"></svg><svg class="stage fg" id="f2" viewBox="0 0 380 420"></svg><div class="pz">PAUSED<br>nothing lost</div></div>
+  <p class="notes"><b>Bar:</b> a silver strand of moon-yarn glows along the floor and turns into a soft knitted band. <b>Shelf:</b> the open shelf in the right-hand bookcase.</p>
+ </div>
+ <div class="card k3 work" id="c3">
+  <h2>K3 <small>Tiny diving-bell room, sticker style</small></h2>
+  <p class="d">Bold outlines and bright flat colour. A round brass room with a porthole full of kelp, a swinging caged bulb, a squishy mustard chair, and Bloop, his little anglerfish cat, who bats at the yarn.</p>
+  <div class="sw"><svg class="stage" id="s3" viewBox="0 0 380 420"></svg><svg class="stage fg" id="f3" viewBox="0 0 380 420"></svg><div class="pz">PAUSED<br>nothing lost</div></div>
+  <p class="notes"><b>Bar:</b> a coral strand across the metal grate floor turns into a chunky knitted band. The time sits on a brass plate. <b>Shelf:</b> the bolted shelf by the gauge.</p>
+ </div>
+</div>
+<script>
+const $ = (s) => document.querySelector(s);
+const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+const SZ = { small: { min: 15, name: 'a sock' }, medium: { min: 30, name: 'a kelp scarf' }, large: { min: 60, name: 'a jumper with his face' } };
+let P = 40, paused = false, size = 'medium', playing = false;
+function rng(seed) { let s = seed; return () => { s = (s * 16807) % 2147483647; return (s - 1) / 2147483646; }; }
+const hx = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+function mix(a, b, t) { const A = hx(a), B = hx(b); return '#' + A.map((v, i) => Math.round(v + (B[i] - v) * t).toString(16).padStart(2, '0')).join(''); }
+const sh = (h, t) => (t >= 0 ? mix(h, '#ffffff', t) : mix(h, '#000000', -t));
+const hash = (a, b) => { const x = Math.sin(a * 127.1 + b * 311.7) * 43758.5453; return x - Math.floor(x); };
+
+/* ================= the knitted pieces (row 0 = top of the finished piece; knitting starts at the bottom row) ================= */
+const SOCK = [
+  'aaaaaaa......', 'bbbbbbb......', 'aaaaaaa......', 'ccccccc......', 'ccccccc......', 'ddddddd......', 'ccccccc......', 'ccccccc......',
+  'ddddddd......', 'ccccccc......', 'cccccccc.....', 'ccccccccccc..', 'eccccccccccee', 'eeccccccccdee', '.eeccccccceee', '..eeeeeeeee..'];
+function scarf() {
+  const R = 22, W = 8, g = [];
+  for (let r = 0; r < R; r++) {
+    let row = '';
+    const sx = Math.round(3.5 + 1.7 * Math.sin(r * 0.62));
+    for (let c = 0; c < W; c++) {
+      let k = 'a';
+      if (r < 2 || r >= R - 2) k = r % 2 ? 'd' : 'b';
+      else if (c === sx) k = 'c';
+      else if (r % 3 === 0 && ((r / 3) % 2 ? c === sx - 1 || c === sx - 2 : c === sx + 1 || c === sx + 2)) k = 'e';
+      row += k;
+    }
+    g.push(row);
+  }
+  return g;
+}
+function jumper() {
+  const R = 18, W = 19, g = [];
+  for (let r = 0; r < R; r++) {
+    let row = '';
+    for (let c = 0; c < W; c++) {
+      const body = c >= 4 && c <= 14, sleeve = c <= 3 || c >= 15;
+      let k = '.';
+      if (r === 0) { if ((c >= 3 && c <= 6) || (c >= 12 && c <= 15)) k = c === 6 || c === 12 ? 'b' : 'a'; }
+      else if (r === 1) { if (c >= 1 && c <= 17) k = c >= 7 && c <= 11 ? 'b' : 'a'; }
+      else if (r <= 10) { if (body || sleeve) k = 'a'; if (sleeve && r === 5) k = 'c'; if (sleeve && r >= 9) k = 'b'; }
+      else if (body) k = r >= 16 ? 'b' : 'a';
+      if (body && r >= 2 && r <= 14) { const dx = (c - 9) * 6, dy = (r - 8) * 4.4; if (dx * dx + dy * dy <= 22 * 22) k = 'f'; }
+      if ((c === 7 || c === 11) && (r === 7 || r === 8)) k = 'e';
+      if ((c === 6 || c === 12) && r === 10) k = 'p';
+      if ((c === 8 || c === 10) && r >= 11 && r <= 13) k = 'g';
+      if (c === 9 && r === 12) k = 'g';
+      if (c === 9 && r === 2) k = 'k';
+      row += k;
+    }
+    g.push(row);
+  }
+  return g;
+}
+const GRIDS = { small: SOCK, medium: scarf(), large: jumper() };
+const PSCALE = { small: 1.25, medium: 1.15, large: 1 };
+const SW = 6, SH = 4; // one stitch is 6 by 4
+
+const STITCH = {
+  px(x, y, C) { // 16-bit stitch: a V made of 2x2 pixels
+    return `<rect x="${x}" y="${y}" width="6" height="4" fill="${C}"/><rect x="${x}" y="${y}" width="2" height="2" fill="${sh(C, 0.32)}"/><rect x="${x + 2}" y="${y}" width="2" height="2" fill="${sh(C, -0.5)}"/><rect x="${x + 4}" y="${y + 2}" width="2" height="2" fill="${sh(C, -0.22)}"/>`;
+  },
+  paint(x, y, C, r, c) { // soft painted V: two leaning loops
+    const v = (hash(r, c) - 0.5) * 0.14, A = sh(C, v + 0.08), B = sh(C, v - 0.14);
+    return `<rect x="${x}" y="${y}" width="6" height="4" fill="${sh(C, -0.55)}"/><ellipse cx="${x + 1.75}" cy="${y + 2.1}" rx="1.65" ry="2.55" transform="rotate(-27 ${x + 1.75} ${y + 2.1})" fill="${A}"/><ellipse cx="${x + 4.25}" cy="${y + 2.1}" rx="1.65" ry="2.55" transform="rotate(27 ${x + 4.25} ${y + 2.1})" fill="${B}"/><ellipse cx="${x + 1.4}" cy="${y + 1.3}" rx=".6" ry="1" transform="rotate(-27 ${x + 1.4} ${y + 1.3})" fill="#fff" opacity=".28"/>`;
+  },
+  stk(x, y, C) { // chunky sticker V
+    return `<rect x="${x}" y="${y}" width="6" height="4" fill="${sh(C, -0.38)}"/><path d="M${x + 1.1},${y + 0.8} L${x + 3},${y + 3.5} L${x + 4.9},${y + 0.8}" stroke="${C}" stroke-width="2.3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
+  },
+};
+function pieceSVG(style, sz, pal) {
+  const g = GRIDS[sz], R = g.length, W = g[0].length;
+  let s = '';
+  if (sz === 'medium') { // fringe on the cast-on end
+    for (let c = 0; c < W; c++) { const x = c * SW + 3; s += style === 'px' ? `<rect x="${x - 1}" y="${R * SH}" width="2" height="${c % 2 ? 6 : 8}" fill="${pal.b}"/>` : `<path d="M${x},${R * SH - 1} q${c % 2 ? 1.5 : -1.5},4 0,${c % 2 ? 7 : 9}" stroke="${pal.b}" stroke-width="${style === 'stk' ? 2.2 : 1.6}" fill="none" stroke-linecap="round"/>`; }
+  }
+  let under = '';
+  if (style !== 'px') for (let r = 0; r < R; r++) for (let c = 0; c < W; c++) { if (g[r][c] === '.') continue; under += style === 'stk' ? `<rect x="${c * SW - 1.8}" y="${r * SH - 1.8}" width="${SW + 3.6}" height="${SH + 3.6}" fill="${OL3}"/>` : `<rect x="${c * SW - 0.6}" y="${r * SH + 1.2}" width="${SW + 1.2}" height="${SH + 1}" fill="#000" opacity=".22"/>`; }
+  for (let r = 0; r < R; r++) for (let c = 0; c < W; c++) { const k = g[r][c]; if (k === '.') continue; s += STITCH[style](c * SW, r * SH, pal[k], r, c); }
+  return under + s;
+}
+// which part of the piece is knitted at progress f (rows from the bottom; each row goes the opposite way to the one before)
+function knitState(sz, f) {
+  const g = GRIDS[sz], R = g.length, W = g[0].length;
+  const done = clamp(f, 0, 1) * R, full = Math.floor(done), part = done - full;
+  const out = { R, W, rects: [], top: R * SH, cur: null };
+  if (full > 0) { out.rects.push([-3, (R - full) * SH, W * SW + 6, full * SH + (sz === 'medium' ? 12 : 3)]); out.top = (R - full) * SH; }
+  const ri = R - full - 1;
+  if (ri >= 0 && full < R) {
+    const row = g[ri]; let c0 = row.search(/[^.]/), c1 = row.length - 1; while (row[c1] === '.') c1--;
+    const n = c1 - c0 + 1, s = Math.floor(part * n), ltr = full % 2 === 0;
+    if (s > 0) { const w = s * SW, x = ltr ? c0 * SW : (c1 + 1) * SW - w; out.rects.push([x, ri * SH, w, SH]); out.top = ri * SH; }
+    const cc = ltr ? c0 + s : c1 - s;
+    out.cur = [cc * SW, ri * SH];
+    if (s === 0 && full === 0) out.top = R * SH - 1;
+  }
+  return out;
+}
+
+/* ================= pixel canvas helpers (K1) ================= */
+function PC(w, h) { return { w, h, c: new Array(w * h).fill(0) }; }
+const pget = (p, x, y) => (x < 0 || y < 0 || x >= p.w || y >= p.h ? 0 : p.c[y * p.w + x]);
+const pset = (p, x, y, k) => { if (x >= 0 && y >= 0 && x < p.w && y < p.h) p.c[y * p.w + x] = k; };
+function pshape(p, fn) { for (let y = 0; y < p.h; y++) for (let x = 0; x < p.w; x++) { const k = fn(x + 0.5, y + 0.5, x, y); if (k) pset(p, x, y, k); } }
+function pout(p, k) { const o = p.c.slice(); for (let y = 0; y < p.h; y++) for (let x = 0; x < p.w; x++) { if (p.c[y * p.w + x]) continue; if (pget(p, x - 1, y) || pget(p, x + 1, y) || pget(p, x, y - 1) || pget(p, x, y + 1)) o[y * p.w + x] = k; } p.c = o; }
+function prend(p, pal, u, ox = 0, oy = 0) {
+  let s = '';
+  for (let y = 0; y < p.h; y++) { let x = 0; while (x < p.w) { const k = p.c[y * p.w + x]; if (!k) { x++; continue; } let x2 = x; while (x2 < p.w && p.c[y * p.w + x2] === k) x2++; s += `<rect x="${ox + x * u}" y="${oy + y * u}" width="${(x2 - x) * u}" height="${u}" fill="${pal[k] || k}"/>`; x = x2; } }
+  return s;
+}
+function pcells(list, k, w, h) { const p = PC(w, h); list.forEach(([x, y]) => pset(p, x, y, k)); return p; }
+
+/* ================= Ulhu, pixel (K1) ================= */
+const UP = { K: '#1d3328', m: '#aae2be', s: '#78be96', l: '#e1fae6', W: '#5a8c5a', w: '#3c643c', c: '#faf5d7', C: '#e6dcb2', e: '#1b1b2f', h: '#ffffff', p: '#f28ca0', g: '#78c86e', G: '#f2c35a', B: '#2a1f12' };
+function k1Ulhu() {
+  const W = 34, H = 36, cx = 17, hy = 13.5, rx = 11.7, ry = 10.3, byc = 28, brx = 8.6, bry = 6.8;
+  const mir = (x) => W - 1 - x;
+  const wing = PC(W, H);
+  const edge = { 7: 12, 8: 13.6, 9: 15, 10: 15.6, 11: 15.6, 12: 15.6, 13: 15.6, 14: 15.6, 15: 15.6, 16: 15, 17: 14, 18: 15, 19: 13, 20: 11.8 };
+  pshape(wing, (x, y, i, j) => { const dx = Math.abs(x - cx); const e = edge[j]; if (!e || dx < 10 || dx > e) return 0; return dx > 13.4 ? 'w' : 'W'; });
+  pout(wing, 'K');
+  const body = PC(W, H);
+  pshape(body, (x, y) => {
+    const nx = (x - cx) / rx, ny = (y - hy) / ry, d = nx * nx + ny * ny;
+    if (d <= 1) { if (nx < -0.3 && ny < -0.28 && d > 0.42) return 'l'; if ((nx > 0.55 && d > 0.5) || ny > 0.82) return 's'; return 'm'; }
+    const bx = (x - cx) / brx, bY = (y - byc) / bry, bd = bx * bx + bY * bY;
+    if (bd <= 1) { const cX = (x - cx) / 5.4, cY = (y - byc - 1.3) / 4.4; if (cX * cX + cY * cY <= 1) return cX > 0.45 ? 'C' : 'c'; return bx > 0.5 ? 's' : 'm'; }
+    return 0;
+  });
+  pout(body, 'K');
+  // face tentacles, light from the fire on the left
+  const pat = { 11: 'K', 12: 'm', 13: 's', 14: 'K', 15: 'm', 16: 's', 17: 'm', 18: 's', 19: 'K', 20: 'm', 21: 's', 22: 'K' };
+  for (let y = 20; y <= 28; y++) for (let x = 11; x <= 22; x++) { if (!pget(body, x, y) || pget(body, x, y) === 'K') continue; if (y >= 26 && (x === 11 || x === 22)) continue; pset(body, x, y, pat[x]); }
+  [[12, 29], [13, 29], [15, 29], [18, 29], [20, 29], [21, 29]].forEach(([x, y]) => pset(body, x, y, 's'));
+  [[11, 29], [14, 29], [16, 29], [17, 29], [19, 29], [22, 29], [12, 30], [13, 30], [15, 30], [18, 30], [20, 30], [21, 30]].forEach(([x, y]) => { if (pget(body, x, y) !== 'c' && pget(body, x, y) !== 'C') pset(body, x, y, 'K'); });
+  // blush
+  [[7, 16], [8, 16], [mir(7), 16], [mir(8), 16]].forEach(([x, y]) => pset(body, x, y, 'p'));
+  // sprout
+  [[17, 2], [17, 1], [15, 0], [16, 1], [18, 0], [19, 0], [14, 0]].forEach(([x, y], i) => pset(body, x, y, i < 2 ? 'w' : 'g'));
+  const eye = (x0) => [[x0 + 1, 11], [x0 + 2, 11], [x0, 12], [x0 + 1, 12], [x0 + 2, 12], [x0 + 3, 12], [x0, 13], [x0 + 1, 13], [x0 + 2, 13], [x0 + 3, 13], [x0, 14], [x0 + 1, 14], [x0 + 2, 14], [x0 + 3, 14], [x0 + 1, 15], [x0 + 2, 15]];
+  const eo = pcells([...eye(10), ...eye(20)], 'e', W, H);
+  [[11, 12], [11, 13], [21, 12], [21, 13]].forEach(([x, y]) => pset(eo, x, y, 'h'));
+  [[12, 14], [22, 14]].forEach(([x, y]) => pset(eo, x, y, '#8fb4ff'));
+  const ec = pcells([[10, 13], [13, 13], [11, 14], [12, 14], [20, 13], [23, 13], [21, 14], [22, 14]], 'e', W, H);
+  const eh = pcells([[11, 12], [12, 12], [10, 13], [13, 13], [21, 12], [22, 12], [20, 13], [23, 13]], 'e', W, H);
+  const bw = pcells([[10, 9], [11, 9], [12, 10], [mir(10), 9], [mir(11), 9], [mir(12), 10]], 'w', W, H);
+  const bz = pcells([[10, 10], [11, 10], [12, 10], [mir(10), 10], [mir(11), 10], [mir(12), 10]], 'w', W, H);
+  const bh = pcells([[10, 9], [11, 8], [12, 8], [13, 9], [mir(10), 9], [mir(11), 8], [mir(12), 8], [mir(13), 9]], 'w', W, H);
+  // glasses: two round-ish gold rims, a bridge and arms
+  const gl = PC(W, H);
+  const ring = (x0) => { for (let x = x0 + 1; x <= x0 + 4; x++) { pset(gl, x, 10, 'G'); pset(gl, x, 17, 'G'); } for (let y = 11; y <= 16; y++) { pset(gl, x0, y, 'G'); pset(gl, x0 + 5, y, 'G'); } };
+  ring(9); ring(19);
+  [[15, 12], [16, 11], [17, 11], [18, 12], [8, 12], [7, 11], [mir(8), 12], [mir(7), 11]].forEach(([x, y]) => pset(gl, x, y, 'G'));
+  const glint = pcells([[13, 11], [23, 11]], '#ffffff', W, H);
+  // arms and hands (hands are drawn with the needles)
+  const arms = PC(W, H);
+  [[9, 25], [10, 25], [9, 26], [10, 26], [10, 27], [11, 27], [10, 28], [11, 28], [11, 29], [12, 29], [11, 30], [12, 30]].forEach(([x, y]) => { pset(arms, x, y, x === 9 || (x === 10 && y > 26) || (x === 11 && y > 28) ? 'm' : 's'); pset(arms, mir(x), y, x === 9 || (x === 10 && y > 26) || (x === 11 && y > 28) ? 's' : 'm'); });
+  pout(arms, 'K');
+  const U = 4;
+  return {
+    back: prend(wing, UP, U), body: prend(body, UP, U),
+    eyes: `<g class="eo"><g class="blink" style="transform-origin:0 ${13.5 * U}px">${prend(eo, UP, U)}</g></g><g class="ec">${prend(ec, UP, U)}</g><g class="eh">${prend(eh, UP, U)}</g>`,
+    brows: `<g class="bw">${prend(bw, UP, U)}</g><g class="bz">${prend(bz, UP, U)}</g><g class="bh">${prend(bh, UP, U)}</g>`,
+    glasses: `<g class="gl">${prend(gl, UP, U)}<g opacity=".7">${prend(glint, UP, U)}</g></g>`,
+    arms: prend(arms, UP, U),
+  };
+}
+
+/* ================= Ulhu, vector (K2 painterly, K3 sticker) ================= */
+function ulhuDefs(k) {
+  return `<radialGradient id="${k}-head" cx=".36" cy=".3" r=".78"><stop offset="0" stop-color="#e6fff2"/><stop offset=".5" stop-color="#a3e6c4"/><stop offset="1" stop-color="#5aae8a"/></radialGradient>
+  <radialGradient id="${k}-body" cx=".4" cy=".3" r=".8"><stop offset="0" stop-color="#b8eed2"/><stop offset="1" stop-color="#5aa585"/></radialGradient>
+  <radialGradient id="${k}-iris" cx=".45" cy=".6" r=".7"><stop offset="0" stop-color="#3b6fa8"/><stop offset=".55" stop-color="#1f2c58"/><stop offset="1" stop-color="#111530"/></radialGradient>`;
+}
+function ulhuVec(k) {
+  const st = k === 'k3', OL = st ? '#173029' : '#2b6a52', ow = st ? 2.8 : 1.2;
+  const wf = st ? '#4f9a66' : '#3f8a57', wl = st ? OL : '#1d4a33';
+  const wing = `<path d="M0,0 C-8,-14 -22,-26 -33,-22 L-28,-13 L-35,-6 L-27,-1 L-31,8 C-20,9 -8,7 0,6 Z" fill="${wf}" stroke="${wl}" stroke-width="${st ? 2.6 : 1.2}" stroke-linejoin="round"/><path d="M-2,3 L-28,-13 M-2,4 L-27,-1" stroke="${wl}" stroke-width="${st ? 1.6 : 0.9}" fill="none" opacity=".75"/>`;
+  let s = `<g transform="translate(-23,22)"><g class="wing">${wing}</g></g><g transform="translate(23,22) scale(-1,1)"><g class="wing">${wing}</g></g>`;
+  s += `<ellipse cx="0" cy="46" rx="25" ry="21" fill="${st ? '#95dcb7' : `url(#${k}-body)`}" stroke="${OL}" stroke-width="${ow}"/><ellipse cx="0" cy="52" rx="15" ry="12" fill="#f6efd6"${st ? ` stroke="${OL}" stroke-width="1.6"` : ''}/>`;
+  s += '<g class="head">';
+  s += `<g transform="translate(0,-28)"><g class="sprout"><path d="M0,1 q-2,-6 1,-11" stroke="#3f8a57" stroke-width="${st ? 3 : 2.2}" fill="none" stroke-linecap="round"/><ellipse cx="-5.5" cy="-11" rx="5.6" ry="2.9" transform="rotate(-28 -5.5 -11)" fill="#86e27f" stroke="${OL}" stroke-width="${st ? 1.8 : 0.7}"/><ellipse cx="6.5" cy="-13" rx="5.6" ry="2.9" transform="rotate(28 6.5 -13)" fill="#86e27f" stroke="${OL}" stroke-width="${st ? 1.8 : 0.7}"/></g></g>`;
+  s += `<ellipse rx="33" ry="29.5" fill="${st ? '#a8e8c6' : `url(#${k}-head)`}" stroke="${OL}" stroke-width="${ow + 0.3}"/>`;
+  if (st) s += `<path d="M24,-10 q7,16 -8,31" stroke="#80cba5" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M-25,-11 q7,-12 21,-14" stroke="#effff6" stroke-width="4.2" fill="none" stroke-linecap="round"/><circle cx="2" cy="-25" r="2" fill="#effff6"/>`;
+  else s += '<ellipse cx="-13" cy="-15" rx="11" ry="6" transform="rotate(-22 -13 -15)" fill="#fff" opacity=".42"/><path d="M27,-12 q6,12 -2,26" stroke="#e8f4ff" stroke-width="2" fill="none" opacity=".35" stroke-linecap="round"/>';
+  // brows: focused while knitting, soft while dozing, lifted when happy
+  const bc = st ? OL : '#2b6a52', bwid = st ? 2.8 : 2.1;
+  s += `<g class="bw"><path d="M-20,-16 q6,-1.2 12,1 M20,-16 q-6,-1.2 -12,1" stroke="${bc}" stroke-width="${bwid}" stroke-linecap="round"/></g>`;
+  s += `<g class="bz"><path d="M-19,-13 q6,2 11,0 M19,-13 q-6,2 -11,0" stroke="${bc}" stroke-width="${bwid}" fill="none" stroke-linecap="round"/></g>`;
+  s += `<g class="bh"><path d="M-19,-17 q6,-5 11,0 M19,-17 q-6,-5 -11,0" stroke="${bc}" stroke-width="${bwid}" fill="none" stroke-linecap="round"/></g>`;
+  const eye = (x) => `<g transform="translate(${x},-1)"><g class="blink"><ellipse rx="7.8" ry="9.3" fill="${st ? '#1b1f3a' : `url(#${k}-iris)`}"/>${st ? '' : '<path d="M-5,4.5 q5,4 10,0" stroke="#6fd6ff" stroke-width="1.2" fill="none" opacity=".7"/>'}<circle cx="-2.8" cy="-3.7" r="3.2" fill="#fff"/><circle cx="2.8" cy="3.3" r="1.5" fill="#fff"/></g></g>`;
+  s += `<g class="eo">${eye(-12.5)}${eye(12.5)}</g>`;
+  s += `<g class="ec"><path d="M-20,0 q7.5,5.5 15,0 M5,0 q7.5,5.5 15,0" stroke="#1b1f3a" stroke-width="2.6" fill="none" stroke-linecap="round"/></g>`;
+  s += `<g class="eh"><path d="M-20,1 q7.5,-9 15,0 M5,1 q7.5,-9 15,0" stroke="#1b1f3a" stroke-width="2.8" fill="none" stroke-linecap="round"/></g>`;
+  s += `<ellipse cx="-22" cy="9" rx="6.5" ry="3.8" fill="#ff9fb4" opacity="${st ? 0.95 : 0.7}"/><ellipse cx="22" cy="9" rx="6.5" ry="3.8" fill="#ff9fb4" opacity="${st ? 0.95 : 0.7}"/>`;
+  [-11, -3.7, 3.7, 11].forEach((x, i) => {
+    const d = x < 0 ? -1 : 1, p = `M0,0 q${2.6 * d},7 0,12 q${-2.6 * d},5 ${1.8 * d},10`;
+    s += `<g transform="translate(${x},13)"><g class="tw" style="animation-delay:${-i * 0.35}s"><path d="${p}" stroke="${OL}" stroke-width="${st ? 8.4 : 6.6}" fill="none" stroke-linecap="round"/><path d="${p}" stroke="${st ? '#8ad6b0' : '#7fcfaa'}" stroke-width="${st ? 4.6 : 4.6}" fill="none" stroke-linecap="round"/></g></g>`;
+  });
+  // little round grandma glasses with a chain
+  const gc = st ? '#f2b53c' : '#e6c26a';
+  s += `<g class="gl">${st ? `<circle cx="-12.5" cy="-1" r="10.6" fill="none" stroke="${OL}" stroke-width="5"/><circle cx="12.5" cy="-1" r="10.6" fill="none" stroke="${OL}" stroke-width="5"/>` : ''}
+   <circle cx="-12.5" cy="-1" r="10.6" fill="#fff" fill-opacity=".13" stroke="${gc}" stroke-width="${st ? 2.6 : 1.7}"/><circle cx="12.5" cy="-1" r="10.6" fill="#fff" fill-opacity=".13" stroke="${gc}" stroke-width="${st ? 2.6 : 1.7}"/>
+   <path d="M-2,-3 q2,-3 4,0" stroke="${gc}" stroke-width="2" fill="none"/><path d="M-23,-3 L-31,-6 M23,-3 L31,-6" stroke="${gc}" stroke-width="1.6"/>
+   ${st ? '' : `<path d="M-30,-5 Q-42,18 -25,36" stroke="${gc}" stroke-width=".9" fill="none" stroke-dasharray="1.6 1.3" opacity=".85"/>`}
+   <path d="M-18,-7 q3,-3 7,-3 M7,-7 q3,-3 7,-3" stroke="#fff" stroke-width="1.6" fill="none" opacity=".75" stroke-linecap="round"/></g>`;
+  s += '</g>';
+  s += `<g class="zz"><text class="z" x="26" y="-30">z</text><text class="z z2" x="33" y="-42">z</text><text class="z z3" x="40" y="-56">Z</text></g>`;
+  return s;
+}
+function armsVec(k, needleCol) {
+  const st = k === 'k3', OL = st ? '#173029' : '#2b6a52', fill = st ? '#8ad6b0' : '#8fdcb9';
+  const arm = (d) => `<path d="${d}" stroke="${OL}" stroke-width="${st ? 9.5 : 8}" fill="none" stroke-linecap="round"/><path d="${d}" stroke="${fill}" stroke-width="${st ? 5 : 5.6}" fill="none" stroke-linecap="round"/>`;
+  const needle = (x2, y2, kx) => `<path d="M${kx},4 L${x2},${y2}" stroke="${st ? OL : '#3a2414'}" stroke-width="${st ? 5.4 : 3.6}" stroke-linecap="round"/><path d="M${kx},4 L${x2},${y2}" stroke="${needleCol}" stroke-width="${st ? 2.6 : 2.2}" stroke-linecap="round"/><circle cx="${kx}" cy="4" r="3.6" fill="#ff7a8a" stroke="${st ? OL : '#6a2030'}" stroke-width="${st ? 2 : 1}"/>`;
+  const hand = `<circle r="5.2" fill="${fill}" stroke="${OL}" stroke-width="${st ? 2.6 : 1.3}"/>`;
+  let s = arm('M-23,32 q-8,12 6,22') + arm('M23,32 q8,12 -6,22');
+  s += `<g transform="translate(-17,54)"><g class="nl">${needle(31, -19, -8)}${hand}</g></g>`;
+  s += `<g transform="translate(17,54)"><g class="nr">${needle(-31, -19, 8)}${hand}</g></g>`;
+  s += `<g transform="translate(0,41)"><g class="ck"><path d="M0,-6 L1.5,-1.5 L6,0 L1.5,1.5 L0,6 L-1.5,1.5 L-6,0 L-1.5,-1.5 Z" fill="#fff6c8"/><path d="M-9,-6 l-3,-3 M9,-6 l3,-3" stroke="#fff6c8" stroke-width="1.4" stroke-linecap="round"/></g></g>`;
+  s += `<g class="hearts">${[[-30, -40, 0], [28, -48, 0.7], [0, -66, 1.4]].map(([x, y, d]) => `<g transform="translate(${x},${y})"><path class="hrt" style="animation-delay:${d}s" d="M0,4 C-8,-3 -5,-9 0,-5 C5,-9 8,-3 0,4 Z" fill="#ff7a8a" stroke="${st ? OL : 'none'}" stroke-width="1.5"/></g>`).join('')}</g>`;
+  return s;
+}
+
+/* ================= the three versions ================= */
+const V = {};
+
+/* ---------- K1: firelit cottage nook, pixel art ---------- */
+V.k1 = {
+  card: '#c1', svg: '#s1', fg: '#f1', style: 'px',
+  cross: [178, 195], ball: [300, 298, 24], bandY: 380,
+  pal: {
+    small: { a: '#2f7a52', b: '#f2c35a', c: '#4fc489', d: '#f6efd6', e: '#f2c35a' },
+    medium: { a: '#1f6a4a', b: '#c98a2a', c: '#7fe07a', d: '#f2c35a', e: '#a8f08a' },
+    large: { a: '#9a3048', b: '#6e1f34', c: '#f2c35a', f: '#aae2be', e: '#1b1b2f', p: '#f28ca0', g: '#5a9c78', k: '#78c86e' },
+  },
+  shelf: { y: 78, slots: [262, 308, 352], box: [40, 40] },
+  build() {
+    const u = k1Ulhu();
+    let s = ''; let b = `<defs>
+     <pattern id="k1-stone" width="32" height="16" patternUnits="userSpaceOnUse"><rect width="32" height="16" fill="#3b2834"/><rect y="7" width="32" height="1" fill="#241820"/><rect y="15" width="32" height="1" fill="#241820"/><rect x="15" width="1" height="7" fill="#241820"/><rect x="31" width="1" height="7" fill="#241820"/><rect x="7" y="8" width="1" height="7" fill="#241820"/><rect x="23" y="8" width="1" height="7" fill="#241820"/><rect x="2" y="1" width="3" height="1" fill="#4c3646"/><rect x="18" y="9" width="3" height="1" fill="#4c3646"/><rect x="10" y="4" width="2" height="1" fill="#30202b"/></pattern>
+     <pattern id="k1-board" width="64" height="12" patternUnits="userSpaceOnUse"><rect width="64" height="12" fill="#5a3820"/><rect y="11" width="64" height="1" fill="#2e1c10"/><rect x="40" width="1" height="11" fill="#2e1c10"/><rect x="6" y="4" width="10" height="1" fill="#6a4428"/><rect x="46" y="7" width="8" height="1" fill="#4a2e1a"/></pattern>
+     <radialGradient id="k1-fire" cx="48" cy="236" r="300" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffb04a" stop-opacity=".55"/><stop offset=".35" stop-color="#ff8a3a" stop-opacity=".2"/><stop offset="1" stop-color="#ff8a3a" stop-opacity="0"/></radialGradient>
+     <linearGradient id="k1-dark" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#000" stop-opacity="0"/><stop offset=".6" stop-color="#000" stop-opacity=".1"/><stop offset="1" stop-color="#000" stop-opacity=".45"/></linearGradient>
+     <clipPath id="k1-glass"><rect x="298" y="104" width="64" height="92"/></clipPath>
+    </defs>`;
+    b += '<rect width="380" height="270" fill="url(#k1-stone)"/>';
+    // window (right), pointed arch, deep sea outside
+    const win = PC(20, 27), inA = (x, y, r, w) => (y >= 10 ? x >= 10 - w && x <= 10 + w : Math.hypot(x - (10 - w + r), y - 10) <= r && Math.hypot(x - (10 + w - r), y - 10) <= r);
+    pshape(win, (x, y) => { if (y > 25.5) return 0; if (!inA(x, y, 13, 10)) return 0; if (!inA(x, y, 11, 8)) return (Math.floor(x / 3) + Math.floor(y / 3)) % 2 ? 'g' : 'G'; if (Math.abs(x - 10) < 0.6 || Math.abs(y - 15) < 0.6) return 'L'; return y < 9 ? 'a' : y < 17 ? 'b' : 'c'; });
+    for (let x = 0; x < 20; x++) { pset(win, x, 25, 'G'); pset(win, x, 26, 'S'); }
+    pout(win, 'K');
+    b += `<g transform="translate(290,92)">${prend(win, { g: '#7d7380', G: '#686072', L: '#2a2030', a: '#123f5a', b: '#0d3047', c: '#0a2236', K: '#1b1218', S: '#5a5262' }, 4)}</g>`;
+    s += `<g clip-path="url(#k1-glass)"><g transform="translate(300,150)"><g class="pfish"><rect x="0" y="0" width="12" height="6" fill="#ff9a5a"/><rect x="12" y="1" width="4" height="4" fill="#ff9a5a"/><rect x="-4" y="-2" width="4" height="4" fill="#d9703a"/><rect x="-4" y="4" width="4" height="4" fill="#d9703a"/><rect x="8" y="1" width="2" height="2" fill="#1b1b2f"/></g></g>
+      ${[[312, 190, 0], [342, 194, -1.6], [326, 188, -3]].map(([x, y, d]) => `<rect class="pbub" style="animation-delay:${d}s" x="${x}" y="${y}" width="4" height="4" fill="none" stroke="#9fe6ff" stroke-width="1.5"/>`).join('')}
+      <rect x="338" y="124" width="8" height="4" fill="#ff9fd8" opacity=".8"/><rect x="338" y="128" width="2" height="6" fill="#ff9fd8" opacity=".6"/><rect x="342" y="128" width="2" height="8" fill="#ff9fd8" opacity=".6"/></g>`;
+    // ceiling beam
+    b += '<rect width="380" height="14" fill="#5a3a22"/><rect y="14" width="380" height="4" fill="#2e1c10"/>' + [20, 90, 170, 250, 330].map((x) => `<rect x="${x}" y="5" width="22" height="2" fill="#6e4a2c"/>`).join('');
+    // shelf on the right wall
+    b += '<rect x="236" y="78" width="140" height="6" fill="#7a4e2a"/><rect x="236" y="78" width="140" height="2" fill="#9a6a3a"/><rect x="236" y="84" width="140" height="2" fill="#2e1c10"/><rect x="250" y="86" width="4" height="10" fill="#4a2e1a"/><rect x="360" y="86" width="4" height="10" fill="#4a2e1a"/>';
+    // fireplace (left)
+    const fp = PC(26, 30);
+    pshape(fp, (x, y, i, j) => {
+      if (j < 3) return i < 26 ? (j === 0 ? 'q' : 'b') : 0;
+      if (i < 1 || i > 24) return 0;
+      const ox = x - 13, inner = j >= 12 && Math.abs(ox) < 7 && (j > 15 || Math.hypot(ox, j - 15.5) < 7);
+      if (inner) return j >= 26 ? 'k' : 'k';
+      return (Math.floor(i / 4) + Math.floor(j / 2)) % 2 ? 'g' : 'G';
+    });
+    // logs
+    for (let x = 8; x <= 18; x++) { pset(fp, x, 27, x % 3 ? 'w' : 'W'); pset(fp, x, 28, 'W'); }
+    pout(fp, 'K');
+    b += `<g transform="translate(-6,148)">${prend(fp, { q: '#9a6a3a', b: '#6e4a2c', g: '#857a80', G: '#6e6470', k: '#120a0a', w: '#7a4a24', W: '#4a2a12', K: '#1b1218' }, 4)}</g>`; s += '<g transform="translate(-6,148)">';
+    const R1 = rng(7);
+    for (let fI = 0; fI < 3; fI++) {
+      const fl = PC(26, 30);
+      for (let x = 7; x <= 19; x++) {
+        const bell = Math.exp(-((x - 13) ** 2) / 14), h = Math.round(3 + 9 * bell * (0.55 + 0.6 * R1()));
+        for (let y = 26; y > 26 - h; y--) { const t = (26 - y) / h; pset(fl, x, y, t < 0.42 ? 'Y' : t < 0.78 ? 'O' : 'R'); }
+      }
+      s += `<g class="fl" style="animation-delay:${-fI * 0.16}s">${prend(fl, { Y: '#ffe27a', O: '#ff9a3a', R: '#d9452a' }, 4)}</g>`;
+    }
+    // candle and a glow jar on the mantel
+    s += `<rect x="22" y="-14" width="6" height="14" fill="#f6efd6"/><rect x="22" y="-14" width="2" height="14" fill="#fff"/><g transform="translate(25,-16)"><g class="candle" style="transform-origin:0 0"><rect x="-2" y="-6" width="4" height="6" fill="#ffd56a"/><rect x="-1" y="-3" width="2" height="3" fill="#fff6c8"/></g></g>
+      <rect x="64" y="-18" width="16" height="18" fill="#5ef2a0" opacity=".25"/><rect x="64" y="-18" width="16" height="18" fill="none" stroke="#bfe0ff" stroke-width="2"/><rect x="66" y="-22" width="12" height="4" fill="#7a4e2a"/><rect x="69" y="-12" width="3" height="3" fill="#5ef2a0" class="cur"/><rect x="74" y="-7" width="2" height="2" fill="#5ef2a0" class="cur" style="animation-delay:.3s"/></g>`;
+    // floor and rug
+    b += '<rect y="268" width="380" height="152" fill="url(#k1-board)"/><rect y="268" width="380" height="3" fill="#2e1c10"/>';
+    const rug = PC(56, 12);
+    pshape(rug, (x, y) => { const nx = (x - 28) / 28, ny = (y - 6) / 6, d = nx * nx + ny * ny; if (d > 1) return 0; if (d > 0.62) return (Math.floor(x / 2) + Math.floor(y / 2)) % 2 ? 'y' : 'r'; if (d > 0.5) return 'R'; return Math.abs(ny) < 0.18 && Math.floor(x / 3) % 2 ? 'y' : 'r'; });
+    b += `<g transform="translate(66,272)">${prend(rug, { y: '#d9a33a', r: '#8a2a3e', R: '#5a1828' }, 4)}</g>`;
+    s += '<rect y="270" width="380" height="150" fill="url(#k1-fire)" class="fglow"/>';
+    // the chair: back layer
+    const chB = PC(44, 34), chF = PC(44, 34);
+    pshape(chB, (x, y, i, j) => {
+      const inBack = i >= 6 && i <= 37 && j >= 0 && j <= 24 && !((j < 4) && ((i < 6 + (4 - j) * 1.3) || (i > 37 - (4 - j) * 1.3))) && !(j < 2 && i > 13 && i < 30 && j < 1);
+      const seat = i >= 7 && i <= 36 && j >= 19 && j <= 26, base = i >= 3 && i <= 40 && j >= 26 && j <= 30, leg = (i === 4 || i === 5 || i === 38 || i === 39) && j >= 31 && j <= 33;
+      if (leg) return 'L';
+      if (base) return j === 26 ? 'y' : i < 10 ? 'q' : i > 34 ? 'R' : 'r';
+      if (seat) return j === 19 ? 'q' : i > 31 ? 'R' : 'r';
+      if (inBack) { if ((i === 14 || i === 22 || i === 30) && j === 7) return 'y'; if ((i === 18 || i === 26) && j === 13) return 'y'; if ((i === 14 || i === 22 || i === 30) && j === 8) return 'R'; if ((i === 18 || i === 26) && j === 14) return 'R'; return i < 11 ? 'q' : i > 33 ? 'R' : 'r'; }
+      return 0;
+    });
+    pout(chB, 'K');
+    pshape(chF, (x, y, i, j) => { const arm = (i >= 1 && i <= 9) || (i >= 34 && i <= 42); if (!arm || j < 14 || j > 27) return 0; const top = j < 17; const cxA = i <= 9 ? 5 : 38; if (j === 14 && Math.abs(i - cxA) > 3) return 0; if (top) return Math.abs(i - cxA) < 2 && j === 15 ? 'q' : i <= 9 ? 'q' : 'r'; return i <= 9 ? (i < 4 ? 'q' : 'r') : (i > 39 ? 'R' : 'r'); });
+    pout(chF, 'K');
+    const CP = { r: '#9a3048', R: '#6e1f34', q: '#c24e64', y: '#e8b04a', L: '#3a2414', K: '#24080f' };
+    b += `<g transform="translate(90,132)">${prend(chB, CP, 4)}</g>`;
+    // Ulhu
+    s += `<g transform="translate(110,74)"><g class="hop"><g class="breath" style="transform-origin:${17 * 4}px ${34 * 4}px">${u.back}${u.body}<g class="head">${u.eyes}${u.brows}${u.glasses}</g>
+      <g class="zz"><text class="z" x="112" y="20">z</text><text class="z z2" x="122" y="6">z</text><text class="z z3" x="132" y="-8">Z</text></g></g></g></g>`;
+    s += `<g transform="translate(90,132)">${prend(chF, CP, 4)}</g>`;
+    // basket for the yarn ball (back half)
+    s += '<rect x="270" y="286" width="60" height="4" fill="#5a3a1a"/>';
+    s += `<g class="lap"><g id="k1-piece"></g></g>`;
+    s += '<g id="k1-ballg"></g>';
+    const bk = PC(20, 8); pshape(bk, (x, y, i, j) => ((i + j) % 3 === 0 ? 'w' : j === 0 ? 'q' : 'b')); pout(bk, 'K');
+    s += `<g transform="translate(260,288)">${prend(bk, { w: '#8a5a2a', b: '#b07a3a', q: '#d9a35a', K: '#2e1c10' }, 3)}</g>`;
+    s += '<path id="k1-strand" d="" stroke="#5ef2a0" stroke-width="2.5" fill="none" shape-rendering="auto"/>';
+    s += `<g transform="translate(110,74)"><g class="hop">${u.arms}</g></g>`;
+    const hand = '<rect x="-5" y="-5" width="10" height="10" fill="#1d3328"/><rect x="-4" y="-4" width="8" height="8" fill="#aae2be"/><rect x="-4" y="-4" width="4" height="4" fill="#e1fae6"/>';
+    const ndl = (x2, y2, kx) => `<path d="M${kx},5 L${x2},${y2}" stroke="#3a2414" stroke-width="5" shape-rendering="auto"/><path d="M${kx},5 L${x2},${y2}" stroke="#e8b04a" stroke-width="2.6" shape-rendering="auto"/><rect x="${kx - 3}" y="2" width="6" height="6" fill="#ff7a8a" stroke="#3a1418" stroke-width="1"/>`;
+    s += `<g class="hop"><g transform="translate(158,206)"><g class="nl">${ndl(36, -20, -8)}${hand}</g></g><g transform="translate(198,206)"><g class="nr">${ndl(-36, -20, 8)}${hand}</g></g>
+      <g transform="translate(178,192)"><g class="ck"><rect x="-1" y="-6" width="2" height="12" fill="#fff6c8"/><rect x="-6" y="-1" width="12" height="2" fill="#fff6c8"/><rect x="-9" y="-9" width="2" height="2" fill="#fff6c8"/><rect x="7" y="-9" width="2" height="2" fill="#fff6c8"/></g></g>
+      <g class="hearts">${[[150, 112, 0], [204, 104, 0.7], [178, 84, 1.4]].map(([x, y, d]) => `<g transform="translate(${x},${y})"><g class="hrt" style="animation-delay:${d}s"><rect x="-6" y="-4" width="4" height="4" fill="#ff7a8a"/><rect x="2" y="-4" width="4" height="4" fill="#ff7a8a"/><rect x="-6" y="0" width="12" height="4" fill="#ff7a8a"/><rect x="-2" y="4" width="4" height="3" fill="#ff7a8a"/></g></g>`).join('')}</g></g>`;
+    s += '<g opacity=".55"><rect width="380" height="270" fill="url(#k1-fire)" class="fglow"/></g><rect width="380" height="420" fill="url(#k1-dark)"/>';
+    s += '<g id="k1-shelf"></g><g id="k1-bar"></g>';
+    s += `<text id="k1-tb" x="16" y="349" font-family="VT323" font-size="44" fill="#ffe9b0" stroke="#1b1008" stroke-width="3" paint-order="stroke" letter-spacing="1"></text><text id="k1-ts" x="18" y="367" font-family="Pixelify Sans" font-weight="500" font-size="14" fill="#e6c88a" stroke="#1b1008" stroke-width="3" paint-order="stroke"></text>`;
+    return b + '<!--FG-->' + s;
+  },
+  ballSVG(r) { // pixel yarn ball, drawn at full size and scaled
+    const b = PC(16, 16);
+    pshape(b, (x, y) => { const d = Math.hypot(x - 8, y - 8); if (d > 7.6) return 0; if (d < 3 && x < 7 && y < 7) return 'l'; return (Math.floor((x + y) / 2) % 3 === 0) ? 'd' : (x > 10 ? 's' : 'm'); });
+    pout(b, 'K');
+    return `<g class="px">${prend(b, { m: '#4fc489', s: '#2f8a5a', d: '#1f6a42', l: '#a8f0c8', K: '#123020' }, 3, -24, -48)}</g>`;
+  },
+  bar(f) {
+    const y = this.bandY, x0 = 18, cols = 26, rows = 2, total = cols * rows, n = f >= 1 ? total : Math.floor(f * total);
+    const C = ['#2f8a5a', '#2f8a5a', '#2f8a5a', '#2f8a5a', '#f2c35a'];
+    let s = `<rect x="${x0 - 4}" y="${y - 2}" width="${cols * 12 + 8}" height="20" fill="#000" opacity=".22"/>`;
+    for (let i = 0; i < n; i++) { const c = Math.floor(i / rows), r = rows - 1 - (i % rows); s += `<g transform="translate(${x0 + c * 12},${y + r * 8}) scale(2)">${STITCH.px(0, 0, C[c % 5])}</g>`; }
+    const xf = x0 + Math.ceil(n / rows) * 12, xe = x0 + cols * 12 + 14;
+    if (f < 1) {
+      for (let x = xf + 2; x < xe - 6; x += 4) s += `<rect x="${x}" y="${y + 6 + Math.round(3 * Math.sin(x / 7))}" width="3" height="3" fill="#4fc489"/>`;
+      const br = Math.round(3 + 6 * (1 - f));
+      s += `<rect x="${xe - br * 2}" y="${y + 8 - br * 2}" width="${br * 4}" height="${br * 4}" fill="#123020"/><rect x="${xe - br * 2 + 2}" y="${y + 8 - br * 2 + 2}" width="${br * 4 - 4}" height="${br * 4 - 4}" fill="#4fc489"/><rect x="${xe - br * 2 + 2}" y="${y + 8 - br * 2 + 2}" width="${br}" height="${br}" fill="#a8f0c8"/>`;
+      s += `<g transform="translate(${xf},${y + 8})"><g class="mini"><rect x="-1" y="-14" width="3" height="24" fill="#e8b04a"/></g></g><g transform="translate(${xf + 4},${y + 8})"><g class="mini" style="animation-direction:alternate-reverse"><rect x="-1" y="-14" width="3" height="24" fill="#d99a3a"/></g></g>`;
+      if (n > 0) s += `<rect class="cur" x="${x0 + Math.floor((n) / rows) * 12}" y="${y + (rows - 1 - (n % rows)) * 8}" width="12" height="8" fill="none" stroke="#fff6c8" stroke-width="2"/>`;
+    }
+    return s;
+  },
+  strandCol: '#5ef2a0',
+};
+
+/* ---------- K2: moonlit sunken library, painterly ---------- */
+V.k2 = {
+  card: '#c2', svg: '#s2', fg: '#f2', style: 'paint',
+  cross: [170, 205], ball: [262, 300, 21], bandY: 380,
+  pal: {
+    small: { a: '#5b4a8a', b: '#e9dcb0', c: '#8a7ac8', d: '#cfd6ff', e: '#e9dcb0' },
+    medium: { a: '#2a6a62', b: '#cfd6ff', c: '#7fd6b0', d: '#9a8ad8', e: '#b8f0d0' },
+    large: { a: '#3e4f8a', b: '#2a3566', c: '#cfd6ff', f: '#a3e6c4', e: '#141a33', p: '#f2a0c0', g: '#5aae8a', k: '#86e27f' },
+  },
+  shelf: { y: 150, slots: [292, 326, 360], box: [30, 34] },
+  build() {
+    const R2 = rng(42);
+    let s = ''; let b = `<defs>${ulhuDefs('k2')}
+     <linearGradient id="k2-bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#121c3e"/><stop offset="1" stop-color="#0a1024"/></linearGradient>
+     <radialGradient id="k2-moon" cx="196" cy="78" r="120" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff6d6"/><stop offset=".12" stop-color="#e8f0ff" stop-opacity=".9"/><stop offset=".3" stop-color="#6fa0d8" stop-opacity=".55"/><stop offset="1" stop-color="#1a3a6a" stop-opacity="0"/></radialGradient>
+     <linearGradient id="k2-water" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a5a8a"/><stop offset="1" stop-color="#0c2244"/></linearGradient>
+     <linearGradient id="k2-shaft" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#dfeaff" stop-opacity=".3"/><stop offset="1" stop-color="#dfeaff" stop-opacity="0"/></linearGradient>
+     <linearGradient id="k2-wood" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a1e2c"/><stop offset="1" stop-color="#160f1a"/></linearGradient>
+     <linearGradient id="k2-floor" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a2236"/><stop offset="1" stop-color="#141020"/></linearGradient>
+     <radialGradient id="k2-vel" cx=".35" cy=".25" r=".9"><stop offset="0" stop-color="#9a4a86"/><stop offset=".6" stop-color="#5e2452"/><stop offset="1" stop-color="#2e0f2a"/></radialGradient>
+     <radialGradient id="k2-vig" cx=".5" cy=".45" r=".72"><stop offset=".6" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".55"/></radialGradient>
+     <radialGradient id="k2-pool" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#cfe0ff" stop-opacity=".28"/><stop offset="1" stop-color="#cfe0ff" stop-opacity="0"/></radialGradient>
+     <radialGradient id="k2-lamp" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ffb8e0" stop-opacity=".5"/><stop offset="1" stop-color="#ff9fd8" stop-opacity="0"/></radialGradient>
+     <radialGradient id="k2-yarn" cx=".35" cy=".3" r=".75"><stop offset="0" stop-color="#f2f0ff"/><stop offset=".55" stop-color="#b0a6e8"/><stop offset="1" stop-color="#5a4e9a"/></radialGradient>
+     <radialGradient id="k2-bub" cx=".35" cy=".3" r=".7"><stop offset="0" stop-color="#fff" stop-opacity=".7"/><stop offset=".5" stop-color="#cfe6ff" stop-opacity=".08"/><stop offset=".85" stop-color="#cfe6ff" stop-opacity=".25"/><stop offset="1" stop-color="#cfe6ff" stop-opacity=".55"/></radialGradient>
+     <filter id="k2-soft" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="2.4"/></filter>
+     <filter id="k2-blur6" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="6"/></filter>
+     <filter id="k2-brush" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency=".06 .9" numOctaves="2" seed="3"/><feDisplacementMap in="SourceGraphic" scale="3.2"/></filter>
+     <filter id="k2-grain" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" seed="9"/><feColorMatrix values="0 0 0 0 .9  0 0 0 0 .85  0 0 0 0 1  0 0 0 .5 -.12"/></filter>
+     <filter id="k2-pglow" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur in="SourceAlpha" stdDeviation="1.6"/><feOffset dy="1.5"/><feComponentTransfer><feFuncA type="linear" slope=".55"/></feComponentTransfer><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+     <filter id="k2-yglow" x="-10%" y="-200%" width="120%" height="500%"><feGaussianBlur stdDeviation="1.8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+     <clipPath id="k2-win"><path d="M112,236 V96 Q112,40 170,16 Q228,40 228,96 V236 Z"/></clipPath>
+    </defs>`;
+    b += '<rect width="380" height="420" fill="url(#k2-bg)"/>';
+    // the great window
+    b += `<g filter="url(#k2-brush)"><path d="M104,244 V96 Q104,32 170,6 Q236,32 236,96 V244 Z" fill="#232a48"/></g>`;
+    b += `<g clip-path="url(#k2-win)"><rect x="100" y="0" width="140" height="250" fill="url(#k2-water)"/><circle cx="196" cy="78" r="120" fill="url(#k2-moon)"/><circle cx="196" cy="78" r="15" fill="#fffbe8" filter="url(#k2-soft)"/>
+      <path d="M100,210 Q140,190 170,206 Q200,190 240,204 V250 H100 Z" fill="#0a1a33" opacity=".85"/><path d="M118,236 q-6,-30 4,-60 q8,-24 0,-40" stroke="#123a40" stroke-width="5" fill="none" filter="url(#k2-soft)"/>
+      </g>`; s += `<g clip-path="url(#k2-win)">${[0, 1, 2].map((i) => `<path class="shaft" style="animation-delay:${-i * 2.3}s" d="M${150 + i * 26},20 L${172 + i * 26},20 L${190 + i * 30},240 L${150 + i * 30},240 Z" fill="url(#k2-shaft)" opacity=".7"/>`).join('')}</g>`;
+    s += `<g stroke="#232a48" stroke-width="5" fill="none"><path d="M170,96 V236 M112,150 H228 M112,96 Q140,96 170,96 Q200,96 228,96"/><path d="M140,96 Q140,66 170,52 Q200,66 200,96"/><circle cx="170" cy="74" r="9"/><circle cx="160" cy="84" r="0.1"/></g><path d="M104,244 V96 Q104,32 170,6 Q236,32 236,96 V244" fill="none" stroke="#3a4468" stroke-width="2"/>`;
+    // moonlight falling into the room
+    s += `<path class="shaft" d="M120,120 L230,120 L300,420 L60,420 Z" fill="url(#k2-shaft)" opacity=".5"/>`;
+    // bookcases
+    const books = (x0, x1, yb, seed) => { const r = rng(seed); let b = '', x = x0; const cols = ['#5b4a7a', '#3e5a7a', '#7a4a5a', '#4a6a5a', '#8a7a5a', '#6a3a4a', '#3a4a6a']; while (x < x1 - 6) { const w = 6 + Math.floor(r() * 5), h = 26 + Math.floor(r() * 16), c = cols[Math.floor(r() * cols.length)], lean = r() < 0.12 && x + w + 8 < x1; b += `<g ${lean ? `transform="rotate(-14 ${x + w} ${yb})"` : ''}><rect x="${x}" y="${yb - h}" width="${w}" height="${h}" fill="${c}"/><rect x="${x}" y="${yb - h}" width="1.5" height="${h}" fill="#fff" opacity=".12"/><rect x="${x}" y="${yb - h + 5}" width="${w}" height="2" fill="#e6c26a" opacity=".45"/></g>`; x += w + (lean ? 9 : 1); } return b; };
+    b += `<g filter="url(#k2-brush)"><rect x="-4" y="26" width="98" height="246" fill="url(#k2-wood)"/>${[78, 132, 186, 240].map((y, i) => `${books(4, 86, y, 11 + i)}<rect x="-4" y="${y}" width="98" height="7" fill="#3a2a3e"/>`).join('')}<rect x="88" y="26" width="8" height="246" fill="#3a2a3e"/><rect x="-4" y="18" width="104" height="10" fill="#3a2a3e"/></g>`;
+    b += `<g filter="url(#k2-brush)"><rect x="276" y="26" width="108" height="246" fill="url(#k2-wood)"/>${books(284, 380, 92, 31)}<rect x="276" y="92" width="108" height="7" fill="#3a2a3e"/><rect x="276" y="${this.shelf.y}" width="108" height="7" fill="#3a2a3e"/>${books(284, 380, 206, 33)}<rect x="276" y="206" width="108" height="7" fill="#3a2a3e"/>${books(284, 330, 262, 35)}<rect x="276" y="26" width="8" height="246" fill="#3a2a3e"/><rect x="270" y="18" width="114" height="10" fill="#3a2a3e"/></g>`;
+    b += `<rect x="284" y="${this.shelf.y - 52}" width="96" height="52" fill="#0d0a18" opacity=".55"/><path d="M290,${this.shelf.y - 8} h84" stroke="#e6c26a" stroke-width=".8" opacity=".35"/>`;
+    // floor, moon pool, rug
+    b += '<rect y="268" width="380" height="152" fill="url(#k2-floor)"/>' + [292, 320, 352, 390].map((y) => `<path d="M0,${y} H380" stroke="#0e0a16" stroke-width="1.2" opacity=".7"/>`).join('');
+    b += '<ellipse cx="180" cy="310" rx="150" ry="36" fill="url(#k2-pool)"/><g filter="url(#k2-brush)"><ellipse cx="172" cy="292" rx="122" ry="20" fill="#3a2450"/><ellipse cx="172" cy="292" rx="110" ry="15" fill="none" stroke="#e6c26a" stroke-width="1.2" stroke-dasharray="5 4" opacity=".55"/></g>';
+    // jellyfish lamp on a little table (left front)
+    s += `<circle cx="58" cy="212" r="34" fill="url(#k2-lamp)" class="jel"/>`; b += `<circle cx="58" cy="196" r="70" fill="url(#k2-lamp)"/><g filter="url(#k2-brush)"><path d="M40,270 l6,-40 h24 l6,40" fill="#2a1e2c"/><ellipse cx="58" cy="230" rx="26" ry="5" fill="#4a3448"/></g>
+      <path d="M44,228 q0,-30 14,-34 q14,4 14,34 Z" fill="#cfe6ff" opacity=".18" stroke="#cfe6ff" stroke-opacity=".45" stroke-width="1"/><g class="jel"><path d="M50,212 q8,-14 16,0 Z" fill="#ffb8e0"/><path d="M52,212 q-1,6 1,11 M56,212 q1,7 -1,13 M60,212 q-1,6 1,11 M64,212 q1,5 -1,9" stroke="#ffb8e0" stroke-width="1.2" fill="none"/></g>
+      <g filter="url(#k2-brush)"><rect x="20" y="256" width="30" height="7" fill="#6a3a4a"/><rect x="23" y="249" width="26" height="7" fill="#3e5a7a"/><rect x="21" y="263" width="32" height="6" fill="#8a7a5a"/></g>`;
+    // the wingback chair
+    b += `<g filter="url(#k2-brush)"><path d="M108,250 V150 Q100,118 112,106 Q140,92 170,94 Q200,92 228,106 Q240,118 232,150 V250 Z" fill="url(#k2-vel)"/>
+      <path d="M108,150 Q96,140 98,118 Q110,124 116,142 Z M232,150 Q244,140 242,118 Q230,124 224,142 Z" fill="#5e2452"/>
+      ${[[140, 128], [170, 122], [200, 128], [155, 158], [185, 158]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="2.6" fill="#e6c26a"/><path d="M${x - 9},${y + 6} q9,-4 18,0" stroke="#2e0f2a" stroke-width="1.4" fill="none" opacity=".7"/>`).join('')}
+      <rect x="112" y="226" width="116" height="24" rx="10" fill="#7a3468"/><rect x="104" y="246" width="132" height="18" rx="4" fill="#4a1a40"/><path d="M106,262 h128" stroke="#e6c26a" stroke-width="1.6" stroke-dasharray="2 3"/>
+      <path d="M112,268 q-6,-2 -4,-8 h10 Z M228,268 q6,-2 4,-8 h-10 Z" fill="#2a1a10"/></g>`;
+    s += `<g transform="translate(170,150) scale(1.25)"><g class="hop"><g class="breath">${ulhuVec('k2')}</g></g></g>`;
+    s += `<g><path d="M94,250 V196 Q94,184 108,184 Q122,184 122,196 V250 Z" fill="url(#k2-vel)"/><ellipse cx="108" cy="190" rx="14" ry="7" fill="#b45a9a" opacity=".6"/><path d="M246,250 V196 Q246,184 232,184 Q218,184 218,196 V250 Z" fill="url(#k2-vel)"/><ellipse cx="232" cy="190" rx="14" ry="7" fill="#8a3a74" opacity=".6"/></g>`;
+    s += `<g class="lap"><g id="k2-piece"></g></g>`;
+    s += '<g id="k2-ballg"></g><path id="k2-strand2" d="" stroke="#cfd6ff" stroke-width="5" fill="none" opacity=".18"/><path id="k2-strand" d="" stroke="#e4e8ff" stroke-width="1.7" fill="none"/>';
+    s += `<g transform="translate(170,150) scale(1.25)"><g class="hop">${armsVec('k2', '#cfd6ff')}</g></g>`;
+    // drifting bubbles and motes
+    s += [[40, 300, 0, 4], [120, 330, -2, 3], [250, 320, -4.5, 5], [330, 300, -1.3, 3.5], [300, 340, -6, 2.5], [200, 350, -3.2, 3], [80, 360, -5.5, 2.2], [350, 360, -7, 4.2]].map(([x, y, d, r]) => `<circle class="bub" style="animation-delay:${d}s;animation-duration:${7 + r}s" cx="${x}" cy="${y}" r="${r}" fill="url(#k2-bub)"/>`).join('');
+    s += Array.from({ length: 14 }, (_, i) => `<circle class="mote" style="animation-delay:${-i * 0.7}s" cx="${130 + R2() * 130}" cy="${130 + R2() * 170}" r="${0.7 + R2() * 0.9}" fill="#fff6d6" opacity="${0.35 + R2() * 0.4}"/>`).join('');
+    s += '<rect width="380" height="420" fill="url(#k2-vig)"/>';
+    s += '<g id="k2-shelf"></g><g id="k2-bar"></g>';
+    s += `<text id="k2-tb" x="16" y="346" font-family="Cormorant Garamond" font-style="italic" font-weight="700" font-size="36" fill="#f4ecd0" filter="url(#k2-yglow)"></text><text id="k2-ts" x="18" y="365" font-family="Cormorant Garamond" font-style="italic" font-weight="600" font-size="16" fill="#b8c0e8"></text>`;
+    return b + '<!--FG-->' + s;
+  },
+  ballSVG(r) {
+    return `<circle cx="0" cy="${-r}" r="${r}" fill="url(#k2-yarn)"/><g transform="translate(0,${-r})"><g class="spin"><path d="M${-r * 0.85},${-r * 0.35} Q0,${-r * 1.05} ${r * 0.85},${-r * 0.35} M${-r * 0.95},${r * 0.1} Q0,${-r * 0.7} ${r * 0.95},${r * 0.1} M${-r * 0.8},${r * 0.55} Q0,${-r * 0.1} ${r * 0.8},${r * 0.55} M${-r * 0.3},${-r * 0.93} Q${r * 0.35},0 ${-r * 0.05},${r}" stroke="#4a3e8a" stroke-width="1.1" fill="none" opacity=".55"/></g></g><ellipse cx="${-r * 0.35}" cy="${-r * 1.4}" rx="${r * 0.3}" ry="${r * 0.17}" fill="#fff" opacity=".55"/>`;
+  },
+  bar(f) {
+    const y = this.bandY, x0 = 18, cols = 26, rows = 2, total = cols * rows, n = f >= 1 ? total : Math.floor(f * total);
+    const C = ['#5b4a8a', '#5b4a8a', '#7fd6b0', '#5b4a8a', '#5b4a8a', '#cfd6ff'];
+    let s = `<ellipse cx="190" cy="${y + 10}" rx="185" ry="16" fill="#cfe0ff" opacity=".05"/>`;
+    let band = '';
+    for (let i = 0; i < n; i++) { const c = Math.floor(i / rows), r = rows - 1 - (i % rows); band += `<g transform="translate(${x0 + c * 12},${y + r * 8}) scale(2)">${STITCH.paint(0, 0, C[c % 6], r, c)}</g>`; }
+    const xd = x0 + Math.ceil(n / rows) * 12;
+    if (n) s += `<rect x="${x0 - 1}" y="${y + 2}" width="${xd - x0 + 2}" height="17" rx="4" fill="#000" opacity=".3"/>`;
+    s += band;
+    const xf = x0 + Math.ceil(n / rows) * 12, xe = x0 + cols * 12 + 16;
+    if (f < 1) {
+      let d = `M${xf},${y + 8}`; for (let x = xf; x < xe - 10; x += 10) d += ` q2.5,-6 5,0 q2.5,6 5,0`;
+      s += `<path d="${d}" stroke="#cfd6ff" stroke-width="5" fill="none" opacity=".18"/><path d="${d}" stroke="#e4e8ff" stroke-width="1.8" fill="none"/>`;
+      const br = 4 + 9 * (1 - f);
+      s += `<g transform="translate(${xe},${y + 8 + br})">${this.ballSVG(br)}</g>`;
+      s += `<g transform="translate(${xf},${y + 8})"><g class="mini"><path d="M-6,-16 L6,10" stroke="#cfd6ff" stroke-width="2" stroke-linecap="round"/></g><g class="mini" style="animation-direction:alternate-reverse"><path d="M6,-16 L-6,10" stroke="#e6c26a" stroke-width="2" stroke-linecap="round"/></g></g>`;
+      if (n > 0) s += `<rect class="cur" x="${x0 + Math.floor(n / rows) * 12}" y="${y + (rows - 1 - (n % rows)) * 8}" width="12" height="8" rx="3" fill="none" stroke="#fff6d6" stroke-width="1.6"/>`;
+    }
+    return s;
+  },
+};
+
+/* ---------- K3: tiny diving-bell room, sticker style ---------- */
+const OL3 = '#173029';
+V.k3 = {
+  card: '#c3', svg: '#s3', fg: '#f3', style: 'stk',
+  cross: [178, 205], ball: [330, 302, 20], bandY: 382,
+  pal: {
+    small: { a: '#ff7a59', b: '#fff1d6', c: '#ffb03a', d: '#fff1d6', e: '#3fbfb0' },
+    medium: { a: '#2f9a6a', b: '#ffb03a', c: '#8be07a', d: '#ff7a59', e: '#c8f59a' },
+    large: { a: '#ff7a59', b: '#c84a3a', c: '#fff1d6', f: '#a8e8c6', e: '#1b1f3a', p: '#ff9fb4', g: '#4f9a66', k: '#86e27f' },
+  },
+  shelf: { y: 124, slots: [274, 314, 354], box: [34, 36] },
+  build() {
+    let s = ''; let b = `<defs>${ulhuDefs('k3')}
+     <radialGradient id="k3-wall" cx=".5" cy=".42" r=".75"><stop offset="0" stop-color="#2a6a66"/><stop offset=".7" stop-color="#174442"/><stop offset="1" stop-color="#0c2626"/></radialGradient>
+     <linearGradient id="k3-sea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4ac6c8"/><stop offset="1" stop-color="#16607a"/></linearGradient>
+     <radialGradient id="k3-warm" cx="190" cy="70" r="260" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffd27a" stop-opacity=".4"/><stop offset=".5" stop-color="#ffb04a" stop-opacity=".1"/><stop offset="1" stop-color="#ffb04a" stop-opacity="0"/></radialGradient>
+     <pattern id="k3-grate" width="14" height="10" patternUnits="userSpaceOnUse"><rect width="14" height="10" fill="#2c3a3c"/><rect x="2" y="2" width="10" height="4" rx="2" fill="#141e20"/></pattern>
+     <filter id="k3-ol" x="-20%" y="-20%" width="140%" height="140%"><feMorphology in="SourceAlpha" operator="dilate" radius="1.6" result="d"/><feFlood flood-color="${OL3}"/><feComposite in2="d" operator="in"/><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+     <clipPath id="k3-port"><circle cx="78" cy="132" r="48"/></clipPath>
+    </defs>`;
+    b += '<rect width="380" height="420" fill="url(#k3-wall)"/>';
+    // curved hull panels and rivets: the inside of a round bell
+    [-60, 40, 130, 250, 340, 440].forEach((x) => { const k = (x - 190) * 0.22; b += `<path d="M${x},0 Q${x - k},140 ${x},270" stroke="#0e2e2e" stroke-width="3" fill="none"/>`; for (let y = 16; y < 266; y += 22) { const t = y / 270, xx = (1 - t) * (1 - t) * x + 2 * (1 - t) * t * (x - k) + t * t * x; b += `<circle cx="${(xx + 7).toFixed(1)}" cy="${y}" r="2.2" fill="#3f8a84"/><circle cx="${(xx + 7.5).toFixed(1)}" cy="${y - 0.5}" r=".9" fill="#8fd6cc"/>`; } });
+    b += '<path d="M0,40 Q190,0 380,40" stroke="#0e2e2e" stroke-width="3" fill="none"/>';
+    // pipes and gauge
+    b += `<rect x="-4" y="12" width="388" height="12" rx="6" fill="#d99a3a" stroke="${OL3}" stroke-width="2.6"/><rect x="-4" y="14" width="388" height="3" fill="#ffd27a" opacity=".7"/>${[60, 150, 260, 340].map((x) => `<rect x="${x}" y="9" width="10" height="18" rx="2" fill="#b07a2a" stroke="${OL3}" stroke-width="2"/>`).join('')}
+      <path d="M318,24 V44" stroke="${OL3}" stroke-width="7"/><path d="M318,24 V44" stroke="#d99a3a" stroke-width="3.5"/><circle cx="318" cy="62" r="18" fill="#fff1d6" stroke="${OL3}" stroke-width="3"/><circle cx="318" cy="62" r="14" fill="none" stroke="#d99a3a" stroke-width="2"/>${[-60, -30, 0, 30, 60].map((a) => `<path d="M318,50 v3" stroke="${OL3}" stroke-width="1.6" transform="rotate(${a} 318 62)"/>`).join('')}`; s += `<g transform="translate(318,62)"><g class="gauge"><path d="M0,0 V-11" stroke="#e8483a" stroke-width="2.2" stroke-linecap="round"/></g></g><circle cx="318" cy="62" r="2.6" fill="${OL3}"/>`;
+    // porthole
+    s += `<circle cx="78" cy="132" r="48" fill="url(#k3-sea)"/><g clip-path="url(#k3-port)">
+      <path d="M30,140 L70,90 L60,110 L100,70 L126,110 V180 H30 Z" fill="#9fe6e8" opacity=".18"/>
+      <g transform="translate(78,128)"><g class="dfish"><path d="M0,0 q9,-7 18,0 q-9,7 -18,0 Z M0,0 l-7,-5 v10 Z" fill="#ffb03a" stroke="${OL3}" stroke-width="1.6"/><circle cx="12" cy="-1" r="1.4" fill="${OL3}"/></g></g>
+      <g transform="translate(78,112)"><g class="dfish" style="animation-duration:13s;animation-delay:-5s"><path d="M0,0 q6,-4 12,0 q-6,4 -12,0 Z M0,0 l-5,-3 v6 Z" fill="#ff7a8a" stroke="${OL3}" stroke-width="1.4"/></g></g>
+      ${[[46, 0], [64, -1.2], [100, -2.1], [114, -0.6]].map(([x, d], i) => `<g transform="translate(${x},182)"><g class="kelp" style="animation-delay:${d}s"><path d="M0,0 C${i % 2 ? 8 : -8},-20 ${i % 2 ? -8 : 8},-40 0,-${54 + i * 8}" stroke="${OL3}" stroke-width="8" fill="none" stroke-linecap="round"/><path d="M0,0 C${i % 2 ? 8 : -8},-20 ${i % 2 ? -8 : 8},-40 0,-${54 + i * 8}" stroke="${i % 2 ? '#4fbf6a' : '#3a9a58'}" stroke-width="4.6" fill="none" stroke-linecap="round"/></g></g>`).join('')}
+      ${[[70, 168, 0], [90, 172, -1.5], [58, 170, -3]].map(([x, y, d]) => `<circle class="bub" style="animation-delay:${d}s;animation-duration:4s" cx="${x}" cy="${y}" r="2.6" fill="none" stroke="#e8ffff" stroke-width="1.4"/>`).join('')}
+      <path d="M44,104 q14,-22 40,-24" stroke="#fff" stroke-width="5" fill="none" opacity=".45" stroke-linecap="round"/></g>
+      <circle cx="78" cy="132" r="48" fill="none" stroke="${OL3}" stroke-width="16"/><circle cx="78" cy="132" r="48" fill="none" stroke="#e0a648" stroke-width="10"/><circle cx="78" cy="132" r="53" fill="none" stroke="${OL3}" stroke-width="2.4"/><circle cx="78" cy="132" r="43" fill="none" stroke="${OL3}" stroke-width="2.4"/>
+      ${Array.from({ length: 8 }, (_, i) => { const a = i * Math.PI / 4 + 0.39; return `<circle cx="${(78 + 48 * Math.cos(a)).toFixed(1)}" cy="${(132 + 48 * Math.sin(a)).toFixed(1)}" r="2.6" fill="#fff1d6" stroke="${OL3}" stroke-width="1.4"/>`; }).join('')}`;
+    // shelf
+    b += `<rect x="252" y="${this.shelf.y}" width="124" height="9" rx="3" fill="#b8c4c0" stroke="${OL3}" stroke-width="2.6"/><path d="M262,${this.shelf.y + 9} l10,14 M366,${this.shelf.y + 9} l-10,14" stroke="${OL3}" stroke-width="5" stroke-linecap="round"/><path d="M262,${this.shelf.y + 9} l10,14 M366,${this.shelf.y + 9} l-10,14" stroke="#8a9a96" stroke-width="2" stroke-linecap="round"/><circle cx="258" cy="${this.shelf.y + 4.5}" r="1.8" fill="${OL3}"/><circle cx="370" cy="${this.shelf.y + 4.5}" r="1.8" fill="${OL3}"/>`;
+    // floor grate and knitted round rug
+    b += `<rect y="268" width="380" height="152" fill="url(#k3-grate)"/><rect y="266" width="380" height="5" fill="#d99a3a" stroke="${OL3}" stroke-width="2"/>`;
+    b += `<ellipse cx="180" cy="292" rx="132" ry="24" fill="#ff7a59" stroke="${OL3}" stroke-width="3"/><ellipse cx="180" cy="291" rx="104" ry="18" fill="#fff1d6"/><ellipse cx="180" cy="290" rx="78" ry="13" fill="#3fbfb0"/><ellipse cx="180" cy="289" rx="50" ry="8" fill="#ffb03a"/>`;
+    // hanging caged bulb
+    s += `<g transform="translate(190,24)"><g class="bulb"><path d="M0,0 V36" stroke="${OL3}" stroke-width="2.4"/><circle cx="0" cy="50" r="30" fill="#ffd27a" opacity=".25"/><circle cx="0" cy="50" r="10" fill="#fff3b0" stroke="${OL3}" stroke-width="2.4"/><path d="M-11,48 Q-11,34 0,34 Q11,34 11,48 Q11,62 0,64 Q-11,62 -11,48 Z M0,34 V64 M-11,48 H11" stroke="#d99a3a" stroke-width="2.2" fill="none"/><rect x="-5" y="31" width="10" height="5" fill="#d99a3a" stroke="${OL3}" stroke-width="2"/></g></g>`;
+    // the squishy chair (back), Ulhu, chair arms
+    b += '<rect width="380" height="270" fill="url(#k3-warm)"/>'; b += `<path d="M112,250 C96,180 112,108 178,104 C244,108 260,180 244,250 Z" fill="#f0b03c" stroke="${OL3}" stroke-width="3.4"/><path d="M134,170 q44,-26 88,0 M128,206 q50,-18 100,0" stroke="#c88a22" stroke-width="2.6" fill="none" stroke-linecap="round"/>${[[156, 150], [200, 150], [178, 186]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="3" fill="#c88a22" stroke="${OL3}" stroke-width="1.6"/>`).join('')}
+      <path d="M126,232 h104 q10,0 10,10 v10 h-124 v-10 q0,-10 10,-10 Z" fill="#ffc85a" stroke="${OL3}" stroke-width="3"/><rect x="114" y="248" width="128" height="16" rx="6" fill="#e09a2a" stroke="${OL3}" stroke-width="3"/><path d="M126,264 v6 M230,264 v6" stroke="${OL3}" stroke-width="6" stroke-linecap="round"/>`;
+    s += `<g transform="translate(178,150) scale(1.25)"><g class="hop"><g class="breath">${ulhuVec('k3')}</g></g></g>`;
+    s += `<rect x="96" y="190" width="30" height="64" rx="15" fill="#ffc85a" stroke="${OL3}" stroke-width="3.4"/><path d="M102,200 q9,-6 18,0" stroke="#fff1d6" stroke-width="3" fill="none" stroke-linecap="round"/><rect x="230" y="190" width="30" height="64" rx="15" fill="#f0b03c" stroke="${OL3}" stroke-width="3.4"/>`;
+    s += `<g class="lap"><g id="k3-piece"></g></g>`;
+    s += `<g id="k3-ballg"></g><path id="k3-strand" d="" stroke="#ff7a59" stroke-width="2.6" fill="none" stroke-linecap="round"/>`;
+    s += `<g transform="translate(178,150) scale(1.25)"><g class="hop">${armsVec('k3', '#fff1d6')}</g></g>`;
+    // Bloop the anglerfish cat
+    s += `<g transform="translate(276,296)"><g class="catb">
+      <path d="M18,-8 l14,-10 v20 Z" fill="#6a4a9a" stroke="${OL3}" stroke-width="2.6" stroke-linejoin="round"/>
+      <g transform="translate(0,-34)"><g class="lure"><path d="M0,14 Q-4,-6 -18,-8" stroke="${OL3}" stroke-width="2.4" fill="none"/><circle cx="-18" cy="-8" r="9" fill="#fff3b0" opacity=".35" class="lglow"/><circle cx="-18" cy="-8" r="4.6" fill="#fff3b0" stroke="${OL3}" stroke-width="2" class="lglow"/></g></g>
+      <path d="M-14,-26 l-3,-12 l11,7 Z M10,-28 l6,-11 l3,13 Z" fill="#6a4a9a" stroke="${OL3}" stroke-width="2.4" stroke-linejoin="round"/>
+      <ellipse cx="0" cy="-12" rx="21" ry="18" fill="#7a5aae" stroke="${OL3}" stroke-width="3"/><ellipse cx="0" cy="-5" rx="13" ry="9" fill="#b89ae0"/>
+      <g class="eo"><g transform="translate(-8,-16)"><g class="blink" style="animation-delay:-1.3s"><circle r="6" fill="#fff" stroke="${OL3}" stroke-width="2"/><circle cx="1" cy="1" r="3.4" fill="${OL3}"/><circle cx="-.5" cy="-.8" r="1.3" fill="#fff"/></g></g><g transform="translate(8,-16)"><g class="blink" style="animation-delay:-1.3s"><circle r="6" fill="#fff" stroke="${OL3}" stroke-width="2"/><circle cx="-1" cy="1" r="3.4" fill="${OL3}"/><circle cx="-2.5" cy="-.8" r="1.3" fill="#fff"/></g></g></g>
+      <g class="ec"><path d="M-13,-15 q5,4 10,0 M3,-15 q5,4 10,0" stroke="${OL3}" stroke-width="2.4" fill="none" stroke-linecap="round"/></g>
+      <g class="eh"><path d="M-13,-14 q5,-6 10,0 M3,-14 q5,-6 10,0" stroke="${OL3}" stroke-width="2.4" fill="none" stroke-linecap="round"/></g>
+      <path d="M-6,-5 q6,5 12,0" stroke="${OL3}" stroke-width="2" fill="#fff"/><path d="M-3,-4 l1,3 l1,-3 M2,-4 l1,3 l1,-3" stroke="${OL3}" stroke-width="1" fill="#fff"/>
+      <ellipse cx="-15" cy="-8" rx="3.6" ry="2.2" fill="#ff9fb4"/><ellipse cx="15" cy="-8" rx="3.6" ry="2.2" fill="#ff9fb4"/>
+      <g transform="translate(-16,-6)"><g class="swat"><path d="M0,0 q-12,-4 -14,-14 q8,0 14,8 Z" fill="#6a4a9a" stroke="${OL3}" stroke-width="2.4" stroke-linejoin="round"/></g></g>
+      <g class="zz"><text class="z" x="12" y="-40">z</text><text class="z z2" x="19" y="-52">z</text></g>
+     </g></g>`;
+    s += '<g id="k3-shelf"></g><g id="k3-bar"></g>';
+    s += `<rect x="12" y="326" width="226" height="48" rx="10" fill="#e0a648" stroke="${OL3}" stroke-width="3"/><rect x="17" y="331" width="216" height="38" rx="7" fill="none" stroke="#ffd27a" stroke-width="1.6"/>${[[20, 334], [230, 334], [20, 366], [230, 366]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="2" fill="${OL3}"/>`).join('')}
+      <text id="k3-tb" x="28" y="358" font-family="Fredoka" font-weight="700" font-size="28" fill="${OL3}"></text><text id="k3-ts" x="250" y="344" font-family="Fredoka" font-weight="500" font-size="13" fill="#dff6ff"></text><text id="k3-ts2" x="250" y="360" font-family="Fredoka" font-weight="500" font-size="13" fill="#dff6ff"></text>`;
+    return b + '<!--FG-->' + s;
+  },
+  ballSVG(r) {
+    return `<circle cx="0" cy="${-r}" r="${r}" fill="#ff7a59" stroke="${OL3}" stroke-width="2.8"/><g transform="translate(0,${-r})"><g class="spin"><path d="M${-r * 0.8},${-r * 0.3} Q0,${-r * 1} ${r * 0.8},${-r * 0.3} M${-r * 0.9},${r * 0.15} Q0,${-r * 0.6} ${r * 0.9},${r * 0.15} M${-r * 0.75},${r * 0.55} Q0,${-r * 0.05} ${r * 0.75},${r * 0.55}" stroke="#c84a3a" stroke-width="2" fill="none" stroke-linecap="round"/></g></g><path d="M${-r * 0.55},${-r * 1.55} q${r * 0.25},${-r * 0.22} ${r * 0.55},${-r * 0.25}" stroke="#ffd2c0" stroke-width="2.4" fill="none" stroke-linecap="round"/>`;
+  },
+  bar(f) {
+    const y = this.bandY, x0 = 18, cols = 26, rows = 2, total = cols * rows, n = f >= 1 ? total : Math.floor(f * total);
+    const C = ['#ff7a59', '#ff7a59', '#fff1d6', '#ff7a59', '#3fbfb0', '#ff7a59'];
+    let band = '';
+    for (let i = 0; i < n; i++) { const c = Math.floor(i / rows), r = rows - 1 - (i % rows); band += `<g transform="translate(${x0 + c * 12},${y + r * 8}) scale(2)">${STITCH.stk(0, 0, C[c % 6])}</g>`; }
+    const xd = x0 + Math.ceil(n / rows) * 12;
+    let s = (n ? `<rect x="${x0 - 2}" y="${y - 2}" width="${xd - x0 + 4}" height="20" rx="3" fill="${OL3}"/>` : '') + band;
+    const xf = x0 + Math.ceil(n / rows) * 12, xe = x0 + cols * 12 + 16;
+    if (f < 1) {
+      let d = `M${xf},${y + 8}`; for (let x = xf; x < xe - 10; x += 12) d += ` q3,-7 6,0 q3,7 6,0`;
+      s += `<path d="${d}" stroke="${OL3}" stroke-width="5" fill="none" stroke-linecap="round"/><path d="${d}" stroke="#ff7a59" stroke-width="2.6" fill="none" stroke-linecap="round"/>`;
+      const br = 4 + 9 * (1 - f);
+      s += `<g transform="translate(${xe},${y + 8 + br})">${this.ballSVG(br)}</g>`;
+      s += `<g transform="translate(${xf},${y + 8})"><g class="mini"><path d="M-6,-16 L6,10" stroke="${OL3}" stroke-width="5" stroke-linecap="round"/><path d="M-6,-16 L6,10" stroke="#fff1d6" stroke-width="2.4" stroke-linecap="round"/></g><g class="mini" style="animation-direction:alternate-reverse"><path d="M6,-16 L-6,10" stroke="${OL3}" stroke-width="5" stroke-linecap="round"/><path d="M6,-16 L-6,10" stroke="#ffd27a" stroke-width="2.4" stroke-linecap="round"/></g></g>`;
+      if (n > 0) s += `<rect class="cur" x="${x0 + Math.floor(n / rows) * 12}" y="${y + (rows - 1 - (n % rows)) * 8}" width="12" height="8" rx="2" fill="none" stroke="#fff3b0" stroke-width="2.4"/>`;
+    }
+    return s;
+  },
+};
+
+/* ================= shared update ================= */
+function shelfSVG(v, fin) {
+  const { y, slots, box } = v.shelf;
+  const order = ['small', 'medium', 'large'].filter((k) => k !== size);
+  let s = '';
+  const put = (sz, x, cls) => {
+    const g = GRIDS[sz], W = g[0].length * SW, H = g.length * SH + (sz === 'medium' ? 9 : 0), k = Math.min(box[0] / W, box[1] / H);
+    const inner = `<g transform="translate(${(-W * k / 2).toFixed(1)},${(-H * k).toFixed(1)}) scale(${k.toFixed(3)})">${pieceSVG(v.style, sz, v.pal[sz])}</g>`;
+    return `<g transform="translate(${x},${y})"><g class="${cls}">${inner}</g></g>`;
+  };
+  s += put(order[0], slots[0], '') + put(order[1], slots[1], '');
+  const x = slots[2];
+  if (fin) {
+    s += put(size, x, 'pop');
+    s += `<g class="spark">${[[-18, -38], [16, -30], [0, -48], [20, -6]].map(([dx, dy], i) => `<g transform="translate(${x + dx},${y + dy})"><path class="sp" style="animation-delay:${i * 0.3}s" d="M0,-6 L1.5,-1.5 L6,0 L1.5,1.5 L0,6 L-1.5,1.5 L-6,0 L-1.5,-1.5 Z" fill="#ffd56a"/></g>`).join('')}</g>`;
+  } else {
+    const col = v.style === 'px' ? '#e6c88a' : v.style === 'paint' ? '#e6c26a' : '#fff1d6';
+    s += `<rect x="${x - box[0] / 2 - 2}" y="${y - box[1] - 2}" width="${box[0] + 4}" height="${box[1] + 2}" rx="${v.style === 'px' ? 0 : 5}" fill="none" stroke="${col}" stroke-opacity=".55" stroke-width="1.4" stroke-dasharray="3 3"/><text x="${x}" y="${y - box[1] / 2 + 3}" text-anchor="middle" font-size="9" font-weight="700" fill="${col}" opacity=".85" font-family="Atkinson Hyperlegible">today</text>`;
+  }
+  return s;
+}
+const built = {};
+let lastKey = '';
+function updateVersion(id, p) {
+  const v = V[id], f = p / 100, fin = p >= 100, st = paused ? 'paused' : fin ? 'fin' : 'work';
+  $(v.card).className = `card ${id} ${st}`;
+  // piece on the needles
+  const ks = knitState(size, f), sc = PSCALE[size];
+  const g = $(`#${id}-piece`);
+  if (built[id] !== size) {
+    g.innerHTML = `<clipPath id="${id}-pc"></clipPath><g clip-path="url(#${id}-pc)">${pieceSVG(v.style, size, v.pal[size])}</g><g id="${id}-cur"></g>`;
+    built[id] = size;
+  }
+  $(`#${id}-pc`).innerHTML = ks.rects.map(([x, y, w, h]) => `<rect x="${x}" y="${y}" width="${w}" height="${h}"/>`).join('');
+  const [cx, cy] = v.cross;
+  g.setAttribute('transform', `translate(${(cx - ks.W * SW * sc / 2).toFixed(1)},${(cy + 7 - ks.top * sc).toFixed(1)}) scale(${sc})`);
+  $(`#${id}-cur`).innerHTML = ks.cur && !fin ? `<rect class="cur" x="${ks.cur[0]}" y="${ks.cur[1]}" width="${SW}" height="${SH}" fill="none" stroke="#fff6c8" stroke-width="1.1"/>` : '';
+  const bk = Math.floor(f * 52) + '|' + (f >= 1);
+  if (v.lastBar !== bk) { $(`#${id}-bar`).innerHTML = v.bar(f); v.lastBar = bk; }
+  const left = Math.max(1, Math.ceil(SZ[size].min * (1 - f)));
+  const tb = $(`#${id}-tb`), ts = $(`#${id}-ts`);
+  tb.textContent = fin ? 'Done!' : `${left} min left`;
+  const sub = fin ? `${SZ[size].min} min of focus. It is on the shelf.` : paused ? 'Paused while you are away. Nothing lost.' : `Knitting ${SZ[size].name}`;
+  if (id === 'k3') { const words = sub.split(' '), half = Math.ceil(words.length / 2); ts.textContent = words.slice(0, half).join(' '); $('#k3-ts2').textContent = words.slice(half).join(' '); }
+  else ts.textContent = sub;
+  const key = id + size + fin;
+  if (v.lastShelf !== key) { $(`#${id}-shelf`).innerHTML = shelfSVG(v, fin); v.lastShelf = key; }
+}
+function update() {
+  $('#pv').textContent = Math.round(P) + '%';
+  for (const id of ['k1', 'k2', 'k3']) updateVersion(id, P);
+}
+function buildAll() {
+  for (const id of ['k1', 'k2', 'k3']) { const [bg, fg] = V[id].build().split('<!--FG-->'); $(V[id].svg).innerHTML = bg; $(V[id].fg).innerHTML = fg; built[id] = null; V[id].lastShelf = null; V[id].ballR = null; V[id].lastBar = null; }
+  update();
+}
+// the main yarn ball: wobbles as yarn is pulled, shrinks as the piece grows, strand runs up to the needles
+function frame(t) {
+  const live = !paused && P < 100, f = P / 100;
+  for (const id of ['k1', 'k2', 'k3']) {
+    const v = V[id], [bx, by, r0] = v.ball, s = 1 - 0.6 * f, r = r0 * s;
+    const a = live ? 8 * Math.sin(t / 1000 * 2 * Math.PI / 1.05) + 3 * Math.sin(t / 1000 * 2 * Math.PI / 0.37) : 0;
+    const bg = $(`#${id}-ballg`); if (!bg) continue;
+    if (v.ballR !== Math.round(r * 4)) { v.ballR = Math.round(r * 4); bg.innerHTML = `<g id="${id}-bw">${id === 'k1' ? `<g transform="scale(${s.toFixed(3)})">${v.ballSVG(r0)}</g>` : v.ballSVG(r)}</g>`; }
+    const bw = $(`#${id}-bw`); bw.setAttribute('transform', `translate(${(bx + a * 0.3).toFixed(2)},${by}) rotate(${a.toFixed(2)})`);
+    const rad = a * Math.PI / 180, h = (id === 'k1' ? 2 * r0 * s : 2 * r) * 0.92;
+    const sx = bx + a * 0.3 + Math.sin(rad) * h, sy = by - Math.cos(rad) * h;
+    const [nx, ny] = v.cross, sag = 30 + (live ? 6 * Math.sin(t / 1000 * 2 * Math.PI / 1.4) : 0);
+    const d = P >= 100 ? '' : `M${nx},${ny + 4} Q${((nx + sx) / 2).toFixed(1)},${(Math.max(ny, sy) + sag).toFixed(1)} ${sx.toFixed(1)},${sy.toFixed(1)}`;
+    $(`#${id}-strand`).setAttribute('d', d); const s2 = $(`#${id}-strand2`); if (s2) s2.setAttribute('d', d);
+  }
+}
+
+/* ================= controls ================= */
+$('#pr').oninput = (e) => { P = Number(e.target.value); update(); };
+$('#pa').onclick = () => { paused = !paused; $('#pa').classList.toggle('on', paused); $('#pa').textContent = paused ? 'Come back to the app' : 'Leave the app (pause)'; update(); };
+$('#play').onclick = () => { playing = !playing; if (playing && P >= 100) P = 0; setPlay(); };
+function setPlay() { $('#play').classList.toggle('on', playing); $('#play').textContent = playing ? 'Stop' : 'Play'; }
+$('#sz').onclick = (e) => { const s = e.target.dataset.s; if (!s) return; size = s; [...$('#sz').children].forEach((b) => b.classList.toggle('on', b.dataset.s === s)); buildAll(); };
+let last = performance.now(), lastF = 0;
+function tick(t) {
+  if (playing && !paused) { P = Math.min(100, P + (t - last) / 1000 * 5); $('#pr').value = Math.round(P); update(); if (P >= 100) { playing = false; setPlay(); } }
+  last = t; if (t - lastF > 40) { frame(t); lastF = t; } requestAnimationFrame(tick);
+}
+window.setState = (o) => {
+  if (o.size && o.size !== size) { size = o.size; [...$('#sz').children].forEach((b) => b.classList.toggle('on', b.dataset.s === size)); buildAll(); }
+  if ('p' in o) { P = o.p; $('#pr').value = P; }
+  if ('paused' in o) { paused = o.paused; $('#pa').classList.toggle('on', paused); }
+  update();
+};
+buildAll(); requestAnimationFrame(tick);
+</script>
+</body></html>
