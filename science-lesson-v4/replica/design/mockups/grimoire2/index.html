@@ -1,0 +1,1192 @@
+<title>Grimoire: opens on the day in glass (1U.10)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Grenze+Gotisch:wght@500;700&family=IM+Fell+English:ital@0;1&display=swap">
+<style>
+/* Layout: the phone (max 390px) with the background switch above it, then one card per background. The phone inside is always the game's dark world. */
+:root{
+  --abyss:#121a17; --pane:#18221e; --line:#2c3d36;
+  --ink:#ece6d4; --muted:#a3b2aa;
+  --eld:#5ef2a0; --curse:#ff7a66; --bless:#5aa7ff; --gold:#e8c46e;
+  --g:'Grenze Gotisch','Palatino Linotype',Georgia,serif;
+  --f:'IM Fell English',Garamond,Georgia,serif;
+  --a:'Atkinson Hyperlegible',system-ui,-apple-system,'Segoe UI',sans-serif;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--abyss:#040706;--pane:#0d1613;--line:#22322c;--ink:#e8e1cf;--muted:#93a39b;color-scheme:dark}}
+:root[data-theme="dark"]{--abyss:#040706;--pane:#0d1613;--line:#22322c;--ink:#e8e1cf;--muted:#93a39b;color-scheme:dark}
+body{background:var(--abyss);color:var(--ink);font:15px/1.5 var(--a)}
+.wrap,.wrap *{box-sizing:border-box}
+.wrap{max-width:1100px;margin:0 auto;padding-inline:16px;padding-block:28px 64px}
+.kick{font:700 13px var(--a);letter-spacing:.18em;text-transform:uppercase;color:var(--eld)}
+h1{font:700 clamp(40px,9vw,68px)/.95 var(--g);margin:.12em 0 .2em;color:var(--ink);text-wrap:balance}
+.lede{color:var(--muted);font-size:16px;max-width:64ch;margin:0}
+.picks{margin-top:26px;display:grid;grid-template-columns:minmax(0,390px) minmax(0,1fr);gap:28px;align-items:start}
+@media (max-width:820px){.picks{grid-template-columns:minmax(0,1fr)}}
+.pcol{min-width:0;max-width:390px;width:100%}
+.ctl{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 12px}
+.seg{display:inline-flex;border:1px solid #2f443b;border-radius:5px;overflow:hidden}
+.seg button{font:700 14px var(--a);color:var(--muted);background:#0c1411;border:0;border-right:1px solid #24342e;padding:8px 9px;min-height:40px;min-width:44px;cursor:pointer}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{background:#1b2c25;color:#fff;box-shadow:inset 0 -2px 0 var(--eld)}
+.btn{font:700 14px var(--a);color:var(--gold);background:#120f08;border:1px solid #5a4a26;border-radius:5px;padding:8px 12px;min-height:40px;cursor:pointer}
+button:focus-visible,.stage:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.cap{margin:10px 2px 0;color:var(--muted);font-size:14px;min-height:2.6em}
+.cap b{color:var(--ink);font:500 20px/1.1 var(--g);display:block}
+
+/* the phone */
+.phone{position:relative;width:100%;height:720px;border-radius:22px;border:1px solid #23332d;background:#030404;overflow:hidden;box-shadow:0 20px 50px rgba(0,0,0,.6),inset 0 0 0 4px #0a110e;isolation:isolate;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.stage{position:absolute;inset:0;cursor:pointer;overflow:hidden}
+.scene{position:absolute;inset:0;transform-origin:50% 50%}
+.scene canvas{position:absolute;inset:0;width:100%;height:100%;display:block;image-rendering:pixelated;image-rendering:crisp-edges}
+.flash{position:absolute;inset:0;z-index:2;background:#5ef2a0;opacity:0;pointer-events:none}
+.clock{position:absolute;left:0;right:0;top:0;z-index:3;display:flex;justify-content:space-between;padding:10px 16px;font:700 13px var(--a);color:#c9d6cf;font-variant-numeric:tabular-nums;text-shadow:0 1px 0 #000,0 0 4px #000;pointer-events:none}
+.hint{position:absolute;left:50%;bottom:26px;z-index:3;transform:translateX(-50%);font:500 22px var(--g);color:#f3e7c8;background:rgba(6,10,8,.8);border:1px solid #3a5a4a;border-radius:999px;padding:6px 18px 8px;white-space:nowrap;pointer-events:none;transition:opacity .3s}
+.hint[data-off="1"]{opacity:0}
+
+/* the Vespers sheet (entries unchanged; only its backdrop now lets the room show through) */
+.sheet{position:absolute;inset:0;z-index:20;display:flex;flex-direction:column;background:rgba(6,6,10,.38);opacity:0;pointer-events:none}
+.sheet.open{opacity:1;pointer-events:auto}
+.shd{flex:none;display:flex;align-items:center;gap:10px;padding:14px 14px 10px;border-bottom:1px solid #1d1a26;background:rgba(10,8,16,.9)}
+.shd .ttl{flex:1;min-width:0}
+.shd .ttl b{display:block;font:700 28px/1 var(--g);color:#f1e9ff;text-shadow:0 0 14px rgba(160,120,255,.35)}
+.shd .ttl small{font:13px var(--a);color:#a9b4ae}
+.back{flex:none;font:700 13px var(--a);color:#cfc6e0;background:#15111d;border:1px solid #3a3050;border-radius:6px;padding:7px 10px;min-height:36px;cursor:pointer}
+.sb{flex:1;overflow-y:auto;padding:12px 14px 16px;scrollbar-width:thin}
+.sft{flex:none;padding:10px 14px 14px;border-top:1px solid #1d1a26;background:rgba(8,8,11,.92)}
+.big{display:block;width:100%;min-height:52px;font:700 24px/1 var(--g);letter-spacing:.03em;color:#08100d;background:linear-gradient(180deg,#7af7b6,#3fcf86);border:1px solid #8affc4;border-radius:8px;cursor:pointer;box-shadow:0 3px 0 #1a5a3a,0 0 18px rgba(94,242,160,.25)}
+.say{display:flex;align-items:flex-start;gap:10px;margin:2px 0 12px}
+.say img{flex:none;width:44px;height:44px;image-rendering:pixelated}
+.say p{margin:0;padding:7px 11px 8px;background:radial-gradient(ellipse at 30% 20%,#f3e7c8,#dcc797 80%);color:#2a1a12;border-radius:3px 10px 10px 10px;font:italic 15px/1.25 var(--f);box-shadow:0 2px 0 #5a4428}
+.dayg{max-width:300px;margin:0 auto 8px}.sec{display:inline-block;font:700 22px/1.05 var(--g);color:#efe6ff;margin:10px 0 6px;padding:2px 8px 4px;border-radius:6px;background:rgba(10,8,16,.82)}
+.line{position:relative;display:flex;flex-direction:column;gap:6px;padding-left:22px}
+.line::before{content:"";position:absolute;left:8px;top:6px;bottom:6px;width:2px;background:linear-gradient(#3a3050,#5ef2a0 60%,#3a3050)}
+.ev{position:relative;display:flex;align-items:center;gap:10px;width:100%;text-align:left;font:inherit;color:#e4def0;background:#100e15;border:1px solid #2c2538;border-radius:8px;padding:8px 10px;min-height:46px;cursor:pointer}
+.ev::before{content:"";position:absolute;left:-19px;top:50%;width:10px;height:10px;margin-top:-5px;border-radius:50%;background:var(--bless);box-shadow:0 0 0 2px #0a0810,0 0 8px var(--bless)}
+.ev.c::before{background:var(--curse);box-shadow:0 0 0 2px #0a0810,0 0 8px var(--curse)}
+.ev.c{border-color:#4a2228}
+.ev[aria-expanded="true"]{background:#1a1220;border-color:var(--gold)}
+.ev time{font:700 13px var(--a);color:#93a39b;font-variant-numeric:tabular-nums;width:3.2em;flex:none}
+.ev b{flex:1;min-width:0;font-weight:700}
+.ev .sd{flex:none;width:30px;height:30px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:radial-gradient(circle at 40% 35%,#2a2015,#0c0a08);box-shadow:inset 0 0 0 1.5px #8a6a2a}
+.ev .sd.none{background:#121016;box-shadow:inset 0 0 0 1.5px #3a3348;color:#6f667e;font:700 14px var(--a)}
+.sd svg{width:72%;height:72%}
+.tray{margin:2px 0 6px;padding:10px;border:1px dashed #3a3050;border-radius:8px;background:#0c0a11}
+.q{font:700 13.5px var(--a);color:#d9d2e6;margin:2px 0 6px}
+.sr{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.sbn{display:flex;flex-direction:column;align-items:center;gap:4px;padding:7px 2px 6px;background:#100e15;border:1px solid #2c2538;border-radius:8px;cursor:pointer;color:#b8afc8;font:11.5px/1.15 var(--a);text-align:center;min-height:44px}
+.sbn .sd{width:34px;height:34px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:radial-gradient(circle at 40% 35%,#2a2015,#0c0a08);box-shadow:inset 0 0 0 1.5px #8a6a2a}
+.sbn[aria-pressed="true"]{border-color:var(--gold);background:#231b0e;color:#ffe2a0;box-shadow:0 0 12px rgba(232,196,110,.25)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chip{font:13.5px/1 var(--a);color:#d8d2e4;background:#14111b;border:1px solid #352c45;border-radius:999px;padding:8px 12px;min-height:34px;cursor:pointer}
+.chip[aria-pressed="true"]{background:#3a1d22;border-color:#ff7a66;color:#ffd9d2}
+.toast{position:absolute;left:12px;right:12px;bottom:12px;z-index:30;padding:10px 12px;background:#101b17;color:#e8e1cf;border:1px solid #2f443b;border-radius:8px;font-size:14px;transform:translateY(160%);transition:transform .35s ease}
+.toast.show{transform:none}
+
+/* the cards */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:12px;margin:0;padding:0;list-style:none}
+.card{display:flex;flex-direction:column;gap:4px;width:100%;text-align:left;font:inherit;color:inherit;background:var(--pane);border:1px solid var(--line);border-radius:8px;padding:12px 14px 13px;cursor:pointer;min-width:0}
+.card:hover{border-color:#3a5a4a}
+.card[aria-current="true"]{border-color:var(--eld);box-shadow:0 0 0 1px rgba(94,242,160,.25)}
+.card .hd{display:flex;align-items:baseline;gap:10px}
+.card .hd b{font:700 22px/1 var(--g);color:var(--gold)}
+.card .hd span{font:500 22px/1.05 var(--g);color:var(--ink);text-wrap:balance}
+.card p{margin:0;color:var(--muted);font-size:14px}
+.note{font-size:14px;color:var(--muted);margin-top:30px;max-width:72ch}
+@media (prefers-reduced-motion:reduce){.hint,.toast{transition:none}}
+</style>
+
+<div class="wrap">
+  <div class="kick">Ulhu · Vespers · round five</div>
+  <h1>The Grimoire opens on your day</h1>
+  <p class="lede">Your picks BG1 desk, T1 tome and T4 chains, unchanged. Tap the book: when the tentacles drag you in, the first page is your day in glass, the same window as the night line (curses on the left in red, blessings on the right, the path weaving down from morning to evening, the light filling down it). Ulhu's line and the night line, where you tell him more about each curse, follow underneath.</p>
+
+  <div class="picks">
+    <div class="pcol">
+      <div class="ctl">
+        <div class="seg" id="seg" role="group" aria-label="Background">
+          <button type="button" data-v="BG1" aria-pressed="true">BG1</button><button type="button" data-v="BG2" aria-pressed="false">BG2</button><button type="button" data-v="BG3" aria-pressed="false">BG3</button><button type="button" data-v="BG4" aria-pressed="false">BG4</button><button type="button" data-v="BG5" aria-pressed="false">BG5</button>
+        </div>
+        <button type="button" class="btn" id="replay">Replay</button>
+      </div>
+      <div class="phone" id="phone">
+        <div class="stage" id="stage" role="button" tabindex="0" aria-label="Open the grimoire">
+          <div class="scene" id="scene"><canvas id="pix" width="130" height="240" aria-hidden="true"></canvas></div>
+          <div class="flash" id="flash"></div>
+        </div>
+        <div class="clock"><span>20:14</span><span>Wednesday 28 October</span></div>
+        <div class="hint" id="hint">Tap the book</div>
+        <div class="sheet" id="sheet" role="dialog" aria-label="Vespers" inert>
+          <div class="shd"><div class="ttl"><b>Vespers</b><small>Wednesday 28 October · 3 curses, 3 blessings</small></div><button type="button" class="back" data-a="close">Back to the book</button></div>
+          <div class="sb" id="sb"></div>
+          <div class="sft"><button type="button" class="big" data-a="ring">That's all</button></div>
+        </div>
+        <div class="toast" id="toast" role="status"></div>
+      </div>
+      <p class="cap" id="cap"></p>
+    </div>
+    <ul class="cards" id="cards"></ul>
+  </div>
+
+  <p class="note">Tap during the animation to skip straight to the sheet. With reduced motion switched on, nothing sways or flickers and the sheet simply fades in. The 3D engine is gone: the whole scene is one small pixel canvas, so it adds almost nothing to the download.</p>
+</div>
+
+<script>window.ULHU_SPR = {"idle":"data:image/png;base64,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","happy":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAPa0lEQVR4AbyZe5CXVRnHn3fZBCUQTNQtRCm0pZypltLIP0KasAv+1wWbaehiM0pNwWQ11UQjU3ZlcCy7TOSFanQcLU27uBOwlcglWcexZBFEQNwF3WVxdwV2+cHb93POe97f+V2Wvf2Wd9/vOc95znMu3+c857zv+9s6O8PXPc/dnoK7lYPy4dGBcv14lc+4AyCSkgifufzLibL8DsTL9bnBOAhn3AFLRRqCIPD5xi9WpIF80J2p/Iw7oJzYN36xXAGhO6uIHZOpxjUbdwcsu+WmtIgbi/Iq6YXE/N+2e9vsR1+6x5ZJ13htU9q4yGNc2avzcXeAxojuJJIRiyu/cdNWu+bqq2yDcmoCcESQxyOvuQOKq71Mq70sXbJsqVXFTUttwWc+YR/5+CetafF19us/3GELPvsxW/Wb1R5rf5rzxQlzFRG5ooZCTR0A+TC3O1beGsSq+cFjR+2is8+xODdtB4uuVZETUI+HE2rmgED+jpU/sJ8LB0/22ne+/U27bPrFwkzmnyHJSE9Wfix3gq9kSwiJ4BWGE1atXW23yBmAaMiqapLVzAHMBvKmuR8SecoOERnKB4+9JtKQL0YA+hKoD19OlAFl2b1KjsAJIFONKRuzA1h5wD7/d2ebHTzVWzKhXYcP2K7uA0536DikY/KvOX0xyciSOeCJgKJVLaUxO4DJQJ78dDgo8heW7Ply8mpNtEBc4uluogAQBeB0tkPVjdoBPK9BIJ8kmjmIRtx15CVXig+6i84+W3u/CnlnqSRVPw7IQsWt+grd6BWjdgBDLtGjjBwQqOS7j7STmSMvZSl5f+o7g/Jk2LzUadaWKFiodwe2YKYacTZiByy7JXu+37i0dLDUT4y0KvlJIn/0aGmbqJSw6pQT9eCgAk7JkGXmnpQUMmHJF5fags993HDCaB6TI3aAcWmObvwgk4PMCaZK9nx4zpsuIkFZldux0cMjtSQ4IbZKTXob9KJfxtm4aZt7kxzUMKsoz3IH4EFQblBZLp0R295TCJap2+MNWvFDetlxWhnolltcySeuIVr15zWZE7JCyDBxcqJ6FXJzCYmguoOKrFS1G8peo1VVcXNoglCRO0Dtg+60uaaQ18dyUDIZVoSVMShXM7LBLyhlvJxRkNFbmKQK+M8ZSB7FMK4pSV3Y01MumGRTZkxye4mKwcB41AVelEGSJHboePZmpxX5yvwV9pX5yzVnWSq0sQHGbAHbRVCt+UuS+kD2dkhmy10/K1Qoalt3t9n2XW3WCnbvdHlKnw4yrXI3LpqXghmzJhvgvADFCIgaDW8rRA0ksuLFlTe7bfMaaSEgJzipepLG6pKC2Yr3Qtz3tUKOwBTy5DlCiOSKkQnOAXyKaqlsU+uThhM3PrHVTnex15grpBMZstcvnHS2dRx9zU06TFxV7l5OJGCokt/JKcPkkFp3mkGZ7tDHmsyRUllwAjLdgbAr3El5OmdQJ6RAjcJodZDnOxzyVzfNM8o8WxmkGiBPPeSLb3aTdfBVPuKIAkA/y1lNN2NKpcgiv1Q5SOl3n/71IDXDVMM8N02sLj49Nz31pL1rUaN1T+4x9ocNcuEE0/odPHbMUs2+Q6+5rA5Ys2WNAVVjYvGFExjfIXYGisiQ1V+z5Tb1c1uujSMBJ6QaAOQGqToEucILjfodATSJF/DakKbmtoBZ6jVZFsqnc4JvMFiqyURVIQoilRPDfPNhpYW8Mn/rkPSCT4MTPv27G72iBmnmAHpi0gKzEXSjHBpMUmByQAujNmnFlsQJQJXu1kjONHWlYnLb1jW2RjD16bXe0qdmJeS1n70NKT0B5CqgCrhR6Q2bJESAVVyEi7OvqBlCMapGpX2G6ZVqy0oi3/lid5mytEjoo4ELuePuhGISRUBRGSQaDrYNPnT/PvPYH8yVF6eOH4CUVW8WGITK0BIdCHq/HTmpvOTT1CB//szp9q3Wcxy2LfqygdAukA9ll7sJkQA0+RlAYXAM5oTQ4kP3ByeEjkPN8PORtOw80G2QJ89HCB7MFV5gEb1UTGNTRQBFwBRA0RAJDUAGWIK/f2KWgcc+OcsAdTlkoDuLOKS8xvTQsFhTLlMGxRaRpApIB/LktzYdNXDVY7fbVc23R8ZBVKOSEX0MhVo5wMqqreQKHgwhtaO5lR5LbEoKVWsjZexNNSwrSjPIrS6aN27OVx7yOAPrkIe5zVn4HtdtoTCBaus5fKIkP35UnUlDvRzA/nL25jwRlsjl3tDKLgb67g1fM0BLkJvwbBNan9e7ulD+OFCVgVDPCAGMT1/gqd1tBkK/OfmXFP4XT7fOA0dUldgD37/LHv/Dg8acpHB3ff1Jg9yVH71M5Ads6nn1yk8of51BftI5qavHTg5wbXzCyOYSX87SOAr4txXqHc3bmTci847yyvaucjhJ1aaJ7X++o+rKd7/c4+L5eP9Zee+sfsNbL7HG+Zda+wvHjIr2fcfIrH2vz1/t9rSPD5xV+RjU08UtmnsOR8fxvGsbXSexf3DCys/fbN8RqCzOX1GlAs3z/jCIkCgMgPOeXCnzvGsVnYxu/552mzWnQSuuldepv2u7DlxVrL/zz/b0X9fb7g3/Sfa2bElmL3hvOmfhlenMt820yVPrre/Vgr2evEf5FJXJVe7vr7OJk8wKpyZYfd0p74AkmhhiSlIGdE2ZE8J5gElbdCbQD0AfsF2hHGSX01Eu5AXnB9R5ewns7VlvacgjYFfrfpt+wRT7x52P2IQ6hblI0AZMEJmTaZ29/tx668vIVssnTkqt/3jiyBdO1XkHFKfhIkr9aXSl8b2/bb/t3yHvoyyrxgkrv3CzXzXqhKY5c7F0wAkrb7jZgEFVq8+YgAgCpkvNlJrxyTvDzrVFC+Zbc8tm60pftftWrbOn/7beka/PyLPyroESyBBx+9oOqWTW11swhurrOWkmoa9Xuc61geOUdAaIvOlym4EDw2TEAQHRnsMDxtUTn56aLfXoCycmkJWg7bHWBCeY7ByUxE6IjRPVxeWinIj8TntFz/mLs5WfQdhr5esnnLTCyQlaOeVa+Zh8sb2Xutq7vFAtZX5Bn5jVQZ7TEHL6Gc+dklPPOys/NXHC1PN0eh5LbNLk1Oa8+y121UcuM/Zbo35lCX2ROydopZE94tG8JpBPVARYePiaVw4cNh5xHHyEP3t+2owpJeTZu2ru7ku19x2uaLBLBack8Z1K8kJXe6eBVIOiUYWxDi4COA1RhNPxmc0vUsxPzfz0POzMc/3xgdc5u/LEh7rXajwvVEn/9MO1Jdrmliccefb+JYqALf98xqZpzx95uTdfecgT7iUNx1CoKyic2FP9/WYTJ56y/v5EeWr7dr5sfd1d9lp2oHBwTJyYWp/KnLIF7SHaDTV28Db/xACcByCQJwLRx+Q3/f5Bg/wbZ55v3SKPEwrZPAsad6gxy+sPd3RFqtIlqYNEQZ1DLpAfwAnZaQlZnBDqw6Plivdd7B4lUc8jFiF/690/zk95Vr7l7oeMiGwQ+Y4Dne7UxwlhntUGKQn9MoOcfFgJ4j6ycRFAGfLkne0nrKdrwDpfGrDern4XAbTl+Wk6KIkM00UkMPDsBfPT0o8lPAxk5G5kQbeaW0ChUG/19adEvt3Y65A3XSwGZDsOvGI44cgrvTb9Qp0BWiRzjc1ds7X3AXNwCiU5WcncDNkjLqA3O9jR55BBnStIcHmVBPLl6q6Ow5Gq0mLV2p9E9ZUiZDl4iQDIc+BhFfb6CZFtmDnDiADCHz317tTyQtk6mpWT71LY+5kFcokWdMAh68J1V+ceJ7LslacAZRCM6AhQ16uIcK1UmWg1gEQ3mcbst7eYPM/zh374GwPOSOO47/g3TbdCoU4RUFAEdBhXt1Z6WrbSRMDm7c/Yq2mfTbMpdukFb7R51y2w8kvdOVWiNNV8QJ94qOhu5h3mu7dlM2ZODxc4AhcBCNSEvFymHDoql1OvqEghX65sbvFfcw987y6RPyknTHAmrDRvePFeD2VnkCXVnJCzymzIYidQDrxCji7AOYBCtUp0eAsgA2RwuEPPVWHqG86ieY4rL2o0EBSPPfqogUA+Dv9nH1ln5/RNtA++8z3utIe0OwP00oMz6OPN0xoMhAhCB6ZoXNCpUAdEJ3hB3wWAObLvmTP2AZRBKOcOCIqqeRU3xys/45LJVZsF5Y62F/Ln++N6xBX0nQ556m9Y+Hbbs7fdIA9p3vje8eEPUDV2xJMcpLchHYC39m7cUuEC+gaXzX+fXX399Xn3ifYiUGZgx84XbO7c2cbK84YHeePixd3lZjihadrl9oUPXmcx+dZHW7BwSJTqVV6pvwlzcLnGB15bTN28FQ1FTXVpSAdUbzY8LaTnNs62EAF8zdGSMCd3n9xitnbDf+WEK2zPvnanJonJU3bA404YPBlpzYgdEDzr9lh04rLPwbaDOwycb+fate+fbw39R2zhm6fbqiuvsXtvWmqE/nN/ucvWbnzWNuw5YpBn0uQ3LLzC2dwnu52yAet3bjeQKpxSGX79q181gAykim55MyoNRxyxA4bT6T79gsO7PLmzZ6ZlcyPs4xWHvLNVgrmysruo/fHq1WV1FBmgaINmOBi1A0Ik/K+52R7SR8211y02AGlebkKeJIklSRLNhUkCv/chDoIBliCUjQLIFD/JyIfxt+ucAGapocvMhp2N2gEVI4gTBxzkX1QEkG/V1xx2qiIrQcSpRD9UoVpftBkNedqN2QH8GkRHkOcRtn9Ph/FjBuQb9EFTOWGo+29/2rFyHtVK0tEBkFjthjioVjcc3ZgdwCA4Ybd+nMQJa29dbVv/9YxBnje827e1YlIT+FC3UYX6YBOoiQNC53zg8Cn78J2/dx8ywQmhvnruIyKuIz4+9ct7DJg7BGzcrpo6gEjgQ4bn/MN3FZ3wzT82i8Bp4lgHmAzcnYQXJFci8e3GY/XpvaYOoEO2AnsyOOHnt/zMHvztvVrNdcI9dv2vPBxnuDkkro4VX/Krdbbkl+vsSZ3ugBciUBknjDZ21NwBYUr1dYX8FyMmH/TDzectrvz8HW7bkdjV3AH8Qsu/pwqn6u3dIgGRpsXX5HPa/kiLgcsXf9ZisNoghDoN5i2+xprURwz3K5B+DaK+Fqi5A3gUEv6QL06QOC+WhpKKTihth75UM1RPQ9fX3AG71/v/1THZGKwu4HwYDtj3MejL0dF+or2Ta5DU3AGVc9KMM+VIJs6PGlkzd14i077apzl1o8W4OQACYG/LZvffWyY/0knSHtAWjLT9cOzHzQHDGbwWNmPt4/8AAAD//1xxHLMAAAAGSURBVAMALS7m6p4SKGsAAAAASUVORK5CYII=","proud":"data:image/png;base64,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","sad":"data:image/png;base64,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","sleepy":"data:image/png;base64,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"};</script>
+<script>/* Blood and sigils (Patryk 2026-10-27, final picks from the "Blood and Sigils" mock-up):
+   blood BL8b "Soaked in", sigils F3 / D3 / S3c / C3c-2 in the Set 3 gilded style, glow G5 "Abyssal ripple".
+   BLOOD.open(host, card, onPick): four sigils rise at the bottom of host (a position:relative, maybe scrolling, pane)
+   and four spurts of blood fly from the tapped curse tile onto them. Tapping a sigil glows it, everything sinks away,
+   then onPick('Flesh' | 'Domain' | 'Scene' | 'Coven'). A tap anywhere else in host, or BLOOD.close(), sinks it away
+   and calls onPick(null). onPick is always called exactly once per open.
+   BLOOD.icons holds the four icon SVG strings (they carry their own gilded colours, so they work anywhere).
+   How the blood is drawn: soft blobs go into a hidden field where touching blobs merge, then the field is shaded
+   (depth colour, darker clotting rim, one sharp highlight, a soft shadow). All CSS classes start with bl-. */
+(function () {
+'use strict';
+if (window.BLOOD) return;
+
+const cl = (x) => (x < 0 ? 0 : x > 1 ? 1 : x), seg = (k, a, b) => cl((k - a) / (b - a)), eo = (x) => 1 - Math.pow(1 - x, 3), lerp = (a, b, t) => a + (b - a) * t;
+function rng(s) { return function () { s |= 0; s = (s + 0x6D2B79F5) | 0; let t = Math.imul(s ^ (s >>> 15), 1 | s); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+const RMQ = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
+const RM = () => !!(RMQ && RMQ.matches);
+
+/* ================= CSS (injected once) ================= */
+const CSS = `
+.bl-layer{position:absolute;left:0;top:0;width:0;height:0;z-index:40;pointer-events:none;overflow:hidden;--gd:.55s}
+.bl-cv{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:7}
+.bl-row{position:absolute;left:8px;right:8px;bottom:8px;display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+.bl-slot{display:flex;justify-content:center}
+.bl-row .bl-sg{transition:transform .25s ease-out,opacity .2s}
+.bl-row.bl-off .bl-sg{opacity:0;transform:translateY(20px);pointer-events:none}
+.bl-row.bl-sink .bl-sg{opacity:0;transform:translateY(26px);pointer-events:none;transition:transform .32s ease-in,opacity .3s}
+.bl-sg{--d:56px;display:flex;flex-direction:column;align-items:center;gap:4px;min-height:44px;min-width:44px;background:none;border:0;padding:0;margin:0;font:inherit;color:inherit;cursor:pointer;pointer-events:auto;-webkit-tap-highlight-color:transparent;
+  --bg:radial-gradient(circle at 50% 38%,#173a34,#06120f 75%);--rim:#c8a050;--lab:#f0d088}
+.bl-sg:focus-visible{outline:2px solid #5ef2a0;outline-offset:2px}
+.bl-disc{position:relative;width:var(--d);height:var(--d);border-radius:50%;background:var(--bg);display:grid;place-items:center;z-index:6;
+  --bs:inset 0 0 0 2px var(--rim),inset 0 -6px 12px rgba(0,0,0,.55),0 3px 8px rgba(0,0,0,.65);box-shadow:var(--bs)}
+.bl-clip{position:absolute;inset:0;border-radius:50%;overflow:hidden}
+.bl-disc .bl-ico{position:relative;z-index:1;width:72%;height:72%}
+.bl-fx{position:absolute;inset:0;z-index:2;pointer-events:none;display:grid;place-items:center}
+.bl-lab{position:relative;z-index:8;font:700 15px/1 var(--g,'Grenze Gotisch',serif);letter-spacing:.03em;color:var(--lab)}
+.bl-ico{overflow:visible}
+.bl-ico *{stroke-linecap:round;stroke-linejoin:round}
+.bl-i{fill:none;stroke:var(--bl-ic,#e8c46e);stroke-width:2}
+.bl-f{fill:var(--bl-ic,#e8c46e)}
+.bl-af{fill:var(--bl-ic2,#c4323a)}
+.bl-h{fill:var(--bl-hole,#020806)}
+.bl-d{fill:rgba(0,0,0,.42)}
+/* what a BL8b spurt leaves on a sigil */
+.bl-soakL{position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 50% 58%,rgba(225,35,45,.95),rgba(125,4,14,.95) 55%,rgba(45,0,6,.97));opacity:0;transition:opacity .5s ease-out}
+.bl-disc.bl-soaked .bl-soakL{opacity:.9}
+.bl-disc.bl-soaked .bl-ico{filter:sepia(1) saturate(3.2) hue-rotate(-38deg) brightness(1.08) drop-shadow(0 0 3px rgba(255,70,60,.9));transition:filter .5s}
+.bl-disc.bl-soaked{animation:bl-soakp 1.8s ease-in-out infinite}
+.bl-disc.bl-now .bl-soakL,.bl-disc.bl-now .bl-ico{transition:none}
+@keyframes bl-soakp{50%{box-shadow:var(--bs),0 0 16px 3px rgba(210,25,35,.6)}}
+.bl-disc.bl-thd{animation:bl-thd .32s ease-out}
+@keyframes bl-thd{25%{transform:scale(.9) translateY(2px)}60%{transform:scale(1.04)}}
+/* G5 Abyssal ripple */
+.bl-rip{position:absolute;inset:0;border-radius:50%;border:2px solid #5ef2a0;box-shadow:0 0 10px #5ef2a0,inset 0 0 8px #5ef2a0;opacity:0;animation:bl-rip calc(var(--gd) * 1.3) ease-out forwards}
+@keyframes bl-rip{0%{transform:scale(.7);opacity:.95}100%{transform:scale(2.1);opacity:0}}
+.bl-disc.bl-g5{animation:bl-g5 calc(var(--gd) * 1.3) ease-out}
+.bl-disc.bl-g5 .bl-ico{animation:bl-g5i calc(var(--gd) * 1.3) ease-out}
+@keyframes bl-g5{30%{box-shadow:var(--bs),inset 0 0 18px rgba(94,242,160,.9),0 0 22px 4px rgba(94,242,160,.6)}}
+@keyframes bl-g5i{30%{filter:brightness(1.6) drop-shadow(0 0 5px #5ef2a0)}}
+.bl-disc.bl-grm{box-shadow:var(--bs),0 0 0 3px #5ef2a0,0 0 18px rgba(94,242,160,.8)}
+/* the chosen reason turns blood red, whichever sigil it is (Coven's figures are dark, so the soak alone hid it; 1U.13) */
+.bl-sg.bl-pick .bl-disc{--rim:#ff5a4e;box-shadow:var(--bs),0 0 0 3px #e0242e,0 0 20px 4px rgba(225,30,40,.75)}
+.bl-sg.bl-pick .bl-disc .bl-soakL{opacity:.95}
+.bl-sg.bl-pick .bl-ico{--bl-ic:#ffd2c8;--bl-hole:#3a0006;filter:drop-shadow(0 0 4px rgba(255,70,60,.95))}
+.bl-sg.bl-pick .bl-lab{color:#ff6a5e;text-shadow:0 0 8px rgba(255,40,40,.8)}
+.bl-row.bl-sink .bl-sg.bl-pick{opacity:1;transform:none;transition:none}
+@media (prefers-reduced-motion:reduce){.bl-disc.bl-soaked{animation:none}.bl-row .bl-sg,.bl-row.bl-sink .bl-sg{transition:opacity .15s}.bl-row.bl-off .bl-sg,.bl-row.bl-sink .bl-sg{transform:none}}
+`;
+function injectCss() { if (typeof document === 'undefined' || document.getElementById('blood-css')) return;
+  const s = document.createElement('style'); s.id = 'blood-css'; s.textContent = CSS; (document.head || document.documentElement).appendChild(s); }
+injectCss();
+
+/* ================= the four icons (F3, D3, S3c, C3c-2) ================= */
+const VAL = (y) => '<path class="bl-f" d="M7 ' + y + 'h34v4c-2.8 2.6-5.7 2.6-8.5 0-2.8 2.6-5.7 2.6-8.5 0-2.8 2.6-5.7 2.6-8.5 0-2.8 2.6-5.7 2.6-8.5 0z"/>';
+const HOODS = '<path class="bl-i" d="M11 19c-3 0-5 4-5 8 0 3-1 5-2 7v8h9M37 19c3 0 5 4 5 8 0 3 1 5 2 7v8h-9"/><path class="bl-d" d="M24 9c-6 0-9 6-9 11 0 4-2 8-3 10v12h24V30c-1-2-3-6-3-10 0-5-3-11-9-11z"/><path class="bl-i" d="M24 9c-6 0-9 6-9 11 0 4-2 8-3 10v12h24V30c-1-2-3-6-3-10 0-5-3-11-9-11z"/><ellipse class="bl-h" cx="24" cy="21" rx="3.5" ry="4.5"/><circle class="bl-af" cx="22.6" cy="21" r=".9"/><circle class="bl-af" cx="25.4" cy="21" r=".9"/>';
+const INNER = {
+  Flesh: '<path class="bl-af" d="M24 40C15 34 10 28 10 21a7 7 0 0 1 14-3 7 7 0 0 1 14 3c0 7-5 13-14 19z"/><path class="bl-i" d="M24 40C15 34 10 28 10 21a7 7 0 0 1 14-3 7 7 0 0 1 14 3c0 7-5 13-14 19z"/><path class="bl-i" stroke-width="1.5" d="M5 23c6-4 13 4 19 0s13-4 19 0M5 29c6 4 13-4 19 0s13 4 19 0M11 21l-1-3M19 24l1 3M29 22l-1-3M37 24l1 3M13 30l-1 3M21 28l1-3M31 30l-1 3M38 29l1-3"/><path class="bl-i" d="M24 4v9M20.5 7.5h7"/>',
+  Domain: '<path class="bl-f" opacity=".25" d="M10 15.5L24 8.4l14 7.1z"/><path class="bl-i" d="M7 16L24 7l17 9zM7 18h34M7 37h34M5 41h38"/><path class="bl-i" stroke-width="3" d="M12 20v15M20 20v15M28 20v15M36 20v15"/><path class="bl-af" d="M22.5 26h3v9h-3z"/>',
+  Scene: '<path class="bl-i" d="M6 44V13l18-6 18 6v31"/>' + VAL(13) + '<path class="bl-af" d="M7 17c1 8 2 17 0 27h5c-1-8 0-14 4-18-3-3-6-6-9-9zM41 17c-1 8-2 17 0 27h-5c1-8 0-14-4-18 3-3 6-6 9-9z"/><path class="bl-f" opacity=".14" d="M24 17l-6 27h12z"/><path class="bl-i" stroke-width="3.4" d="M23 44c-3-5 5-8 3-13s-6-4-4.5-8.5c1.2-3 5-2.6 4.5.5"/><circle class="bl-h" cx="25.6" cy="36.5" r=".9"/><circle class="bl-h" cx="24.3" cy="29.5" r=".9"/><circle class="bl-h" cx="22.4" cy="23.5" r=".8"/><path class="bl-i" d="M3 44.5h42"/>',
+  Coven: '<path class="bl-f" d="M27 1a4.5 4.5 0 1 0 0 8 4.2 4.2 0 0 1 0-8z"/><g transform="translate(11.5 21.5) scale(0.72)"><path class="bl-h" d="M0 0c-4 0-6 4-6 8 0 3-1 5-2 7v15h16V15c-1-2-2-4-2-7 0-4-2-8-6-8z"/><path class="bl-i" opacity=".5" d="M0 0c-4 0-6 4-6 8 0 3-1 5-2 7v15h16V15c-1-2-2-4-2-7 0-4-2-8-6-8z"/><ellipse class="bl-h" cx="0" cy="8.5" rx="2.3" ry="3"/><circle class="bl-af" cx="-.9" cy="8.5" r=".55" opacity="0.55"/><circle class="bl-af" cx=".9" cy="8.5" r=".55" opacity="0.55"/></g><g transform="translate(36.5 21.5) scale(0.72)"><path class="bl-h" d="M0 0c-4 0-6 4-6 8 0 3-1 5-2 7v15h16V15c-1-2-2-4-2-7 0-4-2-8-6-8z"/><path class="bl-i" opacity=".5" d="M0 0c-4 0-6 4-6 8 0 3-1 5-2 7v15h16V15c-1-2-2-4-2-7 0-4-2-8-6-8z"/><ellipse class="bl-h" cx="0" cy="8.5" rx="2.3" ry="3"/><circle class="bl-af" cx="-.9" cy="8.5" r=".55" opacity="0.55"/><circle class="bl-af" cx=".9" cy="8.5" r=".55" opacity="0.55"/></g><g transform="translate(24 12) scale(1.05)"><path class="bl-h" d="M0 0c-4 0-6 4-6 8 0 3-1 5-2 7v15h16V15c-1-2-2-4-2-7 0-4-2-8-6-8z"/><path class="bl-i" d="M0 0c-4 0-6 4-6 8 0 3-1 5-2 7v15h16V15c-1-2-2-4-2-7 0-4-2-8-6-8z"/><ellipse class="bl-h" cx="0" cy="8.5" rx="2.3" ry="3"/><circle class="bl-af" cx="-.9" cy="8.5" r=".55"/><circle class="bl-af" cx=".9" cy="8.5" r=".55"/></g><path class="bl-i" d="M3 44.5h42"/>' };
+const NAMES = ['Flesh', 'Domain', 'Scene', 'Coven'];
+const CODES = { Flesh: 'F3', Domain: 'D3', Scene: 'S3c', Coven: 'C3c-2' };
+const svgOf = (n) => '<svg class="bl-ico" viewBox="0 0 48 48" aria-hidden="true" focusable="false">' + INNER[n] + '</svg>';
+const ICONS = {}; NAMES.forEach((n) => { ICONS[n] = svgOf(n); });
+const sigilHtml = (n) => '<div class="bl-slot"><button type="button" class="bl-sg" data-sig="' + n + '" aria-label="' + n + ' (' + CODES[n] + ')"><span class="bl-disc"><span class="bl-clip"><span class="bl-soakL"></span></span>' + ICONS[n] + '<span class="bl-fx"></span></span><span class="bl-lab">' + n + '</span></button></div>';
+
+/* ================= blood renderer ================= */
+let SPR = null;   // soft round blob sprite, made on first use
+function sprite() { if (SPR) return SPR; const c = document.createElement('canvas'); c.width = c.height = 64; const x = c.getContext('2d'), im = x.createImageData(64, 64);
+  for (let j = 0; j < 64; j++) for (let i = 0; i < 64; i++) { const dx = (i + .5 - 32) / 32, dy = (j + .5 - 32) / 32, q = dx * dx + dy * dy, v = q < 1 ? (1 - q) * (1 - q) * .62 : 0, o = (j * 64 + i) * 4;
+    im.data[o] = im.data[o + 1] = im.data[o + 2] = 255; im.data[o + 3] = Math.round(v * 255); }
+  x.putImageData(im, 0, 0); SPR = c; return c; }
+const LN = (() => { const v = [-.5, -.62, .6], l = Math.hypot(...v); return v.map((a) => a / l); })();
+const HV = (() => { const v = [LN[0], LN[1], LN[2] + 1], l = Math.hypot(...v); return v.map((a) => a / l); })();
+const TH = .32;
+function shade(a, o, W, H, FS) {
+  o.fill(0); const K = 7 * FS, so = Math.max(2, Math.round(2 * FS)), sy2 = Math.max(3, Math.round(3 * FS)), W4 = W * 4;
+  for (let y = 3; y < H - 3; y++) for (let x = 3; x < W - 3; x++) {
+    const q = (y * W + x) * 4, v = a[q + 3] / 255;
+    if (v < TH - .045) { const vs = a[q - sy2 * W4 - so * 4 + 3] / 255; if (vs > TH - .16) o[q + 3] = Math.min(1, (vs - (TH - .16)) / .16) * 150; continue; }
+    const m = Math.min(1, (v - (TH - .045)) / .06);
+    const gx = (a[q + 7] - a[q - 1]) / 255, gy = (a[q + W4 + 3] - a[q - W4 + 3]) / 255;
+    let nx = -gx * K, ny = -gy * K, nz = 1; const nl = 1 / Math.sqrt(nx * nx + ny * ny + 1); nx *= nl; ny *= nl; nz *= nl;
+    const dif = Math.max(0, nx * LN[0] + ny * LN[1] + nz * LN[2]), sp = Math.pow(Math.max(0, nx * HV[0] + ny * HV[1] + nz * HV[2]), 40) * 1.2;
+    const th = Math.sqrt(cl((v - TH) / .3)), rim = 1 - cl((v - TH) / .06);
+    let r = lerp(205, 120, th), g = lerp(24, 6, th), b = lerp(34, 14, th);
+    r = lerp(r, 58, rim * .8); g = lerp(g, 3, rim * .8); b = lerp(b, 7, rim * .8);
+    const sh = .45 + .75 * dif; r = r * sh + sp * 255; g = g * sh + sp * 225; b = b * sh + sp * 225;
+    o[q] = r; o[q + 1] = g; o[q + 2] = b; o[q + 3] = m * 255;
+  }
+}
+function mkPath(f, n) { n = n || 90; const pts = []; let L = 0;
+  for (let i = 0; i <= n; i++) { const p = f(i / n); if (i) L += Math.hypot(p[0] - pts[i - 1][0], p[1] - pts[i - 1][1]); pts.push([p[0], p[1], L]); }
+  return { L, at(s) { s = Math.max(0, Math.min(L, s)); let lo = 0, hi = n; while (hi - lo > 1) { const m = (lo + hi) >> 1; if (pts[m][2] < s) lo = m; else hi = m; }
+    const A = pts[lo], B = pts[hi], d = B[2] - A[2] || 1, t = (s - A[2]) / d; return [A[0] + (B[0] - A[0]) * t, A[1] + (B[1] - A[1]) * t]; },
+    atU(u) { return this.at(u * L); } }; }
+
+/* the four spurts in flight; each lands on its sigil at HITS[i] */
+const HITS = [.23, .39, .55, .71];
+function spurtKit(g, R, endAt, vol) { vol = vol || 1;
+  const S = g.S, W0 = (i) => .02 + i * .16;
+  const A = g.T.map((T) => { const e = endAt(T), c = [lerp(S[0], e[0], .55), S[1] + (e[1] - S[1]) * .05 - 8];
+    const f = (u) => { const v = 1 - u; return [v * v * S[0] + 2 * v * u * c[0] + u * u * e[0], v * v * S[1] + 2 * v * u * c[1] + u * u * e[1]]; };
+    return { P: mkPath(f), drops: Array.from({ length: vol > 1 ? 12 : 8 }, () => [R(), R()]), spat: Array.from({ length: 8 }, () => [R(), R(), R()]) }; });
+  return { A, hk: (i) => W0(i) + .21,
+    fly(a, k) { a.blob(S[0], S[1] + 2, 3.4 * eo(seg(k, 0, .05)));
+      A.forEach((s, i) => { const w0 = W0(i), l = seg(k, w0, w0 + .26), pulse = l > 0 && l < .2 ? Math.sin(l / .2 * Math.PI) : 0; if (pulse) a.blob(S[0], S[1] + 3, (3 + 4 * pulse) * vol);
+        const h = Math.min(1, l * 1.25);
+        if (h > 0 && h < 1) for (let u = Math.max(0, h - .28); u <= h; u += .012) { const z = (u - (h - .28)) / .28, r = z > .7 ? lerp(2.4, 3.8, (z - .7) / .3) : (.9 + 1.5 * z) * (Math.sin(u * 110) > -.1 ? 1 : .35); a.blob(...s.P.atU(u), r * vol); }
+        const T = g.T[i]; s.drops.forEach(([u, r]) => { if (u * .9 >= h) return; const p = s.P.atU(u * .9); if (Math.hypot(p[0] - T.x, p[1] - T.y) < T.r * 1.1) return; a.blob(...p, (1.3 + r * 1.5) * (vol > 1 ? vol * 1.08 : 1)); }); }); } };
+}
+/* BL8b Soaked in: each spurt bursts on its sigil and sinks into it; a bead seeps out underneath */
+const SCENE = { dur: 1000,
+  setup(g, R) { const K = spurtKit(g, R, (T) => [T.x, T.y - T.r * .15], 1.35);
+    return (a, k) => { K.fly(a, k);
+      g.T.forEach((T, i) => { const q = seg(k, K.hk(i), K.hk(i) + .27); if (q <= 0) return; const r = T.r, P = [T.x, T.y - r * .15], qq = eo(Math.min(1, q * 4)), ab = eo(seg(q, .25, .9)), keep = 1 - ab, sp = K.A[i].spat;
+        a.blob(...P, r * .4 * qq * keep); for (let j = 0; j < 5; j++) { const an = j / 5 * 6.283 + sp[j][0]; a.blob(P[0] + Math.cos(an) * r * .3 * qq, P[1] + Math.sin(an) * r * .28 * qq, r * .17 * qq * keep); }
+        sp.slice(0, 4).forEach(([u, v, w]) => { const an = -Math.PI * 1.05 + u * Math.PI * 1.1, d = r * (1.16 + .28 * v); a.blob(T.x + Math.cos(an) * d, T.y + Math.sin(an) * d, (.8 + 1 * w) * qq); });
+        if (ab > .2) { const s2 = seg(ab, .2, 1); a.blob(T.x + r * .18, T.y + r * .97, 1.6 + 1.2 * s2); a.blob(T.x + r * .18, T.y + r + 1.5 + 3 * s2, 1.6 * s2 + .4); } }); }; } };
+
+class Blood {
+  constructor(cv) { this.cv = cv; this.ox = cv.getContext('2d'); this.f = document.createElement('canvas'); this.fx = this.f.getContext('2d', { willReadFrequently: true }); this.dr = 0; this.k = 0; this.raf = 0;
+    const self = this;
+    this.api = { t: 0, alpha(v) { self.fx.globalAlpha = v; },
+      blob(x, y, r) { if (!(r > .25)) return; if (self.dr) { r *= 1 - .5 * self.dr; y += self.dr * self.dr * 24; } const R = r / .531 * self.FS; self.fx.drawImage(sprite(), x * self.FS - R, y * self.FS - R, 2 * R, 2 * R); } };
+  }
+  size(w, h) { if (w < 20 || h < 20) return false; let FS = (window.devicePixelRatio || 1) > 1.4 ? 1.5 : 1;
+    if (w * h * FS * FS > 1.1e6) FS = 1;   // big screens: keep the per-frame shading cheap
+    this.FS = FS; const W = Math.ceil(w * FS), H = Math.ceil(h * FS);
+    if (this.cv.width !== W || this.cv.height !== H) { this.cv.width = this.f.width = W; this.cv.height = this.f.height = H; this.img = this.ox.createImageData(W, H); }
+    this.W = W; this.H = H; return true; }
+  // (re)build the scene for geometry g with this open's seed; the same seed gives the same splashes after a scroll or resize
+  build(g) { const R = rng(this.seed); this.draw = SCENE.setup(g, R); }
+  frame(k, t) { if (!this.draw || !this.W) return; const fx = this.fx; fx.globalCompositeOperation = 'source-over'; fx.globalAlpha = 1; fx.clearRect(0, 0, this.W, this.H); fx.globalCompositeOperation = 'lighter';
+    this.api.t = t; this.draw(this.api, k); const src = fx.getImageData(0, 0, this.W, this.H).data; shade(src, this.img.data, this.W, this.H, this.FS); this.ox.putImageData(this.img, 0, 0); }
+  redraw() { this.frame(this.k, 1.5); }
+  play(g, o) { cancelAnimationFrame(this.raf); this.cv.style.opacity = '1'; this.dr = 0; this.seed = (Math.random() * 1e9) | 0; this.build(g);
+    const fired = {}, D = SCENE.dur, t0 = performance.now();
+    if (o.still) { this.k = 1; this.frame(1, 1.5); HITS.forEach((_, i) => o.onHit(i, true)); return; }
+    const f = (now) => { const t = now - t0, k = Math.min(1, t / D); this.k = k; this.frame(k, t / 1000); HITS.forEach((hk, i) => { if (k >= hk && !fired[i]) { fired[i] = 1; o.onHit(i, false); } });
+      this.raf = k < 1 ? requestAnimationFrame(f) : 0; };
+    this.raf = requestAnimationFrame(f); }
+  drain(still, done) { cancelAnimationFrame(this.raf); this.k = 1; if (still || !this.draw) { this.clear(); done(); return; }
+    const t0 = performance.now(), D = 420;
+    const f = (now) => { const q = Math.min(1, (now - t0) / D); this.dr = q; this.frame(1, 1.5 + (now - t0) / 1000); this.cv.style.opacity = String(1 - q * q);
+      if (q < 1) this.raf = requestAnimationFrame(f); else { this.clear(); done(); } };
+    this.raf = requestAnimationFrame(f); }
+  clear() { cancelAnimationFrame(this.raf); this.raf = 0; this.ox.clearRect(0, 0, this.cv.width, this.cv.height); this.draw = null; this.dr = 0; this.cv.style.opacity = '1'; }
+}
+
+/* ================= one open session ================= */
+let cur = null;   // { host, card, onPick, layer, row, blood, state: 'open' | 'closing', ... }
+
+function hitFx(btn, still) { if (!btn) return; const d = btn.querySelector('.bl-disc');
+  if (!still) { d.classList.remove('bl-thd'); void d.offsetWidth; d.classList.add('bl-thd'); setTimeout(() => d.classList.remove('bl-thd'), 420); }
+  if (still) d.classList.add('bl-soaked', 'bl-now'); else setTimeout(() => { if (d.isConnected) d.classList.add('bl-soaked'); }, 90); }
+function glow(btn, still) { const d = btn.querySelector('.bl-disc'), fx = d.querySelector('.bl-fx');
+  btn.classList.add('bl-pick'); d.classList.remove('bl-g5', 'bl-grm', 'bl-thd'); void d.offsetWidth;
+  if (still) { d.classList.add('bl-grm'); return; }
+  fx.innerHTML = '<i class="bl-rip"></i><i class="bl-rip" style="animation-delay:.12s"></i><i class="bl-rip" style="animation-delay:.24s"></i>'; d.classList.add('bl-g5'); }
+
+// lay the overlay over the visible part of host (it scrolls with host's content, so follow scrollTop)
+function place(s) { const h = s.host, L = s.layer; L.style.left = h.scrollLeft + 'px'; L.style.top = h.scrollTop + 'px'; L.style.width = h.clientWidth + 'px'; L.style.height = h.clientHeight + 'px'; }
+function geom(s) { const h = s.host, hr = h.getBoundingClientRect(), ox = hr.left + h.clientLeft, oy = hr.top + h.clientTop;
+  const C = s.card.getBoundingClientRect(), cx = C.left - ox, cy = C.top - oy;
+  return { S: [cx + C.width / 2, cy + C.height - 1],
+    T: [...s.row.querySelectorAll('.bl-slot')].map((sl) => { const r = sl.getBoundingClientRect(), D = sl.querySelector('.bl-disc').offsetWidth; return { x: r.left - ox + r.width / 2, y: r.top - oy + D / 2, r: D / 2 }; }) }; }
+// after a scroll or resize: move the overlay, rebuild the paths for the new positions, keep the animation going
+function relayout(s) { if (cur !== s) return; place(s); if (!s.blood.size(s.host.clientWidth, s.host.clientHeight)) return;
+  if (!s.blood.draw) return; s.blood.build(geom(s)); if (!s.blood.raf) s.blood.redraw(); }
+function schedule(s) { if (s.pend) return; s.pend = requestAnimationFrame(() => { s.pend = 0; relayout(s); }); }
+
+function teardown(s, result) { if (s.done) return; s.done = true; clearTimeout(s.tSink); clearTimeout(s.tGo); cancelAnimationFrame(s.pend); s.blood.clear();
+  s.host.removeEventListener('scroll', s.onScroll); s.host.removeEventListener('click', s.onHost); if (s.ro) s.ro.disconnect(); window.removeEventListener('resize', s.onScroll);
+  if (s.layer.parentNode) s.layer.parentNode.removeChild(s.layer); if (cur === s) cur = null;
+  try { if (typeof s.onPick === 'function') s.onPick(result); } catch (e) { setTimeout(() => { throw e; }); } }
+// sink away, then call onPick(result)
+function finish(s, result, delay) { if (s.state !== 'open') return; s.state = 'closing'; const still = RM();
+  s.tGo = setTimeout(() => {
+    s.row.classList.add('bl-sink'); let n = 2; const one = () => { if (--n === 0) teardown(s, result); };
+    s.blood.drain(still, one); s.tSink = setTimeout(one, 340); }, delay); }
+
+function open(host, card, onPick) {
+  if (!host || !card) { if (typeof onPick === 'function') onPick(null); return; }
+  injectCss(); if (cur) teardown(cur, null);
+  if (getComputedStyle(host).position === 'static') host.style.position = 'relative';
+  const still = RM(), layer = document.createElement('div'); layer.className = 'bl-layer';
+  layer.innerHTML = '<canvas class="bl-cv" aria-hidden="true"></canvas><div class="bl-row bl-off" role="group" aria-label="Pick a sigil">' + NAMES.map(sigilHtml).join('') + '</div>';
+  const s = cur = { host, card, onPick, layer, row: layer.querySelector('.bl-row'), blood: new Blood(layer.querySelector('canvas')), state: 'open', done: false, pend: 0 };
+  host.appendChild(layer); place(s);
+  s.row.addEventListener('click', (e) => { const b = e.target.closest('.bl-sg'); if (!b) return; e.stopPropagation(); if (s.state !== 'open') return;
+    glow(b, RM()); finish(s, b.dataset.sig, 420); });
+  s.onHost = (e) => { if (s.layer.contains(e.target)) return; close(); };
+  s.onScroll = () => schedule(s);
+  host.addEventListener('scroll', s.onScroll, { passive: true });
+  window.addEventListener('resize', s.onScroll);
+  if (window.ResizeObserver) { s.ro = new ResizeObserver(() => schedule(s)); s.ro.observe(host); }
+  // the tap that opened us may still be bubbling up to host: listen for "tap elsewhere" from the next event on
+  setTimeout(() => { if (cur === s && s.state === 'open') host.addEventListener('click', s.onHost); }, 0);
+  const slots = s.row.querySelectorAll('.bl-sg');
+  if (s.blood.size(host.clientWidth, host.clientHeight)) s.blood.play(geom(s), { still, onHit: (i, st) => hitFx(slots[i], st) });
+  // BL8b: the sigils rise at once while the first spurt is in the air
+  if (still) s.row.classList.remove('bl-off'); else { void s.row.offsetWidth; requestAnimationFrame(() => { if (cur === s) s.row.classList.remove('bl-off'); }); }
+}
+function close() { if (cur && cur.state === 'open') finish(cur, null, 0); }
+
+window.BLOOD = { open, close, icons: ICONS };
+})();
+</script><script>/* Stained glass (Patryk's final picks, 2026-10-28, from the "Absolution Glass" mock-up, round eight):
+   G1 blessing glass with his tweaks (G1r): SC2 medium stars, each a five-point star of five honey diamond pieces, the glass
+   round every star cut to fit it (two rings of pieces whose joins radiate from its points and notches), a gently curving
+   path of shaped pieces from star to star, the BRIGHTER pale-blue path and the brighter ring of pieces round each star,
+   a honey border band, hairline lead, and light that moves left to right (background a little, path more, stars most).
+   X2 Absolution card: the curse wrapped in a dark red shell; Absolution I lights the half of the glass nearest the curse
+   (calm small steps from the bottom corner) while faint hairlines creep over the shell; Absolution II lights only from where
+   I stopped (the middle) to the far end, the hairlines split into bright cracks, then A1b "Absolved" (the light dims behind
+   the word) and the shell falls away. A honey line of light runs along the lead where lit glass meets dark glass, so you can
+   see how far the light has reached. Stars ignite with a small four-point spark and thin rays, then twinkle. H3: sparks
+   rise from the glass and land on the health bar, one sliver of health each.
+   D1 day in glass (the Vespers night line, NG1): one tall window, morning at the top, evening at the bottom; blessings are
+   honey stars right of a fixed middle line, curses are blood moons left of it, and the path weaves between them in time
+   order (right for a blessing, left for a curse); the light fills down the glass with a bright front and the same honey edge.
+
+   API (one global, window.GLASS):
+   GLASS.tile(opts) -> HTML for a blessing tile's glass background (position:absolute, inset 0, z-index 1: put it first inside
+     the tile button, which needs position:relative and overflow:hidden; class gl-tilebox on the button adds the G1 tile edge).
+     opts { key (seed and handle), w, h (optional glass size in px; measured from the tile when left out), lit 0-1,
+            anim (true: sweep the light in the first time this key is painted) }
+   GLASS.absolution(opts) -> HTML for the whole Absolution card (curse half + glass antidote half).
+     opts { key (handle; default from the two names), curse { name, key (omen picture), img (URL override), hp, attrs },
+            blessing { name, key, img, pay (runes), attrs }, stage 0|1|2 (steps done), hpBack (total health lost: shown as
+            two halves like game-ui, floor half first; or [first, second]) }
+     attrs are raw attribute strings for the two <button>s (data-a etc.), like STONE's tickAttrs.
+   GLASS.light(key, stage, o) animates whatever holds that key:
+     card: to stage 1 or 2 (0 -> 2 plays both). o { to (element or selector: H3 sparks fly to it), from, upto (0-1 along it,
+       where the bar is now and where it ends), onSpark(k, n), onDone(el) }. After stage 2 the card plays Absolved and then
+       fires a bubbling 'gl-absolved' event (detail.key); the caller then re-renders the two normal tiles.
+     tile: to lit level `stage` (0-1, default 1), sweeping left to right; the same level again replays the sweep.
+     day: replays the day filling down the glass (stage ignored).
+   GLASS.day(events, opts) -> HTML for one day window (aspect 200:320, width 100%, max 340px).
+     events [{ t:'HH:MM', side:'c'|'b', name }]; opts { key, play (default true: fill once, the first time the key is shown),
+     hours (default true: 08:00 to 20:00 marks), cracked (default true: the pieces where the path crosses the middle line
+     are cracked; false = whole pieces, the NG1 test) }.
+   GLASS.paint(root) paints every holder inside root (call after inserting the HTML; cheap to repeat).
+   GLASS.sparks(fromEl, toEl, o) the H3 sparks on their own: o { n, from, upto, onSpark }.
+
+   Each window is cut once per key and size (seeded by the key), drawn into cached canvases (colour, shade and lead
+   layers), and only the light animates; when nothing moves nothing repaints. prefers-reduced-motion: final states at once.
+   All CSS classes start with gl-. No em dashes in any visible text. */
+(function () {
+'use strict';
+if (typeof window === 'undefined' || window.GLASS) return;
+
+const RM = () => !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+const DPRf = () => Math.min(2, window.devicePixelRatio || 1);
+const esc = (s) => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
+const lerp = (a, b, t) => a + (b - a) * t;
+const PI = Math.PI, hyp = Math.hypot;
+const sstep = (t) => t * t * (3 - 2 * t);
+const eOut = (t) => 1 - Math.pow(1 - t, 3);
+// keyframes [[offset, value], ...] at t 0-1, smooth inside each step (close to the mock-up's CSS keyframes)
+const kf = (t, f) => { if (t <= f[0][0]) return f[0][1]; for (let i = 1; i < f.length; i++) if (t <= f[i][0]) return lerp(f[i - 1][1], f[i][1], sstep((t - f[i - 1][0]) / (f[i][0] - f[i - 1][0]))); return f[f.length - 1][1]; };
+function hashStr(s) { s = String(s); let h = 2166136261 >>> 0; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return (h >>> 0) % 100000 + 1; }
+function rng(seed) { let s = (seed * 2654435761) >>> 0 || 12345; return () => { s ^= s << 13; s >>>= 0; s ^= s >>> 17; s ^= s << 5; s >>>= 0; return s / 4294967296; }; }
+
+/* ---------- geometry (the mock-up's leaded glass engine, cut down to the picked designs) ---------- */
+function clip(poly, f) { const out = []; for (let k = 0; k < poly.length; k++) { const a = poly[k], b = poly[(k + 1) % poly.length], fa = f(a[0], a[1]), fb = f(b[0], b[1]);
+  if (fa <= 0) out.push(a); if ((fa < 0 && fb > 0) || (fa > 0 && fb < 0)) { const t = fa / (fa - fb); out.push([a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t]); } } return out; }
+function inside(poly, x, y) { let c = false; for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) { const xi = poly[i][0], yi = poly[i][1], xj = poly[j][0], yj = poly[j][1];
+  if (((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi)) c = !c; } return c; }
+const cen = (p) => [p.reduce((a, q) => a + q[0], 0) / p.length, p.reduce((a, q) => a + q[1], 0) / p.length];
+const area = (p) => Math.abs(p.reduce((a, q, k) => { const n = p[(k + 1) % p.length]; return a + q[0] * n[1] - n[0] * q[1]; }, 0)) / 2;
+const rectPoly = (x0, y0, x1, y1) => [[x0, y0], [x1, y0], [x1, y1], [x0, y1]];
+function vorSites(sites, r, lim) { return sites.map((p, i) => { let poly = rectPoly(r[0], r[1], r[2], r[3]); sites.forEach((q, j) => { if (i === j || Math.abs(q[0] - p[0]) > lim || Math.abs(q[1] - p[1]) > lim) return;
+  const mx = (p[0] + q[0]) / 2, my = (p[1] + q[1]) / 2, nx = q[0] - p[0], ny = q[1] - p[1]; poly = clip(poly, (x, y) => (x - mx) * nx + (y - my) * ny); }); return poly; }); }
+function border(R, W, H, b, seg) { const out = [], run = (x0, y0, x1, y1, horiz) => { const L = horiz ? x1 - x0 : y1 - y0; let t = 0;
+  while (t < L - .5) { let e = Math.min(L, t + seg * (.75 + R() * .5)); if (L - e < seg * .4) e = L; out.push(horiz ? rectPoly(x0 + t, y0, x0 + e, y1) : rectPoly(x0, y0 + t, x1, y0 + e)); t = e; } };
+  run(0, 0, W, b, true); run(0, H - b, W, H, true); run(0, b, b, H - b, false); run(W - b, b, W, H - b, false); return out; }
+function pickStars(R, zones, gap) { const pts = [];
+  zones.forEach(([x0, y0, x1, y1, n]) => { for (let t = 0, got = 0; t < 80 && got < n; t++) { const p = [x0 + R() * (x1 - x0), y0 + R() * (y1 - y0)]; if (pts.every((q) => hyp(q[0] - p[0], q[1] - p[1]) > gap)) { pts.push(p); got++; } } });
+  if (!pts.length) return pts; const ch = [pts.shift()];
+  while (pts.length) { const l = ch[ch.length - 1]; let bi = 0, bd = 1e9; pts.forEach((s, k) => { const d = hyp(s[0] - l[0], s[1] - l[1]); if (d < bd) { bd = d; bi = k; } }); ch.push(pts.splice(bi, 1)[0]); }
+  return ch; }
+const sN = (x, y, ro, n, k, rot) => Array.from({ length: n * 2 }, (_, i) => { const a = rot + i * PI / n - PI / 2, rr = i % 2 ? ro * k : ro; return [x + Math.cos(a) * rr, y + Math.sin(a) * rr]; });
+// a five-point star of 5 rhombus pieces meeting at the centre
+const rhombi = (x, y, R0, rot) => { const d = R0 / 1.618; return [0, 1, 2, 3, 4].map((k) => { const a = rot - PI / 2 + k * 2 * PI / 5, h = PI / 5;
+  return [[x, y], [x + Math.cos(a - h) * d, y + Math.sin(a - h) * d], [x + Math.cos(a) * R0, y + Math.sin(a) * R0], [x + Math.cos(a + h) * d, y + Math.sin(a + h) * d]]; }); };
+// a crescent moon: four crescent pieces and one dark piece for the shadowed part
+function moonPieces(x, y, r, phi) { const d = .5 * r, ri = .7 * r, rho = (t) => { const a = t - phi; return d * Math.cos(a) + Math.sqrt(ri * ri - d * d * Math.sin(a) * Math.sin(a)); };
+  let al = 0; for (let k = 0; k <= 200; k++) { const a = k / 200 * PI; if (rho(phi + PI + a) < r - .01) al = a; }
+  const out = [], N = 4; for (let i = 0; i < N; i++) { const ta = phi + PI - al + 2 * al * i / N, tb = phi + PI - al + 2 * al * (i + 1) / N, q = [];
+    for (let k = 0; k <= 5; k++) { const t = ta + (tb - ta) * k / 5; q.push([x + Math.cos(t) * r, y + Math.sin(t) * r]); }
+    for (let k = 5; k >= 0; k--) { const t = ta + (tb - ta) * k / 5, rr = Math.min(r, rho(t)); q.push([x + Math.cos(t) * rr, y + Math.sin(t) * rr]); } out.push(q); }
+  out.push(Array.from({ length: 36 }, (_, k) => { const t = k / 36 * 2 * PI, rr = Math.min(r, rho(t)); return [x + Math.cos(t) * rr, y + Math.sin(t) * rr]; }));
+  return out; }
+
+// the antique palette (hue, saturation, lightness): only the families the picked designs use
+const PAL = {
+  bg: [[220, 60, 30], [228, 52, 26], [214, 64, 33], [242, 42, 28], [205, 55, 30], [256, 38, 30]],
+  border: [[36, 48, 46], [32, 44, 40], [40, 50, 52], [28, 42, 44]],
+  paleB: [[214, 54, 58], [220, 50, 62], [208, 56, 56], [224, 46, 60]], midB: [[216, 50, 50], [222, 46, 52], [210, 52, 48]],
+  haloB: [[218, 52, 37], [210, 56, 39], [226, 46, 37]], halo: [[222, 50, 35], [214, 54, 36], [230, 44, 35]],
+  star: [[42, 60, 72], [38, 56, 66], [46, 58, 76], [40, 52, 70], [36, 58, 68]],
+  cbg: [[345, 45, 20], [330, 36, 22], [352, 50, 18], [318, 30, 20]], redp: [[352, 62, 44], [2, 58, 42], [346, 56, 46]],
+  blood: [[356, 82, 56], [350, 76, 52], [4, 80, 55], [348, 72, 49]], chaloD: [[340, 40, 12], [350, 44, 14], [332, 36, 13]], shadow: [[232, 40, 11], [242, 30, 9]] };
+const hsl = (h, s, l) => 'hsl(' + h.toFixed(0) + ',' + clamp(s, 10, 95).toFixed(0) + '%,' + clamp(l, 4, 90).toFixed(0) + '%)';
+// one sheet of streaky glass: a linear gradient across the piece's box, six stops
+function gradSpec(R, c) { const a = R() * PI, x = Math.cos(a) * .5, y = Math.sin(a) * .5, h = c[0] + (R() - .5) * 10, s = c[1] + (R() - .5) * 12, l = c[2] + (R() - .5) * 6;
+  const st = [[0, 6], [.16 + R() * .1, -5], [.36 + R() * .1, 9], [.55 + R() * .08, -6], [.74 + R() * .1, 5], [1, -3]];
+  return { x1: .5 - x, y1: .5 - y, x2: .5 + x, y2: .5 + y, st: st.map(([o, d]) => [o, hsl(h + (R() - .5) * 8, s + (R() - .5) * 8, l + d)]) }; }
+
+function cut(o) {
+  const W = o.w, H = o.h, R = rng(o.seed || 1), b = o.border || 0, inner = [b, b, W - b, H - b], pcs = [], F = o.fit;
+  if (b) border(R, W, H, b, o.bseg || 12).forEach((p) => pcs.push({ p, fam: 'border' }));
+  let stars = o.events ? o.events.map((e) => [e.x, e.y]) : pickStars(R, o.zones || [], o.starGap || 24);
+  const sizes = o.sizes(stars.length, R);
+  stars = stars.map((s, k) => { const m = b + sizes[k] + 1.5; return [clamp(s[0], m, W - m), clamp(s[1], m, H - m)]; });
+  const s0 = o.s || 10, cols = Math.max(1, Math.round((inner[2] - inner[0]) / s0)), rows = Math.max(1, Math.round((inner[3] - inner[1]) / s0)), sx = (inner[2] - inner[0]) / cols, sy = (inner[3] - inner[1]) / rows;
+  const srot = stars.map(() => (R() - .5) * .3), motif = (k) => (o.motif ? o.motif(k) : 'star');
+  // G1: rings of pieces round every star, so their joins radiate from its points and notches; each touching piece is trimmed
+  // along the star's edge; the path is a curved run of fuller shaped pieces flowing into the ring pieces facing the next star
+  const outR = (k) => F.rings[F.rings.length - 1].r * sizes[k], sites = [], nC = o.nChain || stars.length;
+  const nb = stars.map((s, k) => (k >= nC ? [] : [stars[k - 1], k + 1 < nC ? stars[k + 1] : null]).filter(Boolean).map((q) => Math.atan2(q[1] - s[1], q[0] - s[0])));
+  stars.forEach((s, k) => { const R0 = sizes[k], a0 = srot[k] - PI / 2;
+    F.rings.forEach((rg, ri) => { const n = rg.n, off = rg.off != null ? rg.off : PI / n, ring = [];
+      for (let i = 0; i < n; i++) { const a = a0 + off + (rg.tw || 0) + i * 2 * PI / n, rr = rg.r * R0 * (1 + (ri ? (R() - .5) * (rg.jr || 0) : 0));
+        ring.push({ x: s[0] + Math.cos(a) * rr, y: s[1] + Math.sin(a) * rr, a, star: k, ri }); }
+      nb[k].forEach((na) => { let bi = 0, bd = 9; ring.forEach((p, i) => { const d = Math.abs(Math.atan2(Math.sin(p.a - na), Math.cos(p.a - na))); if (d < bd) { bd = d; bi = i; } }); ring[bi].pale = true; });
+      ring.forEach((p) => { if (stars.every((q, j) => j === k || hyp(q[0] - p.x, q[1] - p.y) > outR(j) * .92)) sites.push(p); }); }); });
+  const st = F.step, ps = [];
+  for (let k = 1; k < nC; k++) { const A = stars[k - 1], B = stars[k], L = hyp(B[0] - A[0], B[1] - A[1]) || 1, nx = -(B[1] - A[1]) / L, ny = (B[0] - A[0]) / L, bow = (F.bow || 0) * L * (k % 2 ? 1 : -1);
+    const C = [(A[0] + B[0]) / 2 + nx * bow, (A[1] + B[1]) / 2 + ny * bow], pts = [], len = [0];
+    for (let i = 0; i <= 60; i++) { const t = i / 60, u = 1 - t; pts.push([u * u * A[0] + 2 * u * t * C[0] + t * t * B[0], u * u * A[1] + 2 * u * t * C[1] + t * t * B[1]]); if (i) len.push(len[i - 1] + hyp(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1])); }
+    const T = len[60], at = (d) => { let i = 1; while (i < 60 && len[i] < d) i++; const f = (d - len[i - 1]) / ((len[i] - len[i - 1]) || 1); return [pts[i - 1][0] + (pts[i][0] - pts[i - 1][0]) * f, pts[i - 1][1] + (pts[i][1] - pts[i - 1][1]) * f, pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]]; };
+    const d0 = outR(k - 1) + st * .55, d1 = T - outR(k) - st * .55, n = Math.max(0, Math.round((d1 - d0) / st));
+    for (let i = 0; i <= n; i++) { if (d1 < d0 - st * .3) break; const d = n ? d0 + (d1 - d0) * i / n : (d0 + d1) / 2, q = at(d + (i && i < n ? (R() - .5) * st * .3 : 0)), tl = hyp(q[2], q[3]) || 1, j = (R() - .5) * (F.jag || 1.6);
+      ps.push({ x: q[0] - q[3] / tl * j, y: q[1] + q[2] / tl * j, path: true }); } }
+  const grid = []; for (let j = 0; j < rows; j++) for (let i = 0; i < cols; i++) grid.push({ x: inner[0] + (i + .5 + (R() - .5) * .8) * sx, y: inner[1] + (j + .5 + (R() - .5) * .8) * sy });
+  const keep = grid.filter((g) => ps.every((q) => hyp(q.x - g.x, q.y - g.y) > (F.clr || st)) && sites.every((q) => hyp(q.x - g.x, q.y - g.y) > s0 * .62) && stars.every((s, k) => hyp(s[0] - g.x, s[1] - g.y) > outR(k) + s0 * .45));
+  const all = keep.concat(sites, ps), polys = vorSites(all.map((q) => [q.x, q.y]), inner, 3.2 * Math.max(sx, sy));
+  const edges = []; stars.forEach((s, k) => { if (motif(k) !== 'star') return; const R0 = sizes[k], d = R0 / 1.618, a0 = srot[k] - PI / 2;
+    for (let i = 0; i < 5; i++) { const a = a0 + i * 2 * PI / 5, tip = [s[0] + Math.cos(a) * R0, s[1] + Math.sin(a) * R0];
+      [-1, 1].forEach((sg) => edges.push({ a: tip, b: [s[0] + Math.cos(a + sg * PI / 5) * d, s[1] + Math.sin(a + sg * PI / 5) * d], c: s })); } });
+  polys.forEach((p, i) => { if (p.length < 3) return; let q = p;
+    edges.forEach((e) => { const m = [(e.a[0] + e.b[0]) / 2, (e.a[1] + e.b[1]) / 2]; if (q.length < 3 || !inside(q, m[0], m[1])) return;
+      const nx = e.b[1] - e.a[1], ny = e.a[0] - e.b[0], sc = Math.sign((e.c[0] - e.a[0]) * nx + (e.c[1] - e.a[1]) * ny);
+      q = clip(q, (x, y) => sc * ((x - e.a[0]) * nx + (y - e.a[1]) * ny)); });
+    if (q.length < 3 || area(q) < 1.2) return; const src = all[i], pale = src.path || src.pale, c = cen(q), kind = pale ? 'path' : src.ri != null ? 'ring' : 'bg';
+    if (o.famFx) { const r = o.famFx(kind, src, c); pcs.push({ p: q, fam: r.fam, path: kind === 'path' || !!r.lit, crack: !!r.crack }); return; }
+    pcs.push({ p: q, fam: pale ? (R() < (F.mix || 0) ? F.mfam : F.pfam) : (F.halo && src.ri === 0) ? F.hfam : (F.halo2 && src.ri === 1) ? 'halo' : 'bg', path: !!pale || (!!F.haloLit && src.ri === 0) }); });
+  const noWob = stars.map((s, k) => [s[0], s[1], sizes[k] * 1.12]);
+  pcs.forEach((pc) => { pc.c = cen(pc.p); });
+  const dz = o.dark; pcs.forEach((pc) => { pc.dark = !!dz && pc.c[0] > dz[0] && pc.c[0] < dz[2] && pc.c[1] > dz[1] && pc.c[1] < dz[3]; });
+  const sheets = {}, fill = (fam, dark) => { const key = fam + (dark ? 'D' : ''); if (!sheets[key]) sheets[key] = (PAL[fam] || PAL.bg).map((c) => gradSpec(R, [c[0], c[1], c[2] - (dark ? 10 : 0)])); const l = sheets[key]; return l[Math.floor(R() * l.length)]; };
+  const amp = .5, ph = (o.seed || 1) * 1.3, fld = (x, y) => [Math.sin(x * .37 + y * .11 + ph) * amp + Math.sin(y * .53 - x * .07 + ph * 2) * amp * .5, Math.cos(y * .33 + x * .13 + ph) * amp + Math.sin(x * .47 + ph * 3) * amp * .5];
+  const edgeOf = (x, y) => x < .01 || y < .01 || x > W - .01 || y > H - .01;
+  const wob = (poly) => { const out = []; poly.forEach((a, k) => { const c = poly[(k + 1) % poly.length], n = Math.max(1, Math.round(hyp(c[0] - a[0], c[1] - a[1]) / 5));
+    for (let t = 0; t < n; t++) { const x = a[0] + (c[0] - a[0]) * t / n, y = a[1] + (c[1] - a[1]) * t / n; if (edgeOf(x, y) || noWob.some((z) => hyp(x - z[0], y - z[1]) < z[2])) { out.push([x, y]); continue; } const d = fld(x, y); out.push([x + d[0], y + d[1]]); } }); return out; };
+  const pieces = pcs.map((pc) => { const pts = wob(pc.p), out = { pts, g: fill(pc.fam, pc.dark && !pc.path), role: pc.fam === 'border' || !pc.path ? 0 : 1, x: pc.c[0], y: pc.c[1] };
+    if (pc.crack) { const v = pc.p, cx = pc.c[0], cy = pc.c[1]; out.crack = []; for (let m = 0; m < 3; m++) { const q = v[Math.floor(R() * v.length)];
+      out.crack.push([[cx, cy], [cx + (q[0] - cx) * .45 + (R() - .5) * 1.6, cy + (q[1] - cy) * .45 + (R() - .5) * 1.6], [cx + (q[0] - cx) * .85, cy + (q[1] - cy) * .85]]); } }
+    return out; });
+  const starsOut = stars.map((s, k) => { const R0 = sizes[k], sf = o.motifFam ? o.motifFam(k) : 'star';
+    if (motif(k) === 'moon') { const mp = moonPieces(s[0], s[1], R0 * .92, srot[k] - 2.3);
+      return { x: s[0], y: s[1], R0, moon: true, parts: mp.map((q, i) => ({ pts: q, g: fill(i === mp.length - 1 ? 'shadow' : sf, false) })), outline: Array.from({ length: 28 }, (_, i) => [s[0] + Math.cos(i / 28 * 2 * PI) * R0 * .92, s[1] + Math.sin(i / 28 * 2 * PI) * R0 * .92]) }; }
+    const rh = rhombi(s[0], s[1], R0, srot[k]);
+    return { x: s[0], y: s[1], R0, parts: rh.map((q) => ({ pts: q, g: fill(sf, false) })), outline: [].concat.apply([], rh.map((q) => [q[1], q[2]])) }; });
+  const bubbles = []; for (let k = 0; k < 10; k++) bubbles.push([R() * W, R() * H, .3 + R() * .5]);
+  return { W, H, pieces, stars: starsOut, bubbles, lw: o.lw || .85, lightAt: o.lightAt || [.5, 0] };
+}
+
+/* ---------- the picked designs ---------- */
+const FIT_G1R = { rings: [{ n: 10, r: 1.5 }, { n: 10, r: 2.7, jr: .06 }], step: 7.6, clr: 7.4, bow: .12, jag: 1.6, halo: true, mix: .3, pfam: 'paleB', mfam: 'midB', hfam: 'haloB', haloLit: true, halo2: true };
+const sc = (z, W, H, w0, h0) => z.map((r) => [r[0] * W / w0, r[1] * H / h0, r[2] * W / w0, r[3] * H / h0, r[4]]);
+function cutTile(seed, W, H) { // SC2 medium stars in G1r glass, on the 170x100 tile the mock-up used, scaled to the tile
+  return cut({ w: W, h: H, seed, s: 10, border: 5.5, bseg: 12, starGap: 32, sizes: (n) => Array(n).fill(6.6), fit: FIT_G1R,
+    zones: sc([[118, 4, 166, 17, 1], [62, 60, 166, 80, 3]], W, H, 170, 100), dark: sc([[58, 18, 168, 58]], W, H, 170, 100)[0], lightAt: [.55, 0] }); }
+function cutPanel(seed, W, H) { // the Absolution glass: the same G1r cut, a little coarser, honey border band
+  return cut({ w: W, h: H, seed, s: 13, border: 5, bseg: 13, lw: .95, starGap: 38, sizes: (n) => Array(n).fill(7.5),
+    fit: { rings: FIT_G1R.rings, step: 9.6, clr: 9.4, bow: .12, jag: 2, halo: true, mix: .3, pfam: 'paleB', mfam: 'midB', hfam: 'haloB', halo2: true },
+    zones: sc([[115, 8, 185, 34, 2], [70, 90, 215, 116, 2], [60, 120, 150, 146, 1]], W, H, 224, 152), lightAt: [.3, 0] }); }
+const DW = 200, DH = 320, DB = 5;
+const hrOf = (t) => { const m = /^(\d{1,2}):(\d{2})/.exec(String(t || '')); return m ? +m[1] + +m[2] / 60 : null; };
+const yOf = (h) => DB + 16 + (clamp(h, 6.5, 22.5) - 6.5) / 16 * (DH - 2 * DB - 32);
+function dayEvents(events) {
+  const ev = (events || []).map((e) => ({ h: hrOf(e.t), kind: e.side === 'c' ? 'c' : 'b', name: e.name || '' })).filter((e) => e.h != null).sort((a, b) => a.h - b.h);
+  const out = ev.map((e, i) => ({ x: e.kind === 'b' ? DW * (.7 + ((i * 37) % 11) / 100) : DW * (.21 + ((i * 53) % 13) / 100), y: yOf(e.h), kind: e.kind, name: e.name }));
+  // two marks on the same side too close in time are nudged apart, then squeezed back into the window if they ran off the end
+  const last = { b: -99, c: -99 }; out.forEach((e) => { e.y = Math.max(e.y, last[e.kind] + 17); last[e.kind] = e.y; });
+  const top = DB + 12, bot = DH - DB - 12, mx = out.length ? out[out.length - 1].y : 0; if (mx > bot) out.forEach((e) => { e.y = top + (e.y - top) * (bot - top) / (mx - top); });
+  return out;
+}
+function cutDay(seed, ev, cracked) { // D1: a fixed middle line, blood moons left, honey stars right
+  const sz = ev.map((e) => (e.kind === 'c' ? 8.6 : 7));
+  return cut({ w: DW, h: DH, seed, s: 12, border: 5, bseg: 13, lw: .9, events: ev, nChain: ev.length, sizes: () => sz,
+    fit: { rings: [{ n: 10, r: 1.5 }, { n: 10, r: 2.6, jr: .06 }], step: 9, clr: 8.8, bow: .1, jag: 1.6 },
+    motif: (k) => (ev[k].kind === 'c' ? 'moon' : 'star'), motifFam: (k) => (ev[k].kind === 'c' ? 'blood' : 'star'),
+    famFx: (kind, src, c) => { const left = c[0] < DW / 2;
+      if (kind === 'path') return { fam: left ? 'redp' : 'paleB', crack: cracked && Math.abs(c[0] - DW / 2) < 7 && !!src.path };
+      if (kind === 'ring') return { fam: src.ri === 0 ? (left ? 'chaloD' : 'haloB') : (left ? 'cbg' : 'bg'), lit: src.ri === 0 };
+      return { fam: left ? 'cbg' : 'bg' }; }, lightAt: [.5, 0] }); }
+
+/* ---------- canvas layers ---------- */
+const LC = '#0a0b10';
+function path2(pts) { const p = new Path2D(); p.moveTo(pts[0][0], pts[0][1]); for (let i = 1; i < pts.length; i++) p.lineTo(pts[i][0], pts[i][1]); p.closePath(); return p; }
+function bbox(pts) { let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9; pts.forEach((q) => { if (q[0] < x0) x0 = q[0]; if (q[0] > x1) x1 = q[0]; if (q[1] < y0) y0 = q[1]; if (q[1] > y1) y1 = q[1]; }); return [x0, y0, x1 - x0, y1 - y0]; }
+function fillGlass(ctx, P2, pts, g) { const b = bbox(pts), gr = ctx.createLinearGradient(b[0] + g.x1 * b[2], b[1] + g.y1 * b[3], b[0] + g.x2 * b[2], b[1] + g.y2 * b[3]); g.st.forEach((s) => gr.addColorStop(s[0], s[1])); ctx.fillStyle = gr; ctx.fill(P2); }
+function layer(S) { const c = document.createElement('canvas'); c.width = S.cw; c.height = S.ch; const x = c.getContext('2d'); x.setTransform(S.k, 0, 0, S.k, S.ox, S.oy); return c; }
+// the units-to-pixels fit: the glass covers its holder (like SVG "slice"), centred
+function fitTo(S, cssW, cssH, dpr) { S.cw = Math.max(1, Math.round(cssW * dpr)); S.ch = Math.max(1, Math.round(cssH * dpr)); S.k = Math.max(S.cw / S.geo.W, S.ch / S.geo.H); S.ox = (S.cw - S.geo.W * S.k) / 2; S.oy = (S.ch - S.geo.H * S.k) / 2; S.dpr = dpr; }
+function drawTop(S) { // lead, bubbles, the soft overhead light and the frame
+  const G = S.geo, c = layer(S), x = c.getContext('2d'), lead = new Path2D(), sl = new Path2D();
+  G.pieces.forEach((p) => lead.addPath(p.P)); G.stars.forEach((s) => s.parts.forEach((q) => sl.addPath(q.P)));
+  x.lineJoin = 'round'; x.strokeStyle = LC; x.lineWidth = G.lw; x.stroke(lead); x.lineWidth = G.lw * .9; x.stroke(sl);
+  x.fillStyle = 'rgba(255,255,255,.14)'; G.bubbles.forEach((b) => { x.beginPath(); x.arc(b[0], b[1], b[2], 0, 2 * PI); x.fill(); });
+  x.save(); x.scale(G.W, G.H); const rg = x.createRadialGradient(G.lightAt[0], G.lightAt[1], 0, G.lightAt[0], G.lightAt[1], .9); rg.addColorStop(0, 'rgba(255,248,230,.2)'); rg.addColorStop(1, 'rgba(255,248,230,0)'); x.fillStyle = rg; x.fillRect(0, 0, 1, 1); x.restore();
+  x.strokeStyle = LC; x.lineWidth = 1.6; x.strokeRect(.8, .8, G.W - 1.6, G.H - 1.6);
+  return c; }
+function prep(G) { if (G.ready) return; G.pieces.forEach((p) => { p.P = path2(p.pts); }); G.stars.forEach((s) => { s.parts.forEach((q) => { q.P = path2(q.pts); }); s.O = path2(s.outline); }); G.ready = true; }
+function drawCol(S, roles) { // the glass itself, at full colour: tiles keep background, path and stars apart so each can light on its own
+  const G = S.geo, out = roles ? [layer(S), layer(S), layer(S)] : [layer(S)], ctx = out.map((c) => c.getContext('2d'));
+  G.pieces.forEach((p) => fillGlass(ctx[roles ? p.role : 0], p.P, p.pts, p.g)); G.stars.forEach((s) => s.parts.forEach((q) => fillGlass(ctx[roles ? 2 : 0], q.P, q.pts, q.g)));
+  return out; }
+
+/* ---------- cache ---------- */
+const CACHE = new Map(), CACHE_MAX = 16, GEO = new Map(), GEO_MAX = 40;
+const geoOf = (id, make) => { let g = GEO.get(id); if (!g) { g = make(); prep(g); GEO.set(id, g); while (GEO.size > GEO_MAX) GEO.delete(GEO.keys().next().value); } return g; };
+function entry(id, geo, cssW, cssH, kind) {
+  const dpr = DPRf(), key = id + '@' + cssW + 'x' + cssH + '@' + dpr; let S = CACHE.get(key);
+  if (S) { CACHE.delete(key); CACHE.set(key, S); return S; }
+  S = { key, geo, kind }; fitTo(S, cssW, cssH, dpr);
+  if (kind === 'tile') { S.L = drawCol(S, true); S.cols = tileCols(geo); } else { S.L = drawCol(S, false); S.items = itemsOf(geo); S.edges = edgesOf(geo); }
+  S.top = drawTop(S);
+  CACHE.set(key, S); while (CACHE.size > CACHE_MAX) CACHE.delete(CACHE.keys().next().value);
+  return S; }
+
+/* ---------- blessing tile: light by role, left to right ---------- */
+const UNLIT = .32, LITA = [.5, .8, 1]; // background, path, stars (the mock-up's st5 levels)
+const roleA = (r, v) => UNLIT + (LITA[r] - UNLIT) * v;
+function tileCols(G) { const n = 16, cols = Array.from({ length: n }, (_, i) => ({ P: new Path2D(), x: (i + .5) / n * G.W }));
+  G.pieces.forEach((p) => cols[clamp(Math.floor(p.x / G.W * n), 0, n - 1)].P.addPath(p.P)); G.stars.forEach((s) => cols[clamp(Math.floor(s.x / G.W * n), 0, n - 1)].P.addPath(s.O)); return cols; }
+function drawTile(S, cv, from, to, e) {
+  const x = cv.getContext('2d'), G = S.geo; x.setTransform(1, 0, 0, 1, 0, 0); x.globalAlpha = 1; x.fillStyle = '#04060c'; x.fillRect(0, 0, S.cw, S.ch);
+  if (e === Infinity || from === to) { [0, 1, 2].forEach((r) => { x.globalAlpha = roleA(r, to); x.drawImage(S.L[r], 0, 0); }); }
+  else S.cols.forEach((c) => { const d0 = c.x / G.W * 900; x.save(); x.setTransform(S.k, 0, 0, S.k, S.ox, S.oy); x.clip(c.P); x.setTransform(1, 0, 0, 1, 0, 0);
+    [0, 1, 2].forEach((r) => { const p = sstep(clamp((e - d0 - (r ? 120 : 0)) / 800, 0, 1)); x.globalAlpha = lerp(roleA(r, from), roleA(r, to), p); x.drawImage(S.L[r], 0, 0); }); x.restore(); });
+  x.globalAlpha = 1; x.drawImage(S.top, 0, 0); }
+
+/* ---------- lightable glass (the Absolution card and the day): a dark shade on every piece lifts as the light arrives ---------- */
+function itemsOf(G) { const it = G.pieces.map((p) => ({ P: p.P, x: p.x, y: p.y, crack: p.crack }));
+  G.stars.forEach((s) => it.push({ P: s.O, x: s.x, y: s.y, star: s })); return it; }
+function edgesOf(G) { // every lead join between two field pieces, for the honey seam where lit meets dark
+  const E = new Map(); G.pieces.forEach((p, i) => { const v = p.pts; for (let k = 0; k < v.length; k++) { const a = v[k], b = v[(k + 1) % v.length], key = Math.round(a[0] + b[0]) + ':' + Math.round(a[1] + b[1]);
+    const e = E.get(key); if (e) { if (e.o[0] !== i && e.o.length < 2) e.o.push(i); } else E.set(key, { a, b, o: [i] }); } });
+  return [...E.values()].filter((e) => e.o.length === 2); }
+const CATCH = [[0, .55], [.35, .3], [.55, .34], [1, 0]];
+const IGN = [[0, .6], [.35, 1.8], [1, 1]], IGR = [[0, 0], [.35, 20], [1, 45]], RAYO = [[0, 0], [.25, 1], [1, .3]], RAYS = [[0, .2], [.25, 1.2], [1, .45]];
+// st: { on (Uint8Array: lit in the end), pre (lit before this run), d (delays ms), base (unlit shade), front (ms or 0) }
+function drawLit(S, cv, st, e) {
+  const x = cv.getContext('2d'), G = S.geo, I = S.items, n = I.length, fin = e === Infinity;
+  const prog = (i) => (st.pre[i] ? 1 : !st.on[i] ? 0 : fin ? 1 : clamp((e - st.d[i]) / 1500, 0, 1));
+  const shade = (i) => (st.pre[i] ? 0 : !st.on[i] || (!fin && e < st.d[i]) ? st.base : fin ? 0 : kf((e - st.d[i]) / 1500, CATCH));
+  x.setTransform(1, 0, 0, 1, 0, 0); x.globalAlpha = 1; x.clearRect(0, 0, S.cw, S.ch); x.drawImage(S.L[0], 0, 0);
+  x.setTransform(S.k, 0, 0, S.k, S.ox, S.oy);
+  x.lineCap = 'round'; x.strokeStyle = '#fff1d0'; x.lineWidth = .45;
+  I.forEach((it, i) => { if (!it.crack) return; x.globalAlpha = lerp(.2, .95, prog(i)); x.beginPath(); it.crack.forEach((c) => { x.moveTo(c[0][0], c[0][1]); x.lineTo(c[1][0], c[1][1]); x.lineTo(c[2][0], c[2][1]); }); x.stroke(); });
+  const groups = new Map(); for (let i = 0; i < n; i++) { const a = Math.round(shade(i) * 50); if (!a) continue; let g = groups.get(a); if (!g) groups.set(a, (g = new Path2D())); g.addPath(I[i].P); }
+  x.fillStyle = '#03050b'; groups.forEach((g, a) => { x.globalAlpha = a / 50; x.fill(g); });
+  x.setTransform(1, 0, 0, 1, 0, 0); x.globalAlpha = 1; x.drawImage(S.top, 0, 0); x.setTransform(S.k, 0, 0, S.k, S.ox, S.oy);
+  // star sparks: a small four-point spark and a thin cross of rays, igniting 350 ms after the light reaches the star
+  I.forEach((it, i) => { if (!it.star || it.star.moon || !st.on[i]) return; const t = st.pre[i] || fin ? 1 : (e - st.d[i] - 350) / 1300; if (t < 0) return;
+    const s = it.star, k = kf(t, IGN), r = kf(t, IGR) * PI / 180, tr = st.pre[i] || fin ? 1 : clamp((e - st.d[i] - 350) / 1400, 0, 1);
+    x.save(); x.translate(s.x, s.y); x.rotate(r); x.scale(k, k);
+    x.globalAlpha = kf(tr, RAYO); const rs = kf(tr, RAYS), L = s.R0 * 1.8 * rs; x.strokeStyle = '#fff6dc'; x.lineWidth = .45; x.beginPath(); x.moveTo(-L, 0); x.lineTo(L, 0); x.moveTo(0, -L); x.lineTo(0, L); x.stroke();
+    x.globalAlpha = .95; x.fillStyle = '#fffdf2'; x.fill(path2(sN(0, 0, s.R0 * .3, 4, .3, 0))); x.restore(); });
+  // the honey seam along the lead where lit glass meets dark glass
+  const lit = (i) => !!(st.pre[i] || (st.on[i] && (fin || st.d[i] + 350 <= e))); let sm = null;
+  S.edges.forEach((ed) => { if (lit(ed.o[0]) !== lit(ed.o[1])) { if (!sm) sm = new Path2D(); sm.moveTo(ed.a[0], ed.a[1]); sm.lineTo(ed.b[0], ed.b[1]); } });
+  if (sm) { x.globalAlpha = 1; x.strokeStyle = '#ffe7aa'; x.lineWidth = 1.5; x.shadowColor = '#ffcf6a'; x.shadowBlur = 2 * S.dpr; x.stroke(sm); x.shadowBlur = 0; }
+  // the day's bright front, running down the glass
+  if (st.front && !fin) { const T = st.front + 500, p = e / T; if (p < 1) { const y = p < .96 ? -14 + p / .96 * (G.H * .97) : -14 + G.H * .97 + (p - .96) / .04 * (G.H * .03 + 14);
+    const gr = x.createLinearGradient(0, y, 0, y + 14); gr.addColorStop(0, 'rgba(255,233,176,0)'); gr.addColorStop(.7, 'rgba(255,233,176,.55)'); gr.addColorStop(.85, 'rgba(255,246,220,.9)'); gr.addColorStop(1, 'rgba(255,233,176,0)');
+    x.globalAlpha = p < .96 ? 1 : 1 - (p - .96) / .04; x.fillStyle = gr; x.fillRect(0, y, G.W, 14); } }
+  x.globalAlpha = 1; x.setTransform(1, 0, 0, 1, 0, 0); }
+
+function run(el, ms, frame) { // one rAF loop per holder; the last frame is the static final state
+  if (el._glRaf) cancelAnimationFrame(el._glRaf); const t0 = performance.now(), my = (el._glRun = (el._glRun || 0) + 1);
+  const tick = (t) => { if (el._glRun !== my) return; const e = t - t0; if (e >= ms || !el.isConnected) { el._glRaf = 0; frame(Infinity); return; } frame(e); el._glRaf = requestAnimationFrame(tick); };
+  if (RM()) { el._glRaf = 0; frame(Infinity); return; } el._glRaf = requestAnimationFrame(tick); }
+
+/* ---------- twinkles over lit stars (HTML, so the glass never repaints while idle) ---------- */
+function twinkle(host, S, idx, n, seed) {
+  Array.prototype.slice.call(host.querySelectorAll(':scope > .gl-glint')).forEach((g) => g.remove()); if (!n || !idx.length) return;
+  const R = rng(seed), pick = idx.slice().sort(() => R() - .5).slice(0, n), cssW = S.cw / S.dpr, cssH = S.ch / S.dpr;
+  pick.forEach((s) => { const g = document.createElement('i'); g.className = 'gl-glint';
+    g.style.left = ((s.x * S.k + S.ox) / S.dpr / cssW * 100).toFixed(2) + '%'; g.style.top = ((s.y * S.k + S.oy) / S.dpr / cssH * 100).toFixed(2) + '%';
+    g.style.animationDelay = (-R() * 2.4).toFixed(2) + 's'; g.style.animationDuration = (1.8 + R() * 1.4).toFixed(2) + 's'; host.appendChild(g); }); }
+
+/* ---------- the X2 shell round the curse card: hairlines (I), then the break (II) ---------- */
+function cellsOf(W, H, cols, rows, R) {
+  const sites = []; for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) sites.push([(c + .5 + (r % 2 ? .22 : -.12) + (R() - .5) * .7) * W / cols, (r + .5 + (R() - .5) * .8) * H / rows]);
+  return sites.map((p, i) => { let poly = rectPoly(0, 0, W, H); sites.forEach((q, j) => { if (i === j) return; const mx = (p[0] + q[0]) / 2, my = (p[1] + q[1]) / 2, nx = q[0] - p[0], ny = q[1] - p[1]; poly = clip(poly, (x, y) => (x - mx) * nx + (y - my) * ny); }); return poly; }); }
+const PS = (pts) => pts.map((p) => p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ');
+function shell(seed, stage) {
+  const R = rng(seed), cs = cellsOf(32, 44, 3, 5, R).filter((p) => p.length >= 3), O = [32, 30], frac = .72, T1 = 1700, T2 = 700, edges = new Map();
+  const onB = (p) => p[0] < .05 || p[0] > 31.95 || p[1] < .05 || p[1] > 43.95;
+  const same = (a, b) => (Math.abs(a[0]) < .05 && Math.abs(b[0]) < .05) || (Math.abs(a[0] - 32) < .05 && Math.abs(b[0] - 32) < .05) || (Math.abs(a[1]) < .05 && Math.abs(b[1]) < .05) || (Math.abs(a[1] - 44) < .05 && Math.abs(b[1] - 44) < .05);
+  cs.forEach((p) => p.forEach((a, k) => { const b = p[(k + 1) % p.length]; if ((onB(a) && onB(b) && same(a, b)) || hyp(b[0] - a[0], b[1] - a[1]) < .3) return;
+    const ka = a[0].toFixed(1) + ',' + a[1].toFixed(1), kb = b[0].toFixed(1) + ',' + b[1].toFixed(1), key = ka < kb ? ka + '|' + kb : kb + '|' + ka; if (!edges.has(key)) edges.set(key, [a, b]); }));
+  const dist = (p) => hyp(p[0] - O[0], p[1] - O[1]);
+  const list = [...edges.values()].map(([a, b]) => (dist(a) <= dist(b) ? { a, b, d: dist(a) } : { a: b, b: a, d: dist(b) }));
+  const maxD = Math.max.apply(null, list.map((l) => dist(l.b))), th = frac * maxD;
+  const ln = (l, cls, s, dl) => '<line class="gl-ck' + cls + (stage >= s ? ' gl-on' : '') + '" data-s="' + s + '" pathLength="1" x1="' + l.a[0].toFixed(2) + '" y1="' + l.a[1].toFixed(2) + '" x2="' + l.b[0].toFixed(2) + '" y2="' + l.b[1].toFixed(2) + '" style="--d:' + Math.round(dl) + 'ms"/>';
+  let cr = ''; list.forEach((l) => { if (l.d < th) cr += ln(l, ' gl-hl', 1, l.d / th * T1); }); list.forEach((l) => { cr += ln(l, '', 2, l.d / maxD * T2); });
+  let sh = ''; cs.forEach((p) => { const c = cen(p), dx = c[0] - 16;
+    sh += '<polygon class="gl-shd" points="' + PS(p) + '" style="--tx:' + (dx * 1.6 + (R() - .5) * 6).toFixed(1) + 'px;--ty:' + (30 + R() * 25).toFixed(1) + 'px;--rot:' + ((R() - .5) * 160).toFixed(0) + 'deg;--fd:' + Math.round(R() * 250) + 'ms"/>'; });
+  return '<svg class="gl-shards" viewBox="0 0 32 44" preserveAspectRatio="none" aria-hidden="true">' + sh + '</svg><svg class="gl-cracks" viewBox="0 0 32 44" preserveAspectRatio="none" aria-hidden="true">' + cr + '</svg>';
+}
+
+/* ---------- CSS ---------- */
+const CSS = [
+'.gl-tile{position:absolute;inset:0;z-index:1;display:block;overflow:hidden;pointer-events:none;background:#04060c}',
+'.gl-cv{position:absolute;inset:0;width:100%;height:100%;display:block}',
+'.gl-sweep{position:absolute;inset:0;z-index:2;pointer-events:none;opacity:0;background:linear-gradient(100deg,rgba(255,244,214,0) 40%,rgba(255,244,214,.3) 50%,rgba(255,244,214,0) 60%);background-size:300% 100%;background-position:100% 0}',
+'.gl-sweep.gl-go{animation:gl-sweepx 1.1s ease-out}',
+'@keyframes gl-sweepx{0%{opacity:1;background-position:100% 0}100%{opacity:0;background-position:0% 0}}',
+'.gl-tilebox{border:1.5px solid #07090e!important;box-shadow:0 2px 0 #030806,0 0 10px rgba(110,160,240,.15);background:#0b1626}',
+'.gl-glint{position:absolute;z-index:3;width:11px;height:11px;margin:-5.5px 0 0 -5.5px;pointer-events:none;background:radial-gradient(circle,#fff 0 1.2px,rgba(255,240,200,0) 2.5px),linear-gradient(90deg,rgba(255,250,230,0),#fffbe8 50%,rgba(255,250,230,0)) center/100% 1.4px no-repeat,linear-gradient(0deg,rgba(255,250,230,0),#fffbe8 50%,rgba(255,250,230,0)) center/1.4px 100% no-repeat;filter:drop-shadow(0 0 2px #ecd08e);animation:gl-glint 2.4s ease-in-out infinite alternate;will-change:transform,opacity}',
+'@keyframes gl-glint{0%{opacity:.15;transform:scale(.5) rotate(0)}100%{opacity:1;transform:scale(1.25) rotate(45deg)}}',
+/* the Absolution card */
+'.gl-ab{position:relative;display:grid;grid-template-columns:38% minmax(0,1fr);min-height:152px;border-radius:7px;overflow:hidden;box-shadow:0 2px 0 #030806,0 0 0 1.5px #07090e;transition:box-shadow 1s;font-family:var(--a,system-ui,sans-serif)}',
+'.gl-ab.gl-s1{box-shadow:0 2px 0 #030806,0 0 0 1.5px #3a3018,0 0 16px rgba(240,215,160,.3)}',
+'.gl-ab.gl-s2{animation:gl-abglow 2.2s ease-in-out infinite alternate}',
+'@keyframes gl-abglow{from{box-shadow:0 2px 0 #030806,0 0 0 1.5px #806432,0 0 18px rgba(240,215,160,.4)}to{box-shadow:0 2px 0 #030806,0 0 0 1.5px #c49a4e,0 0 34px rgba(245,222,170,.65)}}',
+'.gl-ab button{font:inherit;cursor:pointer;margin:0;min-width:0}',
+'.gl-abC{position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:8px 6px;border:none;border-right:3px solid #07090e;color:#f3e2dc;background:radial-gradient(130% 50% at 50% 112%,#6e0c18,rgba(58,10,16,0) 72%),linear-gradient(180deg,#2a0f13,#140608);transition:filter 1s}',
+'.gl-abC>*{position:relative;z-index:2}',
+'.gl-cCard{position:relative;width:64px;height:88px;display:block}',
+'.gl-cCard>img{display:block;width:100%;height:100%;image-rendering:pixelated;filter:drop-shadow(0 2px 0 rgba(0,0,0,.6));transition:filter 1.2s}',
+'.gl-cCard::after{content:"";position:absolute;inset:-14px;z-index:1;background:radial-gradient(circle,rgba(250,236,190,.75),rgba(235,205,140,0) 65%);opacity:0;transition:opacity 1s;pointer-events:none}',
+'.gl-s1 .gl-cCard::after{opacity:.35}.gl-s2 .gl-cCard::after{opacity:.7}',
+'.gl-cNm{font:700 13px/1.1 var(--a,system-ui,sans-serif);text-shadow:0 1px 2px #000;text-align:center;overflow-wrap:anywhere}',
+'.gl-cHp{font:700 12px var(--a,system-ui,sans-serif);color:#ff7a66}',
+'.gl-abC.gl-hit{animation:gl-chit .5s}',
+'@keyframes gl-chit{30%{filter:brightness(1.6) saturate(1.4);transform:scale(.97)}}',
+'.gl-abB{position:relative;overflow:hidden;border:none;padding:8px 9px;display:flex;flex-direction:column;justify-content:space-between;gap:4px;background:#0b1626;text-align:left;color:#eef5ff}',
+'.gl-gx{position:absolute;inset:0;z-index:0;transition:filter 1s}',
+'.gl-abB>:not(.gl-gx){position:relative;z-index:2}',
+'.gl-bTop{display:flex;justify-content:space-between;align-items:center;gap:6px}',
+'.gl-lbl{font:700 17px/1.2 var(--g,Georgia,serif);letter-spacing:.04em;color:#f6e2b0;text-shadow:0 0 8px rgba(240,210,150,.7),0 1px 2px #000;background:rgba(4,8,18,.62);padding:0 6px;border-radius:3px;transition:text-shadow .6s;white-space:nowrap}',
+'.gl-s2 .gl-lbl{text-shadow:0 0 12px rgba(245,225,175,1),0 0 22px rgba(235,200,130,.7),0 1px 2px #000}',
+'.gl-pips{display:flex;gap:6px;padding:3px 5px;background:rgba(4,8,18,.62);border-radius:3px}',
+'.gl-pips i{display:block;width:8px;height:8px;transform:rotate(45deg);border:1.5px solid #f6e2b0;transition:background .5s,box-shadow .5s}',
+'.gl-pips i.gl-on{background:#fbf0d2;box-shadow:0 0 8px 2px #e8cc8e}',
+'.gl-bMid{display:flex;align-items:center;gap:7px}',
+'.gl-bcard{flex:none;width:48px;height:66px;image-rendering:pixelated;filter:drop-shadow(0 1px 3px rgba(0,0,0,.9));transition:filter .8s}',
+'.gl-s1 .gl-bcard{filter:drop-shadow(0 0 5px rgba(245,225,170,.7))}.gl-s2 .gl-bcard{animation:gl-cardglow 1.6s ease-in-out infinite alternate}',
+'@keyframes gl-cardglow{from{filter:drop-shadow(0 0 5px rgba(245,225,170,.7))}to{filter:drop-shadow(0 0 12px rgba(255,240,200,1))}}',
+'.gl-bNm{font:700 14px/1.15 var(--a,system-ui,sans-serif);background:rgba(4,8,18,.66);padding:3px 6px;border-radius:3px;text-shadow:0 1px 2px #000;min-width:0;overflow-wrap:anywhere}',
+'.gl-bFt{display:flex;justify-content:space-between;align-items:center;gap:6px;font:700 12.5px var(--a,system-ui,sans-serif)}',
+'.gl-bFt>span{background:rgba(4,8,18,.66);padding:1px 6px;border-radius:3px}',
+'.gl-pay{display:inline-flex;align-items:center;gap:3px;color:#e6c26a}.gl-pay img{width:15px;height:15px;image-rendering:pixelated}',
+'.gl-each{color:#f6e2b0;white-space:nowrap}',
+'.gl-breath{position:absolute;inset:0;z-index:1;pointer-events:none;opacity:0;background:radial-gradient(80% 90% at 40% 45%,rgba(255,240,205,.3),rgba(240,215,160,0) 70%);transition:opacity 1s;will-change:opacity}',
+'.gl-s1 .gl-breath{opacity:.5}.gl-s2 .gl-breath{animation:gl-breath 3.2s ease-in-out infinite alternate}',
+'@keyframes gl-breath{from{opacity:.45}to{opacity:1}}',
+'.gl-shards,.gl-cracks{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}',
+'.gl-shards{z-index:2}.gl-cracks{z-index:3;filter:drop-shadow(0 0 1.5px #ecd08e) drop-shadow(0 0 3px rgba(235,200,130,.8))}',
+'.gl-shd{fill:rgba(112,0,22,.52);transform-box:fill-box;transform-origin:center}',
+'.gl-ck{fill:none;stroke:#fffbe0;stroke-width:.75;stroke-linecap:round;stroke-dasharray:1 1;stroke-dashoffset:1;transition:stroke-dashoffset .55s ease-out var(--d,0ms)}',
+'.gl-ck.gl-hl{stroke-width:.32;opacity:.75;transition-duration:.9s}',
+'.gl-ck.gl-on{stroke-dashoffset:0}',
+'.gl-absolving .gl-gx{filter:brightness(.5)}.gl-absolving .gl-abC{filter:brightness(.7)}',
+'.gl-absolving .gl-cracks{opacity:0;transition:opacity .6s .5s}.gl-absolving .gl-cCard>img{filter:brightness(2.2)}',
+'.gl-absolving .gl-shd{animation:gl-shfall 1.2s cubic-bezier(.5,0,.9,.6) var(--fd,0ms) forwards}',
+'@keyframes gl-shfall{to{transform:translate(var(--tx),var(--ty)) rotate(var(--rot));opacity:0}}',
+'.gl-absd{position:absolute;inset:0;z-index:20;display:grid;place-items:center;font:700 38px var(--g,Georgia,serif);letter-spacing:.08em;color:#f2d48e;background:radial-gradient(ellipse 66% 60% at 50% 50%,rgba(3,4,8,.9),rgba(3,4,8,.62) 55%,rgba(3,4,8,0) 88%);animation:gl-absd 2.4s ease-out forwards;pointer-events:none}',
+'.gl-absd span{text-shadow:0 2px 0 #000,0 0 14px rgba(230,180,90,.85),0 0 30px rgba(230,180,90,.4)}',
+'@keyframes gl-absd{0%{opacity:0;transform:scale(.85)}18%{opacity:1;transform:scale(1.06)}70%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.02)}}',
+/* H3 sparks */
+'.gl-fx{position:fixed;inset:0;pointer-events:none;z-index:9999;overflow:hidden}',
+'.gl-hspk{position:absolute;width:5px;height:5px;margin:-2.5px 0 0 -2.5px;border-radius:50%;background:#fff;box-shadow:0 0 6px 2px #f3dca6,0 0 2px #fff;transition:transform .65s cubic-bezier(.55,0,.85,.55)}',
+/* the day window */
+'.gl-day{position:relative;border-radius:8px;overflow:hidden;box-shadow:0 0 0 1px #2a2416,0 6px 18px rgba(0,0,0,.5);background:#04060c;aspect-ratio:200/320;width:100%;max-width:340px;margin-inline:auto}',
+'.gl-hrs{position:absolute;inset:0;pointer-events:none;font:700 10px var(--a,system-ui,sans-serif);color:rgba(255,240,210,.7);text-shadow:0 1px 2px #000}',
+'.gl-hrs span{position:absolute;left:4%;transform:translateY(-50%);background:rgba(4,6,12,.55);padding:0 4px;border-radius:3px}',
+'@media (prefers-reduced-motion:reduce){.gl-ab,.gl-ab *,.gl-tile *,.gl-glint{animation:none!important;transition:none!important}.gl-absolving .gl-shards{opacity:0}}'
+].join('\n');
+function css() { if (document.getElementById('glass-css')) return; const s = document.createElement('style'); s.id = 'glass-css'; s.textContent = CSS; (document.head || document.documentElement).appendChild(s); }
+
+/* ---------- the API ---------- */
+const DAYS = new Map(), PLAYED = new Set(), ANIMD = new Set();
+function tile(o) {
+  css(); o = o || {}; const lit = clamp(o.lit == null ? 1 : +o.lit || 0, 0, 1);
+  return '<span class="gl-tile" aria-hidden="true" data-gl-key="' + esc(o.key == null ? 'tile' : o.key) + '" data-gl-lit="' + lit + '"' + (o.w ? ' data-gl-w="' + Math.round(+o.w) + '"' : '') + (o.h ? ' data-gl-h="' + Math.round(+o.h) + '"' : '') + (o.anim ? ' data-gl-anim="1"' : '') + '>' +
+    '<canvas class="gl-cv"></canvas><i class="gl-sweep"></i></span>';
+}
+const card = (kind, c) => { if (c.img) return c.img; try { return window.OMENS ? window.OMENS.card(kind, c.key) : ''; } catch (e) { return ''; } };
+const runeSrc = (n, k) => { try { return window.RUNES ? window.RUNES.pick(n, k).src : ''; } catch (e) { return ''; } };
+const halves = (hp) => (Array.isArray(hp) ? [+hp[0] || 0, +hp[1] || 0] : [Math.floor((+hp || 0) / 2), (+hp || 0) - Math.floor((+hp || 0) / 2)]);
+const LBL = ['Absolution', 'Absolution I', 'Absolution II'];
+function absolution(o) {
+  css(); o = o || {}; const c = o.curse || {}, b = o.blessing || {}, s = clamp(+o.stage || 0, 0, 2), hb = halves(o.hpBack), key = o.key == null ? 'ab:' + (c.name || '') + '|' + (b.name || '') : String(o.key);
+  const hpC = c.hp == null ? hb[0] + hb[1] : c.hp, ci = card('c', c), bi = card('b', b), rs = b.pay ? runeSrc(b.pay, b.name) : '';
+  const each = hb[0] === hb[1] ? '+' + hb[0] + ' HP each' : '+' + hb[0] + ', then +' + hb[1] + ' HP';
+  return '<div class="gl-ab gl-s' + s + '" data-gl-key="' + esc(key) + '" data-gl-stage="' + s + '">' +
+    '<button type="button" class="gl-abC" ' + (c.attrs || '') + ' aria-label="' + esc((c.name || 'Curse') + ' curse, ' + LBL[s]) + '"><span class="gl-cCard">' + (ci ? '<img src="' + esc(ci) + '" alt="">' : '') + shell(hashStr(key) + 7, s) + '</span>' +
+    '<span class="gl-cNm">' + esc(c.name || '') + '</span><span class="gl-cHp">&minus;' + esc(hpC) + ' HP</span></button>' +
+    '<button type="button" class="gl-abB" ' + (b.attrs || '') + ' aria-label="' + esc((b.name || 'Blessing') + ', the antidote') + '"><span class="gl-gx"><canvas class="gl-cv"></canvas><i class="gl-breath"></i></span>' +
+    '<span class="gl-bTop"><span class="gl-lbl">' + LBL[s] + '</span><span class="gl-pips"><i' + (s > 0 ? ' class="gl-on"' : '') + '></i><i' + (s > 1 ? ' class="gl-on"' : '') + '></i></span></span>' +
+    '<span class="gl-bMid">' + (bi ? '<img class="gl-bcard" src="' + esc(bi) + '" alt="">' : '') + '<span class="gl-bNm">' + esc(b.name || '') + '</span></span>' +
+    '<span class="gl-bFt">' + (b.pay ? '<span class="gl-pay">+' + esc(b.pay) + (rs ? '<img src="' + esc(rs) + '" alt="">' : '') + '</span>' : '<span></span>') + '<span class="gl-each">' + esc(each) + '</span></span></button></div>';
+}
+function day(events, o) {
+  css(); o = o || {}; const ev = dayEvents(events), key = o.key == null ? 'day:' + hashStr(JSON.stringify(ev.map((e) => [e.kind, Math.round(e.y)]))) : String(o.key);
+  DAYS.set(key, { ev, cracked: o.cracked !== false }); while (DAYS.size > 60) DAYS.delete(DAYS.keys().next().value);
+  const nb = ev.filter((e) => e.kind === 'b').length, nc = ev.length - nb;
+  const label = 'Your day in glass: ' + nb + ' blessing' + (nb === 1 ? '' : 's') + ' and ' + nc + ' curse' + (nc === 1 ? '' : 's') + (ev.length ? '. ' + ev.map((e) => e.name).filter(Boolean).join(', ') : '');
+  const hrs = o.hours === false ? '' : '<div class="gl-hrs">' + [8, 12, 16, 20].map((h) => '<span style="top:' + (yOf(h) / DH * 100).toFixed(1) + '%">' + (h < 10 ? '0' : '') + h + ':00</span>').join('') + '</div>';
+  return '<div class="gl-day" role="img" aria-label="' + esc(label) + '" data-gl-key="' + esc(key) + '"' + (o.play === false ? '' : ' data-gl-play="1"') + '><canvas class="gl-cv"></canvas>' + hrs + '</div>';
+}
+
+/* ---------- painting ---------- */
+const QUEUE = []; let busy = false;
+function pump() { if (busy) return; busy = true;
+  setTimeout(function next() { const job = QUEUE.shift(); if (!job) { busy = false; return; } try { if (job.el.isConnected) job.fn(); } catch (e) { console.error(e); } setTimeout(next, 0); }, 30); }
+function sizeOf(el) { const r = el.getBoundingClientRect(); return [Math.round(r.width), Math.round(r.height)]; }
+function canvasFor(el, S) { const cv = el.querySelector('canvas.gl-cv'); if (cv.width !== S.cw || cv.height !== S.ch) { cv.width = S.cw; cv.height = S.ch; } return cv; }
+function geoFor(el) {
+  const key = el.getAttribute('data-gl-key') || '', seed = hashStr(key);
+  if (el.classList.contains('gl-tile')) { const sz = sizeOf(el), W = +el.getAttribute('data-gl-w') || sz[0], H = +el.getAttribute('data-gl-h') || sz[1]; return { id: 't|' + key + '|' + W + 'x' + H, kind: 'tile', host: el, sz, make: () => cutTile(seed, W, H) }; }
+  if (el.classList.contains('gl-ab')) { const gx = el.querySelector('.gl-gx'), sz = sizeOf(gx); return { id: 'a|' + key + '|' + sz[0] + 'x' + sz[1], kind: 'card', host: gx, sz, make: () => cutPanel(seed, sz[0], sz[1]) }; }
+  const D = DAYS.get(key) || { ev: [], cracked: true }; return { id: 'd|' + key + '|' + (D.cracked ? 1 : 0) + '|' + D.ev.map((e) => e.kind + Math.round(e.y)).join(','), kind: 'day', host: el, sz: sizeOf(el), make: () => cutDay(seed, D.ev, D.cracked) };
+}
+function stateFor(el, S, stage) { // which pieces are lit at a card stage: Absolution I = the half nearest the curse, II = all
+  const I = S.items, n = I.length, G = S.geo, on = new Uint8Array(n), key = (it) => hyp(it.x, it.y - G.H);
+  if (stage > 0) { const ks = I.map(key).sort((a, b) => a - b), kh = ks[Math.floor(n / 2)]; I.forEach((it, i) => { on[i] = stage >= 2 || key(it) <= kh ? 1 : 0; }); }
+  return { on, pre: on, d: new Float32Array(n), base: .74, front: 0 }; }
+function paintOne(el, g) {
+  const S = entry(g.id, geoOf(g.id, g.make), g.sz[0], g.sz[1], g.kind === 'tile' ? 'tile' : 'lit'), key = el.getAttribute('data-gl-key'), cv = canvasFor(g.host, S);
+  if (g.kind === 'tile') {
+    const lit = +el.getAttribute('data-gl-lit') || 0; el._glS = S;
+    if (el.getAttribute('data-gl-anim') === '1' && !ANIMD.has(key) && !RM()) { ANIMD.add(key); tileTo(el, 0, lit); return; }
+    if (!el._glRaf) { drawTile(S, cv, lit, lit, Infinity); el._glLit = lit; tileGlints(el, S, lit); }
+    return; }
+  if (g.kind === 'card') {
+    if (el._glRaf && el._glS === S) return; el._glS = S;
+    const s = +el.getAttribute('data-gl-stage') || 0; drawLit(S, cv, stateFor(el, S, s), Infinity); cardGlints(el, S, s); return; }
+  el._glS = S;
+  if (el.getAttribute('data-gl-play') === '1' && !PLAYED.has(key)) { PLAYED.add(key); playDay(el); return; }
+  if (!el._glRaf) { const n = S.items.length, on = new Uint8Array(n).fill(1); drawLit(S, cv, { on, pre: on, d: new Float32Array(n), base: .55, front: 0 }, Infinity); }
+}
+function paint(root) {
+  css(); root = root || document;
+  const els = Array.prototype.slice.call(root.querySelectorAll('.gl-tile,.gl-ab,.gl-day')); if (root.matches && root.matches('.gl-tile,.gl-ab,.gl-day')) els.unshift(root);
+  let queued = false;
+  els.forEach((el) => { const g = geoFor(el); if (g.sz[0] < 20 || g.sz[1] < 20) return; // hidden: try again on the next paint
+    const dpr = DPRf(), ck = g.id + '@' + g.sz[0] + 'x' + g.sz[1] + '@' + dpr;
+    if (CACHE.has(ck)) { paintOne(el, g); return; }
+    if (QUEUE.some((j) => j.el === el)) return; QUEUE.push({ el, fn: () => paintOne(el, geoFor(el)) }); queued = true; });
+  if (queued) pump();
+}
+function tileGlints(el, S, lit) { twinkle(el, S, lit >= .5 ? S.geo.stars : [], 2, hashStr(el.getAttribute('data-gl-key')) + 3); }
+function cardGlints(el, S, s) { const st = stateFor(el, S, s), list = []; S.items.forEach((it, i) => { if (it.star && st.on[i]) list.push(it.star); }); twinkle(el.querySelector('.gl-gx'), S, list, s === 1 ? 3 : s === 2 ? 6 : 0, hashStr(el.getAttribute('data-gl-key')) + s); }
+function tileTo(el, from, to) {
+  const S = el._glS; if (!S) return; const cv = el.querySelector('canvas.gl-cv'), sw = el.querySelector('.gl-sweep');
+  el._glLit = to; twinkle(el, S, [], 0, 1);
+  if (sw && !RM()) { sw.classList.remove('gl-go'); void sw.offsetWidth; sw.classList.add('gl-go'); }
+  run(el, 1900, (e) => { drawTile(S, cv, from, to, e); if (e === Infinity) tileGlints(el, S, to); });
+}
+function playDay(el) {
+  const S = el._glS; if (!S) { paint(el); return; } const n = S.items.length, on = new Uint8Array(n).fill(1), d = new Float32Array(n), T = 5200;
+  S.items.forEach((it, i) => { d[i] = it.y / S.geo.H * T; });
+  const cv = el.querySelector('canvas.gl-cv'), st = { on, pre: new Uint8Array(n), d, base: .55, front: T };
+  run(el, T + 1500, (e) => drawLit(S, cv, st, e));
+}
+const wait = (el, gen, ms) => new Promise((r) => setTimeout(() => r(el._glGen === gen && el.isConnected), RM() ? Math.min(ms, 60) : ms));
+async function cardTo(el, s, o) {
+  const S = el._glS, prev = +el.getAttribute('data-gl-stage') || 0; if (s <= prev) return;
+  if (s - prev > 1) { await cardTo(el, prev + 1, Object.assign({}, o, { onDone: null })); if (!el.isConnected) return; await new Promise((r) => setTimeout(r, RM() ? 0 : 1900)); }
+  const gen = (el._glGen = (el._glGen || 0) + 1), T = 1700;
+  el.setAttribute('data-gl-stage', s); el.classList.remove('gl-s0', 'gl-s1', 'gl-s2'); el.classList.add('gl-s' + s);
+  el.querySelector('.gl-lbl').textContent = LBL[s]; Array.prototype.forEach.call(el.querySelectorAll('.gl-pips i'), (p, k) => p.classList.toggle('gl-on', k < s));
+  Array.prototype.forEach.call(el.querySelectorAll('.gl-ck[data-s="' + s + '"]'), (c) => c.classList.add('gl-on'));
+  const gx = el.querySelector('.gl-gx');
+  if (S) { // the light: I from the bottom corner by the curse to the middle, II from the middle on to the far end
+    const I = S.items, n = I.length, key = (it) => hyp(it.x, it.y - S.geo.H), ks = I.map(key).sort((a, b) => a - b), kh = ks[Math.floor(n / 2)], km = ks[n - 1] || 1;
+    const pre = stateFor(el, S, s - 1).on, on = stateFor(el, S, s).on, d = new Float32Array(n);
+    I.forEach((it, i) => { if (on[i] && !pre[i]) { const k = key(it); d[i] = s === 1 ? k / (kh || 1) * T : (k - kh) / ((km - kh) || 1) * T; } });
+    twinkle(gx, S, [], 0, 1); const cv = gx.querySelector('canvas.gl-cv');
+    run(el, T + 1900, (e) => { drawLit(S, cv, { on, pre, d, base: .74, front: 0 }, e); if (e === Infinity && el._glGen === gen) cardGlints(el, S, s); });
+  }
+  if (o.to) sparks(gx, o.to, { n: 10, from: o.from, upto: o.upto, onSpark: o.onSpark });
+  if (s < 2) return;
+  if (!(await wait(el, gen, 2550))) return;
+  el.classList.add('gl-absolving'); const a = document.createElement('div'); a.className = 'gl-absd'; a.innerHTML = '<span>Absolved</span>'; el.appendChild(a);
+  if (!(await wait(el, gen, RM() ? 1200 : 2400))) return;
+  el.dispatchEvent(new CustomEvent('gl-absolved', { bubbles: true, detail: { key: el.getAttribute('data-gl-key') } })); if (o.onDone) o.onDone(el);
+}
+function light(key, stage, o) {
+  css(); o = o || {}; key = String(key);
+  Array.prototype.slice.call(document.querySelectorAll('[data-gl-key]')).filter((el) => el.getAttribute('data-gl-key') === key).forEach((el) => {
+    if (el.classList.contains('gl-tile')) { const to = clamp(stage == null ? 1 : +stage || 0, 0, 1), cur = el._glLit == null ? +el.getAttribute('data-gl-lit') || 0 : el._glLit; el.setAttribute('data-gl-lit', to); if (!el._glS) { paint(el); return; } tileTo(el, cur === to ? 0 : cur, to); }
+    else if (el.classList.contains('gl-ab')) { if (!el._glS) paint(el); cardTo(el, clamp(+stage || 0, 0, 2), o); }
+    else if (el.classList.contains('gl-day')) { if (!el._glS) { PLAYED.delete(key); paint(el); } else playDay(el); }
+  });
+}
+let FX = null;
+function sparks(fromEl, to, o) { // H3: sparks rise from the glass and land on the health bar, one sliver each
+  o = o || {}; const tEl = typeof to === 'string' ? document.querySelector(to) : to, n = o.n || 10; if (!fromEl || !tEl) return;
+  if (RM()) { if (o.onSpark) o.onSpark(n - 1, n); return; }
+  css(); if (!FX || !FX.isConnected) { FX = document.createElement('div'); FX.className = 'gl-fx'; document.body.appendChild(FX); }
+  const fr = fromEl.getBoundingClientRect(), tr = tEl.getBoundingClientRect(), f0 = o.from == null ? .8 : +o.from, f1 = o.upto == null ? 1 : +o.upto;
+  for (let k = 0; k < n; k++) { const s = document.createElement('span'); s.className = 'gl-hspk'; const sx = fr.left + Math.random() * fr.width, sy = fr.top + fr.height * (.3 + Math.random() * .6);
+    s.style.left = sx + 'px'; s.style.top = sy + 'px'; FX.appendChild(s); const tx = tr.left + tr.width * (f0 + (f1 - f0) * (k + 1) / n), ty = tr.top + tr.height / 2;
+    setTimeout(() => { s.style.transform = 'translate(' + (tx - sx).toFixed(1) + 'px,' + (ty - sy).toFixed(1) + 'px)'; }, k * 95 + 30);
+    setTimeout(() => { s.remove(); if (o.onSpark) o.onSpark(k, n); }, k * 95 + 690); }
+}
+
+window.GLASS = { tile, absolution, light, day, paint, sparks };
+})();
+</script>
+<script>
+(function () {
+'use strict';
+const $ = (s, r) => (r || document).querySelector(s), $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
+const RMQ = window.matchMedia ? matchMedia('(prefers-reduced-motion: reduce)') : null, RM = () => !!(RMQ && RMQ.matches);
+const V = {
+  BG1: ['Candlelit desk', 'A warm wooden desk lit by two flickering pixel candles, with an inkwell and a quill.'],
+  BG2: ['Stone alcove', 'The book rests on a stone plinth inside an arch carved with softly glowing green runes.'],
+  BG3: ['Deep-sea library', 'A sunken library with shelves on both sides, swaying kelp and a few bubbles drifting up.'],
+  BG4: ['Tentacle frame', 'Chunky purple pixel tentacles curl in from the edges and sway gently, framing the book.'],
+  BG5: ['Tentacles round the book', 'Ulhu-green pixel tentacles curl out from under the book, and little ones peek in from the corners.'] };
+const phone = $('#phone'), stage = $('#stage'), scene = $('#scene'), flash = $('#flash'), sheet = $('#sheet'), hint = $('#hint'), cap = $('#cap'), toast = $('#toast');
+let cur = 'BG1', phase = 'rest', playT0 = 0, anims = [];
+
+/* ================= pixel drawing ================= */
+const cv = $('#pix'), g = cv.getContext('2d'); let W = 130, H = 240;
+const R = Math.round, OL = '#0b0a10';
+function rng(s) { return () => { s |= 0; s = (s + 0x6D2B79F5) | 0; let t = Math.imul(s ^ (s >>> 15), 1 | s); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+function rc(x, y, w, h, c) { g.fillStyle = c; g.fillRect(R(x), R(y), R(w), R(h)); }
+function disc(cx, cy, r, c) { g.fillStyle = c; cx = R(cx); cy = R(cy); const n = Math.ceil(r); for (let y = -n; y <= n; y++) { const q = r * r - y * y; if (q < 0) continue; const w = Math.floor(Math.sqrt(q) + .3); g.fillRect(cx - w, cy + y, 2 * w + 1, 1); } }
+function ring(cx, cy, r, c) { g.fillStyle = c; const n = Math.max(12, R(r * 7)); for (let i = 0; i < n; i++) { const a = i / n * Math.PI * 2; g.fillRect(R(cx + Math.cos(a) * r), R(cy + Math.sin(a) * r), 1, 1); } }
+function line(x0, y0, x1, y1, c) { g.fillStyle = c; const n = Math.ceil(Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0))) || 1; for (let i = 0; i <= n; i++) g.fillRect(R(x0 + (x1 - x0) * i / n), R(y0 + (y1 - y0) * i / n), 1, 1); }
+const sm = (a, b, t) => { const x = Math.min(1, Math.max(0, (t - a) / (b - a))); return x * x * (3 - 2 * x); };
+// stepped vignette: three hard bands, the pixel way
+function vignette() { for (let k = 1; k <= 3; k++) { const b = k * 3, c = 'rgba(0,0,0,.16)'; rc(0, 0, W, b, c); rc(0, H - b, W, b, c); rc(0, b, b, H - 2 * b, c); rc(W - b, b, b, H - 2 * b, c); } }
+
+/* ---- a tentacle: a chain of discs, outline, dark, mid, a highlight, and suckers on one side ---- */
+function armPts(o, t) {
+  const n = Math.max(8, R(o.len / 1.1)), st = o.len / n, P = []; let x = o.x, y = o.y;
+  for (let i = 0; i <= n; i++) { const s = i / n, aa = o.a + (o.bend || 0) * s + o.curl * s * s * s + (o.sw || 0) * Math.sin(t * (o.sp || 1.4) + (o.ph || 0) + s * 3.2) * s;
+    P.push({ x: o.mir ? W - x : x, y, r: o.r0 + (o.r1 - o.r0) * s, a: o.mir ? Math.PI - aa : aa }); x += Math.cos(aa) * st; y += Math.sin(aa) * st; }
+  return P;
+}
+function drawArm(P, p) {
+  P.forEach((q) => disc(q.x, q.y, q.r + 1, p[0]));
+  P.forEach((q) => disc(q.x, q.y, q.r, p[1]));
+  P.forEach((q) => { if (q.r >= 1.2) disc(q.x - q.r * .22, q.y - q.r * .26, q.r * .66, p[2]); });
+  P.forEach((q, i) => { if (q.r >= 2.4 && i % 2 === 0) disc(q.x - q.r * .42, q.y - q.r * .46, q.r * .2, p[3]); });
+  P.forEach((q, i) => { if (i % 4 !== 1 || q.r < 1.8) return; const nx = -Math.sin(q.a), ny = Math.cos(q.a), sx = q.x + nx * q.r * .6, sy = q.y + ny * q.r * .6;
+    disc(sx, sy, Math.max(.7, q.r * .32), p[4]); disc(sx - .4, sy - .4, Math.max(.3, q.r * .14), p[5]); });
+}
+const GREEN = ['#0c1a14', '#1f6a4a', '#3fae78', '#a6f5c8', '#e9a9bf', '#fff0f4'];
+const PLUM = ['#140a1c', '#4a2a6a', '#7a4aa6', '#d4a8f2', '#f2b6d4', '#fff2f8'];
+const arm = (o, t, pal) => drawArm(armPts(o, t), pal);
+
+/* ---- the T1 tome, with T4's chains ---- */
+function chain(x0, x1, y, t, strain) {
+  for (let x = x0, i = 0; x < x1; x += 3, i++) { const j = strain ? R(Math.sin(t * 40 + i * 1.7) * strain) : 0;
+    if (i % 2 === 0) { rc(x - 1, y - 2 + j, 5, 5, OL); rc(x, y - 1 + j, 3, 3, '#8a8f99'); rc(x + 1, y + j, 1, 1, '#1a1a20'); rc(x, y - 1 + j, 2, 1, '#c9cdd6'); }
+    else { rc(x - 1, y - 1 + j, 4, 3, OL); rc(x, y + j, 2, 1, '#5c616b'); } }
+}
+function book(cx, cy, bw, bh, s, t) {
+  // s: {open 0..1, chains bool, strain, rings 0..4, portal 0..1}
+  const sp = R(cx - bw / 2 * (1 - s.open)), y = R(cy - bh / 2), shx = s.shake || 0;
+  const X = sp + shx;
+  // shadow
+  const lw = s.open > .5 ? bw : 0;
+  rc(X - lw + 3, y + 4, bw + lw, bh, 'rgba(0,0,0,.4)');
+  // right page block (thickness to the right and bottom)
+  rc(X - 1, y - 1, bw + 3, bh + 4, OL);
+  rc(X, y + bh, bw + 1, 2, '#c9b688'); rc(X + bw, y, 1, bh + 1, '#bba776');
+  if (s.open > 0) pages(X, y, bw, bh, 1, s, t);
+  // the cover, swinging over the spine
+  const cw = R(bw * Math.cos(Math.PI * Math.min(1, s.open)));
+  if (s.open > .5) {
+    rc(X + cw - 2, y - 2, -cw + 2, bh + 6, OL); rc(X + cw - 1, y - 1, -cw + 1, bh + 4, '#2a2530');
+    rc(X - bw - 1, y - 1, bw + 1, bh + 4, OL); pages(X - bw, y, bw, bh, 0, s, t);
+    rc(X - bw, y + bh, bw, 2, '#c9b688'); rc(X - 1, y, 2, bh + 2, '#b8a272'); rc(X, y + bh + 2, 1, 1, OL);
+    circle(X, y + bh / 2, Math.min(bw * .82, bh * .46), s, t);
+  } else if (cw > 0) {
+    rc(X, y, cw, bh, '#25212c');
+    rc(X + 1, y + 1, cw - 2, 2, '#3b3646'); rc(X + 1, y + 1, 2, bh - 2, '#332f3d'); rc(X + 1, y + bh - 2, cw - 2, 1, '#18151d');
+    rc(X, y, 4, bh, '#1b1821'); rc(X + 4, y, 1, bh, '#100e15'); rc(X + 1, y + 2, 1, bh - 4, '#2c2834');
+    if (cw > bw * .85) cover(X, y, bw, bh, s, t);
+  }
+}
+function cover(X, y, bw, bh, s, t) {
+  const cx = X + 2 + bw / 2, cy = y + bh / 2, r = bw * .27;
+  // embossed circle: carved ring with a lit lip, a faint green core that breathes
+  ring(cx, cy, r + 1, '#3d3849'); ring(cx, cy, r, '#121017'); ring(cx, cy, r * .62, '#121017'); ring(cx, cy, r * .62 + 1, '#3d3849');
+  const br = RM() ? 1 : (Math.floor(t * 3) % 4 === 0 ? 2 : 1);
+  disc(cx, cy, 2 + br * .6, br > 1 ? '#2f8a5e' : '#1f5a40'); rc(cx, cy, 1, 1, '#9af7c6');
+  for (let k = 0; k < 5; k++) { const a = -Math.PI / 2 + k * Math.PI * 2 / 5; rc(cx + Math.cos(a) * r * .8, cy + Math.sin(a) * r * .8, 1, 1, '#4a4458'); }
+  // two stylised cracks
+  line(X + 7, y + 6, X + 11, y + 10, '#120f17'); line(X + 11, y + 10, X + 10, y + 14, '#120f17'); rc(X + 8, y + 6, 1, 1, '#4a4458');
+  line(X + bw - 9, y + bh - 7, X + bw - 13, y + bh - 12, '#120f17'); rc(X + bw - 9, y + bh - 8, 1, 1, '#4a4458');
+  // iron corners
+  [[X, y, 1, 1], [X + bw - 1, y, -1, 1], [X, y + bh - 1, 1, -1], [X + bw - 1, y + bh - 1, -1, -1]].forEach(([x0, y0, dx, dy]) => {
+    for (let k = 0; k < 7; k++) for (let j = 0; j < 7 - k; j++) rc(x0 + dx * j, y0 + dy * k, 1, 1, (j === 6 - k) ? '#2a2c33' : (k === 0 || j === 0) ? '#b8bcc6' : '#7b808b');
+    rc(x0 + dx * 2, y0 + dy * 2, 1, 1, '#2a2c33'); });
+  // clasps on the fore-edge
+  [.28, .72].forEach((f) => { const yy = R(y + bh * f) + (s.strain ? R(Math.sin(t * 50 + f * 9) * s.strain * .6) : 0);
+    rc(X + bw - 7, yy - 3, 11, 7, OL); rc(X + bw - 6, yy - 2, 9, 5, '#6b6f78'); rc(X + bw - 6, yy - 2, 9, 1, '#b8bcc6'); rc(X + bw - 6, yy + 2, 9, 1, '#3c3f46'); rc(X + bw - 3, yy - 1, 2, 2, '#2a2c33'); });
+  if (s.chains) { const L = X - 4, Rr = X + bw + 4; chain(L, Rr, R(y + bh * .4), t, s.strain); chain(L, Rr, R(y + bh * .6), t, s.strain);
+    const py = R(y + bh / 2), px = X + bw - 2 + (s.strain ? R(Math.sin(t * 37) * s.strain) : 0);
+    rc(px - 4, py - 4, 9, 9, OL); rc(px - 3, py - 1, 7, 5, '#c9a24a'); rc(px - 3, py - 1, 7, 1, '#f2d58a'); rc(px - 3, py + 3, 7, 1, '#8a6a2a'); rc(px, py + 1, 1, 1, OL);
+    rc(px - 2, py - 3, 5, 1, '#8a8f99'); rc(px - 2, py - 3, 1, 2, '#8a8f99'); rc(px + 2, py - 3, 1, 2, '#8a8f99'); }
+}
+function pages(x, y, bw, bh, right, s, t) {
+  rc(x, y, bw, bh, '#efe2c2');
+  if (right) { rc(x, y, 3, bh, '#d6c398'); rc(x + 3, y, 1, bh, '#e2d2ab'); } else { rc(x + bw - 3, y, 3, bh, '#d6c398'); rc(x + bw - 4, y, 1, bh, '#e2d2ab'); }
+  rc(x, y, bw, 1, '#fff6dc');
+  const r = rng(right ? 11 : 7);
+  for (let yy = y + 5; yy < y + bh - 4; yy += 3) { let xx = x + 5; while (xx < x + bw - 6) { const w = 2 + R(r() * 6); if (xx + w < x + bw - 5) rc(xx, yy, w, 1, '#cdb98f'); xx += w + 1 + R(r() * 2); } }
+}
+function circle(cx, cy, Rr, s, t) {
+  const radii = [Rr, Rr * .82, Rr * .55, Rr * .3];
+  disc(cx, cy, Rr + 2, 'rgba(239,226,194,.85)');
+  radii.forEach((r, k) => { const lit = s.rings > k; if (lit) { ring(cx, cy, r + 1, 'rgba(94,242,160,.35)'); ring(cx, cy, r - 1, 'rgba(94,242,160,.25)'); } ring(cx, cy, r, lit ? '#3fd88a' : '#9a8a64'); });
+  const pts = []; for (let k = 0; k < 5; k++) { const a = -Math.PI / 2 + k * Math.PI * 2 / 5; pts.push([cx + Math.cos(a) * radii[1], cy + Math.sin(a) * radii[1]]); }
+  for (let k = 0; k < 5; k++) { const a = pts[k], b = pts[(k + 2) % 5]; line(a[0], a[1], b[0], b[1], s.rings > 1 ? '#2fb874' : '#a8986c'); }
+  for (let k = 0; k < 12; k++) { const a = k / 12 * Math.PI * 2, rr = (radii[0] + radii[1]) / 2; rc(cx + Math.cos(a) * rr, cy + Math.sin(a) * rr, 1, 1, s.rings > 0 ? '#5ef2a0' : '#8a7a5a'); }
+  if (s.portal > 0) { const pr = radii[2] * s.portal; disc(cx, cy, pr + 1, '#0f3a28'); disc(cx, cy, pr, '#06140f'); if (pr > 3) { ring(cx, cy, pr * .6, '#123f2c'); rc(cx - 1, cy - 1, 2, 2, '#5ef2a0'); } }
+}
+
+/* ================= five rooms ================= */
+const BG = {};
+BG.BG1 = { back(t) { // candlelit desk
+  const ph = 14; for (let y = 0, i = 0; y < H; y += ph, i++) { rc(0, y, W, ph, i % 2 ? '#4a2c1a' : '#43281a'); rc(0, y, W, 1, '#5e3a24'); rc(0, y + ph - 1, W, 1, '#22130a');
+    const r = rng(i * 7 + 3); for (let k = 0; k < 6; k++) rc(r() * W, y + 3 + r() * (ph - 6), 4 + r() * 9, 1, '#38200f'); const sx = R(r() * W); rc(sx, y, 1, ph, '#22130a'); rc(sx + 3, y + 4, 1, 1, '#1a0e07'); }
+  const C = [[16, 30, 18, 0], [W - 16, 36, 13, 1.7]];
+  C.forEach(([x, y, h, p]) => { const f = RM() ? 0 : Math.floor(t * 7 + p * 3) % 3; for (let k = 4; k >= 1; k--) disc(x, y + 2, k * 9 + (f === 1 ? 1 : 0), 'rgba(255,184,90,.06)'); });
+  C.forEach(([x, y, h, p]) => candle(x, y, h, t, p));
+  // inkwell and quill
+  const ix = 18, iy = H - 30; disc(ix, iy, 7, OL); disc(ix, iy, 6, '#22344a'); disc(ix - 1, iy - 1, 4, '#30486a'); disc(ix, iy, 3, OL); disc(ix, iy, 2, '#06080c'); rc(ix - 3, iy - 4, 2, 1, '#8fb0d0');
+  for (let i = 0; i <= 26; i++) { const qx = ix + 2 + i * .62, qy = iy - 2 - i * 1.1; if (i < 6) rc(qx, qy, 1, 1, '#d8c79c'); else { const w = i < 22 ? 2 : 1; rc(qx - w - 1, qy, w * 2 + 3, 1, OL); rc(qx - w, qy, w * 2 + 1, 1, '#ece4d0'); rc(qx + w, qy, 1, 1, '#b9b0a0'); } }
+} };
+function candle(x, y, h, t, p) {
+  const f = RM() ? 0 : Math.floor(t * 7 + p * 3) % 3;
+  rc(x - 8, y + h, 16, 4, OL); rc(x - 7, y + h, 14, 2, '#c99a4a'); rc(x - 7, y + h, 14, 1, '#f2c66a'); rc(x - 7, y + h + 2, 14, 1, '#7a5a26');
+  rc(x - 4, y - 1, 8, h + 1, OL); rc(x - 3, y, 6, h, '#eadfc2'); rc(x + 1, y, 2, h, '#c8b48c'); rc(x - 3, y, 1, h, '#fff6dc'); rc(x - 1, y, 1, 4, '#fff6dc'); rc(x - 1, y + 4, 1, 1, '#d8cba8');
+  rc(x, y - 2, 1, 2, '#2a1a10');
+  const hh = [5, 6, 4][f], sw = [0, 1, 0][f];
+  rc(x - 2 + sw * 0, y - 2 - hh, 4, hh, OL); rc(x - 1, y - 2 - hh, 3, hh - 1, '#ffb03a'); rc(x + sw, y - 3 - hh, 1, 2, '#ffb03a'); rc(x, y - hh, 1, hh - 3, '#ffe36a'); rc(x, y - 3, 1, 1, '#e8645a');
+}
+const RUNES = [[0b10001, 0b01010, 0b00100, 0b01010, 0b10001], [0b00100, 0b01110, 0b10101, 0b00100, 0b00100], [0b11100, 0b10010, 0b11100, 0b10100, 0b10010], [0b01110, 0b10001, 0b10101, 0b10001, 0b01110], [0b10000, 0b11000, 0b10100, 0b10010, 0b11111]];
+function rune(x, y, k, c) { const m = RUNES[k % RUNES.length]; for (let j = 0; j < 5; j++) for (let i = 0; i < 5; i++) if (m[j] >> (4 - i) & 1) rc(x + i, y + j, 1, 1, c); }
+BG.BG2 = { back(t) { // stone alcove
+  const r = rng(5); for (let y = 0, row = 0; y < H; y += 10, row++) { for (let x = -(row % 2) * 9; x < W; x += 18) { const c = r() < .5 ? '#2c2e37' : '#31333d';
+    rc(x, y, 17, 9, c); rc(x, y, 17, 1, '#454859'); rc(x, y, 1, 9, '#3a3d4c'); rc(x, y + 8, 17, 1, '#1d1e25'); if (r() < .3) rc(x + 4 + r() * 8, y + 3 + r() * 3, 2, 1, '#24252d'); } rc(0, y + 9, W, 1, '#121318'); }
+  const cx = W / 2, top = H * .14, bot = H * .8, aw = W * .42;
+  // arch opening
+  disc(cx, top + aw, aw + 6, OL); rc(cx - aw - 6, top + aw, (aw + 6) * 2 + 1, bot - top - aw, OL);
+  disc(cx, top + aw, aw + 5, '#3a3c48'); rc(cx - aw - 5, top + aw, (aw + 5) * 2 + 1, bot - top - aw, '#3a3c48');
+  disc(cx, top + aw, aw, '#0e0f15'); rc(cx - aw, top + aw, aw * 2 + 1, bot - top - aw, '#0e0f15');
+  disc(cx, top + aw + 4, aw - 5, '#13141c'); rc(cx - aw + 5, top + aw + 4, aw * 2 - 9, bot - top - aw, '#13141c');
+  // arch stones with runes, breathing in three steps
+  const n = 9; for (let i = 0; i < n; i++) { const a = Math.PI + i / (n - 1) * Math.PI, x = cx + Math.cos(a) * (aw + 2.5), y = top + aw + Math.sin(a) * (aw + 2.5);
+    rc(x - 1, y - 1, 2, 2, '#4a4d5c'); }
+  const runeAt = [[cx - aw - 4, top + aw + 18], [cx + aw - 1, top + aw + 18], [cx - aw - 4, top + aw + 50], [cx + aw - 1, top + aw + 50], [cx - 2, top - 4], [cx - aw * .72 - 2, top + aw * .3 - 3], [cx + aw * .72 - 3, top + aw * .3 - 3]];
+  runeAt.forEach(([x, y], i) => { const lv = RM() ? 1 : (Math.floor(t * 1.6 + i * 1.3) % 4 === 0 ? 2 : Math.floor(t * 1.6 + i * 1.3) % 4 === 2 ? 0 : 1);
+    disc(x + 2, y + 2, 6 + lv, 'rgba(94,242,160,' + [.06, .1, .16][lv] + ')'); rc(x - 1, y - 1, 7, 7, '#23252e'); rune(x, y, i, ['#2f8a5e', '#4fd08a', '#a6f5c8'][lv]); });
+  // plinth
+  const pw = W * .9, px = cx - pw / 2, py = H * .34, ph = H * .32, fh = H * .82 - py - ph;
+  rc(px - 1, py - 1, pw + 2, ph + fh + 2, OL); rc(px, py, pw, ph, '#3b3d48'); rc(px, py, pw, 1, '#565a6c'); rc(px, py + ph, pw, fh, '#26272f'); for (let yy = py + ph + 10; yy < py + ph + fh - 2; yy += 10) rc(px, yy, pw, 1, '#1d1e25'); rune(cx - 2, py + ph + fh / 2 - 2, 3, '#3a3d4c'); rc(px, py + ph, pw, 1, '#1a1b21');
+  for (let k = 0; k < 6; k++) rc(px + 6 + k * pw / 6, py + ph + 3, 5, 1, '#31333c');
+  const r2 = rng(9); for (let k = 0; k < 14; k++) rc(px + 3 + r2() * (pw - 6), py + 3 + r2() * (ph - 6), 2, 1, '#34363f');
+} };
+BG.BG3 = { back(t) { // deep-sea library
+  const bands = ['#0f3b44', '#0d333c', '#0b2b33', '#09232b', '#071b22', '#05141a']; bands.forEach((c, i) => rc(0, i * H / 6, W, H / 6 + 1, c));
+  for (let k = 0; k < 3; k++) { const x0 = 20 + k * 38; for (let y = 0; y < H * .8; y++) rc(x0 + y * .3, y, 7, 1, 'rgba(160,240,255,.045)'); }
+  rc(0, H - 9, W, 9, '#2e3a2c'); rc(0, H - 9, W, 1, '#4a5c40'); const rs = rng(4); for (let k = 0; k < 12; k++) rc(rs() * W, H - 7 + rs() * 5, 2, 1, '#3c4a36');
+  shelf(0, 22, 3); shelf(W - 22, 22, 8);
+  kelp(30, 18, t, 0); kelp(42, 12, t, 1.4); kelp(W - 42, 16, t, 2.2); kelp(W - 30, 11, t, .7);
+  for (let i = 0; i < 7; i++) { const r = rng(40 + i), bx = 26 + r() * (W - 52), sp = 9 + r() * 6, yy = H - 10 - ((t * sp + r() * H) % (H - 10)), x = bx + Math.sin(t * 2 + i) * 1.5, s = 1 + (i % 3) * .6;
+    disc(x, yy, s + 1, '#8fd8ea'); disc(x, yy, s, '#0d2f38'); rc(x - s * .5, yy - s * .5, 1, 1, '#e8fbff'); }
+} };
+function shelf(x0, w, seed) {
+  rc(x0, 0, w, H - 9, '#24180f'); rc(x0 + (x0 ? 0 : w - 2), 0, 2, H - 9, '#3b2a1c');
+  const r = rng(seed), cols = ['#5a3a5c', '#2f5a5a', '#6a4a2a', '#3a4a6a', '#6a2f36', '#4a5a2f'];
+  for (let y = 26; y < H - 12; y += 32) { rc(x0, y, w, 3, OL); rc(x0, y, w, 1, '#5a4030'); rc(x0, y + 1, w, 1, '#3b2a1c');
+    let x = x0 + (x0 ? 2 : 0); while (x < x0 + w - (x0 ? 0 : 2) - 3) { const bw = 3 + R(r() * 2), bh = 14 + R(r() * 9), c = cols[R(r() * 5)];
+      rc(x, y - bh, bw, bh, c); rc(x, y - bh, 1, bh, OL); rc(x, y - bh, bw, 1, OL); rc(x + 1, y - bh + 1, bw - 1, 1, 'rgba(255,255,255,.18)'); rc(x + 1, y - bh + 4, bw - 1, 1, '#c9a24a'); x += bw + (r() < .2 ? 1 : 0); } }
+  rc(x0, 0, w, H - 9, 'rgba(5,20,26,.35)');
+}
+function kelp(bx, n, t, p) {
+  for (let j = 0; j < n; j++) { const y = H - 9 - j * 4, x = bx + (RM() ? 0 : Math.sin(t * 1.1 + j * .45 + p)) * j * .28;
+    rc(x - 2, y - 4, 5, 5, '#0d2418'); rc(x - 1, y - 4, 3, 4, '#2f7a4a'); rc(x - 1, y - 4, 1, 4, '#5fc07a');
+    if (j % 3 === 1) { const d = j % 2 ? 1 : -1; disc(x + d * 4, y - 3, 2, '#0d2418'); disc(x + d * 4, y - 3, 1.3, '#3f9a5a'); } }
+}
+BG.BG4 = { back(t) { // tentacle frame
+  rc(0, 0, W, H, '#150d1f'); for (let y = 0; y < H; y += 2) for (let x = (y % 4) ? 1 : 3; x < W; x += 4) if ((x * 7 + y * 3) % 11 < 2) rc(x, y, 1, 1, '#1d1429');
+  const r = rng(12); for (let k = 0; k < 24; k++) rc(r() * W, r() * H, 1, 1, k % 3 ? '#3a2a5a' : '#6a4a9a');
+}, front(t, mode) { const tt = RM() ? 0 : t, k = mode === 'sheet' ? 1.15 : 1;
+  arm({ x: -3, y: H * .8, a: -.3, len: 54 * k, r0: 7, r1: .9, bend: -.2, curl: -5, sw: .22, sp: 1.1, ph: 0 }, tt, PLUM);
+  arm({ x: -3, y: H * .3, a: .2, len: 40 * k, r0: 5.5, r1: .8, bend: .3, curl: 4.6, sw: .25, sp: 1.3, ph: 1.2 }, tt, PLUM);
+  arm({ x: -3, y: H * .6, a: -.2, len: 46 * k, r0: 6.5, r1: .9, bend: -.2, curl: -4.8, sw: .22, sp: 1.2, ph: 2.1, mir: 1 }, tt, PLUM);
+  arm({ x: -3, y: H * .15, a: .35, len: 36 * k, r0: 5, r1: .8, bend: .2, curl: 4.6, sw: .25, sp: 1.0, ph: .6, mir: 1 }, tt, PLUM);
+  arm({ x: W * .42, y: H + 3, a: -1.45, len: 26 * k, r0: 6, r1: .9, bend: -.3, curl: -4.4, sw: .2, sp: .9, ph: 3 }, tt, PLUM);
+} };
+BG.BG5 = { back(t, mode, bk) { // tentacles round the book
+  rc(0, 0, W, H, '#061013');
+  for (let y = 0; y < H; y += 12) for (let x = (y / 12 % 2) * -6; x < W; x += 12) { rc(x, y, 11, 11, ((x + y) / 12) % 2 ? '#0e2024' : '#0c1c20'); rc(x, y, 11, 1, '#15292e'); }
+  for (let y = 11; y < H; y += 12) rc(0, y, W, 1, '#061013');
+  const tt = RM() ? 0 : t;
+  if (bk) { const { cx, cy, bw, bh, open } = bk, hw = open > .5 ? bw : bw / 2, hh = bh / 2;
+    [[-1, -1], [1, -1], [-1, 1], [1, 1]].forEach(([sx, sy], i) => { const a = Math.atan2(sy * hh, sx * hw);
+      arm({ x: cx + sx * hw * .55, y: cy + sy * hh * .55, a: a, len: 50, r0: 6.5, r1: 1, bend: 0, curl: sx * sy * 3.6, sw: .2, sp: .9, ph: i * 1.7 }, tt, GREEN); });
+    [[-1, 0], [1, 0]].forEach(([sx], i) => arm({ x: cx + sx * hw * .6, y: cy + 6, a: sx < 0 ? Math.PI : 0, len: 34, r0: 5, r1: .9, curl: -sx * 3.8, sw: .22, sp: .8, ph: 2 + i }, tt, GREEN));
+  }
+  const k = mode === 'sheet' ? 1.25 : 1;
+  arm({ x: -3, y: H * .1, a: .5, len: 32 * k, r0: 6.5, r1: .9, bend: -.3, curl: 4.2, sw: .3, sp: .8, ph: .4 }, tt, GREEN);
+  arm({ x: -3, y: H * .1, a: .5, len: 30 * k, r0: 6, r1: .9, bend: -.3, curl: 4.2, sw: .3, sp: .8, ph: 2.2, mir: 1 }, tt, GREEN);
+  arm({ x: -3, y: H * .9, a: -.6, len: 34 * k, r0: 7, r1: .9, bend: .3, curl: -4.4, sw: .3, sp: .7, ph: 1.1 }, tt, GREEN);
+  arm({ x: -3, y: H * .9, a: -.6, len: 32 * k, r0: 6.5, r1: .9, bend: .3, curl: -4.4, sw: .3, sp: .7, ph: 3.0, mir: 1 }, tt, GREEN);
+} };
+
+/* ================= the T4 sequence on the T1 tome ================= */
+const DUR = 3.2;
+let bits = [];
+function seq(pt) {
+  return { shake: pt < .95 ? R(Math.sin(pt * 60) * sm(.1, .9, pt) * 1.6) : 0, strain: pt < .95 ? sm(.1, .9, pt) * 1.5 : 0, chains: pt < .95,
+    open: sm(1.0, 1.45, pt), rings: pt < 1.35 ? 0 : 1 + Math.floor((pt - 1.35) / .12), portal: sm(1.75, 2.3, pt), armP: sm(1.55, 2.25, pt), grip: sm(2.1, 2.5, pt) };
+}
+function snapBits(cx, cy, bw, bh) { const r = rng(99); bits = []; for (let i = 0; i < 26; i++) { const y = cy + (i % 2 ? .1 : -.1) * bh, x = cx - bw / 2 - 4 + r() * (bw + 8), a = Math.atan2(y - cy, x - cx) + (r() - .5);
+  bits.push({ x, y, vx: Math.cos(a) * (30 + r() * 40), vy: Math.sin(a) * (30 + r() * 40) - 20, c: r() < .3 ? '#c9cdd6' : '#8a8f99' }); } }
+
+function draw(t, pt) {
+  const mode = phase === 'sheet' ? 'sheet' : 'rest', bw = Math.min(54, R(W * .42)), bh = R(bw * 1.32), cx = R(W / 2), cy = R(H * .5);
+  const s = pt == null ? { open: 0, chains: true, strain: 0, rings: 0, portal: 0 } : seq(pt);
+  const B = BG[cur]; B.back(t, mode, mode === 'sheet' ? null : { cx, cy, bw, bh, open: s.open });
+  if (mode !== 'sheet') {
+    book(cx, cy, bw, bh, s, t);
+    if (pt != null && pt >= .95 && pt < 1.9) { const d = pt - .95; bits.forEach((b) => { const x = b.x + b.vx * d, y = b.y + b.vy * d + 60 * d * d; rc(x - 2, y - 2, 5, 4, OL); rc(x - 1, y - 1, 3, 2, '#8a8f99'); rc(x - 1, y - 1, 2, 1, '#c9cdd6'); }); }
+  }
+  if (B.front) B.front(t, mode);
+  if (pt != null && s.armP > 0) { const L = H * .62 * s.armP;
+    arm({ x: -6, y: H + 6, a: -1.05, len: L, r0: 10, r1: 1.2, bend: .25, curl: -(2.2 + 3 * s.grip), sw: .12, sp: 3, ph: 0 }, t, GREEN);
+    arm({ x: -6, y: H + 6, a: -1.05, len: L, r0: 10, r1: 1.2, bend: .25, curl: -(2.2 + 3 * s.grip), sw: .12, sp: 3, ph: 1.5, mir: 1 }, t, GREEN); }
+  vignette();
+}
+
+/* ================= loop ================= */
+let lastKey = '', raf = 0, frozen = false;
+function tick(now) {
+  raf = requestAnimationFrame(tick); if (frozen) return;
+  const ts = now / 1000;
+  if (phase === 'play') { const pt = Math.floor((ts - playT0) * 24) / 24; const key = 'p' + pt; if (key !== lastKey) { lastKey = key; draw(ts, pt); } return; }
+  const q = RM() ? 0 : Math.floor(ts * 10) / 10, key = cur + phase + q + W + H;
+  if (key !== lastKey) { lastKey = key; draw(q, null); }
+}
+function size() { const r = stage.getBoundingClientRect(); W = Math.max(60, R(r.width / 3)); H = Math.max(100, R(r.height / 3)); cv.width = W; cv.height = H; g.imageSmoothingEnabled = false; lastKey = ''; }
+new ResizeObserver(size).observe(stage); size();
+raf = requestAnimationFrame(tick);
+
+/* ---------- the sheet (unchanged) ---------- */
+const ICON = (n) => (window.BLOOD && BLOOD.icons && BLOOD.icons[n]) || '';
+const SIGS = [['Flesh', 'A feeling'], ['Domain', 'A place'], ['Scene', 'What was going on'], ['Coven', 'The people']];
+const EV = [{ t: '06:52', n: 'Snoozing', c: 1, s: 'Flesh', d: ['Tired'] }, { t: '07:05', n: 'Floss', c: 0 }, { t: '12:40', n: 'Walk outside', c: 0 }, { t: '16:38', n: 'Junk food', c: 1, s: 'Domain', d: [] }, { t: '18:10', n: 'Read a chapter', c: 0 }, { t: '19:20', n: 'Doom-scrolling', c: 1, s: null, d: [] }];
+const CH = ['Tired', 'Bored', 'Stressed', 'Sofa', 'Bed', 'Kitchen', 'Alone', 'Family'];
+let sel = 5;
+const ulhu = () => (window.ULHU_SPR && ULHU_SPR.idle) || '';
+function renderSheet() {
+  let h = '<div class="sec">Today in glass</div><div class="dayg">' + (window.GLASS ? GLASS.day(EV.map((e) => ({ t: e.t, side: e.c ? 'c' : 'b', name: e.n })), { key: 'grim-today' }) : '') + '</div><div class="say"><img src="' + ulhu() + '" alt="Ulhu"><p>Three curses on the line. Tap one and tell me more. I keep a file.</p></div><div class="sec">The night line</div><div class="line">';
+  EV.forEach((e, i) => { h += '<button type="button" class="ev' + (e.c ? ' c' : '') + '" data-a="ev" data-i="' + i + '" aria-expanded="' + (sel === i) + '"><time>' + e.t + '</time><b>' + e.n + '</b>' +
+      (e.c ? (e.s ? '<span class="sd" title="' + e.s + '">' + ICON(e.s) + '</span>' : '<span class="sd none" title="No sigil yet">?</span>') : '') + '</button>';
+    if (sel === i && e.c) h += '<div class="tray"><div class="q">What was behind it?</div><div class="sr">' + SIGS.map(([n, c]) => '<button type="button" class="sbn" data-a="sig" data-v="' + n + '" aria-pressed="' + (e.s === n) + '"><span class="sd">' + ICON(n) + '</span><span><b>' + n + '</b><br>' + c + '</span></button>').join('') + '</div>' +
+      '<div class="chips">' + CH.map((c) => '<button type="button" class="chip" data-a="chip" data-v="' + c + '" aria-pressed="' + e.d.includes(c) + '">' + c + '</button>').join('') + '</div></div>'; });
+  $('#sb').innerHTML = h + '</div>'; if (window.GLASS) GLASS.paint($('#sb'));
+}
+sheet.addEventListener('click', (ev) => {
+  const b = ev.target.closest('[data-a]'); if (!b) return; const a = b.dataset.a, e = EV[sel];
+  if (a === 'close') return closeSheet();
+  if (a === 'ring') { closeSheet(); showToast('Vespers rung. 41 nights. +3 runes.'); return; }
+  if (a === 'ev') { const i = +b.dataset.i; sel = sel === i ? -1 : i; }
+  if (a === 'sig' && e) e.s = e.s === b.dataset.v ? null : b.dataset.v;
+  if (a === 'chip' && e) { const k = e.d.indexOf(b.dataset.v); if (k < 0) e.d.push(b.dataset.v); else e.d.splice(k, 1); }
+  renderSheet(); const f = $$('[data-a="' + a + '"]', sheet).find((x) => x.dataset.i === b.dataset.i && x.dataset.v === b.dataset.v); if (f) f.focus({ preventScroll: true });
+});
+function showToast(m) { toast.textContent = m; toast.classList.add('show'); clearTimeout(showToast.t); showToast.t = setTimeout(() => toast.classList.remove('show'), 4000); }
+function stopAnims() { anims.forEach((a) => a.cancel()); anims = []; flash.style.opacity = 0; }
+function openSheet(quick) {
+  stopAnims(); phase = 'sheet'; lastKey = ''; renderSheet(); sheet.classList.add('open'); sheet.removeAttribute('inert'); hint.dataset.off = '1';
+  if (RM()) sheet.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300 });
+  else { sheet.animate([{ opacity: 0, transform: 'scale(1.14)', filter: 'brightness(2.4) saturate(1.6) blur(4px)' }, { opacity: 1, offset: .45 }, { opacity: 1, transform: 'scale(1)', filter: 'none' }], { duration: quick ? 420 : 560, easing: 'cubic-bezier(.2,.8,.2,1)' }); }
+  setTimeout(() => { const f = $('.back', sheet); if (f && phone.contains(document.activeElement)) f.focus({ preventScroll: true }); }, 50);
+}
+function closeSheet(instant) {
+  const done = () => { sheet.classList.remove('open'); sheet.setAttribute('inert', ''); };
+  phase = 'rest'; lastKey = ''; hint.dataset.off = '0';
+  if (instant || RM()) return done();
+  sheet.animate([{ opacity: 1, transform: 'scale(1)' }, { opacity: 0, transform: 'scale(.92)' }], { duration: 320, easing: 'ease-in' }).finished.then(done, done);
+}
+
+/* ---------- playing ---------- */
+let endT = 0;
+function play() {
+  if (phase !== 'rest') return;
+  if (RM()) { openSheet(); return; }
+  phase = 'play'; hint.dataset.off = '1'; playT0 = performance.now() / 1000; lastKey = '';
+  const bw = Math.min(54, R(W * .42)), bh = R(bw * 1.32); snapBits(R(W / 2), R(H * .5), bw, bh);
+  const D = DUR * 1000;
+  // haul back, then down into the circle
+  anims.push(scene.animate([{ transform: 'none', offset: 0 }, { transform: 'none', offset: 2.45 / DUR }, { transform: 'scale(.8) translateY(-4%)', offset: 2.8 / DUR, easing: 'cubic-bezier(.6,0,.9,.4)' }, { transform: 'scale(6) translateY(0)' }], { duration: D, fill: 'forwards' }));
+  anims.push(flash.animate([{ opacity: 0, offset: 0 }, { opacity: 0, offset: 2.85 / DUR }, { opacity: 1 }], { duration: D, fill: 'forwards' }));
+  clearTimeout(endT); endT = setTimeout(() => { if (phase === 'play') { openSheet(); requestAnimationFrame(() => { scene.getAnimations().forEach((a) => a.cancel()); }); } }, D - 60);
+}
+function skip() { if (phase !== 'play') return; clearTimeout(endT); openSheet(true); }
+stage.addEventListener('pointerdown', (e) => { if (phase === 'play') { e.preventDefault(); skip(); } });
+stage.addEventListener('click', () => { if (phase === 'rest') play(); });
+stage.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); if (phase === 'play') skip(); else play(); } });
+
+function choose(v) {
+  cur = v; lastKey = ''; $$('#seg button').forEach((b) => b.setAttribute('aria-pressed', b.dataset.v === v));
+  $$('.card').forEach((c) => c.setAttribute('aria-current', c.dataset.v === v));
+  cap.innerHTML = '<b>' + v + ' · ' + V[v][0] + '</b>' + V[v][1];
+}
+$('#seg').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) choose(b.dataset.v); });
+$('#replay').addEventListener('click', () => { clearTimeout(endT); stopAnims(); if (phase === 'sheet') closeSheet(true); phase = 'rest'; lastKey = ''; setTimeout(play, 120); });
+$('#cards').innerHTML = Object.keys(V).map((v) => '<li><button type="button" class="card" data-v="' + v + '" aria-current="false"><span class="hd"><b>' + v + '</b><span>' + V[v][0] + '</span></span><p>' + V[v][1] + '</p></button></li>').join('');
+$('#cards').addEventListener('click', (e) => { const c = e.target.closest('.card'); if (!c) return; choose(c.dataset.v); if (phone.getBoundingClientRect().top < 0) phone.scrollIntoView({ block: 'center', behavior: RM() ? 'auto' : 'smooth' }); });
+choose('BG1');
+window.__G5 = { choose, play, skip, openSheet, get phase() { return phase; }, frame(pt) { frozen = true; if (pt < 1) snapBits(R(W / 2), R(H * .5), Math.min(54, R(W * .42)), R(Math.min(54, R(W * .42)) * 1.32)); draw(1, pt); }, unfreeze() { frozen = false; lastKey = ''; } };
+})();
+</script>
