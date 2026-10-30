@@ -1,0 +1,123 @@
+[
+  {
+    "meta": {
+      "class": "13D",
+      "topic": "Evolution of the universe",
+      "title": "Evolution of the Universe",
+      "lessonType": "standard",
+      "theme": "physics",
+      "worksheet": "A",
+      "differentiation": "none",
+      "year": 13,
+      "subject": "Physics",
+      "macrotopic": "Chapter 20 - Cosmology",
+      "lessonNumber": 5,
+      "examQuestion": false
+    },
+    "title": {
+      "objectives": [
+        "Describe how the universe evolved from the Big Bang to today.",
+        "Explain the evidence for dark matter and dark energy.",
+        "Describe the possible fates of the universe."
+      ],
+      "keywords": ["inflation", "nucleosynthesis", "cosmic microwave background", "dark matter", "dark energy", "critical density"]
+    },
+    "doNow": {
+      "variant": "A",
+      "questions": [
+        { "q": "State the cosmological principle.", "a": "On a large scale the universe is homogeneous and isotropic, and the laws of physics are universal.", "marks": 2 },
+        { "q": "State Hubble's law.", "a": "The recession velocity of a galaxy is proportional to its distance from us (v = H_0 d).", "marks": 1 },
+        { "q": "What is a light-year?", "a": "The distance light travels in one year, about 9.5 \\times 10^{15} m.", "marks": 1 },
+        { "q": "Write the Doppler equation for light from a receding source.", "a": "{\\Delta\\lambda/\\lambda} \\approx {v/c}", "marks": 1 },
+        { "q": "State Wien's displacement law.", "a": "\\lambda_{max} T = constant (2.9 \\times 10^{-3} m K)", "marks": 1 },
+        { "q": "H_0 \\approx 2.2 \\times 10^{-18} s^{-1}. Estimate the age of the universe in seconds.", "a": "t \\approx 1/H_0 = 4.5 \\times 10^{17} s (about 14 billion years)", "marks": 2 }
+      ]
+    },
+    "engage": {
+      "variant": "prediction",
+      "title": "THE FIRST MINUTES",
+      "hook": "Hydrogen and helium make up almost all the normal matter in the universe. Why did the Big Bang make so little of anything heavier?",
+      "imagePlaceholder": false,
+      "reveal": {
+        "question": "You will be able to answer this by the end of the lesson.",
+        "answer": "Nucleosynthesis only lasted a few minutes. The universe expanded and cooled too quickly for nuclei to keep fusing past helium. Heavier elements were made much later, in stars."
+      }
+    },
+    "learn": [
+      {
+        "variant": "K",
+        "heading": "From the Big Bang to today",
+        "imagePlaceholder": false,
+        "events": [
+          { "year": "0 s", "label": "Big Bang", "detail": "Space and time begin; extremely hot and dense" },
+          { "year": "~10^{-35} s", "label": "Inflation", "detail": "Space expands extremely rapidly for a tiny fraction of a second" },
+          { "year": "~10^{-12} s", "label": "Quarks and leptons", "detail": "Fundamental particles and antiparticles fill the universe" },
+          { "year": "~10^{-6} s", "label": "Hadrons", "detail": "Quarks combine into protons and neutrons" },
+          { "year": "~3 minutes", "label": "Nucleosynthesis", "detail": "Protons and neutrons fuse into helium nuclei; it stops as the universe cools" },
+          { "year": "~380 000 years", "label": "Atoms and the CMB", "detail": "Electrons join nuclei; photons travel freely: the CMB" },
+          { "year": "~200 million years", "label": "First stars", "detail": "Gravity pulls hydrogen and helium into stars; galaxies follow" },
+          { "year": "~13.7 billion years", "label": "Today", "detail": "CMB cooled to 2.7 K; expansion accelerating" }
+        ]
+      },
+      {
+        "variant": "A",
+        "heading": "Dark matter and dark energy",
+        "imagePlaceholder": false,
+        "boxes": [
+          { "header": "Dark matter", "items": ["Stars far from a galaxy's centre orbit almost as fast as stars near it.", "The visible mass predicts they should be slower, so there is extra, unseen mass: dark matter.", "It does not emit or absorb electromagnetic radiation; we detect it only by its gravity."] },
+          { "header": "Dark energy", "items": ["1998: distant type 1a supernovae (standard candles) were fainter than expected.", "So they are further away than predicted: the expansion of the universe is accelerating.", "The energy driving this is called dark energy."] },
+          { "header": "What the universe is made of", "items": ["about 5% ordinary matter · about 27% dark matter · about 68% dark energy"] }
+        ]
+      },
+      {
+        "variant": "A",
+        "heading": "The fate of the universe",
+        "imagePlaceholder": false,
+        "boxes": [
+          { "header": "Depends on the density compared with the critical density", "items": ["Closed (density > critical): gravity stops the expansion; the universe collapses (Big Crunch).", "Flat (density = critical): expansion slows, approaching zero.", "Open (density < critical): expansion continues forever."] },
+          { "header": "What the evidence suggests", "items": ["Dark energy makes the expansion accelerate.", "The universe is likely to keep expanding forever and cool towards absolute zero."] }
+        ]
+      }
+    ],
+    "build": [
+      { "type": "mcq", "q": "Why was the cosmic microwave background released about 380 000 years after the Big Bang?", "options": ["A. Neutral atoms formed, so photons were no longer scattered by free electrons.", "B. The first stars formed and began to emit radiation.", "C. Quarks combined to form protons and neutrons.", "D. Nucleosynthesis produced helium nuclei."], "answer": "A", "explanation": "Once the universe cooled to about 3000 K, electrons joined nuclei, so photons could travel freely.", "commonError": "Thinking the CMB comes from the first stars." },
+      { "type": "mcq", "q": "What happened during inflation?", "options": ["A. Space expanded extremely rapidly for a tiny fraction of a second.", "B. The universe cooled to 2.7 K.", "C. The first atoms formed.", "D. The universe briefly contracted."], "answer": "A", "explanation": "Inflation was a very rapid expansion around 10^{-35} s after the Big Bang.", "commonError": "Confusing inflation with the release of the CMB." },
+      { "type": "mcq", "q": "Which of these formed FIRST after the Big Bang?", "options": ["A. protons and neutrons", "B. quarks and leptons", "C. helium nuclei", "D. hydrogen atoms"], "answer": "B", "explanation": "Quarks and leptons came first; quarks then combined into hadrons such as protons and neutrons.", "commonError": "Choosing protons, which are made of quarks." },
+      { "type": "mcq", "q": "Stars at the edge of a galaxy orbit faster than the visible mass predicts. What does this suggest?", "options": ["A. dark matter", "B. dark energy", "C. inflation", "D. redshift"], "answer": "A", "explanation": "Extra, unseen mass (dark matter) provides the gravity for the faster orbits.", "commonError": "Mixing up dark matter (extra gravity) and dark energy (accelerating expansion)." },
+      { "type": "mcq", "q": "Distant type 1a supernovae are fainter than predicted. What does this show?", "options": ["A. The expansion of the universe is accelerating.", "B. The expansion of the universe is slowing down.", "C. The universe is not expanding.", "D. Distant galaxies are moving towards us."], "answer": "A", "explanation": "Fainter means further away than predicted, so the expansion has sped up.", "commonError": "Thinking fainter means the expansion is slowing." },
+      { "type": "mcq", "q": "Roughly what fraction of the universe is ordinary matter?", "options": ["A. about 5%", "B. about 27%", "C. about 68%", "D. about 95%"], "answer": "A", "explanation": "About 5% ordinary matter, 27% dark matter and 68% dark energy.", "commonError": "Choosing 27% (dark matter) or 95% (everything that is NOT ordinary matter)." },
+      { "type": "trueFalse", "heading": "COMMON MISCONCEPTIONS", "statements": [
+        { "text": "The Big Bang was an explosion of matter into empty space.", "isTrue": false, "correction": "Space itself expanded; there was no empty space outside for matter to fly into." },
+        { "text": "Dark matter does not emit light, but we can detect it by its gravity.", "isTrue": true },
+        { "text": "Dark matter and dark energy are the same thing.", "isTrue": false, "correction": "Dark matter adds gravity (holds galaxies together); dark energy drives the accelerating expansion." },
+        { "text": "The cosmic microwave background comes from the first stars.", "isTrue": false, "correction": "It was released about 380 000 years after the Big Bang, when atoms formed, long before any stars." }
+      ] }
+    ],
+    "apply": {
+      "developing": [
+        { "q": "Put these events in order, earliest first: helium nuclei form; inflation; atoms form and the CMB is released; quarks and leptons form; the first stars form.", "a": "inflation → quarks and leptons form → helium nuclei form → atoms form and the CMB is released → the first stars form", "marks": 2, "qType": "concept" },
+        { "q": "State two pieces of evidence for the Big Bang.", "a": "Any two: the redshift of distant galaxies / Hubble's law (the universe is expanding); the cosmic microwave background; the amount of helium in the universe (about 25% by mass).", "marks": 2, "qType": "concept" },
+        { "q": "Explain why the universe became transparent about 380 000 years after the Big Bang.", "a": "The universe cooled to about 3000 K, so electrons combined with nuclei to form neutral atoms. Photons were no longer scattered by free electrons, so they could travel freely.", "marks": 2, "qType": "concept" }
+      ],
+      "reaching": [
+        { "q": "Describe the evidence from galaxy rotation for dark matter.", "a": "Stars far from a galaxy's centre orbit at almost the same speed as stars nearer the centre. The visible mass predicts the speed should fall with distance. So there must be extra, unseen mass spread through the galaxy: dark matter.", "marks": 3, "qType": "concept" },
+        { "q": "Explain how observations of type 1a supernovae led to the idea of dark energy.", "a": "Type 1a supernovae have a known luminosity (standard candles). Distant ones were fainter than expected, so they are further away than predicted. This means the expansion is accelerating, which needs a source of energy: dark energy.", "marks": 3, "qType": "concept" },
+        { "q": "The CMB today has a peak wavelength of 1.06 mm. Use Wien's law (\\lambda_{max} T = 2.9 \\times 10^{-3} m K) to calculate its temperature.", "a": "T = 2.9 \\times 10^{-3} \\div 1.06 \\times 10^{-3} = 2.7 K", "marks": 2, "qType": "calculation" }
+      ],
+      "mastering": [
+        { "q": "Describe how the universe has evolved from the Big Bang to the present day.", "a": "Inflation, then quarks and leptons, then hadrons, then helium nuclei by nucleosynthesis in the first minutes; atoms and the CMB at about 380 000 years; stars and galaxies after about 200 million years; today expansion is accelerating and the CMB is at 2.7 K.", "marks": 6, "qType": "extended_writing", "contentType": "extended_writing",
+          "indicativeContent": [
+            "Inflation: space expanded extremely rapidly just after the Big Bang",
+            "Quarks and leptons formed, then quarks combined into hadrons (protons and neutrons)",
+            "Nucleosynthesis in the first few minutes formed helium nuclei; it stopped as the universe cooled",
+            "About 380 000 years: electrons joined nuclei to form atoms; the universe became transparent and the CMB was released",
+            "After about 200 million years gravity formed the first stars, then galaxies",
+            "Today: about 13.7 billion years old, CMB at 2.7 K, expansion accelerating (dark energy)"
+          ] },
+        { "q": "Describe the possible fates of the universe, and explain what current evidence suggests will happen.", "a": "Closed: density above the critical density, gravity stops the expansion and the universe collapses (Big Crunch). Flat: density equals the critical density, expansion slows towards zero. Open: density below critical, it expands forever. Type 1a supernovae show the expansion is accelerating (dark energy), so the universe will probably expand forever and cool.", "marks": 4, "qType": "concept" },
+        { "q": "H_0 = 68 km s^{-1} Mpc^{-1}. Estimate the age of the universe in years. (1 Mpc = 3.1 \\times 10^{22} m; 1 year = 3.15 \\times 10^{7} s)", "a": "H_0 = 68 \\times 10^{3} \\div 3.1 \\times 10^{22} = 2.2 \\times 10^{-18} s^{-1}; t \\approx 1/H_0 = 4.6 \\times 10^{17} s; \\div 3.15 \\times 10^{7} = 1.4 \\times 10^{10} years", "marks": 3, "qType": "calculation" }
+      ]
+    },
+    "worksheetExtras": { "wordBank": [] }
+  }
+]

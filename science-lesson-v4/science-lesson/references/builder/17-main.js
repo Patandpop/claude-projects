@@ -14,6 +14,45 @@ function resolveOutputDir(L) {
 }
 
 /* =========================================================================
+   DRIVE FOLDER FOR THE LESSON NOTES (.path.txt, .manifest.json)
+   ========================================================================= */
+
+// A level (item 1.8, 2026-10-30): since the October reorganisation Drive has no subject level and
+// the chapters sit in Module folders. At home the uploader's own lookup reads Drive (read only);
+// without Drive (claude.ai) these folders, as listed on Drive on 2026-10-30, are used.
+const ALEVEL_MODULES = {
+  12: { 'Module 4 - Electrons, Waves and Photons': { 8: 'Charge and Current', 9: 'Energy, Power and Resistance', 10: 'Electrical Circuits', 11: 'Waves 1', 12: 'Waves 2', 13: 'Quantum Physics' },
+        'Module 5 - Newtonian World and Astrophysics': { 14: 'Thermal Physics', 15: 'Ideal Gases' } },
+  13: { 'Module 5 - Newtonian World and Astrophysics': { 17: 'Oscillations', 19: 'Stars', 20: 'Cosmology' },
+        'Module 6 - Particles and Medical Physics': { 21: 'Capacitance', 22: 'Electric Fields', 23: 'Magnetic Fields', 24: 'Particle Physics', 25: 'Radioactivity', 26: 'Nuclear Physics', 27: 'Medical Imagining' } },
+};
+
+// The uploader's chapter lookup when it sits beside build.js (home), else null.
+function alevelLookup() {
+  if (process.env.ALEVEL_NO_DRIVE) return null;
+  try { return require(path.join(__dirname, 'upload-to-drive.js')).alevelLessonDir || null; } catch (_) { return null; }
+}
+
+// The lesson's folder below Lessons/, as a list of folder names.
+function lessonRel(meta, title, lookup) {
+  const { year, subject, macrotopic, lessonNumber } = meta;
+  const lesson = `Lesson ${lessonNumber} - ${title}`;
+  if (+year < 12) return [`Year ${year}`, subject, macrotopic, lesson];
+  if (lookup) {
+    try {
+      const m = /[\\/]Lessons[\\/](.+)$/.exec(lookup(year, macrotopic, lessonNumber, title) || '');
+      if (m) return m[1].split(/[\\/]/);
+    } catch (_) { /* Drive not readable: the table below */ }
+  }
+  const n = +(String(macrotopic).match(/(\d+)/) || [])[1];
+  for (const [mod, chs] of Object.entries(ALEVEL_MODULES[+year] || {})) {
+    if (chs[n]) return [`Year ${year}`, mod, `Chapter ${n} - ${chs[n]}`, lesson];
+  }
+  console.log(`  (A level: no module known for "${macrotopic}", so the Drive note has none)`);
+  return [`Year ${year}`, macrotopic, lesson];
+}
+
+/* =========================================================================
    MAIN
    ========================================================================= */
 
@@ -184,7 +223,8 @@ async function main() {
       const { year, subject, macrotopic, lessonNumber } = L.meta;
       const lessonTitle = L.meta.title || L.meta.topic;
       if (year && subject && macrotopic && lessonNumber && lessonTitle) {
-        const drivePath = `G:\\My Drive\\Beechen Cliff Science\\Lessons\\Year ${year}\\${subject}\\${macrotopic}\\Lesson ${lessonNumber} - ${lessonTitle}`;
+        const rel = lessonRel(L.meta, lessonTitle, alevelLookup());
+        const drivePath = 'G:\\My Drive\\Beechen Cliff Science\\Lessons\\' + rel.join('\\');
         fs.writeFileSync(path.join(outDir, base + '.path.txt'), drivePath, 'utf8');
         console.log('  \u2713 ' + base + '.path.txt');
         // 4b \u2014 Manifest sidecar (2026/27 school-Drive uploader): which files belong in
@@ -195,7 +235,7 @@ async function main() {
         const manifest = {
           builtOn: new Date().toISOString().slice(0, 10),
           class: L.meta.class || null, year, subject, macrotopic, lessonNumber, title: lessonTitle,
-          folder: `Year ${year}/${subject}/${macrotopic}/Lesson ${lessonNumber} - ${lessonTitle}`,
+          folder: rel.join('/'),
           files: deckOnly ? [base + '.pptx'] : [base + '.pptx', base + '_worksheet.docx',
                   base + (isRev ? '_answers.docx' : '_support_worksheet.docx')],
         };
@@ -228,4 +268,4 @@ async function main() {
   if (fail && !ok) process.exit(2);
 }
 
-main().catch((e) => { console.error(e); process.exit(2); });
+if (!process.env.BUILD_NO_MAIN) main().catch((e) => { console.error(e); process.exit(2); });   // BUILD_NO_MAIN: test/run.js loads this part alone to check lessonRel

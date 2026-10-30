@@ -36,6 +36,7 @@ const FIXTURES = [
   'triangle-handwriting-test.json', // 2026-10-02: 3- and 4-cell formula triangles, picture handwriting, EOT font embed, curved graph
   'lesson-quality-test.json',  // 2026-10-19 Lesson quality A: {k} gold underline, answer yellow, objectives slide, exam wording, misconception, notes, MCQ CHECK
   'dual-coding-test.json',     // 2026-10-23 Part B: Learn L labelled picture (build one part at a time + all-labels slide)
+  'alevel-13d-test.json',      // 2026-10-30 item 1.8: 13D lesson, Drive notes name Module/Chapter (no Physics level)
 ];
 
 // Strings the RENDERER must never emit (terminology + font-glyph regressions).
@@ -750,6 +751,33 @@ async function main() {
       }
       fs.rmSync(tmpD, { recursive: true, force: true });
       if (!bad.length) pass('diagram_gen.py: all 9 templates draw, each with its labelled parts'); else fail('diagram_gen.py: ' + bad.join(', '));
+    }
+
+    // Item 1.8 (2026-10-30): an A-level lesson's Drive notes name the Module/Chapter folder
+    // (no Physics level), so the planner can attach its multiple-choice questions.
+    if (fixture === 'alevel-13d-test.json') {
+      const base = baseName(lessons[0].meta);
+      let note = '', folder = '';
+      try { note = fs.readFileSync(path.join(outDir, base + '.path.txt'), 'utf8'); } catch (_) {}
+      try { folder = JSON.parse(fs.readFileSync(path.join(outDir, base + '.manifest.json'), 'utf8')).folder; } catch (_) {}
+      if (/\\Lessons\\Year 13\\Module 5 - [^\\]+\\Chapter 20 - [^\\]+\\Lesson 5 - /.test(note) && !note.includes('\\Physics\\'))
+        pass('A level: the path note names the Module and Chapter folders, no Physics level');
+      else fail('A level: wrong path note: ' + (note || '(missing)'));
+      if (folder && note.endsWith(folder.split('/').join('\\'))) pass('A level: the manifest folder matches the path note');
+      else fail('A level: manifest folder ' + (folder || '(missing)') + ' differs from the path note');
+      // the table used without Drive (claude.ai): load 17-main.js alone and ask it
+      const vm = require('vm');
+      const ctx = { require, console: { log() {} }, path, fs, process: { env: { BUILD_NO_MAIN: '1' } } };
+      vm.runInNewContext(fs.readFileSync(path.join(ROOT, 'science-lesson', 'references', 'builder', '17-main.js'), 'utf8'), ctx);
+      const rel = (year, macrotopic) => ctx.lessonRel({ year, subject: 'Physics', macrotopic, lessonNumber: 2 }, 'T', null).join('/');
+      const want = [
+        [12, 'Chapter 12 - Waves 2', 'Year 12/Module 4 - Electrons, Waves and Photons/Chapter 12 - Waves 2/Lesson 2 - T'],
+        [13, 'Ch 27', 'Year 13/Module 6 - Particles and Medical Physics/Chapter 27 - Medical Imagining/Lesson 2 - T'],
+        [13, 'Chapter 18 - Something', 'Year 13/Chapter 18 - Something/Lesson 2 - T'],
+        [11, 'P1 Energy', 'Year 11/Physics/P1 Energy/Lesson 2 - T'],
+      ].filter(([y, m, w]) => rel(y, m) !== w);
+      if (!want.length) pass('A level without Drive: the module table gives the real folders (GCSE unchanged)');
+      else fail('module table wrong for: ' + want.map(([y, m]) => y + ' ' + m + ' gave ' + rel(y, m)).join('; '));
     }
 
     if (fixture === 'flow-native-test.json') {

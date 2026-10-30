@@ -106,8 +106,8 @@ Canonical package list = `$ENTRIES` in `package-skill.ps1`. Keep `package-skill.
 | 7MLA | 7 | All science | Word bank |
 | 8XP | 8 | Biology + Physics | Word bank on cloze |
 | 8AG | 8 | Biology, then Physics | Word bank on cloze (2026-10-09) |
-| 9AS | 9 | Physics + Chemistry | Word bank not decided |
-| 9XS | 9 | All science | Word bank not decided |
+| 9AS | 9 | Physics + Chemistry | No word bank |
+| 9XS | 9 | All science | No word bank |
 | 10C2 | 10 | Physics + Chemistry (Combined) | Word bank, extra support |
 | 10S2 | 10 | Physics (triple) | No word bank |
 | 11S2 | 11 | Physics (triple) | No word bank, exam year |

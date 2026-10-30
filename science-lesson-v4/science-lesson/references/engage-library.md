@@ -76,4 +76,4 @@ Each is a real puzzle the lesson answers. None has an obvious answer, none is a 
 - Fun facts the lesson never comes back to (research: "seductive details" lower recall).
 - A big demo with no prediction and no explanation later: pupils remember the bang, not the science.
 - Silly questions with an obvious answer, or a statement where a question should be.
-- If no good hook fits, leave Engage out.
+- Leaving Engage out. Every standard and practical lesson has an Engage attempt, always a question (Patryk 2026-10-30). If no hook above fits, ask one from the history of the idea, from real data, or from what Patryk has just said or shown.
