@@ -1,0 +1,557 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ulhu: focus crafts, round 2 (stone carving and knitting)</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Grenze+Gotisch:wght@500;700&family=IM+Fell+English:ital@0;1&display=swap">
+<style>
+body{margin:0;background:#020504;color:#e8e1cf;font:14px 'Atkinson Hyperlegible',system-ui,sans-serif;padding:16px}
+h1{font:700 28px 'Grenze Gotisch',serif;color:#5ef2a0;margin:0 0 4px}
+.lead{color:#9fb1a8;max-width:800px;margin:0 0 12px;line-height:1.45}
+.ctl{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;margin:0 0 16px;padding:10px 12px;border:1px solid #1b2823;border-radius:12px;background:#0b1411;max-width:780px}
+.ctl label{font-weight:700;color:#c9a560}
+.ctl input[type=range]{width:220px;accent-color:#5ef2a0}
+.ctl .pv{min-width:42px;font-weight:700}
+button{padding:8px 14px;border-radius:999px;border:1px solid #5aa7ff;background:#0f1a24;color:#bfe0ff;font:700 13px 'Atkinson Hyperlegible';cursor:pointer}
+button.on{background:#5aa7ff;color:#08101a}
+.seg{display:flex;gap:4px}
+.seg button{border-color:#c9a560;color:#ffe2a0;background:#1a140a}
+.seg button.on{background:#c9a560;color:#1a140a}
+.grid{display:flex;flex-wrap:wrap;gap:22px;align-items:flex-start}
+.card{width:380px;background:#07100d;border:1px solid #1b2823;border-radius:18px;overflow:hidden}
+.card h2{font:500 25px 'Grenze Gotisch';color:#ffd56a;margin:10px 12px 0}
+.card .d{color:#9fb1a8;margin:2px 12px 8px;line-height:1.35;font-size:13px}
+.sw{position:relative}
+.stage{display:block;width:380px;height:330px}
+.time{position:absolute;left:10px;top:10px;background:#020504c0;border:1px solid #2f443b;border-radius:14px;padding:5px 12px 6px;line-height:1}
+.time b{font:700 34px 'Atkinson Hyperlegible';color:#fff}
+.time i{font:700 15px 'Atkinson Hyperlegible';color:#fff;font-style:normal;margin-left:4px}
+.time span{display:block;font:700 11px 'Atkinson Hyperlegible';color:#c9a560;letter-spacing:.08em;text-transform:uppercase;margin-top:3px}
+.pz{display:none;position:absolute;right:10px;top:12px;font:700 11px 'Atkinson Hyperlegible';letter-spacing:.06em;color:#bfe0ff;background:#0f1a24e0;border:1px solid #5aa7ff;border-radius:999px;padding:4px 9px;text-align:center;line-height:1.3}
+.paused .pz{display:block}
+.fintag{display:none;position:absolute;left:0;right:0;bottom:62px;text-align:center;font:700 19px 'Grenze Gotisch';color:#ffd56a;text-shadow:0 2px 0 #000,0 0 10px #000}
+.fin .fintag{display:block}
+.bars{display:flex;gap:6px;margin:10px 12px 2px;flex-wrap:wrap}
+.bars button{font-size:12px;padding:6px 10px;border-color:#2f443b;color:#cfe;background:#0b1411}
+.bars button.on{background:#5ef2a0;color:#04120b;border-color:#5ef2a0}
+.bd{color:#9fb1a8;font-size:12.5px;margin:4px 12px 8px;min-height:34px;line-height:1.35}
+.shelfh{font:500 16px 'Grenze Gotisch';color:#c9a560;margin:4px 12px 0}
+.shelf{display:block;width:380px;height:92px}
+.var{color:#7f948a;font-size:12px;margin:0 12px 12px}
+
+/* Ulhu bits shared */
+.blink{animation:blink 4.2s infinite}
+@keyframes blink{0%,93%,100%{transform:scaleY(1)}95%{transform:scaleY(.1)}}
+.eo{display:inline}.ec,.eh{display:none}
+.paused .eo,.fin .eo{display:none}.paused .ec{display:inline}.fin .eh{display:inline}
+.zz{display:none}.paused .zz{display:inline}
+.z{font:700 13px 'Grenze Gotisch';fill:#bfe0ff;animation:zz 2.6s ease-in-out infinite;opacity:0}
+.z2{animation-delay:.85s}.z3{animation-delay:1.7s}
+@keyframes zz{0%{transform:translate(0,0);opacity:0}25%{opacity:1}100%{transform:translate(10px,-18px);opacity:0}}
+.wing{animation:flap .7s ease-in-out infinite alternate}
+@keyframes flap{from{transform:rotate(-7deg)}to{transform:rotate(6deg)}}
+.paused .wing{animation:none}
+.breath{transition:transform .5s}
+.paused .breath{animation:breath 3.2s ease-in-out infinite}
+@keyframes breath{0%,100%{transform:scale(1,1)}50%{transform:scale(1.03,.97)}}
+
+/* STONE */
+.work .hy{animation:hy 6s ease-in-out infinite}
+.work .hx{animation:hx 6s ease-in-out infinite}
+.paused .hx,.fin .hx{transform:translateX(calc(-1 * var(--sx)))}
+.fin .hy{animation:joy .8s ease-in-out infinite}
+@keyframes joy{0%,100%{transform:translateY(0)}45%{transform:translateY(-16px)}}
+@keyframes hy{
+ 0%{transform:translateY(0px)}
+ 3%{transform:translateY(-7px)}
+ 6%{transform:translateY(0px)}
+ 9%{transform:translateY(-7px)}
+ 13%{transform:translateY(0px)}
+ 19%{transform:translateY(var(--peak))}
+ 25%{transform:translateY(0px)}
+ 29%{transform:translateY(-6px)}
+ 31%{transform:translateY(0px)}
+ 34%,38%{transform:translateY(var(--hi))}
+ 41%{transform:translateY(0px)}
+ 47%{transform:translateY(var(--peak))}
+ 53%{transform:translateY(0px)}
+ 57%,63%{transform:translateY(var(--hi))}
+ 67%{transform:translateY(0px)}
+ 69.5%{transform:translateY(-14px)}
+ 72%{transform:translateY(0px)}
+ 74.5%{transform:translateY(-14px)}
+ 77%{transform:translateY(0px)}
+ 80%{transform:translateY(-7px)}
+ 83%{transform:translateY(0px)}
+ 86%{transform:translateY(-7px)}
+ 89%{transform:translateY(0px)}
+ 93%{transform:translateY(var(--peak))}
+ 97%,100%{transform:translateY(0px)}}
+@keyframes hx{
+ 0%,13%{transform:translateX(calc(-1 * var(--sx))) scaleX(1) translateY(-34px) rotate(0deg) translateY(34px) scale(1)}
+ 25%{transform:translateX(var(--sx)) scaleX(1) translateY(-34px) rotate(360deg) translateY(34px) scale(1)}
+ 27%,41%{transform:translateX(var(--sx)) scaleX(-1) translateY(-34px) rotate(360deg) translateY(34px) scale(1)}
+ 53%{transform:translateX(calc(-1 * var(--sx))) scaleX(-1) translateY(-34px) rotate(720deg) translateY(34px) scale(1)}
+ 55%,67%{transform:translateX(calc(-1 * var(--sx))) scaleX(1) translateY(-34px) rotate(720deg) translateY(34px) scale(1)}
+ 72%{transform:translateX(0px) scaleX(1) translateY(-34px) rotate(720deg) translateY(34px) scale(1.1)}
+ 77%{transform:translateX(var(--sx)) scaleX(1) translateY(-34px) rotate(720deg) translateY(34px) scale(1)}
+ 79%,89%{transform:translateX(var(--sx)) scaleX(-1) translateY(-34px) rotate(720deg) translateY(34px) scale(1)}
+ 97%{transform:translateX(calc(-1 * var(--sx))) scaleX(-1) translateY(-34px) rotate(1080deg) translateY(34px) scale(1)}
+ 100%{transform:translateX(calc(-1 * var(--sx))) scaleX(1) translateY(-34px) rotate(1080deg) translateY(34px) scale(1)}}
+.swing{animation:swing .5s ease-in infinite}
+@keyframes swing{0%{transform:rotate(-52deg)}55%{transform:rotate(-58deg)}80%{transform:rotate(3deg)}87%{transform:rotate(-8deg)}100%{transform:rotate(-52deg)}}
+.paused .swing{animation:none;transform:rotate(40deg)}
+.fin .swing{animation:none;transform:rotate(-20deg)}
+.chips{animation:chipvis 6s step-end infinite}
+@keyframes chipvis{0%{opacity:1}13%{opacity:0}27%{opacity:1}41%{opacity:0}55%{opacity:1}67%{opacity:0}79%{opacity:1}89%{opacity:0}100%{opacity:0}}
+.chip{animation:chip .5s ease-out infinite;animation-delay:.4s;opacity:0}
+@keyframes chip{0%{transform:translate(0,0) rotate(0);opacity:1}75%{opacity:.9}100%{transform:translate(var(--x),var(--y)) rotate(240deg);opacity:0}}
+.tink{animation:tink .5s infinite;animation-delay:.4s;opacity:0}
+@keyframes tink{0%{opacity:1;transform:scale(.4)}30%{opacity:1;transform:scale(1.2)}60%,100%{opacity:0;transform:scale(1.4)}}
+.paused .chips,.fin .chips{display:none}
+.spark{display:none}.fin .spark{display:inline}
+.sp{animation:sp 1.4s ease-in-out infinite}
+@keyframes sp{0%,100%{opacity:0;transform:scale(.3)}50%{opacity:1;transform:scale(1)}}
+.bub{animation:bub 7s linear infinite}
+@keyframes bub{0%{transform:translate(0,0);opacity:0}10%{opacity:.7}100%{transform:translate(6px,-260px);opacity:0}}
+.kelp{animation:kelp 4s ease-in-out infinite alternate}
+@keyframes kelp{from{transform:rotate(-5deg)}to{transform:rotate(5deg)}}
+.ray{animation:ray 6s ease-in-out infinite alternate}
+@keyframes ray{from{opacity:.05}to{opacity:.13}}
+.lit{filter:url(#s-glow)}
+.cur{animation:curp 1s ease-in-out infinite alternate}
+@keyframes curp{from{opacity:.35}to{opacity:1}}
+.dust{animation:dust .5s ease-out infinite;opacity:0}
+@keyframes dust{0%{opacity:.9;transform:translate(0,0)}100%{opacity:0;transform:translate(var(--x),var(--y))}}
+.paused .dust,.paused .cur{animation:none}
+.mal{animation:mal .5s ease-in infinite}
+@keyframes mal{0%,60%{transform:rotate(-50deg)}85%{transform:rotate(5deg)}100%{transform:rotate(-50deg)}}
+.paused .mal{animation:none}
+
+/* KNIT */
+.work .rock{animation:rock 3.2s ease-in-out infinite}
+@keyframes rock{0%,100%{transform:rotate(-1.6deg)}50%{transform:rotate(1.6deg)}}
+.work .nl{animation:nl .45s ease-in-out infinite alternate}
+.work .nr{animation:nl .45s ease-in-out infinite alternate-reverse}
+@keyframes nl{from{transform:rotate(-7deg)}to{transform:rotate(5deg)}}
+.clk{opacity:0;font:700 8px 'Atkinson Hyperlegible';fill:#ffe2a0}
+.work .clk{animation:clk .9s ease-out infinite}
+.work .clk2{animation-delay:.45s}
+@keyframes clk{0%{opacity:0;transform:translate(0,2px)}12%{opacity:1;transform:translate(0,0)}45%{opacity:0;transform:translate(0,-5px)}100%{opacity:0}}
+.glasses{transition:transform .7s ease}
+.paused .glasses{transform:translateY(7px) rotate(-6deg)}
+.tilt{transition:transform .7s ease}
+.paused .tilt{transform:rotate(-7deg)}
+.heart{display:none}.fin .heart{display:inline}
+.hrt{animation:hrt 2.2s ease-out infinite;opacity:0}
+@keyframes hrt{0%{opacity:0;transform:translate(0,0) scale(.5)}20%{opacity:1}100%{opacity:0;transform:translate(4px,-30px) scale(1.1)}}
+.steam{animation:steam 2.6s ease-in-out infinite;opacity:0}
+@keyframes steam{0%{opacity:0;transform:translate(0,0)}30%{opacity:.6}100%{opacity:0;transform:translate(3px,-16px)}}
+.jelly{animation:jelly 3s ease-in-out infinite alternate}
+@keyframes jelly{from{opacity:.55}to{opacity:1}}
+.fish{animation:fish 9s linear infinite}
+@keyframes fish{from{transform:translateX(-50px)}to{transform:translateX(50px)}}
+.sway{animation:sway 2.4s ease-in-out infinite alternate}
+@keyframes sway{from{transform:rotate(-6deg)}to{transform:rotate(6deg)}}
+.paused .sway{animation:none}
+.swingin{animation:sway .9s ease-in-out infinite alternate}
+
+/* shelf */
+.pop{animation:pop .9s cubic-bezier(.3,1.6,.5,1) both}
+@keyframes pop{from{transform:translateY(-40px) scale(.2);opacity:0}to{transform:translateY(0) scale(1);opacity:1}}
+.glint{animation:sp 1.6s ease-in-out infinite}
+</style></head><body>
+<h1>Focus crafts, round 2: stone carving and knitting</h1>
+<p class="lead">The two crafts you kept, done properly. Drag the progress slider or press Play (about 20 seconds from start to finished). Press "Leave the app" to see him paused: he dozes with his tools in hand and nothing is lost. Switch the task size to see a bigger piece for a bigger task. Under each card, tap the bar letters to try each progress bar idea, then tell me which letters you like.</p>
+<div class="ctl">
+ <label for="pr">Progress</label><input id="pr" type="range" min="0" max="100" value="35"><span class="pv" id="pv">35%</span>
+ <button id="play">Play</button>
+ <button id="pa">Leave the app (pause)</button>
+ <span class="seg" id="sz"><button data-s="small">Small, 15 min</button><button data-s="medium" class="on">Medium, 30 min</button><button data-s="large">Large, 60 min</button></span>
+</div>
+<div class="grid">
+ <div class="card work" id="stone">
+  <h2>Stone carving</h2>
+  <p class="d">Ulhu hops all round the stone with a chisel and mallet. Chips fly, and the shape comes out of the rock as your focus goes on.</p>
+  <div class="sw"><svg class="stage" id="sst" viewBox="0 0 380 330"></svg>
+   <div class="time" id="stime"></div><div class="pz">PAUSED<br>back when you are</div></div>
+  <div class="bars" id="sbars"></div><p class="bd" id="sbd"></p>
+  <div class="shelfh">The shelf</div><svg class="shelf" id="ssh" viewBox="0 0 380 92"></svg>
+  <p class="var" id="svar"></p>
+ </div>
+ <div class="card work" id="knit">
+  <h2>Knitting</h2>
+  <p class="d">Ulhu in his armchair with his reading glasses on, needles clicking, the yarn ball wobbling and shrinking as the piece grows row by row.</p>
+  <div class="sw"><svg class="stage" id="kst" viewBox="0 0 380 330"></svg>
+   <div class="time" id="ktime"></div><div class="pz">PAUSED<br>back when you are</div></div>
+  <div class="bars" id="kbars"></div><p class="bd" id="kbd"></p>
+  <div class="shelfh">The shelf</div><svg class="shelf" id="ksh" viewBox="0 0 380 92"></svg>
+  <p class="var" id="kvar"></p>
+ </div>
+</div>
+<svg id="probe" width="0" height="0" style="position:absolute"></svg>
+<script>
+const $ = (s) => document.querySelector(s);
+const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+const MIN = { small: 15, medium: 30, large: 60 };
+let P = 35, paused = false, size = 'medium', playing = false;
+const bar = { stone: 'P1', knit: 'P4' };
+function rng(seed) { let s = seed; return () => { s = (s * 16807) % 2147483647; return (s - 1) / 2147483646; }; }
+const circ = (cx, cy, r) => `M${cx - r},${cy}a${r},${r} 0 1,0 ${2 * r},0a${r},${r} 0 1,0 ${-2 * r},0Z`;
+const ell = (cx, cy, rx, ry) => `M${cx - rx},${cy}a${rx},${ry} 0 1,0 ${2 * rx},0a${rx},${ry} 0 1,0 ${-2 * rx},0Z`;
+let uid = 0;
+
+/* ---------- Ulhu (drawn to match the game sprite: mint head, big dark eyes, blush, face tentacles, dark green wings, cream belly, sprout) ---------- */
+function headGrad(id) { return `<radialGradient id="${id}" cx=".36" cy=".3" r=".75"><stop offset="0" stop-color="#d4fae8"/><stop offset=".55" stop-color="#93dfbd"/><stop offset="1" stop-color="#5cb893"/></radialGradient>`; }
+function ulhuBody(hg, o = {}) {
+  const wing = '<path d="M0,2 C-10,-12 -22,-20 -28,-16 L-24,-9 L-29,-2 L-23,2 L-25,10 C-16,10 -6,8 0,6 Z" fill="#3f8a57" stroke="#1d4a33" stroke-width="1.5" stroke-linejoin="round"/><path d="M0,4 L-24,-9 M0,5 L-23,2" stroke="#1d4a33" stroke-width="1" fill="none"/>';
+  let s = `<g transform="translate(-11,-27)"><g class="wing">${wing}</g></g><g transform="translate(11,-27) scale(-1,1)"><g class="wing">${wing}</g></g>`;
+  s += '<ellipse cx="-8" cy="-3.5" rx="6.5" ry="4.5" fill="#6cc79f" stroke="#2f6b55" stroke-width="1.4"/><ellipse cx="8" cy="-3.5" rx="6.5" ry="4.5" fill="#6cc79f" stroke="#2f6b55" stroke-width="1.4"/>';
+  s += '<ellipse cx="0" cy="-17" rx="15.5" ry="15" fill="#8fdcb9" stroke="#2f6b55" stroke-width="1.6"/><ellipse cx="0" cy="-12" rx="9.5" ry="8" fill="#f3ecd2"/>';
+  s += `<circle cx="0" cy="-42" r="22" fill="url(#${hg})" stroke="#2f6b55" stroke-width="1.8"/><ellipse cx="-9" cy="-55" rx="6" ry="3.2" fill="#fff" opacity=".45" transform="rotate(-20 -9 -55)"/>`;
+  s += '<path d="M0,-63 q-1.5,-5 1,-9" stroke="#3f8a57" stroke-width="2" fill="none"/><ellipse cx="-4" cy="-71" rx="4.6" ry="2.4" transform="rotate(-25 -4 -71)" fill="#7fe07a" stroke="#3f8a57" stroke-width=".8"/><ellipse cx="6" cy="-73" rx="4.6" ry="2.4" transform="rotate(25 6 -73)" fill="#7fe07a" stroke="#3f8a57" stroke-width=".8"/>';
+  const eo = (x) => `<g transform="translate(${x},-45)"><g class="blink"><ellipse rx="5.3" ry="6.5" fill="#16203a"/><circle cx="-1.8" cy="-2.5" r="2" fill="#fff"/><circle cx="1.7" cy="2.1" r=".95" fill="#fff"/></g></g>`;
+  s += `<g class="eo">${eo(-8)}${eo(8)}</g>`;
+  s += '<g class="ec"><path d="M-13,-44 q5,3.5 10,0 M3,-44 q5,3.5 10,0" stroke="#16203a" stroke-width="2" fill="none" stroke-linecap="round"/></g>';
+  s += '<g class="eh"><path d="M-13,-43 q5,-6 10,0 M3,-43 q5,-6 10,0" stroke="#16203a" stroke-width="2.2" fill="none" stroke-linecap="round"/></g>';
+  s += '<ellipse cx="-15.5" cy="-36" rx="4.2" ry="2.4" fill="#ff9fb4" opacity=".85"/><ellipse cx="15.5" cy="-36" rx="4.2" ry="2.4" fill="#ff9fb4" opacity=".85"/>';
+  [-9, -3, 3, 9].forEach((x) => { const d = x < 0 ? -1 : 1; s += `<path d="M${x},-33 q${2.5 * d},5 0,9 q${-2.5 * d},4 ${d},7.5" stroke="#2f6b55" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M${x},-33 q${2.5 * d},5 0,9 q${-2.5 * d},4 ${d},7.5" stroke="#5fb894" stroke-width="3.2" fill="none" stroke-linecap="round"/>`; });
+  if (o.glasses) {
+    s += '<g class="glasses"><path d="M-15,-46 Q-22,-40 -20,-26 Q-17,-14 -10,-10" stroke="#e0b85c" stroke-width=".8" fill="none" stroke-dasharray="1.4 1.2" opacity=".85"/><circle cx="-8" cy="-45" r="7.3" fill="#fff" fill-opacity=".14" stroke="#e0b85c" stroke-width="1.5"/><circle cx="8" cy="-45" r="7.3" fill="#fff" fill-opacity=".14" stroke="#e0b85c" stroke-width="1.5"/><path d="M-1.2,-46 q1.2,-2 2.4,0" stroke="#e0b85c" stroke-width="1.3" fill="none"/><path d="M-15.2,-46 L-21,-48 M15.2,-46 L21,-48" stroke="#e0b85c" stroke-width="1.2"/><ellipse cx="-10.5" cy="-48" rx="2.2" ry="1.1" fill="#fff" opacity=".55" transform="rotate(-30 -10.5 -48)"/><ellipse cx="5.5" cy="-48" rx="2.2" ry="1.1" fill="#fff" opacity=".55" transform="rotate(-30 5.5 -48)"/></g>';
+  }
+  s += '<g class="zz"><text class="z" x="16" y="-64">z</text><text class="z z2" x="22" y="-74">z</text><text class="z z3" x="28" y="-84">Z</text></g>';
+  return s;
+}
+function tentArm(d) { return `<path d="${d}" stroke="#2f6b55" stroke-width="7" fill="none" stroke-linecap="round"/><path d="${d}" stroke="#8fdcb9" stroke-width="4.6" fill="none" stroke-linecap="round"/>`; }
+
+/* ---------- STONE: three pieces, each a rough block that is chipped away to a finished shape ---------- */
+const STONES = {
+  small: { name: 'a pebble idol', alt: 'Other small ones: a tiny moai, a sleeping fish.', W: 66, H: 68, Hs: 67.5,
+    block: 'M-31,0 L-33,-18 L-30,-42 L-24,-58 L-10,-67 L8,-68 L24,-60 L32,-40 L33,-16 L31,0 Z',
+    shapes: [circ(0, -40, 22), 'M-20,0 V-18 Q-20,-26 -12,-26 H12 Q20,-26 20,-18 V0 Z', circ(0, -63, 4.5)],
+    det: '<ellipse cx="-8" cy="-42" rx="4.5" ry="5.5" fill="#2a3431"/><ellipse cx="8" cy="-42" rx="4.5" ry="5.5" fill="#2a3431"/><circle cx="-9.5" cy="-44" r="1.3" fill="#d6ddd9"/><circle cx="6.5" cy="-44" r="1.3" fill="#d6ddd9"/>' + [-10, -3.5, 3.5, 10].map((x) => `<path d="M${x},-27 q-2,6 0,11 q2,5 0,10" stroke="#47524e" stroke-width="1.7" fill="none"/>`).join('') + '<path d="M-20,-3 H20" stroke="#47524e" stroke-width="1.4"/>' },
+  medium: { name: 'a deep-sea totem', alt: 'Other medium ones: a bust of Ulhu, an anglerfish head.', W: 78, H: 140, Hs: 135.5,
+    block: 'M-37,0 L-39,-30 L-36,-70 L-38,-104 L-30,-128 L-12,-140 L10,-139 L30,-130 L38,-108 L36,-70 L39,-34 L37,0 Z',
+    shapes: ['M-28,0 V-44 H28 V0 Z', 'M-24,-44 V-86 H24 V-44 Z', circ(0, -108, 22), 'M-16,-116 L-36,-130 L-32,-106 L-20,-98 Z', 'M16,-116 L36,-130 L32,-106 L20,-98 Z', circ(0, -131, 4.5)],
+    det: '<path d="M-28,-44 H28 M-24,-86 H24" stroke="#47524e" stroke-width="2"/><circle cx="-12" cy="-28" r="6.5" fill="none" stroke="#47524e" stroke-width="2"/><circle cx="12" cy="-28" r="6.5" fill="none" stroke="#47524e" stroke-width="2"/><circle cx="-12" cy="-28" r="2.5" fill="#2a3431"/><circle cx="12" cy="-28" r="2.5" fill="#2a3431"/><path d="M-16,-12 L-12,-7 L-8,-12 L-4,-7 L0,-12 L4,-7 L8,-12 L12,-7 L16,-12" stroke="#47524e" stroke-width="1.8" fill="none"/><path d="M-16,-72 q5,-5 10,0 M6,-72 q5,-5 10,0" stroke="#2a3431" stroke-width="2.4" fill="none"/><path d="M0,-86 q10,6 4,16" stroke="#47524e" stroke-width="1.6" fill="none"/><circle class="glow" cx="4" cy="-68" r="3.2" fill="#5ef2a0"/><path d="M-14,-56 h28" stroke="#47524e" stroke-width="1.6"/><ellipse cx="-8" cy="-110" rx="4.5" ry="5.5" fill="#2a3431"/><ellipse cx="8" cy="-110" rx="4.5" ry="5.5" fill="#2a3431"/>' + [-9, -3, 3, 9].map((x) => `<path d="M${x},-97 q-2,4 0,8" stroke="#47524e" stroke-width="1.6" fill="none"/>`).join('') },
+  large: { name: 'a statue of Ulhu', alt: 'Other large ones: a deep-sea idol, a kraken on a rock.', W: 128, H: 171, Hs: 160.5,
+    block: 'M-60,0 L-63,-40 L-60,-90 L-64,-120 L-50,-150 L-24,-168 L6,-171 L34,-164 L56,-144 L64,-110 L60,-70 L63,-30 L60,0 Z',
+    shapes: ['M-46,0 V-20 H46 V0 Z', ell(-12, -24, 10, 6), ell(12, -24, 10, 6), ell(0, -56, 28, 32), circ(0, -110, 36), 'M-24,-80 L-60,-128 L-55,-110 L-63,-98 L-54,-88 L-59,-72 L-28,-62 Z', 'M24,-80 L60,-128 L55,-110 L63,-98 L54,-88 L59,-72 L28,-62 Z', circ(0, -150, 6), ell(-8, -156, 7, 3.5), ell(8, -156, 7, 3.5)],
+    det: '<ellipse cx="-13" cy="-113" rx="8" ry="10" fill="#2a3431"/><ellipse cx="13" cy="-113" rx="8" ry="10" fill="#2a3431"/><circle cx="-16" cy="-117" r="2.4" fill="#d6ddd9"/><circle cx="10" cy="-117" r="2.4" fill="#d6ddd9"/>' + [-15, -5, 5, 15].map((x) => `<path d="M${x},-92 q-3,7 0,13 q3,6 0,12" stroke="#47524e" stroke-width="2.4" fill="none"/>`).join('') + '<ellipse cx="0" cy="-48" rx="16" ry="14" fill="none" stroke="#47524e" stroke-width="1.6"/><path d="M-26,-80 L-55,-110 M-27,-72 L-54,-88 M26,-80 L55,-110 M27,-72 L54,-88" stroke="#47524e" stroke-width="1.5"/><path d="M-46,-20 H46" stroke="#47524e" stroke-width="1.6"/><path d="M-8,-5 V-15 L0,-10 L8,-15 V-5" stroke="#2a3431" stroke-width="2" fill="none"/>' },
+};
+// precompute carve cells: grid over the block, cells wholly inside the finished shape are skipped, the rest are removed top first with some randomness
+function prepStone(key) {
+  const S = STONES[key]; if (S.cells) return S;
+  const probe = $('#probe');
+  probe.innerHTML = S.shapes.map((d) => `<path d="${d}"/>`).join('');
+  const paths = [...probe.querySelectorAll('path')];
+  const inside = (x, y) => paths.some((p) => p.isPointInFill(new DOMPoint(x, y)));
+  const c = 11, cols = Math.ceil(S.W / c), rows = Math.ceil(S.H / c), r = rng(key.length * 97 + 11), cells = [];
+  for (let j = 0; j < rows; j++) for (let i = 0; i < cols; i++) {
+    const x = -S.W / 2 + i * c, y = -S.H + j * c;
+    const pts = [[x + 1, y + 1], [x + c - 1, y + 1], [x + 1, y + c - 1], [x + c - 1, y + c - 1], [x + c / 2, y + c / 2]];
+    if (pts.every(([a, b]) => inside(a, b))) continue;
+    cells.push({ x, y, w: c, k: j + r() * 3.2, rot: (r() - 0.5) * 18 });
+  }
+  cells.sort((a, b) => a.k - b.k);
+  S.cells = cells;
+  const rr = rng(key.length * 31 + 5); S.rub = [];
+  for (let i = 0; i < 44; i++) { const side = i % 2 ? 1 : -1, x = side * (S.W / 2 + 4 + rr() * 34), s = 2.5 + rr() * 4; S.rub.push(`<path d="M${x - s},-1 L${x - s * 0.4},${-s * 1.2 - (i % 5)} L${x + s},${-s * 0.6} L${x + s * 0.7},-1 Z" fill="${['#7d8783', '#9aa49f', '#5d6762'][i % 3]}" />`); }
+  return S;
+}
+function stoneFinal(S, sc) { // the finished piece, used on the shelf
+  return `<g transform="scale(${sc})">${S.shapes.map((d) => `<path d="${d}" fill="url(#s-pol)" stroke="#3a4340" stroke-width="1.2"/>`).join('')}${S.det}</g>`;
+}
+const RUNES = ['M-4,-10V10M-4,-6L5,-10M-4,0L5,-4', 'M-5,10V-10L5,0L-5,10', 'M0,-10V10M-6,-4L0,2L6,-4', 'M-5,-10V10M5,-10V10M-5,-3L5,3', 'M-6,-8L6,8M6,-8L-6,8', 'M0,-10V10M0,-10L6,-4M0,-2L-6,4', 'M-5,-10L5,0L-5,10M5,-10V10', 'M-6,0L0,-10L6,0L0,10Z', 'M-4,-10V10M-4,-10L5,-5L-4,0', 'M0,-10V10M-6,-10L6,10'];
+const SBARS = {
+  P1: ['P1 Rune ledge', 'P1: the stone ledge he works on is the bar. Ten carved runes along its face light up green one by one; the next rune glows faintly while it fills.'],
+  P2: ['P2 Rune strip', 'P2: a line of rune writing is chiselled along the ledge as you go. A tiny chisel and mallet work at the tip, dust puffs, and the cut groove glows.'],
+  P3: ['P3 Block wall', 'P3: ten cut stone blocks are laid along the ledge. Each one drops into its slot when it is ready, so you can count the blocks left.'],
+};
+function stoneStage() {
+  const S = prepStone(size);
+  const sx = S.W / 2 + 58;
+  let s = `<defs>${headGrad('s-hg')}
+   <linearGradient id="s-bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#14453d"/><stop offset=".7" stop-color="#0a2420"/><stop offset="1" stop-color="#06120f"/></linearGradient>
+   <linearGradient id="s-rock" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#aab4ae"/><stop offset="1" stop-color="#5a6460"/></linearGradient>
+   <linearGradient id="s-pol" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#d0d8d3"/><stop offset=".6" stop-color="#9ba7a1"/><stop offset="1" stop-color="#6f7a75"/></linearGradient>
+   <linearGradient id="s-ledge" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4d5a55"/><stop offset="1" stop-color="#26302c"/></linearGradient>
+   <pattern id="s-chis" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(28)"><path d="M0,3.5 H4.5" stroke="#00000030" stroke-width="1.3"/></pattern>
+   <filter id="s-glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="2.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+   <mask id="s-mask" maskUnits="userSpaceOnUse" x="-200" y="-300" width="400" height="400"><g id="s-maskg"></g></mask>
+  </defs>
+  <rect width="380" height="330" fill="url(#s-bg)"/>
+  <path class="ray" d="M90,0 L150,0 L230,270 L140,270 Z" fill="#bff7e4"/><path class="ray" style="animation-delay:-3s" d="M240,0 L275,0 L320,270 L260,270 Z" fill="#bff7e4"/>
+  <path d="M0,220 Q40,190 80,215 Q120,200 150,226 L150,270 L0,270 Z" fill="#0b2a25"/><path d="M250,226 Q300,196 340,212 Q365,204 380,214 L380,270 L250,270 Z" fill="#0b2a25"/>
+  <g transform="translate(22,272)"><g class="kelp"><path d="M0,0 C-8,-30 8,-50 -2,-90 C-8,-110 4,-120 0,-140" stroke="#1f6a4a" stroke-width="6" fill="none" stroke-linecap="round"/></g></g>
+  <g transform="translate(360,272)"><g class="kelp" style="animation-delay:-2s"><path d="M0,0 C8,-30 -8,-55 2,-80 C8,-96 -2,-104 0,-115" stroke="#1f6a4a" stroke-width="5" fill="none" stroke-linecap="round"/></g></g>
+  ${[[40, 260, 0], [70, 268, -2.5], [330, 266, -4.5], [300, 262, -1.2], [350, 270, -5.8]].map(([x, y, d]) => `<circle class="bub" style="animation-delay:${d}s" cx="${x}" cy="${y}" r="${2 + (x % 3)}" fill="none" stroke="#bff7e4" stroke-width="1"/>`).join('')}
+  <rect x="0" y="264" width="380" height="8" fill="#5d6a64"/><rect x="0" y="264" width="380" height="2" fill="#8a9993"/>
+  <g transform="translate(190,270)">
+   <g id="s-rub"></g>
+   <g mask="url(#s-mask)"><path d="${S.block}" fill="url(#s-rock)"/><path d="${S.block}" fill="url(#s-chis)"/><path d="${S.block}" fill="none" stroke="#3a4340" stroke-width="1.5"/><path d="M-10,-20 l8,-14 l-3,-9 M14,${-S.H * 0.6} l-6,12 l5,8" stroke="#3a434099" stroke-width="1.2" fill="none"/></g>
+   <g id="s-polg" opacity="0">${S.shapes.map((d) => `<path d="${d}" fill="url(#s-pol)"/>`).join('')}</g>
+   <g id="s-out" opacity="0">${S.shapes.map((d) => `<path d="${d}" fill="none" stroke="#3a4340" stroke-width="1.3"/>`).join('')}</g>
+   <g id="s-det" opacity="0">${S.det}</g>
+   <g class="spark">${[[-S.W / 2 - 6, -S.H * 0.8], [S.W / 2 + 4, -S.H * 0.5], [0, -S.H - 10], [S.W / 2 - 8, -S.H * 0.9]].map(([x, y], i) => `<g transform="translate(${x},${y})"><path class="sp" style="animation-delay:${i * 0.35}s" d="M0,-7 L1.6,-1.6 L7,0 L1.6,1.6 L0,7 L-1.6,1.6 L-7,0 L-1.6,-1.6 Z" fill="#ffd56a"/></g>`).join('')}</g>
+  </g>
+  <g transform="translate(190,270)"><g class="hy" id="s-hy" style="--sx:${sx}px;--top:${-S.H}px;--peak:${-S.H - (size === 'large' ? 26 : 40)}px;--hi:${(-S.H * 0.42).toFixed(0)}px"><g class="hx"><g class="breath">
+   ${ulhuBody('s-hg')}
+   <g transform="translate(12,-12)">${tentArm('M0,0 q12,5 29,1')}<rect x="28" y="-3" width="9" height="6" rx="1.5" fill="#8f5a2c" stroke="#4a2c14" stroke-width="1"/><rect x="37" y="-2" width="11" height="4" fill="#b4bec3" stroke="#5f6a70" stroke-width=".8"/><path d="M48,-2 L52,0 L48,2 Z" fill="#dfe6ea" stroke="#5f6a70" stroke-width=".8"/><circle cx="31" cy="1" r="3.6" fill="#8fdcb9" stroke="#2f6b55" stroke-width="1.2"/></g>
+   <g transform="translate(6,-18)"><g class="swing">${tentArm('M0,0 q8,-3 14,-1')}<path d="M13,-1 H27" stroke="#7a4a22" stroke-width="3.2" stroke-linecap="round"/><rect x="26" y="-7" width="9" height="19" rx="2.5" fill="#8f5a2c" stroke="#4a2c14" stroke-width="1.3"/><rect x="26" y="-2" width="9" height="3" fill="#c98f4f"/><circle cx="14" cy="-1" r="3.4" fill="#8fdcb9" stroke="#2f6b55" stroke-width="1.2"/></g></g>
+   <g transform="translate(64,-12)"><g class="chips">
+    <g class="tink"><path d="M0,-6 L1.4,-1.4 L6,0 L1.4,1.4 L0,6 L-1.4,1.4 L-6,0 L-1.4,-1.4 Z" fill="#fff6c8"/></g>
+    ${[[16, -22], [22, -6], [12, 14], [-4, -24], [26, -16]].map(([x, y], i) => `<path class="chip" style="--x:${x}px;--y:${y}px" d="M0,0 l${3 + i % 2},-1 l-1,${3 + i % 3} Z" fill="${['#c4ccc8', '#9aa49f', '#e3e8e5'][i % 3]}"/>`).join('')}
+   </g></g>
+  </g></g></g></g>
+  <g id="s-bar"></g>`;
+  return s;
+}
+function stoneBar(p) {
+  const f = p / 100;
+  let s = '<rect x="0" y="272" width="380" height="58" fill="url(#s-ledge)"/><path d="M0,272 H380" stroke="#8a9993" stroke-width="1.2"/><path d="M60,279 l6,8 M210,318 l-5,-7 M330,280 l4,6" stroke="#1b2421" stroke-width="1"/>';
+  if (bar.stone === 'P1') {
+    const n = f * 10;
+    RUNES.forEach((d, i) => {
+      const x = 23 + i * 37.2, y = 301;
+      s += `<g transform="translate(${x},${y})"><rect x="-13" y="-17" width="26" height="34" rx="4" fill="#1d2724" opacity=".55"/><path d="${d}" transform="translate(0,1)" stroke="#8a9993" stroke-width="2.4" fill="none" opacity=".35"/><path d="${d}" stroke="#141c19" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
+      if (i < Math.floor(n)) s += `<path class="lit" d="${d}" stroke="#5ef2a0" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
+      else if (i === Math.floor(n) && p < 100) s += `<g opacity="${(0.15 + 0.85 * (n - i)).toFixed(2)}"><path class="cur" d="${d}" stroke="#5ef2a0" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>`;
+      s += '</g>';
+    });
+  } else if (bar.stone === 'P2') {
+    let d = 'M18,301'; for (let i = 0; i < 17; i++) { const x = 18 + i * 20.5; d += ` L${x + 5},${i % 2 ? 293 : 309} L${x + 10},301 L${x + 15},${i % 3 ? 301 : 294} L${x + 20.5},301`; }
+    s += `<path d="${d}" stroke="#8a999355" stroke-width="1" fill="none" stroke-dasharray="2 3"/>`;
+    s += `<path id="s-groove" d="${d}" pathLength="1000" stroke="#141c19" stroke-width="3.4" fill="none" stroke-linejoin="round" stroke-dasharray="${f * 1000} 1000"/>`;
+    s += `<path class="lit" d="${d}" pathLength="1000" stroke="#5ef2a0" stroke-width="1.4" fill="none" stroke-linejoin="round" stroke-dasharray="${f * 1000} 1000" opacity=".9"/>`;
+    s += '<g id="s-tip"></g>';
+  } else {
+    const n = f * 10;
+    for (let i = 0; i < 10; i++) {
+      const x = 12 + i * 36.2, y = 290;
+      if (i < Math.floor(n)) s += `<g><rect x="${x}" y="${y}" width="33" height="24" rx="2" fill="#8f9b96" stroke="#3a4340" stroke-width="1.2"/><rect x="${x}" y="${y}" width="33" height="4" fill="#b8c2bd"/><path d="${RUNES[i]}" transform="translate(${x + 16.5},${y + 14}) scale(.55)" stroke="#5ef2a0" stroke-width="3" fill="none" class="lit"/></g>`;
+      else if (i === Math.floor(n) && p < 100) { const k = n - i; s += `<rect x="${x}" y="${y}" width="33" height="24" rx="2" fill="none" stroke="#8a9993" stroke-dasharray="3 3"/><g transform="translate(0,${(-(1 - k) * 22).toFixed(1)})" opacity="${(0.25 + 0.75 * k).toFixed(2)}"><rect x="${x}" y="${y}" width="33" height="24" rx="2" fill="#8f9b96" stroke="#3a4340" stroke-width="1.2"/><rect x="${x}" y="${y}" width="33" height="4" fill="#b8c2bd"/></g>`; }
+      else s += `<rect x="${x}" y="${y}" width="33" height="24" rx="2" fill="none" stroke="#8a999377" stroke-dasharray="3 3"/>`;
+    }
+  }
+  return s;
+}
+function stoneUpdate(p) {
+  const S = STONES[size], f = p / 100;
+  const gone = Math.floor(clamp((p - 2) / 90, 0, 1) * S.cells.length);
+  $('#s-maskg').innerHTML = S.shapes.map((d) => `<path d="${d}" fill="#fff"/>`).join('') + S.cells.slice(gone).map((c) => `<rect x="${c.x - 1}" y="${c.y - 1}" width="${c.w + 2}" height="${c.w + 2}" fill="#fff" transform="rotate(${c.rot.toFixed(1)} ${c.x + c.w / 2} ${c.y + c.w / 2})"/>`).join('');
+  $('#s-rub').innerHTML = S.rub.slice(0, Math.round(S.rub.length * gone / S.cells.length)).join('');
+  $('#s-polg').setAttribute('opacity', clamp((p - 40) / 50, 0, 1).toFixed(2));
+  $('#s-out').setAttribute('opacity', clamp((p - 25) / 40, 0, 1).toFixed(2));
+  $('#s-det').setAttribute('opacity', clamp((p - 50) / 42, 0, 1).toFixed(2));
+  const top = -(S.H - (S.H - S.Hs) * f);
+  $('#s-hy').style.setProperty('--top', top.toFixed(1) + 'px');
+  $('#s-bar').innerHTML = stoneBar(p);
+  if (bar.stone === 'P2') {
+    const g = $('#s-groove'), L = g.getTotalLength(), pt = g.getPointAtLength(L * f);
+    $('#s-tip').innerHTML = p >= 100 ? '' : `<g transform="translate(${pt.x.toFixed(1)},${pt.y.toFixed(1)})"><path d="M0,0 L10,-12" stroke="#b4bec3" stroke-width="2.6"/><path d="M10,-12 L15,-18" stroke="#8f5a2c" stroke-width="3.4" stroke-linecap="round"/><g transform="translate(18,-22)"><g class="mal"><path d="M0,0 L-2,-10" stroke="#7a4a22" stroke-width="2"/><rect x="-7" y="-15" width="10" height="7" rx="1.5" fill="#8f5a2c"/></g></g>${[[-8, -8], [-4, -12], [6, -10], [-10, -2]].map(([x, y], i) => `<circle class="dust" style="--x:${x}px;--y:${y}px;animation-delay:${i * 0.12}s" r="1.6" fill="#c4ccc8"/>`).join('')}</g>`;
+  }
+}
+
+/* ---------- KNIT ---------- */
+const KNITS = {
+  small: { name: 'a sock', alt: 'Other small ones: a mitten, a tiny egg cosy.', W: 56, H: 60 },
+  medium: { name: 'a kelp scarf', alt: 'Other medium ones: a bobble hat, a tentacle warmer.', W: 134, H: 92 },
+  large: { name: 'a jumper', alt: 'Other large ones: a patchwork blanket, a cardigan.', W: 116, H: 76 },
+};
+const KBARS = {
+  P4: ['P4 Yarn to row', 'P4: a loose strand of yarn runs along the floor. Stitch by stitch it turns into a knitted band, and the little ball at the end shrinks.'],
+  P5: ['P5 Stitches on needles', 'P5: two big needles meet along the floor. Grey stitches move across onto the left needle and turn coloured, one at a time, until the row is done.'],
+  P6: ['P6 Washing line', 'P6: a washing line with ten pegs. A small knitted square is pegged up each time a tenth is done; the newest one swings in.'],
+};
+function knitPiece(key, f, id) { // f = 0..1 progress; draws the piece hanging from the needles (top centre = 0,0)
+  const K = KNITS[key], rowH = 4;
+  const vp = 'url(#k-v)';
+  if (key === 'medium') {
+    const d = 'M0,0 V58 Q0,80 22,80 H112';
+    const L = 58 + 34.6 + 90; // approx path length
+    let s = `<mask id="${id}m" maskUnits="userSpaceOnUse" x="-40" y="-20" width="200" height="140"><path d="${d}" stroke="#fff" stroke-width="30" fill="none" stroke-dasharray="${(L * f).toFixed(1)} 400"/></mask>`;
+    s += `<g mask="url(#${id}m)"><path d="${d}" stroke="#2c1a10" stroke-width="25" fill="none"/><path d="${d}" stroke="#2e8a64" stroke-width="22" fill="none"/><path d="${d}" stroke="#5ef2a0" stroke-width="22" fill="none" stroke-dasharray="8 8"/><path d="${d}" stroke="#ffd56a" stroke-width="22" fill="none" stroke-dasharray="3 29" stroke-dashoffset="-10"/><path d="${d}" stroke="${vp}" stroke-width="22" fill="none"/></g>`;
+    if (f >= 0.999) s += '<g stroke="#ffd56a" stroke-width="1.6" stroke-linecap="round">' + [-8, -4, 0, 4, 8].map((y) => `<path d="M112,${80 + y} h7"/>`).join('') + '</g>';
+    return s;
+  }
+  let shape, fills;
+  if (key === 'small') {
+    shape = 'M-14,0 H14 V36 Q14,42 20,42 H32 Q42,42 42,51 Q42,60 32,60 H-4 Q-14,60 -14,50 Z';
+    fills = '<rect x="-20" y="-2" width="70" height="70" fill="#4fd394"/><rect x="-20" y="-2" width="70" height="10" fill="#2e8a64"/><rect x="-20" y="16" width="70" height="4" fill="#f3ecd2"/><rect x="-20" y="26" width="70" height="4" fill="#f3ecd2"/><path d="M-14,40 Q-14,58 -2,60 H6 V44 Q-2,44 -14,40 Z" fill="#ffd56a"/><path d="M30,42 Q44,42 42,52 Q42,60 32,60 H28 Z" fill="#ffd56a"/>';
+  } else {
+    shape = 'M-11,0 H11 Q12,5 18,5 L32,8 L58,40 L47,50 L33,34 V76 H-33 V34 L-47,50 L-58,40 L-32,8 L-18,5 Q-12,5 -11,0 Z';
+    fills = '<rect x="-60" y="-2" width="120" height="80" fill="#8a3f72"/><rect x="-60" y="-2" width="120" height="8" fill="#5c2a4c"/><rect x="-60" y="12" width="120" height="4" fill="#f3ecd2"/><rect x="-60" y="20" width="120" height="4" fill="#5ef2a0"/><rect x="-60" y="28" width="120" height="4" fill="#f3ecd2"/><rect x="-60" y="70" width="120" height="8" fill="#5c2a4c"/><path d="M58,40 L47,50 L43,46 L54,36 Z M-58,40 L-47,50 L-43,46 L-54,36 Z" fill="#5c2a4c"/><circle cx="0" cy="51" r="10" fill="#8fdcb9"/><circle cx="-3.6" cy="50" r="2" fill="#16203a"/><circle cx="3.6" cy="50" r="2" fill="#16203a"/><path d="M-4,56 v4 M0,56 v5 M4,56 v4" stroke="#2f6b55" stroke-width="1.6" stroke-linecap="round"/><path d="M0,41 q-1,-3 1,-5" stroke="#3f8a57" stroke-width="1.4" fill="none"/>';
+  }
+  const tot = Math.ceil(K.H / rowH), done = f * tot, rows = Math.floor(done), frac = done - rows;
+  let rev = `<rect x="-80" y="-4" width="160" height="${rows * rowH + 4}" fill="#fff"/>`;
+  if (frac > 0 && rows < tot) rev += `<rect x="-80" y="${rows * rowH}" width="${(160 * frac).toFixed(1)}" height="${rowH + 0.3}" fill="#fff"/>`;
+  return `<clipPath id="${id}c"><path d="${shape}"/></clipPath><mask id="${id}m" maskUnits="userSpaceOnUse" x="-80" y="-10" width="160" height="100">${rev}</mask>
+   <g mask="url(#${id}m)"><g clip-path="url(#${id}c)">${fills}<rect x="-60" y="0" width="120" height="80" fill="${vp}"/></g><path d="${shape}" fill="none" stroke="#2c1a10" stroke-width="1.4"/></g>`;
+}
+function knitStage() {
+  const sc = 1.35;
+  let s = `<defs>${headGrad('k-hg')}
+   <linearGradient id="k-bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a1a35"/><stop offset="1" stop-color="#140c1b"/></linearGradient>
+   <linearGradient id="k-vel" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#a0466a"/><stop offset="1" stop-color="#5a1f3c"/></linearGradient>
+   <radialGradient id="k-lamp" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ffd56a" stop-opacity=".45"/><stop offset="1" stop-color="#ffd56a" stop-opacity="0"/></radialGradient>
+   <radialGradient id="k-sea" cx=".4" cy=".35" r=".7"><stop offset="0" stop-color="#1d5a7a"/><stop offset="1" stop-color="#0a1f33"/></radialGradient>
+   <pattern id="k-v" width="6" height="4" patternUnits="userSpaceOnUse"><path d="M.6,.3 L3,3.6 L5.4,.3" fill="none" stroke="#00000055" stroke-width="1"/><path d="M1.1,.4 L3,2.7" stroke="#ffffff38" stroke-width=".8"/></pattern>
+   <pattern id="k-wall" width="26" height="26" patternUnits="userSpaceOnUse"><path d="M13,4 l3,5 l-3,5 l-3,-5 Z" fill="#ffffff08"/></pattern>
+   <clipPath id="k-port"><circle cx="318" cy="118" r="31"/></clipPath>
+  </defs>
+  <rect width="380" height="330" fill="url(#k-bg)"/><rect width="380" height="262" fill="url(#k-wall)"/>
+  <circle cx="318" cy="118" r="31" fill="url(#k-sea)"/>
+  <g clip-path="url(#k-port)"><g transform="translate(318,120)"><g class="fish"><path d="M0,0 q8,-6 16,0 q-8,6 -16,0 Z M0,0 l-6,-4 v8 Z" fill="#5aa7ff" opacity=".7"/></g></g>
+   ${[[305, 148, 0], [325, 152, -2], [335, 146, -4]].map(([x, y, d]) => `<circle class="bub" style="animation-delay:${d}s;animation-duration:5s" cx="${x}" cy="${y}" r="2" fill="none" stroke="#bfe0ff" stroke-width=".8"/>`).join('')}</g>
+  <circle cx="318" cy="118" r="31" fill="none" stroke="#c9a560" stroke-width="6"/><circle cx="318" cy="118" r="34.5" fill="none" stroke="#7a5a26" stroke-width="1.5"/>
+  ${[0, 60, 120, 180, 240, 300].map((a) => `<circle cx="${(318 + 31 * Math.cos(a * Math.PI / 180)).toFixed(1)}" cy="${(118 + 31 * Math.sin(a * Math.PI / 180)).toFixed(1)}" r="1.6" fill="#7a5a26"/>`).join('')}
+  <circle cx="44" cy="176" r="60" fill="url(#k-lamp)" class="jelly"/>
+  <rect x="0" y="262" width="380" height="68" fill="#2b1a12"/>${[0, 1, 2, 3, 4, 5, 6].map((i) => `<path d="M0,${270 + i * 9} H380" stroke="#1c110b" stroke-width="1"/>`).join('')}
+  <ellipse cx="168" cy="268" rx="150" ry="10" fill="#5a1f3c"/><ellipse cx="168" cy="268" rx="140" ry="7" fill="none" stroke="#ffd56a55" stroke-width="1.4" stroke-dasharray="4 4"/>
+  <g><path d="M44,264 V210" stroke="#5a3a1e" stroke-width="5"/><path d="M30,264 l14,-8 l14,8" stroke="#5a3a1e" stroke-width="4" fill="none"/><ellipse cx="44" cy="208" rx="24" ry="5" fill="#7a5230"/>
+   <path d="M30,206 q0,-20 8,-26 h12 q8,6 8,26 Z" fill="#bfe0ff22" stroke="#bfe0ff77" stroke-width="1.2"/><g class="jelly"><path d="M36,190 q8,-12 16,0 Z" fill="#ff9fd8"/><path d="M38,190 q-1,6 1,10 M42,190 q1,7 -1,12 M46,190 q-1,6 1,10 M50,190 q1,5 -1,9" stroke="#ff9fd8" stroke-width="1.2" fill="none"/></g>
+   <path d="M60,203 h12 v-1 q0,-7 -6,-7 q-6,0 -6,7 Z" fill="#f3ecd2"/><path d="M72,198 q4,0 3,3 q-1,2 -3,1" stroke="#f3ecd2" stroke-width="1.4" fill="none"/><path class="steam" d="M64,193 q-3,-4 0,-8 q3,-4 0,-8" stroke="#ffffff88" stroke-width="1.2" fill="none"/><path class="steam" style="animation-delay:1.3s" d="M68,193 q-3,-4 0,-8 q3,-4 0,-8" stroke="#ffffff88" stroke-width="1.2" fill="none"/></g>
+  <path id="k-strand" d="" stroke="#5ef2a0" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+  <g transform="translate(305,266)"><g id="k-ball"></g></g>
+  <g transform="translate(160,268)"><g class="rock">
+   <path d="M-78,-4 Q0,14 78,-4" stroke="#7a5230" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M-50,-14 V2 M50,-14 V2" stroke="#7a5230" stroke-width="5"/>
+   <path d="M-58,-58 L-58,-150 Q-58,-178 -30,-181 Q0,-190 30,-181 Q58,-178 58,-150 L58,-58 Z" fill="url(#k-vel)" stroke="#3a1226" stroke-width="2"/>
+   ${[[-30, -150], [0, -158], [30, -150], [-30, -110], [0, -116], [30, -110]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="2.2" fill="#3a1226"/>`).join('')}
+   <rect x="-60" y="-50" width="120" height="38" rx="6" fill="#6e2848" stroke="#3a1226" stroke-width="2"/><path d="M-58,-20 H58" stroke="#ffd56a66" stroke-width="1.2" stroke-dasharray="3 3"/>
+   <rect x="-56" y="-66" width="112" height="20" rx="9" fill="#b45a80" stroke="#3a1226" stroke-width="2"/>
+   <g transform="translate(0,-60) scale(${sc})"><g class="tilt">${ulhuBody('k-hg', { glasses: true })}</g></g>
+   <path d="M-74,-50 V-92 Q-74,-106 -60,-106 Q-46,-106 -46,-92 V-50 Z" fill="url(#k-vel)" stroke="#3a1226" stroke-width="2"/><circle cx="-60" cy="-94" r="6" fill="none" stroke="#3a1226" stroke-width="1.5"/>
+   <path d="M74,-50 V-92 Q74,-106 60,-106 Q46,-106 46,-92 V-50 Z" fill="url(#k-vel)" stroke="#3a1226" stroke-width="2"/><circle cx="60" cy="-94" r="6" fill="none" stroke="#3a1226" stroke-width="1.5"/>
+   <rect x="-74" y="-52" width="148" height="40" rx="5" fill="#6e2848" opacity="0"/>
+   <g transform="translate(0,${(-60 - 18 * sc).toFixed(1)})" id="k-piece"></g>
+   <g transform="translate(0,-60) scale(${sc})"><g class="tilt">
+    ${tentArm('M-13,-24 q-6,5 -3,10')}${tentArm('M13,-24 q6,5 3,10')}
+    <g transform="translate(-16,-14)"><g class="nl"><path d="M-9,4 L27,-12" stroke="#c9a560" stroke-width="1.8" stroke-linecap="round"/><circle cx="-9" cy="4" r="2.2" fill="#ff7a8a"/></g></g>
+    <g transform="translate(16,-14)"><g class="nr"><path d="M9,4 L-27,-12" stroke="#c9a560" stroke-width="1.8" stroke-linecap="round"/><circle cx="9" cy="4" r="2.2" fill="#ff7a8a"/></g></g>
+    <circle cx="-16" cy="-14" r="3.6" fill="#8fdcb9" stroke="#2f6b55" stroke-width="1.2"/><circle cx="16" cy="-14" r="3.6" fill="#8fdcb9" stroke="#2f6b55" stroke-width="1.2"/>
+    <text class="clk" x="-30" y="-28">click</text><text class="clk clk2" x="9" y="-28">clack</text>
+    <g class="heart">${[[-24, -60, 0], [22, -66, 0.7], [0, -80, 1.4]].map(([x, y, d]) => `<g transform="translate(${x},${y})"><path class="hrt" style="animation-delay:${d}s" d="M0,3 C-6,-2 -4,-7 0,-4 C4,-7 6,-2 0,3 Z" fill="#ff7a8a"/></g>`).join('')}</g>
+   </g></g>
+  </g></g>
+  <g id="k-bar"></g>`;
+  return s;
+}
+function knitBar(p) {
+  const f = p / 100;
+  let s = '';
+  if (bar.knit === 'P4') {
+    const x0 = 18, x1 = 350, xp = x0 + (x1 - x0) * f, y = 300;
+    s += `<rect x="${x0}" y="${y - 8}" width="${(xp - x0).toFixed(1)}" height="16" fill="#2e8a64"/><rect x="${x0}" y="${y - 8}" width="${(xp - x0).toFixed(1)}" height="16" fill="url(#k-v)"/>`;
+    for (let x = x0; x < xp; x += 30) s += `<rect x="${x + 18}" y="${y - 8}" width="${Math.max(0, Math.min(6, xp - x - 18)).toFixed(1)}" height="16" fill="#ffd56a"/><rect x="${x + 18}" y="${y - 8}" width="${Math.max(0, Math.min(6, xp - x - 18)).toFixed(1)}" height="16" fill="url(#k-v)"/>`;
+    s += `<rect x="${x0}" y="${y - 8}" width="${(xp - x0).toFixed(1)}" height="16" fill="none" stroke="#14301f" stroke-width="1"/>`;
+    if (p < 100) {
+      let d = `M${xp.toFixed(1)},${y}`; for (let x = xp; x < x1; x += 8) d += ` q2,-5 4,0 q2,5 4,0`;
+      s += `<path d="${d}" stroke="#5ef2a0" stroke-width="1.6" fill="none"/><circle cx="${x1 + 9}" cy="${y}" r="${(3 + 7 * (1 - f)).toFixed(1)}" fill="#3fc283" stroke="#1d5a3c"/>`;
+      s += `<g transform="translate(${xp.toFixed(1)},${y})"><g class="sway"><path d="M-6,-14 L6,8 M6,-14 L-6,8" stroke="#c9a560" stroke-width="1.8" stroke-linecap="round"/></g></g>`;
+    }
+  } else if (bar.knit === 'P5') {
+    const N = 22, n = f * N, done = Math.floor(n), gap = 15.4, x0 = 22;
+    const split = x0 + done * gap + (p < 100 ? gap * 0.5 : 0);
+    s += `<path d="M10,296 L${(split - 2).toFixed(1)},296" stroke="#c9a560" stroke-width="3.4" stroke-linecap="round"/><circle cx="8" cy="296" r="4.6" fill="#ff7a8a"/>`;
+    if (p < 100) s += `<path d="M${(split + 2).toFixed(1)},296 L370,296" stroke="#c9a560" stroke-width="3.4" stroke-linecap="round"/><circle cx="372" cy="296" r="4.6" fill="#ff7a8a"/>`;
+    for (let i = 0; i < N; i++) {
+      const x = x0 + i * gap + (i >= done ? gap * 0.6 : 0);
+      if (i < done) s += `<path d="M${x - 5},296 q0,-8 5,-8 q5,0 5,8 q0,8 -5,8 q-5,0 -5,-8" fill="none" stroke="${i % 4 === 3 ? '#ffd56a' : '#5ef2a0'}" stroke-width="2.4"/><path d="M${x - 4},307 L${x},313 L${x + 4},307" stroke="${i % 4 === 3 ? '#ffd56a' : '#3fc283'}" stroke-width="2" fill="none"/>`;
+      else if (i === done && p < 100) s += `<g transform="translate(${x},296)"><g class="sway"><path d="M-5,0 q0,-8 5,-8 q5,0 5,8 q0,8 -5,8 q-5,0 -5,-8" fill="none" stroke="#5ef2a0" stroke-width="2.4" opacity="${(0.3 + 0.7 * (n - done)).toFixed(2)}"/></g></g>`;
+      else s += `<path d="M${x - 5},296 q0,-8 5,-8 q5,0 5,8 q0,8 -5,8 q-5,0 -5,-8" fill="none" stroke="#8a7a8a" stroke-width="2" opacity=".6"/>`;
+    }
+  } else {
+    s += '<path d="M8,276 V326 M372,276 V326" stroke="#7a5230" stroke-width="4"/><path d="M8,280 Q190,296 372,280" stroke="#c9b48a" stroke-width="1.4" fill="none"/>';
+    const n = f * 10, done = Math.floor(n), cols = ['#5ef2a0', '#ffd56a', '#8a3f72', '#5aa7ff', '#ff9fb4'];
+    for (let i = 0; i < 10; i++) {
+      const t = (i + 0.5) / 10, x = 8 + 364 * t, y = 280 + 2 * t * (1 - t) * 16 * 2 * 0.5 * 2;
+      const sq = `<rect x="-10" y="2" width="20" height="18" fill="${cols[i % 5]}"/><rect x="-10" y="2" width="20" height="18" fill="url(#k-v)"/><rect x="-10" y="2" width="20" height="18" fill="none" stroke="#2c1a10"/><rect x="-2" y="-3" width="4" height="8" rx="1" fill="#e8e1cf" stroke="#7a5230" stroke-width=".8"/>`;
+      if (i < done) s += `<g transform="translate(${x.toFixed(1)},${y.toFixed(1)})"><g class="sway" style="animation-delay:${-i * 0.37}s">${sq}</g></g>`;
+      else if (i === done && p < 100) s += `<g transform="translate(${x.toFixed(1)},${y.toFixed(1)})" opacity="${(0.2 + 0.8 * (n - done)).toFixed(2)}"><g class="swingin">${sq}</g></g>`;
+      else s += `<g transform="translate(${x.toFixed(1)},${y.toFixed(1)})"><rect x="-2" y="-3" width="4" height="8" rx="1" fill="#e8e1cf" stroke="#7a5230" stroke-width=".8" opacity=".5"/></g>`;
+    }
+  }
+  return s;
+}
+let ballS = 1;
+function knitUpdate(p) {
+  const f = p / 100;
+  $('#k-piece').innerHTML = knitPiece(size, f, 'kp');
+  ballS = 1 - 0.62 * f;
+  $('#k-bar').innerHTML = knitBar(p);
+}
+function ballFrame(t) { // the yarn ball wobbles and the strand sways (stops when paused or finished)
+  const live = !paused && P < 100;
+  const a = live ? 9 * Math.sin(t / 1000 * 2 * Math.PI / 1.1) : 0;
+  const r = 22 * ballS;
+  const ball = $('#k-ball'); if (!ball) return;
+  ball.setAttribute('transform', `rotate(${a.toFixed(2)}) translate(${(a * 0.25).toFixed(2)},0)`);
+  ball.innerHTML = `<circle cx="0" cy="${-r}" r="${r}" fill="#3fc283" stroke="#1d5a3c" stroke-width="1.5"/><g transform="translate(0,${-r}) scale(${ballS})"><path d="M-18,-8 Q0,-22 18,-8 M-21,2 Q0,-14 21,2 M-17,12 Q0,-2 17,12 M-8,-20 Q6,0 -2,21" stroke="#1d5a3c" stroke-width="1.4" fill="none"/></g>`;
+  const rad = a * Math.PI / 180, bx = 305 + Math.sin(rad) * 2 * r * 0.9 + a * 0.25, by = 266 - Math.cos(rad) * 2 * r * 0.9;
+  // needle tip in stage coordinates, rocking ignored (the rock is tiny)
+  const nx = 172, ny = 180, sag = 34 + (live ? 5 * Math.sin(t / 1000 * 2 * Math.PI / 1.4) : 0);
+  $('#k-strand').setAttribute('d', `M${nx},${ny} Q${((nx + bx) / 2).toFixed(1)},${(Math.max(ny, by) + sag).toFixed(1)} ${bx.toFixed(1)},${by.toFixed(1)}`);
+}
+
+/* ---------- shelves ---------- */
+function shelfSvg(kind, p) {
+  const others = ['small', 'medium', 'large'].filter((k) => k !== size);
+  let s = '';
+  if (kind === 'stone') {
+    s += '<rect x="6" y="4" width="368" height="76" rx="10" fill="#0b1a17" stroke="#26362f"/><rect x="0" y="74" width="380" height="12" fill="#5d6a64"/><rect x="0" y="74" width="380" height="2" fill="#8a9993"/>';
+    others.forEach((k, i) => { const S = prepStone(k); s += `<g transform="translate(${70 + i * 95},74)">${stoneFinal(S, 0.36)}</g>`; });
+    const S = STONES[size];
+    if (p >= 100) s += `<g transform="translate(300,74)"><g class="pop">${stoneFinal(S, 0.36)}</g><path class="glint" d="M${S.W * 0.2},${-S.H * 0.36 - 4} l1.5,-4 l1.5,4 l4,1.5 l-4,1.5 l-1.5,4 l-1.5,-4 l-4,-1.5 Z" fill="#ffd56a"/></g>`;
+    else s += `<rect x="262" y="12" width="76" height="60" rx="8" fill="none" stroke="#5ef2a066" stroke-dasharray="4 4"/><text x="300" y="46" text-anchor="middle" font-size="11" fill="#9fb1a8" font-family="Atkinson Hyperlegible">today's piece</text>`;
+  } else {
+    s += '<rect x="0" y="0" width="380" height="92" fill="#1a1022"/><rect x="0" y="74" width="380" height="9" fill="#7a5230"/><rect x="0" y="74" width="380" height="2" fill="#a0744a"/><path d="M30,83 l8,8 M350,83 l-8,8" stroke="#5a3a1e" stroke-width="4"/>';
+    const fit = { small: [0.6, -36], medium: [0.42, -40], large: [0.55, -42] };
+    others.forEach((k, i) => { const [sc, dy] = fit[k]; s += `<g transform="translate(${(k === 'medium' ? 40 : 70) + i * 95},${74 + dy}) scale(${sc})">${knitPiece(k, 1, 'sh' + (uid++))}</g>`; });
+    if (p >= 100) { const [sc, dy] = fit[size]; s += `<g transform="translate(${size === 'medium' ? 270 : 300},${74 + dy})"><g class="pop"><g transform="scale(${sc})">${knitPiece(size, 1, 'sh' + (uid++))}</g></g></g><path class="glint" d="M345,20 l1.5,-4 l1.5,4 l4,1.5 l-4,1.5 l-1.5,4 l-1.5,-4 l-4,-1.5 Z" fill="#ffd56a"/>`; }
+    else s += `<rect x="262" y="12" width="76" height="60" rx="8" fill="none" stroke="#ffd56a66" stroke-dasharray="4 4"/><text x="300" y="46" text-anchor="middle" font-size="11" fill="#c9b48a" font-family="Atkinson Hyperlegible">today's piece</text>`;
+  }
+  return s;
+}
+
+/* ---------- wiring ---------- */
+let lastFin = null;
+function timeHtml(p) {
+  if (p >= 100) return '<b>Done</b><span>' + MIN[size] + ' min focus. On the shelf now</span>';
+  return `<b>${Math.max(1, Math.ceil(MIN[size] * (1 - p / 100)))}</b><i>min left</i><span>making ${STONES[size].name}</span>`;
+}
+function update() {
+  const p = P, st = paused ? 'paused' : p >= 100 ? 'fin' : 'work';
+  $('#pv').textContent = Math.round(p) + '%';
+  for (const id of ['stone', 'knit']) $('#' + id).className = 'card ' + st;
+  stoneUpdate(p); knitUpdate(p);
+  $('#stime').innerHTML = timeHtml(p);
+  $('#ktime').innerHTML = p >= 100 ? timeHtml(p) : `<b>${Math.max(1, Math.ceil(MIN[size] * (1 - p / 100)))}</b><i>min left</i><span>making ${KNITS[size].name}</span>`;
+  const fin = p >= 100;
+  if (fin !== lastFin) { $('#ssh').innerHTML = shelfSvg('stone', p); $('#ksh').innerHTML = shelfSvg('knit', p); lastFin = fin; }
+}
+function build() {
+  $('#sst').innerHTML = stoneStage(); $('#kst').innerHTML = knitStage();
+  $('#svar').textContent = 'Now making ' + STONES[size].name + '. ' + STONES[size].alt;
+  $('#kvar').textContent = 'Now making ' + KNITS[size].name + '. ' + KNITS[size].alt;
+  lastFin = null; update();
+}
+function barButtons() {
+  $('#sbars').innerHTML = Object.keys(SBARS).map((k) => `<button data-k="${k}" class="${bar.stone === k ? 'on' : ''}">${SBARS[k][0]}</button>`).join('');
+  $('#kbars').innerHTML = Object.keys(KBARS).map((k) => `<button data-k="${k}" class="${bar.knit === k ? 'on' : ''}">${KBARS[k][0]}</button>`).join('');
+  $('#sbd').textContent = SBARS[bar.stone][1]; $('#kbd').textContent = KBARS[bar.knit][1];
+}
+$('#sbars').onclick = (e) => { const k = e.target.dataset.k; if (!k) return; bar.stone = k; barButtons(); update(); };
+$('#kbars').onclick = (e) => { const k = e.target.dataset.k; if (!k) return; bar.knit = k; barButtons(); update(); };
+$('#pr').oninput = (e) => { P = Number(e.target.value); update(); };
+$('#pa').onclick = () => { paused = !paused; $('#pa').classList.toggle('on', paused); $('#pa').textContent = paused ? 'Come back to the app' : 'Leave the app (pause)'; update(); };
+$('#play').onclick = () => { playing = !playing; if (playing && P >= 100) P = 0; setPlay(); };
+function setPlay() { $('#play').classList.toggle('on', playing); $('#play').textContent = playing ? 'Stop' : 'Play'; }
+$('#sz').onclick = (e) => { const s = e.target.dataset.s; if (!s) return; size = s; [...$('#sz').children].forEach((b) => b.classList.toggle('on', b.dataset.s === s)); build(); };
+let last = performance.now();
+function tick(t) {
+  if (playing && !paused) { P = Math.min(100, P + (t - last) / 1000 * 5); $('#pr').value = Math.round(P); update(); if (P >= 100) { playing = false; setPlay(); } }
+  last = t; ballFrame(t); requestAnimationFrame(tick);
+}
+window.setState = (o) => { if (o.size && o.size !== size) { size = o.size; [...$('#sz').children].forEach((b) => b.classList.toggle('on', b.dataset.s === size)); build(); } if ('p' in o) { P = o.p; $('#pr').value = P; } if ('paused' in o) { paused = o.paused; $('#pa').classList.toggle('on', paused); } if (o.sbar) bar.stone = o.sbar; if (o.kbar) bar.knit = o.kbar; barButtons(); update(); };
+barButtons(); build(); requestAnimationFrame(tick);
+</script>
+</body></html>

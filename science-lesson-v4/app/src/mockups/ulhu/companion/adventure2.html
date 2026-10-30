@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ulhu: the overnight adventure, round 2</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Grenze+Gotisch:wght@500;700&family=IM+Fell+English:ital@0;1&family=Pixelify+Sans:wght@500&display=swap">
+<style>
+:root{--ink:#3a2410;--gold:#ffd56a;--mint:#5ef2a0}
+*{box-sizing:border-box}
+body{margin:0;background:#020504;color:#e8e1cf;font:14px 'Atkinson Hyperlegible',system-ui,sans-serif;padding:18px}
+h1{font:700 28px 'Grenze Gotisch',serif;color:var(--mint);margin:0 0 4px}
+.lead{color:#9fb1a8;max-width:980px;margin:0 0 8px;line-height:1.45}
+h2.sec{font:500 25px 'Grenze Gotisch';color:#c9a560;margin:30px 0 4px}
+.sub{color:#9fb1a8;margin:0 0 12px;max-width:980px;line-height:1.4}
+.row{display:flex;flex-wrap:wrap;gap:24px;align-items:flex-start}
+.opt{width:360px}.opt h3{font:500 21px 'Grenze Gotisch';color:var(--gold);margin:0 0 4px}.opt p{color:#9fb1a8;margin:0 0 10px;line-height:1.4;min-height:58px}
+svg.px{image-rendering:pixelated;display:block}
+.tog{display:inline-flex;gap:6px;margin:8px 0 0}.tog button{font:700 12px 'Atkinson Hyperlegible';padding:6px 11px;border-radius:999px;border:1px solid #415a4f;background:#0b1411;color:#cfd8d3;cursor:pointer}.tog button.on{background:var(--mint);color:#06100c;border-color:var(--mint)}
+
+/* ---------- the banner at night ---------- */
+.ban{position:relative;width:360px;height:180px;border-radius:16px;overflow:hidden;border:2px solid #1b2823;background:linear-gradient(180deg,#030713 0%,#081226 50%,#0a1512 100%)}
+.ban .stars i{position:absolute;width:2px;height:2px;background:#cfe0ec;opacity:.6;animation:tw 3s infinite}
+@keyframes tw{50%{opacity:.15}}
+.ban .moon{position:absolute;right:26px;top:14px;width:26px;height:26px;border-radius:50%;background:#e9eef2;box-shadow:0 0 16px #cfe0ec88,inset -7px -3px 0 #b8c6d0}
+.ban .sea{position:absolute;left:0;right:0;bottom:0;height:46px;background:linear-gradient(180deg,#0b2a33,#061418)}
+.ban .sea:before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0 22px,#5fb6c522 22px 30px);animation:sw 6s linear infinite}
+@keyframes sw{to{background-position:60px 0}}
+/* the ledge: pixel stones */
+.ledge{position:absolute;left:0;width:250px;bottom:30px;height:34px;background:
+ linear-gradient(#3b5047,#3b5047) 0 0/100% 3px no-repeat,
+ repeating-linear-gradient(90deg,#26362f 0 28px,#17221e 28px 30px) 0 3px/100% 15px no-repeat,
+ repeating-linear-gradient(90deg,#1f2d28 0 14px,#17221e 14px 16px,#1f2d28 16px 44px,#17221e 44px 46px) 0 18px/100% 16px no-repeat;border-right:3px solid #17221e}
+.ledge:after{content:"";position:absolute;right:-3px;top:0;width:10px;height:34px;background:linear-gradient(90deg,transparent,#0006)}
+.pool{position:absolute;bottom:52px;width:180px;height:40px;border-radius:50%;filter:blur(6px);opacity:.75;animation:flk 2.2s infinite}
+@keyframes flk{0%,100%{opacity:.75}40%{opacity:.55}55%{opacity:.85}70%{opacity:.62}}
+.halo{position:absolute;border-radius:50%;filter:blur(10px);animation:flk 2.2s infinite}
+.lan{position:absolute;bottom:62px}
+.lan .fl{animation:fl 0.9s steps(2) infinite}
+@keyframes fl{50%{opacity:.7}}
+.mote{position:absolute;width:3px;height:3px;border-radius:50%;opacity:0;animation:mote 5s linear infinite}
+@keyframes mote{0%{opacity:0;transform:translate(0,0)}20%{opacity:.9}100%{opacity:0;transform:translate(14px,-60px)}}
+.trail i{position:absolute;bottom:60px;width:5px;height:3px;border-radius:50%;background:#7fd0e044}
+.rip{position:absolute;left:262px;bottom:30px;width:28px;height:7px;border:2px solid #6ab8ff;border-radius:50%;opacity:0;animation:rip 3.4s ease-out infinite}
+.rip.b{animation-delay:1.1s}.rip.c{animation-delay:2.2s}
+@keyframes rip{0%{transform:scale(.3);opacity:.9}100%{transform:scale(3);opacity:0}}
+.bub{position:absolute;left:274px;bottom:24px;width:5px;height:5px;border-radius:50%;border:1px solid #9fd0ff;opacity:0;animation:bub 5s linear infinite}
+@keyframes bub{0%{transform:translateY(0);opacity:0}10%{opacity:.8}100%{transform:translateY(-26px);opacity:0}}
+.coins{position:absolute;left:12px;top:9px;font:700 18px 'Atkinson Hyperlegible';color:var(--gold)}
+
+/* notes */
+.note{position:absolute;cursor:pointer;transition:transform .25s}
+.note:hover{transform:scale(1.06)}
+.parch{bottom:60px;width:118px;padding:9px 10px 10px;color:var(--ink);font:italic 12.5px/1.25 'IM Fell English',serif;
+ background:radial-gradient(circle at 15% 50%,#fff3cf 0,#ecdcae 40%,#cdb57e 100%);
+ clip-path:polygon(0 4%,7% 0,15% 3%,24% 0,33% 2%,44% 0,55% 3%,66% 0,77% 2%,88% 0,100% 3%,98% 14%,100% 27%,97% 40%,100% 55%,98% 70%,100% 84%,97% 100%,85% 97%,73% 100%,60% 97%,47% 100%,35% 97%,22% 100%,10% 97%,0 100%,2% 84%,0 70%,3% 55%,0 40%,2% 26%);
+ transform:rotate(-4deg);filter:drop-shadow(2px 3px 0 #0008)}
+.parch:hover{transform:rotate(-4deg) scale(1.06)}
+.parch .sig{display:block;text-align:right;margin-top:3px;font-size:16px;line-height:1}
+.parch .burn{position:absolute;inset:0;background:radial-gradient(circle at 100% 100%,#7a4a1866 0,transparent 30%),radial-gradient(circle at 0 0,#7a4a1844 0,transparent 25%)}
+.pebble{position:absolute}
+.hang{bottom:66px;width:96px;padding:8px 8px 9px;color:#2c3a2a;font:italic 12px/1.22 'IM Fell English',serif;background:linear-gradient(180deg,#d8dcc0,#b9c2a0);border-radius:2px 2px 6px 6px;transform-origin:50% -20px;animation:swing 4s ease-in-out infinite;box-shadow:inset 0 -6px 8px #6a7a5a55,2px 3px 0 #0008}
+.hang:before{content:"";position:absolute;left:46px;top:-22px;width:2px;height:22px;background:repeating-linear-gradient(180deg,#3f7a4a 0 3px,#2a5a34 3px 6px)}
+.hang .drip{position:absolute;left:44px;bottom:-6px;width:4px;height:5px;border-radius:50% 50% 50% 50%/40% 40% 60% 60%;background:#9fd0ff;animation:drip 2.4s infinite}
+@keyframes drip{0%{transform:translateY(0);opacity:0}20%{opacity:1}100%{transform:translateY(24px);opacity:0}}
+@keyframes swing{50%{transform:rotate(3deg)}}
+.slate{bottom:56px;width:150px;padding:6px 9px;background:linear-gradient(160deg,#323e42,#232c2f);border:4px solid #5a3a1c;border-radius:3px;color:#e6ece8;font:500 11px/1.2 'Pixelify Sans',monospace;transform:rotate(3deg);box-shadow:2px 3px 0 #0009;text-shadow:0 0 1px #fff8}
+.slate small{display:block;color:#9fb1a8;font-size:10px;margin-top:2px;text-align:right}
+.big{position:fixed;inset:0;background:#000b;display:none;align-items:center;justify-content:center;z-index:9}
+.big.on{display:flex}
+.big .card{transform:scale(1.9)}
+
+/* ---------- morning cards ---------- */
+.mban{background:linear-gradient(180deg,#0f3a34 0%,#0b2522 55%,#08110f 100%)}
+.ulhu{position:absolute;left:30px;bottom:56px;width:62px;height:60px;border-radius:46% 46% 38% 38%;background:radial-gradient(circle at 35% 35%,#8ff0c4,#3c9e7a 60%,#1f5a45);animation:bob 2.6s ease-in-out infinite}
+.ulhu:before,.ulhu:after{content:"";position:absolute;top:22px;width:9px;height:11px;border-radius:50%;background:#08110f}.ulhu:before{left:16px}.ulhu:after{right:16px}
+.ulhu i{position:absolute;bottom:-10px;width:8px;height:17px;border-radius:0 0 6px 6px;background:#3c9e7a}.ulhu i:nth-child(1){left:10px}.ulhu i:nth-child(2){left:22px}.ulhu i:nth-child(3){left:34px}.ulhu i:nth-child(4){left:46px}
+.ulhu b{position:absolute;width:4px;height:5px;border-radius:50%;background:#9fd0ff;animation:drip 2s infinite}
+@keyframes bob{50%{transform:translateY(-3px)}}
+/* M1 salvage scroll */
+.scroll{position:relative;width:340px;margin:0 10px;padding:16px 16px 18px;color:var(--ink);background:radial-gradient(ellipse at 30% 30%,#fff3cf,#e6d3a0 60%,#c9ad70);border-radius:4px;box-shadow:0 8px 0 -3px #8a6a3a,0 9px 0 -2px #5a3a1c,4px 10px 14px #0009;transform-origin:50% 0;animation:unroll .9s cubic-bezier(.2,.8,.3,1.2) both}
+.scroll:before,.scroll:after{content:"";position:absolute;top:-30px;width:2px;height:32px;background:repeating-linear-gradient(180deg,#8a6a3a 0 3px,#5a4418 3px 6px)}
+.scroll:before{left:40px}.scroll:after{right:40px}
+@keyframes unroll{from{transform:scaleY(.05);opacity:.4}to{transform:none;opacity:1}}
+.niche{float:left;width:80px;height:92px;margin:0 14px 4px 0;border-radius:40px 40px 6px 6px;background:radial-gradient(circle at 50% 55%,#ffe9a8 0,#c99a4a 35%,#4a2e12 75%);box-shadow:inset 0 0 0 3px #5a3a1c,inset 0 0 18px #0008;display:flex;align-items:center;justify-content:center;position:relative}
+.niche:after{content:"";position:absolute;inset:-6px;border-radius:46px 46px 10px 10px;box-shadow:0 0 22px #ffd56a55;animation:flk 3s infinite}
+.niche svg{animation:spin 3.4s ease-in-out infinite;filter:drop-shadow(0 2px 0 #0007)}
+@keyframes spin{50%{transform:translateY(-4px) rotate(4deg)}}
+.scroll h4{margin:0;font:700 24px 'Grenze Gotisch';color:#5a2a0a;line-height:1}
+.scroll .t{font:italic 16px/1.3 'IM Fell English',serif;margin:6px 0 8px}
+.scroll .m{font:700 10px 'Atkinson Hyperlegible';letter-spacing:.12em;color:#7a5a30;clear:both;padding-top:4px}
+.seal{display:inline-flex;align-items:center;justify-content:center;width:62px;height:62px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#d24a3a,#8a1a12 70%);color:#ffe0c8;font:700 12px 'Atkinson Hyperlegible';text-align:center;line-height:1.05;box-shadow:0 0 0 4px #8a1a1244,2px 3px 0 #0006;cursor:pointer;float:right;margin-top:-8px;clip-path:polygon(50% 0,61% 6%,74% 3%,80% 14%,93% 18%,92% 31%,100% 41%,95% 52%,100% 63%,91% 72%,92% 85%,80% 87%,73% 98%,61% 94%,50% 100%,39% 94%,27% 98%,20% 87%,8% 85%,9% 72%,0 63%,5% 52%,0 41%,8% 31%,7% 18%,20% 14%,26% 3%,39% 6%)}
+.runes{display:inline-block;padding:3px 9px;border-radius:999px;background:#2a1a08;color:var(--gold);font:700 12px 'Atkinson Hyperlegible';margin-top:2px}
+.scroll.bad{width:280px;margin-left:40px;background:radial-gradient(ellipse at 30% 30%,#d8d4c2,#b4ad94 60%,#8e8770);color:#2c2a22;box-shadow:0 8px 0 -3px #6a6450,4px 10px 14px #0009}
+.scroll.bad .niche{width:58px;height:66px;background:radial-gradient(circle at 50% 55%,#c8ccc8 0,#7a807c 40%,#2a2e2c 80%)}
+.scroll.bad .niche:after{box-shadow:none}
+.scroll.bad h4{color:#3a3a32;font-size:20px}
+.scroll.bad .seal{width:50px;height:50px;background:radial-gradient(circle at 35% 30%,#7a8a84,#3a4440 70%);font-size:11px}
+/* M2 net */
+.net{position:relative;width:340px;margin:0 10px;padding:16px;border-radius:14px;background:#0b1411;border:1px solid #2f443b;display:flex;gap:14px;align-items:center}
+.bag{position:relative;flex:none;width:96px;height:110px;cursor:pointer}
+.bag .mesh{position:absolute;inset:14px 6px 0;border-radius:10px 10px 46px 46px;background:
+ repeating-linear-gradient(45deg,#8a7a5a 0 1.5px,transparent 1.5px 10px),repeating-linear-gradient(-45deg,#8a7a5a 0 1.5px,transparent 1.5px 10px),radial-gradient(circle at 50% 60%,#2a4a42,#0b1a17);transition:clip-path .8s;clip-path:inset(0 0 0 0 round 10px 10px 46px 46px)}
+.bag .rim{position:absolute;left:2px;right:2px;top:8px;height:10px;border-radius:50%;border:3px solid #6a4a24}
+.bag .obj{position:absolute;left:50%;top:52%;transform:translate(-50%,-50%);transition:transform .9s cubic-bezier(.2,1.4,.4,1),filter .9s;filter:brightness(.45)}
+.bag.open .mesh{clip-path:inset(62% 0 0 0 round 10px 10px 46px 46px)}
+.bag.open .obj{transform:translate(-50%,-112%);filter:brightness(1) drop-shadow(0 0 8px #ffd56a)}
+.bag .d{position:absolute;bottom:-4px;width:3px;height:5px;border-radius:50%;background:#9fd0ff;animation:drip 1.8s infinite}
+.net h4{margin:0;font:500 22px 'Grenze Gotisch';color:var(--gold)}
+.net .t{font:italic 15px/1.3 'IM Fell English',serif;margin:4px 0 6px;min-height:40px}
+.net .m{font:700 10px 'Atkinson Hyperlegible';letter-spacing:.12em;color:#7f9389}
+.net .tap{font-size:11px;color:#7f9389}
+.btn{display:inline-block;margin-top:8px;padding:8px 14px;border-radius:999px;border:1px solid var(--mint);color:#08100d;background:var(--mint);font-weight:700;cursor:pointer}
+.net.bad{width:290px;margin-left:35px;background:#0d1110;border-color:#26302c}
+.net.bad h4{color:#cfd8d3;font-size:19px}
+/* M3 drawer */
+.drawer{position:relative;width:340px;margin:-6px 10px 0;animation:slide .8s cubic-bezier(.2,.8,.3,1.1) both}
+@keyframes slide{from{transform:translateY(-40px);opacity:0}}
+.drawer .front{position:relative;padding:14px 16px 16px;background:linear-gradient(180deg,#6a4626,#4a2e16);border:3px solid #2a1808;border-top:none;border-radius:0 0 12px 12px;box-shadow:inset 0 0 0 2px #8a6a3a55,0 8px 14px #000a}
+.velvet{display:flex;gap:12px;align-items:center;padding:12px;border-radius:8px;background:radial-gradient(circle at 30% 40%,#5a1a2a,#2a0a14 80%);box-shadow:inset 0 3px 8px #000a}
+.velvet .slot{flex:none;width:70px;height:70px;border-radius:50%;background:radial-gradient(circle,#7a2a3a,#3a0a18);display:flex;align-items:center;justify-content:center;box-shadow:inset 0 2px 6px #000a}
+.slip{flex:1;padding:8px 10px;background:#efe3c0;color:var(--ink);font:italic 14px/1.25 'IM Fell English',serif;transform:rotate(-1.5deg);box-shadow:2px 2px 0 #0007}
+.plate{margin:10px auto 0;width:220px;padding:5px 8px;text-align:center;border-radius:4px;background:linear-gradient(180deg,#e8c878,#a07a2a);color:#3a2406;font:700 14px 'Grenze Gotisch';letter-spacing:.06em;box-shadow:inset 0 1px 0 #fff8,0 2px 0 #0007}
+.plate small{display:block;font:700 9px 'Atkinson Hyperlegible';letter-spacing:.14em;opacity:.8}
+.knob{position:absolute;left:50%;bottom:-9px;width:22px;height:12px;margin-left:-11px;border-radius:0 0 12px 12px;background:#c9a560;box-shadow:0 2px 0 #0008}
+.drawer.bad{width:280px;margin-left:40px}
+.drawer.bad .front{background:linear-gradient(180deg,#4a4a44,#2e2e2a)}
+.drawer.bad .velvet{background:radial-gradient(circle at 30% 40%,#2a3432,#121816 80%)}
+.drawer.bad .slot{background:radial-gradient(circle,#3a4442,#161c1a)}
+.drawer.bad .plate{background:linear-gradient(180deg,#a8aca4,#6a706a)}
+
+/* ---------- the cabinet hall ---------- */
+.hall{position:relative;width:740px;max-width:100%;padding:18px 14px 10px;border-radius:16px;background:linear-gradient(180deg,#0a1210,#060a09);border:1px solid #1b2823;display:flex;gap:10px;align-items:flex-end;overflow-x:auto}
+.hall:after{content:"";position:absolute;left:0;right:0;bottom:0;height:12px;background:repeating-linear-gradient(90deg,#26362f 0 30px,#1b2823 30px 32px)}
+.cab{position:relative;flex:none;width:86px;cursor:pointer;text-align:center;transition:transform .2s;z-index:1;margin-bottom:12px}
+.cab:hover{transform:translateY(-4px)}
+.cab .body{position:relative;height:130px;border-radius:40px 40px 4px 4px;background:linear-gradient(90deg,#3a2410,#5a3a1c 30%,#5a3a1c 70%,#3a2410);border:3px solid #1a0e04;box-shadow:inset 0 0 0 3px #8a6a3a44}
+.cab .glass{position:absolute;inset:16px 10px 22px;border-radius:30px 30px 2px 2px;background:linear-gradient(160deg,#9fd0ff22,#0b1a1700 50%,#9fd0ff11);border:2px solid #1a0e04;overflow:hidden}
+.cab .glass i{position:absolute;left:4px;right:4px;height:2px;background:#8a6a3a}
+.cab .glass b{position:absolute;width:8px;height:8px;border-radius:2px}
+.cab .feet{height:6px;margin:0 6px;background:#1a0e04;border-radius:0 0 3px 3px}
+.cab .lbl{font:500 14px 'Grenze Gotisch';color:#c9a560;margin-top:6px;line-height:1.05}
+.cab .lbl small{display:block;font:700 9px 'Atkinson Hyperlegible';letter-spacing:.1em;color:#7f9389}
+.cab.now .body{box-shadow:inset 0 0 0 3px #8a6a3a44,0 0 20px #ffd56a55}
+.cab.now .glass{background:radial-gradient(circle at 50% 40%,#ffd56a33,#0b1a1700 70%)}
+.cab.later{opacity:.45;filter:saturate(.3)}
+.cab.later .body:after{content:"";position:absolute;inset:0;border-radius:inherit;background:radial-gradient(circle at 20% 80%,#9fb1a855 0 4px,transparent 5px),radial-gradient(circle at 70% 30%,#9fb1a855 0 3px,transparent 4px),radial-gradient(circle at 60% 88%,#9fb1a855 0 5px,transparent 6px)}
+.cab.done .lbl:after{content:"all 8 pieces";display:block;font:700 9px 'Atkinson Hyperlegible';color:var(--mint);letter-spacing:.1em}
+/* the open cabinet */
+.open{display:none;margin-top:18px;gap:24px;flex-wrap:wrap;align-items:flex-start}
+.open.on{display:flex}
+.big-cab{position:relative;width:340px;height:420px;perspective:1400px;margin:0 64px}
+.big-cab .back{position:absolute;inset:0;border-radius:150px 150px 10px 10px;background:radial-gradient(circle at 50% 30%,#3a2a18,#1a1008 80%);border:5px solid #1a0e04;box-shadow:inset 0 0 0 4px #6a4a2466,0 0 30px #000}
+.big-cab .title{position:absolute;top:26px;left:0;right:0;text-align:center;font:700 22px 'Grenze Gotisch';color:#e8c878;text-shadow:0 2px 0 #000}
+.big-cab .title small{display:block;font:700 10px 'Atkinson Hyperlegible';letter-spacing:.14em;color:#b8925a}
+.shelves{position:absolute;left:28px;right:28px;top:96px;bottom:30px;display:grid;grid-template-rows:repeat(3,1fr)}
+.sh{position:relative;display:flex;justify-content:space-around;align-items:flex-end;padding-bottom:10px;border-bottom:8px solid #6a4a24;box-shadow:0 6px 0 #0008}
+.slotc{width:56px;height:56px;display:flex;align-items:center;justify-content:center;border-radius:8px;cursor:pointer;position:relative;transition:transform .2s}
+.slotc:hover{transform:translateY(-3px)}
+.slotc.found:after{content:"";position:absolute;inset:2px;border-radius:50%;box-shadow:0 0 16px #ffd56a44;pointer-events:none}
+.slotc.empty{border:2px dashed #b8925a44;cursor:default}
+.slotc.empty:before{content:"";width:20px;height:20px;border-radius:50%;background:radial-gradient(#b8925a22,transparent 70%)}
+.slotc.placed:before{content:"";position:absolute;right:-2px;top:-2px;width:9px;height:9px;border-radius:50%;background:var(--mint);box-shadow:0 0 6px var(--mint)}
+.door{position:absolute;top:0;bottom:0;width:50%;background:linear-gradient(90deg,#4a2e12,#6a4626 40%,#4a2e12);border:5px solid #1a0e04;transition:transform 1.1s cubic-bezier(.3,.8,.3,1);z-index:3;box-shadow:inset 0 0 0 4px #8a6a3a55}
+.door .pane{position:absolute;inset:40px 18px 40px;border:3px solid #1a0e04;background:linear-gradient(160deg,#9fd0ff33,#0b1a1755);border-radius:4px}
+.door.l{left:0;border-radius:150px 0 0 10px;transform-origin:0 50%}
+.door.l .pane{border-radius:110px 4px 4px 4px}
+.door.r{right:0;border-radius:0 150px 10px 0;transform-origin:100% 50%}
+.door.r .pane{border-radius:4px 110px 4px 4px}
+.door .h{position:absolute;top:50%;width:8px;height:22px;border-radius:4px;background:#c9a560}
+.door.l .h{right:8px}.door.r .h{left:8px}
+.big-cab.opened .door.l{transform:rotateY(-78deg)}
+.big-cab.opened .door.r{transform:rotateY(78deg)}
+.hint{position:absolute;left:0;right:0;bottom:-24px;text-align:center;color:#7f9389;font-size:12px}
+/* styles of cabinet */
+.k2 .back,.k2 .door{border-radius:170px 170px 10px 10px}
+.k2 .back{background:radial-gradient(circle at 50% 30%,#1a3a34,#081614 80%);border-color:#0a1a16;box-shadow:inset 0 0 0 4px #3f7a6a77,0 0 30px #000}
+.k2 .door{background:linear-gradient(90deg,#1f3a34,#3a6a5a 40%,#1f3a34);border-color:#0a1a16;box-shadow:inset 0 0 0 4px #8fd0b044}
+.k2 .door.l{border-radius:170px 0 0 10px}.k2 .door.r{border-radius:0 170px 10px 0}
+.k2 .sh{border-bottom-color:#3f6a5a}
+.k2 .title{color:#bfeedd}.k2 .title small{color:#7fb0a0}
+.k3 .back{border-radius:12px;background:radial-gradient(circle at 50% 30%,#1a2a3a,#0a1018 80%);border-color:#0a0e14;box-shadow:inset 0 0 0 4px #9fd0ff33,0 0 30px #000}
+.k3 .door{border-radius:12px !important;background:linear-gradient(160deg,#9fd0ff22,#0b1a1755);border-color:#2a3a44;box-shadow:inset 0 0 0 2px #cfe8ff22}
+.k3 .door .pane{display:none}
+.k3 .door:after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 14% 88%,#d8d0b8aa 0 6px,transparent 7px),radial-gradient(circle at 24% 82%,#d8d0b8aa 0 4px,transparent 5px),radial-gradient(circle at 86% 10%,#d8d0b8aa 0 5px,transparent 6px)}
+.k3 .sh{border-bottom-color:#4a5a66}
+.k3 .title{color:#cfe8ff}.k3 .title small{color:#8fb0c8}
+/* the found note and the torn page */
+.side{width:360px}
+.fnote{min-height:150px;padding:14px 16px;color:var(--ink);background:radial-gradient(circle at 20% 30%,#fff3cf,#e6d3a0 70%);font:italic 17px/1.35 'IM Fell English',serif;clip-path:polygon(0 3%,10% 0,22% 4%,35% 0,50% 3%,63% 0,78% 4%,90% 0,100% 2%,97% 30%,100% 55%,96% 80%,100% 100%,80% 97%,62% 100%,45% 96%,28% 100%,12% 96%,0 100%,3% 70%,0 45%,3% 20%);opacity:0;transform:translateY(8px) rotate(-1deg);transition:.4s}
+.fnote.on{opacity:1;transform:rotate(-1deg)}
+.fnote b{display:block;font:700 20px 'Grenze Gotisch';font-style:normal;color:#5a2a0a}
+.fnote small{display:block;font:11px 'Atkinson Hyperlegible';font-style:normal;color:#7a5a30;margin-top:8px}
+.page{position:relative;margin-top:16px;padding:14px;border-radius:6px;background:#0b1411;border:1px solid #2f443b}
+.page .pt{font:500 20px 'Grenze Gotisch';color:#c9a560;margin:0 0 2px}
+.page .pc{font:700 10px 'Atkinson Hyperlegible';letter-spacing:.12em;color:#7f9389;margin-bottom:10px}
+.pieces{display:grid;grid-template-columns:1fr 1fr;gap:3px;background:#1a120a;padding:3px;border-radius:3px}
+.pc2{min-height:64px;padding:8px 9px;font:italic 13.5px/1.3 'IM Fell English',serif;color:transparent;background:#0f0a06;transition:background .6s,color .6s;position:relative}
+.pc2.got{color:var(--ink);background:radial-gradient(circle at 30% 30%,#fff3cf,#dcc690 90%)}
+.pc2.fresh{animation:land .7s}
+@keyframes land{0%{transform:scale(1.3) rotate(4deg);box-shadow:0 0 20px var(--gold)}100%{transform:none}}
+.pc2:nth-child(odd).got{clip-path:polygon(0 0,100% 0,97% 20%,100% 45%,96% 70%,100% 100%,0 100%)}
+.pc2:nth-child(even).got{clip-path:polygon(3% 0,100% 0,100% 100%,0 100%,4% 75%,0 50%,3% 25%)}
+.page.whole .pieces{gap:0;padding:0;background:none}
+.page.whole .pc2{clip-path:none !important;background:#ecdcae}
+.page .done{display:none;margin-top:10px;font:italic 14px 'IM Fell English',serif;color:var(--gold)}
+.page.whole .done{display:block}
+.small{font-size:12px;color:#7f9389;margin-top:6px}
+</style></head><body>
+<h1>Ulhu's overnight adventure, round 2</h1>
+<p class="lead">Your picks: <b>1C</b> he leaves a note (with a better note and a better lantern), <b>the card under the banner</b> made far better (the grey-night tone of 2C kept), and <b>3B cabinets per act</b> that open, with finds that give notes you piece together into one torn page per act. Three versions of each to choose from. Tap things: notes, nets, cabinets, finds.</p>
+
+<!-- ================= ROW 1 ================= -->
+<h2 class="sec">1. While he is away: the lantern and the note</h2>
+<p class="sub">After Vespers. The ledge is empty, rings spread where he dived, and the lantern lights the note. A new line each night. Tap a note to read it close up; "next night" shows another.</p>
+<div class="row" id="row1"></div>
+
+<!-- ================= ROW 2 ================= -->
+<h2 class="sec">2. The morning: the find arrives under the banner</h2>
+<p class="sub">From 6 am he is back, a little wet. The find arrives under the banner. Switch between a good night and a grey night (after a bad day: smaller, odder, no runes, never a cost).</p>
+<div class="row" id="row2"></div>
+
+<!-- ================= ROW 3 ================= -->
+<h2 class="sec">3. Where finds live: a cabinet for each act</h2>
+<p class="sub">A hall of seven cabinets, one per half-term act. Past acts are shut, this act glows, later ones are dusty with barnacles. Tap a cabinet: its doors swing open. Tap a find: it gives you its note, a torn piece of one page. Each act's eight pieces make one page, the story of that act, told without ever quite explaining it.</p>
+<div class="tog" id="kstyle"><button class="on" data-k="k1">K1 Apothecary wood</button><button data-k="k2">K2 Drowned reliquary (verdigris)</button><button data-k="k3">K3 Barnacled glass case</button></div>
+<div class="hall" id="hall" style="margin-top:12px"></div>
+<div class="open" id="open">
+  <div class="big-cab k1" id="bigcab"><div class="back"></div><div class="title" id="ctitle"></div><div class="shelves" id="shelves"></div>
+    <div class="door l"><div class="pane"></div><div class="h"></div></div><div class="door r"><div class="pane"></div><div class="h"></div></div><div class="hint">tap a find</div></div>
+  <div class="side">
+    <div class="fnote" id="fnote"></div>
+    <div class="page" id="page"><div class="pt" id="ptitle"></div><div class="pc" id="pcount"></div><div class="pieces" id="pieces"></div>
+      <div class="done">The page is whole. It goes in the back of the cabinet, and the act's window in the term page gets one more pane of light.</div></div>
+    <div class="small">Demo: <a href="#" id="fill" style="color:#5ef2a0">find the rest</a> · <a href="#" id="reset" style="color:#5ef2a0">start again</a></div>
+  </div>
+</div>
+<div class="big" id="big"></div>
+
+<script>
+/* ---------- pixel art: each map row is a string, each letter a colour ---------- */
+function px(map,pal,s,cls){var w=map[0].length,h=map.length,r='';map.forEach(function(row,y){for(var x=0;x<row.length;x++){var ch=row[x];if(ch!=='.'&&pal[ch])r+='<rect x="'+x+'" y="'+y+'" width="1.04" height="1.04" fill="'+pal[ch]+'"'+('fFo'.indexOf(ch)>=0?' class="fl"':'')+'/>';}});
+  return '<svg class="px '+(cls||'')+'" viewBox="0 0 '+w+' '+h+'" width="'+w*s+'" height="'+h*s+'" shape-rendering="crispEdges">'+r+'</svg>';}
+var LANT=["....kBBk....","...k.kk.k...","....kBBk....","..kBBBBBBk..",".kbbbbbbbbk.",".kbggggggbk.",".kbggooggbk.",".kbgofFogbk.",".kbgfFFfgbk.",".kbgoFFogbk.",".kbgoooogbk.",".kbggggggbk.",".kbbbbbbbbk.","..kBBBBBBk..",".kkkkkkkkkk."];
+var FLOAT=["....kkkk....","...k.kk.k...","....kwwk....","...kggggk...","..kggggggk..",".kggoooogk..",".kgofFFfogk.",".kgoFFFFogk.",".kgofFFfogk.",".kggoooogk..","..kggggggk..","...kggggk...","....kwwk....","...kkkkkk..."];
+var L1={k:'#1a120a',B:'#e0b860',b:'#8a6a2a',g:'#6a4a1888',o:'#ff9a30',f:'#ffd56a',F:'#fff4c8'};
+var L2={k:'#0e1a16',B:'#8fd0b0',b:'#3f7a6a',g:'#1a4a3a99',o:'#3fd08a',f:'#8ff0c4',F:'#eafff4'};
+var L3={k:'#2a2c30',B:'#e8e4d8',b:'#a8a49a',g:'#9fd0ff33',o:'#5aa8ff',f:'#9fd0ff',F:'#f0f8ff',w:'#d8d4c8'};
+var NOTES=[["Gone down to the bell.","Back by first light.","Keep the lamp lit."],["The street lamps are on again down there.","I will count them.","Back before you wake."],["Do not wait up.","Do not eat my kelp.","Back by breakfast."],["Someone is sweeping the square.","I am going to ask why.","Home at six."]];
+var night=0;
+var sprites={
+ clapper:["....vvvv....","...v....v...","....vvvv....",".....vV.....",".....vV.....",".....vV.....","....vvVv....","...vVVVVv...","..vVVVVVVv..","..vVVVVVVv..","...vVVVVv...","....vvvv...."],
+ key:["..BBBB......",".B....B.....",".B....B.....","..BBBB......","...bB.......","...bB.......","...bB.......","...bBBBB....","...bB.......","...bBBB.....","...bB.......","............"],
+ number:["............",".bbbbbbbbbb.",".bBBBBBBBBb.",".bBBkkkkBBb.",".bBkBBBBkBb.",".bBBkkkkkBb.",".bBBBBBBkBb.",".bBBBBBkBBb.",".bBBkkkBBBb.",".bBBBBBBBBb.",".bbbbbbbbbb.","............"],
+ slate:["dddddddddddd","dssssssssssd","dsCCsCsCCssd","dssssssssssd","dsCsCCsCsCsd","dssssssssssd","dsCCsCCCsssd","dssssssssssd","dddddddddddd","............","............","............"],
+ cock:["...BB.......","..BBBB......","..BBBBBBB...","...BBBBBBB..","....BBBBB.B.",".....BB...B.",".....b......",".....b......","..bbbbbbbb..",".....b......",".....b......","....bbb....."],
+ spoon:["........ww..",".......wWWw.",".......wWWw.","........ww..",".......w....","......w.....",".....w......",".....w......","......w.....",".....w......","....w.......","...ww......."],
+ rope:["...rrrrrr...","..rRRRRRRr..",".rRrrrrrrRr.",".rRr....rRr.",".rRr.RR.rRr.",".rRr....rRr.",".rRrrrrrrRr.","..rRRRRRRr..","...rrrrrr.r.","..........r.","...........r","............"],
+ hymn:["dddddddddddd","dDDDDDDDDDDD","dWDWDDWDDWWD","dWDWDWWDDDDW","dWWWDDWDDDWD","dDDWDDWDDWDD","dDDWDWWWDWWW","dDDDDDDDDDDD","dddddddddddd","............","............","............"],
+ stone:["............","............","............","............","....kkkk....","...kwWWwk...","..kwWWWwwk..","..kwwwwwwk..","...kwwwwk...","....kkkk....","............","............"],
+ pebble:["......","..kk..",".kwWk.",".kwwk.","..kk..","......"]
+};
+var SP={v:'#4a8a6a',V:'#8fd0b0',B:'#e0b860',b:'#8a6a2a',k:'#2a1a08',d:'#5a3a1c',s:'#2a3438',C:'#9aa8a4',w:'#7a8480',W:'#d0d8dc',r:'#7a5a2a',R:'#b8925a',D:'#2a1a0a'};
+SP.W='#d0d8dc';
+function spr(n,s){return px(sprites[n],SP,s||4);}
+
+/* ---------- row 1 ---------- */
+var row1=[
+ {id:'1C-i',name:'1C-i. Brass lantern, torn parchment',desc:'A brass storm lantern with a real flickering flame, warm light pooling on the stones. The note is torn parchment held down by a pebble, signed with a little tentacle print.',pal:L1,map:LANT,glow:'#ffb840',kind:'parch'},
+ {id:'1C-ii',name:'1C-ii. Ghost-green lantern, note on a kelp string',desc:'An old verdigris lantern burning a cold green ghost-flame. The note hangs on a string of kelp from a peg in the rock, still dripping, swaying a little.',pal:L2,map:LANT,glow:'#3fd08a',kind:'hang'},
+ {id:'1C-iii',name:'1C-iii. Glass float lantern, chalk on a slate',desc:'A fisherman\'s glass float with a blue flame living inside it (no air needed). The note is chalked on a little slate propped against it, in his blocky pixel hand.',pal:L3,map:FLOAT,glow:'#5aa8ff',kind:'slate'}
+];
+function stars(){var s='';for(var i=0;i<16;i++)s+='<i style="left:'+(8+i*22)%350+'px;top:'+(6+(i*37)%70)+'px;animation-delay:'+(i%5)*.6+'s"></i>';return '<div class="stars">'+s+'</div>';}
+function noteHTML(o,n){var L=NOTES[n%NOTES.length];
+ if(o.kind==='parch')return '<div class="note parch" style="left:100px" data-o="'+o.id+'"><div class="burn"></div>'+L.join(' ')+'<span class="sig">'+px(["..kk..",".kkkk.",".kkkk.","k.kk.k","k.kk.k",".k..k."],{k:'#3a2410'},3,'')+'</span></div>'+'<div class="pebble" style="left:192px;bottom:118px">'+px(sprites.pebble,{k:'#1a1a18',w:'#6a706c',W:'#9aa4a0'},4)+'</div>';
+ if(o.kind==='hang')return '<div class="note hang" style="left:54px" data-o="'+o.id+'">'+L.join(' ')+'<i class="drip"></i></div>';
+ return '<div class="note slate" style="left:100px" data-o="'+o.id+'">'+L.join('<br>')+'<small>- U</small></div>';}
+function bannerNight(o,n){
+ var lx=o.kind==='hang'?150:52;
+ var h='<div class="ban">'+stars()+'<div class="moon"></div><div class="sea"></div><div class="ledge"></div>'
+ +'<div class="pool" style="left:'+(lx-62)+'px;background:radial-gradient(ellipse,'+o.glow+'66,transparent 70%)"></div>'
+ +'<div class="halo" style="left:'+(lx-18)+'px;bottom:52px;width:84px;height:84px;background:radial-gradient('+o.glow+'55,transparent 65%)"></div>'
+ +'<div class="lan" style="left:'+lx+'px">'+px(o.map,o.pal,4)+'</div>';
+ for(var i=0;i<4;i++)h+='<i class="mote" style="left:'+(lx+12+i*7)+'px;bottom:'+(110+i*3)+'px;background:'+o.glow+';animation-delay:'+i*1.2+'s"></i>';
+ h+='<div class="trail">'+[214,226,238].map(function(x,i){return '<i style="left:'+x+'px;bottom:'+(60+i%2*3)+'px"></i>';}).join('')+'</div>';
+ h+='<div class="rip"></div><div class="rip b"></div><div class="rip c"></div><i class="bub"></i><i class="bub" style="animation-delay:2.5s;left:282px"></i>';
+ h+='<div class="coins">ᚱ 214</div>'+noteHTML(o,n)+'</div>';
+ return h;}
+function drawRow1(){document.getElementById('row1').innerHTML=row1.map(function(o,i){return '<div class="opt"><h3>'+o.name+'</h3><p>'+o.desc+'</p><div id="b1'+i+'">'+bannerNight(o,night+i)+'</div><div class="tog"><button data-next="'+i+'">next night</button></div></div>';}).join('');}
+drawRow1();
+document.getElementById('row1').addEventListener('click',function(e){
+ var nb=e.target.closest('[data-next]');if(nb){var i=+nb.dataset.next;row1[i].n=(row1[i].n||i)+1;document.getElementById('b1'+i).innerHTML=bannerNight(row1[i],row1[i].n);return;}
+ var nt=e.target.closest('.note');if(nt){var big=document.getElementById('big');var c=nt.cloneNode(true);c.style.position='relative';c.style.left='0';c.style.bottom='0';c.style.transform='scale(2.2) rotate(-2deg)';big.innerHTML='';big.appendChild(c);big.classList.add('on');}
+});
+document.getElementById('big').onclick=function(){this.classList.remove('on');};
+
+/* ---------- row 2 ---------- */
+var GOOD={sp:'clapper',name:'A bell clapper',text:'Green with age. It still swings when no one is looking.',runes:6};
+var BAD={sp:'stone',name:'A very small stone',text:'It is round. That is all. He is pleased with it.'};
+var META='ACT I · THE DROWNED BELL · CHAPTER 9';
+function mornBanner(){return '<div class="ban mban"><div class="sea"></div><div class="ledge"></div><div class="ulhu"><i></i><i></i><i></i><i></i><b style="left:12px;top:40px"></b><b style="left:48px;top:46px;animation-delay:.9s"></b></div><div class="coins">ᚱ 214</div></div>';}
+var row2=[
+ {name:'M1. The salvage scroll',desc:'A parchment scroll unrolls from the banner on two cords. The find turns slowly in a lit alcove; you keep it by pressing the wax seal. Grey night: a smaller, damp scroll and a grey seal.',
+  card:function(f,bad){return '<div class="scroll'+(bad?' bad':'')+'"><div class="niche">'+spr(f.sp,bad?3:5)+'</div><h4>'+f.name+'</h4><div class="t">'+f.text+'</div>'+(f.runes?'<span class="runes">+'+f.runes+' runes</span>':'')+'<div class="seal">'+(bad?'Keep':'Keep<br>it')+'</div><div class="m">'+(bad?'A GREY NIGHT. HE WENT ANYWAY.':META)+'</div></div>';}},
+ {name:'M2. The dripping net',desc:'His net bag hangs under the banner, dark and dripping. Tap it: the mesh falls open and the find rises out, glowing. The words write themselves in. Grey night: an almost empty net.',
+  card:function(f,bad){return '<div class="net'+(bad?' bad':'')+'"><div class="bag"><div class="rim"></div><div class="mesh"></div><div class="obj">'+spr(f.sp,bad?3:5)+'</div><i class="d" style="left:40px"></i><i class="d" style="left:56px;animation-delay:.7s"></i></div><div><div class="tap">tap the net</div><h4 style="opacity:0">'+f.name+'</h4><div class="t" data-t="'+f.text+'"></div>'+(f.runes?'<span class="runes" style="opacity:0">+'+f.runes+' runes</span>':'')+'<div class="m">'+(bad?'A GREY NIGHT':'ACT I · CHAPTER 9')+'</div><span class="btn" style="opacity:0">Into the cabinet</span></div></div>';}},
+ {name:'M3. The drawer in the ledge',desc:'A wooden drawer slides out from under the ledge: the find on red velvet, his paper slip tucked beside it, an engraved brass plate with its name. Grey night: plain wood, grey cloth, tin plate.',
+  card:function(f,bad){return '<div class="drawer'+(bad?' bad':'')+'"><div class="front"><div class="velvet"><div class="slot">'+spr(f.sp,bad?3:4)+'</div><div class="slip">'+f.text+'</div></div><div class="plate">'+f.name+'<small>'+(bad?'A GREY NIGHT':'ACT I · CHAPTER 9')+'</small></div>'+(f.runes?'<div style="text-align:center;margin-top:8px"><span class="runes">+'+f.runes+' runes</span></div>':'')+'<div class="knob"></div></div></div>';}}
+];
+function drawCard(i,bad){var o=row2[i];document.getElementById('c2'+i).innerHTML=mornBanner()+'<div style="margin-top:'+(i===0?34:i===2?0:10)+'px">'+o.card(bad?BAD:GOOD,bad)+'</div>';}
+document.getElementById('row2').innerHTML=row2.map(function(o,i){return '<div class="opt"><h3>'+o.name+'</h3><p>'+o.desc+'</p><div id="c2'+i+'"></div><div class="tog" data-i="'+i+'"><button class="on" data-bad="0">good night</button><button data-bad="1">grey night</button></div></div>';}).join('');
+row2.forEach(function(o,i){drawCard(i,false);});
+document.getElementById('row2').addEventListener('click',function(e){
+ var b=e.target.closest('[data-bad]');if(b){var t=b.parentNode;t.querySelectorAll('button').forEach(function(x){x.classList.toggle('on',x===b);});drawCard(+t.dataset.i,b.dataset.bad==='1');return;}
+ var bag=e.target.closest('.bag');if(bag&&!bag.classList.contains('open')){bag.classList.add('open');var box=bag.parentNode;box.querySelector('.tap').style.display='none';
+  setTimeout(function(){box.querySelector('h4').style.cssText='opacity:1;transition:opacity .6s';var t=box.querySelector('.t'),s=t.dataset.t,k=0;var iv=setInterval(function(){t.textContent=s.slice(0,++k);if(k>=s.length){clearInterval(iv);box.querySelectorAll('.runes,.btn').forEach(function(x){x.style.cssText='opacity:1;transition:opacity .6s';});}},28);},700);}
+});
+
+/* ---------- row 3: cabinets and the torn page ---------- */
+var ACTS=['The Drowned Bell','The Lantern Below','The Frozen Choir','The Waking Reef','The Tide Archive','The Surface Door','The Long Drift'];
+var NOW=0;   // a mock: we are in act I
+var FINDS=[
+ {sp:'clapper',name:'A bell clapper',line:'Green with age. It still swings when no one is looking.',piece:'They rang the bell once, at the wrong hour,'},
+ {sp:'key',name:'A church key',line:'Too heavy for its size.',piece:'and locked the church from the inside.'},
+ {sp:'cock',name:'A weathervane cockerel',line:'It points down.',piece:'On the roof, the cockerel turned to face the water.'},
+ {sp:'number',name:'A brass house number',line:'Number 9. The door it belonged to is somewhere below.',piece:'Number 9 was the last door to close.'},
+ {sp:'spoon',name:'A pewter spoon',line:'Bent, then carefully bent back.',piece:'Someone set the table for one more.'},
+ {sp:'slate',name:'A child\'s slate',line:'Someone wrote the same word on it a hundred times.',piece:'A child wrote one word, again and again, so it would not be lost.'},
+ {sp:'hymn',name:'A hymn board number',line:'Four hundred and twelve.',piece:'They sang four hundred and twelve, and the tide came in to listen.'},
+ {sp:'rope',name:'A rope of bell-pull',line:'Frayed at both ends.',piece:'Then the rope was cut, from both ends at once.'}
+];
+var have={0:1,2:1,3:1,5:1,6:1}, placed={};
+function cabMini(i){var cls=i<NOW?'done':i===NOW?'now':'later';var g='';
+ for(var s=0;s<3;s++)g+='<i style="top:'+(22+s*26)+'px"></i>';
+ var n=i<NOW?8:i===NOW?Object.keys(have).length:0;for(var k=0;k<n;k++)g+='<b style="left:'+(8+(k%3)*14)+'px;top:'+(12+Math.floor(k/3)*26)+'px;background:'+(i===NOW?'#ffd56a':'#c9a560')+'"></b>';
+ return '<div class="cab '+cls+'" data-a="'+i+'"><div class="body"><div class="glass">'+g+'</div></div><div class="feet"></div><div class="lbl"><small>ACT '+['I','II','III','IV','V','VI','VII'][i]+'</small>'+ACTS[i]+'</div></div>';}
+document.getElementById('hall').innerHTML=ACTS.map(function(a,i){return cabMini(i);}).join('');
+function drawShelves(){var h='';for(var r=0;r<3;r++){h+='<div class="sh">';for(var c=0;c<3;c++){var i=r*3+c;if(i>=8){if(r===2&&c===2)h+='<div class="slotc" style="cursor:default"></div>';continue;}
+  h+='<div class="slotc '+(have[i]?'found':'empty')+(placed[i]?' placed':'')+'" data-f="'+i+'">'+(have[i]?spr(FINDS[i].sp,4):'')+'</div>';}h+='</div>';}
+ document.getElementById('shelves').innerHTML=h;}
+function drawPage(fresh){var n=Object.keys(placed).length;document.getElementById('ptitle').textContent='The page of '+ACTS[NOW];
+ document.getElementById('pcount').textContent=n+' OF 8 PIECES';
+ document.getElementById('pieces').innerHTML=FINDS.map(function(f,i){return '<div class="pc2'+(placed[i]?' got':'')+(fresh===i?' fresh':'')+'">'+f.piece+'</div>';}).join('');
+ document.getElementById('page').classList.toggle('whole',n===8);}
+function openCab(i,quiet){if(i>NOW){return;}var bc=document.getElementById('bigcab');document.getElementById('open').classList.add('on');
+ document.getElementById('ctitle').innerHTML='<small>ACT '+['I','II','III','IV','V','VI','VII'][i]+'</small>'+ACTS[i];
+ drawShelves();drawPage();bc.classList.remove('opened');setTimeout(function(){bc.classList.add('opened');},60);
+ document.getElementById('fnote').classList.remove('on');if(!quiet)document.getElementById('open').scrollIntoView({behavior:'smooth',block:'nearest'});}
+document.getElementById('hall').addEventListener('click',function(e){var c=e.target.closest('.cab');if(c)openCab(+c.dataset.a);});
+document.getElementById('shelves').addEventListener('click',function(e){var s=e.target.closest('.slotc.found');if(!s)return;var i=+s.dataset.f,f=FINDS[i],fn=document.getElementById('fnote');
+ fn.classList.remove('on');setTimeout(function(){fn.innerHTML='<b>'+f.name+'</b>"'+f.piece+'"<small>'+f.line+(placed[i]?' This piece is already on the page.':' The piece joins the page below.')+'</small>';fn.classList.add('on');
+  if(!placed[i]){placed[i]=1;drawShelves();drawPage(i);}},150);});
+document.getElementById('kstyle').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;this.querySelectorAll('button').forEach(function(x){x.classList.toggle('on',x===b);});
+ var bc=document.getElementById('bigcab');bc.className='big-cab '+b.dataset.k;openCab(NOW);});
+document.getElementById('fill').onclick=function(e){e.preventDefault();FINDS.forEach(function(f,i){have[i]=1;placed[i]=1;});drawShelves();drawPage();document.getElementById('hall').innerHTML=ACTS.map(function(a,i){return cabMini(i);}).join('');};
+document.getElementById('reset').onclick=function(e){e.preventDefault();have={0:1,2:1,3:1,5:1,6:1};placed={};drawShelves();drawPage();document.getElementById('fnote').classList.remove('on');document.getElementById('hall').innerHTML=ACTS.map(function(a,i){return cabMini(i);}).join('');};
+openCab(0,true);
+</script>
+</body></html>

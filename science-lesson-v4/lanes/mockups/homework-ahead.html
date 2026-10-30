@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Homework ahead (plan item 4.13): the Friday panel (mock-ups)</title>
+<style>
+  :root { --bg:#0e1420; --ink:#e8edf5; --soft:#8a97ad; --card:#182134; --line:#2a3650; --gold:#e3b341; --blue:#4c8dff; --green:#2fbf71; --amber:#f0a030; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:16px/1.4 "Atkinson Hyperlegible",Roboto,system-ui,sans-serif; padding:14px; }
+  header { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:10px; }
+  header b { font-size:18px; margin-right:6px; }
+  button { font:inherit; padding:8px 12px; border-radius:9px; border:1px solid var(--line); background:var(--card); color:var(--ink); }
+  button[aria-pressed="true"] { background:var(--gold); color:#111; border-color:var(--gold); font-weight:700; }
+  .note { color:#b8c2d6; margin:0 0 14px; max-width:900px; } .note b { color:#fff; }
+  .panel { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:14px; max-width:720px; }
+  .panel h3 { margin:0 0 4px; font-size:18px; } .panel .sub { color:var(--soft); font-size:14px; margin-bottom:10px; }
+  .row { display:flex; align-items:center; gap:10px; padding:9px 0; border-top:1px solid var(--line); }
+  .row:first-of-type { border-top:0; }
+  .cls { font-weight:800; width:56px; } .t { flex:1; } .t small { display:block; color:var(--soft); font-size:13px; }
+  .tick { width:24px; height:24px; border:2px solid var(--soft); border-radius:6px; flex:none; } .tick.on { background:var(--green); border-color:var(--green); }
+  .tag { font-size:12px; padding:2px 8px; border-radius:999px; background:#0f1420; border:1px solid var(--line); color:var(--soft); }
+  .tag.k { color:var(--gold); border-color:var(--gold); } .tag.r { color:var(--amber); border-color:var(--amber); }
+  .cta { display:block; width:100%; margin-top:12px; padding:12px; background:var(--gold); color:#111; font-weight:700; border:0; border-radius:10px; font-size:16px; }
+  .strip { display:flex; gap:6px; margin:8px 0 12px; } .wk { flex:1; background:#0f1420; border:1px solid var(--line); border-radius:9px; padding:8px; font-size:13px; } .wk b { display:block; font-size:14px; } .wk.now { border-color:var(--gold); }
+  .wk i { display:block; font-style:normal; margin-top:4px; color:#c5cde0; }
+  .cards { display:grid; grid-template-columns:1fr 1fr; gap:8px; } .cardc { background:#0f1420; border:1px solid var(--line); border-radius:10px; padding:10px; } .cardc b { display:block; font-size:16px; } .cardc small { color:var(--soft); display:block; margin-top:2px; }
+  .cardc .st { margin-top:8px; font-size:13px; } .st.ok { color:var(--green); } .st.due { color:var(--amber); }
+</style>
+</head>
+<body>
+<header><b>Homework ahead, the Friday panel</b><button data-v="A" aria-pressed="true">A one list</button><button data-v="B">B two weeks ahead</button><button data-v="C">C a card per class</button></header>
+<p class="note" id="note"></p>
+<div id="stage"></div>
+<script>
+(function () {
+  'use strict';
+  var V = {
+    A: { note: '<b>A, one list (the lane\'s proposal).</b> On Fridays the Homework tab shows next week\'s lessons that are ticked "Set homework", each with what it will be (Seneca for Years 7 to 9, a self-marked mini test for 10 to 13), a tick to include it, and one button: "Ask Claude to prepare these". A test two weeks away shows a revision homework line with a reminder tag, and a 6-marker done on the board three weeks ago shows as a tick-able line. Nothing is posted: Claude prepares, you set.',
+      html: '<div class="panel"><h3>Set homework for next week</h3><div class="sub">Friday 13 Nov · lessons ticked "Set homework" · nothing is posted</div>' +
+        '<div class="row"><div class="tick on"></div><div class="cls">7MLA</div><div class="t">Cells: specialised cells<small>Seneca · due Fri 20 Nov</small></div><span class="tag">Seneca</span></div>' +
+        '<div class="row"><div class="tick on"></div><div class="cls">10C2</div><div class="t">Energy: efficiency<small>self-marked mini test · due Fri 20 Nov · Core and Challenge</small></div><span class="tag">mini test</span></div>' +
+        '<div class="row"><div class="tick on"></div><div class="cls">10C2</div><div class="t">Revision for the P1 test on 27 Nov<small>two weeks before the test · reminder only, you check and post</small></div><span class="tag r">reminder</span></div>' +
+        '<div class="row"><div class="tick"></div><div class="cls">11S2</div><div class="t">6-marker: the resistance of a wire<small>done on the board 3 weeks ago · comes back without the small questions</small></div><span class="tag k">6-mark</span></div>' +
+        '<div class="row"><div class="tick"></div><div class="cls">12C</div><div class="t">Superposition<small>homework every lesson · OCR questions</small></div><span class="tag">mini test</span></div>' +
+        '<button class="cta">Ask Claude to prepare these (4)</button></div>' },
+    B: { note: '<b>B, two weeks ahead.</b> The same list, but under a strip of the next three weeks so you see what is already prepared (green), what is being asked for now (gold) and the test the revision is for. Good for the "a week or more pre-made in advance" habit; a bit more to read.',
+      html: '<div class="panel"><h3>Homework ahead</h3><div class="strip"><div class="wk"><b>This week</b><i>3 set, 3 marked</i></div><div class="wk now"><b>Next week</b><i>4 to prepare</i></div><div class="wk"><b>Week after</b><i>P1 test 10C2 · revision reminder</i></div></div>' +
+        '<div class="row"><div class="tick on"></div><div class="cls">7MLA</div><div class="t">Cells: specialised cells<small>Seneca · due Fri 20 Nov</small></div><span class="tag">Seneca</span></div>' +
+        '<div class="row"><div class="tick on"></div><div class="cls">10C2</div><div class="t">Energy: efficiency<small>mini test · due Fri 20 Nov</small></div><span class="tag">mini test</span></div>' +
+        '<div class="row"><div class="tick on"></div><div class="cls">10C2</div><div class="t">Revision for the P1 test<small>reminder · test Fri 27 Nov</small></div><span class="tag r">reminder</span></div>' +
+        '<div class="row"><div class="tick"></div><div class="cls">11S2</div><div class="t">6-marker returns<small>the resistance of a wire</small></div><span class="tag k">6-mark</span></div>' +
+        '<button class="cta">Ask Claude to prepare these (3)</button></div>' },
+    C: { note: '<b>C, a card per class.</b> One card per class you teach, each saying what next week\'s homework will be and its state (prepared, to prepare, reminder). Tap a card to change what it is. The button asks for all the "to prepare" ones at once. Easiest on a phone, least detail.',
+      html: '<div class="panel"><h3>Next week\'s homework</h3><div class="cards">' +
+        '<div class="cardc"><b>7MLA</b><small>Cells: specialised cells · Seneca</small><div class="st due">to prepare</div></div>' +
+        '<div class="cardc"><b>8XP</b><small>no homework this week (shared class)</small><div class="st">skip</div></div>' +
+        '<div class="cardc"><b>10C2</b><small>Efficiency mini test + P1 revision reminder</small><div class="st due">to prepare</div></div>' +
+        '<div class="cardc"><b>10S2</b><small>Energy stores mini test</small><div class="st ok">prepared Tue</div></div>' +
+        '<div class="cardc"><b>11S2</b><small>6-marker returns: resistance of a wire</small><div class="st due">to prepare</div></div>' +
+        '<div class="cardc"><b>12C</b><small>Superposition, OCR questions</small><div class="st ok">prepared Wed</div></div></div>' +
+        '<button class="cta">Ask Claude to prepare these (3)</button></div>' }
+  };
+  var stage = document.getElementById('stage'), note = document.getElementById('note');
+  function show(k) { stage.innerHTML = V[k].html; note.innerHTML = V[k].note; document.querySelectorAll('header button').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.v === k)); }); }
+  document.querySelector('header').addEventListener('click', function (e) { var b = e.target.closest('button'); if (b) show(b.dataset.v); });
+  show('A');
+})();
+</script>
+</body>
+</html>

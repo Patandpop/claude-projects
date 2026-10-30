@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Ulhu: haunted ocarina sounds</title><style>body{margin:0;background:#070d0b;color:#e8e1cf;font:16px system-ui,sans-serif;padding:18px}h1{color:#5ef2a0;font-size:24px;margin:0 0 6px}p{color:#9fb1a8;line-height:1.4;max-width:420px}button{display:block;width:100%;max-width:420px;margin:0 0 12px;padding:14px;border-radius:14px;border:2px solid #5ef2a0;background:#0b1411;color:#e8e1cf;text-align:left;font:inherit;cursor:pointer}button b{display:block;color:#ffd56a;font-size:18px}button:active{background:#13261f}</style></head><body><h1>Ulhu's sounds</h1><p>Haunted ocarina: a soft breathy tone, a cave echo, a ghost note underneath, minor keys. Tap each to hear it. These five are the only sounds Ulhu makes; there is no music.</p><button data-s="tick"><b>A tick</b>Two ocarina notes and a faint chime in the echo.</button><button data-s="vespers"><b>Vespers done</b>A slow evening phrase in D minor that comes to rest.</button><button data-s="level"><b>Level up</b>Rising through a haunted minor scale to a bright note, with a sparkle above.</button><button data-s="faint"><b>Fainting</b>A slow falling line that wavers, then sinks into a breath.</button><button data-s="return"><b>Back from the deep</b>A splash, bubbles rising, then a small tune that opens out.</button><script>/* Ulhu as a life companion, the page side (Lane D, Big goal 3, 29 Oct 2026). Decisions:
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Ulhu: haunted ocarina sounds</title><style>body{margin:0;background:#070d0b;color:#e8e1cf;font:16px system-ui,sans-serif;padding:18px}h1{color:#5ef2a0;font-size:24px;margin:0 0 6px}p{color:#9fb1a8;line-height:1.4;max-width:420px}button{display:block;width:100%;max-width:420px;margin:0 0 12px;padding:14px;border-radius:14px;border:2px solid #5ef2a0;background:#0b1411;color:#e8e1cf;text-align:left;font:inherit;cursor:pointer}button b{display:block;color:#ffd56a;font-size:18px}button:active{background:#13261f}</style></head><body><h1>Ulhu's sounds</h1><p>Haunted ocarina: a soft breathy tone, a cave echo, a ghost note underneath, minor keys. Tap each to hear it. The five sounds Ulhu makes, plus one new chorus version of the level up to compare (gold border). There is no music.</p><button data-s="tick"><b>A tick</b>Two ocarina notes and a faint chime in the echo.</button><button data-s="vespers"><b>Vespers done</b>A slow evening phrase in D minor that comes to rest.</button><button data-s="level"><b>Level up</b>Rising through a haunted minor scale to a bright note, with a sparkle above.</button><button data-c="1" style="border-color:#ffd56a"><b>Level up, chorus version (new)</b>A small choir of ocarinas in harmony: a short tune that climbs in a haunted minor and lands on a bright major chord. Compare it with the level up above.</button><button data-s="faint"><b>Fainting</b>A slow falling line that wavers, then sinks into a breath.</button><button data-s="return"><b>Back from the deep</b>A splash, bubbles rising, then a small tune that opens out.</button><script>/* Ulhu as a life companion, the page side (Lane D, Big goal 3, 29 Oct 2026). Decisions:
    replica/design/grills/ulhu-companion.md. The server side is Companion.gs; its data rides in every snapshot as D.comp.
    Part 1, sound (haunted ocarina style since 30 Oct): big moments only (a tick, a level-up, fainting, Vespers, Ulhu back from the deep). No music, nothing
    by time of day, and a switch to turn it off. Sounds are made on the spot (Web Audio), no sound files, nothing paid.
@@ -122,4 +122,32 @@
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else if (root.document) { if (root.document.readyState === 'loading') root.document.addEventListener('DOMContentLoaded', watch); else watch(); }
 })(typeof window !== 'undefined' ? window : this);
-</script><script>document.querySelectorAll("button").forEach(function(b){b.onclick=function(){UZCOMP.setSound(true);UZCOMP.play(b.dataset.s);};});</script></body></html>
+</script><script>
+/* The ocarina chorus (mock-up only, 30 Oct): four ocarina voices in harmony, each doubled and a hair out of tune with
+   itself so it shimmers like a small choir, through the same cave echo. Our own tune: A minor climbing, a turn
+   through G, a lift on E, then it lands on a bright A major chord. */
+function chorusLevel(c){
+  var dest=c.createGain(),dl=c.createDelay(1),fb=c.createGain(),lp=c.createBiquadFilter(),wet=c.createGain();
+  dl.delayTime.value=0.27;fb.gain.value=0.38;lp.type='lowpass';lp.frequency.value=1800;wet.gain.value=0.32;
+  dest.connect(c.destination);dest.connect(dl);dl.connect(lp);lp.connect(fb);fb.connect(dl);lp.connect(wet);wet.connect(c.destination);
+  var T=c.currentTime+0.02;
+  function breath(t,len,v){var n=Math.floor(c.sampleRate*len),b=c.createBuffer(1,n,c.sampleRate),d=b.getChannelData(0);for(var i=0;i<n;i++)d[i]=Math.random()*2-1;
+    var s=c.createBufferSource(),f=c.createBiquadFilter(),g=c.createGain(),at=T+t;s.buffer=b;f.type='lowpass';f.frequency.setValueAtTime(2600,at);f.frequency.exponentialRampToValueAtTime(1200,at+len);
+    g.gain.setValueAtTime(0.0001,at);g.gain.linearRampToValueAtTime(v,at+0.02);g.gain.exponentialRampToValueAtTime(0.0001,at+len);s.connect(f);f.connect(g);g.connect(dest);s.start(at);s.stop(at+len+0.05);}
+  function voice(f,t,len,v,cents,rate){var at=T+t,o=c.createOscillator(),o2=c.createOscillator(),g=c.createGain(),g2=c.createGain(),l=c.createOscillator(),lg=c.createGain(),ff=f*Math.pow(2,cents/1200);
+    o.type='sine';o2.type='triangle';o.frequency.setValueAtTime(ff,at);o2.frequency.setValueAtTime(ff*2,at);g2.gain.value=0.08;o2.connect(g2);g2.connect(g);
+    l.frequency.value=rate;lg.gain.setValueAtTime(0,at);lg.gain.linearRampToValueAtTime(ff*0.011,at+Math.min(0.35,len*0.6));l.connect(lg);lg.connect(o.frequency);
+    g.gain.setValueAtTime(0.0001,at);g.gain.linearRampToValueAtTime(v,at+0.05);g.gain.setValueAtTime(v*0.85,at+len*0.75);g.gain.exponentialRampToValueAtTime(0.0001,at+len);
+    o.connect(g);g.connect(dest);[o,o2,l].forEach(function(x){x.start(at);x.stop(at+len+0.05);});}
+  // one chorus note: two copies a few cents apart with different wobble speeds, a breath, and a quiet ghost an octave below
+  function oca(f,t,len,v){voice(f,t,len,v,-5,5.0);voice(f,t,len,v,5,5.6);breath(t,Math.min(0.1,len),v*0.18);voice(f/2*1.006,t+0.03,len*1.1,v*0.15,0,4.4);}
+  // [start, length, melody, alto, tenor, bass] in hertz (A minor, G, E major, A major)
+  var rows=[[0,.17,440,329.6,261.6,220],[.16,.17,523.3,440,329.6,220],[.32,.17,659.3,523.3,440,220],[.48,.17,587.3,493.9,392,196],[.64,.2,659.3,415.3,329.6,164.8],[.84,1.25,880,659.3,554.4,220]];
+  rows.forEach(function(r){oca(r[2],r[0],r[1],0.042);oca(r[3],r[0],r[1],0.023);oca(r[4],r[0],r[1],0.018);voice(r[5],r[0],r[1]+0.05,0.038,0,4.6);});
+  [1318.5,1760,2217.5].forEach(function(f,i){voice(f,0.95+i*0.09,0.45,0.009,0,6);});   // a faint sparkle as it lands
+}
+var CH=null;
+document.querySelectorAll("button").forEach(function(b){b.onclick=function(){
+  if(b.dataset.c){CH=CH||new (window.AudioContext||window.webkitAudioContext)();if(CH.state==='suspended')CH.resume();chorusLevel(CH);return;}
+  UZCOMP.setSound(true);UZCOMP.play(b.dataset.s);};});
+</script></body></html>

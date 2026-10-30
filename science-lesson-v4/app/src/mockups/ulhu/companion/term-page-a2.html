@@ -1,0 +1,270 @@
+<!doctype html>
+<!--
+HIS RULE (word for word, obeyed everywhere on this page):
+"Every stained-glass design must be real stained glass: each shape is its own glass piece with dark lead lines between all pieces, and lit pieces glow like light through glass. Never draw ordinary shapes or icons and lay them on top of a glass background. Only 1 or 2 lead breaks per section (more looks bad), and the design must be obvious at a glance."
+-->
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ulhu: who I'm becoming, option A in real glass (A2)</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Grenze+Gotisch:wght@500;700&family=IM+Fell+English:ital@0;1&display=swap">
+<style>
+:root{color-scheme:dark}
+html,body{margin:0;background:#020504;color:#e8e1cf}
+body{font:14px/1.45 'Atkinson Hyperlegible',system-ui,sans-serif;background:radial-gradient(ellipse at 50% -5%,#0e1d18,#020504 55%) fixed}
+main{max-width:380px;margin:0 auto;padding:16px 12px 30px;box-sizing:border-box}
+.note{color:#9fb1a8;font-size:13px;margin:0 0 14px;line-height:1.45}
+.note b{color:#ffd56a}
+h1{font:700 27px/1.1 'Grenze Gotisch',serif;color:#ffd56a;margin:0;text-shadow:0 0 16px rgba(255,213,106,.25)}
+.sub{font-size:12px;color:#7f9389;margin:2px 0 4px;letter-spacing:.08em}
+.lbl{font:700 11px 'Atkinson Hyperlegible';letter-spacing:.14em;color:#c9a560;margin:22px 0 8px}
+.figs{display:grid;grid-template-columns:repeat(3,1fr);gap:4px 6px}
+.fig{text-align:center}
+.fig svg{display:block;width:100%;height:auto;overflow:visible}
+.fig b{display:block;font:500 17px/1.1 'Grenze Gotisch',serif;color:#e8e1cf;margin-top:2px}
+.fig span{font-size:12px;color:#9fb1a8}
+/* the leaded panels: the glass is an SVG drawn behind, the words are painted on the pale glass */
+.panel{position:relative}
+.panel svg.glass{position:absolute;left:0;top:0;overflow:visible;z-index:0}
+.panel .in{position:relative;z-index:1;padding:15px 16px}
+.row{height:44px;display:flex;align-items:center;gap:10px;color:#1b231f}
+.row .n{font:700 22px/1 'Grenze Gotisch',serif;color:#6b4a12;width:14px;text-align:center}
+.row b{flex:1;font:700 15px 'Atkinson Hyperlegible'}
+.row i{font-style:normal;font-size:12.5px;color:#34413b}
+.heavy{display:grid;grid-template-columns:1fr 1fr;row-gap:2px;column-gap:24px;color:#1b231f}
+.heavy div{height:26px;display:flex;align-items:center;justify-content:space-between;font-size:13.5px}
+.heavy div b{font-weight:700}.heavy div i{font-style:normal;color:#5a4214;font-weight:700}
+.quote{font:italic 15px/1.35 'IM Fell English',serif;color:#cfd8d3;margin:9px 2px 0}
+svg.chap{display:block;width:100%;height:auto;overflow:visible}
+.key{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12px;color:#9fb1a8;margin-top:6px}
+.key span{display:inline-flex;align-items:center;gap:5px}
+</style></head><body>
+<main>
+<p class="note"><b>A2.</b> Option A again, rebuilt as real leaded glass. Each figure is its own window and the emblem is cut from the glass itself; votes light its pieces one by one, from the bottom up, fully lit at 30. Every panel and chapter window is leaded the same way. Sample data only.</p>
+
+<h1>Act II: The Lantern Below</h1>
+<p class="sub">2 NOV TO TODAY · WEEK 6</p>
+
+<div class="lbl">WHO YOU ARE BECOMING</div>
+<div class="figs" id="figs"></div>
+
+<div class="lbl">ON YOUR BETTER DAYS, THESE CAME FIRST</div>
+<div class="panel" id="first"><div class="in"></div></div>
+
+<div class="lbl">YOUR HEAVY DAYS</div>
+<div class="panel" id="heavy"><div class="in"><div class="heavy"></div></div></div>
+<p class="quote">Heavy days change nothing. The glass kept filling.</p>
+
+<div class="lbl">THE CHAPTERS</div>
+<div id="chap"></div>
+<div class="key" id="key"></div>
+</main>
+
+<script>
+/* ---------- sample data only ---------- */
+const WHO = [['Scholar', 30, 'book'], ['Homeflame', 18, 'flame'], ['Steadfast', 11, 'shield'], ['Nourished', 7, 'cup'], ['Serene', 2, 'moon'], ['Valiant', 0, 'sword']];
+const FIRST = [['Drink water', 12], ['Study physics', 9], ['Walk before school', 7]];
+const HEAVY = [['Marking', 6], ["Parents' evening", 2], ['Report writing', 3], ['Ill', 1]];
+// per school week: blessings, curses, rituals, state (1 sealed by High Vespers, 2 this week, 0 not yet)
+const CH = [[6, 3, 9, 1], [8, 1, 11, 1], [5, 6, 7, 1], [9, 2, 12, 1], [3, 8, 5, 1], [7, 2, 6, 2], [0, 0, 0, 0]];
+const NOW_LIVED = 0.6; // three of five school days of this week lived so far
+
+/* ---------- helpers ---------- */
+const LEAD = '#0b090b';
+const f = n => (+n).toFixed(2);
+function rng(seed) { let a = seed >>> 0; return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ t >>> 15, t | 1); t ^= t + Math.imul(t ^ t >>> 7, t | 61); return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function mixHex(a, b, t) { const A = [1, 3, 5].map(i => parseInt(a.substr(i, 2), 16)), B = [1, 3, 5].map(i => parseInt(b.substr(i, 2), 16)); return '#' + A.map((v, i) => Math.max(0, Math.min(255, Math.round(v + (B[i] - v) * t))).toString(16).padStart(2, '0')).join(''); }
+function tint(c, r, amt) { const t = (r() - .5) * 2 * amt; return t > 0 ? mixHex(c, '#ffffff', t) : mixHex(c, '#000000', -t); }
+function centroid(p) { let x = 0, y = 0; p.forEach(q => { x += q[0]; y += q[1]; }); return [x / p.length, y / p.length]; }
+function inPoly(x, y, p) { let c = false; for (let i = 0, j = p.length - 1; i < p.length; j = i++) { const [xi, yi] = p[i], [xj, yj] = p[j]; if ((yi > y) !== (yj > y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) c = !c; } return c; }
+function clipHalf(poly, o, n) { const out = [], d = q => (q[0] - o[0]) * n[0] + (q[1] - o[1]) * n[1];
+  for (let i = 0; i < poly.length; i++) { const a = poly[i], b = poly[(i + 1) % poly.length], da = d(a), db = d(b);
+    if (da >= 0) out.push(a);
+    if ((da >= 0) !== (db >= 0)) { const t = da / (da - db); out.push([a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t]); } }
+  return out; }
+// one straight glass cut: through point (x,y) at angle deg, splitting only the piece that holds the point
+function cut(pieces, [x, y, deg]) { const i = pieces.findIndex(p => inPoly(x, y, p)); if (i < 0) return pieces;
+  const a = deg * Math.PI / 180, n = [-Math.sin(a), Math.cos(a)], A = clipHalf(pieces[i], [x, y], n), B = clipHalf(pieces[i], [x, y], [-n[0], -n[1]]);
+  if (A.length < 3 || B.length < 3) return pieces; pieces.splice(i, 1, A, B); return pieces; }
+const pathD = p => 'M' + p.map(q => f(q[0]) + ' ' + f(q[1])).join('L') + 'Z';
+const circD = (cx, cy, r) => 'M' + f(cx - r) + ' ' + f(cy) + 'a' + r + ' ' + r + ' 0 1 0 ' + 2 * r + ' 0a' + r + ' ' + r + ' 0 1 0 ' + (-2 * r) + ' 0Z';
+// a pointed lancet arch as a polygon
+function arch(x0, x1, spring, apex, bottom) { const half = (x1 - x0) / 2, rise = spring - apex, R = (half * half + rise * rise) / (2 * half), N = 12;
+  const aA = Math.atan2(-rise, half - R), L = [], Rt = [];
+  for (let i = 0; i <= N; i++) { const a = -Math.PI + (aA + Math.PI) * i / N; L.push([x0 + R + R * Math.cos(a), spring + R * Math.sin(a)]); }
+  for (let i = N; i >= 0; i--) { const p = L[i]; Rt.push([x0 + x1 - p[0], p[1]]); }
+  return [[x0, bottom]].concat(L, Rt.slice(1), [[x1, bottom]]); }
+
+/* ---------- shared glass defs: texture, glow ---------- */
+let GID = 0;
+function glassDefs(uid) {
+  return '<filter id="' + uid + 'tex" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".75 .35" numOctaves="2" seed="' + (3 + GID % 7) + '" result="n"/>' +
+    '<feColorMatrix in="n" type="matrix" values=".33 .33 .33 0 0  .33 .33 .33 0 0  .33 .33 .33 0 0  0 0 0 0 1" result="g"/>' +
+    '<feComposite in="SourceGraphic" in2="g" operator="arithmetic" k1=".75" k2=".66" k3="0" k4="0" result="m"/><feComposite in="m" in2="SourceGraphic" operator="in"/></filter>' +
+    '<filter id="' + uid + 'bloom" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="3.2"/></filter>' +
+    '<filter id="' + uid + 'halo" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="7"/></filter>';
+}
+// one piece of glass: lit pieces get a radial glow inside, unlit pieces are smoky dark with a faint tint
+function glassPiece(uid, d, col, state, extra) {
+  const id = uid + 'g' + (GID++);
+  let stops;
+  if (state === 'lit') stops = [[0, mixHex(col, '#ffffff', .3)], [.55, col], [1, mixHex(col, '#000000', .3)]];
+  else if (state === 'calm') stops = [[0, mixHex(col, '#ffffff', .12)], [.7, col], [1, mixHex(col, '#000000', .35)]];
+  else if (state === 'pale') stops = [[0, mixHex(col, '#ffffff', .35)], [.7, col], [1, mixHex(col, '#000000', .14)]];
+  else stops = [[0, mixHex(col, '#0a0c10', .74)], [1, mixHex(col, '#0a0c10', .88)]];
+  const grad = '<radialGradient id="' + id + '" cx=".42" cy=".36" r=".8">' + stops.map(([o, c]) => '<stop offset="' + o + '" stop-color="' + c + '"/>').join('') + '</radialGradient>';
+  return { defs: grad, path: '<path d="' + d + '" fill="url(#' + id + ')"' + (extra || '') + ' filter="url(#' + uid + 'tex)"/>' };
+}
+
+/* ---------- the identity windows: the emblem IS the glass ---------- */
+// window: x 0..100, spring 58, apex 6, bottom 154 (viewBox padded for the glow)
+const WIN = arch(4, 96, 58, 6, 154);
+const mirror = pts => pts.map(([x, y]) => [100 - x, y]);
+// each emblem: a list of parts {poly, cuts, cols}; cuts split the part into its glass pieces
+function crescentPiece(a1, a2, f0, f1) { const cx = 46, cy = 94, R = 36, T = a => 22 * Math.pow(Math.max(0, Math.sin(Math.PI * (a - 60) / 240)), .8) + .6, out = [], n = 5;
+  for (let i = 0; i <= n; i++) { const a = a1 + (a2 - a1) * i / n, r = R - T(a) * f0, ar = a * Math.PI / 180; out.push([cx + r * Math.cos(ar), cy + r * Math.sin(ar)]); }
+  for (let i = n; i >= 0; i--) { const a = a1 + (a2 - a1) * i / n, r = R - T(a) * f1, ar = a * Math.PI / 180; out.push([cx + r * Math.cos(ar), cy + r * Math.sin(ar)]); }
+  return out; }
+function pagePoly() { const out = [[14, 118], [50, 128]]; for (let i = 0; i <= 10; i++) { const t = 1 - i / 10; out.push([14 + 36 * t, 72 + 10 * t - 9 * Math.sin(Math.PI * t)]); } return out; }
+// a candle flame: round belly, sides sweeping in to a tip that leans a little (one interval per height, so straight cuts across it stay clean)
+function flamePoly() { const L = [], R = [], N = 24; for (let i = 0; i <= N; i++) { const u = i / N, y = 20 + 86 * u, c = 50 + 9 * (1 - u) * (1 - u);
+    const w = u < .68 ? 22 * Math.pow(u / .68, 1.7) : 22 * Math.sqrt(Math.max(0, 1 - Math.pow((u - .68) / .32, 2)));
+    L.push([c - w, y]); R.push([c + w, y]); }
+  return L.concat(R.reverse()); }
+function bowlPoly() { const out = []; for (let i = 0; i <= 16; i++) { const a = Math.PI * i / 16; out.push([50 + 34 * Math.cos(a), 62 + 40 * Math.sin(a)]); } return out; }
+const EMB = {
+  book: [
+    // two open pages with arched tops (the lead between them is the spine), cut into lines like text, on a dark blue cover
+    { poly: pagePoly(false), cuts: [[32, 96, 15.5], [32, 110, 15.5]], cols: ['#a9d6ff', '#8cc6ff'] },
+    { poly: mirror(pagePoly(false)).reverse(), cuts: [[68, 96, -15.5], [68, 110, -15.5]], cols: ['#8cc6ff', '#a9d6ff'] },
+    { poly: [[6, 68], [14, 72], [14, 118], [6, 122]], cuts: [], cols: ['#2f6fd0'] },
+    { poly: [[6, 122], [14, 118], [50, 128], [50, 138]], cuts: [], cols: ['#3a7ce0'] },
+    { poly: mirror([[6, 68], [14, 72], [14, 118], [6, 122]]).reverse(), cuts: [], cols: ['#2f6fd0'] },
+    { poly: mirror([[6, 122], [14, 118], [50, 128], [50, 138]]).reverse(), cuts: [], cols: ['#3a7ce0'] }],
+  cup: [
+    { poly: bowlPoly(), cuts: [[50, 72, 0], [38, 67, 96], [62, 67, 84], [50, 92, 90], [40.8, 87, 125], [59.2, 87, 55]], cols: ['#5ef2a0', '#c9e86a', '#7fe0a0'] },
+    { poly: [[44, 101], [56, 101], [55, 126], [45, 126]], cuts: [[50, 114, 4]], cols: ['#d8b860'] },
+    { poly: [[45, 126], [55, 126], [74, 141], [26, 141]], cuts: [[50, 134, 90]], cols: ['#e0c070', '#c9a560'] }],
+  shield: [
+    { poly: [[18, 40], [50, 34], [82, 40], [82, 88], [74, 112], [50, 136], [26, 112], [18, 88]],
+      cuts: [[50, 80, 90], [34, 76, 0], [66, 76, 0], [34, 58, 40], [66, 58, 140], [36, 100, 140], [64, 100, 40]], cols: ['#ffd56a', '#e09a34'] }],
+  moon: [
+    ...[[60, 100, 0, 1], [100, 140, 0, .5], [100, 140, .5, 1], [140, 180, 0, .5], [140, 180, .5, 1], [180, 220, 0, .5], [180, 220, .5, 1], [220, 260, 0, .5], [220, 260, .5, 1], [260, 300, 0, 1]]
+      .map(([a, b, p, q]) => ({ poly: crescentPiece(a, b, p, q), cuts: [], cols: [p ? '#c4b2ff' : '#a48aff'] })),
+    { poly: [[73, 76], [80, 92], [73, 108], [66, 92]], cuts: [[73, 92, 90]], cols: ['#f1ecff', '#ddd4ff'] }],
+  flame: [
+    { poly: flamePoly(), cuts: [[50, 93, -8], [51, 75, 9], [54, 55, -12], [50, 100, 90], [51, 84, 90]], cols: ['#ffe27a', '#ffd56a', '#ffb347', '#ff9f4a', '#ff8a3a', '#ff6a2a'], byY: 1 },
+    { poly: [[41, 106], [59, 106], [59, 136], [41, 136]], cuts: [[50, 120, 80]], cols: ['#f2e6c8', '#e4d3ac'] },
+    { poly: [[28, 136], [72, 136], [67, 145], [33, 145]], cuts: [], cols: ['#c9a560'] }],
+  sword: [
+    { poly: [[41, 30], [50, 12], [59, 30], [59, 96], [41, 96]], cuts: [[50, 60, 90], [45, 44, -28], [55, 56, 28], [45, 76, -28], [55, 84, 28]], cols: ['#e8edf4', '#c8d2de'] },
+    { poly: [[20, 96], [80, 96], [80, 107], [20, 107]], cuts: [[35, 101, 90], [65, 101, 90]], cols: ['#ff7a66', '#ffb347'] },
+    { poly: [[44, 107], [56, 107], [56, 128], [44, 128]], cuts: [[50, 117, 12]], cols: ['#8a3a2a', '#a8483a'] },
+    { poly: [[50, 128], [59, 137], [50, 146], [41, 137]], cuts: [], cols: ['#ff7a66'] }],
+};
+const HUE = { book: '#6ab8ff', cup: '#5ef2a0', shield: '#ffd56a', moon: '#a48aff', flame: '#ff9f6a', sword: '#ff7a66' };
+// the window behind the emblem: only two lead breaks
+const BG = (() => { let p = [WIN.slice()]; cut(p, [50, 30, 8]); cut(p, [50, 148, -7]); return p; })();
+const BGCOL = ['#1d4f8f', '#16606e', '#1e4a80'];
+
+function figureSVG(name, votes, kind, idx) {
+  const uid = 'w' + idx, r = rng(41 + idx * 17);
+  // cut every part into its pieces
+  const pieces = [];
+  EMB[kind].forEach(part => { let p = [part.poly.map(q => q.slice())]; part.cuts.forEach(c => cut(p, c)); if (part.byY) p.sort((a, b) => centroid(b)[1] - centroid(a)[1]); p.forEach((q, i) => pieces.push({ pts: q, col: part.cols[i % part.cols.length] })); });
+  // fixed lighting order: bottom piece first, climbing to the top
+  pieces.forEach(p => { p.c = centroid(p.pts); });
+  const order = pieces.slice().sort((a, b) => (b.c[1] - a.c[1]) || (a.c[0] - b.c[0]));
+  const lit = Math.floor(votes * pieces.length / 30 + 1e-9);
+  order.forEach((p, k) => { p.on = k < lit; });
+  let defs = glassDefs(uid), bg = '', emb = '', bloom = '', leadBg = '', leadEmb = '';
+  // the hole the emblem is cut into: background glass only exists where the emblem is not
+  defs += '<mask id="' + uid + 'hole" maskUnits="userSpaceOnUse" x="-20" y="-20" width="140" height="200"><rect x="-20" y="-20" width="140" height="200" fill="#fff"/>' + EMB[kind].map(pt => '<path d="' + pathD(pt.poly) + '" fill="#000"/>').join('') + '</mask>';
+  BG.forEach((q, i) => { const g = glassPiece(uid, pathD(q), tint(BGCOL[i], r, .05), 'calm'); defs += g.defs; bg += g.path; leadBg += pathD(q); });
+  pieces.forEach(p => { const d = pathD(p.pts), col = tint(p.col, r, .1), g = glassPiece(uid, d, col, p.on ? 'lit' : 'dark'); defs += g.defs; emb += g.path;
+    if (p.on) bloom += '<path d="' + d + '" fill="' + col + '"/>'; leadEmb += d; });
+  const frac = lit / pieces.length;
+  return '<svg viewBox="-10 -10 120 176" role="img" aria-label="' + name + ', ' + votes + ' of 30 votes"><defs>' + defs + '</defs>' +
+    (frac ? '<path d="' + pathD(WIN) + '" fill="' + HUE[kind] + '" opacity="' + f(.15 + .45 * frac) + '" filter="url(#' + uid + 'halo)"/>' : '') +
+    '<g mask="url(#' + uid + 'hole)">' + bg + '</g>' + emb +
+    '<g filter="url(#' + uid + 'bloom)" opacity=".75" style="mix-blend-mode:screen">' + bloom + '</g>' +
+    '<g fill="none" stroke="' + LEAD + '" stroke-linejoin="round" stroke-linecap="round">' +
+    '<path d="' + leadBg + '" stroke-width="3.6" mask="url(#' + uid + 'hole)"/><path d="' + leadEmb + '" stroke-width="3.6"/>' +
+    '<path d="' + pathD(WIN) + '" stroke-width="5"/></g></svg>';
+}
+document.getElementById('figs').innerHTML = WHO.map(([n, v, k], i) => '<div class="fig">' + figureSVG(n, v, k, i) + '<b>' + n + '</b><span>' + v + ' of 30</span></div>').join('');
+
+/* ---------- leaded panels with pale glass for the words ---------- */
+// border: four gold corner squares and four teal strips; inside: pale glass, split only between rows
+function panelSVG(uid, W, H, cuts) {
+  const B = 11, r = rng(uid.length * 97 + W);
+  let defs = glassDefs(uid), glass = '', bloom = '', lead = '';
+  const add = (pts, col, state) => { const d = pathD(pts), c = tint(col, r, .06), g = glassPiece(uid, d, c, state); defs += g.defs; glass += g.path; lead += d; if (state === 'lit') bloom += '<path d="' + d + '" fill="' + c + '"/>'; };
+  [[0, 0], [W - B, 0], [0, H - B], [W - B, H - B]].forEach(([x, y]) => add([[x, y], [x + B, y], [x + B, y + B], [x, y + B]], '#ffc44a', 'lit'));
+  add([[B, 0], [W - B, 0], [W - B, B], [B, B]], '#1f5a66', 'calm');
+  add([[B, H - B], [W - B, H - B], [W - B, H], [B, H]], '#1f5a66', 'calm');
+  add([[0, B], [B, B], [B, H - B], [0, H - B]], '#24497a', 'calm');
+  add([[W - B, B], [W, B], [W, H - B], [W - B, H - B]], '#24497a', 'calm');
+  let p = [[[B, B], [W - B, B], [W - B, H - B], [B, H - B]]];
+  cuts.forEach(c => cut(p, c));
+  const pale = ['#e4ecdf', '#dde8e2', '#e8e6d6'];
+  p.forEach((q, i) => add(q, pale[i % 3], 'pale'));
+  return '<svg class="glass" width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '"><defs>' + defs + '</defs>' + glass +
+    '<g filter="url(#' + uid + 'bloom)" opacity=".7" style="mix-blend-mode:screen">' + bloom + '</g>' +
+    '<g fill="none" stroke="' + LEAD + '" stroke-linejoin="round"><path d="' + lead + '" stroke-width="3.4"/><rect x="1" y="1" width="' + (W - 2) + '" height="' + (H - 2) + '" stroke-width="4"/></g></svg>';
+}
+const firstIn = document.querySelector('#first .in');
+firstIn.innerHTML = FIRST.map(([n, d], i) => '<div class="row"><span class="n">' + (i + 1) + '</span><b>' + n + '</b><i>first on ' + d + ' days</i></div>').join('');
+document.querySelector('#heavy .heavy').innerHTML = HEAVY.map(([t, n]) => '<div><b>' + t + '</b><i>' + n + (n === 1 ? ' day' : ' days') + '</i></div>').join('');
+function drawPanels() {
+  document.querySelectorAll('.panel svg.glass').forEach(s => s.remove());
+  // better days: one gently slanted lead between each pair of rows (two breaks)
+  const fp = document.getElementById('first'), W = fp.offsetWidth, H = fp.offsetHeight, rows = fp.querySelectorAll('.row');
+  const cuts = [1, 2].map(i => [W / 2, rows[i].offsetTop + fp.querySelector('.in').offsetTop, i === 1 ? 1.2 : -1.2]);
+  fp.insertAdjacentHTML('afterbegin', panelSVG('pf', W, H, cuts));
+  // heavy days: one upright lead between the two columns (one break)
+  const hp = document.getElementById('heavy');
+  hp.insertAdjacentHTML('afterbegin', panelSVG('ph', hp.offsetWidth, hp.offsetHeight, [[hp.offsetWidth / 2, hp.offsetHeight / 2, 90]]));
+}
+drawPanels(); addEventListener('resize', drawPanels); document.fonts && document.fonts.ready.then(drawPanels);
+
+/* ---------- chapter windows: each week's glass IS its counts ---------- */
+function chaptersSVG() {
+  const uid = 'ch', r = rng(9), LW = 40, GAP = 8.5, TOP = 6, SPRING = 34, HEAD = 46, BOT = 156;
+  const GOLD = '#ffc44a', GREEN = '#5ef2a0', RED = '#b8231c';
+  let defs = glassDefs(uid), glass = '', bloom = '', lead = '', text = '';
+  CH.forEach(([bl, cu, ri, st], w) => {
+    const x0 = w * (LW + GAP), x1 = x0 + LW, cx = x0 + LW / 2, A = arch(x0, x1, SPRING, TOP, BOT);
+    // the head of the lancet, with a round hole for the seal
+    const head = clipHalf(A, [cx, HEAD], [0, -1]), rc = [cx, 27, 8.5];
+    const hd = pathD(head) + circD(...rc);
+    let g = glassPiece(uid, hd, tint(st ? '#22477a' : '#1a2c44', r, .05), st ? 'calm' : 'dark', ' fill-rule="evenodd"'); defs += g.defs; glass += g.path; lead += hd;
+    // the seal: red glass set into the lead, lit once High Vespers closes the week
+    const sealed = st === 1, sd = circD(...rc);
+    g = glassPiece(uid, sd, sealed ? '#e0352a' : '#7a1d18', sealed ? 'lit' : 'dark'); defs += g.defs; glass += g.path; lead += sd;
+    if (sealed) bloom += '<path d="' + sd + '" fill="#ff4a3a"/>';
+    // the body: bands of glass sized by the week's counts, bottom to top: rituals, blessings, curses
+    const body = clipHalf(A, [cx, HEAD], [0, 1]), span = BOT - HEAD, lived = st === 1 ? 1 : st === 2 ? NOW_LIVED : 0;
+    let p = [body], y = BOT, cuts = [];
+    const tot = bl + cu + ri;
+    if (tot) [ri, bl].forEach((n, i) => { y -= Math.max(10, span * lived * n / tot); cuts.push([cx, y, i ? -9 : 9]); });
+    if (lived < 1 && lived > 0) cuts.push([cx, BOT - span * lived, 0]);
+    cuts.forEach(c => cut(p, c));
+    p.sort((a, b) => centroid(b)[1] - centroid(a)[1]); // bottom first
+    p.forEach((q, i) => { const d = pathD(q);
+      const isDark = !tot || (lived < 1 && i === p.length - 1);
+      const col = isDark ? '#2a3550' : [GOLD, GREEN, RED][i], c = tint(col, r, .06);
+      g = glassPiece(uid, d, c, isDark ? 'dark' : 'lit'); defs += g.defs; glass += g.path; lead += d;
+      if (!isDark) bloom += '<path d="' + d + '" fill="' + c + '"' + (col === RED ? ' opacity=".55"' : '') + '/>'; });
+    lead += pathD(A);
+    text += '<text x="' + cx + '" y="' + (BOT + 15) + '" text-anchor="middle" font-family="Atkinson Hyperlegible" font-size="10.5" font-weight="700" fill="' + (st === 2 ? '#5ef2a0' : '#9fb1a8') + '">' + (st === 2 ? 'now' : 'W' + (w + 1)) + '</text>';
+  });
+  const W = CH.length * LW + (CH.length - 1) * GAP;
+  return '<svg class="chap" viewBox="-4 0 ' + (W + 8) + ' ' + (BOT + 20) + '" role="img" aria-label="Chapter windows, one per school week"><defs>' + defs + '</defs>' + glass +
+    '<g filter="url(#' + uid + 'bloom)" opacity=".7" style="mix-blend-mode:screen">' + bloom + '</g>' +
+    '<g fill="none" stroke="' + LEAD + '" stroke-width="3.3" stroke-linejoin="round" stroke-linecap="round"><path d="' + lead + '"/></g>' + text + '</svg>';
+}
+document.getElementById('chap').innerHTML = chaptersSVG();
+// key: tiny leaded glass swatches
+const sw = (c, round) => '<svg width="16" height="16" viewBox="0 0 16 16">' + (round ? '<circle cx="8" cy="8" r="6" fill="' + c + '" stroke="' + LEAD + '" stroke-width="2.4"/>' : '<path d="M2 2H14V14H2Z" fill="' + c + '" stroke="' + LEAD + '" stroke-width="2.4" stroke-linejoin="round"/>') + '</svg>';
+document.getElementById('key').innerHTML = '<span>' + sw('#5ef2a0') + 'blessings</span><span>' + sw('#ffc44a') + 'rituals</span><span>' + sw('#b8231c') + 'curses</span><span>' + sw('#e0352a', 1) + 'sealed by High Vespers</span><span>' + sw('#1a2030') + 'not lived yet</span>';
+</script>
+</body></html>
