@@ -433,9 +433,15 @@
     }
     // pay locally like the server: coins, XP, level (the reply then has the exact numbers)
     function earnLocal(d, n, xp) { const p = d.player; p.coins += n; d.weekCoins = (d.weekCoins || 0) + n; p.xp += xp; let up = false; while (p.xp >= p.need) { p.xp -= p.need; p.level++; p.need = need(p.level); p.hp = p.maxHp; p.coins += p.level * (p.gift || 10); up = true; } return up; }
+    // Going deeper (1U.11, DP3-b2): a level up into a new depth (11, 21, 31, 41) opens the kraken doors, once per level
+    function goDeeper() {
+      const lv = D && D.player.level; if (!window.GATE || !(lv > 1) || (lv - 1) % 10 || V.gateLv === lv) return; V.gateLv = lv;
+      setTimeout(() => GATE.play(box, { depth: Math.floor((lv - 1) / 10), name: depthOf(lv), plaque: $('.uz-lv') }), window.LEVELUP ? 150 : 900);
+    }
     function earnFx(r, k, n, up) {
       flyCoin(r, n); floatText(r, '+' + n, '#ffd56a'); glow(k, 'rgba(94,242,160,.85)'); bounce(); buzz(12);
-      if (up) { setTimeout(celebrate, 350); setMood('proud', pickSay('level')); } else setMood('happy', pickSay(V.sayKind || 'tick')); V.sayKind = null;
+      // a level up: LU-X2 The Sky Answers, then the doors if it is a new depth (1U.11)
+      if (up) { setMood('proud', pickSay('level')); setTimeout(() => { if (!window.LEVELUP) { celebrate(); goDeeper(); return; } if (window.LAIR) LAIR.level(ban); buzz([20, 60, 30]); LEVELUP.play(box, D.player.level).then(goDeeper); }, 350); } else setMood('happy', pickSay(V.sayKind || 'tick')); V.sayKind = null;
     }
     const goal = (id) => D.goals.find((g) => g.id === id);
     // log a curse: after its sigil is picked, or straight away on a double tap (Patryk 2026-10-27)

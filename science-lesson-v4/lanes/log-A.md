@@ -11,6 +11,14 @@ Plain-English record of Lane A's work (the Ulhu game), newest entry first.
 
 ---
 
+## 30 Oct 2026, item 1U.11 (first part): the level up and Going deeper
+
+**What changed, level up:** every level up now plays your pick LU-X2 "The Sky Answers" over the Ulhu screen: Ulhu rises from the deep, stars rush in from every edge, aurora curtains fall, his new number pulses three times like a fanfare, and the heal comes last as a small flask and bar in the corner. It lasts about six seconds; a tap ends it early. It is copied straight from the mock-up's own drawing code. With reduced motion on, the last frame shows for a moment.
+
+**What changed, Going deeper:** when a level up takes Ulhu into a new depth (level 11 The Twilight, 21 The Midnight, 31 The Abyss, 41 The Risen), your pick DP3-b2 plays straight after The Sky Answers. Two carved stone doors slide in and meet as one gold kraken eye, "DEPTH II" and the depth's name glow over them, a gold blade of light cuts down the pupil, the doors part on a warm gold flood with bubbles, and the level plaque is struck three times. The crack sits in the plaque's far corner, away from the number, as you asked, and fades after a few seconds. It plays once per level. With reduced motion on, just the name shows for a moment. The faint (FA-R3) comes next, the last of the Big Moments.
+
+**You need to:** nothing now. It goes into the next complete paste set.
+
 ## 29 Oct 2026, item 1U.12: the loading screen
 
 **What changed:** wherever Ulhu waits (opening Ulhu, opening the Den, the Oracle reading the stars), he now stands behind the cauldron and stirs it over the fire, your pick L3a with the improved fire, with a short line under it ("Something is brewing", "Opening the Den", "Reading the stars") and ticking dots. It is copied straight from the mock-up's own drawing. With reduced motion on it is one still picture. A scene waiting in a pane you can't see (the Den or the Oracle before their data comes) is not drawn at all, so it costs no battery.

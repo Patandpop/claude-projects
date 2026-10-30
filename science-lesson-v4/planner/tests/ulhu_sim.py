@@ -3,7 +3,7 @@ Run: python tests/ulhu_sim.py  (add --shots DIR to save screenshots). Synthetic 
 import os, sys, subprocess, time
 from playwright.sync_api import sync_playwright
 P = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '/'; SP = sys.argv[1] if len(sys.argv) > 1 and not sys.argv[1].startswith('--') else __import__('tempfile').mkdtemp()
-js = ''.join(open(P + f, encoding='utf-8').read() + '\n' for f in ['game-ulhu.js', 'game-pixel.js', 'game-runes.js', 'game-temple.js', 'game-stone.js', 'game-omens.js', 'game-tabs.js', 'game-blood.js', 'game-scroll.js', 'game-glass.js', 'game-highvespers.js', 'game-lair.js', 'game-brew.js', 'game-den.js', 'game-ui.js', 'game-oracle.js', 'game-pairs.js'])
+js = ''.join(open(P + f, encoding='utf-8').read() + '\n' for f in ['game-ulhu.js', 'game-pixel.js', 'game-runes.js', 'game-temple.js', 'game-stone.js', 'game-omens.js', 'game-tabs.js', 'game-blood.js', 'game-scroll.js', 'game-glass.js', 'game-highvespers.js', 'game-lair.js', 'game-brew.js', 'game-gate.js', 'game-levelup.js', 'game-den.js', 'game-ui.js', 'game-oracle.js', 'game-pairs.js'])
 page = '''<!doctype html><meta charset="utf-8"><meta name=viewport content="width=device-width,initial-scale=1"><body style="margin:0;background:#0d1b3a">
 <div style="height:60px;background:#0a1020;color:#fff">8AG header</div><div id=u></div><nav style="position:fixed;bottom:0;left:0;right:0;height:62px;background:#0a1020"></nav>
 <script>window.CALLS=[];function call(fn,...args){CALLS.push(fn);window.ARGS=window.ARGS||[];ARGS.push(args);return fetch('/c',{method:'POST',body:JSON.stringify({fn,args})}).then(r=>r.json()).then(x=>{if(x.err)throw new Error(x.err);return x.ok;});}</script>
@@ -22,6 +22,11 @@ try:
         b = p.chromium.launch(); pg = b.new_page(viewport={'width': 390, 'height': 844}, has_touch=True)
         errs = []; pg.on('pageerror', lambda e: errs.append(str(e)))
         pg.goto('http://localhost:' + PORT + '/', timeout=90000); pg.wait_for_timeout(2500)   # a busy PC can take over 30 s to load it
+        try: pg.wait_for_function("document.querySelectorAll('img[alt=runes]').length > 5 && document.querySelector('.uz-coins b')", timeout=30000)
+        except Exception: pass   # the first full paint, which a busy PC makes slow
+        # the level-up scene covers the screen for 6 s and a tap ends it, which would swallow the next tap of these checks:
+        # level ups here are only counted; the scene itself is played and checked on its own near the end (1U.11)
+        pg.evaluate("window.LU_REAL = LEVELUP.play; window.LU_CALLS = []; LEVELUP.play = (h, l) => { LU_CALLS.push(l); return Promise.resolve(); }; 0")   # the 0: a string ending in a function would be called by evaluate
         check('banner shows coins (after-work life ticks pay x1.5 at 4.40 pm), level title and Ulhu', int(pg.inner_text('.uz-coins b')) > 400 and pg.locator('.uz-me img').count() >= 1)
         check('four tabs, Rituals first with a count badge', pg.locator('.uz-tabs button').count() == 4 and pg.locator('.uz-tabs button b.bd:not([hidden])').count() >= 1)
         check('The Call has Toil; the Grimoire opens folded: Breakwater, The Teaching Trench, The Surface World', 'Toil' in pg.inner_text('.uz-pane >> nth=0') and all(t in pg.inner_text('.uz-pane >> nth=1') for t in ['Breakwater', 'The Teaching Trench', 'The Surface World']))
@@ -104,7 +109,10 @@ try:
         if shots: pg.screenshot(path=os.path.join(SP, 's4.png'))
         # den (2026-10-28): the Round Grotto, the Night Market through its archway, dice with every keeper once a day
         coins = lambda: int(pg.inner_text('.uz-coins b'))
-        pg.click('.uz-tabs button >> nth=3'); pg.wait_for_timeout(2200)
+        pg.click('.uz-tabs button >> nth=3')
+        try: pg.wait_for_function("document.querySelector('.dn-grot .dn-cv') && document.querySelectorAll('[data-a=dn-slot]').length == 10", timeout=25000)
+        except Exception: pass
+        pg.wait_for_timeout(600)
         check('the Den opens on the Round Grotto: rings, wardrobe, chests, the archway, then the Oracle', pg.locator('.dn-grot .dn-cv').count() == 1 and pg.locator('[data-a=dn-slot]').count() == 10 and pg.locator('[data-a=dn-ward]').count() == 1 and pg.locator('[data-a=dn-chest]').count() == 2 and pg.locator('.dn-arch').count() == 1 and 'Oracle' in pg.inner_text('.uz-pane >> nth=3'))
         check('the grotto is drawn from his own room (not blank)', pg.evaluate("(() => { const d = document.querySelector('.dn-cv').getContext('2d').getImageData(0, 0, 192, 216).data; let n = 0; for (let i = 0; i < d.length; i += 4) n += d[i] + d[i + 1] + d[i + 2] > 60 ? 1 : 0; return n; })()") > 4000 and pg.locator('.dn-u img').count() >= 1)
         if shots: pg.screenshot(path=os.path.join(SP, 's5.png'))
@@ -257,6 +265,20 @@ try:
         n1 = pg.inner_text('.pz-n'); pg.click('[data-a=pskip]'); pg.wait_for_timeout(300)
         check('Pair all walks through the one-sided omens one at a time (skip moves on)', n1.startswith('1 of') and pg.inner_text('.pz-n').startswith('2 of'))
         pg.click('[data-a=pclose]'); pg.wait_for_timeout(300)
+        # 1U.11 the level up (LU-X2 The Sky Answers): it covers the Ulhu screen, draws stars, aurora and the number, a tap ends it
+        lu = pg.evaluate("""(() => { const box = document.querySelector('.uz'); const p = LU_REAL(box, 13);
+          return new Promise((r) => setTimeout(() => { const w = box.querySelector('.lu-wrap'), c = w && w.querySelector('canvas'); if (!c) return r({ none: 1 });
+            const x = c.getContext('2d').getImageData(0, 0, 240, 176).data; let lit = 0; for (let i = 0; i < x.length; i += 4) if (x[i] + x[i + 1] + x[i + 2] > 300) lit++;
+            const b = w.getBoundingClientRect(), h = box.getBoundingClientRect(); w.click();
+            Promise.race([p.then(() => 'over'), new Promise((q) => setTimeout(() => q('stuck'), 4000))]).then((end) => r({ lit, cover: b.width >= h.width - 1, end, gone: !box.querySelector('.lu-wrap'), ups: LU_CALLS.slice() })); }, 4200)); })()""")
+        check('1U.11 level up: The Sky Answers covers the screen and lights up, and a tap ends it: ' + str(lu), lu.get('lit', 0) > 200 and lu.get('cover') and lu.get('end') == 'over' and lu.get('gone'))
+        # 1U.11 Going deeper (DP3-b2): the kraken doors, the depth name, three strikes on the plaque, the crack clear of the number
+        gt = pg.evaluate("""(() => { const box = document.querySelector('.uz'), lv = box.querySelector('.uz-lv'); window.scrollTo(0, 0);
+          const p = GATE.play(box, { depth: 1, name: 'The Twilight', plaque: lv }), seen = {}, hx = box.querySelector('.uz-hex').getBoundingClientRect();
+          const look = setInterval(() => { const a = box.querySelector('.gt-wrap .arch'); if (a) seen.arch = a.textContent; if (box.querySelectorAll('.gt-wrap .door').length) seen.doors = 1;
+            const c = lv.querySelector('.gt-crk'); if (c) { const r = c.getBoundingClientRect(); seen.crack = 1; seen.clear = r.right <= hx.left || r.left >= hx.right || r.bottom <= hx.top || r.top >= hx.bottom; } }, 50);
+          return Promise.race([p.then(() => 'over'), new Promise((r) => setTimeout(() => r('stuck'), 20000))]).then((end) => { clearInterval(look); seen.end = end; return seen; }); })()""")
+        check('1U.11 going deeper: "DEPTH II The Twilight" over the doors, the plaque cracks clear of the number, and it ends: ' + str(gt), 'DEPTH II' in str(gt.get('arch')) and 'Twilight' in str(gt.get('arch')) and gt.get('crack') and gt.get('clear') and gt.get('end') == 'over')
         pg.evaluate("(() => { const d = document.createElement('div'); d.id = 'brewt'; d.style.cssText = 'position:fixed;inset:0;z-index:99;background:#070d0b'; d.innerHTML = BREW.html('Something is brewing'); document.body.appendChild(d); BREW.run(d); })()"); pg.wait_for_timeout(700)
         check('1U.12 the loading screen is Ulhu stirring the cauldron: the scene draws (fire, pot, Ulhu) with its caption', pg.evaluate("(() => { const c = document.querySelector('#brewt canvas'), x = c.getContext('2d').getImageData(0, 0, 90, 64).data; let n = 0, fire = 0; for (let i = 0; i < x.length; i += 4) { if (x[i + 3]) n++; if (x[i] > 200 && x[i + 1] > 80 && x[i + 2] < 80) fire++; } const ok = n > 4000 && fire > 20 && /Something is brewing/.test(document.querySelector('#brewt .cap').textContent); document.getElementById('brewt').remove(); return ok; })()"))
         check('1U.12 a loading scene in a pane off to the side is not drawn (no battery spent on it)', pg.evaluate("(() => { const d = document.createElement('div'); d.style.cssText = 'position:fixed;left:200vw;top:0;width:300px'; d.innerHTML = BREW.html('x'); document.body.appendChild(d); BREW.run(d); return new Promise((r) => setTimeout(() => { const x = d.querySelector('canvas').getContext('2d').getImageData(0, 0, 90, 64).data; let n = 0; for (let i = 3; i < x.length; i += 4) if (x[i]) n++; d.remove(); r(n === 0); }, 700)); })()"))
