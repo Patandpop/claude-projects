@@ -333,3 +333,6 @@ Patryk's answers, in grill order. Mock-ups follow each area.
 - **Faint FINAL: FA-R3** (replica/design/mockups/faint5/). Remove the little ticks under the stars: the stars themselves are the marks. The rituals should feel realistic: over the three rituals he climbs back to full health and gets back the runes he lost.
 - **Day screen FINAL: B3** (B1 navy and gold plus the small Ulhu touch on the to-dos), lanes/mockups/day-screen-b2.html. He loves the daytime home PC pop-up. The 19:20 after-seven pop-up must be more Ulhu-like: three night versions added to the same page (N1 whisper, N2 night ledger, N3 one eye open), pick pending.
 - New pages waiting for picks: level up replica/design/mockups/levelup4/ (LU-X1/X2/X3), wall replica/design/mockups/wall5/ (WD-1 moon, WD-2 star, WD-3 lancet).
+- **Level up FINAL: LU-X2 The Sky Answers** (replica/design/mockups/levelup4/).
+- **Day screen B3 confirmed** ("B1 with small Ulhu was best"). The 19:20 night pop-up pick (N1/N2/N3) is still open.
+- **Wall:** loves the glass in WD-1 (moon) and WD-2 (star) but they are hard to read at a glance. The outside glass should be lit, not dark. No key should be needed: Roman numerals I to V in the outside glass. Blocks a bit bigger with smaller gaps. Next round: replica/design/mockups/wall6/ (WD-1a/1b, WD-2a/2b).
