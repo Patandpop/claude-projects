@@ -60,6 +60,10 @@ files['Day.gs'] = read('Day.gs');
 files['DayUI.html'] = pack(['day-logic.js', 'day-timer.js', 'day-capture.js', 'day-screen.js']);
 if (!files['Phone.html'].includes('<!--DAY_UI-->')) throw new Error('Phone.html has no <!--DAY_UI--> marker');
 files['Phone.html'] = files['Phone.html'].replace('<!--DAY_UI-->', () => "<?!= include('DayUI') ?>");
+// eyes-free entry, "Blind" (Lane B, 30 Oct 2026): the letter reader and tap rules, only on the phone page
+files['EyesFree.html'] = pack(['eyes-free.js']);
+if (!files['Phone.html'].includes('<!--EYES_FREE-->')) throw new Error('Phone.html has no <!--EYES_FREE--> marker');
+files['Phone.html'] = files['Phone.html'].replace('<!--EYES_FREE-->', () => "<?!= include('EyesFree') ?>");
 // 2026-10-27: the game code is its own file, GameUI.html, pulled in by include() (Planner.html at 406 KB would no longer save in the editor)
 ['Planner.html', 'Phone.html'].forEach((f) => {
   if (!files[f].includes('<!--GAME_UI-->')) throw new Error(f + ' has no <!--GAME_UI--> marker');

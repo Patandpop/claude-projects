@@ -25,6 +25,21 @@ Plain-English record of Lane B's work, newest entry first. Each entry says what 
 9. **Item 4.13, homework ahead: OK to build this?** What already exists: the Homework tab's "Coming up automatically" list suggests revision homework two weeks before every test, one click to fill it in. My proposal for the rest: (a) on Fridays the planner lists next week's lessons that need homework set (the ones ticked "Set homework") and offers one button, "Ask Claude to prepare these", which sends a single request home; nothing is posted. (b) Two weeks before a test, the 6am job makes the revision homework as a Classroom DRAFT (never posted, you check and post it) and the card says "draft ready"; or, if you would rather, it only reminds you. (c) A 6-mark question done on the board comes back as homework three weeks later, chosen from that lesson's real 6-markers, offered as a tick in the Friday list. Reply with the letters you want, and for (b) "draft" or "reminder".
 
 ---
+## 30 Oct 2026, eyes-free entry: the Blind button on the phone
+
+**What changed:**
+- **A "Blind" button beside Plan and Names** on the phone's Lesson tab (the designer's picks 1A, 2A, 3A; say if you want to switch). Press it and the area below becomes one big drawing box, with the class's names faint underneath so you know which class is open.
+- **Draw the first letter of a pupil's first name** with your thumb, anywhere in the box. If only one pupil starts with it, the phone gives a tiny buzz and shows their name big. If several do, two tiny buzzes and "3 pupils": draw their surname initial straight after, no looking needed. If two letters still fit two pupils, two big name buttons appear to tap.
+- **Then tap:** one tap is a positive (saved after a 0.4 second pause, one short buzz, the box flashes green); two taps is a negative (short, long, short buzz, red flash); three taps opens that pupil's usual menu (report to me, border). Hold your thumb still to clear. A pick left alone for 6 seconds is dropped, so a stray tap later never logs.
+- **Same as a seat tap:** it uses the very same saving as tapping a seat, so Undo, the no-signal queue, backdating, the board and the Friday tab all work the same. Plan and Names are unchanged.
+- **Today > Settings, "Blind mode letters":** "Teach the phone my letters" (each letter that starts a name in the open class, three times; about two minutes; the drawings stay on this phone only, never names), "Test my letters" (score out of 20; aim for 18 or more before using it in a lesson), and "Forget my letters".
+- Checks: a new phone check that draws real letters (tests/blind_sim.py, 21 checks), plus the reader's own 55 checks.
+- Also noticed: the ABCD vote check (tests/vote_sim.py) now stops at its "Talking" step. It does the same on the saved version from before this work, so it came with the day screen save, not Blind. Passed to the design chat.
+
+**You need to:** after the next paste set, open the phone, press Blind, then Today > Settings > "Test my letters" with a class open and tell me the score.
+
+**Save:** see the history line "Blind".
+
 ## 30 Oct 2026, big goal 1, step 4: the Memory tab (layout A, blue, orange, red)
 
 **What changed:**

@@ -124,6 +124,19 @@
   .star svg { width:11px; height:11px; }
   .tile.pop .star { animation:pop .55s cubic-bezier(.2,.9,.3,1.5); }
   @keyframes pop { 0% { transform:scale(0) rotate(-40deg); } 100% { transform:none; } }
+  /* eyes-free entry, "Blind" (lanes/design-eyes-free.md, picks 1A 2A 3A, 30 Oct 2026) */
+  .ef { position:relative; height:max(360px, calc(100dvh - 230px)); border:1px solid var(--line); border-radius:14px; overflow:hidden; touch-action:none; user-select:none; -webkit-user-select:none; background:var(--plate); transition:background .15s; }
+  .ef canvas { position:absolute; inset:0; width:100%; height:100%; }
+  .ef .efGhost { position:absolute; inset:0; padding:12px; display:flex; flex-wrap:wrap; gap:6px; align-content:flex-start; opacity:.22; pointer-events:none; }
+  .ef .efGhost span { padding:8px 10px; border:1px solid var(--line); border-radius:10px; font-weight:700; font-size:14px; }
+  .ef .efHint { position:absolute; left:0; right:0; top:8px; text-align:center; color:var(--soft); font-size:13px; pointer-events:none; padding:0 10px; }
+  .ef .efBig { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; pointer-events:none; text-align:center; padding:20px; }
+  .ef .efLetters { font-size:28px; letter-spacing:.3em; color:var(--sodium-text, #E3B341); font-weight:800; }
+  .ef .efName { font-size:min(14vw,60px); font-weight:800; line-height:1.05; }
+  .ef .efSub { color:var(--soft); font-size:17px; margin-top:8px; }
+  .ef .efList { position:absolute; left:0; right:0; bottom:0; display:none; flex-direction:column; gap:10px; padding:12px; }
+  .ef .efList button { font-size:26px; font-weight:800; min-height:76px; border-radius:16px; border:1px solid var(--line); background:var(--card, var(--plate)); color:var(--ink); }
+  .ef.flash-pos { background:#2fbf71; } .ef.flash-neg { background:#e24b4b; } .ef.flash-bad { background:#6b2d2d; }
   .names { display:grid; grid-template-columns:repeat(3,1fr); gap:9px 7px; padding-top:6px; }
   .supp { display:flex; align-items:center; gap:6px; margin-top:14px; flex-wrap:wrap; }
   .supp span { font-weight:800; color:var(--soft); margin-right:4px; }
@@ -285,7 +298,7 @@
 <main>
   <section id="vLog">
     <div class="row">
-      <div class="seg"><button id="mPlan" aria-pressed="true">Plan</button><button id="mNames" aria-pressed="false">Names</button></div>
+      <div class="seg"><button id="mPlan" aria-pressed="true">Plan</button><button id="mNames" aria-pressed="false">Names</button><button id="mBlind" aria-pressed="false" title="Draw a pupil's initial, then tap: one tap positive, two taps negative">Blind</button></div>
       <button class="abcdBtn" id="mAbcd" aria-pressed="false" title="ABCD cards: record the class's answers to the lesson's multiple choice questions">ABCD</button>
       <input id="search" type="search" placeholder="Find" autocomplete="off" class="hidden">
     </div>
@@ -314,6 +327,7 @@
     <div class="sets">
       <div class="setrow"><span>Tapping a student</span><div class="seg2" data-set="tap"><button data-v="pos">Gives a positive</button><button data-v="sheet">Opens options</button></div></div>
       <div class="setrow"><span>Keep screen awake</span><div class="seg2" data-set="awake"><button data-v="on">On</button><button data-v="off">Off</button></div><p class="note" id="awakeNote" style="margin:0"></p></div>
+      <div class="setrow"><span>Blind mode letters</span><div class="row" style="margin:0;gap:6px;flex-wrap:wrap"><button class="x" id="efTeach">Teach the phone my letters</button><button class="x" id="efTry">Test my letters</button><button class="x" id="efForget">Forget my letters</button></div><p class="note" id="efNote" style="margin:0"></p></div>
       <div class="setrow"><span>Theme</span><div class="seg2" data-set="theme"><button data-v="auto">Auto</button><button data-v="light">Light</button><button data-v="dark">Dark</button></div></div>
     </div>
     <p class="note" style="text-align:center;margin-top:24px">App version 22</p>
@@ -369,6 +383,7 @@
 </script>
 <!--GAME_UI-->
 <!--DAY_UI-->
+<!--EYES_FREE-->
 <script>
 const KEY = document.body.dataset.key;
 const $ = id => document.getElementById(id);
@@ -429,14 +444,17 @@ function silenceBar() {
   return `<div class="silbar ${s.pct >= 80 ? 'ok' : 'low'}"><span>Silent time today (goal 80%)</span><b>${s.pct}%</b></div>`;
 }
 function currentView() {
+  if (S.view === 'blind') return 'blind';
   const seated = S.students.some(s => s.x !== null);
   if (!seated) return 'names';
   return S.view || (window.innerWidth > window.innerHeight ? 'plan' : 'names');
 }
 function renderStudents() {
   const t = tally(), box = $('studs'), view = currentView();
-  $('mPlan').setAttribute('aria-pressed', view === 'plan'); $('mNames').setAttribute('aria-pressed', view === 'names');
+  $('mPlan').setAttribute('aria-pressed', view === 'plan'); $('mNames').setAttribute('aria-pressed', view === 'names'); $('mBlind').setAttribute('aria-pressed', view === 'blind');
   $('search').classList.toggle('hidden', view !== 'names');
+  if (view === 'blind') { blindRender(box); S.pop = {}; renderLesson(t); return; }
+  blindOff();
   if (view === 'plan') {
     const seated = S.students.filter(s => s.x !== null && s.y !== null).map(s => Object.assign({}, s));
     // seat spacing = the usual gap between neighbours (not the smallest, so one misplaced seat can't shrink them all)
@@ -482,6 +500,129 @@ function renderLesson(t) {
 }
 function setView(v) { S.view = v; LS.set('view', v); renderStudents(); }
 $('mPlan').onclick = () => { voteOn(false); setView('plan'); }; $('mNames').onclick = () => { voteOn(false); setView('names'); };
+$('mBlind').onclick = () => { voteOn(false); BL.mode = 'draw'; setView('blind'); };
+/* ---------- Blind: eyes-free entry (lanes/design-eyes-free.md; picks 1A, 2A, 3A, 30 Oct 2026) ----------
+   Draw a pupil's first initial anywhere in the box (then the surname initial when several pupils share it), then
+   one tap = positive, two taps = negative (the taps settle after 0.4 s), three taps = the pupil's menu, hold = clear.
+   Each outcome has its own buzz. Everything logged goes through log(), so Undo, the offline queue, backdating, the
+   board and the Friday tab see an ordinary tap. The letters taught on Today > Settings stay on this phone only
+   (strokes, never names). The reader and the rules are planner/eyes-free.js (EyesFree.html in the paste set). */
+const BL = { mode: 'draw', session: null, key: '', input: null, el: null, timer: null, strokes: [], cur: null, teach: null, trial: null };
+const efOwn = () => { try { return JSON.parse(LS.get('ef.own') || '[]'); } catch (e) { return []; } };
+const buzz = p => { try { if (navigator.vibrate) navigator.vibrate(p); } catch (e) {} };
+function blindOff() { if (BL.timer) { clearInterval(BL.timer); BL.timer = null; } BL.el = null; }
+function blindRender(box) {
+  if (!window.EyesFree) { box.innerHTML = '<p class="note">Blind mode is not in this copy of the phone page yet (EyesFree.html comes with the next paste).</p>'; return; }
+  const key = S.cls + '|' + S.students.map(x => x.name).join(',');
+  if (key !== BL.key || !BL.session) { BL.key = key; BL.session = EyesFree.createSession(S.students, { doubleTapMs: 400 }); }
+  if (BL.el && box.contains(BL.el)) return;   // already on screen: keep the ink and the pick
+  box.innerHTML = `<div class="ef" id="efBox"><div class="efGhost">${S.students.map(x => '<span>' + esc(x.short) + '</span>').join('')}</div><canvas></canvas>
+    <div class="efHint" id="efHint"></div><div class="efBig"><div class="efLetters" id="efL"></div><div class="efName" id="efN"></div><div class="efSub" id="efS"></div></div><div class="efList" id="efList"></div></div>`;
+  BL.el = $('efBox');
+  const cv = BL.el.querySelector('canvas'), cx = cv.getContext('2d');
+  const size = () => { const r = cv.getBoundingClientRect(); cv.width = r.width * devicePixelRatio; cv.height = r.height * devicePixelRatio; cx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0); };
+  size();
+  const ink = () => {
+    cx.clearRect(0, 0, cv.width, cv.height); cx.lineWidth = 7; cx.lineCap = 'round'; cx.lineJoin = 'round'; cx.strokeStyle = '#E3B341';
+    BL.strokes.concat(BL.cur ? [BL.cur] : []).forEach(st => { cx.beginPath(); st.forEach((p, i) => i ? cx.lineTo(p.x, p.y) : cx.moveTo(p.x, p.y)); cx.stroke(); });
+  };
+  BL.ink = ink;
+  BL.input = EyesFree.createInput({
+    onLetter: st => { BL.strokes = []; ink(); efLetter(st); },
+    onTap: () => { if (BL.mode === 'draw') efHandle(BL.session.tap(Date.now())); },
+    onHold: () => { BL.strokes = []; BL.cur = null; ink(); if (BL.mode === 'draw') efHandle(BL.session.cancel()); }
+  });
+  // one clock for taps and the hold check (an event's own timeStamp can run behind performance.now on some browsers)
+  const at = e => { const r = cv.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
+  BL.el.addEventListener('pointerdown', e => { if (e.target.closest('.efList')) return; try { BL.el.setPointerCapture(e.pointerId); } catch (err) { /* a pointer the browser no longer tracks */ } const p = at(e); BL.cur = [p]; BL.input.down(p.x, p.y, performance.now()); ink(); });
+  BL.el.addEventListener('pointermove', e => { if (!BL.cur) return; const p = at(e); BL.cur.push(p); BL.input.move(p.x, p.y, performance.now()); ink(); });
+  BL.el.addEventListener('pointerup', e => { if (!BL.cur) return; BL.strokes.push(BL.cur); BL.cur = null; BL.input.up(performance.now()); ink(); });
+  BL.el.addEventListener('pointercancel', () => { BL.cur = null; ink(); });
+  $('efList').addEventListener('click', e => { const b = e.target.closest('[data-ef]'); if (b) efHandle(BL.session.choose(b.dataset.ef, Date.now())); });
+  if (BL.timer) clearInterval(BL.timer);
+  BL.timer = setInterval(() => {
+    if (!BL.el || !document.body.contains(BL.el)) return blindOff();
+    BL.input.tick(performance.now());
+    if (BL.mode === 'draw') efHandle(BL.session.tick(Date.now()));
+    if (!BL.input.pending() && !BL.cur && BL.strokes.length) { BL.strokes = []; ink(); }
+  }, 80);
+  efModeShow();
+}
+function efShow(l, n, sub) { if (!BL.el) return; $('efL').textContent = l || ''; $('efN').textContent = n || ''; $('efS').textContent = sub || ''; }
+function efList(c) { if (!BL.el) return; const el = $('efList'); el.style.display = c && c.length ? 'flex' : 'none'; el.innerHTML = (c || []).map(x => `<button data-ef="${esc(x.name)}">${esc(x.short)}</button>`).join(''); }
+function efFlash(k) { if (!BL.el) return; BL.el.classList.add('flash-' + k); setTimeout(() => BL.el && BL.el.classList.remove('flash-' + k), 260); }
+function efModeShow() {
+  if (!BL.el) return;
+  $('efHint').textContent = BL.mode === 'draw' ? 'Draw the first letter of a name. One tap: positive. Two: negative. Three: menu. Hold: clear.'
+    : BL.mode === 'teach' ? 'Teaching: draw each letter shown, three times.' : 'Testing: draw the letters asked for. Score out of 20.';
+  efShow('', '', ''); efList(null);
+  if (BL.mode === 'teach') efTeachShow(); if (BL.mode === 'try') efTryNext();
+}
+const efLetters = () => BL.session.state().letters.map(l => l.join('/')).join(' ');
+function efLetter(st) {
+  if (BL.mode === 'teach') return efTeachGot(st);
+  if (BL.mode === 'try') return efTryGot(st);
+  efHandle(BL.session.letter(EyesFree.recognise(st, { letters: BL.session.alphabet(), own: efOwn() }), Date.now()));
+}
+function efHandle(ev) {
+  if (!ev) return;
+  if (ev.type === 'picked') { efShow(efLetters(), ev.student.short, 'tap once: positive, twice: negative'); efList(null); buzz(15); }
+  if (ev.type === 'narrow') { efShow(efLetters(), ev.count + ' pupils', 'draw the surname initial'); buzz([15, 40, 15]); }
+  if (ev.type === 'choose') { efShow(efLetters(), '', 'tap the name'); efList(ev.cands); buzz([15, 40, 15]); }
+  if (ev.type === 'nobody') { efShow(ev.letters.join(' '), 'nobody', 'no pupil starts like that'); efFlash('bad'); buzz(180); }
+  if (ev.type === 'tap') efShow('', ev.student.short, ev.count === 1 ? 'positive...' : ev.count === 2 ? 'negative...' : 'menu...');
+  if (ev.type === 'log') {
+    const pos = ev.kind === '+';
+    efFlash(pos ? 'pos' : 'neg'); buzz(pos ? 30 : [30, 60, 30]); efShow('', ev.student.short, pos ? 'positive logged' : 'negative logged'); efList(null);
+    log(ev.names, ev.kind);
+    setTimeout(() => { if (BL.session && BL.session.state().phase === 'idle' && BL.mode === 'draw') efShow('', '', ''); }, 1200);
+  }
+  if (ev.type === 'menu') { efShow('', '', ''); efList(null); buzz([30, 30, 30, 30, 30]); studentSheet(ev.student.name); }
+  if (ev.type === 'expired') { efShow('', '', ''); efList(null); }
+  if (ev.type === 'cleared') { efShow('', '', ''); efList(null); buzz(10); }
+}
+// Teach: three drawings of each letter that starts a first name or surname in this class
+function efTeachShow() {
+  const t = BL.teach; if (!t) return;
+  if (t.i >= t.letters.length) { efShow('', 'Taught', efOwn().length + ' drawings kept on this phone'); BL.teach = null; efNote(); return; }
+  efShow('', t.letters[t.i], 'draw it (' + t.go + ' of 3)');
+}
+function efTeachGot(st) {
+  const t = BL.teach; if (!t) return;
+  LS.set('ef.own', JSON.stringify(EyesFree.addOwn(efOwn(), t.letters[t.i], st, 3))); buzz(15);
+  if (++t.go > 3) { t.go = 1; t.i++; }
+  efTeachShow();
+}
+// Test: it names a pupil from this class, he draws the letters, it keeps a score out of 20
+function efTryNext() {
+  const t = BL.trial; if (!t || !S.students.length) return;
+  if (t.n >= 20) { efShow('', t.hit + ' / 20', t.hit >= 18 ? 'good enough to use in a lesson' : 'teach it your letters, then test again'); efNote('Last test: ' + t.hit + ' / 20'); LS.set('ef.score', t.hit + ' / 20'); BL.trial = null; return; }
+  const st = S.students[Math.floor(Math.random() * S.students.length)], ini = EyesFree.initialsOf(st.name);
+  const several = EyesFree.candidates(S.students, [ini.first]).length > 1;
+  t.want = several ? [ini.first, ini.last] : [ini.first]; t.got = [];
+  efShow(t.hit + ' / ' + t.n, several ? ini.first + ' ' + ini.last : ini.first, several ? 'draw ' + ini.first + ', then ' + ini.last : 'draw ' + ini.first);
+}
+function efTryGot(st) {
+  const t = BL.trial; if (!t) return;
+  const r = EyesFree.recognise(st, { letters: t.got.length ? EyesFree.alphabet(EyesFree.candidates(S.students, [t.want[0]]), 'last') : EyesFree.alphabet(S.students, 'first'), own: efOwn() });
+  const want = t.want[t.got.length], got = r.letters[0] ? r.letters[0].letter : '?';
+  t.got.push(got);
+  if (got !== want) { t.n++; efFlash('bad'); buzz(120); snack('Read as ' + got + ' (wanted ' + want + ')'); return efTryNext(); }
+  if (t.got.length < t.want.length) { buzz(15); $('efS').textContent = 'now ' + t.want[1]; return; }
+  t.n++; t.hit++; efFlash('pos'); buzz(30); efTryNext();
+}
+function efNote(extra) { const el = $('efNote'); if (el) el.textContent = efOwn().length + ' drawings kept on this phone' + (LS.get('ef.score') ? '. Last test: ' + LS.get('ef.score') : '') + (extra && !/Last test/.test(extra) ? '. ' + extra : ''); }
+function efStart(mode) {
+  if (!S.students.length) { snack('Open a class first'); return; }
+  if (!window.EyesFree) { snack('Blind mode comes with the next paste'); return; }
+  BL.mode = mode;
+  if (mode === 'teach') BL.teach = { letters: EyesFree.alphabet(S.students, 'first').concat(EyesFree.alphabet(S.students, 'last')).filter((l, i, a) => a.indexOf(l) === i), i: 0, go: 1 };
+  if (mode === 'try') BL.trial = { n: 0, hit: 0 };
+  setTab('log'); S.view = 'blind'; BL.el = null; renderStudents();
+}
+$('efTeach').onclick = () => efStart('teach'); $('efTry').onclick = () => efStart('try');
+$('efForget').onclick = () => { if (!confirm('Forget the letters you taught this phone?')) return; LS.set('ef.own', '[]'); efNote(); snack('Forgotten'); };
+efNote();
 /* ABCD card votes (specs/learning-loop.md M3/M4; Patryk 2026-10-22). Corners match the room: A bottom left,
    B top left, C top right, D bottom right, in the board's MCQ colours. Tap a letter = everyone. Drag from one
    letter to another = those two; keep the finger down and slide left or right to set the split (the pair
