@@ -847,6 +847,54 @@
     for (let n = 0; n < 120; n++, d = addDays(d, 1)) { const p = lessonsOn(data, cls, d); if (p.length) return { date: iso(d), period: p[0] }; }
     return null;
   }
+  // Homework ahead (4.13, layout B2, Patryk 2026-10-30): three weeks from the week of `today`. Each week lists the
+  // lessons ticked "Set homework" (a lesson's own tick wins; otherwise the class's last lesson of the week, as on the
+  // lesson card), each marked made when homework for that class is already set around that day or a quiz file from
+  // home is due on that lesson's due day. A test adds a revision reminder two weeks before it (a reminder only, never a draft).
+  // weeks: [{ monday: 'YYYY-MM-DD', slots }] (this, next, after); hw: rows { cls, kind, setOn, dueOn }; files: [{ name }].
+  function homeworkAhead(data, weeks, hw, files, today) {
+    const t0 = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const rows = (hw || []).filter((r) => r && r.cls);
+    const due = (files || []).map((x) => /^homework-(.+?)-(\d{4}-\d{2}-\d{2})(?:-core|-challenge)?\.json$/.exec((x && x.name) || '')).filter(Boolean).map((m) => ({ cls: m[1], due: m[2] }));
+    const cls = (data && data.classes) || {};
+    const kindFor = (c) => { const y = +((cls[c] || {}).year) || 0; return y >= 12 ? 'textbook questions' : y >= 10 ? 'exam practice' : 'homework'; };
+    const items = [], out = [];
+    const mondays = (weeks || []).map((w) => parse(w.monday));
+    const weekOf = (d) => mondays.findIndex((m) => d >= m && d < addDays(m, 7));
+    (weeks || []).forEach((w, n) => {
+      const mon = mondays[n], slots = w.slots || [];
+      const teach = (x) => ['lesson', 'revision', 'test'].includes(x.kind) && !x.double;
+      slots.forEach((x, k) => {
+        if (x.kind !== 'lesson' || x.double || !x.cls) return;
+        const last = !slots.some((y, j) => j > k && y.cls === x.cls && teach(y));
+        const on = x.checks && typeof x.checks.setHw === 'boolean' ? x.checks.setHw : last;
+        if (!on) return;
+        const date = addDays(mon, x.day), d = iso(date);
+        const L = ((cls[x.cls] || {}).seq || [])[x.i] || {};
+        const dd = dueFor(data, x.cls, d);
+        const made = rows.some((r) => r.cls === x.cls && r.kind !== 'revise' && r.setOn >= iso(addDays(date, -2)) && r.setOn <= iso(addDays(date, 2)))
+          || (dd && due.some((q) => q.cls === x.cls && Math.abs(parse(q.due) - parse(dd.due)) <= 864e5 * 1.5));   // a quiz file from home due on this lesson's due day
+        items.push({ week: n, key: x.cls + '|' + d + '|' + x.period, cls: x.cls, date: d, period: x.period, kind: 'hw', label: kindFor(x.cls),
+          title: L.title || x.text || 'Homework', topic: L.topic || '', due: dd ? dd.due : null, made, past: date < t0 });
+      });
+      // a test in this week: the revision reminder lands two weeks earlier, in whichever of the three weeks that is
+      slots.filter((x) => x.kind === 'test' && !x.double && x.cls).forEach((x) => {
+        const test = addDays(mon, x.day), at = addDays(test, -14), n2 = weekOf(at);
+        if (n2 < 0) return;
+        const topic = (((cls[x.cls] || {}).seq || []).find((L) => L.unit === x.unit) || {}).topic || 'the topic';
+        const made = rows.some((r) => r.cls === x.cls && r.kind === 'revise' && r.dueOn <= iso(test) && r.dueOn >= iso(at));
+        items.push({ week: n2, key: x.cls + '|revise|' + iso(test), cls: x.cls, date: iso(at), kind: 'revise', label: 'reminder',
+          title: 'Revision for the ' + topic + ' test on ' + iso(test), topic, unit: x.unit, test: iso(test), due: iso(test), made, past: at < t0 });
+      });
+    });
+    (weeks || []).forEach((w, n) => {
+      const mine = items.filter((x) => x.week === n);
+      const tests = (w.slots || []).filter((x) => x.kind === 'test' && !x.double && x.cls).map((x) => x.cls);
+      out.push({ monday: w.monday, label: ['This week', 'Next week', 'Week after'][n] || 'Later', need: mine.length, made: mine.filter((x) => x.made).length, tests });
+    });
+    items.sort((a, b) => a.week - b.week || (a.date < b.date ? -1 : a.date > b.date ? 1 : 0) || (a.period || 0) - (b.period || 0));
+    return { weeks: out, items };
+  }
   function dueFor(data, cls, setOn) {
     const s = parse(setOn);
     const days = [];
@@ -904,6 +952,6 @@
   }
 
   const api = { dueFor, nextLessonDay, lessonsOn, lessonEnd, recs, findRecord, setRecord, lessonNotes, recordChanges, remapRecords, migrateMarks, cascade, revisionSlot, unitBefore, applyAdded, addedNum, remapWeek, lessonId, applyMarks, classReport, topicList, wouldSkip, setSlot, markLesson, refillClass, planFrom, periodTime, calendarEvents, DAYS, iso, parse, addDays, mondayOf, isTeachingDay, nextSchoolDay, weekLetter, progressBefore, next, autofill, moveSlot, refillAfter,
-    EXTRAS, extrasSuggested, gradeFor, hwCoverage, hwStatus, lastResults, lastVotes, doNowFromVote, memoryGrid, memorySuggest, specTitle, mostMissed, hwForLesson, lessonSlot, testSlot, notHappened, slotDone, slotDay, fromFilled, reflowWeek, CHECKS, sheetCells, sheetModel, setsCount, printList, buildPrompt, carryForward, equipCell, lessonCell, setsLabel };
+    EXTRAS, extrasSuggested, gradeFor, hwCoverage, hwStatus, lastResults, lastVotes, homeworkAhead, doNowFromVote, memoryGrid, memorySuggest, specTitle, mostMissed, hwForLesson, lessonSlot, testSlot, notHappened, slotDone, slotDay, fromFilled, reflowWeek, CHECKS, sheetCells, sheetModel, setsCount, printList, buildPrompt, carryForward, equipCell, lessonCell, setsLabel };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.PlannerLogic = api;
 })(typeof window !== 'undefined' ? window : this);

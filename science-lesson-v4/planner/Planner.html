@@ -273,6 +273,40 @@
   #toast.on { display:flex; }
   #toast button { background:transparent; border:none; color:var(--gold); font-weight:700; padding:0; }
   .build-stamp { position:fixed; right:6px; bottom:3px; font-size:10px; color:#888; opacity:.6; pointer-events:none; z-index:5; }
+  /* Homework ahead (4.13, layout B2, 2026-10-30): the three weeks as a lantern-lit path, one card per lesson */
+  .hwa .hwbody { position:relative; }
+  .hwa .asub { color:var(--muted); font-size:13px; margin:0 0 12px; } .hwa .asub b { color:var(--ink); font-weight:600; }
+  .hwa .path { position:relative; display:flex; gap:12px; margin:8px 0 18px; padding:0 4px; }
+  .hwa .path::before { content:""; position:absolute; left:40px; right:40px; top:22px; height:2px; background:linear-gradient(90deg, rgba(250,187,46,.15), rgba(250,187,46,.7), rgba(250,187,46,.15)); }
+  .hwa .wk { flex:1; position:relative; background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:30px 12px 12px; box-shadow:0 10px 24px rgba(0,0,0,.28); }
+  body.light .hwa .wk { box-shadow:0 6px 16px rgba(13,27,94,.08); }
+  .hwa .wk .lamp { position:absolute; top:12px; left:50%; transform:translateX(-50%); width:20px; height:20px; border-radius:50%; background:var(--panel2); border:2px solid var(--line); }
+  .hwa .wk.now { border-color:rgba(250,187,46,.7); background:linear-gradient(180deg, rgba(250,187,46,.12), transparent 55%), var(--panel); }
+  .hwa .wk.now .lamp { background:var(--gold); border-color:#FFD97A; box-shadow:0 0 0 6px rgba(250,187,46,.18), 0 0 18px rgba(250,187,46,.55); }
+  .hwa .wk.done .lamp { background:var(--green); border-color:var(--green); box-shadow:0 0 10px rgba(102,187,106,.5); }
+  .hwa .wk b { display:block; font-size:14px; } .hwa .wk span { display:block; color:var(--muted); font-size:12px; margin-top:2px; }
+  .hwa .ring { position:absolute; right:10px; top:8px; width:34px; height:34px; border-radius:50%; display:grid; place-items:center; font-size:11px; font-weight:700; background:conic-gradient(var(--gold) calc(var(--p) * 1%), var(--line) 0); }
+  .hwa .ring i { width:26px; height:26px; border-radius:50%; background:var(--panel); display:grid; place-items:center; font-style:normal; }
+  .hwa .card { position:relative; display:flex; align-items:center; gap:12px; background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:12px 14px 12px 18px; margin:10px 0; box-shadow:0 6px 18px rgba(0,0,0,.25); overflow:hidden; }
+  body.light .hwa .card { box-shadow:0 4px 12px rgba(13,27,94,.07); }
+  .hwa .card::before { content:""; position:absolute; left:0; top:0; bottom:0; width:6px; background:var(--c); }
+  .hwa .card::after { content:""; position:absolute; inset:0; pointer-events:none; background:linear-gradient(135deg, rgba(255,255,255,.04), transparent 40%); }
+  .hwa .tick { width:26px; height:26px; border-radius:8px; border:2px solid var(--line); flex:none; display:grid; place-items:center; color:#0D1B5E; font-weight:900; background:var(--panel2); cursor:pointer; padding:0; font-family:inherit; }
+  .hwa .tick.on { background:var(--gold); border-color:#FFD97A; }
+  .hwa .chip { border:2px solid var(--c); border-radius:16px; padding:3px 11px; font-weight:700; font-size:13px; color:var(--ink); flex:none; background:var(--panel2); }
+  .hwa .t { flex:1; min-width:0; } .hwa .t b { display:block; font-weight:600; font-size:15px; } .hwa .t small { display:block; color:var(--muted); font-size:12px; margin-top:2px; }
+  .hwa .kind { font-size:12px; color:var(--muted); border:1px solid var(--line); border-radius:8px; padding:3px 8px; flex:none; background:var(--panel2); }
+  .hwa .kind.gold { color:var(--gold); border-color:rgba(250,187,46,.6); } .hwa .kind.warm { color:var(--orange); border-color:rgba(255,167,38,.6); } .hwa .kind.ok { color:var(--green); border-color:rgba(102,187,106,.6); }
+  .hwa .card.ready { opacity:.78; } .hwa .card.ready .tick { background:var(--green); border-color:var(--green); cursor:default; }
+  .hwa .card .set { font-family:inherit; font-size:12px; font-weight:700; border-radius:8px; padding:5px 10px; border:1px solid rgba(255,167,38,.6); background:var(--panel2); color:var(--orange); cursor:pointer; flex:none; }
+  .hwa .sec { display:flex; align-items:center; gap:10px; margin:18px 0 6px; color:var(--gold); font-size:13px; letter-spacing:.06em; text-transform:uppercase; }
+  .hwa .sec::after { content:""; flex:1; height:1px; background:linear-gradient(90deg, rgba(250,187,46,.5), transparent); }
+  .hwa .cta { display:flex; align-items:center; gap:12px; margin-top:18px; background:linear-gradient(180deg, var(--panel2), var(--panel)); border:1px solid var(--line); border-radius:14px; padding:12px 14px; }
+  .hwa .cta .note { flex:1; color:var(--muted); font-size:13px; } .hwa .cta .note b { color:var(--ink); font-weight:600; }
+  .hwa .cta button { font-family:inherit; font-size:14px; font-weight:700; background:var(--gold); color:#0D1B5E; border:1px solid var(--gold); border-radius:10px; padding:10px 16px; box-shadow:0 6px 16px rgba(250,187,46,.25); cursor:pointer; }
+  .hwa .cta button:disabled { opacity:.5; cursor:default; box-shadow:none; }
+  .hwa .foot { color:var(--muted); font-size:12px; margin-top:12px; font-style:italic; }
+  @media (max-width:640px) { .hwa .path { flex-direction:column; } .hwa .path::before { display:none; } }
 </style>
 </head>
 <body>
@@ -635,13 +669,14 @@ const HW_STATES = [['drafted', 'Drafted'], ['scheduled', 'Scheduled'], ['live', 
 const todayIso = () => P.iso(todayMidnight());
 function hwRowsLive() { return (S.hwStat || []).map((r) => Object.assign({}, r, { st: P.hwStatus(r, r.live, todayIso(), r.done || 0) })); }
 function loadHwStat(fresh) {
-  return run('homeworkStatus', !!fresh).then((r) => { S.hwStat = r; if (S.view === 'homework') { hwDrawStrip(); hwDrawByClass(); hwDrawComing(); } if (S.view === 'tests') asDrawResultsList(); })
+  return run('homeworkStatus', !!fresh).then((r) => { S.hwStat = r; if (S.view === 'homework') { hwDrawStrip(); hwDrawByClass(); hwDrawComing(); hwDrawAhead(); } if (S.view === 'tests') asDrawResultsList(); })
     .catch((e) => { const el = $('hwBy'); if (el) el.innerHTML = '<p class="muted">' + esc(String(e.message || e).replace(/^Error:\s*/, '')) + '</p>'; });
 }
 function renderHomework() {
   const g = $('grid'); g.className = 'tab'; g.style.gridTemplateColumns = '';
   S.hwF = S.hwF || { kind: 'quiz', classes: [], per: {}, msg: '', msgEdited: false, results: {}, title: '', link: '' };
   g.innerHTML = '<h2>Homework</h2><p class="lead">Set work for one or several classes, then follow it until it is marked. Each class gets its own Classroom draft (or a post at the time you choose), due at 8:00 on the lesson about a week later. Nothing here is printed.</p>' +
+    '<details class="hwsec hwa" id="hwAheadSec"' + ([0, 5, 6].includes(new Date().getDay()) ? ' open' : '') + '><summary>Homework ahead <span class="sub">next week\'s homework to prepare, and the two weeks after</span></summary><div class="hwbody" id="hwAhead"></div></details>' +
     '<div class="hwstrip" id="hwStrip"></div>' +
     '<details class="hwsec" open id="hwSet"><summary>Set new homework <span class="sub">kind, classes, due dates, message</span></summary><div class="hwbody">' +
       '<div class="hwstep"><div class="st">1. Kind</div><div class="hwkinds" id="hwKinds"></div><div id="hwTL"></div></div>' +
@@ -660,10 +695,11 @@ function renderHomework() {
   hwDrawKinds();
   const draw = (list) => {
     S.hwList = list;
-    hwDrawClasses(); hwDrawPer(); hwDrawMsg();
+    hwDrawClasses(); hwDrawPer(); hwDrawMsg(); hwDrawAhead();
   };
   if (S.hwList) draw(S.hwList);
   run('homeworkList').then(draw).catch((e) => { if (!S.hwList) $('hwCls').innerHTML = '<p>' + esc(String(e.message || e).replace(/^Error:\s*/, '')) + '</p>'; S.hwList = S.hwList || []; hwDrawClasses(); });
+  hwDrawAhead();
   if (S.hwStat) { hwDrawStrip(); hwDrawByClass(); hwDrawComing(); }
   loadHwStat(false);
 }
@@ -837,6 +873,82 @@ function hwDrawByClass() {
   $('hwBy').querySelectorAll('.hwResB').forEach((b) => b.onclick = () => { S.asOpen = b.dataset.id; showTab('tests'); });
 }
 // Revision homework: suggested 2 weeks before each test in the planner (spec 1.4)
+// Homework ahead (4.13, layout B2, Patryk 2026-10-30): next week's lessons ticked "Set homework" (or each class's
+// last lesson of the week) as cards; one button asks Claude at home to prepare the ticked ones. Nothing is posted.
+// A test two weeks away is a reminder only, with a button that fills in "Set new homework" (never a draft by itself).
+const hwaDay = (d) => { const x = P.parse(d); return P.DAYS[(x.getDay() + 6) % 7] + ' ' + x.getDate() + ' ' + ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][x.getMonth()]; };
+function hwaJson(k) { try { return JSON.parse(store.get(k) || '{}') || {}; } catch (e) { return {}; } }
+function hwaWeeks() {
+  const mon0 = P.mondayOf(todayMidnight());
+  return [0, 1, 2].map((n) => {
+    const mon = P.addDays(mon0, 7 * n), key = P.iso(mon);
+    const wk = (S.week && S.week.monday === key) ? S.week : (S.weeks[key] || P.autofill(S.data, S.weeks, mon, S.learned));
+    return { monday: key, slots: (wk && wk.slots) || [] };
+  });
+}
+function hwDrawAhead() {
+  const box = $('hwAhead'); if (!box || !S.data) return;
+  let A;
+  try { A = P.homeworkAhead(S.data, hwaWeeks(), S.hwStat || S.hw || [], S.hwList || [], todayMidnight()); }
+  catch (e) { box.innerHTML = '<p class="muted">Homework ahead could not be worked out: ' + esc(String(e.message || e)) + '</p>'; return; }
+  const off = hwaJson('hwa.off'), asked = hwaJson('hwa.asked');
+  const col = (k) => ((S.data.classes[k] || {}).colour) || '#3F51B5';
+  const live = A.items.filter((x) => x.week <= 1 && !(x.week === 0 && x.past && !x.made));
+  const prep = live.filter((x) => !x.made), made = live.filter((x) => x.made);
+  const ticked = prep.filter((x) => x.kind === 'hw' && !off[x.key] && !asked[x.key]);
+  // this week counts only what is still ahead (a lesson already gone with nothing set is not "to prepare")
+  A.weeks.forEach((w, n) => { if (n === 0) { const mine = live.filter((x) => x.week === 0); w.need = mine.length; w.made = mine.filter((x) => x.made).length; } });
+  const nextW = A.weeks[1] || { need: 0, made: 0 };
+  const left = nextW.need - nextW.made;
+  const sub = '<p class="asub">' + hwaDay(P.iso(todayMidnight())) + ' &middot; <b>' + (left ? left + ' to prepare' : 'nothing to prepare') + '</b> for next week' + (made.length ? ', ' + made.length + ' already made' : '') + ' &middot; nothing is posted until you say</p>';
+  const ring = (w) => { const p = w.need ? Math.round(100 * w.made / w.need) : 100; return '<div class="ring" style="--p:' + p + '"><i>' + w.made + '/' + w.need + '</i></div>'; };
+  const wkLine = (w, n) => {
+    const tests = [...new Set(w.tests)];
+    if (n === 2) return tests.length ? esc(tests.join(', ')) + ' test' + (tests.length > 1 ? 's' : '') + ' &middot; revision reminder' : (w.need ? w.need + ' homework lesson' + (w.need > 1 ? 's' : '') : 'no homework lessons yet');
+    if (!w.need) return 'no homework lessons';
+    if (w.made === w.need) return n === 0 ? 'all set for the rest of the week' : 'all set';
+    return (w.need - w.made) + ' to prepare' + (n === 1 ? ' by Friday' : '');
+  };
+  const path = '<div class="path">' + A.weeks.map((w, n) => '<div class="wk' + (n === 1 ? ' now' : (w.need && w.made === w.need ? ' done' : '')) + '"><div class="lamp"></div>' + ring(w) + '<b>' + w.label + '</b><span>' + wkLine(w, n) + '</span></div>').join('') + '</div>';
+  const lessonAt = (x) => x.date ? hwaDay(x.date) + (x.period ? ' P' + x.period : '') : '';
+  const card = (x) => {
+    const c = col(x.cls), isAsked = !!asked[x.key];
+    if (x.kind === 'revise') return '<div class="card" style="--c:' + c + '"><span class="chip" style="--c:' + c + '">' + esc(x.cls) + '</span><div class="t"><b>' + esc(x.title.replace(/ on (\d{4}-\d{2}-\d{2})$/, (m, d) => ' on ' + hwaDay(d))) + '</b><small>two weeks before the test &middot; a reminder, you check and post</small></div><button class="set" data-hwrev="' + esc(x.key) + '">Set it</button><span class="kind warm">reminder</span></div>';
+    const on = !off[x.key] && !isAsked;
+    return '<div class="card" style="--c:' + c + '"><button class="tick' + (on ? ' on' : '') + '" data-hwtick="' + esc(x.key) + '" title="' + (isAsked ? 'Already asked' : on ? 'Leave this one out' : 'Put this one back in') + '"' + (isAsked ? ' disabled' : '') + '>' + (on || isAsked ? '&#10003;' : '') + '</button><span class="chip" style="--c:' + c + '">' + esc(x.cls) + '</span>' +
+      '<div class="t"><b>' + esc(x.title) + '</b><small>' + esc(x.label) + (x.due ? ' &middot; due ' + hwaDay(x.due) : '') + ' &middot; ' + lessonAt(x) + (isAsked ? ' &middot; asked ' + esc(asked[x.key]) : '') + '</small></div><span class="kind' + (isAsked ? ' ok' : '') + '">' + (isAsked ? 'asked' : esc(x.label)) + '</span></div>';
+  };
+  const ready = (x) => '<div class="card ready" style="--c:' + col(x.cls) + '"><span class="tick">&#10003;</span><span class="chip" style="--c:' + col(x.cls) + '">' + esc(x.cls) + '</span><div class="t"><b>' + esc(x.kind === 'revise' ? x.title.replace(/ on (\d{4}-\d{2}-\d{2})$/, (m, d) => ' on ' + hwaDay(d)) : x.title) + '</b><small>' + esc(x.label) + (x.due ? ' &middot; due ' + hwaDay(x.due) : '') + ' &middot; ' + lessonAt(x) + '</small></div><span class="kind ok">ready</span></div>';
+  box.innerHTML = sub + path +
+    (prep.some((x) => x.week === 0) ? '<div class="sec">To prepare: rest of this week</div>' + prep.filter((x) => x.week === 0).map(card).join('') : '') +
+    (prep.some((x) => x.week === 1) ? '<div class="sec">To prepare: next week</div>' + prep.filter((x) => x.week === 1).map(card).join('') : '<p class="muted">Nothing to prepare for next week.</p>') +
+    (made.length ? '<div class="sec">Already made</div>' + made.map(ready).join('') : '') +
+    '<div class="cta"><div class="note">' + (ticked.length ? '<b>' + ticked.length + ' ticked.</b> Claude prepares them at home; they show here as "ready" once set, and you post them from Classroom.' : 'Tick a card to ask Claude to prepare it.') + '</div><button id="hwaGo"' + (ticked.length ? '' : ' disabled') + '>Ask Claude to prepare these (' + ticked.length + ')</button></div>' +
+    '<div class="foot">A lesson\'s own "Set homework" tick decides; otherwise it is the class\'s last lesson of the week.</div>';
+  box.querySelectorAll('[data-hwtick]').forEach((b) => b.onclick = (e) => { e.preventDefault(); const o = hwaJson('hwa.off'), k = b.dataset.hwtick; if (o[k]) delete o[k]; else o[k] = 1; store.set('hwa.off', JSON.stringify(o)); hwDrawAhead(); });
+  box.querySelectorAll('[data-hwrev]').forEach((b) => b.onclick = (e) => { e.preventDefault(); const x = A.items.find((y) => y.key === b.dataset.hwrev); if (x) hwReviseFor({ s: { cls: x.cls, unit: x.unit }, date: P.parse(x.test) }); });
+  $('hwaGo').onclick = () => hwaAsk(ticked);
+}
+// One request home for all the ticked cards (kind 'homework'; build-ahead never runs these by itself).
+function hwaAsk(list) {
+  if (!list.length) return;
+  const how = (x) => {
+    const y = +((S.data.classes[x.cls] || {}).year) || 0;
+    if (y >= 12) return 'the end-of-subsection textbook questions for this lesson (OCR A only)';
+    if (y >= 10) return 'exam practice: node science-lesson/references/test-paper.js --class ' + x.cls + (x.due ? ' --due ' + x.due : '');
+    return 'a short homework on this lesson (Seneca or a quick quiz)';
+  };
+  const text = 'Prepare homework (Homework ahead, ' + hwaDay(P.iso(todayMidnight())) + '). Make each one ready for me to check; post nothing.\n' +
+    list.map((x) => '- ' + x.cls + ', set ' + hwaDay(x.date) + (x.period ? ' P' + x.period : '') + ': "' + x.title + '"' + (x.due ? ', due ' + hwaDay(x.due) : '') + '. Make ' + how(x) + '.').join('\n');
+  $('hwaGo').disabled = true; $('hwaGo').textContent = 'Sending...';
+  run('sendRequest', { kind: 'homework', text, lessons: [] }).then(() => {
+    const a = hwaJson('hwa.asked'), when = hwaDay(P.iso(todayMidnight()));
+    list.forEach((x) => { a[x.key] = when; });
+    store.set('hwa.asked', JSON.stringify(a));
+    toast('Asked Claude to prepare ' + list.length + ' homework' + (list.length > 1 ? 's' : '') + '. Nothing is posted.');
+    hwDrawAhead();
+  }).catch((e) => { toast(String(e.message || e).replace(/^Error:\s*/, '')); hwDrawAhead(); });
+}
 function hwDrawComing() {
   const up = upcomingTests(8);
   const set = (S.hwStat || []).filter((r) => r.kind === 'revise');

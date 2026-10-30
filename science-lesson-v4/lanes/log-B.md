@@ -4,27 +4,41 @@ Plain-English record of Lane B's work, newest entry first. Each entry says what 
 
 ## Waiting on you
 
-1. **Approve the builder plan for item 1.8 (A-level Drive address).** It touches the lesson builder, so it waits for your yes. The problem: for a Year 12 or 13 lesson the builder writes the wrong Drive address into the two small note files beside the lesson (it says "Year 13/Physics/Chapter 20 ...", but on Drive there is no Physics level and the chapters sit inside Module folders). The files still land in the right place, but the planner uses that note to attach each lesson's multiple-choice questions for the phone voter, so 12C and 13D lessons get none, and the school push uses the same wrong address. The plan: (1) for Year 12 or 13 the builder asks the uploader's own chapter lookup for the real folder and writes that into both notes (when Drive is not reachable it works out the module from the chapter-to-module table the October reorganisation used); (2) check the planner finds 12C and 13D lessons by that address; (3) add a 13D test lesson so it cannot slip back. Nothing on Drive is created, moved or renamed. Reply "yes to 1.8".
-2. **OK to write the Do Now mix rule into SKILL.md?** The picker now aims for 4 short recall questions, one 2-mark explain and one calculation (item 2.1). The plan says the rule only goes into the skill notes with your OK. Reply "yes to the mix rule".
-3. **Next paste set (Lane A makes it):** my planner changes from items 2.2, 2.3, 2.4, 2.7, 2.8 and 2.12, 2.9, backdating, the memory map and the Memory tab (Planner.html, Logic.html, Code.gs, Phone.html, Behaviour.gs, BoardPage.html, and the new Memory.gs) need to go into the next complete set; after pasting, re-import planner-data.json from home once. Optional: paste the new Mailbox.gs into the home link's own project and deploy a new version (item 4.6, faster quiz list).
-
-4. **Approve the builder plan for items 2.5 and 2.6 (lesson builder fixes).** They touch the lesson builder, so they wait for your yes. I checked the code itself, since the two audits disagree. What I would change, one at a time, with a test for each:
-   - **Sentence starters:** the standard sheet still shows them on its easiest tier (and on any 4+ mark question). Move them to the support sheet only, except where a lesson asks for them on purpose.
-   - **No calculation working given away:** on a lesson that teaches a new method, the standard sheet's GUESS box comes half filled in (Given, Unknown, Equation). Make that pre-filled box appear on the support sheet only; the standard sheet gets the empty GUESS box.
-   - **Word bank from each class's setting:** the builder still has its own "no word bank" list naming last year's 8AB and 9AB. Read class-defaults.json instead, so 10S2, 11S2 and the A-level classes get none without anyone remembering. 9AS and 9XS are still undecided there, so they keep today's behaviour (a word bank) until you say.
-   - **Whiteboard round answers:** the answer text is a fixed small size in a big box; size it to fill the box.
-   - **Graph slide title:** it reads "READ THE GRAPH: ANSWERS" before the answers show. It becomes "READ THE GRAPH", with the answers still on click.
-   - **False picture warning:** the build check asks for a picture description on comparison slides, which have no picture. Skip them.
-   - **Long exam questions:** a long question (like the 7-mark one on 11S2) shrinks to the smallest text and still runs off. When it does not fit, the later parts move to a second slide, and the same for its mark scheme panel (which also overflows on long schemes, so that counts as not fixed). Also make sure no "[FIG]" marker can show in a board mark scheme.
-   - **Mark totals:** "3 to 4 mark questions shown as 6" has no example yet. I would look for one in the October lessons first; if I can't find one, I'll ask you for the lesson where you saw it.
-   - **2.6, a delayed multiple choice:** one question from a lesson 3 to 4 weeks ago joins the multiple-choice block (as its last question, labelled "from [lesson]"), taken from that earlier lesson's own checked questions, so the class meets it again at a spaced gap. It travels with the lesson's questions to the phone, so its ABCD vote is saved like the others.
-   - **From 2.13, test lessons for this year:** a 10S2 test lesson (checks no word bank appears), a 13D one (comes with 1.8), and a build warning when lesson text has an em dash. These depend on the fixes above, so they go in with them.
-   - **From the memory map (big goal 1, step 5):** the lesson's ticked "Suggested Do Now" sections pass through to the Do Now picker and show in the Do Now slide's notes, and every multiple-choice question gets a short "why someone picks this" note on each wrong option at build time (the build check refuses one without), so the ABCD votes can say which misconception the class holds.
-   Nothing on Drive changes. Reply "yes to the builder plan" (or pick which bullets).
-7. **Item 2.10, the "last week's homework" slide:** a builder job that needs a mock-up first. I can't publish mock-ups from this chat, so it waits; tell me if you want me to make the mock-up as a file you can open instead.
-9. **Item 4.13, homework ahead: OK to build this?** What already exists: the Homework tab's "Coming up automatically" list suggests revision homework two weeks before every test, one click to fill it in. My proposal for the rest: (a) on Fridays the planner lists next week's lessons that need homework set (the ones ticked "Set homework") and offers one button, "Ask Claude to prepare these", which sends a single request home; nothing is posted. (b) Two weeks before a test, the 6am job makes the revision homework as a Classroom DRAFT (never posted, you check and post it) and the card says "draft ready"; or, if you would rather, it only reminds you. (c) A 6-mark question done on the board comes back as homework three weeks later, chosen from that lesson's real 6-markers, offered as a tick in the Friday list. Reply with the letters you want, and for (b) "draft" or "reminder".
+1. **Upload the new skill file.** The skill notes and the lesson builder changed today (the items below), so the rebuilt `science-lesson.skill` needs uploading to claude.ai: replace the old file directly (not in Projects).
+2. **Next paste set (Lane A makes it):** my planner changes from items 2.2, 2.3, 2.4, 2.7, 2.8 and 2.12, 2.9, backdating, the memory map, the Memory tab, Blind and now homework ahead (Planner.html, Logic.html, Code.gs, Phone.html, EyesFree.html, Behaviour.gs, BoardPage.html, and the new Memory.gs) need to go into the next complete set; after pasting, re-import planner-data.json from home once. Optional: paste the new Mailbox.gs into the home link's own project and deploy a new version (item 4.6, faster quiz list).
+3. **Which lesson showed "3 to 4 mark questions as 6"?** I searched every saved October lesson and found no mark total that disagrees with its parts. Tell me the class and lesson (or send a photo of the slide) and I'll fix it.
+4. **After the paste: your Blind letters score.** Press Blind, then Today > Settings > "Test my letters" with a class open, and tell me the score.
 
 ---
+## 30 Oct 2026, homework ahead on the Homework tab (item 4.13, layout B2 made warmer)
+
+**What changed:**
+- **A new first section on the Homework tab, "Homework ahead"**, in the warmer B2 look you asked for: the three weeks (this week, next week, the week after) as a lantern-lit path, each with a ring showing how many of its homework lessons are made, next week's lamp lit gold.
+- **One card per homework lesson**, with the class's colour ribbon and chip, the lesson's title, what kind it is (exam practice for Years 10 and 11, textbook questions for 12C and 13D, homework for the rest), when it is due, and which lesson it is set in. "To prepare: rest of this week" and "To prepare: next week" are separate, and "Already made" shows what is set (from Classroom) or ready from home.
+- **Which lessons count:** a lesson's own "Set homework" tick decides; otherwise it is the class's last lesson of the week, the same rule the lesson card already uses.
+- **One gold button, "Ask Claude to prepare these"**, sends a single request home for the ticked cards (untick any you don't want; it remembers). Nothing is posted: they come back as "ready" and you post them from Classroom. The afternoon build-ahead run never picks these up by itself.
+- **A test two weeks away shows as a reminder card** with a "Set it" button that fills in "Set new homework" as revision. It never makes a draft by itself, as the test default said.
+- It opens by itself on Friday to Sunday and stays shut on other days (click to open).
+- Not yet: (c), a board 6-marker coming back three weeks later. Nothing records which 6-marker was done on the board yet, so that needs the builder to note it first.
+- Checks: 8 new planner logic checks and a new browser check (tests/homework_ahead_sim.py, 14 checks), dark and light.
+
+**You need to:** nothing until the next paste set; then open the Homework tab on a Friday.
+
+## 30 Oct 2026, lesson builder: items 1.8, 2.5, 2.6, 2.13, the 20 language rules, Engage and the Do Now mix
+
+**What changed:**
+- **Year 12 and 13 lessons (item 1.8):** the two small note files beside each A-level lesson now name the real Drive folder (Module, then Chapter, no Physics level). At home the builder asks the uploader's own lookup; on claude.ai it uses the module list as it is on Drive today. The seven old 12C and 13D notes are corrected too, so the next planner data export attaches their multiple-choice questions for the phone voter. Nothing on Drive was created, moved or renamed.
+- **Worksheets (2.5):** sentence starters are on the support sheet only (unless a lesson asks for them on purpose); the standard sheet's GUESS box is always empty (the half-filled one is support only); the word bank now follows each class's setting, so **9AS and 9XS get none**, like 10S2, 11S2, 12C and 13D, and 10C2 keeps its bank.
+- **Slides (2.5):** whiteboard round answers fill their box; the graph slide says "READ THE GRAPH"; a long exam question no longer shrinks and runs off: the parts that don't fit move to a second slide marked "continued", and the same for its mark scheme; no "[FIG]" marker can reach the board.
+- **Checks (2.5):** no false "picture description" warning on comparison tables.
+- **A question from 3 to 4 weeks ago (2.6):** at home, one multiple-choice question from the class's lesson built 3 to 4 weeks earlier joins the block as its last question, labelled "FROM [that lesson]". It is extra to the six and goes to the phone voter too.
+- **Memory map:** the sections you tick under "Suggested Do Now" go to the Do Now picker and show in the Do Now slide's notes.
+- **Skill notes (SKILL.md):** Engage is now always there and always a question (from history, real data, or what you just said); the Do Now mix (4 short recall, one 2-mark explain, one calculation); your 20 teaching-language rules; 9AS and 9XS "No word bank". The build now warns (never rewrites) on: a slide sentence over 20 words (25 for A level), a Learn slide with no notes, more than 3 notes beside a picture (5 for A level), a passive instruction, a missing Engage, an Engage with no question, a long question or a hype word, no notes saying where the lesson answers it, a long multiple-choice option, and any em dash.
+- **New test lessons (2.13):** a 13D one, a 10S2 one (no word bank on either sheet), a long exam question one, and checks on the new warnings and the 3-to-4-weeks question.
+- The skill file is rebuilt.
+
+**You need to:** upload the new `science-lesson.skill` to claude.ai (replace the old file directly). And tell me which lesson showed "3 to 4 mark questions as 6": I couldn't find one.
+
 ## 30 Oct 2026, eyes-free entry: the Blind button on the phone
 
 **What changed:**

@@ -75,7 +75,7 @@ window.google = { script: { run: (function make(ok, bad) {
     setGradeBands(k, b) { setTimeout(() => ok(b), 0); },
     renameAdded(k, cls, unit, title, name) { setTimeout(() => ok({ cls, unit, title, name }), 0); },
     makeHomework(k, name) { setTimeout(() => ok({ made: [{ title: name, form: 'https://forms', draft: true, note: '' }], seen: 1, already: 0, names: [name] }), 0); },
-    sendRequest() { setTimeout(() => ok({ id: 'preview' }), 0); },
+    sendRequest(k, req) { window.__REQ = req; setTimeout(() => ok({ id: 'preview' }), 0); },
     setBehaviourUrl(k, u) { setTimeout(() => ok(u), 0); }, learnEquipment() { setTimeout(() => ok(true), 0); },
     myEvents() { setTimeout(() => ok([{ title: 'Department meeting', day: 2, time: '15:30-16:30', allDay: false }, { title: 'Parents evening Y9', day: 3, time: '', allDay: true }]), 0); },
     syncWeek(k, m, evs) { setTimeout(() => ok({ written: evs.length, calendar: 'Lessons (Planner)' }), 0); },

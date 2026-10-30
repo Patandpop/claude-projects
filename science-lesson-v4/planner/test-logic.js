@@ -429,5 +429,35 @@ if (fs.existsSync(DRIVE)) {
   ok(!/—/.test(pr), 'build request: no em dashes');
 }
 
+// Homework ahead (4.13, layout B2, 2026-10-30): three weeks of "Set homework" lessons, made or still to prepare,
+// and a revision reminder two weeks before a test. Made-up timetable and classes.
+{
+  const T = (cls, days, period) => days.map((day) => ({ day, period, cls }));
+  const tt = [...T('XA', [0, 3], 1), ...T('XB', [1, 4], 2)];
+  const hd = { terms: [['2026-11-02', '2026-12-18']], inset: [], weekAStart: '2026-09-07', timetable: { A: tt, B: tt },
+    classes: { XA: { year: 10, seq: [{ title: 'Efficiency', topic: 'P1 Energy', unit: 'P1#0' }, { title: 'Power', topic: 'P1 Energy', unit: 'P1#0' }] },
+               XB: { year: 7, seq: [{ title: 'Cells', topic: 'Cells', unit: 'C#0' }] } } };
+  const L = (cls, day, i, extra) => Object.assign({ cls, day, period: 1, kind: 'lesson', i }, extra || {});
+  const weeks = [
+    { monday: '2026-11-09', slots: [L('XA', 0, 0), L('XA', 3, 1), L('XB', 1, 0), L('XB', 4, 0)] },
+    { monday: '2026-11-16', slots: [L('XA', 0, 0), L('XA', 3, 1, { checks: { setHw: false } }), L('XB', 1, 0, { checks: { setHw: true } }), L('XB', 4, 0)] },
+    { monday: '2026-11-23', slots: [L('XA', 0, 0), { cls: 'XA', day: 3, period: 1, kind: 'test', unit: 'P1#0' }, L('XB', 4, 0)] },
+  ];
+  const hw = [{ cls: 'XA', kind: 'quiz', setOn: '2026-11-12', dueOn: '2026-11-19' }];
+  const files = [{ name: 'homework-XB-2026-11-27.json' }];
+  const a = P.homeworkAhead(hd, weeks, hw, files, P.parse('2026-11-13'));
+  const wk = (n) => a.items.filter((x) => x.week === n && x.kind === 'hw');
+  ok(wk(0).map((x) => x.cls + ' ' + x.date).join(', ') === 'XA 2026-11-12, XB 2026-11-13', 'homework ahead: this week, each class\'s last lesson of the week is the homework lesson');
+  ok(wk(0)[0].made && !wk(0)[1].made, 'homework ahead: made when homework for that class was set that day, else still to prepare');
+  ok(wk(1).map((x) => x.cls + ' ' + x.date).join(', ') === 'XB 2026-11-17, XB 2026-11-20' && !wk(1)[0].made, 'homework ahead: a lesson\'s own tick wins (on or off; XA Monday is not its last lesson); a file counts only for its own due day');
+  ok(wk(1).find((x) => x.date === '2026-11-20').made, 'homework ahead: a quiz file from home due on the lesson\'s due day counts as made');
+  const rem = a.items.find((x) => x.kind === 'revise');
+  ok(rem && rem.week === 0 && rem.date === '2026-11-12' && rem.title === 'Revision for the P1 Energy test on 2026-11-26' && rem.label === 'reminder', 'homework ahead: a test brings a revision reminder two weeks before it, in the right week');
+  ok(wk(0)[0].label === 'exam practice' && wk(0)[1].label === 'homework' && wk(0)[0].due === '2026-11-19', 'homework ahead: the kind follows the year, and each has its due lesson');
+  ok(a.weeks.map((w) => w.label + ' ' + w.made + '/' + w.need).join(', ') === 'This week 1/3, Next week 1/2, Week after 0/1' && a.weeks[2].tests.join() === 'XA', 'homework ahead: a made / to do count for each of the three weeks, with the tests');
+  const again = P.homeworkAhead(hd, weeks, hw.concat([{ cls: 'XA', kind: 'revise', setOn: '2026-11-12', dueOn: '2026-11-19' }]), files, P.parse('2026-11-13'));
+  ok(again.items.find((x) => x.kind === 'revise').made, 'homework ahead: the reminder is ticked off once revision homework is set for that test');
+}
+
 console.log(fails ?`\n${fails} FAILED` : '\nall planner logic checks passed');
 process.exit(fails ? 1 : 0);
