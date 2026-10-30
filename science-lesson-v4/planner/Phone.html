@@ -679,7 +679,6 @@ function logMany(type) { const names = S.sel.slice(); S.sel = []; $('selbar').cl
 
 /* ---------- silence control ---------- */
 let modeTimer = null, tick = null, offset = 0;
-let LIMIT = 13;   // noise limit in dB above the quiet-room level, loaded from the server
 let SET = Number(LS.get('timerSet')) || 180;   // seconds the timer will start from
 const mmss = s => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 // A timer that ran out more than 1.5 s ago counts as no timer, so you can start a new one straight away.
@@ -696,16 +695,16 @@ function silText() {
     set: mmss(SET), left: t ? mmss(Math.max(0, Math.ceil((t.paused ? t.left || 0 : t.end - now) / 1000))) : '',
     stime: sec < 0 ? String(-sec) : mmss(Math.max(0, sec)),
     lost: m.lost ? mmss(Math.max(0, Math.floor((now - m.lost.start) / 1000))) : '',
-    sword: m.paused ? 'Paused' : m.live === 'red' ? 'Tripped' : m.live === 'amber' ? 'Getting loud' : sec < 0 ? 'Counting down' : 'Listening'
+    sword: m.paused ? 'Paused' : sec < 0 ? 'Counting down' : 'Silent'   // no microphone (2026-10-30): you judge it with Talking
   };
 }
 function silHTML(m, t) {
   if (m.lost) return `<button class="lostp" data-lost="0"><span class="face">&#9785;</span><span class="grow">Time lost<small>tap when they are back on task</small></span><b data-k="lost"></b></button>`;
   const talk = `<button class="talk" data-lost="1">Talking: count the time lost</button>`;
   if (m.mode === 'teaching') {
-    let h = `<div class="modes3"><button data-mode="countdown">Countdown<small>3, 2, 1, ends when quiet</small></button>
-      <button data-mode="entry">Silent entry<small>softer limit, ends when quiet</small></button></div>`;
-    // set the time first, then choose: a plain timer (practicals) or silent work (timer plus listening)
+    let h = `<div class="modes3"><button data-mode="countdown">Countdown<small>3, 2, 1, then silence</small></button>
+      <button data-mode="entry">Silent entry<small>passes after 30 s with no Talking tap</small></button></div>`;
+    // set the time first, then choose: a plain timer (practicals) or silent work (timer; Talking counts the time lost)
     if (!t) h += `<div class="trun idle"><button data-t="-30">&minus;30s</button><span class="tt"><b data-k="set"></b><small>set the time</small></span><button data-t="+30">+30s</button></div>
       <div class="go2"><button data-t="start">Timer only</button><button class="gw" data-mode="work">Silent work</button></div>`;
     else h += `<div class="trun"><button data-t="-30">&minus;30s</button><span class="tt"><b data-k="left"></b><small>${esc(t.label || 'Timer')}${m.paused ? ' · paused' : ''}</small></span>
@@ -850,8 +849,17 @@ async function loadFriday() {
   $('fri').innerHTML = '<p class="note">Loading</p>';
   try { S.fri = await call('getFriday'); renderFriday(); } catch (e) { $('fri').innerHTML = '<p class="note">Could not load.</p>'; }
 }
+// Patryk 2026-10-30: the weekly goal is what earns emails home. A class that missed it (silent under 80% or too
+// much time lost) gets none that week: it can't be picked unless he taps "Include anyway".
+const goalMissed = c => c.goal && c.goal.status === 'missed' && !S.unlock[c.cls];
 function renderFriday() {
+  S.unlock = S.unlock || {};
   $('fri').innerHTML = S.fri.map(c => {
+    if (goalMissed(c)) {
+      const open = !!S.open[c.cls];
+      return `<div class="cls skipped"><button class="cls-h" data-open="${esc(c.cls)}"><b>${esc(c.cls)}</b><span class="grow">Goal missed: no emails home this week</span>${goalChip(c.goal, c.fortnight)}</button>` +
+        (open ? `<div class="cls-b"><p class="note">Too much time was lost this week, so nobody in ${esc(c.cls)} is emailed.</p><button class="skip" data-unlock="${esc(c.cls)}">Include anyway</button></div>` : '') + `</div>`;
+    }
     const picks = S.picks[c.cls] || [], skipped = !!S.skip[c.cls], open = !!S.open[c.cls] && !skipped;
     const ordered = c.students.slice().sort((a, b) => (b.pos > 0 && !b.recent) - (a.pos > 0 && !a.recent) || b.pos - a.pos || a.name.localeCompare(b.name));
     const body = open ? `<div class="cls-b"><button class="skip" data-skip="${esc(c.cls)}">Skip this class</button>${ordered.map(s => {
@@ -862,13 +870,14 @@ function renderFriday() {
     return `<div class="cls${skipped ? ' skipped' : ''}"><button class="cls-h" data-open="${esc(c.cls)}"><b>${esc(c.cls)}</b>
       <span class="grow">${skipped ? 'Skipped, tap to include' : `${picks.length} of ${MAX} picked`}</span>${goalChip(c.goal, c.fortnight)}</button>${body}</div>`;
   }).join('');
-  const total = Object.keys(S.picks).reduce((n, k) => n + (S.skip[k] ? 0 : S.picks[k].length), 0);
+  const total = Object.keys(S.picks).reduce((n, k) => n + (S.skip[k] || goalMissed(S.fri.find(c => c.cls === k) || {}) ? 0 : S.picks[k].length), 0);
   $('makeList').textContent = `Make email list (${total})`; $('makeList').classList.toggle('hidden', !total);
 }
 $('fri').addEventListener('click', e => {
   const b = e.target.closest('button'); if (!b) return;
   if (b.dataset.open) { const c = b.dataset.open; if (S.skip[c]) delete S.skip[c]; else S.open[c] = !S.open[c]; return renderFriday(); }
   if (b.dataset.skip) { S.skip[b.dataset.skip] = true; return renderFriday(); }
+  if (b.dataset.unlock) { S.unlock[b.dataset.unlock] = true; S.open[b.dataset.unlock] = true; return renderFriday(); }
   if (b.dataset.pick) {
     const c = b.dataset.pick, n = b.dataset.name, p = S.picks[c] = S.picks[c] || [], i = p.indexOf(n);
     if (i > -1) p.splice(i, 1); else if (p.length >= MAX) snack(`${MAX} already picked. Untick one first.`); else p.push(n);
@@ -877,7 +886,7 @@ $('fri').addEventListener('click', e => {
 });
 $('makeList').onclick = () => {
   const lines = [];
-  S.fri.forEach(c => { const p = S.picks[c.cls] || []; if (p.length && !S.skip[c.cls]) { lines.push(c.cls); p.forEach(n => lines.push(n)); lines.push(''); } });
+  S.fri.forEach(c => { const p = S.picks[c.cls] || []; if (p.length && !S.skip[c.cls] && !goalMissed(c)) { lines.push(c.cls); p.forEach(n => lines.push(n)); lines.push(''); } });
   $('listText').value = lines.join('\n').trim();
   $('msgText').value = friMessages(S.fri, S.picks, S.skip);
   $('fri').classList.add('hidden'); $('makeList').classList.add('hidden'); $('friList').classList.remove('hidden');
@@ -894,7 +903,7 @@ function friMessage(c, st) {
 }
 function friMessages(fri, picks, skip) {
   const out = [];
-  fri.forEach(c => { if (skip[c.cls]) return; (picks[c.cls] || []).forEach(n => { const st = c.students.find(x => x.name === n) || { name: n, pos: 0 }; out.push(`${c.cls}: ${n}\n${friMessage(c, st)}`); }); });
+  fri.forEach(c => { if (skip[c.cls] || goalMissed(c)) return; (picks[c.cls] || []).forEach(n => { const st = c.students.find(x => x.name === n) || { name: n, pos: 0 }; out.push(`${c.cls}: ${n}\n${friMessage(c, st)}`); }); });
   return out.join('\n\n----------\n\n');
 }
 $('copyMsg').onclick = async () => {
@@ -909,7 +918,7 @@ $('copy').onclick = async () => {
   catch (e) { ta.removeAttribute('readonly'); ta.select(); const ok = document.execCommand('copy'); ta.setAttribute('readonly', ''); snack(ok ? 'Copied' : 'Select the text and copy it'); }
 };
 $('mark').onclick = async () => {
-  const picks = []; Object.keys(S.picks).forEach(c => { if (!S.skip[c]) S.picks[c].forEach(n => picks.push({ cls:c, name:n })); });
+  const picks = []; Object.keys(S.picks).forEach(c => { if (!S.skip[c] && !goalMissed(S.fri.find(x => x.cls === c) || {})) S.picks[c].forEach(n => picks.push({ cls:c, name:n })); });
   if (!picks.length) return;
   try { await call('markEmailed', picks); snack(`${picks.length} marked as emailed`); S.picks = {}; S.skip = {}; $('backPick').onclick(); loadFriday(); }
   catch (e) { snack('Not saved. Try again.'); }
@@ -1061,7 +1070,7 @@ $('dotBtn').addEventListener('click', () => {
 applyTheme(); updateHint(); renderSettings(); keepAwake();
 
 function applyInit(d) {
-  RULES = d.rules; CLASSES = d.classes; TODAY = d.today; if (d.limit) LIMIT = d.limit;
+  RULES = d.rules; CLASSES = d.classes; TODAY = d.today;
   $('when').textContent = `Week ${d.week}, ${new Date().toLocaleDateString('en-GB', { weekday:'long' })}  (app 20, server ${d.version || 'old'})`;
 }
 const firstClass = d => CLASSES.includes(d.active) ? d.active : (TODAY[0] || CLASSES[0]);

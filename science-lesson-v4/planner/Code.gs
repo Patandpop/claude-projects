@@ -1357,9 +1357,13 @@ function orderXlsx_(model, title) {
 /* Workplan 2.7 (2026-10-29): the order sheet as a Gmail DRAFT to the technicians, the .xlsx attached.
    Never sent: he opens Gmail, checks it and presses Send. The addresses are the TECH_EMAILS script
    property (commas between them); with none set the draft has no "To" and the page says so. Logged. */
+// The science technicians (Patryk 2026-10-30). The TECH_EMAILS script property, if set, wins.
+// The addresses are not kept in the project history: bundle.js fills them in from planner/private-settings.json
+// (a file on the home PC only) when it makes the paste files. Unfilled, the placeholder has no @ and is ignored.
+const TECH_EMAILS_DEFAULT = '{{TECH_EMAILS}}';
 function orderSheetDraft(k, model, title) {
   check_(k);
-  const to = String(PropertiesService.getScriptProperties().getProperty('TECH_EMAILS') || '').split(/[,;\s]+/).filter((x) => /@/.test(x)).join(',');
+  const to = String(PropertiesService.getScriptProperties().getProperty('TECH_EMAILS') || TECH_EMAILS_DEFAULT).split(/[,;\s]+/).filter((x) => /@/.test(x)).join(',');
   const body = 'Hello,\n\nHere is the order sheet for ' + title.replace(/^Order Sheet /, '') + ' (attached).\n\nThank you';
   const d = GmailApp.createDraft(to, title, body, { attachments: [orderXlsx_(model, title)] });
   try { tab_('Log', ['when', 'what', 'where']).appendRow([new Date(), 'order sheet email drafted', title + (to ? ' to ' + to.split(',').length + ' address(es)' : ' (no address set)')]); } catch (e) { /* optional */ }

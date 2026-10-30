@@ -25,16 +25,6 @@
   label { display:block; font-weight:700; margin:6px 0 6px; font-size:14px; }
   select { width:100%; font:inherit; padding:10px 12px; border:1px solid var(--line); border-radius:10px; background:#fff; color:var(--ink); margin-bottom:12px; }
   button:focus-visible, select:focus-visible { outline:3px solid #1B67C9; outline-offset:2px; }
-  .micbox { background:#fff; border:1px solid var(--line); border-radius:12px; padding:10px 12px; margin:0 0 10px; }
-  .mrow { display:flex; align-items:center; gap:8px; margin:4px 0; font-size:14px; }
-  .mrow span { flex:1; color:var(--soft); font-weight:700; }
-  .mrow b { min-width:170px; text-align:center; }
-  .mrow button { width:40px; margin:0; padding:6px 0; background:#fff; border:1px solid var(--line); color:var(--ink); }
-  .micbox > button { margin:8px 0 0; }
-  .meter { position:relative; height:12px; background:#E2E8F0; border-radius:6px; overflow:hidden; margin:6px 0 8px; }
-  .meter i { position:absolute; left:0; top:0; bottom:0; width:0; background:#FFC53D; transition:width .15s; }
-  .meter em { position:absolute; top:0; bottom:0; width:2px; background:#12345C; }
-  .meter em.trip { background:#C8372D; }
   #cv { position:fixed; left:0; top:0; width:204px; height:78px; opacity:0; pointer-events:none; z-index:-1; }
 </style>
 </head>
@@ -45,21 +35,10 @@
     <h1>Positives board</h1>
     <p class="note">Pop the board out once. It floats above everything, including a full-screen PowerPoint, and keeps updating from your phone. Drag its corner in as far as it goes. The text redraws sharp at any size.</p>
     <button class="primary" id="pop">Pop out board</button>
-    <button class="secondary" id="micBtn">Turn on microphone</button>
-    <div class="micbox">
-      <div class="mrow"><span>Room now</span><b id="roomNow">mic off</b></div>
-      <div class="meter"><i id="mFill"></i><em id="mQuiet"></em><em id="mTrip" class="trip"></em></div>
-      <div class="mrow"><span>Quiet level</span><button data-adj="base" data-d="-1">&minus;</button><b id="baseVal">not set</b><button data-adj="base" data-d="1">+</button></div>
-      <div class="mrow"><span>Trips at</span><button data-adj="lim" data-d="-1">&minus;</button><b id="limVal"></b><button data-adj="lim" data-d="1">+</button></div>
-      <div class="mrow"><span>Silent entry: extra allowance</span><button data-adj="entry" data-d="-1">&minus;</button><b id="entryVal"></b><button data-adj="entry" data-d="1">+</button></div>
-      <div class="mrow"><span>Silent entry: can pass after</span><button data-adj="emin" data-d="-5">&minus;</button><b id="eminVal"></b><button data-adj="emin" data-d="5">+</button></div>
-      <button class="secondary" id="calib">Measure quiet level now</button>
-    </div>
+    <p class="note">Silences are judged by you, not a microphone: while your phone's Talking button is on, the board shows the sad face and those seconds count as not silent.</p>
     <p class="note" id="msg"></p>
-    <p class="note" id="baseInfo"></p>
-    <p class="note" id="micCheck"></p>
     <p class="note" id="status">Connecting</p>
-    <p class="note">Board version 25</p>
+    <p class="note">Board version 26</p>
   </div>
 </div>
 <canvas id="cv" width="204" height="78"></canvas>
@@ -213,7 +192,7 @@ function drawListen(now) {
 /* silent work: the time, and the timeline, which is the line */
 function drawWork(now) {
   bg(now);
-  label(sess.mic ? sess.word : sess.word + ' (no mic)');
+  label(sess.word);
   if (!TIMER) {   // timer stopped part way: the same line as the countdown
     T(mmss((Date.now() - sess.listenAt) / 1000), W - 6, 14, 13, 'rgba(255,197,61,.85)', DISPLAY, 'right');
     theLine(now, 0, W, LINE, false); silenceWord(43); return;
@@ -264,7 +243,8 @@ function drawLost(now) {
   g.beginPath(); g.arc(34, 39, 20, 0, Math.PI * 2); g.stroke();
   g.beginPath(); g.arc(27, 33, 2.4, 0, Math.PI * 2); g.arc(41, 33, 2.4, 0, Math.PI * 2); g.fill();
   g.beginPath(); g.arc(34, 53, 9, Math.PI * 1.15, Math.PI * 1.85); g.stroke();
-  T('Time lost', 66, 22, 11, 'rgba(234,242,250,.85)');
+  T(sess ? sess.word + ': time lost' : 'Time lost', 66, 22, 11, 'rgba(234,242,250,.85)');
+  if (TIMER && !PAUSED) T(mmss((TIMER.endLocal - Date.now()) / 1000), W - 6, 14, 13, GOLD, DISPLAY, 'right');   // the silent work timer keeps going in the corner
   const sc = 1 + 0.03 * Math.max(0, Math.sin(now / 250));
   g.save(); g.translate(66, 62); g.scale(sc, sc); T(mmss(sec), 0, 0, 40, CHALK); g.restore();
 }
@@ -423,35 +403,16 @@ function live(state) {
   lastLive = state; liveAt = Date.now();
   call('setLive', sess.sid, state).catch(() => {});
 }
-function p20(a) { if (!a.length) return null; const s = a.slice().sort((x, y) => x - y); return s[Math.floor(s.length * 0.2)]; }
 
-// Room level, cleaned up: a single bang far above the rest of the last second is ignored,
-// then the level is averaged (by energy) over that second. Short spikes can no longer trip it.
-// 2026-10-07: some microphones gate silence to almost nothing (far below the room's real quiet
-// level). The bang check and the average then sat far too low, so a real loud noise after a long
-// silence was thrown away as a "bang" and read near the old level. Readings are now floored just
-// under the quiet level, and a bang is judged against the quiet level, never anything lower.
-const RAW = [];
-let HEARD = null, BANGS = 0;   // mic check (2026-10-08): what the board hears after cleaning, and bangs ignored
-function smooth(db) {
-  const floor = BASE === null ? -Infinity : BASE - 6;
-  RAW.push(Math.max(db, floor)); if (RAW.length > 10) RAW.shift();
-  const sorted = RAW.slice().sort((a, b) => a - b), med = sorted[Math.floor(sorted.length / 2)];
-  const ref = Math.max(med, BASE === null ? med : BASE);
-  const vals = RAW.map(v => v > ref + 12 && RAW.filter(w => w > ref + 12).length === 1 ? ref : v);   // only a lone blip is a "bang"
-  if (db > ref + 12 && RAW.filter(w => w > ref + 12).length === 1) BANGS++;
-  return 10 * Math.log10(vals.reduce((s, v) => s + Math.pow(10, v / 10), 0) / vals.length);
-}
-
-// runs every 0.1 s; db is null when there is no microphone
-function step(db) {
-  if (calib) { if (db !== null) calib.push(db); return; }
+// 2026-10-30 (Patryk): no microphone. You are the judge: a second counts as not silent while your phone's
+// Talking button is on (LOST), and only then. The same seconds make the timeline and the %.
+let ENTRY_MIN = 30;   // silent entry can pass after 30 s with no Talking tap (so an empty room can't pass before they arrive)
+function step() {
   if (!sess) return;
-  if (PAUSED) { LEVEL = 0; sess.lastStep = Date.now(); return; }   // paused: nothing heard, nothing scored
+  if (PAUSED) { LEVEL = 0; sess.lastStep = Date.now(); return; }   // paused: nothing scored
   const now = Date.now(), t = (now - sess.startLocal) / 1000;
   // timed by the clock, so it stays right even if the browser runs this less often
   const dt = clamp((now - (sess.lastStep || now - 100)) / 1000, 0.02, 0.5); sess.lastStep = now;
-  if (db !== null && BASE === null) sess.samples.push(db);
   if (sess.phase === 'count') {
     if (t >= sess.cd) { if (sess.mode === 'countdown') enterListen(now); else { sess.phase = 'statement'; sess.statementAt = now; } }
     else return;
@@ -462,50 +423,26 @@ function step(db) {
   if (sess.phase === 'celebrate') { if ((now - sess.celebrateAt) / 1000 >= (sess.mode === 'entry' ? CEL_ENTRY : CEL_COUNT)) finish(true, false); return; }
   // silent work ends itself when its timer reaches 0:00, and the % plays
   if (sess.mode === 'work' && TIMER && TIMER.endLocal - now <= 0) { finish(true, false); return; }
-  // no quiet level set yet: the first silence measures one
-  if (db !== null && BASE === null && sess.samples.length >= 20) { BASE = Math.round(p20(sess.samples)); store.set('baseline', BASE); showBase(); }
-  const hasMic = db !== null && BASE !== null;
-  sess.mic = hasMic;
-  if (!hasMic) { LEVEL = 0; return; }
-  const level = smooth(db), since = (now - sess.listenAt) / 1000;
-  HEARD = level;
-  // softer limit during silent entry (students coming in, you greeting them)
-  const lim = LIM + (sess.mode === 'entry' ? ENTRY : 0);
-  LEVEL = Math.max(0, (level - BASE) / lim);
-  // two thresholds: trips above the limit, only counts as quiet again 3 dB below it
-  const over = level > BASE + lim, under = level < BASE + lim - 3;
-  if (sess.tripped) {
-    if (under) { sess.clearFor += dt; if (sess.clearFor >= 1.75) { sess.tripped = false; sess.run = 0; } } else sess.clearFor = 0;
-  } else {
-    sess.run = over ? Math.min(2.6, sess.run + dt) : Math.max(0, sess.run - dt);
-    if (sess.run >= 2.5) { sess.tripped = true; sess.clearFor = 0; }
-  }
-  // scored a second at a time: a second is loud if it tripped, or was over the limit for half of it.
-  // The timeline and the % use the same seconds, so they always agree.
-  sess.secAcc += dt; if (over) sess.secOver += dt; sess.secLoud = sess.secLoud || sess.tripped;
+  const over = !!LOST, since = (now - sess.listenAt) / 1000;
+  sess.tripped = over; LEVEL = over ? 1 : 0;
+  sess.secAcc += dt; if (over) sess.secOver += dt; sess.secLoud = sess.secLoud || over;
   if (sess.secAcc >= 0.999) {
     const loud = sess.secLoud || sess.secOver >= 0.5;
     const i = TIMER ? Math.floor((TIMER.total - (TIMER.endLocal - now)) / 1000) - 1 : sess.hist.length;
     sess.hist.push({ i: i, loud: loud }); sess.mon += 1; if (loud) sess.red += 1;
     sess.secAcc = Math.max(0, sess.secAcc - 1); sess.secLoud = false; sess.secOver = 0;
   }
-  live(sess.tripped ? 'red' : sess.run >= 1 ? 'amber' : 'quiet');
+  live(over ? 'red' : 'quiet');
   if (sess.mode === 'countdown' || sess.mode === 'entry') {
-    // accepted after ACCEPT (2.8 s) of quiet in a row; then it ends, so your talking isn't counted.
-    // Silent entry also waits a minimum time first, so an empty room can't pass before they arrive.
-    if (!over && !sess.tripped) { if (sess.quietFrom === null) sess.quietFrom = since; sess.quiet = since - sess.quietFrom; }
+    // accepted after ACCEPT (2.8 s) with no Talking tap; silent entry also waits ENTRY_MIN first
+    if (!over) { if (sess.quietFrom === null) sess.quietFrom = since; sess.quiet = since - sess.quietFrom; }
     else { sess.quietFrom = null; sess.quiet = 0; }
     if (sess.quiet >= ACCEPT && (sess.mode === 'countdown' || since >= ENTRY_MIN)) { sess.settle = Math.round(sess.quietFrom * 10) / 10; sess.phase = 'celebrate'; sess.celebrateAt = now; }
   }
 }
 
-/* ---------- audio clock (keeps running when the tab is hidden) and microphone ---------- */
-let actx = null, proc = null, calib = null;
-// Google's page can't use the microphone, so a small helper window (a normal top-level window from this page)
-// listens and passes the level back here about 10 times a second.
-let micDb = null, micAt = 0, micWin = null;
-window.onMicLevel = db => { micDb = db; micAt = performance.now(); };
-const micFresh = () => micDb !== null && performance.now() - micAt < 800;
+/* ---------- audio clock (keeps the board ticking when the tab is hidden) ---------- */
+let actx = null, proc = null;
 function startClock() {
   if (actx) { actx.resume(); return; }
   actx = new AudioContext();
@@ -516,87 +453,11 @@ function startClock() {
   let acc = 0;
   proc.onaudioprocess = e => {
     acc += e.inputBuffer.length / actx.sampleRate;
-    if (acc >= 0.1) { acc -= 0.1; step(micFresh() ? micDb : null); }
+    if (acc >= 0.1) { acc -= 0.1; step(); }
     draw();
     if (performance.now() - lastPoll > 1000) poll();
   };
 }
-const HELPER = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Board microphone</title>
-<style>body{margin:0;padding:16px;font-family:"Segoe UI",system-ui,sans-serif;background:#0D2442;color:#EAF2FA}
-h1{font-size:18px;margin:0 0 6px}p{font-size:13px;color:#A3BAD3;margin:0 0 10px}
-button{font:inherit;font-weight:700;padding:10px 14px;border:0;border-radius:10px;background:#FFC53D;color:#3D2A00;cursor:pointer}
-select{width:100%;font:inherit;padding:6px;margin:8px 0;border-radius:8px}
-.bar{height:10px;background:rgba(255,255,255,.15);border-radius:6px;overflow:hidden;margin-top:10px}.bar i{display:block;height:100%;width:0;background:#FFC53D}</style></head>
-<body><h1>Board microphone</h1><p>Keep this window open. You can minimise it.</p>
-<button id="go">Start microphone</button><select id="mic"><option value="">Default microphone</option></select>
-<div class="bar"><i id="lvl"></i></div><p id="st" style="margin-top:8px"></p>
-<script>
-let ctx=null,stream=null,nodes=[];
-async function start(){
-  try{
-    if(stream) stream.getTracks().forEach(t=>t.stop()); nodes.forEach(n=>n.disconnect()); nodes=[];
-    const id=document.getElementById('mic').value;
-    stream=await navigator.mediaDevices.getUserMedia({audio:{deviceId:id?{exact:id}:undefined,echoCancellation:false,noiseSuppression:false,autoGainControl:false}});
-    if(!ctx) ctx=new AudioContext(); await ctx.resume();
-    const src=ctx.createMediaStreamSource(stream);
-    const hp=ctx.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=300;
-    const lp=ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=3000;
-    const pr=ctx.createScriptProcessor(2048,1,1); const mute=ctx.createGain(); mute.gain.value=0;
-    let sum=0,n=0; const size=Math.round(ctx.sampleRate*0.1);
-    pr.onaudioprocess=e=>{const ch=e.inputBuffer.getChannelData(0); for(let i=0;i<ch.length;i++) sum+=ch[i]*ch[i]; n+=ch.length;
-      if(n>=size){const db=20*Math.log10(Math.sqrt(sum/n)+1e-9); sum=0;n=0;
-        try{ if(window.opener&&window.opener.onMicLevel) window.opener.onMicLevel(db); else document.getElementById('st').textContent='Lost the board page. Close this and turn the microphone on again.'; }catch(err){}
-        document.getElementById('lvl').style.width=Math.max(0,Math.min(100,(db+80)*1.4))+'%';}};
-    src.connect(hp);hp.connect(lp);lp.connect(pr);pr.connect(mute);mute.connect(ctx.destination); nodes=[src,hp,lp,pr,mute];
-    const devs=(await navigator.mediaDevices.enumerateDevices()).filter(d=>d.kind==='audioinput'); const sel=document.getElementById('mic'), cur=sel.value;
-    sel.innerHTML='<option value="">Default microphone</option>'+devs.map(d=>'<option value="'+d.deviceId+'">'+(d.label||'Microphone').replace(/</g,'&lt;')+'</option>').join(''); sel.value=cur;
-    document.getElementById('st').textContent='Listening. The bar moves when the room makes noise.';
-    document.getElementById('go').textContent='Restart microphone';
-  }catch(e){document.getElementById('st').textContent='Microphone blocked: '+e.message+'. Click the icon in the address bar to allow it.';}
-}
-document.getElementById('go').onclick=start; document.getElementById('mic').onchange=start;
-<\/script></body></html>`;
-function openMic() {
-  if (micWin && !micWin.closed) { micWin.focus(); return; }
-  micWin = window.open('', 'board_mic', 'width=380,height=240');
-  if (!micWin) { $('msg').textContent = 'The browser blocked the microphone window. Allow pop-ups for this page, then click again.'; return; }
-  micWin.document.open(); micWin.document.write(HELPER); micWin.document.close();
-  $('msg').textContent = 'In the small window, click Start microphone and allow it. Then minimise that window.';
-}
-$('micBtn').onclick = () => { startClock(); openMic(); };
-// Quiet level (dB) and limit (dB above quiet) are set on this page and used straight away, even mid-silence.
-let BASE = store.get('baseline') !== null ? Number(store.get('baseline')) : null;
-let LIM = Number(store.get('limitDb')) || 13;
-let ENTRY = store.get('entryDb') !== null ? Number(store.get('entryDb')) : 6;
-let ENTRY_MIN = store.get('entryMin') !== null ? Number(store.get('entryMin')) : 30;
-function showBase() {
-  $('baseInfo').textContent = '';
-  $('baseVal').textContent = BASE === null ? 'not set' : `${BASE.toFixed(0)} dB`;
-  $('limVal').textContent = BASE === null ? `${LIM} dB above quiet` : `${(BASE + LIM).toFixed(0)} dB (${LIM} above quiet)`;
-  $('entryVal').textContent = `+${ENTRY} dB`;
-  $('eminVal').textContent = `${ENTRY_MIN} s`;
-}
-const DBMIN = -100, DBMAX = -20, pct = db => Math.max(0, Math.min(100, (db - DBMIN) / (DBMAX - DBMIN) * 100));
-setInterval(() => {
-  const on = micFresh();
-  $('roomNow').textContent = on ? `${micDb.toFixed(0)} dB` : 'mic off';
-  // mic check: the raw reading next to what the board actually uses, so a spiky mic shows up
-  $('micCheck').textContent = on && HEARD !== null && sess ? `Mic check: raw ${micDb.toFixed(0)} dB, board hears ${HEARD.toFixed(0)} dB${PAUSED ? ' (paused)' : ''}. Single bangs ignored so far: ${BANGS}.` : '';
-  $('mFill').style.width = on ? pct(micDb) + '%' : '0';
-  $('mFill').style.background = on && BASE !== null && micDb > BASE + LIM ? '#C8372D' : '#FFC53D';
-  $('mQuiet').style.display = $('mTrip').style.display = BASE === null ? 'none' : 'block';
-  if (BASE !== null) { $('mQuiet').style.left = pct(BASE) + '%'; $('mTrip').style.left = pct(BASE + LIM) + '%'; }
-}, 200);
-document.addEventListener('click', e => {
-  const btn = e.target.closest('[data-adj]'); if (!btn) return;
-  const d = Number(btn.dataset.d);
-  if (btn.dataset.adj === 'base') { BASE = (BASE === null ? (micFresh() ? Math.round(micDb) : -60) : BASE) + d; store.set('baseline', BASE); }
-  else if (btn.dataset.adj === 'lim') { LIM = Math.max(2, Math.min(40, LIM + d)); store.set('limitDb', LIM); }
-  else if (btn.dataset.adj === 'entry') { ENTRY = Math.max(0, Math.min(20, ENTRY + d)); store.set('entryDb', ENTRY); }
-  else { ENTRY_MIN = Math.max(0, Math.min(300, ENTRY_MIN + d)); store.set('entryMin', ENTRY_MIN); }
-  showBase();
-});
-
 /* ---------- video picture-in-picture ---------- */
 const vid = $('vid');
 // Frames are pushed by hand after every draw. canvas.captureStream() alone stops sending frames
@@ -658,20 +519,11 @@ $('pop').onclick = () => {
   }, 1200);
 };
 vid.addEventListener('leavepictureinpicture', () => { SCALE = 1; sizeCanvas(); $('msg').textContent = 'Board closed. Click Pop out board to float it again.'; vid.play().catch(() => {}); });
-$('calib').onclick = () => {
-  startClock();
-  if (!micFresh()) { $('msg').textContent = 'Turn on the microphone first, then measure.'; return; }
-  $('msg').textContent = 'Measuring for 5 seconds. Keep the room as it normally is when silent.';
-  calib = [];
-  setTimeout(() => { const v = p20(calib); calib = null; if (v !== null) { BASE = Math.round(v); store.set('baseline', BASE); showBase(); $('msg').textContent = 'Quiet level saved.'; } }, 5000);
-};
-
 /* ---------- start ---------- */
-showBase();
 function loop() { if (!actx || actx.state !== 'running') draw(); requestAnimationFrame(loop); }
 loop();
 setInterval(() => { if (!actx || actx.state !== 'running') { poll(); draw(); if (actx) actx.resume().catch(() => {}); } }, 1000);
-setInterval(() => { if (!actx || actx.state !== 'running') step(micFresh() ? micDb : null); }, 100);
+setInterval(() => { if (!actx || actx.state !== 'running') step(); }, 100);
 Promise.all([document.fonts.load(`900 32px ${DISPLAY}`), document.fonts.load(`800 29px ${TEXT}`)]).catch(() => {}).then(() => draw());
 poll();
 </script>

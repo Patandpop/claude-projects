@@ -236,7 +236,7 @@ ok('merge is noted in the planner Log tab, not the behaviour log', m.sheets.Log 
   orderXlsx_ = (model, title) => ({ name: title + '.xlsx' });   // the Sheets export itself is not in the mock
   delete m.props.TECH_EMAILS;
   const a = api.orderSheetDraft(k, {}, 'Order Sheet Week A - Nov 9');
-  ok('order sheet draft with no TECH_EMAILS: a draft with no "To", and the page is told', a.noAddress === true && drafts[0].to === '' && drafts[0].o.attachments[0].name === 'Order Sheet Week A - Nov 9.xlsx');
+  ok('order sheet draft with no addresses filled in: a draft with no "To", and the page is told', a.noAddress === true && drafts[0].to === '' && drafts[0].o.attachments[0].name === 'Order Sheet Week A - Nov 9.xlsx');
   m.props.TECH_EMAILS = 'tech.one@example.org; tech.two@example.org';
   const b = api.orderSheetDraft(k, {}, 'Order Sheet Week B - Nov 16');
   const logs = m.sheets.Log._data.filter((r) => r[1] === 'order sheet email drafted');

@@ -1,5 +1,5 @@
 /**
- * Behaviour logger, noise meter control and Friday review.
+ * Behaviour logger, silences (judged by your Talking taps, no microphone since 2026-10-30) and Friday review.
  * PART OF THE PLANNER since 2026-10-12 (one Apps Script project, one spreadsheet): this file sits
  * beside the planner's Code.gs and uses its key (PLANNER_KEY), its check_() and its spreadsheet.
  * Phone page = planner link + &view=phone, board = planner link + &view=board.
@@ -21,7 +21,7 @@ const MODES = {
   work:      { label: 'Silent work',  max: 1200 },
   entry:     { label: 'Silent entry', max: 900 }   // ends itself once the class is silent, like the countdown
 };
-const DEFAULTS = { STANDARD: 90, STEP: 3, SENSITIVITY: 'Medium', COUNTDOWN_SECS: 3, EMAIL_GAP_DAYS: 21, LOST_GOAL_SECS: 180, SIGN_OFF: '' };   // SIGN_OFF: the name under Friday messages home (2.8)
+const DEFAULTS = { STANDARD: 90, STEP: 3, COUNTDOWN_SECS: 3, EMAIL_GAP_DAYS: 21, LOST_GOAL_SECS: 180, SIGN_OFF: '' };   // SIGN_OFF: the name under Friday messages home (2.8)
 const LOG_TAIL = 8000;
 // Sheets reads a cell that starts with + or - as a formula, which turned every saved positive into #ERROR!.
 // So the Log stores words, and the app turns them back into symbols when it reads.
@@ -122,7 +122,7 @@ function init(k) {
   return {
     classes: classes, today: today, week: wl,
     active: PropertiesService.getScriptProperties().getProperty('BOARD_CLASS') || '',
-    rules: RULES, mode: modeState_(), version: B_VERSION, limit: limit_()
+    rules: RULES, mode: modeState_(), version: B_VERSION
   };
 }
 
@@ -331,7 +331,7 @@ function startSilence_(mode, cls, countdownOverride) {
     mode: mode, sid: sid, cls: cls, start: Date.now(),
     countdown: countdownOverride !== null ? countdownOverride : (mode === 'countdown' ? Number(s.COUNTDOWN_SECS) || 0 : 0),
     // countdown: your count is the settling time, so they get 1.5 s after it. Silent work: 3 s to settle.
-    grace: mode === 'countdown' ? 0 : mode === 'entry' ? 2 : 3, margin: limit_(),
+    grace: mode === 'countdown' ? 0 : mode === 'entry' ? 2 : 3,
     title: countdownOverride === 0 ? 'Seated and silent' : ''
   };
   PropertiesService.getScriptProperties().setProperty('MODE', JSON.stringify(m));
@@ -348,14 +348,6 @@ function silenceToday_(cls) {
 }
 function getSilence(k, cls) { check_(k); return silenceToday_(cls); }
 
-/* ---------- noise limit you set on the phone (dB above the quiet-room level) ---------- */
-function limit_() { return Number(PropertiesService.getScriptProperties().getProperty('LIMIT_DB')) || 13; }
-function setLimit(k, db) {
-  check_(k);
-  const v = Math.max(2, Math.min(30, Math.round(Number(db) || 13)));
-  PropertiesService.getScriptProperties().setProperty('LIMIT_DB', String(v));
-  return v;
-}
 
 /* ---------- end-of-lesson recap on the board ---------- */
 // Everyone with a positive today in this class, most positives first. The board scrolls through it.

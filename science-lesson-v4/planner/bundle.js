@@ -28,6 +28,12 @@ fs.mkdirSync(out, { recursive: true });
 
 const files = {};
 files['Code.gs'] = read('Code.gs');
+// private settings (staff email addresses) live only on the home PC, in planner/private-settings.json (git-ignored);
+// they go into the pasted Code.gs, never into the project history (2026-10-30)
+{
+  let priv = {}; try { priv = JSON.parse(read('private-settings.json')); } catch (e) { /* none on this PC: placeholders stay */ }
+  files['Code.gs'] = files['Code.gs'].replace('{{TECH_EMAILS}}', () => String(priv.TECH_EMAILS || '').replace(/'/g, ''));
+}
 files['Planner.html'] = read('Planner.html');
 files['Logic.html'] = '<script>\n' + read('logic.js') + '\n</script>\n';
 files['Memory.gs'] = read('memory.js');   // the memory map maths (big goal 1): a server file, PlannerMemory, used by Code.gs's daily update
