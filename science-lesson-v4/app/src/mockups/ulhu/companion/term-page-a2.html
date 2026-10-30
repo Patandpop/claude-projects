@@ -173,7 +173,7 @@ function figureSVG(name, votes, kind, idx) {
   // fixed lighting order: bottom piece first, climbing to the top
   pieces.forEach(p => { p.c = centroid(p.pts); });
   const order = pieces.slice().sort((a, b) => (b.c[1] - a.c[1]) || (a.c[0] - b.c[0]));
-  const lit = Math.floor(votes * pieces.length / 30 + 1e-9);
+  const lit = Math.round(votes * pieces.length / 30);
   order.forEach((p, k) => { p.on = k < lit; });
   let defs = glassDefs(uid), bg = '', emb = '', bloom = '', leadBg = '', leadEmb = '';
   // the hole the emblem is cut into: background glass only exists where the emblem is not
