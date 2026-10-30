@@ -696,9 +696,10 @@
       if (loser === 0) { ksay(pick(KB[g.k].L.lose), 'gloat'); g.wh = pick(WHISPER.bad); } else { ksay(pick(['Hm.', 'A lucky cup.', 'Again. Again!']), 'sulk'); g.wh = pick(WHISPER.good); }
       X.paint(); }, RM ? 50 : 700);
   }
-  function settle(X, won) {
+  // the price is saved while the sea plays (1U.6, D3 test default): the result shows once both are over
+  function settle(X, won, sea) {
     const g = DG; g.phase = 'saving'; X.paint();
-    X.call('gameHaggle', g.k, won ? 'win' : 'lose', null, g.you).then((s) => { X.setShop(s); g.phase = 'done'; g.won = won; ksay(pick(KB[g.k].L[won ? 'win' : 'lose']), won ? 'sulk' : 'gloat'); X.paint(); })
+    Promise.all([X.call('gameHaggle', g.k, won ? 'win' : 'lose', null, g.you), sea]).then(([s]) => { X.setShop(s); g.phase = 'done'; g.won = won; ksay(pick(KB[g.k].L[won ? 'win' : 'lose']), won ? 'sulk' : 'gloat'); X.paint(); })
       .catch((e) => { g.phase = 'done'; g.won = won; g.err = String((e && e.message) || e).replace(/^Error:\s*/, ''); X.paint(); });
   }
   function diceHtml(X) {
@@ -712,7 +713,7 @@
       const R = g.rev, row = (l, a) => '<div class="dn-rrow"><small>' + l + '</small><span>' + a.map((f) => die(f, f === R.claim.f || f === 0 ? ' hit' : ' dim')).join('') + '</span></div>';
       if (g.phase === 'done') {
         const it = itemsOf(X, g.k).find((i) => i.id === g.item);   // one big olden word, then the item at its new price (1U.9)
-        h += '<div class="dn-res ' + (g.won ? 'ok' : 'bad') + '"><h3 class="dn-word" aria-label="' + (g.won ? 'You win the haggle' : K.name + ' wins the haggle') + '">' + (g.won ? 'VANQUISHT' : 'ENGULFT') + '</h3>' +
+        h += '<div class="dn-res ' + (g.won ? 'ok' : 'bad') + '"><h3 class="dn-word" aria-label="' + (g.won ? 'You win the haggle' : K.name + ' wins the haggle') + '">' + (g.won ? 'VANQUISHT' : 'UNDONE') + '</h3>' +
           (it ? '<p class="dn-newp"><span>' + X.esc(it.name) + '</span> ' + priceHtml(X, it, it.id) + '</p>' : '') +
           (g.err ? '<p class="dn-err">Not saved: ' + X.esc(g.err) + '</p>' : '') + '<button class="dn-big" data-a="dn-leave">Back to the stall</button></div>';
       } else if (!R) h += '<div class="dn-hint">Settling the price...</div>';
@@ -811,7 +812,7 @@
     const say = LINE[k] || (LINE[k] = pick(K.L.arrive));
     let h = stallScene(X, k, LINE.f || 'idle', say);
     h += '<div class="dn-kh"><span><b>' + K.name + '</b></span>' +   // 1U.3: no label under the name (the aria-label keeps what and trade for a screen reader)
-      (res === 'win' ? '<span class="dn-badge ok">Vanquisht</span>' : res === 'lose' ? '<span class="dn-badge bad">Engulft</span>' : res === 'playing' ? (DG && DG.k === k ? '<button class="dn-hag" data-a="dn-resume">Back to the dice</button>' : '<span class="dn-badge bad">Engulft</span>') : '<button class="dn-hag" data-a="dn-peek">Haggle</button>') + '</div>';
+      (res === 'win' ? '<span class="dn-badge ok">Vanquisht</span>' : res === 'lose' ? '<span class="dn-badge bad">Undone</span>' : res === 'playing' ? (DG && DG.k === k ? '<button class="dn-hag" data-a="dn-resume">Back to the dice</button>' : '<span class="dn-badge bad">Undone</span>') : '<button class="dn-hag" data-a="dn-peek">Haggle</button>') + '</div>';
     h += '<div class="dn-wares">' + its.map((i) => {
       const key = i.id, lk = i.cat ? i.lock > X.D.player.level && !i.own : i.locked && !i.own; let a = i.cat ? (i.own ? 'wear' : 'dn-wear') : 'shop', st, cls = '';
       if (i.cat) st = i.on ? 'Wearing' : i.own ? 'Wear' : lk ? 'Level ' + i.lock : priceHtml(X, i, key);
@@ -922,7 +923,9 @@
     if (a === 'dn-f') { g.pickF = Number(v); X.paint(); return true; }
     if (a === 'dn-claim') { const c = { n: g.pickN, f: g.pickF }; if (g.phase === 'you' && DICE.legal(c, g.prev, tot)) { g.walkArm = false; youClaim(X, c); } return true; }
     if (a === 'dn-liar') { if (g.phase === 'you' && g.prev && g.claimer === 1) { g.walkArm = false; liar(X, 0); } return true; }
-    if (a === 'dn-next') { if (g.phase === 'reveal') newRound(X); else if (g.phase === 'over') settle(X, g.you > 0); return true; }
+    if (a === 'dn-next') { if (g.phase === 'reveal') newRound(X); else if (g.phase === 'over') { const won = g.you > 0, tb = document.querySelector('.dn-table');
+      // the end of the last round: the sea comes over the whole table and takes the loser's dice (game-dicewater.js)
+      settle(X, won, window.DWATER && tb ? DWATER.play(tb, { keeper: g.k, lose: !won, yours: g.yd, theirs: g.hd }) : null); } return true; }
     if (a === 'dn-walk') { if (!g.walkArm) { g.walkArm = true; X.paint(); return true; } g.you = 0; settle(X, false); return true; }
     if (a === 'dn-leave') { DG = null; V.den = 'stall'; X.paint(); return true; }
     return true;

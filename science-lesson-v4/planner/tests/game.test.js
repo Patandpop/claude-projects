@@ -6,7 +6,7 @@ const dir = process.env.PLANNER_SRC || path.join(__dirname, '..');   // PLANNER_
 m.props.PLANNER_KEY = 'k';
 const src = ['Code.gs', 'Behaviour.gs', 'game-art.js', 'Game.gs'].map((f) => fs.readFileSync(path.join(dir, f), 'utf8')).join('\n');
 global.SHOP = require('../game-shop.json');
-eval(src + '\nglobal.G_PRICE=gHagglePrice_;global.G={gVespersPay_,GAME,gWall_,gameLoad,gameTick,gameUntick,gameSaveGoal,gameArchive,gameFreeze,gameShop,gameArt,gameBuy,gamePlace,gameBossStart,gameBossStage,gameBossRemove,gameBossSave,gameTag,gameChips,gameVespers,gameVespersUndo,gameVespersTime,gameMoon,gameReview,gameQuestStep,gameGroupSave,gameWear,gameUnbuy,gameHoardSave,gameHoardClaim,gameChronicle,gameAim,gameHaggle,gPay_,gDie_,gNeed_,gAdd_,gDow_,gDiff_,gIsFrozen_,gameMergeGoals,gameUnmerge};');
+eval(src + '\nglobal.G_PRICE=gHagglePrice_;global.G={gVespersPay_,GAME,gWall_,gBar_,gameLoad,gameTick,gameUntick,gameSaveGoal,gameArchive,gameFreeze,gameShop,gameArt,gameBuy,gamePlace,gameBossStart,gameBossStage,gameBossRemove,gameBossSave,gameTag,gameChips,gameVespers,gameVespersUndo,gameVespersTime,gameMoon,gameReview,gameQuestStep,gameGroupSave,gameWear,gameUnbuy,gameHoardSave,gameHoardClaim,gameChronicle,gameAim,gameHaggle,gPay_,gDie_,gNeed_,gAdd_,gDow_,gDiff_,gIsFrozen_,gameMergeGoals,gameUnmerge};');
 
 const k = 'k'; let failed = 0;
 const ok = (n, c) => { console.log((c ? '  PASS ' : '  FAIL ') + n); if (!c) failed++; };
@@ -573,6 +573,21 @@ console.log('\n-- 30 Oct 2026: the wall (Breakwater, WD-1b-ii): this week and ne
   ok('homework: set on the day it was set, needed on the class\'s last lesson of the week, none before it', at(3, 2).hw === 'set' && at(0, 1).hw === 'none');
   ok('an every-lesson class needs homework every lesson', at(1, 3).hw === 'needed' && at(9, 5).hw === 'needed');
   ok('free periods and period 6 are not on the wall', w.lessons.length === 4); }
+
+console.log('\n-- 30 Oct 2026: the 2-week bar in glass (1U.13, G1): two weeks of a ritual as panes');
+{ const W = { data: {} }, T = '2026-10-29', tk = (id, days) => { const o = {}; days.forEach((d) => { o[id + '|' + d] = (o[id + '|' + d] || 0) + 1; }); return o; };
+  const sum = (b) => b.reduce((a, w) => a + w.len, 0), sig = (b) => b.map((w) => w.s + w.len + (w.times > 1 ? 'x' + w.times : '')).join(' ');
+  const school = { id: 'r', kind: 'daily', days: '12345', created: '2026-09-01' };
+  const b1 = G.gBar_(school, T, tk('r', ['2026-10-16', '2026-10-19', '2026-10-20', '2026-10-22', '2026-10-23', '2026-10-26', '2026-10-27', '2026-10-28', '2026-10-29']), W, {});
+  ok('a school-day ritual: 14 days, the Friday pane stretches over the weekend, a lone miss is forgiven: ' + sig(b1), sum(b1) === 14 && sig(b1) === 'o3 o1 o1 e1 o1 o3 o1 o1 o1 o1');
+  const daily = { id: 'f', kind: 'daily', days: '1234567', created: '2026-09-01' }, all = []; for (let d = '2026-10-16'; d <= T; d = G.gAdd_(d, 1)) if (d !== '2026-10-20' && d !== '2026-10-21' && d !== '2026-10-26' && d !== T) all.push(d);
+  const b2 = G.gBar_(daily, T, tk('f', all.concat(['2026-10-24'])), W, { '2026-10-26': 'sick' });
+  ok('every day: two misses in a row are forgiven then missed, a day off is its own pane, two ticks split the pane, today is open: ' + sig(b2), sum(b2) === 14 && /^o1 o1 o1 o1 e1 x1 o1 o1 o1x2 o1 f1 o1 o1 w1$/.test(sig(b2)));
+  const every = { id: 'c', kind: 'daily', everyN: 3, created: '2026-10-10' };
+  const b3 = G.gBar_(every, T, tk('c', ['2026-10-18', '2026-10-21', '2026-10-27']), W, {});
+  ok('every 3 days: one pane per window, ending when it is done or missed, the open window last: ' + sig(b3), sum(b3) === 14 && b3.filter((w) => w.s === 'o').length === 3 && b3[b3.length - 1].s === 'w' && b3.some((w) => w.s === 'e' && w.len === 3));
+  const fresh = G.gBar_(Object.assign({}, daily, { created: '2026-10-25' }), T, tk('f', ['2026-10-25', '2026-10-29']), W, {});
+  ok('a new ritual: the days before it existed are one dark pane: ' + sig(fresh), sum(fresh) === 14 && fresh[0].s === 'n' && fresh[0].len === 9 && fresh[fresh.length - 1].s === 'o'); }
 
 console.log('\n' + (failed ? failed + ' FAILED' : 'all game server checks passed'));
 process.exit(failed ? 1 : 0);

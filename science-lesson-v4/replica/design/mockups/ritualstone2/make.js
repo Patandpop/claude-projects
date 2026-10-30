@@ -27,7 +27,7 @@ const must = (s, a) => { if (s.indexOf(a) < 0) throw new Error('game-stone.js ch
 function copy(id, o) {
   let s = stone; const key = id.toLowerCase();
   ['const V = {', "chips: .08 };", 'fR += bd * 16 * v.sheen; fG += bd * 14 * v.sheen; fB += bd * 26 * v.sheen;'].forEach((a) => must(s, a));
-  const st = o.st || [16, 14, 26]; const ovr = Object.assign({}, o); delete ovr.st;
+  const st = o.st || [16, 14, 26]; const ovr = Object.assign({ c1: .45, spec: 1.4, sx: 44 }, o); delete ovr.st;   // the stone as it was before S1 went into the game (30 Oct), so every row still starts from it
   s = s.replace('const V = {', 'const V = Object.assign({').replace('chips: .08 };', 'chips: .08 }, ' + JSON.stringify(ovr) + ');')
     .replace('fR += bd * 16 * v.sheen; fG += bd * 14 * v.sheen; fB += bd * 26 * v.sheen;', 'fR += bd * ' + st[0] + ' * v.sheen; fG += bd * ' + st[1] + ' * v.sheen; fB += bd * ' + st[2] + ' * v.sheen;')
     .split('window.STONE').join('window.STONE_' + key).split("'stone-css'").join("'stone-css-" + key + "'").replace(/\bst-/g, key + '-');

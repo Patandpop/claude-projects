@@ -85,8 +85,8 @@ function boxBlur(src, w, h, r) {
 const blur2 = (a, w, h, r) => boxBlur(boxBlur(a, w, h, r), w, h, r);
 
 /* ---------- ST-final: the stone recipe ---------- */
-const V = Object.assign({ code: 'ST-final', base: [22, 18, 30], c1: .45, b2: .15, b3: .1, pits: 3, pitR: [.6, 1.6], spec: 1.4, sx: 44, sheen: 1,
-  bev: 5.2, bevR: 4, side: 7, cham: 3, rough: .6, chips: .08 }, {});
+const V = Object.assign({ code: 'ST-S1', base: [22, 18, 30], c1: .3, b2: .15, b3: .1, pits: 3, pitR: [.6, 1.6], spec: 2.2, sx: 70, sheen: 1,   // S1 deeper polish (test default, 30 Oct; was c1 .45, spec 1.4, sx 44)
+  bev: 5.2, bevR: 4, side: 7, cham: 3, rough: .6, chips: .08 }, {"c1":0.45,"spec":1.4,"sx":44});
 const ROW_H = 64; // css px, including the slab's thickness and its shadow
 // where the face sits inside the row (css px): the thickness and the drop shadow take the bottom
 const M = { l: 3, t: 2, r: 3, b: V.side + 5 };
@@ -446,7 +446,7 @@ function boxBlur(src, w, h, r) {
 const blur2 = (a, w, h, r) => boxBlur(boxBlur(a, w, h, r), w, h, r);
 
 /* ---------- ST-final: the stone recipe ---------- */
-const V = Object.assign({ code: 'ST-final', base: [22, 18, 30], c1: .45, b2: .15, b3: .1, pits: 3, pitR: [.6, 1.6], spec: 1.4, sx: 44, sheen: 1,
+const V = Object.assign({ code: 'ST-S1', base: [22, 18, 30], c1: .3, b2: .15, b3: .1, pits: 3, pitR: [.6, 1.6], spec: 2.2, sx: 70, sheen: 1,   // S1 deeper polish (test default, 30 Oct; was c1 .45, spec 1.4, sx 44)
   bev: 5.2, bevR: 4, side: 7, cham: 3, rough: .6, chips: .08 }, {"c1":0.3,"spec":2.2,"sx":70});
 const ROW_H = 64; // css px, including the slab's thickness and its shadow
 // where the face sits inside the row (css px): the thickness and the drop shadow take the bottom
@@ -807,8 +807,8 @@ function boxBlur(src, w, h, r) {
 const blur2 = (a, w, h, r) => boxBlur(boxBlur(a, w, h, r), w, h, r);
 
 /* ---------- ST-final: the stone recipe ---------- */
-const V = Object.assign({ code: 'ST-final', base: [22, 18, 30], c1: .45, b2: .15, b3: .1, pits: 3, pitR: [.6, 1.6], spec: 1.4, sx: 44, sheen: 1,
-  bev: 5.2, bevR: 4, side: 7, cham: 3, rough: .6, chips: .08 }, {"spec":0.5,"sx":20,"sheen":0.5,"b3":0.16});
+const V = Object.assign({ code: 'ST-S1', base: [22, 18, 30], c1: .3, b2: .15, b3: .1, pits: 3, pitR: [.6, 1.6], spec: 2.2, sx: 70, sheen: 1,   // S1 deeper polish (test default, 30 Oct; was c1 .45, spec 1.4, sx 44)
+  bev: 5.2, bevR: 4, side: 7, cham: 3, rough: .6, chips: .08 }, {"c1":0.45,"spec":0.5,"sx":20,"sheen":0.5,"b3":0.16});
 const ROW_H = 64; // css px, including the slab's thickness and its shadow
 // where the face sits inside the row (css px): the thickness and the drop shadow take the bottom
 const M = { l: 3, t: 2, r: 3, b: V.side + 5 };
@@ -1168,8 +1168,8 @@ function boxBlur(src, w, h, r) {
 const blur2 = (a, w, h, r) => boxBlur(boxBlur(a, w, h, r), w, h, r);
 
 /* ---------- ST-final: the stone recipe ---------- */
-const V = Object.assign({ code: 'ST-final', base: [22, 18, 30], c1: .45, b2: .15, b3: .1, pits: 3, pitR: [.6, 1.6], spec: 1.4, sx: 44, sheen: 1,
-  bev: 5.2, bevR: 4, side: 7, cham: 3, rough: .6, chips: .08 }, {"base":[30,20,44],"sheen":1.6});
+const V = Object.assign({ code: 'ST-S1', base: [22, 18, 30], c1: .3, b2: .15, b3: .1, pits: 3, pitR: [.6, 1.6], spec: 2.2, sx: 70, sheen: 1,   // S1 deeper polish (test default, 30 Oct; was c1 .45, spec 1.4, sx 44)
+  bev: 5.2, bevR: 4, side: 7, cham: 3, rough: .6, chips: .08 }, {"c1":0.45,"spec":1.4,"sx":44,"base":[30,20,44],"sheen":1.6});
 const ROW_H = 64; // css px, including the slab's thickness and its shadow
 // where the face sits inside the row (css px): the thickness and the drop shadow take the bottom
 const M = { l: 3, t: 2, r: 3, b: V.side + 5 };
@@ -1529,8 +1529,8 @@ function boxBlur(src, w, h, r) {
 const blur2 = (a, w, h, r) => boxBlur(boxBlur(a, w, h, r), w, h, r);
 
 /* ---------- ST-final: the stone recipe ---------- */
-const V = Object.assign({ code: 'ST-final', base: [22, 18, 30], c1: .45, b2: .15, b3: .1, pits: 3, pitR: [.6, 1.6], spec: 1.4, sx: 44, sheen: 1,
-  bev: 5.2, bevR: 4, side: 7, cham: 3, rough: .6, chips: .08 }, {"base":[16,20,34]});
+const V = Object.assign({ code: 'ST-S1', base: [22, 18, 30], c1: .3, b2: .15, b3: .1, pits: 3, pitR: [.6, 1.6], spec: 2.2, sx: 70, sheen: 1,   // S1 deeper polish (test default, 30 Oct; was c1 .45, spec 1.4, sx 44)
+  bev: 5.2, bevR: 4, side: 7, cham: 3, rough: .6, chips: .08 }, {"c1":0.45,"spec":1.4,"sx":44,"base":[16,20,34]});
 const ROW_H = 64; // css px, including the slab's thickness and its shadow
 // where the face sits inside the row (css px): the thickness and the drop shadow take the bottom
 const M = { l: 3, t: 2, r: 3, b: V.side + 5 };
@@ -1890,8 +1890,8 @@ function boxBlur(src, w, h, r) {
 const blur2 = (a, w, h, r) => boxBlur(boxBlur(a, w, h, r), w, h, r);
 
 /* ---------- ST-final: the stone recipe ---------- */
-const V = Object.assign({ code: 'ST-final', base: [22, 18, 30], c1: .45, b2: .15, b3: .1, pits: 3, pitR: [.6, 1.6], spec: 1.4, sx: 44, sheen: 1,
-  bev: 5.2, bevR: 4, side: 7, cham: 3, rough: .6, chips: .08 }, {"base":[20,22,28],"spec":2.6,"sx":30});
+const V = Object.assign({ code: 'ST-S1', base: [22, 18, 30], c1: .3, b2: .15, b3: .1, pits: 3, pitR: [.6, 1.6], spec: 2.2, sx: 70, sheen: 1,   // S1 deeper polish (test default, 30 Oct; was c1 .45, spec 1.4, sx 44)
+  bev: 5.2, bevR: 4, side: 7, cham: 3, rough: .6, chips: .08 }, {"c1":0.45,"spec":2.6,"sx":30,"base":[20,22,28]});
 const ROW_H = 64; // css px, including the slab's thickness and its shadow
 // where the face sits inside the row (css px): the thickness and the drop shadow take the bottom
 const M = { l: 3, t: 2, r: 3, b: V.side + 5 };
@@ -2251,8 +2251,8 @@ function boxBlur(src, w, h, r) {
 const blur2 = (a, w, h, r) => boxBlur(boxBlur(a, w, h, r), w, h, r);
 
 /* ---------- ST-final: the stone recipe ---------- */
-const V = Object.assign({ code: 'ST-final', base: [22, 18, 30], c1: .45, b2: .15, b3: .1, pits: 3, pitR: [.6, 1.6], spec: 1.4, sx: 44, sheen: 1,
-  bev: 5.2, bevR: 4, side: 7, cham: 3, rough: .6, chips: .08 }, {"pits":14,"pitR":[0.6,2.2],"b2":0.25,"b3":0.18,"spec":0.9});
+const V = Object.assign({ code: 'ST-S1', base: [22, 18, 30], c1: .3, b2: .15, b3: .1, pits: 3, pitR: [.6, 1.6], spec: 2.2, sx: 70, sheen: 1,   // S1 deeper polish (test default, 30 Oct; was c1 .45, spec 1.4, sx 44)
+  bev: 5.2, bevR: 4, side: 7, cham: 3, rough: .6, chips: .08 }, {"c1":0.45,"spec":0.9,"sx":44,"pits":14,"pitR":[0.6,2.2],"b2":0.25,"b3":0.18});
 const ROW_H = 64; // css px, including the slab's thickness and its shadow
 // where the face sits inside the row (css px): the thickness and the drop shadow take the bottom
 const M = { l: 3, t: 2, r: 3, b: V.side + 5 };
@@ -2612,8 +2612,8 @@ function boxBlur(src, w, h, r) {
 const blur2 = (a, w, h, r) => boxBlur(boxBlur(a, w, h, r), w, h, r);
 
 /* ---------- ST-final: the stone recipe ---------- */
-const V = Object.assign({ code: 'ST-final', base: [22, 18, 30], c1: .45, b2: .15, b3: .1, pits: 3, pitR: [.6, 1.6], spec: 1.4, sx: 44, sheen: 1,
-  bev: 5.2, bevR: 4, side: 7, cham: 3, rough: .6, chips: .08 }, {"c1":0.9,"b2":0.1});
+const V = Object.assign({ code: 'ST-S1', base: [22, 18, 30], c1: .3, b2: .15, b3: .1, pits: 3, pitR: [.6, 1.6], spec: 2.2, sx: 70, sheen: 1,   // S1 deeper polish (test default, 30 Oct; was c1 .45, spec 1.4, sx 44)
+  bev: 5.2, bevR: 4, side: 7, cham: 3, rough: .6, chips: .08 }, {"c1":0.9,"spec":1.4,"sx":44,"b2":0.1});
 const ROW_H = 64; // css px, including the slab's thickness and its shadow
 // where the face sits inside the row (css px): the thickness and the drop shadow take the bottom
 const M = { l: 3, t: 2, r: 3, b: V.side + 5 };
@@ -2973,8 +2973,8 @@ function boxBlur(src, w, h, r) {
 const blur2 = (a, w, h, r) => boxBlur(boxBlur(a, w, h, r), w, h, r);
 
 /* ---------- ST-final: the stone recipe ---------- */
-const V = Object.assign({ code: 'ST-final', base: [22, 18, 30], c1: .45, b2: .15, b3: .1, pits: 3, pitR: [.6, 1.6], spec: 1.4, sx: 44, sheen: 1,
-  bev: 5.2, bevR: 4, side: 7, cham: 3, rough: .6, chips: .08 }, {"bev":7.5,"bevR":6,"side":10,"cham":4});
+const V = Object.assign({ code: 'ST-S1', base: [22, 18, 30], c1: .3, b2: .15, b3: .1, pits: 3, pitR: [.6, 1.6], spec: 2.2, sx: 70, sheen: 1,   // S1 deeper polish (test default, 30 Oct; was c1 .45, spec 1.4, sx 44)
+  bev: 5.2, bevR: 4, side: 7, cham: 3, rough: .6, chips: .08 }, {"c1":0.45,"spec":1.4,"sx":44,"bev":7.5,"bevR":6,"side":10,"cham":4});
 const ROW_H = 64; // css px, including the slab's thickness and its shadow
 // where the face sits inside the row (css px): the thickness and the drop shadow take the bottom
 const M = { l: 3, t: 2, r: 3, b: V.side + 5 };
@@ -3334,8 +3334,8 @@ function boxBlur(src, w, h, r) {
 const blur2 = (a, w, h, r) => boxBlur(boxBlur(a, w, h, r), w, h, r);
 
 /* ---------- ST-final: the stone recipe ---------- */
-const V = Object.assign({ code: 'ST-final', base: [22, 18, 30], c1: .45, b2: .15, b3: .1, pits: 3, pitR: [.6, 1.6], spec: 1.4, sx: 44, sheen: 1,
-  bev: 5.2, bevR: 4, side: 7, cham: 3, rough: .6, chips: .08 }, {"bev":3.5,"bevR":3,"side":4,"cham":2});
+const V = Object.assign({ code: 'ST-S1', base: [22, 18, 30], c1: .3, b2: .15, b3: .1, pits: 3, pitR: [.6, 1.6], spec: 2.2, sx: 70, sheen: 1,   // S1 deeper polish (test default, 30 Oct; was c1 .45, spec 1.4, sx 44)
+  bev: 5.2, bevR: 4, side: 7, cham: 3, rough: .6, chips: .08 }, {"c1":0.45,"spec":1.4,"sx":44,"bev":3.5,"bevR":3,"side":4,"cham":2});
 const ROW_H = 64; // css px, including the slab's thickness and its shadow
 // where the face sits inside the row (css px): the thickness and the drop shadow take the bottom
 const M = { l: 3, t: 2, r: 3, b: V.side + 5 };
@@ -3695,8 +3695,8 @@ function boxBlur(src, w, h, r) {
 const blur2 = (a, w, h, r) => boxBlur(boxBlur(a, w, h, r), w, h, r);
 
 /* ---------- ST-final: the stone recipe ---------- */
-const V = Object.assign({ code: 'ST-final', base: [22, 18, 30], c1: .45, b2: .15, b3: .1, pits: 3, pitR: [.6, 1.6], spec: 1.4, sx: 44, sheen: 1,
-  bev: 5.2, bevR: 4, side: 7, cham: 3, rough: .6, chips: .08 }, {"rough":1.4,"chips":0.3,"cham":5});
+const V = Object.assign({ code: 'ST-S1', base: [22, 18, 30], c1: .3, b2: .15, b3: .1, pits: 3, pitR: [.6, 1.6], spec: 2.2, sx: 70, sheen: 1,   // S1 deeper polish (test default, 30 Oct; was c1 .45, spec 1.4, sx 44)
+  bev: 5.2, bevR: 4, side: 7, cham: 3, rough: .6, chips: .08 }, {"c1":0.45,"spec":1.4,"sx":44,"rough":1.4,"chips":0.3,"cham":5});
 const ROW_H = 64; // css px, including the slab's thickness and its shadow
 // where the face sits inside the row (css px): the thickness and the drop shadow take the bottom
 const M = { l: 3, t: 2, r: 3, b: V.side + 5 };
@@ -4056,8 +4056,8 @@ function boxBlur(src, w, h, r) {
 const blur2 = (a, w, h, r) => boxBlur(boxBlur(a, w, h, r), w, h, r);
 
 /* ---------- ST-final: the stone recipe ---------- */
-const V = Object.assign({ code: 'ST-final', base: [22, 18, 30], c1: .45, b2: .15, b3: .1, pits: 3, pitR: [.6, 1.6], spec: 1.4, sx: 44, sheen: 1,
-  bev: 5.2, bevR: 4, side: 7, cham: 3, rough: .6, chips: .08 }, {"c1":0.15,"b2":0.04,"b3":0.03,"spec":2,"sx":90});
+const V = Object.assign({ code: 'ST-S1', base: [22, 18, 30], c1: .3, b2: .15, b3: .1, pits: 3, pitR: [.6, 1.6], spec: 2.2, sx: 70, sheen: 1,   // S1 deeper polish (test default, 30 Oct; was c1 .45, spec 1.4, sx 44)
+  bev: 5.2, bevR: 4, side: 7, cham: 3, rough: .6, chips: .08 }, {"c1":0.15,"spec":2,"sx":90,"b2":0.04,"b3":0.03});
 const ROW_H = 64; // css px, including the slab's thickness and its shadow
 // where the face sits inside the row (css px): the thickness and the drop shadow take the bottom
 const M = { l: 3, t: 2, r: 3, b: V.side + 5 };
@@ -4417,8 +4417,8 @@ function boxBlur(src, w, h, r) {
 const blur2 = (a, w, h, r) => boxBlur(boxBlur(a, w, h, r), w, h, r);
 
 /* ---------- ST-final: the stone recipe ---------- */
-const V = Object.assign({ code: 'ST-final', base: [22, 18, 30], c1: .45, b2: .15, b3: .1, pits: 3, pitR: [.6, 1.6], spec: 1.4, sx: 44, sheen: 1,
-  bev: 5.2, bevR: 4, side: 7, cham: 3, rough: .6, chips: .08 }, {"base":[38,18,34]});
+const V = Object.assign({ code: 'ST-S1', base: [22, 18, 30], c1: .3, b2: .15, b3: .1, pits: 3, pitR: [.6, 1.6], spec: 2.2, sx: 70, sheen: 1,   // S1 deeper polish (test default, 30 Oct; was c1 .45, spec 1.4, sx 44)
+  bev: 5.2, bevR: 4, side: 7, cham: 3, rough: .6, chips: .08 }, {"c1":0.45,"spec":1.4,"sx":44,"base":[38,18,34]});
 const ROW_H = 64; // css px, including the slab's thickness and its shadow
 // where the face sits inside the row (css px): the thickness and the drop shadow take the bottom
 const M = { l: 3, t: 2, r: 3, b: V.side + 5 };
@@ -4778,8 +4778,8 @@ function boxBlur(src, w, h, r) {
 const blur2 = (a, w, h, r) => boxBlur(boxBlur(a, w, h, r), w, h, r);
 
 /* ---------- ST-final: the stone recipe ---------- */
-const V = Object.assign({ code: 'ST-final', base: [22, 18, 30], c1: .45, b2: .15, b3: .1, pits: 3, pitR: [.6, 1.6], spec: 1.4, sx: 44, sheen: 1,
-  bev: 5.2, bevR: 4, side: 7, cham: 3, rough: .6, chips: .08 }, {"base":[34,30,36],"c1":0.6,"spec":1.8});
+const V = Object.assign({ code: 'ST-S1', base: [22, 18, 30], c1: .3, b2: .15, b3: .1, pits: 3, pitR: [.6, 1.6], spec: 2.2, sx: 70, sheen: 1,   // S1 deeper polish (test default, 30 Oct; was c1 .45, spec 1.4, sx 44)
+  bev: 5.2, bevR: 4, side: 7, cham: 3, rough: .6, chips: .08 }, {"c1":0.6,"spec":1.8,"sx":44,"base":[34,30,36]});
 const ROW_H = 64; // css px, including the slab's thickness and its shadow
 // where the face sits inside the row (css px): the thickness and the drop shadow take the bottom
 const M = { l: 3, t: 2, r: 3, b: V.side + 5 };
@@ -5139,8 +5139,8 @@ function boxBlur(src, w, h, r) {
 const blur2 = (a, w, h, r) => boxBlur(boxBlur(a, w, h, r), w, h, r);
 
 /* ---------- ST-final: the stone recipe ---------- */
-const V = Object.assign({ code: 'ST-final', base: [22, 18, 30], c1: .45, b2: .15, b3: .1, pits: 3, pitR: [.6, 1.6], spec: 1.4, sx: 44, sheen: 1,
-  bev: 5.2, bevR: 4, side: 7, cham: 3, rough: .6, chips: .08 }, {"base":[14,24,22]});
+const V = Object.assign({ code: 'ST-S1', base: [22, 18, 30], c1: .3, b2: .15, b3: .1, pits: 3, pitR: [.6, 1.6], spec: 2.2, sx: 70, sheen: 1,   // S1 deeper polish (test default, 30 Oct; was c1 .45, spec 1.4, sx 44)
+  bev: 5.2, bevR: 4, side: 7, cham: 3, rough: .6, chips: .08 }, {"c1":0.45,"spec":1.4,"sx":44,"base":[14,24,22]});
 const ROW_H = 64; // css px, including the slab's thickness and its shadow
 // where the face sits inside the row (css px): the thickness and the drop shadow take the bottom
 const M = { l: 3, t: 2, r: 3, b: V.side + 5 };
@@ -5500,8 +5500,8 @@ function boxBlur(src, w, h, r) {
 const blur2 = (a, w, h, r) => boxBlur(boxBlur(a, w, h, r), w, h, r);
 
 /* ---------- ST-final: the stone recipe ---------- */
-const V = Object.assign({ code: 'ST-final', base: [22, 18, 30], c1: .45, b2: .15, b3: .1, pits: 3, pitR: [.6, 1.6], spec: 1.4, sx: 44, sheen: 1,
-  bev: 5.2, bevR: 4, side: 7, cham: 3, rough: .6, chips: .08 }, {"base":[26,16,22],"sheen":1.4});
+const V = Object.assign({ code: 'ST-S1', base: [22, 18, 30], c1: .3, b2: .15, b3: .1, pits: 3, pitR: [.6, 1.6], spec: 2.2, sx: 70, sheen: 1,   // S1 deeper polish (test default, 30 Oct; was c1 .45, spec 1.4, sx 44)
+  bev: 5.2, bevR: 4, side: 7, cham: 3, rough: .6, chips: .08 }, {"c1":0.45,"spec":1.4,"sx":44,"base":[26,16,22],"sheen":1.4});
 const ROW_H = 64; // css px, including the slab's thickness and its shadow
 // where the face sits inside the row (css px): the thickness and the drop shadow take the bottom
 const M = { l: 3, t: 2, r: 3, b: V.side + 5 };

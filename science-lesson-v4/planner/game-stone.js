@@ -58,7 +58,7 @@ function boxBlur(src, w, h, r) {
 const blur2 = (a, w, h, r) => boxBlur(boxBlur(a, w, h, r), w, h, r);
 
 /* ---------- ST-final: the stone recipe ---------- */
-const V = { code: 'ST-final', base: [22, 18, 30], c1: .45, b2: .15, b3: .1, pits: 3, pitR: [.6, 1.6], spec: 1.4, sx: 44, sheen: 1,
+const V = { code: 'ST-S1', base: [22, 18, 30], c1: .3, b2: .15, b3: .1, pits: 3, pitR: [.6, 1.6], spec: 2.2, sx: 70, sheen: 1,   // S1 deeper polish (test default, 30 Oct; was c1 .45, spec 1.4, sx 44)
   bev: 5.2, bevR: 4, side: 7, cham: 3, rough: .6, chips: .08 };
 const ROW_H = 64; // css px, including the slab's thickness and its shadow
 // where the face sits inside the row (css px): the thickness and the drop shadow take the bottom

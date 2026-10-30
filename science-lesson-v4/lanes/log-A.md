@@ -5,12 +5,35 @@ Plain-English record of Lane A's work (the Ulhu game), newest entry first.
 ## Waiting on you
 
 0. **Paste the complete set "K1 knitting" (30 Oct, 14:38, 18 files), the newest.** On Google Drive, in Admin\Planner Sync, the files ending "(2026-10-30, complete set, K1 knitting).txt". **If you already pasted the 14:12 set "wall, faint fix, Blind, term glass", only GameComp has changed:** paste that one file, then Deploy, Manage deployments, edit, New version. If you haven't pasted the 14:12 set yet, paste all 18 from this set instead, over the file of the same name: Code, Planner, Logic, Memory, Behaviour, Phone, BoardPage, Game, Companion, GameShop, GameUI, GameArt, GameHV, GameDen, GameComp, Day, DayUI, EyesFree. **New files, if you haven't made them yet:** EyesFree (HTML), Day (Script), DayUI (HTML), Companion (Script), GameComp (HTML), Memory (Script). Then deploy the same way. On top of the 14:12 set, it adds Lane D's K1 knitting scene in the Focus tab and the approved term page glass. It replaces every older set.
-8. **Pick a ritual stone (1U.7, round two).** Mock-up: `replica/design/mockups/ritualstone2/index.html`. Fifteen variations that all start from your current stone and change how it is made: S1 deeper polish, S2 velvet matte, S3 violet heart, S4 midnight, S5 sea-washed, S6 pitted basalt, S7 marbled, S8 thick slab, S9 thin tile, S10 rough-hewn, S11 glass-smooth obsidian, S12 plum, S13 smoky quartz, S14 abyssal green-black, S15 ember-veined (NOW at the top to compare). Pick a number, or a mix ("S1 polish with S3's violet").
-7. **Look at the Grimoire opening on your day (1U.10).** Mock-up: `replica/design/mockups/grimoire2/index.html`. Tap the book: after the chains snap and the tentacles drag you in, the first page is your day in glass (curses red on the left, blessings blue on the right, the path weaving down the day), with Ulhu's line and the night line under it. Say OK and I build it into the game.
-6. **Pick the 2-week bar in glass (1U.13, round two).** Mock-up: `replica/design/mockups/ritualbar2/index.html`. Under each real ritual tablet, the last two weeks as a strip of real stained glass (one or two breaks per pane): **G1** clear glass strip (green done, ruby missed, violet forgiven, blue day off), **G2** done panes in the ritual's own streak colour, **G3** the strip set into a stone window. An every-few-days ritual gets ONE pane across its days (split in two if done twice), and a school-day ritual's Friday pane stretches over the weekend, so quiet days never look like skips.
-9. **Pick the dice game's ending (1U.6, round three).** Mock-up: `replica/design/mockups/dicewater2/index.html` (open it on the PC; Lose and Win buttons on each). One worked example with the real Ulhu and the real Squall at the top and his call between them, a pixel-3D table, and the sea over the WHOLE table: when it lets go, the loser's dice are gone and the winner's stand there wet. **D1** tide sweep (your W1, rebuilt), **D2** the deep takes them (tentacles rise in the flood and pull the loser's dice under), **D3** low and close (a new angle at table height, the wave towers and crashes down). Also pick a losing word from the ten at the bottom of the page (BESTED, OUTFOXT, FLEECED, SWINDLED, UNDONE, OUTPLAYED, BEGGARED, HUMBLED, CALLED OUT, OUTBID); tap one to see it in every scene.
+8. **Ritual stone (1U.7): S1 "deeper polish" is in the game as a first version.** To swap it, name another from `replica/design/mockups/ritualstone2/index.html` (S1 to S15, or a mix like "S1 with S3's violet"). NOW on that page is the stone as it was before.
+7. **Vespers through the Grimoire (1U.10): built as shown in the mock-up.** Look at it in the game after your Vespers time: the tablet on The Call, the book, then your day in glass. Say what to change.
+6. **2-week bar (1U.13): G1 "clear glass strip" is in the game as a first version.** To swap it, say G2 (the ritual's own streak colour) or G3 (the strip set in a stone window), from `replica/design/mockups/ritualbar2/index.html`.
+9. **Dice ending (1U.6): D3 "low and close" with the word UNDONE is in the game as a first version.** To swap, say D1 or D2, or another word, from `replica/design/mockups/dicewater2/index.html`.
 
 ---
+
+## 30 Oct 2026, your go: the open picks built as first versions
+
+You asked for everything still open to be finished to a high standard. Where a pick was still yours, I built my recommended option. Each one is easy to swap later (see the Waiting list).
+
+**What changed:**
+- **Ritual stone: S1 "deeper polish".** You said you like the current stone most and it could be improved. S1 is that same stone, polished longer: a smoother grain and a tighter, brighter shine. Nothing else about it changes.
+- **The 2-week bar: G1, in real stained glass.** Under every ritual tablet there is now a slim leaded strip of the last two weeks, with one pane per day (one or two lead breaks per pane, nothing laid on top):
+  - **Colours:** green glass where you did it, deep ruby where you missed, violet for a forgiven miss (the first miss in a row), pale blue for a day off, and a dark pane before the ritual existed.
+  - **Today:** today's pane has a dotted gold line until it's done.
+  - **Quiet days:** a school-day ritual's Friday pane stretches over the weekend. An every-few-days ritual gets one pane per window, which ends on the day you did it, so quiet days never look like skips. Doing a ritual twice in one day splits its pane in two.
+  - **How it's worked out:** the planner replays the same rules it already uses for misses and streaks, so the bar always agrees with your streak.
+- **Vespers through the Grimoire (1U.10).** The game had no nightly Vespers screen yet (only the server side), so this is new:
+  - **The book:** from your Vespers time (8 pm unless you changed it) a green Vespers tablet sits on The Call. Tap it and the Grimoire plays: the candlelit desk, the chained book straining until the chains snap, the circle lighting ring by ring, the tentacles dragging you in.
+  - **Your day in glass:** it opens first on your day in glass, with curses red on the left, blessings on the right and the path weaving down from morning to evening. Ulhu's line and the night line follow.
+  - **Tagging curses:** tap a curse to give it a sigil (Flesh, Domain, Scene, Coven) and a few words (Tired, Sofa, Phone and so on, plus your own).
+  - **Ringing Vespers:** "That's all" (or "Clean today" with no curses) rings Vespers, pays its runes and keeps its streak. Undo works.
+  - **Skipping:** a tap during the book skips to the page.
+- **Dice ending: D3 "low and close", the word UNDONE.** At the end of the last round you see the table through Ulhu's eyes: the keeper across it, your tentacles on the near edge. The wave towers over the keeper's side and crashes over the whole table, then slides back. The loser's dice are gone, and the winner's stand there wet. Then one word: VANQUISHT if you won, UNDONE if you lost. UNDONE replaces ENGULFT everywhere (the stall badge too). The dice show pips 1 to 4 for the game's four faces. A tap skips it.
+- **Faint rule:** already in the game from your correction this morning (all health back, a quarter of the lost runes per full set of three rituals, two days).
+- **Term page:** Lane D's approved glass is already in the game (their log, item 3). Nothing for me to change.
+
+**You need to:** paste the next complete set when I say it's ready, then look at each one and swap anything you don't like.
 
 ## 30 Oct 2026, the wall: built into the game (WD-1b-ii with your fixes)
 

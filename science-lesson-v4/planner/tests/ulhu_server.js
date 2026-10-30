@@ -26,6 +26,7 @@ const b2 = G.gameBossStart(k, { name: 'Mark the 10S2 test', size: 5, k: 'deep', 
 G.gameBossStage(k, b2, 0, true);
 G.gameHoardSave(k, { name: 'Takeaway night', cost: 300 }); G.gameHoardSave(k, { name: 'One hour of gaming', cost: 80 });
 const read = G.gameLoad(k).goals.find((g) => g.name === 'Read'); G.gameTick(k, read.id, 1);
+G.gameVespersTime(k, '15:00');   // Vespers opens at 3 pm here, so the evening book (1U.10) can be checked on this Friday afternoon
 const page = fs.readFileSync(process.argv[3], 'utf8');
 http.createServer((req, res) => {
   if (req.method === 'GET') { res.writeHead(200, { 'content-type': 'text/html' }); return res.end(page); }

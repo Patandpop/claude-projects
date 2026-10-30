@@ -169,6 +169,18 @@
 .uz-chips{display:flex;flex-wrap:wrap;gap:6px}
 .uz-bt.gl-tilebox>span:not(.gl-tile){position:relative;z-index:2}
 .uz-hvtab{display:block;width:100%;margin:0 0 10px;padding:14px;border-radius:8px;border:1.5px solid #c4323a;background:linear-gradient(180deg,#2a0c10,#12070a);text-align:left;color:#f0d8d0;font:600 14px var(--a)}.uz-hvtab b{display:block;font:500 24px var(--g);color:#ffb3a8}
+.uz-vtab{display:flex;align-items:center;gap:12px;width:100%;margin:0 0 10px;padding:12px 14px;border-radius:8px;border:1.5px solid #3fae78;background:linear-gradient(180deg,#14261d,#0a120e);text-align:left;color:#cfe8dc;font:600 14px var(--a)}.uz-vtab b{display:block;font:500 24px var(--g);color:#a6f5c8}.uz-vtab i{font-style:normal;font-size:30px;line-height:1}
+.uz-vs h3{margin:2px 0 0;font:700 30px/1 var(--g);color:#f1e9ff;text-shadow:0 0 14px rgba(160,120,255,.35)}.uz-vs>small{display:block;margin:0 0 8px;font:13px var(--a);color:#a9b4ae}
+.uz-vs .sec{display:inline-block;font:700 22px/1.05 var(--g);color:#efe6ff;margin:10px 0 6px}.uz-vs .dayg{max-width:300px;margin:0 auto 8px}
+.uz-vs .say{display:flex;align-items:flex-start;gap:10px;margin:6px 0 10px}.uz-vs .say img{flex:none;width:44px;height:44px;image-rendering:pixelated}.uz-vs .say p{margin:0;padding:7px 11px 8px;background:radial-gradient(ellipse at 30% 20%,#f3e7c8,#dcc797 80%);color:#2a1a12;border-radius:3px 10px 10px 10px;font:italic 15px/1.25 var(--f,Georgia,serif);box-shadow:0 2px 0 #5a4428}
+.uz-vs .line{position:relative;display:flex;flex-direction:column;gap:6px;padding-left:22px}.uz-vs .line::before{content:'';position:absolute;left:8px;top:6px;bottom:6px;width:2px;background:linear-gradient(#3a3050,#5ef2a0 60%,#3a3050)}
+.uz-vs .ev{position:relative;display:flex;align-items:center;gap:10px;width:100%;text-align:left;font:inherit;color:#e4def0;background:#100e15;border:1px solid #2c2538;border-radius:8px;padding:8px 10px;min-height:46px}.uz-vs .ev::before{content:'';position:absolute;left:-19px;top:50%;width:10px;height:10px;margin-top:-5px;border-radius:50%;background:#5aa7ff;box-shadow:0 0 0 2px #0a0810,0 0 8px #5aa7ff}
+.uz-vs .ev.c::before{background:#ff7a66;box-shadow:0 0 0 2px #0a0810,0 0 8px #ff7a66}.uz-vs .ev.c{border-color:#4a2228}.uz-vs .ev.on{background:#1a1220;border-color:#e8c46e}.uz-vs .ev time{font:700 13px var(--a);color:#93a39b;width:3.2em;flex:none}.uz-vs .ev b{flex:1;min-width:0}.uz-vs .ev small{font:13px var(--a);color:#b8afc8}
+.uz-vs .sd{flex:none;width:30px;height:30px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:radial-gradient(circle at 40% 35%,#2a2015,#0c0a08);box-shadow:inset 0 0 0 1.5px #8a6a2a}.uz-vs .sd.none{background:#121016;box-shadow:inset 0 0 0 1.5px #3a3348;color:#6f667e;font:700 14px var(--a)}.uz-vs .sd svg{width:72%;height:72%}
+.uz-vs .tray{margin:2px 0 6px;padding:10px;border:1px dashed #3a3050;border-radius:8px;background:#0c0a11}.uz-vs .q{font:700 13.5px var(--a);color:#d9d2e6;margin:2px 0 6px}.uz-vs .sr{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.uz-vs .sbn{display:flex;flex-direction:column;align-items:center;gap:4px;padding:7px 2px 6px;background:#100e15;border:1px solid #2c2538;border-radius:8px;color:#b8afc8;font:13px/1.15 var(--a);text-align:center;min-height:44px}.uz-vs .sbn .sd{width:34px;height:34px}.uz-vs .sbn.on{border-color:#e8c46e;background:#231b0e;color:#ffe2a0}
+.uz-vs .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}.uz-vs .chip{font:13.5px/1 var(--a);color:#d8d2e4;background:#14111b;border:1px solid #352c45;border-radius:999px;padding:8px 12px;min-height:34px}.uz-vs .chip.on{background:#3a1d22;border-color:#ff7a66;color:#ffd9d2}
+.uz-vring{display:block;width:100%;min-height:52px;margin:14px 0 4px;font:700 24px/1 var(--g);color:#08100d;background:linear-gradient(180deg,#7af7b6,#3fcf86);border:1px solid #8affc4;border-radius:8px;box-shadow:0 3px 0 #1a5a3a,0 0 18px rgba(94,242,160,.25)}
 .uz-hvback{height:44px;margin:0 0 8px;padding:0 12px;border-radius:6px;border:1.5px solid #2f443b;background:#131d19;color:#cfe8dc;font:700 14px var(--a)}
 .uz-aim{display:flex;flex-wrap:wrap;align-items:center;gap:5px;padding:2px 0 8px 62px}.uz-aim button{height:44px;min-width:44px;padding:0 10px;border-radius:6px;border:1.5px solid #2f443b;background:#131d19;color:#cfe8dc;font:700 14px var(--a)}.uz-aim button.on{border-color:#ffd56a;background:#2a2410;color:#ffe2a0}.uz-aim span{font:600 13px var(--a);color:#8fa298;margin-left:4px}
 .uz-rise{margin:0 0 10px;padding:12px 14px;border-radius:8px;border:1.5px solid #5ef2a0;background:linear-gradient(180deg,#0c2a22,#08140f);color:#cfe8dc;font:600 15px var(--a)}.uz-rise b{font:500 21px var(--g);color:#5ef2a0;display:block}
@@ -539,7 +551,8 @@
         Array.from({ length: Math.min(w.n, 7) }, (_, i) => '<i style="display:inline-block;width:7px;height:7px;border-radius:2px;border:1px solid ' + c + ';background:' + (i < Math.round(k * Math.min(w.n, 7) / w.n) ? c : 'transparent') + '"></i>').join('') + '<span>' + lbl + '</span></span>'; }
     function ritualRow(g) {
       const on = g.doneToday, emb = !on && g.miss && !D.frozen, n = g.streak, col = sCol(Math.max(1, n + (on ? 0 : 1)));
-      const st = g.strip ? '<div class="uz-strip">' + String(g.strip).split('').map((c) => '<i style="background:' + (c === 'o' ? col : c === 'f' ? '#3a6a9a' : c === 'x' ? '#3a1418' : '#1a1430') + '"></i>').join('') + '</div>' : '';
+      // the 2-week bar in glass (1U.13, G1 test default, 30 Oct; game-bar.js); the thin strip stays as a fallback
+      const st = window.RBAR && g.bar ? RBAR.html(g.bar, D.today, 'rb' + g.id) : g.strip ? '<div class="uz-strip">' + String(g.strip).split('').map((c) => '<i style="background:' + (c === 'o' ? col : c === 'f' ? '#3a6a9a' : c === 'x' ? '#3a1418' : '#1a1430') + '"></i>').join('') + '</div>' : '';
       if (window.STONE) return '<div class="uz-strow' + (on ? ' done' : '') + '">' + STONE.row({ id: g.id, name: g.name, streak: n, done: on,
           subHtml: '<span>' + (on ? 'appeased' : emb ? 'embers' : 'awaits') + '</span> <span>' + esc(rep(g)) + '</span>' + (g.win ? ' ' + winHtml(g) : '') + (n > 0 ? ' <span style="font-weight:700;color:' + col + '">' + n + ' night' + (n === 1 ? '' : 's') + '</span>' : ''),
           payHtml: '<span class="uz-pay">' + (g.auto ? SEAL : '') + '<span>+' + g.pay + coin(18, g.pay, g.id) + '</span></span>' + archBtn(g.id),
@@ -592,16 +605,46 @@
       return { work, life, done };
     }
     const todayLeft = () => { if (!D) return 0; const T = todayItems(); return T.work.length + T.life.length; };
+    /* ---------- Vespers (1U.10): the evening book. From his Vespers time a tablet on The Call opens the Grimoire (BG1 desk,
+       T1 tome, T4 chains, game-grimoire.js); the book drags him in and opens on his day in glass (game-glass.js D1:
+       curses red on the left, blessings on the right, the path weaving down from morning to evening), then the night
+       line: each curse can take a sigil and a few words. "That's all" rings Vespers (gameVespers, with the tags). ---------- */
+    const VSIGS = [['Flesh', 'A feeling'], ['Domain', 'A place'], ['Scene', 'What was going on'], ['Coven', 'The people']];
+    const VCHIPS = ['Tired', 'Bored', 'Stressed', 'Hungry', 'Sofa', 'Bed', 'Kitchen', 'Phone', 'Alone', 'Family', 'Friends'];
+    function vespEvents() { const v = D.vespers || {}; return (v.curses || []).map((x) => Object.assign({ c: 1 }, x)).concat((v.goods || []).map((x) => Object.assign({ c: 0 }, x))).sort((a, b) => (a.at < b.at ? -1 : 1)); }
+    function vespTag(e) { V.vtag = V.vtag || {}; if (!V.vtag[e.tickId]) V.vtag[e.tickId] = { sig: e.sig || '', d: e.detail ? String(e.detail).split(', ').filter(Boolean) : [] }; return V.vtag[e.tickId]; }
+    function vespers() {
+      const v = D.vespers, ev = vespEvents(), nc = ev.filter((e) => e.c).length, nb = ev.length - nc, ICON = (n) => (window.BLOOD && BLOOD.icons && BLOOD.icons[n]) || '';
+      const ul = window.ULHU_ART && ULHU_ART.b16 && ULHU_ART.b16.idle, chips = VCHIPS.concat((v.chips || []).filter((c) => VCHIPS.indexOf(c) < 0));
+      const line = !ev.length ? 'Nothing on the line tonight. Ring the bell and sleep.' : !nc ? 'Not one curse. The deep is suspicious, and proud.' : nc === 1 ? 'One curse on the line. Tap it and tell me what was behind it. I keep a file.' : nc + ' curses on the line. Tap one and tell me more. I keep a file.';
+      let h = '<button data-a="vespclose" class="uz-hvback">‹ Back to The Call</button><div class="uz-vs"><h3>Vespers</h3><small>' + esc(DN[dt(D.today).getUTCDay()] + ' ' + Number(String(D.today).slice(8)) + ' ' + MON[dt(D.today).getUTCMonth()]) + ' · ' + nc + ' curse' + (nc === 1 ? '' : 's') + ', ' + nb + ' blessing' + (nb === 1 ? '' : 's') + (v.streak ? ' · ' + v.streak + ' night' + (v.streak === 1 ? '' : 's') : '') + '</small>';
+      if (window.GLASS && ev.length) h += '<div class="sec">Today in glass</div><div class="dayg">' + GLASS.day(ev.map((e) => ({ t: e.at, side: e.c ? 'c' : 'b', name: e.name })), { key: 'vesp' + D.today + ev.length }) + '</div>';
+      h += '<div class="say">' + (ul ? '<img src="' + ul + '" alt="Ulhu">' : '') + '<p>' + esc(line) + '</p></div>';
+      if (ev.length) {
+        h += '<div class="sec">The night line</div><div class="line">';
+        ev.forEach((e) => { const tg = e.c ? vespTag(e) : null, on = V.vsel === e.tickId;
+          h += '<button class="ev' + (e.c ? ' c' : '') + (on ? ' on' : '') + '" data-a="vev" data-id="' + esc(e.tickId) + '"><time>' + esc(e.at) + '</time><b>' + esc(e.name) + (tg && tg.d.length ? '<br><small>' + esc(tg.d.join(', ')) + '</small>' : '') + '</b>' +
+            (e.c ? (tg.sig ? '<span class="sd" title="' + tg.sig + '">' + ICON(tg.sig) + '</span>' : '<span class="sd none" title="No sigil yet">?</span>') : '') + '</button>';
+          if (on && e.c) h += '<div class="tray"><div class="q">What was behind it?</div><div class="sr">' + VSIGS.map(([n, c]) => '<button class="sbn' + (tg.sig === n ? ' on' : '') + '" data-a="vsig" data-id="' + esc(e.tickId) + '" data-v="' + n + '"><span class="sd">' + ICON(n) + '</span><span><b>' + n + '</b><br>' + c + '</span></button>').join('') + '</div>' +
+            '<div class="chips">' + chips.map((c) => '<button class="chip' + (tg.d.indexOf(c) >= 0 ? ' on' : '') + '" data-a="vchip" data-id="' + esc(e.tickId) + '" data-v="' + esc(c) + '">' + esc(c) + '</button>').join('') + '</div></div>'; });
+        h += '</div>';
+      }
+      return h + (v.done ? '<p class="uz-p" style="text-align:center;color:#a6f5c8;margin:14px 0">Vespers rung tonight.</p>' : '<button class="uz-vring" data-a="vring">' + (nc ? 'That\'s all' : 'Clean today') + '</button>') + '</div>';
+    }
+    function vespTab() { const v = D.vespers; if (!v || !v.open || v.done || V.vesp) return '';
+      return '<button data-a="vespopen" class="uz-vtab"><i aria-hidden="true">📖</i><span><b>Vespers</b><span>The book is waiting. Read your day before you sleep.</span></span></button>'; }
     function today() {
       const T = todayItems(); let h = '';
       const rs = D.player.rise;   // the Rise quest after fainting (Patryk 2026-10-28)
       if (rs && window.FAINT) h += FAINT.panel(rs);   // Rise again (1U.11, FA-R3): three stained-glass stars, one per ritual
       else if (rs) h += '<div class="uz-rise"><b>Rise again</b>' + (3 - rs.lit) + ' more rituals bring back ' + rs.back + ' of the lost runes.</div>';
       // High Vespers (Sunday to Tuesday) replaces the old Sunday card (Patryk 2026-10-28): a tablet that opens the whole screen
+      if (V.vesp && D.vespers) return vespers();
       if (window.HIGHV && D.high) {
         if (V.hv) return '<button data-a="hvclose" class="uz-hvback">‹ Back to The Call</button>' + HIGHV.html(D.high, D.review, { attrs: { answer: 'hvans', seal: 'hvseal', pane: 'hvpane', field: 'hv' }, reward: D.high.saved ? 0 : 20 });
         if (D.high.show) h += '<button data-a="hvopen" class="uz-hvtab"><b>High Vespers</b><span>The week is ready to be read and sealed</span></button>';
       } else if (D.review && D.review.show) h += review();
+      h += vespTab();
       if (T.work.length) h += '<div class="uz-cap"><span><b style="color:#cfe8dc">Toil</b></span><span style="font:700 12px var(--a);color:#5ef2a0">' + T.work.length + ' left</span></div>' + T.work.map((x) => x.html).join('');
       if (T.life.length) h += '<div class="uz-cap" style="margin-top:6px"><span><b style="color:#b6ffd6">The Surface</b></span><span style="font:700 12px var(--a);color:#5ee08a">' + T.life.length + ' left</span></div>' + T.life.map((x) => x.html).join('');
       // quests not due yet, or with no date, were nowhere on this tab (Patryk 2026-10-27: "I can't see any quests")
@@ -979,6 +1022,7 @@
       if (window.UZDEN) UZDEN.after(X, body);
       if (window.BREW) BREW.run(body);   // any loading scene on the page starts stirring (1U.12)
       if (window.FAINT) FAINT.paint(body);   // the Rise again stars
+      if (window.RBAR) RBAR.paint(body);   // the 2-week bars in glass
       const sb = body.querySelector('.uz-stampbox'); if (sb && V.stampNew) { V.stampNew = false; anim(sb, [{ transform: 'scale(2.4) rotate(-28deg)', opacity: 0 }, { transform: 'scale(.92) rotate(-10deg)', opacity: 1, offset: 0.7 }, { transform: 'scale(1) rotate(-10deg)', opacity: 1 }], { duration: 420, easing: 'cubic-bezier(.2,.8,.3,1.2)' }); }
       if (window.TEMPLE) TEMPLE.paint(body);
       if (window.STONE) STONE.paint(body);
@@ -1078,6 +1122,17 @@
       if (a === 'tmpl') { V.draft.name = V.draft.name || 'Mark the 9AS test'; V.draft.size = 5; V.draft.k = 'shog'; V.draft.steps = [['Half marked', 2], ['The rest', 5], ['Scores summed', 6], ['Entered', 7]].map(([n, dd]) => ({ n, by: addD(D.today, dd) })); return paint(); }
       if (a === 'submit') return submit();
       if (a === 'hvopen') { V.hv = true; paint(); body.scrollTop = 0; return; }
+      if (a === 'vespopen') { buzz([10, 40, 10]); const go = () => { V.vesp = true; V.vsel = null; paint(); body.scrollTop = 0; };
+        if (window.GRIM) GRIM.play(box).then(go); else go(); return; }
+      if (a === 'vespclose') { V.vesp = false; paint(); return; }
+      if (a === 'vev') { V.vsel = V.vsel === id ? null : id; paint(); return; }
+      if (a === 'vsig' || a === 'vchip') { const e = vespEvents().find((x) => x.tickId === id); if (!e) return; const tg = vespTag(e); buzz(6);
+        if (a === 'vsig') tg.sig = tg.sig === v ? '' : v; else { const i = tg.d.indexOf(v); if (i < 0) tg.d.push(v); else tg.d.splice(i, 1); }
+        paint(); return; }
+      if (a === 'vring') { const ev = vespEvents(), tags = ev.filter((e) => e.c && V.vtag && V.vtag[e.tickId]).map((e) => ({ tickId: e.tickId, sig: V.vtag[e.tickId].sig, detail: V.vtag[e.tickId].d.join(', ') })), clean = !ev.some((e) => e.c);
+        return act({ verb: 'Vespers:', name: clean ? 'clean today' : 'rung' }, ['gameVespersUndo'], 'gameVespers', [{ tags, clean }], (d) => { d.vespers.done = true; },
+          (res) => { V.vesp = false; V.vtag = null; paint(); const vd = res && res.vespersDone; if (!vd || vd.already) return;
+            earnFx(r, null, vd.coins, !!vd.up); V.last = { verb: 'Vespers rung:', name: vd.streak + ' night' + (vd.streak === 1 ? '' : 's'), delta: '+' + vd.coins, unit: 'coin' }; paintTop(); }); }
       if (a === 'hvclose') { V.hv = false; return paint(); }
       if (a === 'hvpane') return;   // the High Vespers module opens its own panes
       if (a === 'hvans') { if (window.HIGHV) HIGHV.answer('kept', v); buzz(10); return; }

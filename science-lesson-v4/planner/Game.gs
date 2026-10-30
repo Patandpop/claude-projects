@@ -249,6 +249,42 @@ function gEveryMiss_(g, d, ticks) {
   return n > 0 && n % g.everyN === 0;
 }
 function gNet_(ticks, id, day) { return ticks.filter((t) => String(t.day) === day && t.goalId === id).reduce((a, t) => a + Number(t.delta), 0); }
+// The 2-week bar in glass (1U.13, test default G1, 30 Oct): the last 14 days of a ritual as windows, oldest first, ending
+// today, replayed with the same rules as the rollover. Each window is one pane: { len (days), s, times }. s: 'o' done (times
+// = ticks that day, up to 3), 'x' missed, 'e' a forgiven miss (the first miss in a row), 'f' a day off (frozen), 'w' the window
+// still open today, 'n' before the ritual existed. A day it isn't due (a school-day ritual's weekend) joins the pane before
+// it; an every-few-days ritual gets one pane per window, which ends on the day it is done or on its due day.
+function gBar_(g, today, tickDay, world, frozen) {
+  const d0 = gAdd_(today, -13), cr = String(g.created || '').slice(0, 10), from = cr && cr > gAdd_(d0, -42) ? cr : gAdd_(d0, -42);
+  const net = (d) => tickDay[g.id + '|' + d] || 0, wins = [];
+  const add = (a, b, s, times) => { const last = wins[wins.length - 1]; if (s === 'n' && last && last.s === 'n') { last.b = b; return; } wins.push({ a, b, s, times }); };
+  if (cr && d0 < cr) add(d0, gAdd_(cr, -1), 'n');
+  let m = false;
+  if (g.everyN) {
+    let ws = from, anchor = from;
+    for (let d = from; d <= today; d = gAdd_(d, 1)) {
+      const n = net(d);
+      if (n > 0) { add(ws, d, 'o', Math.min(3, n)); anchor = d; ws = gAdd_(d, 1); m = false; continue; }
+      if (d > anchor && gDiff_(anchor, d) % g.everyN === 0) {
+        if (d === today) break;
+        if (gIsFrozen_(d, world, frozen, g)) add(ws, d, 'f');
+        else { add(ws, d, m ? 'x' : 'e'); m = !m; }
+        ws = gAdd_(d, 1);
+      }
+    }
+    if (ws <= today) add(ws, today, 'w');
+  } else {
+    for (let d = from; d <= today; d = gAdd_(d, 1)) {
+      const n = net(d), due = gIsDue_(Object.assign({}, g, { lastDone: '' }), d), last = wins[wins.length - 1];
+      if (n > 0) { add(d, d, 'o', Math.min(3, n)); m = false; continue; }   // any tick clears a waiting miss, as gTick_ does
+      if (gIsFrozen_(d, world, frozen, g)) { add(d, d, 'f'); continue; }
+      if (!due) { if (last) last.b = d; else add(d, d, 'n'); continue; }
+      if (d === today) { add(d, d, 'w'); continue; }
+      add(d, d, m ? 'x' : 'e'); m = !m;
+    }
+  }
+  return wins.map((w) => { const a = w.a < d0 ? d0 : w.a, b = w.b > today ? today : w.b; return b < a ? null : { len: gDiff_(a, b) + 1, s: w.s, times: w.times || 1 }; }).filter(Boolean);
+}
 
 /* ---- Absolution (Patryk 2026-10-27): a slipped curse can be won back by its antidote blessing (a two-sided habit's own
    good side). Window = the slip day and the whole next day. Absolution I gives back half the health the slip cost,
@@ -557,7 +593,7 @@ function gSnapshot_(world, extra) {
     if (g.kind === 'habit' && g.polarity !== 'minus') { o.featured = false; o.pay = gBlessAmt_(g); const sl = gOpenSlips_(ticks, goals, g.id, today); if (sl.length) o.absolve = sl[0]; }
     if (g.kind === 'habit' && g.polarity === 'both') { const side = (sd) => ticks.filter((t) => t.goalId === g.id && String(t.day) === today && gNote_(t).side === sd && !undone[t.id]).length; o.cCount = side('c'); o.bCount = side('b'); }
     if (g.kind === 'todo') { o.due = g.due; o.doneOn = g.lastDone; o.dueToday = !g.lastDone || gDiff_(g.lastDone, today) <= 14; }
-    if (g.kind === 'daily') { o.dueToday = gIsDue_(g, today); o.strip = strip(g);
+    if (g.kind === 'daily') { o.dueToday = gIsDue_(g, today); o.strip = strip(g); o.bar = gBar_(g, today, tickDay, world, frozen);
       // an every-few-days ritual's window (1U.13, 2026-10-29): due by which day, and how far into the window today is
       if (g.everyN) { const last = g.lastDone || '', by = last ? gAdd_(last, g.everyN) : today; o.win = { by, n: g.everyN, k: last ? Math.min(g.everyN, gDiff_(last, today)) : g.everyN, late: by < today }; }
       if (g.aim) { const r = aimRows.find((x) => x.goalId === g.id && String(x.day) === today); o.aim = g.aim; o.aimToday = { minutes: r && r.minutes !== '' ? Number(r.minutes) : null, full: !!(r && String(r.full) === 'true') };

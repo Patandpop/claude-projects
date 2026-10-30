@@ -3,7 +3,7 @@ Run: python tests/ulhu_sim.py  (add --shots DIR to save screenshots). Synthetic 
 import os, sys, subprocess, time
 from playwright.sync_api import sync_playwright
 P = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '/'; SP = sys.argv[1] if len(sys.argv) > 1 and not sys.argv[1].startswith('--') else __import__('tempfile').mkdtemp()
-js = ''.join(open(P + f, encoding='utf-8').read() + '\n' for f in ['game-ulhu.js', 'game-pixel.js', 'game-runes.js', 'game-temple.js', 'game-stone.js', 'game-omens.js', 'game-tabs.js', 'game-blood.js', 'game-scroll.js', 'game-glass.js', 'game-highvespers.js', 'game-lair.js', 'game-brew.js', 'game-gate.js', 'game-levelup.js', 'game-faint.js', 'game-wall.js', 'game-den.js', 'game-ui.js', 'game-oracle.js', 'game-pairs.js'])
+js = ''.join(open(P + f, encoding='utf-8').read() + '\n' for f in ['game-ulhu.js', 'game-pixel.js', 'game-runes.js', 'game-temple.js', 'game-stone.js', 'game-bar.js', 'game-omens.js', 'game-tabs.js', 'game-blood.js', 'game-scroll.js', 'game-glass.js', 'game-highvespers.js', 'game-lair.js', 'game-brew.js', 'game-gate.js', 'game-levelup.js', 'game-faint.js', 'game-wall.js', 'game-grimoire.js', 'game-den.js', 'game-dicewater.js', 'game-ui.js', 'game-oracle.js', 'game-pairs.js'])
 page = '''<!doctype html><meta charset="utf-8"><meta name=viewport content="width=device-width,initial-scale=1"><body style="margin:0;background:#0d1b3a">
 <div style="height:60px;background:#0a1020;color:#fff">8AG header</div><div id=u></div><nav style="position:fixed;bottom:0;left:0;right:0;height:62px;background:#0a1020"></nav>
 <script>window.CALLS=[];function call(fn,...args){CALLS.push(fn);window.ARGS=window.ARGS||[];ARGS.push(args);return fetch('/c',{method:'POST',body:JSON.stringify({fn,args})}).then(r=>r.json()).then(x=>{if(x.err)throw new Error(x.err);return x.ok;});}</script>
@@ -157,13 +157,14 @@ try:
         if shots: pg.screenshot(path=os.path.join(SP, 's7.png'))
         if pg.locator('[data-a=dn-claim]:not([disabled])').count(): pg.click('[data-a=dn-claim]'); pg.wait_for_timeout(1800)
         pg.click('[data-a=dn-walk]'); pg.click('[data-a=dn-walk]'); pg.wait_for_timeout(1200)
-        check('walking out settles it as a loss: ENGULFT, then that item at its new price', 'ENGULFT' in pg.inner_text('.dn-res') and pg.locator('.dn-res .dn-newp s').count() == 1)
+        check('walking out settles it as a loss: UNDONE, then that item at its new price', 'UNDONE' in pg.inner_text('.dn-res') and pg.locator('.dn-res .dn-newp s').count() == 1)
         pg.click('[data-a=dn-leave]'); pg.wait_for_timeout(400)
-        check('back at her stall: only the item played for costs 10% more, no second game', 'Engulft' in pg.inner_text('.dn-kh') and pg.locator('[data-a=dn-peek]').count() == 0 and pg.locator('.dn-ware s').count() == 1 and pg.locator('.dn-ware[data-id="' + hag_id + '"] s').count() == 1)
+        check('back at her stall: only the item played for costs 10% more, no second game', 'Undone' in pg.inner_text('.dn-kh') and pg.locator('[data-a=dn-peek]').count() == 0 and pg.locator('.dn-ware s').count() == 1 and pg.locator('.dn-ware[data-id="' + hag_id + '"] s').count() == 1)
         check('the server refuses a second game with the same keeper today', 'already played' in pg.evaluate("call('gameHaggle', 'weaver', 'start', '" + hag_id + "').then(function () { return 'ok'; }, function (e) { return e.message; })"))
         # a second keeper is still playable: the glassblower, played to the end
         pg.click('.uz-dock [data-a=den][data-v=market]'); pg.wait_for_timeout(500); pg.click('[data-a=dn-visit][data-v=glass]'); pg.wait_for_timeout(2600)
         pg.click('[data-a=dn-peek]'); pg.wait_for_timeout(300); pg.click('[data-a=dn-sit]'); pg.wait_for_timeout(1500)
+        pg.evaluate("window.DW_SEEN = null; window.DW_LOOK = setInterval(() => { const w = document.querySelector('.dw-wrap'); if (w) DW_SEEN = { word: w.querySelector('.dw-word').textContent, drawn: w.querySelector('canvas').width }; }, 60); 0")
         t0 = time.time()
         while time.time() - t0 < 120 and not pg.locator('.dn-res').count():   # call Liar! whenever we can, else the lowest claim
             try:   # a slow PC can still be redrawing the table: try again next time round
@@ -175,8 +176,10 @@ try:
         pg.wait_for_selector('.dn-res', timeout=10000)
         won = pg.locator('.dn-res.ok').count() == 1
         check('a second keeper plays the same day, to the end', pg.locator('.dn-res').count() == 1)
+        dw = pg.evaluate("clearInterval(DW_LOOK), DW_SEEN")
+        check('1U.6 at the end the sea comes over the whole table (D3) and the word is ' + ('VANQUISHT' if won else 'UNDONE') + ': ' + str(dw), dw and dw['drawn'] == 160 and dw['word'] == ('VANQUISHT' if won else 'UNDONE') and pg.locator('.dw-wrap').count() == 0)
         pg.click('[data-a=dn-leave]'); pg.wait_for_timeout(400)
-        check('the result is kept at that stall, on that one item (Vanquisht and less on a win, Engulft and 10% more on a loss)', ('Vanquisht' if won else 'Engulft') in pg.inner_text('.dn-kh') and pg.locator('.dn-ware s').count() == 1)
+        check('the result is kept at that stall, on that one item (Vanquisht and less on a win, Undone and 10% more on a loss)', ('Vanquisht' if won else 'Undone') in pg.inner_text('.dn-kh') and pg.locator('.dn-ware s').count() == 1)
         pg.click('.uz-dock [data-a=den][data-v=market]'); pg.wait_for_timeout(500)
         check('the plaza marks both stalls with today\'s result', pg.locator('.dn-booth i').count() == 2)
         pg.click('.uz-dock [data-a=den][data-v=room]'); pg.wait_for_timeout(600)
@@ -195,8 +198,8 @@ try:
         check('tapping a ritual opens it to edit (Edit ritual, Save, Archive)', 'Edit ritual' in pg.inner_text('.uz-form') and pg.locator('.uz-form [data-a=farch]').count() == 1)
         check('sizes, not minutes', 'Medium' in pg.inner_text('.uz-form') and ' min' not in pg.inner_text('.uz-form'))
         pg.fill('.uz-form [data-name]', 'Workout'); pg.click('.uz-form [data-a=submit]')
-        # wait for the save itself (up to 8 s), not a fixed pause: a busy test machine answers late, not wrongly
-        try: pg.wait_for_function("(document.querySelectorAll('.uz-pane')[1] || {}).innerText && document.querySelectorAll('.uz-pane')[1].innerText.indexOf('Workout') >= 0", timeout=8000)
+        # wait for the save itself (up to 20 s), not a fixed pause: a busy test machine answers late, not wrongly
+        try: pg.wait_for_function("(document.querySelectorAll('.uz-pane')[1] || {}).innerText && document.querySelectorAll('.uz-pane')[1].innerText.indexOf('Workout') >= 0", timeout=20000)
         except Exception: pass
         check('the edit is saved (renamed to Workout)', 'Workout' in pg.inner_text('.uz-pane >> nth=1'))
         pg.click('.uz-tabs [data-v="1"]'); pg.wait_for_timeout(300); pg.click('.uz-dock [data-v=quest]'); pg.wait_for_timeout(300)
@@ -281,9 +284,15 @@ try:
         check('1U.11 level up: The Sky Answers covers the screen and lights up, and a tap ends it: ' + str(lu), lu.get('lit', 0) > 200 and lu.get('cover') and lu.get('end') == 'over' and lu.get('gone'))
         # 1U.11 the faint (FA-R3): the vial shatters, the lost runes float away, he wakes with all his health (rules of 30 Oct)
         fz = pg.evaluate("""(() => { const box = document.querySelector('.uz'); const p = FAINT.faint(box, { max: 60, hp: 20, runes: 200, lost: 80, wake: 60, lv: 7, title: 'Tide Caller' });
-          return new Promise((r) => setTimeout(() => { const w = box.querySelector('.fz'), lab = w && w.querySelector('.lab'), b = w && w.getBoundingClientRect(), h = box.getBoundingClientRect();
-            const o = { cover: !!w && b.width >= h.width - 1, lab: lab ? lab.textContent : '', ulhu: !!(w && w.querySelector('.ulhu img')) };
-            setTimeout(() => { o.hp = w.querySelector('.hpl').textContent; w.click(); Promise.race([p.then(() => 'over'), new Promise((q) => setTimeout(() => q('stuck'), 4000))]).then((end) => { o.end = end; o.gone = !box.querySelector('.fz'); r(o); }); }, 5200); }, 3200)); })()""")
+          // waits for each moment rather than a fixed time: a busy PC runs the scene slowly (30 Oct)
+          const until = (f, ms) => new Promise((r) => { const t0 = performance.now(); (function go() { const v = f(); if (v || performance.now() - t0 > ms) return r(v); setTimeout(go, 100); })(); });
+          const w = () => box.querySelector('.fz'), o = {};
+          return until(() => { const x = w(), l = x && x.querySelector('.lab'); return l && /drift/.test(l.textContent) && l; }, 20000).then((l) => {
+            const x = w(), b = x && x.getBoundingClientRect(), h = box.getBoundingClientRect();
+            o.cover = !!x && b.width >= h.width - 1; o.lab = l ? l.textContent : ''; o.ulhu = !!(x && x.querySelector('.ulhu img'));
+            return until(() => { const x2 = w(), hp = x2 && x2.querySelector('.hpl'); return hp && hp.textContent === '60/60' && hp.textContent; }, 25000); }).then((hp) => {
+            const x = w(); o.hp = hp || (x && x.querySelector('.hpl') ? x.querySelector('.hpl').textContent : ''); if (x) x.click();
+            return Promise.race([p.then(() => 'over'), new Promise((q) => setTimeout(() => q('stuck'), 4000))]).then((end) => { o.end = end; o.gone = !box.querySelector('.fz'); return o; }); }); })()""")
         check('1U.11 faint: it covers the screen, "80 runes drift out of reach", he wakes with all his health, a tap ends it: ' + str(fz), fz.get('cover') and '80 runes drift out of reach' in fz.get('lab', '') and fz.get('ulhu') and fz.get('hp') == '60/60' and fz.get('end') == 'over' and fz.get('gone'))
         # Rise again: the card at the top of The Call, three stained-glass stars, no tick boxes under them
         rc = pg.evaluate("""(() => { const d = document.createElement('div'); d.className = 'uz-pane'; d.innerHTML = FAINT.panel({ stage: 1, lit: 1, ids: ['a'], back: 30 }); document.body.appendChild(d); FAINT.paint(d);
@@ -310,6 +319,30 @@ try:
         pg.evaluate("(() => { const d = document.createElement('div'); d.id = 'brewt'; d.style.cssText = 'position:fixed;inset:0;z-index:99;background:#070d0b'; d.innerHTML = BREW.html('Something is brewing'); document.body.appendChild(d); BREW.run(d); })()"); pg.wait_for_timeout(700)
         check('1U.12 the loading screen is Ulhu stirring the cauldron: the scene draws (fire, pot, Ulhu) with its caption', pg.evaluate("(() => { const c = document.querySelector('#brewt canvas'), x = c.getContext('2d').getImageData(0, 0, 90, 64).data; let n = 0, fire = 0; for (let i = 0; i < x.length; i += 4) { if (x[i + 3]) n++; if (x[i] > 200 && x[i + 1] > 80 && x[i + 2] < 80) fire++; } const ok = n > 4000 && fire > 20 && /Something is brewing/.test(document.querySelector('#brewt .cap').textContent); document.getElementById('brewt').remove(); return ok; })()"))
         check('1U.12 a loading scene in a pane off to the side is not drawn (no battery spent on it)', pg.evaluate("(() => { const d = document.createElement('div'); d.style.cssText = 'position:fixed;left:200vw;top:0;width:300px'; d.innerHTML = BREW.html('x'); document.body.appendChild(d); BREW.run(d); return new Promise((r) => setTimeout(() => { const x = d.querySelector('canvas').getContext('2d').getImageData(0, 0, 90, 64).data; let n = 0; for (let i = 3; i < x.length; i += 4) if (x[i]) n++; d.remove(); r(n === 0); }, 700)); })()"))
+        # 1U.10 Vespers: the tablet on The Call opens the Grimoire (BG1 desk, T1 tome, T4 chains), which drags him in and opens on
+        # the day in glass, then the night line; a curse takes a sigil and a few words; "That's all" rings Vespers
+        pg.evaluate("window.scrollTo(0, 0); document.querySelectorAll('.uz-tabs button')[0].click(); 0"); pg.wait_for_timeout(600)
+        check('1U.10 from his Vespers time a Vespers tablet sits on The Call', pg.locator('.uz-pane >> nth=0').locator('[data-a=vespopen]').count() == 1)
+        pg.evaluate("window.GR_SEEN = 0; window.GR_LOOK = setInterval(() => { const c = document.querySelector('.gr-wrap canvas'); if (c) GR_SEEN = Math.max(GR_SEEN, c.width); }, 50); 0")
+        pg.locator('.uz-pane >> nth=0').locator('[data-a=vespopen]').click()
+        try: pg.wait_for_function("document.querySelector('.uz-vs') && !document.querySelector('.gr-wrap')", timeout=25000)
+        except Exception: pass
+        vs = pg.evaluate("(() => { clearInterval(GR_LOOK); const s = document.querySelector('.uz-vs'); return s ? { book: GR_SEEN, glass: !!s.querySelector('.dayg canvas, .dayg [data-gl], .dayg .gl-day, .dayg div'), text: s.textContent, curses: s.querySelectorAll('.ev.c').length, ring: !!s.querySelector('[data-a=vring]') } : { book: GR_SEEN }; })()")
+        check('1U.10 the book plays (a pixel canvas), then Vespers opens on the day in glass and the night line with the curses: ' + str({k: v for k, v in vs.items() if k != 'text'}), vs.get('book', 0) > 40 and vs.get('glass') and 'Today in glass' in vs.get('text', '') and 'The night line' in vs.get('text', '') and vs.get('curses', 0) >= 1 and vs.get('ring'))
+        pg.locator('.uz-vs .ev.c').first.click(); pg.wait_for_timeout(300)
+        pg.locator('.uz-vs [data-a=vsig][data-v=Flesh]').first.click(); pg.wait_for_timeout(200)
+        pg.locator('.uz-vs [data-a=vchip][data-v=Tired]').first.click(); pg.wait_for_timeout(200)
+        check('1U.10 a curse takes a sigil and a word on the night line', pg.locator('.uz-vs .ev.c').first.locator('.sd:not(.none)').count() == 1 and 'Tired' in pg.locator('.uz-vs .ev.c').first.inner_text())
+        n0 = len(pg.evaluate("window.ARGS"))
+        pg.locator('.uz-vs [data-a=vring]').click()
+        try: pg.wait_for_function("!document.querySelector('.uz-vs') && CALLS.includes('gameVespers')", timeout=20000)
+        except Exception: pass
+        rv = pg.evaluate("(() => { const i = CALLS.lastIndexOf('gameVespers'); return i < 0 ? null : JSON.stringify(ARGS[i]); })()")
+        check('1U.10 "That\'s all" rings Vespers with the tag, back on The Call, the tablet gone: ' + str(rv)[:160], rv and 'Flesh' in rv and 'Tired' in rv and pg.locator('.uz-vs').count() == 0 and pg.locator('[data-a=vespopen]').count() == 0)
+        # 1U.13 the 2-week bar in glass under each ritual tablet (G1)
+        pg.evaluate("document.querySelectorAll('.uz-tabs button')[1].click(); 0"); pg.wait_for_timeout(800)
+        rb = pg.evaluate("(() => { const b = [...document.querySelectorAll('.rb[data-rb]')]; return { n: b.length, drawn: b.filter((x) => { const c = x.querySelector('canvas'); return c && c.width > 50; }).length, lets: b.length ? b[0].querySelectorAll('.rb-l > *').length : 0 }; })()")
+        check('1U.13 each ritual tablet has its 2-week bar in glass, drawn, with 14 day letters: ' + str(rb), rb['n'] >= 3 and rb['drawn'] >= 1 and rb['lets'] == 14)
         check('no page errors', not errs)
         if errs: print(errs[:3])
         b.close()
