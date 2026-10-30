@@ -345,10 +345,10 @@
       '<g clip-path="url(#' + uid + 'clip)"><g mask="url(#' + uid + 'hole)">' + BGZ.glass + '</g>' + BD.glass + G.glass +
       '<g filter="url(#' + uid + 'bloom)" opacity=".5" style="mix-blend-mode:screen">' + G.bloom + '</g>' + G.bubbles(10, 14, 80, 130, 9) +
       '<g fill="none" stroke="' + LEAD + '" stroke-linejoin="round" stroke-linecap="round">' +
-      '<g mask="url(#' + uid + 'hole)"><path d="' + BGZ.lead + '" stroke-width=".7"/><path d="' + barD + '" stroke-width="2.3"/></g>' +
-      '<path d="' + BD.lead + '" stroke-width=".9"/><path d="' + G.lead + '" stroke-width="1.35"/></g>' +
+      '<g mask="url(#' + uid + 'hole)"><path d="' + BGZ.lead + '" stroke-width=".5"/><path d="' + barD + '" stroke-width="2"/></g>' +
+      '<path d="' + BD.lead + '" stroke-width=".7"/><path d="' + G.lead + '" stroke-width="1.15"/></g>' +
       '<path d="' + pathD(WIN) + '" fill="url(#' + uid + 'lg)"/></g>' +
-      '<path d="' + pathD(WIN) + '" fill="none" stroke="' + LEAD + '" stroke-width="2.8" stroke-linejoin="round"/></svg>';
+      '<path d="' + pathD(WIN) + '" fill="none" stroke="' + LEAD + '" stroke-width="2.4" stroke-linejoin="round"/></svg>';
   }
 
   /* ---------- leaded panels: a honey border band and pale glass for the words ---------- */
@@ -381,19 +381,22 @@
         const mx = (p[0] + q[0]) / 2, my = (p[1] + q[1]) / 2; poly = clipHalf(poly, [mx, my], [-(q[0] - p[0]), -(q[1] - p[1])]); });
       return { p: poly, site: p, k: i }; }).filter((x) => x.p.length >= 3);
   }
+  // the lancet is cut like the game's day glass: a thin segmented honey border band (rituals light it from the bottom)
+  // round a mosaic of small pieces (blessings blue, curses red, the rest dim field glass), a red seal set in the head
+  const LW_ = 44, LH_ = 118, LY0 = LW_ * 0.866;
+  const LOUT = arch(0, LW_, LY0, 0, LH_), LIN = arch(2.7, LW_ - 2.7, LY0, 3.4, LH_ - 2.7), LBAND = bandPieces(LOUT, LIN, 7);
   function chapterSVG(rid, c, n, maxRit, toN) {
-    const W = 44, H = 118, y0 = W * 0.866, b = 4.2, uid = rid + 'c' + n + '-', G = glazier(uid, 100 + n * 7);
+    const W = LW_, H = LH_, uid = rid + 'c' + n + '-', G = glazier(uid, 100 + n * 7);
     const bl = Number(c.blessings) || 0, cu = Number(c.curses) || 0, ri = Number(c.rituals) || 0, tot = bl + cu;
     const fromN = dayNo(c.from), future = !c.now && fromN > toN;
     const lived = future ? 0 : c.now ? clamp(isNaN(toN - fromN) ? 0.5 : (toN - fromN + 1) / 7, 1 / 7, 1) : 1;
-    const depth = (x, y) => { let d = Math.min(x, W - x, H - y); if (y < y0) d = Math.min(d, W - Math.hypot(x, y - y0), W - Math.hypot(x - W, y - y0)); return d; };
     // the seal: one round piece set into the head, with a ring of pieces cut round it
-    const SC = [W / 2, 25], SR = 10;
-    const ring = Array.from({ length: 7 }, (_, k) => polar(SC[0], SC[1], SR * 1.25, -90 + k * 360 / 7 + 10));
-    const cells = vor(G.R, [0, 0, W, H], 6.4, [SC].concat(ring), (p) => Math.hypot(p[0] - SC[0], p[1] - SC[1]) < SR * 1.9);
+    const SC = [W / 2, 24], SR = 7;
+    const ring = Array.from({ length: 7 }, (_, k) => polar(SC[0], SC[1], SR * 1.55, -90 + k * 360 / 7 + 10));
+    const cells = vor(G.R, [0, 0, W, H], 5.2, [SC].concat(ring), (p) => Math.hypot(p[0] - SC[0], p[1] - SC[1]) < SR * 2.2);
     const pcs = [];
-    cells.forEach((x) => { const cc = centroid(x.p), d = depth(cc[0], cc[1]); if (d < -1.5) return; pcs.push({ p: x.p, c: cc, d, seal: x.site === SC }); });
-    const field = pcs.filter((q) => !q.seal && q.d >= b), band = pcs.filter((q) => !q.seal && q.d < b), seal = pcs.find((q) => q.seal);
+    cells.forEach((x) => { const p = clipConvex(x.p, LIN); if (p.length < 3) return; pcs.push({ p, c: centroid(p), seal: x.site === SC }); });
+    const field = pcs.filter((q) => !q.seal), seal = pcs.find((q) => q.seal);
     // lit glass: blotchy, like High Vespers; the days of this week not lived yet stay night glass
     const lit = tot ? Math.min(0.92, 0.14 + tot / 40) : 0, ph = (100 + n * 7) * 1.7;
     const nz = (q) => Math.sin(q.c[0] * 0.1 + ph) * 0.8 + Math.sin(q.c[1] * 0.055 - ph * 2) * 1.4 + Math.sin((q.c[0] - q.c[1]) * 0.07 + ph * 3) * 0.5 + G.R() * 0.12;
@@ -401,20 +404,23 @@
     alive.forEach((q) => { q.v = nz(q); }); alive.sort((a, z) => a.v - z.v);
     const nLit = Math.round(alive.length * lit), nBlue = tot ? Math.round(nLit * bl / tot) : 0;
     field.forEach((q) => { q.fam = 'night'; });
-    alive.forEach((q, k) => { q.fam = k >= nLit ? 'night' : k < nBlue ? 'blue' : 'red'; });
-    // the honey band: rituals, rising from the bottom
-    band.sort((a, z) => z.c[1] - a.c[1]); const nGold = Math.round(band.length * (maxRit ? clamp(ri / maxRit, 0, 1) : 0) * lived);
-    band.forEach((q, k) => { q.fam = k < nGold ? 'honey' : 'honeyD'; });
+    alive.forEach((q, k) => { q.fam = k >= nLit ? 'dim' : k < nBlue ? 'blue' : 'red'; });
     if (seal) seal.fam = c.closed ? 'blood' : 'chaloD';
     const glowOf = (fam) => (fam === 'blue' ? '#4a7aff' : fam === 'red' ? '#c02a30' : fam === 'blood' ? '#ff4a3a' : null);
-    pcs.forEach((q) => { G.piece(q.p, G.fam(q.fam), glowOf(q.fam)); });
-    const outline = 'M0 ' + H + 'L0 ' + y0.toFixed(1) + 'A' + W + ' ' + W + ' 0 0 1 ' + (W / 2) + ' 0A' + W + ' ' + W + ' 0 0 1 ' + W + ' ' + y0.toFixed(1) + 'L' + W + ' ' + H + 'Z';
-    return '<svg class="uzct-lancet" viewBox="-1.5 -1.5 ' + (W + 3) + ' ' + (H + 3) + '" aria-hidden="true"><defs>' + glowDefs(uid, 1.6) + G.defs + '<clipPath id="' + uid + 'c"><path d="' + outline + '"/></clipPath></defs>' +
+    const colOf = (fam) => { if (fam !== 'dim') return G.fam(fam); const k = G.fam('field'); return [k[0], k[1] - 8, k[2] - 9]; };
+    pcs.forEach((q) => { G.piece(q.p, colOf(q.fam), glowOf(q.fam)); });
+    const fieldLead = G.lead; G.lead = '';
+    // the honey band: rituals, rising from the bottom
+    const band = LBAND.map((q) => ({ q, y: centroid(q)[1] })).sort((a, z) => z.y - a.y), nGold = Math.round(band.length * (maxRit ? clamp(ri / maxRit, 0, 1) : 0) * lived);
+    band.forEach((b, k) => { G.piece(b.q, G.fam(k < nGold ? 'honey' : 'honeyD'), null); });
+    const outline = pathD(LOUT);
+    return '<svg class="uzct-lancet" viewBox="-1.5 -1.5 ' + (W + 3) + ' ' + (H + 3) + '" aria-hidden="true"><defs>' + glowDefs(uid, 1.4) + G.defs + '<clipPath id="' + uid + 'c"><path d="' + outline + '"/></clipPath></defs>' +
       '<g clip-path="url(#' + uid + 'c)">' + G.glass + '<g filter="url(#' + uid + 'bloom)" opacity=".3" style="mix-blend-mode:screen">' + G.bloom + '</g>' + G.bubbles(0, 0, W, H, 5) +
-      '<path d="' + G.lead + '" fill="none" stroke="' + LEAD + '" stroke-width=".8" stroke-linejoin="round"/>' +
-      (seal ? '<path d="' + pathD(seal.p) + '" fill="none" stroke="' + LEAD + '" stroke-width="1.4" stroke-linejoin="round"/>' : '') +
+      '<path d="' + fieldLead + '" fill="none" stroke="' + LEAD + '" stroke-width=".45" stroke-linejoin="round"/>' +
+      '<path d="' + G.lead + '" fill="none" stroke="' + LEAD + '" stroke-width=".5" stroke-linejoin="round"/>' +
+      (seal ? '<path d="' + pathD(seal.p) + '" fill="none" stroke="' + LEAD + '" stroke-width=".9" stroke-linejoin="round"/>' : '') +
       '<rect width="' + W + '" height="' + H + '" fill="url(#' + uid + 'lg)"/></g>' +
-      '<path d="' + outline + '" fill="none" stroke="' + LEAD + '" stroke-width="2.2" stroke-linejoin="round"/></svg>';
+      '<path d="' + outline + '" fill="none" stroke="' + LEAD + '" stroke-width="1.4" stroke-linejoin="round"/></svg>';
   }
   // a key swatch: a tiny window of two pieces of the same glass, leaded like the rest
   function swatch(rid, k, fam, round) {
