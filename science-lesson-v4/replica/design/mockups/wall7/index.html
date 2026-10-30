@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Moon Slice Variations</title>
+<style>
+:root{color-scheme:dark;--bg:#0a0d14;--card:#10141d;--ink:#e8ebf2;--mute:#9ca3b4;--line:#222838;--lightg:#f3e3b8;--focus:#9fd7ff}
+html,body{background:var(--bg);margin:0}
+body{color:var(--ink);font:15px/1.45 system-ui,'Segoe UI',sans-serif;background:radial-gradient(ellipse at 50% -10%,#1a2033,var(--bg) 60%) fixed;overflow-x:hidden}
+main{max-width:412px;margin:0 auto;padding:14px 10px;box-sizing:border-box}
+h1{font:700 28px/1.05 Georgia,serif;margin:0 6px 6px;color:var(--lightg);text-shadow:0 0 18px rgba(240,210,150,.3)}
+main>p{margin:4px 6px}
+.mute{color:var(--mute);font-size:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 6px 8px;margin-top:14px}
+.card h3,.card .cap,.card .chooser,.card .info,.card .key{margin-left:4px;margin-right:4px}
+.card h3{font:700 17px/1.15 Georgia,serif;margin-top:0;margin-bottom:0;color:var(--ink)}
+.code{display:inline-block;font:700 11px system-ui,sans-serif;letter-spacing:.06em;color:#0b0d12;background:var(--lightg);border-radius:3px;padding:1px 6px;margin-right:6px;vertical-align:2px}
+.cap{font-size:13px;color:var(--mute);margin-top:3px;margin-bottom:0}
+.chooser{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.chooser button{min-height:32px;padding:0 11px;border-radius:16px;border:1.5px solid #333b52;background:#151a26;font:700 12.5px system-ui,sans-serif;color:#d0d5e0;cursor:pointer}
+.chooser button[aria-pressed="true"]{border-color:#c9a24a;background:#2a2410;color:var(--lightg)}
+button:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+svg.wall{display:block;width:100%;height:auto;margin:8px auto 0;touch-action:manipulation}
+svg .pc{cursor:pointer}
+.info{min-height:20px;margin-top:8px;padding:6px 9px;border-radius:7px;background:#0b0e15;border:1px solid #1f2535;font-size:13px;color:#d6dbe6}
+.info b{color:var(--lightg)}
+.key{display:grid;grid-template-columns:1fr 1fr;gap:4px 10px;margin-top:8px;font-size:12px;color:#c4cad6}
+.key span{display:flex;align-items:center;gap:6px}
+.key svg{flex:none}
+</style>
+</head>
+<body>
+<main>
+<h1>Moon slices, round two</h1>
+<p class="mute">Your pick WD-1b first, exactly as it was, then three variations of it. Same two made-up weeks, same moon, same five slices with dark glass numerals I to V. In each period, the inner piece is the lesson and the outer piece is its homework. Tap any shard.</p>
+<div id="cards"></div>
+</main>
+
+<script>
+/* ---------- made-up two weeks (periods 1 to 5), same data as wall6 ---------- */
+const DAYS=['Mon 2 Nov','Tue 3 Nov','Wed 4 Nov','Thu 5 Nov','Fri 6 Nov','Mon 9 Nov','Tue 10 Nov','Wed 11 Nov','Thu 12 Nov','Fri 13 Nov'];
+const DL=['M','T','W','T','F'];
+const SCHED=[
+ [[1,'9AS'],[2,'10S2'],[3,'12C'],[5,'7MLA']],
+ [[1,'11S2'],[3,'12C'],[5,'8XP']],
+ [[1,'13D'],[4,'9XS']],
+ [[1,'10C2'],[2,'8AG'],[3,'11S2'],[4,'9AS'],[5,'13D']],
+ [[1,'12C'],[4,'7MLA'],[5,'10S2']],
+ [[2,'9XS'],[3,'10S2'],[5,'8XP']],
+ [[1,'11S2'],[2,'13D'],[4,'12C'],[5,'7MLA']],
+ [[2,'12C'],[5,'9AS']],
+ [[1,'10C2'],[2,'8AG'],[3,'11S2'],[4,'9XS'],[5,'13D']],
+ [[2,'13D'],[4,'10S2'],[5,'9AS']]
+];
+const NOHW=new Set(['0-5','1-5','4-4','5-5','6-5','8-2']);
+const LESSONS=[];
+SCHED.forEach((d,di)=>d.forEach(([p,c])=>LESSONS.push({day:di,per:p,cls:c,needHw:!NOHW.has(di+'-'+p),i:LESSONS.length})));
+const N=LESSONS.length;
+const CLASSCOL={'7MLA':'#ff7a5c','8XP':'#f2a541','8AG':'#f5d142','9AS':'#7fd36b','9XS':'#3fcf8a','10C2':'#3fd6c6','10S2':'#3fb4e8','11S2':'#6a8cff','12C':'#b98bff','13D':'#e870d8'};
+const STATES={behind:'Behind',track:'On track',ahead:'Well ahead'};
+function statusFor(s){return LESSONS.map(l=>{
+  let b,h;
+  if(s==='ahead'){b=true;h=true;}
+  else if(s==='track'){if(l.day<5){b=true;h=true}else{const k=l.i-LESSONS.findIndex(x=>x.day>=5);b=k<9;h=k<5}}
+  else{b=l.i<7;h=l.i<4}
+  return {built:b,hw:l.needHw?(h&&b?'set':'needed'):'none'}})}
+// a day is finished when every lesson is built and every homework it needs is set
+function dayDone(st,d){return LESSONS.filter(l=>l.day===d).every(l=>st[l.i].built&&st[l.i].hw!=='needed')}
+
+/* ---------- geometry helpers ---------- */
+const S=64,GAP=3,TOP=11,ROWGAP=4,CX=32;
+let CY=34.5; // set per card: the moon sits a little low to leave room for numeral I
+const f=n=>(+n).toFixed(2);
+const P=(r,a)=>[CX+r*Math.cos(a),CY+r*Math.sin(a)];
+const DEG=Math.PI/180;
+const ANGC=k=>-Math.PI/2+k*72*DEG; // centre angle of period k (0 = P1, at 12 o'clock), clockwise
+function rng(seed){let a=seed>>>0;return()=>{a=(a+0x6D2B79F5)>>>0;let t=a;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296}}
+function area(p){let s=0;for(let i=0;i<p.length;i++){const a=p[i],b=p[(i+1)%p.length];s+=a[0]*b[1]-b[0]*a[1]}return Math.abs(s/2)}
+function centroid(p){let x=0,y=0;p.forEach(q=>{x+=q[0];y+=q[1]});return[x/p.length,y/p.length]}
+function clipHalf(poly,o,n){const out=[],d=q=>(q[0]-o[0])*n[0]+(q[1]-o[1])*n[1];
+  for(let i=0;i<poly.length;i++){const a=poly[i],b=poly[(i+1)%poly.length],da=d(a),db=d(b);
+    if(da>=0)out.push(a);
+    if((da>=0)!==(db>=0)){const t=da/(da-db);out.push([a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t])}}
+  return out}
+function split(poly,o,n){return[clipHalf(poly,o,n),clipHalf(poly,o,[-n[0],-n[1]])]}
+function crossings(poly,o,n){let c=0;const d=q=>(q[0]-o[0])*n[0]+(q[1]-o[1])*n[1];
+  for(let i=0;i<poly.length;i++){if((d(poly[i])>=0)!==(d(poly[(i+1)%poly.length])>=0))c++}return c}
+// break a piece into about k shards with straight leaded cuts; cuts never run through a numeral
+function shatter(poly,k,r,minA,avoid){let ps=[poly];minA=minA||5;avoid=avoid||[];
+  for(let i=0,tries=0;i<k-1&&tries<80;tries++){ps.sort((a,b)=>area(b)-area(a));const big=ps[0],c=centroid(big);
+    const o=[c[0]+(r()-.5)*4,c[1]+(r()-.5)*4],a=r()*Math.PI,n=[Math.cos(a),Math.sin(a)];
+    if(crossings(big,o,n)!==2)continue;
+    if(avoid.some(([x,y,rad])=>Math.abs((x-o[0])*n[0]+(y-o[1])*n[1])<rad))continue;
+    const[A,B]=split(big,o,n);
+    if(A.length>2&&B.length>2&&area(A)>minA&&area(B)>minA){ps[0]=A;ps.push(B);i++}}
+  return ps}
+function ringShards(r0,r1,a1,a2,k,r,seg){const cuts=[a1];for(let i=1;i<k;i++)cuts.push(a1+(a2-a1)*(i+(r()-.5)*.6)/k);cuts.push(a2);
+  const out=[];for(let i=0;i<k;i++)out.push(ringPoly(r0,r1,cuts[i],cuts[i+1],seg||3));return out}
+// a radius can be a number, or a function of the angle (for a bumpy moon rim)
+const RAD=(r,a)=>typeof r==='function'?r(a):r;
+function arcPts(r,a1,a2,n){const o=[];for(let i=0;i<=n;i++){const a=a1+(a2-a1)*i/n;o.push(P(RAD(r,a),a))}return o}
+function ringPoly(r0,r1,a1,a2,n){return arcPts(r1,a1,a2,n).concat(arcPts(r0,a2,a1,n))}
+function edgePt(a){const c=Math.cos(a),s=Math.sin(a);let t=1e9;
+  if(c>1e-9)t=Math.min(t,(S-CX)/c);if(c<-1e-9)t=Math.min(t,-CX/c);
+  if(s>1e-9)t=Math.min(t,(S-CY)/s);if(s<-1e-9)t=Math.min(t,-CY/s);return[CX+c*t,CY+s*t]}
+function cornersBetween(a1,a2){const out=[];[[S,S],[0,S],[0,0],[S,0]].forEach(([x,y])=>{let aa=Math.atan2(y-CY,x-CX);while(aa<a1)aa+=2*Math.PI;if(aa<a2)out.push([aa,x,y])});return out.sort((p,q)=>p[0]-q[0]).map(p=>[p[1],p[2]])}
+function mixHex(a,b,t){const A=[1,3,5].map(i=>parseInt(a.substr(i,2),16)),B=[1,3,5].map(i=>parseInt(b.substr(i,2),16));
+  return '#'+A.map((v,i)=>Math.max(0,Math.min(255,Math.round(v+(B[i]-v)*t))).toString(16).padStart(2,'0')).join('')}
+function tint(col,r,amt){const t=(r()-.5)*2*(amt||.16);return t>0?mixHex(col,'#ffffff',t):mixHex(col,'#000000',-t)}
+
+/* ---------- the Roman numerals: thin pieces of dark glass, each leaded in ---------- */
+const NUMPOS=[[32,7.6],[56.4,25],[54,56],[10,56],[7.6,25]];
+function glyph(p,hh){
+  if(p===1)return[[0,-hh,0,hh]];
+  if(p===2)return[[-1.5,-hh,-1.5,hh],[1.5,-hh,1.5,hh]];
+  if(p===3)return[[-2.9,-hh,-2.9,hh],[0,-hh,0,hh],[2.9,-hh,2.9,hh]];
+  if(p===4)return[[-3.6,-hh,-3.6,hh],[-1.3,-hh,1.2,hh],[3.7,-hh,1.2,hh]];
+  return[[-2.8,-hh,0,hh],[2.8,-hh,0,hh]]}
+const GHALF=[0,0,1.5,2.9,3.7,2.8];
+const BAR={hh:4.4,w:1.75};
+function numPos(v,p){return(v.numpos||NUMPOS)[p-1]}
+function barAvoid(v,p){const[x,y]=numPos(v,p);return[x,y,Math.max(GHALF[p],v.hh||BAR.hh)+2.2]}
+function barPieces(v,p){const[x,y]=numPos(v,p),out=[],hh=v.hh||BAR.hh;
+  glyph(p,hh).forEach(([x1,y1,x2,y2])=>{const dx=x2-x1,dy=y2-y1,L=Math.hypot(dx,dy),nx=-dy/L*BAR.w/2,ny=dx/L*BAR.w/2;
+    out.push({pts:[[x+x1+nx,y+y1+ny],[x+x2+nx,y+y2+ny],[x+x2-nx,y+y2-ny],[x+x1-nx,y+y1-ny]],col:v.numGlass,on:'calm'})});
+  return out}
+
+/* ---------- the lit slices outside the moon ---------- */
+function outerGlass(v,sh,top,r,sec,done){
+  for(let k=0;k<5;k++){const p=k+1,poly=sec(k);
+    let base=v.zones[k],on=true;
+    // WD-1b-iii: an unfinished day keeps its slices dim; a finished day blazes
+    if(v.glowDone){if(done)base=mixHex(base,'#fff6dc',.14);else{base=mixHex(base,'#17121c',.55);on='calm'}}
+    shatter(poly,5,r,7,[barAvoid(v,p)]).forEach(q=>sh.push({pts:q,col:tint(base,r,.07),kind:'fill',on}));
+    barPieces(v,p).forEach(q=>top.push(q))}}
+
+/* ============ the moon ============ */
+function moonBlock(v,st,d){const sh=[],top=[],r=rng(1000+d*31),G=v.geo||{};
+  CY=G.cy||34.5;
+  const R=G.R||19,RI=G.RI||11.5,RIM=G.RIM||2.2,HALO=G.halo||0,RO0=R+RIM;
+  // the moon's outer edge: a perfect circle, or (WD-1b-ii) a gently bumpy rim
+  const RO=G.wobble?(a=>RO0+G.wobble*(.55*Math.sin(3*a+1.3+d)+.45*Math.sin(7*a+.4+2*d))):RO0;
+  const RH=HALO?(typeof RO==='function'?a=>RO(a)+HALO:RO0+HALO):RO;
+  const done=dayDone(st,d);
+  const sec=k=>{const a1=ANGC(k)-36*DEG,a2=ANGC(k)+36*DEG;return[P(RAD(RH,a1),a1),edgePt(a1)].concat(cornersBetween(a1,a2),[edgePt(a2)],arcPts(RH,a2,a1,6))};
+  outerGlass(v,sh,top,r,sec,done);
+  for(let k=0;k<5;k++){const a=ANGC(k)-36*DEG;sh.push({spoke:[P(RAD(RH,a),a),edgePt(a)]})}
+  // WD-1b-iii: a thin halo of gold glass round the moon, lit only when the day is finished
+  if(HALO)for(let k=0;k<5;k++){const a=ANGC(k);for(let j=0;j<2;j++){const a1=a-36*DEG+j*36*DEG,a2=a1+36*DEG;
+    sh.push({pts:ringPoly(RO,RH,a1,a2,4),col:done?tint('#ffd36a',r,.05):tint('#4a3a1c',r,.05),kind:'fill',on:done?true:'calm'})}}
+  // rim of the moon: lit silver on the right, shadowed on the left (crescent), cut with every wedge
+  const rimN=G.rimPieces||3,rimW=72/rimN;
+  for(let k=0;k<5;k++){const a=ANGC(k);for(let j=0;j<rimN;j++){const a1=a-36*DEG+j*rimW*DEG,a2=a1+rimW*DEG,mid=(a1+a2)/2;
+    const lit=Math.cos(mid-(-20*DEG));
+    let col=lit>0?mixHex(v.rimLit,v.rimDark,.5-lit*.5):v.rimDark;
+    if(G.rimSpeckle&&r()<.35)col=mixHex(col,'#000000',.22); // pitted, uneven rim glass
+    sh.push({pts:ringPoly(R,RO,a1,a2,3),col:tint(col,r,.06),kind:'fill',on:lit>0?true:'calm'})}}
+  // the five period wedges: lesson in the middle, homework round the outside
+  const nCr=G.craters||1;
+  for(let k=0;k<5;k++){const p=k+1,a1=ANGC(k)-36*DEG,a2=ANGC(k)+36*DEG;
+    const L=partState(v,st,d,p,'lesson'),H=partState(v,st,d,p,'hw');
+    const les=[[CX,CY]].concat(arcPts(RI,a1,a2,3));
+    sh.push({heavy:1,pts:les},{heavy:1,pts:ringPoly(RI,R,a1,a2,6)});
+    const ls=shatter(les,3,r,6),craterL=Math.floor(r()*ls.length);
+    ls.forEach((q,i)=>sh.push({pts:q,col:moonTint(L,r,i===craterL,G),kind:'lesson',p,on:L.on}));
+    const hs=[];ringShards(RI,R,a1,a2,3,r,2).forEach(q=>shatter(q,2,r,6).forEach(z=>hs.push(z)));
+    const cr=new Set();while(cr.size<Math.min(nCr,hs.length))cr.add(Math.floor(r()*hs.length));
+    hs.forEach((q,i)=>sh.push({pts:q,col:moonTint(H,r,cr.has(i),G),kind:'hw',p,on:H.on}))}
+  return{sh,top,done}}
+function moonTint(s,r,crater,G){let c=s.on===true?mixHex(s.col,'#f4f1ff',.18):s.col;
+  if(crater)c=G.craters>1?mixHex(c,'#26304a',s.on?.34:.24):mixHex(c,'#000000',s.on?.28:.22);return tint(c,r,.12)}
+
+/* ---------- what colour a period's piece is ---------- */
+function partState(v,st,d,p,part){const l=LESSONS.find(x=>x.day===d&&x.per===p);
+  if(!l)return part==='lesson'?{col:v.free,on:'calm'}:{col:v.noHw,on:'calm'};
+  const s=st[l.i];
+  if(part==='lesson')return s.built?{col:CLASSCOL[l.cls],on:true}:{col:v.unlit,on:false};
+  if(s.hw==='set')return{col:v.hwSet,on:true};
+  if(s.hw==='none')return{col:v.noHw,on:'calm'};
+  return{col:v.unlit,on:false}}
+
+/* ---------- the four cards ---------- */
+const SLICES=['#f3cd63','#eeab4f','#e48f4c','#d97357','#c95d68']; // WD-1b: gold at P1, warming to ruby by P5
+const DAWN=['#f2ab9c','#f6c868','#f1dc92','#e9984f','#a985cf'];   // dawn pink, morning gold, noon straw, afternoon amber, dusk violet
+const MOONBASE={block:moonBlock,rimLit:'#c3cbe0',rimDark:'#3b4257',free:'#7f97ab',noHw:'#8b84b4',hwSet:'#fbfaff',unlit:'#171a24',numGlass:'#1b1520'};
+const VARS=[
+ Object.assign({id:'WD-1b',title:'The moon, five slices',zones:SLICES,
+  cap:'Your pick, unchanged, so you can compare: slices warm from gold (I) to ruby (V).'},MOONBASE),
+ Object.assign({id:'WD-1b-i',title:'Dawn to dusk',zones:DAWN,
+  cap:'Changes the colours: the day runs from dawn pink (I) through noon gold to dusk violet (V).'},MOONBASE),
+ Object.assign({id:'WD-1b-ii',title:'A bigger, truer moon',zones:SLICES,
+  geo:{R:21,RI:12.8,RIM:2.4,cy:35,wobble:.7,craters:2,rimPieces:4,rimSpeckle:1},hh:3.6,
+  numpos:[[32,6.6],[55.5,16.5],[56,56.5],[8,56.5],[8.5,16.5]],
+  cap:'Changes the moon: bigger, with a bumpy pitted rim and more craters; numerals tucked against the frame, III and IV in the corners.'},MOONBASE),
+ Object.assign({id:'WD-1b-iii',title:'Finished days blaze',zones:SLICES,glowDone:1,
+  geo:{halo:3,R:17.5,RI:10.8,RIM:1.8},
+  cap:'Changes the glow: a finished day blazes and lights a thin gold halo round its moon; an unfinished day stays dim.'},MOONBASE)
+];
+
+/* ---------- drawing: every shard is its own leaded piece ---------- */
+const LEAD='#0a090c';
+function pathD(pts,open){return 'M'+pts.map(q=>f(q[0])+' '+f(q[1])).join('L')+(open?'':'Z')}
+function blockSVG(v,st,d,uid){const{sh,top,done}=v.block(v,st,d);let g='',bloom='',lead='',heavy='',g2='',lead2='';
+  sh.forEach(s=>{if(s.spoke){heavy+=pathD(s.spoke,1);return}
+    const D=pathD(s.pts);if(s.heavy){heavy+=D;return}
+    const attrs=s.kind==='fill'?'':' class="pc" data-d="'+d+'" data-p="'+s.p+'" data-part="'+s.kind+'"';
+    const filt=s.on===false?' filter="url(#'+uid+'tex)"':'';
+    const op=s.on==='calm'&&s.kind!=='fill'?' fill-opacity=".88"':'';
+    g+='<path'+attrs+' d="'+D+'" fill="'+s.col+'"'+op+filt+'/>';
+    if(s.on===true)bloom+='<path d="'+D+'" fill="'+s.col+'"'+(s.kind==='fill'?' fill-opacity=".55"':'')+'/>';
+    lead+=D});
+  top.forEach(s=>{const D=pathD(s.pts);g2+='<path d="'+D+'" fill="'+s.col+'"/>';lead2+=D});
+  return{g,bloom,lead,heavy,g2,lead2,done}}
+function defsFor(uid){return '<filter id="'+uid+'tex" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="1.2" numOctaves="2" seed="7" result="n"/><feColorMatrix in="n" type="matrix" values="0 0 0 0 .55  0 0 0 0 .58  0 0 0 0 .66  0 0 0 .2 0" result="c"/><feComposite in="c" in2="SourceGraphic" operator="in" result="t"/><feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="t"/></feMerge></filter>'+
+  '<filter id="'+uid+'bloom" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="1.5"/></filter>'+
+  '<filter id="'+uid+'blaze" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="2.4"/></filter>'}
+function wallSVG(v,st,uid){const W=5*S+4*GAP,H=TOP+2*S+ROWGAP;let glass='',bloom='',blaze='',lead='',top='',labels='';
+  for(let c=0;c<5;c++)labels+='<text x="'+(c*(S+GAP)+S/2)+'" y="8.5" text-anchor="middle" font-size="8.5" font-weight="700" fill="#aab2c4" font-family="system-ui,sans-serif">'+DL[c]+'</text>';
+  for(let d=0;d<10;d++){const ox=(d%5)*(S+GAP),oy=TOP+(d>=5?S+ROWGAP:0),T='translate('+ox+' '+oy+')',b=blockSVG(v,st,d,uid);
+    glass+='<g transform="'+T+'">'+b.g+'</g>';
+    if(v.glowDone&&b.done)blaze+='<g transform="'+T+'">'+b.bloom+'</g>';else bloom+='<g transform="'+T+'">'+b.bloom+'</g>';
+    lead+='<g transform="'+T+'"><path d="'+b.lead+'"/><path d="'+b.heavy+'" stroke-width="2.3"/></g>';
+    top+='<g transform="'+T+'">'+b.g2+'<g fill="none" stroke="'+LEAD+'" stroke-linejoin="round" stroke-linecap="round"><path d="'+b.lead2+'" stroke-width=".9"/></g>'+
+      '<rect x="1" y="1" width="'+(S-2)+'" height="'+(S-2)+'" rx="1.5" fill="none" stroke="'+LEAD+'" stroke-width="2.4"/></g>'}
+  return '<svg class="wall" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+v.title+' wall, two weeks"><defs>'+defsFor(uid)+'</defs>'+labels+glass+
+   '<g filter="url(#'+uid+'bloom)" opacity="'+(v.glowDone?.3:.42)+'" style="mix-blend-mode:screen" pointer-events="none">'+bloom+'</g>'+
+   (blaze?'<g filter="url(#'+uid+'blaze)" opacity=".8" style="mix-blend-mode:screen" pointer-events="none">'+blaze+'</g>':'')+
+   '<g fill="none" stroke="'+LEAD+'" stroke-width="1.3" stroke-linejoin="round" pointer-events="none">'+lead+'</g><g pointer-events="none">'+top+'</g><g class="sel" pointer-events="none"></g></svg>'}
+function swatch(fill,texture){return '<svg width="18" height="13" viewBox="0 0 18 13"><path d="M1 1H10L8 12H1Z" fill="'+fill+'" stroke="'+LEAD+'" stroke-width="1.5"/><path d="M10 1H17V12H8Z" fill="'+(texture?fill:mixHex(fill,'#ffffff',.18))+'" stroke="'+LEAD+'" stroke-width="1.5"/>'+(texture?'<path d="M3 4h3M11 8h3" stroke="#2a2f3c" stroke-width="1"/>':'')+'</svg>'}
+
+function describe(d,p,part,st){const l=LESSONS.find(x=>x.day===d&&x.per===p);
+  const base='<b>'+DAYS[d]+', P'+p;
+  if(!l)return base+'</b>: free period ('+(part==='lesson'?'lesson piece':'homework piece')+').';
+  const s=st[l.i];
+  if(part==='lesson')return base+', '+l.cls+', lesson</b>: '+(s.built?'built.':'not built yet.');
+  return base+', '+l.cls+', homework</b>: '+(s.hw==='set'?'homework set.':s.hw==='none'?'no homework needed.':'homework needed, not set yet.')}
+
+const cards=document.getElementById('cards');
+VARS.forEach((v,vi)=>{
+  const card=document.createElement('section');card.className='card';card.id=v.id;
+  card.innerHTML='<h3><span class="code">'+v.id+'</span>'+v.title+'</h3><p class="cap">'+v.cap+'</p><div class="chooser"></div><div class="wallbox"></div><div class="info">Tap a shard.</div>'+
+   '<div class="key">'+
+   '<span>'+swatch('#3fb4e8')+'Lesson built (class colour)</span>'+
+   '<span>'+swatch(v.unlit,1)+'Not built / not set</span>'+
+   '<span>'+swatch(v.hwSet)+'Homework set</span>'+
+   '<span>'+swatch(v.free)+'Free period</span>'+
+   '<span>'+swatch(v.noHw)+'No homework needed</span>'+
+   (v.glowDone?'<span>'+swatch('#ffd36a')+'Gold halo: day finished</span>':'')+'</div>';
+  cards.appendChild(card);
+  const ch=card.querySelector('.chooser'),box=card.querySelector('.wallbox'),info=card.querySelector('.info');
+  let state='track',st;
+  function render(){st=statusFor(state);box.innerHTML=wallSVG(v,st,'v'+vi);
+    ch.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.s===state));
+    const b=st.filter(s=>s.built).length,need=st.filter(s=>s.hw!=='none').length,h=st.filter(s=>s.hw==='set').length;
+    const dd=v.glowDone?', days finished <b>'+[0,1,2,3,4,5,6,7,8,9].filter(d=>dayDone(st,d)).length+'</b> of 10':'';
+    info.innerHTML='Built <b>'+b+'</b> of '+N+' lessons, homework set <b>'+h+'</b> of '+need+dd+'. Tap a shard.'}
+  Object.entries(STATES).forEach(([k,t])=>{const b=document.createElement('button');b.textContent=t;b.dataset.s=k;b.onclick=()=>{state=k;render()};ch.appendChild(b)});
+  box.addEventListener('click',e=>{const pc=e.target.closest('.pc');if(!pc)return;
+    const d=pc.dataset.d,p=pc.dataset.p,part=pc.dataset.part;info.innerHTML=describe(+d,+p,part,st);
+    const T=pc.parentNode.getAttribute('transform');let o='';
+    box.querySelectorAll('.pc[data-d="'+d+'"][data-p="'+p+'"][data-part="'+part+'"]').forEach(s=>o+=s.getAttribute('d'));
+    box.querySelector('.sel').innerHTML='<path d="'+o+'" transform="'+T+'" fill="#ffffff" fill-opacity=".18" stroke="#ffffff" stroke-width="1"/>'});
+  render();
+});
+</script>
+</body>
+</html>
