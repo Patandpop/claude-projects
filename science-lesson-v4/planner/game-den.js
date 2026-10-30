@@ -836,7 +836,7 @@
   }
   function render(X) {
     KEEP_ITEMS = (k) => itemsOf(X, k);
-    if (!X.SHOP || !X.ROOM) return '<p class="dn-note">Opening the Den…</p>' + X.oracle();
+    if (!X.SHOP || !X.ROOM) return (window.BREW ? BREW.html('Opening the Den') : '<p class="dn-note">Opening the Den…</p>') + X.oracle();
     const v = X.V.den;
     if (v === 'market') return marketHtml(X);
     if (v === 'stall' && KB[X.V.stall]) return stallHtml(X);

@@ -787,7 +787,7 @@
     const LVC = { all: '#5ef2a0', most: '#ffd56a', some: '#a48aff', none: '#2a2050' };
     function oracle() {
       if (CHRON && window.ORACLE) return ORACLE.html(CHRON); // the stained-glass rose window (game-oracle.js, 2026-10-29); the old view below is the fallback
-      if (!CHRON) return '<div class="uz-orc"><h4>Oracle</h4><p class="uz-p" style="color:#a99cc8">Reading the stars…</p></div>';
+      if (!CHRON) return '<div class="uz-orc"><h4>Oracle</h4>' + (window.BREW ? BREW.html('Reading the stars', true) : '<p class="uz-p" style="color:#a99cc8">Reading the stars…</p>') + '</div>';
       const wk = CHRON.days.slice(28), kept = CHRON.days.filter((d) => !d.future && (d.level === 'all' || d.level === 'most')).length;
       return '<div class="uz-orc"><h4>Oracle<span>' + kept + ' kept in 5 weeks</span></h4><div class="uz-wk">' + wk.map((d) => {
         const lab = DN[dt(d.day).getUTCDay()];
@@ -934,7 +934,7 @@
 
     /* ---------- paint ---------- */
     function paint() {
-      if (!D) { body.innerHTML = '<div style="height:100%;display:flex;align-items:center;justify-content:center;font:24px var(--g);color:#5ef2a0;text-align:center;padding:20px">' + (err ? esc(err) : 'Summoning Ulhu…') + '</div>'; return; }
+      if (!D) { body.innerHTML = !err && window.BREW ? BREW.html('Something is brewing') : '<div style="height:100%;display:flex;align-items:center;justify-content:center;font:24px var(--g);color:#5ef2a0;text-align:center;padding:20px">' + (err ? esc(err) : 'Summoning Ulhu…') + '</div>'; if (window.BREW) BREW.run(body); return; }   // the loading screen: Ulhu stirs the cauldron (1U.12)
       paintBanner(); paintTop();
       const keep = [...body.querySelectorAll('.uz-pane')].map((p) => p.scrollTop), oldForm = body.querySelector('.uz-form'), fs = oldForm ? oldForm.scrollTop : 0;
       const ae = document.activeElement, ds = ae && body.contains(ae) ? ae.dataset : null;
@@ -949,6 +949,7 @@
       if (focus) { const n = body.querySelector(focus); if (n) { n.focus(); try { n.setSelectionRange(n.value.length, n.value.length); } catch (e) { /* not a text box */ } } }
       drawSky();
       if (window.UZDEN) UZDEN.after(X, body);
+      if (window.BREW) BREW.run(body);   // any loading scene on the page starts stirring (1U.12)
       const sb = body.querySelector('.uz-stampbox'); if (sb && V.stampNew) { V.stampNew = false; anim(sb, [{ transform: 'scale(2.4) rotate(-28deg)', opacity: 0 }, { transform: 'scale(.92) rotate(-10deg)', opacity: 1, offset: 0.7 }, { transform: 'scale(1) rotate(-10deg)', opacity: 1 }], { duration: 420, easing: 'cubic-bezier(.2,.8,.3,1.2)' }); }
       if (window.TEMPLE) TEMPLE.paint(body);
       if (window.STONE) STONE.paint(body);

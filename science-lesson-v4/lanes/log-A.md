@@ -11,6 +11,16 @@ Plain-English record of Lane A's work (the Ulhu game), newest entry first.
 
 ---
 
+## 29 Oct 2026, item 1U.12: the loading screen
+
+**What changed:** wherever Ulhu waits (opening Ulhu, opening the Den, the Oracle reading the stars), he now stands behind the cauldron and stirs it over the fire, your pick L3a with the improved fire, with a short line under it ("Something is brewing", "Opening the Den", "Reading the stars") and ticking dots. It is copied straight from the mock-up's own drawing. With reduced motion on it is one still picture. A scene waiting in a pane you can't see (the Den or the Oracle before their data comes) is not drawn at all, so it costs no battery.
+
+**You need to:** nothing now. It goes into the next complete paste set.
+
+Also: the Ulhu browser check now copes with a very busy PC (all the chats at once). It waits longer for the first page load and presses Undo directly, because on a slow PC the Undo line folded itself away (it hides 10 seconds after a tap) before the check could press it.
+
+**Queued from the design chat (30 Oct):** faint FA-R3 (no ticks under the stars; over three rituals he climbs back to full health and the lost runes come back as tablets in bubbles), level up LU-X2 "The Sky Answers", and the wall WD-1b (final look from wall7 once you pick). Each is built where it sits in the list: Big Moments next, then the wall and golems.
+
 ## 29 Oct 2026, item 1U.9: the haggle prize is one item, by dice kept
 
 **What changed:** before you sit down, the keeper asks which ONE item you play for (up to five of that stall's best, the dearest picked; tap another to switch). When the stalls get their spotlight (1U.6) it will be whatever is in the spotlight. A win takes money off that item only: 25% if you still hold 5 or 4 dice, 20% with 3, 15% with 2, 10% with 1. A loss or walking out puts 10% on that item today. Still one game a day with each keeper. The end shows one big word, VANQUISHT or ENGULFT (the default until you pick the losing word on the dice mock-up), then the item at its new price. The stall's badge says the same word.

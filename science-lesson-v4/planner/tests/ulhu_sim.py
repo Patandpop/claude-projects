@@ -3,7 +3,7 @@ Run: python tests/ulhu_sim.py  (add --shots DIR to save screenshots). Synthetic 
 import os, sys, subprocess, time
 from playwright.sync_api import sync_playwright
 P = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '/'; SP = sys.argv[1] if len(sys.argv) > 1 and not sys.argv[1].startswith('--') else __import__('tempfile').mkdtemp()
-js = ''.join(open(P + f, encoding='utf-8').read() + '\n' for f in ['game-ulhu.js', 'game-pixel.js', 'game-runes.js', 'game-temple.js', 'game-stone.js', 'game-omens.js', 'game-tabs.js', 'game-blood.js', 'game-scroll.js', 'game-glass.js', 'game-highvespers.js', 'game-lair.js', 'game-den.js', 'game-ui.js', 'game-oracle.js', 'game-pairs.js'])
+js = ''.join(open(P + f, encoding='utf-8').read() + '\n' for f in ['game-ulhu.js', 'game-pixel.js', 'game-runes.js', 'game-temple.js', 'game-stone.js', 'game-omens.js', 'game-tabs.js', 'game-blood.js', 'game-scroll.js', 'game-glass.js', 'game-highvespers.js', 'game-lair.js', 'game-brew.js', 'game-den.js', 'game-ui.js', 'game-oracle.js', 'game-pairs.js'])
 page = '''<!doctype html><meta charset="utf-8"><meta name=viewport content="width=device-width,initial-scale=1"><body style="margin:0;background:#0d1b3a">
 <div style="height:60px;background:#0a1020;color:#fff">8AG header</div><div id=u></div><nav style="position:fixed;bottom:0;left:0;right:0;height:62px;background:#0a1020"></nav>
 <script>window.CALLS=[];function call(fn,...args){CALLS.push(fn);window.ARGS=window.ARGS||[];ARGS.push(args);return fetch('/c',{method:'POST',body:JSON.stringify({fn,args})}).then(r=>r.json()).then(x=>{if(x.err)throw new Error(x.err);return x.ok;});}</script>
@@ -21,7 +21,7 @@ try:
     with sync_playwright() as p:
         b = p.chromium.launch(); pg = b.new_page(viewport={'width': 390, 'height': 844}, has_touch=True)
         errs = []; pg.on('pageerror', lambda e: errs.append(str(e)))
-        pg.goto('http://localhost:' + PORT + '/'); pg.wait_for_timeout(2500)
+        pg.goto('http://localhost:' + PORT + '/', timeout=90000); pg.wait_for_timeout(2500)   # a busy PC can take over 30 s to load it
         check('banner shows coins (after-work life ticks pay x1.5 at 4.40 pm), level title and Ulhu', int(pg.inner_text('.uz-coins b')) > 400 and pg.locator('.uz-me img').count() >= 1)
         check('four tabs, Rituals first with a count badge', pg.locator('.uz-tabs button').count() == 4 and pg.locator('.uz-tabs button b.bd:not([hidden])').count() >= 1)
         check('The Call has Toil; the Grimoire opens folded: Breakwater, The Teaching Trench, The Surface World', 'Toil' in pg.inner_text('.uz-pane >> nth=0') and all(t in pg.inner_text('.uz-pane >> nth=1') for t in ['Breakwater', 'The Teaching Trench', 'The Surface World']))
@@ -43,14 +43,14 @@ try:
         check('1.16 every tick carries the moment it was made and its own id', pg.evaluate("(() => { const a = ARGS[CALLS.lastIndexOf('gameTick')]; const m = a && a[a.length - 1]; return !!(m && m.at && m.aid); })()"))
         n_loads = pg.evaluate("CALLS.filter(c => c === 'gameLoad').length"); pg.evaluate("window.dispatchEvent(new Event('focus'))"); pg.wait_for_timeout(700)
         check('1.10 coming back to a page whose day has passed reloads it from the server', pg.evaluate("CALLS.filter(c => c === 'gameLoad').length") == n_loads + 1)
-        pg.click('[data-a=undo]'); pg.wait_for_timeout(900)
+        pg.locator('[data-a=undo]').dispatch_event('click'); pg.wait_for_timeout(900)   # pressed directly: on a busy PC the undo line can fold away (10 s) first
         check('Undo puts it back (screen and server)', int(pg.inner_text('.uz-coins b')) == c0 and 'Undone' in pg.inner_text('.uz-undo'))
         # 1U.1 (Patryk 29 Oct): a boss stage due today sits in The Call; tapping it must land a hit
         st = pg.locator('.uz-pane >> nth=0').locator('[data-a=stage]')
         check('1U.1 a boss stage due today is listed in The Call', st.count() >= 1)
         st.first.click(); pg.wait_for_timeout(1500)
         check('...and tapping it lands a hit on the boss (screen and server)', 'hit:' in pg.inner_text('.uz-undo').lower() and 'gameBossStage' in pg.evaluate('CALLS'))
-        pg.click('[data-a=undo]'); pg.wait_for_timeout(900)
+        pg.locator('[data-a=undo]').dispatch_event('click'); pg.wait_for_timeout(900)   # pressed directly: on a busy PC the undo line can fold away (10 s) first
         check('...and Undo reopens the stage', 'Undone' in pg.inner_text('.uz-undo') and pg.locator('.uz-pane >> nth=0').locator('[data-a=stage]').count() >= 1)
         # swipe to Quests
         def swipe(dx):
@@ -65,11 +65,17 @@ try:
         check('a checklist step ticks', any(x in pg.inner_text('.uz-pane >> nth=1') for x in ['2/3', '2 of 3']))
         hs = pg.evaluate("[...document.querySelectorAll('.uz-pane:nth-child(2) .sc-card')].map(c => [c.querySelectorAll('.sc-step').length, c.querySelector('.sc-body').offsetHeight])")
         check('1U.2 a quest with no steps is a compact card, one with steps keeps its room: ' + str(hs), any(n == 0 and h < 110 for n, h in hs) and all(h >= 120 for n, h in hs if n) and all(h >= 80 for n, h in hs))
-        q = pg.locator('.uz-pane >> nth=1').locator('[data-scroll] [data-a=tick], .uz-q [data-a=tick]').first; q.click(); pg.wait_for_timeout(5500)   # the scroll is sealed and burns first
+        q = pg.locator('.uz-pane >> nth=1').locator('[data-scroll] [data-a=tick], .uz-q [data-a=tick]').first; q.click()   # the scroll is sealed and burns first
+        try: pg.wait_for_function("[...document.querySelectorAll('.uz-pane')][1].innerText.includes('Vanquished')", timeout=20000)
+        except Exception: pass
         check('a fulfilled quest goes to Vanquished', 'Vanquished' in pg.inner_text('.uz-pane >> nth=1'))
-        pg.locator('[data-a=banish]').first.click(); pg.locator('[data-a=banish]').first.click(); pg.wait_for_timeout(700)
+        pg.locator('[data-a=banish]').first.click(); pg.locator('[data-a=banish]').first.click()
+        try: pg.wait_for_function("document.querySelectorAll('.uz-bossw').length == 1", timeout=6000)
+        except Exception: pass
         check('Banish (two taps) removes a boss, Undo brings it back', pg.locator('.uz-bossw').count() == 1)
-        pg.click('[data-a=undo]'); pg.wait_for_timeout(800)
+        pg.locator('[data-a=undo]').dispatch_event('click')   # pressed directly: the undo line folds away 10 s after the last tap
+        try: pg.wait_for_function("document.querySelectorAll('.uz-bossw').length == 2", timeout=6000)
+        except Exception: pass
         check('...and it is back', pg.locator('.uz-bossw').count() == 2)
         # boss form
         pg.click('.uz-dock [data-v=boss]'); pg.wait_for_timeout(200)
@@ -147,9 +153,11 @@ try:
         pg.click('[data-a=dn-peek]'); pg.wait_for_timeout(300); pg.click('[data-a=dn-sit]'); pg.wait_for_timeout(1500)
         t0 = time.time()
         while time.time() - t0 < 120 and not pg.locator('.dn-res').count():   # call Liar! whenever we can, else the lowest claim
-            if pg.locator('[data-a=dn-next]:not([disabled])').count(): pg.click('[data-a=dn-next]')
-            elif pg.locator('[data-a=dn-liar]:not([disabled])').count(): pg.click('[data-a=dn-liar]')
-            elif pg.locator('[data-a=dn-claim]:not([disabled])').count(): pg.click('[data-a=dn-claim]')
+            try:   # a slow PC can still be redrawing the table: try again next time round
+                if pg.locator('[data-a=dn-next]:not([disabled])').count(): pg.click('[data-a=dn-next]', timeout=5000)
+                elif pg.locator('[data-a=dn-liar]:not([disabled])').count(): pg.click('[data-a=dn-liar]', timeout=5000)
+                elif pg.locator('[data-a=dn-claim]:not([disabled])').count(): pg.click('[data-a=dn-claim]', timeout=5000)
+            except Exception: pass
             pg.wait_for_timeout(250)
         pg.wait_for_selector('.dn-res', timeout=10000)
         won = pg.locator('.dn-res.ok').count() == 1
@@ -173,7 +181,10 @@ try:
         pg.wait_for_timeout(300)
         check('tapping a ritual opens it to edit (Edit ritual, Save, Archive)', 'Edit ritual' in pg.inner_text('.uz-form') and pg.locator('.uz-form [data-a=farch]').count() == 1)
         check('sizes, not minutes', 'Medium' in pg.inner_text('.uz-form') and ' min' not in pg.inner_text('.uz-form'))
-        pg.fill('.uz-form [data-name]', 'Workout'); pg.click('.uz-form [data-a=submit]'); pg.wait_for_timeout(1200)
+        pg.fill('.uz-form [data-name]', 'Workout'); pg.click('.uz-form [data-a=submit]')
+        # wait for the save itself (up to 8 s), not a fixed pause: a busy test machine answers late, not wrongly
+        try: pg.wait_for_function("(document.querySelectorAll('.uz-pane')[1] || {}).innerText && document.querySelectorAll('.uz-pane')[1].innerText.indexOf('Workout') >= 0", timeout=8000)
+        except Exception: pass
         check('the edit is saved (renamed to Workout)', 'Workout' in pg.inner_text('.uz-pane >> nth=1'))
         pg.click('.uz-tabs [data-v="1"]'); pg.wait_for_timeout(300); pg.click('.uz-dock [data-v=quest]'); pg.wait_for_timeout(300)
         check('the quest form has a date picker', pg.locator('.uz-form input[type=date]').count() == 1)
@@ -246,6 +257,9 @@ try:
         n1 = pg.inner_text('.pz-n'); pg.click('[data-a=pskip]'); pg.wait_for_timeout(300)
         check('Pair all walks through the one-sided omens one at a time (skip moves on)', n1.startswith('1 of') and pg.inner_text('.pz-n').startswith('2 of'))
         pg.click('[data-a=pclose]'); pg.wait_for_timeout(300)
+        pg.evaluate("(() => { const d = document.createElement('div'); d.id = 'brewt'; d.style.cssText = 'position:fixed;inset:0;z-index:99;background:#070d0b'; d.innerHTML = BREW.html('Something is brewing'); document.body.appendChild(d); BREW.run(d); })()"); pg.wait_for_timeout(700)
+        check('1U.12 the loading screen is Ulhu stirring the cauldron: the scene draws (fire, pot, Ulhu) with its caption', pg.evaluate("(() => { const c = document.querySelector('#brewt canvas'), x = c.getContext('2d').getImageData(0, 0, 90, 64).data; let n = 0, fire = 0; for (let i = 0; i < x.length; i += 4) { if (x[i + 3]) n++; if (x[i] > 200 && x[i + 1] > 80 && x[i + 2] < 80) fire++; } const ok = n > 4000 && fire > 20 && /Something is brewing/.test(document.querySelector('#brewt .cap').textContent); document.getElementById('brewt').remove(); return ok; })()"))
+        check('1U.12 a loading scene in a pane off to the side is not drawn (no battery spent on it)', pg.evaluate("(() => { const d = document.createElement('div'); d.style.cssText = 'position:fixed;left:200vw;top:0;width:300px'; d.innerHTML = BREW.html('x'); document.body.appendChild(d); BREW.run(d); return new Promise((r) => setTimeout(() => { const x = d.querySelector('canvas').getContext('2d').getImageData(0, 0, 90, 64).data; let n = 0; for (let i = 3; i < x.length; i += 4) if (x[i]) n++; d.remove(); r(n === 0); }, 700)); })()"))
         check('no page errors', not errs)
         if errs: print(errs[:3])
         b.close()
