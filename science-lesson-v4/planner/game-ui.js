@@ -1026,6 +1026,7 @@
     const shopRefresh = () => call('gameShop').then((s) => { SHOP = s; paint(); }).catch(() => {});
     // what the Den (game-den.js) may use
     const X = { get D() { return D; }, V, get SHOP() { return SHOP; }, get ROOM() { return ROOM; }, setShop: (s) => { SHOP = s; }, esc, coin, layers, mood, night, act, call, paint, shake, setMood, bounce, buzz, shopRefresh, witem, WNAMES, WCATS, TIERC, IMG, A, oracle, body, fx };
+    if (window.UZCOMP && UZCOMP.attach) UZCOMP.attach(X, box);   // the life companion: day tags, the night's note, finds, cabinets (game-companion.js, Lane D)
 
     /* ---------- taps ---------- */
     box.addEventListener('click', (e) => {
