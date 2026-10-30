@@ -13,7 +13,7 @@
 const BRIDGE_CALLS = [
   // behaviour (the phone page)
   'init', 'openClass', 'logEvent', 'logMany', 'removeEvent', 'removeMany', 'positivesOver', 'getMode', 'setMode',
-  'setLive', 'setLost', 'setSupport', 'getSilence', 'setLimit', 'showRecap', 'stopRecap', 'setTimer', 'adjustTimer',
+  'setLive', 'setLost', 'setSupport', 'getSilence', 'showRecap', 'stopRecap', 'setTimer', 'adjustTimer',
   'stopTimer', 'setPause', 'endMode', 'getFriday', 'markEmailed', 'lessonMcqs', 'saveVote', 'removeVote',
   // the planner
   'loadAll', 'saveWeek', 'saveWeeks', 'saveLessonChanges', 'saveLessons', 'saveClassSetting', 'learnEquipment',

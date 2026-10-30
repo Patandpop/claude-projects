@@ -126,7 +126,10 @@ ok('no window title is ever stored', !JSON.stringify(m.sheets.Timer._data).inclu
 const maybeRow = timerReport(k, '', '9999').find((x) => x.maybe);
 timerEdit(k, maybeRow.id, { minutes: 75 });
 ok('editing a "maybe" row fixes its minutes and clears the flag', timerReport(k, '', '9999').find((x) => x.id === maybeRow.id).minutes === 75 && !timerReport(k, '', '9999').find((x) => x.id === maybeRow.id).maybe);
-ok('the report covers a date range', timerReport(k, addDay(TODAY, 1), '9999').length === 0 && timerReport(k, TODAY, TODAY).length === 5);
+// counted by each row's own day: a timer started "3 hours ago" falls on yesterday when the tests run before 3am
+const allRows = timerReport(k, '', '9999'), todays = allRows.filter((x) => x.day === TODAY).length;
+ok('the report covers a date range', timerReport(k, addDay(TODAY, 1), '9999').length === 0 && todays > 0 && timerReport(k, TODAY, TODAY).length === todays &&
+  timerReport(k, addDay(TODAY, -1), TODAY).length === allRows.length);
 
 // ---- rules and settings
 timerRulesSave(k, [{ pattern: 'seneca', job: 'Setting homework' }, { pattern: 'bad', job: 'Nope' }, { pattern: 'arbor', job: 'Admin' }]);

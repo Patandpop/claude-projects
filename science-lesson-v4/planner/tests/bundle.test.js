@@ -38,7 +38,7 @@ const w = [];
 const kept = S.stripFile('x.gs', broken);
 ok(kept.text === broken || !kept.warnings.length, 'code that does not parse is left as it was');
 // the real sources: every .gs and every script block must still parse after stripping
-for (const f of ['Code.gs', 'Behaviour.gs', 'Game.gs', 'Companion.gs', 'Mailbox.gs', 'logic.js', 'game-ui.js', 'game-den.js', 'game-oracle.js', 'game-companion.js', 'Planner.html', 'Phone.html', 'BoardPage.html']) {
+for (const f of ['Code.gs', 'Behaviour.gs', 'Game.gs', 'Companion.gs', 'Mailbox.gs', 'logic.js', 'game-ui.js', 'game-den.js', 'game-oracle.js', 'game-companion.js', 'Planner.html', 'Phone.html', 'BoardPage.html', 'Day.gs', 'day-logic.js', 'day-screen.js']) {
   const p = path.join(__dirname, '..', f);
   if (!fs.existsSync(p)) continue;
   const r = S.stripFile(f, fs.readFileSync(p, 'utf8'));
@@ -69,6 +69,8 @@ try {
   const planner = fs.readFileSync(path.join(dist, 'Planner.html'), 'utf8'), phone = fs.readFileSync(path.join(dist, 'Phone.html'), 'utf8');
   ok(!/\{\{BUILD_STAMP\}\}/.test(planner + phone) && /class="build-stamp"[^>]*>\d{1,2} \w{3} \d{2}:\d{2}</.test(planner) && /class="build-stamp"[^>]*>\d{1,2} \w{3} \d{2}:\d{2}</.test(phone),
     'Planner and Phone carry the build date and time in a corner');
+  ok(/<\?!= include\('DayUI'\) \?>/.test(phone) && !/DAY_UI/.test(phone) && /DayScreen/.test(fs.readFileSync(path.join(dist, 'DayUI.html'), 'utf8')) && fs.existsSync(path.join(dist, 'Day.gs')),
+    'the phone pulls in the day screen (DayUI.html), and Day.gs is in the set');
   const sizes = fs.readdirSync(dist).filter((f) => /\.(gs|html)$/.test(f)).map((f) => [f, fs.statSync(path.join(dist, f)).size]);
   ok(sizes.every(([, n]) => n < 340 * 1024), 'every paste file is under 340 KB: ' + sizes.map(([f, n]) => `${f} ${(n / 1024).toFixed(0)}`).join(', '));
   ok(!/\/\/ the behaviour app is part of the planner/.test(fs.readFileSync(path.join(dist, 'Code.gs'), 'utf8')) && !/<!--/.test(planner.replace(/<script[\s\S]*?<\/script>/g, '')), 'pasted copies have no comments');

@@ -1,7 +1,7 @@
 // node planner/bundle.js [--pasted] [--label "what changed"]
 //   Writes planner/dist/ with the files to paste into Apps Script: Code.gs, Planner.html, Logic.html (logic.js wrapped
 //   in a <script> tag), Behaviour.gs, Phone.html, BoardPage.html, Game.gs, GameShop.gs, GameUI.html, GameArt.html,
-//   GameHV.html, GameDen.html.
+//   GameHV.html, GameDen.html, Day.gs and DayUI.html (the day screen).
 //
 // Paste-file guard (Fable work plan 0.4, 29 Oct 2026):
 //   - comments are stripped from the pasted copies only (strip-comments.js; the sources keep every comment);
@@ -55,6 +55,11 @@ files['GameHV.html'] = pack(['game-highvespers.js', 'game-lair.js', 'game-brew.j
 files['GameDen.html'] = pack(['game-den.js']);
 // 2026-10-29 Lane D: Ulhu as a life companion, the page side (sound now; day tags, his adventure and the term page next)
 files['GameComp.html'] = pack(['game-companion.js']);
+// 2026-10-30 Lane C: the day screen (layout B3) with its timer and quick capture, on the phone's Day tab; Day.gs is its server side
+files['Day.gs'] = read('Day.gs');
+files['DayUI.html'] = pack(['day-logic.js', 'day-timer.js', 'day-capture.js', 'day-screen.js']);
+if (!files['Phone.html'].includes('<!--DAY_UI-->')) throw new Error('Phone.html has no <!--DAY_UI--> marker');
+files['Phone.html'] = files['Phone.html'].replace('<!--DAY_UI-->', () => "<?!= include('DayUI') ?>");
 // 2026-10-27: the game code is its own file, GameUI.html, pulled in by include() (Planner.html at 406 KB would no longer save in the editor)
 ['Planner.html', 'Phone.html'].forEach((f) => {
   if (!files[f].includes('<!--GAME_UI-->')) throw new Error(f + ' has no <!--GAME_UI--> marker');

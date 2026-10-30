@@ -113,15 +113,16 @@
   }
 
   // ghost blocks (3.2 point 5): free periods get marking, tests and chasing; lesson builds only after school.
-  // Most urgent first; a block goes where it fits whole. Nothing is saved until he accepts one.
+  // Most urgent first; a block goes where it fits whole. Nothing is saved until he accepts one. His own small to-dos and
+  // captures stay in the list (and count in the workload) but get no block, so the timeline holds only the real work.
   function ghostBlocks(todos, avail) {
     var FREE_KINDS = { mark: 1, review: 1, chase: 1 };
     var slots = avail.frees.map(function (f) { return { where: 'P' + f.period, left: f.end - f.start, start: f.start }; });
     if (avail.afterMin > 0) slots.push({ where: 'after', left: avail.afterMin, start: avail.after.start, after: true });
     var out = [];
     todos.forEach(function (t) {
-      if (t.kind === 'ritual' || t.planned) return;
-      var ok = FREE_KINDS[t.kind] ? slots : t.kind === 'build' ? slots.filter(function (s) { return s.after; }) : slots.filter(function (s) { return s.after; });
+      if (!(FREE_KINDS[t.kind] || t.kind === 'build') || t.planned) return;
+      var ok = FREE_KINDS[t.kind] ? slots : slots.filter(function (s) { return s.after; });
       var s = ok.find(function (x) { return x.left >= t.minutes; });
       if (!s) return;
       out.push({ todoId: t.id, where: s.where, start: hhmm(s.start + (s.used || 0)), minutes: t.minutes, text: t.text });

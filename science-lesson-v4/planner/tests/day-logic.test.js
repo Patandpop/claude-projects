@@ -111,6 +111,8 @@ ok('model: rows in time order: four lessons, the free P2, after school, shutdown
 ok('model: the free holds the marking block, after school the build', dm.rows[1].ghosts.some((g) => g.todoId === 'c') && dm.rows[5].ghosts.some((g) => g.todoId === 'b') && dm.rows[5].at === '15:15');
 ok('model: lessons carry class, title and built flag; an unplanned one shows as not planned', dm.rows[0].cls === '9AS' && dm.rows[0].built === true && dm.rows[3].planned === false);
 ok('model: workload, Ulhu\'s mood and the likeliest timer jobs come with it', dm.workload.fits === false && dm.mood === 'stir' && dm.likely[0].job === 'Marking' && dm.likely[0].cls === '9AS');
+const dmA = L.dayModel(Object.assign({}, LOAD, { items: items }), L.mins('08:00'));
+ok('model: his own small to-dos stay in the list but get no block on the timeline', dmA.todos.all.some((t) => t.id === 'a') && !dmA.rows.some((r) => (r.ghosts || []).some((g) => g.todoId === 'a')) && dmA.rows.some((r) => (r.ghosts || []).length));
 ok('model: a dismissed suggestion does not come back today', !L.dayModel(LOAD, L.mins('08:00'), ['c']).rows[1].ghosts.length);
 ok('model: the shutdown card shows from his set time, not after 19:00, not once done',
   !L.dayModel(LOAD, L.mins('16:59')).shutdownDue && L.dayModel(LOAD, L.mins('17:01')).shutdownDue && !L.dayModel(LOAD, L.mins('19:05')).shutdownDue && !L.dayModel(Object.assign({}, LOAD, { doneForToday: true }), L.mins('17:30')).shutdownDue);

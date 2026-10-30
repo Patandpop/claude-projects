@@ -1,8 +1,10 @@
 // The evening timer's phone side (Lane C; lanes/design-installed-app.md 3.9, the picker in lanes/mockups/day-screen.html).
-// A self-contained piece: DayTimer.mount(element, call, opts). It is NOT attached to any page yet; it goes onto the
-// day screen once Patryk has OKed the picker. Needs planner/day-logic.js (window.DayLogic) loaded first.
+// A self-contained piece: DayTimer.mount(element, call, opts). Used by the day screen (planner/day-screen.js) for its
+// "More..." picker and the top bar. Needs planner/day-logic.js (window.DayLogic) loaded first.
 //   call(fn, ...args) -> Promise: google.script.run on the planner pages, API.call in the installed app.
-//   opts: { todayClasses: ['9AS', ...], recent: [{ job, cls, startedAt }], timer: running row or null, source: 'phone'|'pc'|'free', now: () => ms }
+//   opts: { todayClasses: ['9AS', ...], recent: [{ job, cls, startedAt }], timer: running row or null, source: 'phone'|'pc'|'free', now: () => ms,
+//           bar: an element for the running timer (the day screen's fixed top bar; without it the chip sits in the picker),
+//           noLikely: true to leave out the "Likeliest now" row (the day screen shows its own start buttons) }
 // Shows the running chip (job, class, minutes, Stop) and the picker: the 3 likeliest jobs first, then job, then class
 // when the job carries one. Starting a new job stops the old one (the server does that too). Colours come from the
 // page's own theme variables, so Light, Dark and Auto follow the page.
@@ -39,11 +41,11 @@
     function draw() {
       var likely = L.likelyJobs(o.todayClasses || [], o.recent || []);
       var needsCls = !!L.CLASS_JOBS[S.job];
-      var h = '<div class="dt">';
-      if (S.timer) h += '<div class="run" data-dt="running"><i></i><span>' + esc(label(S.timer.job, S.timer.cls)) + ' · ' + minutes() + ' min</span><button data-dt="stop">Stop</button></div>';
-      h += '<h4>Likeliest now</h4><div class="chips">' + likely.map(function (x, i) { return '<button class="likely" data-dt="likely" data-i="' + i + '">' + esc(label(x.job, x.cls)) + '</button>'; }).join('') + '</div>';
-      h += '<h4>1. What job?</h4><div class="grid">' + L.JOBS.map(function (j) { return '<button data-dt="job" data-v="' + esc(j) + '" aria-pressed="' + (S.job === j) + '">' + esc(j) + '</button>'; }).join('') + '</div>';
-      if (needsCls) h += '<h4>2. Which class?</h4><div class="chips">' + classes.map(function (c) { return '<button data-dt="cls" data-v="' + esc(c) + '" aria-pressed="' + (S.cls === c) + '">' + esc(c) + '</button>'; }).join('') + '</div>';
+      var h = '<div class="dt">', run = S.timer ? '<div class="run" data-dt="running"><i></i><span>' + esc(label(S.timer.job, S.timer.cls)) + ' · ' + minutes() + ' min</span><button data-dt="stop">Stop</button></div>' : '';
+      if (o.bar) { o.bar.innerHTML = run ? '<div class="dt">' + run + '</div>' : ''; o.bar.hidden = !S.timer; } else h += run;   // the day screen keeps the running timer in a bar fixed at the top
+      if (!o.noLikely) h += '<h4>Likeliest now</h4><div class="chips">' + likely.map(function (x, i) { return '<button class="likely" data-dt="likely" data-i="' + i + '">' + esc(label(x.job, x.cls)) + '</button>'; }).join('') + '</div>';
+      h += '<h4>' + (o.noLikely ? '' : '1. ') + 'What job?</h4><div class="grid">' + L.JOBS.map(function (j) { return '<button data-dt="job" data-v="' + esc(j) + '" aria-pressed="' + (S.job === j) + '">' + esc(j) + '</button>'; }).join('') + '</div>';
+      if (needsCls) h += '<h4>' + (o.noLikely ? '' : '2. ') + 'Which class?</h4><div class="chips">' + classes.map(function (c) { return '<button data-dt="cls" data-v="' + esc(c) + '" aria-pressed="' + (S.cls === c) + '">' + esc(c) + '</button>'; }).join('') + '</div>';
       h += '<button class="go" data-dt="start"' + (!S.job || (needsCls && !S.cls) || S.busy ? ' disabled' : '') + '>Start' + (S.job ? ': ' + esc(label(S.job, needsCls ? S.cls : '')) : '') + '</button>';
       h += '<div class="msg" data-dt="msg">' + esc(S.msg) + '</div></div>';
       el.innerHTML = h;
@@ -67,15 +69,17 @@
       return call('timerStop', now()).then(function () { S.busy = false; draw(); if (o.onChange) o.onChange(null); },
         function (e) { S.busy = false; S.timer = before; S.msg = 'Not stopped: ' + ((e && e.message) || 'no signal') + '. Try again.'; draw(); });
     }
-    el.addEventListener('click', function (e) {
-      var b = e.target.closest('[data-dt]'); if (!b || !el.contains(b)) return;
+    function onClick(e) {
+      var b = e.target.closest('[data-dt]'); if (!b || !(el.contains(b) || (o.bar && o.bar.contains(b)))) return;
       var k = b.getAttribute('data-dt');
       if (k === 'likely') { var x = el._likely[+b.getAttribute('data-i')]; if (x) start(x.job, x.cls); }
       else if (k === 'job') { S.job = b.getAttribute('data-v'); if (!L.CLASS_JOBS[S.job]) S.cls = ''; draw(); }
       else if (k === 'cls') { S.cls = b.getAttribute('data-v'); draw(); }
       else if (k === 'start') start(S.job, S.cls);
       else if (k === 'stop') stop();
-    });
+    }
+    el.addEventListener('click', onClick);
+    if (o.bar) o.bar.addEventListener('click', onClick);
     var tick = setInterval(function () { if (S.timer && el.isConnected) draw(); else if (!el.isConnected) clearInterval(tick); }, 30000);
     draw();
     return { state: function () { return S; }, set: function (timer) { S.timer = timer; draw(); }, start: start, stop: stop };

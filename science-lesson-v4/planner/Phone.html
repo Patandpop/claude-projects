@@ -49,6 +49,7 @@
 
   /* silence control */
   .silence { position:sticky; top:0; z-index:5; padding:8px 14px; background:var(--glass); backdrop-filter:blur(8px); }
+  body.ds-running .silence { top:46px; }   /* under the day screen's running-timer bar */
   .modes3 { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
   .limit { display:flex; align-items:center; gap:8px; margin-top:6px; font-size:14px; font-weight:700; color:var(--soft); }
   .limit button { border:1px solid var(--line); background:var(--plate); border-radius:10px; width:44px; height:36px; font-weight:800; font-size:18px; color:var(--ink); }
@@ -208,6 +209,11 @@
 
   /* Today and Friday */
   .ranges { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px; }
+  /* backdating and the end-of-day reminder (Phase 5, 2026-10-30) */
+  .backBar { display:flex; align-items:center; gap:8px; background:var(--warn-wash); color:var(--warn-text); border-radius:12px; padding:8px 12px; margin:0 0 10px; font-weight:800; font-size:14px; }
+  .backBar button, .remind button { margin-left:auto; border:1px solid var(--line); background:var(--plate); border-radius:999px; padding:6px 12px; font-weight:800; font-size:13px; color:var(--ink); }
+  .remind { background:var(--plate); border:1px solid var(--line); border-radius:12px; padding:8px 12px; margin:0 0 10px; font-size:14px; }
+  .remind b { display:block; margin-bottom:6px; } .remind button { margin:0 6px 0 0; }
   .ranges button { border:1px solid var(--line); background:var(--plate); border-radius:999px; padding:7px 14px; font-weight:800; font-size:14px; }
   .ranges button[aria-pressed="true"] { background:var(--ink); color:var(--on-ink); border-color:var(--ink); }
   .cls { background:var(--plate); border:1px solid var(--line); border-radius:16px; margin-bottom:10px; overflow:hidden; }
@@ -285,15 +291,18 @@
     </div>
     <p class="hint" id="hint">Tap to award. Hold to pick several.</p>
     <p class="hint" id="memLine"></p>
+    <div class="backBar hidden" id="backBar"></div>
+    <div class="remind hidden" id="remind"></div>
     <div id="vote" class="hidden"></div>
     <div id="studs"></div>
     <div id="lesson"></div>
   </section>
 
   <section id="vDay" class="hidden">
-    <h2>Today in this class</h2>
+    <div class="ranges" id="dayPick"></div>
+    <h2 id="dayHead">Today in this class</h2>
     <div id="daySum"></div>
-    <h2>Logged today</h2>
+    <h2 id="dayHead2">Logged today</h2>
     <div id="dayList"></div>
     <h2>Positives</h2>
     <div class="ranges" id="ranges">
@@ -311,6 +320,8 @@
   </section>
 
   <section id="vUlhu" class="hidden"><div id="ulhu"></div></section>
+
+  <section id="vDs" class="hidden"><div id="dayScreen"></div></section>
 
   <section id="vFri" class="hidden">
     <div id="fri"></div>
@@ -337,6 +348,7 @@
 <div class="snack" id="snack" role="status"><span id="snackText"></span><button id="snackUndo">Undo</button></div>
 
 <nav>
+  <button id="tDs" aria-pressed="false"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>Day</button>
   <button id="tLog" aria-pressed="true"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="3" y="4" width="7" height="6" rx="1.5"/><rect x="14" y="4" width="7" height="6" rx="1.5"/><rect x="3" y="14" width="7" height="6" rx="1.5"/><rect x="14" y="14" width="7" height="6" rx="1.5"/></svg>Lesson</button>
   <button id="tDay" aria-pressed="false"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"/></svg>Today</button>
   <button id="tUlhu" aria-pressed="false"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M12 3c-4 0-7 3-7 7 0 2 .8 3.6 2 4.8V20l3-2 2 1.5 2-1.5 3 2v-5.2c1.2-1.200 2-2.800 2-4.800 0-4-3-7-7-7z"/><circle cx="9.500" cy="10" r="1" fill="currentColor"/><circle cx="14.500" cy="10" r="1" fill="currentColor"/></svg>Ulhu</button>
@@ -356,6 +368,7 @@
 })();
 </script>
 <!--GAME_UI-->
+<!--DAY_UI-->
 <script>
 const KEY = document.body.dataset.key;
 const $ = id => document.getElementById(id);
@@ -363,7 +376,7 @@ const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>'
 const LS = { get: k => { try { return localStorage.getItem(k); } catch (e) { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} } };
 const STAR = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2.5 2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z"/></svg>';
 let RULES = {}, CLASSES = [], TODAY = [];
-const S = { cls:'', students:[], ratio:2.6, events:[], tab:'log', view: LS.get('view') || '', mode:{mode:'teaching'}, days:1,
+const S = { cls:'', students:[], ratio:2.6, events:[], tab:'log', view: LS.get('view') || '', mode:{mode:'teaching'}, days:1, back:'', recent:[], quiet:[],
   fri:null, picks:{}, skip:{}, open:{}, shownResult:'', pop:{}, sel:[] };
 
 const NET = { down: false };
@@ -385,7 +398,7 @@ function snack(text, ids) {
 }
 $('snackUndo').onclick = async () => {
   const ids = snackIds.slice(); $('snack').classList.remove('show'); if (!ids.length) return;
-  try { S.events = await call('removeMany', S.cls, ids); render(); snack('Undone'); } catch (e) { snack('Undo failed. Check your connection.'); }
+  try { S.events = await call('removeMany', S.cls, ids, S.back); render(); snack('Undone'); } catch (e) { snack('Undo failed. Check your connection.'); }
 };
 
 function tally() {
@@ -662,16 +675,19 @@ async function log(names, type, rule) {
   // same tap to the server, never a second positive or negative
   const ts = Date.now(), tapId = ts + '-' + Math.random().toString(36).slice(2, 8);
   try {
-    const ev = names.length > 1 ? await call('logMany', S.cls, names, type, rule || 0, ts, tapId) : await call('logEvent', S.cls, names[0], type, rule || 0, ts, tapId);
-    S.events = ev.concat(queued(S.cls));
-    LS.set(cacheKey(S.cls), JSON.stringify(Object.assign(JSON.parse(LS.get(cacheKey(S.cls)) || '{}'), { events: ev })));
+    const cls = S.cls, back = S.back;
+    S.quiet = S.quiet.filter(c => back || c !== cls); renderBack();
+    const ev = names.length > 1 ? await call('logMany', cls, names, type, rule || 0, ts, tapId, back) : await call('logEvent', cls, names[0], type, rule || 0, ts, tapId, back);
+    if (S.cls !== cls || S.back !== back) return;
+    S.events = ev.concat(queued(cls));
+    if (!back) LS.set(cacheKey(cls), JSON.stringify(Object.assign(JSON.parse(LS.get(cacheKey(cls)) || '{}'), { events: ev })));
     const ids = S.events.filter(e => !before.has(e.id)).map(e => e.id);
     render();
     snack(second.length ? `Detention: ${second.map(shortOf).join(', ')}` : type === '+' ? `Positive for ${who}` : type === 'R' ? `Report to me: ${who}` : `Negative for ${who}`, ids);
   } catch (e) {
     // no signal: keep the tap on the phone and send it later with the time it happened (the same ts and id)
     temps.forEach(x => { x.queued = true; });
-    setQueue(getQueue().concat([{ cls: S.cls, names, type, rule: rule || 0, ts, id: tapId, tries: 0 }]));
+    setQueue(getQueue().concat([{ cls: S.cls, names, type, rule: rule || 0, ts, id: tapId, tries: 0, day: S.back }]));
     render(); snack('No signal: saved on your phone, it will send when you reconnect');
   }
 }
@@ -719,7 +735,7 @@ function silHTML(m, t) {
 }
 function renderSilence(force) {
   const m = S.mode, box = $('silence');
-  if (S.tab === 'fri' || S.tab === 'ulhu') { box.classList.add('hidden'); silKey = ''; return; }
+  if (S.tab === 'fri' || S.tab === 'ulhu' || S.tab === 'ds') { box.classList.add('hidden'); silKey = ''; return; }
   box.classList.remove('hidden');
   const t = timerOn(m.timer) ? m.timer : null;
   const key = [m.lost ? 'L' : '', m.mode, m.sid || '', m.label || '', t ? 'T' + (t.label || '') : '-', m.paused ? 'P' : ''].join('|');
@@ -814,6 +830,10 @@ function scheduleMode() {
 
 /* ---------- Today ---------- */
 function renderDay() {
+  const lab = S.back ? (S.recent.find(r => r.day === S.back) || {}).label || S.back : '';
+  $('dayPick').innerHTML = [{ day: '', label: 'Today' }].concat(S.recent).map(r => `<button data-back="${r.day}" aria-pressed="${r.day === S.back}">${esc(r.label)}</button>`).join('');
+  $('dayHead').textContent = S.back ? lab + ' in this class' : 'Today in this class';
+  $('dayHead2').textContent = S.back ? 'Logged on ' + lab : 'Logged today';
   const pos = {}, neg = {};
   S.events.forEach(e => { if (e.type === '+') pos[e.name] = (pos[e.name] || 0) + 1; else { const x = neg[e.name] = neg[e.name] || { n: 0, r: 0 }; x.n++; if (e.type === 'R') x.r++; } });
   const pl = Object.keys(pos).sort((a, b) => pos[b] - pos[a] || a.localeCompare(b));
@@ -822,13 +842,13 @@ function renderDay() {
     <div class="col"><h3>Negatives</h3>${nl.length ? nl.map(n => `<div class="r"><span>${esc(shortOf(n))}</span><b>${neg[n].n}${neg[n].r ? ' (R)' : ''}${neg[n].n >= 2 ? ' DET' : ''}</b></div>`).join('') : '<div class="r soft">None</div>'}</div></div>`;
   const ev = S.events.slice().reverse();
   const tag = e => e.type === '+' ? '<span class="tag p">+</span>' : e.type === 'R' ? '<span class="tag r">R</span>' : '<span class="tag n">&minus;</span>';
-  $('dayList').innerHTML = ev.length ? `<ul class="list">${ev.map(e => `<li><span class="soft">${esc(e.t)}</span>${tag(e)}<span class="grow">${esc(e.name)}${e.type === 'R' ? ` <span class="soft">${esc(RULES[e.rule] || '')}</span>` : ''}</span><button class="x" data-del="${e.id}">Remove</button></li>`).join('')}</ul>` : '<p class="note">Nothing logged today.</p>';
+  $('dayList').innerHTML = ev.length ? `<ul class="list">${ev.map(e => `<li><span class="soft">${esc(e.t)}</span>${tag(e)}<span class="grow">${esc(e.name)}${e.type === 'R' ? ` <span class="soft">${esc(RULES[e.rule] || '')}</span>` : ''}</span><button class="x" data-del="${e.id}">Remove</button></li>`).join('')}</ul>` : (S.back ? '<p class="note">Nothing logged on this day.</p>' : '<p class="note">Nothing logged today.</p>');
   loadPositives();
 }
 $('dayList').addEventListener('click', async e => {
   const b = e.target.closest('[data-del]'); if (!b) return;
   const ev = S.events.find(x => String(x.id) === b.dataset.del); if (!ev || !confirm(`Remove this entry for ${ev.name}?`)) return;
-  try { S.events = await call('removeMany', S.cls, [Number(b.dataset.del)]); renderDay(); snack('Removed'); } catch (err) { snack('Could not remove.'); }
+  try { S.events = await call('removeMany', S.cls, [Number(b.dataset.del)], S.back); renderDay(); snack('Removed'); } catch (err) { snack('Could not remove.'); }
 });
 async function loadPositives() {
   $('posList').innerHTML = '<p class="note">Loading</p>';
@@ -934,17 +954,27 @@ function renderChips() {
 $('chips').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; if (b.id === 'more') return classSheet(); pickClass(b.dataset.cls); });
 function pickClass(c) { if (c === S.cls) return; S.sel = []; $('selbar').classList.add('hidden'); $('search').value = ''; loadClass(c); }
 let ULHU = null;   // the Ulhu screen, made the first time its tab opens
+// The day screen (Lane C, layout B3 picked 30 Oct 2026): timeline, to-dos, timer, quick capture. Made the first time its
+// tab opens; the running timer then stays as a bar at the top on every tab. "Done for today" sends a 'daydone' event
+// for Ulhu's ritual tick (Lane A's side).
+let DAYS = null;
+function openDay() {
+  if (!window.DayScreen) { $('dayScreen').innerHTML = '<p class="note">The day screen is not in this copy of the planner yet.</p>'; return; }
+  if (DAYS) { DAYS.reload(); return; }
+  DAYS = DayScreen.mount($('dayScreen'), call, { source: 'phone', names: () => S.students.map(s => s.name),
+    onDone: r => window.dispatchEvent(new CustomEvent('daydone', { detail: r })) });
+}
 function setTab(t) {
   S.tab = t;
   document.body.classList.toggle('ulhuOn', t === 'ulhu');
-  [['log','tLog','vLog'],['day','tDay','vDay'],['fri','tFri','vFri'],['ulhu','tUlhu','vUlhu']].forEach(([k, b, v]) => { $(b).setAttribute('aria-pressed', t === k); $(v).classList.toggle('hidden', t !== k); });
-  $('chips').classList.toggle('hidden', t === 'fri' || t === 'ulhu');
-  $('clsTitle').textContent = t === 'fri' ? 'Friday' : t === 'ulhu' ? 'Ulhu' : S.cls;
+  [['log','tLog','vLog'],['day','tDay','vDay'],['fri','tFri','vFri'],['ulhu','tUlhu','vUlhu'],['ds','tDs','vDs']].forEach(([k, b, v]) => { $(b).setAttribute('aria-pressed', t === k); $(v).classList.toggle('hidden', t !== k); });
+  $('chips').classList.toggle('hidden', t === 'fri' || t === 'ulhu' || t === 'ds');
+  $('clsTitle').textContent = t === 'fri' ? 'Friday' : t === 'ulhu' ? 'Ulhu' : t === 'ds' ? new Date().toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' }) : S.cls;
   if (t === 'ulhu') { window.scrollTo(0, 0); if (!$('ulhu').firstChild) ULHU = GameUI.mount($('ulhu'), call, { wide: false }); else if (ULHU) setTimeout(ULHU.refit, 30); }
   renderSilence();
-  if (t === 'log') renderStudents(); if (t === 'day') renderDay(); if (t === 'fri') loadFriday();
+  if (t === 'log') renderStudents(); if (t === 'day') renderDay(); if (t === 'fri') loadFriday(); if (t === 'ds') openDay();
 }
-$('tLog').onclick = () => setTab('log'); $('tDay').onclick = () => setTab('day'); $('tFri').onclick = () => setTab('fri'); $('tUlhu').onclick = () => setTab('ulhu');
+$('tDs').onclick = () => setTab('ds'); $('tLog').onclick = () => setTab('log'); $('tDay').onclick = () => setTab('day'); $('tFri').onclick = () => setTab('fri'); $('tUlhu').onclick = () => setTab('ulhu');
 // Ulhu's badge on the bottom bar: rituals still to do today, read from the copy the Ulhu screen keeps on the phone (2026-10-26)
 function ulhuBadge() {
   let n = 0;
@@ -955,19 +985,43 @@ function ulhuBadge() {
 }
 ulhuBadge(); window.addEventListener('ulhuchange', ulhuBadge); document.addEventListener('visibilitychange', () => { if (!document.hidden) ulhuBadge(); });
 // the link with &tab=ulhu opens straight on Ulhu (for a home-screen shortcut)
-try { google.script.url.getLocation((l) => { if (l && l.parameter && l.parameter.tab === 'ulhu') setTab('ulhu'); }); } catch (e) { /* not inside Apps Script */ }
-$('refresh').onclick = () => { if (S.tab === 'fri') loadFriday(); else loadClass(S.cls); };
-function render() { if (S.tab === 'log') renderStudents(); if (S.tab === 'day') renderDay(); }
+try { google.script.url.getLocation((l) => { if (l && l.parameter && l.parameter.tab === 'ulhu') setTab('ulhu'); if (l && l.parameter && l.parameter.tab === 'day') setTab('ds'); }); } catch (e) { /* not inside Apps Script */ }
+$('refresh').onclick = () => { if (S.tab === 'fri') loadFriday(); else if (S.tab === 'ds') openDay(); else loadClass(S.cls); };
+function render() { if (S.tab === 'log') renderStudents(); if (S.tab === 'day') renderDay(); renderBack(); }
+
+/* ---------- backdating and the end-of-day reminder (Phase 5, 2026-10-30) ----------
+   Pick an earlier school day on the Today tab: until you go back to today, taps on the Lesson tab are saved for that day
+   (an amber bar says which) and the board is left alone. After 3:15 pm on a school day, the Lesson tab asks about any of
+   today's classes with nothing logged yet. */
+function setBack(day) {
+  if (day === S.back) return;
+  S.back = day; S.sel = []; $('selbar').classList.add('hidden');
+  if (S.cls) loadClass(S.cls); render();
+}
+function renderBack() {
+  const lab = S.back ? (S.recent.find(r => r.day === S.back) || {}).label || S.back : '';
+  $('backBar').classList.toggle('hidden', !S.back);
+  $('backBar').innerHTML = S.back ? `<span>Logging for ${esc(lab)}</span><button data-back="">Back to today</button>` : '';
+  const now = new Date(), late = now.getHours() * 60 + now.getMinutes() >= 15 * 60 + 15 && now.getDay() >= 1 && now.getDay() <= 5;
+  const left = S.back || !late || LS.get('remindOff') === now.toDateString() ? [] : S.quiet;
+  $('remind').classList.toggle('hidden', !left.length);
+  $('remind').innerHTML = left.length ? `<b>Any positives to add for today? Nothing logged yet for:</b>${left.map(c => `<button data-remind="${esc(c)}">${esc(c)}</button>`).join('')}<button data-remind-off="1">Not today</button>` : '';
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-back]'); if (b) return setBack(b.dataset.back);
+  const r = e.target.closest('[data-remind]'); if (r) { if (S.tab !== 'log') setTab('log'); return pickClass(r.dataset.remind); }
+  if (e.target.closest('[data-remind-off]')) { LS.set('remindOff', new Date().toDateString()); renderBack(); }
+});
 
 // Each class's last loaded data is kept on the phone, so it still shows with no signal.
 function cacheKey(c) { return 'class:' + c; }
-function queued(c) { return getQueue().filter(q => q.cls === c).flatMap(q => q.names.map(n => ({ id: 'q' + q.ts, t: '', name: n, type: q.type, rule: q.rule || 0, queued: true }))); }
+function queued(c) { return getQueue().filter(q => q.cls === c && (q.day || '') === S.back).flatMap(q => q.names.map(n => ({ id: 'q' + q.ts, t: '', name: n, type: q.type, rule: q.rule || 0, queued: true }))); }
 async function loadClass(cls, savedOnly) {
   S.cls = cls; if (!savedOnly && S.vote && S.vote.on) loadVote(); $('clsTitle').textContent = cls; $('clsTitle').classList.toggle('clsTitleLong', cls.length > 6); renderChips();
   const cached = (() => { try { return JSON.parse(LS.get(cacheKey(cls)) || 'null'); } catch (e) { return null; } })();
   // show this class straight away (saved copy, or empty), never the previous class's lists
   S.students = cached ? cached.students : []; S.ratio = cached ? cached.ratio : 2.6; S.silence = cached ? cached.silence : null;
-  S.events = (cached ? cached.events : []).concat(queued(cls)); memLine(cached && cached.memory);
+  S.events = (cached && !S.back ? cached.events : []).concat(queued(cls)); memLine(cached && cached.memory);
   if (cached) render(); else { $('studs').innerHTML = '<p class="note">Loading</p>'; $('lesson').innerHTML = ''; }
   if (savedOnly) return;   // instant open: the saved copy only, no server call (opening a class also moves the board)
   try {
@@ -976,6 +1030,7 @@ async function loadClass(cls, savedOnly) {
     S.students = d.students; S.ratio = d.ratio; S.silence = d.silence || null; S.events = d.events.concat(queued(cls));
     memLine(d.memory);
     LS.set(cacheKey(cls), JSON.stringify({ students: d.students, ratio: d.ratio, events: d.events, silence: d.silence || null, memory: d.memory || [] }));
+    if (S.back) { const back = S.back, ev = await call('classDay', cls, back); if (S.cls !== cls || S.back !== back) return; S.events = ev.concat(queued(cls)); }
     render();
   } catch (e) {
     if (cached) snack('No signal: showing the saved copy of this class');
@@ -1002,9 +1057,9 @@ async function flushQueue() {
     const item = getQueue()[0];
     const looksUp = !NET.down && navigator.onLine;
     try {
-      const ev = item.names.length > 1 ? await call('logMany', item.cls, item.names, item.type, item.rule || 0, item.ts, item.id) : await call('logEvent', item.cls, item.names[0], item.type, item.rule || 0, item.ts, item.id);
+      const ev = item.names.length > 1 ? await call('logMany', item.cls, item.names, item.type, item.rule || 0, item.ts, item.id, item.day || '') : await call('logEvent', item.cls, item.names[0], item.type, item.rule || 0, item.ts, item.id, item.day || '');
       setQueue(getQueue().slice(1)); sent++;
-      if (item.cls === S.cls) { S.events = ev.concat(queued(S.cls)); render(); }
+      if (item.cls === S.cls && (item.day || '') === S.back) { S.events = ev.concat(queued(S.cls)); render(); }
     } catch (e) {
       if (!looksUp || !navigator.onLine) break;   // no signal (before or during the send): everything waits, nothing counts against the tap
       item.tries = (item.tries || 0) + 1; item.why = String((e && e.message) || e).slice(0, 120);
@@ -1070,7 +1125,7 @@ $('dotBtn').addEventListener('click', () => {
 applyTheme(); updateHint(); renderSettings(); keepAwake();
 
 function applyInit(d) {
-  RULES = d.rules; CLASSES = d.classes; TODAY = d.today;
+  RULES = d.rules; CLASSES = d.classes; TODAY = d.today; S.recent = d.recent || []; S.quiet = d.quiet || []; renderBack();
   $('when').textContent = `Week ${d.week}, ${new Date().toLocaleDateString('en-GB', { weekday:'long' })}  (app 20, server ${d.version || 'old'})`;
 }
 const firstClass = d => CLASSES.includes(d.active) ? d.active : (TODAY[0] || CLASSES[0]);
