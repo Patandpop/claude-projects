@@ -238,15 +238,17 @@ function pieceSVG(style, sz, pal) {
   if (sz === 'medium') { // fringe on the cast-on end
     for (let c = 0; c < W; c++) { const x = c * SW + 3; s += style === 'px' ? `<rect x="${x - 1}" y="${R * SH}" width="2" height="${c % 2 ? 6 : 8}" fill="${pal.b}"/>` : `<path d="M${x},${R * SH - 1} q${c % 2 ? 1.5 : -1.5},4 0,${c % 2 ? 7 : 9}" stroke="${pal.b}" stroke-width="${style === 'stk' ? 2.2 : 1.6}" fill="none" stroke-linecap="round"/>`; }
   }
+  let under = '';
+  if (style !== 'px') for (let r = 0; r < R; r++) for (let c = 0; c < W; c++) { if (g[r][c] === '.') continue; under += style === 'stk' ? `<rect x="${c * SW - 1.8}" y="${r * SH - 1.8}" width="${SW + 3.6}" height="${SH + 3.6}" fill="${OL3}"/>` : `<rect x="${c * SW - 0.6}" y="${r * SH + 1.2}" width="${SW + 1.2}" height="${SH + 1}" fill="#000" opacity=".22"/>`; }
   for (let r = 0; r < R; r++) for (let c = 0; c < W; c++) { const k = g[r][c]; if (k === '.') continue; s += STITCH[style](c * SW, r * SH, pal[k], r, c); }
-  return s;
+  return under + s;
 }
 // which part of the piece is knitted at progress f (rows from the bottom; each row goes the opposite way to the one before)
 function knitState(sz, f) {
   const g = GRIDS[sz], R = g.length, W = g[0].length;
   const done = clamp(f, 0, 1) * R, full = Math.floor(done), part = done - full;
   const out = { R, W, rects: [], top: R * SH, cur: null };
-  if (full > 0) { out.rects.push([0, (R - full) * SH, W * SW, full * SH + (sz === 'medium' ? 12 : 0)]); out.top = (R - full) * SH; }
+  if (full > 0) { out.rects.push([-3, (R - full) * SH, W * SW + 6, full * SH + (sz === 'medium' ? 12 : 3)]); out.top = (R - full) * SH; }
   const ri = R - full - 1;
   if (ri >= 0 && full < R) {
     const row = g[ri]; let c0 = row.search(/[^.]/), c1 = row.length - 1; while (row[c1] === '.') c1--;
@@ -574,7 +576,7 @@ V.k2 = {
       <path d="M112,268 q-6,-2 -4,-8 h10 Z M228,268 q6,-2 4,-8 h-10 Z" fill="#2a1a10"/></g>`;
     s += `<g transform="translate(170,150) scale(1.25)"><g class="hop"><g class="breath">${ulhuVec('k2')}</g></g></g>`;
     s += `<g><path d="M94,250 V196 Q94,184 108,184 Q122,184 122,196 V250 Z" fill="url(#k2-vel)"/><ellipse cx="108" cy="190" rx="14" ry="7" fill="#b45a9a" opacity=".6"/><path d="M246,250 V196 Q246,184 232,184 Q218,184 218,196 V250 Z" fill="url(#k2-vel)"/><ellipse cx="232" cy="190" rx="14" ry="7" fill="#8a3a74" opacity=".6"/></g>`;
-    s += `<g class="lap" filter="url(#k2-pglow)"><g id="k2-piece"></g></g>`;
+    s += `<g class="lap"><g id="k2-piece"></g></g>`;
     s += '<g id="k2-ballg"></g><path id="k2-strand2" d="" stroke="#cfd6ff" stroke-width="5" fill="none" opacity=".18"/><path id="k2-strand" d="" stroke="#e4e8ff" stroke-width="1.7" fill="none"/>';
     s += `<g transform="translate(170,150) scale(1.25)"><g class="hop">${armsVec('k2', '#cfd6ff')}</g></g>`;
     // drifting bubbles and motes
@@ -594,7 +596,9 @@ V.k2 = {
     let s = `<ellipse cx="190" cy="${y + 10}" rx="185" ry="16" fill="#cfe0ff" opacity=".05"/>`;
     let band = '';
     for (let i = 0; i < n; i++) { const c = Math.floor(i / rows), r = rows - 1 - (i % rows); band += `<g transform="translate(${x0 + c * 12},${y + r * 8}) scale(2)">${STITCH.paint(0, 0, C[c % 6], r, c)}</g>`; }
-    s += `<g filter="url(#k2-pglow)">${band}</g>`;
+    const xd = x0 + Math.ceil(n / rows) * 12;
+    if (n) s += `<rect x="${x0 - 1}" y="${y + 2}" width="${xd - x0 + 2}" height="17" rx="4" fill="#000" opacity=".3"/>`;
+    s += band;
     const xf = x0 + Math.ceil(n / rows) * 12, xe = x0 + cols * 12 + 16;
     if (f < 1) {
       let d = `M${xf},${y + 8}`; for (let x = xf; x < xe - 10; x += 10) d += ` q2.5,-6 5,0 q2.5,6 5,0`;
@@ -602,7 +606,7 @@ V.k2 = {
       const br = 4 + 9 * (1 - f);
       s += `<g transform="translate(${xe},${y + 8 + br})">${this.ballSVG(br)}</g>`;
       s += `<g transform="translate(${xf},${y + 8})"><g class="mini"><path d="M-6,-16 L6,10" stroke="#cfd6ff" stroke-width="2" stroke-linecap="round"/></g><g class="mini" style="animation-direction:alternate-reverse"><path d="M6,-16 L-6,10" stroke="#e6c26a" stroke-width="2" stroke-linecap="round"/></g></g>`;
-      if (n > 0) s += `<rect class="cur" x="${x0 + Math.floor(n / rows) * 12}" y="${y + (rows - 1 - (n % rows)) * 8}" width="12" height="8" rx="3" fill="#fff6d6" opacity=".5" filter="url(#k2-soft)"/>`;
+      if (n > 0) s += `<rect class="cur" x="${x0 + Math.floor(n / rows) * 12}" y="${y + (rows - 1 - (n % rows)) * 8}" width="12" height="8" rx="3" fill="none" stroke="#fff6d6" stroke-width="1.6"/>`;
     }
     return s;
   },
@@ -657,7 +661,7 @@ V.k3 = {
       <path d="M126,232 h104 q10,0 10,10 v10 h-124 v-10 q0,-10 10,-10 Z" fill="#ffc85a" stroke="${OL3}" stroke-width="3"/><rect x="114" y="248" width="128" height="16" rx="6" fill="#e09a2a" stroke="${OL3}" stroke-width="3"/><path d="M126,264 v6 M230,264 v6" stroke="${OL3}" stroke-width="6" stroke-linecap="round"/>`;
     s += `<g transform="translate(178,150) scale(1.25)"><g class="hop"><g class="breath">${ulhuVec('k3')}</g></g></g>`;
     s += `<rect x="96" y="190" width="30" height="64" rx="15" fill="#ffc85a" stroke="${OL3}" stroke-width="3.4"/><path d="M102,200 q9,-6 18,0" stroke="#fff1d6" stroke-width="3" fill="none" stroke-linecap="round"/><rect x="230" y="190" width="30" height="64" rx="15" fill="#f0b03c" stroke="${OL3}" stroke-width="3.4"/>`;
-    s += `<g class="lap" filter="url(#k3-ol)"><g id="k3-piece"></g></g>`;
+    s += `<g class="lap"><g id="k3-piece"></g></g>`;
     s += `<g id="k3-ballg"></g><path id="k3-strand" d="" stroke="#ff7a59" stroke-width="2.6" fill="none" stroke-linecap="round"/>`;
     s += `<g transform="translate(178,150) scale(1.25)"><g class="hop">${armsVec('k3', '#fff1d6')}</g></g>`;
     // Bloop the anglerfish cat
@@ -687,7 +691,8 @@ V.k3 = {
     const C = ['#ff7a59', '#ff7a59', '#fff1d6', '#ff7a59', '#3fbfb0', '#ff7a59'];
     let band = '';
     for (let i = 0; i < n; i++) { const c = Math.floor(i / rows), r = rows - 1 - (i % rows); band += `<g transform="translate(${x0 + c * 12},${y + r * 8}) scale(2)">${STITCH.stk(0, 0, C[c % 6])}</g>`; }
-    let s = `<g filter="url(#k3-ol)">${band}</g>`;
+    const xd = x0 + Math.ceil(n / rows) * 12;
+    let s = (n ? `<rect x="${x0 - 2}" y="${y - 2}" width="${xd - x0 + 4}" height="20" rx="3" fill="${OL3}"/>` : '') + band;
     const xf = x0 + Math.ceil(n / rows) * 12, xe = x0 + cols * 12 + 16;
     if (f < 1) {
       let d = `M${xf},${y + 8}`; for (let x = xf; x < xe - 10; x += 12) d += ` q3,-7 6,0 q3,7 6,0`;
@@ -709,7 +714,7 @@ function shelfSVG(v, fin) {
   const put = (sz, x, cls) => {
     const g = GRIDS[sz], W = g[0].length * SW, H = g.length * SH + (sz === 'medium' ? 9 : 0), k = Math.min(box[0] / W, box[1] / H);
     const inner = `<g transform="translate(${(-W * k / 2).toFixed(1)},${(-H * k).toFixed(1)}) scale(${k.toFixed(3)})">${pieceSVG(v.style, sz, v.pal[sz])}</g>`;
-    return `<g transform="translate(${x},${y})"><g class="${cls}"${v.style === 'stk' ? ' filter="url(#k3-ol)"' : v.style === 'paint' ? ' filter="url(#k2-pglow)"' : ''}>${inner}</g></g>`;
+    return `<g transform="translate(${x},${y})"><g class="${cls}">${inner}</g></g>`;
   };
   s += put(order[0], slots[0], '') + put(order[1], slots[1], '');
   const x = slots[2];
@@ -738,7 +743,8 @@ function updateVersion(id, p) {
   const [cx, cy] = v.cross;
   g.setAttribute('transform', `translate(${(cx - ks.W * SW * sc / 2).toFixed(1)},${(cy + 7 - ks.top * sc).toFixed(1)}) scale(${sc})`);
   $(`#${id}-cur`).innerHTML = ks.cur && !fin ? `<rect class="cur" x="${ks.cur[0]}" y="${ks.cur[1]}" width="${SW}" height="${SH}" fill="none" stroke="#fff6c8" stroke-width="1.1"/>` : '';
-  $(`#${id}-bar`).innerHTML = v.bar(f);
+  const bk = Math.floor(f * 52) + '|' + (f >= 1);
+  if (v.lastBar !== bk) { $(`#${id}-bar`).innerHTML = v.bar(f); v.lastBar = bk; }
   const left = Math.max(1, Math.ceil(SZ[size].min * (1 - f)));
   const tb = $(`#${id}-tb`), ts = $(`#${id}-ts`);
   tb.textContent = fin ? 'Done!' : `${left} min left`;
@@ -753,7 +759,7 @@ function update() {
   for (const id of ['k1', 'k2', 'k3']) updateVersion(id, P);
 }
 function buildAll() {
-  for (const id of ['k1', 'k2', 'k3']) { const [bg, fg] = V[id].build().split('<!--FG-->'); $(V[id].svg).innerHTML = bg; $(V[id].fg).innerHTML = fg; built[id] = null; V[id].lastShelf = null; V[id].ballR = null; }
+  for (const id of ['k1', 'k2', 'k3']) { const [bg, fg] = V[id].build().split('<!--FG-->'); $(V[id].svg).innerHTML = bg; $(V[id].fg).innerHTML = fg; built[id] = null; V[id].lastShelf = null; V[id].ballR = null; V[id].lastBar = null; }
   update();
 }
 // the main yarn ball: wobbles as yarn is pulled, shrinks as the piece grows, strand runs up to the needles
