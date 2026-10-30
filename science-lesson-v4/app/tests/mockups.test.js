@@ -15,8 +15,10 @@ const same = (a, b) => fs.readFileSync(a, 'utf8').replace(/\r\n/g, '\n') === fs.
 ok('eyes-free.js on the site is the same as planner/eyes-free.js', same(path.join(M, 'eyes-free.js'), path.join(ROOT, 'planner', 'eyes-free.js')));
 const ef = fs.readFileSync(path.join(M, 'eyes-free.html'), 'utf8'), src = fs.readFileSync(path.join(ROOT, 'lanes', 'mockups', 'eyes-free.html'), 'utf8');
 ok('eyes-free.html on the site loads the code from beside it, and is otherwise the lane mock-up', /<script src="eyes-free\.js"><\/script>/.test(ef) && ef.replace('<script src="eyes-free.js"></script>', '<script src="../../planner/eyes-free.js"></script>').replace(/\r\n/g, '\n') === src.replace(/\r\n/g, '\n'));
+ok('the diagram-style page and its pictures are on the site, same as the lane copy', same(path.join(M, 'diagram-style', 'index.html'), path.join(ROOT, 'lanes', 'mockups', 'diagram-style', 'index.html')) && fs.readdirSync(path.join(M, 'diagram-style')).filter((f) => /\.png$/.test(f)).length === 9);
 const idx = fs.readFileSync(path.join(M, 'index.html'), 'utf8');
 fs.readdirSync(M).filter((f) => /\.html$/.test(f) && f !== 'index.html').forEach((f) => ok(`the index links to ${f}`, idx.includes(`href="${f}"`)));
+ok('the index links to the diagram-style page', idx.includes('href="diagram-style/index.html"'));
 ok('no real class list or pupil name is bundled (the pages hold made-up rosters only)', !/Testperson|tomczynski/i.test(idx + ef));
 
 console.log(failed ? `\n${failed} FAILED` : '\nAll mock-up site checks passed');

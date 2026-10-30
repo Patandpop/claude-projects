@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>One drawing style for Claude-drawn diagrams (mock-ups)</title>
+<style>
+  body { margin:0; background:#1b2233; color:#e8edf5; font:16px/1.45 "Trebuchet MS",Trebuchet,system-ui,sans-serif; padding:16px; }
+  h1 { font-size:22px; margin:0 0 6px; } p { color:#b8c2d6; max-width:900px; margin:0 0 14px; } b { color:#fff; }
+  h2 { font-size:19px; margin:26px 0 8px; display:flex; align-items:center; gap:10px; }
+  h2 span { background:#FABB2E; color:#111; border-radius:8px; padding:2px 10px; font-size:17px; }
+  .row { display:flex; gap:10px; flex-wrap:wrap; }
+  .row img { width:min(100%, 420px); border-radius:6px; border:1px solid #2a3650; background:#fff; }
+  .why { color:#8a97ad; font-size:15px; max-width:900px; margin:6px 0 0; }
+</style>
+</head>
+<body>
+<h1>One drawing style for the diagrams Claude draws</h1>
+<p>Your 19 Oct goal: diagrams in one consistent, hand-drawn-feeling style that is not AI-looking. The same three diagrams (particles, a series circuit, an animal cell) in three styles. All are drawn by code on this PC with what the lesson builder already has (no picture service, no cost), so whichever you pick can be built straight into Learn slides. Pick A, B or C, or say what to mix.</p>
+
+<h2><span>A</span> Clean textbook</h2>
+<div class="row"><img src="clean-particles.png" alt=""><img src="clean-circuit.png" alt=""><img src="clean-cell.png" alt=""></div>
+<p class="why">Navy lines, pale fill, the slide font. Crisp and consistent, looks like a good textbook. The least "drawn".</p>
+
+<h2><span>B</span> Pencil sketch</h2>
+<div class="row"><img src="sketch-particles.png" alt=""><img src="sketch-circuit.png" alt=""><img src="sketch-cell.png" alt=""></div>
+<p class="why">Wobbly ink lines, cream paper, the handwriting font the worksheets already use for model answers. Feels drawn by a person; pupils can copy it as it is. Labels are still typed, so they always read.</p>
+
+<h2><span>C</span> Chalk on the board</h2>
+<div class="row"><img src="chalk-particles.png" alt=""><img src="chalk-circuit.png" alt=""><img src="chalk-cell.png" alt=""></div>
+<p class="why">Chalk-white lines on the slide navy, labels in the answer yellow. Sits naturally on the navy answer boxes and the dark Learn panels. Harder to print.</p>
+
+<p style="margin-top:28px">How it would work in the builder: a Learn item names the diagram and its labels; the builder draws it with the chosen style and places it like any picture, with the labelled-picture build (one part per click) on top. Made by <code>lanes/mockups/diagram-style/make.py</code>.</p>
+</body>
+</html>
