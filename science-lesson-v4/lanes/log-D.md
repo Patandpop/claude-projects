@@ -3,7 +3,7 @@
 ## Waiting on you
 1. The overnight adventure, round 2: mock-up ready: replica/design/mockups/companion/adventure2.html (row 1 lantern and note: 1C-i, 1C-ii or 1C-iii; row 2 the morning find: M1 scroll, M2 net or M3 drawer; row 3 cabinet style: K1, K2 or K3).
 2. The term page, A redone as real stained glass: mock-up ready: replica/design/mockups/companion/term-page-a2.html (six identity windows with the emblem cut from the glass, leaded panels, a lancet per week with a red glass seal; say yes or what to change).
-3. Focus crafts round 2 (stone carving and knitting, task sizes, progress bars): being made (focus-crafts-2.html).
+3. Focus crafts round 2: mock-up ready: replica/design/mockups/companion/focus-crafts-2.html (stone carving and knitting, small/medium/large pieces, pause; pick a progress bar for each: P1 rune ledge, P2 rune strip, P3 block wall for stone; P4 yarn to row, P5 stitches on needles, P6 washing line for knitting).
 4. Ocarina chorus: mock-up ready: replica/design/mockups/companion/sounds.html (gold button; chorus, old, or both).
 5. Next paste set (Lane A makes it): two new files join the set, Companion.gs (server) and GameComp.html (sound).
 6. Nudges on the phone need Lane C's notifications (installed app, step 8). The rules are built and waiting; nothing reaches your phone until then.
