@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ulhu: 15 ritual stones (1U.7, round two)</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Grenze+Gotisch:wght@500;700&display=swap">
+<style>
+/* One dark look by design (the drowned temple). */
+:root{color-scheme:dark;--a:'Atkinson Hyperlegible',system-ui,sans-serif;--g:'Grenze Gotisch',Georgia,serif}
+*{box-sizing:border-box}
+html,body{margin:0;background:#070d0b;color:#e8e1cf;font:15px/1.45 var(--a)}
+main{max-width:412px;margin:0 auto;padding:16px 10px 40px}
+h1{font:700 30px/1.1 var(--g);color:#ffd56a;margin:4px 6px 6px}
+.intro{color:#8fa298;margin:0 6px 12px}
+.card{background:#0c1512;border:1px solid #24443a;border-radius:10px;padding:10px 4px 6px;margin:14px 0}
+.card h3{margin:0 6px 2px;font:700 18px var(--a)}.card h3 b{color:#ffd56a;margin-right:6px}
+.cap{margin:0 6px 6px;color:#b9c4bc;font-size:14px}
+.pay{color:#f4dd9a}
+</style>
+</head>
+<body>
+<main>
+<h1>Fifteen ritual stones</h1>
+<p class="intro">Round two of 1U.7. You like the current stone most, so every one of these starts from it and changes how the stone itself is made: its polish, grain, pits, thickness, edges, or the colour deep inside it. The cracks are the same in every card so you compare only the stone. Pick a number, or say which to mix (for example "S1 polish with S3's violet").</p>
+<div id="cards"></div>
+</main>
+<script>/*__STONES__*/</script>
+<script>
+(function () {
+'use strict';
+const VARS = /*__VARS__*/;
+const RITS = [
+  { name: 'Read', s: 12, done: true, sub: 'appeased · 15 min · 12 nights', pay: 18 },
+  { name: 'Train', s: 3, done: false, sub: 'awaits · 1 session · 3 nights', pay: 24 },
+  { name: 'Mark one set', s: 70, done: false, sub: 'embers · 30 min · 70 nights', pay: 30 }
+];
+const host = document.getElementById('cards');
+VARS.forEach(([id, name, cap]) => {
+  const S = window['STONE_' + id.toLowerCase()], c = document.createElement('section'); c.className = 'card'; c.id = id;
+  c.innerHTML = '<h3><b>' + id + '</b>' + name + '</h3><p class="cap">' + cap + '</p>' + RITS.map((r, i) => S.row({ id: id + i, name: r.name, streak: r.s, done: r.done, subHtml: r.sub, payHtml: '<span class="pay">+' + r.pay + '</span>' })).join('');
+  host.appendChild(c); S.paint(c);
+});
+})();
+</script>
+</body>
+</html>
