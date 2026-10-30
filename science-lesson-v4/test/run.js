@@ -943,6 +943,10 @@ async function main() {
   console.log('');
   { const si = require(path.join(__dirname, 'spec-index.test.js')).run(); hardFails += si.fails; warnings += si.warns; }
 
+  // The morning brief end to end, preview only (2026-10-30).
+  console.log('');
+  { const bs = require(path.join(__dirname, 'brief-smoke.test.js')).run(); hardFails += bs.fails; warnings += bs.warns; }
+
   // Flag-only checks on lesson MCQs (4.11, 2026-10-29).
   console.log('');
   hardFails += require(path.join(__dirname, 'mcq-lint.test.js')).run().fails;

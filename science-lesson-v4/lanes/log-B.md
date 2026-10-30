@@ -6,7 +6,7 @@ Plain-English record of Lane B's work, newest entry first. Each entry says what 
 
 1. **Approve the builder plan for item 1.8 (A-level Drive address).** It touches the lesson builder, so it waits for your yes. The problem: for a Year 12 or 13 lesson the builder writes the wrong Drive address into the two small note files beside the lesson (it says "Year 13/Physics/Chapter 20 ...", but on Drive there is no Physics level and the chapters sit inside Module folders). The files still land in the right place, but the planner uses that note to attach each lesson's multiple-choice questions for the phone voter, so 12C and 13D lessons get none, and the school push uses the same wrong address. The plan: (1) for Year 12 or 13 the builder asks the uploader's own chapter lookup for the real folder and writes that into both notes (when Drive is not reachable it works out the module from the chapter-to-module table the October reorganisation used); (2) check the planner finds 12C and 13D lessons by that address; (3) add a 13D test lesson so it cannot slip back. Nothing on Drive is created, moved or renamed. Reply "yes to 1.8".
 2. **OK to write the Do Now mix rule into SKILL.md?** The picker now aims for 4 short recall questions, one 2-mark explain and one calculation (item 2.1). The plan says the rule only goes into the skill notes with your OK. Reply "yes to the mix rule".
-3. **Next paste set (Lane A makes it):** my planner changes from items 2.2, 2.3, 2.4, 2.7, 2.8 and 2.12 and the memory map (Planner.html, Code.gs, Phone.html, Behaviour.gs, and the new Memory.gs) need to go into the next complete set; after pasting, re-import planner-data.json from home once.
+3. **Next paste set (Lane A makes it):** my planner changes from items 2.2, 2.3, 2.4, 2.7, 2.8 and 2.12 and the memory map (Planner.html, Code.gs, Phone.html, Behaviour.gs, and the new Memory.gs) need to go into the next complete set; after pasting, re-import planner-data.json from home once. Optional: paste the new Mailbox.gs into the home link's own project and deploy a new version (item 4.6, faster quiz list).
 
 4. **Approve the builder plan for items 2.5 and 2.6 (lesson builder fixes).** They touch the lesson builder, so they wait for your yes. I checked the code itself, since the two audits disagree. What I would change, one at a time, with a test for each:
    - **Sentence starters:** the standard sheet still shows them on its easiest tier (and on any 4+ mark question). Move them to the support sheet only, except where a lesson asks for them on purpose.
@@ -25,15 +25,25 @@ Plain-English record of Lane B's work, newest entry first. Each entry says what 
 6. **Item 2.9, the silent-work timer: what is still missing?** Most of it was built on 24 Oct: on the phone, "silent work" on/off with the colour change, the "Talking: count the time lost" tap that turns phone and board red and counts the seconds, the % of silent time, and the weekly goal (80% silent and no more than 3 minutes lost; 6 for a fortnightly class) shown on the Friday tab. The plan also asks what "earning it" gives the class: (a) positives for everyone present, (b) a line in the Friday messages home (now built, item 2.8), (c) a celebration on the board, or a mix. Tell me which, and anything about the timer that does not work the way you want, and I will make a mock-up.
 7. **Item 2.10, the "last week's homework" slide:** a builder job that needs a mock-up first. I can't publish mock-ups from this chat, so it waits; tell me if you want me to make the mock-up as a file you can open instead.
 8. **Memory map: pick how the Memory tab looks.** Three layouts in one mock-up page: A, a grid (one row per topic, one coloured square per section); B, bars (each section a bar showing its %); C, a due list (reddest first, as cards). The "Suggested Do Now" box for lesson cards is the same in all three. The page is lanes/mockups/memory-tab.html in the project (I could not send it to your phone from this chat; open it on the PC, or ask the design chat to publish it). Reply A, B, C or a mix.
+9. **Item 4.13, homework ahead: OK to build this?** What already exists: the Homework tab's "Coming up automatically" list suggests revision homework two weeks before every test, one click to fill it in. My proposal for the rest: (a) on Fridays the planner lists next week's lessons that need homework set (the ones ticked "Set homework") and offers one button, "Ask Claude to prepare these", which sends a single request home; nothing is posted. (b) Two weeks before a test, the 6am job makes the revision homework as a Classroom DRAFT (never posted, you check and post it) and the card says "draft ready"; or, if you would rather, it only reminds you. (c) A 6-mark question done on the board comes back as homework three weeks later, chosen from that lesson's real 6-markers, offered as a tick in the Friday list. Reply with the letters you want, and for (b) "draft" or "reminder".
+10. **Item 4.14, the whole-class feedback sheet: what should it look like?** I need a picture of it before building: one page per class after a marked test or key homework, with "what went well", the 3 most-missed questions with the right answer, the common wrong answer and why, and a short "now do this" task? Or the school's own whole-class feedback template, if there is one (send it and I will build to it).
 
 ---
+## 30 Oct 2026, Phase 5: a smoke test for the morning brief (and no more em dashes in it)
+
+**What changed:** the main test now runs the whole morning brief once in its preview mode (it prints the page and never writes to Drive) and checks that it finishes, makes a complete page, names only this year's classes, and has no em dashes. That last check found 21 em dashes the brief was showing you ("Period 1: 8AG — Photosynthesis", "HW OUT — SET"); they are now colons and commas ("Period 1: 8AG, Photosynthesis", "HW OUT (SET):").
+
+**You need to:** nothing.
+
+**Save:** see the history line "Morning brief: smoke test, em dashes out".
+
 ## 30 Oct 2026, item 4.11: checks on multiple-choice wrong answers (flag only)
 
 **What changed:** a new report reads every built lesson's multiple-choice questions and flags the weak ones against the rules taken from real exam papers: the right answer clearly the longest (a give-away), very uneven options, two options the same, "all/none of the above", number options not smallest to largest, a NOT stem not in capitals, a wrong option without its "why" (the mistake it catches), and, across a lesson's six, a letter never used or used more than twice. It only reports; it never changes a lesson. Run today, 9 built lessons have something to look at, mostly lessons built before the 19 Oct "every wrong option names its mistake" rule. I will use it on lessons I build from now on.
 
 **You need to:** nothing.
 
-**Save:** see the history line "MCQ checks on built lessons".
+**Save:** 2ecd32e8.
 
 ## 30 Oct 2026, item 4.7: the behaviour log stays fast
 

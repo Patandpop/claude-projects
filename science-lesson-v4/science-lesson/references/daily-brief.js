@@ -300,7 +300,7 @@ function section(num, title, cls, body) {
 
 function sec1(todayPeriods, ctx, standing, uploadLog, log) {
   if (!todayPeriods || !todayPeriods.length)
-    return miss('[Planner.xlsx not found or no lessons today — check timetable]');
+    return miss('[Planner.xlsx not found or no lessons today: check timetable]');
 
   const periods = todayPeriods.filter(function(p) { return !p.isAbsent; });
   if (!periods.length) return '<p>No lessons today.</p>';
@@ -360,8 +360,8 @@ function sec1(todayPeriods, ctx, standing, uploadLog, log) {
     if (p.setHomework) {
       const qs = getHwQuestions(cls, topic);
       hwOut = qs
-        ? div('hw-out', '<strong>HW OUT — SET:</strong><br>' + qs.map(function(q, i) { return (i+1) + '. ' + q.text; }).join('<br>'))
-        : div('hw-out', '<strong>HW OUT — </strong>' + miss('[GENERATE HOMEWORK — topic: ' + topic + ']'));
+        ? div('hw-out', '<strong>HW OUT (SET):</strong><br>' + qs.map(function(q, i) { return (i+1) + '. ' + q.text; }).join('<br>'))
+        : div('hw-out', '<strong>HW OUT: </strong>' + miss('[GENERATE HOMEWORK: topic: ' + topic + ']'));
     }
 
     // Homework IN (M6, M7)
@@ -372,8 +372,8 @@ function sec1(todayPeriods, ctx, standing, uploadLog, log) {
     let hwIn = '';
     if (lastHw) {
       const isSeneca = /seneca/i.test(lastHw.message);
-      hwIn = div('hw-in', '<strong>HW IN — COLLECT:</strong> ' + lastHw.message
-        + (isSeneca ? ' — ' + flag('red', 'CHECK SENECA — log detentions for non-completion') : ''));
+      hwIn = div('hw-in', '<strong>HW IN (COLLECT):</strong> ' + lastHw.message
+        + (isSeneca ? ': ' + flag('red', 'CHECK SENECA: log detentions for non-completion') : ''));
     }
 
     // Late/owed work (M8)
@@ -382,7 +382,7 @@ function sec1(todayPeriods, ctx, standing, uploadLog, log) {
           && en.message.toLowerCase().includes(cls.toLowerCase());
     });
     const lateHtml = late.length
-      ? div('late-work', '<strong>OWED WORK:</strong> ' + late.map(function(_, i) { return 'Student ' + (i+1); }).join(', ') + ' — SUPER GOOD EXCUSES ONLY')
+      ? div('late-work', '<strong>OWED WORK:</strong> ' + late.map(function(_, i) { return 'Student ' + (i+1); }).join(', ') + ': SUPER GOOD EXCUSES ONLY')
       : '';
 
     // Cover note (M9)
@@ -390,17 +390,17 @@ function sec1(todayPeriods, ctx, standing, uploadLog, log) {
       return en.category === 'cover' && en.message.toLowerCase().includes(cls.toLowerCase());
     });
     const coverHtml = coverEn
-      ? div('cover-note', '<strong>COVER NOTE:</strong> ' + coverEn.message + ' — Do Now should draw from prior lesson.')
+      ? div('cover-note', '<strong>COVER NOTE:</strong> ' + coverEn.message + ': Do Now should draw from prior lesson.')
       : '';
 
     return div('lesson-block',
-      elt('h3', '', 'Period ' + p.period + ': ' + cls + ' — ' + topic + ' ' + flags)
+      elt('h3', '', 'Period ' + p.period + ': ' + cls + ', ' + topic + ' ' + flags)
       + '<div class="lesson-meta">'
       + '<strong>Folder:</strong> ' + folderLink + '<br>'
       + '<strong>Presentation:</strong> ' + pptxLink + '<br>'
       + '<strong>Print:</strong> ' + wsLinks + '<br>'
       + '<strong>Print counts:</strong> ' + (printCounts || miss('[CHECK COUNTS]'))
-      + (extra.length ? '<br><strong>Extra time:</strong> ' + extra.map(function(s) { return s.id + ' — ' + s.percent + '% extra time'; }).join(', ') : '')
+      + (extra.length ? '<br><strong>Extra time:</strong> ' + extra.map(function(s) { return s.id + ': ' + s.percent + '% extra time'; }).join(', ') : '')
       + '</div>'
       + hwOut + hwIn + lateHtml + coverHtml
     );
@@ -410,20 +410,20 @@ function sec1(todayPeriods, ctx, standing, uploadLog, log) {
 // ─── Section 2: Tutor Time (M10) ──────────────────────────────────────────────
 
 function sec2(standing, log) {
-  const tutorCls  = (standing && standing.tutorClass) || miss('[unknown — add to context-standing.json]');
+  const tutorCls  = (standing && standing.tutorClass) || miss('[unknown: add to context-standing.json]');
   const tutorCnt  = (standing && standing.tutorCount) || '?';
   const concerns  = byCategory(log, 'tutor-note');
   const parentFl  = byCategory(log, 'parent-call');
   const isFriday  = dow() === 5;
 
   return '<p><strong>Tutor class:</strong> ' + tutorCls + ' (' + tutorCnt + ' students)</p>'
-    + '<p><strong>Attendance:</strong> ' + miss('[Check register — flag any lates/absences]') + '</p>'
+    + '<p><strong>Attendance:</strong> ' + miss('[Check register: flag any lates/absences]') + '</p>'
     + (concerns.length
       ? div('concern', '<strong>Concerns / behaviour notes:</strong><ul>'
           + concerns.map(function(c, i) { return '<li>Student ' + (i+1) + ': ' + c.message + '</li>'; }).join('')
           + '</ul>')
       : '<p><em>No tutor concerns logged.</em></p>')
-    + '<p><strong>Tracker goals:</strong> ' + miss('[Check positives target — update tracker]') + '</p>'
+    + '<p><strong>Tracker goals:</strong> ' + miss('[Check positives target: update tracker]') + '</p>'
     + ((!isFriday && parentFl.length)
       ? div('warn', '<strong>Parent contact needed:</strong><ul>'
           + parentFl.map(function(c, i) { return '<li>Student ' + (i+1) + ': ' + c.message + '</li>'; }).join('')
@@ -440,7 +440,7 @@ function sec3(log, ctx) {
 
   // Order sheet warning (M11)
   if (d >= 3 && !orderSubmittedThisWeek(log))
-    parts.push(div('urgent', '<strong>ORDER SHEET DUE THURSDAY 3:15 — NOT YET SUBMITTED</strong>'));
+    parts.push(div('urgent', '<strong>ORDER SHEET DUE THURSDAY 3:15: NOT YET SUBMITTED</strong>'));
 
   // Observation triple-check (M15)
   byCategory(log, 'observation').forEach(function(obs) {
@@ -450,7 +450,7 @@ function sec3(log, ctx) {
     if (daysAway >= 0 && daysAway <= 3) {
       const clsMatch = obs.message.match(/class\s+(\w+)/i);
       const obsClass = clsMatch ? ' (' + clsMatch[1] + ')' : '';
-      parts.push(div('urgent', '<strong>TRIPLE CHECK POWERPOINT — observation ' + dm[0] + obsClass + '</strong>'));
+      parts.push(div('urgent', '<strong>TRIPLE CHECK POWERPOINT: observation ' + dm[0] + obsClass + '</strong>'));
     }
   });
 
@@ -491,11 +491,11 @@ function sec4(ctx, log, todayPeriods, standing) {
   const freeCount = Math.max(0, 5 - lessons);
   parts.push('<p><small>' + lessons + ' lesson' + (lessons !== 1 ? 's' : '') + ' today, '
     + freeCount + ' free period' + (freeCount !== 1 ? 's' : '')
-    + (freeCount < 2 ? ' — priority tasks only' : '') + '</small></p>');
+    + (freeCount < 2 ? ': priority tasks only' : '') + '</small></p>');
 
   // Book marking rota (M13)
   if (wk === 1) {
-    parts.push('<p><strong>Book marking:</strong> Week 1 of year — skip.</p>');
+    parts.push('<p><strong>Book marking:</strong> Week 1 of year: skip.</p>');
   } else if (wk <= 4) {
     const idx = ((wk - 2) * 2) % ALL.length;
     parts.push('<p><strong>Book marking this week:</strong> ' + ALL[idx] + ', ' + ALL[(idx+1) % ALL.length] + '</p>');
@@ -512,7 +512,7 @@ function sec4(ctx, log, todayPeriods, standing) {
   (ctx && ctx.tests ? ctx.tests : []).forEach(function(t) {
     const da = (new Date(t.date) - TODAY) / 86400000;
     if (da >= 10 && da <= 14)
-      parts.push(div('warn', '<strong>PLC for ' + t.topic + ' (' + t.class + ') due — upload now</strong>'));
+      parts.push(div('warn', '<strong>PLC for ' + t.topic + ' (' + t.class + ') due: upload now</strong>'));
   });
 
   // ATL/behaviour — shown only on lighter days (M12: more tasks when more free periods)
@@ -521,7 +521,7 @@ function sec4(ctx, log, todayPeriods, standing) {
 
   // Y12/13 on lesson days (time-sensitive — always shown)
   if (todayPeriods && todayPeriods.some(function(p) { return /^1[23]/.test(p.class); }))
-    parts.push('<p><strong>Y12/13 homework:</strong> Set questions today — 1 week deadline.</p>');
+    parts.push('<p><strong>Y12/13 homework:</strong> Set questions today: 1 week deadline.</p>');
 
   return parts.join('\n');
 }
@@ -537,7 +537,7 @@ function sec5(ctx, log) {
     if (da >= 0 && da <= 30) {
       const plc = t.plcUploaded ? '&#10003; PLC done' : miss('PLC not uploaded');
       parts.push('<p><strong>Test in ' + da + ' days (' + t.date + '):</strong> '
-        + t.class + ' — ' + t.topic + ' (' + (t.tier || 'standard') + ') — ' + plc + '</p>');
+        + t.class + ', ' + t.topic + ' (' + (t.tier || 'standard') + '): ' + plc + '</p>');
     }
   });
 
@@ -548,7 +548,7 @@ function sec5(ctx, log) {
     const clsMatch = obs.message.match(/class\s+(\w+)/i);
     const obsClass = clsMatch ? clsMatch[1] : 'relevant class';
     parts.push(div('warn', '<strong>Observation logged:</strong> ' + obs.message
-      + ' — check books for ' + obsClass + ' by lesson before ' + dateStr));
+      + ': check books for ' + obsClass + ' by lesson before ' + dateStr));
   });
 
   // Logged deadlines
@@ -585,7 +585,7 @@ function sec7(todayPeriods) {
     + '<li>&#9744; Positives logged on system</li>'
     + '<li>&#9744; Negatives logged on system</li>'
     + '<li>&#9744; Classroom clean</li>'
-    + '<li>&#9744; Chairs up — ' + chairs + '</li>'
+    + '<li>&#9744; Chairs up: ' + chairs + '</li>'
     + '</ul>';
 }
 
@@ -596,7 +596,7 @@ function buildHtml(bodyParts) {
   return '<!DOCTYPE html>\n<html lang="en">\n<head>\n'
     + '<meta charset="UTF-8">\n'
     + '<meta name="viewport" content="width=device-width,initial-scale=1">\n'
-    + '<title>Daily Brief — ' + dayName() + ' ' + d + '</title>\n'
+    + '<title>Daily Brief: ' + dayName() + ' ' + d + '</title>\n'
     + '<style>\n'
     + 'body{font-family:"Trebuchet MS",Arial,sans-serif;max-width:900px;margin:2rem auto;padding:0 1rem;background:#f8f9fa;color:#212529}\n'
     + 'h1{border-bottom:3px solid #0d6efd;padding-bottom:.5rem}\n'
@@ -620,7 +620,7 @@ function buildHtml(bodyParts) {
     + 'a,.drive-link{color:#0d6efd}\n'
     + '.checklist{list-style:none;padding:0}.checklist li{padding:.3rem 0;font-size:1rem}\n'
     + '</style>\n</head>\n<body>\n'
-    + '<h1>Daily Brief — ' + dayName() + ' ' + d + '</h1>\n'
+    + '<h1>Daily Brief: ' + dayName() + ' ' + d + '</h1>\n'
     + bodyParts.join('\n')
     + '\n<footer style="margin-top:2rem;font-size:.8rem;color:#6c757d">Generated '
     + new Date().toISOString().slice(0, 19).replace('T', ' ')
@@ -654,7 +654,7 @@ function main() {
 
   // M18: fallback to terminal if Drive not mounted
   if (!DRIVE_UP) {
-    process.stderr.write('WARNING: G:\\ not mounted — printing to terminal instead.\n');
+    process.stderr.write('WARNING: G:\\ not mounted: printing to terminal instead.\n');
     console.log(html);
     return;
   }
