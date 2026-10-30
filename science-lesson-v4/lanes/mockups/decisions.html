@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Everything waiting on you (30 Oct 2026)</title>
+<style>
+  :root { --bg:#0e1420; --ink:#e8edf5; --soft:#8a97ad; --card:#182134; --line:#2a3650; --gold:#e3b341; --blue:#4c8dff; }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:16px/1.4 "Atkinson Hyperlegible",Roboto,system-ui,sans-serif; padding:14px 14px 110px; }
+  h1 { font-size:22px; margin:0 0 4px; } .lead { color:var(--soft); margin:0 0 16px; }
+  h2 { font-size:15px; letter-spacing:.08em; text-transform:uppercase; color:var(--gold); margin:26px 0 8px; }
+  .d { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:12px 14px; margin:10px 0; }
+  .d.done { border-color:#2fbf71; }
+  .d b { display:block; font-size:17px; margin-bottom:4px; } .d p { margin:4px 0 8px; color:#c5cde0; font-size:15px; }
+  .d a { color:var(--blue); }
+  .opts { display:flex; flex-wrap:wrap; gap:6px; }
+  .opts button { font:inherit; color:var(--ink); background:#0f1420; border:1px solid var(--line); border-radius:9px; padding:9px 12px; min-height:42px; }
+  .opts button[aria-pressed="true"] { background:var(--gold); color:#111; border-color:var(--gold); font-weight:700; }
+  .d textarea { width:100%; min-height:44px; margin-top:6px; background:#0f1420; color:var(--ink); border:1px solid var(--line); border-radius:9px; padding:8px; font:inherit; }
+  .bar { position:fixed; left:0; right:0; bottom:0; background:var(--card); border-top:1px solid var(--line); padding:10px 14px; display:flex; gap:8px; align-items:center; }
+  .bar button { font:inherit; padding:12px 16px; border-radius:10px; border:0; background:var(--gold); color:#111; font-weight:700; flex:1; min-height:48px; }
+  .bar .n { color:var(--soft); font-size:14px; }
+  #out { position:fixed; inset:0; background:var(--bg); padding:16px; display:none; z-index:5; }
+  #out textarea { width:100%; height:70vh; background:#0f1420; color:var(--ink); border:1px solid var(--line); border-radius:9px; padding:10px; font:14px/1.4 ui-monospace,monospace; }
+  #out button { font:inherit; padding:12px 16px; border-radius:10px; border:1px solid var(--line); background:var(--card); color:var(--ink); margin:8px 6px 0 0; }
+</style>
+</head>
+<body>
+<h1>Everything waiting on you</h1>
+<p class="lead">Tap an answer under each one (or type), then <b>Copy my answers</b> at the bottom and paste the text into any lane chat. Answers are kept on this phone only until you clear them. Mock-up links open the page to look at.</p>
+<div id="list"></div>
+<div class="bar"><span class="n" id="count"></span><button id="copy">Copy my answers</button></div>
+<div id="out"><p>Select all and copy if the button did not copy on its own. Paste it into the chat.</p><textarea id="outText"></textarea><br><button id="back">Back</button><button id="clear">Clear all my answers</button></div>
+
+<script>
+(function () {
+  'use strict';
+  var D = [
+    // ---- Lane C (your day)
+    { g: 'Lane C: your day', k: 'c1', t: 'Obsidian inbox folder for the quick-capture box', p: 'Nothing is written to Obsidian until you answer.', o: ['A G:\\My Drive\\Obsidian\\Inbox from planner.md (the lane\'s pick)', 'B a folder I name (type it)', 'C inside Beechen Cliff Science\\Admin'] , free: true },
+    { g: 'Lane C: your day', k: 'c2', t: 'Per-pupil homework results move to your personal Planner Sheet', p: 'As decided in the installed-app grill.', o: ['Yes, move them', 'No, keep them at school'] },
+    { g: 'Lane C: your day', k: 'c3', t: 'Cloudflare site address', p: 'Paste the address ending .pages.dev (and say the build settings matched).', free: true },
+    { g: 'Lane C: your day', k: 'c4', t: 'The school test results', p: 'Two minutes on a school PC at the site address with /test/ on the end; paste the three results.', free: true },
+    { g: 'Lane C: your day', k: 'c7a', t: 'Eyes-free: your Try score out of 20', p: 'Open <a href="eyes-free.html">the eyes-free page</a>, press Try, draw 20 letters.', free: true },
+    { g: 'Lane C: your day', k: 'c7b', t: 'Eyes-free pick 1: when a first letter fits several pupils', o: ['A draw the surname initial without looking (pick)', 'B the names pop up to tap'] },
+    { g: 'Lane C: your day', k: 'c7c', t: 'Eyes-free pick 2: how a tap becomes a positive', o: ['A after a 0.4 s pause, one trip (pick)', 'B at once, a second tap undoes it'] },
+    { g: 'Lane C: your day', k: 'c7d', t: 'Eyes-free pick 3: the way into Blind mode', o: ['A a Blind button beside Plan and Names (pick)', 'B drawing anywhere on the plan counts', 'C the phone upside down'] },
+    { g: 'Lane C: your day', k: 'c8a', t: 'The "last week\'s homework" slide', p: '<a href="homework-feedback.html">Mock-up</a> (plan item 2.10).', o: ['A three cards', 'B one question per slide, answers as bars', 'C table plus "Fix it now"'] },
+    { g: 'Lane C: your day', k: 'c8b', t: 'The whole-class feedback sheet', p: 'Same <a href="homework-feedback.html">mock-up</a>, Sheet buttons (4.14).', o: ['A four boxes', 'B question strip', 'C spec colours'] },
+    { g: 'Lane C: your day', k: 'c9a', t: 'Answer boxes on the board', p: '<a href="slides-polish.html">Mock-up</a>, press Lights on (4.12).', o: ['A as now', 'B bigger and bolder', 'C white text, yellow label', 'D cream box'] },
+    { g: 'Lane C: your day', k: 'c9b', t: 'True or false reveal', p: 'Same mock-up (4.9).', o: ['A stamp', 'B flip', 'C corners, one per slide'] },
+    { g: 'Lane C: your day', k: 'c9c', t: 'GUESS worked example', p: 'Same mock-up.', o: ['A rows', 'B cards', 'C steps'] },
+    { g: 'Lane C: your day', k: 'c9d', t: 'Exam question with a picture on the worksheet', p: 'Same mock-up (4.4).', o: ['A two-up', 'B picture first', 'C picture beside the stem'] },
+    { g: 'Lane C: your day', k: 'c10', t: 'Lessons built before 7 pm: switch it on?', p: 'Run the dry run, then install, then watch one run (log-C item 10).', o: ['I will switch it on', 'Not yet'] },
+    { g: 'Lane C: your day', k: 'c11', t: 'Learn slides: which dual-coding layouts to build', p: '<a href="learn-dual-coding.html">Mock-up</a>, six layouts. Several is fine; say which is the default.', o: ['A notes around a picture', 'B write this, see this', 'C one idea', 'D build it up', 'E concept map', 'F cause and effect'], multi: true, free: true },
+    { g: 'Lane C: your day', k: 'c12', t: 'The print pack: may it live on Drive, and where?', p: 'Until you say, it goes to the Desktop folder "Print packs".', o: ['Desktop is fine', 'Admin\\Print Packs on Drive', 'Somewhere else (type it)'], free: true },
+    { g: 'Lane C: your day', k: 'c14', t: 'The 20 teaching-language rules', p: 'lanes/research-teaching-language.md, section 3. Say yes, or list the numbers to change.', o: ['Yes to all 20', 'Yes except the numbers I type'], free: true },
+    { g: 'Lane C: your day', k: 'c15', t: 'One drawing style for Claude-drawn diagrams', p: '<a href="diagram-style/index.html">Mock-up</a>.', o: ['A clean textbook', 'B pencil sketch', 'C chalk on the board'] },
+    { g: 'Lane C: your day', k: 'c17a', t: 'Exam practice front cover', p: '<a href="exam-practice-cover.html">Mock-up</a>.', o: ['A exam-board style', 'B one glance', 'C slim strip, questions on page 1'] },
+    { g: 'Lane C: your day', k: 'c17b', t: 'Exam practice tick boxes', p: 'Same mock-up, Tick boxes button.', o: ['1 as now', '2 a 6 mm box', '3 an 8 mm box, bigger type'] },
+    // ---- Lane B (learning)
+    { g: 'Lane B: learning', k: 'b1', t: 'Builder plan for item 1.8 (A-level Drive address)', p: 'Lane B\'s waiting item 1.', o: ['Yes to 1.8', 'Not yet'] },
+    { g: 'Lane B: learning', k: 'b2', t: 'Write the Do Now mix rule into SKILL.md?', p: '4 short recall, one 2-mark explain, one calculation.', o: ['Yes to the mix rule', 'No'] },
+    { g: 'Lane B: learning', k: 'b4', t: 'Builder plan for items 2.5 and 2.6 (lesson builder fixes)', p: 'Lane B\'s waiting item 4 lists the bullets. Yes to all, or type which bullets.', o: ['Yes to the builder plan', 'Only the bullets I type'], free: true },
+    { g: 'Lane B: learning', k: 'b8', t: 'Memory map tab layout', p: '<a href="memory-tab.html">Mock-up</a>. You picked it in another chat; it was never saved.', o: ['A grid', 'B bars', 'C due list', 'a mix (type it)'], free: true },
+    { g: 'Lane B: learning', k: 'b9', t: 'Homework ahead (4.13): which parts, and draft or reminder', p: '(a) Friday list with "Ask Claude to prepare these"; (b) revision homework two weeks before a test as a Classroom draft, or only a reminder; (c) a 6-marker returns as homework three weeks later.', o: ['a', 'b as a draft', 'b as a reminder', 'c'], multi: true },
+    { g: 'Lane B: learning', k: 'bw', t: 'Word bank for 9AS and 9XS', p: 'Undecided in class-defaults; they keep a word bank until you say.', o: ['9AS yes, 9XS yes', '9AS yes, 9XS no', '9AS no, 9XS yes', 'Neither'] },
+    { g: 'Lane B: learning', k: 'br', t: 'Review lessons: keep the answers sheet, or answers on the board only?', o: ['Keep the answers sheet', 'Board only, drop the sheet'] },
+    { g: 'Lane B: learning', k: 'be', t: 'OK for the Engage rule (a real question the lesson answers; none if no good hook)?', o: ['Yes', 'No, keep Engage always'] },
+    { g: 'Lane B: learning', k: 's1', t: '6-mark slide question 1: highlights on the model answer', o: ['All colours at once', 'One colour per click'] },
+    { g: 'Lane B: learning', k: 's2', t: '6-mark slide question 2: when and how it comes back as homework', p: '14 days is pencilled in.', o: ['14 days, inside the next exam practice', '14 days, its own one-question homework', 'A different gap (type it)'], free: true },
+    { g: 'Lane B: learning', k: 's3', t: '6-mark slide question 3: at school with no exam library', o: ['Leave the slides out, add at home (current plan)', 'Claude types the 6-marker from a photo'] },
+    // ---- Lane A (Ulhu game)
+    { g: 'Lane A: Ulhu', k: 'a1', t: 'The 2-week bar under the rituals (1U.13)', p: '<a href="ulhu/ritualbar/index.html">Mock-up</a>.', o: ['B1 pebbles', 'B2 tide line', 'B3 carved ledge', 'a mix (type it)'], free: true },
+    { g: 'Lane A: Ulhu', k: 'a2', t: 'The dice-game water (1U.6)', p: '<a href="ulhu/dicewater/index.html">Mock-up</a>.', o: ['W1 tide sweep', 'W2 tentacle', 'W3 breaking wave'] },
+    { g: 'Lane A: Ulhu', k: 'a2w', t: 'The losing word', o: ['ENGULFT', 'FORFEIT', 'BEREFT', 'DROWNED', 'FORSAKEN'] },
+    { g: 'Lane A: Ulhu', k: 'a3', t: 'The Grimoire\'s opened page (1U.10)', p: '<a href="ulhu/grimoire/opened.html">Mock-up</a>.', o: ['O1 one rose window', 'O2 round and lancet', 'O3 three medallions'] },
+    { g: 'Lane A: Ulhu', k: 'av', t: 'Does the Vespers bonus also boost blessings, bosses and the weekly review?', o: ['Yes', 'No, Vespers only'] },
+    // ---- Lane D (companion)
+    { g: 'Lane D: Ulhu companion', k: 'd1', t: 'Day tags: where they live', p: '<a href="ulhu/companion/day-tags.html">Mock-up</a>.', o: ['A hold the moon', 'B a ribbon under the tabs', 'C week stones'] },
+    { g: 'Lane D: Ulhu companion', k: 'd2', t: 'The overnight adventure: one letter per row', p: '<a href="ulhu/companion/adventure.html">Mock-up</a>. Type three letters (row 1, row 2, row 3).', free: true },
+    { g: 'Lane D: Ulhu companion', k: 'd3', t: 'The term page and chapter windows', p: '<a href="ulhu/companion/term-page.html">Mock-up</a>.', o: ['A one scroll', 'B cathedral wall with a rose window', 'C two tabs'] },
+    { g: 'Lane D: Ulhu companion', k: 'd4', t: 'Focus crafts: keep or drop each', p: '<a href="ulhu/companion/focus-crafts.html">Mock-up</a>. Type the ones to keep.', free: true }
+  ];
+  var LS = { get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set: function (k, v) { try { localStorage.setItem(k, v); } catch (e) {} } };
+  var A = (function () { try { return JSON.parse(LS.get('decisions') || '{}'); } catch (e) { return {}; } })();
+  function save() { LS.set('decisions', JSON.stringify(A)); count(); }
+  function count() { var n = D.filter(function (d) { var a = A[d.k]; return a && (a.picks && a.picks.length || a.text); }).length; document.getElementById('count').textContent = n + ' of ' + D.length + ' answered'; }
+  function render() {
+    var list = document.getElementById('list'), g = '', html = '';
+    D.forEach(function (d) {
+      var a = A[d.k] || { picks: [], text: '' };
+      if (d.g !== g) { g = d.g; html += '<h2>' + g + '</h2>'; }
+      html += '<div class="d' + (a.picks.length || a.text ? ' done' : '') + '" data-k="' + d.k + '"><b>' + d.t + '</b>' + (d.p ? '<p>' + d.p + '</p>' : '') +
+        (d.o ? '<div class="opts">' + d.o.map(function (o) { return '<button data-o="' + o.replace(/"/g, '&quot;') + '" aria-pressed="' + (a.picks.indexOf(o) >= 0) + '">' + o + '</button>'; }).join('') + '</div>' : '') +
+        (d.free ? '<textarea placeholder="Type here">' + (a.text || '').replace(/</g, '&lt;') + '</textarea>' : '') + '</div>';
+    });
+    list.innerHTML = html; count();
+  }
+  document.getElementById('list').addEventListener('click', function (e) {
+    var b = e.target.closest('button'); if (!b) return;
+    var card = b.closest('.d'), k = card.dataset.k, d = D.filter(function (x) { return x.k === k; })[0], a = A[k] = A[k] || { picks: [], text: '' };
+    var i = a.picks.indexOf(b.dataset.o);
+    if (d.multi) { if (i >= 0) a.picks.splice(i, 1); else a.picks.push(b.dataset.o); }
+    else a.picks = i >= 0 ? [] : [b.dataset.o];
+    save(); render();
+  });
+  document.getElementById('list').addEventListener('input', function (e) {
+    var t = e.target; if (t.tagName !== 'TEXTAREA') return;
+    var k = t.closest('.d').dataset.k; A[k] = A[k] || { picks: [], text: '' }; A[k].text = t.value; save();
+    t.closest('.d').classList.toggle('done', !!(A[k].picks.length || A[k].text));
+  });
+  function text() {
+    var lines = ['My answers (' + new Date().toLocaleDateString('en-GB') + '):'], g = '';
+    D.forEach(function (d) {
+      var a = A[d.k]; if (!a || !(a.picks.length || a.text)) return;
+      if (d.g !== g) { g = d.g; lines.push('', g.toUpperCase()); }
+      lines.push('- ' + d.t + ': ' + a.picks.join(', ') + (a.text ? (a.picks.length ? '. ' : '') + a.text.trim() : ''));
+    });
+    return lines.join('\n');
+  }
+  document.getElementById('copy').onclick = function () {
+    var t = text(); document.getElementById('outText').value = t; document.getElementById('out').style.display = 'block';
+    try { var pr = navigator.clipboard.writeText(t); if (pr && pr.catch) pr.catch(function () {}); } catch (e) {}
+  };
+  document.getElementById('back').onclick = function () { document.getElementById('out').style.display = 'none'; };
+  document.getElementById('clear').onclick = function () { A = {}; save(); render(); document.getElementById('out').style.display = 'none'; };
+  render();
+})();
+</script>
+</body>
+</html>

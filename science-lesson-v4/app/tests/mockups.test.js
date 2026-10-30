@@ -9,7 +9,7 @@ const ROOT = path.join(__dirname, '..', '..');
 const M = path.join(ROOT, 'app', 'src', 'mockups');
 const same = (a, b) => fs.readFileSync(a, 'utf8').replace(/\r\n/g, '\n') === fs.readFileSync(b, 'utf8').replace(/\r\n/g, '\n');
 
-['homework-feedback.html', 'slides-polish.html', 'learn-dual-coding.html', 'memory-tab.html', 'exam-practice-cover.html'].forEach((f) => {
+['homework-feedback.html', 'slides-polish.html', 'learn-dual-coding.html', 'memory-tab.html', 'exam-practice-cover.html', 'decisions.html'].forEach((f) => {
   ok(`${f} on the site is the same as lanes/mockups/${f}`, fs.existsSync(path.join(M, f)) && same(path.join(M, f), path.join(ROOT, 'lanes', 'mockups', f)));
 });
 ok('eyes-free.js on the site is the same as planner/eyes-free.js', same(path.join(M, 'eyes-free.js'), path.join(ROOT, 'planner', 'eyes-free.js')));
