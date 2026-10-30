@@ -398,5 +398,36 @@ if (fs.existsSync(DRIVE)) {
   ok(saved < 400 && unsaved < 1500, `speed: a whole year of 41 weeks (${saved} ms saved, ${unsaved} ms with 36 weeks still to plan)`);
 }
 
+// Big goal 1, the Memory tab (layout A, 30 Oct 2026): rows, squares, the lesson card's Suggested Do Now, the build request
+{
+  const md = { specIndex: [
+      { code: 'Physics: Latent Heat', title: 'Latent Heat', unit: 'Particle Model', board: 'AQA', subject: 'Physics' },
+      { code: 'Physics: Density', title: 'Density', unit: 'Particle Model', board: 'AQA', subject: 'Physics' },
+      { code: 'Physics: Gas Pressure', title: 'Gas Pressure', unit: 'Particle Model', board: 'AQA', subject: 'Physics' },
+      { code: 'Physics: Isotopes', title: 'Isotopes', unit: 'Atomic Structure', board: 'AQA', subject: 'Physics' },
+      { code: 'KS3: Atoms', title: 'Atoms', unit: 'Atomic Structure', board: 'KS3', subject: 'KS3' }],
+    classes: { '9ZZ': { seq: [{ spec: ['Physics: Density'] }, { spec: ['Physics: Isotopes'] }, { spec: ['KS3: Atoms'] }, {}] } } };
+  const mem = { '9ZZ': [
+    { spec: 'Physics: Density', recall: 91, state: 'green' }, { spec: 'Physics: Latent Heat', recall: 48, state: 'red', reteach: true },
+    { spec: 'Physics: Isotopes', recall: 70, state: 'unknown' }, { spec: 'KS3: Atoms', recall: 79, state: 'amber' }] };
+  const gr = P.memoryGrid(md, mem, '9ZZ');
+  ok(gr.rows.map((r) => r.unit).join(' | ') === 'Particle Model | Atomic Structure (Physics) | Atomic Structure (KS3)', 'memory tab: one row per unit in scheme order; same-named units get their subject');
+  ok(gr.rows[0].squares.map((q) => q.state).join(',') === 'red,green,untaught', 'memory tab: one square per section of the unit, untaught ones grey');
+  ok(gr.taught === 4 && gr.count.red === 1 && gr.count.unknown === 1 && gr.rows[0].squares[0].reteach, 'memory tab: counts and the re-teach flag');
+  ok(P.memoryGrid(md, {}, '9ZZ').taught === 0 && P.memoryGrid({}, null, 'X').rows.length === 0, 'memory tab: no scores or no data is empty, not an error');
+  let sug = P.memorySuggest(md, mem, '9ZZ', {});
+  ok(sug.map((x) => x.code).join(',') === 'Physics: Latent Heat,Physics: Isotopes,KS3: Atoms', 'suggested Do Now: red, then not checked yet, then fading; blue never');
+  ok(sug.every((x) => x.ticked) && P.memorySuggest(md, mem, '9ZZ', { tick: 1 }).filter((x) => x.ticked).length === 1, 'suggested Do Now: the top ones are ticked');
+  sug = P.memorySuggest(md, mem, '9ZZ', { pins: [{ spec: 'Physics: Density', on: '2026-11-02' }, { spec: 'Physics: Gas Pressure', on: '2026-10-01' }], date: '2026-11-05' });
+  ok(sug[0].code === 'Physics: Density' && sug[0].pinned && sug[0].ticked && !sug.some((x) => x.code === 'Physics: Gas Pressure'), 'suggested Do Now: a section put on from the Memory tab comes first, for 14 days');
+  sug = P.memorySuggest(md, mem, '9ZZ', { chosen: ['KS3: Atoms'] });
+  ok(sug.filter((x) => x.ticked).map((x) => x.code).join() === 'KS3: Atoms', 'suggested Do Now: his own ticks on the card win');
+  const slot = { kind: 'lesson', cls: '9ZZ', i: 3, day: 1 };
+  const pr = P.buildPrompt(md, slot, {}, { monday: '2026-11-02', slots: [slot] }, mem);
+  ok(/Do Now spec \(from the memory map, most due first\): Physics: Latent Heat \(48%\); Physics: Isotopes \(not checked yet\); KS3: Atoms \(79%\)\./.test(pr), 'build request: the ticked memory map sections go to Claude');
+  ok(!/Do Now spec/.test(P.buildPrompt(md, Object.assign({}, slot, { dnSpec: [] }), {}, { monday: '2026-11-02', slots: [slot] }, mem)) && !/Do Now spec/.test(P.buildPrompt(md, slot, {}, null)), 'build request: nothing ticked, or no memory map, adds no line');
+  ok(!/—/.test(pr), 'build request: no em dashes');
+}
+
 console.log(fails ?`\n${fails} FAILED` : '\nall planner logic checks passed');
 process.exit(fails ? 1 : 0);

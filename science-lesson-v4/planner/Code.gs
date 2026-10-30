@@ -735,6 +735,21 @@ function readMemory_() {
     return out;
   } catch (e) { return {}; }
 }
+// The Memory tab's detail panel (layout A, 30 Oct 2026): one class's evidence rows, newest first (class level, no names),
+// with the 75% line and when the map was last worked out. [{ when, spec, source, pct, n, qRef, mainWrong, why, guess }]
+function memoryDetail(k, cls) {
+  check_(k);
+  const sh = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Memory Evidence'), rows = [];
+  if (sh && sh.getLastRow() > 1) sh.getRange(2, 1, sh.getLastRow() - 1, MEM_EV_HEAD.length).getValues().forEach((r) => {
+    if (String(r[2]) !== cls) return;
+    rows.push({ when: r[1] instanceof Date ? Utilities.formatDate(r[1], TZ, 'yyyy-MM-dd') : String(r[1]), spec: String(r[4]), source: String(r[5]), pct: r[6] === '' ? null : Math.round(Number(r[6])),
+      n: String(r[7]), qRef: String(r[9]), mainWrong: String(r[10]), why: String(r[11]), guess: r[12] === true || r[12] === 'TRUE' });
+  });
+  rows.sort((a, b) => (a.when < b.when ? 1 : a.when > b.when ? -1 : 0));
+  const sc = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Memory Scores');
+  const upd = sc && sc.getLastRow() > 1 ? sc.getRange(2, MEM_SC_HEAD.length, 1, 1).getValue() : '';
+  return { evidence: rows.slice(0, 400), dueBelow: memSettings_().dueBelow, updated: upd instanceof Date ? Utilities.formatDate(upd, TZ, 'd MMM HH:mm') : '' };
+}
 // The daily time trigger (public so a trigger can call it; it only reads Forms and writes class counts).
 function dailyResults() {
   refreshResults_();
@@ -1062,7 +1077,7 @@ function loadAll_(withData) {
   const cs = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('ClassSettings');
   if (cs && cs.getLastRow() > 1) cs.getRange(2, 1, cs.getLastRow() - 1, 2).getValues().forEach(([cls, json]) => { try { classSettings[cls] = JSON.parse(json); } catch (e) { /* skip */ } });
   const lr = lessonRows_(false), records = lr.rows.map((r) => r.rec).filter(Boolean);
-  return { version: VERSION, data: dw.data, weeks, weekStamps: dw.weekStamps, lessonsStamp: lr.stamp, learned, added, classSettings, records, results: readResults_(), votes: readVotes_(), homework: hwCards_(),
+  return { version: VERSION, data: dw.data, weeks, weekStamps: dw.weekStamps, lessonsStamp: lr.stamp, learned, added, classSettings, records, results: readResults_(), votes: readVotes_(), homework: hwCards_(), memory: readMemory_(),
     behaviourUrl: PropertiesService.getScriptProperties().getProperty('BEHAVIOUR_URL') || '',
     gradeBands: (() => { try { return JSON.parse(PropertiesService.getScriptProperties().getProperty('GRADE_BANDS') || '{}'); } catch (e) { return {}; } })() };
 }

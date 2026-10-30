@@ -702,6 +702,54 @@
     const weak = qs.filter((v) => v.pct < 100).sort((a, b) => a.pct - b.pct || a.q - b.q).slice(0, 3);
     return { key: last.key, title: last.title, when: last.when, n: qs.length, avg, weak };
   }
+  /* Big goal 1, the Memory tab (layout A, picked by Patryk 30 Oct 2026). memory = readMemory_(): { cls: [{ spec, recall,
+     state, reteach, lastEvidence }] }, class level only. Rows = the spec units this class's lessons touch, in scheme order;
+     one square per spec section of that unit, in index order. A section with no score yet is "untaught" (grey).
+     Returns { rows: [{ unit, squares: [{ code, title, state, recall, reteach, lastEvidence }] }], count, taught }. */
+  function memoryGrid(data, memory, cls) {
+    const idx = (data && data.specIndex) || [], byCode = new Map(idx.map((x) => [x.code, x]));
+    const mine = new Map(((memory || {})[cls] || []).map((x) => [x.spec, x]));
+    const unitKey = (x) => (x.board || '') + '|' + (x.subject || '') + '|' + x.unit;
+    const units = [], seen = new Set();
+    const add = (code) => { const x = byCode.get(code); if (x && !seen.has(unitKey(x))) { seen.add(unitKey(x)); units.push(x); } };
+    ((((data && data.classes) || {})[cls] || {}).seq || []).forEach((L) => (L.spec || []).forEach(add));
+    mine.forEach((x, code) => add(code));
+    const named = units.map((u) => u.unit), count = { red: 0, amber: 0, green: 0, unknown: 0 };
+    const rows = units.map((u) => ({
+      unit: named.filter((n) => n === u.unit).length > 1 ? u.unit + ' (' + u.subject + ')' : u.unit,
+      squares: idx.filter((x) => unitKey(x) === unitKey(u)).map((x) => {
+        const m = mine.get(x.code), state = m ? m.state : 'untaught';
+        if (state in count) count[state]++;
+        return { code: x.code, title: x.title, state, recall: m && m.recall != null ? m.recall : null, reteach: !!(m && m.reteach), lastEvidence: (m && m.lastEvidence) || '' };
+      }),
+    }));
+    return { rows, count, taught: count.red + count.amber + count.green + count.unknown };
+  }
+  // A spec code's short title ("Physics: Latent Heat" -> "Latent Heat"), from the index when it has it.
+  function specTitle(data, code) {
+    const x = ((data && data.specIndex) || []).find((y) => y.code === code);
+    return x ? x.title : String(code).replace(/^[^:]+:\s*/, '');
+  }
+  /* The lesson card's "Suggested Do Now" (design 5.2): sections he put on the Do Now from the Memory tab in the last
+     14 days (pins: [{ spec, on }]) first, then the class's reddest taught sections (red, then not checked yet, then
+     fading; lowest recall first; blue and grey never), 10 at most, the top 6 ticked. chosen = the codes he ticked on
+     this lesson's card (the slot's dnSpec), which wins over the default ticks once he has touched them. */
+  function memorySuggest(data, memory, cls, o) {
+    const opt = o || {}, rank = { red: 0, unknown: 1, amber: 2 }, n = opt.n || 10, tick = opt.tick == null ? 6 : opt.tick;
+    const from = opt.date ? iso(addDays(parse(opt.date), -14)) : '';
+    const mine = new Map(((memory || {})[cls] || []).map((x) => [x.spec, x]));
+    const pins = [...new Set((opt.pins || []).filter((p) => p && p.spec && (!opt.date || (p.on <= opt.date && p.on >= from))).map((p) => p.spec))];
+    const rest = [...mine.values()].filter((x) => x.state in rank && !pins.includes(x.spec))
+      .sort((a, b) => rank[a.state] - rank[b.state] || (a.recall == null ? 0 : a.recall) - (b.recall == null ? 0 : b.recall) || (a.spec < b.spec ? -1 : 1));
+    const list = pins.map((code) => ({ code, pinned: true })).concat(rest.map((x) => ({ code: x.spec }))).slice(0, Math.max(n, pins.length));
+    const chosen = Array.isArray(opt.chosen) ? opt.chosen : null;
+    if (chosen) chosen.forEach((code) => { if (!list.some((x) => x.code === code)) list.push({ code }); });
+    return list.map((x, i) => {
+      const m = mine.get(x.code) || {};
+      return { code: x.code, title: specTitle(data, x.code), recall: m.recall != null ? m.recall : null, state: m.state || 'untaught', reteach: !!m.reteach,
+        pinned: !!x.pinned, ticked: chosen ? chosen.includes(x.code) : (x.pinned || i < tick) };
+    });
+  }
   // A missed vote question put on a lesson's Do Now: what the build request says (with the lesson's
   // own options and answer when the planner has them). v = a lastVotes weak row; mcq = that lesson's mcq list.
   function doNowFromVote(v, mcq) {
@@ -721,7 +769,7 @@
     return row.status === 'form only' ? 'form only' : 'drafted';
   }
   // week (optional): the rest of the week, so a lesson already made for another class is reused
-  function buildPrompt(data, s, profile, week) {
+  function buildPrompt(data, s, profile, week, memory) {
     const c = data.classes[s.cls] || {};
     const L = s.kind === 'lesson' ? c.seq[s.i] : null;
     const lines = [];
@@ -751,6 +799,12 @@
     // Workplan 2.2: a question the class missed in last lesson's ABCD cards goes back on the Do Now
     (s.dnVotes || []).forEach((x) => lines.push(`Put on the Do Now (missed in the ABCD cards in ${x.from}, ${x.pct}% right${x.wrong ? ', most picked ' + x.wrong : ''}): ${x.q}` +
       (x.opts ? ` Options: ${x.opts}.` : '') + (x.right ? ` Answer: ${x.right}.` : '') + (x.why ? ` Misconception: ${x.why}` : '')));
+    // big goal 1: the ticked "Suggested Do Now" sections from the memory map go to the Do Now picker at home
+    if (s.kind === 'lesson' && memory) {
+      const date = week && week.monday ? iso(addDays(parse(week.monday), s.day || 0)) : '';
+      const on = memorySuggest(data, memory, s.cls, { pins: (profile || {}).memPin, date, chosen: s.dnSpec }).filter((x) => x.ticked);
+      if (on.length) lines.push('Do Now spec (from the memory map, most due first): ' + on.map((x) => x.code + (x.recall != null && x.state !== 'unknown' ? ' (' + x.recall + '%)' : ' (not checked yet)')).join('; ') + '.');
+    }
     CHECKS.forEach(([k, t]) => { if ((s.checks || {})[k]) lines.push(t + '.'); });
     EXTRAS.forEach(([k, , t]) => { if ((s.adds || {})[k]) lines.push(t + '.'); });
     if (s.book && s.bookOn) lines.push(`Textbooks out: ${s.book}.`);
@@ -850,6 +904,6 @@
   }
 
   const api = { dueFor, nextLessonDay, lessonsOn, lessonEnd, recs, findRecord, setRecord, lessonNotes, recordChanges, remapRecords, migrateMarks, cascade, revisionSlot, unitBefore, applyAdded, addedNum, remapWeek, lessonId, applyMarks, classReport, topicList, wouldSkip, setSlot, markLesson, refillClass, planFrom, periodTime, calendarEvents, DAYS, iso, parse, addDays, mondayOf, isTeachingDay, nextSchoolDay, weekLetter, progressBefore, next, autofill, moveSlot, refillAfter,
-    EXTRAS, extrasSuggested, gradeFor, hwCoverage, hwStatus, lastResults, lastVotes, doNowFromVote, mostMissed, hwForLesson, lessonSlot, testSlot, notHappened, slotDone, slotDay, fromFilled, reflowWeek, CHECKS, sheetCells, sheetModel, setsCount, printList, buildPrompt, carryForward, equipCell, lessonCell, setsLabel };
+    EXTRAS, extrasSuggested, gradeFor, hwCoverage, hwStatus, lastResults, lastVotes, doNowFromVote, memoryGrid, memorySuggest, specTitle, mostMissed, hwForLesson, lessonSlot, testSlot, notHappened, slotDone, slotDay, fromFilled, reflowWeek, CHECKS, sheetCells, sheetModel, setsCount, printList, buildPrompt, carryForward, equipCell, lessonCell, setsLabel };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.PlannerLogic = api;
 })(typeof window !== 'undefined' ? window : this);

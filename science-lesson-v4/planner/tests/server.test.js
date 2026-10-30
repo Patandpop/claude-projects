@@ -11,7 +11,7 @@ m.sheets.Data = m.makeSheet('Data', [['chunk'], [JSON.stringify(Object.assign({ 
 // one project since 2026-10-12: the planner's Code.gs and Behaviour.gs load together (a clash would break this)
 const SRC = process.env.PLANNER_SRC || path.join(__dirname, '..');   // PLANNER_SRC: the bundle test points this at the comment-stripped copies
 eval(fs.readFileSync(path.join(SRC, 'Code.gs'), 'utf8') + '\n' + fs.readFileSync(path.join(SRC, 'Behaviour.gs'), 'utf8') +
-  '\nglobal.api={init,openClass,classDay,logEvent,logMany,removeMany,getBoard,setMode,endMode,getMode,setTimer,adjustTimer,stopTimer,submitResult,getSilence,getFriday,positivesOver,setSupport,setPause,mergeBehaviourData,behaviourWeek,sameClass_,lessonMcqs,orderSheetDraft,memoryUpdate_,readMemory_,saveVote,removeVote,setLost,loadAll_,saveWeek,saveWeeks,saveLessons,saveLessonChanges,weekLetter_,plannerCal_};');
+  '\nglobal.api={init,openClass,classDay,logEvent,logMany,removeMany,getBoard,setMode,endMode,getMode,setTimer,adjustTimer,stopTimer,submitResult,getSilence,getFriday,positivesOver,setSupport,setPause,mergeBehaviourData,behaviourWeek,sameClass_,lessonMcqs,orderSheetDraft,memoryUpdate_,readMemory_,saveVote,removeVote,setLost,loadAll_,saveWeek,saveWeeks,saveLessons,saveLessonChanges,weekLetter_,plannerCal_,memoryDetail};');
 const k = 'k', out = []; let failed = 0;
 const ok = (n, c) => { out.push((c ? 'PASS ' : 'FAIL ') + n); if (!c) failed++; };
 
@@ -305,6 +305,10 @@ ok('merge is noted in the planner Log tab, not the behaviour log', m.sheets.Log 
   ok('memory: running the update again adds no evidence and keeps one square', b.evidence === 0 && m.sheets['Memory Evidence']._data.length === 3 && m.sheets['Memory Scores']._data.length === 2);
   const snap = api.readMemory_();
   ok('memory: the snapshot for home holds the class square with its recall and state', snap['9AS'] && snap['9AS'][0].spec === 'Physics: Internal Energy' && typeof snap['9AS'][0].recall === 'number');
+  ok('memory tab: the planner gets the snapshot when it loads', JSON.stringify(api.loadAll_(false).memory) === JSON.stringify(snap));
+  const det = api.memoryDetail(k, '9AS');
+  ok('memory tab: the detail panel gets the class\'s evidence (source, % right, question), newest first, and the 75% line', det.dueBelow === 75 && det.evidence.length >= 1 && det.evidence.every((e) => e.spec && e.source && e.qRef) &&
+    det.evidence.every((e, i, a) => !i || a[i - 1].when >= e.when) && api.memoryDetail(k, 'NOCLASS').evidence.length === 0);
   const top = api.openClass(k, '9AS').memory;
   ok('memory: opening a class on the phone brings its reddest spots (title, % or ?)', Array.isArray(top) && top.length <= 3 && top.every((x) => x.title && !/:/.test(x.title)));
   const names = m.sheets.Students._data.slice(1).map((r) => String(r[1])).filter(Boolean);

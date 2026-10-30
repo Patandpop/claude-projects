@@ -48,6 +48,9 @@ window.google = { script: { run: (function make(ok, bad) {
     saveLessons() { setTimeout(() => ok({ saved: true }), 0); },
     saveLessonChanges(k, changes) { setTimeout(() => ok({ saved: changes.length, stamp: Date.now() }), 0); },
     pushHome() { setTimeout(() => ok('nothing new'), 0); },
+    // the Memory tab (big goal 1): made-up class-level evidence, no names
+    memoryDetail(k, cls) { setTimeout(() => ok({ evidence: window.__MEMEV || [], dueBelow: 75, updated: '30 Oct 06:10' }), 0); },
+    saveClassSetting(k, cls, obj) { setTimeout(() => ok(true), 0); },
     // behaviour, built in (2026-10-12): a made-up class, no real names
     init() { setTimeout(() => ok({ classes: ['7ML', '8XP'], today: ['8XP'], rules: { 2: 'Work ethic', 4: 'Attention' }, version: 22 }), 0); },
     openClass(k, cls) { setTimeout(() => ok({ students: ['Ada Lovelace', 'Alan Turing', 'Marie Curie'].map((n, i) => ({ name: n, short: n.split(' ')[0] + ' ' + n.split(' ')[1][0] + '.', x: 20 + i * 30, y: 50, support: '' })), ratio: 2.6, events: (window.__EV = window.__EV || []) }), 0); },
