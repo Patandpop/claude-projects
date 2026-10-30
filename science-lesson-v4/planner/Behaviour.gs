@@ -8,7 +8,7 @@
  * Students: Short is the name students see on the board. X and Y are seat positions (% of the plan), Ratio is the plan's width/height.
  */
 
-const B_VERSION = 23;   // shown on the phone and board so you can check the new code is live
+const B_VERSION = 24;   // shown on the phone and board so you can check the new code is live
 // TZ ('Europe/London') comes from the planner's Code.gs (one project since 2026-10-12)
 const RULES = { 2: 'Work ethic', 3: 'Quality', 4: 'Attention', 5: 'Voice', 6: 'Lab safety', 7: 'Fixed stations', 8: 'Silent entry' };
 // Term dates, the first Week A and the timetable all come from the planner's data (plannerCal_ in Code.gs),
@@ -119,8 +119,11 @@ function init(k) {
   const tt = plannerTimetable_();
   const slots = ((tt && tt[wl]) || []).filter(s => s.day === wd - 1).sort((a, b) => a.period - b.period);
   const today = slots.map(s => classes.find(c => sameClass_(c, s.cls))).filter((c, i, a) => c && a.indexOf(c) === i);
+  const logged = {};
+  readToday_().forEach(r => { if (dayStr_(r.ts) === dayStr_(now)) logged[r.cls] = true; });
   return {
     classes: classes, today: today, week: wl,
+    recent: recentDays_(now, classes, tt), quiet: today.filter(c => !logged[c]),
     active: PropertiesService.getScriptProperties().getProperty('BOARD_CLASS') || '',
     rules: RULES, mode: modeState_(), version: B_VERSION
   };
@@ -157,34 +160,69 @@ function when_(tapTime) {
   const t = Number(tapTime), now = Date.now();
   return t && t <= now + 60000 && now - t < 36 * 3600000 ? new Date(t) : new Date();
 }
+// Backdating (workplan Phase 5, 2026-10-30): a tap logged for an earlier school day ('yyyy-MM-dd', up to BACK_DAYS
+// back, never today or later) is written at midday UTC of that day plus the minutes and seconds of the tap, so each row keeps its own time and a resent tap is still the same tap
+// (the Remove button finds a row by its time). '' or today: an ordinary tap.
+const BACK_DAYS = 14;
+function pastDay_(day) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(day || ''));
+  if (!m) return null;
+  const today = dayStr_(new Date());
+  if (day >= today) return null;
+  if (dayNum_(today) - dayNum_(day) > BACK_DAYS) throw new Error('Only the last ' + BACK_DAYS + ' days can be backdated');
+  return day;
+}
+function backTime_(day, tapTime) { const p = day.split('-').map(Number); return new Date(Date.UTC(p[0], p[1] - 1, p[2], 12) + ((Number(tapTime) || Date.now()) % 3600000)); }
+// One class's entries for an earlier day, same shape as today_
+function dayEvents_(cls, day) {
+  return readLog_().filter(r => r.cls === cls && dayStr_(r.ts) === day).map(r => ({
+    id: r.ts.getTime(), t: Utilities.formatDate(r.ts, TZ, 'HH:mm'), name: r.name, type: r.type, rule: r.rule
+  }));
+}
+function classDay(k, cls, day) { check_(k); const d = pastDay_(day); return d ? dayEvents_(cls, d) : today_(cls); }
+// The last few school days before today (term days only, Monday to Friday), each with the classes on its timetable
+function recentDays_(now, classes, tt) {
+  const out = [];
+  try {
+    for (let back = 1; back <= BACK_DAYS && out.length < 5; back++) {
+      const d = new Date(now.getTime() - back * 86400000), wd = weekday_(d), mon = dayNum_(dayStr_(d)) - (wd - 1);
+      if (wd > 5 || !teachingWeek_(mon)) continue;
+      const slots = ((tt && tt[weekLetter_(d)]) || []).filter(s => s.day === wd - 1).sort((a, b) => a.period - b.period);
+      out.push({ day: dayStr_(d), label: Utilities.formatDate(d, TZ, 'EEE d MMM'),
+        classes: slots.map(s => classes.find(c => sameClass_(c, s.cls))).filter((c, i, a) => c && a.indexOf(c) === i) });
+    }
+  } catch (e) { /* no term dates yet: no backdating list */ }
+  return out;
+}
 function rule_(type, rule) {
   // report to me needs a rule; a negative may carry one (the reason for a detention)
   const r = Number(rule) || 0;
   if (type === 'R' && !RULES[r]) throw new Error('Pick a rule');
   return (type === 'R' || type === '-') && RULES[r] ? r : '';
 }
-function logEvent(k, cls, name, type, rule, tapTime, tapId) {
+function logEvent(k, cls, name, type, rule, tapTime, tapId, day) {
   check_(k);
   if (['+', '-', 'R'].indexOf(type) === -1) throw new Error('Unknown type');
   rule = rule_(type, rule);
-  const now = when_(tapTime);
+  const back = pastDay_(day), now = back ? backTime_(back, tapTime) : when_(tapTime);
   withLock_(() => {
     if (seenTap_(tapId, now, cls, [name], type)) return;   // the same tap again: already written
     bSheet_('Log').appendRow([now, cls, name, TYPE_WORD[type], rule, rule ? RULES[rule] : '']);
     SpreadsheetApp.flush();
     rememberTap_(tapId);
   });
+  if (back) return dayEvents_(cls, back);
   const events = today_(cls);
   refreshBoard_(cls, events);
   return events;
 }
 
 /** Same as logEvent for several students at once (multi-select). */
-function logMany(k, cls, names, type, rule, tapTime, tapId) {
+function logMany(k, cls, names, type, rule, tapTime, tapId, day) {
   check_(k);
   if (['+', '-', 'R'].indexOf(type) === -1) throw new Error('Unknown type');
   rule = rule_(type, rule);
-  const now = when_(tapTime);
+  const back = pastDay_(day), now = back ? backTime_(back, tapTime) : when_(tapTime);
   withLock_(() => {
     if (seenTap_(tapId, now, cls, names, type)) return;   // the same tap again: already written
     const sh = bSheet_('Log');
@@ -193,6 +231,7 @@ function logMany(k, cls, names, type, rule, tapTime, tapId) {
     SpreadsheetApp.flush();
     rememberTap_(tapId);
   });
+  if (back) return dayEvents_(cls, back);
   const events = today_(cls);
   refreshBoard_(cls, events);
   return events;
@@ -218,7 +257,7 @@ function removeEvent(k, cls, id) {
   return events;
 }
 
-function removeMany(k, cls, ids) {
+function removeMany(k, cls, ids, day) {
   check_(k);
   const want = {};
   (ids || []).forEach(id => want[Number(id)] = true);
@@ -232,6 +271,8 @@ function removeMany(k, cls, ids) {
       if (vals[i][0] instanceof Date && want[vals[i][0].getTime()] && vals[i][1] === cls) sh.deleteRow(last - n + 1 + i);
     }
   });
+  const back = pastDay_(day);
+  if (back) return dayEvents_(cls, back);
   const events = today_(cls);
   refreshBoard_(cls, events);
   return events;
@@ -621,7 +662,8 @@ function readToday_() {
     const start = Math.max(2, end - CHUNK + 1);
     const got = sh.getRange(start, 1, end - start + 1, 5).getValues().filter(r => r[0] instanceof Date);
     rows.unshift(...got);
-    if (got.length && dayStr_(got[0][0]) < t) break;   // the oldest row of this chunk is from before today: done
+    // stop at a chunk with nothing from today in it (a backdated row can sit among today's rows, so one old row is not enough)
+    if (got.length && dayStr_(got[0][0]) < t && !got.some(r => dayStr_(r[0]) === t)) break;
   }
   return rows.map(r => ({ ts: r[0], cls: String(r[1]), name: String(r[2]), type: WORD_TYPE[String(r[3]).trim()] || '?', rule: Number(r[4]) || 0 }));
 }

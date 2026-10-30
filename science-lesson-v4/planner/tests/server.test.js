@@ -11,7 +11,7 @@ m.sheets.Data = m.makeSheet('Data', [['chunk'], [JSON.stringify(Object.assign({ 
 // one project since 2026-10-12: the planner's Code.gs and Behaviour.gs load together (a clash would break this)
 const SRC = process.env.PLANNER_SRC || path.join(__dirname, '..');   // PLANNER_SRC: the bundle test points this at the comment-stripped copies
 eval(fs.readFileSync(path.join(SRC, 'Code.gs'), 'utf8') + '\n' + fs.readFileSync(path.join(SRC, 'Behaviour.gs'), 'utf8') +
-  '\nglobal.api={init,openClass,logEvent,logMany,removeMany,getBoard,setMode,endMode,getMode,setTimer,adjustTimer,stopTimer,submitResult,getSilence,getFriday,positivesOver,setSupport,setPause,mergeBehaviourData,behaviourWeek,sameClass_,lessonMcqs,orderSheetDraft,memoryUpdate_,readMemory_,saveVote,removeVote,setLost,loadAll_,saveWeek,saveWeeks,saveLessons,saveLessonChanges,weekLetter_,plannerCal_};');
+  '\nglobal.api={init,openClass,classDay,logEvent,logMany,removeMany,getBoard,setMode,endMode,getMode,setTimer,adjustTimer,stopTimer,submitResult,getSilence,getFriday,positivesOver,setSupport,setPause,mergeBehaviourData,behaviourWeek,sameClass_,lessonMcqs,orderSheetDraft,memoryUpdate_,readMemory_,saveVote,removeVote,setLost,loadAll_,saveWeek,saveWeeks,saveLessons,saveLessonChanges,weekLetter_,plannerCal_};');
 const k = 'k', out = []; let failed = 0;
 const ok = (n, c) => { out.push((c ? 'PASS ' : 'FAIL ') + n); if (!c) failed++; };
 
@@ -156,6 +156,32 @@ ok('merge is noted in the planner Log tab, not the behaviour log', m.sheets.Log 
   api.logMany(k, '7BYA', ['Test Pupil One', 'Test Pupil Two'], '-', 2, t + 100, 'tap-3');
   ok('a multi-select tap sent twice is written once (two rows, not four)', log.length === n0 + 4);
   ok('taps take the document lock, never the script lock the homework Form build holds', m.lockLog.length >= 5 && m.lockLog.every((x) => x === 'document'));
+}
+
+// Phase 5 (2026-10-30): backdating. A tap for an earlier day is saved on that day, its answer is that day's entries,
+// today's list and the board are left alone, and today's entries are still all found after it.
+{
+  const iso = (d) => Utilities.formatDate(d, 'Europe/London', 'yyyy-MM-dd'), log = m.sheets['Behaviour Log']._data;
+  const d3 = iso(new Date(Date.now() - 3 * 864e5)), today = iso(new Date());
+  const before = api.openClass(k, '7BYA').events.length, board0 = JSON.stringify(api.getBoard(k, 6).names);
+  let back = api.logEvent(k, '7BYA', 'Test Pupil Two', '+', 0, Date.now(), 'tap-back-1', d3);
+  ok('backdating: the tap is saved on the chosen day', iso(log[log.length - 1][0]) === d3);
+  ok('backdating: the answer is that day\'s entries', back.length >= 1 && back.every((e) => e.id < Date.now() - 864e5));
+  ok('backdating: today\'s list is unchanged (a backdated row in the middle of today\'s is passed over, not a stop)', api.openClass(k, '7BYA').events.length === before);
+  ok('backdating: the board is left alone', JSON.stringify(api.getBoard(k, 6).names) === board0);
+  back = api.logMany(k, '7BYA', ['Test Pupil One', 'Test Pupil Two'], '-', 0, Date.now(), 'tap-back-2', d3);
+  ok('backdating: several at once, each row its own time', back.filter((e) => e.type === '-').length === 2 && new Set(back.map((e) => e.id)).size === back.length);
+  ok('backdating: the day\'s entries can be read back', api.classDay(k, '7BYA', d3).length === back.length);
+  back = api.removeMany(k, '7BYA', back.filter((e) => e.type === '-').map((e) => e.id), d3);
+  ok('backdating: Remove works on that day and answers with that day', back.length === 1 && back[0].type === '+');
+  const n0 = log.length;
+  api.logEvent(k, '7BYA', 'Test Pupil One', '+', 0, Date.now(), 'tap-back-3', today);
+  ok('backdating: today\'s date is an ordinary tap', iso(log[log.length - 1][0]) === today && log.length === n0 + 1);
+  let threw = false; try { api.logEvent(k, '7BYA', 'Test Pupil One', '+', 0, Date.now(), 'tap-back-4', iso(new Date(Date.now() - 20 * 864e5))); } catch (e) { threw = /14 days/.test(e.message); }
+  ok('backdating: more than 14 days back is refused', threw && log.length === n0 + 1);
+  const ini = api.init(k);
+  ok('init lists recent school days (term weekdays before today, up to 5) with each day\'s classes', Array.isArray(ini.recent) && ini.recent.length <= 5 && ini.recent.every((r) => r.day < today && /^\d{4}-\d\d-\d\d$/.test(r.day) && r.label && Array.isArray(r.classes)));
+  ok('init lists today\'s classes with nothing logged (the end-of-day reminder)', Array.isArray(ini.quiet) && ini.quiet.every((c) => ini.today.includes(c)) && !ini.quiet.includes('7BYA'));
 }
 
 // 1.5 (2026-10-29): two planner tabs open at once. Each save carries the stamp its page loaded; a save over a row saved

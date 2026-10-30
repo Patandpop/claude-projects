@@ -6,7 +6,7 @@ Plain-English record of Lane B's work, newest entry first. Each entry says what 
 
 1. **Approve the builder plan for item 1.8 (A-level Drive address).** It touches the lesson builder, so it waits for your yes. The problem: for a Year 12 or 13 lesson the builder writes the wrong Drive address into the two small note files beside the lesson (it says "Year 13/Physics/Chapter 20 ...", but on Drive there is no Physics level and the chapters sit inside Module folders). The files still land in the right place, but the planner uses that note to attach each lesson's multiple-choice questions for the phone voter, so 12C and 13D lessons get none, and the school push uses the same wrong address. The plan: (1) for Year 12 or 13 the builder asks the uploader's own chapter lookup for the real folder and writes that into both notes (when Drive is not reachable it works out the module from the chapter-to-module table the October reorganisation used); (2) check the planner finds 12C and 13D lessons by that address; (3) add a 13D test lesson so it cannot slip back. Nothing on Drive is created, moved or renamed. Reply "yes to 1.8".
 2. **OK to write the Do Now mix rule into SKILL.md?** The picker now aims for 4 short recall questions, one 2-mark explain and one calculation (item 2.1). The plan says the rule only goes into the skill notes with your OK. Reply "yes to the mix rule".
-3. **Next paste set (Lane A makes it):** my planner changes from items 2.2, 2.3, 2.4, 2.7, 2.8 and 2.12 and the memory map (Planner.html, Code.gs, Phone.html, Behaviour.gs, BoardPage.html, and the new Memory.gs) need to go into the next complete set; after pasting, re-import planner-data.json from home once. Optional: paste the new Mailbox.gs into the home link's own project and deploy a new version (item 4.6, faster quiz list).
+3. **Next paste set (Lane A makes it):** my planner changes from items 2.2, 2.3, 2.4, 2.7, 2.8 and 2.12, 2.9, backdating and the memory map (Planner.html, Code.gs, Phone.html, Behaviour.gs, BoardPage.html, and the new Memory.gs) need to go into the next complete set; after pasting, re-import planner-data.json from home once. Optional: paste the new Mailbox.gs into the home link's own project and deploy a new version (item 4.6, faster quiz list).
 
 4. **Approve the builder plan for items 2.5 and 2.6 (lesson builder fixes).** They touch the lesson builder, so they wait for your yes. I checked the code itself, since the two audits disagree. What I would change, one at a time, with a test for each:
    - **Sentence starters:** the standard sheet still shows them on its easiest tier (and on any 4+ mark question). Move them to the support sheet only, except where a lesson asks for them on purpose.
@@ -26,6 +26,18 @@ Plain-English record of Lane B's work, newest entry first. Each entry says what 
 9. **Item 4.13, homework ahead: OK to build this?** What already exists: the Homework tab's "Coming up automatically" list suggests revision homework two weeks before every test, one click to fill it in. My proposal for the rest: (a) on Fridays the planner lists next week's lessons that need homework set (the ones ticked "Set homework") and offers one button, "Ask Claude to prepare these", which sends a single request home; nothing is posted. (b) Two weeks before a test, the 6am job makes the revision homework as a Classroom DRAFT (never posted, you check and post it) and the card says "draft ready"; or, if you would rather, it only reminds you. (c) A 6-mark question done on the board comes back as homework three weeks later, chosen from that lesson's real 6-markers, offered as a tick in the Friday list. Reply with the letters you want, and for (b) "draft" or "reminder".
 
 ---
+## 30 Oct 2026, Phase 5: backdating and an end-of-day reminder on the phone
+
+**What changed:**
+- **Add positives for an earlier day.** The phone's Today tab now has a row of days at the top: Today, then the last 5 school days (weekdays in term). Pick one and its entries for the class show underneath. Go to the Lesson tab: an amber bar says "Logging for Tue 3 Nov", and every tap (positive, negative, report to me) is saved on that day. Remove and Undo work on that day too. The board in the classroom is left alone. Press "Back to today" on the bar to return. You can go back up to 14 days; further back is refused.
+- **End-of-day reminder.** After 3:15 pm on a school day, the Lesson tab asks "Any positives to add for today? Nothing logged yet for:" with a button for each of today's classes that has nothing logged. Tap one to open it, or "Not today" to hide it until tomorrow.
+- Backdated positives count in that week's Friday messages home, like any other.
+- Checks: 13 new server checks and a new phone check (tests/backdate_sim.py, 10 checks).
+
+**You need to:** nothing now. It goes in the next complete paste set (Behaviour.gs, Phone.html). The phone's corner should then say "server 24".
+
+**Save:** see the history line "Backdating". (Lane C's save 0646145c already carried the phone part.)
+
 ## 30 Oct 2026, item 4.14 dropped: you already make the whole-class feedback sheet
 
 **What changed:** nothing built. You told me the marking feedback sheet is a printout you make yourself, so item 4.14 (a feedback sheet builder) is off Lane B's list and no longer waiting on you.
