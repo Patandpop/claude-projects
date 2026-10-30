@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ulhu: the 2-week bar in stained glass (1U.13, round two)</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Grenze+Gotisch:wght@500;700&display=swap">
+<style>
+/* One dark look by design (the drowned temple). */
+:root{color-scheme:dark;--a:'Atkinson Hyperlegible',system-ui,sans-serif;--g:'Grenze Gotisch',Georgia,serif}
+*{box-sizing:border-box}
+html,body{margin:0;background:#070d0b;color:#e8e1cf;font:15px/1.45 var(--a)}
+main{max-width:412px;margin:0 auto;padding:16px 10px 40px}
+h1{font:700 30px/1.1 var(--g);color:#ffd56a;margin:4px 6px 6px}
+.intro{color:#8fa298;margin:0 6px 12px}
+.card{background:#0c1512;border:1px solid #24443a;border-radius:10px;padding:10px 4px;margin:16px 0}
+.card h3{margin:0 6px 2px;font:700 18px var(--a)}.card h3 b{color:#ffd56a;margin-right:6px}
+.cap{margin:0 6px 8px;color:#b9c4bc;font-size:14px}
+.rit{margin:0 0 10px}
+.bar{display:block;width:calc(100% - 20px);margin:-2px 10px 0}
+.lets{display:grid;grid-template-columns:repeat(14,1fr);margin:2px 12px 0;font:700 10.5px var(--a);color:#8a8496;text-align:center}
+.lets b{color:#efeaf4}
+.sum{display:flex;justify-content:space-between;margin:1px 12px 0;font:700 12px var(--a);color:#a9a2b6}
+.pay{color:#f4dd9a}
+.key{display:flex;flex-wrap:wrap;gap:6px 12px;margin:10px 6px 0;font-size:13px;color:#a9a2b6}
+.key canvas{width:22px;height:14px;vertical-align:-2px;margin-right:4px}
+</style>
+</head>
+<body>
+<main>
+<h1>The 2-week bar, in glass</h1>
+<p class="intro">Round two of 1U.13, from B1. Under each real ritual tablet, the last two weeks as a strip of stained glass: one leaded pane per day, one or two breaks in each pane, nothing laid on top. No more "not due" dashes: a ritual that is due every few days gets ONE pane across those days, lit once it is done, and split in two if you did it twice. A school-day ritual's Friday pane stretches over the weekend. Same pretend data in every card. Pick a letter, or mix.</p>
+<div id="cards"></div>
+<div class="key" id="key"></div>
+</main>
+<script>/*__STONE__*/</script>
+<script>
+(function () {
+'use strict';
+const DPR = Math.min(3, window.devicePixelRatio || 1);
+// two weeks, oldest first, ending today (a Thursday)
+const DAYS = 'FSSMTWTFSSMTWT'.split('');
+// each ritual as windows of days: len days, state o done (times = how many), x missed, e forgiven miss, f day off,
+// w open (the current window, not over yet)
+const RITS = [
+  { name: 'Read', sub: 'School days', streak: 12, done: true, pay: 12, win: [{ len: 3, s: 'o' }, { len: 1, s: 'o' }, { len: 1, s: 'o' }, { len: 1, s: 'x' }, { len: 1, s: 'o' }, { len: 3, s: 'o' }, { len: 1, s: 'o' }, { len: 1, s: 'e' }, { len: 1, s: 'o' }, { len: 1, s: 'o' }] },
+  { name: 'Floss', sub: 'Every day', streak: 5, done: false, pay: 6, win: 'oooxooofooooow'.split('').map((s) => ({ len: 1, s })) },
+  { name: 'Call a friend', sub: 'Every 3 days · due by Sat', streak: 4, done: false, pay: 15, win: [{ len: 3, s: 'o' }, { len: 3, s: 'o', times: 2 }, { len: 3, s: 'x' }, { len: 3, s: 'o' }, { len: 2, s: 'w' }] }
+];
+const GREEN = '#2fbf6a';
+const COL = { x: '#c4323a', e: '#9a5ad8', f: '#6a9ad8' };
+function rng(seed) { return () => { seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const hex = (c) => [1, 3, 5].map((i) => parseInt(c.slice(i, i + 2), 16));
+const rgb = (a, k) => 'rgb(' + a.map((v) => Math.max(0, Math.min(255, Math.round(v * k)))).join(',') + ')';
+// one glass piece: a polygon filled like light through glass (bright middle, mottled, darker edges); lit or unlit
+function glass(c, poly, col, lit, r) {
+  const xs = poly.map((p) => p[0]), ys = poly.map((p) => p[1]), x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+  c.save(); c.beginPath(); poly.forEach((p, i) => i ? c.lineTo(p[0], p[1]) : c.moveTo(p[0], p[1])); c.closePath(); c.clip();
+  const base = hex(col), cx = (x0 + x1) / 2 + (r() - .5) * (x1 - x0) * .4, cy = (y0 + y1) / 2;
+  const g = c.createRadialGradient(cx, cy, 1, cx, cy, Math.max(x1 - x0, y1 - y0) * .8);
+  if (lit) { g.addColorStop(0, rgb(base, 1.12)); g.addColorStop(.55, rgb(base, .86)); g.addColorStop(1, rgb(base, .5)); }
+  else { g.addColorStop(0, rgb(base, .62)); g.addColorStop(1, rgb(base, .36)); }
+  c.fillStyle = g; c.fillRect(x0, y0, x1 - x0, y1 - y0);
+  // the glass's own mottle and a streak of shine, so it reads as glass and not paint
+  for (let i = 0; i < (x1 - x0) * (y1 - y0) / (14 * DPR * DPR); i++) { c.fillStyle = 'rgba(255,255,255,' + (lit ? .05 + r() * .07 : .02 + r() * .03) + ')'; c.beginPath(); c.arc(x0 + r() * (x1 - x0), y0 + r() * (y1 - y0), (1 + r() * 2.2) * DPR, 0, 7); c.fill(); }
+  if (lit) { c.strokeStyle = 'rgba(255,255,255,.22)'; c.lineWidth = 1.4 * DPR; c.beginPath(); c.moveTo(x0 + (x1 - x0) * .15, y1); c.lineTo(x0 + (x1 - x0) * .45, y0); c.stroke(); }
+  c.restore();
+}
+function lead(c, poly, w) { c.save(); c.lineJoin = 'round'; c.strokeStyle = '#17121c'; c.lineWidth = w; c.beginPath(); poly.forEach((p, i) => i ? c.lineTo(p[0], p[1]) : c.moveTo(p[0], p[1])); c.closePath(); c.stroke();
+  c.strokeStyle = 'rgba(190,180,200,.22)'; c.lineWidth = Math.max(1, w * .22); c.stroke(); c.restore(); }
+// a pane split by one break (two pieces), or two breaks for a wide pane: every piece its own glass
+function pane(c, x, y, w, h, col, lit, seed, opts) {
+  const r = rng(seed), breaks = w > h * 4 ? 2 : 1, cuts = [];
+  for (let k = 1; k <= breaks; k++) { const f = k / (breaks + 1); cuts.push([x + w * (f + (r() - .5) * .22), x + w * (f + (r() - .5) * .3)]); }
+  let left = [[x, y], [x, y + h]];
+  const pieces = [];
+  cuts.forEach(([t, b]) => { pieces.push([left[0], [t, y], [b, y + h], left[1]]); left = [[t, y], [b, y + h]]; });
+  pieces.push([left[0], [x + w, y], [x + w, y + h], left[1]]);
+  pieces.forEach((p, i) => glass(c, p, i % 2 && lit ? mixc(col, '#ffffff', .12) : col, lit, r));
+  pieces.forEach((p) => lead(c, p, 1.3 * DPR));
+  lead(c, [[x, y], [x + w, y], [x + w, y + h], [x, y + h]], 3.2 * DPR);   // the pane's own frame, heavier than its break
+  if (opts && opts.open) { c.save(); c.setLineDash([3 * DPR, 3 * DPR]); c.strokeStyle = '#ffd56a'; c.lineWidth = 1.4 * DPR; c.strokeRect(x + 2.5 * DPR, y + 2.5 * DPR, w - 5 * DPR, h - 5 * DPR); c.restore(); }
+}
+function mixc(a, b, k) { const A = hex(a), B = hex(b); return '#' + A.map((v, i) => Math.round(v + (B[i] - v) * k).toString(16).padStart(2, '0')).join(''); }
+// the whole strip: the windows laid side by side in one leaded frame, a heavier lead between the two weeks
+function strip(cv, rit, look) {
+  const W = cv.clientWidth * DPR, H = (look.h || 22) * DPR; cv.width = W; cv.height = H; cv.style.height = (look.h || 20) + 'px';
+  const c = cv.getContext('2d'), fr = (look.frame || 3) * DPR, day = (W - 2 * fr) / 14;
+  c.fillStyle = look.frameCol || '#17121c'; c.fillRect(0, 0, W, H);
+  let d = 0;
+  rit.win.forEach((wn, i) => {
+    const x = fr + d * day, w = wn.len * day, y = fr, h = H - 2 * fr, seed = rit.name.length * 97 + i * 13;
+    const done = wn.s === 'o', col = done ? (look.col ? look.col(rit) : GREEN) : wn.s === 'w' ? '#3a4a46' : COL[wn.s];
+    if (done && (wn.times || 1) > 1) { const n = wn.times; for (let k = 0; k < n; k++) pane(c, x + w * k / n, y, w / n, h, col, true, seed + k * 7); }
+    else pane(c, x, y, w, h, col, done || wn.s === 'e' || wn.s === 'f', seed, { open: wn.s === 'w' });
+    d += wn.len;
+  });
+  // the line between last week and this week
+  let e = 0; const ends = rit.win.map((w) => (e += w.len)); if (ends.indexOf(7) >= 0) { c.fillStyle = look.frameCol || '#17121c'; c.fillRect(fr + 7 * day - 1.6 * DPR, 0, 3.2 * DPR, H); }   // only where a pane really ends
+  if (look.frameCol) { c.strokeStyle = 'rgba(255,255,255,.08)'; c.lineWidth = DPR; c.strokeRect(DPR / 2, DPR / 2, W - DPR, H - DPR); }
+}
+const LOOKS = [
+  ['G1', 'Clear glass strip', 'A slim leaded strip under the tablet: green glass where the ritual was done, deep ruby where it was missed, violet for a forgiven miss, pale blue for a day off. The pane that is still open has a dotted gold line round it.', { h: 20 }],
+  ['G2', 'In the ritual\'s own colour', 'The same strip, but done panes take the colour the tablet itself glows (orange at the start of a streak, gold, blue, then green at 66 nights), so the bar and the tablet tell one story.', { h: 20, col: (r) => STONE.sCol(r.streak) }],
+  ['G3', 'A window in the stone', 'The strip is a little taller and set into a stone frame the colour of the tablet, like a window cut through the slab and lit from behind.', { h: 24, frame: 5, frameCol: '#2a2630' }]
+];
+const host = document.getElementById('cards');
+LOOKS.forEach(([id, name, cap, look]) => {
+  const card = document.createElement('section'); card.className = 'card'; card.id = id;
+  card.innerHTML = '<h3><b>' + id + '</b>' + name + '</h3><p class="cap">' + cap + '</p>';
+  host.appendChild(card);
+  RITS.forEach((r, i) => {
+    const d = document.createElement('div'); d.className = 'rit';
+    const done = r.win.reduce((a, w) => a + (w.s === 'o' ? (w.times || 1) : 0), 0);
+    d.innerHTML = STONE.row({ id: id + i, name: r.name, streak: r.streak, done: r.done, subHtml: r.sub, payHtml: '<span class="pay">+' + r.pay + '</span>' }) +
+      '<canvas class="bar"></canvas><div class="lets">' + DAYS.map((x, j) => j === 13 ? '<b>' + x + '</b>' : '<span>' + x + '</span>').join('') + '</div>';
+    card.appendChild(d);
+    strip(d.querySelector('canvas.bar'), r, look);
+  });
+  STONE.paint(card);
+});
+document.getElementById('key').innerHTML = [['done', GREEN, 1], ['missed', COL.x, 0], ['forgiven miss', COL.e, 1], ['day off', COL.f, 1]].map(([t, col, lit], i) => '<span><canvas data-k="' + i + '"></canvas>' + t + '</span>').join('');
+document.querySelectorAll('#key canvas').forEach((cv, i) => { const [t, col, lit] = [['done', GREEN, 1], ['missed', COL.x, 0], ['forgiven miss', COL.e, 1], ['day off', COL.f, 1]][i]; cv.width = 22 * DPR; cv.height = 14 * DPR; const c = cv.getContext('2d'); c.fillStyle = '#17121c'; c.fillRect(0, 0, cv.width, cv.height); pane(c, 1.5 * DPR, 1.5 * DPR, 19 * DPR, 11 * DPR, col, !!lit, 5 + i); });
+})();
+</script>
+</body>
+</html>
