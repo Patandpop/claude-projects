@@ -1,0 +1,547 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ulhu: knitting, round 4 (K1 and K3 in his real pixel style)</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Grenze+Gotisch:wght@500;700&family=Pixelify+Sans:wght@500;700&display=swap">
+<style>
+body{margin:0;background:#020504;color:#e8e1cf;font:14px 'Atkinson Hyperlegible',system-ui,sans-serif;padding:16px}
+h1{font:700 28px 'Grenze Gotisch',serif;color:#5ef2a0;margin:0 0 4px}
+.lead{color:#9fb1a8;max-width:860px;margin:0 0 12px;line-height:1.45}
+.ctl{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;margin:0 0 16px;padding:10px 12px;border:1px solid #1b2823;border-radius:12px;background:#0b1411;max-width:820px;position:sticky;top:0;z-index:5}
+.ctl label{font-weight:700;color:#c9a560}
+.ctl input[type=range]{width:220px;accent-color:#5ef2a0}
+.ctl .pv{min-width:42px;font-weight:700}
+button{padding:8px 14px;border-radius:999px;border:1px solid #5aa7ff;background:#0f1a24;color:#bfe0ff;font:700 13px 'Atkinson Hyperlegible';cursor:pointer}
+button.on{background:#5aa7ff;color:#08101a}
+.seg{display:flex;gap:4px;flex-wrap:wrap}
+.seg button{border-color:#c9a560;color:#ffe2a0;background:#1a140a}
+.seg button.on{background:#c9a560;color:#1a140a}
+.grid{display:flex;flex-wrap:wrap;gap:22px;align-items:flex-start}
+.card{width:384px;max-width:100%;background:#07100d;border:1px solid #1b2823;border-radius:14px;overflow:hidden}
+.card h2{font:500 26px 'Grenze Gotisch';color:#ffd56a;margin:10px 12px 0}
+.card h2 small{font:700 13px 'Atkinson Hyperlegible';color:#9fb1a8;margin-left:6px}
+.card .d{color:#9fb1a8;margin:2px 12px 8px;line-height:1.38;font-size:13px}
+.sw{position:relative;width:384px;max-width:100%;aspect-ratio:192/184;background:#000}
+.sw canvas{position:absolute;left:0;top:0;width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-edges}
+.plq{position:absolute;left:5%;right:5%;top:91.6%;height:7.6%;display:flex;align-items:center;justify-content:space-between;gap:8px;font:500 12.5px 'Pixelify Sans',monospace;white-space:nowrap;pointer-events:none}
+.plq span{overflow:hidden;text-overflow:ellipsis}
+.plq .tl{font-weight:700;flex:none}
+.k1 .plq{color:#ffe2a0}.k1 .plq .tl{color:#fff3c8}
+.k3 .plq{color:#2a1a08}.k3 .plq .tl{color:#1a0e02}
+.pz{display:none;position:absolute;right:8px;top:8px;font:700 11px 'Pixelify Sans';letter-spacing:.05em;color:#bfe0ff;background:#0f1a24e8;border:2px solid #5aa7ff;padding:4px 8px;text-align:center;line-height:1.3}
+.paused .pz{display:block}
+.notes{color:#9fb1a8;font-size:12.5px;margin:8px 12px 12px;line-height:1.4}
+.notes b{color:#e8e1cf}
+@media (max-width:430px){body{padding:3px}.ctl{position:static}h1,.lead{margin-left:6px;margin-right:6px}.ctl input[type=range]{width:150px}.card{border-radius:8px}}
+</style></head><body>
+<h1>Knitting, round 4: K1 and K3, in his real pixels</h1>
+<p class="lead">This time Ulhu is his actual game sprite, copied pixel for pixel, with only glasses and two tentacle arms holding needles added on the same grid. The rooms, chair, Bloop, shelf and knitting are all drawn in the same chunky pixels so it looks like one game. Drag the progress slider or press Play (about 20 seconds from start to finished). Press "Leave the app" to see him doze. Switch the size to see the sock, the kelp scarf or the jumper with his face.</p>
+<div class="ctl">
+ <label for="pr">Progress</label><input id="pr" type="range" min="0" max="100" value="40"><span class="pv" id="pv">40%</span>
+ <button id="play">Play</button>
+ <button id="pa">Leave the app (pause)</button>
+ <span class="seg" id="sz"><button data-s="small">Small, 15 min (sock)</button><button data-s="medium" class="on">Medium, 30 min (kelp scarf)</button><button data-s="large">Large, 60 min (jumper)</button></span>
+</div>
+<div class="grid">
+ <div class="card k1 work" id="k1">
+  <h2>K1 <small>Firelit cottage nook</small></h2>
+  <p class="d">A crackling fire under a wooden mantelpiece, a stone cottage wall, a pointed window onto the moonlit sea with fish going past, and his red wingback chair on a warm rug. A basket of spare yarn sits by the window.</p>
+  <div class="sw"><canvas id="k1-bg" width="192" height="184"></canvas><canvas id="k1-fg" width="192" height="184"></canvas><div class="plq"><span id="k1-tx"></span><span class="tl" id="k1-tl"></span></div><div class="pz">PAUSED<br>nothing lost</div></div>
+  <p class="notes"><b>Bar:</b> a knitted strip in his colours, pinned along the skirting board with brass pins. It grows stitch by stitch from the left; the loose yarn ahead of it shows how far is left, and the time and piece name sit on a little wooden plaque. <b>Shelf:</b> the mantelpiece above the fire.</p>
+ </div>
+ <div class="card k3 work" id="k3">
+  <h2>K3 <small>Tiny diving-bell room</small></h2>
+  <p class="d">A round brass room full of rivets and pipes, a porthole with swaying kelp, fish and bubbles, a caged bulb swinging gently, a pressure gauge, his squishy mustard chair, and Bloop, his little anglerfish cat, who bats at the yarn ball.</p>
+  <div class="sw"><canvas id="k3-bg" width="192" height="184"></canvas><canvas id="k3-fg" width="192" height="184"></canvas><div class="plq"><span id="k3-tx"></span><span class="tl" id="k3-tl"></span></div><div class="pz">PAUSED<br>nothing lost</div></div>
+  <p class="notes"><b>Bar:</b> the knitted strip hangs from a brass rail on little rings. It grows stitch by stitch; the loose yarn ahead shows what is left, and the time and piece name are stamped on a brass plate. <b>Shelf:</b> the bolted shelf under the gauge.</p>
+ </div>
+</div>
+<script>
+const ULHU_SRC = {"idle":"data:image/png;base64,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","sleepy":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAPqklEQVR4AcSaf5BW1XnHn7usYiFiEEyARESluGnppAGjUnGG4BQ6kbR/MYPOGJMGJ3HbcaSmSWsndCRpElsdHFvbdNxIqHGS1qlDIu1UJipGKIS6m2li4yaYgKvCqrus/GbZhdvv5zn33Pe+d993f76YO/d7nnOe5zk/vs/5ce97d5vsXb6+9YuH0iLK3W/O7GX9eMs33L40BUvXLk0DbnAZ23vXA/CpBXcmsfNiHh2BSck0EC88siPvLzSb2o62iu5dDwCDgDggD774j3f5qoi6KLE1Ah4EwiAUydP2ryUAdBwB+ZhnBTSafGy7nnxXAtB67x1p64YM5AuIA9vznZftvj/9luHbsmJR+iEh2oaTS7XHq7CWPQ7ing8ythHOgaX5TjunAYAMiJ0PJ5/bucc+dv219uzOH+Vuow1CXmFUGe2Dgl/DA9C6oVWzLWiWYz9rWm+zNXdkIC/c/Ce32cf+eLXdtHqNLV71h/bPjz9syz692r7cdr9jgyRoWbE4DViUz1psF7lDh1wV2l5IdgjYItj3uY9slKOtKWYaLR9e/zVvEvKeKSXdJ0/YrN+YYkWJS02WGIQWbQug7LA3yzw6FMlGXVE2NAAs94e/9FUD3WeO2pf+6h77zekfcBgrL0P3KZG/QORPSGZBKA6KIKRJYqkqsQoCHii61M2PhTyNNCQArfd+Lm3Vko+zDnkar4XijL/fyZ+sciNGrkhTF8VkQ1sIQsvK2tsB8nHGoyzWr5WfcAAgbpop0/VCT6cBZcOdsdnb94aXc/Ka+UD+hHlVzbZlVzXtVOYA03oAGzgbHrnfWnQ2ZFVcQN4zSkZLXq42oQAE8mZrWj8l3EZ7Ybl7zmzvoTdsCPnC3s/cxiU2tP3dkCCMp6FxByCSD52mQWQzHgqV1Gc+2/OzJd9UEHIrVUFU0AagLIkJUAyQUuuCPEG4Qe/4gDJgJdQCtloYdwBiY8y+5xmXMnvfCcu9euanmh98vue17OU39M4aiIZSMaorMjhcv+hqGw0q9apz4woAs38zz3IhSVLzLZxqQEDtxyD4zDvp4zZLM085lR1IZHexRBtSo4pQsfrGgAaZ2MdX32yLVv2RHX2737635Yd2X+uDSS1QoxbGHADIlxtKM+K5XmODbHzOo6eMNHF0WZWoQlV5pAL+oSHapR/eIJfrTXKkmmV7HoDW7FFWdqhXZgiOnLxKWg34x0EhnXAYq2f9MMdpCFQfI76gbEcHop48UJ3uk8ddSxA8M0zC0wNElzwAFoZnY78YuGr5YMy69YhjRnLyMsU784zFTGYVs9K5FEXisZ+mVr3AgGnvu8CmXXKB/xqjHB3qSYYNgj1Qg/Rs7fk3OeUrRtMkBbe6aeaMYEWBsi86oeOVTnPsfdk6QFYuuw9Xnjl3ih6h4RdnZQUEDsPVG9YG+TDz1W92OXnI1W0h6zwTwa1cocoYXMawauPsQz6r7EPzALB3aH5Hx4tuo+yZOgl2/A8y0/LpPnVSp/xULf+T3mjKwFIZgITfhbw/NVxJUjBQ9BY8o2SkIJTrqkrdG98igmMTZDg9d4o8z9NYDuahabTnMw55LXvKQ71ra1KNo0yt2lMO1YoJlVr0KzI0MLTXfAUwaTt//KItWtFi70w9bHyMAKFidUoQ0EA6EZs3Txy3dUvuKmGdygVct44qOVKWAcg1lcw6+ebtXRfavWvJOrtLfTx26zcqjspBCSg74r1oxVXywRsoq9sDIDmum2ZGPVdyXicS5Y6krlJBnsnIlVUOoVAOQu5bIxN/OTKxNcyFH0OaSSvsP4iBIZWYNYGhYI+y6PfgrgdtI9i9UXJjxUQFZ6da9AdkVUlpdhcK3gbtCA/u2mjAvL6ZC/nSJLA6l1xMwzWX7oN3qnLiqF4BqXt4EiNW2T+uVoITMDWgkCVWdUHeFdlLEfmNGjzSK3hm5ATyar3aMe8rZHpe76u2j6NUCQBtghqNVAcBp8RWPtHl+IN/6zLAgEGqVQTM2eJrfm1kNQiBVAggBnKAPDNV7Yc2gJaI6a2PfdZufexz1vNan8384HQ33tMxxfasuNP2rLzTyzFh3B/5/RYDUUc75BkjqAQAbQlxFZTUQ4uxVZEfahydBvIxEMPWUF89rx9y8gQB8u4vfbF7yLs+S2LbUWZqzgBqCliAz1w0mzEwWS2/2LfCf62ea0WEmc29jKcDyDW0LXh7VQ3mHubqVCnI1NFfVZ0fpJn5Hi3/mZdOt68tOuG45umH7JptD2W1EGontEjBQRtlbY0VgJv7e1JcPkS1c1sHbbitkYliOmJz27bvCjOfkScIVHriK48ijLExRi8oGRycpNTsyKGBKnnyROKhwd7Et9fy7Ll3DL0KH9G7AQ3HDpDr1/65AfOmzK/E05C06x0dWMFuuiAKlPV3ejdnFdEzHsD7Pj7oQNcvDxozDmlfAa+9o2En9sRXNllz81knjz9jY6zzP3qFXXvTfCc/7eLzcgn5C6akNjDY7PWaUh8BVYcH5wENhw4Wp53b2rNhUy9kU7I1EexFUyRY0eEDKproA/me9HB+8BEEvJ559PuInDyF+cs/mp46fT5ZO7D/pJEpy8N9YeGfOn0eZwAuAn0z68r6TdiBF0ISghDIt+irLEFYv/ZurYS7gwOpt0MmgNkEHmdslUxwIGrAd7jOZfmkQjCaQX7ulbMN0sz83o4uN/1A5Cc1nbFXnv2f3Bvyg2cn2cLr59rxwwM29cJmO3Zk0N4zrSL7+5ts8mSzwbNN1qz6CoX3buEq5oOmVhrJY2NFIGth8fwWC9vAdCjaqK+OvZ3uOzO5yCBPECL56e+70H7w6FM++LrkRXrqtPOGkCcYkyen1t+feP1BBUsBsHCJeyKEQkwTZQK6OrsMWDZTMuQ3QVh/++fNJ5c2hEg+yvVrP29//Rn5lOqjt8JVizzLn5n/3/98JifP4AvVNKOTvNjV2W29B3qcPApIF2V/P6U09/cAcBqaRs8BYbrCqZn4waFiLk/p9KSMf0v+CwuNWefTHUmZTCQfPOqn5Xos9zjzRfKQZtki92/fzczUb9QtmgmXlaSsaYJMc/MZO6Wv1ZyOv/jx63b4rW6RPm0XXdzscprkKZHHPv/q+To9zxj1Ks2GXAwChFIFFARLrXXD+EH0CBLyl+gNj2V/mfY+M8+yP6PlGsk3N50Nzlk6b9l16byFs2zewtml9VXdfu/BQzr0Eo0syWqaly2emn466uBzKZc39oevO/EUjfpZC+bJakbHnhllwp+1iq5bvv5IsegHHuTf1nMe8j96/qcG+b63jhoHXgjCWS1fX7hetzKGxMv1EsjXsjUNnpnkB0I8Hft1QJw/+ay9+vM3/fQ8rgOFUxQ9B8ixIwPST9IgQr1ajQZdKpEq2uYokufxFsmzkjZ8837jJYfl/sTfbLIdj/+77f7hSzbr0kvsHZEnCCx7gjCo09sbtBGuRHah92CvgURrA6SSQFa/m+KyglwkGSVBmKpHCEGIdoLBwRLr8ejxlkaZQD66Qv6rm+/zmeeUZ/ljO9V/vs3+4Ew7+HqPvVenPkGI/WEXBxflBKJl3UjlpsGzze7Tn52O/VoBR3tPW8+BAUMeOzpoPJdPS6+AWpdWxiFF9dLfutTrDWpvlg9EDEmSWJIQ87D/zRIzgdR0QZ6zp+uVbpt7xRw95/VmJ3tckQdfe9tmf2CGsfwJAv2oWn5frn0P5i2co70/x2c5N5JJlQjHxAUckYQP/QNZ/dZmkpdnQ4JTyI2cXq7OR/aq9qA3ZhryBCGe9nj1vXXEtyNkWQG72n9qSxb/jgcB+3hBn9SNknxEU3icJD7bkKcMokPvAe0hgQgCGgkIsxv9WAWAMvu9XS8zYMt9bQaIOoA8yx3yBKHrlwdUJRXJI37gQZ7lHskj571/ti3+xDKrfYXRRBuzDQ9WKcCKDU4ADiDqtALM9m/fxdgkK89WnHGiMWQZvQffLqu8vCH7Lw5v0DWV5Ont/22QJwiQJwhYu7XXOej6dOBBniBQjuTxAfWDgLUC7TwvFIm6opBEfh4A9FFBvgyCgB2QN+1V09V7sMcunBF+eKjo97WzrrJrZ7Uon8ortaef2hpQIL9Tp/xPnvy2/ez7m23KsfPtxg9frRVwtGoF9L11TG2YXfneOQ5LVQQS3O+ZMdlAr84jwLjAPr0g7XtudxLJ41sEHEDU5QGIiqIsOhb1R3v9xMxVl+hPTXmhRublzn0+8716vkN+IPudjuvll82xfa8ecPLFFdC+9TnM40cSqtbjEKymF6GYqyNpAJTNiRRgwZLfs+tvucWMdScwScCyC/Ifarlcp3yfzdAb3sCA3tlxkC91brzyYlu7fKEtmr7Abl/5CfvwTTdmNc3at27P8+XMMU0CoH9gxmgsv/ZrFdQad+6QZYZdAZlPlRhNo7ECb3SQJwjsfV5rsf3sqX9BCIqEbmU8CL/ad8BX+mj3OvVAaCKklMeCMQeAxgnCET1XAWXge33rVtvT3emYkVxkK5ctsdkDh225ZvnL1yyz797xSYvk2559yZ79VZ+1PfeSkaeNtTcutH/97G32XWHvf2wy8MzP2w1kC8a+cPfd9oU/K3x/UMXquZdiDPe4AkD7BAFZhWwSuvT5iuf7q5LR7iZPguaKedr7+w94oUiAly5XDpcUKxT8ao6pYK+VHXcAaIwO/2/bNtvy9TZbuWqVI5KPki/D4Y1BKdNIRWH5FRfbZ7T31y7/bZdS5TdBIFYgKvUbzcDfPvCAAT/tdeJzTgDGEn3HIicUgOqOUv+JzMxD/rIr5xi/5kpnU3UVL9WZTred+2TCAeBrEMPkpaa5edB/2MzV7/jdz//Ef9CkigCQwG0oUqmABHeiPCBfC4QLRBszD2J5rHLCAaBDgtCsjyoEAfLMPO/yvOFhrw0xLRmqiad28z9tLnmEIss/5CaeNiQADIMgvKIvtF/85D32vU3fNsjP0k/av3xyG+YayOYRIUTyhIUzwIpLRnb2OWgkedPVsACoLb8ZIF9uIE8QWAl/UTcIXqU6EVkU+exnZXTnAg0PAIMkCP9w79/blk2PG/LJb37HlzOkbqmzrNd8Y7MBfACz7Xhqu7ULtHsucE4CwED5cDnI5ysVFq+q/ilbLwhyHfGepw8hIzqNwaHhAWCAfCb73Y8vt6tFvEzeZ1Xv+Ffd9GkDCyRB1HfIBngddmRt0A6AG30gG4GGByD+nn9RREY3wLDJQzq6GhN57JV7aHgAeBLETghC+9bn/VdduwICOB+K4GMMhNBFSb5D+569z2oA1AWx7UbJhgeAgUEEkI+fREN+9ClBKHvTJijrJ1I+JwGIA2KwZUTbaCR1CQQgP5o6Y/U5pwEY62DG4z/ROv8PAAD//8rR5tgAAAAGSURBVAMAZ/M2+epsspAAAAAASUVORK5CYII=","happy":"data:image/png;base64,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"};
+
+/* Round 4. Everything is drawn on a grid of "art pixels", each 2 by 2 canvas pixels, which is the pixel size of his game sprite.
+   Ulhu himself is the real 64 by 64 game sprite (b16 idle, sleepy and happy), drawn 1 to 1. */
+const $ = (s) => document.querySelector(s);
+const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+const AW = 96, AH = 92, U = 2;
+const SZ = { small: { min: 15, name: 'a sock' }, medium: { min: 30, name: 'a kelp scarf' }, large: { min: 60, name: 'a jumper with his face' } };
+let P = 40, paused = false, size = 'medium', playing = false;
+function rng(seed) { let s = seed; return () => { s = (s * 16807) % 2147483647; return (s - 1) / 2147483646; }; }
+const hx = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+function mix(a, b, t) { const A = hx(a), B = hx(b); return '#' + A.map((v, i) => clamp(Math.round(v + (B[i] - v) * t), 0, 255).toString(16).padStart(2, '0')).join(''); }
+const sh = (h, t) => (t >= 0 ? mix(h, '#ffffff', t) : mix(h, '#000000', -t));
+const hash = (a, b) => { const x = Math.sin(a * 127.1 + b * 311.7) * 43758.5453; return x - Math.floor(x); };
+const BAY = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
+const bay = (x, y) => BAY[(y & 3) * 4 + (x & 3)] / 16;
+
+/* ---------- art-pixel buffer for the static backgrounds ---------- */
+class Buf {
+  constructor(w = AW, h = AH) { this.w = w; this.h = h; this.c = new Array(w * h).fill(null); }
+  p(x, y, col) { x = Math.floor(x); y = Math.floor(y); if (x >= 0 && y >= 0 && x < this.w && y < this.h && col) this.c[y * this.w + x] = col; }
+  g(x, y) { return x < 0 || y < 0 || x >= this.w || y >= this.h ? null : this.c[y * this.w + x]; }
+  r(x, y, w, h, col) { for (let j = 0; j < h; j++) for (let i = 0; i < w; i++) this.p(x + i, y + j, typeof col === 'function' ? col(x + i, y + j, i, j) : col); }
+  circ(cx, cy, r, col) { for (let y = Math.floor(cy - r - 1); y <= cy + r + 1; y++) for (let x = Math.floor(cx - r - 1); x <= cx + r + 1; x++) { const dx = x + 0.5 - cx, dy = y + 0.5 - cy; if (dx * dx + dy * dy <= r * r) this.p(x, y, typeof col === 'function' ? col(x, y, dx, dy) : col); } }
+  outline(col) { const o = this.c.slice(); for (let y = 0; y < this.h; y++) for (let x = 0; x < this.w; x++) { if (this.c[y * this.w + x]) continue; if (this.g(x - 1, y) || this.g(x + 1, y) || this.g(x, y - 1) || this.g(x, y + 1)) o[y * this.w + x] = col; } this.c = o; }
+  draw(ctx, ox = 0, oy = 0) { for (let y = 0; y < this.h; y++) { let x = 0; while (x < this.w) { const k = this.c[y * this.w + x]; if (!k) { x++; continue; } let x2 = x; while (x2 < this.w && this.c[y * this.w + x2] === k) x2++; ctx.fillStyle = k; ctx.fillRect((ox + x) * U, (oy + y) * U, (x2 - x) * U, U); x = x2; } } }
+  // dithered light: each source brightens towards its colour in 3 steps, plus a dithered darkness away from all lights
+  light(srcs, dark, skip) {
+    for (let y = 0; y < this.h; y++) for (let x = 0; x < this.w; x++) {
+      const i = y * this.w + x; let col = this.c[i]; if (!col || (skip && skip(x, y))) continue;
+      let tot = 0;
+      for (const s of srcs) { const d = Math.hypot(x - s.x, y - s.y) / s.r, L = Math.max(0, 1 - d); tot += L * (s.dk == null ? 1 : s.dk); const lv = Math.floor(clamp(L * 3 + bay(x, y) - 0.3, 0, 3)) / 3; if (lv > 0) col = mix(col, s.col, lv * s.k); }
+      const dv = Math.floor(clamp((1 - Math.min(1, tot)) * dark * 3 + bay(x + 1, y + 2) - 0.5, 0, 3)) / 3;
+      if (dv > 0) col = mix(col, '#04050a', dv * 0.42);
+      this.c[i] = col;
+    }
+  }
+}
+const F = (c, x, y, w, h, col) => { c.fillStyle = col; c.fillRect(Math.round(x) * U, Math.round(y) * U, w * U, h * U); };
+// a curved strand of yarn as a pixel line (quadratic curve), with a darker pixel under it so it reads as a strand
+function strand(c, x0, y0, qx, qy, x1, y1, col, lo) {
+  const seen = new Set(), pts = [];
+  const n = Math.ceil((Math.abs(x1 - x0) + Math.abs(y1 - y0) + Math.abs(qy - y0)) * 3) + 4;
+  for (let i = 0; i <= n; i++) { const t = i / n, a = (1 - t) * (1 - t), b = 2 * (1 - t) * t, d = t * t; const x = Math.round(a * x0 + b * qx + d * x1), y = Math.round(a * y0 + b * qy + d * y1); const k = x + ',' + y; if (!seen.has(k)) { seen.add(k); pts.push([x, y]); } }
+  pts.forEach(([x, y]) => { if (!seen.has(x + ',' + (y + 1))) F(c, x, y + 1, 1, 1, lo); });
+  pts.forEach(([x, y], i) => F(c, x, y, 1, 1, i % 4 === 1 ? sh(col, 0.3) : col));
+}
+
+/* ---------- the knitted pieces (row 0 = top of the finished piece, knitting starts at the bottom row) ---------- */
+const SOCK = ['aaaaaaa......', 'bbbbbbb......', 'aaaaaaa......', 'ccccccc......', 'ccccccc......', 'ddddddd......', 'ccccccc......', 'ccccccc......',
+  'ddddddd......', 'ccccccc......', 'cccccccc.....', 'ccccccccccc..', 'eccccccccccee', 'eeccccccccdee', '.eeccccccceee', '..eeeeeeeee..'];
+function scarf() { const R = 22, W = 8, g = []; for (let r = 0; r < R; r++) { let row = ''; const sx = Math.round(3.5 + 1.7 * Math.sin(r * 0.62)); for (let c = 0; c < W; c++) { let k = 'a'; if (r < 2 || r >= R - 2) k = r % 2 ? 'd' : 'b'; else if (c === sx) k = 'c'; else if (r % 3 === 0 && ((r / 3) % 2 ? c === sx - 1 || c === sx - 2 : c === sx + 1 || c === sx + 2)) k = 'e'; row += k; } g.push(row); } return g; }
+function jumper() {
+  const R = 18, W = 19, g = [];
+  for (let r = 0; r < R; r++) { let row = ''; for (let c = 0; c < W; c++) { const body = c >= 4 && c <= 14, sleeve = c <= 3 || c >= 15; let k = '.';
+    if (r === 0) { if ((c >= 3 && c <= 6) || (c >= 12 && c <= 15)) k = c === 6 || c === 12 ? 'b' : 'a'; } else if (r === 1) { if (c >= 1 && c <= 17) k = c >= 7 && c <= 11 ? 'b' : 'a'; }
+    else if (r <= 10) { if (body || sleeve) k = 'a'; if (sleeve && r === 5) k = 'c'; if (sleeve && r >= 9) k = 'b'; } else if (body) k = r >= 16 ? 'b' : 'a';
+    if (body && r >= 2 && r <= 14) { const dx = (c - 9) * 6, dy = (r - 8) * 4.4; if (dx * dx + dy * dy <= 22 * 22) k = 'f'; }
+    if ((c === 7 || c === 11) && (r === 7 || r === 8)) k = 'e'; if ((c === 6 || c === 12) && r === 10) k = 'p'; if ((c === 8 || c === 10) && r >= 11 && r <= 13) k = 'g'; if (c === 9 && r === 12) k = 'g'; if (c === 9 && r === 2) k = 'k';
+    row += k; } g.push(row); }
+  return g;
+}
+const GRIDS = { small: SOCK, medium: scarf(), large: jumper() };
+const PAL = {
+  small: { a: '#faf5d7', b: '#f28ca0', c: '#78be96', d: '#3c643c', e: '#e0b860' },
+  medium: { a: '#3c643c', b: '#e0b860', c: '#8fd06a', d: '#c98a2a', e: '#aae2be' },
+  large: { a: '#9a3048', b: '#6e1f34', c: '#e0b860', f: '#aae2be', e: '#1b1b2f', p: '#f28ca0', g: '#5a9c78', k: '#8fd06a' },
+};
+const OUTL = '#141c18';
+// knit texture at one art pixel per stitch: alternate columns lighter and darker so it reads as ribs of V stitches
+const knitCol = (col, c, r) => sh(col, c % 2 ? -0.16 : (r % 2 ? 0.04 : 0.12));
+// small version for the shelf: every other stitch
+function miniBuf(sz) {
+  const g = GRIDS[sz], R = g.length, W = g[0].length, mw = Math.ceil(W / 2), mh = Math.ceil(R / 2);
+  const b = new Buf(mw + 2, mh + 2);
+  for (let r = 0; r < mh; r++) for (let c = 0; c < mw; c++) { const k = g[Math.min(R - 1, r * 2)][Math.min(W - 1, c * 2)]; if (k !== '.') b.p(c + 1, r + 1, knitCol(PAL[sz][k], c, r)); }
+  b.outline(OUTL); return b;
+}
+const MINI = { small: miniBuf('small'), medium: miniBuf('medium'), large: miniBuf('large') };
+// the part already knitted, hanging from the needles: newest row at the top
+function lapPiece(c, sz, f, cx, top, maxRows) {
+  const g = GRIDS[sz], R = g.length, W = g[0].length;
+  const done = clamp(f, 0, 1) * R, full = Math.floor(done), part = done - full;
+  const b = new Buf(W + 2, maxRows + 3);
+  const curRow = R - full - 1; let rows = [];
+  if (curRow >= 0) rows.push(curRow);
+  for (let r = R - full; r < R; r++) rows.push(r);
+  rows = rows.slice(0, maxRows);
+  rows.forEach((gr, i) => {
+    const row = g[gr]; const c0 = row.search(/[^.]/); let c1 = row.length - 1; while (row[c1] === '.') c1--;
+    let from = c0, to = c1;
+    if (gr === curRow) { const n = c1 - c0 + 1, s = Math.floor(part * n), ltr = full % 2 === 0; if (s === 0) return; if (ltr) to = c0 + s - 1; else from = c1 - s + 1; }
+    for (let col = from; col <= to; col++) if (row[col] !== '.') b.p(col + 1, i + 1, knitCol(PAL[sz][row[col]], col, gr));
+  });
+  b.outline(OUTL);
+  b.draw(c, Math.round(cx - (W + 2) / 2), top - 1);
+}
+
+/* ---------- Ulhu: his real sprite ---------- */
+const IMG = {};
+function loadImgs() { return Promise.all(Object.keys(ULHU_SRC).map((k) => new Promise((res) => { const i = new Image(); i.onload = () => { IMG[k] = i; res(); }; i.src = ULHU_SRC[k]; }))); }
+function tinted(img, col, a) { const cv = document.createElement('canvas'); cv.width = 64; cv.height = 64; const x = cv.getContext('2d'); x.drawImage(img, 0, 0); if (a > 0) { x.globalCompositeOperation = 'source-atop'; x.fillStyle = col; x.globalAlpha = a; x.fillRect(0, 0, 64, 64); } return cv; }
+const UX = 37, UY = 26; // his top-left, in art pixels (same place in both scenes)
+const SKIN = '#aae2be', SKIN2 = '#78be96', SKOUT = '#284632';
+function drawUlhu(c, S, st, t) {
+  const mood = st === 'paused' ? 'sleepy' : st === 'fin' ? 'happy' : 'idle', im = S.tint[mood];
+  const step = Math.floor(t / 140);
+  const hop = st === 'fin' ? [0, -1, -3, -4, -3, -1, 0, 0][step % 8] : 0;
+  const X = UX * U, Y = (UY + hop) * U;
+  const wdy = st === 'paused' ? 0 : st === 'fin' ? (step % 2 ? -2 : 0) : (Math.floor(t / 520) % 2 ? -2 : 0);
+  const hdy = st === 'paused' ? (Math.floor(t / 1700) % 2 ? 2 : 0) : 0;
+  c.drawImage(im, 0, 0, 12, 64, X, Y + wdy, 12, 64);
+  if (mood === 'sleepy') c.drawImage(im, 52, 14, 12, 50, X + 52, Y + 14 + wdy, 12, 50); else c.drawImage(im, 52, 0, 12, 64, X + 52, Y + wdy, 12, 64);
+  c.drawImage(im, 12, 30, 40, 34, X + 12, Y + 30, 40, 34);
+  if (mood === 'sleepy') c.drawImage(im, 12, 0, 36, 30, X + 12, Y + hdy, 36, 30), c.drawImage(im, 48, 14, 4, 16, X + 48, Y + 14 + hdy, 4, 16);
+  else c.drawImage(im, 12, 0, 40, 30, X + 12, Y + hdy, 40, 30);
+  if (mood === 'idle' && t % 4300 < 150) c.drawImage(S.tint.sleepy, 14, 13, 36, 15, X + 14, Y + 13, 36, 15);
+  return { hop };
+}
+// glasses on the same 2-pixel grid, sitting over his eyes; when he dozes they slide down his nose
+function glasses(c, st, hop) {
+  const ox = UX, oy = UY + hop + (st === 'paused' ? 3 : 0), G = '#e0b860', g2 = '#8a6a2a', gl = '#fff6d0';
+  const rim = (x0, y0) => { F(c, ox + x0 + 1, oy + y0, 5, 1, G); F(c, ox + x0, oy + y0 + 1, 1, 6, G); F(c, ox + x0 + 6, oy + y0 + 1, 1, 6, g2); F(c, ox + x0 + 1, oy + y0 + 7, 5, 1, g2); F(c, ox + x0 + 4, oy + y0 + 1, 1, 1, gl); };
+  if (st === 'paused') { rim(8, 6); rim(17, 7); F(c, ox + 15, oy + 9, 2, 1, G); }
+  else { rim(8, 6); rim(17, 6); F(c, ox + 15, oy + 8, 2, 1, G); F(c, ox + 6, oy + 8, 2, 1, g2); F(c, ox + 24, oy + 8, 2, 1, g2); }
+}
+// two of his face tentacles become arms; needles in his "hands"
+function armsAndNeedles(c, st, t, hop) {
+  const ox = UX, oy = UY + hop, k = st === 'work' ? Math.floor(t / 180) % 4 : 0, drop = st === 'paused' ? 2 : 0;
+  const rh = [[0, 0], [-1, 0], [-1, -1], [0, 0]][k], lh = [[0, 0], [0, 0], [0, 1], [0, 0]][k];
+  const arm = (pts) => { // 2-pixel-thick tentacle with outline and an underside shade
+    const cells = new Map();
+    for (let i = 0; i < pts.length - 1; i++) { const [a, b] = pts[i], [c2, d] = pts[i + 1], n = Math.max(Math.abs(c2 - a), Math.abs(d - b)) * 2 + 1; for (let s = 0; s <= n; s++) { const x = Math.round(a + (c2 - a) * s / n), y = Math.round(b + (d - b) * s / n); if (cells.get(x + ',' + y) !== 1) cells.set(x + ',' + y, 1); cells.set(x + 1 + ',' + y, 1); if (!cells.has(x + ',' + (y + 1))) cells.set(x + ',' + (y + 1), 2); } }
+    const out = new Set();
+    cells.forEach((v, key) => { const [x, y] = key.split(',').map(Number); [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(([dx, dy]) => { const q = x + dx + ',' + (y + dy); if (!cells.has(q)) out.add(q); }); });
+    out.forEach((key) => { const [x, y] = key.split(',').map(Number); F(c, ox + x, oy + y, 1, 1, SKOUT); });
+    cells.forEach((v, key) => { const [x, y] = key.split(',').map(Number); F(c, ox + x, oy + y, 1, 1, v === 2 ? SKIN2 : SKIN); });
+  };
+  const L = [12 + lh[0], 27 + lh[1] + drop], R = [20 + rh[0], 27 + rh[1] + drop];
+  const needle = (x0, y0, x1, y1, knob) => { const n = Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0)); for (let s = 0; s <= n; s++) { const x = Math.round(x0 + (x1 - x0) * s / n), y = Math.round(y0 + (y1 - y0) * s / n); F(c, ox + x, oy + y + 1, 1, 1, '#3a1e0a'); F(c, ox + x, oy + y, 1, 1, s % 3 ? '#c9853a' : '#f0b060'); } F(c, ox + x0, oy + y0, 1, 1, knob); F(c, ox + x0 + (x1 > x0 ? -1 : 1), oy + y0, 1, 1, knob); F(c, ox + x0, oy + y0 + 1, 1, 1, '#a04a5a'); };
+  if (st === 'paused') { needle(L[0] - 3, L[1] + 1, L[0] + 9, L[1] + 3, '#f28ca0'); needle(R[0] + 3, R[1] + 1, R[0] - 9, R[1] + 3, '#f28ca0'); }
+  else { needle(L[0] - 4, L[1] + 2, L[0] + 9, L[1] - 6, '#f28ca0'); needle(R[0] + 4, R[1] + 2, R[0] - 9, R[1] - 6, '#f28ca0'); }
+  arm([[10, 21], [8, 24], [L[0] - 2, L[1]], L]);
+  arm([[21, 21], [23, 24], [R[0] + 1, R[1]], [R[0] - 1, R[1]]]);
+  if (k === 2) { const x = ox + 16, y = oy + 21; F(c, x, y - 1, 1, 1, '#fff6c8'); F(c, x - 1, y, 3, 1, '#fff6c8'); F(c, x, y + 1, 1, 1, '#fff6c8'); }
+  return [ox + R[0], oy + R[1], ox + L[0], oy + L[1]];
+}
+function zzz(c, t) {
+  const Z = [[0, 0], [1, 0], [2, 0], [2, 1], [1, 2], [0, 3], [0, 4], [1, 4], [2, 4]];
+  for (let i = 0; i < 3; i++) { const ph = ((t / 900 + i) % 3) / 3, s = Math.floor(ph * 8); if (ph > 0.92) continue; const x = UX + 26 + s, y = UY + 1 - s * 2; Z.forEach(([dx, dy]) => F(c, x + dx, y + dy, 1, 1, ph > 0.7 ? '#9fb8cc' : '#e9f4ff')); }
+}
+function sparkle(c, x, y, ph) { const a = ph > 0.5 ? '#fff6c8' : '#ffd56a'; F(c, x, y, 1, 1, '#ffffff'); if (ph > 0.25) { F(c, x - 1, y, 1, 1, a); F(c, x + 1, y, 1, 1, a); F(c, x, y - 1, 1, 1, a); F(c, x, y + 1, 1, 1, a); } if (ph > 0.6) { F(c, x - 2, y, 1, 1, '#c98a2a'); F(c, x + 2, y, 1, 1, '#c98a2a'); F(c, x, y - 2, 1, 1, '#c98a2a'); F(c, x, y + 2, 1, 1, '#c98a2a'); } }
+
+/* ---------- yarn ball: a pixel circle with wrapped strands that spin and shrink ---------- */
+const YARN = '#8fd0a8';
+function ball(c, cx, floorY, r, spin, jig) {
+  const cy = floorY - r, b = new Buf(20, 20), o = 10;
+  for (let y = 0; y < 20; y++) for (let x = 0; x < 20; x++) {
+    const dx = x + 0.5 - o, dy = y + 0.5 - o, d = Math.hypot(dx, dy); if (d > r) continue;
+    let col = YARN;
+    const u = dx * 0.8 + dy * 0.6 + spin, v = dx * -0.55 + dy * 0.85 - spin * 0.6;
+    if (((Math.floor(u * 0.9) % 3) + 3) % 3 === 0 && dy < r * 0.3) col = '#5a9c78';
+    else if (((Math.floor(v) % 3) + 3) % 3 === 0 && dy >= -r * 0.2) col = '#3c7a5a';
+    const lit = -(dx + dy) / r;
+    if (lit > 0.75) col = sh(col, 0.35); else if (lit > 0.3) col = sh(col, 0.12); else if (lit < -0.75) col = sh(col, -0.35); else if (lit < -0.3) col = sh(col, -0.15);
+    b.p(x, y, col);
+  }
+  b.outline('#16301f');
+  b.draw(c, Math.round(cx - o + jig), Math.round(cy - o));
+  return [Math.round(cx + jig), Math.round(cy - r)];
+}
+
+/* ---------- the bar: a knitted strip that grows stitch by stitch ---------- */
+const BAR = { x: 4, y: 74, cols: 17, rows: 2, sw: 5, sh: 4 };
+const NST = BAR.cols * BAR.rows;
+const STRIPE = ['#aae2be', '#aae2be', '#aae2be', '#faf5d7', '#5a8c5a', '#faf5d7', '#aae2be', '#aae2be', '#78be96', '#3c643c'];
+function stitchCol(cI, r) { const k = cI % 10; if (k === 4 && r === 0) return '#f28ca0'; return STRIPE[k]; }
+function stitch(c, x, y, col) { // a V: two arms meeting at the bottom middle
+  const D = sh(col, -0.5), A = sh(col, 0.25), B = sh(col, -0.06), M = sh(col, -0.2);
+  const g = ['ADDDB', 'AADBB', 'DAMBD', 'DDMDD'], m = { A, B, D, M };
+  for (let j = 0; j < 4; j++) for (let i = 0; i < 5; i++) F(c, x + i, y + j, 1, 1, m[g[j][i]]);
+}
+function drawBar(c, S, f, st, t) {
+  const n = Math.floor(clamp(f, 0, 1) * NST + 1e-6), { x: X, y: Y, sw, sh: H } = BAR;
+  const wcols = Math.ceil(n / BAR.rows);
+  if (wcols) { c.globalAlpha = 0.35; F(c, X + 1, Y + BAR.rows * H, wcols * sw, 1, '#000000'); c.globalAlpha = 1; }
+  for (let i = 0; i < n; i++) { const ci = Math.floor(i / BAR.rows), r = i % BAR.rows; stitch(c, X + ci * sw, Y + r * H, stitchCol(ci, r)); }
+  // cast-on knot on the left
+  F(c, X - 1, Y + 2, 1, 5, '#3c643c'); F(c, X - 2, Y + 3, 1, 3, '#5a8c5a');
+  S.pins(c, wcols);
+  if (st === 'fin') return;
+  // loose yarn ahead: lies in a soft wave along the board, shorter as the strip grows
+  const ex = X + wcols * sw, endX = X + BAR.cols * sw + 2;
+  for (let x = ex + 1; x < endX; x++) { const y = Y + 3 + [0, 0, 1, 1, 1, 0, 0, -1, -1, -1][(x + 3) % 10]; c.globalAlpha = 0.4; F(c, x, y + 1, 1, 1, '#000000'); c.globalAlpha = 1; F(c, x, y, 1, 1, x % 5 === 0 ? '#c4ecd2' : YARN); }
+  F(c, endX, Y + 2, 2, 3, '#5a9c78'); F(c, endX + 1, Y + 1, 1, 1, '#3c643c');
+  // two little needles at the growing edge, and the stitch being made blinks
+  const cx = X + Math.floor(n / BAR.rows) * sw, cy = Y + (n % BAR.rows) * H;
+  const k = st === 'work' ? Math.floor(t / 180) % 4 : 0, dip = k === 1 || k === 2 ? 1 : 0;
+  const nd = (x0, y0, dx) => { for (let s = 0; s < 8; s++) { F(c, x0 + Math.round(s * dx), y0 - s + 1, 1, 1, '#5a3a1c'); F(c, x0 + Math.round(s * dx), y0 - s, 1, 1, s % 3 ? '#c9853a' : '#f0b060'); } F(c, x0 + Math.round(7 * dx), y0 - 7, 1, 1, '#f28ca0'); };
+  if (n < NST) {
+    if (st === 'work' && Math.floor(t / 330) % 2) { F(c, cx, cy - 1, 5, 1, '#fff6c8'); F(c, cx, cy + 4, 5, 1, '#fff6c8'); F(c, cx - 1, cy, 1, 4, '#fff6c8'); F(c, cx + 5, cy, 1, 4, '#fff6c8'); }
+    else if (st === 'paused') { F(c, cx, cy - 1, 5, 1, '#9fb8cc'); F(c, cx, cy + 4, 5, 1, '#9fb8cc'); }
+    nd(cx + 1, cy + 4 + dip, -0.45); nd(cx + 3, cy + 4, 0.5);
+  }
+}
+
+/* ---------- shelf: the other two pieces, plus today's slot ---------- */
+function drawShelf(c, S, fin, t) {
+  const order = ['small', 'medium', 'large'].filter((k) => k !== size);
+  const put = (sz, x, dy = 0) => { const m = MINI[sz]; m.draw(c, Math.round(x - m.w / 2), S.shelfY - m.h + 1 + dy); };
+  put(order[0], S.slots[0]); put(order[1], S.slots[1]);
+  const x = S.slots[2], m = MINI[size];
+  if (fin) {
+    const e = t - (S.finT == null ? t : S.finT), dy = e < 120 ? 7 : e < 240 ? 3 : e < 360 ? -2 : e < 480 ? -1 : 0;
+    put(size, x, dy);
+    [[-6, -m.h - 2], [5, -m.h + 1], [-1, -m.h - 5], [6, -3]].forEach(([dx, dy2], i) => { const ph = ((t / 700 + i * 0.27) % 1); if (ph < 0.85) sparkle(c, x + dx, S.shelfY + dy2, ph); });
+  } else {
+    const x0 = Math.round(x - m.w / 2) + 1, y0 = S.shelfY - m.h + 2, w = m.w - 2, h = m.h - 2;
+    for (let i = 0; i < w; i += 2) { F(c, x0 + i, y0, 1, 1, S.dash); F(c, x0 + i, y0 + h - 1, 1, 1, S.dash); }
+    for (let j = 0; j < h; j += 2) { F(c, x0, y0 + j, 1, 1, S.dash); F(c, x0 + w - 1, y0 + j, 1, 1, S.dash); }
+  }
+}
+
+/* ---------- chair (shared shape, own colours) ---------- */
+function chairBack(B, P, wings, rad) {
+  const x0 = 38, x1 = 68, y0 = 16, y1 = 56;
+  const inside = (x, y) => { if (x < x0 || x > x1 || y < y0 || y > y1) return false; const cx = x < x0 + rad ? x0 + rad : x > x1 - rad ? x1 - rad : x, cy = y < y0 + rad ? y0 + rad : y; return Math.hypot(x - cx, y - cy) <= rad; };
+  const T = new Buf();
+  for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) if (inside(x, y)) { const u = (x - x0) / (x1 - x0); let col = u < 0.18 ? P.hi : u > 0.82 ? P.lo : P.mid; if (y < y0 + 3) col = sh(col, 0.1); T.p(x, y, col); }
+  if (wings) for (const s of [-1, 1]) for (let y = 22; y <= 48; y++) for (let x = 0; x < 6; x++) { const xx = s < 0 ? 33 + x : 68 + x; const top = y < 27 ? (s < 0 ? x >= 27 - y : x <= 5 - (27 - y)) : true; if (top) T.p(xx, y, s < 0 ? (x < 2 ? P.hi : P.mid) : (x > 3 ? P.lo : P.mid)); }
+  for (const by of [24, 33, 42]) for (const bx of [45, 53, 61]) { const X = bx + (by === 33 ? -4 : 0); if (X < x0 + 2) continue; T.p(X, by, P.btn); T.p(X - 1, by - 1, P.hi); T.p(X + 1, by + 1, sh(P.mid, -0.18)); T.p(X + 2, by + 2, sh(P.mid, -0.1)); T.p(X - 2, by + 2, sh(P.mid, -0.1)); }
+  T.outline(P.out);
+  T.c.forEach((v, i) => { if (v) B.c[i] = v; });
+}
+function chairFront(P, rad) {
+  const T = new Buf();
+  for (const ax of [33, 67]) for (let y = 50; y <= 59; y++) for (let x = ax; x < ax + 7; x++) { if (y === 50 && (x === ax || x === ax + 6)) continue; if (rad > 4 && y === 51 && (x === ax || x === ax + 6)) continue; const top = y < 53; const col = top ? (y === 50 || (rad > 4 && y === 51) ? sh(P.hi, 0.12) : P.hi) : (x === ax ? P.hi : x === ax + 6 ? P.lo : P.mid); T.p(x, y, col); }
+  T.r(40, 55, 27, 1, sh(P.hi, 0.05)); T.r(40, 56, 27, 3, P.mid); T.r(40, 59, 27, 1, P.lo);
+  for (const lx of [35, 70]) T.r(lx, 60, 2, 3, P.leg);
+  T.outline(P.out);
+  return T;
+}
+
+/* ---------- K1: firelit cottage nook ---------- */
+function buildK1() {
+  const B = new Buf(), R = rng(11);
+  // stone wall
+  for (let row = 0; row * 5 + 4 < 62; row++) { const y0 = 4 + row * 5; let x = -(row % 2) * 5; while (x < AW) { const w = 7 + Math.floor(R() * 6), base = ['#4e3f38', '#55443b', '#4a3b35', '#5a4840', '#463832'][Math.floor(R() * 5)]; for (let j = 0; j < 5; j++) for (let i = 0; i < w; i++) { let col = base; if (i === w - 1 || j === 4) col = '#2b211d'; else if (j === 0) col = sh(base, 0.12); else if (j === 3) col = sh(base, -0.14); else if (hash(x + i, y0 + j) > 0.9) col = sh(base, -0.1); B.p(x + i, y0 + j, col); } x += w; } }
+  // beam and hanging herbs
+  B.r(0, 0, AW, 4, (x, y) => (y === 0 ? '#2a180c' : y === 3 ? '#1e1008' : hash(x, 3) > 0.8 ? '#2e1c0e' : y === 1 ? '#4e3220' : '#3a2414'));
+  for (const hx0 of [30, 54]) { B.r(hx0, 4, 1, 3, '#c9a050'); for (let j = 0; j < 5; j++) for (let i = -2; i <= 2; i++) if (Math.abs(i) <= 2 - (j > 2 ? 1 : 0)) B.p(hx0 + i, 7 + j, (i + j) % 2 ? '#3e6a2a' : '#5a8a3a'); B.p(hx0, 6, '#e0b860'); }
+  // fireplace
+  for (let y = 27; y < 60; y++) for (let x = 2; x < 35; x++) { const sx = x + (Math.floor((y - 27) / 4) % 2) * 3, bx = Math.floor(sx / 6), by = Math.floor((y - 27) / 4); const base = ['#7a6a5e', '#857466', '#6e5f54'][(bx + by * 2) % 3]; let col = base; if (sx % 6 === 5 || (y - 27) % 4 === 3) col = '#3e332c'; else if ((y - 27) % 4 === 0) col = sh(base, 0.12); B.p(x, y, col); }
+  const opening = (x, y) => { if (y < 34 || y > 58) return false; const hw = y === 34 ? 7 : y === 35 ? 9 : y === 36 ? 10 : 11; return x >= 18 - hw && x <= 18 + hw; };
+  for (let y = 34; y <= 58; y++) for (let x = 6; x <= 30; x++) if (opening(x, y)) { let col = '#140a07'; if (y < 50 && (x + Math.floor(y / 3)) % 5 !== 0 && y % 3 !== 0) col = y < 42 ? '#2a120c' : '#3a1a10'; B.p(x, y, col); }
+  B.r(0, 24, 37, 1, '#b07a42'); B.r(0, 25, 37, 2, (x) => (hash(x, 25) > 0.75 ? '#6a3e1e' : '#7a4a24')); B.r(0, 27, 37, 1, '#3e2410');
+  B.r(2, 28, 3, 2, '#5a3418'); B.r(32, 28, 3, 2, '#5a3418');
+  B.r(0, 58, 37, 4, (x, y) => (y === 58 ? '#8a7a6a' : y === 61 ? '#3e332c' : '#6a5a50'));
+  // logs and the ember bed
+  B.r(9, 53, 19, 3, (x, y) => (y === 53 ? '#7a4a24' : '#5a3418')); B.r(11, 50, 15, 3, (x, y) => (y === 50 ? '#8a5a2e' : '#62391a'));
+  for (const [ex, ey] of [[9, 54], [27, 54], [11, 51], [25, 51]]) B.p(ex, ey, '#c9925a');
+  B.r(10, 56, 18, 2, (x) => (x % 3 ? '#ff6a2a' : '#ffb43a'));
+  // window onto the sea
+  const glass = (x, y) => { if (y < 12 || y > 38) return false; const hw = y === 12 ? 2 : y === 13 ? 4 : y === 14 ? 5 : y === 15 ? 6 : 7; return x >= 83 - hw && x <= 82 + hw; };
+  for (let y = 9; y <= 40; y++) for (let x = 73; x <= 92; x++) { let near = false; for (let dy = -2; dy <= 2; dy++) for (let dx = -2; dx <= 2; dx++) if (glass(x + dx, y + dy)) near = true; if (near && !glass(x, y)) B.p(x, y, (x + y) % 7 === 0 ? '#6e6052' : y < 13 || x < 76 ? '#a09080' : '#8a7a6a'); }
+  const win = new Set();
+  for (let y = 12; y <= 38; y++) for (let x = 76; x <= 89; x++) if (glass(x, y)) {
+    const v = (y - 12) / 26 + (bay(x, y) - 0.5) * 0.18, cols = ['#14365a', '#0e2c4c', '#0a2238', '#071a2c', '#05121f'];
+    let col = cols[clamp(Math.floor(v * 5), 0, 4)];
+    const dm = Math.hypot(x + 0.5 - 86, y + 0.5 - 17);
+    if (dm < 2.7) col = dm < 1.6 ? '#f2f6e0' : '#d0d8b8'; else if (Math.abs(x - 85.5) < 1.5 + (y - 19) * 0.12 && y > 20 && bay(x, y) > 0.55) col = '#2a5a80';
+    if (y > 34 && y > 38 - hash(x, 5) * 6) col = '#0c2a1c';
+    if (x === 83 || y === 25) col = '#1a1410'; else win.add(x + ',' + y);
+    B.p(x, y, col);
+  }
+  B.r(72, 40, 22, 1, '#a8743e'); B.r(72, 41, 22, 2, '#6a3e1e');
+  // floor planks and the rug
+  for (let y = 60; y < 70; y++) { const row = Math.floor((y - 60) / 3); for (let x = 0; x < AW; x++) { const seam = (x + row * 13) % 21 === 0, base = ['#5a3820', '#62402a', '#4e301c', '#583822'][row % 4]; let col = (y - 60) % 3 === 2 || seam ? '#2a1a0e' : (y - 60) % 3 === 0 ? sh(base, 0.12) : base; if (!seam && hash(x, y) > 0.92) col = sh(base, -0.12); B.p(x, y, col); } }
+  for (let y = 60; y < 70; y++) for (let x = 26; x < 82; x++) { const dx = (x + 0.5 - 54) / 27, dy = (y + 0.5 - 65) / 4.6, d = dx * dx + dy * dy; if (d > 1) continue; let col = '#8a2a2a'; if (d > 0.72) col = '#c9a050'; else if (d > 0.6) col = '#5a1a1a'; else if ((Math.abs(x - 54) + Math.abs(y - 65) * 3) % 6 === 0) col = '#e6c88a'; else if ((x + y) % 2 && d < 0.2) col = '#9a3a32'; B.p(x, y, col); }
+  // basket of spare yarn by the window
+  B.circ(88, 55.5, 2.6, (x, y, dx, dy) => (dx + dy < -1.5 ? '#ffb8c6' : dx + dy > 1.6 ? '#c06a7e' : (x + y) % 3 === 0 ? '#d8788c' : '#f28ca0'));
+  B.circ(92, 56, 2.3, (x, y, dx, dy) => (dx + dy < -1.2 ? '#ffffff' : dx + dy > 1.4 ? '#c8c0a0' : (x - y) % 3 === 0 ? '#e0d8b4' : '#faf5d7'));
+  B.r(84, 57, 11, 6, (x, y) => (y === 57 ? '#c09a50' : (x + Math.floor(y / 2)) % 2 ? '#a07a3a' : '#7a5a28'));
+  B.r(84, 63, 11, 1, '#3a2410');
+  chairBack(B, K1.chair, true, 4);
+  B.light([{ x: 18, y: 50, r: 62, col: '#ff9a48', k: 0.42 }, { x: 18, y: 50, r: 26, col: '#ffd08a', k: 0.25, dk: 0.5 }, { x: 84, y: 24, r: 22, col: '#7ab0d8', k: 0.18, dk: 0.6 }], 0.85, (x, y) => win.has(x + ',' + y) || (y >= 34 && y <= 58 && x >= 7 && x <= 29) || y >= 70);
+  // bar area: skirting, the board the strip is pinned to, and the plaque
+  B.r(0, 70, AW, 1, '#6a4224'); B.r(0, 71, AW, 2, '#3a2414');
+  B.r(0, 73, AW, 11, (x, y) => (y === 83 ? '#3a2616' : hash(x >> 2, y) > 0.85 ? '#5e4228' : x % 31 === 0 ? '#4a321e' : '#6a4a2c'));
+  B.r(0, 84, AW, 8, '#1e1208'); B.r(1, 84, AW - 2, 1, '#c9a050'); B.r(1, 91, AW - 2, 1, '#6a4a1a'); B.r(1, 85, 1, 6, '#c9a050'); B.r(AW - 2, 85, 1, 6, '#6a4a1a');
+  K1.win = win;
+  return B;
+}
+const K1 = {
+  id: 'k1', chair: { hi: '#c84a44', mid: '#9a2a30', lo: '#5e161c', btn: '#4a0e14', out: '#240608', leg: '#3a2010' },
+  shelfY: 23, slots: [7, 18, 29], dash: '#e6c88a', ballX: 81, floorY: 67, tintCol: '#ff9a48', tintA: 0.07,
+  pins(c, w) { for (let i = 0; i < w; i += 3) { const x = BAR.x + i * BAR.sw + 2; F(c, x, BAR.y - 1, 2, 1, '#f0d080'); F(c, x + 1, BAR.y - 1, 1, 1, '#a07a2a'); } },
+  mid(c, t, st) {
+    // fire: columns of flame that change every frame, hot core, orange body, red tips
+    const fr = Math.floor(t / 110), base = 53;
+    for (let x = 10; x <= 27; x++) { const cen = 1 - Math.abs(x - 18.5) / 9.5, h = Math.round(3 + 11 * cen + hash(x, fr) * 4 - (st === 'paused' ? 2 : 0)); for (let j = 0; j < h; j++) { const y = base - j, rel = j / h; if (rel > 0.75 && hash(x * 3 + j, fr) > 0.6) continue; const col = rel < 0.35 && cen > 0.55 ? '#fff2a8' : rel < 0.55 ? '#ffc040' : rel < 0.8 ? '#f07a22' : '#c03a1a'; F(c, x, y, 1, 1, col); } }
+    for (let i = 0; i < 3; i++) { const q = t / 1300 + i * 0.33, ph = q % 1, x = 13 + Math.floor(hash(i, Math.floor(q)) * 12), y = 46 - Math.floor(ph * 12); if (y > 35) F(c, x + (Math.floor(ph * 6) % 2), y, 1, 1, ph > 0.6 ? '#c03a1a' : '#ffb43a'); }
+    c.drawImage(Math.floor(t / 240) % 3 === 0 ? this.glowB : this.glowA, 0, 0);
+    // fish and bubbles in the window
+    const W = this.win, put = (x, y, col) => { if (W.has(x + ',' + y)) F(c, x, y, 1, 1, col); };
+    const fx = 70 + Math.floor((t / 260) % 34), fy = 29;
+    [[1, 0], [2, 0], [3, 0], [5, 0], [0, 1], [1, 1], [3, 1], [4, 1], [1, 2], [2, 2], [3, 2], [5, 2]].forEach(([dx, dy]) => put(fx - dx, fy + dy, dy === 0 ? '#ffb070' : '#f08a3a'));
+    put(fx - 1, fy + 1, '#1a0a04');
+    const f2 = 96 - Math.floor((t / 420) % 30); [[0, 0], [1, 0], [2, 0], [-1, 0], [0, -1], [1, 1]].forEach(([dx, dy]) => put(f2 + dx, 20 + dy, '#8ab8d8'));
+    for (let i = 0; i < 3; i++) { const ph = (t / 3400 + i * 0.37) % 1, x = 79 + i * 3 + (Math.floor(ph * 9) % 2), y = 37 - Math.floor(ph * 24); put(x, y, '#9fd0ff'); }
+    if (Math.floor(t / 500) % 2) put(86, 22, '#4a7aa0');
+  },
+};
+
+/* ---------- K3: tiny diving-bell room ---------- */
+function bloop(c, x, y, st, t) {
+  const M = [
+    '....k......k........',
+    '...khk....khk.......',
+    '...khbk..kbbk.......',
+    '..khhbbkkbbbbk......',
+    '.khhbbbbbbbbbbk.....',
+    '.khbbbbbeeeebbbk....',
+    'khhbbbbeeoqeebbbk...',
+    'khbbbbbeeooeebbbbk..',
+    'khbbbbbbeeeebbkwkwk.',
+    'kdhbbbbbbbbbbkmmmmmk',
+    'kdbbbbbbbbbbbkmmmmk.',
+    '.kdbbbbbbbbbbbkwkwk.',
+    '..kddbbbbbbbbbbbk...',
+    '...kdddddddddddk....',
+    '....kfk.....kfk.....',
+    '.....k.......k......'];
+  const PALB = { k: '#0a0f1e', h: '#5a78c0', b: '#33509a', d: '#1e2c5e', e: '#ffe27a', o: '#0a0f1e', q: '#ffffff', w: '#f2eedc', m: '#6a1a36', f: '#4a68b0' };
+  const sleep = st === 'paused', bat = st === 'work' && t % 1600 > 1150;
+  const hop = st === 'fin' ? [0, -1, -2, -2, -1, 0, 0, 0][(Math.floor(t / 140) + 3) % 8] : 0;
+  const by = sleep && Math.floor(t / 1700) % 2 ? 1 : 0;
+  M.forEach((row, j) => { for (let i = 0; i < row.length; i++) { let k = row[i]; if (k === '.') continue; if (sleep && 'eoq'.includes(k)) k = j === 7 ? 'k' : 'b'; if (bat && j >= 14 && i >= 11) continue; F(c, x + i, y + j + hop + (j < 9 ? by : 0), 1, 1, PALB[k]); } });
+  [[-1, 9], [-2, 8], [-2, 7], [-1, 6]].forEach(([dx, dy]) => F(c, x + dx, y + dy + hop, 1, 1, '#1e2c5e'));
+  F(c, x - 1, y + 5 + hop, 1, 1, '#33509a');
+  if (bat) { [[14, 12], [15, 11], [16, 11], [17, 10]].forEach(([dx, dy]) => F(c, x + dx, y + dy + hop, 1, 1, '#4a68b0')); F(c, x + 18, y + 10 + hop, 1, 1, '#0a0f1e'); F(c, x + 17, y + 9 + hop, 1, 1, '#0a0f1e'); }
+  // lure on a stalk from the forehead, with a glow that pulses
+  const sw = sleep ? 0 : [0, 1, 1, 0][Math.floor(t / 400) % 4];
+  [[9, 2], [10, 1], [11, 0], [12, -1], [13, -1], [14 + sw, 0]].forEach(([dx, dy]) => F(c, x + dx, y + dy + hop + by, 1, 1, '#6a7ab0'));
+  const lx = x + 15 + sw, ly = y + 1 + hop + by, on = sleep ? 0.25 : 0.6 + 0.4 * (Math.floor(t / 300) % 3) / 2;
+  c.globalAlpha = on * 0.35; [[-2, 0], [2, 1], [0, -2], [1, 3], [-1, 2], [3, -1], [-2, 2], [2, -2]].forEach(([dx, dy]) => F(c, lx + dx, ly + dy, 1, 1, '#9ff0ff')); c.globalAlpha = 1;
+  F(c, lx, ly, 2, 2, sleep ? '#4a8a9a' : '#9ff0ff'); F(c, lx, ly, 1, 1, sleep ? '#6aaaba' : '#ffffff');
+  if (sleep) { const ph = (t / 1100) % 1; if (ph < 0.8) { const s = Math.floor(ph * 5); F(c, x + 6 + s, y - 3 - s * 2, 2, 1, '#cfe6ff'); F(c, x + 7 + s, y - 2 - s * 2, 1, 1, '#cfe6ff'); F(c, x + 7 + s, y - 1 - s * 2, 2, 1, '#cfe6ff'); } }
+  return bat;
+}
+function buildK3() {
+  const B = new Buf();
+  // brass plates with rivets
+  for (let y = 0; y < 60; y++) for (let x = 0; x < AW; x++) { const px = x % 16, py = y % 20; let col = py < 2 ? '#9a7a38' : py > 17 ? '#5e4420' : py < 8 ? '#8a6a2e' : '#7a5c28'; if (px === 15 || py === 19) col = '#3a2a10'; else if (px === 0) col = '#a8884a'; if ((px === 2 || px === 13) && (py === 3 || py === 16)) col = '#f0d888'; else if ((px === 2 || px === 13) && (py === 4 || py === 17)) col = '#3a2a10'; if (hash(x, y) > 0.95) col = sh(col, -0.08); B.p(x, y, col); }
+  // rounded ceiling corners and a girder
+  for (let y = 0; y < 12; y++) for (let x = 0; x < AW; x++) { if (x < 11 - y || x > 84 + y) B.p(x, y, '#120c06'); else if (x === 11 - y || x === 84 + y) B.p(x, y, '#3a2a10'); }
+  B.r(0, 3, AW, 2, (x, y) => (y === 3 ? '#c9a050' : '#6a4a1a')); for (let x = 4; x < AW; x += 8) B.p(x, 3, '#f8e4a0');
+  // copper pipes and a valve wheel
+  B.r(0, 7, 40, 3, (x, y) => (y === 7 ? '#e09060' : y === 9 ? '#6a3418' : '#b8683a')); B.r(38, 7, 3, 14, (x) => (x === 38 ? '#e09060' : x === 40 ? '#6a3418' : '#b8683a'));
+  for (const jx of [14, 30]) B.r(jx, 6, 2, 5, '#c9a050');
+  B.circ(34.5, 8.5, 3, (x, y, dx, dy) => (Math.hypot(dx, dy) < 1 ? '#f0d080' : Math.hypot(dx, dy) > 2.2 ? '#a83a2a' : (x + y) % 2 ? '#c84a3a' : '#7a2018'));
+  // porthole: brass ring, bolts, and deep water inside
+  const PX = 81, PY = 23, RI = 10, port = new Set();
+  for (let y = PY - 15; y <= PY + 15; y++) for (let x = PX - 15; x <= PX + 15; x++) {
+    const dx = x + 0.5 - PX, dy = y + 0.5 - PY, d = Math.hypot(dx, dy);
+    if (d <= RI) { const v = (y - (PY - RI)) / (2 * RI) + (bay(x, y) - 0.5) * 0.2; let col = ['#13606e', '#0e4a5a', '#0a3a4a', '#08303e', '#05202c'][clamp(Math.floor(v * 5), 0, 4)]; if ((x - y + 200) % 9 < 2 && y < PY + 4 && bay(x, y) > 0.4) col = sh(col, 0.15); if (y > PY + 7) col = (x + y) % 3 ? '#1e3a34' : '#284a3e'; B.p(x, y, col); port.add(x + ',' + y); }
+    else if (d <= 13.5) { const lit = -(dx + dy) / d; B.p(x, y, d > 12.6 ? (lit > 0 ? '#a8843c' : '#5a4018') : lit > 0.5 ? '#f0d080' : lit > -0.3 ? '#c9a050' : '#7a5a20'); }
+    else if (d <= 14.5) B.p(x, y, '#2a1a08');
+  }
+  for (let i = 0; i < 8; i++) { const a = i * Math.PI / 4 + 0.3, x = Math.round(PX + Math.cos(a) * 11.8 - 0.5), y = Math.round(PY + Math.sin(a) * 11.8 - 0.5); B.p(x, y, '#fff0b0'); B.p(x + 1, y + 1, '#3a2a10'); }
+  // pressure gauge
+  B.circ(10, 15, 6, (x, y, dx, dy) => { const d = Math.hypot(dx, dy); if (d > 5.2) return '#2a1a08'; if (d > 4.3) return dx + dy < 0 ? '#f0d080' : '#a07a2a'; return '#f0e6c8'; });
+  for (let i = 0; i < 7; i++) { const a = Math.PI * (0.8 + i * 0.233), x = Math.floor(10 + Math.cos(a) * 3.4), y = Math.floor(15 + Math.sin(a) * 3.4); B.p(x, y, i >= 5 ? '#c83a2a' : '#3a2a10'); }
+  B.r(9, 21, 2, 4, (x) => (x === 9 ? '#e09060' : '#6a3418'));
+  // shelf with brackets
+  B.r(1, 36, 31, 1, '#c09050'); B.r(1, 37, 31, 2, '#6a4a22'); B.r(1, 39, 31, 1, '#2a1a08');
+  for (const bx of [4, 27]) { B.r(bx, 40, 2, 4, (x) => (x === bx ? '#e0c070' : '#7a5a20')); B.p(bx, 41, '#fff0b0'); }
+  // grate floor
+  for (let y = 60; y < 70; y++) for (let x = 0; x < AW; x++) { let col = y === 60 ? '#7a8286' : '#3a4044'; if (x % 4 >= 1 && x % 4 <= 2 && y % 3 === 1 && y > 60) col = '#0e1012'; else if (y % 3 === 0 && y > 60) col = '#4e5458'; if (x % 4 === 0 && y > 60) col = '#565e62'; B.p(x, y, col); }
+  chairBack(B, K3.chair, false, 8);
+  B.light([{ x: 29, y: 17, r: 58, col: '#ffcf7a', k: 0.34 }, { x: 29, y: 17, r: 22, col: '#fff0c0', k: 0.24, dk: 0.5 }, { x: 81, y: 25, r: 24, col: '#4ab8c8', k: 0.14, dk: 0.4 }], 0.9, (x, y) => port.has(x + ',' + y) || y >= 70);
+  // bar area: dark wall, brass rail, brass plate
+  B.r(0, 70, AW, 22, (x, y) => ((x + y) % 11 === 0 ? '#241e16' : '#1a1610'));
+  B.r(0, 70, AW, 1, '#f0d080'); B.r(0, 71, AW, 1, '#c9a050'); B.r(0, 72, AW, 1, '#6a4a1a');
+  for (let x = 6; x < AW; x += 15) B.p(x, 71, '#fff0b0');
+  B.r(1, 84, AW - 2, 8, (x, y) => (y === 84 ? '#f0d080' : y === 91 ? '#6a4a1a' : x === 1 ? '#e0c070' : x === AW - 2 ? '#7a5a20' : (x + y) % 13 === 0 ? '#b8903e' : '#c9a050'));
+  for (const nx of [3, AW - 4]) { B.p(nx, 86, '#fff0b0'); B.p(nx, 89, '#fff0b0'); B.p(nx + 1, 87, '#6a4a1a'); B.p(nx + 1, 90, '#6a4a1a'); }
+  K3.port = port; K3.PY = PY;
+  return B;
+}
+const K3 = {
+  id: 'k3', chair: { hi: '#f4cc5c', mid: '#d8a42a', lo: '#94661a', btn: '#7a5212', out: '#3a2406', leg: '#3a2a10' },
+  shelfY: 35, slots: [7, 16, 26], dash: '#ffe2a0', ballX: 28, floorY: 67, tintCol: '#ffd08a', tintA: 0.05,
+  pins(c, w) { for (let i = 0; i < w; i += 2) { const x = BAR.x + i * BAR.sw + 1; F(c, x, BAR.y - 1, 1, 1, '#f0d080'); F(c, x + 1, BAR.y - 1, 1, 1, '#7a5a20'); F(c, x, BAR.y - 2, 2, 1, '#c9a050'); } },
+  mid(c, t, st) {
+    const W = this.port, put = (x, y, col) => { if (W.has(x + ',' + y)) F(c, x, y, 1, 1, col); };
+    // kelp swaying in the porthole
+    [[75, 14, 0], [79, 18, 1.7], [85, 12, 3.1], [88, 8, 4.4]].forEach(([x0, h, ph]) => { for (let j = 0; j < h; j++) { const y = this.PY + 10 - j, x = x0 + Math.round(1.6 * Math.sin(t / 900 + j * 0.32 + ph) * (j / h)); put(x, y, j % 4 === 0 ? '#5ab04a' : '#2e7a3a'); put(x + 1, y, '#1e5a2a'); if (j % 4 === 2) put(x + (j % 8 ? 2 : -1), y, '#4a9a3e'); } });
+    const fx = 66 + Math.floor((t / 230) % 34);
+    [[1, 0], [2, 0], [3, 0], [5, 0], [0, 1], [1, 1], [3, 1], [4, 1], [1, 2], [2, 2], [3, 2], [5, 2]].forEach(([dx, dy]) => put(fx - dx, 22 + dy, dy === 0 ? '#ffd070' : '#f0a030'));
+    put(fx - 1, 23, '#1a0a04');
+    const f2 = 96 - Math.floor((t / 380) % 32); [[0, 0], [1, 0], [2, 0], [-1, 0], [0, -1], [1, 1], [0, 1]].forEach(([dx, dy]) => put(f2 + dx, 17 + dy, '#e86a8a'));
+    for (let i = 0; i < 4; i++) { const ph = (t / 3000 + i * 0.29) % 1, x = 76 + i * 3 + (Math.floor(ph * 10) % 2), y = 32 - Math.floor(ph * 20); put(x, y, '#bff0ff'); if (i % 2) put(x + 1, y - 1, '#7ad0e0'); }
+    // gauge needle wobble
+    const a = Math.PI * (1.25 + 0.22 * Math.sin(t / 700) + (st === 'paused' ? -0.35 : 0));
+    for (let s = 0; s <= 3; s++) F(c, Math.floor(10 + Math.cos(a) * s * 0.95), Math.floor(15 + Math.sin(a) * s * 0.95), 1, 1, '#c83a2a');
+    F(c, 9, 14, 2, 2, '#2a1a08');
+    // caged bulb, gently swinging, with a dithered glow
+    const dx = [0, 1, 1, 0, 0, -1, -1, 0][Math.floor(t / 420) % 8];
+    for (let y = 0; y < 7; y++) F(c, 29 + Math.round(dx * y / 7), y + 5, 1, 1, '#1a1208');
+    const bx = 26 + dx;
+    c.drawImage(Math.floor(t / 350) % 2 ? this.glowA : this.glowB, dx * U, 0);
+    F(c, bx + 1, 11, 5, 1, '#f0d080'); F(c, bx, 12, 7, 1, '#c9a050'); F(c, bx, 13, 7, 1, '#7a5a20');
+    F(c, bx + 1, 14, 5, 6, '#ffe08a'); F(c, bx + 2, 14, 3, 5, '#fff3b8'); F(c, bx + 3, 15, 1, 3, '#ffffff');
+    for (const cx of [0, 3, 6]) F(c, bx + cx, 14, 1, 6, '#3a2a10');
+    F(c, bx + 1, 17, 5, 1, '#3a2a10'); F(c, bx, 20, 7, 1, '#c9a050'); F(c, bx + 2, 21, 3, 1, '#7a5a20');
+  },
+};
+
+/* ---------- glow overlays (dithered, made once) ---------- */
+function glow(cx, cy, r, col, a, seed) { const cv = document.createElement('canvas'); cv.width = AW * U; cv.height = AH * U; const x = cv.getContext('2d'); x.fillStyle = col; for (let y = 0; y < 70; y++) for (let i = 0; i < AW; i++) { const L = 1 - Math.hypot(i - cx, y - cy) / r; if (L <= 0) continue; const lv = Math.floor(clamp(L * 3 + bay(i + seed, y) - 0.4, 0, 3)); if (lv) { x.globalAlpha = a * lv; x.fillRect(i * U, y * U, U, U); } } return cv; }
+
+/* ---------- putting a scene together ---------- */
+function setup(S, build) {
+  const bg = $('#' + S.id + '-bg').getContext('2d');
+  S.fg = $('#' + S.id + '-fg').getContext('2d'); S.fg.imageSmoothingEnabled = false;
+  const B = build(); bg.fillStyle = '#000'; bg.fillRect(0, 0, AW * U, AH * U); B.draw(bg);
+  const front = chairFront(S.chair, S.id === 'k3' ? 8 : 4);
+  const cv = document.createElement('canvas'); cv.width = AW * U; cv.height = AH * U; front.draw(cv.getContext('2d')); S.front = cv;
+  S.tint = { idle: tinted(IMG.idle, S.tintCol, S.tintA), sleepy: tinted(IMG.sleepy, S.tintCol, S.tintA), happy: tinted(IMG.happy, S.tintCol, S.tintA) };
+  if (S.id === 'k1') { S.glowA = glow(18, 48, 40, '#ff8a30', 0.05, 0); S.glowB = glow(18, 48, 44, '#ff8a30', 0.05, 2); }
+  else { S.glowA = glow(29, 17, 24, '#ffe0a0', 0.1, 0); S.glowB = glow(29, 17, 27, '#ffe0a0', 0.09, 1); }
+}
+function draw(S, t) {
+  const c = S.fg, f = P / 100, fin = P >= 100, st = paused ? 'paused' : fin ? 'fin' : 'work';
+  if (fin && !S.wasFin) S.finT = t; S.wasFin = fin;
+  c.clearRect(0, 0, AW * U, AH * U);
+  S.mid(c, t, st);
+  drawShelf(c, S, fin, t);
+  const batting = S.id === 'k3' ? bloop(c, 2, 44, st, t) : false;
+  const u = drawUlhu(c, S, st, t);
+  c.drawImage(S.front, 0, 0);
+  const r = fin ? 3 : 3 + 3.4 * (1 - f), live = st === 'work';
+  const spin = live ? t / 260 : (S.spin || 0); if (live) S.spin = spin;
+  const jig = (live && Math.floor(t / 180) % 4 === 1 ? 1 : 0) + (batting ? -1 : 0);
+  if (!fin) lapPiece(c, size, f, UX + 16, UY + u.hop + 27 + (st === 'paused' ? 2 : 0), size === 'medium' ? 13 : 11);
+  const hands = fin ? null : armsAndNeedles(c, st, t, u.hop);
+  glasses(c, st, u.hop);
+  if (fin) for (let s = 0; s < 9; s++) { F(c, 66 + s, 50 - Math.floor(s / 3), 1, 1, s % 3 ? '#c9853a' : '#f0b060'); F(c, 65 + s, 51 - Math.floor(s / 4), 1, 1, s % 3 ? '#c9853a' : '#f0b060'); }
+  const top = ball(c, S.ballX, S.floorY, r, spin, jig);
+  if (hands) { const [hx0, hy0] = S.id === 'k1' ? [hands[0], hands[1]] : [hands[2], hands[3]]; const sag = 6 + (live ? [0, 1, 1, 0][Math.floor(t / 300) % 4] : 0); strand(c, top[0], top[1], (top[0] + hx0) / 2, Math.max(top[1], hy0) + sag, hx0, hy0 + 1, YARN, '#2a5a3e'); }
+  if (st === 'paused') zzz(c, t);
+  if (fin) for (let i = 0; i < 3; i++) { const ph = (t / 900 + i / 3) % 1; if (ph < 0.8) { const x = UX + 6 + i * 10, y = UY - 2 - Math.floor(ph * 8); F(c, x, y, 1, 1, '#f28ca0'); F(c, x + 2, y, 1, 1, '#f28ca0'); F(c, x - 1, y + 1, 5, 1, '#f28ca0'); F(c, x, y + 2, 3, 1, '#d86a84'); F(c, x + 1, y + 3, 1, 1, '#d86a84'); } }
+  drawBar(c, S, f, st, t);
+}
+function updateText() {
+  $('#pv').textContent = Math.round(P) + '%';
+  const f = P / 100, fin = P >= 100, left = Math.max(1, Math.ceil(SZ[size].min * (1 - f)));
+  for (const id of ['k1', 'k3']) {
+    $('#' + id).className = 'card ' + id + ' ' + (paused ? 'paused' : fin ? 'fin' : 'work');
+    $('#' + id + '-tl').textContent = fin ? 'Done!' : left + ' min left';
+    $('#' + id + '-tx').textContent = fin ? SZ[size].min + ' min of focus. On the shelf.' : paused ? 'Paused while you are away. Nothing lost.' : 'Knitting ' + SZ[size].name;
+  }
+}
+
+/* ---------- controls ---------- */
+$('#pr').oninput = (e) => { P = Number(e.target.value); updateText(); };
+$('#pa').onclick = () => { paused = !paused; $('#pa').classList.toggle('on', paused); $('#pa').textContent = paused ? 'Come back to the app' : 'Leave the app (pause)'; updateText(); };
+$('#play').onclick = () => { playing = !playing; if (playing && P >= 100) P = 0; setPlay(); };
+function setPlay() { $('#play').classList.toggle('on', playing); $('#play').textContent = playing ? 'Stop' : 'Play'; }
+$('#sz').onclick = (e) => { const s = e.target.dataset.s; if (!s) return; size = s; [...$('#sz').children].forEach((b) => b.classList.toggle('on', b.dataset.s === s)); updateText(); };
+let last = 0, lastF = -1e9, T = null;
+function tick(t) {
+  if (playing && !paused) { P = Math.min(100, P + (t - last) / 1000 * 5); $('#pr').value = Math.round(P); updateText(); if (P >= 100) { playing = false; setPlay(); } }
+  last = t;
+  if (t - lastF > 70) { const tt = T == null ? t : T; draw(K1, tt); draw(K3, tt); lastF = t; }
+  requestAnimationFrame(tick);
+}
+// for screenshots: setState({p, paused, size, t}); t freezes the animation clock at that moment
+window.setState = (o) => {
+  if (o.size) { size = o.size; [...$('#sz').children].forEach((b) => b.classList.toggle('on', b.dataset.s === size)); }
+  if ('p' in o) { P = o.p; $('#pr').value = P; }
+  if ('paused' in o) { paused = o.paused; $('#pa').classList.toggle('on', paused); }
+  if ('t' in o) T = o.t;
+  updateText(); lastF = -1e9;
+};
+loadImgs().then(() => { setup(K1, buildK1); setup(K3, buildK3); updateText(); requestAnimationFrame(tick); window.READY = true; });
+</script>
+</body></html>
