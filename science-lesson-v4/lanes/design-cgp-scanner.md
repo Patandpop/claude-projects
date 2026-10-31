@@ -53,7 +53,7 @@ None. Everything runs on the home PC. The index reaches the planner the way Kerb
 
 ## 6. How it is tested
 
-`node planner/tests/cgp-index.test.js` (33 checks, all green on 31 Oct):
+`node planner/tests/cgp-index.test.js` (35 checks, all green on 31 Oct; the last three draw real pictures and read them with the Windows OCR, so they run on Windows only, and the test's own two-page spread is cut into page 4 and page 5 before reading):
 - the made-up 12-page book (cover, contents, five topic pages over two topics, a Warm-Up and Exam Questions page, a Revision Summary, an Answers page, an Index) from its saved OCR: titles, topic strip, page numbers, sub-headings, questions (with the QI slip), the questions page's exam question 1.1 under "Exam Questions", the answers page naming page 5, contents and index not topics, the cover having neither title nor number;
 - the whole index: codes P1.1 to P2.2 with the right pages, the question page with its answers page, the answers map, no doubts on a clean book, ten spot-check lines, the three files written;
 - the existing parser (`textbook-index.js`) reads the block unchanged and the existing matcher finds the right page;
@@ -77,7 +77,7 @@ Nothing from a real book is in the repo. The capture step is not covered by a ch
 
 ## 8. Risks and what to do about them
 
-- **The online viewer may not turn pages with the Right arrow, or may draw two pages at once.** Found on the first capture. Fixes, in order: change the key or click the "next" control (one line); take the picture of the page area only (`clip` in the screenshot call, so the viewer's toolbar is never read as a title); split a two-page spread down the middle before OCR. The reader needs no change for any of these.
+- **The online viewer may not turn pages with the Right arrow, or may draw two pages at once.** Two pages at once is already handled: the OCR step cuts any picture clearly wider than it is tall down the middle into a left and a right page (named `-L` and `-R`, left first as books read) and reads the halves, never the spread. The rest is found on the first capture. Fixes, in order: change the key or click the "next" control (one line); take the picture of the page area only (`clip` in the screenshot call, so the viewer's toolbar is never read as a title). The reader needs no change for any of these.
 - **The viewer may block automation or show a "verify you are human" step.** He does that step himself in the window before pressing Enter. If the site refuses the automated browser outright, the fallback in section 3 step 1 (his own screenshots) still gives the full index; the reading and indexing are the same.
 - **Terms of use.** He is a paying reader paging through his own book; the tool keeps an index, not the book. It is still his call (question 3 below). The fallback keeps him in charge of every page turn.
 - **OCR slips on real pages** (coloured bands, pictures behind text, small italics). The fake book is clean print, so the real books will raise more doubts. The doubts list and the ten-page spot check exist for this; the rule of 8 Oct stands: nothing is trusted until spot-checked, because a wrong page wastes a lesson and the technicians' time. If a book comes out with many doubts, raise the capture zoom (`deviceScaleFactor` 2) and read again; the OCR step skips nothing when `-Force` is given.

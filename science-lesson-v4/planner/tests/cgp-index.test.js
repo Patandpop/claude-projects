@@ -72,10 +72,15 @@ ok(noTitle.doubts.some((d) => /no title found/.test(d)), 'a page full of text wi
 if (process.platform === 'win32') {
   const draw = path.join(os.tmpdir(), 'cgp-test-draw-' + process.pid);
   const r1 = cp.spawnSync('powershell', ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', path.join(__dirname, 'cgp-fake-pages.ps1'), '-Out', draw], { encoding: 'utf8' });
-  for (const f of fs.readdirSync(draw)) if (f !== 'page-0006.png') fs.unlinkSync(path.join(draw, f));   // one page is enough
+  // a two-page spread, as an online viewer often shows: page 4 and page 5 side by side in one picture
+  const r0 = cp.spawnSync('powershell', ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', path.join(__dirname, 'cgp-stitch.ps1'), '-Left', path.join(draw, 'page-0006.png'), '-Right', path.join(draw, 'page-0007.png'), '-Out', path.join(draw, 'spread.png')], { encoding: 'utf8' });
+  for (const f of fs.readdirSync(draw)) if (f !== 'page-0006.png' && f !== 'spread.png') fs.unlinkSync(path.join(draw, f));   // one page and one spread are enough
   const r2 = cp.spawnSync('powershell', ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', path.join(__dirname, '..', 'tools', 'cgp-ocr.ps1'), '-Folder', draw], { encoding: 'utf8' });
-  const live = fs.existsSync(path.join(draw, 'ocr', 'page-0006.json')) ? T.analysePage(JSON.parse(fs.readFileSync(path.join(draw, 'ocr', 'page-0006.json'), 'utf8'))) : null;
+  const read = (f) => (fs.existsSync(path.join(draw, 'ocr', f)) ? T.analysePage(JSON.parse(fs.readFileSync(path.join(draw, 'ocr', f), 'utf8'))) : null);
+  const live = read('page-0006.json'), left = read('spread-L.json'), right = read('spread-R.json');
   ok(r1.status === 0 && r2.status === 0 && live && live.title === 'Specific Heat Capacity' && live.printed === 4, 'live: the Windows OCR reads a freshly drawn page (title and page number right)' + (live ? '' : ' ' + (r2.stderr || r2.stdout || '').trim().slice(0, 200)));
+  ok(r0.status === 0 && left && right && left.title === 'Specific Heat Capacity' && left.printed === 4 && right.title === 'Warm-Up and Exam Questions' && right.printed === 5, 'live: a two-page spread is cut into its left and right pages before reading (page 4, then page 5)');
+  ok(!fs.existsSync(path.join(draw, 'ocr', 'spread.json')) && /spreads cut/.test(r2.stdout || ''), 'the spread itself is not read as a page, and the cut is reported');
   fs.rmSync(draw, { recursive: true, force: true });
 } else console.log('SKIP live Windows OCR check (not Windows)');
 

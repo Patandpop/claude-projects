@@ -31,7 +31,34 @@ try { $engine = [Windows.Media.Ocr.OcrEngine]::TryCreateFromLanguage((New-Object
 if (-not $engine) { $engine = [Windows.Media.Ocr.OcrEngine]::TryCreateFromUserProfileLanguages() }
 if (-not $engine) { throw 'Windows OCR is not available on this PC (Settings > Time and language > Language: add English (United Kingdom) with the Optical character recognition feature).' }
 
-$files = Get-ChildItem -Path $Folder -File | Where-Object { $_.Extension -match '^\.(png|jpe?g)$' } | Sort-Object Name
+# Two-page spreads: a picture clearly wider than it is tall is two facing pages. It is cut down the middle into
+# "<name>-L" and "<name>-R" (left page first, as books read) and the halves are read instead; the spread itself is
+# left as it is. A single page in landscape (a fold-out) is rare in these guides, so width > 1.15 x height is the test.
+Add-Type -AssemblyName System.Drawing
+$files = Get-ChildItem -Path $Folder -File | Where-Object { $_.Extension -match '^\.(png|jpe?g)$' -and $_.BaseName -notmatch '-[LR]$' } | Sort-Object Name
+$split = 0
+foreach ($f in $files) {
+  $img = [System.Drawing.Image]::FromFile($f.FullName)
+  $w = $img.Width; $h = $img.Height
+  if ($w -gt $h * 1.15) {
+    $half = [int]($w / 2)
+    foreach ($side in @(@('L', 0), @('R', $half))) {
+      $target = Join-Path $Folder ($f.BaseName + '-' + $side[0] + '.png')
+      if ((Test-Path $target) -and -not $Force) { continue }
+      $bmp = New-Object System.Drawing.Bitmap $half, $h
+      $g = [System.Drawing.Graphics]::FromImage($bmp)
+      $g.DrawImage($img, (New-Object System.Drawing.Rectangle 0, 0, $half, $h), (New-Object System.Drawing.Rectangle $side[1], 0, $half, $h), [System.Drawing.GraphicsUnit]::Pixel)
+      $g.Dispose(); $bmp.Save($target, [System.Drawing.Imaging.ImageFormat]::Png); $bmp.Dispose()
+    }
+    $split++
+  }
+  $img.Dispose()
+}
+if ($split -gt 0) { Write-Host ("{0} two-page spreads cut into left and right pages" -f $split) }
+# the pages to read: single pages plus the halves of spreads (never the spread itself)
+$spreads = @{}
+foreach ($f in $files) { if (Test-Path (Join-Path $Folder ($f.BaseName + '-L.png'))) { $spreads[$f.Name] = $true } }
+$files = Get-ChildItem -Path $Folder -File | Where-Object { $_.Extension -match '^\.(png|jpe?g)$' -and -not $spreads.ContainsKey($_.Name) } | Sort-Object Name
 $done = 0; $skipped = 0
 foreach ($f in $files) {
   $target = Join-Path $Out ($f.BaseName + '.json')
