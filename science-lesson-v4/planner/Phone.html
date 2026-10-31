@@ -396,6 +396,10 @@ const S = { cls:'', students:[], ratio:2.6, events:[], tab:'log', view: LS.get('
 
 const NET = { down: false };
 function call(fn, ...args) {
+  // in the installed app (Lane C, lanes/design-installed-app.md 5.1) there is no Google bridge: the call goes through
+  // the app's api.js instead, which adds the key kept on the device. Inside Apps Script nothing changes.
+  if (!(window.google && google.script && google.script.run) && window.API)
+    return API.call(fn, ...args).then(v => { NET.down = false; updateDot(); return v; }, e => { NET.down = !(e && e.server); updateDot(); throw e; });
   return new Promise((res, rej) => google.script.run
     .withSuccessHandler(v => { NET.down = false; updateDot(); res(v); })
     .withFailureHandler(e => { NET.down = true; updateDot(); rej(e); })[fn](KEY, ...args));
