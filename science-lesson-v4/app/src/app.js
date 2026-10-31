@@ -29,7 +29,7 @@
     } else {
       var u = API.settings().url;
       $('server').textContent = 'Connected to ' + u.replace(/^https:\/\/script\.google\.com\/macros\/s\/(.{6}).*$/, 'your planner (…$1…)') + '. The key is kept on this device only.';
-      drawOutbox(); pushRefresh();
+      drawOutbox(); pushRefresh(); drawJobs(); if (JOBS) JOBS.poll();
     }
   }
   API.onLocked = function () { show('setup', 'The planner did not accept the key. Type it again.'); };
@@ -107,11 +107,11 @@
 
   // ---- notifications on this device (push.js): off until switched on here; the planner says whether it is set up
   var PUSH = window.makePush ? makePush({ api: API, storage: localStorage, navigator: navigator, Notification: window.Notification, pushManagerOk: 'PushManager' in window }) : null;
-  function pushKinds() { return [$('pushMorning').checked && 'morning', $('pushNudge').checked && 'nudge'].filter(Boolean); }
+  function pushKinds() { return [$('pushMorning').checked && 'morning', $('pushNudge').checked && 'nudge', $('pushJob').checked && 'job'].filter(Boolean); }
   function pushDraw(st, text, good) {
     var on = !!(st && st.device && st.device.status === 'on');
     Array.prototype.forEach.call($('pushOn').children, function (b) { b.setAttribute('aria-pressed', String((b.dataset.v === 'on') === on)); });
-    if (on) { $('pushMorning').checked = st.device.kinds.indexOf('morning') >= 0; $('pushNudge').checked = st.device.kinds.indexOf('nudge') >= 0; }
+    if (on) { $('pushMorning').checked = st.device.kinds.indexOf('morning') >= 0; $('pushNudge').checked = st.device.kinds.indexOf('nudge') >= 0; $('pushJob').checked = st.device.kinds.indexOf('job') >= 0; }
     $('pushTest').classList.toggle('hidden', !on);
     if (text !== undefined) say($('pushMsg'), text, good);
   }
@@ -137,7 +137,7 @@
   }
   if (PUSH) {
     $('pushOn').addEventListener('click', function (e) { var b = e.target.closest('button'); if (b) pushSwitch(b.dataset.v === 'on'); });
-    ['pushMorning', 'pushNudge'].forEach(function (id) { $(id).addEventListener('change', function () {
+    ['pushMorning', 'pushNudge', 'pushJob'].forEach(function (id) { $(id).addEventListener('change', function () {
       if ($('pushOn').querySelector('[data-v="on"]').getAttribute('aria-pressed') === 'true') pushSwitch(true);   // on: save the new ticks
     }); });
     $('pushTest').onclick = function () {
@@ -145,6 +145,39 @@
       PUSH.test().then(function (r) { say($('pushMsg'), r && r.sent ? 'Sent. It should arrive in a few seconds.' : (r && r.why) || 'Not sent: this device has gone. Switch On again.', !!(r && r.sent)); }, pushFail);
     };
   } else $('pushCard').classList.add('hidden');
+
+  // ---- background jobs (jobs.js): a pill each at the top of Today; the order sheet's file downloads from its pill
+  var JOBS = window.makeJobs ? makeJobs({ api: API, storage: localStorage }) : null;
+  var JOB_NAMES = { orderSheet: 'order sheet', results: 'homework results', memory: 'memory map' };
+  function cap(t) { return t.charAt(0).toUpperCase() + t.slice(1); }
+  function drawJobs() {
+    var box = $('jobs'); box.innerHTML = '';
+    (JOBS ? JOBS.list() : []).forEach(function (j) {
+      var name = cap(j.label || JOB_NAMES[j.kind] || 'job'), el = document.createElement('span'), btn = function (text, fn) { var b = document.createElement('button'); b.className = 'plain'; b.textContent = text; b.onclick = fn; el.appendChild(b); };
+      var busy = j.status === 'queued' || j.status === 'running' || j.status === 'sending', bad = j.status === 'failed' || j.status === 'unsent';
+      el.className = 'pill' + (j.status === 'done' ? ' done' : bad ? ' bad' : '');
+      el.appendChild(document.createTextNode(busy ? 'Making ' + name.toLowerCase() + '...' : j.status === 'done' ? name + ' ready' : name + ': ' + (j.note || 'did not work')));
+      if (j.status === 'done' && j.hasFile) btn('Download', function () { download(j.id); });
+      if (bad && j.small) btn('Try again', function () { JOBS.retry(j.id).catch(function () {}); });
+      if (!busy) btn('x', function () { JOBS.dismiss(j.id); });
+      box.appendChild(el);
+    });
+  }
+  function download(id) {
+    JOBS.file(id).then(function (f) {
+      var bin = atob(f.b64), bytes = new Uint8Array(bin.length);
+      for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([bytes], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }));
+      a.download = f.name; document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+    }, function (e) { say($('homeMsg'), e.message, false); });
+  }
+  if (JOBS) {
+    JOBS.onChange = drawJobs;
+    $('jobCard').addEventListener('click', function (e) {
+      var b = e.target.closest('button[data-job]'); if (!b) return;
+      JOBS.start(b.dataset.job, null).catch(function (err) { if (err && /^Not allowed/.test(err.message)) say($('homeMsg'), 'This copy of the planner has no background jobs yet (they come with the next paste).', false); });
+    });
+  } else $('jobCard').classList.add('hidden');
 
   // ---- install and updates
   if ('serviceWorker' in navigator && location.protocol !== 'file:') {

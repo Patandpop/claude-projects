@@ -1,7 +1,7 @@
-"""Notifications in the installed app (app/src/push.js, app.js, sw.js), in headless Chromium against a fake planner.
+"""Notifications and background jobs in the installed app (app/src/push.js, app.js, sw.js), in headless Chromium against a fake planner.
 The browser's own push service is replaced by a stand-in (a headless browser has none), so this checks the app's side:
 the Notifications card says what the planner allows, On saves this device with the ticked kinds, a tick change while on
-is saved, Send a test, Off, and an old planner copy without notifications gets a plain line. (Headless Chromium will not let a service worker show a
+is saved, Send a test, Off; a job's pill (making, ready, Download, x); and an old planner copy without notifications gets a plain line. (Headless Chromium will not let a service worker show a
 notification, so the service worker's own handling is checked in node: app/tests/push-client.test.js.) Made-up data only.
 Run:  python app/tests/push_sim.py   (needs playwright + chromium)."""
 import os, sys, json, subprocess, tempfile, threading, functools, http.server
@@ -42,6 +42,7 @@ with sync_playwright() as p:
     ctx.add_init_script(STUB)
     seen, old = [], {'v': False}
     device = {'v': None}
+    jobs = {}
     def server(route, req):
         body = json.loads(req.post_data or '{}'); fn = body.get('fn'); args = body.get('args') or []
         seen.append({'fn': fn, 'args': args})
@@ -54,15 +55,19 @@ with sync_playwright() as p:
         if fn == 'pushSave': device['v'] = {'status': 'on', 'kinds': args[1], 'lastSent': None}; return ans({'ready': True, 'device': device['v']})
         if fn == 'pushRemove': device['v'] = {'status': 'off', 'kinds': [], 'lastSent': None}; return ans({'ready': True, 'device': device['v']})
         if fn == 'pushTest': return ans({'sent': 1, 'gone': 0, 'failed': 0})
+        if fn == 'jobStart': jobs[args[2]] = 'queued'; return ans({'id': args[2], 'kind': args[0], 'label': 'homework results', 'status': 'queued', 'note': ''})
+        if fn == 'jobStatus':
+            if args[0] == 'jOrder1': return ans({'id': 'jOrder1', 'label': 'order sheet', 'status': 'done', 'note': 'Week 10.xlsx is ready', 'hasFile': True, 'file': {'name': 'Week 10.xlsx', 'b64': 'UEsDBA=='}})
+            jobs[args[0]] = 'done'; return ans({'id': args[0], 'label': 'homework results', 'status': 'done', 'note': '3 homeworks read', 'hasFile': False})
         ans({'mode': 'teaching'})
     ctx.route('https://script.google.com/**', server)
     pg = ctx.new_page(); errs = []; pg.on('pageerror', lambda e: errs.append(str(e)))
     pg.goto(BASE); pg.wait_for_timeout(300)
     pg.fill('#url', URL); pg.fill('#key', 'good-key-123'); pg.click('#save'); pg.wait_for_timeout(600)
     pressed = lambda: pg.eval_on_selector('#pushOn [aria-pressed="true"]', 'b => b.dataset.v')
-    check('the Notifications card is there, Off, both kinds ticked, no test button yet',
-          pg.is_visible('#pushCard') and pressed() == 'off' and pg.is_checked('#pushMorning') and pg.is_checked('#pushNudge') and not pg.is_visible('#pushTest'))
-    pg.uncheck('#pushNudge'); pg.click('#pushOn [data-v="on"]'); pg.wait_for_timeout(600)
+    check('the Notifications card is there, Off, all three kinds ticked, no test button yet',
+          pg.is_visible('#pushCard') and pressed() == 'off' and pg.is_checked('#pushMorning') and pg.is_checked('#pushNudge') and pg.is_checked('#pushJob') and not pg.is_visible('#pushTest'))
+    pg.uncheck('#pushNudge'); pg.uncheck('#pushJob'); pg.click('#pushOn [data-v="on"]'); pg.wait_for_timeout(600)
     save = [s for s in seen if s['fn'] == 'pushSave']
     check('On: this device is saved with only the ticked kind, its own id and push address, with the planner\'s key',
           len(save) == 1 and save[0]['args'][1] == ['morning'] and save[0]['args'][0]['endpoint'] == 'https://push.example/dev1' and len(save[0]['args'][0]['deviceId']) >= 6
@@ -75,6 +80,18 @@ with sync_playwright() as p:
     pg.reload(); pg.wait_for_timeout(700)
     check('opening the app again shows it On, from the planner', pressed() == 'on' and pg.is_checked('#pushNudge') and 'On for this device' in pg.inner_text('#pushMsg'))
 
+    # background jobs: a pill while it runs, then "ready"; the order sheet's file downloads from its pill
+    pg.click('#jobCard [data-job="results"]'); pg.wait_for_timeout(400)
+    check('a job shows a "Making..." pill straight away', 'Making homework results...' in pg.inner_text('#jobs'))
+    try: pg.wait_for_function("document.getElementById('jobs').innerText.indexOf('Homework results ready') >= 0", timeout=25000)
+    except Exception: pass
+    check('10 seconds later it asks, and the pill says ready', 'Homework results ready' in pg.inner_text('#jobs') and any(s['fn'] == 'jobStatus' for s in seen))
+    pg.evaluate('''localStorage.setItem('app.jobs', JSON.stringify([{ id: 'jOrder1', kind: 'orderSheet', label: 'order sheet', status: 'done', hasFile: true, small: false }]))''')
+    pg.reload(); pg.wait_for_timeout(600)
+    with pg.expect_download() as dl: pg.click('#jobs button:has-text("Download")')
+    check('the order sheet downloads from its pill with its own name', dl.value.suggested_filename == 'Week 10.xlsx' and 'Try again' not in pg.inner_text('#jobs'))
+    pg.click('#jobs button:has-text("x")'); pg.wait_for_timeout(200)
+    check('x clears the pill', pg.inner_text('#jobs').strip() == '')
     pg.click('#pushOn [data-v="off"]'); pg.wait_for_timeout(500)
     check('Off: the push address is dropped here and the planner is told', pg.evaluate('window.__unsub') == 1 and any(s['fn'] == 'pushRemove' for s in seen) and pressed() == 'off' and not pg.is_visible('#pushTest'))
     old['v'] = True; pg.reload(); pg.wait_for_timeout(600)

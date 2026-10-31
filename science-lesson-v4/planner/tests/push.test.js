@@ -38,7 +38,7 @@ const dev = (id, ep) => ({ deviceId: id, label: 'Phone', endpoint: ep || 'https:
 
 // ---- before the planner is set up
 let s = pushStatus(k, 'phone-1');
-ok('before set-up: not ready, no device, the two kinds offered', s.ready === false && s.device === null && s.kinds.join() === 'morning,nudge');
+ok('before set-up: not ready, no device, the three kinds offered', s.ready === false && s.device === null && s.kinds.join() === 'morning,nudge,job');
 let threw = ''; try { pushStatus('wrong'); } catch (e) { threw = e.message; }
 ok('the wrong key is locked out', threw === 'Locked');
 for (const [bad, why] of [[{ deviceId: 'x' }, 'Bad device id'], [Object.assign(dev('phone-1'), { endpoint: 'http://plain.example/x' }), 'Bad device address'], [Object.assign(dev('phone-1'), { keys: { p256dh: 'short', auth: AUTH } }), 'Bad device keys']]) {

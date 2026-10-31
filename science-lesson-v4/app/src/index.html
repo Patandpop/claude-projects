@@ -39,6 +39,11 @@
   .msg:empty { display:none; }
   .msg.good { background:var(--good-wash); color:var(--good); } .msg.bad { background:var(--bad-wash); color:var(--bad); }
   .note { color:var(--muted); font-size:14px; }
+  .jobs { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px; }
+  .jobs .pill { display:inline-flex; align-items:center; gap:6px; padding:5px 10px; border-radius:999px; border:1px solid var(--line); background:var(--panel); font-size:13px; }
+  .jobs .pill.done { border-color:var(--gold); }
+  .jobs .pill.bad { border-color:#c0392b; }
+  .jobs .pill button { padding:2px 8px; font-size:12px; }
   .seg { display:inline-flex; border:1px solid var(--line); border-radius:8px; overflow:hidden; }
   .seg button { border-radius:0; background:var(--panel); color:var(--ink); font-weight:700; padding:8px 14px; }
   .seg button[aria-pressed="true"] { background:var(--gold); color:var(--navy); }
@@ -67,6 +72,7 @@
 
   <section id="home" class="hidden">
     <h2>Today</h2>
+    <div id="jobs" class="jobs"></div>
     <div class="card">
       <p style="margin:0">The app's screens arrive one by one. Until then your planner and phone links work as they always have.</p>
     </div>
@@ -90,11 +96,17 @@
       <div class="seg" id="pcOn"><button data-v="off">Off</button><button data-v="on">On</button></div>
       <p class="msg" id="pcMsg" role="status"></p>
     </div>
+    <h2>Background jobs</h2>
+    <div class="card" id="jobCard">
+      <p class="note" style="margin-top:0">These run on the planner while you carry on. A pill at the top shows how each one is going.</p>
+      <div class="row"><button class="plain" data-job="results">Refresh homework results now</button><button class="plain" data-job="memory">Update the memory map now</button></div>
+    </div>
     <h2>Notifications</h2>
     <div class="card" id="pushCard">
       <p class="note" style="margin-top:0">For this device. Nothing before 7am or after 7pm. The morning one comes at 7am on school days only, and only when a lesson today is not built (class codes and lesson titles, never names). Ulhu's nudge is at most one a day.</p>
       <label><input type="checkbox" id="pushMorning" checked> Morning: lessons not built yet</label>
       <label><input type="checkbox" id="pushNudge" checked> Ulhu's nudge</label>
+      <label><input type="checkbox" id="pushJob" checked> A long job has finished (when the app was closed)</label>
       <div class="seg" id="pushOn"><button data-v="off">Off</button><button data-v="on">On</button></div>
       <div class="row"><button class="plain hidden" id="pushTest">Send a test</button></div>
       <p class="msg" id="pushMsg" role="status"></p>
@@ -110,6 +122,7 @@
 <script src="shared/day-popup.js"></script>
 <script src="pc-timer.js"></script>
 <script src="push.js"></script>
+<script src="jobs.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

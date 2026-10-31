@@ -9,7 +9,7 @@
 //     site (the mock-ups) are left to the browser and never replace the kept home page.
 'use strict';
 var STORE = 'planner-app {{BUILD_STAMP}}';
-var SHELL = ['./', 'app.js', 'api.js', 'outbox.js', 'pc-timer.js', 'push.js', 'shared/day-logic.js', 'shared/day-popup.js', 'shared/game-ulhu.js', 'manifest.webmanifest', 'icons/icon-32.png', 'icons/icon-180.png', 'icons/icon-192.png', 'icons/icon-512.png'];
+var SHELL = ['./', 'app.js', 'api.js', 'outbox.js', 'pc-timer.js', 'push.js', 'jobs.js', 'shared/day-logic.js', 'shared/day-popup.js', 'shared/game-ulhu.js', 'manifest.webmanifest', 'icons/icon-32.png', 'icons/icon-180.png', 'icons/icon-192.png', 'icons/icon-512.png'];
 
 self.addEventListener('install', function (e) {
   e.waitUntil(caches.open(STORE).then(function (c) { return c.addAll(SHELL); }));

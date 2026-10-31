@@ -24,7 +24,9 @@ const BRIDGE_CALLS = [
   'dayLoad', 'daySettings', 'daySettingsSave', 'todoSave', 'todoSet', 'blockAccept', 'doneForToday', 'captureSave', 'captureFile',
   'obsidianFlush', 'timerStart', 'timerStop', 'timerLog', 'timerEdit', 'timerReport', 'timerRules', 'timerRulesSave',
   // notifications (this file); pushTick belongs to the trigger and is not reachable from outside
-  'pushStatus', 'pushSave', 'pushRemove', 'pushTest'
+  'pushStatus', 'pushSave', 'pushRemove', 'pushTest',
+  // long jobs (this file); jobRun belongs to the trigger and is not reachable from outside
+  'jobStart', 'jobStatus', 'jobList'
 ];
 // Ulhu: every public game call (gameLoad, gameTick, ...). Names ending in _ are private and never reachable.
 const BRIDGE_GAME = /^game[A-Z][A-Za-z0-9]*$/;
@@ -414,14 +416,14 @@ function timerRulesSave(k, rows) {
    Two kinds, each switchable per device: "morning" (07:00 to 07:30 on school days only: today's lessons not built or not
    planned, class codes and lesson titles only, never names; nothing when everything is built) and "nudge" (Lane D's
    Ulhu nudges, Companion.gs gameNudge: at most one a day, its own rules). Nothing is sent before 07:00 or from 19:00.
-   A job-finished kind joins when long jobs (step 7) exist.
+   A third kind, "job", says a long job has finished (below) when the app was not open to see it.
    How: the app subscribes a device and saves it here (Push tab). pushTick runs every 30 minutes (one trigger, made the
    first time a device switches on) and posts the message to the Cloudflare Worker (app/worker/push-worker.js), which
    locks and signs it for each device. Script properties: PUSH_WORKER_URL, PUSH_SECRET, PUSH_PUBLIC_KEY (made by
    node app/tools/make-push-keys.js). Devices are never deleted: switched off, or "gone" when the phone's push service
    says it no longer exists. */
 DAY_TABS['Push'] = ['deviceId', 'label', 'endpoint', 'p256dh', 'auth', 'kinds', 'status', 'addedAt', 'lastSent', 'lastStatus'];
-const PUSH_KINDS = ['morning', 'nudge'];
+const PUSH_KINDS = ['morning', 'nudge', 'job'];
 const PUSH_FROM = 7, PUSH_TO = 19;   // quiet before 07:00 and from 19:00, every day
 const dNow_ = () => (typeof DAY_NOW !== 'undefined' && DAY_NOW ? new Date(DAY_NOW) : new Date());
 function dPushProps_() {
@@ -526,4 +528,101 @@ function pushTest(k, deviceId) {
   check_(k);
   if (!deviceId) throw new Error('Bad device id');
   return pushSend_('test', { title: 'Planner', body: 'Notifications work on this device.', tag: 'test', url: './' }, String(deviceId));
+}
+
+/* ------------------------------------------------------------- long jobs (lanes/design-installed-app.md 6.1, step 7)
+   A slow server task (the order sheet's Excel file, refreshing homework results, updating the memory map) runs in the
+   background instead of holding the screen. jobStart writes a Jobs row ("queued") and sets a one-off trigger a few
+   seconds later; jobRun works through the queue, oldest first, and writes done or failed with a plain note. The app
+   asks jobStatus every 10 seconds while it is open; if nobody has asked for a minute when a job ends, a "job"
+   notification is sent instead (quiet hours as above). A file a job makes (the order sheet) is kept in the script's
+   cache for 6 hours for the app to download; nothing is saved to Drive. Rows are never deleted. */
+DAY_TABS['Jobs'] = ['id', 'kind', 'label', 'status', 'at', 'startedAt', 'endedAt', 'note'];
+const JOB_KINDS = {
+  orderSheet: { label: 'order sheet', run: (a) => { const t = dClean_(a && a.title, 80) || 'Order sheet';
+    if (!a || !a.model) throw new Error('No order sheet was sent');
+    const blob = orderXlsx_(a.model, t); return { file: { name: t + '.xlsx', b64: Utilities.base64Encode(blob.getBytes()) }, note: t + '.xlsx is ready' }; } },
+  results: { label: 'homework results', run: () => { const r = refreshResults_(); pushState_(true); return { note: (r ? r.length : 0) + ' homeworks read' }; } },
+  memory: { label: 'memory map', run: () => { memoryUpdate_(); pushState_(true); return { note: 'memory map updated' }; } }
+};
+const JOB_BUDGET = 270000, JOB_STALE = 10 * 60000, JOB_KEEP = 21600;   // 4.5 min a run (Apps Script stops at 6), 6 h for files
+const dJobCache_ = () => CacheService.getScriptCache();
+function dJobOut_(r) {
+  return { id: r.id, kind: r.kind, label: r.label, status: r.status, at: r.at || null, endedAt: r.endedAt || null, note: r.note || '',
+    hasFile: r.status === 'done' && !!dJobCache_().get('jobfile:' + r.id) };
+}
+function dJobTrigger_(ms) {
+  if (ScriptApp.getProjectTriggers().some((t) => t.getHandlerFunction() === 'jobRun')) return;
+  ScriptApp.newTrigger('jobRun').timeBased().after(ms || 5000).create();
+}
+
+// start a job; id (optional) comes from the app's outbox, so the same tap sent twice starts one job
+function jobStart(k, kind, args, id) {
+  check_(k);
+  const def = JOB_KINDS[kind];
+  if (!def) throw new Error('Unknown job: ' + String(kind).slice(0, 30));
+  const jid = /^[A-Za-z0-9_-]{6,40}$/.test(String(id || '')) ? String(id) : dId_('job');
+  const a = JSON.stringify(args === undefined ? null : args);
+  if (a.length > 90000) throw new Error('That is too big to send as one job');
+  return dLock_(() => {
+    const hit = dRows_('Jobs').filter((r) => r.id === jid)[0];
+    if (hit) return dJobOut_(hit);
+    dJobCache_().put('jobargs:' + jid, a, JOB_KEEP);
+    dJobCache_().put('jobseen:' + jid, String(Date.now()), JOB_KEEP);
+    dAppend_('Jobs', { id: jid, kind: kind, label: def.label, status: 'queued', at: Date.now() });
+    dJobTrigger_();
+    return dJobOut_(dRows_('Jobs').filter((r) => r.id === jid)[0]);
+  });
+}
+// how a job is going; with file = true a finished file comes back once asked for (the app downloads it)
+function jobStatus(k, id, file) {
+  check_(k);
+  const r = dRows_('Jobs').filter((x) => x.id === id)[0];
+  if (!r) throw new Error('That job is not known');
+  dJobCache_().put('jobseen:' + id, String(Date.now()), JOB_KEEP);
+  const out = dJobOut_(r);
+  if (file && out.hasFile) out.file = JSON.parse(dJobCache_().get('jobfile:' + id));
+  return out;
+}
+// the last few jobs (for the pills when the app opens)
+function jobList(k) {
+  check_(k);
+  return dRows_('Jobs').slice(-8).reverse().map(dJobOut_);
+}
+
+// The trigger: runs queued jobs, oldest first, until the time budget is used; sets itself again if any are left.
+function jobRun() {
+  ScriptApp.getProjectTriggers().filter((t) => t.getHandlerFunction() === 'jobRun').forEach((t) => ScriptApp.deleteTrigger(t));
+  const t0 = Date.now();
+  dRows_('Jobs').filter((r) => r.status === 'running' && t0 - Number(r.startedAt) > JOB_STALE)
+    .forEach((r) => dUpdate_('Jobs', r, { status: 'failed', endedAt: t0, note: 'It stopped part way (it took too long). Try again.' }));
+  let next;
+  while ((next = dRows_('Jobs').filter((r) => r.status === 'queued')[0])) {
+    if (Date.now() - t0 > JOB_BUDGET) { dJobTrigger_(1000); return { left: true }; }
+    dUpdate_('Jobs', next, { status: 'running', startedAt: Date.now() });
+    let ch;
+    try {
+      const raw = dJobCache_().get('jobargs:' + next.id);
+      const res = JOB_KINDS[next.kind].run(raw ? JSON.parse(raw) : null) || {};
+      if (res.file) {
+        const f = JSON.stringify(res.file);
+        if (f.length > 99000) throw new Error('the file is too big to hand to the app (over 70 KB)');
+        dJobCache_().put('jobfile:' + next.id, f, JOB_KEEP);
+      }
+      ch = { status: 'done', note: dClean_(res.note || 'Done', 200) };
+    } catch (e) {
+      ch = { status: 'failed', note: dClean_('It did not work: ' + ((e && e.message) || e), 200) };
+    }
+    ch.endedAt = Date.now();
+    dUpdate_('Jobs', next, ch);
+    dJobTell_(next, ch);
+  }
+  return { left: false };
+}
+// nobody watching (the app has not asked for a minute): a "job" notification, within the quiet hours
+function dJobTell_(job, ch) {
+  const seen = Number(dJobCache_().get('jobseen:' + job.id)) || 0, hour = Number(Utilities.formatDate(dNow_(), DAY_TZ, 'H'));
+  if (Date.now() - seen < 60000 || hour < PUSH_FROM || hour >= PUSH_TO) return null;
+  const name = job.label.charAt(0).toUpperCase() + job.label.slice(1);
+  return pushSend_('job', { title: 'Planner', body: name + (ch.status === 'done' ? ' ready.' : ' did not work. Open the app to try again.'), tag: 'job-' + job.id, url: './' });
 }
