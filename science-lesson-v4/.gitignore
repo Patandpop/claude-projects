@@ -68,3 +68,6 @@ planner/tools/.build-ahead-off
 planner/tools/build-ahead.log
 planner/tools/build-ahead-run.log
 build-ahead-notes.txt
+# CGP book scanner (planner/tools/cgp-index.js): his browser login and the page pictures stay on this PC
+planner/tools/.cgp-browser-profile/
+cgp-pages-*/

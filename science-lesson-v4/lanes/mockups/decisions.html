@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>What truly needs you (30 Oct 2026)</title>
+<title>What truly needs you (31 Oct 2026)</title>
 <style>
   :root { --bg:#0e1420; --ink:#e8edf5; --soft:#8a97ad; --card:#182134; --line:#2a3650; --gold:#e3b341; --blue:#4c8dff; }
   * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
@@ -29,7 +29,7 @@
 </head>
 <body>
 <h1>What truly needs you</h1>
-<p class="lead">Updated 30 Oct, late: only two things are left, both facts only you have (the site address is in: https://ulhu-planner.pages.dev). Everything else has a test default or your answer and is being built that way (the list is at the bottom). Tap or type, then <b>Copy my answers</b> and paste into any lane chat.</p>
+<p class="lead">Updated 31 Oct: two facts only you have (the eyes-free score and the school test), plus three short questions for the CGP book scanner, which is built and waiting for you at the PC (design: lanes/design-cgp-scanner.md). Everything else has a test default or your answer and is being built that way (the list is at the bottom). Tap or type, then <b>Copy my answers</b> and paste into any lane chat.</p>
 <div id="list"></div>
 <p class="defaults">Built with a test default, change later if you like: eyes-free A, A, A; homework slide A; feedback sheet A; true or false A stamp; GUESS A rows; worksheet pictures A two-up; Learn layouts B then A; diagram style B pencil sketch; exam practice cover A and 6 mm tick boxes; memory tab A grid; 6-mark slide: all highlights at once, back after 14 days inside exam practice, slides added at home; Obsidian inbox (a); per-pupil results move to your Sheet; print pack on the Desktop. Full table: <a href="https://github.com/Patandpop/claude-projects/blob/pre-reskin/science-lesson-v4/lanes/test-defaults.md">lanes/test-defaults.md</a>.</p>
 <div class="bar"><span class="n" id="count"></span><button id="copy">Copy my answers</button></div>
@@ -40,7 +40,10 @@
   'use strict';
   var D = [
     { g: 'A few words', k: 'c7a', t: 'Eyes-free: your Try score out of 20', p: '<a href="eyes-free.html">The page</a>, press Try, draw 20 letters.', free: true },
-    { g: 'A few words', k: 'c4', t: 'The school test: the three results from https://ulhu-planner.pages.dev/test/ on a school PC', free: true }
+    { g: 'A few words', k: 'c4', t: 'The school test: the three results from https://ulhu-planner.pages.dev/test/ on a school PC', free: true },
+    { g: 'CGP books (the scanner is ready to try)', k: 'cgp1', t: '"Ice books": on 15 Oct you said CGP "and ice books". What are they?', p: 'A second publisher’s online books, the KS3 Activate online edition, or a slip of the thumb? If they are online page-by-page books, the same tool indexes them.', free: true },
+    { g: 'CGP books (the scanner is ready to try)', k: 'cgp2', t: 'Keeping your CGP login on the home PC', p: 'The scanner opens its own browser window and you log in. The design: lanes/design-cgp-scanner.md.', o: ['A keep it in the tool’s own browser profile (recommended: your own PC, outside git)', 'B log in every time (nothing kept)'] },
+    { g: 'CGP books (the scanner is ready to try)', k: 'cgp3', t: 'Turning the pages: the tool, or you?', p: 'A: you log in and open the cover; the tool presses Right arrow and takes one picture per page, then reads them with the free OCR built into Windows. B: you take the page screenshots yourself into a folder and the tool does the rest.', o: ['A the tool turns the pages (recommended)', 'B I screenshot the pages myself'] }
   ];
   var LS = { get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set: function (k, v) { try { localStorage.setItem(k, v); } catch (e) {} } };
   var A = (function () { try { return JSON.parse(LS.get('decisions2') || '{}'); } catch (e) { return {}; } })();
