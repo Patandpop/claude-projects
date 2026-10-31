@@ -3,7 +3,7 @@ Run: python tests/ulhu_sim.py  (add --shots DIR to save screenshots). Synthetic 
 import os, sys, subprocess, time
 from playwright.sync_api import sync_playwright
 P = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '/'; SP = sys.argv[1] if len(sys.argv) > 1 and not sys.argv[1].startswith('--') else __import__('tempfile').mkdtemp()
-js = ''.join(open(P + f, encoding='utf-8').read() + '\n' for f in ['game-ulhu.js', 'game-pixel.js', 'game-runes.js', 'game-temple.js', 'game-stone.js', 'game-bar.js', 'game-omens.js', 'game-tabs.js', 'game-blood.js', 'game-scroll.js', 'game-glass.js', 'game-highvespers.js', 'game-lair.js', 'game-brew.js', 'game-gate.js', 'game-levelup.js', 'game-faint.js', 'game-wall.js', 'game-grimoire.js', 'game-den.js', 'game-dicewater.js', 'game-ui.js', 'game-oracle.js', 'game-pairs.js'])
+js = ''.join(open(P + f, encoding='utf-8').read() + '\n' for f in ['game-ulhu.js', 'game-pixel.js', 'game-runes.js', 'game-temple.js', 'game-stone.js', 'game-bar.js', 'game-omens.js', 'game-tabs.js', 'game-blood.js', 'game-scroll.js', 'game-glass.js', 'game-highvespers.js', 'game-lair.js', 'game-brew.js', 'game-gate.js', 'game-levelup.js', 'game-faint.js', 'game-wall.js', 'game-grimoire.js', 'game-den.js', 'game-dicewater.js', 'game-golems.js', 'game-ui.js', 'game-oracle.js', 'game-pairs.js'])
 page = '''<!doctype html><meta charset="utf-8"><meta name=viewport content="width=device-width,initial-scale=1"><body style="margin:0;background:#0d1b3a">
 <div style="height:60px;background:#0a1020;color:#fff">8AG header</div><div id=u></div><nav style="position:fixed;bottom:0;left:0;right:0;height:62px;background:#0a1020"></nav>
 <script>window.CALLS=[];function call(fn,...args){CALLS.push(fn);window.ARGS=window.ARGS||[];ARGS.push(args);return fetch('/c',{method:'POST',body:JSON.stringify({fn,args})}).then(r=>r.json()).then(x=>{if(x.err)throw new Error(x.err);return x.ok;});}</script>
@@ -191,6 +191,24 @@ try:
         pg.click('.orx-sh .x'); pg.wait_for_timeout(200)
         check('the day sheet closes', pg.locator('.orx-sh').count() == 0)
         if shots: pg.screenshot(path=os.path.join(SP, 's7.png'))
+        # 30 Oct picks: the paper golems (marking bosses) stand under the wall; nothing is summoned until he taps.
+        # 31 Oct (Patryk: "they are still bosses"): each golem fights in the bosses' temple arena, on the boss card
+        pg.click('.uz-tabs [data-v="1"]'); pg.wait_for_timeout(400)
+        g1 = pg.locator('.uz-pane >> nth=1')
+        check("golems: this week's books are suggested under the wall, none summoned yet", g1.locator('.uz-gs [data-a=gsum]').count() >= 1 and g1.locator('[data-tp-k^="gm:"]').count() == 0)
+        g1.locator('.uz-gs [data-a=gsum]').first.click()
+        pg.wait_for_function("window.CALLS.indexOf('gameGolem') >= 0", timeout=20000); pg.wait_for_timeout(1500)   # the summon has been answered and drawn
+        pg.evaluate("(() => { const g = document.querySelectorAll('.uz-pane')[1].querySelector('[data-tp-k^=gm]'), p = g.closest('.uz-pane'); p.scrollTop += g.getBoundingClientRect().top - p.getBoundingClientRect().top - 40; })()"); pg.wait_for_timeout(1500)
+        drawn = pg.evaluate("(() => { const a = document.querySelectorAll('.uz-pane')[1].querySelector('[data-tp-k^=gm]'); if (!a) return 0; const c = a.querySelector('.tp-scene'), d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; let n = 0; for (let i = 0; i < d.length; i += 4) if (d[i] > 180 && d[i + 1] > 160 && d[i + 2] > 120) n++; return n; })()")
+        check('...Summon puts the golem in the boss arena, drawn (' + str(drawn) + ' paper pixels), a stage per sitting', drawn > 40 and g1.locator('[data-a=gstage]').count() >= 1 and 'gameGolem' in pg.evaluate('CALLS'))
+        if shots: pg.screenshot(path=os.path.join(SP, 'g1.png'))
+        g1.locator('[data-a=gstage]').first.click(); pg.wait_for_timeout(2000)
+        check('...a sitting is a claw strike: one block of its health gone (screen and server)', g1.locator('.tp-boss:has([data-a=gstage]) .tp-hpb.tp-lost').count() == 1 and 'Marked:' in pg.inner_text('.uz-undo'))
+        g1.locator('[data-a=gpick]').first.click(); pg.wait_for_timeout(300)
+        check('...its Edit button offers the eight class colours', g1.locator('.uz-gmt [data-a=gtheme]').count() == 8)
+        g1.locator('.uz-gmt [data-t=coral]').click(); pg.wait_for_timeout(1500)
+        check('...and a picked colour sticks', ':coral:' in pg.evaluate("document.querySelectorAll('.uz-pane')[1].querySelector('[data-tp-k^=gm]').dataset.tpK"))
+        if shots: pg.screenshot(path=os.path.join(SP, 'g2.png'))
         # 2026-10-26: edit after setting, a date picker for quests, sizes not minutes, instant open, no-signal saving
         pg.click('.uz-tabs [data-v="1"]'); pg.wait_for_timeout(400)
         pg.locator('.uz-pane >> nth=1').locator('.uz-strow [data-a=editg]').first.click()

@@ -32,9 +32,9 @@
   const PXA = () => window.PX || { bosses: {}, bossMeta: {}, bossBySize: {} };
   const NUM = (h) => h >= 20 ? 'XX' : h >= 10 ? 'X' : h >= 5 ? 'V' : 'II';
   const hoursOf = (b, meta) => { const n = parseFloat(b && b.size); return isFinite(n) && n > 0 ? n : (meta && meta.hours) || 2; };
-  function kOf(b) { const P = PXA(), k = b && (b.k || b.creature); if (k && P.bosses[k]) return k;
+  function kOf(b) { const P = PXA(), k = b && (b.k || b.creature); if (k && (P.bosses[k] || /^gm:/.test(k))) return k;   // gm:... a paper golem (game-golems.js)
     const h = hoursOf(b), by = P.bossBySize || {}, sz = h >= 20 ? 20 : h >= 10 ? 10 : h >= 5 ? 5 : 2; return (by[sz] && by[sz][0]) || 'spawn'; }
-  const metaOf = (k) => (PXA().bossMeta || {})[k] || { name: 'Spawn', size: '2h', hours: 2 };
+  const metaOf = (k) => /^gm:/.test(k) ? { name: (window.GOLEM && GOLEM.names[k.split(':')[1]]) || 'Paper golem', size: 'paper golem', hours: 2 } : (PXA().bossMeta || {})[k] || { name: 'Spawn', size: '2h', hours: 2 };
   let HOARD = null; const hoard = () => { if (HOARD === null) { try { HOARD = window.RUNES.pick(300, 'boss', 'boss').src; } catch (e) { HOARD = ''; } } return HOARD; };
   const runeImg = (cls) => hoard() ? '<img class="' + cls + '" src="' + hoard() + '" alt="">' : '';
   const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'], MONS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -118,6 +118,7 @@
   const SPR = {};
   function sprite(k) {
     if (SPR[k]) return SPR[k];
+    if (/^gm:/.test(k) && window.GOLEM) return (SPR[k] = GOLEM.sprite(k));   // a paper golem: drawn live, frame by frame
     const s = PXA().bosses[k] || PXA().bosses.spawn, o = SPR[k] = { k, img: null, w: s ? s.w : 0, h: s ? (CROP[k] || s.h) : 0, px: [], ready: null };
     o.ready = new Promise((res) => { if (!s) return res(o); const im = new Image();
       im.onload = () => { const c = mk(o.w, o.h), x = c.getContext('2d'); x.drawImage(im, 0, 0); const d = x.getImageData(0, 0, o.w, o.h).data;
@@ -269,6 +270,7 @@
       const S = this.S, W = S.W, H = S.H, c = this.ctx, g = this.gctx, L = this.L, Lc = this.Lc;
       const t = RM ? 0 : now / 1000, el = this.mode === 'idle' ? -1 : now - this.t0, dt = Math.min(.05, (now - (this.last || now)) / 1000); this.last = now;
       for (const n in L) L[n].clearRect(0, 0, W, H);
+      if (this.sp.update) this.sp.update(now);
       const I = (el >= 0 && el < SINK) ? 1 + .8 * Math.sin(Math.PI * el / SINK) : 1;
       elderSign(L.fl, S.circle, t);
       if (!RM && this.mode === 'idle') { this.acc += dt; if (this.acc > .45) { this.acc = 0; const a = Math.random() * Math.PI; this.bubble(S.circle.cx + Math.cos(a) * S.circle.R * .9, S.circle.cy + Math.sin(a) * S.circle.R * S.circle.sq * .9); } }

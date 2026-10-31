@@ -6,7 +6,7 @@ const dir = process.env.PLANNER_SRC || path.join(__dirname, '..');   // PLANNER_
 m.props.PLANNER_KEY = 'k';
 const src = ['Code.gs', 'Behaviour.gs', 'game-art.js', 'Game.gs'].map((f) => fs.readFileSync(path.join(dir, f), 'utf8')).join('\n');
 global.SHOP = require('../game-shop.json');
-eval(src + '\nglobal.G_PRICE=gHagglePrice_;global.G={gVespersPay_,GAME,gWall_,gBar_,gameLoad,gameTick,gameUntick,gameSaveGoal,gameArchive,gameFreeze,gameShop,gameArt,gameBuy,gamePlace,gameBossStart,gameBossStage,gameBossRemove,gameBossSave,gameTag,gameChips,gameVespers,gameVespersUndo,gameVespersTime,gameMoon,gameReview,gameQuestStep,gameGroupSave,gameWear,gameUnbuy,gameHoardSave,gameHoardClaim,gameChronicle,gameAim,gameHaggle,gPay_,gDie_,gNeed_,gAdd_,gDow_,gDiff_,gIsFrozen_,gameMergeGoals,gameUnmerge};');
+eval(src + '\nglobal.G_PRICE=gHagglePrice_;global.G={gVespersPay_,GAME,gWall_,gBar_,gameLoad,gameTick,gameUntick,gameSaveGoal,gameArchive,gameFreeze,gameShop,gameArt,gameBuy,gamePlace,gameBossStart,gameBossStage,gameBossRemove,gameBossSave,gameGolem,gameTag,gameChips,gameVespers,gameVespersUndo,gameVespersTime,gameMoon,gameReview,gameQuestStep,gameGroupSave,gameWear,gameUnbuy,gameHoardSave,gameHoardClaim,gameChronicle,gameAim,gameHaggle,gPay_,gDie_,gNeed_,gAdd_,gDow_,gDiff_,gIsFrozen_,gameMergeGoals,gameUnmerge};');
 
 const k = 'k'; let failed = 0;
 const ok = (n, c) => { console.log((c ? '  PASS ' : '  FAIL ') + n); if (!c) failed++; };
@@ -589,5 +589,49 @@ console.log('\n-- 30 Oct 2026: the 2-week bar in glass (1U.13, G1): two weeks of
   const fresh = G.gBar_(Object.assign({}, daily, { created: '2026-10-25' }), T, tk('f', ['2026-10-25', '2026-10-29']), W, {});
   ok('a new ritual: the days before it existed are one dark pane: ' + sig(fresh), sum(fresh) === 14 && fresh[0].s === 'n' && fresh[0].len === 9 && fresh[fresh.length - 1].s === 'o'); }
 
+console.log('\n-- paper golems (marking bosses, 30 Oct picks)');
+{ at('2026-11-27T10:00:00Z');   // a Friday: the 8XP books are due next Friday
+  let s = G.gameSaveGoal(k, { name: 'Mark 8XP books', kind: 'termly', minutes: 60, track: 'necessary', sittings: 2, due: '2026-12-04' });
+  const mg = s.goals.find((g) => g.name === 'Mark 8XP books');
+  ok('no golem is suggested before the week the books are due', !s.golems.suggest.some((x) => x.id === mg.id) && !s.golems.list.some((x) => x.id === mg.id));
+  at('2026-11-30T10:00:00Z'); s = G.gameLoad(k);
+  ok('from the Monday of that week the planner suggests it, and never summons it by itself', s.golems.suggest.some((x) => x.id === mg.id && x.cls === '8XP' && x.type === 'books') && !s.golems.list.some((x) => x.id === mg.id));
+  s = G.gameGolem(k, 'summon', mg.id);
+  let gm = s.golems.list.find((x) => x.id === mg.id);
+  ok('summoned: a Bookstack (Years 8-9) in its own moss colours, two sittings of health', gm && gm.look === 'y89' && gm.theme === 'moss' && gm.sittings === 2 && gm.sitDone === 0 && !s.golems.suggest.some((x) => x.id === mg.id) && s.golem.summoned === mg.id);
+  s = G.gameGolem(k, 'theme', { cls: '8XP', theme: 'frost' });
+  ok('he picks the class colours himself', s.golems.list.find((x) => x.id === mg.id).theme === 'frost' && s.golems.theme['8XP'] === 'frost');
+  let threw = false; try { G.gameGolem(k, 'theme', { cls: 'bad', theme: 'gold' }); } catch (e) { threw = true; }
+  ok('an unknown class is refused', threw);
+  const c0 = s.player.coins, lv0 = s.player.level;
+  s = G.gameTick(k, mg.id, 1);
+  const pay1 = s.last.coins;
+  ok('a sitting tears a chunk off (one block gone), paying the usual marking rate', s.golems.list.find((x) => x.id === mg.id).sitDone === 1 && pay1 > 0 && !s.last.golem);
+  s = G.gameTick(k, mg.id, 1);
+  ok('the last sitting beats it: the sitting pay plus 60 runes, said so', s.last.golem && s.last.golem.coins === 60 && s.last.coins === pay1 + 60 && s.player.coins - c0 - gifts(lv0, s.player.level) === pay1 * 2 + 60);
+  ok('it leaves the field and its trophy is kept', !s.golems.list.some((x) => x.id === mg.id) && s.golems.trophies[0].cls === '8XP' && s.golems.trophies[0].look === 'y89' && s.golems.trophies[0].theme === 'frost');
+  s = G.gameUntick(k, mg.id);
+  ok('Undo of the last sitting brings it back, takes the 60 and the trophy', s.golems.list.some((x) => x.id === mg.id && x.sitDone === 1) && !s.golems.trophies.length && s.player.coins - c0 - gifts(lv0, s.player.level) === pay1);
+  s = G.gameGolem(k, 'unsummon', mg.id);
+  ok('Send it back: a suggestion again', !s.golems.list.some((x) => x.id === mg.id) && s.golems.suggest.some((x) => x.id === mg.id));
+  // PAG: 12C did a practical on Monday (kit ordered, not a demo)
+  global.GAME_WORLD.data.classes['12C'] = { seq: [{ num: 3, title: 'Resistivity of a wire', built: true }, { num: 4, title: 'I-V curves', built: true }] };
+  global.GAME_WORLD.weeks['2026-11-30'] = { slots: [{ kind: 'lesson', cls: '12C', i: 0, day: 0, period: 2, sets: '4 sets' }, { kind: 'lesson', cls: '12C', i: 1, day: 1, period: 3, sets: 'demo' }] };
+  at('2026-12-02T10:00:00Z'); s = G.gameLoad(k);
+  const pg = s.golems.suggest.filter((x) => x.type === 'pag');
+  ok('after a 12C practical a PAG golem is suggested (not for the demo), marked by a week after', pg.length === 1 && pg[0].cls === '12C' && /Resistivity/.test(pg[0].name) && pg[0].due === '2026-12-07');
+  s = G.gameGolem(k, 'pag', pg[0].key);
+  gm = s.golems.list.find((x) => x.kind === 'pag');
+  ok('summoning it makes its marking (one sitting, due a week after) as a PAG Scholar', gm && gm.look === 'pag' && gm.theme === 'storm' && gm.sittings === 1 && gm.due === '2026-12-07' && gm.cls === '12C' && !s.golems.suggest.some((x) => x.type === 'pag'));
+  s = G.gameGolem(k, 'pag', pg[0].key);
+  ok('summoning the same practical twice makes one golem', s.golems.list.filter((x) => x.kind === 'pag').length === 1);
+  at('2026-12-10T10:00:00Z'); s = G.gameLoad(k);
+  ok('an overdue golem just waits', s.golems.list.some((x) => x.id === gm.id));
+  ok('a practical over a week ago is no longer suggested', !s.golems.suggest.some((x) => x.type === 'pag'));
+  global.GAME_WORLD.weeks['2026-12-07'] = { slots: [{ kind: 'lesson', cls: '12C', i: 0, day: 2, period: 1, sets: '4 sets' }] };
+  s = G.gameLoad(k); const p2 = s.golems.suggest.find((x) => x.type === 'pag');
+  s = G.gameGolem(k, 'nopag', p2.key);
+  ok('"Not this one" puts a practical away for good', !s.golems.suggest.some((x) => x.type === 'pag') && !G.gameLoad(k).golems.suggest.some((x) => x.type === 'pag'));
+  delete global.GAME_WORLD.weeks['2026-11-30']; delete global.GAME_WORLD.weeks['2026-12-07']; }
 console.log('\n' + (failed ? failed + ' FAILED' : 'all game server checks passed'));
 process.exit(failed ? 1 : 0);

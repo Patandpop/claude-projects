@@ -9,8 +9,24 @@ Plain-English record of Lane A's work (the Ulhu game), newest entry first.
 7. **Vespers through the Grimoire (1U.10): built as shown in the mock-up.** Look at it in the game after your Vespers time: the tablet on The Call, the book, then your day in glass. Say what to change.
 6. **2-week bar (1U.13): G1 "clear glass strip" is in the game as a first version.** To swap it, say G2 (the ritual's own streak colour) or G3 (the strip set in a stone window), from `replica/design/mockups/ritualbar2/index.html`.
 9. **Dice ending (1U.6): D3 "low and close" with the word UNDONE is in the game as a first version.** To swap, say D1 or D2, or another word, from `replica/design/mockups/dicewater2/index.html`.
+10. **Paper golems: built as a first version (31 Oct).** Three things I decided for you; say if any is wrong: (a) Crumple is drawn in its round-three look (aged parchment), the other years in their round-two look; (b) beating a golem pays 60 runes on top of the sittings, the same as a 2-hour boss; (c) Year 12 and 13 book marking (if you ever add it) gets the Elder Scholar, PAG marking the PAG Scholar.
 
 ---
+
+## 31 Oct 2026, wall and golems: the paper golems (marking bosses)
+
+**What changed:** your marking jobs can now be fought as paper golems, using your final picks (Crumple for Year 7, the round-two golems for every other year).
+- **Where they appear:** under the Breakwater wall in the Grimoire there is a "Paper golems" row.
+- **Book marking:** from the Monday of the week a class's books are due, the row suggests "9AS books due" with a Summon button. Nothing is summoned unless you tap it.
+- **PAG marking (12C and 13D):** for a week after a practical (a lesson with kit ordered, not a demo), the row suggests "PAG 12C: (lesson title)". Summon makes its marking job, due a week after the practical. "Not this one" puts that practical away for good.
+- **A boss like the others (your note today):** a summoned golem stands in the bosses' own temple arena (the steps, light rays, bubbles and the Elder Sign circle), on the same boss card. The golem matches the class's year: Crumple (Year 7), Bookstack (8 and 9), Red-pen Brute (10 and 11), PAG Scholar (12C and 13D practicals).
+- **Fighting it:** its sittings are its stages and health blocks ("First half marked", "Second half marked"). Tapping one plays the bosses' claw strike, breaks a block and tears a chunk off the golem with red ticks.
+- **Beating it:** the last sitting drags it down into the pool like a boss. You get a boss's runes (60) on top of the sitting pay, and a small faded trophy of it goes on a new "Golem trophies" shelf in the Sanctum. Undo takes all of that back.
+- **On The Call:** a summoned golem shows there too once it is due within 3 days. Before that it stays in the Teaching area.
+- **Overdue:** an overdue golem just waits. Nothing bad happens.
+- **Colours:** tap Edit on a golem's card to pick its class's colours from the eight themes (coral, ember, frost, moss, ink, storm, ash, gold). "Send it back" undoes a summon made by mistake.
+
+**You need to:** nothing now. It goes into the next complete paste set. Three choices I made are on the Waiting list (item 10).
 
 ## 30 Oct 2026, your go: the open picks built as first versions
 

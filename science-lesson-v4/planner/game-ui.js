@@ -102,6 +102,10 @@
 .uz-seal{display:inline-flex;align-items:center;gap:3px;padding:1px 6px 1px 2px;border-radius:9px;background:#26173a;border:1px solid #5a3a8a;font:700 11px var(--a);color:#d4bfff!important;white-space:nowrap}.uz-seal img{width:12px!important;height:12px!important}
 .uz-tide{padding:9px 12px 10px;border-radius:5px;background:linear-gradient(180deg,#12202a,#0d161c);border:1px solid #23404e}
 .uz-mk{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.uz-gms{margin:0 0 10px}.uz-gmh{display:flex;justify-content:space-between;align-items:baseline;margin:0 2px 4px;font:13px var(--a);color:#a9bcb0}.uz-gmh b{font:500 18px var(--g);color:#cfe8dc}
+.uz-gmt{display:flex;flex-wrap:wrap;gap:6px;margin:-2px 0 8px}.uz-gmt button{min-height:44px;padding:0 12px;border-radius:22px;border:1.5px solid #2f443b;font:700 13px var(--a);color:#14100a;cursor:pointer}.uz-gmt button.on{outline:2px solid #fff}.uz-gmt .back{background:#131d19;color:#cfd8d3}
+.uz-gs{display:flex;align-items:center;gap:8px;padding:8px 10px;margin:0 0 6px;border-radius:6px;background:#10181a;border:1px dashed #3a5a4e}.uz-gs span{flex:1;min-width:0;display:flex;flex-direction:column}.uz-gs b{font:700 15px var(--a);color:#e8e1cf}.uz-gs small{font:13px var(--a);color:#a9bcb0}
+.uz-gs button{flex:none;min-height:44px;padding:0 14px;border-radius:22px;border:1.5px solid #5ef2a0;background:#123326;color:#a6f5c8;font:700 14px var(--a);cursor:pointer}.uz-gs button.no{border-color:#2f443b;background:transparent;color:#93a69c;font-weight:400}
 .uz-mc{padding:7px 8px 8px;border-radius:5px;background:linear-gradient(180deg,#1b2924,#131d19);border:1px solid #2a3b33;border-left:4px solid #5aa7ff;box-shadow:0 2px 0 #040807}
 .uz-mc .hd{display:flex;align-items:baseline;justify-content:space-between;gap:4px;margin-bottom:6px}.uz-mc .hd b{font:700 17px var(--a);color:#ece5d3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .uz-mc .hd span{display:flex;align-items:center;gap:2px;font:700 12px var(--a);color:#f0c45a;flex:none}
@@ -579,6 +583,36 @@
               (V.edit ? '<button class="uz-pen" data-a="arch" data-id="' + m.id + '" style="width:auto;height:30px">Archive</button>' : '') + '</div>';
           }).join('') + '<button class="uz-new" data-a="form" data-v="mark">+ Class to mark</button></div>';
     }
+    /* ---------- paper golems (the marking bosses, Patryk's picks of 30 Oct; game-golems.js draws them) ----------
+       A marking job he has summoned stands in the Teaching area (row under the wall), and on The Call once it is due
+       within 3 days. A sitting is the same tick as before; the last one beats it (a boss's runes and a trophy). */
+    const golemOf = (id) => (D.golems && window.GOLEM && window.TEMPLE ? D.golems.list.find((x) => x.id === id) : null);
+    function golemCard(m) {
+      const g = goal(m.id) || m, n = g.sittings || 1, done = g.sitDone || 0, cls = m.cls || '';
+      const lab = (i) => n === 1 ? (m.kind === 'pag' ? 'Write-ups marked' : 'Books marked') : n === 2 ? (i ? 'Second half marked' : 'First half marked') : 'Sitting ' + (i + 1);
+      const tear = done > 0 ? (n === 2 ? done : 1) : 0, gb = { id: m.id, name: m.kind === 'pag' ? m.name : cls + ' books', k: 'gm:' + m.look + ':' + (m.theme || '') + ':' + tear, size: 2, reward: D.golems.pay || 0,
+        stages: Array.from({ length: n }, (_, i) => ({ name: lab(i), due: m.due, done: i < done ? D.today : '' })) };
+      let h = '<div class="uz-bossw" data-boss="' + m.id + '">' + TEMPLE.card(gb, { today: D.today, stageAttrs: (i) => 'data-a="gstage" data-id="' + m.id + '" data-v="' + i + '" data-fx="' + m.id + 's' + i + '"', editAttrs: 'data-a="gpick" data-v="' + esc(cls) + '"' }) + '</div>';
+      if (V.gpick === cls) h += '<div class="uz-gmt">' + D.golems.themes.map((t) => '<button data-a="gtheme" data-v="' + esc(cls) + '" data-t="' + t + '" class="' + (t === m.theme ? 'on' : '') + '" style="background:' + GOLEM.themes[t][0] + '">' + t + '</button>').join('') +
+        '<button class="back" data-a="gunsum" data-id="' + m.id + '">Send it back</button></div>';
+      return h;
+    }
+    // a marking sitting, ticked or unticked (the plain buttons, and a golem's stage after its claw strike)
+    function markTick(g, on, r, k) {
+      const id = g.id, cls = g.name.replace(/^Mark\s+/i, '').replace(/\s+books\b.*$/i, '');
+      let upL = false; const gm = golemOf(id), bonus = gm && on && g.sitDone + 1 >= g.sittings ? (D.golems.pay || 0) : 0;   // the last sitting beats a summoned golem
+      V.sayKind = 'mark'; act({ verb: bonus ? 'Vanquished:' : on ? 'Marked:' : 'Unmarked:', name: bonus ? (gm.kind === 'pag' ? gm.name : gm.cls + ' books') : cls + ' ' + (on ? g.sitDone + 1 : g.sitDone - 1) + '/' + g.sittings, delta: (on ? '+' : '−') + (g.pay + bonus), unit: 'coin' }, on ? ['gameUntick', id] : ['gameTick', id, 1], on ? 'gameTick' : 'gameUntick', on ? [id, 1] : [id],
+        (d) => { const x = d.goals.find((y) => y.id === id); x.sitDone += on ? 1 : -1; if (on) upL = earnLocal(d, g.pay + bonus, g.pay + bonus); else d.player.coins -= g.pay;
+          const gl = d.golems && d.golems.list.find((y) => y.id === id); if (gl) gl.sitDone = x.sitDone; if (gl && x.sitDone >= x.sittings) d.golems.list = d.golems.list.filter((y) => y !== gl); });
+      if (on) { earnFx(r, k, g.pay + bonus, upL); if (bonus) { celebrate(true); setMood('proud', pickSay('vanq')); } if (window.STONE) STONE.flare(k); } else buzz(6);
+    }
+    function golemRow() {
+      const G = D.golems; if (!G || !window.GOLEM) return '';
+      let h = G.suggest.map((s) => '<div class="uz-gs"><span><b>' + esc(s.type === 'pag' ? s.name : s.cls + ' books due') + '</b><small>' + (s.type === 'pag' ? 'practical ' + dshort(s.date) + ' · mark by ' + dshort(s.due) : 'by ' + dueTxt(s.due)) + '</small></span>' +
+        (s.type === 'pag' ? '<button class="no" data-a="gnopag" data-v="' + esc(s.key) + '">Not this one</button><button data-a="gpag" data-v="' + esc(s.key) + '">Summon</button>' : '<button data-a="gsum" data-id="' + s.id + '">Summon</button>') + '</div>').join('');
+      h += G.list.map(golemCard).join('');
+      return h ? '<div class="uz-gms"><div class="uz-gmh"><b>Paper golems</b><span>' + G.list.length + ' summoned</span></div>' + h + '</div>' : '';
+    }
     const summonRow = (s) => '<div class="uz-row' + (s.built ? ' done' : '') + '" style="--e:' + (s.ahead ? '#f2a93b' : '#5aa7ff') + '"><span class="uz-tk' + (s.built ? ' on' : ' auto') + '">' + (s.built ? '<img src="' + IMG.tick + '" alt="">' : '') + '</span>' +
               '<div class="uz-mid"><div class="nm">' + esc(s.name) + '</div><div class="uz-sub"><span>for ' + esc(dshort(s.date)) + '</span></div></div><div class="uz-pay">' + SEAL + (s.pay ? '<span>+' + s.pay + coin(18, s.pay, s.name) + '</span>' : '') + '</div></div>';
     const nextSchool = (t) => { let d = addD(t, 1); while (dt(d).getUTCDay() % 6 === 0) d = addD(d, 1); return d; };
@@ -598,7 +632,8 @@
       const t = D.today, nx = nextSchool(t), work = [], life = [], done = [];
       D.goals.filter((g) => g.kind === 'todo' && (!g.doneOn || V.settling[g.id]) && g.due && g.due <= t).forEach((q) => work.push({ id: q.id, name: q.name, html: questCard(q) }));
       D.bosses.forEach((b) => b.stages.forEach((st, i) => { if (!st.done && st.due && st.due <= t) work.push({ id: b.id + 's' + i, name: st.name, html: stageRow(b, st, i) }); }));
-      D.goals.filter((g) => g.kind === 'termly' && g.sitDone < g.sittings && g.due && diff(t, g.due) <= 6).sort((a, b) => (a.due < b.due ? -1 : 1)).forEach((m) => work.push({ id: m.id, name: m.name, html: markRow(m) }));
+      D.goals.filter((g) => g.kind === 'termly' && g.sitDone < g.sittings && g.due && diff(t, g.due) <= 6).sort((a, b) => (a.due < b.due ? -1 : 1)).forEach((m) => { const gm = golemOf(m.id); if (gm && diff(t, m.due) > 3) return;   // a summoned golem: on The Call from 3 days before
+        work.push({ id: m.id, name: m.name, html: gm ? golemCard(gm) : markRow(m) }); });
       D.summoned.filter((x) => !x.built && x.date <= nx).forEach((x) => work.push({ id: x.name, name: x.name, html: summonRow(x), auto: true }));
       dailies().forEach((g) => { const it = { id: g.id, name: g.name, html: ritualRow(g), auto: !!g.auto };
         if (g.doneToday && !V.settling[g.id]) done.push(it); else (g.track === 'life' ? life : work).push(it); });
@@ -674,12 +709,12 @@
     function grimoire() {
       const t = D.today, rits = D.goals.filter((g) => g.kind === 'daily'), qs = D.goals.filter((g) => g.kind === 'todo' && (!g.doneOn || V.settling[g.id]));
       const marks = D.goals.filter((g) => g.kind === 'termly' && g.sitDone < g.sittings), byDue = (a, b) => ((a.due || '9') < (b.due || '9') ? -1 : 1);
-      let h = breakwater();
+      let h = breakwater() + golemRow();
       D.groups.filter((g) => !g.parent && g.type !== 'summon' && g.type !== 'marking').forEach((a) => {
         const kids = D.groups.filter((x) => (x.id === a.id || x.parent === a.id) && x.type === 'list');
         const r = rits.filter((g) => kids.some((x) => x.id === g.grp));
         const q = qs.filter((g) => areaOf(g.grp) === a.id);
-        const mk = a.id === 'teach' ? marks : [], bo = D.bosses.filter((b) => areaOf(b.grp || 'teach') === a.id), nq = q.length + mk.length + bo.length;
+        const mk = a.id === 'teach' ? marks.filter((m) => !golemOf(m.id)) : [], bo = D.bosses.filter((b) => areaOf(b.grp || 'teach') === a.id), nq = q.length + mk.length + bo.length;
         h += '<div class="uz-sec">' + header(a.id, a.name, '', r.length + ' rituals · ' + nq + ' quests', '', false);
         if (V.open[a.id]) {
           if (r.length) h += '<div class="uz-sub2">Rituals</div>';
@@ -1025,6 +1060,7 @@
       if (window.RBAR) RBAR.paint(body);   // the 2-week bars in glass
       const sb = body.querySelector('.uz-stampbox'); if (sb && V.stampNew) { V.stampNew = false; anim(sb, [{ transform: 'scale(2.4) rotate(-28deg)', opacity: 0 }, { transform: 'scale(.92) rotate(-10deg)', opacity: 1, offset: 0.7 }, { transform: 'scale(1) rotate(-10deg)', opacity: 1 }], { duration: 420, easing: 'cubic-bezier(.2,.8,.3,1.2)' }); }
       if (window.TEMPLE) TEMPLE.paint(body);
+      if (window.GOLEM) GOLEM.paint(body);   // the golem trophies on the Sanctum shelf
       if (window.STONE) STONE.paint(body);
       if (window.SCROLL) SCROLL.paint(body);
       if (window.GLASS) GLASS.paint(body);
@@ -1087,6 +1123,30 @@
     box.addEventListener('click', (e) => {
       const b = e.target.closest('[data-a]'); if (!b || !box.contains(b)) return;
       const a = b.dataset.a, id = b.dataset.id, v = b.dataset.v, r = b.getBoundingClientRect(), k = b.dataset.fx;
+      if (a === 'gsum' || a === 'gpag' || a === 'gnopag') {   // summon a golem, or say no to a practical's PAG golem
+        const sg = (D.golems.suggest || []).find((x) => (a === 'gsum' ? x.id === id : x.key === v)); if (!sg) return;
+        if (a === 'gnopag') return act({ verb: 'Not summoned:', name: sg.name }, null, 'gameGolem', ['nopag', v], (d) => { d.golems.suggest = d.golems.suggest.filter((x) => x !== sg && x.key !== v); });
+        buzz([10, 40, 20]); setMood('happy', pickSay('boss'));
+        return act({ verb: 'Golem summoned:', name: sg.type === 'pag' ? sg.name : sg.cls + ' books' }, a === 'gsum' ? ['gameGolem', 'unsummon', id] : null, 'gameGolem', a === 'gsum' ? ['summon', id] : ['pag', v],
+          (d) => { d.golems.suggest = d.golems.suggest.filter((x) => (a === 'gsum' ? x.id !== id : x.key !== v));
+            if (a === 'gsum') { const g = d.goals.find((x) => x.id === id), cls = sg.cls, y = parseInt(cls, 10) || 7, look = y <= 7 ? 'y7c' : y <= 9 ? 'y89' : y <= 11 ? 'y1011' : 'y1213';
+              d.golems.list.push({ id, name: sg.name, cls, kind: 'books', look, theme: d.golems.theme[cls] || { y7c: 'gold', y89: 'moss', y1011: 'ember', y1213: 'ink' }[look], sittings: g ? g.sittings : 2, sitDone: g ? g.sitDone : 0, due: sg.due }); } });
+      }
+      if (a === 'gstage') {
+        const g = goal(id), gm = golemOf(id), i = Number(v); if (!g || !gm || V.striking) return;
+        if (i < g.sitDone) { if (i === g.sitDone - 1) markTick(g, false, r, k); return; }   // only the last sitting can be taken back
+        if (i !== g.sitDone) return;
+        V.striking = true; buzz(15); setMood('happy', pickSay('boss'));
+        const last = g.sitDone + 1 >= g.sittings;
+        const save = () => { V.striking = false; markTick(g, true, r, k); };
+        if (!b.closest('.tp-boss')) { V.striking = false; return markTick(g, true, r, k); }
+        return Promise.resolve(TEMPLE.strike(id, i)).then(() => (last ? new Promise((res) => TEMPLE.beaten(id, res)) : null)).then(save, save);
+      }
+      if (a === 'gpick') { V.gpick = V.gpick === v ? null : v; return paint(); }
+      if (a === 'gtheme') { const t = b.dataset.t, old = D.golems.theme[v]; V.gpick = null;
+        return act({ verb: 'Colours:', name: v + ' ' + t }, ['gameGolem', 'theme', { cls: v, theme: old || '' }], 'gameGolem', ['theme', { cls: v, theme: t }], (d) => { d.golems.theme[v] = t; d.golems.list.forEach((x) => { if (x.cls === v) x.theme = t; }); }); }
+      if (a === 'gunsum') { const gm = golemOf(id); if (!gm) return; V.gpick = null;
+        return act({ verb: 'Sent back:', name: gm.name }, ['gameGolem', 'summon', id], 'gameGolem', ['unsummon', id], (d) => { d.golems.list = d.golems.list.filter((x) => x.id !== id); }); }
       if (a === 'wall') {   // a piece of the wall says which day, period and class it is (no redraw, the glass stays put)
         const pc = e.target.closest('.pc'); if (!pc || !window.WALL || !D.wall) return;
         V.wallInfo = WALL.describe(D.wall, +pc.dataset.d, +pc.dataset.p, pc.dataset.part); const i = b.querySelector('.uz-walli'); if (i) i.innerHTML = V.wallInfo;
@@ -1145,13 +1205,7 @@
       if (a === 'dayoff') { const was = D.moon || (D.frozen ? 'dark' : 'full'), nx = PHASE[was][1]; return act({ verb: 'Moon:', name: PHASE[nx][0] }, ['gameMoon', D.today, was], 'gameMoon', [D.today, nx], (d) => { d.moon = nx; d.frozen = nx !== 'full'; }); }
       if (a === 'tick' || a === 'untick') {
         const g = goal(id); if (!g) return;
-        if (g.kind === 'termly') {
-          const on = a === 'tick', cls = g.name.replace(/^Mark\s+/i, '').replace(/\s+books\b.*$/i, ''), half = g.sittings === 2 ? ((on ? g.sitDone : g.sitDone - 1) ? ' 2nd half' : ' 1st half') : '';
-          let upL = false;
-          V.sayKind = 'mark'; act({ verb: on ? 'Marked:' : 'Unmarked:', name: cls + ' ' + (on ? g.sitDone + 1 : g.sitDone - 1) + '/' + g.sittings, delta: (on ? '+' : '−') + g.pay, unit: 'coin' }, on ? ['gameUntick', id] : ['gameTick', id, 1], on ? 'gameTick' : 'gameUntick', on ? [id, 1] : [id],
-            (d) => { const x = d.goals.find((y) => y.id === id); x.sitDone += on ? 1 : -1; if (on) upL = earnLocal(d, g.pay, g.pay); else d.player.coins -= g.pay; });
-          if (on) { earnFx(r, k, g.pay, upL); if (window.STONE) STONE.flare(k); } else buzz(6); return;
-        }
+        if (g.kind === 'termly') return markTick(g, a === 'tick', r, k);
         if (g.kind === 'todo') {
           const on = !g.doneOn; let upL = false;
           // the scroll is sealed and burns first (about 3.4 s), then it is saved and paid, so no redraw cuts the seal short

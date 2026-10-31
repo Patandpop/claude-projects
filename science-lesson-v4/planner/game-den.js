@@ -793,7 +793,10 @@
       if (hd.length) h += '<button class="dn-go" data-a="edit">' + (V.edit ? 'Stop editing' : 'Edit (remove rewards)') + '</button>';
       return h + '</div>';
     }
-    return '<p class="dn-note">Tap a green ring to place or swap your things, the wardrobe to dress Ulhu, a chest to claim a reward, or the archway for the Night Market.</p>';
+    // the paper golems he has beaten, kept on a shelf in the Sanctum (Patryk 29 Oct: a small trophy of each)
+    const tro = (X.D.golems && X.D.golems.trophies) || [];
+    const shelf = tro.length && window.GOLEM ? '<div class="dn-gshelf"><b>Golem trophies</b><div>' + tro.slice(0, 12).map((t) => '<span title="' + X.esc(t.name + ', ' + t.on) + '">' + GOLEM.html({ look: t.look, theme: t.theme, sittings: 1, sitDone: 1 }, { beaten: true, size: 64 }) + '<small>' + X.esc(t.cls || '') + '</small></span>').join('') + '</div></div>' : '';
+    return '<p class="dn-note">Tap a green ring to place or swap your things, the wardrobe to dress Ulhu, a chest to claim a reward, or the archway for the Night Market.</p>' + shelf;
   }
   function marketHtml(X) {
     if (!PLZ) plazaSrc().then(() => X.paint());
@@ -942,6 +945,7 @@
 .dn-arch{width:64px;height:64px;margin:-32px 0 0 -32px}.dn-arch span{position:absolute;right:2px;bottom:-6px;white-space:nowrap;font:700 13px var(--a);color:#b6ffd6;text-shadow:0 1px 3px #000,0 0 6px #000}
 .dn-title{position:absolute;left:10px;top:8px;font:500 20px var(--g);color:#cfe8dc;text-shadow:0 2px 0 #000;pointer-events:none}
 .dn-note{font:13px/1.45 var(--a);color:#9fb3a9;margin:2px 2px}.dn-note b{color:#5ef2a0}
+.dn-gshelf{margin:8px 2px 0;padding:8px;border-radius:6px;background:#0c1513;border:1px solid #3a2f1a}.dn-gshelf b{font:700 13px var(--a);color:#e6c26a}.dn-gshelf div{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}.dn-gshelf span{display:flex;flex-direction:column;align-items:center;font:12px var(--a);color:#a9bcb0}
 .dn-panel{border-radius:8px;background:linear-gradient(180deg,#121c1a,#0b1210);border:1px solid #23332c;padding:8px}
 .dn-ph{display:flex;align-items:center;justify-content:space-between;font:500 19px var(--g);color:#e8e1cf}.dn-x{width:44px;height:44px;border:none;background:none;color:#8a9a92;font:20px var(--a)}
 .dn-row{display:flex;gap:6px;overflow-x:auto;padding:4px 0 6px;scrollbar-width:thin}

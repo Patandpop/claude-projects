@@ -79,7 +79,7 @@ function gAppend_(t, o) { delete G_C.v[t]; gTab_(t).appendRow(G_HEAD[t].map((h) 
 function gDel_(t, row) { delete G_C.v[t]; gTab_(t).deleteRow(row); }
 function gSet_(t, row, field, v) { delete G_C.v[t]; gTab_(t).getRange(row, G_HEAD[t].indexOf(field) + 1).setValue(gText_(v)); }
 function gPlayer_() {
-  const p = { coins: 0, xp: 0, level: 1, hp: GAME.maxHp, maxHp: GAME.maxHp, lastDay: '', deaths: 0, seeded: '', diedDay: '', levelUpDay: '', frozenOk: '', groups: '', wear: '', markPlan: '', vTime: '20:00', vStreak: 0, vBest: 0, vLast: '', vPrev: '', myChips: '', aimsSeeded: '', riseDay: '', riseLost: 0, riseDone: '', riseStage: 0, riseLit: '', riseFrom: '', riseUntil: '', riseGot: 0 };
+  const p = { coins: 0, xp: 0, level: 1, hp: GAME.maxHp, maxHp: GAME.maxHp, lastDay: '', deaths: 0, seeded: '', diedDay: '', levelUpDay: '', frozenOk: '', groups: '', wear: '', markPlan: '', vTime: '20:00', vStreak: 0, vBest: 0, vLast: '', vPrev: '', myChips: '', aimsSeeded: '', riseDay: '', riseLost: 0, riseDone: '', riseStage: 0, riseLit: '', riseFrom: '', riseUntil: '', riseGot: 0, golems: '' };
   gRows_('player').forEach((r) => { const v = r.Value; p[r.Setting] = (typeof p[r.Setting] === 'number') ? Number(v) : String(v === undefined ? '' : v); });
   return p;
 }
@@ -326,6 +326,10 @@ function gTick_(g, delta, auto, ref, note, when) {
       const open = gOpenSlips_(ticks, goals, g.id, today)[0];
       if (open) { const back = open.stage === 0 ? Math.floor(open.lost / 2) : open.lost - Math.floor(open.lost / 2), got = Math.min(back, p.maxHp - p.hp);
         p.hp += got; out.hp += got; note.absOf = open.slip; out.abs = { stage: open.stage + 1, hp: back, curse: open.name }; } }
+    if (g.kind === 'termly' && g.sitDone + 1 >= g.sittings && gGolemOf_(g, p)) {   // the last sitting beats a summoned golem: a boss's runes and a trophy
+      const gm = gGolemOf_(g, p), bonus = G_GOLEM_PAY; p.coins += bonus; out.coins += bonus; out.xp += bonus; if (gAddXp_(p, bonus, today)) out.up = true;
+      note.golem = { cls: gm.cls, look: gm.look, theme: gm.theme, kind: gm.kind, name: g.name }; out.golem = { name: g.name, coins: bonus };
+    }
     if (g.row && g.kind !== 'ghost') {
       if (g.kind === 'termly') gSet_('goals', g.row, 'sitDone', g.sitDone + 1);
       else if (gNet_(ticks, g.id, today) === 0) {                           // first tick of the day moves streak and colour
@@ -620,7 +624,7 @@ function gSnapshot_(world, extra) {
   const hoard = gRows_('hoard').filter((h) => String(h.archived) !== 'true').map((h) => ({ id: h.id, name: h.name, cost: Number(h.cost) || 0, claims: Number(h.claims) || 0 }));
   return gOut_(Object.assign({ bosses: bosses.filter((b) => b.status === 'active'), beaten: gBeaten_(), review, vespers, high, whoList: G_WHO, moon: gPhase_(today, world, frozen), vMult: gVMult_(), room, owned: owned.map((r) => r.itemId), player: { coins: p.coins, xp: p.xp, level, need: gNeed_(level), hp: p.hp, maxHp: p.maxHp, deaths: p.deaths, coinName: GAME.coin, gift: GAME.levelGift,
       rise: gRiseView_(p, today) }, mood, today, frozen: fz,
-    goals: view, summoned, tide, hw, wall, weekCoins, groups: gGroups_(p), hoard, wear: gWearState_(p, wearRows), freezes: gFreezesAhead_(world, today, frozen), blessCount: gBlessCount_(goals, todayTicks), hour: Number(Utilities.formatDate(gNow_(), TZ, 'H')),
+    goals: view, summoned, tide, hw, wall, golems: gGolems_(p, world, today, ticks), weekCoins, groups: gGroups_(p), hoard, wear: gWearState_(p, wearRows), freezes: gFreezesAhead_(world, today, frozen), blessCount: gBlessCount_(goals, todayTicks), hour: Number(Utilities.formatDate(gNow_(), TZ, 'H')),
     table: { base: GAME.base, mult: GAME.mult, hpLoss: GAME.hpLoss } }, comp, extra || {}));
 }
 // what goes back to the page is plain JSON (a Date or NaN inside makes Apps Script send back null)
@@ -663,7 +667,7 @@ function gameTick(k, id, delta, sig, meta) {
     res = gTick_(g, delta < 0 ? -1 : 1, false, ref, delta < 0 && /^(Flesh|Domain|Scene|Coven)$/.test(String(sig || '')) ? { sig } : null, when) || { already: true };
   });
   if (bad) throw new Error(bad);
-  return gSnapshot_(gWorld_(), { last: res && !res.already ? { coins: res.coins || 0, hp: res.hp || 0, up: !!res.up, died: res.died || null, bad: !!res.bad, abs: res.abs || null, rise: res.rise || null } : null });
+  return gSnapshot_(gWorld_(), { last: res && !res.already ? { coins: res.coins || 0, hp: res.hp || 0, up: !!res.up, died: res.died || null, bad: !!res.bad, abs: res.abs || null, rise: res.rise || null, golem: res.golem || null } : null });
 }
 // untick: writes an exact reversing row (never deletes), restores streak, colour and sittings
 function gameUntick(k, id, meta) {
@@ -946,6 +950,73 @@ function gameHaggle(k, keeper, result, item, left) {
   });
   if (bad) throw new Error(bad);
   return gameShop(k);
+}
+
+/* ---------------------------------------------------------------- paper golems (marking bosses, Patryk's picks of 29-30 Oct)
+   A golem is a marking job (a termly "Mark 9AS books" goal, or a PAG write-up for 12C and 13D) that he has summoned.
+   Nothing is summoned by itself: the planner SUGGESTS "[class] books due" from the Monday of the week the marking is due,
+   and a PAG golem for 12C or 13D in the week after a practical (a lesson with kit ordered, not a demo); he taps to summon.
+   Each sitting tears a chunk off (the goal's sittings are its health blocks); the last sitting beats it: a boss's runes
+   (G_GOLEM_PAY, on top of the sitting's own pay) and a trophy. An overdue golem just waits.
+   Player setting "golems" (JSON): { sum: { goalId: day summoned }, pag: { practical key: goalId or 'no' }, theme: { class: theme } }. */
+const G_GOLEM_PAY = 60;   // the same as a 2-hour boss
+const G_GOLEM_THEMES = ['coral', 'ember', 'frost', 'moss', 'ink', 'storm', 'ash', 'gold'];
+const G_GOLEM_DEF = { y7c: 'gold', y89: 'moss', y1011: 'ember', y1213: 'ink', pag: 'storm' };   // each golem's own colours from the mock-up
+const G_PAG = ['12C', '13D'];
+function gGolemSet_(p) { let o = {}; try { o = p.golems ? JSON.parse(p.golems) : {}; } catch (e) { o = {}; } o.sum = o.sum || {}; o.pag = o.pag || {}; o.theme = o.theme || {}; return o; }
+// the class a marking goal is for ("Mark 9AS books", "PAG 12C: Resistivity"), and the golem that goes with its year
+function gGolemCls_(name) { const m = /\b(\d{1,2})([A-Z]{1,4}\d?)\b/.exec(String(name || '').toUpperCase()); return m ? m[1] + m[2] : ''; }
+function gGolemLook_(cls, pag) { const y = parseInt(cls, 10) || 7; return pag ? 'pag' : y <= 7 ? 'y7c' : y <= 9 ? 'y89' : y <= 11 ? 'y1011' : 'y1213'; }
+function gGolemOf_(g, p) {
+  const o = gGolemSet_(p); if (g.kind !== 'termly' || !o.sum[g.id]) return null;
+  const pag = /^PAG\b/i.test(String(g.name)), cls = gGolemCls_(g.name), look = gGolemLook_(cls, pag);
+  return { cls, kind: pag ? 'pag' : 'books', look, theme: o.theme[cls] || G_GOLEM_DEF[look] };
+}
+// the practicals of 12C and 13D in the last 7 days (today included), newest first
+function gPagDone_(world, today) {
+  const out = [], d = world.data || {};
+  [gMonday_(gAdd_(today, -7)), gMonday_(today)].forEach((wk) => {
+    (((world.weeks || {})[wk] || {}).slots || []).forEach((s) => {
+      if (G_PAG.indexOf(s.cls) < 0 || s.kind !== 'lesson' || !s.sets || s.sets === 'demo') return;
+      const date = gAdd_(wk, Number(s.day) || 0); if (date > today || date < gAdd_(today, -7)) return;
+      const seq = ((d.classes || {})[s.cls] || {}).seq || [], L = seq[s.i];
+      out.push({ key: s.cls + '|' + date + '|' + s.period, cls: s.cls, date, title: String((L && L.title) || 'the practical').slice(0, 60), due: gAdd_(date, 7) });
+    });
+  });
+  return out.sort((a, b) => (a.date < b.date ? 1 : -1));
+}
+function gGolems_(p, world, today, ticks) {
+  const o = gGolemSet_(p), goals = gGoals_().filter((g) => g.kind === 'termly'), undone = gUndone_(ticks);
+  const list = goals.filter((g) => o.sum[g.id] && g.sitDone < g.sittings).map((g) => Object.assign({ id: g.id, name: g.name, sittings: g.sittings, sitDone: g.sitDone, due: g.due, on: o.sum[g.id] }, gGolemOf_(g, p)));
+  const suggest = goals.filter((g) => !o.sum[g.id] && !/^PAG\b/i.test(String(g.name)) && g.sitDone < g.sittings && g.due && today >= gMonday_(g.due))
+    .map((g) => ({ type: 'books', id: g.id, cls: gGolemCls_(g.name), name: g.name, due: g.due }));
+  gPagDone_(world, today).filter((x) => !o.pag[x.key]).forEach((x) => suggest.push({ type: 'pag', key: x.key, cls: x.cls, name: 'PAG ' + x.cls + ': ' + x.title, due: x.due, date: x.date }));
+  const trophies = ticks.filter((t) => !undone[t.id] && gNote_(t).golem).map((t) => Object.assign({ on: String(t.day) }, gNote_(t).golem)).reverse();
+  return { list, suggest, theme: o.theme, themes: G_GOLEM_THEMES, trophies, pay: G_GOLEM_PAY };
+}
+// act: 'summon' (a marking goal id), 'pag' (a practical key: makes its PAG marking goal and summons it), 'nopag' (not
+// this practical), 'theme' ({ cls, theme }), 'unsummon' (a goal id: back to a suggestion, for a tap made by mistake)
+function gameGolem(k, act, arg) {
+  check_(k); gFresh_();
+  let res = null;
+  withLock_(function () { gFresh_(true);
+    const p = gPlayer_(), o = gGolemSet_(p), today = gDay_(gNow_());
+    if (act === 'summon') { const g = gGoals_().find((x) => x.id === arg && x.kind === 'termly'); if (!g) throw new Error('That marking is gone.'); o.sum[g.id] = today; res = { summoned: g.id }; }
+    else if (act === 'unsummon') delete o.sum[String(arg)];
+    else if (act === 'pag' || act === 'nopag') {
+      const x = gPagDone_(gWorld_(), today).find((y) => y.key === arg); if (!x) throw new Error('That practical is not in the last week.');
+      if (o.pag[x.key]) return;
+      if (act === 'nopag') o.pag[x.key] = 'no';
+      else { const id = 'g' + Utilities.getUuid().slice(0, 7);
+        gAppend_('goals', { id, name: 'PAG ' + x.cls + ': ' + x.title, kind: 'termly', polarity: 'plus', days: '', everyN: '', minutes: 60, track: 'necessary', auto: '', value: 0, streak: 0, best: 0, lastDone: '', private: '', sittings: 1, sitDone: 0, due: x.due, archived: '', created: today, grp: 'marking' });
+        o.pag[x.key] = id; o.sum[id] = today; res = { summoned: id }; }
+    } else if (act === 'theme') { const c = String((arg || {}).cls || ''), t = String((arg || {}).theme || '');
+      if (!/^\d{1,2}[A-Z]{1,4}\d?$/.test(c)) throw new Error('Unknown class.');
+      if (G_GOLEM_THEMES.indexOf(t) >= 0) o.theme[c] = t; else delete o.theme[c]; }
+    else throw new Error('Unknown golem action.');
+    p.golems = JSON.stringify(o); gSavePlayer_(p);
+  });
+  return gSnapshot_(gWorld_(), res ? { golem: res } : null);
 }
 
 /* ---------------------------------------------------------------- boss fights (slice 7)
