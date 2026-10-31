@@ -9,6 +9,11 @@
 
 ## Entries (newest first)
 
+### 31 Oct, the last three screens seen (restart after the PC restart)
+- What changed: nothing in the game. I looked at the three companion screens nobody had seen yet, in headless screenshots on a phone-size page: the cabinets' "Opening the cabinets..." message, the "would not open" message with its Try again button (Try again then opens all seven), the "tags still on their way" sheet when you hold the moon too early (its close button works), and the odd little things shelf (both kinds of find show their note when tapped). All looked right. A new check, planner/tests/companion_states.py, now tests these every time.
+- Nothing else is open for this lane: stone carving was dropped, nudges wait on Lane C's notifications, and the adventure round 2 waits on your pick.
+- You need to: nothing.
+
 ### 30 Oct, finishing pass on everything picked
 - Term page: fits a phone exactly, clearer chapter numbers (blessings blue, curses red), greyer glass for empty days, long names wrap, a Try again button on errors. The approved glass is unchanged.
 - Knitting (K1): the arms come from his sides and hold the needles at chest height, so his belly is clear. The lap knitting shows two cast-on rows from the start and stays visible when he dozes.
