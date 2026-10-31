@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Jeopardy pop-out, wired into the behaviour app (mock-up, made-up class)</title>
+<style>
+  :root { --navy:#0D1B5E; --deep:#152347; --gold:#FABB2E; --green:#1E8C3A; --amber:#D46B00; --paper:#EDF2F8; --ink:#12345C; --soft:#557192; --line:#C9D6E5; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:"Trebuchet MS", "Segoe UI", sans-serif; background:#1b1f2a; color:#eee; }
+  .top { display:flex; flex-wrap:wrap; gap:8px; align-items:center; padding:12px 16px; background:#11141c; border-bottom:1px solid #333; position:sticky; top:0; z-index:5; }
+  .top b { margin-right:8px; }
+  .top button { font:inherit; padding:8px 12px; border-radius:8px; border:1px solid #555; background:#222; color:#eee; cursor:pointer; }
+  .top button[aria-pressed="true"] { background:var(--gold); color:#111; border-color:var(--gold); font-weight:700; }
+  .note { padding:10px 16px; color:#bbb; font-size:14px; max-width:980px; line-height:1.45; }
+  .stage { width:min(1100px, 96vw); aspect-ratio:16/9; margin:10px auto 20px; position:relative; overflow:hidden; border-radius:10px; box-shadow:0 20px 60px rgba(0,0,0,.5); }
+  .scr { position:absolute; inset:0; display:none; padding:24px; }
+  .scr.on { display:flex; flex-direction:column; }
+  /* look A: the game's own look */
+  .A { background:var(--deep); color:#fff; }
+  .A .chip { background:#0b1540; border:1px solid #324; color:#fff; }
+  .A .chip[aria-pressed="true"] { background:var(--gold); color:#111; }
+  .A .card { background:var(--navy); border:1px solid #2b3a7a; border-radius:12px; padding:14px 16px; }
+  .A .tile { background:var(--navy); color:var(--gold); border:2px solid #2b3a7a; }
+  .A .tile.used { background:#0a1240; color:#334; border-color:#1a2460; }
+  .A .cat { background:var(--gold); color:#111; }
+  .A .side.L { border-color:var(--green); } .A .side.R { border-color:var(--amber); }
+  .A .clue { background:var(--navy); }
+  .A .btn { background:var(--gold); color:#111; }
+  .A .btn.ghost { background:transparent; color:#fff; border:2px solid #fff; }
+  .A .btn.L { background:var(--green); color:#fff; } .A .btn.R { background:var(--amber); color:#fff; }
+  /* look B: the planner's look */
+  .B { background:var(--paper); color:var(--ink); background-image:linear-gradient(rgba(18,52,92,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(18,52,92,.06) 1px,transparent 1px); background-size:24px 24px; font-family:"Atkinson Hyperlegible Next","Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif; }
+  .B h1, .B .big, .B .tile, .B .val { font-family:"Big Shoulders Display","Arial Narrow",sans-serif; font-weight:900; }
+  .B .chip { background:#fff; border:1px solid var(--line); color:var(--ink); }
+  .B .chip[aria-pressed="true"] { background:var(--ink); color:#fff; }
+  .B .card { background:#fff; border:1px solid var(--line); border-radius:12px; padding:14px 16px; }
+  .B .tile { background:#fff; color:var(--ink); border:2px solid var(--line); }
+  .B .tile.used { background:transparent; color:#b9c6d6; border-color:#dde5ee; }
+  .B .cat { background:var(--ink); color:#fff; }
+  .B .side.L { border-color:var(--green); } .B .side.R { border-color:var(--amber); }
+  .B .clue { background:#fff; border:1px solid var(--line); color:var(--ink); }
+  .B .btn { background:var(--ink); color:#fff; }
+  .B .btn.ghost { background:#fff; color:var(--ink); border:2px solid var(--line); }
+  .B .btn.L { background:var(--green); color:#fff; } .B .btn.R { background:var(--amber); color:#fff; }
+  h1 { margin:0 0 6px; font-size:34px; line-height:1; }
+  .sub { opacity:.75; margin:0 0 14px; font-size:15px; }
+  .chips { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px; }
+  .chip { font:inherit; padding:7px 12px; border-radius:999px; cursor:pointer; font-size:15px; }
+  .cards { display:grid; grid-template-columns:1.3fr 1fr; gap:14px; flex:1; min-height:0; }
+  .card h2 { margin:0 0 8px; font-size:20px; }
+  .card ul { margin:0; padding:0; list-style:none; }
+  .card li { padding:8px 0; border-top:1px solid rgba(128,128,128,.25); display:flex; justify-content:space-between; gap:10px; font-size:15px; }
+  .card li small { opacity:.7; }
+  .rosters { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px; }
+  .side { border:3px solid; border-radius:10px; padding:8px 10px; font-size:14px; line-height:1.5; }
+  .side b { display:block; margin-bottom:4px; }
+  .btn { font:inherit; font-weight:800; padding:12px 18px; border-radius:10px; border:0; cursor:pointer; font-size:17px; }
+  .grid { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; flex:1; }
+  .cat { font-weight:800; display:flex; align-items:center; justify-content:center; text-align:center; padding:8px; border-radius:8px; font-size:16px; }
+  .tile { display:flex; align-items:center; justify-content:center; font-size:30px; font-weight:900; border-radius:8px; cursor:pointer; }
+  .score { display:flex; justify-content:space-between; align-items:center; margin-top:12px; font-size:22px; font-weight:800; }
+  .score span i { font-style:normal; opacity:.7; font-size:15px; margin-left:8px; }
+  .clue { flex:1; border-radius:14px; padding:26px 30px; display:flex; flex-direction:column; }
+  .val { font-size:20px; opacity:.8; }
+  .big { font-size:38px; line-height:1.2; margin:10px 0 auto; }
+  .duel { display:grid; grid-template-columns:1fr auto 1fr; gap:14px; align-items:center; margin-top:16px; }
+  .duel .side { font-size:22px; font-weight:800; text-align:center; padding:12px; }
+  .duel .side small { display:block; font-size:13px; font-weight:400; opacity:.75; }
+  .ring { width:86px; height:86px; border-radius:50%; border:8px solid var(--gold); border-right-color:transparent; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:26px; }
+  .B .ring { border-color:var(--ink); border-right-color:transparent; }
+  .answerRow { display:flex; gap:12px; justify-content:center; margin-top:18px; align-items:center; flex-wrap:wrap; }
+  .toast { font-size:15px; font-weight:700; padding:6px 12px; border-radius:999px; background:rgba(30,140,58,.15); border:1px solid var(--green); color:var(--green); }
+  .B .toast { background:#e8f6ec; }
+  .phone { position:absolute; right:22px; bottom:22px; width:230px; border-radius:22px; background:#111; color:#fff; padding:14px 12px 12px; box-shadow:0 10px 30px rgba(0,0,0,.5); border:3px solid #333; font-family:"Segoe UI",system-ui,sans-serif; }
+  .phone .pc { display:flex; gap:6px; margin-bottom:8px; }
+  .phone .pc span { font-size:12px; padding:4px 8px; border-radius:999px; background:#2a2f44; }
+  .phone .pc span.on { background:var(--gold); color:#111; font-weight:700; }
+  .phone .strip { background:#1e2335; border-radius:12px; padding:10px; font-size:13px; }
+  .phone .strip b { display:block; font-size:12px; opacity:.8; margin-bottom:6px; }
+  .phone .strip .d { display:flex; justify-content:space-between; margin-bottom:8px; font-weight:700; }
+  .phone .strip .bb { display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; }
+  .phone .strip .bb button { font:inherit; font-size:13px; font-weight:800; padding:10px 0; border-radius:8px; border:0; color:#fff; }
+  .phone .strip .bb .l { background:var(--green); } .phone .strip .bb .r { background:var(--amber); } .phone .strip .bb .n { background:#444; }
+  .vc { display:flex; flex-direction:column; gap:10px; }
+  .vc .phrase { font-size:34px; line-height:1.35; font-weight:700; }
+  .vc .phrase s { text-decoration:none; opacity:.25; border-bottom:3px solid; }
+  .vc .bank li b { font-weight:700; }
+  .foot { font-size:13px; opacity:.7; margin-top:10px; }
+</style>
+</head>
+<body>
+<div class="top">
+  <b>Look:</b>
+  <button id="lookA" aria-pressed="true">A his game's look (test default)</button>
+  <button id="lookB" aria-pressed="false">B the planner's look</button>
+  <b style="margin-left:14px">Screen:</b>
+  <button data-s="games" aria-pressed="true">1 Games page</button>
+  <button data-s="board" aria-pressed="false">2 Board</button>
+  <button data-s="clue" aria-pressed="false">3 Clue</button>
+  <button data-s="answer" aria-pressed="false">4 Answer, the positive goes in</button>
+  <button data-s="phrase" aria-pressed="false">5 Memory phrase</button>
+</div>
+<p class="note">Made-up class and names. What is new is what feeds the game: the sides come from the behaviour app's seating plan (sheet-left is the room's Right side, as in your handover), a win logs a positive for that pupil like a phone tap, boards come from the lesson build, and the phone gets Left / Right / Nobody for the clue on the board. The game's rules, click path and keys do not change. Design: <code>lanes/design-jeopardy-popout.md</code>.</p>
+
+<div class="stage A" id="stage">
+
+  <section class="scr on" data-s="games">
+    <h1>Games</h1>
+    <p class="sub">Second tab on the classroom PC. The class is the one open on your phone.</p>
+    <div class="chips"><button class="chip">7MLA</button><button class="chip">8XP</button><button class="chip" aria-pressed="true">9AS</button><button class="chip">9XS</button><button class="chip">10C2</button><button class="chip">10S2</button><button class="chip">11S2</button></div>
+    <div class="cards">
+      <div class="card">
+        <h2>Jeopardy</h2>
+        <ul>
+          <li><span><b>Pressure in fluids</b> <small>from Lesson 6, built Tue</small></span><small>4 categories, 1 Daily Double</small></li>
+          <li><span><b>Particle model recap</b> <small>from Lesson 4, built last week</small></span><small>3 categories</small></li>
+          <li><span><b>Forces recap (Year 11)</b> <small>your board</small></span><small>5 categories</small></li>
+        </ul>
+        <div class="rosters">
+          <div class="side L"><b>Left side (room), 15</b>Aria B, Ben K, Cass M, Dev P, Eli R, Fern S, Gus T, Hana V, Ike W, Jo Y, Kit A, Lou C, Max D, Nia F, Ollie G</div>
+          <div class="side R"><b>Right side (room), 16</b>Pip H, Quin J, Rae L, Sam N, Tess O, Uma Q, Vic U, Wes X, Xan Z, Yas B, Zed C, Ash E, Bay G, Cy I, Dee K, Eve M</div>
+        </div>
+        <p class="foot">Sides from the seating plan (sheet-left = room's Right). Pupils with no seat are asked once. <u>Swap sides</u> if this class is the other way round.</p>
+        <div style="margin-top:auto;display:flex;gap:10px"><button class="btn">Start: Pressure in fluids</button><button class="btn ghost">Your boards and the prompt builder</button></div>
+      </div>
+      <div class="card">
+        <h2>Memory phrase</h2>
+        <ul>
+          <li><span><b>Pressure = force / area</b> <small>Lesson 5</small></span><small>14 words</small></li>
+          <li><span><b>Particles in a gas...</b> <small>Lesson 3</small></span><small>22 words</small></li>
+          <li><span><b>Newton's first law</b> <small>your phrase</small></span><small>31 words</small></li>
+        </ul>
+        <p class="foot">Phrases from this class's lessons, plus yours. Class size filled in (31).</p>
+        <div style="margin-top:auto"><button class="btn ghost">Open Vanishing Cues</button></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="scr" data-s="board">
+    <h1>Pressure in fluids <span style="font-size:16px;opacity:.7;font-weight:400">Round 1</span></h1>
+    <div class="grid">
+      <div class="cat">Pressure on a surface</div><div class="cat">Pressure in liquids</div><div class="cat">Atmosphere</div><div class="cat">Key words</div>
+      <div class="tile used">100</div><div class="tile">100</div><div class="tile">100</div><div class="tile">100</div>
+      <div class="tile">200</div><div class="tile used">200</div><div class="tile">200</div><div class="tile">200</div>
+      <div class="tile">300</div><div class="tile">300</div><div class="tile">300</div><div class="tile">300</div>
+      <div class="tile">400</div><div class="tile">400</div><div class="tile used">400</div><div class="tile">400</div>
+      <div class="tile">500</div><div class="tile">500</div><div class="tile">500</div><div class="tile">500</div>
+    </div>
+    <div class="score"><span style="color:var(--green)">Left side 700 <i>in control</i></span><span style="opacity:.7;font-size:14px">7 positives sent so far</span><span style="color:var(--amber)">Right side 400</span></div>
+  </section>
+
+  <section class="scr" data-s="clue">
+    <div class="clue">
+      <div class="val">Pressure in liquids, 300</div>
+      <div class="big">A diver goes twice as deep in the same lake. What happens to the pressure from the water, and why?</div>
+      <div class="duel">
+        <div class="side L">Cass M<small>Left side, drawn from the plan. Not in</small></div>
+        <div class="ring">18</div>
+        <div class="side R">Rae L<small>Right side, drawn from the plan. Not in</small></div>
+      </div>
+      <p class="foot">Everyone writes on whiteboards; only the two named boards score. Lock-out buttons as now. Space, Enter or Right arrow: the answer.</p>
+    </div>
+    <div class="phone"><div class="pc"><span>Plan</span><span>Names</span><span>Blind</span><span class="on">Game</span></div><div class="strip"><b>Pressure in liquids, 300</b><div class="d"><span style="color:#6fd38a">Cass M</span><span style="color:#ffb15c">Rae L</span></div><div class="bb"><button class="l">Left</button><button class="r">Right</button><button class="n">Nobody</button></div></div></div>
+  </section>
+
+  <section class="scr" data-s="answer">
+    <div class="clue">
+      <div class="val">Pressure in liquids, 300: the answer</div>
+      <div class="big">It doubles. Pressure in a liquid is proportional to depth (p = h × ρ × g), so twice the depth is twice the pressure.</div>
+      <div class="answerRow">
+        <button class="btn L">1 Left wins: Cass M</button>
+        <button class="btn R">2 Right wins: Rae L</button>
+        <button class="btn ghost">0 Nobody</button>
+      </div>
+      <div class="answerRow"><span class="toast">+1 positive for Cass M, on your phone now</span><span class="foot" style="margin:0">Undo on the score bar takes the positive back too.</span></div>
+    </div>
+  </section>
+
+  <section class="scr" data-s="phrase">
+    <h1>Memory phrase <span style="font-size:16px;opacity:.7;font-weight:400">9AS, from Lesson 5</span></h1>
+    <div class="vc">
+      <div class="card">
+        <div class="phrase">Pressure <s>is</s> force <s>divided</s> <s>by</s> area, <s>so</s> <s>a</s> <u>smaller</u> area <s>means</s> <s>a</s> <u>bigger</u> pressure.</div>
+        <p class="foot">Vanishing Cues as it is now: read it together, pass it round the room, watch it disappear, say it, write it. Hover a gap for a hint. Key words (starred) stay longest.</p>
+      </div>
+      <div class="card bank"><h2>Phrase bank, 9AS</h2><ul><li><b>Pressure = force / area</b><small>Lesson 5, this week</small></li><li><b>Particles in a gas move fast and far apart...</b><small>Lesson 3</small></li><li><b>Newton's first law</b><small>your phrase, saved 12 Sep</small></li></ul></div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var stage = document.getElementById('stage');
+  document.getElementById('lookA').onclick = function () { stage.className = 'stage A'; press('lookA', 'lookB'); };
+  document.getElementById('lookB').onclick = function () { stage.className = 'stage B'; press('lookB', 'lookA'); };
+  function press(on, off) { document.getElementById(on).setAttribute('aria-pressed', 'true'); document.getElementById(off).setAttribute('aria-pressed', 'false'); }
+  Array.prototype.forEach.call(document.querySelectorAll('.top button[data-s]'), function (b) {
+    b.onclick = function () {
+      Array.prototype.forEach.call(document.querySelectorAll('.top button[data-s]'), function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+      Array.prototype.forEach.call(document.querySelectorAll('.scr'), function (s) { s.classList.toggle('on', s.dataset.s === b.dataset.s); });
+    };
+  });
+})();
+</script>
+</body>
+</html>

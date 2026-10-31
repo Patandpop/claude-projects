@@ -2,6 +2,7 @@
 
 ## Waiting on you
 20. **CGP book scanner, ready for you at the PC (design chat, 31 Oct):** the tool that turns your three online CGP books into a topic-to-page index (with where the questions and answers are) is built and checked on a made-up book. It needs you for the one part only you can do: logging in. On the home PC, once: `npm install --no-save playwright` (free). Then for each book: `node planner/tools/cgp-index.js capture physics` (a browser window opens; log in, open the book at its cover, press Enter in the terminal; it takes one picture per page), then `node planner/tools/cgp-index.js ocr cgp-pages-physics`, then `node planner/tools/cgp-index.js index cgp-pages-physics`, and read `cgp-pages-physics\spot-check.txt`: ten pages to confirm against the book. Same with `chemistry` and `biology`. Three short questions on the decisions page first ("ice books", keep your login on the PC, the tool turns pages or you screenshot). Design and risks: `lanes/design-cgp-scanner.md`. Nothing from the books goes into git or Drive, only the index.
+22. **Jeopardy and the memory-phrase tool, wired into the behaviour app (design chat, 31 Oct; your 15 Oct point 6): design done, nothing to answer unless you want to swap a default.** Mock-up on the site: https://ulhu-planner.pages.dev/mockups/jeopardy-board (made-up class; A your game's own look, B the planner's). Defaults: the positive goes to the winning duellist only; look A; boards come from the lesson build first. Say "Jeopardy B" or "positive for both" to swap. Design: `lanes/design-jeopardy-popout.md`. Lane C build wires it after the Lesson page is in the installed app; Lane B writes the boards.
 1. **Obsidian inbox: confirm the folder.** It is set to (a) `G:\My Drive\Obsidian\Inbox from planner.md`, with writing switched OFF. Captures you send to Obsidian are kept safe in the planner until you say yes; then they are written, oldest first. Say "yes, (a)", or name another folder.
 2. **Per-pupil homework results**: the design moves them into your personal Planner Sheet along with everything else (your decision in the installed-app grill). Say "keep them at school" if that has changed.
 4. **The school test** (two minutes at school): open https://ulhu-planner.pages.dev/test/ on a school PC, paste your mailbox address and key (the same two values in the school planner's Script properties, MAILBOX_URL and MAILBOX_KEY), press "Run the test", and read the three results back to the chat (the "Copy the results" button copies them). The page never remembers the key.
@@ -24,9 +25,21 @@
    3. That worker's Settings, Variables and secrets: add the four lines of block 1, each as a Secret. Open the worker's address in a browser: it should say "Planner push worker: ready".
    4. The planner's Apps Script, Project Settings, Script properties: add the three lines of block 2 (the worker address goes in PUSH_WORKER_URL).
    5. On the phone, the app's Settings, Notifications: tick what you want, press On, allow it, then "Send a test".
-5. **Next paste set** (for Lane A to make): the phone page and the planner open instantly from their saved copy, and the phone has the new Day tab. Planner.html and Phone.html changed, and the set has **two new files** to make once in the Apps Script editor: a script file called `Day` (from Day.gs) and an HTML file called `DayUI` (from DayUI.html). Name them exactly that, or the phone's Day tab says "not in this copy yet". Day.gs changed again on 31 Oct (notifications); still no new Apps Script file.
+5. **Next paste set** (for Lane A to make): the phone page and the planner open instantly from their saved copy, and the phone has the new Day tab. Planner.html and Phone.html changed, and the set has **two new files** to make once in the Apps Script editor: a script file called `Day` (from Day.gs) and an HTML file called `DayUI` (from DayUI.html). Name them exactly that, or the phone's Day tab says "not in this copy yet". Day.gs changed again on 31 Oct (notifications, then background jobs); still no new Apps Script file.
 
 ## Entries (newest first)
+
+### 31 Oct 2026, design chat: Jeopardy and the memory-phrase tool, wired into the behaviour app (design and mock-up)
+- What changed: a design a builder can follow (`lanes/design-jeopardy-popout.md`) and a mock-up (`lanes/mockups/jeopardy-board.html`, also on the site) for your 15 Oct ask: the Jeopardy game as a second tab on the classroom PC, fed by the behaviour app.
+  - **Rosters from the seating plan:** the sides are worked out from the plan the behaviour app already holds, with your mirroring rule (the plan is drawn with the board at the bottom, so the sheet's left half is the room's Right side); "Swap sides" stays for a class that comes out the other way; a pupil with no seat is asked once.
+  - **A right answer is a positive:** "Left wins" logs a positive for the Left duellist through the same call as a phone tap, so it shows on your phone at once and counts in the Friday list; undo takes it back; it queues with no signal. One tap id per clue per side, so nothing doubles.
+  - **Boards from your lessons:** a "Jeopardy next lesson" tick on a lesson makes the home build write a board in your game's own format from that lesson's questions and the class's red spots on the memory map; your own boards and the prompt builder stay.
+  - **The phone** gets Left, Right and Nobody for the clue on the board, so you can run a round from anywhere in the room. Keys and click path on the PC do not change.
+  - **Vanishing Cues** gets the class picker and its phrases from the lessons' memory phrases; it logs nothing per pupil.
+  - Test defaults (swap any): the positive to the winning duellist only; look A (your game's look); boards from the lesson build first. Recorded in `lanes/test-defaults.md`.
+- Not built: it waits for the Lesson page to be inside the installed app (Lane C build, step 6), then Lane C wires it and Lane B writes the boards (Plan Mode). The order and the checks are in the design, sections 6 and 7.
+- You need to: nothing, unless you want a different default.
+- Save: see git log "Jeopardy pop-out design".
 
 ### 31 Oct 2026, design chat: the CGP book scanner (your 15 Oct high priority), built up to the point that needs you
 - What changed: a home tool reads your three online CGP Combined Science books and makes the same kind of topic-to-page index the planner and the lesson builder already use for Kerboodle and Activate, plus where every Warm-Up, Exam Questions and Revision Summary page is and which page holds its answers (that is what the "book task" after a test review needs: "questions 1 to 3 on page 5, answers on page 9").
@@ -38,6 +51,19 @@
 - For Lane B (after your spot check): paste the three blocks into `textbook-index.md`, and let the class pick the book (10C2 Combined: CGP; 10S2 and 11S2 triple: Kerboodle Physics; KS3: Activate), then the follow-up book task (plan 4.2). Both are written out in the design, section 7.
 - You need to: the three questions on the decisions page, then the commands in Waiting item 20 (about 15 minutes a book, mostly waiting), then say "pages right" or name the wrong ones.
 - Save: see git log "CGP book scanner".
+
+### 31 Oct 2026, Lane C: background jobs (installed app step 7)
+- What changed: slow planner tasks now run in the background while you carry on, instead of holding the screen.
+  - **Three to start with:** the order sheet's Excel file, refreshing homework results, and updating the memory map. Homework drafts join when the school agent exists (step 3, after the school test).
+  - **In the app:** a small pill at the top of Today: "Making homework results..." then "Homework results ready". The order sheet's pill has a **Download** button. A failed one says why in plain words, with **Try again**; **x** clears a pill. Settings has a "Background jobs" card with two buttons (refresh homework results, update the memory map) so you can use it before the other screens move into the app.
+  - **App closed when it finishes:** a third notification kind, "A long job has finished", sends "Order sheet ready." to your phone instead (in the day only, never after 7pm). It is a third tick on the Notifications card.
+  - The finished file is kept on the planner for 6 hours for the app to download. Nothing is saved to Drive.
+  - A job stuck for over 10 minutes (the server stopped) is marked failed, so a pill never spins for ever.
+- The planner page's own Excel button is unchanged (Lane B's page); the app uses the background way.
+- Checks, all new: 17 for the planner side, 10 for the app side, 4 more in the real-browser check (pill, ready, download, clear).
+- You need to: nothing. It works once the next paste set is in and the app talks to the planner.
+- For Lane A: Day.gs changed again (next complete set; still no new Apps Script file).
+- Save: see git log "Installed app step 7: background jobs".
 
 ### 31 Oct 2026, Lane C (restarted after the PC restart): notifications (installed app step 8)
 - What changed: the installed app can now send you notifications, two kinds, each one you can switch on or off per device:
