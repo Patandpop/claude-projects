@@ -46,6 +46,7 @@
 - How it works, in plain words: a phone only shows a notification that a server has locked and signed, and the planner cannot do that maths. So a tiny free Cloudflare worker does it (`app/worker/push-worker.js`, the same free account as the app site, no paid plan). It keeps nothing: no list of phones, no messages. The planner keeps the list of your devices in a new Push tab (rows are never deleted; a phone that stops existing is marked "gone").
 - In the app: Settings has a new Notifications card: two ticks, On and Off, and "Send a test". It says plainly when the planner is not set up yet, when a browser cannot do it (an iPhone needs the app on the home screen first), or when the planner copy is older than this.
 - Not yet: the "job finished" kind (it comes with long jobs, step 7, which are not built). The look of the card is the plain shell style, like the PC timer card; it gets a proper design with the other screens.
+- Also: one day-screen check failed on Saturdays (to-dos only look at school days); it now knows about weekends.
 - Checks, all new: 13 for the worker (a message it locks is opened again by a separate implementation, and the signature checked), 28 for the planner side (school days, once a morning, quiet hours, nudges, a gone phone, the sender down), 12 for the app and service worker, 8 in a real browser.
 - You need to: nothing now. Waiting item 20 is the set-up, for when the app is on your personal planner.
 - For Lane A: Day.gs changed (next complete set; no new Apps Script file). The app's files are on the site, not in the paste.

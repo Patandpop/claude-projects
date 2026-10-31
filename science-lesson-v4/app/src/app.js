@@ -29,7 +29,7 @@
     } else {
       var u = API.settings().url;
       $('server').textContent = 'Connected to ' + u.replace(/^https:\/\/script\.google\.com\/macros\/s\/(.{6}).*$/, 'your planner (…$1…)') + '. The key is kept on this device only.';
-      drawOutbox();
+      drawOutbox(); pushRefresh();
     }
   }
   API.onLocked = function () { show('setup', 'The planner did not accept the key. Type it again.'); };
@@ -104,6 +104,47 @@
     });
     pcDraw(); pcStart();
   } else $('pcCard').classList.add('hidden');
+
+  // ---- notifications on this device (push.js): off until switched on here; the planner says whether it is set up
+  var PUSH = window.makePush ? makePush({ api: API, storage: localStorage, navigator: navigator, Notification: window.Notification, pushManagerOk: 'PushManager' in window }) : null;
+  function pushKinds() { return [$('pushMorning').checked && 'morning', $('pushNudge').checked && 'nudge'].filter(Boolean); }
+  function pushDraw(st, text, good) {
+    var on = !!(st && st.device && st.device.status === 'on');
+    Array.prototype.forEach.call($('pushOn').children, function (b) { b.setAttribute('aria-pressed', String((b.dataset.v === 'on') === on)); });
+    if (on) { $('pushMorning').checked = st.device.kinds.indexOf('morning') >= 0; $('pushNudge').checked = st.device.kinds.indexOf('nudge') >= 0; }
+    $('pushTest').classList.toggle('hidden', !on);
+    if (text !== undefined) say($('pushMsg'), text, good);
+  }
+  function pushFail(e) {
+    var m = (e && e.message) || 'No answer';
+    pushDraw(null, /^Not allowed/.test(m) ? 'This copy of the planner has no notifications yet (they come with the next paste).' : m, false);
+  }
+  function pushRefresh() {
+    if (!PUSH || !API.ready()) return;
+    if (!PUSH.supported()) return pushDraw(null, 'This browser cannot show notifications. On an iPhone, add the app to the home screen first.', false);
+    PUSH.status().then(function (st) {
+      if (!st || typeof st.ready !== 'boolean') return pushFail({ message: 'Not allowed' });
+      var gone = st.device && st.device.status === 'gone';
+      pushDraw(st, !st.ready ? 'Not set up on the planner yet.' : gone ? 'This device stopped receiving them. Switch On again.' : st.device && st.device.status === 'on' ? 'On for this device.' : '', !!st.ready && !gone);
+    }, function (e) { if (navigator.onLine) pushFail(e); });
+  }
+  function pushSwitch(wantOn) {
+    if (wantOn && !pushKinds().length) return say($('pushMsg'), 'Tick at least one kind first.', false);
+    say($('pushMsg'), wantOn ? 'Switching on...' : 'Switching off...', true);
+    (wantOn ? PUSH.on(pushKinds()) : PUSH.off()).then(function (st) {
+      pushDraw(st, wantOn ? 'On. Press "Send a test" to check it arrives.' : 'Off for this device.', true);
+    }, pushFail);
+  }
+  if (PUSH) {
+    $('pushOn').addEventListener('click', function (e) { var b = e.target.closest('button'); if (b) pushSwitch(b.dataset.v === 'on'); });
+    ['pushMorning', 'pushNudge'].forEach(function (id) { $(id).addEventListener('change', function () {
+      if ($('pushOn').querySelector('[data-v="on"]').getAttribute('aria-pressed') === 'true') pushSwitch(true);   // on: save the new ticks
+    }); });
+    $('pushTest').onclick = function () {
+      say($('pushMsg'), 'Sending...', true);
+      PUSH.test().then(function (r) { say($('pushMsg'), r && r.sent ? 'Sent. It should arrive in a few seconds.' : (r && r.why) || 'Not sent: this device has gone. Switch On again.', !!(r && r.sent)); }, pushFail);
+    };
+  } else $('pushCard').classList.add('hidden');
 
   // ---- install and updates
   if ('serviceWorker' in navigator && location.protocol !== 'file:') {

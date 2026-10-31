@@ -9,7 +9,7 @@
 //     site (the mock-ups) are left to the browser and never replace the kept home page.
 'use strict';
 var STORE = 'planner-app {{BUILD_STAMP}}';
-var SHELL = ['./', 'app.js', 'api.js', 'outbox.js', 'pc-timer.js', 'shared/day-logic.js', 'shared/day-popup.js', 'shared/game-ulhu.js', 'manifest.webmanifest', 'icons/icon-32.png', 'icons/icon-180.png', 'icons/icon-192.png', 'icons/icon-512.png'];
+var SHELL = ['./', 'app.js', 'api.js', 'outbox.js', 'pc-timer.js', 'push.js', 'shared/day-logic.js', 'shared/day-popup.js', 'shared/game-ulhu.js', 'manifest.webmanifest', 'icons/icon-32.png', 'icons/icon-180.png', 'icons/icon-192.png', 'icons/icon-512.png'];
 
 self.addEventListener('install', function (e) {
   e.waitUntil(caches.open(STORE).then(function (c) { return c.addAll(SHELL); }));
@@ -40,5 +40,21 @@ self.addEventListener('fetch', function (e) {
   e.respondWith(caches.match(req, { cacheName: STORE }).then(function (hit) {
     var net = fetch(req).then(function (r) { if (r.ok) { var copy = r.clone(); caches.open(STORE).then(function (c) { c.put(req, copy); }); } return r; }).catch(function () { return hit; });
     return hit || net;
+  }));
+});
+
+// notifications (build step 8): the planner's message arrives locked for this device; the browser opens it and this shows
+// it. Tapping it brings the app forward (or opens it).
+self.addEventListener('push', function (e) {
+  var m = {}; try { m = e.data ? e.data.json() : {}; } catch (err) { m = { body: e.data ? e.data.text() : '' }; }
+  e.waitUntil(self.registration.showNotification(String(m.title || 'Planner'), { body: String(m.body || ''), tag: m.tag || undefined,
+    icon: 'icons/icon-192.png', badge: 'icons/icon-192.png', data: { url: m.url || './' } }));
+});
+self.addEventListener('notificationclick', function (e) {
+  e.notification.close();
+  var url = new URL((e.notification.data && e.notification.data.url) || './', self.registration.scope).href;
+  e.waitUntil(self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function (list) {
+    for (var i = 0; i < list.length; i++) if (list[i].url.indexOf(self.registration.scope) === 0 && 'focus' in list[i]) return list[i].focus();
+    return self.clients.openWindow(url);
   }));
 });

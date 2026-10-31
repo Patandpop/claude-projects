@@ -36,7 +36,8 @@ let d = dayLoad(k);
 ok('dayLoad: today, the period times and the calendar come back', d.day === TODAY && !!d.periodTimes && d.cal.terms.length === 1);
 ok('today\'s lessons from the saved week, with built flags', d.lessons.length === 3 && d.lessons[0].cls === '9AS' && d.lessons[0].built === true && d.lessons[1].built === false && d.lessons[1].title === 'L4 Ripple tanks');
 const ids = d.items.map((x) => x.id);
-ok('an unbuilt lesson today is a to-do', ids.includes('build:' + TODAY + ':3:10S2'));
+const WEEKEND = IDX >= 5;   // to-dos look at school days only, so at the weekend today's lesson is not one
+ok(WEEKEND ? 'an unbuilt lesson today is not a to-do at the weekend' : 'an unbuilt lesson today is a to-do', ids.includes('build:' + TODAY + ':3:10S2') !== WEEKEND);
 ok('a test slot is not a build to-do', !ids.some((x) => /:4:12C/.test(x)));
 ok('key homework past its due day is "mark" to-do', ids.includes('mark:9AS-x-1'));
 const ch = d.items.find((x) => x.id === 'chase:10C2-y-1');

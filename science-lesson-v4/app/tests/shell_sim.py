@@ -69,7 +69,8 @@ with sync_playwright() as p:
     pg.fill('#url', GOOD); pg.fill('#key', 'good-key-123'); pg.click('#save'); pg.wait_for_selector('#home:not(.hidden)')
     check('the right address and key connect, and the home and Settings show', 'Connected' in pg.inner_text('#homeMsg') and pg.is_hidden('#setup'))
     check('the key is never in a link or on screen, and the key box is emptied', all('good-key-123' not in s['url'] for s in seen) and 'good-key-123' not in pg.inner_text('body') and pg.input_value('#key') == '')
-    check('it was tested with one harmless read (getMode), sent as plain text', json.loads(seen[-1]['body'])['fn'] == 'getMode')
+    good = [json.loads(s['body'])['fn'] for s in seen if 'good-key-123' in s['body']]
+    check('it was tested with one harmless read (getMode), sent as plain text; the only other call reads the notifications state', good[0] == 'getMode' and set(good) <= {'getMode', 'pushStatus'})
 
     # ---- no signal: opens from the device's own copy (after a mock-up page was opened, which must not replace it)
     pg.goto(BASE + 'mockups/')

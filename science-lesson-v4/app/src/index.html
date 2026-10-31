@@ -90,6 +90,15 @@
       <div class="seg" id="pcOn"><button data-v="off">Off</button><button data-v="on">On</button></div>
       <p class="msg" id="pcMsg" role="status"></p>
     </div>
+    <h2>Notifications</h2>
+    <div class="card" id="pushCard">
+      <p class="note" style="margin-top:0">For this device. Nothing before 7am or after 7pm. The morning one comes at 7am on school days only, and only when a lesson today is not built (class codes and lesson titles, never names). Ulhu's nudge is at most one a day.</p>
+      <label><input type="checkbox" id="pushMorning" checked> Morning: lessons not built yet</label>
+      <label><input type="checkbox" id="pushNudge" checked> Ulhu's nudge</label>
+      <div class="seg" id="pushOn"><button data-v="off">Off</button><button data-v="on">On</button></div>
+      <div class="row"><button class="plain hidden" id="pushTest">Send a test</button></div>
+      <p class="msg" id="pushMsg" role="status"></p>
+    </div>
     <p class="note"><a class="btn plain" href="test/">Open the school test</a></p>
   </section>
   <p class="stamp">build {{BUILD_STAMP}}</p>
@@ -100,6 +109,7 @@
 <script src="shared/game-ulhu.js"></script>
 <script src="shared/day-popup.js"></script>
 <script src="pc-timer.js"></script>
+<script src="push.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

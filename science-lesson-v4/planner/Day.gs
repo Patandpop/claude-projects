@@ -22,7 +22,9 @@ const BRIDGE_CALLS = [
   'turnOnDailyResults', 'setBehaviourUrl', 'exportXlsx',
   // the day screen, capture box and evening timer (this file)
   'dayLoad', 'daySettings', 'daySettingsSave', 'todoSave', 'todoSet', 'blockAccept', 'doneForToday', 'captureSave', 'captureFile',
-  'obsidianFlush', 'timerStart', 'timerStop', 'timerLog', 'timerEdit', 'timerReport', 'timerRules', 'timerRulesSave'
+  'obsidianFlush', 'timerStart', 'timerStop', 'timerLog', 'timerEdit', 'timerReport', 'timerRules', 'timerRulesSave',
+  // notifications (this file); pushTick belongs to the trigger and is not reachable from outside
+  'pushStatus', 'pushSave', 'pushRemove', 'pushTest'
 ];
 // Ulhu: every public game call (gameLoad, gameTick, ...). Names ending in _ are private and never reachable.
 const BRIDGE_GAME = /^game[A-Z][A-Za-z0-9]*$/;
@@ -406,4 +408,122 @@ function timerRulesSave(k, rows) {
     if (vals.length) sh.getRange(2, 1, vals.length, head.length).setValues(vals);
     return timerRules(k);
   });
+}
+
+/* ------------------------------------------------------------- notifications (lanes/design-installed-app.md 6.2, step 8)
+   Two kinds, each switchable per device: "morning" (07:00 to 07:30 on school days only: today's lessons not built or not
+   planned, class codes and lesson titles only, never names; nothing when everything is built) and "nudge" (Lane D's
+   Ulhu nudges, Companion.gs gameNudge: at most one a day, its own rules). Nothing is sent before 07:00 or from 19:00.
+   A job-finished kind joins when long jobs (step 7) exist.
+   How: the app subscribes a device and saves it here (Push tab). pushTick runs every 30 minutes (one trigger, made the
+   first time a device switches on) and posts the message to the Cloudflare Worker (app/worker/push-worker.js), which
+   locks and signs it for each device. Script properties: PUSH_WORKER_URL, PUSH_SECRET, PUSH_PUBLIC_KEY (made by
+   node app/tools/make-push-keys.js). Devices are never deleted: switched off, or "gone" when the phone's push service
+   says it no longer exists. */
+DAY_TABS['Push'] = ['deviceId', 'label', 'endpoint', 'p256dh', 'auth', 'kinds', 'status', 'addedAt', 'lastSent', 'lastStatus'];
+const PUSH_KINDS = ['morning', 'nudge'];
+const PUSH_FROM = 7, PUSH_TO = 19;   // quiet before 07:00 and from 19:00, every day
+const dNow_ = () => (typeof DAY_NOW !== 'undefined' && DAY_NOW ? new Date(DAY_NOW) : new Date());
+function dPushProps_() {
+  const p = PropertiesService.getScriptProperties();
+  return { url: String(p.getProperty('PUSH_WORKER_URL') || '').replace(/\/+$/, ''), secret: p.getProperty('PUSH_SECRET') || '', publicKey: p.getProperty('PUSH_PUBLIC_KEY') || '' };
+}
+function dPushDevices_(kind, deviceId) {
+  return dRows_('Push').filter((r) => r.status === 'on' && (deviceId ? r.deviceId === deviceId : String(r.kinds).split('|').indexOf(kind) >= 0));
+}
+function dSchoolDay_(day, data) {
+  const wd = new Date(day + 'T12:00:00Z').getUTCDay();
+  if (wd === 0 || wd === 6 || (data.inset || []).indexOf(day) >= 0) return false;
+  return (data.terms || []).some((t) => day >= t[0] && day <= t[1]);
+}
+// the morning text, or '' when there is nothing to say (everything built, or not a school day)
+function dMorningText_(day) {
+  const world = dWorld_(), data = world.data || {};
+  if (!dSchoolDay_(day, data)) return '';
+  const todo = dLessons_(world, day).filter((L) => L.kind === 'lesson' && L.built !== true)
+    .map((L) => L.cls + ' P' + L.period + (L.title ? ' ' + L.title : '') + (L.planned ? ' not built' : ' not planned'));
+  return todo.length ? 'Today: ' + todo.join(', ') : '';
+}
+
+// Send one message to every device that has this kind switched on (or to one device). Returns what happened.
+function pushSend_(kind, msg, deviceId) {
+  const P = dPushProps_(), devs = dPushDevices_(kind, deviceId);
+  if (!P.url || !P.secret) return { sent: 0, why: 'Notifications are not set up on the planner yet' };
+  if (!devs.length) return { sent: 0, why: 'No device has this switched on' };
+  const out = { sent: 0, gone: 0, failed: 0 }, now = Date.now();
+  for (let i = 0; i < devs.length; i += 20) {
+    const part = devs.slice(i, i + 20);
+    let res = null;
+    try {
+      const r = UrlFetchApp.fetch(P.url + '/send', { method: 'post', contentType: 'application/json', headers: { 'X-Push-Secret': P.secret }, muteHttpExceptions: true,
+        payload: JSON.stringify({ subs: part.map((d) => ({ endpoint: d.endpoint, keys: { p256dh: d.p256dh, auth: d.auth } })), msg: msg }) });
+      res = JSON.parse(r.getContentText());
+    } catch (e) { res = null; }
+    if (!res || !res.ok) { out.failed += part.length; out.why = (res && res.error) || 'The notification sender did not answer'; continue; }
+    (res.results || []).forEach((x) => {
+      const d = part[x.i]; if (!d) return;
+      const st = Number(x.status) || 0, ch = { lastStatus: st || String(x.error || 'failed') };
+      if (st === 404 || st === 410) { ch.status = 'gone'; out.gone++; } else if (st >= 200 && st < 300) { ch.lastSent = now; out.sent++; } else out.failed++;
+      dUpdate_('Push', d, ch);
+    });
+  }
+  dAppend_('Day Log', { day: dDay_(dNow_()), what: 'push ' + kind + ': ' + out.sent + ' sent' + (out.gone ? ', ' + out.gone + ' gone' : '') + (out.failed ? ', ' + out.failed + ' failed' : ''), at: now });
+  return out;
+}
+
+// The half-hourly trigger. Safe to run any number of times: the morning message goes once a day (even if the sender
+// was down: no repeats), nudges follow Lane D's own once-a-day rule.
+function pushTick() {
+  const now = dNow_(), day = dDay_(now), hour = Number(Utilities.formatDate(now, DAY_TZ, 'H')), out = {};
+  if (hour < PUSH_FROM || hour >= PUSH_TO) return { quiet: true };
+  if (hour === PUSH_FROM && dPushDevices_('morning').length && !dRows_('Day Log').some((r) => r.day === day && /^(push morning|morning checked)/.test(String(r.what)))) {
+    const text = dMorningText_(day);
+    if (text) out.morning = pushSend_('morning', { title: 'Planner', body: text, tag: 'morning-' + day, url: './' });
+    else dAppend_('Day Log', { day: day, what: 'morning checked: nothing to say', at: Date.now() });
+  }
+  if (dPushDevices_('nudge').length && typeof gameNudge === 'function') {
+    const key = PropertiesService.getScriptProperties().getProperty('PLANNER_KEY');
+    let n = null; try { n = gameNudge(key, true); } catch (e) { n = null; }
+    if (n && n.text) out.nudge = pushSend_('nudge', { title: 'Ulhu', body: n.text, tag: 'nudge-' + day, url: './' });
+  }
+  return out;
+}
+function dPushTrigger_() {
+  if (ScriptApp.getProjectTriggers().some((t) => t.getHandlerFunction() === 'pushTick')) return false;
+  ScriptApp.newTrigger('pushTick').timeBased().everyMinutes(30).create();
+  return true;
+}
+
+function pushStatus(k, deviceId) {
+  check_(k);
+  const P = dPushProps_(), d = deviceId ? dRows_('Push').filter((r) => r.deviceId === deviceId)[0] : null;
+  return { ready: !!(P.url && P.secret && P.publicKey), publicKey: P.publicKey, kinds: PUSH_KINDS.slice(),
+    device: d ? { status: d.status, kinds: String(d.kinds).split('|').filter(Boolean), lastSent: d.lastSent || null } : null };
+}
+// save (or update) this device: dev = { deviceId, label, endpoint, keys: { p256dh, auth } }; kinds from PUSH_KINDS
+function pushSave(k, dev, kinds) {
+  check_(k);
+  const d = dev || {}, keys = d.keys || {};
+  if (!/^[A-Za-z0-9_-]{6,40}$/.test(String(d.deviceId || ''))) throw new Error('Bad device id');
+  if (!/^https:\/\/\S{8,900}$/.test(String(d.endpoint || ''))) throw new Error('Bad device address');
+  if (!/^[A-Za-z0-9_-]{80,100}$/.test(String(keys.p256dh || '')) || !/^[A-Za-z0-9_-]{16,30}$/.test(String(keys.auth || ''))) throw new Error('Bad device keys');
+  const want = (kinds || []).filter((x) => PUSH_KINDS.indexOf(x) >= 0).join('|');
+  dLock_(() => {
+    const hit = dRows_('Push').filter((r) => r.deviceId === d.deviceId)[0];
+    const row = { label: dClean_(d.label, 40), endpoint: d.endpoint, p256dh: keys.p256dh, auth: keys.auth, kinds: want, status: 'on' };
+    if (hit) dUpdate_('Push', hit, row); else dAppend_('Push', Object.assign({ deviceId: d.deviceId, addedAt: Date.now() }, row));
+    dPushTrigger_();
+  });
+  return pushStatus(k, d.deviceId);
+}
+function pushRemove(k, deviceId) {
+  check_(k);
+  dLock_(() => dRows_('Push').filter((r) => r.deviceId === deviceId).forEach((r) => dUpdate_('Push', r, { status: 'off' })));
+  return pushStatus(k, deviceId);
+}
+// one message to this device only, when he presses "Send a test" (his own tap, so the quiet hours do not apply)
+function pushTest(k, deviceId) {
+  check_(k);
+  if (!deviceId) throw new Error('Bad device id');
+  return pushSend_('test', { title: 'Planner', body: 'Notifications work on this device.', tag: 'test', url: './' }, String(deviceId));
 }
