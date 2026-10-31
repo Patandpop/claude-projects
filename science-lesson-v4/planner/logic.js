@@ -769,7 +769,20 @@
     return row.status === 'form only' ? 'form only' : 'drafted';
   }
   // week (optional): the rest of the week, so a lesson already made for another class is reused
-  function buildPrompt(data, s, profile, week, memory) {
+  // Workplan 2.10 (test build, 2026-10-31): the lines that ask for the "last week's homework" slide after the
+  // Do Now answers, from lastResults (class counts only). [] when there are no results or he unticked it.
+  function hwBackLines(results, s, week) {
+    if (s.kind !== 'lesson' || s.hwBack === false || !results || !week || !week.monday) return [];
+    const r = lastResults(results, s.cls, iso(addDays(parse(week.monday), s.day || 0)));
+    if (!r || !r.weak.length) return [];
+    return ['Last week\'s homework slide (test build): add "homeworkFeedback" to the lesson, the slide after the Do Now answers, with these ' +
+      (r.weak.length === 1 ? 'one most-missed question' : r.weak.length + ' most-missed questions') + ' from "' + (r.title || 'last homework') + '" (due ' + r.dueOn + ', ' +
+      r.done + (r.size ? ' of ' + r.size : '') + ' did it; class counts only, never names). For each, write the right answer and one line on why the common wrong answer is wrong:',
+    ...r.weak.map((q) => '- Q' + q.key + (q.text ? ' "' + String(q.text).slice(0, 200) + '"' : '') + ': ' + q.pct + '% of marks' +
+      (q.wrong && q.wrong[0] ? '; most common wrong answer "' + q.wrong[0].answer + '" (' + q.wrong[0].count + ' of ' + r.done + ')' : '') +
+      (q.missed && q.missed[0] ? '; mark point missed most: ' + q.missed[0].title + ' (' + q.missed[0].pct + '% missed it)' : '') + '.')];
+  }
+  function buildPrompt(data, s, profile, week, memory, results) {
     const c = data.classes[s.cls] || {};
     const L = s.kind === 'lesson' ? c.seq[s.i] : null;
     const lines = [];
@@ -799,6 +812,7 @@
     // Workplan 2.2: a question the class missed in last lesson's ABCD cards goes back on the Do Now
     (s.dnVotes || []).forEach((x) => lines.push(`Put on the Do Now (missed in the ABCD cards in ${x.from}, ${x.pct}% right${x.wrong ? ', most picked ' + x.wrong : ''}): ${x.q}` +
       (x.opts ? ` Options: ${x.opts}.` : '') + (x.right ? ` Answer: ${x.right}.` : '') + (x.why ? ` Misconception: ${x.why}` : '')));
+    hwBackLines(results, s, week).forEach((x) => lines.push(x));   // workplan 2.10
     // big goal 1: the ticked "Suggested Do Now" sections from the memory map go to the Do Now picker at home
     if (s.kind === 'lesson' && memory) {
       const date = week && week.monday ? iso(addDays(parse(week.monday), s.day || 0)) : '';
@@ -952,6 +966,6 @@
   }
 
   const api = { dueFor, nextLessonDay, lessonsOn, lessonEnd, recs, findRecord, setRecord, lessonNotes, recordChanges, remapRecords, migrateMarks, cascade, revisionSlot, unitBefore, applyAdded, addedNum, remapWeek, lessonId, applyMarks, classReport, topicList, wouldSkip, setSlot, markLesson, refillClass, planFrom, periodTime, calendarEvents, DAYS, iso, parse, addDays, mondayOf, isTeachingDay, nextSchoolDay, weekLetter, progressBefore, next, autofill, moveSlot, refillAfter,
-    EXTRAS, extrasSuggested, gradeFor, hwCoverage, hwStatus, lastResults, lastVotes, homeworkAhead, doNowFromVote, memoryGrid, memorySuggest, specTitle, mostMissed, hwForLesson, lessonSlot, testSlot, notHappened, slotDone, slotDay, fromFilled, reflowWeek, CHECKS, sheetCells, sheetModel, setsCount, printList, buildPrompt, carryForward, equipCell, lessonCell, setsLabel };
+    EXTRAS, extrasSuggested, gradeFor, hwCoverage, hwStatus, lastResults, lastVotes, homeworkAhead, doNowFromVote, memoryGrid, memorySuggest, specTitle, mostMissed, hwForLesson, lessonSlot, testSlot, notHappened, slotDone, slotDay, fromFilled, reflowWeek, CHECKS, sheetCells, sheetModel, setsCount, printList, buildPrompt, hwBackLines, carryForward, equipCell, lessonCell, setsLabel };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.PlannerLogic = api;
 })(typeof window !== 'undefined' ? window : this);

@@ -5,11 +5,21 @@ Plain-English record of Lane B's work, newest entry first. Each entry says what 
 ## Waiting on you
 
 1. **Upload the new skill file.** The skill notes and the lesson builder changed today (the items below), so the rebuilt `science-lesson.skill` needs uploading to claude.ai: replace the old file directly (not in Projects).
-2. **Next paste set (Lane A makes it):** my planner changes from items 2.2, 2.3, 2.4, 2.7, 2.8 and 2.12, 2.9, backdating, the memory map, the Memory tab, Blind and now homework ahead (Planner.html, Logic.html, Code.gs, Phone.html, EyesFree.html, Behaviour.gs, BoardPage.html, and the new Memory.gs) need to go into the next complete set; after pasting, re-import planner-data.json from home once. Optional: paste the new Mailbox.gs into the home link's own project and deploy a new version (item 4.6, faster quiz list).
+2. **Next paste set (Lane A makes it):** my planner changes from items 2.2, 2.3, 2.4, 2.7, 2.8 and 2.12, 2.9, backdating, the memory map, the Memory tab, Blind homework ahead and now last week's homework slide (Planner.html, Logic.html, Code.gs, Phone.html, EyesFree.html, Behaviour.gs, BoardPage.html, and the new Memory.gs) need to go into the next complete set; after pasting, re-import planner-data.json from home once. Optional: paste the new Mailbox.gs into the home link's own project and deploy a new version (item 4.6, faster quiz list).
 3. **Which lesson showed "3 to 4 mark questions as 6"?** I searched every saved October lesson and found no mark total that disagrees with its parts. Tell me the class and lesson (or send a photo of the slide) and I'll fix it.
 4. **After the paste: your Blind letters score.** Press Blind, then Today > Settings > "Test my letters" with a class open, and tell me the score.
 
 ---
+## 31 Oct 2026, item 2.10: "last week's homework" slide (layout A, three cards), TEST BUILD, pick still open
+
+**What changed:**
+- **A new slide straight after the Do Now answers**: the three questions the class got most wrong in last week's homework, side by side as three cards. Each card has the class's score in a coloured ring (red under 50%, amber 50 to 74%, green 75% and over), the question, the right answer in a navy box that appears when you click, "9 of 24 put ..." with the most common wrong answer in orange, and one line on why that answer is wrong. The bar at the top names the homework and how many did it. Class numbers only, never names. The three cards use the same text size row by row, so they read as a set.
+- **In the planner**, click a lesson that has homework results from the last two weeks and a new box, "Last week's homework", lists the three with a tick "Show these on a slide after the Do Now answers (test build)". It is on by default; untick it to leave the slide out. When on, the build request asks Claude for the slide, with the numbers from the Results tab.
+- The builder warns if a card has no right answer or more than three are given. The skill notes explain the new part of a lesson.
+- Checks: 2 new planner logic checks, 4 new regression checks (slide 3, three rings, three click-to-show answers, no em dash). I built a test lesson and looked at the slide in PowerPoint: it matches mock-up A.
+
+**You need to:** nothing until the next paste set (Planner.html, Logic.html) and the skill upload. Then tell me after a lesson or two whether to keep A or try B.
+
 ## 30 Oct 2026, homework ahead on the Homework tab (item 4.13, layout B2 made warmer)
 
 **What changed:**

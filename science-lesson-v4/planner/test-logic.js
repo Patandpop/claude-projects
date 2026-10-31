@@ -319,6 +319,16 @@ if (fs.existsSync(DRIVE)) {
   const lr = P.lastResults(resRows, '9XS', '2026-10-21');
   ok(lr && lr.dueOn === '2026-10-19' && lr.weak.map((q) => q.key).join(',') === '2,3,1', 'lesson card: newest homework due before the lesson, its 3 weakest questions first');
   ok(P.lastResults(resRows, '9XS', '2026-11-20') === null && P.lastResults(resRows, '10C2', '2026-10-21') === null, 'lesson card: nothing older than 14 days, nothing for another class');
+  // workplan 2.10 (2026-10-31, test build): last week's homework slide asked for in the build request, on unless unticked
+  {
+    const rr = JSON.parse(JSON.stringify(resRows)); rr[1].title = 'Cells'; rr[1].questions[1].wrong = [{ answer: '6 J', count: 9 }];
+    const wk = { monday: '2026-10-19', slots: [] }, hs = { kind: 'lesson', cls: '9XS', i: 0, day: 2 };
+    const pr = P.buildPrompt(data, hs, null, wk, null, rr);
+    ok(/Last week's homework slide \(test build\): add "homeworkFeedback"[^\n]*"Cells" \(due 2026-10-19, 22 did it/.test(pr) && /- Q2: 30% of marks; most common wrong answer "6 J" \(9 of 22\)\./.test(pr) && /- Q3: 55%/.test(pr) && /- Q1: 80%/.test(pr),
+      'homework slide: the build request lists the 3 most-missed questions with the common wrong answer');
+    ok(!/homeworkFeedback/.test(P.buildPrompt(data, Object.assign({}, hs, { hwBack: false }), null, wk, null, rr)) && !/homeworkFeedback/.test(P.buildPrompt(data, hs, null, wk, null, [])) && !/homeworkFeedback/.test(P.buildPrompt(data, hs, null, wk)),
+      'homework slide: left out when unticked, or when there are no results');
+  }
   // workplan 2.12 (2026-10-29): a note for next time on a lesson shows for any class planning that lesson, and goes to Claude
   {
     const d2 = JSON.parse(JSON.stringify(data)), cls = Object.keys(d2.classes)[0], L0 = d2.classes[cls].seq[0];

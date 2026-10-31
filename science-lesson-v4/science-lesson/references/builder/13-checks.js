@@ -141,6 +141,13 @@ function contentCheck(L) {
     check(!!(c && c.pages), `Extension "${(c && c.subtopic) || i + 1}" support page`, `Extension column "${(c && c.subtopic) || i + 1}" has no support page (pages)`);
     check(qs.length && qs.every((q) => String(q.a || '').trim()), `Extension "${(c && c.subtopic) || i + 1}" answers`, `Extension column "${(c && c.subtopic) || i + 1}" has a question with no answer (it drops off the answers slide)`);
   });
+  // last week's homework slide (2.10, test build): three cards, each with its right answer
+  if (L.homeworkFeedback) {
+    const hq = arr(L.homeworkFeedback.questions);
+    if (hq.length > 3) lines.push(`  ✗ homeworkFeedback has ${hq.length} questions: only the first 3 are shown`);
+    const noRight = hq.slice(0, 3).filter((q) => !String((q && q.right) || '').trim()).length;
+    check(hq.length && !noRight, `Last week's homework slide: ${Math.min(3, hq.length)} question(s)`, hq.length ? `homeworkFeedback: ${noRight} question(s) with no right answer (the click box is empty)` : 'homeworkFeedback has no questions: the slide is left out');
+  }
   const nPrac = arr(L.build).filter((b) => (b.type || b.variant) === 'practical').length;
   if (nPrac > 2) lines.push(`  ✗ ${nPrac} practicals — a lesson has at most 2; only the first 2 are drawn on the worksheet`);
   if (arr(L.extension).length > 4) lines.push('  ✗ Extension has more than 4 subtopic columns — only the first 4 are drawn');

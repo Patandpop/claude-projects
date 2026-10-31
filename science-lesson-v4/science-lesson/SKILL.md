@@ -189,6 +189,8 @@ The renderer validates each lesson loudly (never blocks): Do Now exactly 6 · MC
     "specPoints": ["optional — spec reference strings shown in presenter notes on the Do Now slide only. Use for spec codes or statements the Do Now is testing (e.g. 'AQA P5.1 — alternating current'). Never shown to students."],
     "spec": ["optional: the spec codes in the planner's build request line 'Do Now spec (from the memory map, most due first)'. Copy them here: the automatic picker prefers questions on them, and they show in the Do Now slide's notes."]
   },
+  "homeworkFeedback": { "title": "optional, test build (pick still open): ONLY when the build request has a 'Last week's homework slide' line. Copy its questions (up to 3); one slide after the Do Now answers. Class counts only, never names.", "due": "Fri 23 Oct", "done": 24, "size": 28,
+    "questions": [ { "n": 4, "q": "the homework question", "pct": 38, "right": "the right answer (shown on click)", "wrong": "the most common wrong answer, or the mark point missed", "wrongN": 9, "why": "one line on why the wrong answer is wrong" } ] },
   "engage": { "...": "see slide-options-v4.md ENGAGE" },
   "learn": [
 

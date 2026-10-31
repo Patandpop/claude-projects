@@ -798,6 +798,20 @@ async function main() {
       else fail('parts missing after the split: ' + lost.join(', '));
       if (!/\[FIG/.test(all)) pass('no [FIG] marker on the exam slides');
       else fail('a [FIG] marker reached the exam slides');
+      // Item 2.10 (2026-10-31, test build): last week's homework, three cards, right after the Do Now answers
+      const ord = fs.existsSync(pptx) ? new AdmZip(pptx).getEntries().filter((e) => /slides\/slide\d+\.xml$/.test(e.entryName))
+        .sort((a, b) => +a.entryName.match(/(\d+)\.xml$/)[1] - +b.entryName.match(/(\d+)\.xml$/)[1]).map((e) => e.getData().toString('utf8')) : [];
+      const hi = ord.findIndex((x) => x.includes('LAST WEEK’S HOMEWORK'));
+      const hs = ord[hi] || '';
+      if (hi === 2 && ord[1].includes('Purple pen time')) pass('homework slide: straight after the Do Now answers');
+      else fail(`homework slide: at slide ${hi + 1}, expected slide 3 after the Do Now answers`);
+      if ((hs.match(/prstGeom prst="ellipse"/g) || []).length === 3 && ['38%', '46%', '54%'].every((p) => hs.includes('<a:t>' + p + '</a:t>'))) pass('homework slide: three % rings');
+      else fail('homework slide: the three % rings are missing');
+      const clicks = (hs.match(/nodeType="clickEffect"/g) || []).length;
+      if (clicks === 3 && ['8 mm', 'Cell membrane', 'genetic material'].every((t) => hs.includes(t))) pass('homework slide: the three right answers appear on click');
+      else fail(`homework slide: ${clicks} click-revealed boxes, expected the 3 right answers`);
+      if (hs.includes('9 of 24 put') && !hs.includes('—')) pass('homework slide: "n of N put", no em dash');
+      else fail('homework slide: "n of N put" missing or an em dash');
     }
 
     // Item 2.13 (2026-10-30): 10S2 has no word bank (class-defaults.json), on either sheet.

@@ -1714,7 +1714,7 @@ function revisionLesson(s, unit, put) {
     if (who !== 'claude' && who !== 'same') return;
     const t = S.week.slots[S.sel];
     const when = P.DAYS[s.day] + ' ' + P.addDays(S.monday, s.day).toLocaleDateString('en-GB', { day:'numeric', month:'short' }) + ' P' + s.period;
-    run('sendRequest', { kind: 'build', text: '', lessons: [{ when, cls: s.cls, prompt: P.buildPrompt(S.data, t, (S.classSettings || {})[s.cls], S.week, S.memory) }] })
+    run('sendRequest', { kind: 'build', text: '', lessons: [{ when, cls: s.cls, prompt: P.buildPrompt(S.data, t, (S.classSettings || {})[s.cls], S.week, S.memory, S.results) }] })
       .then(() => toast('Revision lesson asked for. At home say "do my planner requests"'))
       .catch((e) => toast('Revision lesson set, but not sent to Claude: ' + e.message));
   };
@@ -1778,6 +1778,16 @@ function votesCard(s) {
         '<button class="eDnv" data-q="' + x.q + '">' + (has ? 'Take off the Do Now' : 'Put on this lesson\'s Do Now') + '</button></div>';
     }).join('') : '<p class="muted">Every question 100% right.</p>') + '</div>';
 }
+// Workplan 2.10 (test build, 31 Oct 2026): last week's homework, three most-missed questions, on a slide after the Do Now
+// answers. On unless unticked (s.hwBack === false). Class counts only.
+function hwBackCard(s) {
+  const r = P.lastResults(S.results, s.cls, P.iso(P.addDays(P.parse(S.week.monday), s.day)));
+  if (!r || !r.weak.length) return '';
+  return '<div class="card"><h4>Last week\'s homework <span class="src">' + esc(r.title || '') + ': ' + r.done + (r.size ? ' of ' + r.size : '') + ' did it, average ' + r.avg + '%</span></h4>' +
+    r.weak.map((q) => '<div style="margin:3px 0">Q' + esc(q.key) + ': ' + q.pct + '% of marks' + (q.wrong && q.wrong[0] ? ', most put ' + esc(q.wrong[0].answer) + ' (' + q.wrong[0].count + ')' : '') +
+      (q.missed && q.missed[0] ? ', missed most: ' + esc(q.missed[0].title) : '') + (q.text ? '<br><span class="muted">' + esc(String(q.text).slice(0, 140)) + '</span>' : '') + '</div>').join('') +
+    '<label class="inline" style="display:block;margin-top:6px"><input type="checkbox" id="eHwBack"' + (s.hwBack === false ? '' : ' checked') + '> Show these on a slide after the Do Now answers (test build)</label></div>';
+}
 // Big goal 1 (30 Oct 2026): the lesson card's "Suggested Do Now" from the memory map. The ticks go to Claude with the
 // build request (the Do Now picker at home uses them). Nothing is put on a Do Now on its own.
 function memSugFor(s) {
@@ -1834,7 +1844,7 @@ function editor() {
         '<input type="text" id="eBook" placeholder="Textbook pages" value="' + esc(s.book || (curL && curL.book) || '') + '" style="flex:1"></div>' +
       (s.kind === 'lesson' ? '<label class="inline"><input type="checkbox" id="eRemember"' + (s.eqSrc === 'remembered' ? ' checked' : '') + '> use this every time this lesson is taught</label>' : '') +
     '</div>' +
-    (isLesson ? checklistCard(s) : '') + (s.kind === 'lesson' ? extrasCard(s) + votesCard(s) + memDnCard(s) + noteCard(s) : '') +
+    (isLesson ? checklistCard(s) : '') + (s.kind === 'lesson' ? extrasCard(s) + votesCard(s) + hwBackCard(s) + memDnCard(s) + noteCard(s) : '') +
     (['lesson', 'revision'].includes(s.kind) ? '<div class="card"><h4>Who makes it</h4>' +
       '<label class="inline" style="display:block"><input type="checkbox" id="eOwn"' + (s.own ? ' checked' : '') + '> I have made this myself (never sent to Claude)</label>' +
       (() => { const others = S.week.slots.map((x, n) => ({ x, n })).filter(({ x, n }) => n !== S.sel && x.cls !== s.cls && !x.double && ['lesson', 'revision'].includes(x.kind));
@@ -1935,6 +1945,11 @@ function editor() {
     w.slots[S.sel].dnVotes = at >= 0 ? cur.filter((d, i) => i !== at) : cur.concat(P.doNowFromVote(x, L.mcq));
     change(w, at >= 0 ? 'Taken off the Do Now' : 'On the Do Now: it goes to Claude with the build request');
   });
+  if ($('eHwBack')) $('eHwBack').onchange = () => {   // workplan 2.10 (test build)
+    const w = JSON.parse(JSON.stringify(S.week));
+    if ($('eHwBack').checked) delete w.slots[S.sel].hwBack; else w.slots[S.sel].hwBack = false;
+    change(w, $('eHwBack').checked ? 'Last week\'s homework slide: on' : 'Last week\'s homework slide: off', true);
+  };
   document.querySelectorAll('.eMem').forEach((el) => el.onchange = () => {   // big goal 1: Suggested Do Now ticks
     const w = JSON.parse(JSON.stringify(S.week));
     w.slots[S.sel].dnSpec = [...document.querySelectorAll('.eMem')].filter((x) => x.checked).map((x) => x.dataset.code);
@@ -1954,7 +1969,7 @@ function editor() {
   $('eRev').onclick = () => carry('Review section not finished last lesson (' + P.lessonCell(S.data, s) + ')');
   $('eHw').onclick = () => carry('Collect homework set last lesson (' + P.lessonCell(S.data, s) + ')');
   $('ePrompt').onclick = () => {
-    const text = P.buildPrompt(S.data, S.week.slots[S.sel], (S.classSettings || {})[S.week.slots[S.sel].cls], S.week, S.memory);
+    const text = P.buildPrompt(S.data, S.week.slots[S.sel], (S.classSettings || {})[S.week.slots[S.sel].cls], S.week, S.memory, S.results);
     navigator.clipboard.writeText(text).then(() => toast('Build prompt copied')).catch(() => modal('<h3>Build prompt</h3><pre>' + esc(text) + '</pre>'));
   };
   $('eAsk').onclick = () => sendToClaude([S.sel]);
@@ -1979,7 +1994,7 @@ function markGaps() {
 function lessonRequest(i) {
   const s = S.week.slots[i];
   const when = P.DAYS[s.day] + ' ' + P.addDays(S.monday, s.day).toLocaleDateString('en-GB', { day:'numeric', month:'short' }) + ' P' + s.period;
-  return { when, cls: s.cls, prompt: P.buildPrompt(S.data, s, (S.classSettings || {})[s.cls], S.week, S.memory) };
+  return { when, cls: s.cls, prompt: P.buildPrompt(S.data, s, (S.classSettings || {})[s.cls], S.week, S.memory, S.results) };
 }
 function sendToClaude(preselect) {
   if (!S.week) return;
@@ -2105,7 +2120,7 @@ $('mkDay').onclick = async () => {
   $('mdCancel').onclick = closeModal;
   $('mdGo').onclick = () => {
     const pick = new Set([...document.querySelectorAll('.mdReq')].filter((x) => x.checked).map((x) => +x.dataset.p));
-    const lessons = slots.filter((s) => pick.has(s.period)).map((s) => ({ when: label + ' P' + s.period, cls: s.cls, prompt: P.buildPrompt(S.data, s, (S.classSettings || {})[s.cls], week, S.memory) }));
+    const lessons = slots.filter((s) => pick.has(s.period)).map((s) => ({ when: label + ' P' + s.period, cls: s.cls, prompt: P.buildPrompt(S.data, s, (S.classSettings || {})[s.cls], week, S.memory, S.results) }));
     const kit = P.printList(S.data, week, S.classSettings).filter((x) => x.startsWith(P.DAYS[day] + ' '));
     const text = ['Make my next day: ' + label + '.', $('mdNote').value.trim(), kit.length ? 'Printing that day: ' + kit.join('; ') : ''].filter(Boolean).join(' ');
     if (!lessons.length) { toast('Nothing ticked'); return; }

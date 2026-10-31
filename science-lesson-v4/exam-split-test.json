@@ -62,6 +62,41 @@
     }
    ]
   },
+  "homeworkFeedback": {
+   "title": "Cells and microscopes",
+   "due": "Fri 23 Oct",
+   "done": 24,
+   "size": 28,
+   "questions": [
+    {
+     "n": 4,
+     "q": "A cell is 0.02 mm wide. The microscope magnifies it 400 times. Calculate the width of the image.",
+     "pct": 38,
+     "right": "8 mm",
+     "wrong": "0.00005 mm",
+     "wrongN": 9,
+     "why": "They divided by the magnification instead of multiplying: image size = real size x magnification."
+    },
+    {
+     "n": 7,
+     "q": "Which part of a plant cell controls what enters and leaves the cell?",
+     "pct": 46,
+     "right": "B  Cell membrane",
+     "wrong": "C  Cell wall",
+     "wrongN": 8,
+     "why": "The cell wall supports the cell; the membrane controls what goes in and out."
+    },
+    {
+     "n": 2,
+     "q": "State what the nucleus does.",
+     "pct": 54,
+     "right": "It contains the genetic material and controls the cell.",
+     "wrong": "Makes energy for the cell",
+     "wrongN": 7,
+     "why": "That is the mitochondria, where respiration happens."
+    }
+   ]
+  },
   "engage": {
    "variant": "oddOneOut",
    "hook": "6 out of 12 objects are alive — can you find them?",

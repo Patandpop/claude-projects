@@ -80,6 +80,7 @@ async function buildPptx(L, outPath) {
 
   slideTitleDoNow(pptx, L);                                     // questions embedded — always
   slideDoNowAnswers(pptx, L);
+  slideHomeworkFeedback(pptx, L);                               // workplan 2.10 (test build): only when given
   // Lesson quality A: O7 objectives + key words. Review/revision/test lessons used an authored
   // "Engage = objectives" slide before this existed: keep that one and don't add a second.
   if (['standard', 'practical', 'annotation'].includes(type) || !L.engage) slideObjectives(pptx, L);

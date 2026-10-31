@@ -125,6 +125,65 @@ function slideDoNowAnswers(pptx, L) {
   bottomBar(s, objectiveText(L));
 }
 
+/* ---- LAST WEEK'S HOMEWORK (workplan 2.10, layout A "three cards", TEST BUILD 2026-10-31) ----
+   Straight after the Do Now answers when L.homeworkFeedback is given (the planner asks for it when the
+   class has homework results; one untick turns it off). Class counts only, never names.
+   homeworkFeedback: { title, due?, done, size?, questions: [{ n, q, pct, right, wrong?, wrongN?, why? }] }
+   (first 3 used). Each card: % ring (red under 50, amber 50-74, green 75+), the question, the right
+   answer in a navy box with gold text (appears on click via the finish pass), "n of N put <wrong>", why. */
+function slideHomeworkFeedback(pptx, L) {
+  const hf = L.homeworkFeedback;
+  const qs = (hf && arr(hf.questions).filter((q) => q && q.q)) || [];
+  if (!qs.length) return;
+  const list = qs.slice(0, 3);
+  const s = pptx.addSlide();
+  s.background = { color: BG };
+  navBar(s, 'donow');
+  const head = 'DO NOW · LAST WEEK’S HOMEWORK' + (hf.title ? ' · ' + String(hf.title).toUpperCase() : '') +
+    (hf.done != null ? ' · ' + hf.done + (hf.size ? ' of ' + hf.size : '') + ' did it' : '');
+  const y0 = sectionHeader(s, head, DONOW_BAR, TOP) + 0.04;
+  const cardH = BOT_Y - 0.12 - y0, n = list.length;
+  const cw = (CW - (n - 1) * 0.18) / n, iw0 = cw - 0.3;
+  // one font size per row across the cards (the smallest any card needs), so the three read as a set
+  const room0 = y0 + cardH - 0.12 - (y0 + 1.1), same = (f) => Math.min(...list.map(f));
+  const fsQ = same((q) => autoFontSize(prettyText(q.q), iw0, room0 * 0.4, { min: 12, max: 20 }));
+  const fsA = same((q) => autoFontSize(prettyText(q.right || ''), iw0 - 0.2, room0 * 0.22, { min: 12, max: 20 }));
+  const fsW = same((q) => autoFontSize((q.wrongN != null ? q.wrongN + ' of ' + (hf.done != null ? hf.done : '') + ' put ' : 'Most common wrong answer: ') + (q.wrong || ''), iw0, room0 * 0.14, { min: 11, max: 16 }));
+  const fsY = same((q) => autoFontSize(prettyText(q.why || ''), iw0, room0 - room0 * 0.76 - 0.24, { min: 11, max: 15 }));
+  list.forEach((q, i) => {
+    const x = MX + i * (cw + 0.18), ix = x + 0.15, iw = cw - 0.3;
+    s.addShape('rect', { x, y: y0, w: cw, h: cardH, fill: { color: 'FFFFFF' }, line: GOLD2 });
+    const pct = Math.max(0, Math.min(100, Math.round(+q.pct || 0)));
+    const ring = pct < 50 ? 'C62828' : pct < 75 ? AMBER : '2E7D32';
+    s.addShape('ellipse', { x: ix, y: y0 + 0.15, w: 0.8, h: 0.8, fill: { color: ring }, line: { type: 'none' } });
+    txt(s, pct + '%', { x: ix, y: y0 + 0.15, w: 0.8, h: 0.8, color: 'FFFFFF', bold: true, fontSize: 17, align: 'center', valign: 'middle', margin: 0 });
+    txt(s, [{ text: 'Question ' + (q.n != null ? q.n : i + 1), options: { color: '555555', fontSize: 13, breakLine: true } },
+      { text: pct + '% of marks', options: { color: '111111', bold: true, fontSize: 15 } }],
+    { x: ix + 0.95, y: y0 + 0.15, w: iw - 0.95, h: 0.8, valign: 'middle', margin: 0 });
+    // the rest of the card: question, answer box, "n of N put", why (heights share what is left)
+    const top = y0 + 1.1, room = y0 + cardH - 0.12 - top;
+    const qh = room * 0.4, ah = room * 0.22, wh = room * 0.14, yh = room - qh - ah - wh - 0.24;
+    const qt = prettyText(q.q);
+    txt(s, qt, { x: ix, y: top, w: iw, h: qh, color: '111111', fontSize: fsQ, valign: 'top', fit: 'shrink', margin: 0 });
+    const at = prettyText(q.right || '');
+    txt(s, at, { x: ix, y: top + qh + 0.08, w: iw, h: ah, fill: { color: NAVY }, color: GOLD, bold: true,
+      fontSize: fsA, valign: 'middle', fit: 'shrink', margin: 6 });
+    if (q.wrong) {
+      const wn = q.wrongN != null ? q.wrongN + (hf.done != null ? ' of ' + hf.done : '') + ' put ' : 'Most common wrong answer: ';
+      txt(s, [{ text: wn, options: { color: '333333' } }, { text: prettyText(q.wrong), options: { color: AMBER, bold: true } }],
+        { x: ix, y: top + qh + ah + 0.16, w: iw, h: wh, fontSize: fsW, valign: 'middle', fit: 'shrink', margin: 0 });
+    }
+    if (q.why) {
+      const wt = prettyText(q.why);
+      txt(s, wt, { x: ix, y: top + qh + ah + wh + 0.24, w: iw, h: yh, color: '444444', italic: true,
+        fontSize: fsY, valign: 'top', fit: 'shrink', margin: 0 });
+    }
+  });
+  s.addNotes('Last week\'s homework (test build, pick still open): the ' + (n === 1 ? 'question' : n + ' questions') + ' the class missed most' +
+    (hf.due ? ' (due ' + hf.due + ')' : '') + '. Click to show each answer. Class numbers only. Untick it on the planner lesson card to leave this slide out.');
+  bottomBar(s, objectiveText(L));
+}
+
 /* ---- OBJECTIVES (Lesson quality A, Patryk's O7, 2026-10-19) -------------
    Straight after the Do Now answers, before Engage. The Do Now slide keeps its own objectives.
    Dark band "WORDS YOU KNOW" (title.knownWords: [{term, definition}] — only words an earlier lesson
