@@ -80,12 +80,35 @@ function analysePage(page) {
   return {
     file: page.file, title: title ? title.text : '', strip: strip ? strip.text : '', printed: num ? parseInt(num.text, 10) : null,
     kind, subheads, questions, answersFor, lineCount: lines.length,
+    contents: kind === 'contents' ? readContents(lines, title) : [],
   };
 }
 
+// The contents page: "Topic 1: Energy" headings and "Specific Heat Capacity ....... 4" entries. OCR often splits the
+// dotted leader and the number off as a line of their own at the same height, so lines are joined by row first.
+function readContents(lines, title) {
+  const rows = [];
+  for (const l of lines.filter((x) => x !== title).sort((a, b) => a.y - b.y || a.x - b.x)) {
+    const r = rows.find((row) => Math.abs(row.y - l.y) <= Math.max(6, l.h * 0.6));
+    if (r) { r.parts.push(l); r.y = Math.min(r.y, l.y); } else rows.push({ y: l.y, parts: [l] });
+  }
+  const out = []; let chapter = null;
+  for (const r of rows) {
+    // dotted leaders become one space: "Specific Heat Capacity . .4" -> "Specific Heat Capacity 4"
+    const text = clean(r.parts.sort((a, b) => a.x - b.x).map((p) => p.text).join(' ').replace(/(\s*\.)+\s*/g, ' '));
+    const m = /^(.{3,}?)\s+(\d{1,3})$/.exec(text);
+    const ch = chapterOf(m ? m[1] : text);
+    if (ch) { chapter = ch; out.push({ chapter: ch.n, name: ch.name, heading: true, page: m ? parseInt(m[2], 10) : null }); continue; }
+    if (m) out.push({ title: m[1], page: parseInt(m[2], 10), chapter: chapter ? chapter.n : null, name: chapter ? chapter.name : '' });
+  }
+  return out;
+}
+const loose = (s) => String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+
 /* ------------------------------------------------------------------ the whole book */
 
-const chapterOf = (strip) => { const m = /(?:topic|section|unit|chapter)\s*(\d{1,2})\s*[:.-]?\s*(.*)$/i.exec(strip || ''); return m ? { n: parseInt(m[1], 10), name: clean(m[2]) } : null; };
+// "Topic 1: Energy" at the START of a strip or contents row (not "Revision Summary for Topic 1")
+const chapterOf = (strip) => { const m = /^(?:topic|section|unit|chapter)\s*(\d{1,2})\s*[:.-]?\s*(.*)$/i.exec(clean(strip)); return m ? { n: parseInt(m[1], 10), name: clean(m[2]) } : null; };
 
 // Printed page numbers: the OCR'd ones where they agree with their neighbours, the gaps filled by counting on.
 function numberPages(pages) {
@@ -110,14 +133,35 @@ function numberPages(pages) {
 function buildIndex(analysed, opts) {
   const o = opts || {}, book = o.book || 'CGP book', letter = (o.letter || '').toUpperCase();
   const { numbers, doubts } = numberPages(analysed);
+  // the contents page(s): chapter page ranges (a fallback when a book prints no topic strip) and a cross-check
+  const contents = [].concat(...analysed.map((p) => p.contents || []));
+  const chapterStarts = [];
+  for (const e of contents) {
+    if (e.chapter == null) continue;
+    const start = e.heading ? e.page : e.page, have = chapterStarts.find((c) => c.n === e.chapter);
+    if (start == null) { if (!have) chapterStarts.push({ n: e.chapter, name: e.name, page: null }); continue; }
+    if (!have) chapterStarts.push({ n: e.chapter, name: e.name, page: start }); else if (have.page == null || start < have.page) have.page = start;
+  }
+  chapterStarts.sort((a, b) => (a.page == null) - (b.page == null) || a.page - b.page);
+  const chapterByPage = (pg) => { let hit = null; for (const c of chapterStarts) if (c.page != null && c.page <= pg) hit = c; return hit; };
   let chapter = null, inAnswers = false;
   const pages = analysed.map((p, i) => {
     const ch = chapterOf(p.strip); if (ch) chapter = ch;
     if (p.kind === 'answers') inAnswers = true;
     else if (['index', 'reference', 'contents'].includes(p.kind) && p.title) inAnswers = false;
     const kind = inAnswers && p.kind !== 'answers' && p.answersFor.length ? 'answers' : p.kind;
-    return Object.assign({}, p, { page: numbers[i], chapter: chapter ? chapter.n : null, chapterName: chapter ? chapter.name : '', kind });
+    const fromContents = !ch && numbers[i] != null && !p.strip ? chapterByPage(numbers[i]) : null;
+    const c = ch || (p.strip ? chapter : (fromContents || chapter));
+    return Object.assign({}, p, { page: numbers[i], chapter: c ? c.n : null, chapterName: c ? c.name : '', kind });
   });
+  // cross-check: every contents entry should be found, with that title, on that printed page
+  for (const e of contents) {
+    if (e.heading || e.page == null) continue;
+    const at = pages.find((p) => p.page === e.page);
+    if (!at) { doubts.push('contents says "' + e.title + '" is on page ' + e.page + ', but no picture was read as page ' + e.page); continue; }
+    const a = loose(at.title), b = loose(e.title);
+    if (a && b && a !== b && !a.includes(b) && !b.includes(a)) doubts.push('contents says page ' + e.page + ' is "' + e.title + '", but ' + at.file + ' was read as "' + at.title + '"');
+  }
   // section codes: P1.1, P1.2 ... per chapter, topic pages only
   const count = {}, sections = [];
   for (const p of pages) {

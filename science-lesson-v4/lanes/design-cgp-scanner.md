@@ -43,6 +43,7 @@ From the OCR lines and their positions on the page (`analysePage`):
 - **The kind of page**, from the title: contents, index, answers, summary ("Revision Summary"), questions (any title with "questions", "exam practice", "practice paper", "mixed questions"), reference (glossary, equations, periodic table, data sheet), otherwise a topic page. A page with no title is "other" (the cover, a picture page) and is reported if it had a lot of text.
 - **Questions** = numbered lines under a heading that contains "questions" ("Q1 ...", "1) ...", "1.1 ..."), with the common OCR slips fixed (Q1 read as QI or Ql, 10 read as lO).
 - **Answers pages** say which page they answer ("Page 5: Exam Questions"); the tool maps each question page to the first answers page that names it.
+- **The contents page** is read too (OCR splits the dotted leaders and page numbers onto their own lines, so lines are joined back by row first): "Topic 1: Energy" headings and "Specific Heat Capacity ...... 4" entries. It is used twice: as the fallback for chapters when a book prints no topic strip (each page takes the topic whose first contents page it falls under), and as a cross-check: every contents entry must be found on that printed page with that title, or it goes on the doubts list ("contents says page 4 is 'Specific Heat Capacity', but page-0006.png was read as 'Latent Heat'").
 
 Section codes are `P1.1, P1.2 ...` (book letter, topic number, count within the topic), which is the shape the existing parser in `textbook-index.js` expects, so the block is read by the same code that reads Kerboodle and Activate; the check proves it (the parser reads exactly the five topic pages of the test book and the existing matcher sends a "Specific Heat Capacity" lesson to the right page). Question and answer lines are written in words ("page 5 (answers on page 9)") so the parser never mistakes them for sections.
 
@@ -52,10 +53,11 @@ None. Everything runs on the home PC. The index reaches the planner the way Kerb
 
 ## 6. How it is tested
 
-`node planner/tests/cgp-index.test.js` (28 checks, all green on 31 Oct):
+`node planner/tests/cgp-index.test.js` (33 checks, all green on 31 Oct):
 - the made-up 12-page book (cover, contents, five topic pages over two topics, a Warm-Up and Exam Questions page, a Revision Summary, an Answers page, an Index) from its saved OCR: titles, topic strip, page numbers, sub-headings, questions (with the QI slip), the questions page's exam question 1.1 under "Exam Questions", the answers page naming page 5, contents and index not topics, the cover having neither title nor number;
 - the whole index: codes P1.1 to P2.2 with the right pages, the question page with its answers page, the answers map, no doubts on a clean book, ten spot-check lines, the three files written;
 - the existing parser (`textbook-index.js`) reads the block unchanged and the existing matcher finds the right page;
+- the contents page: entries joined back across OCR's split rows, "Revision Summary for Topic 1" an entry and not a topic, the two topic headings, chapters from the contents page when the strips are blanked, and a doubt when a page's title disagrees with the contents page;
 - a page number read wrongly (50 between 2 and 4) becomes 3 and is listed as a doubt; a text-heavy page with no title is reported;
 - on Windows only: one page is drawn afresh and read with the real Windows OCR (title and page number right).
 Nothing from a real book is in the repo. The capture step is not covered by a check: it needs his login, and its first real run is the test (section 9).

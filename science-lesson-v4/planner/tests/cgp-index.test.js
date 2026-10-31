@@ -50,6 +50,16 @@ ok(parsed.sections.map((s) => s.code + ' ' + s.title + ' p' + s.page).join(' | '
 const m = tb.matchLesson({ year: 10, subject: 'Physics', topic: 'Specific Heat Capacity', keywords: ['specific heat capacity'], mdPath });
 ok(m && m.pages[0] === 4, 'the existing matcher sends a Specific Heat Capacity lesson to page 4 of the block');
 
+// --- the contents page: entries joined back across OCR's split rows, chapters as a fallback, and a cross-check
+const con = byFile['page-0003.png'].contents;
+ok(con.some((e) => e.title === 'Specific Heat Capacity' && e.page === 4 && e.chapter === 1 && e.name === 'Energy'), 'a contents entry is read with its page and its topic, across the dotted leader OCR split off');
+ok(con.some((e) => e.title === 'Revision Summary for Topic 1' && e.page === 6 && !e.heading), '"Revision Summary for Topic 1" is an entry, not a new topic');
+ok(con.filter((e) => e.heading).map((e) => e.chapter + ':' + e.name).join(' ') === '1:Energy 2:Electricity', 'the two topic headings on the contents page');
+const noStrip = T.buildIndex(pages.map((p) => Object.assign({}, p, { strip: '' })), { book: 'B', letter: 'P' });
+ok(noStrip.pages.find((p) => p.page === 4).chapterName === 'Energy' && noStrip.pages.find((p) => p.page === 8).chapterName === 'Electricity', 'with no topic strip on the pages, topics come from the contents page by page range');
+const altered = T.buildIndex(pages.map((p) => (p.file === 'page-0006.png' ? Object.assign({}, p, { title: 'Latent Heat' }) : p)), { book: 'B', letter: 'P' });
+ok(altered.doubts.some((d) => /contents says page 4 is "Specific Heat Capacity", but page-0006.png was read as "Latent Heat"/.test(d)), 'a page whose title disagrees with the contents page is a doubt');
+
 // --- page numbers: a misread number is doubted and replaced by counting on
 const fake = (file, printed, kind) => ({ file, printed, kind: kind || 'topic', title: 't', strip: '', subheads: [], questions: [], answersFor: [], lineCount: 20 });
 const seq = [fake('a', 1), fake('b', 2), fake('c', 50), fake('d', 4), fake('e', null)];
