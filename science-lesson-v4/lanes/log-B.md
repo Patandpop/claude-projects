@@ -10,6 +10,18 @@ Plain-English record of Lane B's work, newest entry first. Each entry says what 
 4. **After the paste: your Blind letters score.** Press Blind, then Today > Settings > "Test my letters" with a class open, and tell me the score.
 
 ---
+## 31 Oct 2026, item 4.9: true or false with a stamp (layout A), TEST BUILD, pick still open
+
+**What changed:**
+- **True or false is now one slide, not two.** The rows look as before (numbered statements, a T / F box on the right) and the strip underneath says "Point: A = true, D = false. Be ready to justify on 3-2-1".
+- **Each click does one statement:** a tilted TRUE (green) or FALSE (red) stamp zooms in over the right of the statement, the row turns light green or light red, and for a false one the corrected statement appears underneath in italics. Four statements, four clicks. The old answers slide is gone.
+- Every row uses the same text size, and the statements never run under the stamp.
+- The builder now warns when a false statement has no correction. The skill notes say every false statement needs one.
+- **To go back to the old two slides** for one activity, Claude adds `"reveal": "answers"` to it.
+- Checks: 3 new regression checks (one slide, the stamps and corrections are there, one click per statement). I built a lesson with the mock-up's four pressure statements and opened it in PowerPoint: it opens cleanly, it has 4 clicks, and it matches mock-up A.
+
+**You need to:** upload the skill file (Waiting list item 1). The worksheet is unchanged, and so is the planner (nothing to paste). After a lesson with it, tell me whether to keep A or try B (the flip) or C (one statement a slide, with corners).
+
 ## 31 Oct 2026, item 2.10: "last week's homework" slide (layout A, three cards), TEST BUILD, pick still open
 
 **What changed:**

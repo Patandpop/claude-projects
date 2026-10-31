@@ -148,6 +148,11 @@ function contentCheck(L) {
     const noRight = hq.slice(0, 3).filter((q) => !String((q && q.right) || '').trim()).length;
     check(hq.length && !noRight, `Last week's homework slide: ${Math.min(3, hq.length)} question(s)`, hq.length ? `homeworkFeedback: ${noRight} question(s) with no right answer (the click box is empty)` : 'homeworkFeedback has no questions: the slide is left out');
   }
+  // true or false stamp (4.9, test build): a FALSE stamp needs its correction underneath
+  arr(L.build).filter((b) => (b.type || b.variant) === 'trueFalse' && b.reveal !== 'answers').forEach((b, k) => {
+    const bare = arr(b.statements).map((st, i) => (st && !st.isTrue && !String(st.correction || '').trim() ? i + 1 : 0)).filter(Boolean);
+    if (bare.length) lines.push(`  ✗ true or false ${k + 1}: false statement ${bare.join(', ')} has no correction (the FALSE stamp shows nothing to fix it)`);
+  });
   const nPrac = arr(L.build).filter((b) => (b.type || b.variant) === 'practical').length;
   if (nPrac > 2) lines.push(`  ✗ ${nPrac} practicals — a lesson has at most 2; only the first 2 are drawn on the worksheet`);
   if (arr(L.extension).length > 4) lines.push('  ✗ Extension has more than 4 subtopic columns — only the first 4 are drawn');

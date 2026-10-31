@@ -381,6 +381,7 @@ from the board" prompt — tell me if you'd like the numbered key reproduced the
   ] }
 ```
 Min 4 statements. Mix ~40–60% false. Every false statement needs `correction`.
+One slide (4.9 layout A "the stamp", test build, pick still open): pupils point A = true, D = false; each click stamps TRUE or FALSE on one statement, tints the row and shows a false one's correction underneath. No answers slide. `"reveal": "answers"` brings back the old separate answers slide.
 
 ### BUILD — predictThenCheck
 ```json
@@ -596,5 +597,5 @@ annotation keep the 4-Learn cap.
 - **predictThenCheck** — when key idea involves a mechanism students confidently mispredict (better than MCQ for those topics)
 - **trueFalse** — several independent factual claims; use instead of errorAnalysis when statements don't form continuous worked lines
 - **modelAnswerReview** — test review Build section, one per question; content sourced from the real mark scheme, never invented
-- **correctTheStatement** — any lesson, misconception-based correction task; use instead of trueFalse when you want the correction shown inline rather than on a separate answer slide
+- **correctTheStatement** — any lesson, misconception-based correction task; use instead of trueFalse when pupils should write the correction themselves (handwritten claim, correction below)
 - **markTheAnswers** — peer-assessment on an exam question (esp. review/revision): 3–4 realistically-flawed sample answers marked against the mark scheme; reuses the mark-scheme fields, prints on the worksheet + answer sheet too

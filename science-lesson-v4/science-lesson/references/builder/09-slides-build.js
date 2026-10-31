@@ -70,17 +70,23 @@ function slideMcqImage(pptx, L, item) {
 }
 
 /* ---- BUILD — sort (task + answers) --------------------------------------- */
-/* ---- BUILD — trueFalse (+ answer slide) ----------------------------------- */
+/* ---- BUILD — trueFalse --------------------------------------------------------
+   4.9 layout A "the stamp" (TEST BUILD 2026-10-31, pick still open): ONE slide. Each click stamps
+   TRUE (green) or FALSE (red) across the right of a statement, tints the row and, for a false one,
+   shows the correction underneath. The shapes for row n are named tfReveal:n and addRevealAnimations
+   gives each row one click. item.reveal === "answers" brings back the old separate answers slide. */
 function slideTrueFalse(pptx, L, item) {
   const obj = objectiveText(L);
   const statements = arr(item.statements);
   const RED = 'B71C1C';
   const respW = 0.9;
+  const stamp = item.reveal !== 'answers';
+  const hasCorr = stamp && statements.some((st) => !st.isTrue && st.correction);
 
   let s = pptx.addSlide();
   s.background = { color: BG };
   navBar(s, 'build');
-  let y = sectionHeader(s, 'BUILD \u00B7 ' + (item.heading || 'TRUE OR FALSE'), STAGE.build, TOP);
+  let y = sectionHeader(s, 'BUILD · ' + (item.heading || 'TRUE OR FALSE'), STAGE.build, TOP);
   const footH = 0.4;
   const rows = statements.length;
   const gapTotal = (rows - 1) * GAP;
@@ -88,30 +94,54 @@ function slideTrueFalse(pptx, L, item) {
   // Fill available height like the Do Now slide: rows expand to use the space.
   // Floor keeps long lists legible; high ceiling lets short lists fill the slide
   // instead of leaving a dead zone underneath (the Do Now pattern, not the old 1.3 cap).
-  const rowH = Math.max(0.7, Math.min(1.9, avail / rows));
+  const rowH = Math.max(hasCorr ? 0.95 : 0.7, Math.min(1.9, avail / rows));
   // Centre the block when it does not fill the slide so leftover space is shared.
   const blockH = rows * rowH + gapTotal;
   const ty = y + Math.max(0, (avail - blockH) / 2);
+  const sw = CW - respW - 0.15;
+  // one statement size and one correction size on every row (the smallest any row needs)
+  const fsS = stamp ? Math.min(...statements.map((st) => autoFontSize(String(st.text || ''), sw - 2.4, hasCorr ? rowH * 0.6 : rowH, { min: 14, max: 20 }))) : 15;
+  const fsC = Math.min(...statements.map((st) => autoFontSize(String(st.correction || ''), sw - 2.45, rowH * 0.4, { min: 12, max: 16 })));
   statements.forEach((st, i) => {
     const ry = ty + i * (rowH + GAP);
     // Alternating warm tint gives rhythm instead of a stack of identical white boxes.
     const tint = i % 2 ? 'FFF8E1' : 'FFFFFF';
-    goldBox(s, MX, ry, CW - respW - 0.15, rowH, [
-      { text: (i + 1) + '   ', options: { bold: true, fontSize: 16, color: AMBER } },
-      { text: String(st.text || ''), options: { fontSize: 15 } },
-    ], { valign: 'middle', fill: tint });
+    const runs = [
+      { text: (i + 1) + '   ', options: { bold: true, fontSize: fsS + 1, color: AMBER } },
+      { text: String(st.text || ''), options: { fontSize: fsS } },
+    ];
+    if (!stamp) goldBox(s, MX, ry, sw, rowH, runs, { valign: 'middle', fill: tint });
+    else {
+      // the statement clear of the stamp; with corrections, in the top part with room for the correction underneath
+      goldBox(s, MX, ry, sw, rowH, '', { fill: tint });
+      txt(s, runs, { x: MX, y: ry, w: sw - 1.9, h: hasCorr ? rowH * 0.6 : rowH, color: '1A1A2E', valign: 'middle', margin: 6, fit: 'shrink' });
+    }
     txt(s, 'T  /  F', {
       x: MX + CW - respW, y: ry, w: respW, h: rowH,
       fill: { color: NAVY }, line: GOLD2, color: 'FFFFFF',
       bold: true, fontSize: 15, align: 'center', valign: 'middle',
     });
+    if (!stamp) return;
+    const ok = !!st.isTrue, col = ok ? GREEN_OK : RED, name = 'tfReveal:' + i;
+    s.addShape('rect', { objectName: name, x: MX, y: ry, w: sw, h: rowH, fill: { color: ok ? '43A047' : 'E53935', transparency: 82 }, line: { type: 'none' } });
+    if (hasCorr && !ok && st.correction) {
+      txt(s, String(st.correction), { objectName: name, x: MX + 0.45, y: ry + rowH * 0.58, w: sw - 0.55 - 1.9, h: rowH * 0.4, color: '333333', italic: true, fontSize: fsC, valign: 'top', margin: 2, fit: 'shrink' });
+    }
+    const stW = 1.6, stH = Math.min(0.62, rowH - 0.2);
+    txt(s, ok ? 'TRUE' : 'FALSE', { objectName: name, x: MX + sw - stW - 0.2, y: ry + (rowH - stH) / 2, w: stW, h: stH, rotate: -8,
+      fill: { color: 'FFFFFF', transparency: 15 }, line: { color: col, width: 3.5 }, color: col, bold: true, fontSize: 24, charSpacing: 2,
+      align: 'center', valign: 'middle', margin: 0, rectRadius: 0.06, shape: pptx.ShapeType.roundRect });
   });
   y = ty + rows * rowH + gapTotal + GAP;
-  txt(s, 'Decide T or F for each. Be ready to justify on 3-2-1', {
+  txt(s, stamp ? 'Point: A = true, D = false. Be ready to justify on 3-2-1' : 'Decide T or F for each. Be ready to justify on 3-2-1', {
     x: MX, y, w: CW, h: footH, fill: { color: NAVY },
     color: 'FFFFFF', bold: true, fontSize: 12, align: 'center', valign: 'middle',
   });
   bottomBar(s, obj);
+  if (stamp) {
+    s.addNotes('True or false (test build, pick still open): pupils point, A for true, D for false. Each click stamps one statement' + (hasCorr ? ' and shows the correction of a false one' : '') + '. Ask a pupil to justify before you click.');
+    return;
+  }
 
   // answer slide
   s = pptx.addSlide();

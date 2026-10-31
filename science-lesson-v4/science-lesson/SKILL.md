@@ -245,7 +245,7 @@ Notes on key fields:
 - `learn[].boxes` is the preferred Learn-A form (navy-header boxes stacking rules/key info) — much better than a flat `body` string, which renders plain.
 - `apply[].diagram: true` (or a string label) emits a framed diagram box on the worksheet under that question — use for any question that refers to a circuit/diagram. `diagramLines` controls the box height.
 - `build practical` slides get an apparatus image placeholder automatically; set `imagePlaceholder: false` only if there genuinely is no apparatus. `equipment: ["..."]` lists apparatus items — rendered as a labelled amber-tinted section on the slide.
-- `build trueFalse` accepts an optional `heading` field (e.g. `"heading": "COMMON MISCONCEPTIONS"`) — use this instead of `type: "misconception"` for any activity presenting statements to evaluate. The slide header and answer slide header both use the heading value.
+- `build trueFalse` accepts an optional `heading` field (e.g. `"heading": "COMMON MISCONCEPTIONS"`) — use this instead of `type: "misconception"` for any activity presenting statements to evaluate. The slide header uses the heading value. One slide with a TRUE / FALSE stamp per click (test build, pick still open), so every false statement needs its `correction`; `"reveal": "answers"` gives the old separate answers slide.
 
 Field names are fixed. If a slide type needs something not in the schema, check slide-options-v4.md; if still absent, ask — do not invent.
 

@@ -51,7 +51,16 @@ function addRevealAnimations(pptxPath) {
     if (xml.includes('<p:timing')) continue;
     if (/<a:t>LEARN [·\-:]/.test(xml)) continue;   // Learn content is taught, not revealed
     const boxes = [];
+    // 4.9 true or false stamp (test build 2026-10-31): shapes named tfReveal:<row> appear together, one click per row
+    const groups = new Map();
     for (const sp of xml.match(/<p:sp>[\s\S]*?<\/p:sp>/g) || []) {
+      const m = sp.match(/<p:cNvPr id="(\d+)" name="tfReveal:(\d+)"/);
+      if (!m) continue;
+      if (!groups.has(+m[2])) groups.set(+m[2], []);
+      groups.get(+m[2]).push({ id: m[1], zoom: /<a:t>(TRUE|FALSE)<\/a:t>/.test(sp) });
+    }
+    for (const sp of xml.match(/<p:sp>[\s\S]*?<\/p:sp>/g) || []) {
+      if (/name="tfReveal:/.test(sp)) continue;
       const spPr = (sp.match(/<p:spPr>[\s\S]*?<\/p:spPr>/) || [''])[0];
       if (!/^<p:spPr>[\s\S]*?<a:solidFill><a:srgbClr val="0D1B5E"/.test(spPr.replace(/<a:ln[\s\S]*?<\/a:ln>/g, ''))) continue;
       if (!/<a:rPr[^>]*>[\s\S]*?<a:srgbClr val="(FABB2E|FFD60A)"/.test(sp)) continue;
@@ -72,11 +81,29 @@ function addRevealAnimations(pptxPath) {
       const off = sp.match(/<a:off x="(\d+)" y="(\d+)"/);
       if (id && off) boxes.push({ id, x: +off[1], y: +off[2] });
     }
-    if (!boxes.length) continue;
+    if (!boxes.length && !groups.size) continue;
     // reading order; boxes within ~0.1" of the same top count as one row
     boxes.sort((a, b) => (Math.abs(a.y - b.y) < 91440 ? a.x - b.x : a.y - b.y));
     let n = 3;
-    const clicks = boxes.map((b) => {
+    // a stamp row: the tint and correction appear, the stamp zooms in from twice its size (a stamp landing), one click
+    const effect = (t, first) => {
+      const [c3, c4] = [n++, n++];
+      const tgt = `<p:tgtEl><p:spTgt spid="${t.id}"/></p:tgtEl>`;
+      const grow = (attr) => `<p:anim calcmode="lin" valueType="num"><p:cBhvr><p:cTn id="${n++}" dur="250" fill="hold"/>${tgt}<p:attrNameLst><p:attrName>${attr}</p:attrName></p:attrNameLst></p:cBhvr>` +
+        `<p:tavLst><p:tav tm="0"><p:val><p:strVal val="#${attr}*2"/></p:val></p:tav><p:tav tm="100000"><p:val><p:strVal val="#${attr}"/></p:val></p:tav></p:tavLst></p:anim>`;
+      return `<p:par><p:cTn id="${c3}" presetID="${t.zoom ? 53 : 1}" presetClass="entr" presetSubtype="${t.zoom ? 16 : 0}" fill="hold" grpId="0" nodeType="${first ? 'clickEffect' : 'withEffect'}">` +
+        `<p:stCondLst><p:cond delay="0"/></p:stCondLst><p:childTnLst><p:set><p:cBhvr><p:cTn id="${c4}" dur="1" fill="hold"><p:stCondLst><p:cond delay="0"/></p:stCondLst></p:cTn>` +
+        `${tgt}<p:attrNameLst><p:attrName>style.visibility</p:attrName></p:attrNameLst></p:cBhvr><p:to><p:strVal val="visible"/></p:to></p:set>` +
+        (t.zoom ? grow('ppt_w') + grow('ppt_h') : '') + '</p:childTnLst></p:cTn></p:par>';
+    };
+    const tfClicks = [...groups.keys()].sort((a, b) => a - b).map((k) => {
+      const [c1, c2] = [n++, n++];
+      return `<p:par><p:cTn id="${c1}" fill="hold"><p:stCondLst><p:cond delay="indefinite"/></p:stCondLst><p:childTnLst>` +
+        `<p:par><p:cTn id="${c2}" fill="hold"><p:stCondLst><p:cond delay="0"/></p:stCondLst><p:childTnLst>` +
+        groups.get(k).slice().sort((a, b) => a.zoom - b.zoom).map((t, j) => effect(t, j === 0)).join('') +
+        '</p:childTnLst></p:cTn></p:par></p:childTnLst></p:cTn></p:par>';
+    }).join('');
+    const clicks = tfClicks + boxes.map((b) => {
       const [c1, c2, c3, c4] = [n++, n++, n++, n++];
       return `<p:par><p:cTn id="${c1}" fill="hold"><p:stCondLst><p:cond delay="indefinite"/></p:stCondLst><p:childTnLst>` +
         `<p:par><p:cTn id="${c2}" fill="hold"><p:stCondLst><p:cond delay="0"/></p:stCondLst><p:childTnLst>` +
@@ -92,12 +119,12 @@ function addRevealAnimations(pptxPath) {
       '</p:childTnLst></p:cTn><p:prevCondLst><p:cond evt="onPrev" delay="0"><p:tgtEl><p:sldTgt/></p:tgtEl></p:cond></p:prevCondLst>' +
       '<p:nextCondLst><p:cond evt="onNext" delay="0"><p:tgtEl><p:sldTgt/></p:tgtEl></p:cond></p:nextCondLst></p:seq>' +
       '</p:childTnLst></p:cTn></p:par></p:tnLst><p:bldLst>' +
-      boxes.map((b) => `<p:bldP spid="${b.id}" grpId="0" animBg="1"/>`).join('') + '</p:bldLst></p:timing>';
+      boxes.concat(...groups.values()).map((b) => `<p:bldP spid="${b.id}" grpId="0" animBg="1"/>`).join('') + '</p:bldLst></p:timing>';
     // <p:timing> sits after <p:clrMapOvr> and before any <p:extLst> at the end of <p:sld>
     const tail = xml.lastIndexOf('<p:extLst>') > xml.lastIndexOf('</p:cSld>') ? xml.lastIndexOf('<p:extLst>') : xml.lastIndexOf('</p:sld>');
     xml = xml.slice(0, tail) + timing + xml.slice(tail);
     zip.updateFile(e.entryName, Buffer.from(xml, 'utf8'));
-    total += boxes.length;
+    total += boxes.length + groups.size;
   }
   if (total) zip.writeZip(pptxPath);
   return total;

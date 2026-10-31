@@ -589,6 +589,17 @@ async function main() {
           .join('\n');
       };
       const pptx = path.join(outDir, base + '.pptx'), wsx = path.join(outDir, base + '_worksheet.docx');
+      // Item 4.9 (2026-10-31, test build): true or false is ONE slide, a stamp per statement on click
+      if (fs.existsSync(pptx)) {
+        const tf = new AdmZip(pptx).getEntries().filter((e) => /slides\/slide\d+\.xml$/.test(e.entryName)).map((e) => e.getData().toString('utf8')).filter((x) => x.includes('BUILD · TRUE OR FALSE'));
+        const x = tf[0] || '';
+        if (tf.length === 1) pass('true or false: one slide, no separate answers slide');
+        else fail(`true or false: ${tf.length} slides, expected 1`);
+        if (x.includes('<a:t>TRUE</a:t>') && x.includes('<a:t>FALSE</a:t>') && (x.match(/name="tfReveal:\d+"/g) || []).length === 5) pass('true or false: a TRUE and a FALSE stamp, tint and correction per row');
+        else fail('true or false: stamps or reveal shapes missing');
+        if ((x.match(/nodeType="clickEffect"/g) || []).length === 2 && /Groups of/.test(x)) pass('true or false: one click per statement, the correction is on the slide');
+        else fail('true or false: expected 2 clicks and the correction');
+      }
       if (!fs.existsSync(pptx) || !fs.existsSync(wsx)) { fail('maths-prose outputs missing'); }
       else {
         const slides = paras(pptx), sheet = paras(wsx), xml = readArchiveXml(pptx);
