@@ -1,13 +1,17 @@
 # Lane D log: Ulhu as a life companion
 
 ## Waiting on you
-1. Next paste set (Lane A makes it): Companion.gs and GameComp.html (now holds the term page, focus knitting, sound and the companion screens) plus one line in game-ui.js (already committed). These are the changed Apps Script files.
-2. The overnight adventure round 2: mock-up ready: replica/design/mockups/companion/adventure2.html. The test build uses 1C-i (brass lantern, parchment note), M1 (the scroll) and K1 (wooden cabinets) until you pick.
-3. Term page glass and all 16 identity windows: APPROVED as final ("perfect", 30 Oct). Leviathan stays a sea serpent. Already in the game screen (term-gallery.html shows it).
-4. Knitting: K1 (firelit cottage nook) picked 30 Oct and built into the Focus tab (companion-focus.js, packed in GameComp.html).
-5. Nudges on the phone need Lane C's notifications (installed app, step 8). The rules are built and waiting.
+1. Next paste set (Lane A makes it): GameComp.html (the night note's new look) and Companion.gs if not already pasted.
+2. Morning find: M1 (the scroll) stays, as you said. Tell me if you want M3 (the drawer) somewhere too, for example only for the rarer finds. Grey nights stay greyer on purpose, as you said.
+3. Nudges on the phone: Lane C's notifications call my nudge rules (checked, they match). They go live once you set up the worker after the move to your personal planner.
 
 ## Entries (newest first)
+
+### 31 Oct, your night note pick
+- What changed: the green ghost lantern stays (1C-ii). His note is now the warm torn parchment of 1C-i with burnt corners, without the tentacle stamp, written in the blocky pixel hand of 1C-iii, one line per sentence, signed "- U". It still hangs on its dripping kelp string; tap it to read it big.
+- Morning stays M1, the scroll; grey nights unchanged. Cabinets stay K1.
+- Checks: companion checks green, the night screen checks green. The later screen checks and the game check kept timing out or failing while Lane A was mid-edit in the game files and the PC was at full load; none of those files are mine.
+- You need to: nothing until Lane A's next paste set.
 
 ### 31 Oct, the last three screens seen (restart after the PC restart)
 - What changed: nothing in the game. I looked at the three companion screens nobody had seen yet, in headless screenshots on a phone-size page: the cabinets' "Opening the cabinets..." message, the "would not open" message with its Try again button (Try again then opens all seven), the "tags still on their way" sheet when you hold the moon too early (its close button works), and the odd little things shelf (both kinds of find show their note when tapped). All looked right. A new check, planner/tests/companion_states.py, now tests these every time.

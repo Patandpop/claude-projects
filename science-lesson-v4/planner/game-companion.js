@@ -137,7 +137,7 @@
 
   /* ---------- the screens (test build 30 Oct, from Patryk's picks; the letters in brackets are the mock-up options) ----------
      - day tags (A): HOLD the moon and a sheet rises with the week's days; pick a day, tap its tags. A plain tap still changes the moon.
-     - overnight (1C-ii): while he is away the ledge is empty, a ghost-green lantern burns and his note hangs on dripping kelp.
+     - overnight (1C-ii): while he is away the ledge is empty, a ghost-green lantern burns and his note (torn parchment, his pixel hand, signed - U) hangs on dripping kelp.
      - the morning find (M1): a parchment scroll on two rods hangs under the banner, the find in a stone alcove; the wax seal keeps it.
      - the cabinets (3B, K1): one per act; open one, tap a find for its torn note; eight pieces make the act's page.
      game-ui.js hands this file its helpers once (UZCOMP.attach); everything else lives here. */
@@ -163,14 +163,13 @@
 .uzc-plinth{position:absolute;width:64px;height:9px;border-radius:5px 5px 2px 2px;background:linear-gradient(180deg,#4a5a52,#26332d);box-shadow:inset 0 1px 0 #6a7c72,0 2px 0 rgba(0,0,0,.5);pointer-events:none}
 .uzc-plinth:before{content:"";position:absolute;left:6px;top:-2px;width:18px;height:4px;border-radius:3px;background:#2f6a44;box-shadow:30px 1px 0 -1px #2a5a34}
 .uzc-note{position:absolute;width:124px;cursor:pointer;transform-origin:34px -26px;animation:uzcSwing 4s ease-in-out infinite;filter:drop-shadow(2px 3px 0 rgba(0,0,0,.55))}
-.uzc-note .p{display:block;position:relative;padding:9px 10px 12px;color:#25321f;font:italic 12px/1.24 'IM Fell English',serif;
- background:radial-gradient(circle at 86% 18%,rgba(74,110,60,.32) 0,transparent 22%),radial-gradient(ellipse at 12% 92%,rgba(60,90,50,.38) 0,transparent 30%),url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8 .1' numOctaves='3' seed='9'/%3E%3CfeColorMatrix values='0 0 0 0 .2 0 0 0 0 .28 0 0 0 0 .14 0 0 0 .2 0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E"),linear-gradient(180deg,#e2e5cb,#c3cba8 70%,#a9b48c);
- box-shadow:inset 0 -8px 10px rgba(70,96,58,.35),inset 0 0 0 1px rgba(40,60,30,.25);
- clip-path:polygon(0 0,100% 0,100% 88%,93% 94%,85% 89%,76% 97%,66% 91%,55% 100%,44% 92%,33% 98%,22% 90%,12% 96%,0 90%)}
+.uzc-note .p{display:block;position:relative;padding:10px 10px 12px;color:#3a2410;font:500 11px/1.25 'Pixelify Sans',monospace;
+ background:radial-gradient(circle at 100% 100%,rgba(122,74,24,.4) 0,transparent 30%),radial-gradient(circle at 0 0,rgba(122,74,24,.27) 0,transparent 25%),url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9 .08' numOctaves='3' seed='9'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .22 0 0 0 0 .08 0 0 0 .2 0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E"),radial-gradient(circle at 15% 50%,#fff3cf 0,#ecdcae 40%,#cdb57e 100%);
+ box-shadow:inset 0 0 14px rgba(122,74,24,.35);
+ clip-path:polygon(0 4%,7% 0,15% 3%,24% 0,33% 2%,44% 0,55% 3%,66% 0,77% 2%,88% 0,100% 3%,98% 14%,100% 27%,97% 40%,100% 55%,98% 70%,100% 84%,97% 100%,85% 97%,73% 100%,60% 97%,47% 100%,35% 97%,22% 100%,10% 97%,0 100%,2% 84%,0 70%,3% 55%,0 40%,2% 26%)}
 .uzc-note .p:before{content:"";position:absolute;left:28px;top:4px;width:12px;height:5px;border-radius:50%;background:#2a5a34;box-shadow:inset 0 1px 0 #4a8a5a}
-.uzc-note .sg{float:right;margin:-3px -3px 0 4px}
+.uzc-note .sg{display:block;text-align:right;margin-top:2px;color:#6a4a20}
 .uzc-note .p:after{content:"";display:block;clear:both}
-.uzc-note .sg svg{display:inline-block;vertical-align:middle}
 .uzc-kelp{position:absolute;left:28px;top:-27px;width:14px;height:30px;pointer-events:none}
 .uzc-note:after{content:"";position:absolute;left:58px;bottom:-4px;width:4px;height:5px;border-radius:50% 50% 50% 50%/40% 40% 60% 60%;background:#9fd0ff;animation:uzcDrip 2.4s infinite}
 @keyframes uzcSwing{50%{transform:rotate(3deg)}}
@@ -178,11 +177,10 @@
 .uzc-peg{position:absolute;width:12px;height:7px;border-radius:2px;background:linear-gradient(180deg,#7a7468,#3a3630);box-shadow:inset 0 -2px 0 #1e1b17,0 2px 0 rgba(0,0,0,.5)}
 .uzc-peg:after{content:"";position:absolute;left:4px;top:5px;width:4px;height:6px;border-radius:0 0 2px 2px;background:#2a2620}
 .uzc-note.big{position:absolute;left:50%;top:44%;width:270px;transform:translate(-50%,-50%) rotate(-2deg);z-index:70;animation:uzcBigIn .3s ease-out both;filter:drop-shadow(4px 8px 0 rgba(0,0,0,.6))}
-.uzc-note.big .p{padding:20px 22px 26px;font-size:21px;line-height:1.3}
+.uzc-note.big .p{padding:22px 22px 24px;font-size:19px;line-height:1.3}
 .uzc-note.big .p:before{left:50%;margin-left:-14px;width:28px;height:8px;top:7px}
 .uzc-note.big .uzc-kelp,.uzc-note.big:after{display:none}
-.uzc-note.big .sg svg{width:34px;height:24px}
-.uzc-note.big .hint{display:block;margin-top:10px;text-align:center;font:700 10px 'Atkinson Hyperlegible',sans-serif;font-style:normal;letter-spacing:.14em;color:#4a5a3c}
+.uzc-note.big .hint{display:block;margin-top:10px;text-align:center;font:700 10px 'Atkinson Hyperlegible',sans-serif;font-style:normal;letter-spacing:.14em;color:#7a5a30}
 .uzc-note .hint{display:none}
 @keyframes uzcBigIn{from{opacity:0;transform:translate(-50%,-46%) rotate(-5deg) scale(.85)}}
 .uzc-dim{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 44%,rgba(10,40,28,.55),rgba(0,0,0,.8) 70%);z-index:69;animation:uzcFade .25s both}
@@ -327,7 +325,9 @@
 .uzc-tabs button{flex:1;min-height:42px;padding:6px 4px;border-radius:10px 10px 0 0;border:1px solid #2f443b;border-bottom:none;background:#0b1411;color:#9fb1a8;font:500 17px 'Grenze Gotisch',serif;cursor:pointer}
 .uzc-tabs button.on{background:#1b2823;color:#ffd56a}
 `;
-  function css() { if (document.getElementById('uzc-css')) return; const st = document.createElement('style'); st.id = 'uzc-css'; st.textContent = CSS; document.head.appendChild(st); }
+  function css() { if (document.getElementById('uzc-css')) return; const st = document.createElement('style'); st.id = 'uzc-css'; st.textContent = CSS; document.head.appendChild(st);
+    // his blocky pixel hand for the night note (falls back to a plain monospace offline)
+    const ln = document.createElement('link'); ln.rel = 'stylesheet'; ln.href = 'https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@500&display=swap'; document.head.appendChild(ln); }
 
   /* pixel art: each map row is a string, each letter a colour (f, F and o are the flame, which flickers) */
   function px(map, pal, s) {
@@ -361,10 +361,9 @@
   // his note for the night: a different one each night
   const NOTES = ['Gone down to the bell. Back by first light. Keep the lamp lit.', 'The lamps are on again down there. I will count them. Back before you wake.', 'Do not wait up. Do not eat my kelp. Back by breakfast.', 'Someone is sweeping the square. I am going to ask why. Home at six.',
     'Following a light that is not mine. Back by six.', 'Gone looking for something small. I will know it when I see it.', 'Down and back. Keep my side of the ledge warm.'];
-  // the kelp string the note hangs on (two little fronds, still wet) and his mark: a curled tentacle
+  // the kelp string the note hangs on (two little fronds, still wet)
   const KELP = '<svg class="uzc-kelp" viewBox="0 0 14 30" aria-hidden="true"><path d="M7 0C4 5 10 8 7 13S4 21 7 30" fill="none" stroke="#2a5a34" stroke-width="2.4"/><path d="M7 0C4 5 10 8 7 13S4 21 7 30" fill="none" stroke="#4f9a62" stroke-width=".9"/>' +
     '<path d="M7 9C10 7 13 8 13 10C11 11 9 11 7 10Z" fill="#3f7a4a"/><path d="M6 19C3 17 0 18 1 20C3 21 5 21 6 20Z" fill="#3f7a4a"/><circle cx="12" cy="12" r="1" fill="#9fd0ff"/></svg>';
-  const SIGN = '<svg width="22" height="16" viewBox="0 0 22 16" aria-label="Ulhu"><path d="M2 12C5 15 9 14 10 10S8 4 12 3S19 5 17 9S12 11 13 8" fill="none" stroke="#2f4a2a" stroke-width="1.8" stroke-linecap="round"/><circle cx="4" cy="12.5" r="1" fill="#2f4a2a"/></svg>';
   const hash = (s) => { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; } return h >>> 0; };
 
   /* ---- the banner layer: the lantern and note at night, the cabinet button always ---- */
@@ -384,7 +383,7 @@
         [[6, 0], [24, 1.7], [36, 3.3]].map((m) => '<i class="uzc-mote" style="left:' + (lx + m[0]) + 'px;bottom:52px;animation-delay:' + m[1] + 's"></i>').join('') +
         '<i class="uzc-peg" style="left:' + (nx + 29) + 'px;top:54px"></i>' +
         '<div class="uzc-note" data-c="note" aria-label="His note. Tap to read it close." style="left:' + nx + 'px;top:86px">' + KELP +
-        '<span class="p">' + esc(NOTES[hash(D.today || '') % NOTES.length]) + '<span class="sg">' + SIGN + '</span><span class="hint">TAP TO PUT IT BACK</span></span></div>' +
+        '<span class="p">' + NOTES[hash(D.today || '') % NOTES.length].split(/(?<=\.)\s+/).map(esc).join('<br>') + '<span class="sg">- U</span><span class="hint">TAP TO PUT IT BACK</span></span></div>' +
         [0, 1.1, 2.2].map((t) => '<div class="uzc-rip" style="left:' + rx + 'px;bottom:8px;animation-delay:' + t + 's"></div>').join('') +
         [0.4, 2.6].map((t, i) => '<i class="uzc-bub" style="left:' + (rx + 10 + i * 6) + 'px;bottom:10px;animation-delay:' + t + 's"></i>').join('');
     }
