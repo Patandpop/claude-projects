@@ -30,11 +30,14 @@ self.addEventListener('fetch', function (e) {
   if (!mine(req)) return;   // the browser handles it as normal
   if (req.mode === 'navigate') {
     var home = new URL('./', self.registration.scope).pathname, path = new URL(req.url).pathname;
-    if (path !== home && path !== home + 'index' && path !== home + 'index.html') return;   // a mock-up page: the browser's job
+    // the home page, or the Lesson page (the planner's phone page, step 6: kept the first time it opens, under its tidy
+    // address 'lesson', never 'lesson.html'); any other page (the mock-ups) is the browser's job
+    var page = path === home || path === home + 'index' || path === home + 'index.html' ? './' : path === home + 'lesson' ? 'lesson' : null;
+    if (!page) return;
     e.respondWith(fetch(req).then(function (r) {
-      if (r.ok && !r.redirected) { var copy = r.clone(); caches.open(STORE).then(function (c) { c.put('./', copy); }); }
+      if (r.ok && !r.redirected) { var copy = r.clone(); caches.open(STORE).then(function (c) { c.put(page, copy); }); }
       return r;
-    }).catch(function () { return caches.match('./', { cacheName: STORE }); }));
+    }).catch(function () { return caches.match(page, { cacheName: STORE }); }));
     return;
   }
   e.respondWith(caches.match(req, { cacheName: STORE }).then(function (hit) {

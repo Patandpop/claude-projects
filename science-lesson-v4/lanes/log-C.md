@@ -53,6 +53,19 @@
 - You need to: the three questions on the decisions page, then the commands in Waiting item 20 (about 15 minutes a book, mostly waiting), then say "pages right" or name the wrong ones.
 - Save: see git log "CGP book scanner".
 
+### 31 Oct 2026, Lane C: the planner's phone page inside the app (installed app step 6, first screens)
+- What changed: the app now has your phone page in it, as it is: Lesson (plan, names, positives, votes, silence, timers), Ulhu, Day and Friday. The app's home has an **Open the planner** button, and the page has a small **App settings** button in its corner to come back.
+  - It is put together from the same parts as the paste files (the list is read from the paste maker itself), so the app and the pasted planner can never carry different versions.
+  - It talks to the planner through the app, with the key kept on the device. The key is never written into the page or a link.
+  - After the first open it opens with no signal, from the device's own copy; taps wait and send as they do on the phone page now.
+  - The one change to the phone page itself is 4 lines in how it calls the planner (when Google's own bridge is missing, it uses the app's). Inside Apps Script nothing changes.
+- No mock-up: the design says these screens move across exactly as they are.
+- Not yet: the design renames the phone page's "Today" tab to "This class" in the app so it does not clash with Day; that is a change to the phone page for its owner, so it is left as is for now. The Planner, Homework and Assessment screens come next (Planner.html, the same way). Sound (step 9) can now go in, because Ulhu is in the app.
+- Checks: 8 in a real browser (`app/tests/lesson_sim.py`): opens, loads the class through the app, a tap reaches the planner, all five tabs, opens with no signal, back to settings.
+- You need to: nothing. It works once the app talks to your planner (after the school test and the move).
+- For Lane A: Phone.html changed (commit 6403245f); it goes in the next complete set.
+- Save: see git log "Installed app step 6: the phone page".
+
 ### 31 Oct 2026, Lane C: background jobs (installed app step 7)
 - What changed: slow planner tasks now run in the background while you carry on, instead of holding the screen.
   - **Three to start with:** the order sheet's Excel file, refreshing homework results, and updating the memory map. Homework drafts join when the school agent exists (step 3, after the school test).
