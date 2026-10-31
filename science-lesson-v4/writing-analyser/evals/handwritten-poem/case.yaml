@@ -1,0 +1,13 @@
+schema_version: "1.1"
+name: handwritten-poem
+expected_outcome: |
+  The reply opens with a faithful transcript of the handwritten poem in a code block, keeping every
+  line and stanza break, using the inserted word "easy" in place of the crossed-out "comfortable",
+  and marking any doubtful word as [?word] rather than guessing silently. It then gives specific
+  quoted passages that work and that need a look under tone, style and structure, side-by-side
+  revisions with one line of why each, three short author-lens sections (Coelho, the Strugatskys,
+  Danielewski) in the analyser's own words with one worked example each, a three-item "next time,
+  try" list, and a Word report built with scripts/build-report.js containing highlights and comments.
+  No em dashes anywhere. No scores or grades.
+context:
+  setup_script: place-files.sh

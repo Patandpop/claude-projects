@@ -1,0 +1,11 @@
+{
+  "_comment": "The list of files packed into writing-analyser.skill. Read by package-writing-analyser.ps1. Paths are relative to writing-analyser/. Evals and workspaces are never packed.",
+  "entries": [
+    "SKILL.md",
+    "references/transcription.md",
+    "references/analysis.md",
+    "references/author-lenses.md",
+    "references/report-schema.md",
+    "scripts/build-report.js"
+  ]
+}

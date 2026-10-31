@@ -1,0 +1,9 @@
+schema_version: "1.1"
+name: typed-essay-coelho
+expected_outcome: |
+  No transcript is echoed back (the text was typed). The analysis treats the piece as an essay,
+  quotes exact passages under tone, style and structure with specific reasons, offers three to six
+  side-by-side revisions that keep the writer's voice, includes only the Paulo Coelho lens (the
+  writer asked for that one alone) with the craft described in the analyser's own words and a worked
+  example from the essay, gives a three-item "next time, try" list, and builds the Word report with
+  scripts/build-report.js. No em dashes, no scores.
