@@ -18,7 +18,7 @@
 17. **Exam practice front cover and tick boxes:** `lanes/mockups/exam-practice-cover.html` (also on the site). Cover A exam-board style (title band, name box with the due date, instructions and information side by side, a marks-by-question strip for the self-mark), B one glance (chips, big name line, four plain steps), C a slim strip at the top of page 1 with the questions starting underneath (one sheet fewer per pupil). Tick boxes: 1 as now (about 4 mm, cut from the scan), 2 a drawn 6 mm box (what AQA prints), 3 an 8 mm box with bigger type. Reply with a letter and a number; Lane B builds them into test-paper.js.
 16. **Lane A's and Lane D's open picks are on the phone too:** https://ulhu-planner.pages.dev/mockups/ now lists the ritual bar, the dice water, the Grimoire's opened page, the day tags, the overnight adventure, the term page, the focus crafts and the sounds page, copied as they are from the design folder. Reply to each lane's own waiting item as before.
 15. **One drawing style for Claude-drawn diagrams, pick A, B or C:** `lanes/mockups/diagram-style/index.html` (also on the site under /mockups/). The same three diagrams (particles, a circuit, a cell) as A clean textbook, B pencil sketch (wobbly ink, cream paper, the handwriting font), C chalk on the navy board. All drawn by code already on this PC, nothing paid, so the pick can go straight into Learn slides.
-20. **Notifications, when the app is on your personal planner (not before; nothing to do today):** five steps on the home PC, about 10 minutes.
+21. **Notifications, when the app is on your personal planner (not before; nothing to do today):** five steps on the home PC, about 10 minutes.
    1. In the project folder run `node app/tools/make-push-keys.js` followed by your email. It only prints two blocks of keys; nothing is saved anywhere.
    2. Cloudflare (the same account as the app site): Workers and Pages, Create, Worker, name it `planner-push`, Deploy, then Edit code: replace everything with the contents of `app/worker/push-worker.js`, Deploy.
    3. That worker's Settings, Variables and secrets: add the four lines of block 1, each as a Secret. Open the worker's address in a browser: it should say "Planner push worker: ready".
@@ -48,7 +48,7 @@
 - Not yet: the "job finished" kind (it comes with long jobs, step 7, which are not built). The look of the card is the plain shell style, like the PC timer card; it gets a proper design with the other screens.
 - Also: one day-screen check failed on Saturdays (to-dos only look at school days); it now knows about weekends.
 - Checks, all new: 13 for the worker (a message it locks is opened again by a separate implementation, and the signature checked), 28 for the planner side (school days, once a morning, quiet hours, nudges, a gone phone, the sender down), 12 for the app and service worker, 8 in a real browser.
-- You need to: nothing now. Waiting item 20 is the set-up, for when the app is on your personal planner.
+- You need to: nothing now. Waiting item 21 is the set-up, for when the app is on your personal planner.
 - For Lane A: Day.gs changed (next complete set; no new Apps Script file). The app's files are on the site, not in the paste.
 - For Lane D: `pushTick` in Day.gs calls `gameNudge(key, true)` every half hour from 07:00 to 19:00, but only when a device has "Ulhu's nudge" ticked, and sends whatever comes back. `gameNudgeOff` still decides the kinds.
 - Save: see git log "Installed app step 8: notifications".
